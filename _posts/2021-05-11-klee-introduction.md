@@ -137,7 +137,7 @@ klee --only-output-states-covering-new Regexp.bc
 
 L'option --only-output-states-couvrant-new permet de limiter le nombre de tests effectués
 
-![klee-tutorial6]({{site.url}}\article\klee\klee-tutorial6.JPG)
+![klee-tutorial6]({{site.url}}\assets\article\klee\klee-tutorial6.JPG)
 
 
 
@@ -149,7 +149,7 @@ Les fichiers d'erreurs se trouvent dans le dossier *klee-last*. On peut afficher
 cat test000010.ptr.err
 ```
 
-![klee-tutorial7]({{site.url}}\article\klee\klee-tutorial7.JPG)
+![klee-tutorial7]({{site.url}}\assets\article\klee\klee-tutorial7.JPG)
 
 
 
