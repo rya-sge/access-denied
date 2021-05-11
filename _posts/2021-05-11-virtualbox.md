@@ -2,30 +2,36 @@
 layout: post
 title:  "VirtualBox"
 date:   2021-05-11
-categories: virtualisation
+categories: Virtualisation
 tags: virtualbox
 ---
-Cet article présente mes prises de notes sur l'outil de virtualisation VirtualBox
 
-# VirtualBox - Windows
 
-## Augmenter l'espace de stockage
+# VirtualBox - Augmenter l'espace de stockage
+
+## Contexte
+
+Cet article présente mes prises de notes sur l'outil de virtualisation VirtualBox.
+
+L'ensemble des opérations effectuées l'ont été pour augmenter l'espace de stockage d'une VM Ubuntu (Ubuntu 20.04.2 LTS) avec le logiciel de virtualisation VirtualBox. Celui-ci était installé sur Windows 10 Professional, 64 bits.
+
+## Mise en place
 
 Pour  effectuer cette opération, il faut avoir préalablement éteint votre espace de stockage.
 
 De plus, pensez à sauvegarder vos fichiers de la VM sur votre disque principale car il y a un risque que l'opération puisse échouer, rendant le disque et son contenu illisible.
 
-### Augmenter taille vdi
+## Opération
 
-1) Fichier -> Gestionnaire de média -> sélectionner le disque vdi que vous voulez augmenter et augmenter sa taille avec le curseur![stockage]({{site.url}}\assets\article\virtualBox\gparted_stockage.png)
+### 1) Augmenter taille vdi
+
+ Fichier -> Gestionnaire de média -> sélectionner le disque vdi que vous voulez augmenter et augmenter sa taille avec le curseur![stockage]({{site.url}}\assets\article\virtualBox\gparted_stockage.png)
 
 
 
+## 2) Appliquer le redimensionnement 
 
-
-### Appliquer le redimensionnement 
-
-### Premier essai -> pas concluant
+### a) Premier essai -> pas concluant
 
 De nombreux tutoriels proposent d'utiliser *modifyhd*. Cela n'a pas marché chez moi !!!
 
@@ -41,15 +47,15 @@ C:\"Program Files"\Oracle\VirtualBox\VBoxManage.exe VBoxManage modifyhd SLO2.vdi
 
 -25000 correspond à la taille en MB du nouveau disque.
 
-Source : https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/
+Source : [https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/](https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/)
 
 
 
-### 3) 2ème essai -> concluant
+### b) 2ème essai -> concluant
 
  Pour appliquer le redimensionnement à ma partition sur ubuntu, j'ai suivi ce tutoriel :
 
-https://linuxhint.com/increase-virtualbox-disk-size/
+[https://linuxhint.com/increase-virtualbox-disk-size/](https://linuxhint.com/increase-virtualbox-disk-size/)
 
 Celui-ci propose d'utiliser GNOME partition Editor : https://gparted.org/download.php
 
@@ -75,11 +81,21 @@ Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma p
 
 
 
-## Vérification
+## 3) Vérification
 
 On peut vérifier que l'opération a fonctionné avec l'utilitaire *lsblk*
 
 ![virtualbox_resize_verif]({{site.url}}\assets\article\virtualBox\virtualbox_resize_verif.JPG) 
+
+
+
+# Sources
+
+Liste des sources utilisées :
+
+[](https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/)
+
+[https://linuxhint.com/increase-virtualbox-disk-size/](https://linuxhint.com/increase-virtualbox-disk-size/)
 
 
 
