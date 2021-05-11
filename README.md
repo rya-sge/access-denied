@@ -1,5 +1,7 @@
 # Présentation
 
+Lien url :  [https://rya-sge.github.io/access-denied/](https://rya-sge.github.io/access-denied/)
+
 Ce site regroupe mes notes et essais sur des sujet traitant de l'informatique.
 
 Etudiant à l'HEIG-VD, je ressentais de plus en plus le besoin de regrouper intelligemment mes notes afin qu'elles puissent être utilisables ultérieurement.  A quoi bon passer des heures à configurer un logiciel, le prendre en main si c'est pour tout recommencer quelques mois plus tard.
