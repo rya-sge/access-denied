@@ -1,13 +1,10 @@
 ---
 layout: post
-title:  "VirtualBox"
+title:  "VirtualBox - augmenter l'espace de stockage"
 date:   2021-05-11
 categories: Virtualisation
-tags: virtualbox
+tags: virtualbox virtualisation
 ---
-
-
-# VirtualBox - Augmenter l'espace de stockage
 
 ## Contexte
 

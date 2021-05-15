@@ -9,8 +9,6 @@ Cet article présente Klee ainsi que ses tutoriels de prises en main. Il a été
 
 Le texte présent est principalement une traduction anglais->française ajouté de mes prises des notes de la documentation de Klee.
 
-# Klee
-
 ## Présentation
 
 Klee est un outil permettant de réaliser une analyse concolique. On peut exécuter le programme avec des valeurs concrètes. 
