@@ -80,9 +80,9 @@ Les principales commandes utilisés pour l'envoi d'un email sont :
 
 
 
-# Pour aller plus loin...
+## Pour aller plus loin...
 
-## Outils
+### Outils
 
 Vous pouvez obtenir une liste des MX enregistrés avec la commande dig
 
@@ -102,7 +102,7 @@ En rouge, les commandes que j'ai écrites.
 
 ## ![dig-telnet-exemple]({{site.url}}\assets\article\reseau\SMTP\dig-telnet-exemple.png)
 
-## Email forgé
+### Email forgé
 
 Dans Data, on spécifie un destinataire. Celui-ci peut être différent du MAIL FROM pris en compte par le MTA pour le transfert.
 
@@ -120,7 +120,7 @@ https://github.com/tweakers/MockMock.
 
 Un exemple complet se trouve sur mon repôt git : https://github.com/rya-sge/smtp
 
-# Sources 
+## Sources 
 
 - Cours RES de l'HEIG (M.Liecthi)
 - RFC du protocole : https://datatracker.ietf.org/doc/html/rfc5321
