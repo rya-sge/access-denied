@@ -6,8 +6,6 @@ categories: Virtualisation
 tags: virtualbox virtualisation
 ---
 
-## Contexte
-
 Cet article présente mes prises de notes sur l'outil de virtualisation VirtualBox.
 
 L'ensemble des opérations effectuées l'ont été pour augmenter l'espace de stockage d'une VM Ubuntu (Ubuntu 20.04.2 LTS) avec le logiciel de virtualisation VirtualBox. Celui-ci était installé sur Windows 10 Professional, 64 bits.

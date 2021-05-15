@@ -6,6 +6,8 @@ categories: smtp réseau
 tags: smtp réseau protocole
 ---
 
+Résumé en bref du protocole SMTP ainsi que la présentation de quelques outils(dig, telnet)
+
 ## Description
 
 **SMTP** est un protocole de communication pour l'envoi et le transfert d'email. 
