@@ -84,7 +84,7 @@ On peut vérifier que l'opération a fonctionné avec l'utilitaire *lsblk*
 
 
 
-# Sources
+## Sources
 
 Liste des sources utilisées :
 
