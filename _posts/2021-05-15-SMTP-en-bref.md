@@ -114,11 +114,11 @@ Ainsi, il ne faut pas se fier à l'en-tête du mail que le client voit, car celu
 
 En java, on peut simuler un serveur SMPT, par exemple pour faire des tests avec MockMock :
 
-https://github.com/tweakers/MockMock.
+[https://github.com/tweakers/MockMock](https://github.com/tweakers/MockMock).
 
 
 
-Un exemple complet se trouve sur mon repôt git : https://github.com/rya-sge/smtp
+Un exemple complet se trouve sur mon repôt git : [https://github.com/rya-sge/smtp](https://github.com/rya-sge/smtp)
 
 ## Sources 
 
