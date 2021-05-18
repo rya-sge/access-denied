@@ -2,8 +2,8 @@
 layout: post
 title:  "Metasploit - migration avec keylogger"
 date:   2021-05-16 
-categories: metasploit securité keylogg
-tags: smtp réseau protocole
+categories: metasploit securité keylogger
+tags: metasploit meterpreter keylogger migrate
 ---
 
 Utilisation de la commande migrate sur une session meterpreter puis utilisation d'un keylogger.

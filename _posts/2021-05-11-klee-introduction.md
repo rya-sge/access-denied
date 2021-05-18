@@ -5,9 +5,9 @@ date:   2021-05-11
 categories: reverse
 tags: klee clang reverse sanitizer concolique analyse
 ---
-Cet article présente Klee ainsi que ses tutoriels de prises en main. Il a été réalisé dans le cadre du cours de sécurité logicielle donné par l'HEIG-VD.
+Cet article présente Klee ainsi que ses tutoriels de prises en main. 
 
-Le texte présent est principalement une traduction anglais->française ajouté de mes prises des notes de la documentation de Klee.
+Il s'agit principalement d'une traduction anglais -> française ajouté de mes prises des notes de la documentation proposée par l'éditeur de Klee.
 
 ## Présentation
 
@@ -93,7 +93,7 @@ On peut les lire avec l'outil ktest-tool :
 
 ![klee-tutorial3]({{site.url}}\assets\article\klee\klee-tutorial3.JPG)
 
-### 4. Rejoué un Test Case
+### 4. Rejouer un Test Case
 
 La *replay library*, remplace les appels à  `klee_make_symbolic` par un appel à une fonction qui remplace l'input par la valeur contenue dans le fichier `.ktest` 
 
@@ -161,4 +161,5 @@ klee_assume(re[SIZE - 1] == '\0');
 ## Sources
 
 - [https://klee.github.io/tutorials/testing-function/](https://klee.github.io/tutorials/testing-function/)
-- https://klee.github.io/docker/
+- [https://klee.github.io/docker/](https://klee.github.io/docker/)
+- Il a été réalisé dans le cadre du cours de sécurité logicielle donné par l'HEIG-VD.(M.Bost)
