@@ -8,9 +8,11 @@ tags: docker virtualisation
 
 Présentation et explications des principales commandes de Docker
 
-## Obtenir une image
+### Opérations sur les images
 
-### Pull
+#### Obtenir une image
+
+##### Pull
 
 ```
 docker pull <nom image>
@@ -22,7 +24,7 @@ Vous pouvez ensuite afficher les images disponible avec :
 docker images
 ```
 
-### build
+##### build
 
 ```
 build  <Path | url>
@@ -40,9 +42,25 @@ Lorsqu'on lancera la commande, celle-ci affichera à la fin si tout c'est bien p
 
 *Successfully tagged exemple/test:latest*
 
-## Exécuter un container (run | exec)
+#### Affichage et suppression
 
-### run
+La liste des images disponibles peuvent être obtenues avec :
+
+```bash
+docker images
+```
+
+Il est aussi possible de supprimer une image :
+
+```
+docker image rm <nom image ou ID >
+```
+
+Il est important de régulièrement supprimer les images non utilisées car celles-ci prennent vite beaucoup de place sur le système hôte.
+
+### Exécuter un container (run | exec)
+
+#### run
 
 ```
 docker run <image>
@@ -68,7 +86,7 @@ docker run -it <image> /bin/bash
 
  Permet de démarrer un container en obtenant une  invite de commande dessus.
 
-### exec
+#### exec
 
 ```
 docker exec -it le_container /bin/bash
@@ -80,9 +98,9 @@ Ici, on ouvre un shell
 
 
 
-## Opérations sur les containeurs
+### Opérations sur les containeurs
 
-### Obtenir l'IP d'un conteneur 
+#### Obtenir l'IP d'un conteneur 
 
 ```
 docker ps
@@ -94,7 +112,7 @@ Ensuite son ip
 docker inspect <nom conteneur> | grep IPAddress
 ```
 
-### Port mapping
+#### Port mapping
 
 Il est aussi possible de faire du port mapping.
 
@@ -108,7 +126,7 @@ sudo docker run -p 9090:80 serveur/apache_php
 
 
 
-## Sources
+### Sources
 
 - Tutoriel sur docker : [https://nouslesdevs.com/docker/](https://nouslesdevs.com/docker/)
 - Documentation officielle de Docker : [https://docs.docker.com/reference/](https://docs.docker.com/reference/)
