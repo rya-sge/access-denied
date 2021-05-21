@@ -106,3 +106,9 @@ Ainsi, il sera possible d'accéder au serveur depuis l'hôte avec l'adresse : 12
 sudo docker run -p 9090:80 serveur/apache_php
 ```
 
+
+
+## Sources
+
+- Tutoriel sur docker : [https://nouslesdevs.com/docker/](https://nouslesdevs.com/docker/)
+- Cours de RES de l'HEIG(M.Liechti)
