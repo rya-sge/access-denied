@@ -20,7 +20,7 @@ De plus, pensez à sauvegarder vos fichiers de la VM sur votre disque principale
 
 ### 1) Augmenter taille vdi
 
- Fichier -> Gestionnaire de média -> sélectionner le disque vdi que vous voulez augmenter et augmenter sa taille avec le curseur![stockage]({{site.url}}\assets\article\virtualBox\gparted_stockage.png)
+ Fichier -> Gestionnaire de média -> sélectionner le disque vdi que vous voulez augmenter et augmenter sa taille avec le curseur![stockage]({{site.url_complet}}\assets\article\virtualBox\gparted_stockage.png)
 
 
 
@@ -34,7 +34,7 @@ je mets ici les commandes que j'ai essayé à titre **indicatif**
 
 Pour que les modifications soit prises en compte, il faut encore effectuer l'opération suivante :
 
-![vb_resize]({{site.url}}\assets\article\virtualBox\virtualbox_resize.JPG)
+![vb_resize]({{site.url_complet}}\assets\article\virtualBox\virtualbox_resize.JPG)
 
 C:\"Program Files"\Oracle\VirtualBox\VBoxManage.exe VBoxManage modifyhd SLO2.vdi --resize 25000.
 
@@ -60,19 +60,19 @@ Après avoir mis démarré ma VM sur l'iso du logiciel, voici les opérations qu
 
 Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma partition root/principale
 
-![gparted]({{site.url}}\assets\article\virtualBox\gparted.JPG)
+![gparted]({{site.url_complet}}\assets\article\virtualBox\gparted.JPG)
 
 
 
 2) Ensuite, je vais pouvoir alloué l'espace à /dev/sda5 qui est ma partition principale
 
-![gparted2]({{site.url}}\assets\article\virtualBox\gparted2.JPG)
+![gparted2]({{site.url_complet}}\assets\article\virtualBox\gparted2.JPG)
 
 
 
 3) Il ne reste alors plus qu'à appliquer les opérations
 
-![gp3]({{site.url}}\assets\article\virtualBox\gparted.JPG)
+![gp3]({{site.url_complet}}\assets\article\virtualBox\gparted.JPG)
 
 
 
@@ -80,7 +80,7 @@ Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma p
 
 On peut vérifier que l'opération a fonctionné avec l'utilitaire *lsblk*
 
-![virtualbox_resize_verif]({{site.url}}\assets\article\virtualBox\virtualbox_resize_verif.JPG) 
+![virtualbox_resize_verif]({{site.url_complet}}\assets\article\virtualBox\virtualbox_resize_verif.JPG) 
 
 
 

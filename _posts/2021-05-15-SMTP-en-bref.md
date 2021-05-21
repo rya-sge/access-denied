@@ -90,7 +90,7 @@ Vous pouvez obtenir une liste des MX enregistrés avec la commande dig
 dig -t any <domaine>
 ```
 
-![dig-exemples]({{site.url}}\assets\article\reseau\SMTP\dig-exemples.JPG)
+![dig-exemples]({{site.url_complet}}\assets\article\reseau\SMTP\dig-exemples.JPG)
 
 ```bash
 telnet <serveur mx> 25

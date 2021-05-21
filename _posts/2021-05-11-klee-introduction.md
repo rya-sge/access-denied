@@ -63,7 +63,7 @@ clang -I ../../include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone get_sign
 - -c pour que le code soit compilé comme un fichier objet
 - -O0 -Xclang -disable-O0-optnon permet de compiler sans optimisation
 
-![klee-tutorial1]({{site.url}}\assets\article\klee\klee-tutorial1.JPG)
+![klee-tutorial1]({{site.url_complet}}\assets\article\klee\klee-tutorial1.JPG)
 
 
 
@@ -77,7 +77,7 @@ $ klee get_sign.bc
 
 Dans le code initial, il y avait 2 if et un else, ce qui donne 3 chemins(=path) possibles.
 
-![klee-tutorial2]({{site.url}}\assets\article\klee\klee-tutorial2.JPG)
+![klee-tutorial2]({{site.url_complet}}\assets\article\klee\klee-tutorial2.JPG)
 
 Pour chaque chemin exploré, klee génère un test cases
 
@@ -91,7 +91,7 @@ On peut les lire avec l'outil ktest-tool :
  ktest-tool klee-last/test000001.ktest
 ```
 
-![klee-tutorial3]({{site.url}}\assets\article\klee\klee-tutorial3.JPG)
+![klee-tutorial3]({{site.url_complet}}\assets\article\klee\klee-tutorial3.JPG)
 
 ### 4. Rejouer un Test Case
 
@@ -101,7 +101,7 @@ La *replay library*, remplace les appels à  `klee_make_symbolic` par un appel �
 gcc -I  ../../include -L /home/klee/klee_build/lib/ get_sign.c -lkleeRuntest
 ```
 
-![klee-tutorial4]({{site.url}}\assets\article\klee\klee-tutorial4.JPG)
+![klee-tutorial4]({{site.url_complet}}\assets\article\klee\klee-tutorial4.JPG)
 
 La valeur 255 renvoyée par le dernier test case correspond au return -1
 
@@ -119,7 +119,7 @@ Code : [https://klee.github.io/resources/Regexp.c.html]( https://klee.github.io/
 clang -I ../../include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone Regexp.c
 ```
 
-![klee_tutorial5]({{site.url}}\assets\article\klee\klee-tutorial5.JPG)
+![klee_tutorial5]({{site.url_complet}}\assets\article\klee\klee-tutorial5.JPG)
 
 2) Vérifier l'étape 1 :
 
@@ -135,7 +135,7 @@ klee --only-output-states-covering-new Regexp.bc
 
 L'option --only-output-states-couvrant-new permet de limiter le nombre de tests effectués
 
-![klee-tutorial6]({{site.url}}\assets\article\klee\klee-tutorial6.JPG)
+![klee-tutorial6]({{site.url_complet}}\assets\article\klee\klee-tutorial6.JPG)
 
 
 
@@ -147,7 +147,7 @@ Les fichiers d'erreurs se trouvent dans le dossier *klee-last*. On peut afficher
 cat test000010.ptr.err
 ```
 
-![klee-tutorial7]({{site.url}}\assets\article\klee\klee-tutorial7.JPG)
+![klee-tutorial7]({{site.url_complet}}\assets\article\klee\klee-tutorial7.JPG)
 
 
 

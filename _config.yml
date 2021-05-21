@@ -17,7 +17,8 @@ title: "AccessDenied"
 description: > # this means to ignore newlines until "baseurl:"
   Material theme based on <a href="http://materializecss.com">Materialize.css</a> for jekyll sites
 baseurl: "/access-denied"
-url: "https://rya-sge.github.io/access-denied"
+url: "https://rya-sge.github.io/"
+url_complet: "https://rya-sge.github.io/access-denied"
 permalink: /:year/:month/:day/:title
 repository: rya-sge/access-denied
 paginate: 5
