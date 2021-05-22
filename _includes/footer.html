@@ -31,14 +31,6 @@
     {% endif %}
     {% endfor %}
     {% if site.google_tracking_id %}
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-R2JYK7V41F"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-
-	  gtag('config', '{{site.google_tracking_id}}');
-	</script>
     {% endif %}
     <script src="{{site.baseurl}}/assets/js/main.js"></script>
   </body>
