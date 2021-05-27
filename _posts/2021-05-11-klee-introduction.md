@@ -4,6 +4,7 @@ title:  "Introduction à Klee"
 date:   2021-05-11 
 categories: reverse
 tags: klee clang reverse sanitizer concolique analyse
+Auteur : Ryan S.
 ---
 Cet article présente Klee ainsi que ses tutoriels de prises en main. 
 
@@ -12,6 +13,8 @@ Il s'agit principalement d'une traduction anglais -> française ajouté de mes p
 ## Présentation
 
 Klee est un outil permettant de réaliser une analyse concolique. On peut exécuter le programme avec des valeurs concrètes. 
+
+
 
 ## Installation
 
@@ -37,6 +40,55 @@ Par exemple pour installer nano :
 ```bash
 sudo apt update
 sudo apt-get install nano
+```
+
+
+
+Vous pouvez copier des fichiers de vote hôte dans le conteneur avec la commande *docker cp*
+
+```bash
+docker cp  dossier <nom conteneur | id>:/home/klee/klee_src/examples
+```
+
+## Utilisation dans un programme C
+
+Il faut d'abord inclure le header de klee :
+
+```c
+#include<klee/klee.h>
+```
+
+
+
+Puis faire appel à la fonction klee_make_symbolic pour que klee génère des inputs pour la fonction donnée. Exemple avec le fichier get_sign.c du tutoriel 1 de klee.
+
+```c
+#include "klee/klee.h"
+
+int get_sign(int x) {
+} 
+
+int main() {
+  int a;
+  klee_make_symbolic(&a, sizeof(a), "a");
+  return get_sign(a);
+} 
+```
+
+
+
+Pour repérer les input menant à un chemin particulier, un if par exemple. On peut faire un appel à la fonction klee_abort() dans le if afin que klee génère une erreur :
+
+```c
+klee_abort();
+```
+
+
+
+Klee générera alors des tests contenant ces erreurs qu'on pourra rejouer avec la commande suivante :
+
+```
+for f in *.abort.err;do ktest-tool ${f%.abort.err}.ktest ; done
 ```
 
 
@@ -85,7 +137,7 @@ Pour chaque chemin exploré, klee génère un test cases
 
 Les tests générées ont le format .ktest
 
-On peut les lire avec l'outil ktest-tool : 
+On peut les lire avec l'outil ktest-tool :  
 
 ```bash
  ktest-tool klee-last/test000001.ktest
@@ -93,12 +145,22 @@ On peut les lire avec l'outil ktest-tool :
 
 ![klee-tutorial3]({{site.url_complet}}\assets\article\klee\klee-tutorial3.JPG)
 
+Dans les résultats, le paramètre name fait référence au "a" passé lors de l'appel à klee_make_symbolic
+
+![tutoriel-klee_code]({{site.url_complet}}\assets\article\klee\tutoriel-klee_code.png)
+
 ### 4. Rejouer un Test Case
 
 La *replay library*, remplace les appels à  `klee_make_symbolic` par un appel à une fonction qui remplace l'input par la valeur contenue dans le fichier `.ktest` 
 
 ```bash
 gcc -I  ../../include -L /home/klee/klee_build/lib/ get_sign.c -lkleeRuntest
+```
+
+
+
+```bash
+KTEST_FILE=klee-last/test000001.ktest ./a.out
 ```
 
 ![klee-tutorial4]({{site.url_complet}}\assets\article\klee\klee-tutorial4.JPG)
@@ -149,7 +211,15 @@ cat test000010.ptr.err
 
 ![klee-tutorial7]({{site.url_complet}}\assets\article\klee\klee-tutorial7.JPG)
 
+Pour afficher tous les tests ayant générés un assert abort, on peut lancer sur bash la commande suivante :
 
+```bash
+for f in *.abort.err;do ktest-tool ${f%.abort.err}.ktest ; done
+```
+
+
+
+#### Erreur générée par klee
 
 Pour éviter que Klee génère des erreurs, il faut soit ajouter '\0' à la fin du buffer soit utiliser *klee_assume* comme ceci :
 
@@ -158,8 +228,13 @@ klee_make_symbolic(re, sizeof re, "re");
 klee_assume(re[SIZE - 1] == '\0');
 ```
 
+
+
+###### Auteurs : Ryan S.
+
 ## Sources
 
 - [https://klee.github.io/tutorials/testing-function/](https://klee.github.io/tutorials/testing-function/)
 - [https://klee.github.io/docker/](https://klee.github.io/docker/)
 - Il a été réalisé dans le cadre du cours de sécurité logicielle donné par l'HEIG-VD.(M.Bost)
+
