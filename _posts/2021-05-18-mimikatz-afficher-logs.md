@@ -23,11 +23,11 @@ Lien : [https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512](http
 
 2) Activer un dossier partagé sur votre VM et y déposer le dossier mimikatz_trunk
 
-![shared-folder]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\shared-folder.JPG)
+![shared-folder]({{site.url_complet}}\assets\article\outil-securite\mimikatz\shared-folder.JPG)
 
 3) Dans votre VM, exécuter mimikatz x64 en tant qu**'administrateur**
 
-![mimikatz-launch]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\mimikatz-launch.JPG)
+![mimikatz-launch]({{site.url_complet}}\assets\article\outil-securite\mimikatz\mimikatz-launch.JPG)
 
 
 
@@ -35,7 +35,7 @@ Lien : [https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512](http
 
 Attention : il faut écrire sekurlsa avec un k
 
-![mimikatz-config]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\mimikatz-config.JPG)
+![mimikatz-config]({{site.url_complet}}\assets\article\outil-securite\mimikatz\mimikatz-config.JPG)
 
 
 
@@ -55,7 +55,7 @@ Voici une partie des résultats obtenus
 
 1) Mettre secpol.msc dans  la barre de recherche et le lancer
 
-![secpol.msc]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\secpol.msc.JPG)
+![secpol.msc]({{site.url_complet}}\assets\article\outil-securite\mimikatz\secpol.msc.JPG)
 
 2)  Aller dans Advanced Audit Policy, sous Object Access, cliquer sur Audit kernel Object![windows-policiy-kernel_1]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\windows-policiy-kernel_1.JPG)
 
@@ -63,17 +63,17 @@ Voici une partie des résultats obtenus
 
 3) Cocher success
 
-![windows-policy-kernel-2]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\windows-policy-kernel-2.JPG)
+![windows-policy-kernel-2]({{site.url_complet}}\assets\article\outil-securite\mimikatz\windows-policy-kernel-2.JPG)
 
 4) Exécuter à nouveau mimikatz en tant qu'administrateur, remettez le privilège debug et lancer sekurlsa afin de générer des logs.
 
 5) Aller dans l'event viewer, éventuellement faites un refresh .
 
-![event-viewer-refresh]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\event-viewer-refresh.JPG)
+![event-viewer-refresh]({{site.url_complet}}\assets\article\outil-securite\mimikatz\event-viewer-refresh.JPG)
 
 6) Toujours dans l'event viewer, aller sur les événements avec la catégorie Kernel Object
 
-![windows-logs-kernel]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\windows-logs-kernel.JPG)
+![windows-logs-kernel]({{site.url_complet}}\assets\article\outil-securite\mimikatz\windows-logs-kernel.JPG)
 
 
 
@@ -82,7 +82,7 @@ Voici une partie des résultats obtenus
 - Ici on peut voir que le log indique également  sous Process Name le nom de l'exécutable, ici mimikatz.exe 
 - On peut également voir le nom de l'object Lsass.exe
 
-![windows-event-mimikatz]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\windows-event-mimikatz.JPG)
+![windows-event-mimikatz]({{site.url_complet}}\assets\article\outil-securite\mimikatz\windows-event-mimikatz.JPG)
 
 ## Désavantage :
 
