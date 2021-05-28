@@ -100,7 +100,7 @@ Telnet permet d'établir la connexion avec le serveur mx.
 
 En rouge, les commandes que j'ai écrites.
 
-## ![dig-telnet-exemple]({{site.url}}\assets\article\reseau\SMTP\dig-telnet-exemple.png)
+## ![dig-telnet-exemple]({{site.url_complet}}\assets\article\reseau\SMTP\dig-telnet-exemple.png)
 
 ### Email forgé
 
