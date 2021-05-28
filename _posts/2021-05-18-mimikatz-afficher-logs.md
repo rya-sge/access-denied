@@ -7,10 +7,6 @@ tags: mimikatz log
 Auteur: rya-sge
 ---
 
-
-
-# Exercice - Afficher les logs de Mimikatz
-
 Cet exercice a été réalisé sur une machine windwos dans une VM.
 
 La 1ère étape montre comment installer mimikatz sous windows pour réaliser les tests
