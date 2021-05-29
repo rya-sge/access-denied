@@ -138,7 +138,21 @@ où
 - ece6be770055 correspond à l'id ou le nom de votre conteneur
 - /home/test correspond au path dans le conteneur
 
+#### Définir des variables d'environnement
 
+On peut définir des variables d'environnements au moment du run avec le flag -e.
+
+On peut ainsi transmettre dynamiquement des informations au conteneur
+
+
+
+#### Faire le ménage
+
+```
+docker system prune
+```
+
+Permet de supprimer les conteneurs, images, volumes, etc, qui ne sont plus utilisés
 
 ### Sources
 

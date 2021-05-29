@@ -13,7 +13,7 @@ La 1ère étape montre comment installer mimikatz sous windows pour réaliser le
 
 La 2ème étape montre comment afficher les logs générés par mimikatz.
 
-## 1) Installation de mimikatz sous Windows
+### 1) Installation de mimikatz sous Windows
 
 Depuis votre machine hôte, aller dans release et prend mimikatz_trunk (pas les source code)
 
@@ -51,7 +51,7 @@ Voici une partie des résultats obtenus
 
 
 
-## **Activer les logs sur mimikatz**
+### **Activer les logs sur mimikatz**
 
 1) Mettre secpol.msc dans  la barre de recherche et le lancer
 
@@ -84,7 +84,9 @@ Voici une partie des résultats obtenus
 
 ![windows-event-mimikatz]({{site.url_complet}}\assets\article\outil-securite\mimikatz\windows-event-mimikatz.JPG)
 
-## Désavantage :
+### Désavantage 
 
 -En activant les logs sur les kernels objects, Il y a aussi des logs générés lorsqu'on se connecte normalement à la session....
+
+### Sources
 
