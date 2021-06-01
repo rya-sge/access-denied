@@ -152,7 +152,7 @@ On peut ainsi transmettre dynamiquement des informations au conteneur
 docker system prune
 ```
 
-Permet de supprimer les conteneurs, images, volumes, etc, qui ne sont plus utilisés
+Permet de supprimer les conteneurs qui ne sont pas listés. Typiquement ceux qui apparaissent quand vous faite *ps -a* mais qui ne s'affichent pas avec la commande ps simple
 
 ### Sources
 
