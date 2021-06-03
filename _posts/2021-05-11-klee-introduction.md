@@ -101,7 +101,7 @@ Il est également possible de faire des tests en ligne : [http://klee.doc.ic.ac.
 
 Cette partie est une version abrégée du contenu de ce tutoriel
 
-### 1. Compilation
+#### 1. Compilation
 
 Au sein du conteneur, la commande suivante permet de compiler en  LLVM bitcode 
 
@@ -119,7 +119,7 @@ clang -I ../../include -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone get_sign
 
 
 
-### 2. Run Klee
+#### 2. Run Klee
 
 Ensuite on peut lancer klee sur le fichier bytecode 
 
@@ -133,7 +133,7 @@ Dans le code initial, il y avait 2 if et un else, ce qui donne 3 chemins(=path) 
 
 Pour chaque chemin exploré, klee génère un test cases
 
-### 3. Test Cases
+#### 3. Test Cases
 
 Les tests générées ont le format .ktest
 
@@ -149,18 +149,24 @@ Dans les résultats, le paramètre name fait référence au "a" passé lors de l
 
 ![tutoriel-klee_code]({{site.url_complet}}\assets\article\klee\tutoriel-klee_code.png)
 
-### 4. Rejouer un Test Case
+#### 4. Rejouer un Test Case
 
-La *replay library*, remplace les appels à  `klee_make_symbolic` par un appel à une fonction qui remplace l'input par la valeur contenue dans le fichier `.ktest` 
+La *replay library*, remplace les appels à  `klee_make_symbolic` par un appel à une fonction qui remplace l'input par la valeur contenue dans le fichier `.ktest`
+
+```bash
+export LD_LIBRARY_PATH=/home/klee/klee_build/lib/:$LD_LIBRARY_PATH
+```
 
 ```bash
 gcc -I  ../../include -L /home/klee/klee_build/lib/ get_sign.c -lkleeRuntest
 ```
 
-
-
 ```bash
 KTEST_FILE=klee-last/test000001.ktest ./a.out
+```
+
+```bash
+echo $?
 ```
 
 ![klee-tutorial4]({{site.url_complet}}\assets\article\klee\klee-tutorial4.JPG)
@@ -227,6 +233,18 @@ Pour éviter que Klee génère des erreurs, il faut soit ajouter '\0' à la fin 
 klee_make_symbolic(re, sizeof re, "re");
 klee_assume(re[SIZE - 1] == '\0');
 ```
+
+
+
+## Astuces diverses
+
+Ajouter cette option au lancement de klee pour obtenir tous les chemins faisant cracher un programme. Par défaut, klee ne conserve qu'un seul chemin.
+
+```bash
+–emit-all-errors 
+```
+
+
 
 
 
