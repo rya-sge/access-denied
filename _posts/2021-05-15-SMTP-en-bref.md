@@ -127,4 +127,4 @@ Un exemple complet se trouve sur mon repôt git : [https://github.com/rya-sge/sm
 - Articles sur les protocoles avec états/sans états : [https://www.thegeeksclan.com/stateful-and-stateless-protocols/]( https://www.thegeeksclan.com/stateful-and-stateless-protocols/)
 - Man page de dig : [https://linux.die.net/man/1/dig]( https://linux.die.net/man/1/dig)
 - [https://www.malekal.com/comment-fonctionne-les-serveurs-de-mails-theorie/](https://www.malekal.com/comment-fonctionne-les-serveurs-de-mails-theorie/)
-- Cours RES de l'HEIG (M.Liechtii)
+- Cours RES enseigné à l'HEIG-VD en 2021

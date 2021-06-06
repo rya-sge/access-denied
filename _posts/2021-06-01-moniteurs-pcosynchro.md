@@ -123,4 +123,4 @@ Ainsi le 1er thread mis en attente ne sera pas forcément réveillé en 1er.
 ## Sources
 
 - [https://gitlab.com/reds-public/pco-synchro](https://gitlab.com/reds-public/pco-synchro)
-- Cours PCO enseigné à l'HEIG-VD(Yann Thoma)
+- Cours PCO enseigné à l'HEIG-VD en 2021

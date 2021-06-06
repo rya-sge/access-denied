@@ -255,5 +255,5 @@ Ajouter cette option au lancement de klee pour obtenir tous les chemins faisant 
 
 - [https://klee.github.io/tutorials/testing-function/](https://klee.github.io/tutorials/testing-function/)
 - [https://klee.github.io/docker/](https://klee.github.io/docker/)
-- Il a été réalisé dans le cadre du cours de sécurité logicielle donné par l'HEIG-VD.(M.Bost)
+- Il a été réalisé dans le cadre du cours de sécurité logicielle donné par l'HEIG-VD en 2021.
 

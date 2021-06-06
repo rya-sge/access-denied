@@ -158,4 +158,4 @@ Permet de supprimer les conteneurs qui ne sont pas listés. Typiquement ceux qui
 
 - Tutoriel sur docker : [https://nouslesdevs.com/docker/](https://nouslesdevs.com/docker/)
 - Documentation officielle de Docker : [https://docs.docker.com/reference/](https://docs.docker.com/reference/)
-- Cours de RES de l'HEIG(M.Liechti)
+- Cours RES enseigné à l'HEIG-VD

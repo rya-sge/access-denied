@@ -90,3 +90,4 @@ Voici une partie des résultats obtenus
 
 ### Sources
 
+- Cours SOS enseigné à l'HEIG-VD en 2021

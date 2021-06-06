@@ -59,4 +59,4 @@ Voir cet article pour plus d'informations :
 
 [http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer](http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer)
 
-- Cours de sécurité logicielle enseigné à l'HEIG-VD(M.Bost)
+- Cours de sécurité logicielle enseigné à l'HEIG-VD en 2021
