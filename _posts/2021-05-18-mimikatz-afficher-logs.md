@@ -7,7 +7,7 @@ tags: mimikatz log
 Auteur: rya-sge
 ---
 
-Cet exercice a été réalisé sur une machine windwos dans une VM.
+Cet exercice a été réalisé sur une machine windows dans une VM.
 
 La 1ère étape montre comment installer mimikatz sous windows pour réaliser les tests
 
