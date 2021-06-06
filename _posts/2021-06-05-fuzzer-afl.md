@@ -23,7 +23,7 @@ Exécuter afl sur un programme
 afl-fuzz -i input -o output ./programme
 ```
 
-Sur kali Linux, si vous n'ajouter pas le *./* devant programme, AFL vous renverra l'erreur suivante : *Program ' not found or not executable* 
+Sur kali Linux, si vous n'ajoutez pas le *./* devant programme, AFL vous renverra l'erreur suivante : *Program  not found or not executable* 
 
 
 
@@ -49,7 +49,7 @@ et dans un autre terminal :
 
 ![instances2](C:\Users\super\switchdrive\HEIG\divers\mywebsite\accessDenied\assets\article\outil-securite\afl-fuzzing\instances2.png)
 
-Voir cet articule pour plus d'informations :
+Voir cet article pour plus d'informations :
 
 [https://github.com/google/AFL/blob/master/docs/parallel_fuzzing.txt](https://github.com/google/AFL/blob/master/docs/parallel_fuzzing.txt)
 
@@ -57,6 +57,6 @@ Voir cet articule pour plus d'informations :
 
 - Ce tutoriel est très bien expliqué et complet :
 
-[](http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer)
+[http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer](http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer)
 
 - Cours de sécurité logicielle enseigné à l'HEIG-VD(M.Bost)

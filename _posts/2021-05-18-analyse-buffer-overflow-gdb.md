@@ -1,10 +1,10 @@
 ---
 
 layout: post
-title:  "Analyse de buffer overflow avec gcc"
+title:  "Analyse de buffer overflow avec gdb"
 date:   2021-05-18 
-categories: sécurité reverse gcc
-tags: gcc buffer-overflow reverse sécurité shellcode
+categories: sécurité reverse 
+tags: gcc gdb buffer-overflow reverse shellcode
 ---
 Utilisation de l'outil gcc pour analyser des buffer overflows
 
@@ -20,7 +20,7 @@ sudo bash -c "echo 0 > /proc/sys/kernel/randomize_va_space"
 
 Le bash -c permet de conserver les droits sudo durant l'exécution de la commande.
 
-
+### GCC
 
 Désactiver les protections sur la pile au moment de la compilation de votre programme c
 
@@ -96,9 +96,10 @@ set disassembly-flavor intel
 
 
 
-## Sources :
+## Sources 
 
 - Manuel GCC : [https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html]( https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)
 - Désactiver l'ASLR sur Ubuntu : [https://superuser.com/questions/127238/how-to-turn-off-aslr-in-ubuntu-9-10](https://superuser.com/questions/127238/how-to-turn-off-aslr-in-ubuntu-9-10)
 - Articles sur les désactivation des protections du compilateur : [https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags]( https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags)
 - Cours de sécurité logicielle suivi à l'HEIG-VD(M.Bost)
+- 
