@@ -5,6 +5,7 @@ date:   2021-05-18
 categories: sécurité mimikatz
 tags: mimikatz log 
 Auteur: rya-sge
+description: Afficher les logs de Mimikatz avec Windows
 ---
 
 Cet exercice a été réalisé sur une machine windows dans une VM.

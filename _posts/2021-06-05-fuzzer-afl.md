@@ -4,6 +4,7 @@ title:  "Fuzzing avec AFL"
 date:   2021-06-05 
 categories: sécurité
 tags: fuzzing afl
+description: Fuzzing avec AFL
 ---
 AFL est un outil de fuzzing c'est-à-dire qu'il injecte des données dans le programme. Celles-ci sont au départ aléatoire puis AFL va ensuite adapter les inputs aux résultats obtenus.
 
