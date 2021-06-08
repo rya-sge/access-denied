@@ -54,7 +54,9 @@ Celui-ci propose d'utiliser GNOME partition Editor : https://gparted.org/downloa
 
 Après avoir mis démarré ma VM sur l'iso du logiciel, voici les opérations que j'ai effectuées
 
-1) On peut voir ici que j'ai 9 GO d'espace libre, correspond à l'augmentation du disque dur
+1.  
+
+On peut voir ici que j'ai 9 GO d'espace libre, correspond à l'augmentation du disque dur
 
 Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma partition root/principale
 
@@ -62,13 +64,21 @@ Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma p
 
 
 
-2) Ensuite, je vais pouvoir alloué l'espace à /dev/sda5 qui est ma partition principale
+
+
+2. 
+
+Ensuite, je vais pouvoir alloué l'espace à /dev/sda5 qui est ma partition principale.
 
 ![gparted2]({{site.url_complet}}\assets\article\virtualBox\gparted2.JPG)
 
 
 
-3) Il ne reste alors plus qu'à appliquer les opérations
+
+
+3. 
+
+Il ne reste alors plus qu'à appliquer les opérations.
 
 ![gp3]({{site.url_complet}}\assets\article\virtualBox\gparted0.JPG)
 
