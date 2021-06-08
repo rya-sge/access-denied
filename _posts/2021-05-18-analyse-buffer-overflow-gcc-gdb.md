@@ -1,12 +1,15 @@
 ---
 
 layout: post
-title:  "Analyse de buffer overflow avec gdb"
+title:  "Analyse de buffer overflow avec GCC et GDB"
 date:   2021-05-18 
 categories: sécurité reverse 
 tags: gcc gdb buffer-overflow reverse shellcode
+description: Compilation avec gcc et commandes de base de GDBC
 ---
-Utilisation de l'outil gcc pour analyser des buffer overflows
+Création de l'exécutable à tester avec **GCC**
+
+Présentations des principales commandes de **GDB** pour analyser des buffer overflows
 
 ## Configuration
 
@@ -20,7 +23,7 @@ sudo bash -c "echo 0 > /proc/sys/kernel/randomize_va_space"
 
 Le bash -c permet de conserver les droits sudo durant l'exécution de la commande.
 
-### GCC
+### Compilation avec GCC
 
 Désactiver les protections sur la pile au moment de la compilation de votre programme c
 
@@ -28,6 +31,16 @@ Désactiver les protections sur la pile au moment de la compilation de votre pro
 gcc -m32 −fno−stack−protector -no-pie −z execstack −o prg prg.c
 
 ```
+
+Le flag -m32 nécessite, sur Ubuntu d'avoir installer gcc multilib
+
+```bash
+sudo apt-get install gcc-multilib
+```
+
+Source :  [https://askubuntu.com/questions/453681/gcc-wont-link-with-m32]( https://askubuntu.com/questions/453681/gcc-wont-link-with-m32)
+
+
 
 Explications des flags
 
@@ -44,7 +57,13 @@ Dans gdb, si vous voulez utiliser des shellcodes, il faut l'autoriser à ouvrir 
 (gdb) set follow-fork-mode parent
 ```
 
+**Vérification :**
 
+```bash
+readelf -l nom_programme
+```
+
+Puis sous GNU_STACK, vérifier que le flag est mis à RWE.
 
 ## GBD - Liste de commandes
 
@@ -101,4 +120,5 @@ set disassembly-flavor intel
 - Manuel GCC : [https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html]( https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)
 - Désactiver l'ASLR sur Ubuntu : [https://superuser.com/questions/127238/how-to-turn-off-aslr-in-ubuntu-9-10](https://superuser.com/questions/127238/how-to-turn-off-aslr-in-ubuntu-9-10)
 - Articles sur les désactivation des protections du compilateur : [https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags]( https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags)
+- [HACKING] 01. Tuto exploitation d'un Buffer Overflow : [https://www.youtube.com/watch?v=V7Gdc32XRhA](https://www.youtube.com/watch?v=V7Gdc32XRhA)
 - Cours de sécurité logicielle enseigné à l'HEIG-VD en 2021
