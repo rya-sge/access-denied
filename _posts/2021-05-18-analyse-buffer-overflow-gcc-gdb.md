@@ -7,9 +7,7 @@ categories: sécurité reverse
 tags: gcc gdb buffer-overflow reverse shellcode
 description: Compilation avec gcc et commandes de base de GDB
 ---
-Création de l'exécutable à tester avec **GCC**
-
-Présentations des principales commandes de **GDB** pour analyser des buffer overflows
+Création de l'exécutable à tester avec **GCC** puis présentation des principales commandes de **GDB** pour analyser des buffer overflows
 
 ## Configuration
 
