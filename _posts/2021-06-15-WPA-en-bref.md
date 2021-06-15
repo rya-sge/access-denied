@@ -7,7 +7,7 @@ tags: wpa
 description: Description du protocole WPA
 ---
 
-
+Cet article résume les principaux points du protocole WPA.
 
 ## Résumé
 
