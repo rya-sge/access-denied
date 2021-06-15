@@ -2,8 +2,8 @@
 layout: post
 title:  "SMTP en bref"
 date:   2021-05-15 
-categories: smtp réseau 
-tags: smtp réseau protocole
+categories: réseau 
+tags: smtp protocole
 ---
 
 Résumé en bref du protocole SMTP ainsi que la présentation de quelques outils(dig, telnet)

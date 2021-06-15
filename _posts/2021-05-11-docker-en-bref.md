@@ -2,7 +2,7 @@
 layout: post
 title:  "Docker en bref"
 date:   2021-05-11
-categories: Virtualisation docker
+categories: Virtualisation 
 tags: docker virtualisation
 description: Liste des principales commandes de Docker
 ---

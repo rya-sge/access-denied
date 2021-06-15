@@ -2,7 +2,7 @@
 layout: post
 title:  "Metasploit - migration avec keylogger"
 date:   2021-05-16 
-categories: metasploit securité keylogger
+categories: sécurité
 tags: metasploit meterpreter keylogger migrate
 description: Utilisation de la commande migrate sur une session meterpreter 
 ---

@@ -2,7 +2,7 @@
 layout: post
 title:  "Introduction à Klee"
 date:   2021-05-11 
-categories: reverse
+categories: reverse sécurité
 tags: klee clang reverse sanitizer concolique analyse
 description: Présentation du logiciel Klee ainsi que ses tutoriels
 Auteur : Ryan S.

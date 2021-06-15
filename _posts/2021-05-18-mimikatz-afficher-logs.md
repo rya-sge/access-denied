@@ -2,7 +2,7 @@
 layout: post
 title:  "Mimikatz - afficher les logs"
 date:   2021-05-18 
-categories: sécurité mimikatz
+categories: sécurité 
 tags: mimikatz log 
 Auteur: rya-sge
 description: Afficher les logs de Mimikatz avec Windows
@@ -19,6 +19,8 @@ La 2ème étape montre comment afficher les logs générés par mimikatz.
 Depuis votre machine hôte, aller dans release et prend mimikatz_trunk (pas les source code)
 
 Lien : [https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512](https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512)
+
+
 
 ![wndows-version]({{site.url_complet}}\assets\article\outil-securite\mimikatz\wndows-version.JPG)
 
