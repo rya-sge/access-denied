@@ -29,13 +29,13 @@ Le 2ème cadre rouge concerne la partie qui assure la confidentialité grâce à
 
 
 
-![wpa-schema](../assets/article/reseau/wpa/wpa-schema.png)
+![wpa-schema]({{site.url_complet}}/assets/article/reseau/wpa/wpa-schema.png)
 
 ### Génération des clés
 
 Ce schéma représente la génération des clés
 
-![wpa-generation-cle](../assets/article/reseau/wpa/wpa-generation-cle.png)
+![wpa-generation-cle]({{site.url_complet}}/assets/article/reseau/wpa/wpa-generation-cle.png)
 
 
 
