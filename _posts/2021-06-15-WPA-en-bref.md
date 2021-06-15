@@ -9,7 +9,7 @@ description: Description du protocole WPA
 
 Cet article résume les principaux points du protocole WPA.
 
-## Résumé
+### Résumé
 
 - Nouveau contrôle intégrité *Message Integrity Code*
 - Utilise l'algorithme TKIP
@@ -17,9 +17,9 @@ Cet article résume les principaux points du protocole WPA.
 
 
 
-## Schéma
+### Schéma
 
-### Protocole WPA
+#### Protocole WPA
 
 Représentation simplifiée du protocole WPA.
 
@@ -31,7 +31,7 @@ Le 2ème cadre rouge concerne la partie qui assure la confidentialité grâce à
 
 ![wpa-schema]({{site.url_complet}}/assets/article/reseau/wpa/wpa-schema.png)
 
-### Génération des clés
+#### Génération des clés
 
 Ce schéma représente la génération des clés
 
@@ -39,9 +39,9 @@ Ce schéma représente la génération des clés
 
 
 
-## Détails
+### Détails
 
-### MIC - Intégrité
+#### MIC - Intégrité
 
 - Comment est généré le MIC ?
 
@@ -59,7 +59,7 @@ Il est généré à partir d'une clé MIC, du bloc de données data et des infor
 
 
 
-### TKIP - Confidentialité
+#### TKIP - Confidentialité
 
 Dans WEP, on utilise RC4 directement
 
@@ -69,7 +69,7 @@ Le keystream sera différent à chaque fois.
 
 
 
-### CLES
+#### CLES
 
 Pour envoyer une trame protégée avec WPA (unicast), il faut 2 clés :
 
@@ -80,7 +80,7 @@ Chaque clé est unique pour chaque client
 
 
 
-## Sources 
+### Sources 
 
 Cours SRX enseigné à l'HEIG-VD(2021)
 

@@ -20,7 +20,7 @@ Depuis votre machine hôte, aller dans release et prend mimikatz_trunk (pas les 
 
 Lien : [https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512](https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20210512)
 
-
+--
 
 ![wndows-version]({{site.url_complet}}\assets\article\outil-securite\mimikatz\wndows-version.JPG)
 
