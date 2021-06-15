@@ -85,13 +85,23 @@ Les parties entre crochet [] doivent être remplacé par le contenu souhaité
 
 ### Commandes pour une analyse avancée
 
-| CMD          | Explication                                                  |
-| ------------ | ------------------------------------------------------------ |
-| x/-10bs $ebp | Afficher les 10 1ers bytes de la pile                        |
-| x/s [adr]    | Affiche en string le contenu situé à l'adresse               |
-| x/x [adr]    | Afficher le byte situé à l'adresse en hexa                   |
-| p/x $ebp     | Obtenir l'adresse de ebp. Utilise pour ensuite écraser la valeur de eip, situé 4 byte plus loin(si adresse 32 bits) |
-| x/w [adr]    | Affiche 8 bytes du contenu de adr                            |
+| CMD                   | Explication                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| x/-10bs $ebp          | Afficher les 10 1ers bytes de la pile                        |
+| x/s [adr]             | Affiche en string le contenu situé à l'adresse               |
+| x/x [adr]             | Afficher le byte situé à l'adresse en hexa                   |
+| p/x $ebp              | Obtenir l'adresse de ebp. Utilise pour ensuite écraser la valeur de eip, situé 4 byte plus loin(si adresse 32 bits) |
+| p/s 0x804b048         | Afficher la string située à l'adresse 0x804b048. Utile pour print des inputs/buffers |
+| x/w [adr]             | Affiche 8 bytes du contenu de adr                            |
+| info symbol 0x804a1e0 | Obtenir le symbole correspondant à l'adresse. C'est pratique si on a par exemple des movl avec des pointeurs de fonctions et qu'on voudrait savoir quel est le nom de la fonction correspondante |
+
+Analyse du programme
+
+| CMD            |                                               |
+| -------------- | --------------------------------------------- |
+| info frame     | Afficher infos sur la pile                    |
+| info functions | Afficher toutes les fonctions et leur adresse |
+|                |                                               |
 
 
 
