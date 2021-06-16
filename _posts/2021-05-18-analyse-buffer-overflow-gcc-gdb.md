@@ -26,7 +26,7 @@ Le bash -c permet de conserver les droits sudo durant l'exécution de la command
 Désactiver les protections sur la pile au moment de la compilation de votre programme c
 
 ```bash
-gcc -m32 −fno−stack−protector -no-pie −z execstack −o prg prg.c
+gcc -m32 -fno-stack-protector -no-pie −z execstack −o prg prg.c
 
 ```
 
@@ -90,9 +90,10 @@ Les parties entre crochet [] doivent être remplacé par le contenu souhaité
 | x/-10bs $ebp          | Afficher les 10 1ers bytes de la pile                        |
 | x/s [adr]             | Affiche en string le contenu situé à l'adresse               |
 | x/x [adr]             | Afficher le byte situé à l'adresse en hexa                   |
+| x/w [adr]             | Affiche 8 bytes du contenu de adr                            |
+| x/a [adr]             | Afficher le contenu comme une adresse. Utile pour afficher l'adresse contenue dans un pointeur |
 | p/x $ebp              | Obtenir l'adresse de ebp. Utilise pour ensuite écraser la valeur de eip, situé 4 byte plus loin(si adresse 32 bits) |
 | p/s 0x804b048         | Afficher la string située à l'adresse 0x804b048. Utile pour print des inputs/buffers |
-| x/w [adr]             | Affiche 8 bytes du contenu de adr                            |
 | info symbol 0x804a1e0 | Obtenir le symbole correspondant à l'adresse. C'est pratique si on a par exemple des movl avec des pointeurs de fonctions et qu'on voudrait savoir quel est le nom de la fonction correspondante |
 
 Analyse du programme
@@ -122,6 +123,50 @@ set disassembly-flavor intel
 ```
 
 
+
+## Exemples
+
+### Afficher une variable locale
+
+Cet exemple montre comment afficher une variable locale. La variable locale sera ici un pointeur sur une fonction. 
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+
+void fun() {
+    printf("fun\n");
+}
+
+int main(int argc, char **argv) {
+    void (*ptr_fun)();
+    char buffer[20]={0};
+    ptr_fun=fun;
+    ptr_fun();
+    return 0;
+}
+```
+
+Compilation (32 bits):
+
+```bash
+gcc -m32 -fno-stack-protector -no-pie test.c -o test
+
+```
+
+Tout d'abord, on peut afficher  toutes les fonctions afin de récupérer l'adresse de fun
+
+![afficher-fonction](../assets/article/outil-securite/gdb/afficher-fonction.PNG)
+
+Ensuite, on peut mettre un breakpoint là où s'effectue l'instruction **call**. C'est cette instruction qui va faire que le programme saute à l'adresse contenue dans fun. Une autre instruction intéressant est l'instruction **lea**. Celle-ci permet de loader une adresse mémoire à un emplacement mémoire ou un registre. Une fois le breakpoint mis, on lance le programme avec r
+
+![fonction-breakpoint](../assets/article/outil-securite/gdb/fonction-breakpoint.PNG)
+
+
+
+Puis on peut afficher la valeur de la variable locale en récupérant l'adresse de esp et en additionnant sa valeur avec l'offset indiqué  que l'on peut voir en jaune avec le disas main.
+
+![afficher-valeur-variable](../assets/article/outil-securite/gdb/afficher-valeur-variable.PNG)
 
 ## Sources 
 

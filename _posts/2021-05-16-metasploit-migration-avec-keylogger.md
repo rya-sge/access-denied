@@ -37,13 +37,13 @@ Dans cet article, j'ai choisi internet explorer afin de pouvoir récupérer les 
 
 La commande migrate va permet de migrer le processus :
 
-```
+```bash
 migrate PID
 ```
 
 les commandes getpid et getuid permettent d'afficher le pid courant ainsi que l'utilisateur. Vous pouvez ainsi vérifier le résultat de la commande migrate
 
-```
+```bash
 getpid
 getuid
 ```
