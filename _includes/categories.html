@@ -1,27 +1,27 @@
-<div class="col s12 cat-div">
-  <div class="cat-list">
-    {% for cat in site.categories %}
-    {% capture test %}{{cat[0] | slice: 0}}{% endcapture %}
-    {% capture testup %}{{cat[0] | slice: 0 | upcase}}{% endcapture %}
-    <a class="cat-chip" href="#{{cat[0] | slugify}}{% if test == testup %}_cap{% endif %}"><div class="chip z-depth-1">{{cat[0]}}</div></a>
-    {% endfor %}
-  </div>
-  <div class="divider"></div>
-  <div class="cat-index">
-    {% for cat in site.categories %}
-    {% capture test %}{{cat[0] | slice: 0}}{% endcapture %}
-    {% capture testup %}{{cat[0] | slice: 0 | upcase}}{% endcapture %}
-    <h4 id="{{cat[0] | slugify}}{% if test == testup %}_cap{% endif %}">{{cat[0]}}</h4>
-    <ul class="cat-post">
-      {% for post in cat[1] %}
-      <a class="post-title" href="{{site.baseurl}}{{post.url}}" target="_blank">
-        <li>
-          {{post.title}}
-          <small class="post-date">{{post.date | date_to_string}}</small>
-        </li>
+<div class="c-categories" style="display: none;">
+  <ul class="c-categories__list u-lists-reset">
+    {% capture cats %} {% for cat in site.categories %} {{ cat | first }} {% endfor %} {% endcapture %} {% assign sortedCats
+    = cats | split: ' ' | sort %} {% for category in sortedCats %}
+    <li class="c-categories__item">
+      {% assign cat_dir = site.category_dir | default: 'category' %}
+      <a class="c-categories__link" href="{{ site.baseurl }}/{{ cat_dir }}/{{ category | downcase | slugify }}/">
+        {% for post in site.categories[category] limit: 1 %}
+        {% assign empty-figure = nil %}
+        {% if post.image %}
+        <div class="c-categories__img">
+          <figure style="background-image: url('{{ site.baseurl }}/assets/{{ post.image }}');"></figure>
+          <span class="c-categories__more">View all</span>
+        </div>
+        {% else %}
+          {% assign empty-figure = 'c-empty-figure' %}
+        {% endif %}
+        {% endfor %}
+        <div class="c-categories__container {{empty-figure}}">
+          <h2 class="c-categories__header">{{ category }}</h2>
+          <p class="c-categories__count"><span>{{ site.categories[category] | size }}</span> Posts</p>
+        </div>
       </a>
-      {% endfor %}
-    </ul>
+    </li>
     {% endfor %}
-  </div>
-</div>
+  </ul>
+</div> <!-- ./c-categories -->

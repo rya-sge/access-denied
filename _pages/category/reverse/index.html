@@ -1,0 +1,23 @@
+---
+layout: home
+title: reverse
+permalink: /category/reverse/
+---
+{% include header.html %}
+<div class="c-posts o-opacity">
+    {% for post in site.categories['reverse'] %}
+ <article class="c-post">
+    {% if post.image %}
+    <a class="c-post-thumbnail o-opacity" style="background-image: url({{"/assets/" | prepend: site.baseurl | append : post.image}})"
+        href="{{post.url | prepend: site.baseurl}}"></a>
+    {% else %} {% endif %}
+    <div class="c-post-content">
+      <h2 class="c-post-title">
+        <a href="{{post.url | prepend: site.baseurl}}">{{post.title}}</a>
+      </h2>
+      <p>{{ post.content | strip_html | truncatewords: 15 }}</p>
+    </div>
+  </article> <!-- /.c-post -->
+  {% endfor %}
+</div>
+{% include categories.html %}

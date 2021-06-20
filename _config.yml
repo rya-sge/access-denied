@@ -1,48 +1,59 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+title: AccessDenied
+description: Prises de notes sur l'informatique et la sécurité
+baseurl: "/test" # the subpath of your site, e.g. /blog
+url: "https://rya-sge.github.io/test" # the base hostname & protocol for your site, e.g. http://example.com
+url_complet: "https://rya-sge.github.io/test"
+# Author
+author-name:    rya-sge
+author-image:   1.png
+author-job:     Etudiant en sécurité
+author-email:   ryan.sauge@heig-vd.ch # Add your email for contant form.
+#author-twitter: artemsheludko_ # Add your twitter account
+about-author:   "Ce site regroupe mes prises de note sur des sujets traitants à l'informatique et la sécurité"
 
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-title: "AccessDenied"
-description: > # this means to ignore newlines until "baseurl:"
-  Material theme based on <a href="http://materializecss.com">Materialize.css</a> for jekyll sites
-baseurl: "/access-denied"
-url: "https://rya-sge.github.io"
-url_git: "https://rya-sge.github.io"
-url_complet: "https://rya-sge.github.io/access-denied"
-permalink: /:year/:month/:day/:title
-repository: rya-sge/access-denied
-paginate: 5
+# Social settings
+#social-twitter:   artemsheludko_
+#social-facebook:
+social-github:    rya-sge
+#social-pinterest: artemsheludko
+#social-instagram: artemsheludko_
+#social-youtube:
+#social-vk:
+#social-linkedin:
+repository: rya-sge/test
+# Newsletter
+mailchimp: # Add your MailChimp form identifier. For example - blogenjoyfreedom.us16.list-manage.com/subscribe/post?u=cd56155d76ddeeb4c0bc4d080&amp;id=7a526cd13e
 
-# MatJek specific configurations
-github_profile: "https://github.com/rya-sge"
-user: "rya-sge"
-user_email: "ryan.sauge@heig-vd.ch"
-#contact_url: ""
-#google_tracking_id: "G-R2JYK7V41F"
-#google_site_verification: "G-R2JYK7V41F"
-#disqus_shortname: "matjek"
+# Google Analytics
+google-analytics: # Add your identifier. For example UA-99631805-1
+
+# Comment Section (Disqus)
+disqus-identifier:  # Add your shortname for Disqus Comment. For example mr-brown
 
 # Build settings
 markdown: kramdown
-gems:
-  - jekyll-feed
+permalink: /:year/:month/:day/:title/
+
+
+
+plugins:
   - jekyll-paginate
+  - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
+
+paginate: 7
+paginate_path: "/page/:num/"
+
+include:
+  - _pages
+
+sass:
+  sass_dir: _sass
+  style: compressed
+
+# Exclude from processing.
 exclude:
   - Gemfile
   - Gemfile.lock
-sass:
-  style: compressed
-future: true
+  - vendor

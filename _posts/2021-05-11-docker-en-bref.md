@@ -43,6 +43,14 @@ Lorsqu'on lancera la commande, celle-ci affichera à la fin si tout c'est bien p
 
 *Successfully tagged exemple/test:latest*
 
+
+
+Erreurs possible :
+
+> COPY failed: forbidden path outside the build context: ../../src ()*
+
+https://stackoverflow.com/questions/27068596/how-to-include-files-outside-of-dockers-build-context
+
 #### Affichage et suppression
 
 La liste des images disponibles peuvent être obtenues avec :
