@@ -60,7 +60,7 @@ Voici une partie des résultats obtenus
 
 ![secpol.msc]({{site.url_complet}}\assets\article\outil-securite\mimikatz\secpol.msc.JPG)
 
-2)  Aller dans Advanced Audit Policy, sous Object Access, cliquer sur Audit kernel Object![windows-policiy-kernel_1]({{site.url_complet}}\accessDenied\assets\article\outil-securite\mimikatz\windows-policiy-kernel_1.JPG)
+2)  Aller dans Advanced Audit Policy, sous Object Access, cliquer sur Audit kernel Object![windows-policiy-kernel_1]({{site.url_complet}}\assets\article\outil-securite\mimikatz\windows-policiy-kernel_1.JPG)
 
 
 

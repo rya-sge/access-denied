@@ -85,7 +85,7 @@ Pour réaliser les exemples, on créer d'abord un
 
 A l'affichage, on peut remarquer que file_3 est coloré en bleu et qu'avec la commande ls, on a une petite flèche -> sur le fichier source.
 
-![affichage-lien]({{site.url_complet}}\assets_2\lien\affichage-lien.PNG)
+![affichage-lien]({{site.url_complet}}\assets\linux\lien\affichage-lien.PNG)
 
 ### 2) Modification
 
@@ -95,7 +95,7 @@ On observe le même comportement avec file_1
 
 Conclusion : Que ça soit avec un lien physique ou symbolique, bien que l'implémentation soit différente, le résultat pour l'utilisateur est le même.
 
-![modification]({{site.url_complet}}\assets_2\lien\modification.PNG)
+![modification]({{site.url_complet}}\assets\linux\lien\modification.PNG)
 
 ### 3) Utilisation de la commande mv
 
@@ -110,7 +110,7 @@ va modifier l'inode de l'entrée de file_1 dans le répertoire.
 - Cette modification sera prise en compte par le lien symbolique, car celui-ci pointe sur file_1 (l'entrée).
 -  Alors que le lien physique, lui il pointe toujours sur l'inode d'origine, celui auquel file_1 pointait au début.
 
-![mv-lien]({{site.url_complet}}\assets_2\lien\mv-lien.PNG)
+![mv-lien]({{site.url_complet}}\assets\linux\lien\mv-lien.PNG)
 
 ### 4) Suppression avec rm
 
@@ -120,7 +120,7 @@ On peut aussi constater un affichage en rouge pour file_3 indiquant que le lien 
 
 Le lien physique ne sera pas affecté car celui-ci ne pointe pas directement sur file_1 mais avait repris l'inode sur lequel pointait file_1.
 
-![rm-lien]({{site.url_complet}}\assets_2\lien\rm-lien.PNG)
+![rm-lien]({{site.url_complet}}\assets\linux\lien\rm-lien.PNG)
 
 
 
