@@ -95,7 +95,7 @@ On observe le même comportement avec file_1
 
 Conclusion : Que ça soit avec un lien physique ou symbolique, bien que l'implémentation soit différente, le résultat pour l'utilisateur est le même.
 
-![modification]({{site.url_complet}}/assets/linux/lien/modification.PNG)
+![modification]({{site.url_complet}}/assets/article/linux/lien/modification.PNG)
 
 ### 3) Utilisation de la commande mv
 
