@@ -156,17 +156,17 @@ gcc -m32 -fno-stack-protector -no-pie test.c -o test
 
 Tout d'abord, on peut afficher  toutes les fonctions afin de récupérer l'adresse de fun
 
-![afficher-fonction]({{site.url_complet}}\assets\article\outil-securite\gdb\afficher-fonction.PNG)
+![afficher-fonction]({{site.url_complet}}/assets/article/outil-securite/gdb/afficher-fonction.PNG)
 
 Ensuite, on peut mettre un breakpoint là où s'effectue l'instruction **call**. C'est cette instruction qui va faire que le programme saute à l'adresse contenue dans fun. Une autre instruction intéressant est l'instruction **lea**. Celle-ci permet de loader une adresse mémoire à un emplacement mémoire ou un registre. Une fois le breakpoint mis, on lance le programme avec r
 
-![fonction-breakpoint]({{site.url_complet}}\assets\article\outil-securite\gdb\fonction-breakpoint.PNG)
+![fonction-breakpoint]({{site.url_complet}}/assets/article/outil-securite/gdb/fonction-breakpoint.PNG)
 
 
 
 Puis on peut afficher la valeur de la variable locale en récupérant l'adresse de esp et en additionnant sa valeur avec l'offset indiqué  que l'on peut voir en jaune avec le disas main.
 
-![afficher-valeur-variable]({{site.url_complet}}\assets\article\outil-securite\gdb\afficher-valeur-variable.PNG)
+![afficher-valeur-variable]({{site.url_complet}}/assets/article/outil-securite/gdb/afficher-valeur-variable.PNG)
 
 ## Sources 
 
