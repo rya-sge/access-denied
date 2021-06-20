@@ -54,7 +54,7 @@ $(document).ready(function () {
 
     $(this).addClass('is-loading').text("Loading...");
 
-    $.get('/test/page/' + nextPage, function (data) {
+    $.get('/access-denied/page/' + nextPage, function (data) {
       var htmlData = $.parseHTML(data);
       var $articles = $(htmlData).find('article');
 
