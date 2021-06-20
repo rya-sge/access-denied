@@ -2,7 +2,7 @@ title: AccessDenied
 description: Prises de notes sur l'informatique et la sécurité
 baseurl: "/access-denied" # the subpath of your site, e.g. /blog
 url: "https://rya-sge.github.io/access-denied" # the base hostname & protocol for your site, e.g. http://example.com
-url_complet: "https://rya-sge.github.io/test" #image
+url_complet: "https://rya-sge.github.io/access-denied" #image
 # Author
 author-name:    rya-sge
 author-image:   1.png

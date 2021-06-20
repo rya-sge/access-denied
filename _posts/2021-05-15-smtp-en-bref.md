@@ -90,7 +90,7 @@ Vous pouvez obtenir une liste des MX enregistrés avec la commande dig
 dig -t any <domaine>
 ```
 
-![dig-exemples]({{site.url_complet}}\assets\article\reseau\SMTP\dig-exemples.JPG)
+![dig-exemples]({{site.url_complet}}/assets/article/reseau/SMTP/dig-exemples.JPG)
 
 ```bash
 telnet <serveur mx> 25
@@ -100,7 +100,7 @@ Telnet permet d'établir la connexion avec le serveur mx.
 
 En rouge, les commandes que j'ai écrites.
 
-## ![dig-telnet-exemple]({{site.url_complet}}\assets\article\reseau\SMTP\dig-telnet-exemple.png)
+## ![dig-telnet-exemple]({{site.url_complet}}/assets/article/reseau/SMTP/dig-telnet-exemple.png)
 
 ### Email forgé
 
