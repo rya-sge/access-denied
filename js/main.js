@@ -13,7 +13,7 @@ $(document).ready(function () {
     searchInput: document.getElementById('js-search-input'),
     resultsContainer: document.getElementById('js-results-container'),
     json: '/search.json',
-    searchResultTemplate: '<li><a href="{{ site.baseurl }}{url}">{title}</a></li>',
+    searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
     noResultsText: '<li>No results found</li>'
   })
 
