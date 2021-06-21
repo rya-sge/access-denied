@@ -24,9 +24,9 @@ layout: home
       </h2>
       <p>
         {% if post.description % }
-        post.description
+        {{ post.description }}
         {% else %}
-        post.content | strip_html | truncatewords: 15
+        {{ post.content | strip_html | truncatewords: 15 }}
         {% endif %}
       </p>
       <span class="c-post-date">{{post.date | date: '%Y, %b %d'}}&nbsp;&nbsp;&nbsp;—&nbsp;</span>
