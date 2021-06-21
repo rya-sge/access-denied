@@ -6,11 +6,14 @@ $(document).ready(function () {
   // Simple Search Settings
   ======================= */
 
+  /*
+  https://github.com/christian-fei/Simple-Jekyll-Search/issues/140
+   */
   SimpleJekyllSearch({
     searchInput: document.getElementById('js-search-input'),
     resultsContainer: document.getElementById('js-results-container'),
-    json: 'access-denied/search.json',
-    searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
+    json: '{{ site.url }}/search.json',
+    searchResultTemplate: '<li><a href="{{ site.baseurl }}{url}">{title}</a></li>',
     noResultsText: '<li>No results found</li>'
   })
 
