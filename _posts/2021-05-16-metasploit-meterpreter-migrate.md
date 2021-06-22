@@ -2,7 +2,7 @@
 layout: post
 title:  "Metasploit - Elévation de privilège avec migrate"
 date:   2021-05-16 
-categories: sécurité
+categories: securite
 tags: metasploit meterpreter keylogger migrate
 description: Utilisation de la commande migrate sur une session meterpreter 
 ---
