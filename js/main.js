@@ -8,12 +8,14 @@ $(document).ready(function () {
 
   /*
   https://github.com/christian-fei/Simple-Jekyll-Search/issues/140
+  https://github.com/christian-fei/Simple-Jekyll-Search/issues/132
+  https://github.com/lynn9388/light-blog/blob/f43172f7aae9f18c09c9c1a24f948e7929bff522/_includes/modules/search-box.html
    */
   SimpleJekyllSearch({
     searchInput: document.getElementById('js-search-input'),
     resultsContainer: document.getElementById('js-results-container'),
-    json: 'access-denied/search.json',
-    searchResultTemplate: '<li><a href="{url}"></a></li>',
+    json: '{{ site.baseurl }}/assets/search.json',
+    searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
     noResultsText: '<li>No results found</li>'
   })
 
