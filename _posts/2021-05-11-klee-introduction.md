@@ -5,16 +5,14 @@ date:   2021-05-11
 categories: reverse securite
 tags: klee clang reverse sanitizer concolique analyse
 description: Présentation du logiciel Klee ainsi que ses tutoriels
-image: /article/klee/klee-tutorial6.JPG
+image: 
 auteur: Ryan S.
 ---
 Cet article présente Klee ainsi que ses tutoriels de prises en main. 
 
 Il s'agit principalement d'une traduction anglais -> française ajouté de mes prises des notes de la documentation proposée par l'éditeur de Klee.
 
-Table des matières :
 
-[TOC]
 
 ## Présentation
 
@@ -93,7 +91,7 @@ int main() {
 
 
 
-Pour repérer les input menant à un chemin particulier, un if par exemple. On peut faire un appel à la fonction klee_abort() dans le if afin que klee génère une erreur :
+Pour repérer les input menant à un chemin particulier, un if par exemple. On peut faire un appel à la fonction klee_abort() dans le *if* afin que klee génère une erreur :
 
 ```c
 klee_abort();
