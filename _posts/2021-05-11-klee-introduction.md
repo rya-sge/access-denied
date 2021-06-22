@@ -2,20 +2,35 @@
 layout: post
 title:  "Introduction à Klee"
 date:   2021-05-11 
-categories: reverse sécurité
+categories: reverse securite
 tags: klee clang reverse sanitizer concolique analyse
 description: Présentation du logiciel Klee ainsi que ses tutoriels
-Auteur : Ryan S.
+image: /article/klee/klee-tutorial6.JPG
+auteur: Ryan S.
 ---
 Cet article présente Klee ainsi que ses tutoriels de prises en main. 
 
 Il s'agit principalement d'une traduction anglais -> française ajouté de mes prises des notes de la documentation proposée par l'éditeur de Klee.
 
+Table des matières :
+
+[TOC]
+
 ## Présentation
 
-Klee est un outil permettant de réaliser une analyse concolique. On peut exécuter le programme avec des valeurs concrètes. 
+Klee est un outil permettant de réaliser une analyse concolique. On peut exécuter le programme avec des valeurs concrètes. Il permet notamment de détecter les erreurs suivantes :
 
+- **ptr**: Stores ou  loads  à des emplacements mémoires invalides.
+- **free**: Double or invalid `free()`.
+- **abort**: Appel de la fonction `abort()`.
+- **assert**: Echec d'une insertion
+- **div**: Division ou modulo par 0 
+- **user**: Problème avec l'input ou dont la façon dont est appelé klee (ndlr : pas forcément lié à votre programme)
+- **exec**: instruction inconnue, appelle à une fonction invalide ou avec de assembleur inline. 
 
+Sauf erreur de ma part, klee n'est pas capable de détecter des  fuites de mémoire.
+
+Sources : [https://klee.github.io/tutorials/testing-regex/](https://klee.github.io/tutorials/testing-regex/)
 
 ## Installation
 
