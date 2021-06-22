@@ -2,11 +2,35 @@
 layout: post
 title:  "Fuzzing avec AFL"
 date:   2021-06-05 
-categories: sécurité
+categories: securite
 tags: fuzzing afl
 description: Fuzzing avec AFL
 ---
 AFL est un outil de fuzzing c'est-à-dire qu'il injecte des données dans le programme. Celles-ci sont au départ aléatoire puis AFL va ensuite adapter les inputs aux résultats obtenus.
+
+
+
+### Mise en place
+
+Adapter le programme à AFL :
+
+Si vous voulez déterminer quelle input mène à un endroit du code particulier, il faut ajouter la fonction suivante :   
+
+```c
+  abort();
+```
+
+Ainsi lorsqu'AFL atteindra cette portion du code, cela va générer une erreur qui sera ensuite accessible dans les résultats.
+
+
+
+echo "hello" > tests/case01
+
+Ecrire le 1er cas test qui sera ensuite dérivé pour produire d'autres chemins
+
+
+
+
 
 ### List de commandes utiles
 
@@ -16,7 +40,21 @@ Compiler le code pour AFL:
 /bin/afl-clang-fast -fno-inline program.c -o program
 ```
 
+Cela va instrumenter le code pour l'adapter à aflt
+
+
+
 http://spencerwuwu-blog.logdown.com/posts/1366733-a-simple-guide-of-afl-fuzzer
+
+
+
+uniq carsh : cas vers un chemin unique
+
+Total crashed : 4 inputes différents qui mènent au même endroit dans e programme
+
+total execs : nombre d'input testsé
+
+exec speed :???
 
 Exécuter afl sur un programme
 

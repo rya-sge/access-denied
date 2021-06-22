@@ -2,7 +2,7 @@
 layout: post
 title:  "SMTP en bref"
 date:   2021-05-15 
-categories: réseau 
+categories: reseau 
 tags: smtp protocole
 ---
 

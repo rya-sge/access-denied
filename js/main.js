@@ -14,7 +14,7 @@ $(document).ready(function () {
   SimpleJekyllSearch({
     searchInput: document.getElementById('js-search-input'),
     resultsContainer: document.getElementById('js-results-container'),
-    json: '{{ site.baseurl }}/assets/search.json',
+    json: '/access-denied/search.json',
     searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
     noResultsText: '<li>No results found</li>'
   })

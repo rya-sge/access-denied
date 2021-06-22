@@ -3,7 +3,7 @@
 layout: post
 title:  "Analyse de buffer overflow avec GCC et GDB"
 date:   2021-05-18 
-categories: sécurité reverse 
+categories: securite reverse 
 tags: gcc gdb buffer-overflow shellcode
 description: Compilation avec gcc et commandes de base de GDB
 ---

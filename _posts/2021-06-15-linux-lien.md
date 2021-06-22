@@ -2,7 +2,7 @@
 layout: post
 title:  "Les liens avec Linux"
 date:   2021-06-15 
-categories: Linux
+categories: linux
 tags: bash
 description: Liens symboliques et physiques avec Linux
 ---

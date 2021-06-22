@@ -2,7 +2,7 @@
 layout: post
 title:  "WPA en bref"
 date:   2021-06-15 
-categories: sécurité réseau
+categories: securite reseau
 tags: wpa
 description: Description du protocole WPA
 ---

@@ -2,7 +2,7 @@
 layout: post
 title:  "Mimikatz - afficher les logs"
 date:   2021-05-18 
-categories: sécurité 
+categories: securite 
 tags: mimikatz log 
 Auteur: rya-sge
 description: Afficher les logs de Mimikatz avec Windows
