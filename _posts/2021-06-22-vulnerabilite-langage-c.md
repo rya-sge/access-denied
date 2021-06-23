@@ -150,3 +150,7 @@ En c, les variables non initialisées ont une valeur arbitraire, ce qui peut pro
 
 
 
+## Sources
+
+- [https://cwe.mitre.org](https://cwe.mitre.org)
+- Cours de sécurité logiciel (SLO) enseigné à l'HEIG-VD en 2021
