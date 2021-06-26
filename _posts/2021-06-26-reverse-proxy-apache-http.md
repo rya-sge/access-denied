@@ -1,29 +1,30 @@
 ---
 layout: post
 title:  Configurer un reverse proxy avec HTTP Apache
-date:   2021-06-01 
-categories: réseau
+date:   2021-06-26 
+categories: reseau
 tags: apache proxy load-balancing reverse-proxy
+description: Cet article présente la configuration d'un reverse proxy avec HTTP Apache, avec notammment le load balancing et les sticky sessions.
 Auteur: rya-sge
 ---
 
 
 
-Cet article présente la configuration d'un reverse proxy avec HTTP Apache.
+Cet article présente la configuration d'un *reverse proxy* avec *HTTP Apache*.
 
-Il peut être intéressant d'installer un reverse proxy pour les raisons suivantes:
+Il peut être intéressant d'en installer un pour les raisons suivantes:
 
-- Sécurité : le reverse proxy peut cacher les serveurs backend aux yeux de l'utilisateur
-- Performance : il est possible de répartir la charge entre différence serveur backend avec du load balancing
+- Sécurité : le *reverse proxy* peut cacher les serveurs backend aux yeux de l'utilisateur
+- Performance : il est possible de répartir la charge entre différence serveur backend avec du *load balancing*
 - scalabilité : il est plus facile d'ajouter de nouveaux serveurs backend à infrastructure.
 
 
 
 ### Schéma
 
-Un reverse proxy se situe du côté du serveur. Voici un schéma pour mieux illustrer cela :
+Un *reverse proxy* se situe du côté du serveur. Voici un schéma pour mieux illustrer cela :
 
-![schema-reverse-proxy](../../accessDenied/assets/article/reseau/reverse-proxy/schema-reverse-proxy.png)
+![schema-reverse-proxy]({{site.url_complet}}/assets/article/reseau/reverse-proxy/schema-reverse-proxy.png)
 
 ### Configuration de base
 
@@ -36,7 +37,7 @@ Un reverse proxy se situe du côté du serveur. Voici un schéma pour mieux illu
 
 Exemple :
 
-```
+```bash
 <VirtualHost *:80>
 	ServerName incroyable.ch
 	
@@ -52,13 +53,13 @@ Une explication plus détaillée, avec  des conteneurs Docker se trouve sur mon 
 
 **Load Balancing**
 
-le load balancing permet de redirigés les requêtes en direction de plusieurs serveurs en backend. cela permet d'ajouter de la redondance au proxy.
+Le *load balancing* permet de redirigés les requêtes en direction de plusieurs serveurs en backend. cela permet d'ajouter de la redondance au proxy.
 
 Par défaut la répartition des charges est du Round Robin Les requêtes sont répartis en fonction du nombre de requête traités par chacun des serveurs backend afin de répartir les requête
 
 Ex :
 
-```bashbash
+```bash
 <Proxy balancer://dynamic>
 		BalancerMember 'http://<?php print "$DYNAMIC_APP_1"?>' 
 
@@ -84,7 +85,7 @@ Les **sticky session** permettent d'assigner un serveur particulier à un client
 
 Directive  :
 
-```
+```bash
 ProxySet stickysession=ROUTEID
 ```
 
@@ -108,5 +109,5 @@ Une explication plus détaillée, avec  des conteneurs Docker se trouve sur mon 
 - Article très complet en anglais : [https://www.digitalocean.com/community/tutorials/how-to-use-apache-as-a-reverse-proxy-with-mod_proxy-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-use-apache-as-a-reverse-proxy-with-mod_proxy-on-ubuntu-16-04)
 
 
-- Cours RES enseigné à l'HEIG-VD en 2021
+- Cours de Réseaux(RES) enseigné à l'HEIG-VD en 2021
 
