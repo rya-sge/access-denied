@@ -17,6 +17,23 @@ Cet article n'est pour l'instant pas complet et sera amélioré au fil du temps.
 
 
 
+## Sécurité spatiale et temporelle
+
+Dans cet article, je ferais souvent référence à la sécurité temporelle et la sécurité spatiale.
+
+- La **sécurité spatiale** est obtenue lorsque les accès mémoires sont dans les bornes définies par l'objet. Par exemple avec un buffer de 12 caractères, la sécurité spatiale n'est pas présente si un utilisateur peut écrire plus de 12 caractères
+
+- La **sécurité temporelle** est obtenue lorsque les accès mémoires sont valides au moment de leur réalisation. Par exemple, si vous accéder à un emplacement mémoire au-delà de la taille de votre tableau, alors la sécurité temporelle n'est pas présente.
+
+  Exemple :
+
+  ```c
+  int buffer[12];
+  tab[12] = 0; 
+  ```
+
+  Les index en C commencent à 0. Le programme accède à l'emplacement 12 qui est au-delà de la taille du tableau.
+
 ## Fonctions vulnérables
 
 Voici quelque fonctions qui  représentent des vulnérabilités, soit directement par leur simple utilisation soit alors en cas de mauvaise implémentation de la part du programmeur.
@@ -147,6 +164,10 @@ En c, les variables non initialisées ont une valeur arbitraire, ce qui peut pro
 **Détection :** Il est possible de détecter ces vulnérabilités avec l'outil *Sanitizer en activant UndefinedBehaviorSanitizer.
 
 
+
+### Integer overflow
+
+La circulation des entiers peut entrainer des bugs dans l'application et de potentielles failles de sécurités
 
 
 
