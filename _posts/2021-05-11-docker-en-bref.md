@@ -5,8 +5,8 @@ date:   2021-05-11
 categories: virtualisation 
 tags: docker 
 description: Liste des principales commandes de Docker
-image: {{site.url_complet}}/assets/article/docker/docker-horizontal-monochromatic-white.png
-imageArticle: {{site.url_complet}}/assets/article/docker/docker-horizontal-monochromatic-white.png
+image: article/docker/docker-horizontal-monochromatic-white.png
+imageArticle: article/docker/docker-horizontal-monochromatic-white.png
 ---
 
 Présentation et explications des principales commandes de Docker
