@@ -5,6 +5,7 @@ date:   2021-06-15
 categories: securite reseau
 tags: wpa
 description: Description du protocole WPA
+image: {{site.url_complet}}/assets/article/reseau/wpa/wpa-schema.png
 ---
 
 Cet article résume les principaux points du protocole WPA.
