@@ -1,10 +1,11 @@
 ---
 layout: post
-title:  "Les liens avec Linux"
+title:  "Les liens physiques et symboliques avec Linux"
 date:   2021-06-15 
 categories: linux
 tags: bash
-description: Liens symboliques et physiques avec Linux
+description: Cet article présente les liens symboliques et physiques sur un système d'exploitation GNU/Linux
+image: /assets/article/linux/lien/schema-lien-physique.png
 ---
 
 Cet article présente les liens symboliques et physiques. 
@@ -25,11 +26,15 @@ L'inode contient les métadonnées et des pointeurs vers les blocs de contenus. 
 
 ## Lien physique 
 
+
+
+![schema-lien-physique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-physique.png)
+
 On créée dans  le répertoire une nouvelle entrée qui pointe vers le **même** inode que le fichier source utilisé pour crée le lien.
 
 Pour simplifier, on ne crée pas un nouvel inode et du contenu dans le filesystem, mais plutôt un pointeur dans le répertoire où l'on se trouve
 
-On aura ainsi deux entrées qui pointera vers le même inode/contenu : l'entrée dans le répertoire du fichier d'origine et la nouvelle entrée qu'on a crée avec le lien physique.
+On aura ainsi deux entrées qui pointera vers le même inode/contenu : l'entrée dans le répertoire du fichier d'origine et la nouvelle entrée qu'on a créé avec le lien physique.
 
 
 
@@ -37,7 +42,7 @@ Conséquence :
 
 - Quand vous modifiez le contenu depuis le lien physique (echo, nano, vim), vous modifiez en réalité le contenu de l'inode sur lequel il pointe. Si vous affichez maintenant le fichier source du lien, il affichera alors le contenu modifié.
 
-- Si vous supprimez le fichier source, alors cette suppression ne sera PAS reporté sur le le lien physique. En réalité, vous aurez supprimé une des entrées qui pointe vers l'inode mais sans supprimer l'inode et son contenu.
+- Si vous supprimez le fichier source, alors cette suppression ne sera PAS reporté sur le lien physique. En réalité, vous aurez supprimé une des entrées qui pointe vers l'inode mais sans supprimer l'inode et son contenu.
 
   
 
@@ -45,11 +50,13 @@ Conséquence :
   mv unAutreFichier fichierSrc
   ```
 
-  L'utilisation de la commande mv sur l'entrée du fichier source ne provoque  aucune modification sur le lien physique. La commande mv a  pour conséquence de modifier l'entrée dans le répertoire du fichier source(inode sur lequel il pointe) et non le contenu accessible depuis son inode d'origine.
+  L'utilisation de la commande *mv* sur l'entrée du fichier source ne provoque  aucune modification sur le lien physique. La raison est la suivante : *mv* modifie l'entrée dans le répertoire du fichier source (inode sur lequel il pointe) et non le contenu accessible depuis son inode d'origine.
 
 
 
 ## Lien symbolique 
+
+![schema-lien-symbolique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-symbolique.png)
 
 Contrairement aux liens physiques, un lien symbolique a son propre inode et ses propres données fichiers. Dans les métadonnées, il y aura le chemin absolu ou relatif du fichier source
 
@@ -59,7 +66,7 @@ Conséquence
   mv unAutreFichier fichierSrc
   ```
 
-Ici, cette modification sera bien "prise en compte" par le lien symbolique. La raison est la suivante : le lien symbolique pointe vers le répertoire du fichier source. Cette commande aura modifié l'entrée(nom et inode) contenu dans le fichier source sur lequel pointe le lien symbolique.
+Ici, cette modification sera bien "prise en compte" par le lien symbolique. La raison est la suivante : le lien symbolique pointe vers le répertoire du fichier source. Cette commande aura modifié l'entrée (nom et inode) contenu dans le fichier source sur lequel pointe le lien symbolique.
 
 
 
@@ -89,7 +96,7 @@ A l'affichage, on peut remarquer que file_3 est coloré en bleu et qu'avec la co
 
 ### 2) Modification
 
-Lorsqu'on modifie file_2(lien phyisque), on peut constater que cela modifie également file_1
+Lorsqu'on modifie file_2(lien physique), on peut constater que cela modifie également file_1
 
 On observe le même comportement avec file_1
 
