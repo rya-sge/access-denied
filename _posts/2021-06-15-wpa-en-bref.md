@@ -13,8 +13,8 @@ Cet article résume les principaux points du protocole WPA.
 ### Résumé
 
 - Nouveau contrôle intégrité *Message Integrity Code*
-- Utilise l'algorithme TKIP
-- Double la taille de l'IV, par rapport à WEP, qui passe à 48 bits
+- Utilise l'algorithme *TKIP*
+- Double la taille de l'IV, par rapport à **WEP**, qui passe à 48 bits
 
 
 
@@ -22,11 +22,11 @@ Cet article résume les principaux points du protocole WPA.
 
 #### Protocole WPA
 
-Représentation simplifiée du protocole WPA.
+Représentation simplifiée du protocole **WPA**.
 
-Le premier cadre rouge représente la partie qui protège l'intégrité, grâce au MIC
+Le premier cadre rouge représente la partie qui protège l'intégrité, grâce au *MIC*
 
-Le 2ème cadre rouge concerne la partie qui assure la confidentialité grâce à l'algorithme TKIP.
+Le 2ème cadre rouge concerne la partie qui assure la confidentialité grâce à l'algorithme *TKIP*.
 
 
 
@@ -44,7 +44,7 @@ Ce schéma représente la génération des clés
 
 #### MIC - Intégrité
 
-- Comment est généré le MIC ?
+- Comment est généré le *MIC* ?
 
 Il est généré à partir d'une clé MIC, du bloc de données data et des informations permettant d'authentifiés les émetteurs et les récepteurs. Ceux-ci  sont authentifiés par leur adresse MAC respectives. Pour la priorité, celle-ci vaut toujours 0 en pratique.
 
@@ -64,9 +64,9 @@ Il est généré à partir d'une clé MIC, du bloc de données data et des infor
 
 Dans WEP, on utilise RC4 directement
 
-Avec WPA, on utilise TKIP et c'est lui va utilisé RC4. afin de générer un keystream. TKIP aura pour rôle de rattraper les vulnérabilités présentes dans RC4. 
+Avec WPA, on utilise TKIP et c'est cet algorithme qui va appeler RC4 afin de générer un *keystream*. TKIP aura pour rôle de rattraper les vulnérabilités présentes dans RC4. 
 
-Le keystream sera différent à chaque fois. 
+Le *keystream* sera différent à chaque fois. 
 
 
 
@@ -74,7 +74,7 @@ Le keystream sera différent à chaque fois.
 
 Pour envoyer une trame protégée avec WPA (unicast), il faut 2 clés :
 
-- Une clé pour calculé le MIC
+- Une clé pour calculer le MIC
 - Une clé pour l'algorithme KTIP
 
 Chaque clé est unique pour chaque client

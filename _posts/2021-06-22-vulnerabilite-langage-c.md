@@ -36,17 +36,17 @@ Dans cet article, je ferais souvent référence à la sécurité temporelle et l
 
 ## Fonctions vulnérables
 
-Voici quelque fonctions qui  représentent des vulnérabilités, soit directement par leur simple utilisation soit alors en cas de mauvaise implémentation de la part du programmeur.
+Voici quelques fonctions qui  représentent des vulnérabilités, soit directement par leur simple utilisation soit alors en cas de mauvaise implémentation de la part du programmeur.
 
 ### **1)strcpy**
 
-Avec *strcpy*, on ne précise pas le nombre de caractère maximum à lire, on peut dès lors dépasser la taille du buffer qui contiendra les données. Elle est par conséquent vulnérable à des buffer overflow. La sécurité spatiale n'est pas garantie. 
+Avec *strcpy*, on ne précise pas le nombre de caractère maximum à lire, on peut dès lors dépasser la taille du buffer qui contiendra les données. Elle est par conséquent vulnérable à des **buffer overflow**. La sécurité spatiale n'est pas garantie. 
 
-CWE concerné : CWE 121 -**Stack-based Buffer Overflow**
+CWE concernée : CWE 121 -**Stack-based Buffer Overflow**
 
 https://cwe.mitre.org/data/definitions/121.html
 
-Cette exemple est en grande part e issue de cette même CWE. J'y ais ajouté la variable locale authOK afin de montrer comment on peut concrètement utiliser cette overflow
+Cet exemple est en grande partie issue de cette même CWE. J'y ais ajouté la variable locale authOK afin de montrer comment on peut concrètement utiliser cet *overflow*.
 
 ```c
 #define BUFSIZE 256
@@ -61,15 +61,15 @@ int main(int argc, char **argv) {
 }
 ```
 
-Le programme alloue BUFSIZE  octets sur la stack et va ensuite copier la chaine passée en argument dans buf.
+Le programme alloue BUFSIZE  octets sur la pile et va ensuite copier la chaine passée en argument dans buf.
 
-Vu qu'il ne contrôle pas la taille passé en argument, un utilisateur peut entrer une chaîne > 256, ce qui va écraser la variable authOK et va lui permettre d'accéder à la section secrète.
+Vu qu'il ne contrôle pas la taille passée en argument, un utilisateur peut entrer une chaîne > 256, ce qui va écraser la variable authOK et va lui permettre d'accéder à la section secrète.
 
-On pourrait aussi imaginer écraser la valeur de eip, mais vu qu'on est dans la fonction principale main, cela n'a (à mon avis) pas grande utitlié
+On pourrait aussi imaginer écraser la valeur de eip, mais vu qu'on est dans la fonction principale main, cela n'a (à mon avis) pas grande utilité.
 
 ### **2) scanf()** 
 
-La fonction scanf n'est absolument pas sécurisé. Elle ne doit pas être utilisée.
+La fonction *scanf* n'est absolument pas sécurisé. Elle ne doit pas être utilisée.
 
 Exemple 1 : 
 
@@ -88,7 +88,7 @@ Exemple 2 :
 scanf("%10s", buffer)
 ```
 
-Dans cet exemple, on vérifie le nombre de caractère. Parfait ? Non parce que l'utilisateur peut toujours entrer une chaine plus longue, ce qui aura pour effet que le '/0' ne sera pas copié. On aura bien seulement 127 caractère dans le buffer, mais  la chaine copiés ne contiendra pas le caractère de fin de chaine. Ainsi, en cas de lecture de celui-ci avec par exemple printf, alors on dépassera la taille du buffer. Nous avons alors un **buffer overread**
+Dans cet exemple, on vérifie le nombre de caractère. Parfait ? Non parce que l'utilisateur peut toujours entrer une chaine plus longue, ce qui aura pour effet que le '/0' ne sera pas copié. On aura bien seulement 127 caractère dans le buffer, mais  la chaine copiés ne contiendra pas le caractère de fin de chaine. Ainsi, en cas de lecture de celui-ci avec par exemple *printf*, alors on dépassera la taille du buffer. Nous avons alors un **buffer overread**
 
 **Détection :** Il est possible de détecter ces vulnérabilités avec l'outil *Sanitizer en activant **AddressSanitizer**.
 
@@ -115,7 +115,7 @@ printf(buffer)
 
 On ne précise par le format string avec un %s lors du printf. Un attaquant pourrait exploiter cet faille pour réaliser une attaque par format strings.
 
-Par exemple, l'input suivant utilisé avec *pwntools* permettra d'afficher les 11 premières cases(32 bits) de la pile. On pourrait ainsi  récupérer des informations intéressante "stockées sur la pile, comme la valeur du *canary* afin de pouvoir procéder à un buffer overflow sans être détecté.
+Par exemple, l'input suivant utilisé avec *pwntools* permettra d'afficher les 11 premières cases(32 bits) de la pile. On pourrait ainsi  récupérer des informations intéressante "stockées sur la pile, comme la valeur du *canary* afin de pouvoir procéder à un *buffer overflow* sans être détecté.
 
 ```python
 input = ("AAAA" + "%08x." * 11 + "%x");
@@ -138,7 +138,7 @@ Les fonctions *malloc* et *calloc* vont réserver de la mémoire dans le tas(hea
   }
   ```
 
-  Le programme réserve BUFSIZE octets en mémoire. Ensuite il fait un appel à strcpy en copiant les octets de argv dans buf. Néanmoins, il n'y a aucune garantie que la string dans argv fasse moins de 256 bytes. Il y a par conséquent la possibilité d'effectuer un overflow sur le heap en entrant une chaine de caractères > 256.
+  Le programme réserve BUFSIZE octets en mémoire. Ensuite il fait un appel à *strcpy* en copiant les octets de argv dans buf. Néanmoins, il n'y a aucune garantie que la string dans argv fasse moins de 256 bytes. Il y a par conséquent la possibilité d'effectuer un overflow sur le heap en entrant une chaine de caractères > 256.
 
   Lien CWE : https://cwe.mitre.org/data/definitions/122.html
 

@@ -14,8 +14,8 @@ layout: home
 <div class="c-posts o-opacity" data-page="{{ currentPage }}" data-totalPages="{{ paginator.total_pages }}">
   {% for post in site.posts limit:site.paginate offset:offset %}
   <article class="c-post">
-    {% if post.image %}
-    <a class="c-post-thumbnail o-opacity" style="background-image: url({{"/assets/" | prepend: site.baseurl | append : post.image}})"
+    {% if post.imageIndex %}
+    <a class="c-post-thumbnail o-opacity" style="background-image: url({{"/assets/" | prepend: site.baseurl | append : post.imageIndex}})"
         href="{{post.url | prepend: site.baseurl}}"></a>
     {% else %} {% endif %}
     <div class="c-post-content">
