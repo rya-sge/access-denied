@@ -8,13 +8,13 @@ description: Présentation de l'outil de Fuzzing AFL (American Fuzzy Lop)
 ---
 *AFL*  de Google est un outil de fuzzing, disponible sur le github de google : [https://github.com/google/AFL](https://github.com/google/AFL)
 
-Il a pour objectif de tester les entrées d'un programme en y injectant des donnée. Celles-ci sont au départ aléatoire puis *AFL* va ensuite adapter les inputs aux résultats obtenus.
+Il a pour objectif de tester les entrées d'un programme en y injectant des données. Celles-ci sont au départ aléatoire puis *AFL* va ensuite adapter les inputs aux résultats obtenus.
 
 ### Mise en place
 
 - Adapter le programme à *AFL* 
 
-Si vous voulez déterminer quelle input mène à un endroit du code particulier, il faut ajouter la fonction suivante dans votre code, ici en C :   
+Si vous voulez déterminer quel input mène à un endroit du code particulier, il faut ajouter la fonction suivante dans votre code, ici en C :   
 
 ```c
   abort();
@@ -104,7 +104,7 @@ Dans le dossier output/crashes, afficher les fichiers ayant généré un crash a
 
 ### Astuces
 
-Il est possible de lancer plusieurs instances d'AFL. Pour cela il faut d'abord lancer le master puis ensuite les autres avec l'option -S
+Il est possible de lancer plusieurs instances d'AFL. Pour cela il faut d'abord lancer le master puis les autres avec l'option -S
 
 Ex :
 

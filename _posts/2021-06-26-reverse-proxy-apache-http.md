@@ -6,7 +6,7 @@ categories: reseau
 tags: apache proxy load-balancing reverse-proxy
 description: Cet article présente la configuration d'un reverse proxy avec HTTP Apache, avec notammment le load balancing et les sticky sessions.
 Auteur: rya-sge
-image: article/reseau/reverse-proxy/schema-reverse-proxy.png
+image: assets/article/reseau/reverse-proxy/schema-reverse-proxy.png
 ---
 
 
