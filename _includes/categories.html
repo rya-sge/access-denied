@@ -9,7 +9,7 @@
         {% assign empty-figure = nil %}
         {% if post.image %}
         <div class="c-categories__img">
-          <figure style="background-image: url('{{ site.baseurl }}/assets/{{ post.image }}');"></figure>
+          <figure style="background-image: url('{{ site.baseurl | append: post.image }}');"></figure>
           <span class="c-categories__more">View all</span>
         </div>
         {% else %}
