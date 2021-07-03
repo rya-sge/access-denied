@@ -6,7 +6,7 @@ layout: home
   {% for post in site.categories[page.title] %}
   <article class="c-post">
     {% if post.image %}
-    <a class="c-post-thumbnail" style="background-image: url({{"/assets/" | prepend: site.baseurl | append : post.image}})"
+    <a class="c-post-thumbnail" style="background-image: url({{ site.baseurl | append : post.image}})"
       href="{{post.url | prepend: site.baseurl}}"></a>
     {% else %} {% endif %}
     <div class="c-post-content">
