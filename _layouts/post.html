@@ -50,9 +50,9 @@ layout: home
         {% if post.image %}
           <div class="c-recent__item">
             <a class="c-recent__image" href="{{ post.url }}" style="background-image: url( {{ site.baseurl |
-            append: post.imagePost }})"></a>
+            append: post.image }})"></a>
             <div class="c-recent__footer">
-              <h4><a href="{{ post.url }}">{{ post.title }}</a></h4>
+              <h4><a href="{{ site.baseurl | append: post.url }}">{{ post.title }}</a></h4>
               <div class="c-recent__date">
                 <time datetime="{{ post.date | date_to_xmlschema }}">{{post.date | date: "%B %-d, %Y"}}</time>
               </div>
