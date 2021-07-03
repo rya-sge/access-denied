@@ -49,7 +49,7 @@ layout: home
         {% for post in site.related_posts limit:4 %}
         {% if post.image %}
           <div class="c-recent__item">
-            <a class="c-recent__image" href="{{ site.baseurl | post.url }}" style="background-image: url( {{ site.baseurl |
+            <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}" style="background-image: url( {{ site.baseurl |
             append: post.image }})"></a>
             <div class="c-recent__footer">
               <h4><a href="{{ site.baseurl | append: post.url }}">{{ post.title }}</a></h4>
