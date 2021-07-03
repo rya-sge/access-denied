@@ -5,7 +5,7 @@ date:   2021-06-15
 categories: securite reseau
 tags: wpa
 description: Cet article résume les principaux points du protocole WPA, notamment la génération des clés, le contrôle d'intégrité avec MIC et la confidentialité avec TKIP
-image: article/reseau/wpa/wpa-schema.png
+image: /assets/article/reseau/wpa/wpa-schema.png
 ---
 
 Cet article résume les principaux points du protocole WPA.
