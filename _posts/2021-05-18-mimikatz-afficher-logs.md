@@ -5,7 +5,8 @@ date:   2021-05-18
 categories: securite 
 tags: mimikatz log 
 Auteur: rya-sge
-description: Afficher les logs de Mimikatz avec Windows
+description: Afficher les logs de Mimikatz sur Windows grâce à l'event viewer
+image: /assets/article/outil-securite/mimikatz/windows-policiy-kernel_1.JPG
 ---
 
 Cet exercice a été réalisé sur une machine windows dans une VM.
@@ -70,11 +71,11 @@ Voici une partie des résultats obtenus
 
 4) Exécuter à nouveau mimikatz en tant qu'administrateur, remettez le privilège debug et lancer sekurlsa afin de générer des logs.
 
-5) Aller dans l'event viewer, éventuellement faites un refresh .
+5) Aller dans l'*event viewer*, éventuellement faites un *refresh*.
 
 ![event-viewer-refresh]({{site.url_complet}}/assets/article/outil-securite/mimikatz/event-viewer-refresh.JPG)
 
-6) Toujours dans l'event viewer, aller sur les événements avec la catégorie Kernel Object
+6) Toujours dans l'*event viewer*, aller sur les événements avec la catégorie Kernel Object
 
 ![windows-logs-kernel]({{site.url_complet}}/assets/article/outil-securite/mimikatz/windows-logs-kernel.JPG)
 
@@ -83,13 +84,13 @@ Voici une partie des résultats obtenus
 6) Sélectionner et afficher
 
 - Ici on peut voir que le log indique également  sous Process Name le nom de l'exécutable, ici mimikatz.exe 
-- On peut également voir le nom de l'object Lsass.exe
+- On peut également voir le nom de l'objet Lsass.exe
 
 ![windows-event-mimikatz]({{site.url_complet}}/assets/article/outil-securite/mimikatz/windows-event-mimikatz.JPG)
 
 ### Désavantage 
 
--En activant les logs sur les kernels objects, Il y a aussi des logs générés lorsqu'on se connecte normalement à la session....
+-En activant les logs sur les *kernels objects*, Il y a aussi des logs générés lorsqu'on se connecte normalement à la session....
 
 ### Sources
 

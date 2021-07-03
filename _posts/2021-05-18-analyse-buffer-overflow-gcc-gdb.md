@@ -6,8 +6,9 @@ date:   2021-05-18
 categories: securite reverse 
 tags: gcc gdb buffer-overflow shellcode
 description: Compilation avec gcc et commandes de base de GDB
+image: /assets/article/outil-securite/gdb/fonction-breakpoint.PNG
 ---
-Création de l'exécutable à tester avec **GCC** puis présentation des principales commandes de **GDB** pour analyser des buffer overflows
+Création de l'exécutable à tester avec **GCC** puis présentation des principales commandes de **GDB** pour analyser des *buffer overflows*
 
 ## Configuration
 
@@ -19,7 +20,7 @@ Désactiver l'ASLR :
 sudo bash -c "echo 0 > /proc/sys/kernel/randomize_va_space"
 ```
 
-Le bash -c permet de conserver les droits sudo durant l'exécution de la commande.
+L'ajout de *bash -c* permet de conserver les droits sudo durant l'exécution de la commande.
 
 ### Compilation avec GCC
 
@@ -30,7 +31,7 @@ gcc -m32 -fno-stack-protector -no-pie −z execstack −o prg prg.c
 
 ```
 
-Le flag -m32 nécessite, sur Ubuntu d'avoir installer gcc multilib
+Le flag -m32 nécessite, sur Ubuntu, d'avoir installé gcc multilib
 
 ```bash
 sudo apt-get install gcc-multilib
@@ -116,7 +117,7 @@ run `python2 -c 'print("A" * 10)'`
 
 
 
-Si vous souhaitez avoir la notation assembleur d'intel, vous pouvez configurer cela avec la commande suivante :
+Si vous souhaitez avoir la notation assembleur d'Intel, vous pouvez configurer cela avec la commande suivante :
 
 ```
 set disassembly-flavor intel
@@ -158,13 +159,13 @@ Tout d'abord, on peut afficher  toutes les fonctions afin de récupérer l'adres
 
 ![afficher-fonction]({{site.url_complet}}/assets/article/outil-securite/gdb/afficher-fonction.PNG)
 
-Ensuite, on peut mettre un breakpoint là où s'effectue l'instruction **call**. C'est cette instruction qui va faire que le programme saute à l'adresse contenue dans fun. Une autre instruction intéressant est l'instruction **lea**. Celle-ci permet de loader une adresse mémoire à un emplacement mémoire ou un registre. Une fois le breakpoint mis, on lance le programme avec r
+Ensuite, on peut mettre un breakpoint là où s'effectue l'instruction **call**. C'est cette instruction qui va faire que le programme saute à l'adresse contenue dans fun. Une autre instruction intéressante est l'instruction **lea**. Celle-ci permet de loader une adresse mémoire à un emplacement mémoire ou un registre. Une fois le breakpoint mis, on lance le programme avec r.
 
 ![fonction-breakpoint]({{site.url_complet}}/assets/article/outil-securite/gdb/fonction-breakpoint.PNG)
 
 
 
-Puis on peut afficher la valeur de la variable locale en récupérant l'adresse de esp et en additionnant sa valeur avec l'offset indiqué  que l'on peut voir en jaune avec le disas main.
+Puis on peut afficher la valeur de la variable locale en récupérant l'adresse de esp et en additionnant sa valeur avec l'offset indiqué  que l'on peut voir en jaune avec le *disas main*.
 
 ![afficher-valeur-variable]({{site.url_complet}}/assets/article/outil-securite/gdb/afficher-valeur-variable.PNG)
 
