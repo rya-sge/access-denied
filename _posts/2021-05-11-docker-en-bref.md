@@ -5,8 +5,7 @@ date:   2021-05-11
 categories: virtualisation 
 tags: docker 
 description: Liste des principales commandes de Docker
-image: article/docker/docker-horizontal-monochromatic-white.png
-imageArticle: article/docker/docker-horizontal-monochromatic-white.png
+image: /assets/article/docker/docker-horizontal-monochromatic-white.png
 ---
 
 Présentation et explications des principales commandes de Docker
@@ -17,45 +16,37 @@ Présentation et explications des principales commandes de Docker
 
 ##### Pull
 
-```
+```bash
 docker pull <nom image>
 ```
 
-Vous pouvez ensuite afficher les images disponible avec :
+##### Build
 
-```
-docker images
-```
-
-##### build
-
-```
+```bash
 build  <Path | url>
 ```
 
-Construire une image à partir d'un dockerfile. 
+Construire une image à partir d'un *dockerfile*. 
 
 On peut construire l'image avec un tag choisi à l'avance avec l'option -t
 
-```
+```bash
 docker build --tag exemple/test .
 ```
 
-Lorsqu'on lancera la commande, celle-ci affichera à la fin si tout c'est bien passée
+Lorsqu'on lancera la commande, celle-ci affichera à la fin si tout s'est bien passée
 
 *Successfully tagged exemple/test:latest*
-
-
 
 Erreurs possible :
 
 > COPY failed: forbidden path outside the build context: ../../src ()*
 
-https://stackoverflow.com/questions/27068596/how-to-include-files-outside-of-dockers-build-context
+Source intéressante si vous avez cette erreur : [https://stackoverflow.com/questions/27068596/how-to-include-files-outside-of-dockers-build-context](https://stackoverflow.com/questions/27068596/how-to-include-files-outside-of-dockers-build-context)
 
 #### Affichage et suppression
 
-La liste des images disponibles peuvent être obtenues avec :
+Les images disponibles peuvent être listées avec :
 
 ```bash
 docker images
@@ -63,7 +54,7 @@ docker images
 
 Il est aussi possible de supprimer une image :
 
-```
+```bash
 docker image rm <nom image ou ID >
 ```
 
@@ -73,7 +64,7 @@ Il est important de régulièrement supprimer les images non utilisées car cell
 
 #### run
 
-```
+```bash
 docker run <image>
 ```
 
@@ -91,7 +82,7 @@ Ici lorsque l'utilisateur fait run, cela exécutera la commande *java -jar opt/a
 
 
 
-```
+```bash
 docker run -it <image> /bin/bash
 ```
 
@@ -99,7 +90,7 @@ docker run -it <image> /bin/bash
 
 #### exec
 
-```
+```bash
 docker exec -it le_container /bin/bash
 ```
 
@@ -113,13 +104,13 @@ Ici, on ouvre un shell
 
 #### Obtenir l'IP d'un conteneur 
 
-```
+```bash
 docker ps
 ```
 
 Ensuite son ip 
 
-```
+```bash
 docker inspect <nom conteneur> | grep IPAddress
 ```
 
@@ -131,8 +122,8 @@ Par exemple, ici le port 80 du conteneur sera redirigé sur le port 9090 de loca
 
 Ainsi, il sera possible d'accéder au serveur depuis l'hôte avec l'adresse : 127.0.0.1:9090
 
-```
-sudo docker run -p 9090:80 serveur/apache_php
+```bash
+docker run -p 9090:80 serveur/apache_php
 ```
 
 #### Copier des fichiers
@@ -159,7 +150,7 @@ On peut ainsi transmettre dynamiquement des informations au conteneur
 
 #### Faire le ménage
 
-```
+```bash
 docker system prune
 ```
 
