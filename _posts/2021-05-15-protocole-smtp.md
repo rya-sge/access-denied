@@ -38,7 +38,7 @@ Exemple de communication avec relais
 
 Lors d'un échange SMTP, plusieurs acteurs entre en jeu :
 
-![smtp-tableau-acteur](../assets/article/reseau/SMTP/smtp-tableau-acteur.PNG)
+![smtp-tableau-acteur](/assets/article/reseau/SMTP/smtp-tableau-acteur.PNG)
 
 #### Schéma
 
