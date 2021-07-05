@@ -4,9 +4,11 @@ title:  "SMTP en bref"
 date:   2021-05-15 
 categories: reseau 
 tags: smtp protocole
+description: Résumé en bref du protocole SMTP, utilisé pour envoyer des emails, ainsi que la présentation de quelques outils (dig, telnet)
+image: /assets/article/reseau/SMTP/smtp-schema.png
 ---
 
-Résumé en bref du protocole SMTP ainsi que la présentation de quelques outils(dig, telnet)
+Résumé en bref du protocole SMTP ainsi que la présentation de quelques outils (dig, telnet)
 
 ## Description
 
@@ -18,15 +20,15 @@ Résumé en bref du protocole SMTP ainsi que la présentation de quelques outils
 
 ### Avec état
 
-C'est un protocole avec état car il garde la connexion active. Lors de l'envoi d'un email, on établit la connexion avec le serveur puis on envoie les informations(FROM TO, RCPT TO) puis les données.
+C'est un protocole avec état car il garde la connexion active. Lors de l'envoi d'un email, on établit la connexion avec le serveur puis on envoie les informations (FROM TO, RCPT TO) puis les données.
 
 
 
 ### Ports utilisés
 
-Le port utilisé entre 2 serveurs relais SMPT est le port25 (TCP)
+Le port utilisé entre 2 serveurs relais SMPT est le port **25** (TCP)
 
-Le port utilisé pour l'envoi est le port 581(TCP)
+Le port utilisé pour l'envoi est le port **587**(TCP)
 
 Exemple de communication avec relais
 
@@ -34,15 +36,15 @@ Exemple de communication avec relais
 
 ### Communication
 
-Lors d'un échange SMTP,plusieurs acteurs entre en jeu :
+Lors d'un échange SMTP, plusieurs acteurs entre en jeu :
 
-- MUA (Mail User Agent) de envoyeur
+- MUA (Mail User Agent) de l'émetteur
 
 Permet à l'utilisateur d'envoyer des emails, par exemple Thunderbird ou MS Outlook.
 
 Il utilise le port TCP 587 pour envoyer l'email au MSA.
 
-- MSA(Mail Submission Agent).
+- MSA (Mail Submission Agent).
 
 Le MSA est un intermédiaire entre le MUA et le MTA.
 
@@ -64,27 +66,57 @@ Le MTA destinataire va recevoir l'email et le stocker dans la mailbox du destina
 
 Le destinataire récupère l'email via son MUA avec un protocole comme IMAP ou POP3
 
+#### Schéma
 
+Voici un schéma simplifié du processus
+
+![smtp-schema]({{site.url_complet}}/assets/article/reseau/SMTP/smtp-schema.png)
 
 ## Commandes
 
-Les principales commandes utilisés pour l'envoi d'un email sont :
+Les principales commandes utilisées pour l'envoi d'un email sont :
 
-| Commandes | Description                                                 |      |
-| --------- | ----------------------------------------------------------- | ---- |
-| EHLO      | Envoyé par le client pour prendre contact avec le serveur   |      |
-| MAIL FROM | Spécifie l'origine de l'email                               |      |
-| RCPT TO   | Spécifie le destinataire                                    |      |
-| DATA      | Envoyer les données de l'email, contient notamment le sujet |      |
-| QUIT      | Envoyé par le client pour mettre fin à la connexion         |      |
+| Commandes | Description                                                 |
+| --------- | ----------------------------------------------------------- |
+| EHLO      | Envoyé par le client pour prendre contact avec le serveur   |
+| MAIL FROM | Spécifie l'émetteur, celui qui envoie l'email               |
+| RCPT TO   | Spécifie le véritable destinataire.                         |
+| DATA      | Envoyer les données de l'email, contient notamment le sujet |
+| QUIT      | Envoyé par le client pour mettre fin à la connexion         |
+
+### Schéma
+
+Voici un exemple illustratif et simplifié d'une communication stmp entre un client (souvent le MUA) et un serveur SMTP (souvent le MSA).
+
+Cet exemple est en partie tirée de l'exemple donnée par la RFC : [https://datatracker.ietf.org/doc/html/rfc5321](https://datatracker.ietf.org/doc/html/rfc5321)
+
+![schema-client-serveur]({{site.url_complet}}/assets/article/reseau/SMTP/schema-client-serveur.png)
+
+### EHLO - réponse du serveur
+
+Lorsque le serveur répond, il va envoyer une liste d'extension autorisées. Il faut lire chaque extension ligne par ligne. Une ligne commence par < 250- > (sans les chevrons). Il faut arrêter la lecture dès qu'on lit la ligne débutant par 250 suivi d'un espace.
 
 
+
+### Contenu de l'email
+
+Le  contenu, exprimé suite à une commande DATA peut contenir 5 en-têtes :
+
+| Champ | Explication                  |
+| ----- | ---------------------------- |
+| Date  | Date du message              |
+| From  | Expéditeur du message        |
+| To    | Destinataire du message      |
+| CC    | Destinataire en copie        |
+| BCC   | Destinataire en copie cachée |
+
+Pour que les destinataires soient en copie cachées,  il faut mettre le champ BCC au lieu de CC.
 
 ## Pour aller plus loin...
 
 ### Outils
 
-Vous pouvez obtenir une liste des MX enregistrés avec la commande dig
+Vous pouvez obtenir une liste des MX enregistrés avec la commande **dig**
 
 ```
 dig -t any <domaine>
@@ -104,9 +136,20 @@ En rouge, les commandes que j'ai écrites.
 
 ### Email forgé
 
-Dans Data, on spécifie un destinataire. Celui-ci peut être différent du MAIL FROM pris en compte par le MTA pour le transfert.
+- Sur l'émetteur
 
-Ainsi, il ne faut pas se fier à l'en-tête du mail que le client voit, car celui-ci ne garantir rien sur identité de l'envoyeur.
+
+Dans Data, on peut spécifier un émetteur différent dans le champ **From** que celui indiqué dans la commande *MAIL FROM*, pris en compte par le MTA pour le transfert.
+
+- Sur le destinataire :
+
+
+Dans Data, on spécifie un destinataire différent dans le champ *To* que celui indiqué avec la commande *RCPT TO* pris en compte par le MTA pour le transfert.
+
+- Conclusion :
+
+
+Il ne faut pas se fier à l'en-tête du mail, contenu de Data, que le client voit, car celui-ci ne garantit rien sur identité de l'émetteur ou du destinataire,
 
 
 
@@ -118,7 +161,7 @@ En java, on peut simuler un serveur SMPT, par exemple pour faire des tests avec 
 
 
 
-Un exemple complet se trouve sur mon repôt git : [https://github.com/rya-sge/smtp](https://github.com/rya-sge/smtp)
+Un exemple complet se trouve sur mon dépôt git : [https://github.com/rya-sge/smtp](https://github.com/rya-sge/smtp)
 
 ## Sources 
 
