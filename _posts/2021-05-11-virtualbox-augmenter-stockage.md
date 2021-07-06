@@ -4,17 +4,20 @@ title:  "VirtualBox - augmenter l'espace de stockage"
 date:   2021-05-11
 categories: virtualisation
 tags: virtualbox virtualisation
+description: Cet article est un tutoriel pour augmenter l'espace de stockage d'une machine virtuelle avec le logiciel de virtualisation VirtualBox. 
+image: /assets/article/virtualBox/gparted.JPG
 ---
 
-Cet article présente mes prises de notes sur l'outil de virtualisation VirtualBox.
+Cet article est un tutoriel pour augmenter l'espace de stockage d'une machine virtuelle avec le logiciel de virtualisation **VirtualBox**. 
 
-L'ensemble des opérations effectuées l'ont été pour augmenter l'espace de stockage d'une VM Ubuntu (Ubuntu 20.04.2 LTS) avec le logiciel de virtualisation VirtualBox. Celui-ci était installé sur Windows 10 Professional, 64 bits.
+- L'ensemble des opérations effectuées concernent une VM Ubuntu (Ubuntu 20.04.2 LTS).  
+- VirtualBox était installé sur le système d'exploitation Windows 10 Professional, 64 bits.
 
 ### Mise en place
 
 Pour  effectuer cette opération, il faut avoir préalablement éteint votre espace de stockage.
 
-De plus, pensez à sauvegarder vos fichiers de la VM sur votre disque principale car il y a un risque que l'opération puisse échouer, rendant le disque et son contenu illisible.
+De plus, pensez à sauvegarder vos fichiers de la VM sur votre disque principal car il y a un risque que l'opération puisse échouer, rendant le disque et son contenu illisible.
 
 ### Opération
 
@@ -52,13 +55,13 @@ Source : [https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disq
 
 Celui-ci propose d'utiliser GNOME partition Editor : [https://gparted.org/download.php](https://gparted.org/download.php)
 
-Après avoir mis démarré ma VM sur l'iso du logiciel, voici les opérations que j'ai effectuées :
+Après avoir démarré ma VM sur l'iso du logiciel, voici les opérations que j'ai effectuées :
 
 
 
 1) On peut voir ici que j'ai 9 GO d'espace libre, correspond à l'augmentation du disque dur
 
-Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma partition root/principale
+Je vais alors allouer d'abord l'espace disponible à /dev/sda2 où se situe ma partition root/principale
 
 ![gparted]({{site.url_complet}}/assets/article/virtualBox/gparted.JPG)
 
@@ -66,7 +69,7 @@ Je vais alors alloué d'abord l'espace disponible à /dev/sda2 où se situe ma p
 
 
 
-2) Ensuite, je vais pouvoir alloué l'espace à /dev/sda5 qui est ma partition principale.
+2) Ensuite, je vais pouvoir allouer l'espace à /dev/sda5 qui est ma partition principale.
 
 ![gparted2]({{site.url_complet}}/assets/article/virtualBox/gparted2.JPG)
 
