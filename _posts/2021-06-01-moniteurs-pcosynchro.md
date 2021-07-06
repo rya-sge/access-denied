@@ -37,7 +37,7 @@ Avec un moniteur de **Hoare**, le thread réveillé acquière directement le mut
 
 Une autre différence entre Hoare et Mesa c'est qu'il est possible d'effectuer un réveille multiple, c'est-à-dire de réveiller plusieurs threads, avec Mesa en appelant la fonction *notifyAll*.
 
-### Avec Hoare
+#### Avec Hoare
 
 Avec Hoare, la fonction signal ne va réveiller qu'un seul thread. Il faut alors effectuer des réveils en cascade ou avec une boucle. C'est deux façons de procéder sont détaillés dans la partie dédiée à Hoare.
 
@@ -76,7 +76,7 @@ Ensuite, il redonne la main au thread au thread qui a effectué le signal
 
 Ce code permet de réveiller tous les threads en attente sur la variable de condition.
 
-On a besoin d'un compteur nbWaitingThreads pour déterminer le nombre de threads effectivement en attente.
+On a besoin d'un compteur *nbWaitingThreads* pour déterminer le nombre de threads effectivement en attente.
 
 ```c++
 for(unsigned i = 0; i < nbWaitingThreads; ++i){
@@ -187,7 +187,7 @@ PcoConditionVariable* tabCond = new PcoConditionVariable[size];
 
 Remarques :
 
-Il n'y a pas de garantie que notifyOne ou notifyOne réveille dans l'ordre les threads.
+Il n'y a pas de garantie que notifyOne ou notifyAll réveille dans l'ordre les threads.
 
 Ainsi le 1er thread mis en attente ne sera pas forcément réveillé en 1er.
 
@@ -242,7 +242,7 @@ if(nbWaiting){
 	PcoConditionVariable* cond = queue.front();
     condLists.pop();
     --nbWaitingThreads;
-    cond->notifyOne();
+    cond->notifyOne(); //Réveiller un thread en attente
 }
 ```
 
