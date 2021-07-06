@@ -5,7 +5,7 @@ date:   2021-05-16
 categories: securite
 tags: metasploit meterpreter keylogger migrate
 description: Cet article présente la commande Meterpreter migrate du logiciel  Metasploit. Celle-ci permet à un attaquant d'élever ses privilèges sur la machine après qu'il ait pu obtenir dessus une session meterpreter.
-image: \assets\article\outil-securite\metasploit\migrate.png
+image: /assets/article/outil-securite/metasploit/migrate.png
 ---
 
 Cet article présente une des fonctionnalités du logiciel [Metasploit](https://www.metasploit.com) : la commande Meterpreter *migrate*. Celle-ci permet à un attaquant d'élever ses privilèges sur la machine après qu'il ait pu obtenir dessus une session *meterpreter*. Cette opération peut lui permettre par exemple d'utiliser un keylogger.
@@ -36,7 +36,7 @@ Ensuite, il peut choisir le processus en fonction de ce qu'il a envie de réalis
 
 Pour l'exercice, j'ai choisi internet explorer afin de pouvoir montrer comment il est possible de récupérer les entrées de l'utilisateur (Key logger)
 
-![migrate]({{site.url_complet}}\assets\article\outil-securite\metasploit\processus.png)
+![migrate]({{site.url_complet}}/assets/article/outil-securite/metasploit/processus.png)
 
 
 
@@ -53,7 +53,7 @@ getpid
 getuid
 ```
 
-![migrate]({{site.url_complet}}\assets\article\outil-securite\metasploit\migrate.png)
+![migrate]({{site.url_complet}}/assets/article/outil-securite/metasploit/migrate.png)
 
 
 
@@ -61,11 +61,11 @@ getuid
 
 Cette élévation de privilège lui permet de lancer de nouvelles attaques. Par exemple, il peut lancer un keylogger avec la commande  keyscan_start qui va sniffer les entrées du clavier.
 
-![keyscan_start]({{site.url_complet}}\assets\article\outil-securite\metasploit\keyscan_start.JPG)
+![keyscan_start]({{site.url_complet}}/assets/article/outil-securite/metasploit/keyscan_start.JPG)
 
 Puis  afficher le résultat obtenu.
 
-![keyscan_dump]({{site.url_complet}}\assets\article\outil-securite\metasploit\keyscan_dump.JPG)
+![keyscan_dump]({{site.url_complet}}/assets/article/outil-securite/metasploit/keyscan_dump.JPG)
 
 
 

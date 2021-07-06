@@ -19,7 +19,7 @@ Il peut être intéressant d'en installer un pour les raisons suivantes:
 - Performance : il est possible de répartir la charge entre différence serveur backend avec du *load balancing*
 - scalabilité : il est plus facile d'ajouter de nouveaux serveurs backend à infrastructure.
 
-
+{:toc}
 
 ### Schéma
 
