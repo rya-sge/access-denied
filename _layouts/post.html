@@ -26,6 +26,7 @@ layout: home
           <span>{{page.date | date: '%Y, %b %d'}}</span>
         </div>
       </header>
+      {% include toc.html html=content %}
       {{page.content | markdownify}}
       <div class="c-article__footer u-clearfix">
         <div class="c-article__tag">
