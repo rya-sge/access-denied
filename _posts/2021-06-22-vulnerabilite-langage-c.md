@@ -155,9 +155,9 @@ Les fonctions *malloc* et *calloc* vont réserver de la mémoire dans le tas(hea
   - Il est possible de détecter cette vulnérabilité avec l'outil *Sanitizer en activant LeakSanitizer(LSan).
   -  Par contre, l'utilisation de l'outil klee ne permet PAS de détecter des fuites de mémoires(sauf erreur de ma part)
 
-### Implémentations
+## Implémentations
 
-#### Variables non initialisées.
+### Variables non initialisées
 
 En c, les variables non initialisées ont une valeur arbitraire, ce qui peut provoquer un comportement indéterminé du programme et par conséquent entrainer des failles de sécurités
 

@@ -19,8 +19,6 @@ Il peut être intéressant d'en installer un pour les raisons suivantes:
 - Performance : il est possible de répartir la charge entre différence serveur backend avec du *load balancing*
 - scalabilité : il est plus facile d'ajouter de nouveaux serveurs backend à infrastructure.
 
-{:toc}
-
 ### Schéma
 
 Un *reverse proxy* se situe du côté du serveur. Voici un schéma pour mieux illustrer cela :
@@ -94,15 +92,15 @@ Une explication plus détaillée, avec  des conteneurs Docker se trouve sur mon 
 
 
 
-## Sources 
+### Sources 
 
-### Documentation apache 
+#### Documentation apache 
 
 - Réaliser un reverse proxy : https://httpd.apache.org/docs/2.4/fr/howto/reverse_proxy.html
 - proxy balancer : https://httpd.apache.org/docs/2.4/fr/mod/mod_proxy_balancer.html
 
 
-### Autres sources
+#### Autres sources
 
 - Définition, exemple avec apache httpd : [https://www.ionos.fr/digitalguide/serveur/know-how/quest-ce-quun-reverse-proxy-le-serveur-reverse-proxy/]( https://www.ionos.fr/digitalguide/serveur/know-how/quest-ce-quun-reverse-proxy-le-serveur-reverse-proxy/)
 
