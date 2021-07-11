@@ -38,7 +38,17 @@ Exemple de communication avec relais
 
 Lors d'un échange SMTP, plusieurs acteurs entre en jeu :
 
-![smtp-tableau-acteur]({{site.url_complet}}/assets/article/reseau/SMTP/smtp-tableau-acteur.PNG)
+
+
+| Acteur                                                       | Rôle                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| MUA (Mail User Agent) de l'émetteur------------------------------------------------------------------------------------------------------------------------------------------------- | Permet à l'utilisateur d'envoyer des emails, par exemple Thunderbird ou MS Outlook. Il utilise le port TCP 587 pour envoyer l'email au MSA. |
+| MSA (Mail Submission Agent).                                 | Le MSA est un intermédiaire entre le MUA et le MTA. Il vérifie notamment que l'utilisateur est authentifié, que l'email est syntaxiquement correct puis délègue la suite au MTA |
+| MTA (Mail Transfert Agent) - émetteur                        | Si le nom de domaine est différent de celui du MTA, il fait une requête DNS pour déterminer l'adresse IP du serveur mail. Le serveur DNS lui renvoie une liste des MX(Mail eXchanger) enregistrés. Le MTA utilise ensuite le port 25/TCP pour transférer l'email au MTA destinataire. |
+| MTA - destinataire                                           | Le MTA destinataire va recevoir l'email et le stocker dans la mailbox du destinataire. |
+| MUA destinataire                                             | Le destinataire récupère l'email via son MUA avec un protocole comme IMAP ou POP3 |
+
+
 
 #### Schéma
 
@@ -106,7 +116,7 @@ Telnet permet d'établir la connexion avec le serveur mx.
 
 En rouge, les commandes que j'ai écrites.
 
-## ![dig-telnet-exemple]({{site.url_complet}}/assets/article/reseau/SMTP/dig-telnet-exemple.png)
+![dig-telnet-exemple]({{site.url_complet}}/assets/article/reseau/SMTP/dig-telnet-exemple.png)
 
 ### Email forgé
 
