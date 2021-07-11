@@ -42,7 +42,7 @@ Lors d'un échange SMTP, plusieurs acteurs entre en jeu :
 
 | Acteur                                                       | Rôle                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| MUA (Mail User Agent) de l'émetteur------------------------------------------------------------------------------------------------------------------------------------------------- | Permet à l'utilisateur d'envoyer des emails, par exemple Thunderbird ou MS Outlook. Il utilise le port TCP 587 pour envoyer l'email au MSA. |
+| MUA (Mail User Agent) de l'émetteur--------------------------------------------------------------- | Permet à l'utilisateur d'envoyer des emails, par exemple Thunderbird ou MS Outlook. Il utilise le port TCP 587 pour envoyer l'email au MSA. |
 | MSA (Mail Submission Agent).                                 | Le MSA est un intermédiaire entre le MUA et le MTA. Il vérifie notamment que l'utilisateur est authentifié, que l'email est syntaxiquement correct puis délègue la suite au MTA |
 | MTA (Mail Transfert Agent) - émetteur                        | Si le nom de domaine est différent de celui du MTA, il fait une requête DNS pour déterminer l'adresse IP du serveur mail. Le serveur DNS lui renvoie une liste des MX(Mail eXchanger) enregistrés. Le MTA utilise ensuite le port 25/TCP pour transférer l'email au MTA destinataire. |
 | MTA - destinataire                                           | Le MTA destinataire va recevoir l'email et le stocker dans la mailbox du destinataire. |

@@ -2,9 +2,9 @@
 layout: post
 title:  "Introduction à Node.JS"
 date:   2021-07-11
-categories: nodejs
+categories: reseau programmation
 tags: nodejs javascript serveur backend
-description: Introduction à Node.JS. Celui-ci permet d'exécuter du javascript côté serveur. Il possède un grand nombre de paquets qui peuvent être installés avec le gestionnaire de package npm.
+description: Node.JS est un environnement d’exécution (runtime) en Javascript permettant d'exécuter du javascript côté serveur. Il possède un grand nombre de paquets pouvant être installés avec le gestionnaire de package npm.
 ---
 
 ## Introduction
@@ -49,7 +49,7 @@ npm init
 
 npm init permet d'initialiser le package npm. Cette commande créée un fichier package.json qui contiendra toutes les dépendances.
 
-Documentation officielle : https://docs.npmjs.com/cli/v7/commands/npm-init
+Documentation officielle : [https://docs.npmjs.com/cli/v7/commands/npm-init](https://docs.npmjs.com/cli/v7/commands/npm-init)
 
 - Installer le package
 
@@ -59,7 +59,7 @@ npm install <nom du package>
 
 Dans certaines anciennes version, l'option --save était obligatoire pour ajouter le package dans les dépendances de package.json. Cette option n'est plus nécessaire dans les nouvelles versions car fait par défaut
 
-Documentation : https://docs.npmjs.com/cli/v7/commands/npm-install
+Documentation : [https://docs.npmjs.com/cli/v7/commands/npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install)
 
 - Exécuter le fichier index.js
 
