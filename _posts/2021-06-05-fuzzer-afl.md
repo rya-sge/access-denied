@@ -7,7 +7,7 @@ tags: fuzzing afl
 description: Présentation de l'outil de Fuzzing AFL (American Fuzzy Lop)
 image: /assets/article/outil-securite/afl-fuzzing/result-print.png
 ---
-*AFL*  de Google est un outil de fuzzing, disponible sur le github de google : [https://github.com/google/AFL](https://github.com/google/AFL)
+*AFL*  de Google est un outil de fuzzing (*fuzzer*), disponible sur le github de google : [https://github.com/google/AFL](https://github.com/google/AFL)
 
 Il a pour objectif de tester les entrées d'un programme en y injectant des données. Celles-ci sont au départ aléatoire puis *AFL* va ensuite adapter les inputs aux résultats obtenus.
 

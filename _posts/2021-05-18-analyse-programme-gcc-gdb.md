@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title:  "Analyse de buffer overflow avec GCC et GDB"
+title:  "Analyse de programmes avec GCC et GDB"
 date:   2021-05-18 
 categories: securite reverse 
 tags: gcc gdb buffer-overflow shellcode
