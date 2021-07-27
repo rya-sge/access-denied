@@ -29,7 +29,7 @@ $$
 
 ### SageMath
 
-#### Fonctions proposées par Sage
+#### Fonctions proposées par la librairie
 
 - Pour le déchiffrement, la fonction  *inverse_mod* permet de calculer d très facilement
 - En déclarant le groupe multiplicatif avec *Integers(n)*, tous les calculs vont se faire modulo n ce qui simplifie l'écriture.
