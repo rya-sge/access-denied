@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Chiffrement RSA avec Sage"
+title:  "Chiffrement RSA avec SageMath"
 date:   2021-07-27
 categories: cryptographie
 tags: nodejs javascript serveur backend
