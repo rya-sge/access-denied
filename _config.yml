@@ -41,7 +41,7 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
-  - jekyll-katex
+#  - jekyll-katex
 
 paginate: 7
 paginate_path: "/page/:num/"
