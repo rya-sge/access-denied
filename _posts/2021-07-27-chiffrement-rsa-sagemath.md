@@ -15,10 +15,6 @@ Plus d'informations est disponible sur la documentation d'installation de Sage :
 
 ### Rappel sur le chiffrement RSA
 
-```
-{% katex %}
-```
-
 
 $$
 \textrm{module de chiffrement} \\
@@ -31,9 +27,7 @@ c = m^e \ mod \ φ(n) \\
 m = c^d \ mod \ φ(n)
 $$
 
-```
-{% endkatex %}
-```
+
 
 ### SageMath
 
