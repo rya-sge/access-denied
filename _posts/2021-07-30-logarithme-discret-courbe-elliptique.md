@@ -63,9 +63,13 @@ Pour la résolution, le code et les explications, j'ai repris trois excellent wr
 La consigne du challenge donnait certains nombres et il fallait déterminer d.
 
 > p = 17459102747413984477
+>
 > a = 2
+>
 > b = 3
+>
 > G = (15579091807671783999, 4313814846862507155)
+>
 > Q = (8859996588597792495, 2628834476186361781)
 >
 > d = ???
