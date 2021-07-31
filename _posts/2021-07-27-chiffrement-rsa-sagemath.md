@@ -21,7 +21,7 @@ Plus d'informations est disponible sur la documentation d'installation de Sage :
   module de chiffrement
 
 $$
-n = p * q \\
+n = p * q 
 $$
 
 - Indicatrice d'Euler
@@ -33,7 +33,7 @@ $$
 - Chiffrement
 
 $$
-c = m^e \ mod \ φ(n) 
+c = m^e \ mod \ φ(n)
 $$
 
 - Déchiffrement
