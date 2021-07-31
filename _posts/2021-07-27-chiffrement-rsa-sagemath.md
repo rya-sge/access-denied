@@ -17,27 +17,23 @@ Plus d'informations est disponible sur la documentation d'installation de Sage :
 
 ### Rappel sur le chiffrement RSA
 
-- 
-  module de chiffrement
 
+Module de chiffrement
 $$
-n = p * q 
+n = p * q
 $$
 
-- Indicatrice d'Euler
-
+Indicatrice d'Euler
 $$
 φ(n) = (p - 1)(q - 1)
 $$
 
-- Chiffrement
-
+Chiffrement
 $$
 c = m^e \ mod \ φ(n)
 $$
 
-- Déchiffrement
-
+Déchiffrement
 $$
 m = c^d \ mod \ φ(n)
 $$
