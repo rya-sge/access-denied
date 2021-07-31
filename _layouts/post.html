@@ -29,6 +29,9 @@ layout: home
       {% include toc.html html=content %}
       {{page.content | markdownify}}
       <div class="c-article__footer u-clearfix">
+        <p>
+          Si vous avez des remarques ou des suggestions pour améliorer cet article, c'est avec plaisir que je les lirais
+        </p>
         <div class="c-article__tag">
           {% for tag in page.tags %}
           <a href="{{site.baseurl}}/tags#{{tag}}">&#35; {{ tag }}</a>

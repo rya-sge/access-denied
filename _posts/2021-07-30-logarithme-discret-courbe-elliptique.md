@@ -132,7 +132,7 @@ EC = EllipticCurve(GF(p), [a, b])
 #Define the point G on the curve
 G = EC(15579091807671783999, 4313814846862507155)
 
-#Définir le point Q sur la courbe
+#Define the point Q on the curve
 Q = EC(8859996588597792495, 2628834476186361781)
 
 #Calculate the discrete logarithme
@@ -154,7 +154,7 @@ De nombreuses sources ont été utilisées pour cet article. En voici la liste c
 ### Théorie et définition 
 
 - Cours de cryptographie (CRY) enseigné à l'HEIG-VD en 2020
-- Longueur des clés : [https://www.keylength.com/fr/3/
+- Longueur des clés : [https://www.keylength.com/fr/3/](https://www.keylength.com/fr/3/)
 - Pohlig-Hellman :
   - [connect.ed-diamond.com - Le logarithme discret contre les tunnels sécurisés](https://connect.ed-diamond.com/MISC/MISCHS-006/Le-logarithme-discret-contre-les-tunnels-securises)
   - [www-math.ucdenver.edu - Pohlig-Hellman Algorithm](http://www-math.ucdenver.edu/~wcherowi/courses/m5410/phexample.pdf)
