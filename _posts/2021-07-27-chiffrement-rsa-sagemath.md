@@ -53,7 +53,7 @@ $$
 
 L'objectif ici sera de chiffrer puis déchiffrer un message(ascii) avec RSA.
 
-Pour chiffrer, il faut :
+##### Chiffrement
 
 1. Convertir en byte message à chiffrer 
 
@@ -65,7 +65,9 @@ Pour chiffrer, il faut :
 
 3. Appliquer le chiffrement RSA sur le message
 
-Pour déchiffrer, on suppose le message chiffré sous forme d'un nombre
+##### Déchiffrement
+
+On suppose le message chiffré sous forme d'un nombre
 
 1. Appliquer le déchiffrement RSA sur ce nombre
 
