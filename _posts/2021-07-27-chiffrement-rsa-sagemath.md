@@ -13,13 +13,14 @@ Il est possible d'éditer du code SageMath en utilisant juypter. Pour cela il fa
 
 Plus d'informations est disponible sur la documentation d'installation de Sage : [https://doc.sagemath.org/html/en/installation/launching.html]( https://doc.sagemath.org/html/en/installation/launching.html)
 $$
-n = p * Q
+n = p * Q \n
+φ(n) = (p - 1)(q - 1)
 $$
 
 $$
-n = p * q \\\\\\\
-φ(n) = (p - 1)(q - 1) \\\\\\\
-c = m^e \ mod \ φ(n) \\\\\\\
+n = p * q \\
+φ(n) = (p - 1)(q - 1) \\
+c = m^e \ mod \ φ(n) \\
 m = c^d \ mod \ φ(n)
 $$
 
@@ -35,6 +36,26 @@ n = p * q \\\\\\
 \textrm{Chiffrement} \\\\\\
 c = m^e \ mod \ φ(n) \\\\\\
 \textrm{Déchiffrement} \\\\\\
+m = c^d \ mod \ φ(n)
+$$
+
+$$
+\textrm{module de chiffrement} \\
+n = p * q \\
+$$
+
+$$
+\textrm{Indicatrice d'Euler} \\
+φ(n) = (p - 1)(q - 1) 
+$$
+
+$$
+\textrm{Chiffrement} \\
+c = m^e \ mod \ φ(n) \\
+$$
+
+$$
+\textrm{Déchiffrement} \\
 m = c^d \ mod \ φ(n)
 $$
 
