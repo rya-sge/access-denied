@@ -17,9 +17,9 @@ n = p * Q
 $$
 
 $$
-n = p * q \\
-φ(n) = (p - 1)(q - 1) \\
-c = m^e \ mod \ φ(n) \\
+n = p * q \\\\\\\\
+φ(n) = (p - 1)(q - 1) \\\\\\\\
+c = m^e \ mod \ φ(n) \\\\\\\\
 m = c^d \ mod \ φ(n)
 $$
 
@@ -28,13 +28,13 @@ $$
 
 
 $$
-\textrm{module de chiffrement} \\
-n = p * q \\
-\textrm{Indicatrice d'Euler} \\
-φ(n) = (p - 1)(q - 1) \\
-\textrm{Chiffrement} \\
-c = m^e \ mod \ φ(n) \\
-\textrm{Déchiffrement} \\
+\textrm{module de chiffrement} \\\\\\\\
+n = p * q \\\\\\\\
+\textrm{Indicatrice d'Euler} \\\\\\\\
+φ(n) = (p - 1)(q - 1) \\\\\\\\
+\textrm{Chiffrement} \\\\\\\\
+c = m^e \ mod \ φ(n) \\\\\\\\
+\textrm{Déchiffrement} \\\\\\\\
 m = c^d \ mod \ φ(n)
 $$
 
