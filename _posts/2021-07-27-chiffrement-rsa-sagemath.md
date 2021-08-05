@@ -4,7 +4,7 @@ layout: post
 title:  "Chiffrement RSA avec SageMath"
 date:   2021-07-27
 categories: cryptographie
-tags: nodejs javascript serveur backend
+tags: RSA sage python
 description: Cet article explique comment implémenter le chiffrement RSA avec SageMath. C'est un logiciel permettant de réaliser des opérations mathématiques, particulièrement intéressant pour faire de la cryptographie. De plus, il est possible d'importer des libraires python.
 ---
 
