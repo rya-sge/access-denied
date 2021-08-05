@@ -28,7 +28,7 @@ Exemple i:
 
 Le code suivant :
 
-```
+```python
 integer = 2000
 print("big : ", (integer).to_bytes(2, byteorder='big'))
 print("little : ", (integer).to_bytes(2, byteorder='little'))
@@ -121,7 +121,7 @@ Warning :
 
 Il faut que la string représente un nombre entier. Par exemple, le code suivant :
 
-```
+```python
 Astring = "A_String"
 print(int(Astring ))
 ```
