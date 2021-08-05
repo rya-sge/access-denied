@@ -1,16 +1,16 @@
 ---
 layout: post
-title:  "Conversions entre format de données en python"
+title:  "Conversions entre format de données en python(byte, string, int)"
 date:   2021-08-05
 categories: programmation
 tags: python
-description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents
+description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents en python, par exemple des bytes en int
 image:
 ---
 
 
 
-Cet article décrit différentes façons de convertir des données représentées dans des formats différents : d'un nombre entier en byte,  d'une donnée en byte en nombre, d'une string représentant un nombre hexadécimaux en byte, etc.
+Cet article décrit différentes façons de convertir des données représentées dans des formats différents en python : byte à entier, string à byte, hexa string à byte, etc.
 
 Lors des CTF(Capture the flags), il m'arrivait souvent de perdre du temps dans les conversion et de me mélanger les pinceaux, d'où cet article pour faciliter la compréhension.
 
@@ -43,7 +43,7 @@ Sources :
 
 - [https://docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
 
-### bytes -> int
+#### bytes -> int
 
 >  `int.``from_bytes`(*bytes*, *byteorder*, ***, *signed=False*)
 
