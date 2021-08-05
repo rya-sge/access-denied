@@ -4,7 +4,7 @@ title:  "Conversions entre format de données en python"
 date:   2021-08-05
 categories: programmation
 tags: python
-description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents : d'un nombre entier en byte,  d'une donnée en byte en nombre, d'une string représentant un nombre hexadécimaux en byte, etc.
+description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents
 image:
 ---
 
