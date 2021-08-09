@@ -4,7 +4,7 @@ title:  "Analyser un message chiffré [transposition/substitution]"
 date:   2021-08-09
 categories: cryptographie
 tags: transposition substitution railfence vigenère césar bifid ractf
-description: Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre  sur les chiffrements "basiques" : substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
+description: Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre  sur les chiffrements "basiques" ":" substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
 image: /assets/article/cryptographie/analyse-chiffrement/01-dcode-2.PNG
 ---
 
