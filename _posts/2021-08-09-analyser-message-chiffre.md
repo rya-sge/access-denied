@@ -4,29 +4,29 @@ title:  "Analyser un message chiffré [transposition/substitution]"
 date:   2021-08-09
 categories: cryptographie
 tags: transposition substitution railfence vigenère césar bifid ractf
-description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents en python, par exemple des bytes en int
+description: Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre  sur les chiffrements "basiques" : substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
 image: /assets/article/cryptographie/analyse-chiffrement/01-dcode-2.PNG
 ---
 
 
 
-Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre uniquement sur des chiffrements "basiques" : substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
+Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre  sur les chiffrements classiques : substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
 
 
 
-## Etape initiale
+## Introduction
 
 ###  Traiter le texte 
 
 Parfois il est nécessaire de traiter le message chiffré, boxentriq.com propose de nombreux outils pour cela, comme un qui supprime automatique les espaces.
 
-Supprimer les espaces : https://www.boxentriq.com/code-breaking/remove-spaces
+Supprimer les espaces : [www.boxentriq.com - remove-spaces](https://www.boxentriq.com/code-breaking/remove-spaces)
 
-Page avec tous les outils proposée : https://www.boxentriq.com/code-breaking
+Page avec tous les outils proposée : [www.boxentriq.com/code-breaking](https://www.boxentriq.com/code-breaking)
 
 
 
-## Outils de résolutions (solver)
+### Outils de résolutions (solver)
 
 Ces différents sites ou logiciels proposent tout une gamme d'outils permettant de résoudre des messages chiffrés.
 
@@ -45,7 +45,7 @@ Remarques :
 
 En plus d'installer le logiciel, il faut aussi configurer les dictionnaires dans le menu Option
 
-![05-options](../../assets_2/analyse-cipher/05-options.PNG)
+![05-options]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/05-options.PNG)
 
 ## Analyser le texte chiffré
 
@@ -90,15 +90,15 @@ On peut calculer la fréquence des lettres avec dcode ou avec cryptage. Ce derni
 
 
 
-## Substitution mono-alphabétique
+## 2 familles de chiffrements classiques
+
+### Substitution mono-alphabétique
 
 Le chiffrement par substitution consiste à remplacer dans un message clair un ou plusieurs symboles par d'autres symboles, le plus souvent du même alphabet sans toucher à la structure du texte. Dans cet exemple, on a le **chiffrement de César** qui applique un chiffrement par décalage
 
 Ces système de chiffrement conservent la **répartition** des fréquences des lettres. Par exemple, dans le français, la lettre 'e' a une grande fréquence d'apparition. Ainsi on peut supposer que le symbole ayant la plus haute fréquence correspond à la lettre 'e'.
 
-Pour plus d'informations, 
-
-https://fr.wikipedia.org/wiki/Chiffrement_par_substitution
+Pour plus d'informations : [fr.wikipedia.org - Chiffrement_par_substitution](https://fr.wikipedia.org/wiki/Chiffrement_par_substitution)
 
 
 
@@ -112,7 +112,7 @@ Quelques outils pour décrypter le chiffrement par substitution
 
 
 
-### Vigenere
+#### Vigenere
 
 Pour résoudre des messages chiffrés avec Vigenere, le site Gubulla propose un outil en ligne très efficace et en plusieurs langues : anglais, espagnol, français néerlandais et portugais.
 
@@ -122,7 +122,7 @@ Lien : [www.guballa.de - vigenere-solver](https://www.guballa.de/vigenere-solver
 
 Petite remarque : avec Vigenere, l'indice de coïncidence calculée sur le message chiffré peut être très loin de la langue d'origine. 
 
-## Transposition
+### Transposition
 
 Le chiffrement par transposition consiste à **réarranger** les lettres sans pour autant remplacer les symboles par d'autres symboles comme dans le cas du chiffrement par substitution.
 
@@ -132,8 +132,8 @@ Un exemple connu de chiffre par transposition est le RailFence
 
 Quelques sites proposent des outils pour résoudre automatiquement des chiffrements par transposition :
 
-- https://tholman.com/other/transposition/
-- http://www.cryptoprograms.com/transsolve/columnar
+- [tholman.com - transposition](https://tholman.com/other/transposition/)
+- [www.cryptoprograms.com - columnar](http://www.cryptoprograms.com/transsolve/columnar)
 
 
 
@@ -170,7 +170,7 @@ Ci-dessous, le message chiffré du challenge :
 
 **Solution**
 
-Le site https://quipqiup.com trouve immédiatement la solution 
+Le site [quipqiup.com](https://quipqiup.com) trouve immédiatement la solution 
 
 ![01-quipqiup]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/01-quipqiup.PNG)
 
@@ -214,7 +214,7 @@ Sources :
 
 **Solution** 
 
-Avec ce message chiffré, https://quipqiup.com n'était pas capable de le casser directement.
+Avec ce message chiffré, [quipqiup.com]( https://quipqiup.com) n'était pas capable de le casser directement.
 
 En faisant un calcul de coïncidence, on obtient rien de tangible, là 0.04, bien éloigné de l'anglais et proche de l'aléatoire. J'ai utilisé l'outil en ligne  [planetcalc.com](https://fr.planetcalc.com/7944/) pour obtenir le résultat.
 
@@ -342,7 +342,9 @@ Avec l'outil  [bionsgadgets](  https://bionsgadgets.appspot.com/gadget_forms/ref
 - Nicodemus 6
 - Progkey beaufort 6
 
-La consigne fournit le nombre 143526 qu'on peut alors tester comme clé avec CryptoCrack pour le chiffre de Gromark, périodique. Le gromak simple n'ayant pas donné de résultat.![06-crypto-crack]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/06-crypto-crack.PNG)
+La consigne fournit le nombre 143526 qu'on peut alors tester comme clé avec CryptoCrack pour le chiffre de Gromark, périodique. Le gromak simple n'ayant pas donné de résultat.
+
+![06-crypto-crack]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/06-crypto-crack.PNG)
 
 ## Sources 
 
@@ -358,3 +360,6 @@ RACTF :
 - [CTFTIME - RACTF](https://ctftime.org/event/1051/tasks/)
 - [How to Solve Classical Ciphers - RACTF Crypto 01-06 Writeup](https://www.youtube.com/watch?v=9Q5Q1Nn5Vss)
 
+Théorie :
+
+- VERGNAUD, Damien, 2018.  *Exercices et problèmes de cryptographie*. 3e édition. Malakoff : DUNOD. ISBN 978-2-10-078461-5
