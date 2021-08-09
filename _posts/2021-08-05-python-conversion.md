@@ -36,7 +36,8 @@ print("little : ", (integer).to_bytes(2, byteorder='little'))
 
 produira la sortie suivante
 
-> big :  b'\x07\xd0'
+> big :  b'\x07\xd0' 
+>
 > little :  b'\xd0\x07'
 
 Sources :
@@ -59,7 +60,9 @@ print("big : ", int.from_bytes(byteString, byteorder='big'))
 produira la sortie suivante :
 
 > big : 16
+>
 > little : 4096
+>
 > big :  1952805748
 
 ### Avec la librairie Crypto
@@ -76,6 +79,7 @@ Personnellement, j'utilise plutÃ´t la librarie *Crypto.Util.number*. Celle possÃ
 produira la sortie suivante :
 
 > Byte -> int :  b'test' -> 1952805748
+>
 > int -> Byte :  2000 -> b'\x07\xd0'
 
 
@@ -155,6 +159,7 @@ print("int -> string hexa : ", integer, "->" , hex(integer))
 produira la sortie suivante :
 
 > string hexa -> int :  0x20 -> 32
+>
 > int -> string hexa :  2000 -> 0x7d0
 
 ## hexa string <-> bytes
@@ -184,8 +189,11 @@ print("hex string -> bytes : ", StringHexa[2:], "->", bytes.fromhex(StringHexa2)
 Produit la sortie suivante :
 
 > hex string -> bytes :  20 -> b' '
+>
 > hex string -> bytes :  20 -> b' '
+>
 > hex string -> bytes :  42 -> b'B'
+>
 > hex string -> bytes :  42 -> b'B'
 
 
@@ -225,6 +233,7 @@ print("byte string -> hexa number :", binascii.hexlify(byteString))
 produira la sortie suivante :
 
 > hex string -> byte : b'42' -> b'B'
+>
 > byte string -> hexa number : b'test' -> b'74657374'
 
 
