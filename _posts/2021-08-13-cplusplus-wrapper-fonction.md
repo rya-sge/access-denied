@@ -5,14 +5,14 @@ date:   2021-08-13
 categories: programmation
 tags: c++ wrapper std::function généricité dictionnaire
 description: Cet article introduit l'utilisation des wrappers de fonctions en c++, apparu avec C++11. Le concept sera vu à travers l'implémentation d'un dictionnaire et le wrapper std::function.
-image: /assets/article/cryptographie/analyse-chiffrement/01-dcode-2.PNG
+image: 
 ---
 
 Cet article illustre l'utilisation des **wrappers de fonctions** en c++, apparu avec C++11.
 
 Lors d'un laboratoire effectué dans le cadre d'un cours à l'HEIG, il était demandé d'implémenter un dictionnaire et de pouvoir effectuer des opérations sur celui-ci comme retrouver un mot, insérer un nouveau mot ou en supprimer. Finalement, le but final était d'implémenter un correcteur orthographique en **C++**.
 
-Ici, le code a été décolorés pour ce concentrer uniquement sur les *wrappers* de fonctions à travers la classe *DictionaryContainer* qui représente un dictionnaire et les opérations qu'on peut effectuer sur celui-ci. Plutôt que de déterminer un conteneur fixe pour le dictionnaire comme *vector*, objectif était de laisser libre le choix à l'utilisateur de la classe de choisir le conteneur. C'est là qu'entre en matière les **wrappers de fonctions**.
+Dans le cas présent, le code a été édulcoré pour se concentrer uniquement sur les *wrappers* de fonctions à travers la classe *DictionaryContainer* qui représente un dictionnaire et les opérations qu'on peut effectuer sur celui-ci. Plutôt que de déterminer un conteneur fixe pour le dictionnaire comme *vector*, l'objectif était de laisser libre le choix à l'utilisateur de la classe de choisir le conteneur. C'est là qu'entre en matière les **wrappers de fonctions**.
 
 
 
