@@ -1,10 +1,14 @@
-> layout: post
-> title:  "Arbre couvrant de poids minimum (MST / ACM)"
-> date:   2021-08-22
-> categories: programmation
-> tags:  acm mst minimum-spanning-tree kruskal boruvka prim
-> description: Cet article résume les principales notions et algorithmes utilisés permettant de calculer l'arbre couvrant de poids minimum (ACM ) ou  Minimum Spanning Tree (MST) en anglais.  
-> image: 
+---
+layout: post
+title:  "Arbre recouvrant de poids minimum (MST / ACM)"
+date:   2021-08-22
+categories: programmation
+tags:  acm mst minimum-spanning-tree kruskal boruvka prim
+description: Cet article résume les principales notions et algorithmes utilisés permettant de calculer l'arbre couvrant de poids minimum (ACM ) ou  Minimum Spanning Tree (MST) en anglais.  
+image: 
+---
+
+
 
 Cet article résume les principales notions et algorithmes utilisés permettant de calculer l'arbre couvrant de poids minimum (ACM ) ou  *Minimum Spanning Tree* (MST) en anglais.  
 
@@ -21,7 +25,7 @@ Avant d'aller plus loin, voici quelques définition et notion de la théorie des
 
 Un arbre est un graphe connexe, tous les sommets sont reliés entre eux, et sans cycle. Sur l'image ci-dessous, on peut constater que tous les sommets sont reliés entre eux et qu'aucun sommet n'est relié à lui-même.
 
-![arbre]({{site.url_complet}}/assets/algorithme/mst/arbre.PNG)
+![arbre]({{site.url_complet}}/assets/article/algorithme/mst/arbre.PNG)
 
 
 
@@ -32,7 +36,7 @@ Un arbre est un graphe connexe, tous les sommets sont reliés entre eux, et sans
 
 Dans le graphe ci-dessous, la forêt est constituée de 2 arbres.
 
-![forêt]({{site.url_complet}}/assets/algorithme/mst/forêt.PNG)
+![forêt]({{site.url_complet}}/assets/article/algorithme/mst/forêt.PNG)
 
 
 
@@ -40,22 +44,20 @@ Les forêts tous comme les arbres sont des graphes simples
 
 
 
+## Introduction - Algorithme Glouton
+
+- Un algorithme glouton consiste à faire étape par étape un choix optimum locale.
+
+  Il y a trois grands algorithmes ayant une stratégie gloutonne permettant de calculer l'ACM/MST :
+
+  - Algorithme de Kruskal
+
+  - Algorithme de Prim : Version stricte et paresseuse
+  - Algorithme de Boruvka 
 
 
-## Algorithme 
 
-### Glouton
-
-Un algorithme glouton consiste à faire étape par étape un choix optimum locale.
-
-Il y a trois grands algorithmes ayant une stratégie gloutonne permettant de calculer l'ACM/MST :
-
-- Algorithme de Kruskal
-
-- Algorithme de Prim : Version stricte et paresseuse
-- Algorithme de Boruvka 
-
-
+## Algorithme
 
 ### Algorithme de Kruskal
 
@@ -67,7 +69,7 @@ Il y a trois grands algorithmes ayant une stratégie gloutonne permettant de cal
 
 - Une fois qu'on a sélectionné V-1 arrête, on a le MST et on peut s'arrêter
 
-- Il y a plusieurs façons d'implémenter l'algorithme de Kruskal. Une des possibilités est d'utilisé une structure **Union-Find** avec des arbres. Le représentant d'un sommet est la racine de l'arbre auquel il appartient. Une telle structure implémente trois opérations. Pour un sommet u :
+- Il y a plusieurs façons d'implémenter l'algorithme de **Kruskal**. Une des possibilités est d'utilisé une structure **Union-Find** avec des arbres. Le représentant d'un sommet est la racine de l'arbre auquel il appartient. Une telle structure implémente trois opérations. Pour un sommet u :
   - MakeSet(u) va créer un sous-ensemble ne contenant que u. Le représentant de cet ensemble sera alors u et se sera la racine de l'arbre.
   - Find(u) pour retrouver la classe d'équivalence (le représentant) contenant  u
   - Union(u, v) va fusionner les arbres auxquels appartiennent u et v en rattachant la racine de l'un à l'autre, en général le plus petit arbre est rattaché au plus grand.
@@ -76,13 +78,13 @@ Il y a trois grands algorithmes ayant une stratégie gloutonne permettant de cal
   
   Le graphe suivant est sans cycle et convexe. Chaque arrête possède un poids.
 
-![kruskal-graphe]({{site.url_complet}}/assets/algorithme/mst/kruskal-graphe.jpg)
+![kruskal-graphe]({{site.url_complet}}/assets/article/algorithme/mst/kruskal-graphe.jpg)
 
 
 
 Avec *union-find*, on va d'abord réaliser une queue de priorité où chaque arrête sera mise en fonction de son poids, C'est la fonction *make-set* qui s'en occupe.
 
-![kruskal-initialisation]({{site.url_complet}}/assets/algorithme/mst/kruskal-initialisation.PNG)
+![kruskal-initialisation]({{site.url_complet}}/assets/article/algorithme/mst/kruskal-initialisation.PNG)
 
 Pour chaque arête, numéroté de a à i, on va appelé *Find(u)* afin de déterminer à quelle classe apparient le sommet et par ricochet savoir aussi si les 2 sommets sont déjà connectés entre eux. Si c'est le cas, l'arrête n'a pas besoin d'être ajoutée au MST.
 
@@ -102,9 +104,9 @@ On a 6 arrêtes, on peut alors s'arrêter car on va V - 1 arrête dans le MST, V
 
 On obtient alors la structure suivante. Les lettres correspondent aux arrêtes ayant permis de reliés le sommet au sommet racine, 1.
 
-![kruskal-union]({{site.url_complet}}/assets/algorithme/mst/kruskal-union.jpg)
+![kruskal-union]({{site.url_complet}}/assets/article/algorithme/mst/kruskal-union.jpg)
 
-## Algorithme de Prim
+### Algorithme de Prim
 
 - On part d'un arbre formé d'un seul sommet
 - A chaque étape, on le fait croitre le plus économiquement  possible en ajoutant une nouvelle arrête et un nouveau sommet à l'arbre actuelle.
@@ -112,7 +114,7 @@ On obtient alors la structure suivante. Les lettres correspondent aux arrêtes a
 
 #### Exemple
 
-![prim-graphe-initial]({{site.url_complet}}/assets/algorithme/mst/prim-graphe-initial.jpg)
+![prim-graphe-initial]({{site.url_complet}}/assets/article/algorithme/mst/prim-graphe-initial.jpg)
 
 
 
@@ -132,7 +134,7 @@ On a 5 arrêtes, on peut alors s'arrêter car on a V - 1 arrête dans le MST, V 
 
 On obtient ainsi le MST suivant :
 
-![prim-graphe-resultat]({{site.url_complet}}/assets/algorithme/mst/prim-graphe-resultat.jpg)
+![prim-graphe-resultat]({{site.url_complet}}/assets/article/algorithme/mst/prim-graphe-resultat.jpg)
 
 
 
@@ -149,11 +151,11 @@ Remarque : chaque arrête adjacente à un sommet doit avoir un poids différent.
 
 #### Exemple 
 
-![boruvka-graphe-initial]({{site.url_complet}}/assets/algorithme/mst/boruvka-graphe-initial.jpg)
+![boruvka-graphe-initial]({{site.url_complet}}/assets/article/algorithme/mst/boruvka-graphe-initial.jpg)
 
 On peut constater que le sommet 1 a deux arrêtes (1, 2) et (1,4) de poids identiques. On modifie alors ( en rouge) le poids de l'arrête (12) pour lui attribuer un poids de 1.1. C'est par conséquent l'arrête (1-4) qui va être choisie pour le sommet 1.
 
-![boruvka-corrige]({{site.url_complet}}/assets/algorithme/mst/boruvka-corrige.jpg)
+![boruvka-corrige]({{site.url_complet}}/assets/article/algorithme/mst/boruvka-corrige.jpg)
 
 On peut appliquer **Boruvka** pour chaque sommet, ce qui a nous donner les arrêtes suivantes :
 
@@ -171,13 +173,13 @@ Sommet 6) 5 - 6
 
 On obtient les composantes connexes suivantes :
 
-![boruvka-composante]({{site.url_complet}}/assets/algorithme/mst/boruvka-composante.jpg)
+![boruvka-composante]({{site.url_complet}}/assets/article/algorithme/mst/boruvka-composante.jpg)
 
 
 
 On refait le même processus en choisissant l'arrête (3, 5) de poids 5, poids le plus petit et on obtient le MST suivant :
 
-![boruvka-mst]({{site.url_complet}}/assets/algorithme/mst/boruvka-mst.jpg)
+![boruvka-mst]({{site.url_complet}}/assets/article/algorithme/mst/boruvka-mst.jpg)
 
 
 
