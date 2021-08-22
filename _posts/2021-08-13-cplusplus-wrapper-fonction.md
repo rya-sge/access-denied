@@ -25,7 +25,7 @@ La classe **DictionaryContainer** est notre classe *wrapper*.
 - Le type de donnée contenu dans le dictionnaire est définit par le *template* T. On peut dès lors avoir aussi bien des entiers , des strings que des objets dans notre dictionnaire. 
 - Une entrée dans le dictionnaire est représenté par le terme *key*. 
 
-#### Fonctions publiques
+### Fonctions publiques
 
 Les trois opérations que la classe va fournir publiquement sont :
 
@@ -69,7 +69,7 @@ public:
 
 Ces trois opérations vont appeler les fonctions correspondante du conteneur choisi. Par exemple, pour un conteneur *vector*, la fonction *insert* va appeler *push_back*.  Le paragraphe suivant décrit cette implémentation
 
-#### Fonctions privées
+### Fonctions privées
 
 Pour implémenter les fonctions privées, on aura besoin du wrapper *std::function*. Les fonctions privées seront appelées par les fonctions publiques de la classe et ne seront pas visible à l'extérieur de la classe.
 
@@ -121,7 +121,7 @@ Si on reprend le code plus haut,  la fonction publique *contains* va être compl
 
 
 
-#### Constructeur
+### Constructeur
 
 Le constructeur prend 3 fonctions en paramètre afin d'initialiser les 3 fonctions privées :
 
