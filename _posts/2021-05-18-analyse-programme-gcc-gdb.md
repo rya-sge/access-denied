@@ -159,6 +159,12 @@ Tout d'abord, on peut afficher  toutes les fonctions afin de récupérer l'adres
 
 ![afficher-fonction]({{site.url_complet}}/assets/article/outil-securite/gdb/afficher-fonction.PNG)
 
+Une instruction intéressante si on souhaite connaitre l'adresse d'une fonction :
+
+```bash
+info address nomFonction
+```
+
 Ensuite, on peut mettre un breakpoint là où s'effectue l'instruction **call**. C'est cette instruction qui va faire que le programme saute à l'adresse contenue dans fun. Une autre instruction intéressante est l'instruction **lea**. Celle-ci permet de loader une adresse mémoire à un emplacement mémoire ou un registre. Une fois le breakpoint mis, on lance le programme avec r.
 
 ![fonction-breakpoint]({{site.url_complet}}/assets/article/outil-securite/gdb/fonction-breakpoint.PNG)
