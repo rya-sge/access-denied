@@ -5,12 +5,10 @@ date:   2021-10-03
 categories: web
 tags: flexbox css 
 description: Cet article présente le concept de flexbox en css. Les flexbox permettent  de gérer le positionnement des éléments sur une page. 
-image: /assets/article/docker/docker-horizontal-monochromatic-white.png
+image: /assets/article/web/css/level-10.PNG
 ---
 
 
-
-# Introduction aux flexbox
 
 Cet article présente le concept de **flexbox** en css. Les flexbox permettent  de gérer le positionnement des éléments sur une page. 
 
@@ -35,6 +33,40 @@ Exemple de code
 }
 ```
 
+
+
+### Propriété du container 
+
+- flex-direction
+- flex-wrap
+  - `nowrap` : Tous les éléments sont sont sur une seule ligne.
+  - `wrap` : Les éléments peuvent être sur plusieurs lignes au besoin.
+  - `wrap-reverse` : Les éléments se placent sur plusieurs lignes en séquence inversé.
+- flex-flow
+  - permet de combiner les propriété de flex-direction et flex-wrap
+  - Ex : flex-flow: row wrap
+- justify-content
+- align-items
+- align-content
+  - `flex-start` : Les lignes sont placés en haut du conteneur.
+  - `flex-end`: Les lignes sont placées dans le bas du conteneur.
+  - `center` : Les lignes sont placées dans le centre vertical du conteneur.
+  - `space-between` : Les lignes s'affichent avec un espace égal entre eux.
+  - `space-around` : Les lignes s'affichent avec un espace égal autour d'eux.
+  - `stretch` : Les lignes sont étirées pour s'adapter au conteneur.
+
+### Propriété des enfants 
+
+- flex
+- flex-grow
+- flex-shrink
+- flex-basis
+- order
+- align-self
+  -  Accepte les mêmes valeurs que align-items mais s'applique seulement à l'élément ciblé.
+
+## Propriété du container 
+
 ###  justify-content
 
 Cette propriété permet d'aligner les éléments
@@ -46,6 +78,10 @@ Cette propriété permet d'aligner les éléments
 - `space-around`: les éléments s'affichent avec un espacement égale autour d'eux
 
 La principale différence entre `space-around` et `space-between` réside que le côté droit du 1er élément et le côté gauche du dernière élément auront un espace avec le `space-around`.
+
+Remarques :
+
+Quand la direction est en colonne (flex-direction: row), `justify-content` change pour la verticale et `align-items` pour l'horizontale.
 
 Source : [developer.mozilla.org - justify-content](https://developer.mozilla.org/fr/docs/Web/CSS/justify-content)
 
@@ -81,6 +117,13 @@ Code disponible sur mon github : [rya-sge/AD-ressources - css/flexbox/2-space-be
 
 ![space-between]({{site.url_complet}}/assets/article/web/css/space-between.PNG)
 
+- Avec flex-direction: column
+
+```css
+flex-direction: column;
+justify-content: flex-end;
+```
+
 
 
 ### align-items
@@ -94,6 +137,24 @@ Cette propriété permet d'aligner les éléments verticalement
 - `stretch` : Les éléments sont étirés pour s'adapter au conteneur.
 
 
+
+#### Exemple
+
+Le code suivant va aligner les boîtes vers le bas. Vous pourrez constater l'ajout de la priopriété height à 100% afin que la hauteur de la boite principale corresponde à la hauteur de la page.
+
+```css
+.container{
+	display: flex;
+	align-items: flex-end;
+	height: 100%;
+}
+```
+
+Code disponible sur mon github : [(rya-sge/AD-ressources - css/flexbox/3-flex-end](https://github.com/rya-sge/AD-ressources/tree/master/web/css/flexbox/3-flex-end)
+
+**Résultat**
+
+![3-align-item-flex-end]({{site.url_complet}}/assets/article/web/css/3-align-item-flex-end.PNG)
 
 ### flex-direction
 
