@@ -55,6 +55,10 @@ Source : [https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disq
 
 Celui-ci propose d'utiliser GNOME partition Editor : [https://gparted.org/download.php](https://gparted.org/download.php)
 
+Il faut ajouter l'ISO comme lecteur optique dans les paramètres de la VM :
+
+![gparted-add]({{site.url_complet}}/assets/article/virtualBox/gparted-add.PNG)
+
 Après avoir démarré ma VM sur l'iso du logiciel, voici les opérations que j'ai effectuées :
 
 
@@ -91,10 +95,21 @@ On peut vérifier que l'opération a fonctionné avec l'utilitaire *lsblk*
 
 
 
+## 4) Avec Kali
+
+Avec Kali, j'ai eu comme problème que sda2 se trouvait entre sda1, la partition que je voulais agrandir et mon espace libre.
+
+![gparted-kali1]({{site.url_complet}}/assets/article/virtualBox/gparted-kali1.PNG)
+
+Comme solution, il faut supprimer sda2, agrandir sda1 et refaire sda2(partition de swap)
+
+Source _: [https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted](https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted)
+
 ### Sources
 
 - [https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/](https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/)
 - [https://linuxhint.com/increase-virtualbox-disk-size/](https://linuxhint.com/increase-virtualbox-disk-size/)
+- [https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted](https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted)
 
 
 
