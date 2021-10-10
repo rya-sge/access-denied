@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Android - Les bases pour le design d'une application"
+title:  "Android Studio - Design d'une application"
 date:   2021-10-10
 categories: programmation
 tags: android design mobile
 description: Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application Android, cela comprend le texte à afficher, le multilangue ainsi qu'un formulaire de login.
-image: /assets/article/android/programmation/design/landscape-avd.PNG
+image: /assets/article/programmation/android/design/landscape-avd.PNG
 ---
 
 Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application **Android**, entre autre :
@@ -65,7 +65,7 @@ Pour définir des traductions en plusieurs langues :
 
 Dans l'exemple ci-dessous, j'ai ajouté les traductions pour le français.
 
-![strings-language]({{site.url_complet}}/assets/article/android/programmation/design/strings-language.PNG)
+programmation/![strings-language]({{site.url_complet}}/assets/article/programmation/android/design/strings-language.PNG)
 
 
 
@@ -79,7 +79,7 @@ Cette partie décrit comment créer un *layout* pour  le mode paysage pour l'act
 
 2) A droite, cliquer sur le symbole smartphone
 
-![landscape-variation]({{site.url_complet}}/assets/article/android/programmation/design/landscape-variation.PNG)
+![landscape-variation]({{site.url_complet}}/assets/article/programmation/android/design/landscape-variation.PNG)
 
 3) Sélectionner `Create landscape variation`
 
@@ -89,11 +89,11 @@ Cette partie décrit comment créer un *layout* pour  le mode paysage pour l'act
 
 - Sélectionner votre AVD
 
-![avd-select]({{site.url_complet}}/assets/article/android/programmation/design/avd-select.PNG)
+![avd-select]({{site.url_complet}}/assets/article/programmation/android/design/avd-select.PNG)
 
 -  puis cliquer sur "Edit"
 
-![landscape-avd]({{site.url_complet}}/assets/article/android/programmation/design/landscape-avd.PNG)
+![landscape-avd]({{site.url_complet}}/assets/article/programmation/android/design/landscape-avd.PNG)
 
 
 
@@ -112,7 +112,7 @@ Il arrive souvent qu'on souhaite créer un formulaire que l'utilisateur devra re
 
 Il est aussi possible de créer directement une activité  de login lors de la création d'un projet ou d'une activité et celle-ci aura déjà l'email et le mot de passe de configurer.
 
-![activity-login]({{site.url_complet}}/assets/article/programmation/design/activity-login.PNG)
+![activity-login]({{site.url_complet}}/assets/article/programmation/android/design/activity-login.PNG)
 
 ### Manuellement
 
@@ -138,4 +138,4 @@ Voici comment configurer l'email. Dans InputType, choisir TextEmailAdress. Cela 
 
 
 
-![input-email-default]({{site.url_complet}}/assets/article/programmation/android/programmation/design/input-email-default.PNG)
+![input-email-default]({{site.url_complet}}/assets/article/programmation/android/design/input-email-default.PNG)
