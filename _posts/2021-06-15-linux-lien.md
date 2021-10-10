@@ -32,9 +32,11 @@ L'inode contient les métadonnées et des pointeurs vers les blocs de contenus. 
 
 On créée dans  le répertoire une nouvelle entrée qui pointe vers le **même** inode que le fichier source utilisé pour crée le lien.
 
-Pour simplifier, on ne crée pas un nouvel inode et du contenu dans le filesystem, mais plutôt un pointeur dans le répertoire où l'on se trouve
+- Pour simplifier, on ne crée pas un nouvel inode et du contenu dans le filesystem, mais plutôt un pointeur dans le répertoire où l'on se trouve
 
-On aura ainsi deux entrées qui pointera vers le même inode/contenu : l'entrée dans le répertoire du fichier d'origine et la nouvelle entrée qu'on a créé avec le lien physique.
+
+- On aura ainsi deux entrées qui pointera vers le même inode/contenu : l'entrée dans le répertoire du fichier d'origine et la nouvelle entrée qu'on a créé avec le lien physique.
+- Le inode contient le nombre de lien qui pointe vers lui. Lorsque on exécute la commande `rm `pour supprimer un lien physique, il va décrémenter ce compteur. C'est uniquement quand ce compteur vaut 0 que le système de fichier va supprimer le contenu du  disque.
 
 
 
