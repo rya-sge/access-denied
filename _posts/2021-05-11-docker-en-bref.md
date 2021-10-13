@@ -2,6 +2,7 @@
 layout: post
 title:  "Docker en bref"
 date:   2021-05-11
+last-update: 2021-13-10 
 categories: virtualisation 
 tags: docker 
 description: Liste des principales commandes de Docker
@@ -139,6 +140,21 @@ où
 - dossier correspond au path de votre dossier. Ici le dossier se trouvait à l'endroit où la commande était lancée.
 - ece6be770055 correspond à l'id ou le nom de votre conteneur
 - /home/test correspond au path dans le conteneur
+
+
+
+#### Créer un volume
+
+Les volumes, option -v,  permettent de connecter un dossier de la machine hôte au docker.
+
+Exemple :
+
+```bash
+docker run -ti -v "$PWD/site":/usr/share/nginx/ -d -p 8080:80 --name
+projet-docker --hostname <hostname>
+```
+
+
 
 #### Définir des variables d'environnement
 

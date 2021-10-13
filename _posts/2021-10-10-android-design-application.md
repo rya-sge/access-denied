@@ -130,7 +130,7 @@ Il est aussi possible de le faire avec l'interface graphique, comme pour l'email
 
 ##### Email
 
-Voici comment configurer l'email. Dans InputType, choisir TextEmailAdress. Cela ajouter le code suivante dans le layout :
+Voici comment configurer l'email. Dans `InputType`, choisir `TextEmailAdress`. Cela va ajouter le code suivante dans le layout :
 
 ```xml
   android:inputType="textEmailAddress"

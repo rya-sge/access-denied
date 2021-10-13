@@ -1,7 +1,8 @@
 ---
 layout: post
 title:  "Les liens physiques et symboliques avec Linux"
-date:   2021-06-15 
+date:   2021-06-15
+last-update: 2021-12-10 
 categories: linux
 tags: bash
 description: Cet article présente les liens symboliques et physiques sur un système d'exploitation GNU/Linux
@@ -26,11 +27,17 @@ L'inode contient les métadonnées et des pointeurs vers les blocs de contenus. 
 
 ## Lien physique 
 
-
-
 ![schema-lien-physique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-physique.png)
 
-On créée dans  le répertoire une nouvelle entrée qui pointe vers le **même** inode que le fichier source utilisé pour crée le lien.
+Commande :
+
+```bash
+ln /source /hard-link-name
+```
+
+On créée dans  le répertoire une nouvelle entrée qui pointe vers le **même** inode que le fichier source utilisé pour crée le lien. Vous pourrez remarquer sur l'image de création ci-dessous que la commande ls va afficher la même taille de fichier
+
+Une discussion intéressante sur le sujet : [unix.stackexchange.com - why-do-hard-links-seem-to-take-the-same-space-as-the-originals](https://unix.stackexchange.com/questions/88423/why-do-hard-links-seem-to-take-the-same-space-as-the-originals)
 
 - Pour simplifier, on ne crée pas un nouvel inode et du contenu dans le filesystem, mais plutôt un pointeur dans le répertoire où l'on se trouve
 
@@ -59,6 +66,12 @@ Conséquence :
 ## Lien symbolique 
 
 ![schema-lien-symbolique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-symbolique.png)
+
+Commande :
+
+```bash
+ln --symbolic /source /symbolic-link-name
+```
 
 Contrairement aux liens physiques, un lien symbolique a son propre inode et ses propres données fichiers. Dans les métadonnées, il y aura le chemin absolu ou relatif du fichier source
 
@@ -135,4 +148,7 @@ Le lien physique ne sera pas affecté car celui-ci ne pointe pas directement sur
 
 ## Sources
 
-- Cours ADS enseigné à l'HEIG-VD(2021)
+- Cours Systèmes d'exploitation (SYE) enseigné à l'HEIG-VD en 2020
+- Cours d'Administration système(ADS) enseigné à l'HEIG-VD en 2021
+- Cours d'Administration IT(AIT) enseigné à l'HEIG-VD en 2021
+- [inux-note.com - commande-ln-creation-de-liens/](https://linux-note.com/commande-ln-creation-de-liens/)
