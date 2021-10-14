@@ -76,11 +76,11 @@ Documentation avec Infomaniak :
 
 ### Résumé des étapes
 
-1. Générer une pair de clé SSH
+1. Générer une e de clé SSH
 2. Configurer les fichiers et les répertoires
 3. Copier la clé sur le serveur distant
 
-### Générer une pair de clé ssh
+### Générer une paire de clé ssh
 
 - `ssh-keygen`
   - Exemple avec RSA : `ssh-keygen -t rsa`
@@ -94,7 +94,7 @@ Remarques :
 
 - On peut choisir de protéger ou non la clé par une *passphrase*
 
-- Par défaut, la pair de clé est stocké dans le répertoire personnel de l'utilisateur : `~/.ssh`
+- Par défaut, la paire de clé est stocké dans le répertoire personnel de l'utilisateur : `~/.ssh`
 
   
 
