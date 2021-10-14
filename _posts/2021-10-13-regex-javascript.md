@@ -4,7 +4,7 @@ title:  "Les regex en Javascript"
 date:   2021-10-13
 categories: programmation
 tags: regex javascript
-description: Présentation et utilisations des regex en Javascript
+description: Présentation et utilisation des regex en Javascript
 image: 
 ---
 
@@ -12,7 +12,7 @@ image:
 
 # Les regex en Javascript
 
-Les expressions régulières permettent de sélectionner/déterminer si des chaines de caractères correspondent à un certains "patterns/modèles". Il ne s'agit cependant pas d'un langage de programmation
+Les expressions régulières permettent de sélectionner / déterminer si des chaines de caractères correspondent à un certains "patterns/modèles". Il ne s'agit cependant pas d'un langage de programmation
 
 **Exemple**
 

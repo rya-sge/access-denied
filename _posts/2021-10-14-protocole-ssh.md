@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "SSH - accéder à distance à un shell"
-date:   2021-10-13
+date:   2021-10-14
 last-update: 
 categories: Linux
 tags: shell ssh linux
