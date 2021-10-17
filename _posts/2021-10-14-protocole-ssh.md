@@ -20,8 +20,8 @@ Pour s'authentifier, il existe 2 méthodes :
 
 Lors de la 1ère connexion :
 
-- Le client va s'authentifie auprès du serveur, généralement avec son nom d'utilisateur / mot de passe
-- Le serveur va aussi s'authentifier auprès du client, pour éviter une attaque Man in the middle(MitM)
+- Le client s'authentifie auprès du serveur, généralement avec son nom d'utilisateur / mot de passe
+- Le serveur s'authentifie auprès du client, pour éviter une attaque Man in the middle(MITM)
 
 ## Introduction
 
@@ -50,11 +50,11 @@ ssh [options] [user@]host [commande]
 
 - `host` - Adresse IP ou nom de domaine de la machine distante
 - `user`- c'est le compte utilisateur sur la machine distante (si différent de la machine locale)
-- `command` - Si rien n'est indiqué, c'est un shell qui est lancé sur la machine distance. Le paramètre command permet de spécifier l'action à exécuter. 
+- `command` - Si rien n'est indiqué, c'est un shell qui est lancé sur la machine distance. Le paramètre *command* permet de spécifier l'action à exécuter. 
 
 Quelques autres options
 
-- -p port - permet de spécifie le port sur la machine distante, par défaut c'est le port 22. 
+- -p port - permet de spécifier le port sur la machine distante, par défaut c'est le port 22. 
 
 - -v, -vv, -vvv - pour afficher les messages générés par la commande, peut aider à résoudre des bugs.
 

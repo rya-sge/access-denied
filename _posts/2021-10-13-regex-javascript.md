@@ -12,7 +12,7 @@ image:
 
 # Les regex en Javascript
 
-Les expressions régulières permettent de sélectionner / déterminer si des chaines de caractères correspondent à un certains "patterns/modèles". Il ne s'agit cependant pas d'un langage de programmation
+Les expressions régulières permettent de sélectionner / déterminer si des chaines de caractères correspondent à un certains "patterns/modèles". Il ne s'agit cependant pas d'un langage de programmation.
 
 **Exemple**
 
@@ -34,8 +34,8 @@ Il existe de nombreux outils pour faire des regex
 
 En ligne :
 
-- https://regexr.com
-- https://www.regexpal.com
+- [https://regexr.com](https://regexr.com)
+- [https://www.regexpal.com](https://www.regexpal.com)
 
 ## Principales constructions
 
@@ -43,7 +43,7 @@ En ligne :
 
 - Jeux de caractères([a-z]) où il y  a la correspondance avec n'importe quel caractère s'y trouvant
 - Opérateur logique ou : < | > où la string doit correspondre à la valeur de gauche ou de droite
-- Quantificateurs  (*, +, ?, {n}, {n,m}) qui indiquent le nombre de fois que l'expression correspondent
+- Quantificateurs  (*, +, ?, {n}, {n,m}) qui indiquent le nombre de fois que l'expression doit correspondre.
 
 - Barrières (^$) qui indiquent le début et la fin de chaque mot
 
@@ -139,7 +139,8 @@ function name(value) {
 
 ## Sources 
 
-Cours de Technologie Web (TWEB) enseigné à l'HEIG-VD en 2021
+- Cours de Technologie Web (TWEB) enseigné à l'HEIG-VD en 2021
+- 
 
 
 
