@@ -2,7 +2,7 @@
 layout: post
 title:  "Les regex en Javascript"
 date:   2021-10-13
-categories: programmation
+categories: programmation web
 tags: regex javascript
 description: Présentation et utilisation des regex en Javascript
 image: 
@@ -140,7 +140,7 @@ function name(value) {
 ## Sources 
 
 - Cours de Technologie Web (TWEB) enseigné à l'HEIG-VD en 2021
-- 
+- Cours Linkedin *Learning Regular Expressions* enseigné par K.Skoglund.
 
 
 

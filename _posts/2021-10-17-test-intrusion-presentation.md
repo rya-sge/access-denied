@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Test d'intrusion (pentesting)"
+title:  "Les tests d'intrusion (pentesting)"
 date:   2021-10-17
 categories: securite
 tags: intrusion pentesting
@@ -10,7 +10,7 @@ image:
 
 
 
-## Test d'intrusion
+## Présentation
 
 Un test d'intrusion (*pentesting*) est le processus pour trouver et exploiter des vulnérabilités dans des systèmes d'informations qu'un hacker malveillant pourrait exploiter.
 
@@ -42,7 +42,7 @@ Il existe plusieurs types de tests d'intrusion, en voici une liste :
 - Ingénierie sociale (*Social engineering*) : forcer les utilisateurs à révéler des informations sensibles
 - Equipement volés (*Stolen equipment*) : implique d'obtenir un équipement de la cible (ordinateur d'entreprise) et d'essayer d'extraire des informations de celui-ci
 - Cryptanalyse attaque (*Cryptanalysis attack)* : contourner ou casser les systèmes de chiffrement sur les systèmes locaux ou au travers  le réseau. Cela implique aussi l'évaluation des solutions de gestion des droits numériques (GDN /DRM)
-- Sécurité du produit (*Product security*) : chercher pour des failles de sécurités dans des produits logiciels 8exploier des buffer overflows, élévation de privilèges, expositions d'information sensible non chiffrée, etc.)
+- Sécurité du produit (*Product security*) : chercher pour des failles de sécurités dans des produits logiciels, exploier des *buffer overflows*, élévation de privilèges, expositions d'information sensible non chiffrée, etc.)
 
 ### Guide
 
@@ -53,8 +53,6 @@ Quelques guides expliquent comment réaliser un test d'intrusion
 - OWASP testing guide : [owasp.org/www-project-web-security-testing-guide/](https://owasp.org/www-project-web-security-testing-guide/)
 - NIST framework : [www.nist.gov/cyberframework](https://www.nist.gov/cyberframework)
 - Penetration Testing Framework 0.59 : [http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html](http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html)
-
-
 
 
 

@@ -3,7 +3,7 @@ layout: post
 title:  "SSH - accéder à distance à un shell"
 date:   2021-10-14
 last-update: 
-categories: Linux
+categories: linux
 tags: shell ssh linux
 description: Cet article présente comment accéder à distance à un shell ainsi que la mise en place d'une connexion sécurisée entre un client et un serveur. 
 image: 
@@ -165,7 +165,7 @@ source ~/.bash_aliases
 
 Il suffit ensuite de taper la commande `mon-alias` pour initier une connexion
 
-Source : https://www.better.dev/how-to-create-an-ssh-shortcut
+Source : [www.better.dev/how-to-create-an-ssh-shortcut]( https://www.better.dev/how-to-create-an-ssh-shortcut)
 
 ## Source 
 

