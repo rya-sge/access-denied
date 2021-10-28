@@ -22,18 +22,29 @@ Le canal utilisé pour l'échange doit être authentique car cette échange de c
 ![schema-echange]({{site.url_complet}}/assets/article/cryptographie/diffie-hellman/schema-echange.png)
 
 ## Résumé
-
+- **Alice** 
 
 $$
-Alice \\
-Clé~privée~:~nombre~a~aléatoire \\
+Clé~privée~:~nombre~a~aléatoire
+$$
+$$
+Clé~publique =
+A = g^a mod~p
+$$
+$$
+Clé~partagée = B^a mod~p
+$$
+
+- **Bob**
+
+$$
+Clé~privée~:~nombre~b~aléatoire 
+$$
+$$
 Clé~publique = 
-A = g^a mod~p \\
-Clé~partagée = B^a mod~p \\
-Bob \\
-Clé~privée~:~nombre~b~aléatoire \\
-Clé~publique = 
-B = g^b mod~p  \\
+B = g^b mod~p  
+$$
+$$
 Clé~partagée = A^b~ mod~p
 $$
 
