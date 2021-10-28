@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Implémentation de Diffie-Hellman"
+title:  "Diffie-Hellman expliqué en python"
 date:   2021-10-28
 last-update: 
 categories: cryptographie
