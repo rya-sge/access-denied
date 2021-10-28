@@ -76,7 +76,7 @@ Documentation avec Infomaniak :
 
 ### Résumé des étapes
 
-1. Générer une e de clé SSH
+1. Générer une paire de clé SSH
 2. Configurer les fichiers et les répertoires
 3. Copier la clé sur le serveur distant
 

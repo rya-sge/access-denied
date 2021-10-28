@@ -182,7 +182,7 @@ Avec [dcode](https://www.dcode.fr/substitution-monoalphabetique), la solution es
 
 
 
-Un autre site permet aussi de trouver la solution mais supprime tous les espace ce qui rend sa compréhension plus difficile : http://www.cryptoprograms.com/subsolve/monoalph
+Un autre site permet aussi de trouver la solution mais supprime tous les espace ce qui rend sa compréhension plus difficile : [www.cryptoprograms.com/subsolve/monoalph](http://www.cryptoprograms.com/subsolve/monoalph)
 
 
 
@@ -349,7 +349,7 @@ La consigne fournit le nombre 143526 qu'on peut alors tester comme clé avec Cry
 Outils :
 
 - [www.boxentriq.com - cipher-identifier](https://www.boxentriq.com/code-breaking/cipher-identifier)
-- http://www.cryptoprograms.com
+- [http://www.cryptoprograms.com](http://www.cryptoprograms.com)
 - [https://quipqiup.com](https://quipqiup.com)
 - [cryptocrack - site web](https://sites.google.com/site/cryptocrackprogram/home?authuser=0)
 

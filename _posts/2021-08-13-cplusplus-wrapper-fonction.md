@@ -14,7 +14,7 @@ Lors d'un laboratoire effectué dans le cadre d'un cours à l'HEIG, il était de
 
 Dans le cas présent, le code a été édulcoré pour se concentrer uniquement sur les *wrappers* de fonctions à travers la classe *DictionaryContainer* qui représente un dictionnaire et les opérations qu'on peut effectuer sur celui-ci. Plutôt que de déterminer un conteneur fixe pour le dictionnaire comme *vector*, l'objectif était de laisser libre le choix à l'utilisateur de la classe de choisir le conteneur. C'est là qu'entre en matière les **wrappers de fonctions**.
 
-
+Le code utilisé dans cet article est disponible sur mon github à l'adresse suivante : [github.com/rya-sge/AD-cplusplus/template](https://github.com/rya-sge/AD-ressources/tree/master/programmation/cplusplus/template)
 
 
 
@@ -236,5 +236,5 @@ A noter que l'utilisation de *binary_search* et *lower_bound* est conditionné a
 ## Source 
 
 - Cours d'Algorithmes et structures de données 2 enseigné à l'HEIG-VD en 2020.
-
 - [www.cplusplus.com - std::function](https://www.cplusplus.com/reference/functional/function/)
+- Code disponible sur mon github : [github.com/rya-sge/AD-cplusplus/template](https://github.com/rya-sge/AD-ressources/tree/master/programmation/cplusplus/template)

@@ -45,10 +45,13 @@ Explications des flags
 
 | Flags gcc            | Explication                                                  |
 | -------------------- | ------------------------------------------------------------ |
-| -fno-stack-protector | Désactiver la protection sur la pile                         |
+| -fno-stack-protector | Désactiver la protection sur la pile (stackoverflow)         |
+| --fstack-protector   | Activer la protection sur la pile                            |
 | execstack            | Autoriser l'exécution de la pile                             |
 | -no-pie              | Ne pas produire de lien dynamique indépendant de l'exécutable |
 | -m32                 | Pour compiler en 32 bits                                     |
+
+Source intéressante pour les protections sur la pile : [www.intel.com - compiler-option-details - fstack-protector.html](https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/compiler-options/compiler-option-details/data-options/fstack-protector.html)
 
 Dans gdb, si vous voulez utiliser des shellcodes, il faut l'autoriser à ouvrir un processus fils.
 
