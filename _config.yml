@@ -5,7 +5,8 @@ url: "https://rya-sge.github.io" # the base hostname & protocol for your site, e
 url_complet: "https://rya-sge.github.io/access-denied" #image
 # Author
 author-name:    rya-sge
-author-image:   1.PNG
+author-image:   1.png
+#Source : https://pixabay.com/fr/vectors/pas-d-entrée-signer-attention-909933/
 author-job:     Etudiant en sécurité
 author-email:   ryan.sauge@heig-vd.ch # Add your email for contant form.
 #author-twitter: artemsheludko_ # Add your twitter account
