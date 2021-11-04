@@ -28,7 +28,7 @@ A l'heure où les attaques informatiques se multiplient, il est devenu urgent de
 Cela permet alors de quantifier la probabilité que cela arrive et son impact. Ce qu'on appelle le risque.
 
 Le risque peut se calculer comme suit :
-`Risque = P(menace + Vulnerabilité) * impact`
+`Risque = P(menace x Vulnerabilité) * impact`
 
 ### Type de tests d'intrusion
 

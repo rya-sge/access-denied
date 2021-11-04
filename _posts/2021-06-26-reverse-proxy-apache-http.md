@@ -52,9 +52,9 @@ Une explication plus détaillée, avec  des conteneurs Docker se trouve sur mon 
 
 **Load Balancing**
 
-Le *load balancing* permet de rediriger les requêtes en direction de plusieurs serveurs en backend. cela permet d'ajouter de la redondance au proxy.
+Le *load balancing* permet de rediriger les requêtes en direction de plusieurs serveurs en backend. Cela permet d'ajouter de la redondance au proxy.
 
-Par défaut la répartition des charges est du Round Robin Les requêtes sont répartis en fonction du nombre de requête traités par chacun des serveurs backend afin de répartir les requête
+Par défaut la répartition des charges est du *Round Robin*. Les requêtes sont réparties en fonction du nombre de requêtes traitées par chacun des serveurs backend afin de répartir les requêtes.
 
 Ex :
 
