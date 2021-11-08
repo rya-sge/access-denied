@@ -5,11 +5,11 @@ date:   2021-11-05
 last-update: 
 categories: linux
 tags: backup parted
-description: Cet article présente la réalisation d'un backup "fait maison" sous le système d'exploitation
-image: /assets/linux/sauvegarde/8-df.png
+description: Cet article présente la réalisation d'un backup "fait maison" sous le système d'exploitation Ubuntu 18.04 LTS
+image: /assets/article/linux/sauvegarde/8-df.png
 ---
 
-Cet article présente la réalisation d'un système de backup "fait maison" sur une machine virtuelle vmware tournant sur le système d'exploitation *Ubuntu* 18.04.6 *LTS* 
+Cet article présente la réalisation d'un système de backup "fait maison" sur une machine virtuelle vmware tournant sur le système d'exploitation *Ubuntu* 18.04*LTS* 
 
 
 
@@ -22,7 +22,7 @@ Cet article présente la réalisation d'un système de backup "fait maison" sur 
 - sd pour  disque SCSI (selon l'ID SCSI) 
 - hd pour  les disques sur le contrôleur IDE primaire 
 
-![1-find]({{site.url_complet}}/assets/linux/sauvegarde/1-find.PNG)
+![1-find]({{site.url_complet}}/assets/article/linux/sauvegarde/1-find.PNG)
 
 
 
@@ -32,11 +32,11 @@ Source : https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr
 
 - afficher la liste des partitions visible et leurs informations  : lsblk -o
 
-  ![2-lsblk]({{site.url_complet}}/assets/linux/sauvegarde/2-lsblk.PNG)
+  ![2-lsblk]({{site.url_complet}}/assets/article/linux/sauvegarde/2-lsblk.PNG)
 
 -  afficher la liste des partitions montés on peut utiliser la commande mount
 
-![2-b-mount]({{site.url_complet}}/assets/sauvegarde/2-b-mount.PNG)
+![2-b-mount]({{site.url_complet}}/assets/article/sauvegarde/2-b-mount.PNG)
 
 ### Installer le back-up
 
@@ -44,7 +44,7 @@ Source : https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr
 
 2) On peut alors constater l'apparition d'un nouveau disque /dev/sdb avec la commande vue précédemment : `find /dev/sd*`
 
-![4-find-sdb]({{site.url_complet}}/assets/linux/sauvegarde/4-find-sdb.png)
+![4-find-sdb]({{site.url_complet}}/assets/article/linux/sauvegarde/4-find-sdb.png)
 
 3) avec `parted`
 
@@ -57,7 +57,7 @@ Source : https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr
 
 - Affichage lsblk
 
-  ![6-b-lsblk]({{site.url_complet}}/assets/linux/sauvegarde/6-b-lsblk.png)
+  ![6-b-lsblk]({{site.url_complet}}/assets/article/linux/sauvegarde/6-b-lsblk.png)
 
 - Commande `mkpart` pour créer les partitions
 
@@ -70,7 +70,7 @@ mkpart [part-type name fs-type] start end
 
 Résultat avec 2 partitions créées :
 
-![6-print-free]({{site.url_complet}}/assets/linux/sauvegarde/6-print-free.PNG)
+![6-print-free]({{site.url_complet}}/assets/article/linux/sauvegarde/6-print-free.PNG)
 
 4) Après formatage, on montage les partitions sur /mnt/backup1 et /nt/backup2
 
@@ -79,11 +79,11 @@ sudo mount /dev/sdb1 /mnt/backup1
 sudo mount /dev/sdb2 /mnt/backup2
 ```
 
-![7-mount]({{site.url_complet}}/assets/linux/sauvegarde/7-mount.png)
+![7-mount]({{site.url_complet}}/assets/article/linux/sauvegarde/7-mount.png)
 
 5) On obtient ensuite la quantité d'espace libre sur chacun des filestyme avec la commande `df -h`
 
-![8-df]({{site.url_complet}}/assets/linux/sauvegarde/8-df.png)
+![8-df]({{site.url_complet}}/assets/article/linux/sauvegarde/8-df.png)
 
 
 
