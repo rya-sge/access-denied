@@ -6,7 +6,7 @@ last-update:
 categories: linux
 tags: backup parted
 description: Cet article présente la réalisation d'un backup "fait maison" sous le système d'exploitation Ubuntu 18.04 LTS
-image: /assets/article/linux/sauvegarde/8-df.png
+image: /assets/article/linux/sauvegarde/2-lsblk.PNG
 ---
 
 Cet article présente la réalisation d'un système de backup "fait maison" sur une machine virtuelle vmware tournant sur le système d'exploitation *Ubuntu* 18.04*LTS* 
@@ -26,7 +26,7 @@ Cet article présente la réalisation d'un système de backup "fait maison" sur 
 
 
 
-Source : https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr
+Source : [https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr](https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr)
 
 2) Pour obtenir plus d'informations, on peut :
 
@@ -36,7 +36,7 @@ Source : https://www.debian.org/releases/wheezy/amd64/apcs04.html.fr
 
 -  afficher la liste des partitions montés on peut utiliser la commande mount
 
-![2-b-mount]({{site.url_complet}}/assets/article/sauvegarde/2-b-mount.PNG)
+![2-b-mount]({{site.url_complet}}/assets/article/linux/sauvegarde/2-b-mount.PNG)
 
 ### Installer le back-up
 
