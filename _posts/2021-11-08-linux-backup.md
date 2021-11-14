@@ -89,6 +89,7 @@ sudo mount /dev/sdb2 /mnt/backup2
 
 ## Source 
 
+- Cours d'Administration IT enseigné à l'HEIG-VD en 2021
 - [www.tecmint.com - 8 Linux ‘Parted’ Commands to Create, Resize and Rescue Disk Partitions](https://www.tecmint.com/parted-command-to-create-resize-rescue-linux-disk-partitions/)
 
 Les ressources suivantes permettent d'accéder au MAN en ligne et ont été utilisée pour le labo.
