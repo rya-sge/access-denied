@@ -1,0 +1,106 @@
+---
+layout: post
+title:  "Brute-force de login avec Hydra"
+date:   2021-11-13
+last-update: 
+categories: securite
+tags: hydra pentesting login dbwa
+image: \assets_2\pentest\dvwa\brute-force\login-page.PNG
+description: ce writeup illuste une attaque par brute-force sur l'application d'entrainement DVWA.
+---
+
+
+
+# Brute-force de login avec Hydra
+
+Ce write-up illustre une attaque par brute-force sur une page web de login avec le logiciel **Hydra**
+
+L'attaque a été réalisé sur l'application web vulnérable DVWA en local.
+
+
+
+## Installation DVWA
+
+Vous pouvez récupérer une image docker de DVWA à l'adresse suivante :
+
+[https://hub.docker.com/r/vulnerables/web-dvwa](https://hub.docker.com/r/vulnerables/web-dvwa)
+
+- Pour la lancer :
+
+```bash
+docker run --rm -it -p 80:80 vulnerables/web-dvwa
+```
+
+- Credentials par défaut :
+  - Username: admin
+  - Password: password
+
+## Phase de reconnaissance
+
+### Page de login
+
+![login-page](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\login-page.PNG)
+
+
+
+### Passage des paramètres 
+
+En regardant le code source la page, on peut voir que les paramètres sont passés par GET, ce qui nous sera utile pour configurer Hydra ainsi que les noms des champs : `username` et `password`
+
+
+
+![form-code-source](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\form-code-source.PNG)
+
+### Récupérer le cookie de session
+
+DVWA nécessite d'être connecté pour pouvoir être utilisé. Il faut alors récupérer le cookie de session, que l'on trouve dans la partie Storage/Cookies du navigateur.
+
+On peut également observer la présence d'un second cookie indiquant le niveau de sécurité de l'application, ici `low`
+
+![cookie-session](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\cookie-session.PNG)
+
+
+
+## Attaque
+
+Maintenant, nous avons toutes les informations permettant de lancer une attaque par brute-force.
+
+```bash
+hydra 0.0.0.0 -l admin -P rockyou.txt http-get-form "/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:F=Username and/or password incorrect.:H=Cookie:security=low; PHPSESSID=1bnn5p1207ll8vphurqbel9r97"
+```
+
+### Explication
+
+- -l admin
+
+On part du principe que l'utilisateur cible est admin, mais on pourrait aussi faire du brute-force dessus.
+
+- -P rockyou.txt
+
+Indique le dictionnaire à utiliser pour cracker le mot de passe
+
+- http-get-form
+
+Inique la méthode de transmission des paramètres. Comme vu durant la phase de reconnaissance, les paramètres sont passés par GET
+
+- Pour la string
+  - ^USER^ indique à Hydra qu'il doit remplacer par le user, ici admin
+  - ^PASS^ indique à Hydra qu'il doit remplacer par le password. Vu que nous avons indiqué un dictionnaire, Hydra va remplacer par les mots du dictionnaire
+  - `F=Username and/or password incorrect.`message qui sera affiché par la page en cas de login incorrect. 
+  - `H=Cookie:security=low; PHPSESSID=1bnn5p1207ll8vphurqbel9r97"`permet d'indiquer des headers.
+
+
+
+### Résultats
+
+![hydra-result](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\hydra-result.PNG)
+
+Le mot de passe trouvé est `password`
+
+## Sources
+
+- Installation docker : [https://hub.docker.com/r/vulnerables/web-dvwa](https://hub.docker.com/r/vulnerables/web-dvwa)
+- Tutoriels Kali sur Hydra : [https://www.kali-linux.fr/hacking/tutohydrabruteforce](https://www.kali-linux.fr/hacking/tutohydrabruteforce)
+- Autres write-up :
+  -  [https://securitytutorials.co.uk/brute-forcing-web-logins-with-dvwa/](https://securitytutorials.co.uk/brute-forcing-web-logins-with-dvwa/)
+

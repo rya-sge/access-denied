@@ -166,6 +166,14 @@ On peut ainsi transmettre dynamiquement des informations au conteneur
 
 #### Faire le ménage
 
+```
+docker container kill $(docker ps -q)
+```
+
+Permet de tuer tous les containers en cours d'exécution
+
+
+
 ```bash
 docker system prune
 ```
@@ -177,3 +185,4 @@ Permet de supprimer les conteneurs qui ne sont pas listés. Typiquement ceux qui
 - Tutoriel sur docker : [https://nouslesdevs.com/docker/](https://nouslesdevs.com/docker/)
 - Documentation officielle de Docker : [https://docs.docker.com/reference/](https://docs.docker.com/reference/)
 - Cours RES enseigné à l'HEIG-VD
+- Article listant une liste de commande Docker utile : [https://towardsdatascience.com/15-docker-commands-you-should-know-970ea5203421](https://towardsdatascience.com/15-docker-commands-you-should-know-970ea5203421)
