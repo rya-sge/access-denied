@@ -39,7 +39,7 @@ docker run --rm -it -p 80:80 vulnerables/web-dvwa
 
 ### Page de login
 
-![login-page](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\login-page.PNG)
+![login-page]({{site.url_complet}}/assets/article/pentest/dvwa/brute-force/login-page.PNG)
 
 
 
@@ -49,7 +49,7 @@ En regardant le code source la page, on peut voir que les paramètres sont pass�
 
 
 
-![form-code-source](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\form-code-source.PNG)
+![form-code-source]({{site.url_complet}}/assets/article/pentest/dvwa/brute-force/form-code-source.PNG)
 
 ### Récupérer le cookie de session
 
@@ -57,7 +57,7 @@ DVWA nécessite d'être connecté pour pouvoir être utilisé. Il faut alors ré
 
 On peut également observer la présence d'un second cookie indiquant le niveau de sécurité de l'application, ici `low`
 
-![cookie-session](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\cookie-session.PNG)
+![cookie-session]({{site.url_complet}}/assets/article/pentest/dvwa/brute-force/cookie-session.PNG)
 
 
 
@@ -93,7 +93,7 @@ Inique la méthode de transmission des paramètres. Comme vu durant la phase de 
 
 ### Résultats
 
-![hydra-result](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\assets_2\pentest\dvwa\brute-force\hydra-result.PNG)
+![hydra-result]({{site.url_complet}}/assets/article/pentest/dvwa/brute-force/hydra-result.PNG)
 
 Le mot de passe trouvé est `password`
 
