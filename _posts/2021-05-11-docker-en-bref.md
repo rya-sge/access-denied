@@ -2,7 +2,7 @@
 layout: post
 title:  "Docker en bref"
 date:   2021-05-11
-last-update: 2021-13-10 
+last-update: 2021-12-29 
 categories: virtualisation 
 tags: docker 
 description: Liste des principales commandes de Docker
@@ -98,6 +98,14 @@ docker exec -it le_container /bin/bash
 Exécuter une commande  à l 'intérieur d'un containeur déjà en exécution.
 
 Ici, on ouvre un shell
+
+### Debug
+
+Il est possible d'afficher les logs du container avec la commande `logs`
+
+```
+docker logs <nom container>
+```
 
 
 

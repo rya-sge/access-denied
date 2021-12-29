@@ -1,21 +1,21 @@
 ---
 layout: post
-title:  "Brute-force de login avec Hydra"
+title:  "DVWA - Login & Hydra"
 date:   2021-11-13
 last-update: 
 categories: securite
 tags: hydra pentesting login dbwa
-image: \assets_2\pentest\dvwa\brute-force\login-page.PNG
+image: /assets/article/pentest/dvwa/brute-force/login-page.PNG
 description: ce writeup illuste une attaque par brute-force sur l'application d'entrainement DVWA.
 ---
 
 
 
-# Brute-force de login avec Hydra
-
 Ce write-up illustre une attaque par brute-force sur une page web de login avec le logiciel **Hydra**
 
 L'attaque a été réalisé sur l'application web vulnérable DVWA en local.
+
+Cette démonstration permet de se rendre compte de l'importance d'avoir des mots de passes fort pour **protéger** ses applications.
 
 
 
