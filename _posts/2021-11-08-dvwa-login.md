@@ -6,8 +6,7 @@ last-update:
 categories: securite
 tags: hydra pentesting login dvwa
 image: /assets/article/pentest/dvwa/brute-force/login-page.PNG
-description: Pourquoi est-il important d'employer des mots de passes forts ? Illustration à travers l'exemple de 
-l'application vulnérable DVWA.
+description: Pourquoi est-il important d'employer des mots de passes forts ? Illustration à travers l'exemple de l'application vulnérable DVWA.
 ---
 
 > Cet article a pour objectif de sensibiliser le lecteur à l'importance des mots de passes fort pour protéger l'accès aux applications. 
