@@ -11,9 +11,11 @@ image: /assets/article/cryptographie/diffie-hellman/schema-echange.png
 
 Cet article présente le protocole de mise au point de clé **Diffie-Hellman** (*key-agreement protocol*) avec un exemple d'implémentation pour mieux comprendre les principes.
 
-Le protocole **Diffie-Hellman** se base sur la difficulté du logarithme discret pour garantir le secret partagé, en l'occurrence la clé partagée dans le cas présent.
+- Le protocole **Diffie-Hellman** se base sur la difficulté du logarithme discret pour garantir le secret partagé, en l'occurrence la clé partagée dans le cas présent.
 
-Le canal utilisé pour l'échange doit être authentique car cette échange de clé est vulnérable face à une attaque *man-in-the-middle*.
+
+- Le canal utilisé pour l'échange doit être authentique car cette échange de clé est vulnérable face à une attaque *man-in-the-middle*.
+
 
 
 
@@ -52,7 +54,9 @@ $$
 
 Le code python utilisé pour cette implémentation est issue en partie du challenge *Key Exchange*  du ctf BuckeyeCTF 2021 : [https://ctftime.org/event/1434/tasks/.](https://ctftime.org/event/1434/tasks/)
 
-L'exemple donné dans cet article a pour objectif de permettre une meilleur compréhension du protocole Diffie-Hellmann. Ne reprenez pas ce code dans la pratique!!!!
+L'exemple donné dans cet article a pour objectif de permettre une meilleur compréhension du protocole Diffie-Hellmann, il ne s'agit pas d'une implémentation sûr par conséquent :
+
+> Ne reprenez pas ce code dans la pratique!!!!
 
 Le code dans son entier est disponible sur mon github à l'adresse suivante : [github.com/rya-sge/AD-ressources - cryptography/diffie-hellman-key-exchange.py](https://github.com/rya-sge/AD-ressources/blob/master/cryptography/diffie-hellman-key-exchange.py)
 
@@ -142,8 +146,9 @@ print("flag", plain.decode('utf-8'))
 
 
 
-## Source :
+## Source 
 
 - Cours de Cryptographie (CRY) enseigné à l'HEIG-VD en 2021
 - Challenge *Key Exchange* du BuckeyeCTF 2021 : [https://ctftime.org/event/1434/tasks/](https://ctftime.org/event/1434/tasks/)
+- Le code de l'article est disponible sur mon github personnel : [github.com/rya-sge/AD-ressources - cryptography/diffie-hellman-key-exchange.py](https://github.com/rya-sge/AD-ressources/blob/master/cryptography/diffie-hellman-key-exchange.py)
 

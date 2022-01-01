@@ -6,16 +6,13 @@ last-update:
 categories: securite
 tags: hydra pentesting login dbwa
 image: /assets/article/pentest/dvwa/brute-force/login-page.PNG
-description: ce writeup illuste une attaque par brute-force sur l'application d'entrainement DVWA.
+description: Pourquoi est-il important d'employer des mots de passes forts ? Illustration à travers l'exemple de 
+l'application vulnérable DVWA.
 ---
 
-
-
-Ce write-up illustre une attaque par brute-force sur une page web de login avec le logiciel **Hydra**
-
-L'attaque a été réalisé sur l'application web vulnérable DVWA en local.
-
-Cette démonstration permet de se rendre compte de l'importance d'avoir des mots de passes fort pour **protéger** ses applications.
+> Cet article a pour objectif de sensibiliser le lecteur à l'importance des mots de passes fort pour protéger l'accès aux applications. 
+>
+> L'exemple été réalisé sur l'application web vulnérable DVWA en local.  Il consiste en un write-up d'une attaque par brute-force sur une page web de login en employant le logiciel **Hydra**
 
 
 
