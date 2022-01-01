@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "DVWA - Login & Hydra"
+title:  "DVWA - Page de Login et l'outil Hydra"
 date:   2021-11-13
 last-update: 
 categories: securite
-tags: hydra pentesting login dbwa
+tags: hydra pentesting login dvwa
 image: /assets/article/pentest/dvwa/brute-force/login-page.PNG
 description: Pourquoi est-il important d'employer des mots de passes forts ? Illustration à travers l'exemple de 
 l'application vulnérable DVWA.
