@@ -47,7 +47,7 @@ Ces 2 commandes permettent de vérifier la version de Node.js et de npm d'instal
 npm init
 ```
 
-npm init permet d'initialiser le package npm. Cette commande créée un fichier package.json qui contiendra toutes les dépendances.
+`npm init` permet d'initialiser le package npm. Cette commande créée un fichier `package.json` qui contiendra toutes les dépendances.
 
 Documentation officielle : [https://docs.npmjs.com/cli/v7/commands/npm-init](https://docs.npmjs.com/cli/v7/commands/npm-init)
 
@@ -70,6 +70,13 @@ node index.js
 
 
 ## Fonctionnalités et modules
+
+Cette partie présente plusieurs modules afin de découvrir ce qui peut être réalisé avec Node.JS
+
+- `Chance` pour générer des données aléatoires;
+- `Express`et `http` pour réaliser un serveur backend http;
+- `dgram` pour envoyer et recevoir des datagrammes UDP;
+- `net` pour réaliser un serveur TCP
 
 ### Chance 
 
@@ -130,7 +137,7 @@ On peut se passer du framework express en utilisant http
 const http = require("http");
 ```
 
-Cette article résume bien comment s'y prendre :  [https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/]( https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/)
+Cet article résume bien comment s'y prendre :  [https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/]( https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/)
 
 [https://developer.mozilla.org/fr/docs/Learn/Server-side/Express_Nodejs/Introduction](https://developer.mozilla.org/fr/docs/Learn/Server-side/Express_Nodejs/Introduction)
 
@@ -166,7 +173,7 @@ Exemple :
     });
 ```
 
-Un exemple plus complet se trouve sur mon github :[Teaching-HEIGVD-RES-2020-Labo-Orchestra/blob/master/docker/image-musician/src/musicien.js](https://github.com/rya-sge/Teaching-HEIGVD-RES-2020-Labo-Orchestra/blob/master/docker/image-musician/src/musicien.js)
+Un exemple plus complet se trouve sur mon github : [Teaching-HEIGVD-RES-2020-Labo-Orchestra/blob/master/docker/image-musician/src/musicien.js](https://github.com/rya-sge/Teaching-HEIGVD-RES-2020-Labo-Orchestra/blob/master/docker/image-musician/src/musicien.js)
 
 
 
@@ -206,13 +213,17 @@ Un exemple plus complet se trouve sur mon dépôt github : [Teaching-HEIGVD-RES-
 
 ### Serveur TCP - Net
 
+- Ports d'écoute
+
 Le serveur TCP va écouter sur un port afin de recevoir les connexions TCP.
 
 Dans le code ci-dessous, le port d'écoute est le port 2205.
 
 Elle est utilisée par la fonction *listen*
 
-Au niveau des données envoyées par le serveur au client, celle-ci sont envoyés en format JSON en utilisan *JSON.stringify(buffer)*. L'appel de la fonction *write* sur le socket va permet d'écrire les données dans le socket qui pourront être récupérées par le client.
+- Transmission des données du serveur au client
+
+Quant aux données envoyées par le serveur au client, celles-ci sont envoyées au format JSON en utilisant *JSON.stringify(buffer)*. Les données seront écrites dans le socket en exécutant la  fonction *write*; elles pourront ensuite être récupérées par le client.
 
 ```javascript
 const Net = require('net');
@@ -258,17 +269,19 @@ Un exemple plus complet se trouve sur mon dépôt github : [Teaching-HEIGVD-RES-
 
 ### Exporter des variables
 
-Avec *export*, on peut déclarer des variables pour qu'elles soit accessible en dehors du fichier où elles ont été créés.
+Avec *export*, on peut déclarer des variables pour qu'elles soient accessible en dehors du fichier où elles ont été créés.
 
 Exemple :
 
-Fichier test.js
+- Fichier test.js
+
 
 ```javascript
 export.MyVariable = 3000; //3000 => valeur de la variable
 ```
 
-Ensuite pour récupérer la valeur :
+- Ensuite pour récupérer la valeur :
+
 
 ```
 var testImport = require('./test.js');

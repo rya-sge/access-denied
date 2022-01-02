@@ -11,7 +11,7 @@ description: Cet article présente une liste de vulnérabilités et menaces pote
 
 Cet article présente une liste de vulnérabilités et menaces potentielles avec le langage C.
 
-Il a pour objectif de sensibiliser les programmeurs aux différents points sensibles de la programmation en C. Certaines de ces vulnérabilités sont également présente dans le langage C++.
+Il a pour objectif de sensibiliser les programmeurs aux différents points sensibles de la programmation en C. Certaines de ces vulnérabilités sont également présentes dans le langage C++.
 
 Cet article n'est pour l'instant pas complet et sera amélioré au fil du temps.
 
@@ -38,15 +38,16 @@ Dans cet article, je ferais souvent référence à la sécurité temporelle et l
 
 Voici quelques fonctions qui  représentent des vulnérabilités, soit directement par leur simple utilisation soit alors en cas de mauvaise implémentation de la part du programmeur.
 
-### **1)strcpy**
+### **1) strcpy**
 
 Avec *strcpy*, on ne précise pas le nombre de caractère maximum à lire, on peut dès lors dépasser la taille du buffer qui contiendra les données. Elle est par conséquent vulnérable à des **buffer overflow**. La sécurité spatiale n'est pas garantie. 
 
-CWE concernée : CWE 121 -**Stack-based Buffer Overflow**
+CWE concernée : 
 
-https://cwe.mitre.org/data/definitions/121.html
+- CWE 121 - **Stack-based Buffer Overflow**
+- Page de présentation  : [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
 
-Cet exemple est en grande partie issue de cette même CWE. J'y ais ajouté la variable locale authOK afin de montrer comment on peut concrètement utiliser cet *overflow*.
+Cet exemple est en grande partie issue de cette même CWE. J'y ais ajouté la variable locale `authOK`  afin de montrer comment on peut concrètement utiliser cet *overflow*.
 
 ```c
 #define BUFSIZE 256
