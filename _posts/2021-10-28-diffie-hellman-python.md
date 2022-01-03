@@ -54,7 +54,7 @@ $$
 
 Le code python utilisé pour cette implémentation est issue en partie du challenge *Key Exchange*  du ctf BuckeyeCTF 2021 : [https://ctftime.org/event/1434/tasks/.](https://ctftime.org/event/1434/tasks/)
 
-L'exemple donné dans cet article a pour objectif de permettre une meilleur compréhension du protocole Diffie-Hellmann, il ne s'agit pas d'une implémentation sûr par conséquent :
+L'exemple donné dans cet article a pour objectif de permettre une meilleur compréhension du protocole **Diffie-Hellmann**, il ne s'agit pas d'une implémentation sûr par conséquent :
 
 > Ne reprenez pas ce code dans la pratique!!!!
 
@@ -78,7 +78,7 @@ g = 5
 
 #### Alice
 
-Alice génère ensuite de manière aléatoire une clé secrète a appartenant à {1,... q-1}
+Alice génère ensuite de manière aléatoire une clé secrète `a` appartenant à {1,... q-1}
 
 ```python
 a = rand.randrange(2, p - 1)  # private key
@@ -108,7 +108,7 @@ $$
 
 #### Alice 
 
-Bob envoie également sa clé publique B à Alice, qui va faire pareil de son côté pour calculer la clé partagée-
+Bob envoie également sa clé publique B à Alice, qui va faire pareil de son côté pour calculer la clé partagée.
 $$
 Shared ~ key = B^a
 $$
