@@ -23,9 +23,9 @@ Cela permet de simplifier la lecture des fichiers json.
 
 Les sources disponibles sont les suivantes : 
 
-- https://nodejs.org/api/esm.html
+- [https://nodejs.org/api/esm.html](https://nodejs.org/api/esm.html)
 
-- https://nodejs.org/api/esm.html#json-modules
+- [https://nodejs.org/api/esm.html#json-modules](https://nodejs.org/api/esm.html#json-modules)
 
 La fonctionnalité est encore au stade expérimentale, il faut lancer node js avec le flag `--experimental-json-modules`
 
@@ -37,17 +37,17 @@ node --experimental-modules --experimental-json-modules app.js
 
 
 
-- Pour lancer le script avec la commande `npm start`
+- Avec `npm start`
 
-Il faut ajouter la commande dans la partie `scripts` du fichier `package.json`  
+II faut ajouter la commande dans la partie `scripts` du fichier `package.json` .
+
+Ensuite, il suffira d'exécuter la commande `npm start` pour que `node` soit lancé avec les bons flags.
 
 ```json
 "scripts": {
     "start": "node --experimental-modules --experimental-json-modules app.js"
   },
 ```
-
-Ensuite, il suffira d'exécuter la commande `npm start`
 
 
 
@@ -76,7 +76,7 @@ let mapPersons = persons.reduce((map, person) => map.set(person.id, person), new
 
 Source principale : [stackabuse.com - Reading and Writing JSON Files with Node.js](https://stackabuse.com/reading-and-writing-json-files-with-node-js/)
 
-2) Asynchrone
+### 2) Asynchrone
 
 En utilisant `readFile`, la lecture sera asynchrone (non bloquant)
 
@@ -113,8 +113,8 @@ Documentation officiel Node.js v17.3.0 : [https://nodejs.org/api/esm.html](https
 
 ### Module expérimental
 
-- https://nodejs.org/api/esm.html
-- https://nodejs.org/api/esm.html#json-modules
+- [https://nodejs.org/api/esm.html](https://nodejs.org/api/esm.html)
+- [https://nodejs.org/api/esm.html#json-modules](https://nodejs.org/api/esm.html#json-modules)
 
 ### Module fs
 

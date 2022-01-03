@@ -3,6 +3,7 @@ description: Prises de notes sur l'informatique et la sécurité
 baseurl: "/access-denied" # the subpath of your site, e.g. /blog
 url: "https://rya-sge.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 url_complet: "https://rya-sge.github.io/access-denied" #image
+lang: "fr"
 # Author
 author-name:    rya-sge
 author-image:   1.png
