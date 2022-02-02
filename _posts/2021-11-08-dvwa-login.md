@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "DVWA - Page de Login et l'outil Hydra"
+title:  "DVWA - Challenge Login avec Hydra"
 date:   2021-11-13
 last-update: 
 categories: securite
@@ -53,11 +53,11 @@ DVWA nécessite d'être connecté pour pouvoir être utilisé. Il faut alors ré
 
 On peut également observer la présence d'un second cookie indiquant le niveau de sécurité de l'application, ici `low`
 
+Remarques : si vous ne lancez pas Hydra en lui spécifiant le cookie de session, alors la page d'authentification cible sera la page de connexion à DVWA au lieu du challenge. Plus d'info par ici : [www.it-swarm-fr.com - Pourquoi Hydra renvoie-t-il 16 mots de passe valides alors qu'aucun n'est valide?](https://www.it-swarm-fr.com/fr/web-application/pourquoi-hydra-renvoie-t-il-16-mots-de-passe-valides-alors-quaucun-nest-valide/l958448400/)
+
 ![cookie-session]({{site.url_complet}}/assets/article/pentest/dvwa/brute-force/cookie-session.PNG)
 
-
-
-## Attaque
+## Exploitation
 
 Maintenant, nous avons toutes les informations permettant de lancer une attaque par brute-force.
 

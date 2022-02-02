@@ -141,7 +141,7 @@ Les fonctions *malloc* et *calloc* vont réserver de la mémoire dans le tas(hea
 
   Le programme réserve BUFSIZE octets en mémoire. Ensuite il fait un appel à *strcpy* en copiant les octets de argv dans buf. Néanmoins, il n'y a aucune garantie que la string dans argv fasse moins de 256 bytes. Il y a par conséquent la possibilité d'effectuer un overflow sur le heap en entrant une chaine de caractères > 256.
 
-  Lien CWE : https://cwe.mitre.org/data/definitions/122.html
+  Lien CWE : [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
 
   **Détection :** 
 
