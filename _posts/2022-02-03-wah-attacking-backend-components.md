@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "WAH - Attacking Back-End Components"
+title:  "WAH10 - Attacking Back-End Components"
 date:   2022-02-03
 categories: securite reseau web
 tags: web backend component lfi rfi hpi hpp smtp

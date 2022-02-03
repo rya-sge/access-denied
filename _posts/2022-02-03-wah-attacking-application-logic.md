@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "WAH - Attacking Application Logic"
+title:  "WAH11 - Attacking Application Logic"
 date:   2022-02-03
 categories: securite reseau web
 tags: application logique sql thread wah
