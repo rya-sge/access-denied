@@ -8,22 +8,23 @@ description: Questions & Réponses du chapitre 10 du livre The Web Application H
 image: 
 ---
 
-> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 10,*The Web Application Hacker's Handbook*, du livre *The Web Application Hacker's Handbook*
+> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 10, *Attacking Back-End Components* du livre *The Web Application Hacker's Handbook*.
 >
 > L'article a pour objectif de sensibiliser le lecteur aux différentes vulnérabilités existantes afin qu'il puisse s'en prémunir.
 
 Le chapitre  traite des attaques suivantes :
 
-- Injection de commande OS
-- *Path Traversal Vulnerabilities*
-- Inclusion de fichier (LFI & RFI)
-- Injection des entités XML externes(*Injecting XML External Entities*)
-- Injection dans les services SOAP
-- Redirection HTTP côté serveur (*Server-side HTTP Redirection*)
-- *HTTP Parameter Injection* (HPI)
-- *HTTP Parameter Pollution* (HPP)
-- Injection dans les services mails
-- Injection de commandes SMTP (*SMTP Command Injection*)
+- Injection de commande OS / *Injecting OS Commands* (p.358)
+- *Path Traversal Vulnerabilities* (p.368)
+- Inclusion de fichier / *File Inclusion Vulnerabilities* (LFI & RFI) (p.381)
+- *Injecting XML External Entities* (p.384)
+- *Injecting into SOAP Services*  (p.386)
+- Injecting into Back-end HTTP Requests (p.426)
+  - Redirection HTTP côté serveur / *Server-side HTTP Redirection* (p.390)
+  - *HTTP Parameter Injection* (HPI) (p.393)
+  - *HTTP Parameter Pollution* (HPP) (p.394)
+- Injection dans les services mails (p.397)
+  - Injection de commandes SMTP (*SMTP Command Injection*) (p.399)
 
 A la fin du chapitre, une liste de questions permet de mieux comprendre les différentes attaques présentées.
 
