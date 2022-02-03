@@ -72,7 +72,7 @@ Résultat avec 2 partitions créées :
 
 ![6-print-free]({{site.url_complet}}/assets/article/linux/sauvegarde/6-print-free.PNG)
 
-4) Après formatage, on montage les partitions sur /mnt/backup1 et /nt/backup2
+4) Après formatage, on monte les partitions sur `/mnt/backup1` et `/nt/backup2`
 
 ```
 sudo mount /dev/sdb1 /mnt/backup1
@@ -81,7 +81,7 @@ sudo mount /dev/sdb2 /mnt/backup2
 
 ![7-mount]({{site.url_complet}}/assets/article/linux/sauvegarde/7-mount.png)
 
-5) On obtient ensuite la quantité d'espace libre sur chacun des filestyme avec la commande `df -h`
+5) On obtient ensuite la quantité d'espace libre sur chacun des systèmes de fichier avec la commande `df -h`
 
 ![8-df]({{site.url_complet}}/assets/article/linux/sauvegarde/8-df.png)
 

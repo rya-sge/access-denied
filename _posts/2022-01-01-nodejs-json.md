@@ -27,6 +27,8 @@ Les sources disponibles sont les suivantes :
 
 - [https://nodejs.org/api/esm.html#json-modules](https://nodejs.org/api/esm.html#json-modules)
 
+### Lancement
+
 La fonctionnalité est encore au stade expérimentale, il faut lancer node js avec le flag `--experimental-json-modules`
 
 - En ligne de commande :
@@ -47,6 +49,15 @@ Ensuite, il suffira d'exécuter la commande `npm start` pour que `node` soit lan
 "scripts": {
     "start": "node --experimental-modules --experimental-json-modules app.js"
   },
+```
+
+### Exemple de code
+
+```javascript
+import ANIMES_LIST from "./anime.json"
+mapAnimes = ANIMES_LIST.reduce((map, anime) => map.set(anime.id, anime), new Map())
+console.log("**Converto to map**")
+console.log(mapAnimes)
 ```
 
 

@@ -1,21 +1,23 @@
 ---
 layout: post
 title:  "WAH - Attacking Back-End Components"
-date:   2021-02-03
+date:   2022-02-03
 categories: securite reseau web
 tags: web backend component lfi rfi hpi hpp smtp
 description: Questions & Réponses du chapitre 10 du livre The Web Application Hacker's Handbook
 image: 
 ---
 
-# WAH - Attacking Back-End Components
+> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 10,*The Web Application Hacker's Handbook*, du livre *The Web Application Hacker's Handbook*
+>
+> L'article a pour objectif de sensibiliser le lecteur aux différentes vulnérabilités existantes afin qu'il puisse s'en prémunir.
 
-Le chapitre 10 du livre *The Web Application Hacker's Handbook* traite des attaques suivantes :
+Le chapitre  traite des attaques suivantes :
 
 - Injection de commande OS
 - *Path Traversal Vulnerabilities*
 - Inclusion de fichier (LFI & RFI)
-- Injection des entités XML externes( *Injecting XML External Entities*)
+- Injection des entités XML externes(*Injecting XML External Entities*)
 - Injection dans les services SOAP
 - Redirection HTTP côté serveur (*Server-side HTTP Redirection*)
 - *HTTP Parameter Injection* (HPI)
@@ -72,7 +74,7 @@ Ex : `D:\app\default\home\logs\\..\\\..\\..\secret.txt`
 
 
 
-Source :
+**Source** 
 
 - L'explication de la solution se trouve à la page 369 du livre.
 - Laboratoire PortSwigger : [https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass](https://portswigger.net/web-security/file-path-traversal/lab-validate-file-extension-null-byte-bypass)
@@ -134,7 +136,9 @@ Une attaque HPP consiste à utiliser dans la même requête plusieurs fois le m�
 
 Aucune des 2 attaques n'est un pré-requis pour l'autre même si une attaque HPI implique souvent une attaque HPP. Il existe de nombreux cas d'attaques HPP n'impliquant pas HPI.
 
-Solution : page 394
+**Réponse**
+
+Solution : page 394 du livre
 
 Autre sources : [owasp.org - Testing for HTTP Parameter Pollution](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution)
 
@@ -174,9 +178,10 @@ La meilleur solution est de vérifier l'entrée utilisateur, c'est par conséque
 
 La réponse A n'empêche pas les `mail injection attacks`.
 
-Pour la réponse B, elle est insuffisante car les autres champs du formulaire pourraient permettre d'injecter un second destinataire en ajoutant une second ligne RCPT TO
+Pour la réponse B, elle est insuffisante car les autres champs du formulaire pourraient permettre d'injecter un second destinataire en ajoutant une seconde ligne RCPT TO
 
 ## Sources 
 
 - STUTTARD, Dafydd, PINTO Marcus , 2018. *The Web Application Hacker's Handbook: Finding and Exploiting Security Flaws*. 2e édition. Wiley Publishing
+- Obtenir le livre en ligne : [https://www.oreilly.com/library/view/the-oracle-hackers/9780470080221/](https://www.oreilly.com/library/view/the-oracle-hackers/9780470080221/)
 - Github avec les réponses aux questions : [https://github.com/six2dez/wahh_extras/blob/master/answers.md](https://github.com/six2dez/wahh_extras/blob/master/answers.md)
