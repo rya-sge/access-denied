@@ -115,7 +115,7 @@ Lors de la 2ème étape, il est important que les messages d'erreur renvoyés ne
 *you are unable to reproduce the behavior a second time. What logic flaw*
 *might this indicate, and how should you proceed?*
 
-Ils 'agit d'une vulnérabilité connue comme `race conditions` . Ces vulnérabilités apparaissent durant une brève période et sous des circonstances spécifiques. Dans le cas présent, on peut en conclure que la fonctionnalité concernant les messages d'erreurs n'est pas *thread safe*.
+Ils 'agit d'une vulnérabilité connue sous la dénomination de `race conditions` . Ces vulnérabilités apparaissent durant une brève période et sous des circonstances spécifiques. Dans le cas présent, on peut en conclure que la fonctionnalité concernant les messages d'erreurs n'est pas *thread safe*.
 
 Pour pouvoir l'exploiter, un attaquant peut écrire un script qui lancer de multiples requêtes permettant à certaines d'entre-elles d'exploiter la fenêtre où les conditions nécessaires à la vulnérabilité sont présentes.
 
