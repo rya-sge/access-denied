@@ -4,7 +4,7 @@ title:  "WAH18 - The Application Server"
 date:   2022-02-03
 categories: securite reseau web
 tags: webdav proxy virtualhost oracle
-description: Questions & Réponses du chapitre 11, Attacking Application Logic, du livre The Web Application Hacker's Handbook
+description: Questions & Réponses du chapitre 18, Attacking the Application Server, du livre The Web Application Hacker's Handbook
 image: 
 ---
 
