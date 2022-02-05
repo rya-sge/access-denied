@@ -122,6 +122,8 @@ Documentation officiel Node.js v17.3.0 : [https://nodejs.org/api/esm.html](https
 - [json-modules](https://nodejs.org/api/esm.html#json-modules)
 - [builtin-modules](https://nodejs.org/api/esm.html#builtin-modules)
 
+Cours de Technologie Web (TWEB) enseigné à l’HEIG-VD en 2021-2022
+
 ### Module expérimental
 
 - [https://nodejs.org/api/esm.html](https://nodejs.org/api/esm.html)
