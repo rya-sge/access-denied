@@ -12,7 +12,7 @@ Cet article présente une des fonctionnalités du logiciel [Metasploit](https://
 
 
 
->  Attention : Cet article est publié à titre informatif, il a été réalisé dans un **réseau en local à l'aide de machine virtuelle.** 
+>  Attention : Cet article est publié à titre informatif afin de sensibiliser le lecteur sur les différentes menaces qui peuvent peser sur un système. Il a été réalisé dans un **réseau en local à l'aide de machine virtuelle.**  Vous ne devez en aucun cas employer les outils présentés sur des systèmes sans l'autorisation de leur propriétaire.
 
 
 
