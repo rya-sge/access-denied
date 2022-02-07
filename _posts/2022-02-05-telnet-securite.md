@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Le protocole Telnet et la sécurité"
+title:  "La sécurité du protocole Telnet"
 date:   2022-02-05
 last-update: 
 categories: securite
