@@ -5,7 +5,7 @@ date:   2021-10-28
 last-update: 
 categories: cryptographie
 tags: diffie-hellman asymétrique
-description: Cet article présente le protocole de mise au point de clé Diffie-Hellman (key-agreement protocol) avec un exemple d'implémentation pour mieux comprendre les principes.
+description: Présentation du protocole de mise au point de clé Diffie-Hellman (key-agreement protocol) avec un exemple d'implémentation pour mieux comprendre les principes.
 image: /assets/article/cryptographie/diffie-hellman/schema-echange.png
 ---
 
