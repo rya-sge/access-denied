@@ -59,7 +59,7 @@ layout: home
         <div class="c-recent-post">
             <h4 class="c-recent__title">You might also enjoy</h4>
             <div class="c-recent__box">
-                {% for post in site.categories[{{ page.categories }}] %}
+                {% for post in site.categories[page.categories] %}
                 {% if post.image %}
                 <div class="c-recent__item">
                     <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}"
