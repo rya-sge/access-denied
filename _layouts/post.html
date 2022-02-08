@@ -59,7 +59,7 @@ layout: home
         <div class="c-recent-post">
             <h4 class="c-recent__title">You might also enjoy</h4>
             <div class="c-recent__box">
-                {% for post in site.categories[page.categories] %}
+                {% for post in site.related_posts limit:4 %}
                 {% if post.image %}
                 <div class="c-recent__item">
                     <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}"
@@ -71,33 +71,15 @@ layout: home
                             </time>
                         </div>
                     </div>
-                    {% else %}
-                    {% endif %}
-                    {% endfor %}
                 </div>
+                {% else %}
+                {% endif %}
+                {% endfor %}
             </div>
-        </div>
-        <!--{% for post in site.categories[page.categories[0]] limit:4 %}
-        {% if post.image %}
-          <div class="c-recent__item">
-            <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}" style="background-image: url( {{ site.baseurl |
-            append: post.image }})"></a>
-            <div class="c-recent__footer">
-              <h4><a href="{{ site.baseurl | append: post.url }}">{{ post.title }}</a></h4>
-              <div class="c-recent__date">
-                <time datetime="{{ post.date | date_to_xmlschema }}">{{post.date | date: "%B %-d, %Y"}}</time>
-              </div>
-            </div>
-          </div>
-        {% else %}
+        </div> <!-- /.c-recent-post -->>
+        {% if site.disqus-identifier %}
+        {% include disqus-comments.html %}
         {% endif %}
-        {% endfor %}
-        </div>-->
-
-    </div> <!-- /.c-recent-post -->
-    {% if site.disqus-identifier %}
-    {% include disqus-comments.html %}
-    {% endif %}
     </div> <!-- /.c-wrap-content -->
     </div> <!-- /.c-article__content -->
 </article> <!-- /.c-article-page -->
