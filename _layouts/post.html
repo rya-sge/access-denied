@@ -50,7 +50,22 @@ layout: home
      <div class="c-recent-post">
        <h4 class="c-recent__title">You might also enjoy</h4>
        <div class="c-recent__box">
-       {% for post in site.related_posts limit:4 %}
+           {% for post in site.categories[{{ page.category }}] %}
+       {% if post.image %}
+     <div class="c-recent__item">
+       <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}" style="background-image: url( {{ site.baseurl | append: post.image }})"></a>
+       <div class="c-recent__footer">
+         <h4><a href="{{ site.baseurl | append: post.url }}">{{ post.title }}</a></h4>
+         <div class="c-recent__date">
+           <time datetime="{{ post.date | date_to_xmlschema }}">{{post.date | date: "%B %-d, %Y"}}</time>
+         </div>
+       </div>
+     </div>
+   {% else %}
+   {% endif %}
+   {% endfor %}
+   </div>
+       <!--{% for post in site.related_posts limit:4 %}
        {% if post.image %}
          <div class="c-recent__item">
            <a class="c-recent__image" href="{{ site.baseurl | append: post.url }}" style="background-image: url( {{ site.baseurl |
@@ -65,7 +80,8 @@ layout: home
        {% else %}
        {% endif %}
        {% endfor %}
-       </div>
+       </div>-->
+
      </div> <!-- /.c-recent-post -->
       {% if site.disqus-identifier %}
         {% include disqus-comments.html %}
