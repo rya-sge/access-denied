@@ -5,7 +5,7 @@ title:  "Chiffrement RSA avec SageMath"
 date:   2021-07-27
 categories: cryptographie
 tags: RSA sage python
-description: Cet article explique comment implémenter le chiffrement RSA avec SageMath. C'est un logiciel permettant de réaliser des opérations mathématiques, particulièrement intéressant pour faire de la cryptographie. De plus, il est possible d'importer des libraires python.
+description: Cet article explique comment implémenter le chiffrement RSA avec SageMath, logiciel permettant d'effectuer des opérations mathématiques utiles en cryptographie.
 ---
 
 Cet article explique comment implémenter le chiffrement **RSA** avec *SageMath*. C'est un logiciel permettant de réaliser des opérations mathématiques, particulièrement intéressant pour faire de la cryptographie. De plus, il est possible d'importer des libraires python.
@@ -44,8 +44,8 @@ $$
 
 #### Fonctions proposées par la librairie
 
-- Pour le déchiffrement, la fonction  *inverse_mod* permet de calculer d très facilement
-- En déclarant le groupe multiplicatif avec *Integers(n)*, tous les calculs vont se faire modulo n ce qui simplifie l'écriture.
+- Pour le déchiffrement, la fonction `inverse_mod` permet de calculer d très facilement
+- En déclarant le groupe multiplicatif avec `Integers(n)`, tous les calculs vont se faire modulo n ce qui simplifie l'écriture.
 
 
 
@@ -61,7 +61,7 @@ L'objectif ici sera de chiffrer puis déchiffrer un message(ascii) avec RSA.
 
 2. Convertir en long les bytes obtenus
 
-   -> Ce fait avec la fonction *bytes_to_long* de de la librairie *Crypto.Util.number*
+   -> Ce fait avec la fonction `bytes_to_long` de de la librairie *Crypto.Util.number*
 
 3. Appliquer le chiffrement RSA sur le message
 
@@ -73,11 +73,11 @@ On suppose le message chiffré sous forme d'un nombre
 
 2. Convertir le résultat (long) en byte
 
-   -> Ce fait avec la fonction *long_to_bytes* de la librairie *Crypto.Util.number*
+   -> Ce fait avec la fonction `long_to_bytes` de la librairie *Crypto.Util.number*
 
 3. Décoder en ascii le résultat obtenu
 
-   -> Ce fait avec la fonction  python native *decode*
+   -> Ce fait avec la fonction  python native `decode`
 
 #### Code
 

@@ -8,10 +8,6 @@ description: Présentation et utilisation des regex en Javascript
 image: 
 ---
 
-
-
-# Les regex en Javascript
-
 Les expressions régulières permettent de sélectionner / déterminer si des chaines de caractères correspondent à un certains "patterns/modèles". Il ne s'agit cependant pas d'un langage de programmation.
 
 **Exemple**

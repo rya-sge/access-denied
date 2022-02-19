@@ -8,17 +8,19 @@ description: Cet article présente la commande Meterpreter migrate du logiciel  
 image: /assets/article/outil-securite/metasploit/migrate.png
 ---
 
-Cet article présente une des fonctionnalités du logiciel [Metasploit](https://www.metasploit.com) : la commande Meterpreter *migrate*. Celle-ci permet à un attaquant d'élever ses privilèges sur la machine après qu'il ait pu obtenir dessus une session *meterpreter*. Cette opération peut lui permettre par exemple d'utiliser un keylogger.
+> Attention : Cet article est publié à titre informatif afin de sensibiliser le lecteur sur les différentes menaces qui peuvent peser sur un système. Il a été réalisé dans un **réseau en local à l'aide de machine virtuelle.**  Vous ne devez en aucun cas employer les outils présentés sur des systèmes sans l'autorisation de leur propriétaire.
+>
+> La partie consistant à obtenir la session meterpreter ne sera pas détaillé dans cet article.
+
+Contexte : Un attaquant a pu obtenir une session *meterpreter* (shell) sur une machine "cible". A partir de cette situation, que peut-il concrètement faire ?
+
+Cet article tente de fournir une des réponses possible en présentant une des fonctionnalités du logiciel [Metasploit](https://www.metasploit.com) : la commande meterpreter `migrate`. Celle-ci permet à un attaquant d'élever ses privilèges sur la machine après qu'il ait pu obtenir dessus une session *meterpreter*. Cette opération peut lui permettre par exemple d'utiliser un keylogger.
 
 
 
->  Attention : Cet article est publié à titre informatif afin de sensibiliser le lecteur sur les différentes menaces qui peuvent peser sur un système. Il a été réalisé dans un **réseau en local à l'aide de machine virtuelle.**  Vous ne devez en aucun cas employer les outils présentés sur des systèmes sans l'autorisation de leur propriétaire.
+## Migration dans un processus
 
-
-
-## Migrate
-
-Une fois que l'attaquant a une commande meterpreter sur la machine "cible", il est capable de migrer dans un processus afin :
+Tout d'abord, il peut souhaiter migrer dans un processus afin :
 
 - D'avoir des droits supplémentaires
 - De pouvoir persister sur la machine cible au-delà de la session meterpreter et éviter la détection
