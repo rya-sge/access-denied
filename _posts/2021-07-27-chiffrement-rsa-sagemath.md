@@ -10,7 +10,7 @@ description: Cet article explique comment implémenter le chiffrement RSA avec S
 
 Cet article explique comment implémenter le chiffrement **RSA** avec *SageMath*. C'est un logiciel permettant de réaliser des opérations mathématiques, particulièrement intéressant pour faire de la cryptographie. De plus, il est possible d'importer des libraires python.
 
-Il est possible d'éditer du code SageMath en utilisant juypter. Pour cela il faut lancer en ligne de commande : *sage -n* ou sage -n jupyter
+Il est possible d'éditer du code SageMath en utilisant jupyter. Pour cela il faut lancer en ligne de commande : *sage -n* ou sage -n jupyter
 
 Plus d'informations est disponible sur la documentation d'installation de Sage : [https://doc.sagemath.org/html/en/installation/launching.html]( https://doc.sagemath.org/html/en/installation/launching.html)
 
