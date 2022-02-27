@@ -48,11 +48,56 @@ Il existe plusieurs types de tests d'intrusion, en voici une liste :
 
 Quelques guides expliquent comment réaliser un test d'intrusion
 
-- PTES : [www.pentest-standard.org/index.php/Main_Page](http://www.pentest-standard.org/index.php/Main_Page)
-- OSSTMM  : [www.isecom.org/OSSTMM.3.pdf](https://www.isecom.org/OSSTMM.3.pdf)
-- OWASP testing guide : [owasp.org/www-project-web-security-testing-guide/](https://owasp.org/www-project-web-security-testing-guide/)
-- NIST framework : [www.nist.gov/cyberframework](https://www.nist.gov/cyberframework)
-- Penetration Testing Framework 0.59 : [http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html](http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html)
+#### PTES
+
+Vise à créer une norme sur la manière de réaliser un test d'intrusion
+
+Site web : [www.pentest-standard.org](http://www.pentest-standard.org/index.php/Main_Page)
+
+Celui-ci comprend 7 sections :
+
+- [Pre-engagement Interactions](http://www.pentest-standard.org/index.php/Pre-engagement)
+
+- [Intelligence Gathering](http://www.pentest-standard.org/index.php/Intelligence_Gathering)
+- [Threat Modeling](http://www.pentest-standard.org/index.php/Threat_Modeling)
+- [Vulnerability Analysis](http://www.pentest-standard.org/index.php/Vulnerability_Analysis)
+- [Exploitation](http://www.pentest-standard.org/index.php/Exploitation)
+- [Post Exploitation](http://www.pentest-standard.org/index.php/Post_Exploitation)
+- [Reporting](http://www.pentest-standard.org/index.php/Reporting)
+
+### OSSTMM  
+
+Site web : [www.isecom.org/OSSTMM.3.pdf](https://www.isecom.org/OSSTMM.3.pdf)
+
+Se focalise sur la transparence et la valeur commerciale
+
+Vise la répétabilité, la cohérence et la haute qualité des résultats 
+
+#### OWASP testing guide 
+
+Site web : [owasp.org/www-project-web-security-testing-guide/](https://owasp.org/www-project-web-security-testing-guide/)
+
+Se concentre sur les tests d'applications web
+
+- Techniques et outils
+- Collecte d'informations
+- Logique commerciale, management, authentification, autorisations, Sessions, validation d'input, DOS, test du côté client (client-side)
+
+#### NIST framework 
+
+Site web : [www.nist.gov/cyberframework](https://www.nist.gov/cyberframework)
+
+Orienté *assessement*
+
+- Couvre le planning, le processus, analyse et les méthodes de validations
+- Annexe avec le modèle des règles d'engagement
+- Autres document NIST, avec un haut niveau de points de vue
+  - Fournit quelques conseils sur comment planifier un *security assessment*
+  - *The Guide for Assessing the Security Controls in Federal Information Systems, Special Publication 800-53A*
+
+#### Penetration Testing Framework 0.59 
+
+Site web : http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html](http://www.vulnerabilityassessment.co.uk/Penetration%20Test.html)
 
 
 
@@ -66,18 +111,18 @@ Un test d'intrusion ne peut pas trouver toutes les vulnérabilités sur un envir
 
 - Limite de temps
 
-- Les accès : a quoi a -t-on accès pour réaliser le test ?
+- Les accès : a quoi a-t-on accès pour réaliser le test ?
 
 - La méthode
 
-  - Par exemple : on ne peut pas faire du Déni du service pour réaliser une distraction
+  - Par exemple : on ne peut pas faire du déni du service pour réaliser une distraction
 
 ### Autres facteurs
 
 - Compétences
 - Imagination
 - Exploits connus
-  - On n'a pas forcément le temps d'écrire nos propres exploits pour écrire un exploit pour une faille spécifique trouvée dans un environnement spécifique. En principe, le client ne va pas payer pour que le pentester écrive ses exploits.
+  - On n'a pas forcément le temps d'écrire nos propres exploits pour une faille spécifique trouvée dans un environnement spécifique. En principe, le client ne va pas payer pour que le pentester écrive ses exploits.
 
 ## Source
 
