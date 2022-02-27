@@ -4,8 +4,8 @@ title:  "Arbre recouvrant de poids minimum (MST / ACM)"
 date:   2021-08-22
 categories: programmation
 tags:  acm mst minimum-spanning-tree kruskal boruvka prim
-description: Cet article résume les principales notions et algorithmes utilisés permettant de calculer l'arbre couvrant de poids minimum (ACM ) ou  Minimum Spanning Tree (MST) en anglais.  
-image: 
+description: Cet article résume les principales notions et algorithmes utilisés permettant de calculer l'arbre couvrant de poids minimum (ACM) / Minimum Spanning Tree(MST).  
+image: /assets/article/algorithme/mst/arbre.PNG
 ---
 
 
