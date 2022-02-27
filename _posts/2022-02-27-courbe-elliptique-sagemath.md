@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title:  "Les Courbes Elliptiques avec SageMath"
 date:   2022-02-27
@@ -6,8 +6,8 @@ last-update:
 categories: cryptographie programmation
 tags: logarithme-discret courbe-elliptique sage
 description: Cet article explique l'implémentation des courbes elliptiques avec la librairie SageMath, par exemple la définition et l'addition des points sur une courbe.
-image: assets/article/cryptographie/sagemath/ec/cover-image.PNG
-```
+image: /assets/article/cryptographie/sagemath/ec/cover-image.PNG
+---
 
 
 
