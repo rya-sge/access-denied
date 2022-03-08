@@ -6,6 +6,7 @@ date:   2021-07-27
 categories: cryptographie
 tags: RSA sage python
 description: Cet article explique comment implémenter le chiffrement RSA avec SageMath, logiciel permettant d'effectuer des opérations mathématiques utiles en cryptographie.
+image: /assets/article/cryptographie/sagemath/rsa/formule-math.PNG
 ---
 
 Cet article explique comment implémenter le chiffrement **RSA** avec *SageMath*. C'est un logiciel permettant de réaliser des opérations mathématiques, particulièrement intéressant pour faire de la cryptographie. De plus, il est possible d'importer des libraires python.
