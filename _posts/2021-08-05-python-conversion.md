@@ -20,11 +20,12 @@ Lors des CTF(Capture the flags), il m'arrivait souvent de perdre du temps dans l
 
 #### int -> bytes
 
-Python3 possède la fonction `int.``to_bytes`(*length*, *byteorder*, ***, *signed=False*) qui permet de convertir un entier en bytes.
+Python3 possède la fonction `int.``to_bytes`(*length*, *byteorder*, ***, *signed=False*) qui permet de convertir un entier en bytes. Elle est intéressante si on souhaite s'assurer de la taille en byte de la chaîne résultante.
 
-Il faut pour cela spécifier si l'ordre est big ou little endian.
+- `length`: Longueur de la chaîne de byte résultante
+- `byteorder` : Il faut pour cela spécifier si l'ordre est big ou little endian.
 
-Exemple i:
+Exemple 
 
 Le code suivant :
 
@@ -34,7 +35,7 @@ print("big : ", (integer).to_bytes(2, byteorder='big'))
 print("little : ", (integer).to_bytes(2, byteorder='little'))
 ```
 
-produira la sortie suivante
+produira la sortie suivante :
 
 > big :  b'\x07\xd0' 
 >
@@ -48,7 +49,7 @@ Sources :
 
 >  `int.``from_bytes`(*bytes*, *byteorder*, ***, *signed=False*)
 
-Dans le sens inverse, on peut aussi convertir des bytes en int
+Dans le sens inverse, on peut aussi convertir des bytes en int.
 
 ```python
 byteString = b"test"
@@ -67,7 +68,16 @@ produira la sortie suivante :
 
 ### Avec la librairie Crypto
 
-Personnellement, j'utilise plutôt la librarie *Crypto.Util.number*. Celle possède des fonctions permettant de convertir des long en bytes et inversement.
+La librairie *Crypto.Util.number* permet d'effectuer des conversions (long en bytes et inversement) sans devoir indiquer le nombre de bytes résultant.
+
+- Installation : [pycryptodome](https://pypi.org/project/pycryptodome/)
+- Importation de la librairie
+
+```python
+from Crypto.Util.number import long_to_bytes, bytes_to_long
+```
+
+- Exemple
 
 > ```python
 > byteString = b"test"
@@ -121,7 +131,7 @@ produira la sortie suivante :
 > int -> string 2000 -> 2000
 > string -> int :  2000
 
-Warning :
+Avertissement :
 
 Il faut que la string représente un nombre entier. Par exemple, le code suivant :
 
@@ -202,7 +212,7 @@ On peut constater que la transformation de 0x20 en byte ne donne rien car cette 
 
 Au contraire de 0x42 qui donne B
 
-Warnings :
+Avertissement :
 
 Le nombre hexa, qui est sous format string, ne doit pas contenir le "0x" sinon cela provoquera l'erreur suivante :
 

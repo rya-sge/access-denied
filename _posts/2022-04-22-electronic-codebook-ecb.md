@@ -5,7 +5,7 @@ date:   2022-04-22
 last-update: 
 categories: cryptographie 
 tags: cbc chiffrement-bloc
-description: Cet article présente le mode de chiffrement ECB avec une analyse sur sur sa sécurité (confidentialité, intégrité, authenticité).
+description: Cet article présente le mode de chiffrement ECB avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité).
 image: /assets/article/cryptographie/mode-chiffrement/ecb-encryption.png
 ---
 
@@ -41,13 +41,13 @@ Le mode ECB n'utilise pas d'IV et les blocs sont chiffrés de manières indépen
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/ECB_encryption.svg/1920px-ECB_encryption.svg.png)
 
-Source image : https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+Source image : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ### Déchiffrement
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/ECB_decryption.svg/902px-ECB_decryption.svg.png)
 
-Source : https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+Source : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ## Questions
 
@@ -59,7 +59,7 @@ Non, ECB ne génère pas un flux de bits pré-calculables.
 
 Le chiffrement et le déchiffrement peuvent être parallélisés
 
-### C) Opération partielle 
+#### C) Opération partielle 
 
 Oui, chaque bloc est indépendant des autres blocs. On peut par conséquent chiffrer ou déchiffrer un bloc sans que cela impacte les autres blocs.
 
