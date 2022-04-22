@@ -5,7 +5,7 @@ date:   2022-02-03
 categories: securite reseau web
 tags: web backend component lfi rfi hpi hpp smtp wah
 description: Questions & Réponses du chapitre 10 du livre The Web Application Hacker's Handbook
-image: 
+image:  /assets/article/pentest/wah/wah-cover.PNG
 ---
 
 > Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 10, *Attacking Back-End Components* du livre *The Web Application Hacker's Handbook*.

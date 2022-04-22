@@ -5,7 +5,7 @@ date:   2022-02-03
 categories: securite reseau web
 tags: webdav proxy virtualhost oracle wah
 description: Questions & Réponses du chapitre 18, Attacking the Application Server, du livre The Web Application Hacker's Handbook
-image: 
+image: /assets/article/pentest/wah/wah-cover.PNG
 ---
 
 

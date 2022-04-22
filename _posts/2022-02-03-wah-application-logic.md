@@ -5,7 +5,7 @@ date:   2022-02-03
 categories: securite reseau web
 tags: application logique sql thread wah
 description: Questions & Réponses du chapitre 11, Attacking Application Logic, du livre The Web Application Hacker's Handbook
-image: 
+image: /assets/article/pentest/wah/wah-cover.PNG
 ---
 
 > Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 11, *Attacking Application Logic*, du livre *The Web Application Hacker's Handbook*
