@@ -50,9 +50,9 @@ Rappel : la difficulté repose sur le logarithme discret
 
 - Clé publique
 
-$$
-K = k \* G
-$$
+   $$
+K = k * G
+   $$
 
 Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne peut faire que des additions ou des multiplications par des constantes.
 
@@ -62,9 +62,9 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 1. Tirer un nombre aléatoire uniformément
 
-$$
+   $$
 r ∈ Z^*_p
-$$
+   $$
 
 2. Calculer  un point `R` sur la courbe elliptique
    $$
@@ -85,15 +85,15 @@ $$
 
 4. 
 
-$$
+   $$
 c = Enc_{ke}(m)
-$$
+   $$
 
 5. 
 
-$$
+   $$
 T = MAC_{kM}(c || S2)
-$$
+   $$
 
 6. Le message chiffré est `R||c||T`
 
@@ -129,9 +129,9 @@ $$
 3. On vérifie le tag avec `km`
 4. Si le tag est correct, on déchiffre avec `ke`
 
-$$
+   $$
 m = Dec_{ke} 
-$$
+   $$
 
 
 

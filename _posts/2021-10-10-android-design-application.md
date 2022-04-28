@@ -16,9 +16,22 @@ Cet article présente les quelques astuces de bases pour configurer et modifier 
 
 
 
-## Définir des strings
+### Les ressources
 
-Lorsqu'on développe une application, on souhaite souvent définir du texte à afficher. Il est possible de  les définir et de modifier ceux présent par défaut dans le fichier res/values/**strings.xml**
+Pour définir le design de notre application, Android offre la possibilités d'ajouter des ressources. Celles-ci sont les suivantes :
+
+- Les valeurs(*values*)
+- Les images (*drawables*)
+- Les *layouts* (interface graphique de l'application)
+- Les animations
+- Les menus
+- etc.
+
+Toutes ces ressources sont situées dans des répertoires spécifiques dans le dossier `res`
+
+## Définir le texte affiché
+
+Lorsqu'on développe une application, on souhaite souvent définir du texte à afficher (*strings*). Il est possible de  les définir et de modifier ceux présent par défaut dans le fichier res/values/**strings.xml**
 
 - Exemple pour le nom de l''application (présent par défaut) :
 
@@ -69,7 +82,21 @@ programmation/![strings-language]({{site.url_complet}}/assets/article/programmat
 
 
 
+## Les images(Drawables)
 
+Il existe plusieurs types de drawables, entre autre :
+
+- Fichier bitmap
+- Vector
+- Nine-Path
+- State List
+- Level List
+
+Le logo doit se trouver dans le dossier mipmap
+
+Android utilise Le nom du fichier (sans l'extension) pour définir identifiant de la ressource :
+
+monImage.png -> @drawable/monImage
 
 ## Spécifier l'affichage en mode paysage
 
