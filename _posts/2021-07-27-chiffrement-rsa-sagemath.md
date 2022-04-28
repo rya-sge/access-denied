@@ -31,12 +31,12 @@ $$
 
 Chiffrement
 $$
-c = m^e \ mod \ φ(n)
+c = m^e \ mod \ n
 $$
 
 Déchiffrement
 $$
-m = c^d \ mod \ φ(n)
+m = c^d \ mod \ n
 $$
 
 
