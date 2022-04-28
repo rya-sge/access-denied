@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Le protocole WEP et ses vulnérabilités"
-date:   2021-06-15 
+date:   2028-04-28
 categories: securite reseau
 tags: wep wifi
 description: Cet article présente le protocole Wifi WEP (Wired Equivalent Privacy) en se focalisant sur les aspects sécuritaires (confidentialité, intégrité, authenticité).

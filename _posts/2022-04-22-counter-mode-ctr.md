@@ -9,8 +9,6 @@ description: Cet article présente le mode opératoire CTR avec une analyse sur 
 image: /assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png
 ---
 
-
-
 Cet article présente le mode opératoire CTR (*Counter Mode*). 
 
 Pour une meilleure compréhension, les questions suivantes seront abordées :

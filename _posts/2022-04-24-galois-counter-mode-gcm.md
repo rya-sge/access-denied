@@ -6,7 +6,7 @@ last-update:
 categories: cryptographie 
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode de chiffrement authentifié GCM avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
-image: /article/cryptographie/mode-chiffrement/gcm-schema.PNG
+image: /assets/article/cryptographie/mode-chiffrement/gcm-schema.PNG
 ---
 
 

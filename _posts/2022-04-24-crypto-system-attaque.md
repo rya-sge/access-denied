@@ -70,7 +70,7 @@ Un client parle avec un serveur légitime. En tant qu'attaquant, on intercepte u
 
 Exemple : ROBOT attack sur SSL/TLS
 
-## **Indistinguishability under Chosen-Ciphertext Attacks (IND CCA)**
+## Indistinguishability under Chosen-Ciphertext Attacks (IND CCA)
 
 ![ind-caa]({{site.url_complet}}/assets/article/cryptographie/asymetrique/ind-caa.PNG)
 
