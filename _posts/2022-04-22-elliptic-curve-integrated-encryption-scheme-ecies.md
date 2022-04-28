@@ -109,7 +109,7 @@ On a R||c||T  ainsi que la clé secrète `k`
    $$
 
    $$
-   R = r * G
+   R=r*G
    $$
 
    $$
@@ -122,7 +122,7 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
-(k_e  || k_M) = KDF(kR||S1)
+(k_e||k_M)=KDF(kR||S1)
 $$
 
 
