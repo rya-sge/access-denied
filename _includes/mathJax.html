@@ -7,18 +7,11 @@ Source :
 <script type="text/x-mathjax-config"> MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } }); </script>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$$','$$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\(","\\)"] ],
-    },
-		TeX: {
-    	Macros: {
-				bra: ["\\langle{#1}|", 1],
-				ket: ["|{#1}\\rangle", 1],
-        braket: ["\\langle{#1}\\rangle", 1],
-				bk: ["\\langle{#1}|{#2}|{#3}\\rangle", 3]
-    	}
-  	}
+   jax: ["input/TeX","input/MathML","input/AsciiMath","output/CommonHTML"],
+  extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js","AssistiveMML.js", "a11y/accessibility-menu.js"],
+  TeX: {
+    extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+  }
 	});
 
 </script>
