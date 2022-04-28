@@ -4,23 +4,24 @@ title:  "Android Studio - Design d'une application"
 date:   2021-10-10
 categories: programmation
 tags: android design mobile
-description: Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application Android, cela comprend le texte à afficher, le multilangue ainsi qu'un formulaire de login.
+description: Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application Android (texte à afficher, multilingue, image, etc.)
 image: /assets/article/programmation/android/design/landscape-avd.PNG
 ---
 
 Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application **Android**, entre autre :
 
-- Les textes à afficher sur l'application
-- Les langues afin que le texte puisse s'adapter en fonction de la langue de l'utilisateur
-- L'affichage (paysage /portrait)
+- Les textes à afficher sur l'application ;
+- Les langues afin que le texte puisse s'adapter en fonction de la langue de l'utilisateur ;
+- L'affichage (paysage / portrait) ;
+- Les types de champs dans un formulaire.
 
 
 
-### Les ressources
+## Les ressources
 
 Pour définir le design de notre application, Android offre la possibilités d'ajouter des ressources. Celles-ci sont les suivantes :
 
-- Les valeurs(*values*)
+- Les valeurs (*values*)
 - Les images (*drawables*)
 - Les *layouts* (interface graphique de l'application)
 - Les animations
@@ -29,9 +30,11 @@ Pour définir le design de notre application, Android offre la possibilités d'a
 
 Toutes ces ressources sont situées dans des répertoires spécifiques dans le dossier `res`
 
-## Définir le texte affiché
+## Les strings
 
-Lorsqu'on développe une application, on souhaite souvent définir du texte à afficher (*strings*). Il est possible de  les définir et de modifier ceux présent par défaut dans le fichier res/values/**strings.xml**
+### Définir le texte affiché
+
+Lorsqu'on développe une application, on souhaite souvent définir du texte à afficher (*strings*). Il est possible de  les définir et de modifier ceux présent par défaut dans le fichier `res/values/strings.xml`
 
 - Exemple pour le nom de l''application (présent par défaut) :
 
@@ -65,7 +68,7 @@ Dans notre balise *TextView* qui se trouve dans le fichier xml de l'activité si
 
 ### Application multi-langues
 
-Une application peut être destiné à des utilisateurs de langues différentes. Il est alors important de définir des strings adaptés à chacune de ces langues.
+Une application peut être destiné à des utilisateurs de langues différentes. Il est alors important de définir des *strings* adaptés à chacune de ces langues.
 
 Pour une présentation vidéo, je vous invite à aller regarder celle-ci qui est très bien : [YouTube - How to rotate the Android emulator display](https://www.youtube.com/watch?v=41UeSYiYsjw)
 
@@ -82,9 +85,9 @@ programmation/![strings-language]({{site.url_complet}}/assets/article/programmat
 
 
 
-## Les images(Drawables)
+## Les images (Drawables)
 
-Il existe plusieurs types de drawables, entre autre :
+Il existe plusieurs types de *drawables*, entre autre :
 
 - Fichier bitmap
 - Vector
@@ -92,11 +95,11 @@ Il existe plusieurs types de drawables, entre autre :
 - State List
 - Level List
 
-Le logo doit se trouver dans le dossier mipmap
+Le logo doit se trouver dans le dossier mipmap.
 
-Android utilise Le nom du fichier (sans l'extension) pour définir identifiant de la ressource :
+Android utilise le nom du fichier (sans l'extension) pour définir l'identifiant de la ressource :
 
-monImage.png -> @drawable/monImage
+`monImage.png` -> `@drawable/monImage`
 
 ## Spécifier l'affichage en mode paysage
 
