@@ -35,8 +35,7 @@ disqus-identifier:
 
 # Build settings
 markdown: kramdown
-kramdown:
-  math_engine: mathjax
+
 
 permalink: /:year/:month/:day/:title/
 
