@@ -32,7 +32,7 @@ google-analytics: # Add your identifier. For example UA-99631805-1
 # Comment Section (Disqus)
 disqus-identifier:
   #https-rya-sge-github-io-access-denied  #Add your shortname for Disqus Comment. For example mr-brown
-
+math_engine: mathjax
 # Build settings
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
