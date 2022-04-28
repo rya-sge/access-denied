@@ -6,8 +6,7 @@ last-update:
 categories: cryptographie 
 tags: ecies courbe-elliptique chiffrement-hybride
 description: Cet article présente le schéma de chiffrement intégré ECIES (Elliptic Curve Integrated Encryption Scheme) permettant de réaliser du chiffrement hybride.
-image: /assets/article/cryptographie/mode-chiffrement/ecb-encryption.png
-use_math: true
+image:
 ---
 
 Cet article présente le schéma de chiffrement intégré ECIES (*Elliptic Curve Integrated Encryption Scheme*) permettant de réaliser du chiffrement hybride.
@@ -52,7 +51,7 @@ Rappel : la difficulté repose sur le logarithme discret
 - Clé publique
 
 $$
-K = k*G
+K = k \textasteriskcentered{} G
 $$
 
 Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne peut faire que des additions ou des multiplications par des constantes.
