@@ -7,6 +7,7 @@ categories: cryptographie
 tags: ecies courbe-elliptique chiffrement-hybride
 description: Cet article présente le schéma de chiffrement intégré ECIES (Elliptic Curve Integrated Encryption Scheme) permettant de réaliser du chiffrement hybride.
 image: /assets/article/cryptographie/mode-chiffrement/ecb-encryption.png
+use_math: true
 ---
 
 Cet article présente le schéma de chiffrement intégré ECIES (*Elliptic Curve Integrated Encryption Scheme*) permettant de réaliser du chiffrement hybride.
