@@ -3,7 +3,7 @@ layout: post
 title:  "WPA en bref"
 date:   2021-06-15 
 categories: securite reseau
-tags: wpa
+tags: wpa wifi
 description: Cet article résume les principaux points du protocole WPA, notamment la génération des clés, le contrôle d'intégrité avec MIC et la confidentialité avec TKIP
 image: /assets/article/reseau/wpa/wpa-schema.png
 ---
@@ -54,7 +54,7 @@ Il est généré à partir d'une clé MIC, du bloc de données data et des infor
 
 1) Si un attaquant intercepte le message,  il lui ne sera pas possible de lui faire croire que le message provient de l'attaquant et non de l'émetteur originale
 
-2) Un message protégé par un MIC ne peut être rendu qu'au destinateur qu'on avait choisi au début.
+2) Un message protégé par un MIC ne peut être rendu qu'au destinataire qu'on avait choisi au début.
 
 3) Le récepteur ne va jamais croire que le message provient de quelqu'un d'autres que l'émetteur
 
@@ -83,9 +83,4 @@ Chaque clé est unique pour chaque client
 
 ### Sources 
 
-Cours SRX enseigné à l'HEIG-VD(2021)
-
-
-
-
-
+Cours de Sécurité des Réseaux (SRX) enseigné à la HEIG-VD en 2021.

@@ -1,41 +1,41 @@
 ---
 layout: post
-title:  "Le chiffrement par bloc ECB"
+title:  "Le mode opératoire ECB"
 date:   2022-04-22
 last-update: 
 categories: cryptographie 
 tags: cbc chiffrement-bloc
-description: Cet article présente le mode de chiffrement ECB avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité).
+description: Cet article présente le mode opératoire ECB avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité).
 image: /assets/article/cryptographie/mode-chiffrement/ecb-encryption.png
 ---
 
-Cet article présente le mode de chiffrement ECB (*Electronic Code Book*). 
+Cet article présente le mode opératoire ECB (*Electronic Code Book*). 
 
 Pour une meilleure compréhension, les questions suivantes seront abordées :
 
-A) Est-ce que le mode opératoire transforme le chiffrement par bloc en un chiffrement par flot (Abr : chiffrement par flots)
+A) Est-ce que le mode opératoire transforme le chiffrement par bloc en un chiffrement par flot (Abr.  chiffrement par flots)
 
-B) Est-ce que le chiffrement ou le déchiffrement sont parallélisables (Abr : Paralléliser les opérations)
+B) Est-ce que le chiffrement ou le déchiffrement sont parallélisables (Abr.  Paralléliser les opérations)
 
-C) Est-ce qu'il est possible d'effectuer un déchiffrement partiel et/ou une rechiffrement partiel d'un  nouveau bloc ? (Abr: Opération partielle)
+C) Est-ce qu'il est possible d'effectuer un déchiffrement partiel et/ou une rechiffrement partiel d'un nouveau bloc ? (Abr.  Opération partielle)
 
-D) Quelles sont les conséquences de la réutilisation d'IV (Abr : Réutilisation d'IV)
+D) Quelles sont les conséquences de la réutilisation d'IV (Abr. Réutilisation d'IV)
 
-E) Quelles sont les implications sur le texte clair si on modifie 1 bit du texte chiffré ? (Abré : Modification d'un bit du texte chiffré)
+E) Quelles sont les implications sur le texte clair si on modifie 1 bit du texte chiffré ? (Abr.  Modification d'un bit du texte chiffré)
 
-F) Est-ce qu'un padding est requis ? (Abr : padding)
+F) Est-ce qu'un padding est requis ? (Abr.  padding)
 
-G) Lors de l'implémentation, est-ce que l'on doit avoir du chiffrement et du déchiffrement ou seulement l'un des 2 (Abré : Opération nécessaire)
+G) Lors de l'implémentation, est-ce que l'on doit avoir du chiffrement et du déchiffrement ou seulement l'un des 2 (Abr.  Opération nécessaire)
 
-H) Est-ce qu'il y a des problèmes de sécurité ? (Abré : Problème de sécurité)
+H) Est-ce qu'il y a des problèmes de sécurité ? (Abr.  Problème de sécurité)
 
 
 
 ## Présentation générale
 
-Fonctionnement générale :
+Fonctionnement général :
 
-Le mode ECB n'utilise pas d'IV et les blocs sont chiffrés de manières indépendantes les uns des autres.
+Le mode ECB n'utilise pas d'IV et les blocs sont chiffrés de manière indépendante les uns des autres.
 
 ### Chiffrement
 
@@ -57,11 +57,11 @@ Non, ECB ne génère pas un flux de bits pré-calculables.
 
 #### B) Paralléliser les opérations 
 
-Le chiffrement et le déchiffrement peuvent être parallélisés
+Le chiffrement et le déchiffrement peuvent être parallélisés.
 
 #### C) Opération partielle 
 
-Oui, chaque bloc est indépendant des autres blocs. On peut par conséquent chiffrer ou déchiffrer un bloc sans que cela impacte les autres blocs.
+Oui, chaque bloc est indépendant des autres blocs. On peut par conséquent chiffrer ou déchiffrer un bloc sans que cela n'impacte les autres blocs.
 
 #### D) Réutilisation d'IV 
 
@@ -77,7 +77,7 @@ Oui car taille bloc fixe
 
 #### G) Opération nécessaire 
 
-ECB nécessite les opérations de chiffrement et de déchiffrement
+ECB nécessite les opérations de chiffrement et de déchiffrement.
 
 #### H) Problème de sécurité 
 
@@ -99,7 +99,7 @@ OU
 
 - Il peut changer l’ordre des blocs durant la transmission. 
 
-Le mode ECB résiste donc très mal aux attaques visant à modifier l’intégrité du texte chiffré
+Le mode ECB résiste donc très mal aux attaques visant à modifier l’intégrité du texte chiffré.
 
 
 
@@ -107,9 +107,9 @@ Article très intéressant présentant des exemples d'attaque : [https://blackbo
 
 ## Conclusion
 
-- Ce mode de chiffrement n'est absolument pas recommandé
+- Ce mode de chiffrement n'est absolument pas recommandé.
 
-- Il pourrait potentiellement être utilisé si chaque bloc est garanti être différent mais c'est un cas rare et la menace d'un adversaire actif resterait présente.
+- Il pourrait potentiellement être utilisé si chaque bloc est garanti être différent, mais c'est un cas rare et la menace d'un adversaire actif resterait présente.
 
 ## Sources
 

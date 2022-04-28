@@ -1,15 +1,17 @@
-```
+---
 layout: post
-title:  "Le chiffrement par bloc CTR"
-date:   2022-02-27
+title:  "Le mode opératoire CTR"
+date:   2022-04-22
 last-update: 
 categories: cryptographie 
 tags: cbc chiffrement-bloc
-description: Cet article présente le mode de chiffrement CTR avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
+description: Cet article présente le mode opératoire CTR avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
 image: /assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png
-```
+---
 
-Cet article présente le mode de chiffrement  CTR (*Counter Mode*). 
+
+
+Cet article présente le mode opératoire CTR (*Counter Mode*). 
 
 Pour une meilleure compréhension, les questions suivantes seront abordées :
 
@@ -33,10 +35,10 @@ I) Peut-on l'utiliser pour chiffrer un disque dur ?
 
 ## Présentation 
 
-Fonctionnement générale :
+Fonctionnement général :
 
-- Le mode CTR utilise un nonce (appelé aussi IV) ainsi qu'un compteur, incrémenté pour chaque bloc,
-- Le compteur doit être à usage unique, pareil pour le nonce/IV
+- Le mode CTR utilise un nonce (appelé aussi IV) ainsi qu'un compteur, incrémenté pour chaque bloc.
+- Le compteur doit être à usage unique, pareil pour le nonce/IV.
 
 ### Chiffrement 
 
@@ -56,8 +58,8 @@ Source image : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](ht
 
 C'est effectivement le cas. Tout simplement pour 2 raisons :
 
-- Chaque bloc est indépendant les uns des autres, ce n'est pas une condition mais peut faciliter le pré-calculage des blocs
-- Chiffrement : Le texte clair va être xoré avec la sortie du bloc de chiffrement, ce n'est pas le texte clair qui est chiffré avec la clé mais le *nonce* et le compteur. Comme le *nonce* et le compteur  sont connus à l'avance, on peut dès lors pré-calculer le flux.
+- Chaque bloc est indépendant les uns des autres, ce n'est pas une condition mais peut faciliter le pré-calculage des blocs.
+- Chiffrement : Le texte clair va être xoré avec la sortie du bloc de chiffrement, ce n'est pas le texte clair qui est chiffré avec la clé mais le *nonce* et le compteur. Comme le *nonce* et le compteur sont connus à l'avance, on peut dès lors pré-calculer le flux.
 - Déchiffrement : même raisonnement que pour le chiffrement
 
 #### B) Paralléliser les opérations 
@@ -68,7 +70,7 @@ Le chiffrement et le déchiffrement sont parallélisables. C'est pourquoi il peu
 
 #### C) Opération partielle 
 
-Oui, car le chiffrement et le déchiffrement peuvent être parallélisées
+Oui, car le chiffrement et le déchiffrement peuvent être parallélisés.
 
 
 
@@ -82,11 +84,13 @@ P1~XOR~P2 = C1~XOR~C2
 $$
 **Schéma :**
 
-- L'IV est en 2 parties : nonce(rouge) et le compteur(orange)
+- L'IV est en 2 parties : nonce (rouge) et le compteur (orange)
 - Texte claire / plaintext (P1 & P2): en bleu
 - Message chiffré (C1 et C2) : rouge aussi
 
 ![ctr-reuse-IV]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png)
+
+![ctr-reuse-IV](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\accessDenied\assets\article\cryptographie\mode-chiffrement\ctr-reuse-IV.png)
 
 **Détail du calcul**
 
@@ -95,28 +99,26 @@ After_encryption2 XOR P2 = C2
 Vu que After_encryption1 et After_encryption2 sont identiques, on les remplace par l'inconnue **A**
 
 ```
-Etape 1 :
+Étape 1 :
 A XOR P1 = C1
 A XOR P2 = C2
 
-Etape 2 :
+Étape 2 :
 P1 XOR C1 = A
 P2 XOR C2 = A
 
-Etape 3 :
+Étape 3 :
 P1 XOR C1 = P2 XOR C2
 
 Résultat final :
 P1 XOR P2 = C1 XOR C2
-
-
 ```
 
 
 
 #### E) Modification d'un bit du texte chiffré 
 
-Cela va changer le bit correspondant dans le texte clair correspondant au bloc
+Cela va changer le bit correspondant dans le texte clair correspondant au bloc.
 
 #### F) Padding 
 
@@ -124,11 +126,11 @@ Pas nécessaire car il s'agit d'un chiffrement par flot.
 
 #### G) Opération nécessaire 
 
-Seule l'opération de chiffrement est requise
+Seule l'opération de chiffrement est requise.
 
 #### H) Problème de sécurité 
 
-L'IV doit être de taille suffisante. Sinon on peut l'attaquer avec le paradoxe des anniversaires. Pour trouver une collision sur un IV de 8 bits c'est 2l/2 = 28/2 = 24 = 16.
+L'IV doit être de taille suffisante. Sinon on peut l'attaquer avec le paradoxe des anniversaires. Pour trouver une collision sur un IV de 8 bits, c'est 2l/2 = 28/2 = 24 = 16.
 $$
 2 ^ 8 = 256 ~ possibilités
 $$
@@ -136,13 +138,13 @@ $$
 2 ^ 4 = 16
 $$
 
-Il faudra en moyenne 16 textes claires et leur texte chiffré pour en avoir 2 avec le même IV et ainsi pouvoir effectuer un XOR.
+Il faudra en moyenne 16 textes clairs et leur texte chiffré pour en avoir 2 avec le même IV et ainsi pouvoir effectuer un XOR.
 
 Remarques :
 
-- Il faut faire attention à avoir compteur assez grand pour la taille des messages. Le compteur étant déterministe, il n'est pas sujet à l'attaque par le paradoxe des anniversaires. 
+- Il faut faire attention à avoir un compteur suffisamment grand pour la taille des messages. Le compteur étant déterministe, il n'est pas sujet à l'attaque par le paradoxe des anniversaires. 
 
-- Le nonce peut être tiré soit de manière déterministe soit de manière aléatoire
+- Le nonce peut être tiré soit de manière déterministe soit de manière aléatoir.
   - Pour un IV de 64 bits :
     - Si aléatoire =>Paradoxe des anniversaires, 2^32 messages pour 64 bits avant d'avoir une collision
     - Si déterministe =>2^64 messages avant d'avoir une collision
@@ -162,6 +164,6 @@ Le chiffrement par bloc CTR n'est pas adapté au chiffrement de disque dur car :
 
 ## Sources
 
-- Cours de cryptographie (CRY) enseigné à la HEIG-VD en 2020
-- Cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022
-- Pour les schémas de chiffrement et déchiffrement: [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
+- Cours de cryptographie (CRY) enseigné à la HEIG-VD en 2020.
+- Cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
+- Pour les schémas de chiffrement et déchiffrement : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
