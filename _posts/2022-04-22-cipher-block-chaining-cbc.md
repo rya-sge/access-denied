@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Le chiffrement par bloc CBC"
+title:  "Le mode opératoire CBC"
 date:   2022-02-27
 last-update: 
 categories: cryptographie 

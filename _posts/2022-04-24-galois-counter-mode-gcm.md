@@ -30,8 +30,6 @@ $$
 Z_2[x]/x^{128} + x^7 + x^2 + 1
 $$
 
-​		
-
 - Il a été standardisé dans la NIST SP800-38D. Le document est disponible à l'adresse suivante : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Remarques :
   - Utilisation : IPSec, TLS et SSH
@@ -175,9 +173,9 @@ GCM utilise CTR. Si l’on répète l’IV dans GCM, on peut obtenir un XOR des 
 
 Quelques sources :
 
-- https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams
+- [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)
 - [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
-- https://web.cs.ucdavis.edu/~rogaway/ocb/gcm.pdf
+- [https://web.cs.ucdavis.edu/~rogaway/ocb/gcm.pdf](https://web.cs.ucdavis.edu/~rogaway/ocb/gcm.pdf)
 
 
 
