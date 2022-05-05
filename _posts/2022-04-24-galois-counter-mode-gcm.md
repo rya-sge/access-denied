@@ -30,6 +30,8 @@ $$
 Z_2[x]/x^{128} + x^7 + x^2 + 1
 $$
 
+![gcm-construction]({{site.url_complet}}/assets/article/cryptographie/mode-operation/gcm-construction.PNG)
+
 - Il a été standardisé dans la NIST SP800-38D [NIST 2007]. Le document est disponible à l'adresse suivante : [nvlpubs.nist.gov - nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Remarques :
   - Utilisation : IPSec, TLS et SSH
