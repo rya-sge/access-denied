@@ -4,7 +4,8 @@ title:  "Vulnérabilités avec le langage C"
 date:   2021-06-22
 categories: programmation securite
 tags: c vulnérabilité strcpy scanf printf malloc sanitizer
-description: Cet article présente une liste de vulnérabilités et menaces potentielles avec le langage C afin de sensibiliser les programmeurs.
+description: Cet article présente une liste de vulnérabilités (CWE 121, CWE 122, etc.) et menaces potentielles avec le langage C afin de sensibiliser les programmeurs.
+image: /assets/article/securite/cover/c-vulnerabilite.PNG
 ---
 
 
@@ -45,7 +46,7 @@ Avec *strcpy*, on ne précise pas le nombre de caractère maximum à lire, on pe
 CWE concernée : 
 
 - CWE 121 - **Stack-based Buffer Overflow**
-- Page de présentation  : [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
+- Page de présentation  : [MITRE, 2022a] - [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
 
 Cet exemple est en grande partie issue de cette même CWE. J'y ais ajouté la variable locale `authOK`  afin de montrer comment on peut concrètement utiliser cet *overflow*.
 
@@ -103,7 +104,7 @@ Pour récupérer la saisie de l'utilisateur, il faut spécifier *stdin* comme *s
 char * fgets( char * string, int maxLength, FILE * stream );
 ```
 
-Source : [https://koor.fr/C/cstdio/fgets.wp](https://koor.fr/C/cstdio/fgets.wp)
+Source : [KOOR] - [https://koor.fr/C/cstdio/fgets.wp](https://koor.fr/C/cstdio/fgets.wp)
 
 ### **3) printf**
 
@@ -141,20 +142,20 @@ Les fonctions *malloc* et *calloc* vont réserver de la mémoire dans le tas(hea
 
   Le programme réserve BUFSIZE octets en mémoire. Ensuite il fait un appel à *strcpy* en copiant les octets de argv dans buf. Néanmoins, il n'y a aucune garantie que la string dans argv fasse moins de 256 bytes. Il y a par conséquent la possibilité d'effectuer un overflow sur le heap en entrant une chaine de caractères > 256.
 
-  Lien CWE : [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
+  Lien CWE : [MITRE, 2022b] -  [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
 
   **Détection :** 
 
   - Il est possible de détecter cette vulnérabilité avec
-    -  l'outil **Sanitizer* en activant *AddressSanitizer*(ASan)
+    -  l'outil **Sanitizer* en activant `AddressSanitizer(ASan)`
     - Eventuellement l'outil *klee* avec le type d'erreur *ptr* (ndlr : pas sûr à confirmer)
 
 - Il est importer de libérer la mémoire en réalisant un *free* du pointeur, sinon il y aura une fuite de mémoire (*memory leak*). La sécurité temporelle de l'application ne sera alors pas garantie.
 
   **Détection :** 
 
-  - Il est possible de détecter cette vulnérabilité avec l'outil *Sanitizer en activant LeakSanitizer(LSan).
-  -  Par contre, l'utilisation de l'outil klee ne permet PAS de détecter des fuites de mémoires(sauf erreur de ma part)
+  - Il est possible de détecter cette vulnérabilité avec l'outil *Sanitizer en activant `LeakSanitizer(LSan)`.
+  -  Par contre, l'utilisation de l'outil Klee ne permet PAS de détecter des fuites de mémoires(sauf erreur de ma part)
 
 ## Implémentations
 
@@ -162,7 +163,7 @@ Les fonctions *malloc* et *calloc* vont réserver de la mémoire dans le tas(hea
 
 En c, les variables non initialisées ont une valeur arbitraire, ce qui peut provoquer un comportement indéterminé du programme et par conséquent entrainer des failles de sécurités
 
-**Détection :** Il est possible de détecter ces vulnérabilités avec l'outil *Sanitizer en activant UndefinedBehaviorSanitizer.
+**Détection :** Il est possible de détecter ces vulnérabilités avec l'outil *Sanitizer en activant `UndefinedBehaviorSanitizer`.
 
 
 
@@ -172,7 +173,12 @@ La circulation des entiers peut entrainer des bugs dans l'application et de pote
 
 
 
-## Sources
+## Bibliographie
 
-- [https://cwe.mitre.org](https://cwe.mitre.org)
-- Cours de sécurité logiciel (SLO) enseigné à l'HEIG-VD en 2021
+- Cours de sécurité logiciel (SLO) enseigné à la HEIG-VD en 2021
+- MITRE, 2022a. CWE-121: Stack-based Buffer Overflow. In :  CWE [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
+- MITRE, 2022b. CWE-122: Heap-based Buffer Overflow. In :  CWE [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
+- KOOR. Fonctions *fgets* et *gets*. In :  Koor [en ligne].   [Consulté le 5 mai 2022]. Disponible à l’adresse :  [https://koor.fr/C/cstdio/fgets.wp](https://koor.fr/C/cstdio/fgets.wp)
+
+
+

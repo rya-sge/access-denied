@@ -30,7 +30,7 @@ $$
 Z_2[x]/x^{128} + x^7 + x^2 + 1
 $$
 
-- Il a été standardisé dans la NIST SP800-38D. Le document est disponible à l'adresse suivante : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+- Il a été standardisé dans la NIST SP800-38D [NIST 2007]. Le document est disponible à l'adresse suivante : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Remarques :
   - Utilisation : IPSec, TLS et SSH
   - Meilleure performance que CCM
@@ -45,7 +45,7 @@ $$
 - Un tag d'authentification
 
 
-Sources : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+Sources : [[NIST 2007]](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 
 ### Vecteur d'initialisation 
 
@@ -68,7 +68,7 @@ Sources : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800
 
 > The bit length of the tag, denoted t, is a security parameter, as discussed in Appendix B. In general, t may be any one of the following five values: 128, 120, 112, 104, or 96. For certain applications, t may be 64 or 32; guidance for the use of these two tag lengths, including requirements on the length of the input data and the lifetime of the key in these cases, is given in Appendix C. 
 
-Source : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+Source : [NIST 2007]
 
 #### Authenticated dada (AD)
 
@@ -171,11 +171,11 @@ La constante H est utilisée pour le calcul du Tag. Par conséquent, l'attaquant
 
 GCM utilise CTR. Si l’on répète l’IV dans GCM, on peut obtenir un XOR des textes clairs, comme pour CTR (c.f. une question précédente).
 
-Quelques sources :
+Quelques sources pour approfondir le sujet :
 
-- [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)
-- [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
-- [https://web.cs.ucdavis.edu/~rogaway/ocb/gcm.pdf](https://web.cs.ucdavis.edu/~rogaway/ocb/gcm.pdf)
+- [MDN contributors, 2022] -  [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)
+- [Sbai Azmi, 2017] - [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
+- [NIST 2007] 
 
 
 
@@ -187,16 +187,17 @@ Quelques sources :
 
 
 
-## Sources
+## Bibliographie
 
-Source principale :
+Sources principales :
 
-- *Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC* : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+- NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY, 2007. *Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC* [en ligne]. Gaithersburg, MD 20899-8930 : NIST, novembre 2007. NIST Special Publication 800-38D.  [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
 - Cours de Cryptographie (CRY) enseigné à la HEIG-VD en 2020.
 
-Autres source :
+Sources secondaires :
 
 - [crypto.stackexchange.com - Ciphertext and tag size and IV transmission with AES in GCM mode](https://crypto.stackexchange.com/questions/26783/ciphertext-and-tag-size-and-iv-transmission-with-aes-in-gcm-mode)
 - [crypto.stackexchange.com - Leaving authentication data blank less secure for AES GCM?](https://crypto.stackexchange.com/questions/15699/leaving-authentication-data-blank-less-secure-for-aes-gcm)
-- [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
+- SBAI AZMI, 2017. TLS: Les suites cryptographiques. [en ligne]. 29 mai 2017. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
+- [MDN CONTRIBUTORS](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams/contributors.txt), 2022. AesGcmParams. [en ligne]. 29 avril 2022. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://www.cert-devoteam.fr/1166-2/)
