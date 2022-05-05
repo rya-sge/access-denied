@@ -42,13 +42,13 @@ Fonctionnement général :
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/CTR_encryption_2.svg/902px-CTR_encryption_2.svg.png)
 
-Source image : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
+Source image : [wikipedia.org - Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ### Déchiffrement 
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/CTR_decryption_2.svg/902px-CTR_decryption_2.svg.png)
 
-Source image : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
+Source image : [wikipedia.org - Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ### Questions
 

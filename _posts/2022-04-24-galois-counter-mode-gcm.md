@@ -30,7 +30,7 @@ $$
 Z_2[x]/x^{128} + x^7 + x^2 + 1
 $$
 
-- Il a été standardisé dans la NIST SP800-38D [NIST 2007]. Le document est disponible à l'adresse suivante : [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+- Il a été standardisé dans la NIST SP800-38D [NIST 2007]. Le document est disponible à l'adresse suivante : [nvlpubs.nist.gov - nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Remarques :
   - Utilisation : IPSec, TLS et SSH
   - Meilleure performance que CCM
@@ -191,7 +191,7 @@ Quelques sources pour approfondir le sujet :
 
 Sources principales :
 
-- NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY, 2007. *Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC* [en ligne]. Gaithersburg, MD 20899-8930 : NIST, novembre 2007. NIST Special Publication 800-38D.  [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
+- NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY, 2007. *Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC* [en ligne]. Gaithersburg, MD 20899-8930 : NIST, novembre 2007. NIST Special Publication 800-38D.  [Consulté le 2 mai 2022]. Disponible à l’adresse: [nvlpubs.nist.gov - nistspecialpublication800-38d.pdf](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 - Cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
 - Cours de Cryptographie (CRY) enseigné à la HEIG-VD en 2020.
 
