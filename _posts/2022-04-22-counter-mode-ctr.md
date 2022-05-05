@@ -88,8 +88,6 @@ $$
 
 ![ctr-reuse-IV]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png)
 
-![ctr-reuse-IV](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\accessDenied\assets\article\cryptographie\mode-chiffrement\ctr-reuse-IV.png)
-
 **Détail du calcul**
 
 After_encryption1 XOR P1 = C1

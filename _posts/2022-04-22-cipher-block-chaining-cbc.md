@@ -139,9 +139,7 @@ La présence de 2 blocs identiques B et C indiquent que les entrées dans l'algo
 - Sinon on a un xor des textes clairs, ce qui est suffisant pour dire que la construction est cassée.
   Cette attaque est indépendante de l'IV (qu'il soit fixe ou non) car celui-ci ne joue aucun rôle pour les blocs répétés, hormis pour le 1er bloc.
 
-![cbc-bloc-repetition](C:\Users\super\switchdrive2\HEIG\divers\mywebsite\accessDenied\assets\article\cryptographie\mode-chiffrement\cbc-bloc-repetition.png)
-
-
+![cbc-bloc-repetition]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement/cbc-bloc-repetition.png)
 
 
 

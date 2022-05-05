@@ -36,17 +36,6 @@ $$
   - Meilleure performance que CCM
   - Souvent le choix "par défaut" pour réaliser du chiffrement authentifié [en 2021]
 
-
-
-### Sorties
-
-- Un message chiffré de la même longueur que le message clair
-
-- Un tag d'authentification
-
-
-Sources : [[NIST 2007]](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
-
 ### Vecteur d'initialisation 
 
 - Il accepte un vecteur d'initialisation de n'importe quelle taille
@@ -56,8 +45,6 @@ Sources : [[NIST 2007]](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
   - Citation du NIST
 
   > For IVs, it is recommended that implementations restrict support to the length of 96 bits, to promote interoperability, efficiency, and simplicity of design. 
-
-  
 
 - L'IV (nonce) ne doit jamais être répété. CTR étant utilisé, on a la même vulnérabilité que pour celui-ci :  le XOR des textes chiffrés est égal au XOR des textes clairs ce qui est catastrophique.
 
@@ -93,8 +80,11 @@ GCM comporte quatre entrées (1):
 
 Il a deux sorties :
 
-- Un texte chiffré dont la longueur est identique au texte en clair ;
+- Un message chiffré de la même longueur que le message clair
 - Une étiquette d’authentification (TAG).
+
+
+Sources : [[NIST 2007]](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
 
 ### Transmission
 
@@ -115,6 +105,8 @@ Avertissement :
 Chiffrement
 
 ![gcm-schema]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement\gcm-schema.PNG)
+
+Source du schéma : cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
 
 Remarque :
 
