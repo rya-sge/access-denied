@@ -199,5 +199,5 @@ Sources secondaires :
 
 - [crypto.stackexchange.com - Ciphertext and tag size and IV transmission with AES in GCM mode](https://crypto.stackexchange.com/questions/26783/ciphertext-and-tag-size-and-iv-transmission-with-aes-in-gcm-mode)
 - [crypto.stackexchange.com - Leaving authentication data blank less secure for AES GCM?](https://crypto.stackexchange.com/questions/15699/leaving-authentication-data-blank-less-secure-for-aes-gcm)
-- SBAI AZMI, 2017. TLS: Les suites cryptographiques. [en ligne]. 29 mai 2017. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
-- [MDN CONTRIBUTORS](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams/contributors.txt), 2022. AesGcmParams. [en ligne]. 29 avril 2022. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://www.cert-devoteam.fr/1166-2/)
+- SBAI AZMI, 2017. TLS: Les suites cryptographiques. In : *cert-devoteam* [en ligne]. 29 mai 2017. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
+- [MDN CONTRIBUTORS](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams/contributors.txt), 2022. AesGcmParams. In : *MDN* [en ligne]. 29 avril 2022. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)

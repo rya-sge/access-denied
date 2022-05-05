@@ -176,9 +176,6 @@ La circulation des entiers peut entrainer des bugs dans l'application et de pote
 ## Bibliographie
 
 - Cours de sécurité logiciel (SLO) enseigné à la HEIG-VD en 2021
-- MITRE, 2022a. CWE-121: Stack-based Buffer Overflow. In :  CWE [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
-- MITRE, 2022b. CWE-122: Heap-based Buffer Overflow. In :  CWE [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
-- KOOR. Fonctions *fgets* et *gets*. In :  Koor [en ligne].   [Consulté le 5 mai 2022]. Disponible à l’adresse :  [https://koor.fr/C/cstdio/fgets.wp](https://koor.fr/C/cstdio/fgets.wp)
-
-
-
+- MITRE, 2022a. CWE-121: Stack-based Buffer Overflow. In : *CWE* [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/121.html](https://cwe.mitre.org/data/definitions/121.html)
+- MITRE, 2022b. CWE-122: Heap-based Buffer Overflow. In : *CWE* [en ligne].  19 juillet 2006,  mis à jour le 28 avril 2022. [Consulté le 5 mai 2022]. Disponible à l’adresse : [https://cwe.mitre.org/data/definitions/122.html](https://cwe.mitre.org/data/definitions/122.html)
+- KOOR. Fonctions *fgets* et *gets*. In : *Koor* [en ligne].   [Consulté le 5 mai 2022]. Disponible à l’adresse :  [https://koor.fr/C/cstdio/fgets.wp](https://koor.fr/C/cstdio/fgets.wp)
