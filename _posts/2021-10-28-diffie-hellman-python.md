@@ -125,18 +125,22 @@ Ici, pour l'exemple c'est du AES avec ECB (ne prenez jamais ECB en pratique)
 #### Chiffrement 
 
 ```python
-    print("***Encrypt message***")
-    key = hashlib.sha1(cun.long_to_bytes(shared_secret_A)).digest()[:16]
-    cipher = AES.new(key, AES.MODE_ECB)
-    ciphertext = cipher.encrypt(message)
-    ciphertext.hex()
-    cipherFlag = ciphertext.hex()
-    print(f"ciphertext = {cipherFlag}")
+#Ne pas utiliser en production
+#Do not use in production
+print("***Encrypt message***")
+key = hashlib.sha1(cun.long_to_bytes(shared_secret_A)).digest()[:16]
+cipher = AES.new(key, AES.MODE_ECB)
+ciphertext = cipher.encrypt(message)
+ciphertext.hex()
+cipherFlag = ciphertext.hex()
+print(f"ciphertext = {cipherFlag}")
 ```
 
 #### Déchiffrement
 
 ```python
+#Ne pas utiliser en production
+#Do not use in production
 key = hashlib.sha1(cun.long_to_bytes(shared_secret_B)).digest()[:16]
 ciphertext = bytes.fromhex(cipherFlag)
 cipher = AES.new(key, AES.MODE_ECB)
