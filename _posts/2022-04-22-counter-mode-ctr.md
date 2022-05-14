@@ -7,6 +7,7 @@ categories: cryptographie
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode opératoire CTR avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
 image: /assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png
+isMath: true
 ---
 
 Cet article présente le mode opératoire CTR (*Counter Mode*). 

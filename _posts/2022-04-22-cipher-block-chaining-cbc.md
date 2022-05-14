@@ -7,6 +7,7 @@ categories: cryptographie
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode d'opération CBC en analysant également sa sécurité (réutilisation d'IV, répétition de blocs).
 image: /assets/article/cryptographie/mode-chiffrement/cbc-bloc-repetition.png
+isMath: true
 ---
 
 
