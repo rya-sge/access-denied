@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Le protocole WEP et ses vulnérabilités"
-date:   2028-04-28
+date:   2022-04-28
 categories: securite reseau
 tags: wep wifi
 description: Cet article présente le protocole Wifi WEP (Wired Equivalent Privacy) en se focalisant sur les aspects sécuritaires (confidentialité, intégrité, authenticité).
@@ -20,11 +20,12 @@ Un réseau Wifi ne pouvant guère protéger la disponibilité (*Availibility*), 
 
 ### Confidentialité
 
-WEP chiffre les données en utilisant l'algorithme RC4 qui possède de grosses vulnérabilités.
+- WEP chiffre les données en utilisant l'algorithme RC4 qui possède de grosses vulnérabilités.
 
-Il est notamment vulnérable à une réutilisation du *keystream*. La clé peut être récupérée en moins de 60 secondes.
+- Il est notamment vulnérable à une réutilisation du *keystream*. La clé peut être récupérée en moins de 60 secondes.
 
-La clé est unique pour tous les clients et celle-ci permet de déchiffrer tout le trafic.
+- La clé est unique pour tous les clients et celle-ci permet de déchiffrer tout le trafic.
+
 
 ### Intégrité
 
@@ -50,21 +51,21 @@ WEP n'offre aucune protection contre les doublons. On peut dès lors capturer de
 
 #### Clé partagée / *Shared key*
 
-C'est une séquence "secrète" de 40 bits ou 104 bits appelée **passphrase**. La majorité du temps la clé est sous forme hexadécimale, p. ex  "MotDePasseWifiIncroyable" où une clé en bit sera ensuite dérivée.
+C'est une séquence "secrète" de 40 bits ou 104 bits appelée **passphrase**. La majorité du temps la clé est sous forme hexadécimale, p. ex  "MotDePasseWifiIncroyable" à partir de laquelle une clé en bit sera ensuite dérivée au moyen d'une KDF.
 
 - Génération de la clé
 
-Pour passer du mot de passe ASCII (hexadécimal) à des bits, il va falloir utiliser un algorithme de conversion. Ceux-ci sont en général propriétaires. Ainsi, il peut avoir des problèmes car les algorithmes peuvent être différents entre cartes réseau, *Access Point*, etc.
+Pour passer du mot de passe ASCII (hexadécimal) à des bits, il va falloir utiliser un algorithme de conversion. Ceux-ci sont en général propriétaires. Ainsi, il peut avoir des problèmes, car les algorithmes peuvent être différents entre cartes réseau, *Access Point*, etc.
 
 - Taille de la clé 
 
-La taille de l'IV, 24 bits ne peut pas compter dans la taille de la clé car celui-ci est connu, il est envoyé en clair dans les trames. Cette taille d'IV est parfois ajouté à tort à la taille de la clé, p. ex pour déclarer que la taille de la clé fait 128 bits, ce qui est absolument faux.
+La taille de l'IV, 24 bits ne peut pas compter dans la taille de la clé, car celui-ci est connu, il est envoyé en clair dans les trames. Cette taille d'IV est parfois ajouté à tort à la taille de la clé, p. ex pour déclarer que la taille de la clé fait 128 bits, ce qui est absolument faux.
 
 - La clé est connue par l'AP et les STAs autorisées.
 
-C'est pourquoi la clé n'est pas vraiment secrète. Si on a 400 stations de connectés, alors il y a aura 400 stations au courant de la clé, plus l'AP ce qui fait beaucoup.
+C'est pourquoi la clé n'est pas vraiment secrète. Si on a 400 stations de connectés, alors il y aura 400 stations au courant de la clé, plus l'AP, ce qui fait beaucoup.
 
-**Pour résumé**
+**Pour résumer**
 
 - La clé est une séquence "secrète" de 40 bits ou 104 bits
 - Elle est connue par l'AP ainsi que par les STAs autorisés
@@ -95,11 +96,11 @@ Des problèmes peuvent aussi venir de son implémentation :
 
 #### Conséquence 
 
- La réutilisation d'un IV provoque la réutilisation du *keystream*, ce qui est une catastrophe pour la confidentialité.
+La réutilisation d'un IV provoque la réutilisation du *keystream*, ce qui est une catastrophe pour la confidentialité.
 
 ### Chiffrement
 
-Le chiffrement consister à effectuer un xor entre données + ICV avec le *keystream*. Dans l'image ci-dessous, la partie chiffrée est en gris.
+Le chiffrement consiste à effectuer un xor entre données + ICV avec le *keystream*. Dans l'image ci-dessous, la partie chiffrée est en gris.
 
 Le *keystream* est calculé à partir de la clé et de l'IV
 
@@ -130,7 +131,7 @@ Le *keystream* sera généré avec l'algorithme RC4. Celui-ci utilise comme grai
 
 ## Intégrité
 
-Il utilise **l'ICV / Integrity Check Value** qui s'apparente à un CRC-32. C'est acceptable pour détecter des erreurs aléatoires mais pas pour des erreurs délibérées (ndlr : fait par un attaquant)
+Il utilise **l'ICV / Integrity Check Value** qui s'apparente à un CRC-32. C'est acceptable pour détecter des erreurs aléatoires, mais pas pour des erreurs délibérées (fait par un attaquant,  NDLR).
 
 Il est possible de modifier un message sans être détecté  et sans connaitre la clé de chiffrement. Il suffit pour cela de recalculer l'ICV correspondant aux données modifiées.
 
@@ -143,11 +144,11 @@ Par défaut, tout le monde peut participer au réseau.
 WEP propose néanmoins optionnellement une fonctionnalité d'authentification à travers une **Shared Key Authentication**.
 
 - Celle-ci consiste en à challenge envoyé par l'AP à la STA et celle-ci doit le chiffrer puis le renvoyer.
-- Cette échange est en clair et on peut par conséquent obtenir le challenge en clair.
-- De plus, même dans ce cas-là seule la STA sera authentifiée, l'AP ne le sera pas. On n'a alors pas d'authentification mutuelle.
+- Cet échange est en clair et on peut par conséquent obtenir le challenge en clair.
+- De plus, même dans ce cas-là seul la STA sera authentifiée, l'AP ne le sera pas. On n'a alors pas d'authentification mutuelle.
 - Problème de sécurité :
 
-Un attaquant peut capturer le challenge en clair, la réponse chiffrée envoyée par la station puis ensuite effectuer un xor pour obtenir le *keystream*.
+Un attaquant peut capturer le challenge en clair, la réponse chiffrée envoyée par la station puis effectuer un xor pour obtenir le *keystream*.
 $$
 Plaintext~challenge~XOR~Ciphertext~challenge = Keystream
 $$
@@ -159,11 +160,7 @@ De plus, si on récupère des trames avec l'IV utilisé pour générer le *keyst
 
 WEP n'offre aucune protection contre les doublons. On peut dès lors capturer une trame et la réinjecter autant de fois que l'on souhaite.
 
-Ce manque de protection est à l'origine d'une des plus grandes failles de WEP : celle-ci se basait sur la réutilisation du *keystream*. En réinjectant une trame, l'attaquait forçait la réutilisation du *keystream* (plus ou moins vu que les données étaient identiques)
-
-
-
-
+Ce manque de protection est à l'origine d'une des plus grandes failles de WEP : celle-ci se basait sur la réutilisation du *keystream*. En réinjectant une trame, l'attaquant forçait la réutilisation du *keystream* (plus ou moins vu que les données étaient identiques)
 
 
 
@@ -171,7 +168,7 @@ Ce manque de protection est à l'origine d'une des plus grandes failles de WEP :
 
 WEP n'a absolument pas été conçu pour être sûr.  Actuellement, il est totalement cassé.
 
-- L'algorithme de chiffrement choisi, RC4, est un mauvais choix, il avait déjà des faiblesses connues au moment de l'adoption. Il est vulnérable à la réutilisation du *keystream*, ce qui arrive très vite du à la faible taille de l'IV.
+- L'algorithme de chiffrement choisi, RC4, est un mauvais choix, il avait déjà des faiblesses connues au moment de l'adoption. Il est vulnérable à la réutilisation du *keystream*, ce qui arrive très vite dû à la faible taille de l'IV.
 
 - La partie secrète de la clé est la même pour tout le monde sur le réseau
-- Plusieurs attaques existent (FMS, attaque par fragmentation, attaque CHOPCHOP, attaque Pyshkin Tews Weinmann)
+- Plusieurs attaques existent (FMS, attaque par fragmentation, attaque CHOPCHOP, attaque Pyshkin Tews Weinmann).
