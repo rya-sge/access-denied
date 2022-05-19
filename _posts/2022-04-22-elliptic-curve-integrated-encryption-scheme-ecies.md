@@ -6,7 +6,7 @@ last-update:
 categories: cryptographie 
 tags: ecies courbe-elliptique chiffrement-hybride
 description: Cet article présente le schéma de chiffrement intégré ECIES (Elliptic Curve Integrated Encryption Scheme) permettant de réaliser du chiffrement hybride.
-image:
+image: /assets/article/cryptographie/ecies/decrypt.PNG
 isMath: true
 ---
 
@@ -74,26 +74,27 @@ r ∈ Z^*_p
 
 3. On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K
 
+![decrypt-kdf]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt-kdf.PNG)
 
 $$
 (k_e  || k_M) = KDF(rK||S1)
 $$
 
 - `S` est juste là pour la séparation de domaine (on peut l'ignorer).
+
 - `Ke` est la clé symétrique pour le chiffrement. 
 - `Km` est la clé symétrique pour le MAC.
 - Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.
 
 4. 
-
    $$
-c = Enc_{ke}(m)
+   c = Enc_{ke}(m)
    $$
 
 5. 
 
    $$
-T = MAC_{kM}(c || S2)
+   T = MAC_{kM}(c || S2)
    $$
 
 6. Le message chiffré est `R||c||T`
@@ -105,20 +106,22 @@ T = MAC_{kM}(c || S2)
 On a R||c||T  ainsi que la clé secrète `k`
 
 1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :
+   
+   ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
    $$
-   K = k * G
+K = k * G
    $$
-
+   
    $$
-   R=r*G
+R=r*G
    $$
-
+   
    $$
-   r * K = r * k * G = k * R
+r * K = r * k * G = k * R
    $$
 
    
-
+   
 2. On dérive ensuite les clés grâce à la valeur `kR` trouvée au point 1.
 
 
@@ -131,7 +134,7 @@ $$
 4. Si le tag est correct, on déchiffre avec `ke`
 
    $$
-m = Dec_{ke} 
+m = Dec_{ke}
    $$
 
 

@@ -10,7 +10,7 @@ image: /assets/article/reseau/wpa/wpa-schema.png
 
 Cet article résume les principaux points du protocole WPA.
 
-### Résumé
+## Résumé
 
 - Nouveau contrôle intégrité *Message Integrity Code*
 - Utilise l'algorithme *TKIP*
@@ -18,11 +18,11 @@ Cet article résume les principaux points du protocole WPA.
 
 
 
-### Schéma
+## Schéma
 
-#### Protocole WPA
+### Protocole WPA
 
-Représentation simplifiée du protocole **WPA**.
+Représentation simplifiée du protocole **WPA** pour mes messages unicast
 
 Le premier cadre rouge représente la partie qui protège l'intégrité, grâce au *MIC*
 
@@ -32,7 +32,7 @@ Le 2ème cadre rouge concerne la partie qui assure la confidentialité grâce à
 
 ![wpa-schema]({{site.url_complet}}/assets/article/reseau/wpa/wpa-schema.png)
 
-#### Génération des clés
+### Génération des clés
 
 Ce schéma représente la génération des clés
 
@@ -40,9 +40,9 @@ Ce schéma représente la génération des clés
 
 
 
-### Détails
+## Détails
 
-#### MIC - Intégrité
+### MIC - Intégrité
 
 - Comment est généré le *MIC* ?
 
@@ -60,7 +60,7 @@ Il est généré à partir d'une clé MIC, du bloc de données data et des infor
 
 
 
-#### TKIP - Confidentialité
+### TKIP - Confidentialité
 
 Dans WEP, on utilise RC4 directement
 
@@ -70,14 +70,36 @@ Le *keystream* sera différent à chaque fois.
 
 
 
-#### CLES
+#### Les clés
 
-Pour envoyer une trame protégée avec WPA (unicast), il faut 2 clés :
+Il existe 3 groupes de clés différentes :
 
-- Une clé pour calculer le MIC
-- Une clé pour l'algorithme KTIP
+**Pairwise / Unicast**
 
-Chaque clé est unique pour chaque client
+Pour envoyer une trame protégée avec WPA en unicast, il faut 2 clés :
+
+- La clé TK (*Temporal Key*) permet de garantir le chiffrement et est utilisé pour l'algorithme TKIP.
+- La clé MICK (*Message Integrity Control*) permet de garantir l'intégrité.
+
+Chaque clé est unique pour chaque client.
+
+**Groupe**
+
+Ces clés sont pour les messages en broadcast.
+
+- La clé GTK (*Group Master Key*) permet le chiffrement ;
+- La clé GMIC (*Group Master Key*) permet de garantir l'intégrité..
+
+Les stations n'ont pas le droit d'envoyer elle-même des messages en *broadcast*. Elles doivent envoyer leur message à l'AP, qui lui s'occupera ensuite d'émettre le message en *broadcast*.
+
+
+
+**Envoie de clés**
+
+- La clé KEK  (*Key Encryption Key*)  permet le chiffrement
+- La clé KCK (*Key Confirmation Key*) permet de garantir l'intégrité
+
+
 
 
 
