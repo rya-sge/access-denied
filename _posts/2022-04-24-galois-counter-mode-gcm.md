@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Le mode opératoire de chiffrement GCM"
+title:  "Le mode opératoire GCM"
 date:   2022-04-22
 last-update: 
 categories: cryptographie 
