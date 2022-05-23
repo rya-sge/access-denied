@@ -57,7 +57,7 @@ H) Est-ce qu'il y a des problèmes de sécurité ? (Abr.  Problème de sécurit�
 
 
 
-Source : https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+Source : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ## Questions
 
@@ -107,7 +107,7 @@ Source : [https://orbilu.uni.lu/bitstream/10993/8992/1/2003_1%20Cryptographie%20
 
 Le padding est nécessaire car le chiffrement par bloc, comme AES, demande une taille de bloc fixée. Il y a d'ailleurs une attaque exploitant ce principe : la padding Oracle Attack
 
-Article sur le sujet https://crypto.stackexchange.com/questions/48628/why-is-padding-used-in-cbc-mode
+Article sur le sujet [https://crypto.stackexchange.com/questions/48628/why-is-padding-used-in-cbc-mode](https://crypto.stackexchange.com/questions/48628/why-is-padding-used-in-cbc-mode)
 
 ### G) Opération nécessaire  
 

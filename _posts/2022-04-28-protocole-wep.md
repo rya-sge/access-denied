@@ -6,6 +6,7 @@ categories: securite reseau
 tags: wep wifi
 description: Cet article présente le protocole Wifi WEP (Wired Equivalent Privacy) en se focalisant sur les aspects sécuritaires (confidentialité, intégrité, authenticité).
 image: /assets/article/reseau/wep/wep-encrypt-rc4.png
+isMath: true
 ---
 
 Cet article présente le protocole Wifi WEP (*Wired Equivalent Privacy*) en se focalisant sur les aspects sécuritaires (confidentialité, intégrité, authenticité).

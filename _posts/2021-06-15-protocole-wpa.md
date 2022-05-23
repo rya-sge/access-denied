@@ -94,7 +94,7 @@ Les stations n'ont pas le droit d'envoyer elle-même des messages en *broadcast*
 
 
 
-**Envoie de clés**
+**Transmission des clés**
 
 - La clé KEK  (*Key Encryption Key*)  permet le chiffrement
 - La clé KCK (*Key Confirmation Key*) permet de garantir l'intégrité

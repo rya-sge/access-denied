@@ -1,19 +1,20 @@
 ---
 layout: post
-title:  "Le mode d'opération de chiffrement GCM"
+title:  "Le mode opératoire de chiffrement GCM"
 date:   2022-04-22
 last-update: 
 categories: cryptographie 
 tags: cbc chiffrement-bloc
-description: Cet article présente le mode de chiffrement authentifié GCM avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
+description: Cet article présente le mode opératoire de chiffrement authentifié GCM avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IVs).
 image: /assets/article/cryptographie/mode-chiffrement/gcm-schema.PNG
+isMath: true
 ---
 
 
 
 ## Présentation
 
-GCM pour `Galois/counter mode` permet d'effectuer du chiffrement authentifié. Ainsi, en plus de la confidentialité, il permet de garantir l'authenticité et l'intégrité.
+GCM pour `Galois/counter mode` est un mode opératoire permettant d'effectuer du chiffrement authentifié. Ainsi, en plus de la confidentialité, il permet de garantir l'authenticité et l'intégrité.
 
 - Construction : 
   - Il mélange le *Galois message authentication code* avec le chiffrement par bloc CTR.
