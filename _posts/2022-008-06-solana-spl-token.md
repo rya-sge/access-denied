@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Introduction to Solana and the spl-token command line"
+title: Introduction to Solana and the spl-token command line
 date:   2022-08-06
 last-update: 
 categories: blockchain 
