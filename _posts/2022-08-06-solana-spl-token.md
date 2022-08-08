@@ -7,6 +7,7 @@ categories: blockchain
 tags: solana spl-token airdrop phantom
 description: This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the spl-token command-line utility.
 isMath: false
+image: /assets/article/blockchain/solana/introduction-cli/solana-explorer-transfer.PNG
 ---
 
 This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the `spl-token` command-line utility. It was made by following the Moralis course : https://aca[demy.moralis.io/courses/solana-programming-101](https://academy.moralis.io/courses/solana-programming-101)
@@ -118,7 +119,7 @@ On the screenshot below, you can see the balance is unchanged.
 spl-token create-token -url devnet
 ```
 
-![spl-create-token]({{site.url_complet}}/assets/article/solana\spl-create-token.PNG)
+![spl-create-token]({{site.url_complet}}/assets/article/blockchain/solana/spl-create-token.PNG)
 
 The address of the token is :  `H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws`
 
@@ -142,7 +143,7 @@ spl-token create-account <TOKEN_ADDRESS> --url devnet
 
 The returned id is the token account address
 
-![spl-create-account]({{site.url_complet}}/assets/article/solana\spl-create-account.PNG)
+![spl-create-account]({{site.url_complet}}/assets/article/solana/spl-create-account.PNG)
 
 There is one account by token. An error is generated if you try to create a second account![spl-create-account-2]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-create-account-2.PNG)
 
@@ -265,7 +266,7 @@ We transfer some tokens
 
 ##### Solana explorer
 
-See on Solana explorer : https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet
+See on Solana explorer : [https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet](https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet)
 
 
 
@@ -277,6 +278,6 @@ See on Solana explorer : https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffe
 
 Main references are :
 
-- SOLANA-LABS, 2022a. Token Program. *Solana Program Library*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: https://spl.solana.com/token
-- SOLANA-LABS, 2022b. Install the Solana Tool Suite. *Solana Documentation*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: https://docs.solana.com/cli/install-solana-cli-tools
-- ZSOLT NAGY, no date. Solana Programming 101. *Moralis academy*. Online. [Accessed 3 August 2022]. Retrieved from: https://academy.moralis.io/courses/solana-programming-101
+- SOLANA-LABS, 2022a. Token Program. *Solana Program Library*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: [https://spl.solana.com/token](https://spl.solana.com/token)
+- SOLANA-LABS, 2022b. Install the Solana Tool Suite. *Solana Documentation*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: [https://docs.solana.com/cli/install-solana-cli-tools](https://docs.solana.com/cli/install-solana-cli-tools)
+- ZSOLT NAGY, no date. Solana Programming 101. *Moralis academy*. Online. [Accessed 3 August 2022]. Retrieved from: [https://academy.moralis.io/courses/solana-programming-101](https://academy.moralis.io/courses/solana-programming-101)
