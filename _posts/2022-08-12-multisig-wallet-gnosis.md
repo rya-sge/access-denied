@@ -2,6 +2,7 @@
 layout: post
 title: How to create a multisig wallet with Gnosis Safe
 date:   2022-08-12
+locale: en_US
 last-update: 
 categories: blockchain 
 tags: solana spl-token airdrop phantom
@@ -132,7 +133,7 @@ Before signing the transaction, it is also important to verify the authenticity 
 
 During my tests, it was the contract with the following address : `0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2`
 
-With Etherscan, I can get some information about the contract : https://etherscan.io/address/0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2
+With Etherscan, I can get some information about the contract : [https://etherscan.io/address/0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2](https://etherscan.io/address/0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2)
 
 Even if it is not an absolute guarantee, the two information framed in red already give guarantees on the legitimacy of the contract
 

@@ -2,6 +2,7 @@
 layout: post
 title: Introduction to Solana and the spl-token command line
 date:   2022-08-06
+locale: en_US
 last-update: 
 categories: blockchain 
 tags: solana spl-token airdrop phantom
