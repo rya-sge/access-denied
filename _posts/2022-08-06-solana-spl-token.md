@@ -7,7 +7,7 @@ categories: blockchain
 tags: solana spl-token airdrop phantom
 description: This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the spl-token command-line utility.
 isMath: false
-image: /assets/article/blockchain/solana/introduction-cli/solana-explorer-transfer.PNG
+image: /assets/article/blockchain/solana/introduction-cli/phantom-add-custom-token.PNG
 ---
 
 This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the `spl-token` command-line utility. It was made by following the Moralis course : https://aca[demy.moralis.io/courses/solana-programming-101](https://academy.moralis.io/courses/solana-programming-101)
@@ -89,7 +89,7 @@ solana balance --url devnet
 
 - Screenshot
 
-![solana-airdrop-dev]({{site.url_complet}}/assets/article/\solana\solana-airdrop-dev.PNG)
+![solana-airdrop-dev]({{site.url_complet}}/assets/article/solana/solana-airdrop-dev.PNG)
 
 There is a limitation on the number of SOL you can obtain. It is currently one by call
 
@@ -100,18 +100,6 @@ On the screenshot below, you can see the balance is unchanged.
 
 
 ## Spl-token
-
-### Vocabulary
-
-|                |                                                          |
-| -------------- | -------------------------------------------------------- |
-| Token creation | Define the structure and the parameters of the token     |
-| Token minting  | Instantiat the token and assign the instance to an owner |
-| Token transfer | Change the owner of the token                            |
-
-
-
-
 
 ### Creating a token
 
