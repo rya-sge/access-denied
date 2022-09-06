@@ -91,7 +91,7 @@ solana balance --url devnet
 
 - Screenshot
 
-![solana-airdrop-dev]({{site.url_complet}}/assets/article/solana/introduction-cli/solana-airdrop-dev.PNG)
+![solana-airdrop-dev]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/solana-airdrop-dev.PNG)
 
 There is a limitation on the number of SOL you can obtain. It is currently one by call
 
@@ -133,7 +133,7 @@ spl-token create-account <TOKEN_ADDRESS> --url devnet
 
 The returned id is the token account address
 
-![spl-create-account]({{site.url_complet}}/assets/article/solana/spl-create-account.PNG)
+![spl-create-account]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-create-account.PNG)
 
 There is one account by token. An error is generated if you try to create a second account![spl-create-account-2]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-create-account-2.PNG)
 
