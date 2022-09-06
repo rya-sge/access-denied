@@ -2,7 +2,8 @@
 layout: post
 title: How to create a multisig wallet with Gnosis Safe
 date:   2022-08-12
-locale: en_US
+locale: en-GB
+lang: en
 last-update: 
 categories: blockchain 
 tags: solana spl-token airdrop phantom

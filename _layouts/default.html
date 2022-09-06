@@ -1,5 +1,11 @@
 <!DOCTYPE html>
+<!-- If customer.name = "anonymous" -->
+{% if page.lang == "en" %}
+<html lang="en">
+{% else %}
 <html lang="fr">
+{% endif %}
+
 {% include head.html %}
 
 <body>

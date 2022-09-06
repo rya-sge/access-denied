@@ -2,7 +2,8 @@
 layout: post
 title: Introduction to Solana and the spl-token command line
 date:   2022-08-06
-locale: en_US
+locale: en-GB
+lang: en
 last-update: 
 categories: blockchain 
 tags: solana spl-token airdrop phantom
@@ -90,7 +91,7 @@ solana balance --url devnet
 
 - Screenshot
 
-![solana-airdrop-dev]({{site.url_complet}}/assets/article/solana/solana-airdrop-dev.PNG)
+![solana-airdrop-dev]({{site.url_complet}}/assets/article/solana/introduction-cli/solana-airdrop-dev.PNG)
 
 There is a limitation on the number of SOL you can obtain. It is currently one by call
 
@@ -108,7 +109,7 @@ On the screenshot below, you can see the balance is unchanged.
 spl-token create-token -url devnet
 ```
 
-![spl-create-token]({{site.url_complet}}/assets/article/blockchain/solana/spl-create-token.PNG)
+![spl-create-token]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-create-token.PNG)
 
 The address of the token is :  `H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws`
 
