@@ -115,7 +115,9 @@ The address of the token is :  `H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws`
 
 #### Solana explorer
 
-Information about the token on Solana explorer : [https://explorer.solana.com/address/H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws?cluster=devnet](https://explorer.solana.com/address/H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws?cluster=devnet)
+Information about the token on Solana explorer : 
+
+[explorer.solana.com - tx](https://explorer.solana.com/address/H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws?cluster=devnet)
 
 ![info-token-solana-explorer]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/info-token-solana-explorer.PNG)
 
@@ -182,7 +184,7 @@ spl-token supply H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws --url devnet
 Check on Solana explorer
 
 
-Link : [https://explorer.solana.com/tx/4cieBRVtpe4ivuAn41C26sTfRzJ3LDSYN9kEQ7kr6H14EYYwbi6eJhYK214d4vrXxTD9cvoeaTaDCyzaLtMxbYKL?cluster=devnet]( https://explorer.solana.com/tx/4cieBRVtpe4ivuAn41C26sTfRzJ3LDSYN9kEQ7kr6H14EYYwbi6eJhYK214d4vrXxTD9cvoeaTaDCyzaLtMxbYKL?cluster=devnet)
+Link : [explorer.solana.com - tx]( https://explorer.solana.com/tx/4cieBRVtpe4ivuAn41C26sTfRzJ3LDSYN9kEQ7kr6H14EYYwbi6eJhYK214d4vrXxTD9cvoeaTaDCyzaLtMxbYKL?cluster=devnet)
 
 ![mint-token-solana-explorer]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/mint-token-solana-explorer.PNG)
 
@@ -256,7 +258,7 @@ We transfer some tokens
 
 ##### Solana explorer
 
-See on Solana explorer : [https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet](https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet)
+See on Solana explorer : [explorer.solana - tx](https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet)
 
 
 
