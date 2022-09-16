@@ -77,6 +77,8 @@ mkdir /mnt/image
 sudo mount -o loop <PATH_FILE>.dd /mnt/image
 ```
 
+Warning: do not mount the image on an existing directory containing files, they will be deleted!!!
+
 Reference : [Mohan 2016]
 
 ### Recover Files - Photorec
