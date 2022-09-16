@@ -81,7 +81,7 @@ Warning: do not mount the image on an existing directory containing files, they 
 
 Reference : [Mohan 2016]
 
-### Recover Files - Photorec
+## Recover Files - Photorec
 
 Photorec is a utility to recover files from a disk image. The interest of photorec is that it also recovers deleted files. You can find a presentation of the tool here :  [https://www.cgsecurity.org/wiki/PhotoRec](https://www.cgsecurity.org/wiki/PhotoRec)
 
