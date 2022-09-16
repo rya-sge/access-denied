@@ -52,14 +52,14 @@ Manpage : [http://www.sleuthkit.org/sleuthkit/man/fls.html](http://www.sleuthkit
 
 
 ```bash
-fls -rp -f fat32 usb.dd
+fls -rp -f fat32 <filename>.dd
 ```
 
 - NTFS
 
 
 ```bash
-fls -rp -f ntfs usb_stick.dd
+fls -rp -f ntfs <filename>.dd
 ```
 
 If the files is preceded by an *, it is a deleted files
@@ -74,7 +74,7 @@ Documentation : [https://linux.die.net/man/8/mount](https://linux.die.net/man/8/
 
 ```bash
 mkdir /mnt/image
-sudo mount -o loop <PATH_FILE>.dd /mnt/image
+sudo mount -o loop <filename>.dd /mnt/image
 ```
 
 Warning: do not mount the image on an existing directory containing files, they will be deleted!!!
@@ -86,7 +86,7 @@ Reference : [Mohan 2016]
 Photorec is a utility to recover files from a disk image. The interest of photorec is that it also recovers deleted files. You can find a presentation of the tool here :  [https://www.cgsecurity.org/wiki/PhotoRec](https://www.cgsecurity.org/wiki/PhotoRec)
 
 ```bash
-photorec <YOUR_FILE>.dd
+photorec <filename>.dd
 ```
 
 Reference : [WhatIsFileExtension]
