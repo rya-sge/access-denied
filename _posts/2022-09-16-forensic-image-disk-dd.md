@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Tools to perform forensic analysis on a disk image (dd)
+title: Forensic analysis on a disk image (dd)
 date:   2022-09-16
 locale: en-GB
 lang: en
