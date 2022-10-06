@@ -69,6 +69,6 @@ You can then check if the device is encrypted and if you are able to unlock it.
 
 ## Reference
 
-1. MICROSOFT, 2022a. BitLocker. *Microsoft | Learn*. Online. 13 July 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview](https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview)
-2. MICROSOFT, 2022b. BitLocker settings reference. *Microsoft | Learn*. Online. 5 October 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings](https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings)
+1. MICROSOFT, 2022a. BitLocker. *Microsoft Learn*. Online. 13 July 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview](https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview)
+2. MICROSOFT, 2022b. BitLocker settings reference. *Microsoft Learn*. Online. 5 October 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings](https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings)
 3. UNIVERSITÉ CLERMONT AUVERGNE, no date. *Déchiffrer un disque Bitlocker à l’aide de Kali-Linux*. Online. [Accessed 5 October 2022]. Retrieved from: [https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf](https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf)
