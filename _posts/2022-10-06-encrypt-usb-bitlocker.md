@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title:  Encrypt a USB key on Windows with Bitlocker
 date:   2022-10-06
@@ -7,7 +7,7 @@ categories: cryptographie
 tags: bitlocker aes xts-aes
 description: This article details how to encrypt a USB drive on Windows with Bitlocker
 image: /assets/article/windows/bitlocker/usb/bitlocker-usb-check.png
-```
+---
 
 ## Introduction
 
@@ -50,6 +50,8 @@ The new mode of encryption (XTS-AES) is not ocmpatbiel with older version of Win
 If all is right, you can confirm the encryption.
 
 ![confirmation]({{site.url_complet}}/assets/article/windows/bitlocker/usb/bitlocker-usb-confirmation.PNG)
+
+
 
 ### End
 
