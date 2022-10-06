@@ -190,18 +190,18 @@ On the dashboard, the information about the transaction is available. On the scr
 
 ## Reference
 
-BLOCKNATIVE, 2022. Maximum Web3 Wallet Integration. *blocknative*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://www.blocknative.com/onboard
+BLOCKNATIVE, 2022. Maximum Web3 Wallet Integration. *blocknative*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://www.blocknative.com/onboard](https://www.blocknative.com/onboard)
 
-ETHERSCAN, 2022. *Etherscan*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://etherscan.io
+ETHERSCAN, 2022. *Etherscan*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://etherscan.io](https://etherscan.io)
 
-GNOSIS, 2022a. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://gnosis-safe.io/
+GNOSIS, 2022a. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://gnosis-safe.io/](https://gnosis-safe.io/)
 
-GNOSIS, 2022b. *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://help.gnosis-safe.io/en/
+GNOSIS, 2022b. *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://help.gnosis-safe.io/en/](https://help.gnosis-safe.io/en/)
 
-GNOSIS, 2022c. Privacy Policy. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://gnosis-safe.io/privacy/
+GNOSIS, 2022c. Privacy Policy. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://gnosis-safe.io/privacy/](https://gnosis-safe.io/privacy/)
 
-GNOSIS, 2022d. Terms and Conditions. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://gnosis-safe.io/terms/
+GNOSIS, 2022d. Terms and Conditions. *Gnosis Safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://gnosis-safe.io/terms/](https://gnosis-safe.io/terms/)
 
-SCHOR, Lukas, 2022. What is Gnosis Safe? *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe
+SCHOR, Lukas, 2022. What is Gnosis Safe? *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe](https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe)
 
-SCHUBOTZ, Tobias, 2022. What Safe setup should I use? *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use
+SCHUBOTZ, Tobias, 2022. What Safe setup should I use? *help.gnosis-safe*. Online. 2022. [Accessed 12 August 2022]. Retrieved from: [https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use](https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use)
