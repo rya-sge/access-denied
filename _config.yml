@@ -8,13 +8,13 @@ lang: "fr_FR"
 author-name:    Ryan S. 
 author-image:   1.png
 #Source : https://pixabay.com/fr/vectors/pas-d-entrée-signer-attention-909933/
-author-job:     Etudiant en sécurité à la HEIG-VD
+author-job:     Security engineer | Blockchain Developer
 author-email:    # Add your email for contant form.
 #author-twitter: artemsheludko_ # Add your twitter account
-about-author:   "Ce site regroupe mes prises de note sur des sujets traitant de l'informatique et plus particulièrement de la sécurité"
+about-author:   "This site brings together my notes on subjects dealing with IT and more particularly with security."
 
 # Social settings
-#social-twitter:   artemsheludko_
+social-twitter:   BlockUnderFire
 #social-facebook:
 social-github:    rya-sge
 #social-pinterest: artemsheludko

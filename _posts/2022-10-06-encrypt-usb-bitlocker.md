@@ -2,6 +2,8 @@
 layout: post
 title:  Encrypt a USB key on Windows with Bitlocker
 date:   2022-10-06
+locale: en-GB
+lang: en
 last-update: 
 categories: cryptographie 
 tags: bitlocker aes xts-aes
