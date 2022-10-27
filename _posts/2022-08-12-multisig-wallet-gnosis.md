@@ -68,7 +68,7 @@ List of all available network on August 11, 2022.
 
 ![1b-select-your-network]({{site.url_complet}}/assets/article/blockchain/wallet/gnosis-safe/1b-select-your-network.PNG)
 
-I choosed the rinkeby network for my tests.
+I chose the rinkeby network for my tests.
 
 ![1c-choose-rinkeby]({{site.url_complet}}/assets/article/blockchain/wallet/gnosis-safe/1c-choose-rinkeby.PNG)
 
@@ -88,7 +88,7 @@ For information, Gnosis is based in Gibraltar, therefore the use of the software
 
 Interesting information: 
 
-in point 3.2.c in the privacy document, it is indicated that the IP address is kept in the logs . This could potentially link your IP address to your wallet address and therefore identify you.
+In point 3.2.c in the privacy document, it is indicated that the IP address is kept in the logs . This could potentially link your IP address to your wallet address and therefore identify you.
 
 Terms :  [https://gnosis-safe.io/terms/](https://gnosis-safe.io/terms/)
 
@@ -152,7 +152,7 @@ Even if it is not an absolute guarantee, the two information framed in red alrea
 
 ## Dashboard
 
-One you have created the multi signature wallet, you can access to the dashboard
+Once you have created the multi signature wallet, you can access to the dashboard
 
 ### View
 
@@ -184,7 +184,7 @@ You can then sign the request with your wallet.
 
 
 
-On the dashboard, the information about the transaction is available. On the screenshot we can see that we need a signature from the second owner to reach the threshold in my case.
+On the dashboard, the information about the transaction is available. On the screenshot, we can see that we need a signature from the second owner to reach the threshold in my case.
 
 ![15-dashboard]({{site.url_complet}}/assets/article/blockchain/wallet/gnosis-safe/15-dashboard.PNG)
 

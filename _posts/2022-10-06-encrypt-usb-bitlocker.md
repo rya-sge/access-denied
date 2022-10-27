@@ -7,17 +7,17 @@ lang: en
 last-update: 
 categories: cryptographie 
 tags: bitlocker aes xts-aes
-description: This article details how to encrypt a USB drive on Windows with Bitlocker
+description: This article details how to encrypt a USB drive on Windows with Bitlocker, an encryption tool offered by Windows.
 image: /assets/article/windows/bitlocker/usb/bitlocker-usb-check.png
 ---
 
 ## Introduction
 
-A USB key is small, it's moved (in the office, in your bag), and potentially it gets lost... By encrypting your USB key, you reduce the risk of someone accessing the data if you lose your USB key. On Windows, it is possible to encrypt a USB key with Bitlocker. On Windows 10 and later, Bitlocker uses 128-bit **XTS-AES** by default [2].
+A USB key is small, it's moved (in the office, in your bag), and potentially it gets lost... By encrypting your USB key, you reduce the risk of someone accessing the data if you lose your USB key. On Windows, it is possible to encrypt a USB key with Bitlocker. On Windows 10 and later, Bitlocker uses 128-bit **XTS-AES** by default [MICROSOFT 2022b].
 
 Warning  :
 
-Bitlocker is an encryption tool offered by Windows, it will be difficult to decrypt your USB key on a Linux device. See reference for an example [3]
+Bitlocker is an encryption tool offered by Windows, it will be difficult to decrypt your USB key on a Linux device. See reference for an example [UNIVERSITÉ CLERMONT AUVERGNE].
 
 ## Steps
 
@@ -71,6 +71,8 @@ You can then check if the device is encrypted and if you are able to unlock it.
 
 ## Reference
 
-1. MICROSOFT, 2022a. BitLocker. *Microsoft Learn*. Online. 13 July 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview](https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview)
-2. MICROSOFT, 2022b. BitLocker settings reference. *Microsoft Learn*. Online. 5 October 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings](https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings)
-3. UNIVERSITÉ CLERMONT AUVERGNE, no date. *Déchiffrer un disque Bitlocker à l’aide de Kali-Linux*. Online. [Accessed 5 October 2022]. Retrieved from: [https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf](https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf)
+MICROSOFT, 2022a. BitLocker. *Microsoft Learn*. Online. 13 July 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview](https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview)
+
+MICROSOFT, 2022b. BitLocker settings reference. *Microsoft Learn*. Online. 5 October 2022. [Accessed 5 October 2022]. Retrieved from: [https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings](https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings)
+
+UNIVERSITÉ CLERMONT AUVERGNE, no date. *Déchiffrer un disque Bitlocker à l’aide de Kali-Linux*. Online. [Accessed 5 October 2022]. Retrieved from: [https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf](https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf)
