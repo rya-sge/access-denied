@@ -5,7 +5,7 @@ date:   2022-10-27
 last-update: 
 categories: programmation
 tags: unit test OOP
-description: This article presents some principles to respect when you create unit testing: DRY test, KISS, SRP and Yagni.
+description: This article presents some principles to respect when you create unit testing (DRY test, KISS, SRP and Yagni).
 image: 
 isMath: false
 ---
