@@ -12,9 +12,9 @@ image:
 isMath: false
 ---
 
-This article presents some principles to respect when you create unit testing. The list is recovered from this post  [Gomes 2017](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80).
+This article presents some principles to respect when you create unit testing. The list is recovered from this post [[Gomes 2017](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80)].
 
-Some articles presenting a list of good practices : [Microsoft 2022](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices), [Semyon 2022](https://semaphoreci.com/blog/unit-testing), [Gomes 2017](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80)
+Some articles presenting a list of good practices : [[Microsoft 2022](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)], [[Semyon 2022](https://semaphoreci.com/blog/unit-testing)]
 
 **DRY test**
 
@@ -24,7 +24,7 @@ For example, the most basic example is by reading the code by hand. You remove e
 
 But it can be too complicated, and one of the possible next step is to test a functionality offline before online.
 
-Reference : [Tech With Tech’s Team 2022], [Wikipedia 2022]
+Reference : [[Tech With Tech’s Team 2022](https://techwithtech.com/dry-run-testing-meaning/)], [[Wikipedia 2022](https://en.wikipedia.org/wiki/Dry_run_(testing))]
 
 **KISS / Keep it Simple, Stupid**
 
@@ -35,7 +35,7 @@ Reference : [Simpson no date]
 
 The single-Responsibility principle, more particularly used in OOP, involves dividing responsibilities into functions, modules or classes. By extension, this principle can be adapted to tests: a test, an element (= a responsibility) to be tested
 Reference : [Wynn 2021]
-SRP is a part of the acronym SOLID, more information is available in the reference :[Kovan 2019], [Abba 2022]
+SRP is a part of the acronym SOLID, more information is available in the reference : [[Kovan 2019](https://gkovan.medium.com/solid-design-principles-makes-test-driven-development-faster-and-easier-35c9eec22ff1)], [[Abba 2022](https://www.freecodecamp.org/news/solid-principles-single-responsibility-principle-explained/)]
 
 **Yagni / You Aren't Gonna Need It**
 
@@ -48,7 +48,7 @@ You shouldn't write a test that drives you to develop code that's not needed, be
 - cost of carry
 - cost of repair 
 
-Reference : [Fowler 2015], [tvanfosson 2021], [Gomes 2017]
+Reference : [[Fowler 2015](https://martinfowler.com/bliki/Yagni.html)], [[tvanfosson 2021](https://stackoverflow.com/questions/945493/does-yagni-also-apply-when-writing-tests)], [[Gomes 2017](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80)]
 
 ## Reference
 

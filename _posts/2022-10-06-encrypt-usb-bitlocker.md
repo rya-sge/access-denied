@@ -13,11 +13,11 @@ image: /assets/article/windows/bitlocker/usb/bitlocker-usb-check.png
 
 ## Introduction
 
-A USB key is small, it's moved (in the office, in your bag), and potentially it gets lost... By encrypting your USB key, you reduce the risk of someone accessing the data if you lose your USB key. On Windows, it is possible to encrypt a USB key with Bitlocker. On Windows 10 and later, Bitlocker uses 128-bit **XTS-AES** by default [MICROSOFT 2022b].
+A USB key is small, it's moved (in the office, in your bag), and potentially it gets lost... By encrypting your USB key, you reduce the risk of someone accessing the data if you lose your USB key. On Windows, it is possible to encrypt a USB key with Bitlocker. On Windows 10 and later, Bitlocker uses 128-bit **XTS-AES** by default [[MICROSOFT 2022b](https://learn.microsoft.com/en-us/mem/configmgr/protect/tech-ref/bitlocker/settings)].
 
 Warning  :
 
-Bitlocker is an encryption tool offered by Windows, it will be difficult to decrypt your USB key on a Linux device. See reference for an example [UNIVERSITÉ CLERMONT AUVERGNE].
+Bitlocker is an encryption tool offered by Windows, it will be difficult to decrypt your USB key on a Linux device. See reference for an example [[UNIVERSITÉ CLERMONT AUVERGNE](https://lmv.uca.fr/wp-content/uploads/2019/09/linux-dechiffrement-bitlocker.pdf)].
 
 ## Steps
 
@@ -43,7 +43,7 @@ For a better security, it is preferable to encrypt the entire drive.
 
 ### Mode
 
-The new mode of encryption (XTS-AES) is not ocmpatbiel with older version of Windows. If you encrypt a USB drive, it can be preferable to use a compatible mode.
+The new mode of encryption (XTS-AES) is not compatible with older version of Windows. If you encrypt a USB drive, it can be preferable to use a compatible mode.
 
 ![encryption-mode]({{site.url_complet}}/assets/article/windows/bitlocker/usb/bitlocker-usb-encryption-mode.PNG)
 

@@ -24,9 +24,9 @@ For tutorial purposes, the multisig wallet will be created on a testnet network 
 
 ### Presentation of product
 
-- Gnosis Safe supports ETH, ERC20 (Tokens) and ERC721 (Collectibles) [Gnosis 2022a].
-- Gnosis Safe is a smart contract wallet running on Ethereum that requires a minimum number of people to approve a transaction before it can occur (M-of-N) [Schor 2022].
-- Gnosis is based in Gibraltar, therefore the use of the software has to respect the law of Gibraltar [Gnosis 2022d].
+- Gnosis Safe supports ETH, ERC20 (Tokens) and ERC721 (Collectibles) [[Gnosis 2022a](https://gnosis-safe.io/)].
+- Gnosis Safe is a smart contract wallet running on Ethereum that requires a minimum number of people to approve a transaction before it can occur (M-of-N) [[Schor 2022](https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe)].
+- Gnosis is based in Gibraltar, therefore the use of the software has to respect the law of Gibraltar [[Gnosis 2022d](https://gnosis-safe.io/terms/)].
 
 ## Welcome page
 
@@ -52,7 +52,7 @@ In this step, you have to connect your wallet and configure the network used
 
 #### Supported wallet
 
-To connect your wallet, Gnosis use the solution provided by blocknative.com: https://www.blocknative.com/onboard
+To connect your wallet, Gnosis use the solution provided by blocknative.com: [[Blocknative 2022](https://www.blocknative.com/onboard)]
 
 ![3-supported-wallet]({{site.url_complet}}/assets/article/blockchain/wallet/gnosis-safe/3-supported-wallet.PNG)
 
@@ -90,15 +90,15 @@ Interesting information:
 
 In point 3.2.c in the privacy document, it is indicated that the IP address is kept in the logs . This could potentially link your IP address to your wallet address and therefore identify you.
 
-Terms :  [https://gnosis-safe.io/terms/](https://gnosis-safe.io/terms/)
+Terms :  [[Gnosis 2022d](https://gnosis-safe.io/terms/)]
 
-Privacy : [https://gnosis-safe.io/privacy/]( https://gnosis-safe.io/privacy/)
+Privacy : [[Gnosis 2022c]( https://gnosis-safe.io/privacy/)]
 
 ### 3. Owners and confirmation
 
 In this step, you define the list of owners and the list of signatures needed to sign a transaction
 
-To determine the right parameters, you can find out by reading this article : [https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use](https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use)
+To determine the right parameters, you can find out by reading this article : [[Schubotz 2022](https://help.gnosis-safe.io/en/articles/4772567-what-safe-setup-should-i-use)]
 
 It is a vital step to guarantee the safety of your wallet
 

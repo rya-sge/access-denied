@@ -173,3 +173,8 @@ WEP n'a absolument pas été conçu pour être sûr.  Actuellement, il est total
 
 - La partie secrète de la clé est la même pour tout le monde sur le réseau
 - Plusieurs attaques existent (FMS, attaque par fragmentation, attaque CHOPCHOP, attaque Pyshkin Tews Weinmann).
+
+## Sources
+
+- Cours de Sécurité des Réseaux (SRX) enseigné à la HEIG-VD en 2021.
+- Cours de Sécurité des réseaux sans fil (2022) enseigné à la HEIG-VD en 2022
