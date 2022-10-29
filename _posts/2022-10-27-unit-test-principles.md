@@ -25,6 +25,7 @@ But it can be too complicated, and one of the possible next step is to test a fu
 Reference : [Tech With Tech’s Team 2022], [Wikipedia 2022]
 
 **KISS / Keep it Simple, Stupid**
+
 With this acronym, we can immediately understand the purpose : a test must be more simple than the code it checks
 Reference : [Simpson no date]
 
