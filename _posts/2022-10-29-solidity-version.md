@@ -1,7 +1,7 @@
 ---
 layout: post
 title: How indicates the solidity version of your smart contract
-date:   2022-09-16
+date:   2022-20-29
 locale: en-GB
 lang: en
 last-update: 
