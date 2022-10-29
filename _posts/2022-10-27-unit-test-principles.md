@@ -15,6 +15,7 @@ This article presents some principles to respect when you create unit testing. T
 Some articles presenting a list of good practices : [Microsoft 2022](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices), [Semyon 2022](https://semaphoreci.com/blog/unit-testing), [Gomes 2017](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80)
 
 **DRY test**
+
 A dry test was originally thought by firefighter (according to Wikipedia): it is better to train without a real fire  and without water. It consumes less resource, and it is less risky because there is not
 check the code before you run it OR with less outside components
 For example, the most basic example is by reading the code by hand. You remove execution error of the computer of the scope of the test.
@@ -24,16 +25,14 @@ But it can be too complicated, and one of the possible next step is to test a fu
 Reference : [Tech With Tech’s Team 2022], [Wikipedia 2022]
 
 **KISS / Keep it Simple, Stupid**
-With this acronym, we can immediately understand the purpose
-A test must be more simple than the code it checks
+With this acronym, we can immediately understand the purpose : a test must be more simple than the code it checks
 Reference : [Simpson no date]
 
-
-
 **SRP / Single-responsibility principle**
+
 The single-Responsibility principle, more particularly used in OOP, involves dividing responsibilities into functions, modules or classes. By extension, this principle can be adapted to tests: a test, an element (= a responsibility) to be tested
 Reference : [Wynn 2021]
-SRP is a part of the acronym SOLID, more information is available in the reference : [Kovan 2019], [Abba 2022]
+SRP is a part of the acronym SOLID, more information is available in the reference :[Kovan 2019], [Abba 2022]
 
 **Yagni / You Aren't Gonna Need It**
 
