@@ -2,6 +2,8 @@
 layout: post
 title:  Unit Test Key Principles
 date:   2022-10-27
+locale: en-GB
+lang: en
 last-update: 
 categories: programmation
 tags: unit test OOP
