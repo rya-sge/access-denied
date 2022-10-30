@@ -14,7 +14,7 @@ image:
 
 There are different way to indicate the solidity version of the compiler.
 As stated in the solidity documentation [[docs.soliditylang.org 2022](https://docs.soliditylang.org/en/v0.8.17/layout-of-source-files.html#version-pragma)], the pragma only instructs the compiler to check whether its version matches the one required by the pragma. 
-The version pragma has no effect :
+The version pragma has no effect:
 
 - On the version of the compiler installed locally
 - On the features provider by the compiler.
@@ -53,7 +53,7 @@ For instance, it is possible to indicate precisely a range between two major ver
 ## Conclusion
 As indicated in several articles [[Shashank 2022](https://blog.solidityscan.com/understanding-solidity-pragma-and-its-security-practices-3b5458763a34)], [[immunebytes. 2022](https://www.immunebytes.com/blog/floating-pragma/)], it is better to use the fixed version, the one that was used to develop and test the smart contracts.
 
-For library, some believe that one can use the floating notation because the code will use by other smart contracts. This is notably the choice made by OpenZeppelin, see this issue [[ConsenSys 2017](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)].
+For library, some believe that one can use the floating notation because the code will use by other smart contracts. This is notably the choice made by OpenZeppelin, see this [[issue](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)] [ConsenSys 2017].
 
 
 # Reference

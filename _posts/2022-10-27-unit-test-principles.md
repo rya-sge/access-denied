@@ -39,9 +39,7 @@ SRP is a part of the acronym SOLID, more information is available in the referen
 
 **Yagni / You Aren't Gonna Need It**
 
-When you create a test, it is important not to have to develop features of the project you are testing.
-
-You shouldn't write a test that drives you to develop code that's not needed, because it has a cost
+When you create a test, it is important NOT to have to develop features of the project you are testing. The reason is all created code has a cost :
 
 - cost of build
 - cost of delay
