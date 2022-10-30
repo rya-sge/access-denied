@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Programming contract proxies with OpenZeppelin - Summary
-date:   2022-10-31
+date: 2022-10-31
 locale: en-GB
 lang: en
 last-update: 
