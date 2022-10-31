@@ -158,35 +158,35 @@ FRANGIO, 2022. What’s the difference between onlyInitializing and initialzer? 
 
 IMMUNEFI, 2022. Wormhole Uninitialized Proxy Bugfix Review. *Immunefi*. Online. 20 May 2022. [Accessed 31 October 2022]. Retrieved from: [https://medium.com/immunefi/wormhole-uninitialized-proxy-bugfix-review-90250c41a43a](https://medium.com/immunefi/wormhole-uninitialized-proxy-bugfix-review-90250c41a43a)
 
-OPENZEPPELIN, 2022a. FAQ - Can I safely use delegatecall and selfdestruct? *OpenZeppelin \| docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct](https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct)
+OPENZEPPELIN, 2022a. FAQ - Can I safely use delegatecall and selfdestruct? *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct](https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct)
 
-OPENZEPPELIN, 2022b. OpenZeppelin Hardhat Upgrades API. *OpenZeppelin \| docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades)
+OPENZEPPELIN, 2022b. OpenZeppelin Hardhat Upgrades API. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades)
 
-OPENZEPPELIN, 2022c. Proxy Upgrade Pattern - The Constructor Caveat. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat)
+OPENZEPPELIN, 2022c. Proxy Upgrade Pattern - The Constructor Caveat. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat)
 
-OPENZEPPELIN, 2022d. Proxy Upgrade Pattern - Unstructured Storage Proxies. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies)
+OPENZEPPELIN, 2022d. Proxy Upgrade Pattern - Unstructured Storage Proxies. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies)
 
-OPENZEPPELIN, 2022e. Upgrades Plugins - Test usage. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage](https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage)
+OPENZEPPELIN, 2022e. Upgrades Plugins - Test usage. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage](https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage)
 
 OPENZEPPELIN, 2022f. Writing Upgradeable Contracts - Avoiding Initial Values in Field Declarations. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations)
 
-OPENZEPPELIN, 2022g. Writing Upgradeable Contracts - Initializers. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers)
+OPENZEPPELIN, 2022g. Writing Upgradeable Contracts - Initializers. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers)
 
-OPENZEPPELIN, 2022h. Writing Upgradeable Contracts - Modifying Your Contracts. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
+OPENZEPPELIN, 2022h. Writing Upgradeable Contracts - Modifying Your Contracts. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts)
 
-OPENZEPPELIN, 2022i. Writing Upgradeable Contracts - Potentially Unsafe Operations. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations)
+OPENZEPPELIN, 2022i. Writing Upgradeable Contracts - Potentially Unsafe Operations. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations)
 
 OPENZEPPELIN, 2022j. ERC2771ContextMockUpgradeable.sol. *GitHub - OpenZeppelin*. Online. 14 September 2022. [Accessed 29 October 2022]. Retrieved from: [https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/b551d19e6e37deaa15d8c3ca7beec713031d83fd/contracts/mocks/ERC2771ContextMockUpgradeable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/b551d19e6e37deaa15d8c3ca7beec713031d83fd/contracts/mocks/ERC2771ContextMockUpgradeable.sol)
 
-OPENZEPPELIN, 2022k. OpenZeppelin Truffle Upgrades API. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades)
+OPENZEPPELIN, 2022k. OpenZeppelin Truffle Upgrades API. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades)
 
 OPENZEPPELIN, 2022l. *@openzeppelin/hardhat-upgrades*. Online. version 1.21.0. September 2022. OpenZeppelin. Retrieved from: [https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades](https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades)
 
-OPENZEPPELIN, 2022m. Upgrades Plugins. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
+OPENZEPPELIN, 2022m. Upgrades Plugins. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
 
 OPENZEPPELIN, 2022n. *Initializable.sol*. Online. version v4.7.3. 14 September 2022. OpenZeppelin. [Accessed 29 October 2022]. Retrieved from: [https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol)
 
-OPENZEPPELIN, 2022o. Writing Upgradeable Contracts - Initializing the Implementation Contract. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract)
+OPENZEPPELIN, 2022o. Writing Upgradeable Contracts - Initializing the Implementation Contract. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract)
 
 REUTOV, Arseniy, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://offzone.moscow/getfile/?bmFtZT1BLlJldXRvdl9VcGdyYWRlYWJsZSBzbWFydCBjb250cmFjdHMgc2VjdXJpdHkucGRmJklEPTIzODM=](https://offzone.moscow/getfile/?bmFtZT1BLlJldXRvdl9VcGdyYWRlYWJsZSBzbWFydCBjb250cmFjdHMgc2VjdXJpdHkucGRmJklEPTIzODM=)
 
