@@ -158,9 +158,9 @@ FRANGIO, 2022. What’s the difference between onlyInitializing and initialzer? 
 
 IMMUNEFI, 2022. Wormhole Uninitialized Proxy Bugfix Review. *Immunefi*. Online. 20 May 2022. [Accessed 31 October 2022]. Retrieved from: [https://medium.com/immunefi/wormhole-uninitialized-proxy-bugfix-review-90250c41a43a](https://medium.com/immunefi/wormhole-uninitialized-proxy-bugfix-review-90250c41a43a)
 
-OPENZEPPELIN, 2022a. FAQ - Can I safely use delegatecall and selfdestruct? *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct](https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct)
+OPENZEPPELIN, 2022a. FAQ - Can I safely use delegatecall and selfdestruct? *OpenZeppelin \| docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct](https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#delegatecall-selfdestruct)
 
-OPENZEPPELIN, 2022b. OpenZeppelin Hardhat Upgrades API. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades)
+OPENZEPPELIN, 2022b. OpenZeppelin Hardhat Upgrades API. *OpenZeppelin \| docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades)
 
 OPENZEPPELIN, 2022c. Proxy Upgrade Pattern - The Constructor Caveat. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat)
 
@@ -192,7 +192,7 @@ REUTOV, Arseniy, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack
 
 [Santiago Palladino](https://github.com/spalladino), [Francisco Giordano](https://github.com/frangio), [Hadrien Croubois](https://github.com/Amxx), "EIP-1967: Proxy Storage Slots," *Ethereum Improvement Proposals*, no. 1967, April 2019. [Online serial]. Available: [https://eips.ethereum.org/EIPS/eip-1967.](https://eips.ethereum.org/EIPS/eip-1967.)
 
-SHARKTEAM, 2022. *Upgradable Contract Vulnerability—AnalysisontheHackof Web3 Music PlatformAudius*. Online. 26 July 2022. [Accessed 29 October 2022]. Retrieved from: [https://www.sharkteam.org/report/analysis/20220726001A_en.pdf](https://www.sharkteam.org/report/analysis/20220726001A_en.pdf)
+SHARKTEAM, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 26 July 2022. [Accessed 29 October 2022]. Retrieved from: [https://www.sharkteam.org/report/analysis/20220726001A_en.pdf](https://www.sharkteam.org/report/analysis/20220726001A_en.pdf)
 
 TOULAS, Bill, 2022. Hackers steal $6 million from blockchain music platform Audius. *BleepingComputer*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://www.bleepingcomputer.com/news/security/hackers-steal-6-million-from-blockchain-music-platform-audius/](https://www.bleepingcomputer.com/news/security/hackers-steal-6-million-from-blockchain-music-platform-audius/)
 
