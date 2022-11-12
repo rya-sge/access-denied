@@ -5,7 +5,7 @@ date: 2022-11-12
 last-update: 
 categories: securite
 tags: xss google xss-game
-image: /assets/article/web/xss/xss-game/xss-game-cover
+image: /assets/article/web/xss/xss-game/xss-game-cover.PNG
 description: XSS-game was launched by Google to train for XSS vulnerabilities with 6 challenges to solve. This document summarizes the solutions for challenges 1 to 5.
 ---
 
@@ -14,7 +14,7 @@ A few years ago, Google launched a site, [https://xss-game.appspot.com](https://
 To begin, some useful resources
 
 - [evuln xss-encoder/](http://evuln.com/tools/xss-encoder/)
-- [XSS Filter Evasion Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html#xss-filter-evasion-cheat-sheet)https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html
+- [XSS Filter Evasion Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html#xss-filter-evasion-cheat-sheet)
 - [xss-payload-list](https://github.com/payloadbox/xss-payload-list)
 - [resources.infosecinstitute.com - Deadly Consequences of XSS](https://resources.infosecinstitute.com/topic/deadly-consequences-xss/)
 - [portswigger.net - Cross-site scripting (XSS) cheat sheet](https://portswigger.net/web-security/cross-site-scripting/cheat-sheet)
