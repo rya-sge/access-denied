@@ -3,6 +3,8 @@ layout: post
 title: XSS Game - Google
 date: 2022-11-12
 last-update: 
+locale: en-GB
+lang: en
 categories: securite
 tags: xss google xss-game
 image: /assets/article/web/xss/xss-game/xss-game-cover.PNG
