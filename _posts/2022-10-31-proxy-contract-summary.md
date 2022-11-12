@@ -168,7 +168,7 @@ OPENZEPPELIN, 2022d. Proxy Upgrade Pattern - Unstructured Storage Proxies. *Open
 
 OPENZEPPELIN, 2022e. Upgrades Plugins - Test usage. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage](https://docs.openzeppelin.com/upgrades-plugins/1.x/#test-usage)
 
-OPENZEPPELIN, 2022f. Writing Upgradeable Contracts - Avoiding Initial Values in Field Declarations. *OpenZeppelin | docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations)
+OPENZEPPELIN, 2022f. Writing Upgradeable Contracts - Avoiding Initial Values in Field Declarations. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#avoid-initial-values-in-field-declarations)
 
 OPENZEPPELIN, 2022g. Writing Upgradeable Contracts - Initializers. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializers)
 
@@ -198,4 +198,4 @@ TOULAS, Bill, 2022. Hackers steal $6 million from blockchain music platform Audi
 
 TRUFFLE SUITE, 2022. A Sweet Upgradeable Contract Experience with OpenZeppelin and Truffle. *Truffle Suite*. Online. 2022. [Accessed 30 October 2022]. Retrieved from: [https://trufflesuite.com/blog/a-sweet-upgradeable-contract-experience-with-openzeppelin-and-truffle/](https://trufflesuite.com/blog/a-sweet-upgradeable-contract-experience-with-openzeppelin-and-truffle/)
 
-WEBBER, STEPHEN, 2022. Staying Safe with Smart Contract Upgrades. *OpenZeppelin | news & events*. Online. 16 August 2022. [Accessed 30 October 2022]. Retrieved from: [https://blog.openzeppelin.com/staying-safe-with-smart-contract-upgrades/](https://blog.openzeppelin.com/staying-safe-with-smart-contract-upgrades/)
+WEBBER, STEPHEN, 2022. Staying Safe with Smart Contract Upgrades. *OpenZeppelin news & events*. Online. 16 August 2022. [Accessed 30 October 2022]. Retrieved from: [https://blog.openzeppelin.com/staying-safe-with-smart-contract-upgrades/](https://blog.openzeppelin.com/staying-safe-with-smart-contract-upgrades/)
