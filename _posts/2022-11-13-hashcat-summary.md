@@ -7,7 +7,7 @@ lang: en
 categories: securite 
 tags: hashcat hash
 description: Hashcat is a security tool allowing to recover passwords form a hash on a large number of hash functions (md5, sha1, sha256)
-image: assets/article/outil-securite/hashcat/tryHackMe-hashid-2.PNG
+image: /assets/article/outil-securite/hashcat/tryHackMe-hashid-2.PNG
 ---
 
 Hashcat is a security tool allowing to recover passwords form a hash on a large number of hash functions (md5, sha1, sha256)
@@ -92,7 +92,7 @@ hashcat -m 1420 A60458d2180258d47d7f7bef5236b33e86711ac926518ca4545ebf24cdc0b76c
 
 
 
-## Rules
+### Rules
 
 The rules are rules concerning the generation of passwords. You can create your own rules or use those already provided by Kali. They are interesting if we manage to determine certain "patterns" in the target passwords. The hashcat documentation, for example, indicates that many users add a number to their password to increase complexity. We may then want to create a rule that will add the number 1 to the passwords tested.
 
@@ -113,7 +113,7 @@ References
 - [https://hashcat.net/wiki/doku.php?id=rule_based_attack](https://hashcat.net/wiki/doku.php?id=rule_based_attack)
 - [https://ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf](https://ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf)
 
-#### Exemple
+#### Example
 
 A write-up written for the Board Meeting Gone Wrong challenge shows an interesting example of the use of these rules. The rules were used to generate a leetspeak animal password dictionary. 
 
@@ -125,7 +125,7 @@ hashcat --stdout animals.txt -r /usr/share/hashcat/rules/leetspeak.rule  > anima
 
 Reference: [https://ctftime.org/writeup/24404](https://ctftime.org/writeup/24404)
 
-## Exercice 
+## Challenge 
 
 ### CSAW CTF - SALT
 
@@ -149,7 +149,7 @@ hashcat -m 1420 A60458d2180258d47d7f7bef5236b33e86711ac926518ca4545ebf24cdc0b76c
 
 ### AUCTF 2020 
 
-### Crack Me
+#### Crack Me
 
 > Hash: 33f966f258879f252d582d45cef37e5e
 >
@@ -265,7 +265,7 @@ Result:
 
 ## Others tools
 
-Softwares : John the ripper, RainbowCrack
+Softwares : [John the Ripper](https://www.openwall.com/john/), [RainbowCrack](http://project-rainbowcrack.com)
 
 RainbowCrack provides the ability to find/recover passwords using rainbow tables. It is implemented by Philippe Oechslin
 
@@ -277,5 +277,5 @@ Online: [https://md5decrypt.net](https://md5decrypt.net), [https://hashkiller.io
 
 ## Reference
 
-- https://hashcat.net/hashcat/
+- [https://hashcat.net/hashcat/](https://hashcat.net/hashcat/)
 

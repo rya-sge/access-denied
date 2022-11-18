@@ -58,7 +58,7 @@ $$
 
 > The bit length of the tag, denoted t, is a security parameter, as discussed in Appendix B. In general, t may be any one of the following five values: 128, 120, 112, 104, or 96. For certain applications, t may be 64 or 32; guidance for the use of these two tag lengths, including requirements on the length of the input data and the lifetime of the key in these cases, is given in Appendix C. 
 
-Source : [NIST 2007]
+Source : [[NIST 2007]](nvlpubs.nist.gov - nistspecialpublication800-38d.pdf)
 
 #### Authenticated dada (AD)
 
@@ -170,7 +170,7 @@ Quelques sources pour approfondir le sujet :
 
 - [MDN contributors, 2022] -  [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)
 - [Sbai Azmi, 2017] - [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
-- [NIST 2007] 
+- [[NIST 2007]](nvlpubs.nist.gov - nistspecialpublication800-38d.pdf) 
 
 
 
