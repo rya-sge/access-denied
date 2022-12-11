@@ -103,9 +103,9 @@ The vulnerability was fixed fast enough to avoid losses, the team had 7 days to 
 
 *Amount of loss:* $ 1,180,000
 
-Type : CWE-20 / external call
+Type : [CWE-20: Improper Input Validation](https://cwe.mitre.org/data/definitions/20.html) / external call
 
-According to BlockSec The address parameter was not checked and attackers  exploit this to perform arbitrary call to steal the user funds by tranferring them to their address.
+According to BlockSec, the address parameter was not checked and attackers  exploit this to perform arbitrary call to steal the user funds by tranferring them to their address.
 
 Reference: [official statement](https://twitter.com/BitKeepOS/status/1582157619032395776), [BlockSec- Status](https://twitter.com/BlockSecTeam/status/1582261040334901249).,
 

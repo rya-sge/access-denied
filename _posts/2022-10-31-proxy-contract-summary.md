@@ -184,17 +184,17 @@ OPENZEPPELIN, 2022l. *@openzeppelin/hardhat-upgrades*. Online. version 1.21.0. S
 
 OPENZEPPELIN, 2022m. Upgrades Plugins. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
 
-OPENZEPPELIN, 2022n. *Initializable.sol*. Online. version v4.7.3. 14 September 2022. OpenZeppelin. [Accessed 29 October 2022]. Retrieved from: [https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol)
+OPENZEPPELIN, 2022n. *Initializable.sol*. Online. version v4.7.3. 14 September 2022. OpenZeppelin. [Accessed 29 October 2022]. Retrieved from: [github.com/OpenZeppelin - contracts/proxy/utils/Initializable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol)
 
-OPENZEPPELIN, 2022o. Writing Upgradeable Contracts - Initializing the Implementation Contract. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract)
+OPENZEPPELIN, 2022o. Writing Upgradeable Contracts - Initializing the Implementation Contract. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [docs.openzeppelin.com - initializing_the_implementation_contract](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#initializing_the_implementation_contract)
 
-REUTOV, Arseniy, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://offzone.moscow/getfile/?bmFtZT1BLlJldXRvdl9VcGdyYWRlYWJsZSBzbWFydCBjb250cmFjdHMgc2VjdXJpdHkucGRmJklEPTIzODM=](https://offzone.moscow/getfile/?bmFtZT1BLlJldXRvdl9VcGdyYWRlYWJsZSBzbWFydCBjb250cmFjdHMgc2VjdXJpdHkucGRmJklEPTIzODM=)
+REUTOV, Arseniy, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://offzone.moscow](https://offzone.moscow/getfile/?bmFtZT1BLlJldXRvdl9VcGdyYWRlYWJsZSBzbWFydCBjb250cmFjdHMgc2VjdXJpdHkucGRmJklEPTIzODM=)
 
 [Santiago Palladino](https://github.com/spalladino), [Francisco Giordano](https://github.com/frangio), [Hadrien Croubois](https://github.com/Amxx), "EIP-1967: Proxy Storage Slots," *Ethereum Improvement Proposals*, no. 1967, April 2019. [Online serial]. Available: [https://eips.ethereum.org/EIPS/eip-1967.](https://eips.ethereum.org/EIPS/eip-1967.)
 
-SHARKTEAM, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 26 July 2022. [Accessed 29 October 2022]. Retrieved from: [https://www.sharkteam.org/report/analysis/20220726001A_en.pdf](https://www.sharkteam.org/report/analysis/20220726001A_en.pdf)
+SHARKTEAM, 2022. *Upgradable Contract Vulnerability—Analysis on the Hack of Web3 Music PlatformAudius*. Online. 26 July 2022. [Accessed 29 October 2022]. Retrieved from: [www.sharkteam.org - report/analysis](https://www.sharkteam.org/report/analysis/20220726001A_en.pdf)
 
-TOULAS, Bill, 2022. Hackers steal $6 million from blockchain music platform Audius. *BleepingComputer*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://www.bleepingcomputer.com/news/security/hackers-steal-6-million-from-blockchain-music-platform-audius/](https://www.bleepingcomputer.com/news/security/hackers-steal-6-million-from-blockchain-music-platform-audius/)
+TOULAS, Bill, 2022. Hackers steal $6 million from blockchain music platform Audius. *BleepingComputer*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [www.bleepingcomputer.com](https://www.bleepingcomputer.com/news/security/hackers-steal-6-million-from-blockchain-music-platform-audius/)
 
 TRUFFLE SUITE, 2022. A Sweet Upgradeable Contract Experience with OpenZeppelin and Truffle. *Truffle Suite*. Online. 2022. [Accessed 30 October 2022]. Retrieved from: [https://trufflesuite.com/blog/a-sweet-upgradeable-contract-experience-with-openzeppelin-and-truffle/](https://trufflesuite.com/blog/a-sweet-upgradeable-contract-experience-with-openzeppelin-and-truffle/)
 
