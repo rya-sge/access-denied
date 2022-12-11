@@ -176,11 +176,11 @@ OPENZEPPELIN, 2022h. Writing Upgradeable Contracts - Modifying Your Contracts. *
 
 OPENZEPPELIN, 2022i. Writing Upgradeable Contracts - Potentially Unsafe Operations. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations)
 
-OPENZEPPELIN, 2022j. ERC2771ContextMockUpgradeable.sol. *GitHub - OpenZeppelin*. Online. 14 September 2022. [Accessed 29 October 2022]. Retrieved from: [https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/b551d19e6e37deaa15d8c3ca7beec713031d83fd/contracts/mocks/ERC2771ContextMockUpgradeable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/b551d19e6e37deaa15d8c3ca7beec713031d83fd/contracts/mocks/ERC2771ContextMockUpgradeable.sol)
+OPENZEPPELIN, 2022j. ERC2771ContextMockUpgradeable.sol. *GitHub - OpenZeppelin*. Online. 14 September 2022. [Accessed 29 October 2022]. Retrieved from: [github.com/OpenZeppelin - mocks/ERC2771ContextMockUpgradeable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/b551d19e6e37deaa15d8c3ca7beec713031d83fd/contracts/mocks/ERC2771ContextMockUpgradeable.sol)
 
 OPENZEPPELIN, 2022k. OpenZeppelin Truffle Upgrades API. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades](https://docs.openzeppelin.com/upgrades-plugins/1.x/api-truffle-upgrades)
 
-OPENZEPPELIN, 2022l. *@openzeppelin/hardhat-upgrades*. Online. version 1.21.0. September 2022. OpenZeppelin. Retrieved from: [https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades](https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades)
+OPENZEPPELIN, 2022l. *@openzeppelin/hardhat-upgrades*. Online. version 1.21.0. September 2022. OpenZeppelin. Retrieved from: [www.npmjs.com - @openzeppelin/hardhat-upgrades](https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades)
 
 OPENZEPPELIN, 2022m. Upgrades Plugins. *OpenZeppelin docs*. Online. 2022. [Accessed 29 October 2022]. Retrieved from: [https://docs.openzeppelin.com/upgrades-plugins/1.x/](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
 
