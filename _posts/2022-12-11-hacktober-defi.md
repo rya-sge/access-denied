@@ -45,8 +45,6 @@ Reference: [UVT Hack Bounty](https://mirror.xyz/0x843FE6C51CF716906720Dcc5c9d3f7
 
 [See my status](https://twitter.com/BlockUnderFire/status/1585522254317867008)
 
-
-
 **2022-10-26 / n00dleSwap**
 
 Vulnerability: [SWC-107](https://swcregistry.io/docs/SWC-107) / Reentrancy Attack
@@ -56,8 +54,6 @@ Vulnerability: [SWC-107](https://swcregistry.io/docs/SWC-107) / Reentrancy Attac
 Reference: [BlockSec - Status](https://twitter.com/BlockSecTeam/status/1584959295829180416)
 
 [See my status](https://twitter.com/BlockUnderFire/status/1585151343576383491)
-
-
 
 **2022-10-20/ Ethereum Alarm Clock /  Contract vulnerabilities**
 
@@ -69,7 +65,7 @@ Vulnerability: gas
 
 See [my status](https://twitter.com/BlockUnderFire/status/1583505764802768896)
 
-**2022-10-20 / Petra** / bug
+**2022-10-20 / Petra / bug** 
 
 Vulnerability : bug
 
@@ -119,8 +115,6 @@ https://twitter.com/BitKeepOS/status/1586264526777114626
 
 [See my status](https://twitter.com/BlockUnderFire/status/1582474556790276096)
 
-
-
 **2022-10-11 / TempleDAO**
 
 *Amount of loss:* $ 2,360,000
@@ -132,8 +126,6 @@ One of the functions took a contract as an argument. This contract was not verif
 Reference: [Accident report](https://docs.google.com/document/d/1-chBi1Yqdmz8h81Arg4PIRbSXYFd2nqOKUXCy2c3kZk/edit), [BlockSec - Status](https://twitter.com/BlockSecTeam/status/1582261040334901249)
 
 [See my status](https://twitter.com/BlockUnderFire/status/1579859304102105093)
-
-
 
 **2022-10-11 /  Rabby**
 
@@ -149,9 +141,7 @@ Reference: [official statement](https://twitter.com/Rabby_io/status/157981952549
 
 [See my status](https://twitter.com/BlockUnderFire/status/1579944589250945025)
 
-
-
-**2022-10-02 / Transit Swap** (Cross-chain DEX Aggregator)
+**2022-10-02 / Transit Swap (Cross-chain DEX Aggregator)**
 
 *Amount of loss:* $ 28,900,000
 
@@ -165,7 +155,7 @@ Reference: [SlowMist](https://slowmist.medium.com/cross-chain-dex-aggregator-tra
 
 [See my status](https://twitter.com/BlockUnderFire/status/1576654721464832000)
 
-**2022-10-09 / Xave Finance** / DAO
+**2022-10-09 / Xave Finance / DAO**
 
 *Amount of loss:* $ 635
 
@@ -189,9 +179,7 @@ After doing some research, it seems that the vulnerable code comes from a contra
 
 [See my status](https://twitter.com/BlockUnderFire/status/1583487846488641537)
 
-
-
-**2022-10-06 / BNB Chain **
+**2022-10-06 / BNB Chain**
 
 Amount of loss: 2,000,000 BNB
 
@@ -239,7 +227,7 @@ Reference: [Melody - official statement](https://twitter.com/Melody_SGS/status/1
 
 [See my status](https://twitter.com/BlockUnderFire/status/1584790417740271617)
 
-**2022-10-23 / Layer2DAO** (Optimism)
+**2022-10-23 / Layer2DAO (Optimism)**
 
 Vulnerability : Get multi-signature permission
 
@@ -323,7 +311,7 @@ Steps :
 
 Moola Market negotiated a bug bounty with the attacker to recover a part of the profits (~ $500,000)
 
-**2022-10-12 / Mango **
+**2022-10-12 / Mango**
 
 Method: Oracle Price Manipulation
 
@@ -439,7 +427,7 @@ A classic rug pull
 
 Reference : [www.panewslab.com](https://www.panewslab.com/zh_hk/articledetails/6jry6n1d4iu7.html)
 
-**2022-10-09 / Jumpnfinance  / rug pull **
+**2022-10-09 / Jumpnfinance  / rug pull**
 
 *Amount of loss:* $ 1,150,000
 The scammer call a function in the contract to extract all user's funds.
@@ -463,10 +451,6 @@ See [my status](https://twitter.com/BlockUnderFire/status/1587576704310157318)
 > The theft occurred outside of the 3Commas system, via a phishing attack conducted on inauthentic websites mocked up to resemble the 3Commas interface. 
 
 Reference: [3commas - official statement](https://3commas.io/blog/3commas-security-update-october-20)
-
-2020-10-22 - Blur
-
-https://twitter.com/Denny74962267/status/1587817549869158400
 
 **2022-10-22  / Blur / Impersonate**
 
@@ -502,13 +486,13 @@ Reference: [bleepingcomputer](https://www.bleepingcomputer.com/news/security/fak
 
 ## Others
 
-**2022-10-28 / THORChain / Network interruption **
+**2022-10-28 / THORChain / Network interruption**
 
 The THORCHAIn network suffered front an interruption due to a consensus bug. The root cause is an incorrect type, a Uint value (instead of uint64) was pushed into a string, which then took the value of an arbitrary large number.
 
 Reference: [THORChain - Status](https://twitter.com/THORChain/status/1585800482764730369)
 
-**TokenPocket / DoS **
+**TokenPocket / DoS**
 
 *Amount of loss:* -
 
@@ -533,7 +517,7 @@ Reference: [x-explorer](https://mirror.xyz/x-explore.eth/M2BJgQJaj2JK0mAO9OecByj
 
 ## Unknown
 
-**2022-10-14 / EFLeverVault  **
+**2022-10-14 / EFLeverVault**
 
 EFLeverVault (a mev bot I believe) was exploited for around 750 ETH
 
