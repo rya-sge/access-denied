@@ -1,21 +1,22 @@
 ---
 layout: post
 title: Creating an NFT with Foundry & Solmate
-date:   2022-09-16
+date:   2022-12-20
 locale: en-GB
 lang: en
 last-update: 
 categories: blockchain
 tags: solidity ethereum foundry
-description: This article is a summary of all commands of the tutorial "solmate-nft" offered by foundry
+description: This article is a summary of all commands of the tutorial "Creating an NFT with Solmate" offered by Foundry
 isMath: false
 image: 
 ---
 
-This article is a summary of all commands of the tutorial "solmate-nft" offered by foundry
+This article is a summary of all commands of the tutorial "Creating an NFT with Solmate" offered by Foundry
 
-Link : [https://book.getfoundry.sh/tutorials/solmate-nft](https://book.getfoundry.sh/tutorials/solmate-nft)
-Full implementation  : [https://github.com/FredCoen/nft-tutorial](https://github.com/FredCoen/nft-tutorial)
+- Link : [https://book.getfoundry.sh/tutorials/solmate-nft](https://book.getfoundry.sh/tutorials/solmate-nft)
+
+- Full implementation  : [https://github.com/FredCoen/nft-tutorial](https://github.com/FredCoen/nft-tutorial)
 
 ## Create project and install dependencies
 **Initialize the project**
@@ -33,20 +34,21 @@ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
 **Print tree**
 `tree -L 2`
 This commands is used to check the installation
-.
-├── foundry.toml
-├── lib
-│   ├── forge-std
-│   ├── openzeppelin-contracts
-│   └── solmate
-├── script
-│   └── Counter.s.sol
-├── src
-│   └── Counter.sol
-└── test
-    └── Counter.t.sol
 
-## Configure your environement
+> .
+> ├── foundry.toml
+> ├── lib
+> │   ├── forge-std
+> │   ├── openzeppelin-contracts
+> │   └── solmate
+> ├── script
+> │   └── Counter.s.sol
+> ├── src
+> │   └── Counter.sol
+> └── test
+>     └── Counter.t.sol
+
+## Configure your environment
 **Run local node**	
 `anvil`
 **Set environnement variable**
@@ -63,13 +65,14 @@ This commands is used to check the installation
 ### Deployment
 
 **Deploy your NFT contract**
-Template
+
+- Template
 
 ```bash
 forge create NFT --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args <name> <symbol>
 ```
 
-Full cmd
+- Full command
 
 ```bash
 forge create NFT --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args Bitcoin BTC
@@ -87,7 +90,7 @@ export CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
 export RECIPIENT_ADDRESS=0x70997970c51812dc3a010c7d01b50e0d17dc79c8
 ```
 
-- *Minting from your contract*
+- Minting from your contract
 
 ```bash
 cast send --rpc-url=$RPC_URL $CONTRACT_ADDRESS  "mintTo(address)" $RECIPIENT_ADDRESS --private-key=$PRIVATE_KEY
