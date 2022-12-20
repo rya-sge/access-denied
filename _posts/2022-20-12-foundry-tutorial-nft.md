@@ -35,18 +35,22 @@ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
 `tree -L 2`
 This commands is used to check the installation
 
-> .
-> ├── foundry.toml
-> ├── lib
-> │   ├── forge-std
-> │   ├── openzeppelin-contracts
-> │   └── solmate
-> ├── script
-> │   └── Counter.s.sol
-> ├── src
-> │   └── Counter.sol
-> └── test
->     └── Counter.t.sol
+```
+.
+├── foundry.toml
+├── lib
+│   ├── forge-std
+│   ├── openzeppelin-contracts
+│   └── solmate
+├── script
+│   └── Counter.s.sol
+├── src
+│   └── Counter.sol
+└── test
+    └── Counter.t.sol
+```
+
+
 
 ## Configure your environment
 **Run local node**	
@@ -78,7 +82,8 @@ forge create NFT --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-arg
 forge create NFT --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args Bitcoin BTC
 ```
 
-Result
+- Result
+
 ![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/deploy-contract.png)
 
 ![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/deploy-contract-anvil.png)
@@ -106,7 +111,9 @@ cast send --rpc-url=$RPC_URL $CONTRACT_ADDRESS  "mintTo(address)" $RECIPIENT_ADD
 cast call --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY $CONTRACT_ADDRESS "ownerOf(uint256)" 1
 ```
 
-Result![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/check-owner.png)
+- Result
+
+![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/check-owner.png)
 	
 ![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/check-owner-anvil.png)
 	
@@ -115,6 +122,8 @@ Result![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundr
 
 Warning : this part is performed on an extended version of the basic NFT contract
 
+- Run tests
+
 ```bash
 forge test
 ```
@@ -122,6 +131,8 @@ forge test
 ​	Warning : you may have some warnings when you are running the test
 ​	
 ![alt text]({{site.url_complet}}/assets/article/blockchain/ethereum/foundry-nft-tutorial/test-result.png)
+
+- Run tests with gas report
 
 ```bash
 forge test --gas-report
