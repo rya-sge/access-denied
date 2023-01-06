@@ -8,7 +8,7 @@ lang: en
 categories: programmation
 tags: data-structure array sort
 image:
-description: This article focuses on two structures to stores data represented by numbers: a sorted array VS an unsorted array.
+description: This article compares a sorted array and its unsorted version to stores data represented by numbers.
 isMath: true
 ---
 
