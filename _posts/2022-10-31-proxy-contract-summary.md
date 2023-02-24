@@ -150,7 +150,32 @@ Documentation for Hardhat
 
 Reference: [[WEBBER 2022](https://blog.openzeppelin.com/staying-safe-with-smart-contract-upgrades/)]
 
+## Checklist
 
+List of main points to check on a proxy contract
+
+- constructor
+
+  - call to `_disableInitializers()`to disable the possibility to initialize the implementation
+
+- Storage gap in all base contracts 
+
+- Public initialize function 
+
+  - Add `initializer`to the signature
+
+- Internal `_init` function
+
+  - Add `internal onlyInitializing` to the signature
+  - Call all the `init` functions of the contracts parents
+  - The function does not set any variable, it is role of the `unchained init` function
+
+- internal `__init_unchained` function
+
+  - No call to the parent `init` function of the contracts parents, it is role of the `_init` function
+  - Set the different variables
+
+  
 
 ## Reference
 
