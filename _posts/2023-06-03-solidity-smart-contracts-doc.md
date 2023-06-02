@@ -5,8 +5,8 @@ date:   2023-03-06
 last-update: 
 categories: blockchain
 tags: solidity blockchain ethereum smart-contract
-description: Liste des principales commandes de Docker
-image: /assets/article/docker/docker-horizontal-monochromatic-white.png
+description: This article presents some very interesting tools to perform an analyze of a smart contract written in Solidity and generate the documentation.
+image: 
 ```
 
 This article presents some very interesting tools to perform an analyze of a smart contract written in *Solidity* and generate the documentation.

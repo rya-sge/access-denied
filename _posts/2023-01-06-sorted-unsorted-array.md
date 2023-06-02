@@ -122,8 +122,8 @@ Reference:
 
 ## Remove an element
 
-1) Perform a binary search (upperbound) to find the position where the element has to be inserted
-2) This search can get the following results:
+1. Perform a binary search (upperbound) to find the position where the element has to be inserted
+2. This search can get the following results:
 
 - The element is not in the array => generate an error or do nothing
 - The element is in the array, you you need to move all elements after our target element one position to the left, starting by overwriting the target element. You can then remove the last element of the array with, e.g., with a pop operation.
