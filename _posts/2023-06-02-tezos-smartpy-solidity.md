@@ -22,8 +22,6 @@ This articles describes a correspondence table between the smart contract langua
 
 > Warning: the SmartPy syntax used in this article may be outdated since it was written for the Legacy version of [SmartPy](https://legacy.smartpy.io/) 
 
-[TOC]
-
 ## Overview
 
 #### Define a contract
@@ -116,7 +114,7 @@ def main():
 > - state
 >   - declared outside a function
 >   - stored on the blockchain
-> - **global** (provides information about the blockchain)
+> - global (provides information about the blockchain)
 
 Ref: [https://solidity-by-example.org/variables/](https://solidity-by-example.org/variables/)
 
@@ -218,11 +216,9 @@ assert x.b == "abc"
 assert x.c == True
 ```
 
-- Options
+- Options, Variants
 
-And many others available in the references.
-
-Reference:
+And many others available in the references:
 
 - [https://smartpy.io/manual/syntax/tuples-and-records](https://smartpy.io/manual/syntax/tuples-and-records)
 - [https://legacy.smartpy.io/docs/types/records#literals](https://legacy.smartpy.io/docs/types/records#literals)
@@ -283,7 +279,7 @@ constructor(string[] memory myParam)
 
 *SmartPy*
 
->The `__init__` function can be used to initialize the storage by assigning to fields of `self.data`. Entrypoints can modify the storage.
+>The `__init__` function can be used to initialize the storage by assigning to fields of `self.data`. 
 
 Example
 
@@ -297,7 +293,7 @@ Reference: [https://smartpy.io/manual/syntax/overview](https://smartpy.io/manual
 
 ### Access control
 
-Solidity
+*Solidity*
 
 ```solidity
 require(msg.sender == admin);
@@ -317,13 +313,13 @@ sp.verify(sp.sender == self.data.admin);
 
 **Current timestamp**
 
-- *Solidity*
+*Solidity*
 
 ```solidity
 block.timestamp
 ```
 
-- *SmartPy*
+*SmartPy*
 
 ```python
 sp.now 
