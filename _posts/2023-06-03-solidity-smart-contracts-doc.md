@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title:  Tools to create documentation for Solidity Smart Contracts
 date:   2023-06-03
@@ -7,7 +7,9 @@ categories: blockchain
 tags: solidity blockchain ethereum smart-contract
 description: This article presents some very interesting tools to perform an analyze of a smart contract written in Solidity and generate the documentation.
 image: 
-```
+---
+
+
 
 This article presents some very interesting tools to perform an analyze of a smart contract written in *Solidity* and generate the documentation.
 
