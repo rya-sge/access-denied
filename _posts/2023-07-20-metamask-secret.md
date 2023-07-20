@@ -23,7 +23,7 @@ Metamask has three different **secrets** that are used in different ways :
 They implement and use several standard and cryptography algorithms to generate these three secrets used inside the application (SRP/seed phrase, private key and password) and keep them safe.
 
 - To generate the recovery Phrase, Metamask implements the standard BIP_0039 from Bitcoin
-- To encrypt the SRP and private keys inside the application, Metamask used a password defined by the user. From this password, a key is derived with the algorithm PBKDF2, a derivation key algorithm. The behavior is similar to a password manager.
+- To encrypt the SRP and private keys inside the application, Metamask used a password defined by the user. From this password, a key is derived with the algorithm [PBKDF2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2), a derivation key algorithm. The behavior is similar to a password manager.
 - With this key, the data are encrypted using the algorithm [AES-GCM](https://www.cryptosys.net/pki/manpki/pki_aesgcmauthencryption.html#:~:text=AES%20with%20Galois%2FCounter%20Mode,38D%20%5BSP800-38D%5D.), a well known algorithm to perform authenticated encryption (confidentiality and authentication).
 
 Reference: [17. User Guide: Secret Recovery Phrase, password, and private keys](https://support.metamask.io/hc/en-us/articles/4404722782107)
