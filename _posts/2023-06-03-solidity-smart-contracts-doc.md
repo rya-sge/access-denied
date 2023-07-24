@@ -66,44 +66,47 @@ Surya is also available with the VS Code extension: [vscode-solidity-auditor](ht
 
 ### Graph
 
-> The `graph` command outputs a DOT-formatted graph of the control flow.
+"The `graph` command outputs a DOT-formatted graph of the control flow."
 
 ![](https://user-images.githubusercontent.com/4008213/39415345-fbac4e3a-4c39-11e8-8260-0d9670c352d6.png)
 
 ### ftrace 
 
-> The `ftrace` command outputs a *treefied* function call trace stemming from the defined "CONTRACT::FUNCTION" and traversing "all|internal|external" types of calls.
+"The `ftrace` command outputs a *treefied* function call trace stemming from the defined "CONTRACT::FUNCTION" and traversing "all|internal|external" types of calls."
 
 ![](https://user-images.githubusercontent.com/4008213/42409007-61473d12-81f1-11e8-8fee-1867cfd66822.png)
 
 ### flatten
 
-> The `flatten` command outputs a flattened version of the  source code, with all import statements replaced by the corresponding  source code. Import
+"The `flatten` command outputs a flattened version of the  source code, with all import statements replaced by the corresponding  source code. "
 
 
 
 ### describe
 
-> The `describe` command shows a summary of the contracts and methods in the files provided.
+"The `describe` command shows a summary of the contracts and methods in the files provided."
 
 ![](https://user-images.githubusercontent.com/4008213/48572168-97bfc780-e900-11e8-9e86-d265498de936.png)
 
 ### Inheritance
 
-> The `inheritance` command outputs a DOT-formatted graph of the inheritance tree. 
+"The `inheritance` command outputs a DOT-formatted graph of the inheritance tree. "
 
 ![](https://user-images.githubusercontent.com/23033765/39249140-f50d2828-486b-11e8-81b8-8c4ffb7b1b54.png)
 
 ### Dependencies
 
-> The `dependencies` command outputs the [c3-linearization](https://en.wikipedia.org/wiki/C3_linearization) of a given contract's inheritance graph.  
-> parse: The `parse` command outputs a *treefied* AST object coming from the parser.
+"The `dependencies` command outputs the [c3-linearization](https://en.wikipedia.org/wiki/C3_linearization) of a given contract's inheritance graph. " 
+
+### Parse
+
+"The `parse` command outputs a *treefied* AST object coming from the parser."
 
 ![](https://user-images.githubusercontent.com/4008213/39415303-87df40de-4c39-11e8-8e03-ead72e88f1e3.png)
 
 ### mdreport
 
-> The `mdreport` command creates a Markdown description report  with tables comprising information about the system's files, contracts  and their functions.
+"The `mdreport` command creates a Markdown description report  with tables comprising information about the system's files, contracts  and their functions."
 
 
 
