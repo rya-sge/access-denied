@@ -2,6 +2,7 @@
 layout: post
 title:  "Chiffrement hybride sur les courbes elliptiques avec ECIES"
 date:   2022-04-22
+locale: fr-FR
 last-update: 
 categories: cryptographie 
 tags: ecies courbe-elliptique chiffrement-hybride
@@ -52,7 +53,7 @@ Rappel : la difficulté repose sur le logarithme discret
 - Clé publique
 
    $$
-K = k * G
+   K = k * G
    $$
 
 Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne peut faire que des additions ou des multiplications par des constantes.
@@ -109,15 +110,15 @@ On a R||c||T  ainsi que la clé secrète `k`
    
    ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
    $$
-K = k * G
+   K = k * G
    $$
    
    $$
-R=r*G
+   R=r*G
    $$
    
    $$
-r * K = r * k * G = k * R
+   r * K = r * k * G = k * R
    $$
 
    
@@ -134,7 +135,7 @@ $$
 4. Si le tag est correct, on déchiffre avec `ke`
 
    $$
-m = Dec_{ke}
+   m = Dec_{ke}
    $$
 
 

@@ -2,6 +2,7 @@
 layout: post
 title:  Tools to create documentation for Solidity Smart Contracts
 date:   2023-06-03
+locale: en-GB
 last-update: 
 categories: blockchain
 tags: solidity blockchain ethereum smart-contract

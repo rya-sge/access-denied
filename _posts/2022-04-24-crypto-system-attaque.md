@@ -2,6 +2,7 @@
 layout: post
 title:  "Tester la résistance d'un crypto système à un niveau d'attaques"
 date:   2022-04-24
+locale: fr-FR
 last-update: 
 categories: cryptographie 
 tags: ind-cpa ind-caa asymetrique

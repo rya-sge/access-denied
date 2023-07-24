@@ -2,6 +2,7 @@
 layout: post
 title:  "Le mode opératoire GCM"
 date:   2022-04-22
+locale: fr-FR
 last-update: 
 categories: cryptographie 
 tags: cbc chiffrement-bloc

@@ -2,6 +2,7 @@
 layout: post
 title:  Configurer un reverse proxy avec HTTP Apache
 date:   2021-06-26 
+locale: fr-FR
 categories: reseau
 tags: apache proxy load-balancing reverse-proxy
 description: Cet article présente la configuration d'un reverse proxy avec HTTP Apache, avec notammment le load balancing et les sticky sessions.
