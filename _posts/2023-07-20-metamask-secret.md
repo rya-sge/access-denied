@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptographie
 tags: crypto wallet blockchain cryptography
 description: This article focuses on the different secrets available on Metamask, one of the most used crypto wallets.
-image: /assets/article/blockchain/wallet/metamask/MetaMask.svg
+image: /assets/article/blockchain/wallet/metamask/MetaMask.png
 ---
 
 # Introduction
