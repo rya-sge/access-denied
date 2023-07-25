@@ -2,6 +2,7 @@
 layout: post
 title:  "Deep dive into MetaMask Secrets"
 date:   2023-07-20
+lang: en
 locale: en-GB
 categories: blockchain cryptographie
 tags: crypto wallet blockchain cryptography
