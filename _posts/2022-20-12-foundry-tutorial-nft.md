@@ -9,7 +9,7 @@ categories: blockchain
 tags: solidity ethereum foundry
 description: This article is a summary of all commands of the tutorial "Creating an NFT with Solmate" offered by Foundry
 isMath: false
-image: 
+image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 ---
 
 This article is a summary of all commands of the tutorial "Creating an NFT with Solmate" offered by Foundry
