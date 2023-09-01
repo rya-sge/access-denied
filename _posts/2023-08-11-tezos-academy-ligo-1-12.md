@@ -4,6 +4,8 @@ title:  "Tezos Academy - Overview"
 date:   2023-08-11
 last-update: 
 categories: blockchain
+lang: en
+locale: en-GB
 tags: tezos ligo blockchain JavaScript
 image: /assets/article/blockchain/tezos/TezosLogo_Horizontal_Blue.png
 description: Learn LIGO for Tezos by following the chapters 1-12 of the Tezos Academy, a fun interactive tutorial 
