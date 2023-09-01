@@ -143,9 +143,66 @@ There are three main lessons
 - Chainlink: Decentralized Oracles
 - Advanced Solidity: Get In-depth Knowledge
 
+## Ethereum
 
+### [Patrick Collins](https://www.youtube.com/@PatrickAlphaC)
 
-## Blockchain
+**[Blockchain, Solidity, and Full Stack Web3](https://www.youtube.com/watch?v=gyMwXuJrbJQ)**
+
+**Cost:** free
+
+**Certification:** possible (NFT)
+
+**Description:** *Learn Blockchain, Solidity, and Full Stack Web3 Development with JavaScript – 32-Hour Course :* 
+
+**[Solidity, Blockchain Development, & Smart Contracts](https://www.youtube.com/watch?v=umepbfKp5rI)**
+
+**Cost:** free
+
+**Certification:** possible (NFT)
+
+**Description:**
+
+*This course will give you a full introduction into all of the core concepts related to blockchain, smart contracts, Solidity, ERC20s, full-stack Web3 dapps, decentralized finance (DeFi), Chainlink, Ethereum, upgradable smart contracts, DAOs, aave, IPFS, and more. Follow along with the videos and you'll be a blockchain wizard in no time!* 
+
+### Alchemy University
+
+**Ethereum Developer Bootcamp**
+
+**Cost:** free
+
+**Certification:**  possible (NFT), see [https://twitter.com/AlchemyLearn/status/1638211112654065666](https://twitter.com/AlchemyLearn/status/1638211112654065666)
+
+*The Ethereum Developer Bootcamp is a comprehensive course that teaches  you the fundamentals of web3 development from 0 to 100. The course  includes everything from cryptography to smart contracts to fully  functional dApp development. This is the #1 resource to jumpstart your  web3 career and a MUST if you want to learn Ethereum.* 
+
+[https://university.alchemy.com/#eth-bootcamp](https://university.alchemy.com/#eth-bootcamp)
+
+[**Road to web3**](https://docs.alchemy.com/docs/welcome-to-the-road-to-web3)
+
+**Cost:** free
+
+**Certification:**  unknown
+
+*In this self-paced, 10 project course, you’ll learn from industry  experts on the cutting-edge of web3, meet fellow developers, supercharge your skills through real-world applications, and mint  Proof-of-Knowledge NFTs.*
+
+### [Ethereum Developer Degree [LearnWeb3]](https://learnweb3.io/degrees/ethereum-developer-degree/)
+
+**Cost:** free
+
+**Certificate:** yes (NFT)
+
+**Description:**
+
+*If you're a developer who has no background knowledge of blockchain and  crypto - the Ethereum Developer Degree is the perfect step to go from no background knowledge to being able to build multiple applications and  understanding several key protocols, frameworks, and concepts in the  space.*
+
+This degree is made of 4 lessons
+
+- Freshman
+- Sophomore
+- Junior
+- Senior
+
+## Other Blockchains
 
 ### Bitcoin
 
@@ -208,65 +265,6 @@ To really understand what is special about Bitcoin, we need to  understand how i
 
 - [https://ida.interchain.io/]( https://ida.interchain.io/)
 - [https://ida.interchain.io/ida-course/LPs/week-0/](https://ida.interchain.io/ida-course/LPs/week-0/)
-
-## Ethereum
-
-### [Patrick Collins](https://www.youtube.com/@PatrickAlphaC)
-
-**[Blockchain, Solidity, and Full Stack Web3](https://www.youtube.com/watch?v=gyMwXuJrbJQ)**
-
-**Cost:** free
-
-**Certification:** possible (NFT)
-
-**Description:** *Learn Blockchain, Solidity, and Full Stack Web3 Development with JavaScript – 32-Hour Course :* 
-
-**[Solidity, Blockchain Development, & Smart Contracts](https://www.youtube.com/watch?v=umepbfKp5rI)**
-
-**Cost:** free
-
-**Certification:** possible (NFT)
-
-**Description:**
-
-*This course will give you a full introduction into all of the core concepts related to blockchain, smart contracts, Solidity, ERC20s, full-stack Web3 dapps, decentralized finance (DeFi), Chainlink, Ethereum, upgradable smart contracts, DAOs, aave, IPFS, and more. Follow along with the videos and you'll be a blockchain wizard in no time!* 
-
-### Alchemy University
-
-**Ethereum Developer Bootcamp**
-
-**Cost:** free
-
-**Certification:**  possible (NFT), see [https://twitter.com/AlchemyLearn/status/1638211112654065666](https://twitter.com/AlchemyLearn/status/1638211112654065666)
-
-*The Ethereum Developer Bootcamp is a comprehensive course that teaches  you the fundamentals of web3 development from 0 to 100. The course  includes everything from cryptography to smart contracts to fully  functional dApp development. This is the #1 resource to jumpstart your  web3 career and a MUST if you want to learn Ethereum.* 
-
-[https://university.alchemy.com/#eth-bootcamp](https://university.alchemy.com/#eth-bootcamp)
-
-[**Road to web3**](https://docs.alchemy.com/docs/welcome-to-the-road-to-web3)
-
-**Cost:** free
-
-**Certification:**  unknown
-
-*In this self-paced, 10 project course, you’ll learn from industry  experts on the cutting-edge of web3, meet fellow developers, supercharge your skills through real-world applications, and mint  Proof-of-Knowledge NFTs.*
-
-### [Ethereum Developer Degree [LearnWeb3]](https://learnweb3.io/degrees/ethereum-developer-degree/)
-
-**Cost:** free
-
-**Certificate:** yes (NFT)
-
-**Description:**
-
-*If you're a developer who has no background knowledge of blockchain and  crypto - the Ethereum Developer Degree is the perfect step to go from no background knowledge to being able to build multiple applications and  understanding several key protocols, frameworks, and concepts in the  space.*
-
-This degree is made of 4 lessons
-
-- Freshman
-- Sophomore
-- Junior
-- Senior
 
 ### Solana
 
