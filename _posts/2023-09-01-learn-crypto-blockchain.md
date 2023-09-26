@@ -39,11 +39,11 @@ This section lists the course to learn the general concepts related to Defi.
 
 **Description:**
 
-*In this four-part series, we dive into digital assets. We start with the basics of blockchain and work our way up to decentralized finance  (DeFi).*
+*In this four-part series, we dive into digital assets. We start with the basics of blockchain and work our way up to decentralized finance  (DeFi).* The course is divided in three parts:
 
-- Part 1: Blockchain Basics
-- Part 2: Digital Assets and Protocols
-- Part 3: The Crypto Capital Markets
+- *Part 1: Blockchain Basics*
+- *Part 2: Digital Assets and Protocols*
+- *Part 3: The Crypto Capital Markets*
 
 [**Tokenization Online Course** [dgishares]](https://digishares.io/tokenization-online-course)
 
@@ -112,6 +112,10 @@ This section lists the course to learn the general concepts related to Defi.
 
 - *They are prepared to discuss permissioned blockchain architectures of Hyperledger and Microsoft Azure's blockchain as a service model and analyze the Augur and Grid+ decentralized application platforms.*
 -  *Course material includes emerging alternative decentralization models such as IPFS and Hashgraph*
+
+[Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
+
+*BLOC-511DL: Digital Currency is the first free MOOC (Massive Open Online Course) on Cryptocurrencies and Blockchain technology globally, and the first  course of the MSc in Digital Currency degree programme.*
 
 ## Development
 
@@ -214,19 +218,19 @@ This degree is made of 4 lessons
 
 **Description**
 
-To really understand what is special about Bitcoin, we need to  understand how it works at a technical level. We’ll address the  important questions about Bitcoin, such as:
+*To really understand what is special about Bitcoin, we need to  understand how it works at a technical level. We’ll address the  important questions about Bitcoin, such as:*
 
-- Module 1: Introduction to crypto and cryptocurrencies
-- Module 2: How bitcoin achieves decentralization
-- Module 3: Mechanics of Bitcoin
-- Module 4: How to store and use Bitcoins
-- Module 5: Bitcoin mining
-- Module 6: Bitcoin and Anonymity
-- Module 7: Community, Politics, and Regulation
-- Module 8: Alternative Mining Puzzles
-- Module 9: Bitcoin as a Platform
-- Module 10: Alcoins and the Cryptocurrency Ecosystem
-- Module 11: The Future of Bitcoin
+- *Module 1: Introduction to crypto and cryptocurrencies*
+- *Module 2: How bitcoin achieves decentralization*
+- *Module 3: Mechanics of Bitcoin*
+- *Module 4: How to store and use Bitcoins*
+- *Module 5: Bitcoin mining*
+- *Module 6: Bitcoin and Anonymity*
+- *Module 7: Community, Politics, and Regulation*
+- *Module 8: Alternative Mining Puzzles*
+- *Module 9: Bitcoin as a Platform*
+- *Module 10: Alcoins and the Cryptocurrency Ecosystem*
+- *Module 11: The Future of Bitcoin*
 
 [**Understanding Bitcoin Course**](https://www.youtube.com/playlist?list=PLjGbUPQu3fSQUKCDXLsvDQbtU1SgVQRA7)
 
@@ -238,24 +242,17 @@ To really understand what is special about Bitcoin, we need to  understand how i
 
 **[What is the Interchain?](https://tutorials.cosmos.network/academy/1-what-is-cosmos/#)**
 
-> How does the Interchain network of interoperable blockchains fit into the overall development of blockchain technology?
->
-> Dive into the history of blockchain technology and discover the Interchain  Ecosystem – it is a galaxy of wallets, services, tokens, and dApps.  Then, get your first Cosmos Hub native token and find out how to stake  your ATOM.
-
 **Certification:** no
 
 **cost:** free
 
-[**Interchain Developer Academy**]( https://ida.interchain.io/)
+**Description:**
 
-> You will dive deep into the Interchain  Ecosystem, 
->
-> - Put theory into practice by learning how to initiate and build an application-specific  blockchain using the Cosmos SDK; 
-> - How to use Ignite CLI to scaffold  modules for your blockchain; 
-> - How to connect a chain with other  chains using the Inter-Blockchain Communication Protocol (IBC). 
-> - You will learn how to build frontend and backend applications using CosmJS;  
-> - Operate nodes and validate on an Interchain blockchain; 
-> - Run a  relaying infrastructure between IBC-connected chains
+*How does the Interchain network of interoperable blockchains fit into the overall development of blockchain technology?*
+
+*Dive into the history of blockchain technology and discover the Interchain  Ecosystem – it is a galaxy of wallets, services, tokens, and dApps.  Then, get your first Cosmos Hub native token and find out how to stake  your ATOM.*
+
+[**Interchain Developer Academy**]( https://ida.interchain.io/)
 
 **Certification:** possible if you follow a cohort
 
@@ -265,6 +262,17 @@ To really understand what is special about Bitcoin, we need to  understand how i
 
 - [https://ida.interchain.io/]( https://ida.interchain.io/)
 - [https://ida.interchain.io/ida-course/LPs/week-0/](https://ida.interchain.io/ida-course/LPs/week-0/)
+
+**Description:**
+
+*You will dive deep into the Interchain  Ecosystem,* 
+
+ - *Put theory into practice by learning how to initiate and build an application-specific  blockchain using the Cosmos SDK;* 
+- *How to use Ignite CLI to scaffold  modules for your blockchain;* 
+ - *How to connect a chain with other  chains using the Inter-Blockchain Communication Protocol (IBC).* 
+ - *You will learn how to build frontend and backend applications using CosmJS;*  
+ - *Operate nodes and validate on an Interchain blockchain;* 
+ - *Run a  relaying infrastructure between IBC-connected chains*
 
 ### Solana
 
@@ -278,21 +286,44 @@ To really understand what is special about Bitcoin, we need to  understand how i
 
 The course is divided into 6 modules
 
-Module 1: Client Interaction with the Solana Network
+*Module 1: Client Interaction with the Solana Network*
 
-Module 2: Client Interaction with Common Solana Programs
+*Module 2: Client Interaction with Common Solana Programs*
 
-Module 2: Basic Solana Program Development
+*Module 2: Basic Solana Program Development*
 
-Module 3: Intermediate Solana Program Development
+*Module 3: Intermediate Solana Program Development*
 
-Module 4: Anchor Program Development
+*Module 4: Anchor Program Development*
 
-Module 5: Beyond the Basics
+*Module 5: Beyond the Basics*
 
-Module 6: Solana Program Security
+*Module 6: Solana Program Security*
 
 
+
+
+
+[School of Solana](https://ackeeblockchain.com/school-of-solana)
+
+**Certification:** yes 
+
+**Cost:** free
+
+**Availability:** only by joining a cohort
+
+**Description:**
+
+*Introduction to Solana and Blockchain*
+
+*Introduction to Rust*
+
+*Solana programming model I & II*
+
+*Best development practices and debugging*
+
+*Front-end for Solana Programs*
+*Security*
 
 ### Tezos
 
@@ -330,7 +361,7 @@ You can learn Ligo with Javascript, Pascal or Camel.
 
 **Description**
 
-An introduction to Tezos and how it is different from other blockchains like Ethereum 
+*An introduction to Tezos and how it is different from other blockchains like Ethereum* 
 
 
 
@@ -362,32 +393,30 @@ Organisator: Members of UC Berkeley, Stanford
 
 **Cost:** free
 
+ 1. *Introduction covering a computer science and  finance background required for the remainder of the course.*
 
+   - *The basics of decentralized systems, permissionless blockchains, consensus, smart contracts and contrast DeFi to traditional finance.*
 
-> 1. Introduction covering a computer science and  finance background required for the remainder of the course.
->
->    - The basics of decentralized systems, permissionless blockchains, consensus, smart contracts and contrast DeFi to traditional finance.
->
-> 2. Cover the computer science and economic aspects of DeFi  assets, and how they link to CeFi through stablecoins. 
->
->    - DeFi asset exchanges and contrast the traditional limit  order book models to automated market makers.
->    - various debt models, such as under- and over-collateralized debt, as  well as synthetic assets in DeFi. 
->    - Insurances, portfolio management and  prediction markets form equally crucial elements to a decentralised  economy as we will elaborate on. 
->    - Different attempts at measuring and tracking systemic risk and its  computability.
->
-> 3. Deep-dive into oracles. 
->
->    - decentralized reputation, identities and proof of properties.
->
->    - cover various privacy technologies including  zero-knowledge proofs and their applications in DeFi.
->
->    - Various attempts at how to enforce data ownership, data  monetization and valuation as well as controlled use and misuse of data.
->
-> 4. Security
->
-> - Past security attacks, introspect a few of them in closer detail and provide recommendations on how to strengthen DeFi  security. 
-> - The systemic risks stemming from Miner  Extractable Value (MEV) and how MEV can be minimized by design. 
-> -  Decentralized governance provides power to a pseudonymous collective,  and we will explore how governance works, and how it may be attacked.
+ 2. *Cover the computer science and economic aspects of DeFi  assets, and how they link to CeFi through stablecoins.* 
+
+    - *DeFi asset exchanges and contrast the traditional limit  order book models to automated market makers.*
+   - *various debt models, such as under- and over-collateralized debt, as  well as synthetic assets in DeFi.* 
+        - *Insurances, portfolio management and  prediction markets form equally crucial elements to a decentralised  economy as we will elaborate on.* 
+        - *Different attempts at measuring and tracking systemic risk and its  computability.*
+
+ 3. *Deep-dive into oracles.* 
+
+   - *decentralized reputation, identities and proof of properties.*
+
+        - *cover various privacy technologies including  zero-knowledge proofs and their applications in DeFi.*
+
+        - *Various attempts at how to enforce data ownership, data  monetization and valuation as well as controlled use and misuse of data.*
+
+ 4. *Security*
+
+ - *Past security attacks, introspect a few of them in closer detail and provide recommendations on how to strengthen DeFi  security.* 
+ - *The systemic risks stemming from Miner  Extractable Value (MEV) and how MEV can be minimized by design.* 
+ -  *Decentralized governance provides power to a pseudonymous collective,  and we will explore how governance works, and how it may be attacked.*
 
 
 
@@ -401,15 +430,15 @@ Organisator: Members of UC Berkeley, Stanford
 
 **Description:**
 
-*Cryptography is an indispensable tool for protecting information in  computer systems. In this course you will learn the inner workings of  cryptographic systems and how to correctly use them in real-world  applications. The course begins with a detailed* 
+*In this course you will learn the inner workings of  cryptographic systems and how to correctly use them in real-world  applications. The course begins with a detailed* 
 
-- Course overview and stream ciphers
-- Block ciphers
-- Message Integrity
-- Authenticated Encryption
-- Basic Key Exchange
-- Public-Key Encryption
-- Final Exam
+- *Course overview and stream ciphers*
+- *Block ciphers*
+- *Message Integrity*
+- *Authenticated Encryption*
+- *Basic Key Exchange*
+- *Public-Key Encryption*
+- *Final Exam*
 
 **[ZK-learning [UC Berkeley]](https://zk-learning.org/)**
 
@@ -421,16 +450,16 @@ Organisator: Members of UC Berkeley, Stanford
 
 Organisator: Members of UC Berkeley, Stanford
 
-> This class aims to bring together students and experts in academia and  industry to explore Zero-Knowledge Proofs (ZKP). 
->
-> - An introduction on the history of ZKP. 
-> - We will cover the design of several current efficient ZKP systems. 
-> - Provide tutorials on the front-end compilers to write ZKP  statements. Students can write the computations using such higher-level  programming languages, and compile them to low-level representations and run the ZKP protocols using these tools.
-> - We will cover applications of ZKP
->   - including (1)  privacy-preserving cryptocurrencies and computations such as Zcash and  Zexe; 
->   - (2) zkRollup and zkEVM that improve the scalability of blockchain; 
->   - (3) zkBridge to build a secure foundation for multi-chain  interoperability; 
->   - (4) other applications in machine learning, program  analysis, and network traffic analysis
+The goal of this course is to explore Zero-Knowledge Proofs (ZKP). 
+
+ - *An introduction on the history of ZKP.* 
+- *Cover the design of several current efficient ZKP systems.* 
+ - *Provide tutorials on the front-end compilers to write ZKP  statements. Students can write the computations using such higher-level  programming languages, and compile them to low-level representations and run the ZKP protocols using these tools.*
+ - *We will cover applications of ZKP*
+   - *including (1)  privacy-preserving cryptocurrencies and computations such as Zcash and  Zexe;* 
+   - *(2) zkRollup and zkEVM that improve the scalability of blockchain;* 
+   - *(3) zkBridge to build a secure foundation for multi-chain  interoperability;* 
+   - *(4) other applications in machine learning, program  analysis, and network traffic analysis*
 
 ## Security
 
