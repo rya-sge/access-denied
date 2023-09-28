@@ -90,7 +90,15 @@ The transaction doesn't actually contain the blob data itself. It only contains 
 
 #### Blob construction
 
-The actual blob data itself, under the hood, is constructed using some special mathematical schemes which allow for some fancy optimizations on the network allowing us to heavily speed up computations
+The actual blob data itself, under the hood, is constructed using some special mathematical schemes, called *KZG commitment* which allow optimizations on the network allowing us to heavily speed up computations.
+
+The additional calldata will be committed to using a KZG commitment.
+
+- KZG Commitment is a polynomial commitment scheme adopted by EIP-4844 proto-danksharding
+
+- KZG Ceremony is the process of trust setup for KZG Commitment
+
+Reference: [foresightventures.medium.com/eip-4844-the-first-step-towards-ethereum-full-sharding-9541107af757](https://foresightventures.medium.com/eip-4844-the-first-step-towards-ethereum-full-sharding-9541107af757),[notes.ethereum.org/@dankrad/kzg_commitments_in_proofs](https://notes.ethereum.org/@dankrad/kzg_commitments_in_proofs)
 
 #### Blob data max size
 
@@ -107,9 +115,9 @@ The separation of the pricing mechanics between EIP-1559 transactions and blob t
 
 ## References
 
-1. https://learnweb3.io/lessons/proto-danksharding-scaling-ethereum-using-blobs/
+1. [https://learnweb3.io/lessons/proto-danksharding-scaling-ethereum-using-blobs/](https://learnweb3.io/lessons/proto-danksharding-scaling-ethereum-using-blobs/)
 2. [https://domothy.com/blobspace/](https://domothy.com/blobspace/)
-3. https://notes.ethereum.org/@dankrad/new_sharding
-4. https://twitter.com/protolambda/status/1495538286332624898
-5. https://eips.ethereum.org/EIPS/eip-4844
-6. https://ethereum.org/en/roadmap/danksharding/
+3. [https://notes.ethereum.org/@dankrad/new_sharding](https://notes.ethereum.org/@dankrad/new_sharding)
+4. [https://twitter.com/protolambda/status/1495538286332624898](https://twitter.com/protolambda/status/1495538286332624898)
+5. [https://eips.ethereum.org/EIPS/eip-4844](https://eips.ethereum.org/EIPS/eip-4844)
+6. [https://ethereum.org/en/roadmap/danksharding/](https://ethereum.org/en/roadmap/danksharding/)
