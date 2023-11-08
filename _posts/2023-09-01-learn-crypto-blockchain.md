@@ -19,7 +19,7 @@ This section lists the course to learn the general concepts related to Defi.
 
 ### Beginner
 
-[**Blockchain for everyone [Binance]**](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
+#### [Blockchain for everyone [Binance]](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
 
 **Certification:** yes (NFT)
 
@@ -31,7 +31,7 @@ This section lists the course to learn the general concepts related to Defi.
 
 *6 modules: Blockchain Fundamentals, Crypto Fundamentals, Decentralization, Web3 & Metaverse, Trading Fundamentals, Trading and Investing Strategies*
 
-[**Digital Assets 101 [Fireblocks**]]([https://www.fireblocks.com/academy/](https://www.fireblocks.com/academy/))
+#### [Digital Assets 101 [Fireblocks]](https://www.fireblocks.com/academy/)
 
 **Certification:**  no
 
@@ -45,7 +45,7 @@ This section lists the course to learn the general concepts related to Defi.
 - *Part 2: Digital Assets and Protocols*
 - *Part 3: The Crypto Capital Markets*
 
-[**Tokenization Online Course** [dgishares]](https://digishares.io/tokenization-online-course)
+#### [Tokenization Online Course [dgishares]](https://digishares.io/tokenization-online-course)
 
 **Certification:** yes with Udemy
 
@@ -61,7 +61,7 @@ This section lists the course to learn the general concepts related to Defi.
 
 *Learn tokenization and the business skills to use blockchain technology for real-world assets*
 
-[**Fit for DeFi**[DefiGuide.ch]](https://defiguide.ch/free-defi-course/) 
+#### [Fit for DeFi[DefiGuide.ch]](https://defiguide.ch/free-defi-course/) 
 
 **Certification:** yes, online exam
 
@@ -171,7 +171,7 @@ There are three main lessons
 
 ### Alchemy University
 
-**Ethereum Developer Bootcamp**
+[**Ethereum Developer Bootcamp**](https://university.alchemy.com/#eth-bootcamp)
 
 **Cost:** free
 
@@ -238,6 +238,12 @@ This degree is made of 4 lessons
 
 **Certificate:** no
 
+**[Académie Découvre Bitcoin](https://academie.decouvrebitcoin.fr)**
+
+A website with several ressources and lessons about Bitcoin.
+
+Lessons are in French.s
+
 ### Cosmos
 
 **[What is the Interchain?](https://tutorials.cosmos.network/academy/1-what-is-cosmos/#)**
@@ -299,10 +305,6 @@ The course is divided into 6 modules
 *Module 5: Beyond the Basics*
 
 *Module 6: Solana Program Security*
-
-
-
-
 
 [School of Solana](https://ackeeblockchain.com/school-of-solana)
 
@@ -465,6 +467,29 @@ The goal of this course is to explore Zero-Knowledge Proofs (ZKP).
 
 List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
 
+**[Advanced Web3 Security Course | Part 1[Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)**
+
+**Cost:** free
+
+**Certificate:** no
+
+- Principles Of Smart Contract Design - [16:51](https://www.youtube.com/watch?v=DRZogmD647U&t=1011s) 
+- External Call Safety - [1:03:28](https://www.youtube.com/watch?v=DRZogmD647U&t=3808s) 
+- Complete Reentrancy Guide - [1:36:15](https://www.youtube.com/watch?v=DRZogmD647U&t=5775s) 
+- Principles Of Smart Contract Testing - [2:03:33](https://www.youtube.com/watch?v=DRZogmD647U&t=7413s) 
+- Advanced DeFi, Perpetuals Intro - [3:07:48](https://www.youtube.com/watch?v=DRZogmD647U&t=11268s) 
+- Frontrunning Attacks - [4:45:34](https://www.youtube.com/watch?v=DRZogmD647U&t=17134s) 
+- Sandwich Attacks - [5:09:21](https://www.youtube.com/watch?v=DRZogmD647U&t=18561s) 
+- How To Write A Stellar Finding Report - [5:29:26](https://www.youtube.com/watch?v=DRZogmD647U&t=19766s) 
+- Live Audit Session #1 - [5:47:36](https://www.youtube.com/watch?v=DRZogmD647U&t=20856s) 
+- Code Walk Overview - [6:50:32](https://www.youtube.com/watch?v=DRZogmD647U&t=24632s) 
+- Code Walks - [6:57:11](https://www.youtube.com/watch?v=DRZogmD647U&t=25031s) 
+- Advanced DeFi, Perpetuals Part 2 - [8:10:23](https://www.youtube.com/watch?v=DRZogmD647U&t=29423s) 
+- EVM Intro - [8:57:21](https://www.youtube.com/watch?v=DRZogmD647U&t=32241s) 
+- Memory Guide - [9:31:13](https://www.youtube.com/watch?v=DRZogmD647U&t=34273s) 
+- Yul Masterclass - [10:00:47](https://www.youtube.com/watch?v=DRZogmD647U&t=36047s) 
+- Calldata Masterclass - [10:40:41](https://www.youtube.com/watch?v=DRZogmD647U&t=38441s)
+
 **[Blockchain Security [InfoSec]](https://www.coursera.org/learn/blockchain-security#modules)**
 
 **Cost:** free
@@ -530,3 +555,5 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 ## Ressources
 
 [https://docs.ethernautdao.io/resources/resources](https://docs.ethernautdao.io/resources/resources)
+
+[https://www.web3.university/](https://www.web3.university/)

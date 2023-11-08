@@ -3,7 +3,7 @@ layout: post
 title:  "Solidity Gas Optimization Cheatsheet"
 date:   2023-09-26
 last-update: 
-categories: blockchain
+categories: blockchain ethereum
 lang: en
 locale: en-GB
 tags: blockchain crypto ethereum gas
@@ -62,13 +62,33 @@ Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full
 
 ### C. Use calldata instead of memory
 
-Use calldata instead of array to pass as argument an array
+Use calldata instead of memory to pass as argument, e.g. an array
+
+```solidity
+function mintBatch(address[] calldata accounts,uint256[] calldata values) 
+```
+
+Inside a constructor, unfortunatly it is not possible to use `calldata`, see [ethereum.stackexchange.com](https://ethereum.stackexchange.com/questions/125100/the-reason-why-cant-i-use-calldata-as-a-data-location-for-constructor-parameter) it is the reason why you will see the use of `memory as for this example from OpenZeppelin [ERC20.sol#L50C1-L54C1](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L50C1-L54C1)
+
+```solidity
+constructor(string memory name_, string memory symbol_) 
+{        _name = name_;        
+		_symbol = symbol_;    
+}
+```
+
+
+
 Why ?
 As indicated in the solidity doc *Calldata is a non-modifiable, non-persistent area where function arguments are stored, and behaves mostly like memory.*
 
+From the [Solidity doc](https://docs.soliditylang.org/en/v0.8.21/types.html#data-location)
+
+*If you can, try to use `calldata` as data location because it will avoid copies and also makes sure that the data cannot be modified*
+
 Reference: [4. Coinmonks/solidity-storage-vs-memory-vs-calldata](https://medium.com/coinmonks/solidity-storage-vs-memory-vs-calldata-8c7e8c38bce), [5. docs.soliditylang.org#data-location](https://docs.soliditylang.org/en/v0.8.21/types.html#data-location)
 
-
+Some additional lectures: [github.com/ethereum/solidity/issues/5545](https://github.com/ethereum/solidity/issues/5545)
 
 ### D.  Use uncheck for arithmetic operation
 
@@ -94,7 +114,7 @@ References
 - [https://github.com/ethereum/solidity/issues/10698](https://github.com/ethereum/solidity/issues/10698)
 - [https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic)
 - [https://hackmd.io/@totomanov/gas-optimization-loops](https://hackmd.io/@totomanov/gas-optimization-loops)
-- https://www.rareskills.io/post/gas-optimization#viewer-5f1pj
+- [https://www.rareskills.io/post/gas-optimization#viewer-5f1pj](https://www.rareskills.io/post/gas-optimization#viewer-5f1pj)
 
 
 
@@ -221,7 +241,7 @@ References:
 
 - [https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler](https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler)
 - [https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html](https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html)
-- https://www.rareskills.io/post/gas-optimization#viewer-d3ced
+- [https://www.rareskills.io/post/gas-optimization#viewer-d3ced](https://www.rareskills.io/post/gas-optimization#viewer-d3ced)
 
 ## Others tips
 
