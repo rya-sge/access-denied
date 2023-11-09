@@ -86,15 +86,16 @@ contract Challenge {
 
 ## Solution
 
-1) Compile the contracts with Remix: [https://remix.ethereum.org](https://remix.ethereum.org) 
-2) Connect with a custom external provider
+1.Compile the contracts with Remix: [https://remix.ethereum.org](https://remix.ethereum.org) 
+
+2.Connect with a custom external provider
 
 ![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-HttpProvider.png)
 
-3. Call withdrawAll with the parameters
+3.Call withdrawAll with the parameters
 
 ![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-withdraw.png)
 
-4. Check if the challenge **isSolved**
+4.Check if the challenge **isSolved**
 
-![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-solved.png)
+![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-solved.png)q
