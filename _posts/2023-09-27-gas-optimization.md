@@ -151,7 +151,7 @@ for (uint256 i; i < limit; ) {
 
 Reference: [https://www.rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
 
-### G) Most use condition in AND and OR
+### G. Most use condition in AND and OR
 
 Inside a condition, you should :
 
@@ -161,7 +161,7 @@ For OR operation, same scenario, but in the first place it is the condition with
 
 Reference: [https://www.rareskills.io/post/gas-optimization#viewer-8ieel](https://www.rareskills.io/post/gas-optimization#viewer-8ieel)
 
-### H) Use custom errors instead of require
+### H. Use custom errors instead of require
 
 For custom errors, solidity stores only the first 4 bytes of the hash of the error signature and returns only that.  Therefore during reverting, only 4 bytes needs to be stored in memory.
 
@@ -171,7 +171,7 @@ Reference: [https://blog.openzeppelin.com/defining-industry-standards-for-custom
 
 
 
-### I) Pack your variable inside a struct
+### I. Pack your variable inside a struct
 
 The size slot used by the EVM is 32 bytes. You can pack your variable in a slot of 32 bytes to save gas on storage
 
@@ -207,7 +207,7 @@ struct myStruct {
 
 Reference: [https://www.rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
 
-### J) Use the optimizer to compile your contract
+### J. Use the optimizer to compile your contract
 
 The Solidity optimizer tries to simplify complicated expressions, which reduces both code size and execution cost, 
 

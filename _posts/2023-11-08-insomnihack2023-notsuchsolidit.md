@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title:  "Insomni Hack 2023 - NotSuchSolidIT challenge"
 date:   2023-11-08
@@ -8,7 +8,7 @@ categories: blockchain ethereum
 tags: solidity blockchain ethereum ctf
 description: This article describes the challenge NotSuchSolidIT of Insomni'hack 2023
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
-```
+---
 
 This article presents the challenge [NotSuchSolidIT](https://ctftime.org/task/24679) from [Insomni'hack ](https://www.insomnihack.ch/insomnihack-2023/)
 
@@ -86,14 +86,14 @@ contract Challenge {
 
 ## Solution
 
-1) Compile the contracts with Remix: https://remix.ethereum.org
+1) Compile the contracts with Remix: [https://remix.ethereum.org](https://remix.ethereum.org) 
 2) Connect with a custom external provider
 
 ![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-HttpProvider.png)
 
 3. Call withdrawAll with the parameters
 
-   ![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-withdraw.png)
+![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-withdraw.png)
 
 4. Check if the challenge **isSolved**
 
