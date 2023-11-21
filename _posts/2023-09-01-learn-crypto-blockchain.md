@@ -61,7 +61,7 @@ This section lists the course to learn the general concepts related to Defi.
 
 *Learn tokenization and the business skills to use blockchain technology for real-world assets*
 
-#### [Fit for DeFi[DefiGuide.ch]](https://defiguide.ch/free-defi-course/) 
+#### [Fit for DeFi[DefiGuide.ch]](https://defiguide.org/free-defi-course/) 
 
 **Certification:** yes, online exam
 
@@ -113,9 +113,25 @@ This section lists the course to learn the general concepts related to Defi.
 - *They are prepared to discuss permissioned blockchain architectures of Hyperledger and Microsoft Azure's blockchain as a service model and analyze the Augur and Grid+ decentralized application platforms.*
 -  *Course material includes emerging alternative decentralization models such as IPFS and Hashgraph*
 
-[Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
+#### [Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
+
+**Certification:** yes if you are part of a cohort
+
+**Cost:** free
 
 *BLOC-511DL: Digital Currency is the first free MOOC (Massive Open Online Course) on Cryptocurrencies and Blockchain technology globally, and the first  course of the MSc in Digital Currency degree programme.*
+
+
+
+#### [Blockchain and Decentralized Technologies[distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUDQI8VeWaZLRJFSsqqlHRP5)
+
+**Certification:** yes if you are part of a cohort
+
+**Cost:** free
+
+**Course link**: [https://distributed.education/blockchain-course](https://distributed.education/blockchain-course)
+
+*The course "Blockchain and Decentralized  Technologies" is aimed at training a wide range of students. You will  learn about blockchain technology, how bitcoin and other  cryptocurrencies work (technical aspects), decentralized systems,  information security threats, the Ethereum platform, smart contracts,  how decentralized finance (DeFi) works, and what trends the industry  offers*
 
 ## Development
 
@@ -387,7 +403,27 @@ Remark: the course is not up-to-date
 
 ## Defi
 
-**[Decentralized Finance [UC Berkeley]](https://defi-learning.org/f22)**
+
+
+#### [Decentralized Finance [Distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUAuh4F9NVZWL8zvS6dbS2r1)
+
+**Certification:** yes if you are part of a cohort
+
+**Cost:** free
+
+**Course link**: [https://distributed.education/defi-course](https://distributed.education/defi-course)
+
+*DeFi accounts for more than 50 billion USD total value locked. It is the main industry which is built and operating on blockchain technology.  This DeFi course will let you learn the cutting-edge technologies and  approaches in the world of decentralized finance.*
+
+- *Dive into topics  covering Stablecoins (USDT, USDC, DAI, FRAX),*
+- *Decentralized Exchanges  (Uniswap v2, Uniswap v3, Curve)*
+- *Decentralized Lending Protocols (AAVE,  Compound)*
+- *Financial Derivatives (GMX, Synthetix)*
+- *Zero Knowledge Proof  Technology and its use cases*
+- *Decentralized Identity (Circom, Iden3,  Polygon ID),*
+- *Liquid Staking (Lido, Rocket Pool).* 
+
+#### [Decentralized Finance [UC Berkeley]](https://defi-learning.org/f22)
 
 Organisator: Members of UC Berkeley, Stanford
 
@@ -395,24 +431,16 @@ Organisator: Members of UC Berkeley, Stanford
 
 **Cost:** free
 
- 1. *Introduction covering a computer science and  finance background required for the remainder of the course.*
+ 1. *Introduction covering a computer science and  finance background required for the remainder of the course.**The basics of decentralized systems, permissionless blockchains, consensus, smart contracts and contrast DeFi to traditional finance.*
 
-   - *The basics of decentralized systems, permissionless blockchains, consensus, smart contracts and contrast DeFi to traditional finance.*
-
- 2. *Cover the computer science and economic aspects of DeFi  assets, and how they link to CeFi through stablecoins.* 
-
-    - *DeFi asset exchanges and contrast the traditional limit  order book models to automated market makers.*
-   - *various debt models, such as under- and over-collateralized debt, as  well as synthetic assets in DeFi.* 
-        - *Insurances, portfolio management and  prediction markets form equally crucial elements to a decentralised  economy as we will elaborate on.* 
-        - *Different attempts at measuring and tracking systemic risk and its  computability.*
-
+  2. *Cover the computer science and economic aspects of DeFi  assets, and how they link to CeFi through stablecoins.* *DeFi asset exchanges and contrast the traditional limit  order book models to automated market makers.*various debt models, such as under- and over-collateralized debt, as  well as synthetic assets in DeFi.* 
  3. *Deep-dive into oracles.* 
 
-   - *decentralized reputation, identities and proof of properties.*
+4. *decentralized reputation, identities and proof of properties.*
 
-        - *cover various privacy technologies including  zero-knowledge proofs and their applications in DeFi.*
+- *cover various privacy technologies including  zero-knowledge proofs and their applications in DeFi.*
 
-        - *Various attempts at how to enforce data ownership, data  monetization and valuation as well as controlled use and misuse of data.*
+- *Various attempts at how to enforce data ownership, data  monetization and valuation as well as controlled use and misuse of data.*
 
  4. *Security*
 
@@ -467,7 +495,7 @@ The goal of this course is to explore Zero-Knowledge Proofs (ZKP).
 
 List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
 
-**[Advanced Web3 Security Course | Part 1[Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)**
+#### [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
 
 **Cost:** free
 
@@ -490,7 +518,7 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 - Yul Masterclass - [10:00:47](https://www.youtube.com/watch?v=DRZogmD647U&t=36047s) 
 - Calldata Masterclass - [10:40:41](https://www.youtube.com/watch?v=DRZogmD647U&t=38441s)
 
-**[Blockchain Security [InfoSec]](https://www.coursera.org/learn/blockchain-security#modules)**
+#### [Blockchain Security [InfoSec]](https://www.coursera.org/learn/blockchain-security#modules)
 
 **Cost:** free
 
@@ -498,7 +526,7 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 
 *This course introduces blockchain security, including a description of how the blockchain works at each level of the blockchain ecosystem. The instructor begins with the building blocks that create the structure of blockchain, the cryptography that it uses for security, and the role of hash* 
 
-**[Ethernaut [OpenZeppelin]](https://ethernaut.openzeppelin.com)**
+#### [Ethernaut [OpenZeppelin]](https://ethernaut.openzeppelin.com)
 
 **Cost:** free
 
@@ -508,7 +536,7 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 
 *The Ethernaut is a Web3/Solidity based wargame inspired by [overthewire.org](https://overthewire.org/), played in the Ethereum Virtual Machine. Each level is a smart contract that needs to be 'hacked'. The game is 100% open source and all levels are contributions made by other players.* 
 
-**[Damn Vulnerable DeFi](https://www.damnvulnerabledefi.xyz/)**
+#### [Damn Vulnerable DeFi](https://www.damnvulnerabledefi.xyz/)
 
 **Cost:** free
 

@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain 
 tags: blockchain arweave storage
 description: Arweave is a network acting as a decentralized storage layer to upload files permanently with a single payment.  
-image: /assets/article/blockchain/arweave-logo.png
+image: /assets/article/blockchain/defi/Mark_Maker.pdf
 ---
 
 ## Introduction
@@ -29,7 +29,7 @@ The [permaweb](https://arwiki.wiki/#/en/the-permaweb), Arweave’s network of de
 
 ## Consensus
 
-Arweave introduces a new consensus mechanism called Proof-of-Access  (PoA). Unlike traditional Proof-of-Work (PoW) or Proof-of-Stake (PoS)  mechanisms, PoA doesn't rely on computational power or stakeholding.  
+Arweave introduces a new consensus mechanism called **Proof-of-Access**  (PoA). Unlike traditional Proof-of-Work (PoW) or Proof-of-Stake (PoS)  mechanisms, PoA doesn't rely on computational power or stakeholding.  
 
 Instead, it rewards miners based on the amount of data they store and  the length of time they retain it. 
 
@@ -43,7 +43,7 @@ Warning: The fact that your files will on Arweave permenently means it is possib
 
 ## Cost
 
-Miners store files uploaded to Arweave in return for $AR, the cryptocurrency securing the Arweave network. Thus, it costs a small amount of $AR to upload and store files and this cost changes based on the current demand. 
+Miners store files uploaded to Arweave in return for **$AR**, the cryptocurrency securing the Arweave network. Thus, it costs a small amount of $AR to upload and store files and this cost changes based on the current demand. 
 
 To offer permanent storage, Arweave uses a concept called [**storage endowment**](https://arwiki.wiki/#/en/storage-endowment). It is an estimation of how the price of storage will decrease in the future to distribute appropriate quantities of tokens to miners over time, in order to guarantee the perpetual storage of arbitrary quantities of data.
 
@@ -80,7 +80,7 @@ References:
 
 - A second point is the risk to upload files which can not be deleted (privacy !!!). Once it is uploaded, you have no longer control on the files.
 
-- Lastly, Arweave could be use to upload illegal content which poses a reputational risk.
+- Lastly, Arweave could be use to upload illegal contents which poses a reputational risk.
 
 
 
