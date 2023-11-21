@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain 
 tags: blockchain arweave storage
 description: Arweave is a network acting as a decentralized storage layer to upload files permanently with a single payment.  
-image: /assets/article/blockchain/defi/Mark_Maker.pdf
+image: /assets/article/blockchain/arweave-logo.png
 ---
 
 ## Introduction
