@@ -5,7 +5,7 @@ date:   2023-06-03
 lang: en
 locale: en-GB
 last-update: 
-categories: blockchain
+categories: blockchain ethereum
 tags: solidity blockchain ethereum smart-contract
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 description: This article presents some very interesting tools to perform an analyze of a smart contract written in Solidity and generate the documentation.

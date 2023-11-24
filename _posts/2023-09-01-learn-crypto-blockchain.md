@@ -495,6 +495,8 @@ The goal of this course is to explore Zero-Knowledge Proofs (ZKP).
 
 List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
 
+### Course
+
 #### [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
 
 **Cost:** free
@@ -525,6 +527,8 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 **Certificate:** yes
 
 *This course introduces blockchain security, including a description of how the blockchain works at each level of the blockchain ecosystem. The instructor begins with the building blocks that create the structure of blockchain, the cryptography that it uses for security, and the role of hash* 
+
+### Challenge
 
 #### [Ethernaut [OpenZeppelin]](https://ethernaut.openzeppelin.com)
 

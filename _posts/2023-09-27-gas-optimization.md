@@ -25,7 +25,7 @@ The transaction gas cost is fixed and can be pre computed. And if it can be prec
 
 - gas price : actual price to pay to a validator (since Proof of Stake) to execute the smart contract and validate the transaction. The gas price is not fixed, it depends of the supply and demand.
 
-Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), https://ethereum.org/en/developers/docs/gas/, [ethereum.stackexchange.com - Why do we still pay gas in proof-of-stake?](https://ethereum.stackexchange.com/questions/141701/why-do-we-still-pay-gas-in-proof-of-stake)
+Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), [ethereum.org/en/developers/docs/gas/](https://ethereum.org/en/developers/docs/gas/), [ethereum.stackexchange.com - Why do we still pay gas in proof-of-stake?](https://ethereum.stackexchange.com/questions/141701/why-do-we-still-pay-gas-in-proof-of-stake)
 
 
 
@@ -38,7 +38,7 @@ This allows you to avoid consuming gas when these functions are called from outs
 
 Warning: inside the contract, a call to these functions from another function will continue to consume gas
 
-Reference: https://ethereum.stackexchange.com/questions/13851/could-we-call-a-constant-function-without-spending-any-gas-inside-a-transaction
+Reference: [How can I call a constant function without spending any gas inside a transaction function?](https://ethereum.stackexchange.com/questions/13851/how-can-i-call-a-constant-function-without-spending-any-gas-inside-a-transaction)
 
 
 
@@ -58,7 +58,7 @@ The solution is to create a local variable to avoid fetch information on the blo
 
 See point G for an example
 
-Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), https://www.rareskills.io/post/gas-optimization#viewer-8lubg
+Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), [rareskills.io/post/gas-optimization#viewer-8lubg](https://www.rareskills.io/post/gas-optimization#viewer-8lubg)
 
 ### C. Use calldata instead of memory
 
@@ -111,10 +111,10 @@ See point G for an example with a loop
 
 References
 
-- [https://github.com/ethereum/solidity/issues/10698](https://github.com/ethereum/solidity/issues/10698)
-- [https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic)
-- [https://hackmd.io/@totomanov/gas-optimization-loops](https://hackmd.io/@totomanov/gas-optimization-loops)
-- [https://www.rareskills.io/post/gas-optimization#viewer-5f1pj](https://www.rareskills.io/post/gas-optimization#viewer-5f1pj)
+- [github.com/ethereum/solidity/issues/10698](https://github.com/ethereum/solidity/issues/10698)
+- [docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic)
+- [hackmd.io/@totomanov/gas-optimization-loops](https://hackmd.io/@totomanov/gas-optimization-loops)
+- [www.rareskills.io/post/gas-optimization#viewer-5f1pj](https://www.rareskills.io/post/gas-optimization#viewer-5f1pj)
 
 
 
@@ -131,7 +131,7 @@ According to cygarr on X
 
  *the left contract (i++) contains two extra instructions compared to the right contract (++i). These two instructions are DUP (3 gas) and POP (2 gas), which explains the 5 gas difference from earlier.*
 
-Reference: [https://twitter.com/0xCygaar/status/1607860326271438848](https://twitter.com/0xCygaar/status/1607860326271438848)
+Reference: [twitter.com/0xCygaar/status/1607860326271438848](https://twitter.com/0xCygaar/status/1607860326271438848)
 
 ### F. Gas-optimal for loop template
 
@@ -149,7 +149,7 @@ for (uint256 i; i < limit; ) {
 }
 ```
 
-Reference: [https://www.rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
+Reference: [www.rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
 
 ### G. Most use condition in AND and OR
 
@@ -159,7 +159,7 @@ For AND operation, put the most frequent condition (or the condition with the hi
 
 For OR operation, same scenario, but in the first place it is the condition with the highest probability of success.
 
-Reference: [https://www.rareskills.io/post/gas-optimization#viewer-8ieel](https://www.rareskills.io/post/gas-optimization#viewer-8ieel)
+Reference: [www.rareskills.io/post/gas-optimization#viewer-8ieel](https://www.rareskills.io/post/gas-optimization#viewer-8ieel)
 
 ### H. Use custom errors instead of require
 
@@ -167,7 +167,7 @@ For custom errors, solidity stores only the first 4 bytes of the hash of the err
 
 In the case of string messages in require statements, Solidity has to store(in memory) and revert with at least 64 bytes.
 
-Reference: [https://blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience](https://blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience), https://www.rareskills.io/post/gas-optimization#viewer-a0fm0
+Reference: [blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience](https://blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience), https://www.rareskills.io/post/gas-optimization#viewer-a0fm0
 
 
 
@@ -205,7 +205,7 @@ struct myStruct {
 }
 ```
 
-Reference: [https://www.rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
+Reference: [www.rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
 
 ### J. Use the optimizer to compile your contract
 
@@ -239,15 +239,15 @@ module.exports = {
 
 References:
 
-- [https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler](https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler)
-- [https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html](https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html)
-- [https://www.rareskills.io/post/gas-optimization#viewer-d3ced](https://www.rareskills.io/post/gas-optimization#viewer-d3ced)
+- [hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler](https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler)
+- [docs.soliditylang.org/en/v0.8.17/internals/optimizer.html](https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html)
+- [www.rareskills.io/post/gas-optimization#viewer-d3ced](https://www.rareskills.io/post/gas-optimization#viewer-d3ced)
 
 ## Others tips
 
-- Cheap Contract Deployment Through Clones: [https://www.youtube.com/watch?v=3Mw-pMmJ7TA](https://www.youtube.com/watch?v=3Mw-pMmJ7TA)
+- Cheap Contract Deployment Through Clones: [www.youtube.com/watch?v=3Mw-pMmJ7TA](https://www.youtube.com/watch?v=3Mw-pMmJ7TA)
 
-- Utilizing Bitmaps to dramatically save on Gas: [https://soliditydeveloper.com/bitmaps](https://soliditydeveloper.com/bitmaps)
+- Utilizing Bitmaps to dramatically save on Gas: [soliditydeveloper.com/bitmaps](https://soliditydeveloper.com/bitmaps)
 
 ## Reference
 
