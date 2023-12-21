@@ -94,9 +94,9 @@ The actual blob data itself, under the hood, is constructed using some special m
 
 The additional calldata will be committed to using a KZG commitment.
 
-- KZG Commitment is a polynomial commitment scheme adopted by EIP-4844 proto-danksharding
+- **KZG Commitment** is a polynomial commitment scheme adopted by EIP-4844 proto-danksharding
 
-- KZG Ceremony is the process of trust setup for KZG Commitment
+- **KZG Ceremony** is the process of trust setup for KZG Commitment
 
 Reference: [foresightventures.medium.com/eip-4844-the-first-step-towards-ethereum-full-sharding-9541107af757](https://foresightventures.medium.com/eip-4844-the-first-step-towards-ethereum-full-sharding-9541107af757),[notes.ethereum.org/@dankrad/kzg_commitments_in_proofs](https://notes.ethereum.org/@dankrad/kzg_commitments_in_proofs)
 
