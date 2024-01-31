@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Introduction to Arbitrum"
-date:   2023-12-21
+date:   2024-01-31
 lang: en
 locale: en-GB
 categories: blockchain ethereum
