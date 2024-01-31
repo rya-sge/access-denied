@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum
 tags: ethereum arbitrum layer2 nitro nova orbit optimism
 description: Introduction to Arbitrum, an optimistic layer2 designed to scale Ethereum, and its ecosystem Arbitrum Nova, Orbit and One.
-image: /assets/article/blockchain/bitcoin/560px-Bitcoin_lightning_logo.svg.png
+image: /assets/article/blockchain/ethereum/arbitrum/1223_Arbitrum_Logos_Logomark_RGB.png
 ---
 
 **Arbitrum** is a technology designed to scale Ethereum. The main product is **Arbitrum Rollup**, an Optimistic rollup protocol that inherits Ethereum-level security.
