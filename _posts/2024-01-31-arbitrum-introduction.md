@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum
 tags: ethereum arbitrum layer2 nitro nova orbit optimism
-description: Introduction to Arbitrum, an optimistic layer2 designed to scale Ethereum, and its ecosystem: Arbitrum Nova, Orbit and One.
+description: Introduction to Arbitrum, an optimistic layer2 designed to scale Ethereum, and its ecosystem Arbitrum Nova, Orbit and One.
 image: /assets/article/blockchain/bitcoin/560px-Bitcoin_lightning_logo.svg.png
 ---
 
