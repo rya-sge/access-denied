@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Main Concepts Behind the Lightning network "
+title:  "Main Concepts Behind the Lightning Network "
 date:   2023-12-21
 lang: en
 locale: en-GB
@@ -16,19 +16,17 @@ The concepts are organised in five topics, thanks to ChatGPT to be honest: *Fund
 
 ## Fundamentals and Architecture
 
-#### Lightning Network
+### Lightning Network
 
-*Description:* The lightning network is a second-layer (or layer-2) solution for the Bitcoin blockchain, aiming to enhance transaction speed and reduce fees by conducting off-chain transactions through payment channels.
+The lightning network is a second-layer (or layer-2) solution for the Bitcoin blockchain, aiming to enhance transaction speed and reduce fees by conducting off-chain transactions through payment channels.
 
-#### Payment Channels
+### Payment Channels
 
-*Description:* Private channels between two parties, a 2-of-2 multisignature account, that enable off-chain transactions. Participants can transact without recording every transaction on the main Bitcoin blockchain until the channel is closed. 
+Private channels between two parties, a 2-of-2 multisignature account, that enable off-chain transactions. Participants can transact without recording every transaction on the main Bitcoin blockchain until the channel is closed. 
 
 Reference: [docs.lightning.engineering - Payment channel](https://docs.lightning.engineering/the-lightning-network/payment-channels/etymology#docs-internal-guid-def45c7d-7fff-45bc-4e4e-ad87940fad49)
 
-#### Hash Time-lock Contracts (HTLC)
-
-*Description:*
+### Hash Time-lock Contracts (HTLC)
 
 HTLC is a concept to make the lightning payment atomic and secure. HTCL reduces the counterparty risk by locking the funds in an escrow that requires for unlocking 
 
@@ -44,19 +42,19 @@ References:
 
 ## Node Operation and Security
 
-#### Lightning Network Nodes
+### Lightning Network Nodes
 
-*Description:* Participants in the Lightning Network responsible for maintaining payment channels and facilitating transactions by routing payments through the network.
+Participants in the Lightning Network responsible for maintaining payment channels and facilitating transactions by routing payments through the network.
 
-#### Lightning Network Daemon (LND)
+### Lightning Network Daemon (LND)
 
-*Description:* One of the implementations of the Lightning Network protocol. LND allows users to run Lightning nodes and participate in the Lightning Network.
+One of the implementations of the Lightning Network protocol. LND allows users to run Lightning nodes and participate in the Lightning Network.
 
 Reference: [lightning.engineering - LND](https://lightning.engineering/api-docs/api/lnd/)
 
-#### Watchtowers
+### Watchtowers
 
-*Description:* Services that monitor Lightning Network channels for potential fraud. They act as safeguards, intervening if one party attempts to close a channel dishonestly.
+Services that monitor Lightning Network channels for potential fraud. They act as safeguards, intervening if one party attempts to close a channel dishonestly.
 
 References: 
 
@@ -67,7 +65,7 @@ References:
 
 #### Onion Routing
 
-*Description:* The Onion routing is a technique used in the Lightning Network to make the transmission between the different nodes private and secure. Payments are encrypted in layers, and each node in the network can only decrypt its specific layer, ensuring privacy and security.
+The Onion routing is a technique used in the Lightning Network to make the transmission between the different nodes private and secure. Payments are encrypted in layers, and each node in the network can only decrypt its specific layer, ensuring privacy and security.
 
 The goal is to restrict the information known by a node to the following cases:
 
@@ -83,7 +81,7 @@ References:
 
 #### Trampoline Payments
 
-*Description:* An optimization technique allowing payments to efficiently traverse the network by hopping through well-connected nodes.
+An optimization technique allowing payments to efficiently traverse the network by hopping through well-connected nodes.
 
 *How it works ?* The spender routes the payment to an intermediate node who can select the rest of the path to the final receiver. It is a solution for these different challenges affecting potentially a node :
 
@@ -94,7 +92,7 @@ Reference: [bitcoinops.org - Trampoline payments](https://bitcoinops.org/en/topi
 
 #### Routing Fees
 
-*Description:* Fees paid to Lightning Network nodes for routing payments. Nodes charge fees for facilitating transactions through their channels.
+Fees paid to Lightning Network nodes for routing payments. Nodes charge fees for facilitating transactions through their channels.
 
 Reference: [Channel Fees](https://docs.lightning.engineering/lightning-network-tools/lnd/channel-fees)
 
@@ -104,7 +102,7 @@ Reference: [Channel Fees](https://docs.lightning.engineering/lightning-network-t
 
 #### Channel Liquidity
 
-- *Description:* The amount of funds available for transactions within a payment channel. Balancing liquidity is essential for ensuring smooth transaction routing across the Lightning Network.
+The amount of funds available for transactions within a payment channel. Balancing liquidity is essential for ensuring smooth transaction routing across the Lightning Network.
 
 *Inbound liquidity*: amount of bitcoin that the user is able to receive over a lightning channel. 
 
@@ -114,35 +112,33 @@ Reference: [bitcoin.design - Lightning liquidity](https://bitcoin.design/guide/h
 
 #### Channel Funding
 
-- *Description:* The process of committing funds to a payment channel to initiate off-chain transactions. Both parties contribute to the channel's initial funding.
+The process of committing funds to a payment channel to initiate off-chain transactions. Both parties contribute to the channel's initial funding.
 
 Reference: [Lifecycle of a Payment Channel - Opening a channel](https://docs.lightning.engineering/the-lightning-network/payment-channels/lifecycle-of-a-payment-channel#docs-internal-guid-9d39ae87-7fff-839a-c0ec-60c6ea73aa0b)
 
 #### Channel Closing
 
-- *Description:* The process of settling the final state of a payment channel on the Bitcoin blockchain. Channels can be closed cooperatively or unilaterally.
+The process of settling the final state of a payment channel on the Bitcoin blockchain. Channels can be closed cooperatively or unilaterally.
 
 Reference: [Lifecycle of a Payment Channel - Closing a channel](https://docs.lightning.engineering/the-lightning-network/payment-channels/lifecycle-of-a-payment-channel#docs-internal-guid-05067e10-7fff-49ae-141e-183d040b5b8c)
 
 #### Splicing
 
-- *Description:* The ability to adjust the amount of funds in a Lightning Network channel without closing and reopening it. Splicing allows users to add or remove funds dynamically.
+The ability to adjust the amount of funds in a Lightning Network channel without closing and reopening it. Splicing allows users to add or remove funds dynamically.
 
 [WHAT IS SPLICING AND HOW DOES IT WORK?](https://voltage.cloud/blog/lightning-network-faq/what-is-splicing-lightning-network-how-it-works/), [Lightning Splicing](https://lightningsplice.com/splicing_explained.html)
 
 #### Channel Rebalancing
 
-- *Description:* The process of adjusting the distribution of funds within a payment channel to ensure optimal liquidity. Rebalancing helps in maintaining efficient payment routing.
+The process of adjusting the distribution of funds within a payment channel to ensure optimal liquidity. Rebalancing helps in maintaining efficient payment routing.
 
-  if a LN node has not enough [outbound liquidity](https://voltage.cloud/blog/lightning-network-faq/why-do-lightning-nodes-need-inbound-and-outbound-liquidity/) to route a payment, it can use different methods to rebalance its liquidity in order to be able to route payment again.
+if a LN node has not enough [outbound liquidity](https://voltage.cloud/blog/lightning-network-faq/why-do-lightning-nodes-need-inbound-and-outbound-liquidity/) to route a payment, it can use different methods to rebalance its liquidity in order to be able to route payment again.
 
 Reference: [How Lightning Channel Rebalances Work](https://voltage.cloud/blog/lightning-network-faq/how-lightning-node-channel-rebalancing-works-simplified/), [How To Rebalance A Lightning Channel](https://thebitcoinmanual.com/articles/rebalance-ln-channel/)
 
 ### **Network Analysis and Tools:**
 
 #### Lightning Network Explorer
-
-- *Description:* 
 
 Since the lightning transactions are private, there are no public explorer as for Bitcoin mainet (e.g [blockchain.com](https://www.blockchain.com/explorer)). Nevertheless, you have online tools whih track the number of nodes, channels and the total capacity, e.g [mempool.space/lightning](https://mempool.space/lightning)
 

@@ -98,4 +98,4 @@ contract Challenge {
 
 4.Check if the challenge **isSolved**
 
-![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-solved.png)q
+![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ctf/insomniak2023/remix-solved.png)
