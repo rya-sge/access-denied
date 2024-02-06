@@ -70,8 +70,6 @@ Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#nitro](https://docs
 
 ### Arbitrum One
 
-![Arbitrum One Logo]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/1223_One_Logos_Logomark_primary_RGB.png)
-
 Arbitrum One is a specific deployment of the Arbitrum protocol on the Ethereum mainnet. It is a live and production-ready instance of Arbitrum that developers and users can interact with. 
 
 - **Arbitrum One** is a Layer 2 (L2) optimistic rollup chain that implements the Arbitrum Rollup protocol and settles to Ethereum's Layer 1 (L1) chain. 
@@ -82,8 +80,6 @@ Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#arbitrum-one](https
 
 ### Arbitrum Nova 
 
-![Arbitrum Nova Logo]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/1223_Nova_Logos_Logomark_primary_RGB.png)
-
 - **Arbitrum Nova** is a high-performance alternative to Arbitrum One's chain. While Arbitrum One implements the purely trustless Rollup protocol, Arbitrum Nova implements the mostly trustless [AnyTrust](https://docs.arbitrum.io/inside-anytrust) protocol. 
 - Like Arbitrum One, Arbitrum Nova uses Arbitrum's Nitro technology stack 
 - They key difference between Rollup and AnyTrust is that the AnyTrust protocol introduces an additional trust assumption in the form of a data availability committee (DAC).
@@ -93,8 +89,6 @@ Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#arbitrum-one](https
 Reference: [docs.arbitrum.io/for-devs/concepts/public-chains](https://docs.arbitrum.io/for-devs/concepts/public-chains)
 
 ### Arbitrum Orbit
-
-![Arbitrum Orbit Logo]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/1223_Orbit_Logos_Logomark_primary_RGB.png)
 
 Arbitrum allows the creation of blockchains / dapp on top of Arbitrum one or Nova. With it, you can create your own self-managed Arbitrum Rollup and AnyTrust chains.
 
