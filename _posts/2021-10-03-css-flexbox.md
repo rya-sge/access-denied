@@ -206,6 +206,6 @@ La solution résidait dans l'ajout de la propriété `justify-content: flex-end`
 
 ## Sources
 
-- https://flexboxfroggy.com/#fr
+- [https://flexboxfroggy.com/#fr](https://flexboxfroggy.com/#fr)
 - [developer.mozilla.org - justify-content](https://developer.mozilla.org/fr/docs/Web/CSS/justify-content)
 - Cours de Technologie Web(TWEB) enseigné à l'HEIG-VD en 2021
