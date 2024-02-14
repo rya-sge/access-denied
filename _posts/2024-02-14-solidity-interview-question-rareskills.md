@@ -210,8 +210,9 @@ $$
 10 * 2 = 10 << 1
 $$
 
+
 $$
-10 / 2 = 10 >> 1
+10 \div 2 = 10 >> 1
 $$
 
 Reference: [The RareSkills Book of Solidity Gas Optimization: 80+ Tips](https://www.rareskills.io/post/gas-optimization#viewer-cvebl)
