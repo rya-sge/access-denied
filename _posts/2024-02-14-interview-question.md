@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum
 tags: ethereum solidity interview security gas
 description: This article presents the list of medium questions with their answers related to the article -Solidity Interview Questions- by RareSkills.
-image: /assets/article/blockchain/ethereum/solidity/solidity-logo.svg
+image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
 ---
 
 This article presents the list of medium questions with their answers related to the article [Solidity Interview Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills.
