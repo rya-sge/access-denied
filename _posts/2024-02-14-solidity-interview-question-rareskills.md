@@ -99,8 +99,6 @@ A slippage parameter in a function allows to indicate the minimum amount of toke
 
 Reference: [What are Slippage Attacks in Decentralized Exchanges (DEXs)?](https://www.immunebytes.com/blog/what-are-slippage-attacks-in-decentralized-exchanges-dexs/)
 
-## 
-
 ## Gas
 
 ### Loop
@@ -692,90 +690,6 @@ References: [obheda12 - Transaction Order Dependence (Front-running)](https://gi
 
 
 
-## Solidity style Guide
-
-### Functions ordered
-
-> According to the solidity style guide, how should functions be ordered?$
-
-Functions should be grouped according to their visibility and ordered:
-
-- constructor
-- receive function (if exists)
-- fallback function (if exists)
-- external
-- public
-- internal
-- private
-
-Within a grouping, place the `view` and `pure` functions last.
-
-Example from the documentation
-
-```solidity
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
-contract A {
-    constructor() {
-        // ...
-    }
-
-    receive() external payable {
-        // ...
-    }
-
-    fallback() external {
-        // ...
-    }
-
-    // External functions
-    // ...
-
-    // External functions that are view
-    // ...
-
-    // External functions that are pure
-    // ...
-
-    // Public functions
-    // ...
-
-    // Internal functions
-    // ...
-
-    // Private functions
-    // ...
-}
-```
-
-Reference: [docs.soliditylang.org - order-of-functions](https://docs.soliditylang.org/en/latest/style-guide.html#order-of-functions)
-
-### Modifiers ordered
-
-> According to the solidity style guide, how should function modifiers be ordered?
-
-The modifier order for a function should be:
-
-1. Visibility
-2. Mutability
-3. Virtual
-4. Override
-5. Custom modifiers
-
-Example:
-
-```solidity
-function balance(uint from) public view override returns (uint)  {
-    return balanceOf[from];
-}
-
-function shutdown() public onlyOwner {
-    selfdestruct(owner);
-}
-```
-
-Reference: [docs.soliditylang.org - function-declaration](https://docs.soliditylang.org/en/latest/style-guide.html#function-declaration)
-
 ## Solidity Misc
 
 ###  ERC-165
@@ -888,3 +802,87 @@ See Section `Gas-Type of storage`
 It is stored in the slot `0x40`. This pointer contains the emplacement in memory which is free. Initially, it points to the address `0x80`
 
 See [docs.soliditylang - Layout in Memory](https://docs.soliditylang.org/en/latest/internals/layout_in_memory.html) && [0xpranay - Solidity Internals](https://0xpranay.github.io/solidity-notes/Internals.html)
+
+### Solidity style Guide
+
+#### Functions ordered
+
+> According to the solidity style guide, how should functions be ordered?$
+
+Functions should be grouped according to their visibility and ordered:
+
+- constructor
+- receive function (if exists)
+- fallback function (if exists)
+- external
+- public
+- internal
+- private
+
+Within a grouping, place the `view` and `pure` functions last.
+
+Example from the documentation
+
+```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.9.0;
+contract A {
+    constructor() {
+        // ...
+    }
+
+    receive() external payable {
+        // ...
+    }
+
+    fallback() external {
+        // ...
+    }
+
+    // External functions
+    // ...
+
+    // External functions that are view
+    // ...
+
+    // External functions that are pure
+    // ...
+
+    // Public functions
+    // ...
+
+    // Internal functions
+    // ...
+
+    // Private functions
+    // ...
+}
+```
+
+Reference: [docs.soliditylang.org - order-of-functions](https://docs.soliditylang.org/en/latest/style-guide.html#order-of-functions)
+
+#### Modifiers ordered
+
+> According to the solidity style guide, how should function modifiers be ordered?
+
+The modifier order for a function should be:
+
+1. Visibility
+2. Mutability
+3. Virtual
+4. Override
+5. Custom modifiers
+
+Example:
+
+```solidity
+function balance(uint from) public view override returns (uint)  {
+    return balanceOf[from];
+}
+
+function shutdown() public onlyOwner {
+    selfdestruct(owner);
+}
+```
+
+Reference: [docs.soliditylang.org - function-declaration](https://docs.soliditylang.org/en/latest/style-guide.html#function-declaration)
