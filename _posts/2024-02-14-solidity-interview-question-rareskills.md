@@ -376,7 +376,7 @@ Reference:
 
 > If a proxy makes a delegatecall to A, and A does address(this).balance, whose balance is returned, the proxy's or A?
 
-The returned balance is the balance of A since the call is executed in the context of A.
+The returned balance is the proxy balance since the call is executed in the context of the proxy.
 
 **Revert**
 
