@@ -17,6 +17,10 @@ According to the article, all questions can be answered in three sentences or le
 
 The answers here are more complete than necessary in order to explain in details the topics.
 
+[TOC]
+
+
+
 ## DeFi
 
 ### What is a bonding curve ?
@@ -94,6 +98,8 @@ It can p.ex happens on a DEX with a large order or if the transaction is targete
 A slippage parameter in a function allows to indicate the minimum amount of tokens that you want to be returned from a swap or another operation.
 
 Reference: [What are Slippage Attacks in Decentralized Exchanges (DEXs)?](https://www.immunebytes.com/blog/what-are-slippage-attacks-in-decentralized-exchanges-dexs/)
+
+## 
 
 ## Gas
 
@@ -400,7 +406,43 @@ An immutable variable is stored in the bytecode of the implementation contract a
 
 With a proxy, you can change/upgrade the value of an immutable variable by upgrading to a new implementation.
 
-## Token standard
+## Token 
+
+## Rebasing token
+
+>  What is a rebasing token?
+
+A rebase, or elastic, token, is a token where the supply and the user's balance is adjusted periodically
+
+Use case :
+
+- Algorithmic stablecoin to maintain a peg to another asset. The number of token in circulation are adjusted through the rebase mechanism depending of the token price related to the asset peg. 
+
+Example: [Ampleforth (AMPL)](https://www.coindesk.com/tech/2021/04/21/ampleforth-is-giving-governance-tokens-to-every-wallet-that-ever-held-ampl/)
+
+- Liquid staking Token (LST) : the user's balance is rebased to represent the revenue issue from the staking.
+
+Example: [Lido (stETH)](https://docs.lido.fi/contracts/lido/)
+
+On UniswapV2, this type of token is a problem because the uniswap router contract does not know when a rebasing happen and it makes the pair balance unbalanced, see [uniswap docs](https://docs.uniswap.org/contracts/v2/reference/smart-contracts/common-errors#rebasing-tokens). As a result, rebasing tokens will succeed in pool creation and swapping, but liquidity providers will bear the loss of a negative rebase when their position becomes active, with no way to recover the loss, see [uniswap docs](https://docs.uniswap.org/concepts/protocol/integration-issues#rebasing-tokens)
+
+Global reference: [What Is a Rebase/Elastic Token?](https://www.coindesk.com/learn/what-is-a-rebaseelastic-token/https://www.coindesk.com/learn/what-is-a-rebaseelastic-token/)
+
+## **fee-on-transfer** 
+
+**fee-on-transfer** 
+
+> What is a fee-on-transfer token?
+
+A "Fee on Transfer" token is a token that  takes a percentage of internal commission upon transfer or trade. In other words, every time the token is transfered, a portion of the transfer amount is taken, e.g. to burn or sent to another address as a fee.
+
+Reference: [1inch - What is a Fee on Transfer token?](https://help.1inch.io/en/articles/5651059-what-is-a-fee-on-transfer-token)
+
+On UniswapV2, to swap this type of token, you have to call a specific function which takes in consideration this fee to compute the invariant, see [uniswap docs](https://docs.uniswap.org/contracts/v2/reference/smart-contracts/common-errors#fee-on-transfer-tokens).
+
+
+
+### Token standard
 
 ### [ERC-777](https://eips.ethereum.org/EIPS/eip-777) 
 
