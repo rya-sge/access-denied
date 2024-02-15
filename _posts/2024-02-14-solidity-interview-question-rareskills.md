@@ -408,7 +408,7 @@ With a proxy, you can change/upgrade the value of an immutable variable by upgra
 
 ## Token 
 
-## Rebasing token
+### Rebasing token
 
 >  What is a rebasing token?
 
@@ -428,9 +428,7 @@ On UniswapV2, this type of token is a problem because the uniswap router contrac
 
 Global reference: [What Is a Rebase/Elastic Token?](https://www.coindesk.com/learn/what-is-a-rebaseelastic-token/https://www.coindesk.com/learn/what-is-a-rebaseelastic-token/)
 
-## **fee-on-transfer** 
-
-**fee-on-transfer** 
+### fee-on-transfer
 
 > What is a fee-on-transfer token?
 
@@ -444,7 +442,7 @@ On UniswapV2, to swap this type of token, you have to call a specific function w
 
 ### Token standard
 
-### [ERC-777](https://eips.ethereum.org/EIPS/eip-777) 
+#### [ERC-777](https://eips.ethereum.org/EIPS/eip-777) 
 
 >  What danger do ERC-777 tokens pose?
 
@@ -463,13 +461,13 @@ This contract is determined through a registry.
 
 Reference: [A Dive With ERC-777 And Risk Mitigations](https://medium.com/coinmonks/a-dive-with-erc-777-and-risk-mitigations-9f3ffcac0f78), [ERC777 implementation and security clarifications](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/1749), [ERC-777 callback issue](https://consensys.io/diligence/audits/2020/01/skale-token/#erc-777-callback-issue)
 
-### [ERC-721](https://eips.ethereum.org/EIPS/eip-721)
+#### [ERC-721](https://eips.ethereum.org/EIPS/eip-721)
 
 > How does safeMint differ from mint in the OpenZeppelin ERC721 implementation? 
 
 The safeMint function will check if the destination contract can support ERC-721 token. If not, the call will revert
 
-### [ERC-721A](https://www.erc721a.org/)
+#### [ERC-721A](https://www.erc721a.org/)
 
 > What does ERC-721A do to reduce mint costs? What is the tradeoff?
 
