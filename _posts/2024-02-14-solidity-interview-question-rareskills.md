@@ -430,7 +430,7 @@ Global reference: [What Is a Rebase/Elastic Token?](https://www.coindesk.com/lea
 
 > What is a fee-on-transfer token?
 
-A "Fee on Transfer" token is a token that  takes a percentage of internal commission upon transfer or trade. In other words, every time the token is transfered, a portion of the transfer amount is taken, e.g. to burn or sent to another address as a fee.
+---A "Fee on Transfer" token is a token that  takes a percentage of internal commission upon transfer or trade. In other words, every time the token is transfered, a portion of the transfer amount is taken, e.g. to burn or sent to another address as a fee.
 
 Reference: [1inch - What is a Fee on Transfer token?](https://help.1inch.io/en/articles/5651059-what-is-a-fee-on-transfer-token)
 
@@ -444,17 +444,19 @@ On UniswapV2, to swap this type of token, you have to call a specific function w
 
 >  What danger do ERC-777 tokens pose?
 
-ERC-777 allows a sender of a transaction specified a contract to call.
+--ERC-777 allows a sender of a transaction specified a contract to call, which can be used to perform reentrancy attack.
 
-From the EIP: 
+*From the EIP:* 
 
-- *The holder can “authorize” and “revoke” operators which can send tokens on their behalf*
+- The holder can “authorize” and “revoke” operators which can send tokens on their behalf
 - When sending tokens, the token contract MUST call the `tokensToSend` hook of the *holder* if the *holder* registers an `ERC777TokensSender` implementation via [ERC-1820](https://eips.ethereum.org/EIPS/eip-1820).
 - The token contract MUST call the `tokensReceived` hook of the *recipient* if the *recipient* registers an `ERC777TokensRecipient` implementation via [ERC-1820](https://eips.ethereum.org/EIPS/eip-1820).
 
 This contract is determined through a registry.
 
-- Another possibility for an attacker is to perform a reentrancy attack by setting a malicious contract as a hook when the attacker send or receives tokens. For example to re-enter a `withdraw`function, which will send tokens to the attacker address. The token ERC-777 has to protect against it by adding a nonReentrant` modifier` to callbacks: `_callTokensToSend ` and `_callTokensReceived. See [ERC-777 callback issue](https://consensys.io/diligence/audits/2020/01/skale-token/#erc-777-callback-issue)
+*What are the possible attacks/danger ?*
+
+- An attacker can perform a reentrancy attack by setting a malicious contract as a hook when the attacker sends or receives tokens. For example to re-enter a `withdraw`function, which will send tokens to the attacker address. The token ERC-777 has to protect against it by adding a nonReentrant` modifier` to callbacks: `_callTokensToSend ` and `_callTokensReceived`. See [ERC-777 callback issue](https://consensys.io/diligence/audits/2020/01/skale-token/#erc-777-callback-issue)
 - If a target contract allows making arbitrary calls to any address with any data, an attacker can leverage this to set a malicious contract to call each time the target contract receives or send tokens (see [One more problem with ERC-777](https://mixbytes.io/blog/one-more-problem-with-erc777)). The attacker can choose for example to revert each time resulting in an attack dos.
 
 Reference: [A Dive With ERC-777 And Risk Mitigations](https://medium.com/coinmonks/a-dive-with-erc-777-and-risk-mitigations-9f3ffcac0f78), [ERC777 implementation and security clarifications](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/1749), [ERC-777 callback issue](https://consensys.io/diligence/audits/2020/01/skale-token/#erc-777-callback-issue)
