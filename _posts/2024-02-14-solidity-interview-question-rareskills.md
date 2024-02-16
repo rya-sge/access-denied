@@ -46,7 +46,9 @@ x * y = k
 where
 
 x: number of token 1 in the pool
+
 y: number of token 2 in the pool
+
 k: constant that stays constant during trades but recalculated when liquidity is provided / withdrawn
 
 See [Uniswap V2 - How Uniswap work](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works), [Back to the Basics: Uniswap, Balancer, Curve](https://medium.com/@kinaumov/back-to-the-basics-uniswap-balancer-curve-e930c3ad9046)
