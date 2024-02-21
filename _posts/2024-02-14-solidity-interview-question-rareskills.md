@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  RareSkills Interview Answers - Level Medium
+title:  RareSkills Solidity Interview Answers - Medium
 date:   2024-02-14
 lang: en
 locale: en-GB

@@ -56,7 +56,7 @@ A read operation can be expensive for a loop operation since this operation is p
 
 The solution is to create a local variable to avoid fetch information on the blockchain.
 
-See point G for an example
+See point F for an example
 
 Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), [rareskills.io/post/gas-optimization#viewer-8lubg](https://www.rareskills.io/post/gas-optimization#viewer-8lubg)
 
@@ -135,12 +135,12 @@ Reference: [twitter.com/0xCygaar/status/1607860326271438848](https://twitter.com
 
 ### F. Gas-optimal for loop template
 
-By combining  C, E and F, you can obtain this example to create optimize loop.
+By combining  C, D and E, you can obtain this example to create optimize loop.
 
 ```solidity
-// Storage the storage variable inside a local variable
+// Store the storage variable inside a local variable
 uint256 limit = storageVariableUint256;
-for (uint256 i; i < limit; ) {
+for (uint256 i; i <= limit; ) {
     // deactivate check overflow
     unchecked {
     	// ++i instead of i++
@@ -150,6 +150,24 @@ for (uint256 i; i < limit; ) {
 ```
 
 Reference: [www.rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
+
+**Exception**
+
+*The solidity version [0.8.22](https://soliditylang.org/blog/2023/10/25/solidity-0.8.22-release-announcement) introduces an overflow check optimization that automatically generates an unchecked arithmetic increment of the counter of for loops.  As a result, it is not useful to use `unchecked` if the loop meets the criteria (see the release doc). 
+
+This native optimization works only for the comparison `<`and not with `<=`
+
+**Example**
+
+```solidity
+// Store the storage variable inside a local variable
+uint256 limit = storageVariableUint256;
+for (uint256 i; i < limit; ++i) {
+	// Body
+}
+```
+
+See [Solidity 0.8.22 Release Announcement](https://soliditylang.org/blog/2023/10/25/solidity-0.8.22-release-announcement)
 
 ### G. Most use condition in AND and OR
 
