@@ -13,7 +13,13 @@ isMath: true
 
 [TOC]
 
+This article presents the list of **Hard** questions with their answers related to the article [Solidity Interview Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills.
 
+For the level medium, you can see [my first article](https://rya-sge.github.io/access-denied/2024/02/14/solidity-interview-question-rareskills/).
+
+According to the article, all questions can be answered in three sentences or less.
+
+The answers here are more complete than necessary in order to explain in details the topics.
 
 ## Defi
 
