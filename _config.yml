@@ -1,5 +1,5 @@
 title: AccessDenied
-description: Prises de notes sur l'informatique et la sécurité
+description: note taking on blockchain and security
 baseurl: "/access-denied" # the subpath of your site, e.g. /blog
 url: "https://rya-sge.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 url_complet: "https://rya-sge.github.io/access-denied" #image
@@ -11,7 +11,7 @@ author-image:   1.png
 author-job:     Security engineer | Blockchain Developer
 author-email:    # Add your email for contant form.
 #author-twitter: artemsheludko_ # Add your twitter account
-about-author:   "This site brings together my notes on subjects dealing with IT and more particularly with security."
+about-author:   "This site brings together my notes on subjects dealing with IT, more particularly with security and blockchain."
 
 # Social settings
 social-twitter:   ADCDIII
