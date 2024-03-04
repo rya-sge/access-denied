@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  RareSkills Solidity Interview Answers - Hard
-date:   2024-03-05
+date:   2024-03-04
 lang: en
 locale: en-GB
 categories: blockchain ethereum
