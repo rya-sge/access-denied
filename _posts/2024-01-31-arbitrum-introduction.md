@@ -238,7 +238,7 @@ Whitelist got removed, there are no restrictions on who can transact with the ne
 
 [3. Patch Thursday — Risks on CEX’s Confirmation Number on Arbitrum and Optimism](https://medium.com/chainlight/patch-thursday-risks-on-cexs-confirmation-on-arbitrum-and-optimism-7ee25a1d58bf)
 
-4. ChatGPT with the input "Explains me arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about arbitrum anyTrust, stylus, Arbitrum Nitro stack, arbitrum one and arbitrum nova. Cite example which uses Aribtrum for their project"
+4.ChatGPT with the input "Explains me arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about arbitrum anyTrust, stylus, Arbitrum Nitro stack, arbitrum one and arbitrum nova. Cite example which uses Aribtrum for their project"
 
 
 

@@ -222,6 +222,26 @@ This degree is made of 4 lessons
 - Junior
 - Senior
 
+### [Advanced Solidity: Understanding and Optimizing Gas Costs](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/)
+
+**Cost:** paid (Udemy)
+
+**Certificate:** yes
+
+**Date:** 10/2022
+
+**Description:**
+
+Mastering the Ethereum Virtual Machine and the Solidity Compiler
+
+- Learn how the Ethereum Virtual Machine sets the gas price
+
+- Learn how to improve the gas price of existing code
+
+- Learn how to debug execution costs for smart contracts
+
+- Learn what designs to avoid that lead to high execution costs
+
 ## Other Blockchains
 
 ### Bitcoin
@@ -493,7 +513,7 @@ The goal of this course is to explore Zero-Knowledge Proofs (ZKP).
 
 ## Security
 
-List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
+List of resources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
 
 ### Course
 
@@ -583,6 +603,8 @@ List of ressources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blo
 - The Complete Beginner's Crypto Crash Course: [https://www.youtube.com/playlist?list=PLU52pNodXIGdM6XDgHVG7DsPytlsrR_6b](https://www.youtube.com/playlist?list=PLU52pNodXIGdM6XDgHVG7DsPytlsrR_6b)
 - Whiteboard Crypto: [https://www.youtube.com/@WhiteboardCrypto/videos](https://www.youtube.com/@WhiteboardCrypto/videos)
 - Finematics: [https://www.youtube.com/@Finematics/videos](https://www.youtube.com/@Finematics/videos)
+- [Ethereum Engineering Group](https://www.youtube.com/@EthereumEngineeringGroup)
+- [0xOwenThurm](https://www.youtube.com/@0xOwenThurm/videos)
 
 ## Ressources
 

@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum
 tags: ethereum solidity interview security gas
-description: This article presents the list of medium questions with their answers related to the article -Solidity Interview Questions- by RareSkills.
+description: Solidity Interview questions - Medium, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
 isMath: true
 ---
@@ -16,10 +16,6 @@ This article presents the list of medium questions with their answers related to
 According to the article, all questions can be answered in three sentences or less.
 
 The answers here are more complete than necessary in order to explain in details the topics.
-
-[TOC]
-
-
 
 ## DeFi
 
@@ -355,7 +351,10 @@ Reference:  [Proxy Patterns For Upgradeability Of Solidity Contracts: Transparen
 
  **Self Destructed**
 
-> If a contract delegatecalls an empty address or an implementation that was previously self-destructed, what happens? What if it is a regular call instead of a delegatecall?
+> a) If a contract delegatecalls an empty address or an implementation that was previously self-destructed, what happens? 
+> b) What if it is a regular call instead of a delegatecall?
+
+**Question A**
 
 --- If a contract delegatecalls to a self-destructed implementation, **the delegatecall will return a success**.
 
@@ -373,6 +372,25 @@ Reference:
 - [OpenZeppelin - Proxy.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/192e873fcb5b1f6b4b9efc177be231926e2280d2/contracts/proxy/Proxy.sol#L31)
 - [Why is delegatecall returning 0 and erroring?](https://ethereum.stackexchange.com/questions/107591/why-is-delegatecall-returning-0-and-erroring)
 - [Understanding delegatecall And How to Use It Safely](https://eip2535diamonds.substack.com/p/understanding-delegatecall-and-how)
+
+**Question B**
+
+For a call with `call`, if it is the address 0, the call will return a success. You can test this behavior with Foundry.
+
+```solidity
+address _address = address(0);
+(bool success, bytes memory data) = _address.call{
+gas: 5000
+}(abi.encodeWithSignature("foo(string,uint256)", "call foo", 123));
+assertEq(success, true);
+```
+
+For a self destructed contract, the call will also return `true` but will not do anything since the code has been removed.
+
+Reference:
+
+- [Solidity by Example - Call](https://solidity-by-example.org/call/)
+- [Solidity: A Small Test of the Self-Destruct Operation](https://betterprogramming.pub/solidity-what-happens-with-selfdestruct-f337fcaa58a7)
 
 **Balance**
 
@@ -775,7 +793,11 @@ Reference: [solidity doc - ABI Encoding and Decoding Functions](https://docs.sol
 
 > uint8, uint32, uint64, uint128, uint256 are all valid uint sizes. Are there others?
 
-Yes, there is also uint16, so basically all power of 2 between 3 >= x <= 8
+Yes, all`uint8` to `uint256` in steps of `8` (unsigned of 8 up to 256 bits)
+
+For example, there is also uint16, uint24, uint40...
+
+Reference: [www.velvetshark.com - Max values for each uint in Solidity, from uint8 to uint256](https://www.velvetshark.com/max-int-values-in-solidity), [docs.soliditylang.org - integers](https://docs.soliditylang.org/en/latest/types.html#integers)
 
 ### Interface - Function modifiers
 
