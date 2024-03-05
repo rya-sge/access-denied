@@ -167,7 +167,20 @@ References: [RareSkills - EIP-2930 - Ethereum access list](https://www.rareskill
 
 > How many storage slots does this use? uint64[] x = [1,2,3,4,5]? Does it differ from memory?
 
-TODO
+You will have one storage slot to store the length of the array, here `5`.
+
+For the rest, my guess is that the different values are packed together. Since values are `uint64`, you can pack the 4 first values in a slot, and the last value(5) in a second slot.
+
+[Reference](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#layout-of-state-variables-in-storage): *"Multiple, contiguous items that need less than 32 bytes are packed into a single storage slot if possible"*
+
+Thus, we will have **3 slots used**.
+
+Remark: since it a dynamic array, the location of the data inside the array are computed with the hash of the slot array declaration where the length is stored:`keccak256(abi.encode(ARRAY_SLOT_DECLARATION))`
+
+References:
+
+- [docs.soliditylang.org - Layout of State Variables in Storage](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#layout-of-state-variables-in-storage)
+- [Understanding Solidity’s Storage Layout And How To Access State Variables](https://medium.com/@flores.eugenio03/exploring-the-storage-layout-in-solidity-and-how-to-access-state-variables-bf2cbc6f8018#:~:text=Thinking%20of%20storage%20as%20an,fixed%20length%20of%2032%20bytes.&text=State%20variables%20are%20stored%20according,a%20value%20or%20dynamic%20type.)
 
 ## Proxy
 
