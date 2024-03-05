@@ -73,7 +73,7 @@ Reference:
 
 ## Gas
 
-How many storage slots does this use? uint64[] x = [1,2,3,4,5]? Does it differ from memory?
+### returndatasize vs push0
 
 > Prior to the Shanghai upgrade, under what circumstances is returndatasize() more efficient than push zero?
 
@@ -163,7 +163,11 @@ You can generate an access list transaction to include in your transaction by ca
 
 References: [RareSkills - EIP-2930 - Ethereum access list](https://www.rareskills.io/post/eip-2930-optional-access-list-ethereum), [Infura - Optimizing Ethereum Transactions with eth_createAccessList](https://www.infura.io/blog/post/optimizing-ethereum-transactions-with-eth_createaccesslist)
 
+### Storage slot
 
+> How many storage slots does this use? uint64[] x = [1,2,3,4,5]? Does it differ from memory?
+
+TODO
 
 ## Proxy
 
@@ -787,10 +791,12 @@ Reference: [Deploying Smart Contracts Using `CREATE2`](https://docs.openzeppelin
 
 > Describe the calldata of a function that takes a dynamic length array of uint128 when uint128[1,2,3,4] is passed as an argument
 
+**uint128[1,2,3,4]**
+
 If I use the tool [cast](https://book.getfoundry.sh/reference/cast/cast-calldata) from Foundry to generate calldata from a function `test`
 
 ```bash
-cast calldata "test(uint256[])" [1,2,3,4]
+cast calldata "test(uint128[])" [1,2,3,4]
 ```
 
 The result is:
@@ -804,12 +810,32 @@ We can then analyze the different values:
 | Value      | Description                                                  |
 | ---------- | ------------------------------------------------------------ |
 | 0xd66cd0db | 4 bytes selector from the function, `test`in my example      |
-| <0>2       | Not sure, but my guess is this is the location of the data part since it is a dynamic type |
+| <0>2       | Not sure, but my guess is this is the location of the data part ("offset)") since it is a dynamic type |
 | <0>4       | Array size                                                   |
 | <0>1       | Param 1                                                      |
 | <0>2       | Param 2                                                      |
 | <0>3       | Param 3                                                      |
 | <0>4       | Param 4                                                      |
+
+The numbers inside the array are padded with `0` to fit a 32 bytes / 256 bits numbers
+
+
+
+**uint256[]**
+
+We can also try with uint256[]
+
+```bash
+cast calldata "test(uint256[])" [1,2,3,4]
+```
+
+The result is:
+
+```
+0xd66cd0db000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004
+```
+
+We can then analyze the different values, and we observe that they are the same that for uint128[]
 
 References: [docs.soliditylang - abi-spec.html#examples](https://docs.soliditylang.org/en/v0.8.24/abi-spec.html#examples), [ABI Encoding and EVM Calldata demystified](https://r4bbit.substack.com/p/abi-encoding-and-evm-calldata)
 
