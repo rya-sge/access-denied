@@ -450,11 +450,13 @@ Thus, you call a new time the function approve with the new amount.
 
 In this case, this second transaction can be front-run by the malicious user to spend all approved tokens before the new allowance.
 
-A common solution is to add a functon ìncreaseAlllowance` but cela s'est plutôt averé négative because it has been used for phising attack since this function is not part of the ERC-20 interface.
+A common solution is to add the functions `increaseAlllowance` and `decreaseAllowance` but it turned out to be rather negative because it has been used for phising attack since these functions are not part of the ERC-20 interface and are not always detected by wallets.
 
-Moreover, an approval front-run attack has never been observered in the nature
+Moreover, an approval front-run attack has never been observed in the nature, see [banteg status](https://twitter.com/bantg/status/1699774038418346108)
 
-Reference: [RareSkill - Smart Contract Security - Frontrunning](https://www.rareskills.io/post/smart-contract-security)
+It is now **recommended** to put the allowance to zero before setting a new one.
+
+Reference: [RareSkill - Smart Contract Security - Frontrunning](https://www.rareskills.io/post/smart-contract-security), [docs.google.com - ERC20 API: An Attack Vector on the Approve/TransferFrom Methods](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit?pli=1#heading=h.m9fhqynw2xvt), [github.com/OpenZeppelin/issues/4583](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4583)
 
 ## Solidity Misc
 
