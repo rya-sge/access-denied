@@ -701,7 +701,57 @@ Thus, you can resolve the *stack too depth* by using `internal function` or the 
 
 Reference: [soliditydeveloper.com - Stack Too Deep](https://soliditydeveloper.com/stacktoodeep)
 
+### Calldata of a function
 
+> Describe the calldata of a function that takes a dynamic length array of uint128 when uint128[1,2,3,4] is passed as an argument
+
+**uint128[1,2,3,4]**
+
+If I use the tool [cast](https://book.getfoundry.sh/reference/cast/cast-calldata) from Foundry to generate calldata from a function `test`
+
+```bash
+cast calldata "test(uint128[])" [1,2,3,4]
+```
+
+The result is:
+
+```
+0xd66cd0db000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004
+```
+
+We can then analyze the different values:
+
+| Value      | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| 0xd66cd0db | 4 bytes selector from the function, `test`in my example      |
+| <0>2       | Not sure, but my guess is this is the location of the data part ("offset)") since it is a dynamic type |
+| <0>4       | Array size                                                   |
+| <0>1       | Param 1                                                      |
+| <0>2       | Param 2                                                      |
+| <0>3       | Param 3                                                      |
+| <0>4       | Param 4                                                      |
+
+The numbers inside the array are padded with `0` to fit a 32 bytes / 256 bits numbers
+
+
+
+**uint256[]**
+
+We can also try with uint256[]
+
+```bash
+cast calldata "test(uint256[])" [1,2,3,4]
+```
+
+The result is exactly the same as for the `uint128[]`
+
+```
+0xd66cd0db000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004
+```
+
+We can then analyze the different values, and we observe that they are the same that for uint128[]
+
+References: [docs.soliditylang - abi-spec.html#examples](https://docs.soliditylang.org/en/v0.8.24/abi-spec.html#examples), [ABI Encoding and EVM Calldata demystified](https://r4bbit.substack.com/p/abi-encoding-and-evm-calldata)
 
 ## Blockchain
 
@@ -776,6 +826,8 @@ Reference:
 
 > Under what circumstances would a smart contract that works on Ethereum not work on Polygon or Optimism? (Assume no dependencies on external contracts)
 
+**Opcode not supported**
+
 A smart contract can not work if one of the opcode present in the contract bytecode is not available in these network. The behavior of some specific opcode can also change between Ethereum and a layer2.
 
 For example, during a short period, the opcode PUSH0 was not available in Optimism and the behavior of PREVRANDAO is not the same on Optimism than on Ethereum,
@@ -786,7 +838,13 @@ For Polygon PoS, the chain is fully Ethereum equivalent, probably because the ex
 
 Regarding Polygon zkEVM, the same issue can appear than for Optimism. As for Optimism, the opcode PUSH0 was not directly available on Polygon zkEVM and has been introduced with the [Dragon Fruit upgrade](https://polygon.technology/blog/polygon-zkevm-dragon-fruit-is-live-on-mainnet).
 
+**Precompiles contract**
 
+Ethereum has nine precompiles contracts, which behave like smart contracts built into the Ethereum protocol.
+
+The behavior of these smart contracts can be different on others EVM compatible chain and layer2. For example, `ecrecover` on `zksync` always return a zero address for the zero digests (see [docs.zksync.io#ecrecover](https://docs.zksync.io/build/developer-reference/differences-with-ethereum.html#ecrecover)).
+
+Reference: [Ethereum precompiled contracts](https://www.rareskills.io/post/solidity-precompiles)
 
 > How can a smart contract change its bytecode without changing its address?
 
@@ -800,57 +858,4 @@ new_address = hash(0xFF, sender, salt, bytecode)
 
 Nevertheless, the Ethereum's  [Cancun upgrate](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/cancun.md) will remove the ability to destruct the smart contract bytecode for SELFDESTRUCT (see [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780)), a part if the opcode is called during the same transaction as the contract creation.
 
-Reference: [Deploying Smart Contracts Using `CREATE2`](https://docs.openzeppelin.com/cli/2.8/deploying-with-create2), [Dark Side of CREATE2 opcode](https://medium.com/coinmonks/dark-side-of-create2-opcode-6b6838a42d71)
-
-### Calldata of a function
-
-> Describe the calldata of a function that takes a dynamic length array of uint128 when uint128[1,2,3,4] is passed as an argument
-
-**uint128[1,2,3,4]**
-
-If I use the tool [cast](https://book.getfoundry.sh/reference/cast/cast-calldata) from Foundry to generate calldata from a function `test`
-
-```bash
-cast calldata "test(uint128[])" [1,2,3,4]
-```
-
-The result is:
-
-```
-0xd66cd0db000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004
-```
-
-We can then analyze the different values:
-
-| Value      | Description                                                  |
-| ---------- | ------------------------------------------------------------ |
-| 0xd66cd0db | 4 bytes selector from the function, `test`in my example      |
-| <0>2       | Not sure, but my guess is this is the location of the data part ("offset)") since it is a dynamic type |
-| <0>4       | Array size                                                   |
-| <0>1       | Param 1                                                      |
-| <0>2       | Param 2                                                      |
-| <0>3       | Param 3                                                      |
-| <0>4       | Param 4                                                      |
-
-The numbers inside the array are padded with `0` to fit a 32 bytes / 256 bits numbers
-
-
-
-**uint256[]**
-
-We can also try with uint256[]
-
-```bash
-cast calldata "test(uint256[])" [1,2,3,4]
-```
-
-The result is exactly the same as for the `uint128[]`
-
-```
-0xd66cd0db000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004
-```
-
-We can then analyze the different values, and we observe that they are the same that for uint128[]
-
-References: [docs.soliditylang - abi-spec.html#examples](https://docs.soliditylang.org/en/v0.8.24/abi-spec.html#examples), [ABI Encoding and EVM Calldata demystified](https://r4bbit.substack.com/p/abi-encoding-and-evm-calldata)
-
+Reference: [OpenZeppelin - Deploying Smart Contracts Using `CREATE2`](https://docs.openzeppelin.com/cli/2.8/deploying-with-create2), [Dark Side of CREATE2 opcode](https://medium.com/coinmonks/dark-side-of-create2-opcode-6b6838a42d71)
