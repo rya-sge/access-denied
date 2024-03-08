@@ -15,6 +15,20 @@ This article is a summary of the main concepts behind the [5. EIP-4844:Proto-Dan
 
 The main reference of this article is a lesson from LearnWeb3: [1.Proto-Danksharding: Scaling Ethereum using Blobs](https://learnweb3.io/lessons/proto-danksharding-scaling-ethereum-using-blobs/)
 
+## Introduction
+
+With the next Ethereum Upgrade, Duncan, a new transaction format will be introduced: **EIP-4844 Shared blob transactions.**
+
+Currently, rollup uses calldata to post their transaction on the Layer 1 Ethereum. This is expensive because it is processed by all Ethereum nodes and lives on chain forever.
+
+But rollups only need the data for a short time. For example, optimism rollup have only need the data available during the challenge period, e.g. one week on Arbitrum One.
+
+Proto-Danksharding introduces data blobs that can be sent and attached to blocks. The data in these blobs is not accessible to the EVM and is automatically deleted after a fixed time period (18 days in the EIP).  
+
+Since the data are not stored forever, it makes the whole process cheaper for rollup, thanks to their own own price mechanism.
+
+
+
 ## Common Concept
 
 ### Rollup
@@ -33,7 +47,7 @@ Reference: [6. ethereum.org/en/roadmap/danksharding/](https://ethereum.org/en/ro
 
 #### Sequencers
 
-A group of nodes called *sequencers* are in charge of batching (or *rolling up*) many Layer 2 transactions into a single Layer 1 transaction [https://domothy.com/blobspace/].
+A group of nodes called *sequencers* are in charge of batching (or *rolling up*) many Layer 2 transactions into a single Layer 1 transaction [[2. domothy.com/blobspace/](https://domothy.com/blobspace/)].
 
 ### Sharding
 
@@ -75,7 +89,7 @@ This kind of tasks can be however done by centralized block builders using  high
 
 This part is described in the EIP [4844](https://eips.ethereum.org/EIPS/eip-4844).
 
-Proto-Danksharding introduces data blobs that can be sent and attached to blocks. The data in these blobs is not accessible to the EVM and is automatically deleted after a fixed time period (1-3 months), making the whole process cheaper for rollup 
+Proto-Danksharding introduces data blobs that can be sent and attached to blocks. The data in these blobs is not accessible to the EVM and is automatically deleted after a fixed time period (18 days according to the EIP), making the whole process cheaper for rollup.
 
 Reference: [6. ethereum.org/en/roadmap/danksharding/](https://ethereum.org/en/roadmap/danksharding/).
 
@@ -112,6 +126,32 @@ The blob transactions have their own gas pricing mechanic, named **blob gas**. I
 - Running alongside the existing gas mechanic (EIP-1559)
 
 The separation of the pricing mechanics between EIP-1559 transactions and blob transactions (blob gas is priced independently) prevents one from affecting the other in case of peak.
+
+## Use case
+
+This paragraph come mainly from the [eip-4844](https://eips.ethereum.org/EIPS/eip-4844) specification.
+
+### Optimistic rollups
+
+With Optimism rollup, the underlying data  are only submitted in case of a challenge with the fraud proofs.
+
+The fraud proof system can verify the transition in smaller steps, loading at  most a few values of the blob at a time through calldata. 
+
+For each value:
+
+- It would provide a KZG proof and use the point evaluation precompile to verify the value against the versioned hash that was submitted before, 
+- Then perform the fraud proof verification on that data as is done today.
+
+### ZK rollup
+
+ZK rollups would provide two commitments to their transaction or state delta data: 
+
+- The blob commitment, which the protocol ensures points to available  data.
+- ZK rollup’s own commitment using whatever proof system the rollup uses internally. 
+
+They would use a proof of equivalence protocol, using the point evaluation precompile, to prove that the two commitments refer to the same data.
+
+
 
 ## References
 
