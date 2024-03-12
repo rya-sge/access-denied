@@ -256,9 +256,9 @@ References:
 
 >  How large a uint can be packed with an address in one slot?
 
-An address takes 20 bytes. Thus there are 12 bytes which are still free in this slot.
+A slot contains 32 bytes and an address already takes 20 bytes. Thus there are 12 bytes (= 96 bits) which are still free in this slot.
 
-It can be used to put a uint256(1 bytes) and a uint4
+You can pack an `uint96` with an address in the same slot.
 
 ### Gas refund
 
