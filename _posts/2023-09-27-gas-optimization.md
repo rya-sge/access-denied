@@ -3,7 +3,7 @@ layout: post
 title:  "Solidity Gas Optimization Cheatsheet"
 date:   2023-09-26
 last-update: 
-categories: blockchain ethereum
+categories: blockchain ethereum programmation
 lang: en
 locale: en-GB
 tags: blockchain crypto ethereum gas
