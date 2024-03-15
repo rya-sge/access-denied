@@ -10,7 +10,7 @@ description: Introduction to Arbitrum, an optimistic layer2 designed to scale Et
 image: /assets/article/blockchain/ethereum/arbitrum/1223_Arbitrum_Logos_Logomark_RGB.png
 ---
 
-**Arbitrum** is a technology designed to scale Ethereum. The main product is **Arbitrum Rollup**, an Optimistic rollup protocol that inherits Ethereum-level security.
+**Arbitrum** is a technology designed to scale Ethereum. The main product is **Arbitrum Rollup**, an Optimistic rollup protocol that uses Ethereum for its security.
 
 ## Arbitrum main points
 
@@ -32,7 +32,7 @@ Reference: [1. koreablockchainweek - Arbitrum 101](https://koreablockchainweek.c
 
 ## Arbitrum Ecosystem Components
 
-![insomniak2023]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/orbit_chain.jpeg)
+![orbit chain logo]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/orbit_chain.jpeg)
 
 Reference: [forum.arbitrum.foundation - The Arbitrum Expansion Program and developer Guild](https://forum.arbitrum.foundation/t/the-arbitrum-expansion-program-and-developer-guild/20722?utm_source=substack&utm_medium=email)
 
@@ -57,6 +57,12 @@ The Arbitrum Nitro stack consists of core components like the
   - it can’t, in principle, derive security directly from layer 1
 
 These components work together to form the foundation of the Arbitrum scaling solution.
+
+#### Schema
+
+Here a schema from the [Arbitrum documentation](https://docs.arbitrum.io/inside-arbitrum-nitro/)
+
+![orbit chain logo]({{site.url_complet}}/assets/article/blockchain/ethereum/arbitrum/arbitrum-sequencer-schema.png)
 
 #### Improvements
 
@@ -230,6 +236,50 @@ Upgrade is live, introducing new architecture, increased throughput and lower fe
 
 Whitelist got removed, there are no restrictions on who can transact with the network.
 
+
+
+## FAQ
+
+> How does Arbitrum Rollup compare to other Layer 2 scaling solutions, such as ZK-Rollups or Optimism? 
+
+Contrary to Optimistic rollup, *ZK-Rollups* can provide immediate finality, since the fraud proof eliminates the need of the waiting period, which is one week for **Arbitrum**.
+
+But *optimistic rollup* does not need to provide data since every transaction is assumed to be valid. Except if there is a challenge (fraud-proof claim), the costs are generally cheaper since you reduce the quantity of data to submit.
+
+Reference:
+
+- [Zero-Knowledge vs. Optimistic Rollups Explained: Which One is Better for Blockchain Games?](https://www.immutable.com/blog/zero-knowledge-vs-optimistic-rollups-explained-which-one-is-better-for-blockchain-games).
+
+- [ZK-Rollups vs. Optimistic Rollups: What’s The Difference?](https://www.nervos.org/knowledge-base/zk_rollup_vs_optimistic_rollup)
+
+- [Optimistic Rollups vs. Zero-Knowledge (ZK) Rollups: How Do They Work?](https://www.blockchain-council.org/ethereum/optimistic-rollups-vs-zero-knowledge-rollups/)
+
+
+
+> What are the trade-offs and limitations of using Arbitrum Rollup for dApp development and deployment? 
+
+- Centralized sequence and outage
+
+At the moment, the sequencer is centralized. Since it is responsible for batching the transactions, the network may experience an outage if it stops working. It was the case [in December](https://status.arbitrum.io/clq6te1l142387b8n5bmllk9es) when there was an increase in traffic due to Inscriptions.
+
+- Possible incompatibility with smart contract
+
+You can have minor differences with Ethereum for some opcode. In the future, it is still possible that a new opcode will not be immediately available on Arbitrum, it was e.g. the case for `PUSH0`.
+
+The complete list is available on [rollup.code](https://www.rollup.codes/arbitrum-one), see also my answers on an interview question about Layer2 [RareSkills Solidity Interview Answers - Hard](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#optimistic-rollup-and-a-zk-rollup)
+
+
+
+> How can users and developers interact with Arbitrum Rollup chains, and what tools and services are available to support them?
+
+Since Arbitrum is EVM compatible, you can use the same main developments tools as for Ethereum e.g [Foundry](https://book.getfoundry.sh) or [Hardhat](https://hardhat.org)
+
+See also [docs.arbitrum.io/development-frameworks](https://docs.arbitrum.io/for-devs/dev-tools-and-resources/development-frameworks) and [Web3 libraries and tools](https://docs.arbitrum.io/for-devs/dev-tools-and-resources/web3-libraries-tools)
+
+An explorer for Arbitrum is also available at the following address: [arbiscan.io](https://arbiscan.io)
+
+
+
 ## Main References
 
 [1. koreablockchainweek - Arbitrum 101](https://koreablockchainweek.com/blogs/kbw-blog/arbitrum-101)
@@ -239,6 +289,8 @@ Whitelist got removed, there are no restrictions on who can transact with the ne
 [3. Patch Thursday — Risks on CEX’s Confirmation Number on Arbitrum and Optimism](https://medium.com/chainlight/patch-thursday-risks-on-cexs-confirmation-on-arbitrum-and-optimism-7ee25a1d58bf)
 
 4.ChatGPT with the input "Explains me arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about arbitrum anyTrust, stylus, Arbitrum Nitro stack, arbitrum one and arbitrum nova. Cite example which uses Aribtrum for their project"
+
+5.The FAQ questions (not the answers) have been generated by Copilot.
 
 
 

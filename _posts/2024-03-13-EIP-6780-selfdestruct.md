@@ -65,11 +65,9 @@ If a contract A called a contrat B (or a library) to execute code withtouh verif
 
 A famous example concerns the [Parity multi sig wallet](https://www.parity.io/blog/a-postmortem-on-the-parity-multi-sig-library-self-destruct/). On 2017, a `selfdestruct`has been triggerd by an anonymous user on a library used by the wallet.  As a result, funds in 587 wallets, about 513,774.16 Ether as well as additional tokens, are blocked forever in the contract.
 
-It can also be the case in a proxy architecture, see the paragraph "Proxy implementation not protected" for more details
+It can also be the case in a proxy architecture, see the paragraph "Proxy implementation not protected" for more details.
 
 ### Permanently loss of funds by sending ethers
-
-Ethers
 
 When a smart contract is selfdestructed, all ethers sent to the contract are lost. When a smart contract has no code, following a self-destructed operation, transactions will success with no code executed. Thus, if you send ethers to the contract or call a function previously declared in the smart contract, the value of `msg.value` will be stored and blocked in the contract forever.
 
@@ -91,7 +89,7 @@ In the standard proxy architecture, a function `initialize` replaces the traditi
 
 But this function is public and can also be called directly on the implementation contract if the proper mechanism to avoid this is not put in place. Therefore, an attacker can use this function to take over the contract and if a function contains `selfdestruct` , the attacker can call this function and destroy the implementation contract.
 
-The effect will be different if it is a transparent proxy or a.
+The effect will be different if it is a transparent proxy or an UUPS proxy.
 
 With a transparent proxy, you still have the possibility to upgrade the proxy to a new implementation, but with an UUPS proxy, the logic to upgrade the contract is inside the implementation contract and the proxy can not be upgraded if the implementation contract is destroyed.
 
@@ -188,7 +186,7 @@ Reference: [Fundamentals of Gas Tokens](https://blog.openzeppelin.com/fundamenta
 
 By combining `selfdestruct` with the opcode `create2`, it was possible to change the contract bytecode, furthermore breaking the code immutability.
 
-With `create`, the address can be pre-computed and it is easier to deploy a bytecode at the same address again.
+With `create2`, the address can be pre-computed and it is easier to deploy a bytecode at the same address again.
 
 The operation consisted to:
 
