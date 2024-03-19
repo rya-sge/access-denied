@@ -21,14 +21,14 @@ image: /assets/article/blockchain/ethereum/arbitrum/1223_Arbitrum_Logos_Logomark
 - **Ethereum Compatibility:** Arbitrum is fully compatible with the Ethereum Virtual Machine (EVM), enabling seamless migration for existing Ethereum projects. Developers can use the same tools and languages to build on Arbitrum.
 - **Reduced Gas Fees and Faster Transactions:** By processing transactions off-chain and submitting a summary to the Ethereum mainnet, Arbitrum significantly reduces gas fees and improves transaction confirmation times.
 
-### Components
+### Main Components
 
-- Arbitrum is an optimistic rollup in the Ethereum ecosystem,
+- Arbitrum Rollup, an optimistic rollup in the Ethereum ecosystem for scaling Ethereum smart contracts.
 - Arbitrum **Nitro** is a rollup network with a fraud proof system implemented with EVM compatibility.
 - Arbitrum **Nova** is based on the Arbitrum AnyTrust protocol. Since it stores data through the Data Availability Committee (DAC) rather than the Ethereum network, it can provide higher scalability than Arbitrum One.
-- Arbitrum **Orbit** is a framework that allows developers to easily develop L3 networks at the top of Arbitrum.
+- Arbitrum **Orbit** is a framework that allows developers to easily develop L3 networks at the top of Arbitrum (own Rollup and AnyTrust chains).
 
-Reference: [1. koreablockchainweek - Arbitrum 101](https://koreablockchainweek.com/blogs/kbw-blog/arbitrum-101)
+Reference: [1. koreablockchainweek - Arbitrum 101](https://koreablockchainweek.com/blogs/kbw-blog/arbitrum-101), [docs.arbitrum - The Arbitrum Suite](https://docs.arbitrum.io/welcome/get-started#the-arbitrum-suite)
 
 ## Arbitrum Ecosystem Components
 
@@ -36,9 +36,17 @@ Reference: [1. koreablockchainweek - Arbitrum 101](https://koreablockchainweek.c
 
 Reference: [forum.arbitrum.foundation - The Arbitrum Expansion Program and developer Guild](https://forum.arbitrum.foundation/t/the-arbitrum-expansion-program-and-developer-guild/20722?utm_source=substack&utm_medium=email)
 
+
+
 ### Arbitrum AnyTrust
 
-Arbitrum AnyTrust is a trustless bridge that facilitates the movement of assets between the Ethereum mainnet and the Arbitrum chain. It ensures the security and integrity of asset transfers.
+The Arbitrum protocol requires that all Arbitrum nodes, including  validators, have access to the data of every L2  transaction in the Arbitrum chain's inbox. 
+
+In the Rollup system, used by **Arbitrum One**, the rollup provides  data access by posting the data on L1  Ethereum as calldata, which is costly.
+
+Arbitrum AnyTrust reduces the costs by accepting a mild trust assumption. Indeed, AnyTrust relies on an external Data Availability Committee (DAC) to store data and provide it on demand. 
+
+Reference: [AnyTrust](https://docs.arbitrum.io/inside-anytrust)
 
 ### Arbitrum Nitro Stack
 
@@ -76,11 +84,12 @@ Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#nitro](https://docs
 
 ### Arbitrum One
 
-Arbitrum One is a specific deployment of the Arbitrum protocol on the Ethereum mainnet. It is a live and production-ready instance of Arbitrum that developers and users can interact with. 
+**Arbitrum One** is a Layer 2 (L2) optimistic rollup chain that implements the Arbitrum Rollup protocol and settles to Ethereum's Layer 1 (L1) chain. 
 
-- **Arbitrum One** is a Layer 2 (L2) optimistic rollup chain that implements the Arbitrum Rollup protocol and settles to Ethereum's Layer 1 (L1) chain. 
-- It lets you build high-performance Ethereum dApps with low transaction costs and Ethereum-grade security guarantees, introducing no additional trust assumptions. 
-- This is made possible by the [Nitro](https://docs.arbitrum.io/inside-arbitrum-nitro/) technology stack, a "Geth-at-the-core" architecture that gives Arbitrum One (and Nova) advanced calldata compression, separate contexts for common execution and fault proving, Ethereum L1 gas compatibility, and more.
+- It is a live and production-ready instance of *Arbitrum* that developers and users can interact with. 
+- It lets you build Ethereum dApps with low transaction costs.
+
+Arbitrum One uses Ethereum to guarantee its security and contrary to Arbitrum Nova, there is no additional trust assumptions. 
 
 Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#arbitrum-one](https://docs.arbitrum.io/for-devs/concepts/public-chains#arbitrum-one)
 
@@ -90,13 +99,13 @@ Reference: [docs.arbitrum.io/for-devs/concepts/public-chains#arbitrum-one](https
 - Like Arbitrum One, Arbitrum Nova uses Arbitrum's Nitro technology stack 
 - They key difference between Rollup and AnyTrust is that the AnyTrust protocol introduces an additional trust assumption in the form of a data availability committee (DAC).
 - This committee (detailed below) is responsible for expediting the process of storing, batching, and posting L2 transaction data to Ethereum's L1. 
-- This lets you use Arbitrum in scenarios that demand performance and affordability, while Arbitrum One is optimal for scenarios that demand Ethereum's pure trustlessness. Arbitrum Nova is designed for applications that require a higher transaction throughput and don’t require the full decentralization that rollups provide.equire the full decentralization that rollups provide.
+- This lets you use Arbitrum in scenarios that demand performance and affordability, while Arbitrum One is optimal for scenarios that demand Ethereum's pure trustlessness. Arbitrum Nova is designed for applications that require a higher transaction throughput and don’t require the full decentralization that rollups provide.
 
 Reference: [docs.arbitrum.io/for-devs/concepts/public-chains](https://docs.arbitrum.io/for-devs/concepts/public-chains)
 
 ### Arbitrum Orbit
 
-Arbitrum allows the creation of blockchains / dapp on top of Arbitrum one or Nova. With it, you can create your own self-managed Arbitrum Rollup and AnyTrust chains.
+Arbitrum Orbit allows the creation of blockchains / dapp on top of Arbitrum one or Nova. With it, you can create your own self-managed Arbitrum Rollup and AnyTrust chains.
 
 Its main advantages are:
 
@@ -152,9 +161,11 @@ Reference: [docs.arbitrum.io/stylus/stylus-gentle-introduction](https://docs.arb
 
 Reference: [docs.arbitrum.io/tx-lifecycle](https://docs.arbitrum.io/tx-lifecycle)
 
-## Detect Fraud
+## Security
 
-### Optimism 
+### Detect Fraud
+
+#### Optimism 
 
 Ethereum adopts an [“innocent until proven guilty"](https://insights.deribit.com/market-research/making-sense-of-rollups-part-2-dispute-resolution-on-arbitrum-and-optimism/) attitude to Arbitrum. Layer 1 initially “optimistically assumes” activity on Arbitrum is following the proper rules. 
 
@@ -163,7 +174,7 @@ If a violation occurs (i.e., somebody claims “now I have all of your money”)
 - This claim can be disputed back on L1; 
 - Fraud will be proven, the invalid claim disregarded, and the malicious party will be financially penalized.
 
-### Assertion tree
+#### Assertion tree
 
 - **Arbitrum state**: The state of an Arbitrum chain is confirmed back on Ethereum via "assertions," aka "disputable assertions" or "DAs." These are claims made by Arbitrum validators about the chain's state. To make an assertion, a validator must post a bond in Ether.
 - **Happy / Common scenario**: all outstanding assertions will be valid; i.e., a valid assertion will build on another valid assertion, which builds on another valid assertion, and so on. 
@@ -172,7 +183,7 @@ If a violation occurs (i.e., somebody claims “now I have all of your money”)
 
 Reference: [docs.arbitrum.io/assertion-tree](https://docs.arbitrum.io/assertion-tree)
 
-### Interactive proving
+#### Interactive proving
 
 Arbitrum uses interactive proving. It refers to resolving disputes through interaction between the disputing parties. 
 
@@ -188,7 +199,7 @@ References:
 - [docs.arbitrum.io - Inside Arbitrum Nitro](https://docs.arbitrum.io/inside-arbitrum-nitro/)
 - [docs.arbitrum.io - challenge-manager](https://docs.arbitrum.io/proving/challenge-manager)
 
-## Accident
+### Accident
 
 Since Arbitrum’s launch, its sequencer has halted **three times**. 
 
@@ -198,7 +209,29 @@ Since Arbitrum’s launch, its sequencer has halted **three times**.
 
 Reference: [3. Patch Thursday — Risks on CEX’s Confirmation Number on Arbitrum and Optimism](https://medium.com/chainlight/patch-thursday-risks-on-cexs-confirmation-on-arbitrum-and-optimism-7ee25a1d58bf)
 
+### Governance and Upgrade
+
+The Arbitrum governance has two main bodies:
+
+- **The DAO** - represented by holders of the $ARB token, and votes to pass proposals.
+- **The Security Council** 
+  -  is made up of a 9 of 12 multisig that can take quick action in case of an emergency 
+  -  And a 7 of 12 multisig that can take slow action for routine upgrades that bypass the DAO vote.
+
+According to a [L2Beat report](https://drive.google.com/file/d/182ycEW8C2wk5tGd3X1tG8oQfUy9WmSJk/view), the Security Council can perform emergency upgrades directly through the *UpgradeExecutor*, see also [github.com/ArbitrumFoundation/governance/#l1-upgrade-executor](https://github.com/ArbitrumFoundation/governance/blob/main/docs/overview.md#l1-upgrade-executor)
+
+Such an upgrade can be executed instantly without any delay. 
+
+Thus, the Security Council can instantly upgrade the chain. In case of emergency (security issue), it allows the Council to perform a patch "quickly" to save e.g. user founds.
+
+But, it also means that If this Council acts maliciously, they can steal user funds. 
+
+However, as indicated in the [L2Beat report](https://drive.google.com/file/d/182ycEW8C2wk5tGd3X1tG8oQfUy9WmSJk/view), the Security Council member list is publicly known, and the members are legally
+bound (by a contract with Arbitrum Foundation) to act with integrity.
+
 ## Advantage and Disadvantage
+
+### Advantages
 
 The main advantages of Arbitrum is :
 
@@ -288,9 +321,8 @@ An explorer for Arbitrum is also available at the following address: [arbiscan.i
 
 [3. Patch Thursday — Risks on CEX’s Confirmation Number on Arbitrum and Optimism](https://medium.com/chainlight/patch-thursday-risks-on-cexs-confirmation-on-arbitrum-and-optimism-7ee25a1d58bf)
 
-4.ChatGPT with the input "Explains me arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about arbitrum anyTrust, stylus, Arbitrum Nitro stack, arbitrum one and arbitrum nova. Cite example which uses Aribtrum for their project"
+4. [L2Beat report](https://drive.google.com/file/d/182ycEW8C2wk5tGd3X1tG8oQfUy9WmSJk/view)
 
-5.The FAQ questions (not the answers) have been generated by Copilot.
+5.ChatGPT with the input "Explains me Arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about Arbitrum anyTrust, stylus, Arbitrum Nitro stack, Arbitrum One and Arbitrum Nova. Cite example which uses Arbitrum for their project".
 
-
-
+6.The FAQ questions (not the answers) have been generated by Copilot.
