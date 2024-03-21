@@ -61,8 +61,8 @@ The Arbitrum Nitro stack consists of core components like the
   - Routers: Exactly two contracts (one on L1, one on L2) that route each asset to its designated gateway.
 - [Arbitrum Sequencer](https://docs.arbitrum.io/sequencer)
   - Specially designated Arbitrum full node which, under normal conditions, is responsible for submitting users’ transactions onto L1.
-  -  The Sequencer is a single, centralized entity; eventually, sequencing affordances could be given to a distributed committee of sequencers which come to consensus on orderin
-  - it can’t, in principle, derive security directly from layer 1
+  -  The Sequencer is currently a single and centralized entity. In the future, eventually, it could be replaced by a distributed committee of sequencers which come to consensus on ordering.
+  - It can’t, in principle, derive security directly from layer 1
 
 These components work together to form the foundation of the Arbitrum scaling solution.
 
@@ -122,13 +122,13 @@ Reference: [A gentle introduction: Orbit chains](https://docs.arbitrum.io/launch
 
 ## Arbitrum classic (deprecated)
 
-Classis is  the technology used by Arbitrum  before Nitro and is no depreceted since Auguest 2022
+Classic is  the technology used by Arbitrum  before Nitro and is no deprecated since August 2022
 
 The technology classic implements  the Arbitrum’s L2 state machine— known as [“ArbOS”](https://docs.arbitrum.io/arbos/) 
 
-Arbitrum Classis used the Arbitrum Virtual Machine, a cumstom virtual machine, instead of the EVM
+Arbitrum Classic used the Arbitrum Virtual Machine, a cumstom virtual machine, instead of the EVM
 
-Nitro instead used a version of Geth to be EVM compaible. The code is generally directly compatibles in the native language and when a challenge comes in from the fraud proof system, it is compiled in Wasm bytecode during dispute periodes
+Nitro instead used a version of Geth to be EVM compatible. The code is generally directly compatibles in the native language and when a challenge comes in from the fraud proof system, it is compiled in Wasm bytecode during dispute periodes
 
 Reference:
 
