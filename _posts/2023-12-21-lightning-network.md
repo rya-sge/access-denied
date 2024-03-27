@@ -6,13 +6,33 @@ lang: en
 locale: en-GB
 categories: blockchain 
 tags: blockchain bitcoin lightning-network htlc channel routing onion
-description: This article lists and describes the main concepts behind the Lightning Network, a layer-2 built on the Bitcoin blockchain.
+description: This article lists and describes the main concepts behind the Lightning Network (LN), a layer-2 built on the Bitcoin blockchain.
 image: /assets/article/blockchain/bitcoin/560px-Bitcoin_lightning_logo.svg.png
 ---
 
 This article lists and describes the main concepts behind the Lightning Network, a layer-2 built on the Bitcoin blockchain.
 
-The concepts are organised in five topics, thanks to ChatGPT to be honest: *Fundamentals and Architecture, Node Operation and Security, Privacy and Routing, Channel management*, *Network Analysis and Tools*
+The concepts are organised in five topics: *Fundamentals and Architecture, Node Operation and Security, Privacy and Routing, Channel management*, *Network Analysis and Tools*
+
+## Short presentation
+
+Transactions on the Bitcoin blockchain can be expensive (AVG ~8$) and their confirmations are slow ([~10 minutes](https://coinmarketcap.com/academy/article/how-long-does-a-bitcoin-transaction-take)) 
+
+**Lightning Network (LN)** aims to offer faster and cheapest transactions, in seconds rather than minutes,  and for a few cents.
+
+LN is based on the following technologies: 
+
+- Private channels between two parties, a 2-of-2 multisignature account, that enable off-chain transactions. 
+- Hash Time-lock Contracts: HTCL reduces the counterparty risk by locking the funds in an escrow that requires for unlocking the hash of a secret number or unlocked after a date limit.
+
+In short, the LN works in three steps :
+
+1. **Opening a payment channel**:  the parties which want to perform transactions together open a channel between them by creating a special Bitcoin transaction.
+
+2. **Transacting off-chain**: Once the channel is opened, the two parties can use it to perform payments between them without recording transactions on the main blockchain.
+3. **Settling on the blockchain**: When one party wishes to close the channel, the final state of their transactions is recorded on the main Bitcoin blockchain.
+
+Reference: [bitinfocharts.com - bitcoin-transactionfees.html](https://bitinfocharts.com/comparison/bitcoin-transactionfees.html), [What is Lightning Network and How Does it Work With Bitcoin?](https://trustmachines.co/learn/what-is-lightning-network/)
 
 ## Fundamentals and Architecture
 
@@ -146,7 +166,10 @@ Since the lightning transactions are private, there are no public explorer as fo
 
 - [docs.lightning.engineering/](https://docs.lightning.engineering/)
 - [voltage.cloud/](https://voltage.cloud/)
-
+- [bitinfocharts.com/comparison/bitcoin-transactionfees.html](https://bitinfocharts.com/comparison/bitcoin-transactionfees.html)
+- [How Long Does a Bitcoin Transaction Take?](https://coinmarketcap.com/academy/article/how-long-does-a-bitcoin-transaction-take)
+- [dci.mit.edu/lightning-network](https://dci.mit.edu/lightning-network)
+- [What You Need to Know About Our Bitcoin Lightning Network Integration](https://www.binance.com/en/blog/ecosystem/what-you-need-to-know-about-our-bitcoin-lightning-network-integration-9199943838366033281)
 - ChatGPT with the input 
 
 *Make a list of 20 concepts related to the Bitcoin lightning network and provide for each of them a short description. Regroup them in difference topics*
