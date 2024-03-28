@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum
 tags: ethereum stacking merge
-description: Stacking in Ethereum is a key functionality. This article explains the main concepts behind it: BLS signature, slashing, Withdrawal address,...
+description: Stacking in Ethereum is a key functionality. This article explains the main concepts behind it - BLS signature, slashing, Withdrawal address,...
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 isMath: false
 ---
