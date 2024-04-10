@@ -13,15 +13,17 @@ isMath: false
 
 ## Introduction
 
-When Ethereum has passed from Proof of Work (PoW) to Proof of Stake with the [Merge](https://ethereum.org/en/roadmap/merge/) in 2022, this operation has introduced several changes regarding the type of keys involved in securing the Ethereum chain.
+When Ethereum is passed from Proof of Work (PoW) to Proof of Stake with the [Merge](https://ethereum.org/en/roadmap/merge/) in 2022, this operation has introduced several changes regarding the type of keys involved in securing the Ethereum chain.
 
 With PoW, no identification system is required since you don't care who minted the blocked, only a correct hash was necessary.
 
 But with stacking, validators have now identities and you need digital signatures to uniquely identify them.
 
-For this purpose, Ethereum does not use the traditional Elliptic curve signature (secp256k1) as for legacy chain wallet (e.g EOA) but uses another cryptography scheme called **BLS**, which stands for Boneh–Lynn–Shacham. These signatures use a different Elliptic curve called BLS12-381.
+For this purpose, Ethereum does not use the traditional Elliptic curve signature (secp256k1) as for legacy chain wallet (e.g EOA) but uses another cryptography scheme called **BLS**, which stands for Boneh–Lynn–Shacham. 
 
-- For stacking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionnaly a **Withdrawal key pair** to set the withdrawal address.
+- These signatures use a different Elliptic curve called BLS12-381.
+
+- For stacking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionally a **Withdrawal key pair** to set the withdrawal address.
 - The **advantage** of BLS over the traditional Elliptice curve signature is the ability to aggregate signature. With BLS, you can combine multiple signatures and/or public keys from different users into a single representation. Therefore, it makes possible to verify many signatures in a single operation, instead of verify each signature individually.
 
 Reference: [6. KEYS IN PROOF-OF-STAKE ETHEREUM](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/), [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography), [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
