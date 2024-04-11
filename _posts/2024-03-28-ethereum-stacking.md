@@ -5,8 +5,8 @@ date:   2024-03-28
 lang: en
 locale: en-GB
 categories: blockchain ethereum
-tags: ethereum stacking merge
-description: Stacking in Ethereum is a key functionality. This article explains the main concepts behind it - BLS signature, slashing, Withdrawal address,...
+tags: ethereum staking merge
+description: Staking in Ethereum is a key functionality. This article explains the main concepts behind it - BLS signature, slashing, Withdrawal address,...
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 isMath: false
 ---
@@ -17,13 +17,13 @@ When Ethereum is passed from Proof of Work (PoW) to Proof of Stake with the [Mer
 
 With PoW, no identification system is required since you don't care who minted the blocked, only a correct hash was necessary.
 
-But with stacking, validators have now identities and you need digital signatures to uniquely identify them.
+But with staking, validators have now identities and you need digital signatures to uniquely identify them.
 
 For this purpose, Ethereum does not use the traditional Elliptic curve signature (secp256k1) as for legacy chain wallet (e.g EOA) but uses another cryptography scheme called **BLS**, which stands for Boneh–Lynn–Shacham. 
 
 - These signatures use a different Elliptic curve called BLS12-381.
 
-- For stacking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionally a **Withdrawal key pair** to set the withdrawal address.
+- For staking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionally a **Withdrawal key pair** to set the withdrawal address.
 - The **advantage** of BLS over the traditional Elliptice curve signature is the ability to aggregate signature. With BLS, you can combine multiple signatures and/or public keys from different users into a single representation. Therefore, it makes possible to verify many signatures in a single operation, instead of verify each signature individually.
 
 Reference: [6. KEYS IN PROOF-OF-STAKE ETHEREUM](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/), [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography), [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
@@ -130,9 +130,9 @@ To process incoming validator deposits from the execution layer (formerly 'Eth1'
 - [Teku](https://github.com/Consensys/teku) (Consensys)
 - [Lodestar](https://lodestar.chainsafe.io) (ChainSafe)
 
-## Stacking deposit contract
+## staking deposit contract
 
-The Ethereum stacking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the stacked funds.
+The Ethereum staking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the stacked funds.
 
 Its address is published on the ethereum Foundation [website](https://ethereum.org/en/staking/deposit-contract/). As indicated in the website "Sending ETH to the address on this page will not make you a staker and will result in a failed transaction."
 
