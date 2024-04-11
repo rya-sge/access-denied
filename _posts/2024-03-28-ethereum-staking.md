@@ -130,9 +130,9 @@ To process incoming validator deposits from the execution layer (formerly 'Eth1'
 - [Teku](https://github.com/Consensys/teku) (Consensys)
 - [Lodestar](https://lodestar.chainsafe.io) (ChainSafe)
 
-## staking deposit contract
+## Staking deposit contract
 
-The Ethereum staking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the stacked funds.
+The Ethereum staking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the staked funds.
 
 Its address is published on the ethereum Foundation [website](https://ethereum.org/en/staking/deposit-contract/). As indicated in the website "Sending ETH to the address on this page will not make you a staker and will result in a failed transaction."
 
