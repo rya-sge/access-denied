@@ -13,6 +13,8 @@ isMath: true
 
 This article presents the list of medium questions with their answers related to the article [Solidity Interview Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills.
 
+For the level Hard, you can see [my second article](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/).
+
 According to the article, all questions can be answered in three sentences or less.
 
 The answers here are more complete than necessary in order to explain in details the topics.
@@ -571,7 +573,7 @@ When a transaction is waiting in the mempool to be valided, an "attacker" use th
 Reference:
 
 - [Front-Running Attacks in Blockchain: The Complete Guide](https://www.immunebytes.com/blog/front-running-attacks-in-blockchain-the-complete-guide/)
-- [Front Running and Sandwich Attack Explained | QuillAudits](https://quillaudits.medium.com/front-running-and-sandwich-attack-explained-quillaudits-de1e8ff3356d)
+- [Front Running and Sandwich Attack Explained - QuillAudits](https://quillaudits.medium.com/front-running-and-sandwich-attack-explained-quillaudits-de1e8ff3356d)
 
 **Sandwich attack**
 
@@ -912,3 +914,10 @@ function shutdown() public onlyOwner {
 ```
 
 Reference: [docs.soliditylang.org - function-declaration](https://docs.soliditylang.org/en/latest/style-guide.html#function-declaration)
+
+## Further reading
+
+You can find different answers to these questions in the following resources
+
+- [github.com/typicalHuman/solidity-interview-questions?tab=readme-ov-file#medium](https://github.com/typicalHuman/solidity-interview-questions?tab=readme-ov-file#medium)
+

@@ -334,7 +334,7 @@ Reference: [docs.soliditylang.org - libraries](https://docs.soliditylang.org/en/
 References:
 
 - [RareSkills - Solidity Staticcall EIP 214](https://www.rareskills.io/post/solidity-staticcall)
-- [Intro to Smart Contract Security Audits | Delegatecall (1)](https://slowmist.medium.com/c-delegatecall-i-c55c911ec2d0)
+- [Intro to Smart Contract Security Audits - Delegatecall (1)](https://slowmist.medium.com/c-delegatecall-i-c55c911ec2d0)
 - [Learn Solidity lesson 34. Call, staticcall and delegatecall](https://medium.com/coinmonks/call-staticcall-and-delegatecall-1f0e1853340)
 - [In "msg.sender.call.value(msg.value)", where is msg.value taken from?](https://ethereum.stackexchange.com/questions/77957/in-msg-sender-call-valuemsg-value-where-is-msg-value-taken-from)
 - [How are delegatecall and staticcall in Solidity different?](https://www.educative.io/answers/how-are-delegatecall-and-staticcall-in-solidity-different)
