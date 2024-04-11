@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Ethereum Stacking - How It Works
+title:  Ethereum Staking - How It Works
 date:   2024-03-28
 lang: en
 locale: en-GB
