@@ -13,7 +13,7 @@ layout: home
 {% include header.html %}
 <div class="c-posts o-opacity" data-page="{{ currentPage }}" data-totalPages="{{ paginator.total_pages }}">
   {% for post in site.posts limit:site.paginate offset:offset %}
-  {% if post.exclude != "yes" %}
+  {% if !post.exclude %}
     <article class="c-post">
       {% if post.image %}
       <a class="c-post-thumbnail o-opacity" style="background-image: url({{  site.baseurl | append : post.image}})"
