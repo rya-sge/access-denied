@@ -9,6 +9,7 @@ tags:
 description: 
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 isMath: false
+exclude: yes
 ---
 
 Article available here (typo in the url): [https://rya-sge.github.io/access-denied/2024/03/28/ethereum-staking/](https://rya-sge.github.io/access-denied/2024/03/28/ethereum-staking/)
