@@ -2,13 +2,15 @@
 layout: post
 title:  "WAH10 - Back-End Components"
 date:   2022-02-03
-categories: securite reseau web
+categories: security network web
 tags: web backend component lfi rfi hpi hpp smtp wah
 description: Questions & Réponses du chapitre 10 du livre The Web Application Hacker's Handbook
 image:  /assets/article/pentest/wah/wah-cover.PNG
 ---
 
 > Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 10, *Attacking Back-End Components* du livre *The Web Application Hacker's Handbook*.
+>
+> Deux autres articles sont également disponible pour les chapitres [11 Application Logic](https://rya-sge.github.io/access-denied/2022/02/03/wah-application-logic/) et [18-The Application Server](https://rya-sge.github.io/access-denied/2022/02/03/wah-application-server/).
 >
 > L'article a pour objectif de sensibiliser le lecteur aux différentes vulnérabilités existantes afin qu'il puisse s'en prémunir.
 

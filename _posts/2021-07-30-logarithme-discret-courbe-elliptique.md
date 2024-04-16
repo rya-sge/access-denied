@@ -2,7 +2,7 @@
 layout: post
 title:  "Le Logarithme Discret sur courbe elliptique avec SageMath"
 date:   2021-07-30
-categories: cryptographie
+categories: cryptography
 tags: courbe-elliptique sage logarithme-discret
 description: Cet article traite du problème du logarithme discret sur une courbe elliptique. Il contient un exemple faisant appel à la librairie python SageMath.
 isMath: true 

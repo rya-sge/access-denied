@@ -2,7 +2,7 @@
 layout: post
 title:  "Introduction à Node.JS"
 date:   2021-07-11
-categories: reseau programmation
+categories: network programmation
 tags: node.js javascript serveur backend
 description: Node.JS est un environnement d’exécution (runtime) en Javascript permettant d'exécuter du javascript côté serveur. Il possède un grand nombre de paquets pouvant être installés avec le gestionnaire de package npm.
 ---

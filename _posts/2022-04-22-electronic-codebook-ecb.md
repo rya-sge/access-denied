@@ -4,7 +4,7 @@ title:  "Le mode opératoire ECB"
 date:   2022-04-22
 locale: fr-FR
 last-update: 
-categories: cryptographie 
+categories: cryptography 
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode opératoire ECB avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité).
 image: /assets/article/cryptographie/mode-chiffrement/ecb-encryption.png

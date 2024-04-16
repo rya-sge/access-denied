@@ -2,7 +2,7 @@
 layout: post
 title:  "WAH18 - The Application Server"
 date:   2022-02-03
-categories: securite reseau web
+categories: security network web
 tags: webdav proxy virtualhost oracle wah
 description: Questions & Réponses du chapitre 18, Attacking the Application Server, du livre The Web Application Hacker's Handbook
 image: /assets/article/pentest/wah/wah-cover.PNG
@@ -10,7 +10,9 @@ image: /assets/article/pentest/wah/wah-cover.PNG
 
 
 
-> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 18, *Attacking the Application Server*, du livre *The Web Application Hacker's Handbook*
+> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 18, *Attacking the Application Server*, du livre *The Web Application Hacker's Handbook*.
+>
+> Deux autres articles sont également disponible pour les chapitres [10-Back-End Components](https://rya-sge.github.io/access-denied/2022/02/03/wah-backend-components/) et [11 Application Logic](https://rya-sge.github.io/access-denied/2022/02/03/wah-application-logic/).
 >
 > L'article a pour objectif de sensibiliser le lecteurs aux différentes vulnérabilités existantes afin qu'il puisse s'en prémunir.
 

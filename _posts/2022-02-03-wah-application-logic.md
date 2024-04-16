@@ -2,13 +2,15 @@
 layout: post
 title:  "WAH11 - Application Logic"
 date:   2022-02-03
-categories: securite reseau web
+categories: security network web
 tags: application logique sql thread wah
 description: Questions & Réponses du chapitre 11, Attacking Application Logic, du livre The Web Application Hacker's Handbook
 image: /assets/article/pentest/wah/wah-cover.PNG
 ---
 
-> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 11, *Attacking Application Logic*, du livre *The Web Application Hacker's Handbook*
+> Cet article contient mes réponses personnelles aux questions présentes dans le chapitre 11, *Attacking Application Logic*, du livre *The Web Application Hacker's Handbook*.
+>
+> Deux autres articles sont également disponible pour les chapitres [10 Back-End Components](https://rya-sge.github.io/access-denied/2022/02/03/wah-backend-components/) et [18-The Application Server](https://rya-sge.github.io/access-denied/2022/02/03/wah-application-server/).
 >
 > L'article a pour objectif de sensibiliser le lecteurs aux différentes vulnérabilités existantes afin qu'il puisse s'en prémunir.
 

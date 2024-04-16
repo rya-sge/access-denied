@@ -3,7 +3,7 @@ layout: post
 title:  "La sécurité du protocole Telnet"
 date:   2022-02-05
 last-update: 
-categories: securite
+categories: security
 tags: telnet pentesting 
 image: /assets/article/pentest/telnet/telnet-cov.PNG
 description: Cet article présente un test d'intrusion sur le protocole telnet afin de sensibiliser le lecteur aux différentes vulnérabilités possibles pour qu'il s'en prémunisse.

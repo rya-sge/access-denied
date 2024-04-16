@@ -2,7 +2,7 @@
 layout: post
 title:  "Introduction à Klee"
 date:   2021-05-11 
-categories: reverse securite
+categories: reverse security
 tags: klee clang reverse sanitizer concolique analyse
 description: Présentation du logiciel Klee ainsi que ses tutoriels. Klee est un outil permettant de réaliser une analyse concolique. 
 image: /assets/article/outil-securite/klee/klee-tutorial2.JPG

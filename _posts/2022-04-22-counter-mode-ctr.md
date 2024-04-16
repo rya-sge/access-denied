@@ -3,7 +3,7 @@ layout: post
 title:  "Le mode opératoire CTR"
 date:   2022-04-22
 last-update: 
-categories: cryptographie 
+categories: cryptography
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode opératoire CTR avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IV).
 image: /assets/article/cryptographie/mode-chiffrement/ctr-reuse-IV.png

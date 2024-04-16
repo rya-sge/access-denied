@@ -4,7 +4,7 @@ title:  "Chiffrement hybride sur les courbes elliptiques avec ECIES"
 date:   2022-04-22
 locale: fr-FR
 last-update: 
-categories: cryptographie 
+categories: cryptography
 tags: ecies courbe-elliptique chiffrement-hybride
 description: Cet article présente le schéma de chiffrement intégré ECIES (Elliptic Curve Integrated Encryption Scheme) permettant de réaliser du chiffrement hybride.
 image: /assets/article/cryptographie/ecies/decrypt.PNG

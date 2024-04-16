@@ -3,7 +3,7 @@ layout: post
 title:  "NodeJS - WebSockets avec Express"
 date:   2021-11-14
 last-update: 
-categories: programmation
+categories: programmation web
 tags: javascript node.js  websockets
 image:
 description: Présentation et implémentation de websockets avec express-ws

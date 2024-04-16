@@ -5,7 +5,7 @@ date: 2022-11-12
 last-update: 
 locale: en-GB
 lang: en
-categories: securite web
+categories: security web
 tags: xss google xss-game
 image: /assets/article/web/xss/xss-game/xss-game-cover.PNG
 description: XSS-game was launched by Google to train for XSS vulnerabilities with 6 challenges to solve. This document summarizes the solutions for challenges 1 to 5.

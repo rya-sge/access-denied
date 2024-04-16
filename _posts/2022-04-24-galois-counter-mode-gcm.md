@@ -4,7 +4,7 @@ title:  "Le mode opératoire GCM"
 date:   2022-04-22
 locale: fr-FR
 last-update: 
-categories: cryptographie 
+categories: cryptography 
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode opératoire de chiffrement authentifié GCM avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IVs).
 image: /assets/article/cryptographie/mode-chiffrement/gcm-schema.PNG

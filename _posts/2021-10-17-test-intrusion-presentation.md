@@ -2,7 +2,7 @@
 layout: post
 title:  "Les tests d'intrusion (pentesting)"
 date:   2021-10-17
-categories: securite
+categories: security
 tags: intrusion pentesting
 description: Cet article introduit le concept de test d'intrusion (pentesting)
 image: 

@@ -5,7 +5,7 @@ date:   2022-10-06
 locale: en-GB
 lang: en
 last-update: 
-categories: cryptographie 
+categories: cryptography security
 tags: bitlocker aes xts-aes
 description: This article details how to encrypt a USB drive on Windows with Bitlocker, an encryption tool offered by Windows.
 image: /assets/article/windows/bitlocker/usb/bitlocker-usb-check.png

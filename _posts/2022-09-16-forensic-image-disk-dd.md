@@ -5,7 +5,7 @@ date:   2022-09-16
 locale: en-GB
 lang: en
 last-update: 
-categories: securite
+categories: security
 tags: forensic mount dd
 description: Presentation of a list of tools to perform a forensic analysis on a disk image (minfo, fls, mount, photorec, ...).
 isMath: false

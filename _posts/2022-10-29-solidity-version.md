@@ -5,7 +5,7 @@ date:   2022-10-29
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain
+categories: blockchain programmation
 tags: solidity ethereum smart-contract
 description: There are different way to indicate the solidity version of the compiler. This article presents the advantages and disadvantages of each
 isMath: false
@@ -71,5 +71,4 @@ SHASHANK, 2022. Understanding Solidity Pragma and its Security Practices. *Solid
 SMARTCONTRACTSECURITY, no date. semver_floating_pragma.sol. *SWC Registry*. Online. [Accessed 29 October 2022]. Retrieved from: [https://swcregistry.io/docs/SWC-103#semver_floating_pragmasol](https://swcregistry.io/docs/SWC-103#semver_floating_pragmasol)
 
 SMARTCONTRACTSECURITY, 2018. SWC-103. *SWC Registry*. Online. 24 September 2018. [Accessed 29 October 2022]. Retrieved from: [https://swcregistry.io/docs/SWC-103](https://swcregistry.io/docs/SWC-103)
-
 

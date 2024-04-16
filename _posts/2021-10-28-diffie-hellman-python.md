@@ -3,7 +3,7 @@ layout: post
 title:  "Diffie-Hellman expliqué en python"
 date:   2021-10-28
 last-update: 
-categories: cryptographie
+categories: cryptography
 tags: diffie-hellman asymétrique
 description: Présentation du protocole de mise au point de clé Diffie-Hellman (key-agreement protocol) avec un exemple d'implémentation pour mieux comprendre les principes.
 image: /assets/article/cryptographie/diffie-hellman/schema-echange.png

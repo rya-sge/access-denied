@@ -4,7 +4,7 @@ title: Recover your passwords with Hashcat
 date:  2022-11-13
 locale: en-GB
 lang: en
-categories: securite 
+categories: security
 tags: hashcat hash
 description: Hashcat is a security tool allowing to recover passwords form a hash on a large number of hash functions (md5, sha1, sha256)
 image: /assets/article/outil-securite/hashcat/tryHackMe-hashid-2.PNG

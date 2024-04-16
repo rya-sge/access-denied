@@ -2,7 +2,7 @@
 layout: post
 title:  "Mimikatz - afficher les logs"
 date:   2021-05-18 
-categories: securite 
+categories: security
 tags: mimikatz log 
 Auteur: rya-sge
 description: Afficher les logs de Mimikatz sur Windows grâce à l'event viewer

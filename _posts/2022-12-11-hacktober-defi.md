@@ -5,7 +5,7 @@ date: 2022-12-11
 last-update: 
 locale: en-GB
 lang: en
-categories: securite blockchain
+categories: security blockchain
 tags: DeFi crypto hack
 image:
 description: This article summarizes the main hacks that took place during the month of October 2022 in the DeFi ecosystem. 

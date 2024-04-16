@@ -2,7 +2,7 @@
 layout: post
 title:  "SMTP en bref"
 date:   2021-05-15 
-categories: reseau 
+categories: network
 tags: smtp protocole
 description: Résumé en bref du protocole SMTP, utilisé pour envoyer des emails, ainsi que la présentation de quelques outils (dig, telnet)
 image: /assets/article/reseau/SMTP/schema-client-serveur.png
