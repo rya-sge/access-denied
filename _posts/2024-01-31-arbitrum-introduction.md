@@ -321,7 +321,7 @@ An explorer for Arbitrum is also available at the following address: [arbiscan.i
 
 [3. Patch Thursday — Risks on CEX’s Confirmation Number on Arbitrum and Optimism](https://medium.com/chainlight/patch-thursday-risks-on-cexs-confirmation-on-arbitrum-and-optimism-7ee25a1d58bf)
 
-4. [L2Beat report](https://drive.google.com/file/d/182ycEW8C2wk5tGd3X1tG8oQfUy9WmSJk/view)
+[4.L2Beat report](https://drive.google.com/file/d/182ycEW8C2wk5tGd3X1tG8oQfUy9WmSJk/view)
 
 5.ChatGPT with the input "Explains me Arbitrum, a blockchain rollup, the different concept associated and its ecosystem. Talk also about Arbitrum anyTrust, stylus, Arbitrum Nitro stack, Arbitrum One and Arbitrum Nova. Cite example which uses Arbitrum for their project".
 
