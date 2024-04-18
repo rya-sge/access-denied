@@ -11,44 +11,53 @@ image: /assets/article/blockchain/oracle/chainlink-price-feed.png
 isMath: false
 ---
 
-
-
 This article presents the reasoning to build a blockchain oracle providing external information (e.g. price of an asset) to a smart contract. It is mainly based on this excellent [1.presentation](https://www.youtube.com/watch?v=vFcW18ZpPZ4) from Berkely, part of the [defi-learning course (1)](https://defi-learning.org/f22) and on the Chainlink oracle architecture.
 
 ## Introduction
 
-**Blockchain oracle** such a Chainlink or Pyth are a key piece of the crypto and defi infrastructure. Many defi protocols rely on these oracles to fetch the price of an asset, required e.g. for lending protocol.
+**Blockchain oracles** such a Chainlink or Pyth are key elements of crypto and defi infrastructure. Many *defi* protocols rely on these oracles to fetch the price of an asset, required e.g. for lending protocols.
 
-When a smart contract need information from the external word, e.g. the price of an asset, you can not just perform a direct call to a website or an external sever. It would be too easy...
+> But why an oracle is so important ?
 
-The smart contract can only call another smart contract to get this information...
+Smart contracts runs on the blockchain and the outside world is not available for them.
+
+But the price of an assets depends on several different resources, notably CEX like Binance or Coinbase.
+
+To obtain this information, the smart contract can not just perform a direct call to a website or an external sever. It would be too easy.
+
+The smart contract can only call another smart contract to get this information...**
 
 And this is exactly what provides a blockchain oracle: a **smart contract** to get these information.
 
 But how concretely build a blockchain oracle ? It is not an easy task and you have several challenges to take into consideration:
 
-- Which sources used to know the price (cex, dex, aggregator) ?
+- Which sources used to know the price (CEX, DEX, aggregator) ?
 - What happen if the sources are down ?
 - How to compute the price from these different sources ?
 - How to set the price inside the oracle smart contract ? Which takes this decision and when ?
 - How provide trust to users ? What happen if the oracle is malicious ? 
 
-One of the most known and battle tested oracle is the one set up by Chainlink called [Chainlink Data feeds (2.)](https://docs.chain.link/data-feeds). Its operation, without going into details, is as follows:
+One of the most known and battle tested oracle is the one set up by Chainlink, one of whose products is [Chainlink Data feeds (2.)](https://docs.chain.link/data-feeds). Its operation, without going into details, is as follows:
 
-- The oracle is composed of many decentralized node from different organization to avoid an unique point of failure and a price manipulation by a malicious node.
+- The oracle is composed of many decentralized nodes from different organization (Swisscom) to avoid an unique point of failure and a price manipulation by a malicious node.
 - These nodes fetch the prices from known price aggregators like CoinCeko or GSR
-- Each node has to signed a report and this report is send to the smart contract by a designed node (round robin)
-- The smart contract verifies the different signatures, compute the median value from the different report before making available for other smart contracts.
+- Each node has to provide observations, signed by themselves.
+- These observations are aggregated into a report by a node (leader) and this report is sent to the smart contract by a designed node (round robin).
+- The smart contract verifies the different signatures, compute the median value from the different observations before making them available for other smart contracts.
+
+**You can also use a [TWAP oracle](https://www.halborn.com/blog/post/what-are-twap-oracles), but it is another topic.
+
+## Push/pull oracles
 
 You have traditionally two types of oracle: 
 
-- Push oracles: these oracles proactively provide data to smart contracts without being  explicitly requested, e.g when a  specified event or condition occurs. 
+- **Push oracles**: these oracles proactively provide data to smart contracts without being  explicitly requested, e.g when a  specified event or condition occurs. 
 
-- Pull oracles require smart contracts to request data explicitly. They pull data from  external sources in response to a query from the smart contract.
+- **Pull oracles** require smart contracts to request data explicitly. They pull data from external sources in response to a query from the smart contract.
 
 Chainlink provides a pull based oracle ([Chainlink data streams (3)](https://docs.chain.link/data-streams)) and a push based oracle ([Chainlink data feeds](https://chain.link/data-feeds))
 
-The reasoning taken in this article is mainly based on the push base oracle with the [Price Feeds (4)](https://docs.chain.link/data-feeds#price-feeds), but can also apply to pull base oracle.
+The reasoning taken in this article is mainly based on the push base oracle with the [Price Feeds (4)](https://docs.chain.link/data-feeds#price-feeds), but can also apply to a pull base oracle.
 
 Reference: [5. Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decentralized-apps/oracles/overview)                                                                         
 
@@ -58,7 +67,7 @@ Reference: [5. Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decent
 
 The first thing could be to add the oracle directly into the consensus protocol (block production mechanism). In this case, the miner will search directly information asked by the smart contract.
 
-**Problem:** The miner could be lying or cheating.
+> **Problem:** The miner could be lying or cheating.
 
 In this case, the miner is the only one which provides and knows the information. The others members on the blockchain (nodes) can not verify the integrity of the information provided by the miner
 
@@ -66,7 +75,7 @@ In this case, the miner is the only one which provides and knows the information
 
 In this second step, the miners are replaced by an oracle network, with several different nodes. In this configuration, one node is charged to report the information.
 
-**Problem:** What if sending node lies / cheats?
+**>Problem:** What if sending node lies / cheats?
 
 ### Step 3 - Report with signature
 
@@ -75,6 +84,8 @@ When we want to ensure that an information has not been altered, the common meth
 Thus, to avoid the cheat, we add with the report the different signature from enough nodes (.e.g a threshold).
 
 This principle is put in place by Chainlink oracles with their offchain reporting (OCR) where each node reports its price observation and signs it. When the report is send by the oracle node to the aggregator contract, the contract verifies that there is enough signature (quorum), see [6. docs.chain.link - off-chain-reporting](https://docs.chain.link/architecture-overview/off-chain-reporting).
+
+As indicated in their [technical paper (16)](https://research.chain.link/ocr.pdf), the algorithm used for signatures is  the standard EdDSA and ECDSA schemes.
 
 > **Problem:** What if sending node goes down?
 
@@ -206,6 +217,7 @@ In the case of Chainlink, there are several different nodes maintained by known 
   - [8.How Chainlink Price Feeds Secure the DeFi Ecosystem](https://blog.chain.link/chainlink-price-feeds-secure-defi/)
   - [13.Chainlink - Check the timestamp of the latest answer](https://docs.chain.link/data-feeds#check-the-timestamp-of-the-latest-answer)
   - [15. chain.link/data-feeds#price-and-market-feeds]( https://chain.link/data-feeds#price-and-market-feeds)
+  - [16. research.chain.link/ocr.pdf](https://research.chain.link/ocr.pdf)
   - [docs.chain.link/architecture-overview/architecture-request-model](https://docs.chain.link/architecture-overview/architecture-request-model)
 - [5.Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decentralized-apps/oracles/overview)
 - Pyth
@@ -216,6 +228,3 @@ In the case of Chainlink, there are several different nodes maintained by known 
 - [12. stackoverflow - Is Chainlink's price reference data free to consume?](https://ethereum.stackexchange.com/questions/87473/is-chainlinks-price-reference-data-free-to-consume)
 - [14. ethereum stackexchange - Chainlink Stale Data latestRoundData() guide](https://ethereum.stackexchange.com/questions/154261/chainlink-stale-data-latestrounddata-guide)
 - [www.rareskills.io - How Chainlink Price Feeds Work](https://www.rareskills.io/post/chainlink-price-feed-contract)
-
-
-
