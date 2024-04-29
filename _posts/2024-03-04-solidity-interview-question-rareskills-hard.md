@@ -859,3 +859,10 @@ new_address = hash(0xFF, sender, salt, bytecode)
 Nevertheless, the Ethereum's  [Cancun upgrate](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/cancun.md) will remove the ability to destruct the smart contract bytecode for SELFDESTRUCT (see [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780)), a part if the opcode is called during the same transaction as the contract creation.
 
 Reference: [OpenZeppelin - Deploying Smart Contracts Using `CREATE2`](https://docs.openzeppelin.com/cli/2.8/deploying-with-create2), [Dark Side of CREATE2 opcode](https://medium.com/coinmonks/dark-side-of-create2-opcode-6b6838a42d71)
+
+## Further reading
+
+You can find different answers to these questions in the following resources
+
+- [github.com/typicalHuman/solidity-interview-questions?tab=readme-ov-file#hard](https://github.com/typicalHuman/solidity-interview-questions?tab=readme-ov-file#hard)
+

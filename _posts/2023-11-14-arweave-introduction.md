@@ -12,13 +12,19 @@ image: /assets/article/blockchain/arweave-logo.png
 
 ## Introduction
 
+Store files directly in the blockchain is a good way to guarantee the immutability of files and their accessibility
+
+But there is a problem, as always, most  blockchains are not designed to store file...
+
+This is for example the case for Ethereum and it is the reason why for NFT, the JSON file containing the NFT metada is not directly stored on blockchain.
+
+Here come a solution: decentralized storage network like IPFS or Arweave...
+
 [Arweave](https://www.arweave.org/) is a network acting as a decentralized storage layer to upload files permanently with a single payment. 
 
 In Arweave, you can store smart contracts, web applications, and websites.
 
 The main selling argument is, you only pay once and the files are stored forever. 
-
-The main reference of this article is a lesson from LearnWeb3: [https://learnweb3.io/minis/what-is-arweave](https://learnweb3.io/minis/what-is-arweave)
 
 ## Architecture
 
@@ -47,6 +53,8 @@ Miners store files uploaded to Arweave in return for **$AR**, the cryptocurrency
 
 To offer permanent storage, Arweave uses a concept called [**storage endowment**](https://arwiki.wiki/#/en/storage-endowment). It is an estimation of how the price of storage will decrease in the future to distribute appropriate quantities of tokens to miners over time, in order to guarantee the perpetual storage of arbitrary quantities of data.
 
+The goal of this mechanism is to distribute  appropriately quantities of tokens to miners over time, in order  to encourage miners to keep datas (perpetual storage).
+
 Of the $AR fees paid to upload files, 5% goes to the miners while the other 95% goes into a storage endowment. 
 
 ## Bundling transactions
@@ -71,8 +79,8 @@ All the data (the contracts' code and interactions) are kept on-chain, but the e
 
 References:
 
-- [https://academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
-- [https://warp.cc/](https://warp.cc/)
+- [academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
+- [warp.cc/](https://warp.cc/)
 
 ## Challenges & risk
 
