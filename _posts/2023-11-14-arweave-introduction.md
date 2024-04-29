@@ -43,7 +43,7 @@ Instead, it rewards miners based on the amount of data they store and  the lengt
 
 Files uploaded to Arweave are stored on thousands of computers hosted by people across the world. Smart contracts, web applications, and websites can be hosted on Arweave.
 
-To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access to the decrypted files.
+To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access to the decrypted files. 
 
 Warning: The fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
@@ -86,7 +86,11 @@ References:
 
 - Even if Arweave promises a permanent storage, if the network is shut down, the files will be probably no longer available.
 
+- Of course, there is always a risk that the rewards will no longer be sufficient to encourage minors to store data...
+
 - A second point is the risk to upload files which can not be deleted (privacy !!!). Once it is uploaded, you have no longer control on the files.
+
+- As already said, the fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
 - Lastly, Arweave could be use to upload illegal contents which poses a reputational risk.
 
@@ -94,16 +98,12 @@ References:
 
 ## References
 
-**Main references**
-
 - This lesson from LearnWeb3: [https://learnweb3.io/minis/what-is-arweave](https://learnweb3.io/minis/what-is-arweave)
-
+- [warp - Smart contracts
+   on Arweave](https://warp.cc/)
+- [academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
+- [arwiki.wiki/#/en/main](https://arwiki.wiki/#/en/main)
 - ChatGPT with the input
 
 *Write a short article (about 500-1500) words on Arweave, the  decentralized storage layer. Divide your article in topic with title*
 
-**Other**
-
-- [https://warp.cc/](https://warp.cc/)
-- [https://academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
-- [https://arwiki.wiki/#/en/main](https://arwiki.wiki/#/en/main)
