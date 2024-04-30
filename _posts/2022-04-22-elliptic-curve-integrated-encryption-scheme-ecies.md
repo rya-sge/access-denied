@@ -99,7 +99,7 @@ $$
 5. 
 
    $$
-\begin{aligned}[b]
+\begin{aligned}
    T = MAC_{kM}(c || S2)
 \end{aligned}
    $$
@@ -116,7 +116,7 @@ On a R||c||T  ainsi que la clé secrète `k`
    
    ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
    $$
-   \begin{aligned}
+   \begin{aligned}[b]
    K = k * G\\
    R=r*G\\
    r * K = r * k * G = k * R\\
