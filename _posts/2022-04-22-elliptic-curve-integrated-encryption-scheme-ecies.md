@@ -77,12 +77,12 @@ $$
    R = rG
    $$
 
-3. On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K
-
-![decrypt-kdf]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt-kdf.PNG)
+3. On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.
 
 $$
+\begin{aligned}[b]
 (k\_e  || k\_M) = KDF(rK||S1)
+\end{aligned}
 $$
 
 - `S` est juste là pour la séparation de domaine (on peut l'ignorer).
@@ -112,9 +112,8 @@ $$
 
 On a R||c||T  ainsi que la clé secrète `k`
 
-1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br> 
+1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br>
    
-   ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
    $$
    \begin{aligned}[b]
    K = k * G\\
@@ -122,7 +121,7 @@ On a R||c||T  ainsi que la clé secrète `k`
    r * K = r * k * G = k * R\\
    \end{aligned}
    $$
-
+   
    
    
 2. On dérive ensuite les clés grâce à la valeur `kR` trouvée au point 1.
