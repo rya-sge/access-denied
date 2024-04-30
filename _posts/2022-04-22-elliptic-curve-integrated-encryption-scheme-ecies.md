@@ -64,6 +64,7 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 1. Tirer un nombre aléatoire uniformément
 
+
    $$
 r ∈ Z^*_p
    $$
@@ -85,12 +86,13 @@ $$
 
 - `Ke` est la clé symétrique pour le chiffrement. 
 - `Km` est la clé symétrique pour le MAC.
-- Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.
 
-4. 
-   $$
+Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.
+ 4.
+
+$$
    c = Enc_{ke}(m)
-   $$
+$$
 
 5. 
 
