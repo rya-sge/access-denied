@@ -45,7 +45,8 @@ Public :
 
 Rappel : la difficulté repose sur le logarithme discret
 
-- Clé secrète :
+- Clé secrète :<br> 
+
   $$
   k ∈ Z_n
   $$
@@ -65,9 +66,9 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 1. Tirer un nombre aléatoire uniformément
 
 
-   $$
+$$
 r ∈ Z^*_p
-   $$
+$$
 
 2. Calculer  un point `R` sur la courbe elliptique
    $$
@@ -87,9 +88,8 @@ $$
 - `Ke` est la clé symétrique pour le chiffrement. 
 - `Km` est la clé symétrique pour le MAC.
 
-Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.
+Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.<br> 
  4.
-
 $$
    c = Enc_{ke}(m)
 $$
@@ -108,9 +108,10 @@ $$
 
 On a R||c||T  ainsi que la clé secrète `k`
 
-1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :
+1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br> 
    
    ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
+   <br> 
    $$
    K = k * G
    $$
@@ -134,7 +135,7 @@ $$
 
 
 3. On vérifie le tag avec `km`
-4. Si le tag est correct, on déchiffre avec `ke`
+4. Si le tag est correct, on déchiffre avec `ke`<br> 
 
    $$
    m = Dec_{ke}
