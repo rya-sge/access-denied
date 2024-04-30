@@ -67,7 +67,9 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 
 $$
+\begin{aligned}[b]
 r ∈ Z^*_p
+\end{aligned}
 $$
 
 2. Calculer  un point `R` sur la courbe elliptique
@@ -97,7 +99,9 @@ $$
 5. 
 
    $$
+\begin{aligned}[b]
    T = MAC_{kM}(c || S2)
+\end{aligned}
    $$
 
 6. Le message chiffré est `R||c||T`
@@ -111,17 +115,11 @@ On a R||c||T  ainsi que la clé secrète `k`
 1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br> 
    
    ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
-   <br> 
-   $$
-   K = k * G
-   $$
-   
-   $$
-   R=r*G
-   $$
-   
-   $$
-   r * K = r * k * G = k * R
+   \begin{aligned}[b]
+   K = k * G\\
+   R=r*G\\
+   r * K = r * k * G = k * R\\
+   \end{aligned}
    $$
 
    
@@ -130,7 +128,9 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
+\begin{aligned}[b]
 (k_e||k_M)=KDF(kR||S1)
+\end{aligned}
 $$
 
 
@@ -140,7 +140,7 @@ $$
    $$
    \begin{aligned}[b]
    m = Dec_{ke}
-   \end{aligned}  
+   \end{aligned}
    $$
    
 
