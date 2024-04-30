@@ -137,9 +137,12 @@ $$
 3. On vérifie le tag avec `km`
 4. Si le tag est correct, on déchiffre avec `ke`<br> 
    
-   $`
-   m = Dec\_{ke}
-   `$
+   $$
+   \begin{aligned}[b]
+   m = Dec_{ke}
+   \end{aligned}  
+   $$
+   
 
 
 ## Source
