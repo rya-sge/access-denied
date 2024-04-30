@@ -63,7 +63,7 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 ### Chiffrement
 
-1. Tirer un nombre aléatoire uniformément
+1.Tirer un nombre aléatoire uniformément
 
 
 $$
@@ -72,12 +72,12 @@ r ∈ Z^*_p
 \end{aligned}
 $$
 
-2. Calculer  un point `R` sur la courbe elliptique
+2.Calculer  un point `R` sur la courbe elliptique
    $$
    R = rG
    $$
 
-3. On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.
+3.On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.
 
 $$
 \begin{aligned}[b]
@@ -91,20 +91,19 @@ $$
 - `Km` est la clé symétrique pour le MAC.
 
 Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.<br> 
- 4.
+4.
 $$
 c = Enc_{ke}(m)
 $$
 
-5. 
-
+5.
    $$
 \begin{aligned}
    T = MAC_{kM}(c || S2)
 \end{aligned}
    $$
 
-6. Le message chiffré est `R||c||T`
+6.Le message chiffré est `R||c||T`
 
 
 
