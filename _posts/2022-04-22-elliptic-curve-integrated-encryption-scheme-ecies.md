@@ -91,13 +91,13 @@ $$
 Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.<br> 
  4.
 $$
-c = Enc\_{ke}(m)
+c = Enc_{ke}(m)
 $$
 
 5. 
 
    $$
-   T = MAC\_{kM}(c || S2)
+   T = MAC_{kM}(c || S2)
    $$
 
 6. Le message chiffré est `R||c||T`
@@ -130,17 +130,16 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
-(k\_e||k\_M)=KDF(kR||S1)
+(k_e||k_M)=KDF(kR||S1)
 $$
 
 
 3. On vérifie le tag avec `km`
 4. Si le tag est correct, on déchiffre avec `ke`<br> 
-
-   $$
+   
+   $`
    m = Dec\_{ke}
-   $$
-
+   `$
 
 
 ## Source
