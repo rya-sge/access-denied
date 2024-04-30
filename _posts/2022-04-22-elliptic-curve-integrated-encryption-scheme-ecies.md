@@ -80,7 +80,7 @@ $$
 ![decrypt-kdf]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt-kdf.PNG)
 
 $$
-(k_e  || k_M) = KDF(rK||S1)
+(k\_e  || k\_M) = KDF(rK||S1)
 $$
 
 - `S` est juste là pour la séparation de domaine (on peut l'ignorer).
@@ -91,13 +91,13 @@ $$
 Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.<br> 
  4.
 $$
-   c = Enc_{ke}(m)
+c = Enc\_{ke}(m)
 $$
 
 5. 
 
    $$
-   T = MAC_{kM}(c || S2)
+   T = MAC\_{kM}(c || S2)
    $$
 
 6. Le message chiffré est `R||c||T`
@@ -130,7 +130,7 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
-(k_e||k_M)=KDF(kR||S1)
+(k\_e||k\_M)=KDF(kR||S1)
 $$
 
 
@@ -138,7 +138,7 @@ $$
 4. Si le tag est correct, on déchiffre avec `ke`<br> 
 
    $$
-   m = Dec_{ke}
+   m = Dec\_{ke}
    $$
 
 
