@@ -115,7 +115,8 @@ On a R||c||T  ainsi que la clé secrète `k`
 1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br> 
    
    ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
-   \begin{aligned}[b]
+   $$
+   \begin{aligned}
    K = k * G\\
    R=r*G\\
    r * K = r * k * G = k * R\\
@@ -128,21 +129,19 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
-\begin{aligned}[b]
+\begin{aligned}
 (k_e||k_M)=KDF(kR||S1)
 \end{aligned}
 $$
 
+3.On vérifie le tag avec `km`
 
-3. On vérifie le tag avec `km`
-4. Si le tag est correct, on déchiffre avec `ke`<br> 
-   
-   $$
-   \begin{aligned}[b]
-   m = Dec_{ke}
-   \end{aligned}
-   $$
-   
+4.Si le tag est correct, on déchiffre avec `ke`<br> 
+$$
+\begin{aligned}[b]
+m = Dec_{ke}
+\end{aligned}
+$$
 
 
 ## Source
