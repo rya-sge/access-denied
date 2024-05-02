@@ -73,9 +73,9 @@ r ∈ Z^*_p
 $$
 
 2.Calculer  un point `R` sur la courbe elliptique
-   $$
+$$
    R = rG
-   $$
+$$
 
 3.On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.
 
@@ -97,11 +97,11 @@ c = Enc_{ke}(m)
 $$
 
 5.
-   $$
+$$
 \begin{aligned}
    T = MAC_{kM}(c || S2)
 \end{aligned}
-   $$
+$$
 
 6.Le message chiffré est `R||c||T`
 
@@ -127,7 +127,7 @@ On a R||c||T  ainsi que la clé secrète `k`
 
 
 $$
-\begin{aligned}
+\begin{aligned} [b]
 (k_e||k_M)=KDF(kR||S1)
 \end{aligned}
 $$

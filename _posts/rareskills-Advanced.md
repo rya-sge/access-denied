@@ -129,7 +129,7 @@ For example, if a sandwich attack has bee part of
 
 Some blocks, despite being valid, may not be included in the primary  blockchain. These blocks are referred to as Uncle Blocks or Stale  Blocks. Miners who contribute to the network but fall short of having  their blocks added to the main chain are compensated with a reduced  reward for their efforts.
 
-[https://www.mev.wiki/attack-examples/uncle-bandit-attack](https://www.mev.wiki/attack-examples/uncle-bandit-attack)
+Reference: [www.mev.wiki/attack-examples/uncle-bandit-attack](https://www.mev.wiki/attack-examples/uncle-bandit-attack)
 
 ### Signature malleability attack
 
@@ -139,15 +139,15 @@ With ECDSA, you can have two different valid signatures generated with the same 
 
 If the smart contract implements correctly the signature verification, e.g with OpenZeppelin, this second signature should be rejected.
 
-But if it is not the case, you can perform cool math on the retrieved signature to compute a second valid signature.
+But if it is not the case, you can perform cool math on a valid signature to compute a second valid signature. To retrieve this first signature, an attacker can get it from transactions or smart contract storage. 
 
-An attacker can retrieve a valid signature, by getting information from transactions or smart contract storage. 
+**Current state**
 
 To prevent signature malleability, Ethereum has introduced the [EIP-2](https://eips.ethereum.org/EIPS/eip-2) to consider only lower levels of *s* as valid in a signature. Thus, there is only one valid point at each x coordinate because half points of the curve are no longer considered.
 
 But the precompiled contract `ecrecover` does not include this modification and it still vulnerable to signature malleability. It is the reason why it is safer to use the library [OpenZeppelin ECDSA](https://docs.openzeppelin.com/contracts/5.x/api/utils#ECDSA) which handle appropriately this case. 
 
-More information on the mathematical side:
+**Math part**
 
 The equation for secp256k1 is **y² = x³ + 7** over F(p), which means that a = 0 and b = 7
 
@@ -159,121 +159,7 @@ This is done by :
 
 - flipping the v value ( 27 -> 28, 28 -> 27)
 
-
-
-Reference: [rareskills.io - Smart Contract Securit](https://www.rareskills.io/post/smart-contract-security), [kadenzipfel - Signature Malleability](https://github.com/kadenzipfel/smart-contract-vulnerabilities/blob/master/vulnerabilities/signature-malleability.md), [coders-errands - ECRecover and Signature Verification in Ethereum](https://coders-errand.com/ecrecover-signature-verification-ethereu)m/
-
-
-
-erefore allowing transactions with any s value with 0 < s <  n, opens a transaction malleability concern. This is not a serious  security flaw, especially since Ethereum uses addresses and not  transaction hashes as the input to an ether value transfer or other  transaction, but all Ethereum nodes, including Besu, will only allow  signatures where s <= n/2 . This makes sure that only one of the two  possible valid signatures will be accepted. As any ECDSA library, that  is not focused on Blockchains (e.g. libcrypto from OpenSSL), will not  take this constraint into consideration, any created signature has to be normalized after the creation of the signature to fit the above  mentioned criteria.
-
-
-
-
-
-- The **ECDSA signing** algorithm works by:
-
-1. Calculating the message **hash**, using a cryptographic hash function e.g. SHA-256
-
-```
-h = hash(msg)
-```
-
-1. Generating securely a **random** number ***k\***
-2. Calculating the random point `R = k * G` and take its x-coordinate: `r = R.x`
-3. Calculating the signature proof `s` using the formula:
-
-```
-s = k^-1 * (h + p * r) mod n
-```
-
-where `p` is the signer’s private key, and the order `n`
-
-1. Return the signature (r, s).
-
-
-
-You can compute `-s` with
-
-```
-s = k^-1 * (h + p * r) mod n
-```
-
-
-
-1. Calculate a hash (`e`) from the message to sign.
-2. Generate a secure random value for `k`.
-3. Calculate point `(x₁, y₁)` on the elliptic curve by multiplying `k` with the `G` constant of the elliptic curve.
-4. Calculate `r = x₁ mod n`. If `r` equals zero, go back to step 2.
-5. Calculate `s = k⁻¹(e + rdₐ) mod n`. If `s` equals zero, go back to step 2.
-
-
-
- 
-
-1. Calculating the message **hash**, using a cryptographic hash function e.g. SHA-256
-
-```
-h = hash(msg)
-```
-
-1. Generating securely a **random** number ***k\***
-2. Calculating the random point `R = k * G` and take its x-coordinate: `r = R.x`
-3. Calculating the signature proof `s` using the formula:
-
-$$
-s = k^-1 * (h + p * r) mod n
-$$
-
-
-
-the signature verification algorithm, we are given a signature `(r, s)`, a message `m` and a public key `Q`. We compute a point `X = (x1, y1)` and accept the signature if `x1 == r mod n`.
-
-This verification returns also true for `-X = (x1, -y1)` since it has the same x-coordinate.
-
-The point R is compuded as:
-
-`kG`, modulo *n.*
-
-
-
-```
-X = (eG + rQ) / s mod n. 
-```
-
-where
-
-`Q` is the public key
-
-`R` is the random point chosen during signing. 
-
-`e` is the hash of the message
-
-The inverse can be computed as:
-
-```
--R = (eG + rQ) / -s mod n
-```
-
-
-
-that `r` is the x-coordinate of a random curve point, `kG`, modulo *n.*
-
-
-
-
-
-
-
-Ethereum uses the exact same elliptic curve, called secp256k1
-
- mod 
-
-https://coders-errand.com/malleability-ecdsa-signatures/
-
-.
-
-It's possible to calculate this complementary signature  without knowing the private key used to produce it in the first place,  which gives an attacker the ability to produce a second valid signature.
+Reference: [rareskills.io - Smart Contract Securit](https://www.rareskills.io/post/smart-contract-security), [kadenzipfel - Signature Malleability](https://github.com/kadenzipfel/smart-contract-vulnerabilities/blob/master/vulnerabilities/signature-malleability.md), [coders-errands - ECRecover and Signature Verification in Ethereum](https://coders-errand.com/ecrecover-signature-verification-ethereu), [coders - ECDSA Malleability](https://coders-errand.com/malleability-ecdsa-signatures/)
 
 
 
@@ -281,11 +167,15 @@ It's possible to calculate this complementary signature  without knowing the pri
 
 > Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
 
-[https://medium.com/@ItsCuzzo/using-signatures-ecdsa-for-nft-whitelists-ba0a4d070e92](https://medium.com/@ItsCuzzo/using-signatures-ecdsa-for-nft-whitelists-ba0a4d070e92)
+Firstly, hash the message is part of the specification and it is never a good idea to not follow a specification.
 
-[https://scsfg.io/hackers/signature-attacks/](https://scsfg.io/hackers/signature-attacks/)
+By hashing the message, we ensure that each message has the same size at the end. If the message was not hashed, there is a risk that the message will be padded or truncated, reducing the security.
 
-## read-only reentrancy
+Moreover, it is also recommanded to use a hash whose size matches the subgroup. It is the reason why SHA256/Keccak256 is perfect for [secp256r1](https://neuromancer.sk/std/secg/secp256r1) which is defined in a 256-bit prime field.
+
+Reference: [stackoverflow.com - Openssl ECDSA sign input as-is - without digest](https://stackoverflow.com/questions/61775022/openssl-ecdsa-sign-input-as-is-without-digest), [crypto.stackexchange - Why the need to hash before signing small data?](https://crypto.stackexchange.com/questions/15295/why-the-need-to-hash-before-signing-small-data), [nvlpubs.nist.gov - FIPS 186-5](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf), [crypto.stackexchange.com - Is it secure to ECDSA-sign a public key without hashing it first?](https://crypto.stackexchange.com/questions/48716/is-it-secure-to-ecdsa-sign-a-public-key-without-hashing-it-first)
+
+### Read-only reentrancy
 
 > What is read-only reentrancy?
 
@@ -506,7 +396,7 @@ This file, in the JSON format, is automatically generated by the Solidity compil
 
 - The solidity compiler (solc) version
 
-Reference: https://docs.soliditylang.org/en/latest/metadata.html, [https://www.rareskills.io/post/solidity-metadata](https://www.rareskills.io/post/solidity-metadata)
+Reference: [docs.soliditylang.org/en/latest/metadata.html,](https://docs.soliditylang.org/en/latest/metadata.html,) [www.rareskills.io/post/solidity-metadata](https://www.rareskills.io/post/solidity-metadata)
 
 
 
@@ -536,10 +426,6 @@ It is used for example by Tornado cash where each deposit is associated with a u
 
 Reference: [2π.com/22/nullifiers/](https://2π.com/22/nullifiers/), [nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html](https://nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html)
 
-1. 
-
-2. 
-
 
 
 ### Validate on-chain event
@@ -548,7 +434,7 @@ Reference: [2π.com/22/nullifiers/](https://2π.com/22/nullifiers/), [nmohnblatt
 
 This operation seems complicated to do on-chain without an oracle. My first guess is that it is currently not possible to perform this action.
 
-Discussion on this topic [Proving the Existence of Logs to the Blockchain](https://ethereum.stackexchange.com/questions/16117/proving-the-existence-of-logs-to-the-blockchain)
+Discussion on this topic [ethereum.stackexchange - Proving the Existence of Logs to the Blockchain](https://ethereum.stackexchange.com/questions/16117/proving-the-existence-of-logs-to-the-blockchain)
 
 
 
