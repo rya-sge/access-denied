@@ -21,7 +21,7 @@ Here a summary:
 - [Surya](https://github.com/ConsenSys/surya) : generate graph, inheritance, markdown report, ...
 - [Solgraph](https://github.com/raineorshine/solgraph): generates a [DOT](https://en.wikipedia.org/wiki/DOT_(graph_description_language)) graph that visualizes function control flow of a Solidity contract and highlights potential security vulnerabilities.
 - [Sol2uml](https://github.com/naddison36/sol2uml):  generate an UML/Class diagram
-- vscode-solidity-auditor: [https://github.com/ConsenSys/vscode-solidity-auditor](https://github.com/ConsenSys/vscode-solidity-auditor)
+- [vscode-solidity-auditor](https://github.com/ConsenSys/vscode-solidity-auditor): Visual Studio Code extension contributing security centric syntax and semantic highlighting, a detailed class outline, specialized views, advanced Solidity code insights and augmentation to Visual Studio Code.
 
 Why use these tools ?
 

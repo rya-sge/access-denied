@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  RareSkills Solidity Interview Answers - Advances
+title:  RareSkills Solidity Interview Answers - Advanced
 date:   2024-02-14
 lang: en
 locale: en-GB
@@ -11,17 +11,13 @@ image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
 isMath: false
 ---
 
-
-
-[TOC]
-
 This article presents the list of Advanced questions with their answers related to the article [Solidity Interview Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills.
 
 For the level Medium and Hard, you can see my [my first](https://rya-sge.github.io/access-denied/2024/02/14/solidity-interview-question-rareskills/) and [second article](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/).
 
 According to the article, all questions can be answered in three sentences or less.
 
-The answers here are more complete than necessary in order to explain in details the topics.
+The answers here are more complete than necessary in order to explain in details each topic.
 
 ## Gas
 
@@ -111,8 +107,6 @@ For short values (shorter than 32 bytes) the array elements are stored together 
 
 Otherwise, there is a first slot to store the length of the array and a data area that is computed using a `keccak256` hash of that slot’s position.  
 
-
-
 Reference: [docs.soliditylang.org/en/latest/internals/layout_in_storage.html#bytes-and-string](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#bytes-and-string), [ethereum.stackexchange - Storage and memory layout of strings](https://ethereum.stackexchange.com/questions/107282/storage-and-memory-layout-of-strings)
 
 ## Security
@@ -173,19 +167,39 @@ By hashing the message, we ensure that each message has the same size at the end
 
 Moreover, it is also recommanded to use a hash whose size matches the subgroup. It is the reason why SHA256/Keccak256 is perfect for [secp256r1](https://neuromancer.sk/std/secg/secp256r1) which is defined in a 256-bit prime field.
 
-Reference: [stackoverflow.com - Openssl ECDSA sign input as-is - without digest](https://stackoverflow.com/questions/61775022/openssl-ecdsa-sign-input-as-is-without-digest), [crypto.stackexchange - Why the need to hash before signing small data?](https://crypto.stackexchange.com/questions/15295/why-the-need-to-hash-before-signing-small-data), [nvlpubs.nist.gov - FIPS 186-5](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf), [crypto.stackexchange.com - Is it secure to ECDSA-sign a public key without hashing it first?](https://crypto.stackexchange.com/questions/48716/is-it-secure-to-ecdsa-sign-a-public-key-without-hashing-it-first)
+Reference: 
+
+- [stackoverflow.com - Openssl ECDSA sign input as-is - without digest](https://stackoverflow.com/questions/61775022/openssl-ecdsa-sign-input-as-is-without-digest)
+- [crypto.stackexchange - Why the need to hash before signing small data?](https://crypto.stackexchange.com/questions/15295/why-the-need-to-hash-before-signing-small-data), [nvlpubs.nist.gov - FIPS 186-5](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf)
+- [crypto.stackexchange.com - Is it secure to ECDSA-sign a public key without hashing it first?](https://crypto.stackexchange.com/questions/48716/is-it-secure-to-ecdsa-sign-a-public-key-without-hashing-it-first)
 
 ### Read-only reentrancy
 
 > What is read-only reentrancy?
 
-Recently, new kind of reentrancy appeared. Read-Only Reentrancy can happen when a state from one contract is used by another contract before full update. 
+*Read-only* reentrancy attacks target `view` functions that contain reentrancy vulnerabilities. 
 
-Typical examples are dForce, Sentiment and so on.
+In general, reentrancy attack targets state-modifying function in order to exploit the order where the state is updated.
 
-https://arbiscan.io/tx/0xa9ff2b587e2741575daf893864710a5cbb44bb64ccdc487a100fa20741e0f74d
+In the case of Read-only reentrancy, the goal is to call a view function which values returned by the function are not yet updated.
 
-https://twitter.com/0xNickLFranklin/status/1755148734076420248
+An example has been [reported by ChainSecurity](https://chainsecurity.com/curve-lp-oracle-manipulation-post-mortem/) on Curve Finance: 
+
+- An attacker can deposit tokens into one of the pools, then quickly  start a withdrawal. 
+- During the transaction, the attacker can exploit the transitional moment where the pool is imbalanced: the tokens are out but  the balance hasn’t been updated 
+- By exploiting this vulnerability, the attacker can manipulate the prince and inflate  the value of the pool
+
+Reference: [dragonscVyper, Reentrancy, Curve Finance and the Danger to DeFi](https://blog.dragonscale.ai/vyper-reentrancy-curve-finance-and-the-danger-to-defi/)
+
+Another example is the Sentiment plaform, which allows opening accounts with Balancer pools as assets. In this case, Sentimens called the function `getPrice(token)`from Balancer to know the price of an asset. By using a Read-only reentrancy on this function and a flashloan from Aave, an attacker managed to inflate the price of an asset, because the function `getPrice`does not return the correct price, in a pool and drained the protocol by repeatedly borrow an asset from the platform.
+
+Reference: [Zokyo - Read-only reentrancy attacks: understanding the threat to your smart contracts](https://medium.com/zokyo-io/read-only-reentrancy-attacks-understanding-the-threat-to-your-smart-contracts-99444c0a7334)
+
+
+
+Other references:  [Halborn - What Is Read-Only Reentrancy?](https://www.halborn.com/blog/post/what-is-read-only-reentrancy), [SCT Italia - Understanding the Threat of Read- Only Reentrancy Attacks on YourSmart Contracts](https://smartcontract.tips/articoli/understanding-the-threat-of-read-only-reentrancy-attacks-on-yoursmart-contracts/)
+
+
 
 ###  Symbolic manipulation testing
 
@@ -193,25 +207,23 @@ https://twitter.com/0xNickLFranklin/status/1755148734076420248
 
 With symbolic manipulation, the variables in the programs are replaced by expression ("symbolic") instead of using concrete value.
 
-A useful tool to create symbolic test in Solidity is with [Manticore](https://github.com/trailofbits/manticore).
+When a program is executed symbolically, the values of the variables are not fixed, but are instead represented as expressions in terms of other symbolic variables.
 
-Reference: [Solidity Security Practices Part X: Symbolic Execution](https://medium.com/coinmonks/solidity-security-practices-part-x-symbolic-execution-3af2b82f53aa)
+Symbolic testing can be used as a formal verification method since symbolic testing can check the program for all possible inputs.
 
-Symbolic execution is a technique for exploring all possible execution paths of a program without actually executing it. It works by treating variables in the program as symbolic values, rather than concrete values. When a program is executed symbolically, the values of the variables are not fixed, but are instead represented as expressions in terms of other symbolic variables.
+You can perform symbolic testing for Solidity smart contracts with [Manticore](https://github.com/trailofbits/manticore), [Mythril](https://github.com/ConsenSys/mythril) or [Halmos](https://github.com/a16z/halmos)
 
-### Untrusted smart contract call
+Reference: [Solidity Security Practices Part X: Symbolic Execution](https://medium.com/coinmonks/solidity-security-practices-part-x-symbolic-execution-3af2b82f53aa), [Symbolic testing with Halmos: Leveraging existing tests for formal verification](https://a16zcrypto.com/posts/article/symbolic-testing-with-halmos-leveraging-existing-tests-for-formal-verification/)
 
 > What are the security considerations of reading a (memory) bytes array from an untrusted smart contract call?
 
 According to a [Consensys article](https://consensys.io/blog/ethereum-smart-contract-security-recommendations), external calls may execute malicious code in that contract *or* any other contract that it depends upon.
 
-The smart contrac called can also try to perform `re--entrancy`, so the function has to be correctly protected against.
+The smart contract called can also try to perform `re--entrancy`, so the function has to be correctly protected against.
 
 Moreover, the call should not be performed with `Delegatecall` since it hands over all control to the delegatecallee.
 
 Reference: [Consensys - Ethereum Smart Contract Security Recommendations](https://consensys.io/blog/ethereum-smart-contract-security-recommendations), [Consensys - External Calls](https://consensys.github.io/smart-contract-best-practices/development-recommendations/general/external-calls/), [RareSkills - Smart Contract Security](https://www.rareskills.io/post/smart-contract-security)
-
-
 
 
 
@@ -221,7 +233,7 @@ Reference: [Consensys - Ethereum Smart Contract Security Recommendations](https:
 
 > Are function modifiers called from right to left or left to right, or is it non-deterministic?
 
-According to the documentation, they are evaluated in the order presented.  Therefore, I suppose that it is left-to-right
+According to the documentation, they are evaluated in the order presented.  Therefore, I suppose that it is left-to-right.
 
 Reference: [docs.soliditylang.org/function-modifiers](https://docs.soliditylang.org/en/latest/contracts.html#function-modifiers)
 
@@ -235,9 +247,9 @@ Before that, my guess is that the contract was only really destroyed at the end 
 
 References:
 
-- https://docs.soliditylang.org/en/latest/units-and-global-variables.html#contract-related
+- [docs.soliditylang.org/en/latest/units-and-global-variables.html#contract-related](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#contract-related)
 
-- https://hackmd.io/@vbuterin/selfdestruct
+- [hackmd.io/@vbuterin/selfdestruct](https://hackmd.io/@vbuterin/selfdestruct)
 
 
 ### "years" keyword
@@ -272,23 +284,17 @@ The keyword payable is only a requirement to send ethers with the function `send
 
 I don't think it is really useful to use payable with`call`.
 
-​          sent = owner.send(msg.value);
-
-To perform a call where `value`is used to transfer ether within the call, an address has to be `payable`. This is done by using the keyword `payable` as used in the first notation (a).
-
-The second notation (b) is not correct and will not compile since `msg.sender` is not converted to a payable address.
-
 Reference: [solidity-by-example.org/payable/](https://solidity-by-example.org/payable/), [docs.soliditylang.org/en/v0.8.25/types.html#members-of-addresses](https://docs.soliditylang.org/en/v0.8.25/types.html#members-of-addresses)
 
 ## EVM / Assembly
 
 > What addresses to the ethereum precompiles live at?
 
-Ethereum precompiles behave like smart contracts built into the Ethereum protocol. The nine precompiles live in addresses 0x01 to 0x09.
+Ethereum precompiles behave like smart contracts built into the Ethereum protocol. The nine precompiles live in addresses `0x01` to `0x09`.
 
-Precompiles do not execute inside a smart contract, they are part of the Ethereum client specification. You can see a list of them here in the Geth client: [github.com/ethereum/go-ethereum/blob/master/core/vm/contracts.go#L81](https://github.com/ethereum/go-ethereum/blob/master/core/vm/contracts.go#L81). Because they are a protocol specification, they are listed in the [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) (in Appendix E).
+Precompiles do not execute inside a smart contract, they are part of the Ethereum client specification. You can see a list of them here in the Geth client: [github.com/go-ethereum/.../vm/contracts.go#L73](https://github.com/ethereum/go-ethereum/blob/master/core/vm/contracts.go#L73). Because they are a protocol specification, they are listed in the [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) (in Appendix E).
 
-The list
+The list:
 
 | Address | Name                     | Description                                                  |
 | ------- | ------------------------ | ------------------------------------------------------------ |
@@ -309,7 +315,7 @@ The list
 
 > How does Solidity manage the function selectors when there are more than 4 functions?
 
-If there are more than 4 functions, the EVM will use a binary search to search in the table. A *Binary search* begins by comparing an element in the middle of the array with the target value. I
+If there are more than 4 functions, the EVM will use a binary search to search in the table. A *Binary search* begins by comparing an element in the middle of the array with the target value. 
 
 See my previous article on the hard questions [https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#function-name](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#function-name).
 
@@ -333,11 +339,9 @@ In this case, when A make the deleagtecall to B, it transmis in the call the con
 
 ### ABI encoding
 
-> ABI encoding vary between calldata and memory
+> How does ABI encoding vary between calldata and memory, if at all?
 
-How does ABI encoding vary between calldata and memory, if at all?
-
-**Calldata perseveres for the entire duration of a contract call, whereas memory exists solely for the lifespan of a function call**.
+There is no difference in my opinion. I haven't seen any information indicating that there are differences in the [solidity documentation](https://docs.soliditylang.org/en/v0.8.25/abi-spec.html)
 
 
 
@@ -351,7 +355,7 @@ Since the code is executed in the context of the calling contract, I suppose tha
 
 No difference if n <= 264 since the uint64 will be padded with zero to 32 bytes/256 bits
 
-
+See [docs.soliditylang.org/en/v0.8.25/abi-spec.html#examples](https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#examples)
 
 > If you deploy an empty Solidity contract, what bytecode will be present on the blockchain, if any?
 
@@ -369,7 +373,7 @@ Reference: [RareSkills - Ethereum smart contract creation code](https://www.rare
 
 The keyword verbatim allows to create bytecode :
 
-- foropcodes which are not known to the Yul compiler
+- for opcodes which are not known to the Yul compiler
 - which will not be modified by the optimizer.
 
 This keyword does not exist in solidity and can only be used inside a yul file.
@@ -396,9 +400,29 @@ This file, in the JSON format, is automatically generated by the Solidity compil
 
 - The solidity compiler (solc) version
 
-Reference: [docs.soliditylang.org/en/latest/metadata.html,](https://docs.soliditylang.org/en/latest/metadata.html,) [www.rareskills.io/post/solidity-metadata](https://www.rareskills.io/post/solidity-metadata)
+Reference: [docs.soliditylang.org/en/latest/metadata.html,](https://docs.soliditylang.org/en/latest/metadata.html,) [RareSkills - Understanding smart contract metadata](https://www.rareskills.io/post/solidity-metadata)
+
+### Validate on-chain event
+
+> How can you validate on-chain that another smart contract emitted an event, without using an oracle?
+
+This operation seems complicated to do on-chain without an oracle. My first guess is that it is currently not possible to perform this action.
+
+Discussion on this topic [ethereum.stackexchange - Proving the Existence of Logs to the Blockchain](https://ethereum.stackexchange.com/questions/16117/proving-the-existence-of-logs-to-the-blockchain)
 
 
+
+### Proxy free pointer
+
+> Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
+
+As indicated in a comment in the [Proxy.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/11dc5e3809ebe07d5405fe524385cbe4f890a08b/contracts/proxy/Proxy.sol#L25) file:
+
+"We take full control of memory in this inline assembly block because it will not return to Solidity code. We overwrite the Solidity scratch pad at memory position 0."
+
+The reason why they do this is because there is no code after the assembly block where the overwrite operation is performed. Thus, there is no risk that another instructions overwrite this part of the memory.
+
+Reference: [Proxy forwarding: `0x40` pointer vs 0 pointer](https://forum.openzeppelin.com/t/proxy-forwarding-0x40-pointer-vs-0-pointer/29826)
 
 ## Zero-knowledge
 
@@ -425,28 +449,3 @@ It is similar to a nonce, but unlike this one, the nullifier is destined to be s
 It is used for example by Tornado cash where each deposit is associated with a unique, secret nullifier. To withdraw funds, users have to reveal this nullifier. Once the nullifier has been revealed, it is not possible to use it again in order to avoid a malicious user to perform the same withdrawal again.
 
 Reference: [2π.com/22/nullifiers/](https://2π.com/22/nullifiers/), [nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html](https://nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html)
-
-
-
-### Validate on-chain event
-
-> How can you validate on-chain that another smart contract emitted an event, without using an oracle?
-
-This operation seems complicated to do on-chain without an oracle. My first guess is that it is currently not possible to perform this action.
-
-Discussion on this topic [ethereum.stackexchange - Proving the Existence of Logs to the Blockchain](https://ethereum.stackexchange.com/questions/16117/proving-the-existence-of-logs-to-the-blockchain)
-
-
-
-### Proxy free pointer
-
-> Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
-
-As indicated in a comment in the [Proxy.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/11dc5e3809ebe07d5405fe524385cbe4f890a08b/contracts/proxy/Proxy.sol#L25) file:
-
-"We take full control of memory in this inline assembly block because it will not return to Solidity code. We overwrite the Solidity scratch pad at memory position 0."
-
-The reason why they do this is because there is no code after the assembly block where the overwrite operation is performed. Thus, there is no risk that another instructions overwrite this part of the memory.
-
-Reference: [Proxy forwarding: `0x40` pointer vs 0 pointer](https://forum.openzeppelin.com/t/proxy-forwarding-0x40-pointer-vs-0-pointer/29826)
-
