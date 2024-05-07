@@ -27,7 +27,7 @@ The answers here are more complete than necessary in order to explain in details
 
 The formula is indicated in the Ethereum [yellow paper](https://ethereum.github.io/yellowpaper/paper.pdf), page 28. The function is polymonial. Thus, the cost is linear up to 724B of memory  used. After this limit, the yellow paper indicates that the cost increases significantly more and my guess is that it then becomes exponential.
 
-![evm-yellow-paper-gas-cost-memory](../assets/article/blockchain/ethereum/evm/evm-yellow-paper-gas-cost-memory.png)
+![evm-yellow-paper-gas-cost-memory]({{site.url_complet}}/assets/article/blockchain/ethereum/evm/evm-yellow-paper-gas-cost-memory.png)
 
 As also indicated in the page 29:
 
