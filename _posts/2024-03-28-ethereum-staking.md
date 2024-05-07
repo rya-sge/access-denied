@@ -4,7 +4,7 @@ title:  Ethereum Staking - How It Works
 date:   2024-03-28
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain ethereum cryptography
 tags: ethereum staking merge
 description: Staking in Ethereum is a key functionality. This article explains the main concepts behind it - BLS signature, slashing, Withdrawal address,...
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png

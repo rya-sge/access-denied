@@ -4,7 +4,7 @@ title:  RareSkills Solidity Interview Answers - Hard
 date:   2024-03-04
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain ethereum solidity
 tags: ethereum solidity interview security gas
 description: Solidity Interview questions - Hard, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg

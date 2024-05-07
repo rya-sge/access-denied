@@ -4,7 +4,7 @@ title:  Code4Arena Contest - Dyad Stablecoin Liquidation
 date:   2024-05-02
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain ethereum security
 tags: ethereum solidity interview security gas
 description: This article presents the liquidation function from the Dyad Stablecoin made during the code4Arena contest
 image: /assets/article/blockchain/audit/dyad-vaultManagerV2.png

@@ -4,7 +4,7 @@ title:  "Insomni Hack 2023 - NotSuchSolidIT challenge"
 date:   2023-11-08
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain ethereum solidity
 tags: solidity blockchain ethereum ctf
 description: This article describes the challenge NotSuchSolidIT of Insomni'hack 2023
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
