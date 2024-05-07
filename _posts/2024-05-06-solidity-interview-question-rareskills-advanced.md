@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum
 tags: ethereum solidity interview security gas
 description: Solidity Interview Questions - Advanced, answers from the article - Solidity Interview Questions- by RareSkills.
-image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
+image: /assets/article/blockchain/ethereum/solidity/solidity_logo.png
 isMath: false
 ---
 
