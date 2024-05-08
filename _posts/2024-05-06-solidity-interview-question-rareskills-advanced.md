@@ -115,15 +115,15 @@ Reference: [docs.soliditylang.org/en/latest/internals/layout_in_storage.html#byt
 
 > What is the uncle-block attack from an MEV perspective?
 
-In Ethereum occasionally two blocks are mined at roughly the same time, and only one block can be added to the chain. The other gets "uncled" or orphaned
+In Ethereum occasionally two blocks are mined at roughly the same time, and only one block can be added to the chain. The other gets "uncled" or orphaned.  These uncle blocks are recorded and accessible from the chain, but in their state, they have no impact on the canonical chain
 
-An attacker can see the block "rejected" and he can decide to manipulate some part of the blocks and.
+A third actor, called Uncle Bandit, can see the block "rejected" and he can decide to manipulate some part of the blocks.
 
-For example, if a sandwich attack has been part of
+An interesting [example](https://medium.com/alchemy-api/unmasking-the-ethereum-uncle-bandit-a2b3eb694019) has been seen in practice in 2021 with flashboat. One of the Flashbots users sent a sandwich transaction: a buy and a sell order, which have been unfortunately included in an uncle block.
 
-Some blocks, despite being valid, may not be included in the primary  blockchain. These blocks are referred to as Uncle Blocks or Stale  Blocks. Miners who contribute to the network but fall short of having  their blocks added to the main chain are compensated with a reduced  reward for their efforts.
+The Uncle Bandit, saw this, decide to take only the buy part of the sandwich, added an arbitrage transaction after it to make a profit and submitted the block on-chain.
 
-Reference: [www.mev.wiki/attack-examples/uncle-bandit-attack](https://www.mev.wiki/attack-examples/uncle-bandit-attack)
+Reference: [mev.wiki/attack-examples/uncle-bandit-attack](https://www.mev.wiki/attack-examples/uncle-bandit-attack), [Unmasking the Ethereum Uncle Bandit](https://medium.com/alchemy-api/unmasking-the-ethereum-uncle-bandit-a2b3eb694019), [bertcmiller Tweet](https://twitter.com/bertcmiller/status/1382673587715342339?s=20)
 
 ### Signature malleability attack
 
