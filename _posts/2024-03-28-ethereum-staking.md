@@ -17,14 +17,14 @@ When Ethereum is passed from Proof of Work (PoW) to Proof of Stake with the [Mer
 
 With PoW, no identification system is required since you don't care who minted the blocked, only a correct hash was necessary.
 
-But with staking, validators have now identities and you need digital signatures to uniquely identify them.
+But with staking, validators have now identities, and you need digital signatures to uniquely identify them.
 
-For this purpose, Ethereum does not use the traditional Elliptic curve signature (secp256k1) as for legacy chain wallet (e.g EOA) but uses another cryptography scheme called **BLS**, which stands for Boneh–Lynn–Shacham. 
+For this purpose, Ethereum does not use the traditional Elliptic curve signature (secp256k1) as for legacy chain wallet (e.g. EOA) but uses another cryptography scheme called **BLS**, which stands for Boneh–Lynn–Shacham. 
 
 - These signatures use a different Elliptic curve called BLS12-381.
 
 - For staking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionally a **Withdrawal key pair** to set the withdrawal address.
-- The **advantage** of BLS over the traditional Elliptice curve signature is the ability to aggregate signature. With BLS, you can combine multiple signatures and/or public keys from different users into a single representation. Therefore, it makes possible to verify many signatures in a single operation, instead of verify each signature individually.
+- The **advantage** of BLS over the traditional Elliptice curve signature is the ability to aggregate signature. With BLS, you can combine multiple signatures and/or public keys from different users into a single representation. Therefore, it makes it possible to verify many signatures in a single operation, instead of verifying each signature individually.
 
 Reference: [6. KEYS IN PROOF-OF-STAKE ETHEREUM](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/), [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography), [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
 
@@ -43,13 +43,13 @@ To become a validator on the Beacon Chain, you need to deposit 32 ETH per valida
 
 A validator will get full rewards only if it is online and up to date. This is the validator's responsibility. If the validator goes offline, it will be penalized.
 
-More precisly, the validator will lose an amount of ETH roughly equivalent to the amount of ETH it will have gained in that period if it would have been active
+More precisely, the validator will lose an amount of ETH roughly equivalent to the amount of ETH it will have gained in that period if it would have been active
 
 References: [1.Launchpad - More on slashing risks](https://launchpad.ethereum.org/en/faq)
 
 ### Bad validator behavior
 
-If the validator try to cheat the system, or act contrary to the specification, it will be liable to incur a penalty known as slashing*.*
+If the validator tries to cheat the system, or acts contrary to the specification, it will be liable to incur a penalty known as slashing*.*
 
 - Running the validator keys simultaneously on two or more machines will result in slashing.
 - Simply being offline with an otherwise healthy network does not result in slashing, but will result in small inactivity penalties.
@@ -65,7 +65,7 @@ To become a validator, it is necessary to know about managing keys and protectin
 [Ethereum launchpad](https://launchpad.ethereum.org/) provides the different steps to create a signing key for every validator you want to run. 
 
 - The operator may choose to provide a withdrawal address for his validator when generating the deposit data, which will permanently set the withdrawal address. This is recommended for most users.
-- If the operator does not provide a withdrawal address with its initial deposit data, he will need to derive his withdrawal keys from his mnemonic at a later time. In this case, it is very important to **store the mnemonic phrase safely**—it will be the ONLY way to withdraw the ETHs when the operator choses to activate withdrawals.
+- If the operator does not provide a withdrawal address with its initial deposit data, he will need to derive his withdrawal keys from his mnemonic later. In this case, it is very important to **store the mnemonic phrase safely**—it will be the ONLY way to withdraw the ETHs when the operator choses to activate withdrawals.
 
 Summary:
 
@@ -73,9 +73,9 @@ Summary:
 
 ### Withdrawal address
 
-As already indicated in the previous paragraph, the recommended way is to provide a withdrawal address with the initial deposit to automatically enable reward payments and also the ability to fully exit the funds at anytime.
+As already indicated in the previous paragraph, the recommended way is to provide a withdrawal address with the initial deposit to automatically enable reward payments and also the ability to fully exit the funds at any time.
 
-- The Withdrawal address should be to a regular Ethereum address and will be the only address funds can be sent to from the new validator accounts, and cannot be changed once chosen.
+- The Withdrawal address should be to a regular Ethereum address and will be the only address funds can be sent to from the new validator accounts and cannot be changed once chosen.
 
 - If this is not provided now, the deposited funds will remain locked on the Beacon Chain until an address is provided. Unlocking will require signing a message with the BLS withdrawal keys, generated from the mnemonic seed phrase (so keep it safe).
 
@@ -113,7 +113,7 @@ Despite having the power for creating blockchain content, the Signing keys can n
 
 ## Client
 
-To process incoming validator deposits from the execution layer (formerly 'Eth1' chain), the operator need to run an execution client as well as a consensus client (formerly 'Eth2').
+To process incoming validator deposits from the execution layer (formerly 'Eth1' chain), the operator needs to run an execution client as well as a consensus client (formerly 'Eth2').
 
 #### Execution client
 
@@ -134,7 +134,7 @@ To process incoming validator deposits from the execution layer (formerly 'Eth1'
 
 The Ethereum staking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the staked funds.
 
-Its address is published on the ethereum Foundation [website](https://ethereum.org/en/staking/deposit-contract/). As indicated in the website "Sending ETH to the address on this page will not make you a staker and will result in a failed transaction."
+Its address is published on the ethereum Foundation [website](https://ethereum.org/en/staking/deposit-contract/). As indicated on the website "Sending ETH to the address on this page will not make you a staker and will result in a failed transaction."
 
 ## References
 

@@ -17,7 +17,7 @@ For the level Medium and Hard, you can see my [my first](https://rya-sge.github.
 
 According to the article, all questions can be answered in three sentences or less.
 
-The answers here are more complete than necessary in order to explain in details each topic.
+The answers here are more complete than necessary in order to explain in detail each topic.
 
 ## Gas
 
@@ -25,7 +25,7 @@ The answers here are more complete than necessary in order to explain in details
 
 > How does the EVM price memory usage?
 
-The formula is indicated in the Ethereum [yellow paper](https://ethereum.github.io/yellowpaper/paper.pdf), page 28. The function is polymonial. Thus, the cost is linear up to 724B of memory  used. After this limit, the yellow paper indicates that the cost increases significantly more and my guess is that it then becomes exponential.
+The formula is indicated in the Ethereum [yellow paper](https://ethereum.github.io/yellowpaper/paper.pdf), page 28. The function is polynomial. Thus, the cost is linear up to 724B of memory  used. After this limit, the yellow paper indicates that the cost increases significantly more and my guess is that it then becomes exponential.
 
 ![evm-yellow-paper-gas-cost-memory]({{site.url_complet}}/assets/article/blockchain/ethereum/evm/evm-yellow-paper-gas-cost-memory.png)
 
@@ -39,7 +39,7 @@ See this discussion on ethereum.stackexchange: [How does the cost of EVM memory 
 
 > Under what circumstances do addresses with leading zeros save gas and why?
 
-If the address is used as an argument of a function, an address with more zero will cost less gas because there are more zero in the calldata. It true for smart contract, as well EOA.
+If the address is used as an argument of a function, an address with more zero will cost less gas because there are more zero in the calldata. It is true for smart contract, as well EOA.
 
 Reference: [RareSkills - Use vanity addresses](https://www.rareskills.io/post/gas-optimization#viewer-f970n)
 
@@ -91,7 +91,7 @@ Reference: [docs.soliditylang.org#message-calls](https://docs.soliditylang.org/e
 
  It is due to the two's complement notation  for signed integers.
 
-Numbers with with a lot of zeros cost less gas, but for small negative numbers, the representation will be largely non-zero since the bits are inversed.
+Numbers with a lot of zeros cost less gas, but for small negative numbers, the representation will be largely non-zero since the bits are inversed.
 
 For example, -1 is represented as 0xFFFF....FFFF
 
@@ -117,9 +117,9 @@ Reference: [docs.soliditylang.org/en/latest/internals/layout_in_storage.html#byt
 
 In Ethereum occasionally two blocks are mined at roughly the same time, and only one block can be added to the chain. The other gets "uncled" or orphaned
 
-An attacker can see the the block "rejected" and he can decide to manipulate some part of the blocks and.
+An attacker can see the block "rejected" and he can decide to manipulate some part of the blocks and.
 
-For example, if a sandwich attack has bee part of
+For example, if a sandwich attack has been part of
 
 Some blocks, despite being valid, may not be included in the primary  blockchain. These blocks are referred to as Uncle Blocks or Stale  Blocks. Miners who contribute to the network but fall short of having  their blocks added to the main chain are compensated with a reduced  reward for their efforts.
 
@@ -131,7 +131,7 @@ Reference: [www.mev.wiki/attack-examples/uncle-bandit-attack](https://www.mev.wi
 
 With ECDSA, you can have two different valid signatures generated with the same secret. This complementary signature can be computed without knowing  the private key used to produce the first signature.
 
-If the smart contract implements correctly the signature verification, e.g with OpenZeppelin, this second signature should be rejected.
+If the smart contract implements correctly the signature verification, e.g. with OpenZeppelin, this second signature should be rejected.
 
 But if it is not the case, you can perform cool math on a valid signature to compute a second valid signature. To retrieve this first signature, an attacker can get it from transactions or smart contract storage. 
 
@@ -165,7 +165,7 @@ Firstly, hash the message is part of the specification and it is never a good id
 
 By hashing the message, we ensure that each message has the same size at the end. If the message was not hashed, there is a risk that the message will be padded or truncated, reducing the security.
 
-Moreover, it is also recommanded to use a hash whose size matches the subgroup. It is the reason why SHA256/Keccak256 is perfect for [secp256r1](https://neuromancer.sk/std/secg/secp256r1) which is defined in a 256-bit prime field.
+Moreover, it is also recommended to use a hash whose size matches the subgroup. It is the reason why SHA256/Keccak256 is perfect for [secp256r1](https://neuromancer.sk/std/secg/secp256r1) which is defined in a 256-bit prime field.
 
 Reference: 
 
@@ -179,7 +179,7 @@ Reference:
 
 *Read-only* reentrancy attacks target `view` functions that contain reentrancy vulnerabilities. 
 
-In general, reentrancy attack targets state-modifying function in order to exploit the order where the state is updated.
+In general, reentrancy attack targets state-modifying function to exploit the order where the state is updated.
 
 In the case of Read-only reentrancy, the goal is to call a view function which values returned by the function are not yet updated.
 
@@ -191,7 +191,7 @@ An example has been [reported by ChainSecurity](https://chainsecurity.com/curve-
 
 Reference: [dragonscVyper, Reentrancy, Curve Finance and the Danger to DeFi](https://blog.dragonscale.ai/vyper-reentrancy-curve-finance-and-the-danger-to-defi/)
 
-Another example is the Sentiment plaform, which allows opening accounts with Balancer pools as assets. In this case, Sentimens called the function `getPrice(token)`from Balancer to know the price of an asset. By using a Read-only reentrancy on this function and a flashloan from Aave, an attacker managed to inflate the price of an asset, because the function `getPrice`does not return the correct price, in a pool and drained the protocol by repeatedly borrow an asset from the platform.
+Another example is the Sentiment plaform, which allows opening accounts with Balancer pools as assets. In this case, Sentiment called the function `getPrice(token)`from Balancer to know the price of an asset. By using a Read-only reentrancy on this function and a flashloan from Aave, an attacker managed to inflate the price of an asset, because the function `getPrice`does not return the correct price, in a pool and drained the protocol by repeatedly borrow an asset from the platform.
 
 Reference: [Zokyo - Read-only reentrancy attacks: understanding the threat to your smart contracts](https://medium.com/zokyo-io/read-only-reentrancy-attacks-understanding-the-threat-to-your-smart-contracts-99444c0a7334)
 
@@ -207,7 +207,7 @@ Other references:  [Halborn - What Is Read-Only Reentrancy?](https://www.halborn
 
 With symbolic manipulation, the variables in the programs are replaced by expression ("symbolic") instead of using concrete value.
 
-When a program is executed symbolically, the values of the variables are not fixed, but are instead represented as expressions in terms of other symbolic variables.
+When a program is executed symbolically, the values of the variables are not fixed but are instead represented as expressions in terms of other symbolic variables.
 
 Symbolic testing can be used as a formal verification method since symbolic testing can check the program for all possible inputs.
 
@@ -243,7 +243,7 @@ Reference: [docs.soliditylang.org/function-modifiers](https://docs.soliditylang.
 
 Selfdestruct can no longer destruct/erase the contract bytecode since the Cancun upgrade, more information in [my article](https://rya-sge.github.io/access-denied/2024/03/13/EIP-6780-selfdestruct/).
 
-Before that, my guess is that the contract was only really destroyed at the end of the transaction.
+Before that, I guess the contract was only really destroyed at the end of the transaction.
 
 References:
 
@@ -359,7 +359,7 @@ See [docs.soliditylang.org/en/v0.8.25/abi-spec.html#examples](https://docs.solid
 
 > If you deploy an empty Solidity contract, what bytecode will be present on the blockchain, if any?
 
-By default, the solidity compiler appends some metadata about your contract to the runtime code(more info) [here](https://playground.sourcify.dev/), so you will have non-empty code.
+By default, the solidity compiler appends some metadata about your contract to the runtime code (more info) [here](https://playground.sourcify.dev/), so you will have non-empty code.
 
 It is possible to deactivate the addition of these metadata in the compiler setting.
 
@@ -371,7 +371,7 @@ Reference: [RareSkills - Ethereum smart contract creation code](https://www.rare
 
 >  What does the verbatim keyword do, and where can it be used?
 
-The keyword verbatim allows to create bytecode :
+The keyword verbatim allows to create bytecode:
 
 - for opcodes which are not known to the Yul compiler
 - which will not be modified by the optimizer.
@@ -420,7 +420,7 @@ As indicated in a comment in the [Proxy.sol](https://github.com/OpenZeppelin/ope
 
 "We take full control of memory in this inline assembly block because it will not return to Solidity code. We overwrite the Solidity scratch pad at memory position 0."
 
-The reason why they do this is because there is no code after the assembly block where the overwrite operation is performed. Thus, there is no risk that another instructions overwrite this part of the memory.
+The reason why they do this is because there is no code after the assembly block where the overwrite operation is performed. Thus, there is no risk that other instructions overwrite this part of the memory.
 
 Reference: [Proxy forwarding: `0x40` pointer vs 0 pointer](https://forum.openzeppelin.com/t/proxy-forwarding-0x40-pointer-vs-0-pointer/29826)
 
@@ -430,9 +430,9 @@ Reference: [Proxy forwarding: `0x40` pointer vs 0 pointer](https://forum.openzep
 
 > What is a zk-friendly hash function and how does it differ from a non-zk-friendly hash function?
 
-Contrary to traditional programmation, the efficiency of the circuits in ZK protocols depends on their algebraic structure. Thus, standard hash function like SHA-2 and SHA-3 were not designed with this principle in mind but more with others metrics such as running time.
+Contrary to traditional programming, the efficiency of the circuits in ZK protocols depends on their algebraic structure. Thus, standard hash functions like SHA-2 and SHA-3 were not designed with this principle in mind but more with other metrics such as running time.
 
-Zk-friendly hash function will try to be represent as simple expression in a large fields, which is more efficient in terms of prover execution time and proof size.
+Zk-friendly hash function will try to be represent as simple expression in a large field, which is more efficient in terms of prover execution time and proof size.
 
 Example of zk-friendly hash function: [MiMC](https://byt3bit.github.io/primesym/), [Poseidon](https://eprint.iacr.org/2019/458.pdf), and Vision/Rescue
 
@@ -446,6 +446,6 @@ It refers to a private/secret value which, once revealed, can not be used again.
 
 It is similar to a nonce, but unlike this one, the nullifier is destined to be secret.
 
-It is used for example by Tornado cash where each deposit is associated with a unique, secret nullifier. To withdraw funds, users have to reveal this nullifier. Once the nullifier has been revealed, it is not possible to use it again in order to avoid a malicious user to perform the same withdrawal again.
+It is used for example by Tornado cash where each deposit is associated with a unique, secret nullifier. To withdraw funds, users must reveal this nullifier. Once the nullifier has been revealed, it is not possible to use it again in order to avoid a malicious user performing the same withdrawal again.
 
 Reference: [2π.com/22/nullifiers/](https://2π.com/22/nullifiers/), [nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html](https://nmohnblatt.github.io/zk-jargon-decoder/definitions/nullifier.html)
