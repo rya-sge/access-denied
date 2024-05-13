@@ -5,7 +5,7 @@ date: 2022-10-31
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain ethereum programmation
+categories: blockchain ethereum solidity
 tags: solidity ethereum smart-contract OpenZeppelin
 description: Summary of the most important points to think and check to program proxy contracts on Ethereum, with a focus on the OpenZeppelin library.
 isMath: false

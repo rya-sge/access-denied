@@ -5,7 +5,7 @@ date:   2022-10-29
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain programmation
+categories: blockchain solidity
 tags: solidity ethereum smart-contract
 description: There are different way to indicate the solidity version of the compiler. This article presents the advantages and disadvantages of each
 isMath: false

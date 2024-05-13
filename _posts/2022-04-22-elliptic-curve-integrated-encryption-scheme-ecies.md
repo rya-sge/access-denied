@@ -45,7 +45,8 @@ Public :
 
 Rappel : la difficulté repose sur le logarithme discret
 
-- Clé secrète :
+- Clé secrète :<br> 
+
   $$
   k ∈ Z_n
   $$
@@ -62,43 +63,47 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 ### Chiffrement
 
-1. Tirer un nombre aléatoire uniformément
+1.Tirer un nombre aléatoire uniformément
 
-   $$
-r ∈ Z^*_p
-   $$
-
-2. Calculer  un point `R` sur la courbe elliptique
-   $$
-   R = rG
-   $$
-
-3. On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K
-
-![decrypt-kdf]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt-kdf.PNG)
 
 $$
-(k_e  || k_M) = KDF(rK||S1)
+\begin{aligned}[b]
+r ∈ Z^*_p
+\end{aligned}
+$$
+
+2.Calculer  un point `R` sur la courbe elliptique
+$$
+   R = rG
+$$
+
+3.On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.
+
+$$
+\begin{aligned}[b]
+(k\_e  || k\_M) = KDF(rK||S1)
+\end{aligned}
 $$
 
 - `S` est juste là pour la séparation de domaine (on peut l'ignorer).
 
 - `Ke` est la clé symétrique pour le chiffrement. 
 - `Km` est la clé symétrique pour le MAC.
-- Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.
 
-4. 
-   $$
-   c = Enc_{ke}(m)
-   $$
+Si on fait du chiffrement authentifié, on aura qu'une seule clé pour réaliser le chiffrement authentifié.<br> 
+4.
+$$
+c = Enc_{ke}(m)
+$$
 
-5. 
-
-   $$
+5.
+$$
+\begin{aligned}
    T = MAC_{kM}(c || S2)
-   $$
+\end{aligned}
+$$
 
-6. Le message chiffré est `R||c||T`
+6.Le message chiffré est `R||c||T`
 
 
 
@@ -106,38 +111,35 @@ $$
 
 On a R||c||T  ainsi que la clé secrète `k`
 
-1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :
-   
-   ![decrypt]({{site.url_complet}}/assets/article/cryptographie/ecies/decrypt.PNG)
-   $$
-   K = k * G
-   $$
+1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br>
    
    $$
-   R=r*G
+   \begin{aligned}[b]
+   K = k * G\\
+   R=r*G\\
+   r * K = r * k * G = k * R\\
+   \end{aligned}
    $$
    
-   $$
-   r * K = r * k * G = k * R
-   $$
-
    
    
 2. On dérive ensuite les clés grâce à la valeur `kR` trouvée au point 1.
 
 
 $$
+\begin{aligned} [b]
 (k_e||k_M)=KDF(kR||S1)
+\end{aligned}
 $$
 
+3.On vérifie le tag avec `km`
 
-3. On vérifie le tag avec `km`
-4. Si le tag est correct, on déchiffre avec `ke`
-
-   $$
-   m = Dec_{ke}
-   $$
-
+4.Si le tag est correct, on déchiffre avec `ke`<br> 
+$$
+\begin{aligned}[b]
+m = Dec_{ke}
+\end{aligned}
+$$
 
 
 ## Source

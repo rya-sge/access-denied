@@ -5,7 +5,7 @@ date:   2022-12-20
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain
+categories: blockchain ethereum
 tags: solidity ethereum foundry
 description: This article is a summary of all commands of the tutorial "Creating an NFT with Solmate" offered by Foundry
 isMath: false

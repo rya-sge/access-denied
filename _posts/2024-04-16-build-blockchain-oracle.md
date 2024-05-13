@@ -11,70 +11,81 @@ image: /assets/article/blockchain/oracle/chainlink-price-feed.png
 isMath: false
 ---
 
-
-
 This article presents the reasoning to build a blockchain oracle providing external information (e.g. price of an asset) to a smart contract. It is mainly based on this excellent [1.presentation](https://www.youtube.com/watch?v=vFcW18ZpPZ4) from Berkely, part of the [defi-learning course (1)](https://defi-learning.org/f22) and on the Chainlink oracle architecture.
 
 ## Introduction
 
-**Blockchain oracle** such a Chainlink or Pyth are a key piece of the crypto and defi infrastructure. Many defi protocols rely on these oracles to fetch the price of an asset, required e.g. for lending protocol.
+**Blockchain oracles** such a Chainlink or Pyth are key elements of crypto and defi infrastructure. Many *defi* protocols rely on these oracles to fetch the price of an asset, required e.g. for lending protocols.
 
-When a smart contract need information from the external word, e.g. the price of an asset, you can not just perform a direct call to a website or an external sever. It would be too easy...
+> But why an oracle is so important ?
 
-The smart contract can only call another smart contract to get this information...
+Smart contracts runs on the blockchain and the outside world is not available for them.
+
+But the price of an assets depends on several different resources, notably CEX like Binance or Coinbase.
+
+To obtain this information, the smart contract can not just perform a direct call to a website or an external sever. It would be too easy.
+
+The smart contract can only call another smart contract to get this information...**
 
 And this is exactly what provides a blockchain oracle: a **smart contract** to get these information.
 
 But how concretely build a blockchain oracle ? It is not an easy task and you have several challenges to take into consideration:
 
-- Which sources used to know the price (cex, dex, aggregator) ?
+- Which sources used to know the price (CEX, DEX, aggregator) ?
 - What happen if the sources are down ?
 - How to compute the price from these different sources ?
 - How to set the price inside the oracle smart contract ? Which takes this decision and when ?
 - How provide trust to users ? What happen if the oracle is malicious ? 
 
-One of the most known and battle tested oracle is the one set up by Chainlink called [Chainlink Data feeds (2.)](https://docs.chain.link/data-feeds). Its operation, without going into details, is as follows:
+One of the most known and battle tested oracle is the one set up by Chainlink, one of whose products is [Chainlink Data feeds (2.)](https://docs.chain.link/data-feeds). Its operation, without going into details, is as follows:
 
-- The oracle is composed of many decentralized node from different organization to avoid an unique point of failure and a price manipulation by a malicious node.
+- The oracle is composed of many decentralized nodes from different organization (Swisscom) to avoid an unique point of failure and a price manipulation by a malicious node.
 - These nodes fetch the prices from known price aggregators like CoinCeko or GSR
-- Each node has to signed a report and this report is send to the smart contract by a designed node (round robin)
-- The smart contract verifies the different signatures, compute the median value from the different report before making available for other smart contracts.
+- Each node has to provide observations, signed by themselves.
+- These observations are aggregated into a report by a node (leader) and this report is sent to the smart contract by a designed node (round robin).
+- The smart contract verifies the different signatures, compute the median value from the different observations before making them available for other smart contracts.
 
-You have traditionally two types of oracle: 
+**You can also use a [TWAP oracle](https://www.halborn.com/blog/post/what-are-twap-oracles), but it is another topic.
 
-- Push oracles: these oracles proactively provide data to smart contracts without being  explicitly requested, e.g when a  specified event or condition occurs. 
+## Push/pull oracles
 
-- Pull oracles require smart contracts to request data explicitly. They pull data from  external sources in response to a query from the smart contract.
+You have traditionally two types of oracles: 
+
+- **Push oracles**: these oracles proactively provide data to smart contracts without being  explicitly requested, e.g. when a  specified event or condition occurs. 
+
+- **Pull oracles** require smart contracts to request data explicitly. They pull data from external sources in response to a query from the smart contract.
 
 Chainlink provides a pull based oracle ([Chainlink data streams (3)](https://docs.chain.link/data-streams)) and a push based oracle ([Chainlink data feeds](https://chain.link/data-feeds))
 
-The reasoning taken in this article is mainly based on the push base oracle with the [Price Feeds (4)](https://docs.chain.link/data-feeds#price-feeds), but can also apply to pull base oracle.
+The reasoning taken in this article is mainly based on the push base oracle with the [Price Feeds (4)](https://docs.chain.link/data-feeds#price-feeds), but can also apply to a pull base oracle.
 
 Reference: [5. Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decentralized-apps/oracles/overview)                                                                         
 
-> How to implement a good oracle ?
+> How to implement a good oracle?
 
 ### Step 1 - Directly into the Consensus Protocol
 
-The first thing could be to add the oracle directly into the consensus protocol (block production mechanism). In this case, the miner will search directly information asked by the smart contract.
+The first thing could be to add the oracle directly into the consensus protocol (block production mechanism). In this case, the miner will search directly for information asked by the smart contract.
 
-**Problem:** The miner could be lying or cheating.
+> **Problem:** The miner could be lying or cheating.
 
-In this case, the miner is the only one which provides and knows the information. The others members on the blockchain (nodes) can not verify the integrity of the information provided by the miner
+In this case, the miner is the only one which provides and knows the information. The other members on the blockchain (nodes) can not verify the integrity of the information provided by the miner
 
 ### Step 2 - Oracle Network
 
 In this second step, the miners are replaced by an oracle network, with several different nodes. In this configuration, one node is charged to report the information.
 
-**Problem:** What if sending node lies / cheats?
+**>Problem:** What if sending node lies / cheats?
 
 ### Step 3 - Report with signature
 
-When we want to ensure that an information has not been altered, the common method is to use digital signature.
+When we want to ensure that information has not been altered, the common method is to use digital signature.
 
-Thus, to avoid the cheat, we add with the report the different signature from enough nodes (.e.g a threshold).
+Thus, to avoid cheating, we add to the report the different signature from enough nodes (.e.g a threshold).
 
-This principle is put in place by Chainlink oracles with their offchain reporting (OCR) where each node reports its price observation and signs it. When the report is send by the oracle node to the aggregator contract, the contract verifies that there is enough signature (quorum), see [6. docs.chain.link - off-chain-reporting](https://docs.chain.link/architecture-overview/off-chain-reporting).
+This principle is put in place by Chainlink oracles with their offchain reporting (OCR) where each node reports its price observation and signs it. When the report is sent by the oracle node to the aggregator contract, the contract verifies that there is enough signature (quorum), see [6. docs.chain.link - off-chain-reporting](https://docs.chain.link/architecture-overview/off-chain-reporting).
+
+As indicated in their [technical paper (16)](https://research.chain.link/ocr.pdf), the algorithm used for signatures is  the standard EdDSA and ECDSA schemes.
 
 > **Problem:** What if sending node goes down?
 
@@ -88,20 +99,20 @@ Reference: [6. docs.chain.link - off-chain-reporting](https://docs.chain.link/ar
 
 **Problem:**
 
-We have now our oracle network and we are protected :
+We have now our oracle network and we are protected:
 
 - Against a malicious node thanks to the signature, 
 - Against a failure with the sender node thanks to the backup.
 
-> But what happens if the data source goes down ?
+> But what happens if the data source goes down?
 
 
 
 ### Step 5 - Source liveness
 
-If the nodes fetch information form the same website/data source, the oracle will no longer be able to retrieve the information if the original data source breaks down.
+If the nodes fetch information from the same website/data source, the oracle will no longer be able to retrieve the information if the original data source breaks down.
 
-For example, the exchange FTX was used by several oracles, including Chainlin. When the exchange crashed, the price from the exchange could no longer be considered reliable.
+For example, the exchange FTX was used by several oracles, including Chainlin. When the exchange crashed, the price of the exchange could no longer be considered reliable.
 
 Solution: the oracle has to fetch information from multiple websites to avoid a single point of failure.
 
@@ -113,7 +124,7 @@ During a certain time, there were also CoinMarketCap and CryptoCompare but their
 
 Problem:
 
-> We have decentralization and good liveness. But now we have a new problem: nodes fetch information from several different sources, what if a node disagree ?
+> We have decentralization and good liveness. But now we have a new problem: nodes fetch information from several different sources, what if a node disagree?
 
 
 
@@ -125,13 +136,13 @@ To decide what information to take, we can take data transmitted by the majority
 
 But it is more complicated when you have numerical values.
 
-> What if nodes report differing numerical values ?
+> What if nodes report differing numerical values?
 
 
 
 ### Step 7 - combining report, median
 
-Instead the majority, we can take here the [median](https://en.wikipedia.org/wiki/Median),  which is the value separating the higher half from the lower half.
+Instead, the majority, we can take here the [median](https://en.wikipedia.org/wiki/Median),  which is the value separating the higher half from the lower half.
 
 Given a minority of bad values, median is an honest value or bounded by honest values.
 
@@ -148,9 +159,9 @@ Given a minority of bad values, median is an honest value or bounded by honest v
 
 ![chainlink schema]({{site.url_complet}}/assets/article/blockchain/oracle/chainlink-price-feed.png)
 
-1) External data providers (coincecko, GSR, ..) aggregate raw price data from a multitude of centralized and decentralized exchanges, accounting for time, volume, and outliers.
+1) External data providers (coincecko, GSR, ..) aggregate raw price data from many centralized and decentralized exchanges, accounting for time, volume, and outliers.
 
-2. Chainlink nodes fetch these data provided by these different external data providers. The results is combined in an unique value (median) inside a report
+2. Chainlink nodes fetch these data provided by these different external data providers. The results are combined in a unique value (median) inside a report
 3. Finally, this value is reported to a smart contract, making available for all others smart contracts.    
 
 Reference: [15. chain.link/data-feeds#price-and-market-feeds]( https://chain.link/data-feeds#price-and-market-feeds)   
@@ -191,7 +202,7 @@ Reference: [13. Chainlink - Check the timestamp of the latest answer](https://do
 
 > How do we ensure that a majority of nodes are honest?
 
-In the case of Chainlink, there are several different nodes maintained by known organisation, for example [swisscom](https://www.chainlinkecosystem.com/ecosystem/swisscom) (telecoms company), [kraken](https://www.chainlinkecosystem.com/ecosystem/kraken) and [Coinbase-cloud](https://www.chainlinkecosystem.com/ecosystem/coinbase-cloud). In principle, these companys have no incentive to behave maliciously because they are known to the public.
+In the case of Chainlink, there are several different nodes maintained by known organization, for example [swisscom](https://www.chainlinkecosystem.com/ecosystem/swisscom) (telecoms company), [kraken](https://www.chainlinkecosystem.com/ecosystem/kraken) and [Coinbase-cloud](https://www.chainlinkecosystem.com/ecosystem/coinbase-cloud). In principle, these companies have no incentive to behave maliciously because they are known to the public.
 
 ## References
 
@@ -206,6 +217,7 @@ In the case of Chainlink, there are several different nodes maintained by known 
   - [8.How Chainlink Price Feeds Secure the DeFi Ecosystem](https://blog.chain.link/chainlink-price-feeds-secure-defi/)
   - [13.Chainlink - Check the timestamp of the latest answer](https://docs.chain.link/data-feeds#check-the-timestamp-of-the-latest-answer)
   - [15. chain.link/data-feeds#price-and-market-feeds]( https://chain.link/data-feeds#price-and-market-feeds)
+  - [16. research.chain.link/ocr.pdf](https://research.chain.link/ocr.pdf)
   - [docs.chain.link/architecture-overview/architecture-request-model](https://docs.chain.link/architecture-overview/architecture-request-model)
 - [5.Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decentralized-apps/oracles/overview)
 - Pyth
@@ -216,6 +228,3 @@ In the case of Chainlink, there are several different nodes maintained by known 
 - [12. stackoverflow - Is Chainlink's price reference data free to consume?](https://ethereum.stackexchange.com/questions/87473/is-chainlinks-price-reference-data-free-to-consume)
 - [14. ethereum stackexchange - Chainlink Stale Data latestRoundData() guide](https://ethereum.stackexchange.com/questions/154261/chainlink-stale-data-latestrounddata-guide)
 - [www.rareskills.io - How Chainlink Price Feeds Work](https://www.rareskills.io/post/chainlink-price-feed-contract)
-
-
-

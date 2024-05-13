@@ -12,13 +12,19 @@ image: /assets/article/blockchain/arweave-logo.png
 
 ## Introduction
 
+Store files directly in the blockchain is a good way to guarantee the immutability of files and their accessibility
+
+But there is a problem, as always, most  blockchains are not designed to store file...
+
+This is for example the case for Ethereum and it is the reason why for NFT, the JSON file containing the NFT metada is not directly stored on blockchain.
+
+Here come a solution: decentralized storage network like IPFS or Arweave...
+
 [Arweave](https://www.arweave.org/) is a network acting as a decentralized storage layer to upload files permanently with a single payment. 
 
 In Arweave, you can store smart contracts, web applications, and websites.
 
 The main selling argument is, you only pay once and the files are stored forever. 
-
-The main reference of this article is a lesson from LearnWeb3: [https://learnweb3.io/minis/what-is-arweave](https://learnweb3.io/minis/what-is-arweave)
 
 ## Architecture
 
@@ -37,7 +43,7 @@ Instead, it rewards miners based on the amount of data they store and  the lengt
 
 Files uploaded to Arweave are stored on thousands of computers hosted by people across the world. Smart contracts, web applications, and websites can be hosted on Arweave.
 
-To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access to the decrypted files.
+To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access to the decrypted files. 
 
 Warning: The fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
@@ -46,6 +52,8 @@ Warning: The fact that your files will on Arweave permenently means it is possib
 Miners store files uploaded to Arweave in return for **$AR**, the cryptocurrency securing the Arweave network. Thus, it costs a small amount of $AR to upload and store files and this cost changes based on the current demand. 
 
 To offer permanent storage, Arweave uses a concept called [**storage endowment**](https://arwiki.wiki/#/en/storage-endowment). It is an estimation of how the price of storage will decrease in the future to distribute appropriate quantities of tokens to miners over time, in order to guarantee the perpetual storage of arbitrary quantities of data.
+
+The goal of this mechanism is to distribute  appropriately quantities of tokens to miners over time, in order  to encourage miners to keep datas (perpetual storage).
 
 Of the $AR fees paid to upload files, 5% goes to the miners while the other 95% goes into a storage endowment. 
 
@@ -71,14 +79,18 @@ All the data (the contracts' code and interactions) are kept on-chain, but the e
 
 References:
 
-- [https://academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
-- [https://warp.cc/](https://warp.cc/)
+- [academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
+- [warp.cc/](https://warp.cc/)
 
 ## Challenges & risk
 
 - Even if Arweave promises a permanent storage, if the network is shut down, the files will be probably no longer available.
 
+- Of course, there is always a risk that the rewards will no longer be sufficient to encourage minors to store data...
+
 - A second point is the risk to upload files which can not be deleted (privacy !!!). Once it is uploaded, you have no longer control on the files.
+
+- As already said, the fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
 - Lastly, Arweave could be use to upload illegal contents which poses a reputational risk.
 
@@ -86,16 +98,12 @@ References:
 
 ## References
 
-**Main references**
-
 - This lesson from LearnWeb3: [https://learnweb3.io/minis/what-is-arweave](https://learnweb3.io/minis/what-is-arweave)
-
+- [warp - Smart contracts
+   on Arweave](https://warp.cc/)
+- [academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
+- [arwiki.wiki/#/en/main](https://arwiki.wiki/#/en/main)
 - ChatGPT with the input
 
 *Write a short article (about 500-1500) words on Arweave, the  decentralized storage layer. Divide your article in topic with title*
 
-**Other**
-
-- [https://warp.cc/](https://warp.cc/)
-- [https://academy.warp.cc/docs/sdk/overview](https://academy.warp.cc/docs/sdk/overview)
-- [https://arwiki.wiki/#/en/main](https://arwiki.wiki/#/en/main)
