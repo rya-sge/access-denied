@@ -8,7 +8,7 @@ categories: cryptography blockchain
 tags: hash Petersen starkware
 description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits / zk-SNARK
 image: /assets/article/blockchain/oracle/chainlink-price-feed.png
-isMath: false
+isMath: true
 ---
 
 A hash operation in a zero-knowledge context (e.g zk-SNARK circuit) requires specific construction to be efficient.
