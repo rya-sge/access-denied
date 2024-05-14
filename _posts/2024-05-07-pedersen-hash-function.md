@@ -15,9 +15,9 @@ A hash operation in a zero-knowledge context (e.g zk-SNARK circuit) requires spe
 
 For example, the widely used SHA-256 consists mostly of boolean operations which is not efficient to evaluate inside of a ZK circuit. Each invocation of SHA256 currently adds tens of thousands of multiplication gates, which is clearly not optimized.
 
-One of the hash function designed to be used in a zero-knowledge context is the Pedersen Hash function. This function is more efficient in a ZK circuit since it relies on [elliptic curve cryptography](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). 
+One of the hash function designed to be used in a zero-knowledge context is the **Pedersen Hash function**. This function is more efficient in a ZK circuit since it relies on [elliptic curve cryptography](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). 
 
-Its security is based on the Elliptic Curve Discrete Logarithm Problem (ECDLP), which makes the function `one-way` since solving the ECDLP  is considered as computationally infeasible.
+Its security is based on the **Elliptic Curve Discrete Logarithm Problem** (ECDLP), which makes the function `one-way` since solving the ECDLP  is considered as computationally infeasible.
 
 Hoe does it work ? In short, Pedersen maps a sequence of bits to a compressed point on an elliptic curve and generally returns the x-coordinate of the computed point as a hash.
 
@@ -27,7 +27,7 @@ Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/c
 
 ## Use case
 
-The Pedersen hash is computed as a linear combination of points on an elliptic curve.  Since the computation relies on arithmetic field, they are therefore fairly efficient to compute in zero-knowledge circuits, e.g zk-SNARK proofs  and Merkle Tree.
+The **Pedersen hash** is computed as a linear combination of points on an elliptic curve.  Since the computation relies on arithmetic field, they are therefore fairly efficient to compute in zero-knowledge circuits, e.g zk-SNARK proofs  and Merkle Tree.
 
 For example, SHA256 consists mostly of boolean operations, so it is not efficient to evaluate inside of a zk-SNARK circuit, which is an arithmetic circuit over a large prime field. Each invocation of SHA256 currently adds tens of thousands of multiplication gates, making it the primary cost during proving.
 
@@ -43,7 +43,7 @@ Reference:
 The Pedersen hash is defined as the linear combination of the points with the encoding of the message chunks:
 $$
 \begin{aligned}[b]
-H(M) = H(M1M2 … Mk ) = ⟨M1⟩ ⋅ G1 + ⟨M2⟩ ⋅ G2 + … + ⟨Mk⟩ ⋅ Gk
+H(M) = H(M1M2 … Mk ) = ⟨M1⟩ ⋅ G1 + ⟨M2⟩ ⋅ G2 + … + ⟨Mk⟩ ⋅ Gk\\
 \end{aligned}
 $$
 **Message**
@@ -95,7 +95,7 @@ Reference:
 StarkWare has implemented a version of this function for StarkNet in C++, [released in 2021](https://twitter.com/StarkWareLtd/status/1361295729793372168?lang=en)
 $$
 \begin{aligned}[b]
-H(a,b)=[P0+a_{low}⋅P1+a_{high}⋅P2+b_{low}⋅P3+b_{high}⋅P4]x
+H(a,b)=[P0+a_{low}⋅P1+a_{high}⋅P2+b_{low}⋅P3+b_{high}⋅P4]x \\
 \end{aligned}
 $$
 Where:
