@@ -7,7 +7,7 @@ locale: en-GB
 categories: cryptography blockchain
 tags: hash Petersen starkware
 description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits / zk-SNARK
-image: /assets/article/blockchain/oracle/chainlink-price-feed.png
+image: /assets/article/cryptographie/pedersen-hash-function.png
 isMath: true
 ---
 
@@ -351,3 +351,4 @@ Reference:
 - [iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
 - [zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
 - [StarkWare doc](https://docs.starkware.co/starkex/crypto/pedersen-hash-function.html)
+
