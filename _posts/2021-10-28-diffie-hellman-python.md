@@ -28,27 +28,23 @@ Cet article présente le protocole de mise au point de clé **Diffie-Hellman** (
 - **Alice** 
 
 $$
-Clé~privée~:~nombre~a~aléatoire
-$$
-$$
+\begin{aligned}[b]
+Clé~privée~:~nombre~a~aléatoire \\
 Clé~publique =
-A = g^a mod~p
-$$
-$$
+A = g^a mod~p \\
 Clé~partagée = B^a mod~p
+\end{aligned}
 $$
+
 
 - **Bob**
-
 $$
-Clé~privée~:~nombre~b~aléatoire 
-$$
-$$
+\begin{aligned}[b]
+Clé~privée~:~nombre~b~aléatoire \\
 Clé~publique = 
-B = g^b mod~p  
-$$
-$$
+B = g^b mod~p \\
 Clé~partagée = A^b~ mod~p
+\end{aligned}
 $$
 
 ## Implémentation
@@ -104,14 +100,18 @@ Bob fait pareil de son côté
 
 Puis il utilise la clé publique A d'Alice pour calculer la clé partagée
 $$
+\begin{aligned}[b]
 Shared ~ key = A^b
+\end{aligned}
 $$
 
 #### Alice 
 
 Bob envoie également sa clé publique B à Alice, qui va faire pareil de son côté pour calculer la clé partagée.
 $$
+\begin{aligned}[b]
 Shared ~ key = B^a
+\end{aligned}
 $$
 
 

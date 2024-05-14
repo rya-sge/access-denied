@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Pedersen Hash Function Overview
-date:   2024-04-27
+date:   2024-05-07
 lang: en
 locale: en-GB
 categories: cryptography blockchain
@@ -42,7 +42,9 @@ Reference:
 
 The Pedersen hash is defined as the linear combination of the points with the encoding of the message chunks:
 $$
+\begin{aligned}[b]
 H(M) = H(M1M2 … Mk ) = ⟨M1⟩ ⋅ G1 + ⟨M2⟩ ⋅ G2 + … + ⟨Mk⟩ ⋅ Gk
+\end{aligned}
 $$
 **Message**
 
@@ -92,7 +94,9 @@ Reference:
 
 StarkWare has implemented a version of this function for StarkNet in C++, [released in 2021](https://twitter.com/StarkWareLtd/status/1361295729793372168?lang=en)
 $$
+\begin{aligned}[b]
 H(a,b)=[P0+a_{low}⋅P1+a_{high}⋅P2+b_{low}⋅P3+b_{high}⋅P4]x
+\end{aligned}
 $$
 Where:
 
@@ -302,11 +306,15 @@ pub fn pedersen_hash(a: StarkHash, b: StarkHash) -> StarkHash {
 
 Jubjub is a twisted Edwards curve of the form
 $$
+\begin{aligned}[b]
 -x^2 + y^2 = 1 + d x^2 y^2
+\end{aligned}
 $$
 It is built over the BLS12-381 scalar field, with:
 $$
+\begin{aligned}[b]
 d = -(10240/10241)
+\end{aligned}
 $$
 Reference: [bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
 
