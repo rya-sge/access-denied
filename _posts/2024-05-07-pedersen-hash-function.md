@@ -7,7 +7,7 @@ locale: en-GB
 categories: cryptography blockchain
 tags: hash Petersen starkware
 description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits / zk-SNARK
-image: /assets/article/cryptographie/pedersen-hash-function.png
+image: /assets/article/cryptographie/hash/pedersen-hash-function.png
 isMath: true
 ---
 
@@ -402,9 +402,7 @@ Reference:
 
 As with other hash functions, this function can not be used as a pseudorandom function (PRF) since the hash produced is predicable and not random.
 
-
-
-### Reference 
+### References 
 
 - [research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
 - [pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
