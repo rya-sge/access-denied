@@ -48,7 +48,8 @@ Pedersen commitments are cryptographic algorithms that allow a prover to commit 
 
 The commitment and hash version rely both on the ECDLP hardness assumption.
 
-https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html#:~:text=Pedersen%20commitments,on%20the%20ECDLP%20hardness%20assumption.
+- [Mina book - Commitments](https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html)
+- [RareSkills - What are Pedersen Commitments and How They Work](https://www.rareskills.io/post/pedersen-commitment)
 
 ## Operation
 
@@ -410,6 +411,8 @@ As with other hash functions, this function can not be used as a pseudorandom fu
 - [crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
 
 ## References
+
+This section contains the main references
 
 - [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
 - [iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
