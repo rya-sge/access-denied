@@ -25,6 +25,8 @@ This function is available on Starkware, ZCash and the protocol Iden3.
 
 Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/)
 
+
+
 ## Use case
 
 The **Pedersen hash** is computed as a linear combination of points on an elliptic curve.  Since the computation relies on arithmetic field, they are therefore fairly efficient to compute in zero-knowledge circuits, e.g zk-SNARK proofs  and Merkle Tree.
@@ -36,7 +38,17 @@ Reference:
 - [iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
 - [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)[https://bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
 
+### Pedersen commitment
 
+It important to not confuse the Pederson hash function with the Pedersen commitment.
+
+The pederson commitment adds a  random blinding factor *r*, multiply by a public point on the curve *H*.
+
+Pedersen commitments are cryptographic algorithms that allow a prover to commit to a certain value without revealing it or being able to change it.
+
+The commitment and hash version rely both on the ECDLP hardness assumption.
+
+https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html#:~:text=Pedersen%20commitments,on%20the%20ECDLP%20hardness%20assumption.
 
 ## Operation
 
@@ -58,13 +70,13 @@ $$
 
  **Encoding function**
 
-The function ⟨⋅⟩, commonly referred to as the *encoding* function, converts a bit string into a scalar element.
+The function ⟨⋅⟩, commonly referred to as the *encoding* function, converts a bit string into a scalar element. This function has to be injective in order to be collision-resistant.
 
 **Output**
 
 The output of the hash function defined above is a point on the curve. 
 
-In practice, the desired output may be a field element, in which case *a single coordinate* of the resulting point is often used as the hash.
+In practice, the desired output may be a field element, in which case *a single coordinate* (X) of the resulting point is often used as the hash. 
 
 
 
@@ -333,13 +345,65 @@ See [4-bit Window Pedersen Hash On The Baby Jubjub Elliptic Curve](https://iden3
 
 ## Security
 
-- The hash function is not collision-resistant for variable-length inputs. For example, if we allow larger bit strings to be hashed, such that their encoding is larger than the subgroup order, it would be easy for an attacker to compute collisions.
+This section came mainly from the article [Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/) from nccgroup.
 
-If the hash is truncated to its first half, and if the attacker controls the fixed length input, then there’s the possibility to compute 2 inputs that will yield the same truncated hash.
+### Collision with variable-length inputs
 
-- It is also distinguishable from a random oracle and as such this function should not be used as a pseudorandom function (PRF), accoording to [this research](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/) from nccgroup.
+The hash function is not collision-resistant for variable-length inputs. For example, if we allow larger bit strings to be hashed, such that their encoding is larger than the subgroup order, it come possible to compute collisions.
 
-Reference:  
+**Reminder:*
+
+- The order of an elliptic curve is defined as the number of distinct points on an elliptic curve *E* including the point at infinity ∞.
+- When you perform multiplication (P + P + P....+P), you will finish by get all the points on the curve and you reach the point at infinity ∞ (0). 
+- The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where 0 is the point at infinity.
+
+**Example**
+$$
+A)~r ⋅ G = 0
+$$
+
+As a result, if the take a point G multiply by scalar *a*
+$$
+B)~ G * a
+$$
+This operation produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*
+$$
+C) ~ G * a = G * a + k * r
+$$
+With the equation A, we have
+$$
+(a + k ⋅ r) ⋅ G = a ⋅ G + k ⋅ r ⋅ G = a ⋅ G + k ⋅ 0 = a ⋅ G
+$$
+Thus, multiplying the point *G* by a scalar *a* produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*. This situation happens if the encoding is larger than the subgroup order *r*.
+
+### Weierstrass curve
+
+If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve secp256k1 used in Ethereum and Bitcoin, which is symmetric on the X-axis.
+
+ The second point being the inverse:
+$$
+P = (x, y)\\-P = (x, -y)
+$$
+
+
+But with the twisted Edwards form, the inverse has a different coordinate X.
+$$
+−P=(−x,y)
+$$
+Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return only the X coordinate. 
+
+Reference:
+
+- [Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
+- [Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
+
+###  Pseudorandom function (PRF) 
+
+As with other hash functions, this function can not be used as a pseudorandom function (PRF) since the hash produced is predicable and not random.
+
+
+
+### Reference 
 
 - [research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
 - [pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
