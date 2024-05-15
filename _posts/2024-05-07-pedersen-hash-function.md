@@ -360,20 +360,28 @@ The hash function is not collision-resistant for variable-length inputs. For exa
 
 **Example**
 $$
+\begin{aligned}[b]
 A)~r ⋅ G = 0
+end{aligned}
 $$
 
 As a result, if the take a point G multiply by scalar *a*
 $$
+\begin{aligned}[b]
 B)~ G * a
+end{aligned}
 $$
 This operation produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*
 $$
+\begin{aligned}[b]
 C) ~ G * a = G * a + k * r
+end{aligned}
 $$
 With the equation A, we have
 $$
+\begin{aligned}[b]
 (a + k ⋅ r) ⋅ G = a ⋅ G + k ⋅ r ⋅ G = a ⋅ G + k ⋅ 0 = a ⋅ G
+end{aligned}
 $$
 Thus, multiplying the point *G* by a scalar *a* produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*. This situation happens if the encoding is larger than the subgroup order *r*.
 
@@ -383,13 +391,17 @@ If the function returns only the x-coordinate, it can lead of collision if a Wei
 
  The second point being the inverse:
 $$
+\begin{aligned}[b]
 P = (x, y)\\-P = (x, -y)
+end{aligned}
 $$
 
 
 But with the twisted Edwards form, the inverse has a different coordinate X.
 $$
+\begin{aligned}[b]
 −P=(−x,y)
+end{aligned}
 $$
 Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return only the X coordinate. 
 
