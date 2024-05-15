@@ -83,9 +83,7 @@ In practice, the desired output may be a field element, in which case *a single 
 
 Reference:  [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
 
-## Implementation
-
-### Product
+### Use
 
 #### ZCash (2018)
 
@@ -99,7 +97,7 @@ According to their documentation, this solution with 3-bit has less constraints,
 
 Reference:
 
-- [linkedin.com/pulse/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/](https://www.linkedin.com/pulse/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/)
+- [linkedin.com/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/](https://www.linkedin.com/pulse/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/)
 - [github.com/zcash/zcash/issues/2234](https://github.com/zcash/zcash/issues/2234)
 - [zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
 
@@ -138,13 +136,124 @@ The generators *P*0, …, *P**k* are generated in such a manner that it is d
 
 Reference: 
 
-- [github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
-- [github.com/iden3/circomlib/tree/master/circuits](https://github.com/iden3/circomlib/tree/master/circuits)
-- [github.com/iden3/circomlib/blob/master/circuits/pedersen.circom](https://github.com/iden3/circomlib/blob/master/circuits/pedersen.circom)
+- [github.com/iden3 - pedersen-hash/pedersen.rst](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
+- [github.com/iden3 - circuits](https://github.com/iden3/circomlib/tree/master/circuits)
+- [github.com/iden3 - pedersen.circom](https://github.com/iden3/circomlib/blob/master/circuits/pedersen.circom)
 
-### Language
 
-#### Cairo
+
+## Elliptic curve choice
+
+**Jubjub elliptic curve (Zcash)**
+
+Jubjub is a twisted Edwards curve of the form
+$$
+\begin{aligned}[b]
+-x^2 + y^2 = 1 + d x^2 y^2
+\end{aligned}
+$$
+It is built over the BLS12-381 scalar field, with:
+$$
+\begin{aligned}[b]
+d = -(10240/10241)
+\end{aligned}
+$$
+Reference: [bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
+
+**Baby-Jubjub elliptic curve (iden3)**
+
+Iden3 uses the baby-jubjub curve, under the Montgomery Form .
+$$
+E : v
+2 = u
+3 + 168698u
+2 + u.
+$$
+This is birationally equivalent to the Edwards elliptic curve where d = `9706598848417545097372247223557719406784115219466060233080913168975159366771`.
+
+See [4-bit Window Pedersen Hash On The Baby Jubjub Elliptic Curve](https://iden3-docs.readthedocs.io/en/latest/_downloads/4b929e0f96aef77b75bb5cfc0f832151/Pedersen-Hash.pdf), [Baby Jubjub Elliptic Curve](https://docs.iden3.io/publications/pdfs/Baby-Jubjub.pdf)
+
+## Security
+
+This section came mainly from the article [Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/) from nccgroup.
+
+### Collision with variable-length inputs
+
+The hash function is not collision-resistant for variable-length inputs. For example, if we allow larger bit strings to be hashed, such that their encoding is larger than the subgroup order, it come possible to compute collisions.
+
+**Reminder:*
+
+- The order of an elliptic curve is defined as the number of distinct points on an elliptic curve *E* including the point at infinity ∞.
+- When you perform multiplication (P + P + P....+P), you will finish by get all the points on the curve and you reach the point at infinity ∞ (0). 
+- The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where 0 is the point at infinity.
+
+**Example**
+$$
+\begin{aligned}[b]
+A)~r ⋅ G = 0
+\end{aligned}
+$$
+
+As a result, if the take a point G multiply by scalar *a*
+$$
+\begin{aligned}[b]
+B)~ G * a
+\end{aligned}
+$$
+This operation produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*
+$$
+\begin{aligned}[b]
+C) ~ G * a = G * a + k * r
+\end{aligned}
+$$
+With the equation A, we have
+$$
+\begin{aligned}[b]
+(a + k ⋅ r) ⋅ G = a ⋅ G + k ⋅ r ⋅ G = a ⋅ G + k ⋅ 0 = a ⋅ G
+\end{aligned}
+$$
+Thus, multiplying the point *G* by a scalar *a* produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*. This situation happens if the encoding is larger than the subgroup order *r*.
+
+### Weierstrass curve
+
+If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve secp256k1 used in Ethereum and Bitcoin, which is symmetric on the X-axis.
+
+ The second point being the inverse:
+$$
+\begin{aligned}[b]
+P = (x, y)\\-P = (x, -y)
+\end{aligned}
+$$
+
+
+But with the twisted Edwards form, the inverse has a different coordinate X.
+$$
+\begin{aligned}[b]
+−P=(−x,y)
+\end{aligned}
+$$
+Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return only the X coordinate. 
+
+Reference:
+
+- [Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
+- [Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
+
+###  Pseudorandom function (PRF) 
+
+As with other hash functions, this function can not be used as a pseudorandom function (PRF) since the hash produced is predicable and not random.
+
+### References 
+
+- [research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
+- [pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
+- [crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
+
+
+
+## Implementation
+
+### Cairo
 
 According to the Cairo documentation, the hash function `Poseidon` is cheaper and faster than Pedersen when working with STARK proofs system and it recommends to use Poseidon in Cairo programs.
 
@@ -175,9 +284,9 @@ fn main() -> (felt252, felt252) {
 
 Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html)
 
-#### Rust
+### Rust
 
-##### starknet-rs
+#### starknet-rs
 
 This library offers a complete Starknet library in Rust, which also contains a version for the pedersen hash in rust.
 
@@ -185,7 +294,7 @@ This library offers a complete Starknet library in Rust, which also contains a v
 
 This first part defines the different constants (P1, P2, P3, P4).
 
-Reference: [github.com/xJonathanLEI/starknet-rs/blob/master/starknet-curve/src/curve_params.rs](https://github.com/xJonathanLEI/starknet-rs/blob/master/starknet-curve/src/curve_params.rs)
+Reference: [github.com/xJonathanLEI/starknet-rs - curve_params.rs](https://github.com/xJonathanLEI/starknet-rs/blob/master/starknet-curve/src/curve_params.rs)
 
 ```rust
 pub const PEDERSEN_P1: AffinePoint = AffinePoint {
@@ -274,9 +383,9 @@ pub fn pedersen_hash(x: &FieldElement, y: &FieldElement) -> FieldElement {
 }
 ```
 
-Reference: [github.com/xJonathanLEI/starknet-rs/blob/master/starknet-crypto/src/pedersen_hash.rs](https://github.com/xJonathanLEI/starknet-rs/blob/master/starknet-crypto/src/pedersen_hash.rs)
+Reference: [github.com/xJonathanLEI/starknet-rs - pedersen_hash.rs](https://github.com/xJonathanLEI/starknet-rs/blob/master/starknet-crypto/src/pedersen_hash.rs)
 
-##### Node Pathfinder
+#### Node Pathfinder
 
 This project is a [Starknet](https://www.starknet.io) full node giving to give view into Starknet. A version of pedersen is also available in rust.
 
@@ -310,115 +419,6 @@ pub fn pedersen_hash(a: StarkHash, b: StarkHash) -> StarkHash {
 ```
 
 - Reference: [github.com/eqlabs/pathfinder/blob/b091cb889e624897dbb0cbec3c1df9a9e411eb1e/crates/pedersen/src/lib.rs#L87](https://github.com/eqlabs/pathfinder/blob/b091cb889e624897dbb0cbec3c1df9a9e411eb1e/crates/pedersen/src/lib.rs#L87)
-
-
-
-## Elliptic curve choice
-
-**Jubjub elliptic curve (Zcash)**
-
-Jubjub is a twisted Edwards curve of the form
-$$
-\begin{aligned}[b]
--x^2 + y^2 = 1 + d x^2 y^2
-\end{aligned}
-$$
-It is built over the BLS12-381 scalar field, with:
-$$
-\begin{aligned}[b]
-d = -(10240/10241)
-\end{aligned}
-$$
-Reference: [bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
-
-**Baby-Jubjub elliptic curve (iden3)**
-
-Iden3 uses the baby-jubjub curve, under the Montgomery Form .
-$$
-E : v
-2 = u
-3 + 168698u
-2 + u.
-$$
-This is birationally equivalent to the Edwards elliptic curve where d = `9706598848417545097372247223557719406784115219466060233080913168975159366771`.
-
-See [4-bit Window Pedersen Hash On The Baby Jubjub Elliptic Curve](https://iden3-docs.readthedocs.io/en/latest/_downloads/4b929e0f96aef77b75bb5cfc0f832151/Pedersen-Hash.pdf), [Baby Jubjub Elliptic Curve](https://docs.iden3.io/publications/pdfs/Baby-Jubjub.pdf)
-
-## Security
-
-This section came mainly from the article [Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/) from nccgroup.
-
-### Collision with variable-length inputs
-
-The hash function is not collision-resistant for variable-length inputs. For example, if we allow larger bit strings to be hashed, such that their encoding is larger than the subgroup order, it come possible to compute collisions.
-
-**Reminder:*
-
-- The order of an elliptic curve is defined as the number of distinct points on an elliptic curve *E* including the point at infinity ∞.
-- When you perform multiplication (P + P + P....+P), you will finish by get all the points on the curve and you reach the point at infinity ∞ (0). 
-- The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where 0 is the point at infinity.
-
-**Example**
-$$
-\begin{aligned}[b]
-A)~r ⋅ G = 0
-end{aligned}
-$$
-
-As a result, if the take a point G multiply by scalar *a*
-$$
-\begin{aligned}[b]
-B)~ G * a
-end{aligned}
-$$
-This operation produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*
-$$
-\begin{aligned}[b]
-C) ~ G * a = G * a + k * r
-end{aligned}
-$$
-With the equation A, we have
-$$
-\begin{aligned}[b]
-(a + k ⋅ r) ⋅ G = a ⋅ G + k ⋅ r ⋅ G = a ⋅ G + k ⋅ 0 = a ⋅ G
-end{aligned}
-$$
-Thus, multiplying the point *G* by a scalar *a* produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*. This situation happens if the encoding is larger than the subgroup order *r*.
-
-### Weierstrass curve
-
-If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve secp256k1 used in Ethereum and Bitcoin, which is symmetric on the X-axis.
-
- The second point being the inverse:
-$$
-\begin{aligned}[b]
-P = (x, y)\\-P = (x, -y)
-end{aligned}
-$$
-
-
-But with the twisted Edwards form, the inverse has a different coordinate X.
-$$
-\begin{aligned}[b]
-−P=(−x,y)
-end{aligned}
-$$
-Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return only the X coordinate. 
-
-Reference:
-
-- [Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
-- [Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
-
-###  Pseudorandom function (PRF) 
-
-As with other hash functions, this function can not be used as a pseudorandom function (PRF) since the hash produced is predicable and not random.
-
-### References 
-
-- [research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
-- [pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
-- [crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
 
 ## References
 
