@@ -249,13 +249,16 @@ If the function returns only the x-coordinate, it can lead of collision if a Wei
 
 $$
 \begin{aligned}[b]
-P = (x, y)\\-P = (x, -y)
+P = (x, y)
 \end{aligned}
 $$
 
 
-
-
+$$
+\begin{aligned}[b]
+-P = (x, -y)
+\end{aligned}
+$$
 But with the twisted Edwards form, the inverse has a different coordinate X.
 
 
