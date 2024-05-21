@@ -55,9 +55,7 @@ The commitment and hash version rely both on the ECDLP hardness assumption.
 
 The Pedersen hash is defined as the linear combination of the points with the encoding of the message chunks:
 $$
-\begin{aligned}[b]
 H(M) = H(M1M2 … Mk ) = ⟨M1⟩ ⋅ G1 + ⟨M2⟩ ⋅ G2 + … + ⟨Mk⟩ ⋅ Gk\\
-\end{aligned}
 $$
 **Message**
 

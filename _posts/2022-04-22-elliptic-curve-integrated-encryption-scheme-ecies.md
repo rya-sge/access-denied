@@ -65,7 +65,6 @@ Pour rappel, la courbe elliptique est un groupe additif. Par conséquent, on ne 
 
 1.Tirer un nombre aléatoire uniformément
 
-
 $$
 \begin{aligned}[b]
 r ∈ Z^*_p
