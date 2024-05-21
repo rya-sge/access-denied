@@ -109,6 +109,8 @@ $$
 H(a,b)=[P0+a_{low}⋅P1+a_{high}⋅P2+b_{low}⋅P3+b_{high}⋅P4]x \\
 \end{aligned}
 $$
+
+
 Where:
 
 - a*low*  is the 248 low bits of a.
@@ -147,27 +149,35 @@ Reference:
 **Jubjub elliptic curve (Zcash)**
 
 Jubjub is a twisted Edwards curve of the form
+
+
 $$
 \begin{aligned}[b]
 -x^2 + y^2 = 1 + d x^2 y^2
 \end{aligned}
 $$
+
+
 It is built over the BLS12-381 scalar field, with:
 $$
 \begin{aligned}[b]
 d = -(10240/10241)
 \end{aligned}
 $$
+
+
 Reference: [bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
 
 **Baby-Jubjub elliptic curve (iden3)**
 
 Iden3 uses the baby-jubjub curve, under the Montgomery Form .
 $$
+\begin{aligned}[b]
 E : v
 2 = u
 3 + 168698u
 2 + u.
+\end{aligned}
 $$
 This is birationally equivalent to the Edwards elliptic curve where d = `9706598848417545097372247223557719406784115219466060233080913168975159366771`.
 
@@ -188,30 +198,46 @@ The hash function is not collision-resistant for variable-length inputs. For exa
 - The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where *0* is the point at infinity.
 
 **Example**
+
+
 $$
 \begin{aligned}[b]
 A)~r ⋅ G = 0
 \end{aligned}
 $$
 
+
+
 As a result, if the take a point G multiply by scalar *a*
+
+
 $$
 \begin{aligned}[b]
 B)~ G * a
 \end{aligned}
 $$
+
+
 This operation produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*
+
+
 $$
 \begin{aligned}[b]
 C) ~ G * a = G * a + k * r
 \end{aligned}
 $$
+
+
 With the equation A, we have
+
+
 $$
 \begin{aligned}[b]
 (a + k ⋅ r) ⋅ G = a ⋅ G + k ⋅ r ⋅ G = a ⋅ G + k ⋅ 0 = a ⋅ G
 \end{aligned}
 $$
+
+
 Thus, multiplying the point *G* by a scalar *a* produces the same result as multiplying *G* by *a + k ⋅ r*, for any value of *k*. This situation happens if the encoding is larger than the subgroup order *r*.
 
 ### Weierstrass curve
@@ -219,6 +245,8 @@ Thus, multiplying the point *G* by a scalar *a* produces the same result as mult
 If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve *secp256k1* used in Ethereum and Bitcoin, which is symmetric on the X-axis.
 
  The second point being the inverse:
+
+
 $$
 \begin{aligned}[b]
 P = (x, y)\\-P = (x, -y)
@@ -226,12 +254,18 @@ P = (x, y)\\-P = (x, -y)
 $$
 
 
+
+
 But with the twisted Edwards form, the inverse has a different coordinate X.
+
+
 $$
 \begin{aligned}[b]
 −P=(−x,y)
 \end{aligned}
 $$
+
+
 Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return only the X coordinate. 
 
 Reference:
