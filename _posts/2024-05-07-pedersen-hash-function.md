@@ -23,7 +23,7 @@ Hoe does it work ? In short, Pedersen maps a sequence of bits to a compressed po
 
 This function is available on Starkware, ZCash and the protocol Iden3.
 
-Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/)
+Reference: [5.book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [6. etica - What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/)
 
 
 
@@ -35,8 +35,8 @@ For example, SHA256 consists mostly of boolean operations, so it is not efficien
 
 Reference: 
 
-- [iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
-- [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)[https://bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
+- [1.research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)[https://bitzecbzc.github.io/technology/jubjub/index.html](https://bitzecbzc.github.io/technology/jubjub/index.html)
+- [2. iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
 
 ### Pedersen commitment
 
@@ -48,8 +48,8 @@ Pedersen commitments are cryptographic algorithms that allow a prover to commit 
 
 The commitment and hash version rely both on the ECDLP hardness assumption.
 
-- [Mina book - Commitments](https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html)
-- [RareSkills - What are Pedersen Commitments and How They Work](https://www.rareskills.io/post/pedersen-commitment)
+- [7. Mina book - Commitments](https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html)
+- [8. RareSkills - What are Pedersen Commitments and How They Work](https://www.rareskills.io/post/pedersen-commitment)
 
 ## Operation
 
@@ -81,7 +81,7 @@ In practice, the desired output may be a field element, in which case *a single 
 
 
 
-Reference:  [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
+Reference:  [1. research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
 
 ### Use
 
@@ -97,9 +97,9 @@ According to their documentation, this solution with 3-bit has less constraints,
 
 Reference:
 
+- [3. zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
 - [linkedin.com/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/](https://www.linkedin.com/pulse/4-bit-window-pedersen-hash-function-efficient-standard-paul-socarde/)
 - [github.com/zcash/zcash/issues/2234](https://github.com/zcash/zcash/issues/2234)
-- [zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
 
 #### StarkWare
 
@@ -122,9 +122,9 @@ Where:
 
 The shift point P0 was added for technical reasons to make sure the point at infinity on the elliptic curve does not appear during the computation.
 
-According to the [Cairo documentation](https://book.cairo-lang.org/ch11-05-hash.html), Pedersen was the first hash function used on StarkNet, and is still used to compute the addresses of variables in storage, for example, `LegacyMap` uses Pedersen to hash the keys of a storage mapping on StarkNet.
+According to the [Cairo documentation (5)](https://book.cairo-lang.org/ch11-05-hash.html), Pedersen was the first hash function used on StarkNet, and is still used to compute the addresses of variables in storage, for example, `LegacyMap` uses Pedersen to hash the keys of a storage mapping on StarkNet.
 
-Reference: [doc](https://docs.starkware.co/starkex/crypto/pedersen-hash-function.html), [pedersen-hash.cc](https://github.com/starkware-libs/crypto-cpp/blob/master/src/starkware/crypto/pedersen_hash.cc)
+Reference: [4. StarkWare doc](https://docs.starkware.co/starkex/crypto/pedersen-hash-function.html), [pedersen-hash.cc](https://github.com/starkware-libs/crypto-cpp/blob/master/src/starkware/crypto/pedersen_hash.cc)
 
 #### Iden3
 
@@ -171,7 +171,7 @@ E : v
 $$
 This is birationally equivalent to the Edwards elliptic curve where d = `9706598848417545097372247223557719406784115219466060233080913168975159366771`.
 
-See [4-bit Window Pedersen Hash On The Baby Jubjub Elliptic Curve](https://iden3-docs.readthedocs.io/en/latest/_downloads/4b929e0f96aef77b75bb5cfc0f832151/Pedersen-Hash.pdf), [Baby Jubjub Elliptic Curve](https://docs.iden3.io/publications/pdfs/Baby-Jubjub.pdf)
+See [iden3 - 4-bit Window Pedersen Hash On The Baby Jubjub Elliptic Curve](https://iden3-docs.readthedocs.io/en/latest/_downloads/4b929e0f96aef77b75bb5cfc0f832151/Pedersen-Hash.pdf), [iden3 - Baby Jubjub Elliptic Curve](https://docs.iden3.io/publications/pdfs/Baby-Jubjub.pdf)
 
 ## Security
 
@@ -236,8 +236,8 @@ Thus, for implementation using *Jubjub*, a twisted Edwards curve, you can return
 
 Reference:
 
-- [Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
-- [Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
+- [9. crypto.stackexchange - Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
+- [10. Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
 
 ###  Pseudorandom function (PRF) 
 
@@ -245,9 +245,9 @@ As with other hash functions, this function can not be used as a pseudorandom fu
 
 ### References 
 
-- [research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
-- [pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
-- [crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
+- [1. research.nccgroup - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
+- [11. pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
+- [12. crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
 
 
 
@@ -282,7 +282,7 @@ fn main() -> (felt252, felt252) {
 
 
 
-Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html)
+Reference: [5. book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html)
 
 ### Rust
 
@@ -424,8 +424,16 @@ pub fn pedersen_hash(a: StarkHash, b: StarkHash) -> StarkHash {
 
 This section contains the main references
 
-- [research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
-- [iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
-- [zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
-- [StarkWare doc](https://docs.starkware.co/starkex/crypto/pedersen-hash-function.html)
+- [1. research.nccgroup.com - Breaking Pedersen Hashes in Practice](https://research.nccgroup.com/2023/03/22/breaking-pedersen-hashes-in-practice/)
+- [2. iden3 - Pedersen Hash](https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/pedersen-hash/pedersen.rst)
+- [3. zips.z.cash/protocol/protocol.pdf](https://zips.z.cash/protocol/protocol.pdf), p.77
+- [4. StarkWare doc](https://docs.starkware.co/starkex/crypto/pedersen-hash-function.html)
+- [5.book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), 
+- [6. etica - What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/)
+- [7. Mina book - Commitments](https://o1-labs.github.io/proof-systems/fundamentals/zkbook_commitment.html)
+- [8. RareSkills - What are Pedersen Commitments and How They Work](https://www.rareskills.io/post/pedersen-commitment)
+- [9. crypto.stackexchange - Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
+- [10. Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
+- [11. pedersen sage](https://github.com/ncc-pbottine/ToyPedersenHash/blob/main/pedersen.sage)
+- [12. crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
 
