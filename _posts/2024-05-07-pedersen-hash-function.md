@@ -6,14 +6,14 @@ lang: en
 locale: en-GB
 categories: cryptography blockchain
 tags: hash Petersen starkware
-description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits / zk-SNARK
+description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits (e.g. zk-SNARK)
 image: /assets/article/cryptographie/hash/pedersen-hash-function.png
 isMath: true
 ---
 
 A hash operation in a zero-knowledge context (e.g zk-SNARK circuit) requires specific construction to be efficient.
 
-For example, the widely used SHA-256 consists mostly of boolean operations which is not efficient to evaluate inside of a ZK circuit. Each invocation of SHA256 currently adds tens of thousands of multiplication gates, which is clearly not optimized.
+For example, the widely used SHA-256 consists mostly of boolean operations which is not efficient to evaluate inside of a ZK circuit and adds a lot of multiplication gates for each invocation.
 
 One of the hash function designed to be used in a zero-knowledge context is the **Pedersen Hash function**. This function is more efficient in a ZK circuit since it relies on [elliptic curve cryptography](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). 
 
@@ -23,7 +23,7 @@ Hoe does it work ? In short, Pedersen maps a sequence of bits to a compressed po
 
 This function is available on Starkware, ZCash and the protocol Iden3.
 
-Reference: [5.book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [6. etica - What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/)
+Reference: [5.book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [6. etica - What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/), [10. Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits, page 2](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1),
 
 
 
@@ -57,6 +57,8 @@ The Pedersen hash is defined as the linear combination of the points with the en
 $$
 H(M) = H(M1M2 … Mk ) = ⟨M1⟩ ⋅ G1 + ⟨M2⟩ ⋅ G2 + … + ⟨Mk⟩ ⋅ Gk\\
 $$
+
+
 **Message**
 
 - M is the message  that we wish to hash, represented as a bit string of *fixed* length **k ⋅ r**
