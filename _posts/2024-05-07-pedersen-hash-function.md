@@ -29,7 +29,7 @@ Reference: [book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/c
 
 ## Use case
 
-The **Pedersen hash** is computed as a linear combination of points on an elliptic curve.  Since the computation relies on arithmetic field, they are therefore fairly efficient to compute in zero-knowledge circuits, e.g zk-SNARK proofs  and Merkle Tree.
+The **Pedersen hash** is computed as a linear combination of points on an elliptic curve.  Since the computation relies on arithmetic field, they are therefore fairly efficient to compute in zero-knowledge circuits, e.g zk-SNARK proofs and Merkle Tree.
 
 For example, SHA256 consists mostly of boolean operations, so it is not efficient to evaluate inside of a zk-SNARK circuit, which is an arithmetic circuit over a large prime field. Each invocation of SHA256 currently adds tens of thousands of multiplication gates, making it the primary cost during proving.
 
@@ -181,11 +181,11 @@ This section came mainly from the article [Breaking Pedersen Hashes in Practice]
 
 The hash function is not collision-resistant for variable-length inputs. For example, if we allow larger bit strings to be hashed, such that their encoding is larger than the subgroup order, it come possible to compute collisions.
 
-**Reminder:*
+**Reminder**
 
 - The order of an elliptic curve is defined as the number of distinct points on an elliptic curve *E* including the point at infinity ∞.
-- When you perform multiplication (P + P + P....+P), you will finish by get all the points on the curve and you reach the point at infinity ∞ (0). 
-- The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where 0 is the point at infinity.
+- When you perform multiplication (P + P + P....+P), you will finish by get all the points on the curve and you reach thus the point at infinity ∞ (*0*). 
+- The scalar factor requires to reach this point-at-infinity is the subgroup order and is called *r* in our example. We have the following equation where *0* is the point at infinity.
 
 **Example**
 $$
@@ -216,7 +216,7 @@ Thus, multiplying the point *G* by a scalar *a* produces the same result as mult
 
 ### Weierstrass curve
 
-If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve secp256k1 used in Ethereum and Bitcoin, which is symmetric on the X-axis.
+If the function returns only the x-coordinate, it can lead of collision if a Weierstrass curve is used because we have two points which have the same coordinate x.  An example of this kind of curve is the curve *secp256k1* used in Ethereum and Bitcoin, which is symmetric on the X-axis.
 
  The second point being the inverse:
 $$
