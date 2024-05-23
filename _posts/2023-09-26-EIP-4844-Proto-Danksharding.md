@@ -21,11 +21,11 @@ With the next Ethereum Upgrade, Duncan, a new transaction format will be introdu
 
 Currently, rollup uses calldata to post their transaction on the Layer 1 Ethereum. This is expensive because it is processed by all Ethereum nodes and lives on chain forever.
 
-But rollups only need the data for a short time. For example, optimism rollup have only need the data available during the challenge period, e.g. one week on Arbitrum One.
+But rollups only need the data for a short time. For example, optimism rollup only needs the data available during the challenge period, e.g. one week on Arbitrum One.
 
 Proto-Danksharding introduces data blobs that can be sent and attached to blocks. The data in these blobs is not accessible to the EVM and is automatically deleted after a fixed time period (18 days in the EIP).  
 
-Since the data are not stored forever, it makes the whole process cheaper for rollup, thanks to their own own price mechanism.
+Since the data are not stored forever, it makes the whole process cheaper for rollup, thanks to their own price mechanism.
 
 
 
@@ -33,7 +33,7 @@ Since the data are not stored forever, it makes the whole process cheaper for ro
 
 ### Rollup
 
-A rollup is a blockchain that runs on top of Ethereum, reason why they are called *Layer 2 Blockchains.* The goal is that users conduct the majority of their transactions on the rollup chains instead of the Layer 1 Mainnet. 
+A rollup is a blockchain that runs on top of Ethereum, reason why they are called *Layer 2 Blockchains.* The goal is that users conduct most of their transactions on the rollup chains instead of the Layer 1 Mainnet. 
 
 There are two main types of rullup: Optimistic Rollups & ZK Rollup
 
@@ -61,7 +61,7 @@ The Beacon Chain can then randomly assign validators on the network to different
 
 #### Attack of 51%
 
-An attacker wishes to perform an 51% attack on a specific shard would still have to  control 51% of the entire validator set, otherwise their chances of  having their validators randomly assigned to the same shard are near  zero. [[2. domothy.com/blobspace/](https://domothy.com/blobspace/)]
+An attacker wishes to perform a 51% attack on a specific shard would still have to  control 51% of the entire validator set, otherwise their chances of  having their validators randomly assigned to the same shard are near  zero. [[2. domothy.com/blobspace/](https://domothy.com/blobspace/)]
 
 ## Danksharding
 
@@ -83,7 +83,7 @@ The concept of sharding is replaced by *blobs*. These blobs are constructed in a
 
 The construction of a block becomes a very heavy process in terms of bandwidth  and computation, which is a centralizing force on block builders.
 
-This kind of tasks can be however done by centralized block builders using  high performance machine, already done due to MEV [[2. domothy.com/blobspace/](https://domothy.com/blobspace/)].
+This kind of task can be, however, done by centralized block builders using  high performance machines, already done due to MEV [[2. domothy.com/blobspace/](https://domothy.com/blobspace/)].
 
 ## Proto-Danksharding (EIP-4844)
 
@@ -95,12 +95,12 @@ Reference: [6. ethereum.org/en/roadmap/danksharding/](https://ethereum.org/en/ro
 
 ### Blob-carrying transactions
 
-In addition to the traditional parameter`sender`, `receiver`, `nonce`, `gas` , this new type of transaction contains two new things:
+In addition to the traditional parameters `sender`, `receiver`, `nonce`, `gas` , this new type of transaction contains two new things:
 
 1. `max_fee_per_blob_gas`: a bid by the sequencer on how much they're willing to pay for the blob
-2. `blob_version_hashes`: a list of hashes of blobs - since each transaction can actually include multiple blobs
+2. `blob_version_hashes`: a list of hashes of blobs - since each transaction can include multiple blobs
 
-The transaction doesn't actually contain the blob data itself. It only contains a list of hashes of the blobs. 
+The transaction doesn't contain the blob data itself. It only contains a list of hashes of the blobs. 
 
 #### Blob construction
 
@@ -129,7 +129,7 @@ The separation of the pricing mechanics between EIP-1559 transactions and blob t
 
 ## Use case
 
-This paragraph come mainly from the [eip-4844](https://eips.ethereum.org/EIPS/eip-4844) specification.
+This paragraph comes mainly from the [eip-4844](https://eips.ethereum.org/EIPS/eip-4844) specification.
 
 ### Optimistic rollups
 

@@ -35,7 +35,9 @@ layout: home
             <p>
                 {% if site.social-twitter %}
                 Feel free to contact me on
-                <a href="https://twitter.com/intent/user?screen_name={{ site.social-twitter }}" class="c-btn c-btn--primary c-btn--round c-btn--shadow"><span data-icon='ei-sc-twitter' data-size='xs'></span>Twitter</a>
+                <a href="https://twitter.com/intent/user?screen_name={{ site.social-twitter }}"
+                 rel="nofollow" target="_blank">
+                 <div data-icon='ei-sc-twitter' data-size='sm'></div>
                 {% else %}
                 {% endif %}
             </p>

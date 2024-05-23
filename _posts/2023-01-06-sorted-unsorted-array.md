@@ -28,7 +28,7 @@ With an unsorted array, the different elements are in disorder. Thus, we have th
 
 In the second case (b), we need to perform a search inside the array, which increases the complexity
 
-- Insert an element : O(1)
+- Insert an element: O(1)
 
 We can simply add the element at the end of the array
 
@@ -38,7 +38,7 @@ We can simply add the element at the end of the array
 
   b. Using the value of the element: O(N)
 
-We need to search the element (O(N)), then shift to the left all the other elements situated after this element (O(N)).  Thus we have:
+We need to search the element (O(N)), then shift to the left all the other elements situated after this element (O(N)).  Thus, we have:
 $$
 O(N) + O(N) = 2 * O(N) = O(N)
 $$
@@ -98,7 +98,7 @@ If we can replace the removed element by another value, e.g. -1, we have a compl
 2) This search can get the following results:
 
 - The element is already in the array => generate an error
-- There are no element bigger than the searched element => you can insert the new element at the end of the array
+- There is no element bigger than the searched element => you can insert the new element at the end of the array
 - You have an upperbound match,
 
 ```c
@@ -143,7 +143,7 @@ With a sorted array, we can use a binary search to find our target element.
 
 1) We divide the array in two parts
 2) We search in the first part, if the element is not in this one, we search in the second part, and so on.
-3) We stop as soon as we found the value or reached the end of the array.
+3) We stop as soon as we find the value or reach the end of the array.
 
 ## Conclusion
 
@@ -151,17 +151,17 @@ With a sorted array, we can use a binary search to find our target element.
 
 With an unsorted array, you can easily add a new element because you do not need to care about the order of the array.
 
-Nevertheless, if you want to search an element, you have to iterate through the whole array.
+Nevertheless, if you want to search for an element, you have to iterate through the whole array.
 
-It impacts, e.g, the remove operation too because you need to find the element in order to remove it from the array.
+It impacts, e.g., the remove operation too because you need to find the element in order to remove it from the array.
 
 **Sorted array**
 
-The sorted array is the exact opposite: it is more efficient to perform a research because you can use a binary search.
+The sorted array is the exact opposite: it is more efficient to perform research because you can use a binary search.
 
-It is useful to remove an element because you need to perform a research in order to find the target element
+It is useful to remove an element because you need to perform research to find the target element
 
-Nevertheless, you have to keep the array sorted which makes it more difficult (less efficient) to insert a new element.
+Still, you must keep the array sorted, making it harder (less efficient) to insert a new element.
 
 
 
