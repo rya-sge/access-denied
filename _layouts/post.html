@@ -38,6 +38,7 @@ layout: home
                 <a href="https://twitter.com/intent/user?screen_name={{ site.social-twitter }}"
                  rel="nofollow" target="_blank">
                  <div data-icon='ei-sc-twitter' data-size='sm'></div>
+                </a>
                 {% else %}
                 {% endif %}
             </p>
@@ -46,6 +47,7 @@ layout: home
                 <a href="{{site.baseurl}}/tags#{{tag}}">&#35; {{ tag }}</a>
                 {% endfor %}
             </div>
+            <p>Share button</p>
             <div class="c-article__share">
                 <a href="https://twitter.com/intent/tweet?text={{ page.title | uri_escape }}&url={{ site.url}}{{ site.baseurl }}{{ page.url }}"
                    title="Share
