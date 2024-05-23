@@ -32,16 +32,16 @@ layout: home
         {% include toc.html html=content %}
         {{page.content | markdownify}}
         <div class="c-article__footer u-clearfix">
-            <p>
+            <div>
                 {% if site.social-twitter %}
                 Feel free to contact me on
                 <a href="https://twitter.com/intent/user?screen_name={{ site.social-twitter }}"
                  rel="nofollow" target="_blank">
-                 <div data-icon='ei-sc-twitter' data-size='sm'></div>
+                 <div data-icon='ei-sc-twitter' data-size='s'></div>
                 </a>
                 {% else %}
                 {% endif %}
-            </p>
+            </div>
             <div class="c-article__tag">
                 {% for tag in page.tags %}
                 <a href="{{site.baseurl}}/tags#{{tag}}">&#35; {{ tag }}</a>
