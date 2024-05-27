@@ -13,7 +13,7 @@ isMath: true
 
 This article presents the list of medium questions with their answers related to the article [Solidity Interview Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills.
 
-For the level Hard, you can see [my second article](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/).
+For the levels Hard and Advanced, you can see [my second](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/) and [third](https://rya-sge.github.io/access-denied/2024/05/06/solidity-interview-question-rareskills-advanced/) articles.
 
 According to the article, all questions can be answered in three sentences or less.
 

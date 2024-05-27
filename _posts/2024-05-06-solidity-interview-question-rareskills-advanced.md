@@ -434,7 +434,7 @@ Contrary to traditional programming, the efficiency of the circuits in ZK protoc
 
 Zk-friendly hash function will try to be represent as simple expression in a large field, which is more efficient in terms of prover execution time and proof size.
 
-Example of zk-friendly hash function: [MiMC](https://byt3bit.github.io/primesym/), [Poseidon](https://eprint.iacr.org/2019/458.pdf), and Vision/Rescue
+Example of zk-friendly hash function: [MiMC](https://byt3bit.github.io/primesym/), [Poseidon](https://eprint.iacr.org/2019/458.pdf), Vision/Rescue. See also my article on the [Pedersen hash function](https://rya-sge.github.io/access-denied/2024/05/07/pedersen-hash-function/).
 
 Reference: [zellic.io - ZK-Friendly Hash Functions](https://www.zellic.io/blog/zk-friendly-hash-functions/)
 
