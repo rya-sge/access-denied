@@ -1,12 +1,13 @@
 ---
 layout: post
-title: Winternitz One-Time Signature (OTS)
+title: Winternitz One-Time Signature(OTS)
 date:   2024-05-07
 lang: en
 locale: en-GB
 categories: cryptography blockchain
-tags: hash Petersen starkware
-description:  Presentation of Winternitz One-Time Signature (W-OST), a post quantum algorithm which relies on hash function (e.g  SHA-256)
+tags: hash signature winternitz sha-256
+description: Presentation of Winternitz One-Time Signature (W-OST), a post quantum algorithm which relies on hash function (e.g  SHA-256)
+image: /assets/article/cryptographie/signature/winternitz-cover.png
 isMath: true
 ---
 
