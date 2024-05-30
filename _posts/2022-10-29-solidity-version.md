@@ -12,12 +12,12 @@ isMath: false
 image: 
 ---
 
-There are different way to indicate the solidity version of the compiler.
+There are many ways to indicate the solidity version of the compiler.
 As stated in the solidity documentation [[docs.soliditylang.org 2022](https://docs.soliditylang.org/en/v0.8.17/layout-of-source-files.html#version-pragma)], the pragma only instructs the compiler to check whether its version matches the one required by the pragma. 
 The version pragma has no effect:
 
 - On the version of the compiler installed locally
-- On the features provider by the compiler.
+- On the features provided by the compiler.
 
 ### Fixed
 With this notation, the compiler version is fixed exactly.
@@ -46,14 +46,14 @@ With this notation, minor updates will be accepted. Nevertheless, even if the mo
 The SWC-103 considers the floating notation as a vulnerability.
 
 ### Range notation (to avoid)
-It is possible to use more complex way to indicate the version by using the same notation as the versioner of NPM (semver)  [[npm V6.14.17](https://docs.npmjs.com/cli/v6/using-npm/semver)].
+It is possible to use a more complex way to indicate the version by using the same notation as the versioner of NPM (semver)  [[npm V6.14.17](https://docs.npmjs.com/cli/v6/using-npm/semver)].
 For instance, it is possible to indicate precisely a range between two major version, here 0.4.0 and 0.6.0 [6]
 `pragma solidity >=0.4.0 < 0.6.0;`
 
 ## Conclusion
 As indicated in several articles [[Shashank 2022](https://blog.solidityscan.com/understanding-solidity-pragma-and-its-security-practices-3b5458763a34)], [[immunebytes. 2022](https://www.immunebytes.com/blog/floating-pragma/)], it is better to use the fixed version, the one that was used to develop and test the smart contracts.
 
-For library, some believe that one can use the floating notation because the code will use by other smart contracts. This is notably the choice made by OpenZeppelin, see this [[issue](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)] [ConsenSys 2017].
+For libraries, some believe that one can use the floating notation because the code will be used by other smart contracts. This is notably the choice made by OpenZeppelin, see this [[issue](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)] [ConsenSys 2017].
 
 
 # Reference

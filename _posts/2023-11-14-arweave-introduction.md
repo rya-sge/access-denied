@@ -12,19 +12,19 @@ image: /assets/article/blockchain/arweave-logo.png
 
 ## Introduction
 
-Store files directly in the blockchain is a good way to guarantee the immutability of files and their accessibility
+Store files directly in the blockchain is a good way to guarantee the immutability of files and their accessibility.
 
-But there is a problem, as always, most  blockchains are not designed to store file...
+But there is a problem, as always, most  blockchains are not designed to store files...
 
-This is for example the case for Ethereum and it is the reason why for NFT, the JSON file containing the NFT metada is not directly stored on blockchain.
+This is for example the case for Ethereum, and it is the reason why for NFT, the JSON file containing the NFT metadata is not directly stored on blockchain.
 
-Here come a solution: decentralized storage network like IPFS or Arweave...
+Here comes a solution: decentralized storage network like IPFS or Arweave...
 
 [Arweave](https://www.arweave.org/) is a network acting as a decentralized storage layer to upload files permanently with a single payment. 
 
 In Arweave, you can store smart contracts, web applications, and websites.
 
-The main selling argument is, you only pay once and the files are stored forever. 
+The main selling argument is, you only pay once, and the files are stored forever. 
 
 ## Architecture
 
@@ -43,9 +43,9 @@ Instead, it rewards miners based on the amount of data they store and  the lengt
 
 Files uploaded to Arweave are stored on thousands of computers hosted by people across the world. Smart contracts, web applications, and websites can be hosted on Arweave.
 
-To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access to the decrypted files. 
+To protect your privacy,  files can also be encrypted. In this case, only you can read the contents of your files and even the miners can not access the decrypted files. 
 
-Warning: The fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
+Warning: The fact that your files will on Arweave permanently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
 ## Cost
 
@@ -84,15 +84,15 @@ References:
 
 ## Challenges & risk
 
-- Even if Arweave promises a permanent storage, if the network is shut down, the files will be probably no longer available.
+- Even if Arweave promises permanent storage, if the network is shut down, the files will be probably no longer available.
 
 - Of course, there is always a risk that the rewards will no longer be sufficient to encourage minors to store data...
 
-- A second point is the risk to upload files which can not be deleted (privacy !!!). Once it is uploaded, you have no longer control on the files.
+- A second point is the risk of uploading files which can not be deleted (privacy !!!). Once it is uploaded, you have no longer control over the files.
 
-- As already said, the fact that your files will on Arweave permenently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
+- As already said, the fact that your files will be on Arweave permanently means it is possible that a secure method to encrypt your files will not be secure in the future, e.g. in the case of the appearance of a quantum computer.
 
-- Lastly, Arweave could be use to upload illegal contents which poses a reputational risk.
+- Lastly, Arweave could be used to upload illegal content which poses a reputational risk.
 
 
 

@@ -15,7 +15,7 @@ A hash operation in a zero-knowledge context (e.g zk-SNARK circuit) requires spe
 
 For example, the widely used SHA-256 consists mostly of boolean operations which is not efficient to evaluate inside of a ZK circuit and adds a lot of multiplication gates for each invocation.
 
-One of the hash function designed to be used in a zero-knowledge context is the **Pedersen Hash function**. This function is more efficient in a ZK circuit since it relies on [elliptic curve cryptography](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). 
+One of the hash function designed to be used in a zero-knowledge context is the **Pedersen Hash function**. This function is more efficient in a ZK circuit since it relies on [elliptic curve cryptography](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography) with arithmetic on a finite field. Therefore, you don't need to "convert" the addition operation contrary to bits, which work on GF(2) or 32 bits integer.
 
 Its security is based on the **Elliptic Curve Discrete Logarithm Problem** (ECDLP), which makes the function `one-way` since solving the ECDLP  is considered as computationally infeasible.
 

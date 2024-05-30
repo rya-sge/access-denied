@@ -280,7 +280,7 @@ let c: bool = (a == b); // false
 
 **Conditionals**
 
-```
+```javascript
 let isSmall = (n : nat) : bool => {
   if (n < (10 as nat)) { return true; } else { return false; };
 };
@@ -370,7 +370,7 @@ my_name[0] = "Carter"
 
 **Result**
 
-```
+```javascript
 // Type your solution below
 type coordinates = [int, int, int];
 let earth_coordinates: coordinates = [2, 7, 1];
@@ -389,7 +389,7 @@ Records are like tuples but with named parameters. In other words, they  hold a 
 
 To instantiate a record, you must first  declare its type as follows : 
 
-```
+```javascript
 type user = {
   id       : nat,
   is_admin : bool,
@@ -401,7 +401,7 @@ type user = {
 
 And here is how to define an associated record value :
 
-```
+```ja
 let alice : user = {
   id       : 1 as nat,
   is_admin : true,
@@ -470,7 +470,7 @@ Maps are a data structure which associate values of the same type to  values of 
 
 Maps are declared as: 
 
-```
+```javascript
 type balances = map<string, nat>;
 ```
 
@@ -478,19 +478,19 @@ type balances = map<string, nat>;
 
 To create an empty map :
 
-```
+```javascript
 let empty: balances = Map.empty;
 ```
 
  Warning: An empty map must be casted to the right type. More on this later.
 
-```
+```javascript
 let empty: balances = (Map.empty as map<string, nat>)
 ```
 
 To create an non-empty map :
 
-```
+```javascript
 let moves: balances = Map.literal(list([
 	["tim", 5 as nat],
 	["mark", 0 as nat]
@@ -613,7 +613,7 @@ let iter_op (l : int list) : unit =
 
 We may want to change all the elements of a given list by applying to them a function. This is called a *map operation*, not to be confused with the map data structure. The predefined  functional iterator implementing the mapped operation over lists is  called *List.map* and is used as follows.
 
-```
+```javascript
 let increment (i : int) : int = i + 1
 // Creates a new list with all elements incremented by 1
 let plus_one : int list = List.map increment larger_list
@@ -623,7 +623,7 @@ let plus_one : int list = List.map increment larger_list
 
 A *folded operation* is the most general of iterations. The folded function takes two  arguments: an accumulator and the structure element at hand, with which  it then produces a new accumulator. This enables having a partial result that becomes complete when the traversal of the data structure is over. The predefined functional iterator implementing the folded operation  over lists is called *List.fold* and is used as follows.
 
-```
+```javascript
 let sum (acc, i: int * int) : int = acc + i
 
 let sum_of_elements : int = List.fold sum my_list 0
@@ -639,13 +639,13 @@ Sets are unordered collections of values of the same type, like lists  are order
 
 To define an empty set :
 
-```
+```javascript
 let my_set : int set = Set.empty
 ```
 
 In CameLIGO, there is no predefined syntactic construct for sets: you  must build your set by adding to the empty set. (This is the way in  OCaml.)
 
-```
+```javascript
 let my_set : int set =
 
   Set.add 3 (Set.add 2 (Set.add 2 (Set.add 1 (Set.empty : int set))))
@@ -655,7 +655,7 @@ let my_set : int set =
 
 In CameLIGO, the predefined predicate *Set.mem* tests for membership in a set as follows:
 
-```
+```javascript
 let contains_3 : bool = Set.mem 3 my_set
 ```
 
@@ -663,7 +663,7 @@ let contains_3 : bool = Set.mem 3 my_set
 
   The predefined function *Set.size* returns the number of elements in a given set as follows.
 
-```
+```javascript
 let cardinal : nat = Set.size my_set
 ```
 
@@ -671,7 +671,7 @@ let cardinal : nat = Set.size my_set
 
 There are two ways to update a set, that is to add or remove from it. In CameLIGO, we can use the predefined functions *Set.add* and *Set.remove*. We update a given set by creating another one, with or without some elements.
 
-```
+```javascript
 let larger_set  : int set = Set.add 4 my_set
 let smaller_set : int set = Set.remove 3 my_set
 ```
@@ -682,7 +682,7 @@ It is possible to iterate over elements of a set and apply a function to them (l
 
 There are three kinds of functional iterations over LIGO sets: the *iterated operation* and the *folded operation*.
 
-```
+```javascript
 let iter_op (s : int set) : unit =
 
   let predicate = fun (i : int) -> assert (i > 3)
