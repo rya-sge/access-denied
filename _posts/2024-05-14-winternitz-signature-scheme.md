@@ -7,22 +7,25 @@ locale: en-GB
 categories: cryptography blockchain
 tags: hash Petersen starkware
 description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits (e.g. zk-SNARK)
-image: /assets/article/cryptographie/hash/pedersen-hash-function.png
+image: /assets/article/cryptographie/signature/winternitz-cover.png
 isMath: true
 ---
 
-This article is mainly a summary of the main points and information that I found about the cryptographic algorithm Winternitz One-Time Signature (W-OST).
+Faced with the threat of quantum computers (not yet current), there are many supposedly quantum-resistant cryptographic algorithms.
 
-- W-OST is used for digital signatures that ensures data integrity, authenticity, and non-repudiation. 
+One of them is the algorithm Winternitz One-Time Signature (W-OST)
+
+Winternitz is considered quantum safe since its security is not based on a difficult problem like the logarithm discrete, but relies on hash function (e.g  SHA-256). In short, it consists of computing each element in a chain by hashing the previous element. 
+
+W-OTS iteratively applies a function on a secret input, the private key, whereas the number of iterations depends on the message to be signed.
+
+Unlike traditional signature schemes that use a single private key for multiple signatures, Winternitz OTS generates a new private key for each signature. Therefore, a private key can only be used one time reason why they are called One-Time signature. 
+
 - I am not totally sure about the source, but it seems It was introduced by [Robert Winternitz](https://www.iacr.org/cryptodb/data/author.php?authorkey=1665) in 1982.
 - It is an extension of the Lamport one-time-signature scheme which offers the possibility to decide how many bits will be signed together.
-- Winternitz is also considered quantum safe since its security is not based on a difficult problem like the logarithm discrete.
-- Unlike traditional signature schemes that use a single private key for multiple signatures, Winternitz OTS generates a new private key for each signature. Therefore, a private key can only be used only one time reason why they are called One-Time signature. 
 - In short, W-OTS iteratively applies a function on a secret input, the private key, whereas the number of iterations depends on the message to be signed.
 
 Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pdf), [6. sphere10.com](https://sphere10.com/articles/cryptography/pqc/wots), [github.com/ - Winternitz one time signature](https://github.com/sea212/winternitz-one-time-signature)
-
-
 
 ## Introduction
 
@@ -49,7 +52,7 @@ Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.p
 
 Winternitz is based on the concept of hash chain 
 
-- it consists to Compute each element in chain by hashing previous element.
+- It consists of computing each element in a chain by hashing the previous element. 
 
 $$
 \begin{aligned}
@@ -154,7 +157,7 @@ The Winternitz signature uses a checksum to protect against signature forgeries.
 The checksum ensures that an attacker:
 
 - can not increment any byte of  the message proper without invalidating the checksum
-- they cannot detroy/modify the checksum in a way that would help them.
+- they can not destroy/modify the checksum in a way that would help them.
 
 The construction of the checksum is very similar to the approach used in Merkle’s scheme.
 
@@ -214,7 +217,7 @@ Winternitz was used by the "crypto" project [iota,](https://www.iota.org) a dist
 
 Using Winternitz for a crypto project is an audacious choice since each private key can only be used one time to sign one transaction.
 
-Therefore, it requires to generates a new private key for each transaction which is not convenient.
+Therefore, it requires to generate a new private key for each transaction which is not convenient.
 
 Moreover, in case of an error, for example if a private key is used twice, the security of the account is totally compromised.
 
@@ -263,4 +266,6 @@ Full version - eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pd
 [6. sphere10.com](https://sphere10.com/articles/cryptography/pqc/wots)
 
 [7.Hash-based Signatures: An illustrated Primer](blog.cryptographyengineering.com/2018/04/07/hash-based-signatures-an-illustrated-primer/)
+
+8.Cryptography course
 
