@@ -52,7 +52,9 @@ Winternitz is based on the concept of hash chain
 - it consists to Compute each element in chain by hashing previous element.
 
 $$
+\begin{aligned}
 X_i = HASH(X_i−1)
+\end{aligned}
 $$
 
 
@@ -67,7 +69,7 @@ $$
 
 Reference: [asecuritysite.com/hashsig/wint](https://asecuritysite.com/hashsig/wint ) 
 
-![schema]({{site.url_complet}}/assets/article/cryptographie/signature/winternitz-schema)
+![schema]({{site.url_complet}}/assets/article/cryptographie/signature/winternitz-schema.png)
 
 ## Operation
 
@@ -100,7 +102,9 @@ C) The private key is then hashed 256-N times.
 - Example for the first byte
 
 $$
+\begin{aligned}[b]
 s[0] =H(sk[0])^{256-N0}
+\end{aligned}
 $$
 
 D) The signature is composed of 32 hashes derived from our random private key.
@@ -115,19 +119,25 @@ b) Each byte is then hashed, defined by the number of times defined by the messa
 
 
 $$
+\begin{aligned}[b]
 s[0] =H(sk[0])^{256-N0}
+\end{aligned}
 $$
 
 If N = 4, you have 252
 $$
+\begin{aligned}[b]
 s[0] =H(sk[0])^{252}
+\end{aligned}
 $$
 By applying N on the signature, you get the same number of rounds that are used to generate the public key.
 
 - Example for the first byte
 
 $$
+\begin{aligned}[b]
 H(H(sk[0])^{252})^{4} = H^{256}(sk[0]) = pk[0]
+\end{aligned}
 $$
 c) Since the public key is the last value computed, the final value get in step b must be the public key. If it is not the case, the signature is invalid.
 
@@ -177,12 +187,16 @@ $$
 s[0] =H(sk[0])^{252}
 $$
 we have now
+
+
 $$
 s'[0] =H(s)^{1} = H(sk[0])^{253}
 $$
 Indeed, to pass from 252 (s) hash operation to 253 (s`) , we only have to perform one supplementary hash operation.
 
 The verification process works as usual on our message m\` and the signature s`.
+
+
 $$
 H(H(sk[0])^{253})^{3}) = H^{256}(sk[0]) = pk[0]
 $$
@@ -235,7 +249,8 @@ According to [this document](csrc.nist.gov/csrc/media/Presentations/2022/crclub-
 
 # Reference
 
-[1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pdf)
+[1. On the Security of the Winternitz One-Time Signature Scheme
+Full version - eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pdf)
 
 [2. asecuritysite.com/hashsig/wint](https://asecuritysite.com/hashsig/wint)
 
