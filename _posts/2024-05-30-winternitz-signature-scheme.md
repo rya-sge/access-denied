@@ -187,12 +187,15 @@ $$
 
 If we use our first signature **s** in our equation,  where 
 $$
+\begin{aligned}[b]
 s[0] =H(sk[0])^{252}
+\end{aligned}
 $$
 we have now
 
 
 $$
+\begin{aligned}[b]
 s'[0] =H(s)^{1} = H(sk[0])^{253}
 $$
 Indeed, to pass from 252 (s) hash operation to 253 (s`) , we only have to perform one supplementary hash operation.
@@ -201,7 +204,9 @@ The verification process works as usual on our message m\` and the signature s`.
 
 
 $$
+\begin{aligned}[b]
 H(H(sk[0])^{253})^{3}) = H^{256}(sk[0]) = pk[0]
+\end{aligned}
 $$
 
 Reference: 
@@ -234,10 +239,14 @@ If it is not the case, it is possible to forge a new valid signature under the f
 
 You need to have two messages m1 and m2 such that each byte of the h1 of m1 are less than each byte of the hash of m2, we can forge a new signature by computing:
 $$
+\begin{aligned}[b]
 256−n1< 256−n2
+\end{aligned}
 $$
 $$
+\begin{aligned}[b]
 \tilde{s_i} = H^{\tilde{n_i}-n_i}(s_i)
+\end{aligned}
 $$
 
 The cidectf has a nice challenge on that and you can find a writeup [here](https://sylvainpelissier.gitlab.io/posts/2024-02-04-dicectf-winter/).
