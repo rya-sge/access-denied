@@ -6,8 +6,7 @@ lang: en
 locale: en-GB
 categories: cryptography blockchain
 tags: hash Petersen starkware
-description:  Presentation of the hash function Pedersen, which is efficient for zero-knowledge circuits (e.g. zk-SNARK)
-image: /assets/article/cryptographie/signature/winternitz-cover.png
+description:  Presentation of Winternitz One-Time Signature (W-OST), a post quantum algorithm which relies on hash function (e.g  SHA-256)
 isMath: true
 ---
 
