@@ -224,9 +224,11 @@ Therefore, it requires to generate a new private key for each transaction which 
 
 Moreover, in case of an error, for example if a private key is used twice, the security of the account is totally compromised.
 
-They have finally switched in 2021 for ECDSA, which is not quantum safe but offers a better adaptability to the crypto world.
+Moreover, at the beginning, they used their own hash function Curl, which has revealed to be vulnerable to collision.
 
-Reference: [lekkertech.net - IOTA IOTAs Multisig Problem](http://blog.lekkertech.net/blog/2018/03/07/iota-signatures/), [domschiener - Private Keys and Addresses](https://domschiener.gitbooks.io/iota-guide/content/chapter1/seeds-private-keys-and-addresses.html), [iota - introduction](https://wiki.iota.org/learn/protocols/introduction/)
+They have finally switched in 2021 for ECDSA, which is not quantum safe but offers a better adaptability to the blockchain world.
+
+Reference: [lekkertech.net - IOTA IOTAs Multisig Problem](http://blog.lekkertech.net/blog/2018/03/07/iota-signatures/), [domschiener - Private Keys and Addresses](https://domschiener.gitbooks.io/iota-guide/content/chapter1/seeds-private-keys-and-addresses.html), [iota - introduction](https://wiki.iota.org/learn/protocols/introduction/), [Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367.)
 
 ## Security
 
@@ -274,7 +276,7 @@ Full version - eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pd
 
 [7.Hash-based Signatures: An illustrated Primer](blog.cryptographyengineering.com/2018/04/07/hash-based-signatures-an-illustrated-primer/)
 
-8.HEIG-VD Cryptography course
+8.[HEIG-VD](https://heig-vd.ch) Cryptography course
 
 9.[Winternitz One-Time-Signature](https://winternitz-one-time-signature.readthedocs.io/_/downloads/en/1.0.1/pdf/)
 
