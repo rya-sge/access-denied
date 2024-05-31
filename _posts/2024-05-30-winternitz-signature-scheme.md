@@ -32,15 +32,14 @@ Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.p
 ### General description
 
 - Winternitz are One-time Signatures, meaning that a privite key can only be used to create one signature
-- The parameter W, called, defined the number of
 - They are slower than Lamport signature, but it uses smaller keys.
 - Winternitz works on element of 256 bits, for example a 256-bit hash of a message
   - For example, the 256-bit hash can be produced with SHA-256.
 - Winternitz does not sign bit by bit, but sign bytes
+- The Winternitz parameter (`w`) defines the amount of numbers those bits can represent (w = 2^{bits}). 
 - Private key is a set of 32 seeds (sk0).
 - Public key is a set of 32 values (pk). This is also the last value computed with the different hash operation.
 - Signatures are (32 + checksum) elements.
-
 - Storing all lists makes too large keys → compute them on
   the fly using the hash function.
 - Add a checksum since the final secret list is the public key.
@@ -89,8 +88,6 @@ We then hash these keys several times, and is defined by a parameter (w)
 If we use w=8, we hash the private keys by (2^w). 
 
 This creates 32x256 bits public keys.
-
-The value 8 for w seems to be a "constant"
 
 ### Signature
 
@@ -197,6 +194,7 @@ we have now
 $$
 \begin{aligned}[b]
 s'[0] =H(s)^{1} = H(sk[0])^{253}
+\end{aligned}
 $$
 Indeed, to pass from 252 (s) hash operation to 253 (s`) , we only have to perform one supplementary hash operation.
 
@@ -276,5 +274,7 @@ Full version - eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pd
 
 [7.Hash-based Signatures: An illustrated Primer](blog.cryptographyengineering.com/2018/04/07/hash-based-signatures-an-illustrated-primer/)
 
-8.Cryptography course
+8.HEIG-VD Cryptography course
+
+9.[Winternitz One-Time-Signature](https://winternitz-one-time-signature.readthedocs.io/_/downloads/en/1.0.1/pdf/)
 

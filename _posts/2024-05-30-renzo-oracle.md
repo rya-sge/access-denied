@@ -35,6 +35,8 @@ Reference: [docs.renzoprotocol.com/docs/renzo/ezeth](https://docs.renzoprotocol.
 - [oracle implementation](https://github.com/code-423n4/2024-04-renzo/tree/main/contracts/Oracle)
 - [Analyser report](https://github.com/code-423n4/2024-04-renzo/blob/main/4naly3er-report.md)
 
+[TOC]
+
 
 
 ## Past accident
