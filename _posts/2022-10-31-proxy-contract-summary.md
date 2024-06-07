@@ -16,7 +16,7 @@ image: /assets/article/blockchain/ethereum/proxy_schema-proxy_base.drawio.png
 
 [TOC]
 
-Proxy contracts  are an architecture widely used inside the Ethereum ecosystem. Basically, in this architecture, there is two main contracts:
+Proxy contracts  are an architecture widely used within the Ethereum ecosystem. Basically, in this architecture, there is two main contracts:
 
 - The proxy contract, which stores the memory and delegate its calls to another contract called logic or implementation contracts
 - This second contract contains all the smart contract logic. 
@@ -41,12 +41,14 @@ But this kind of architecture is not easy to implement, and it is the origin of 
 The majority of bug related to proxy concerns:
 
 - Storage collision between the proxy and the implementation contract
-- Storage collision between an implement and the new one when performing an upgrade
+- Storage collision between an implementation and the new one when performing an upgrade
 - Uninitialized implementation but the severity of this has reduced with the EIP-6780 (deactivate selfdestruct) 
 
 [OpenZeppelin](https://www.openzeppelin.com) did a fantastic job of offering proper tools to manage and create proxy contracts.
 
 If you want to use a proxy architecture,  this article is a summary of the most important points to think about and check to build proxy contracts on Ethereum/EVM, with a focus on the OpenZeppelin library. For each topic, you can find more information by reading the provided links.
+
+The [Solidity interviews Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills contains also several questions related to proxy architecture. You can find my answers for them in two article:  [Medium](https://rya-sge.github.io/access-denied/2024/02/14/solidity-interview-question-rareskills/) and [Hard levels](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#proxy)
 
 
 
@@ -292,7 +294,7 @@ List of main points to check on a proxy contract based on OpenZeppelin architect
   - No call to the parent `init` function of the contracts parents, it is role of the `_init` function
   - Set the different variables
 
-- If UUPS proxy, the function to upgrade the proxy is public/external and protected by access control
+- If UUPS proxy, the function to upgrade the proxy is public/external and protected by access control. With OpenZeppelin, the function `_authorizeUpgrade`is correctly overriden.
 
   
 
