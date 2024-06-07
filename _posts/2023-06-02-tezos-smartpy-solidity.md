@@ -21,8 +21,14 @@ This articles describes a correspondence table between the smart contract langua
 
 
 > Warning: the SmartPy syntax used in this article may be outdated since it was written for the Legacy version of [SmartPy](https://legacy.smartpy.io/) 
+>
+> [TOC]
+>
+> 
 
-## Overview
+
+
+## Start
 
 #### Define a contract
 
@@ -42,6 +48,8 @@ Any class inheriting from `sp.Contract` defines a SmartPy *contract*.
 class A(sp.Contract):
 ```
 
+Reference: https://smartpy.io/guides/tutorial#summary
+
 #### Class inheritance
 
 *Solidity*
@@ -56,7 +64,7 @@ contract MyEpicGame is ERC721
 
 *SmartPy*
 
-`class className(parentClassName)`
+The syntax is the following:`class className(parentClassName)`
 
 Example: 
 
@@ -66,13 +74,13 @@ class B(A)
 
 >Note that in SmartPy it is required that the superclass's `__init__` function be called explicitly.
 
-Ref: [https://smartpy.io/manual/syntax/overview](https://smartpy.io/manual/syntax/overview)
+Reference: [https://smartpy.io/manual/syntax/overview](https://smartpy.io/manual/syntax/overview)
 
 #### Library / Module
 
 *Solidity*
 
-Solidity allows to define libraries witht he keyword `library`
+Solidity allows to define libraries with the keyword `library`
 
 ```solidity
 library Math {
@@ -82,7 +90,7 @@ library Math {
 }
 ```
 
-Ref: [https://solidity-by-example.org/library/](https://solidity-by-example.org/library/)
+Reference: [https://solidity-by-example.org/library/](https://solidity-by-example.org/library/)
 
 *SmartPy*
 
@@ -102,21 +110,56 @@ def main():
             self.data.result = x * y
 ```
 
+### Constructor
+
+*Solidity*
+
+Use the keyword `constructor`
+
+```solidity
+constructor(string[] memory myParam)
+```
+
+*SmartPy*
+
+The smart contract constructor is defined with the function  `__init__` , which initialize the storage by assigning to fields of `self.data`. 
+
+Example 1
+
+```python
+def __init__(self):
+	# Define a value with initial integer 0
+    self.init(storage=0)
+```
+
+Example 2:
+
+```python
+import smartpy as sp
+
+@sp.module
+def main():
+    class Ducat(sp.Contract):
+        def __init__(self, admin):
+            self.data.balances = {}
+            self.data.admin = admin
+```
+
+Here, the init function initialize:
+
+-  `balances` is a [map](https://smartpy.io/manual/syntax/lists-sets-and-maps#maps), which associates a balance to each address. Initially it is empty, indicating that nobody owns any Ducats.
+
+- There is an `admin` address that will special powers, e.g. to mint new Ducat
+
+Reference: [https://smartpy.io/manual/syntax/overview](https://smartpy.io/manual/syntax/overview), [smartpy.io/guides/tutorial#summary](https://smartpy.io/guides/tutorial#summary)
+
 ## Variables & Storage
 
 *Solidity*
 
-> There are 3 types of variables in Solidity
->
-> - local
->   - declared inside a function
->   - not stored on the blockchain
-> - state
->   - declared outside a function
->   - stored on the blockchain
-> - global (provides information about the blockchain)
+In solidity, there are 3 types of location for variables: local, state and global. Their location (local, state, global) depends of the place where they are declared or if a specific keyword is used (e.g `memory` and `storage`).
 
-Ref: [https://solidity-by-example.org/variables/](https://solidity-by-example.org/variables/)
+Reference: [https://solidity-by-example.org/variables/](https://solidity-by-example.org/variables/)
 
 *SmartPy*
 
@@ -124,7 +167,7 @@ Ref: [https://solidity-by-example.org/variables/](https://solidity-by-example.or
 
 You can declare a local variable with `sp.local`
 
-```
+```python
 x = sp.local("x", 0)
 ```
 
@@ -253,7 +296,7 @@ Reference: [https://legacy.smartpy.io/docs/introduction/entrypoints](https://leg
 
 *Solidity*
 
-keyword `returns`
+The type returned is indicated with the keyword `returns`
 
 Example :
 
@@ -267,33 +310,15 @@ function tokenURI(uint256 _tokenId) public returns (string memory)
 
 Reference: [https://smartpy.io/reference.html#_return_values](https://smartpy.io/reference.html#_return_values)
 
-### Constructor
 
-*Solidity*
-
-Use the keyword `constructor`
-
-```solidity
-constructor(string[] memory myParam)
-```
-
-*SmartPy*
-
->The `__init__` function can be used to initialize the storage by assigning to fields of `self.data`. 
-
-Example
-
-```python
-def __init__(self):
-	# Define a value with initial integer 0
-    self.init(storage=0)
-```
-
-Reference: [https://smartpy.io/manual/syntax/overview](https://smartpy.io/manual/syntax/overview)
 
 ### Access control
 
 *Solidity*
+
+You can perform verification with the keywork `require` or with a if and a custom error.
+
+For example, here the contract will generate an error if the transaction sender is not equal to the admin address stored in the contract.
 
 ```solidity
 require(msg.sender == admin);
@@ -311,7 +336,7 @@ myFunction(uint256 value) public onlyOwner
 sp.verify(sp.sender == self.data.admin);
 ```
 
-**Current timestamp**
+### Current timestamp
 
 *Solidity*
 
@@ -366,6 +391,16 @@ for(uint256 i = 0; i < y; ++i)
 ```python
 sp.range(x, y, step = 1)
 ```
+
+## Key and signatures
+
+*SmartPy*
+
+On Tezos, each tz address is determined by hashing a public key. 
+
+Public keys are of type `sp.key` and can be defined with `sp.key()`. For example, `sp.key("edpkv3w95AcgCWQeoYm5szaEqXX71JkZ261s4wjH1NYRtibX879rDv")`
+
+Reference: [smartpy.io/manual/syntax/keys-and-signatures](https://smartpy.io/manual/syntax/keys-and-signatures)
 
 
 
