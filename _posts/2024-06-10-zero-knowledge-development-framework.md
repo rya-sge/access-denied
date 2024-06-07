@@ -1,12 +1,12 @@
 ---
 layout: post
 title: Overview of Zero-Knowledge development framework
-date:   2024-05-30
+date:   2024-06-10
 lang: en
 locale: en-GB
 categories: cryptography blockchain
 tags: zeroknowledge zkp
-description: There are several different development framework to build zero-knowledge system: Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
+description: Overview of the main development frameworks to build zero-knowledge system: Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
 image: /assets/article/cryptographie/signature/winternitz-cover.png
 isMath: true
 ---
