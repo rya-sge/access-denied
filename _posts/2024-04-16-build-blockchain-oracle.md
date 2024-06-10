@@ -13,6 +13,8 @@ isMath: false
 
 This article presents the reasoning to build a blockchain oracle providing external information (e.g. price of an asset) to a smart contract. It is mainly based on this excellent [1.presentation](https://www.youtube.com/watch?v=vFcW18ZpPZ4) from Berkely, part of the [defi-learning course (1)](https://defi-learning.org/f22) and on the Chainlink oracle architecture.
 
+[TOC]
+
 ## Introduction
 
 **Blockchain oracles** such a Chainlink or Pyth are key elements of crypto and defi infrastructure. Many *defi* protocols rely on these oracles to fetch the price of an asset, required e.g. for lending protocols.

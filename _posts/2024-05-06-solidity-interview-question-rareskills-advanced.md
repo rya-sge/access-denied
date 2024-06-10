@@ -19,6 +19,8 @@ According to the article, all questions can be answered in three sentences or le
 
 The answers here are more complete than necessary in order to explain in detail each topic.
 
+[TOC]
+
 ## Gas
 
 ###  EVM price memory

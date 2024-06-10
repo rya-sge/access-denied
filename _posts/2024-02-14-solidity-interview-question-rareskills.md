@@ -17,7 +17,13 @@ For the levels Hard and Advanced, you can see [my second](https://rya-sge.github
 
 According to the article, all questions can be answered in three sentences or less.
 
-The answers here are more complete than necessary in order to explain in details the topics.
+The answers here are more complete tha
+
+[TOC]
+
+n necessary in order to explain in details the topics.
+
+
 
 ## DeFi
 
@@ -277,6 +283,8 @@ Remark:
 Initially, the operation self-destruct offered a refund of gas but this is no longer the case since the introduction of [EIP-3529](https://eips.ethereum.org/EIPS/eip-3529)(London fork) which has removed this refund.
 
 ## Proxy
+
+If you want to build a contract for a proxy architecture, I made a summary of the most important points to think about: [Programming proxy contracts with OpenZeppelin | Summary](https://rya-sge.github.io/access-denied/2022/10/31/proxy-contract-summary/)
 
 ### Storage collision 
 

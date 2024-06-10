@@ -14,6 +14,8 @@ This article lists and describes the main concepts behind the Lightning Network,
 
 The concepts are organised in five topics: *Fundamentals and Architecture, Node Operation and Security, Privacy and Routing, Channel management*, *Network Analysis and Tools*
 
+[TOC]
+
 ## Short presentation
 
 Transactions on the Bitcoin blockchain can be expensive (AVG ~8$) and their confirmations are slow ([~10 minutes](https://coinmarketcap.com/academy/article/how-long-does-a-bitcoin-transaction-take)) 
@@ -156,13 +158,13 @@ if a LN node has not enough [outbound liquidity](https://voltage.cloud/blog/ligh
 
 Reference: [How Lightning Channel Rebalances Work](https://voltage.cloud/blog/lightning-network-faq/how-lightning-node-channel-rebalancing-works-simplified/), [How To Rebalance A Lightning Channel](https://thebitcoinmanual.com/articles/rebalance-ln-channel/)
 
-### **Network Analysis and Tools:**
+## Network Analysis and Tools
 
 #### Lightning Network Explorer
 
 Since the lightning transactions are private, there are no public explorer as for Bitcoin mainet (e.g [blockchain.com](https://www.blockchain.com/explorer)). Nevertheless, you have online tools whih track the number of nodes, channels and the total capacity, e.g [mempool.space/lightning](https://mempool.space/lightning)
 
-# Reference
+## Reference
 
 - [docs.lightning.engineering/](https://docs.lightning.engineering/)
 - [voltage.cloud/](https://voltage.cloud/)

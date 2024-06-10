@@ -28,6 +28,8 @@ For this purpose, Ethereum does not use the traditional Elliptic curve signature
 
 Reference: [6. KEYS IN PROOF-OF-STAKE ETHEREUM](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/), [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography), [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
 
+[TOC]
+
 ## Become a validator
 
 To become a validator on the Beacon Chain, you need to deposit 32 ETH per validator that you wish to run. Like all Ethereum transactions, deposits are non-reversible, but the ability to withdrawal your funds via a separate process after depositing remains under your control.

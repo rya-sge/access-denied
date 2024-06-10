@@ -14,9 +14,7 @@ image: /assets/article/blockchain/ethereum/proxy_schema-proxy_base.drawio.png
 
 ## Introduction
 
-[TOC]
-
-Proxy contracts  are an architecture widely used within the Ethereum ecosystem. Basically, in this architecture, there are two main contracts:
+**Proxy contracts**  are an architecture widely used within the Ethereum ecosystem. Basically, in this architecture, there are two main contracts:
 
 - The proxy contract, which stores the memory and delegate its calls to another contract called logic or implementation contracts
 - This second contract contains all the smart contract logic. 
@@ -50,7 +48,7 @@ If you want to use a proxy architecture,  this article is a summary of the most 
 
 The [Solidity interviews Questions](https://www.rareskills.io/post/solidity-interview-questions) by RareSkills contains also several questions related to proxy architecture. You can find my answers for them in two article:  [Medium](https://rya-sge.github.io/access-denied/2024/02/14/solidity-interview-question-rareskills/) and [Hard levels](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#proxy)
 
-
+[TOC]
 
 
 ## General points

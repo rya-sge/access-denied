@@ -37,8 +37,6 @@ Reference: [docs.renzoprotocol.com/docs/renzo/ezeth](https://docs.renzoprotocol.
 
 [TOC]
 
-
-
 ## Past accident
 
 On April 24th, there was a momentary depeg involving Renzo’s ezETH/WETH pair on multiple DEXs set off a chain reaction of liquidations across different protocols. 

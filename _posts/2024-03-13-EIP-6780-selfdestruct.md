@@ -17,6 +17,8 @@ isMath: false
 
 The `Dencun upgrade` introduces the [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) ([ethereum-magicians](https://ethereum-magicians.org/t/eip-6780-deactivate-selfdestruct-except-where-it-occurs-in-the-same-transaction-in-which-a-contract-was-created/13539)) which updates the opcode `selfdestruct` to deactivate the destruction of the contract, except if the contract is destructed in the same transaction as created.
 
+[TOC]
+
 ## History
 
 During its history, several EIP have already been implemented or discussed regarding the opcode `selfdestruct`.
@@ -225,7 +227,7 @@ Contrary to what happened with the [Parity multig sig wallet bug](https://www.pa
 
 But the end of `selfdestruct` does not mean that a `behaviour` of a contract can not be changed, e.g. through the call of functions or with the proxy architecture.
 
-# Conclusion
+## Conclusion
 
 The opcode `selfdestruct` has been initially a good idea. It allowed to reduce the quantity of bytecode stored on the blockchain and provided an interesting tool to developpers to remove unused code and retrieve ethers from a contract.
 
@@ -237,7 +239,7 @@ Therefore, the security risk posed by this sensible operation makes it better to
 
 
 
-# References
+## References
 
 - [EIP-6789](https://eips.ethereum.org/EIPS/eip-6780) ([ethereum-magicians](https://ethereum-magicians.org/t/eip-6780-deactivate-selfdestruct-except-where-it-occurs-in-the-same-transaction-in-which-a-contract-was-created/13539))
 - [Parity multig sig wallet bug](https://www.parity.io/blog/a-postmortem-on-the-parity-multi-sig-library-self-destruct/)

@@ -19,6 +19,10 @@ According to the article, all questions can be answered in three sentences or le
 
 The answers here are more complete than necessary in order to explain in details the topics.
 
+[TOC]
+
+
+
 ## Defi
 
 ### Compound
@@ -183,6 +187,8 @@ References:
 - [Understanding Solidity’s Storage Layout And How To Access State Variables](https://medium.com/@flores.eugenio03/exploring-the-storage-layout-in-solidity-and-how-to-access-state-variables-bf2cbc6f8018#:~:text=Thinking%20of%20storage%20as%20an,fixed%20length%20of%2032%20bytes.&text=State%20variables%20are%20stored%20according,a%20value%20or%20dynamic%20type.)
 
 ## Proxy
+
+If you want to build a contract for a proxy architecture, I made a summary of the most important points to think about: [Programming proxy contracts with OpenZeppelin | Summary](https://rya-sge.github.io/access-denied/2022/10/31/proxy-contract-summary/)
 
 ### EIP-1967 
 

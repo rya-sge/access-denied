@@ -27,6 +27,8 @@ Unlike traditional signature schemes that use a single private key for multiple 
 
 Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pdf), [6. sphere10.com](https://sphere10.com/articles/cryptography/pqc/wots), [github.com/ - Winternitz one time signature](https://github.com/sea212/winternitz-one-time-signature)
 
+[TOC]
+
 ## Introduction
 
 ### General description
@@ -259,7 +261,7 @@ The cidectf has a nice challenge on that and you can find a writeup [here](https
 
 According to [this document](csrc.nist.gov/csrc/media/Presentations/2022/crclub-2022-10-19a/20221020-crypto-club-kelsey-slides-MD-hash-sigs.pdf), WOTS+  is specific variant of Winternitz used in SPHINCS+ for one-time signature.
 
-# Reference
+## Reference
 
 [1. On the Security of the Winternitz One-Time Signature Scheme
 Full version - eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.pdf)

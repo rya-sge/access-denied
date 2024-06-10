@@ -25,7 +25,7 @@ This function is available on Starkware, ZCash and the protocol Iden3.
 
 Reference: [5.book.cairo-lang.org/ch11-05-hash.html](https://book.cairo-lang.org/ch11-05-hash.html), [6. etica - What is the elliptic curve discrete logarithm problem (ECDLP) and why is it difficult to solve?](https://eitca.org/cybersecurity/eitc-is-acc-advanced-classical-cryptography/elliptic-curve-cryptography/introduction-to-elliptic-curves/examination-review-introduction-to-elliptic-curves/what-is-the-elliptic-curve-discrete-logarithm-problem-ecdlp-and-why-is-it-difficult-to-solve/), [10. Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits, page 2](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1),
 
-
+[TOC]
 
 ## Use case
 
