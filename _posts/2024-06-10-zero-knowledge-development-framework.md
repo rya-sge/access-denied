@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: cryptography blockchain
 tags: zeroknowledge zkp
-description: Overview of the main development frameworks to build zero-knowledge system: Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
+description: Overview of the main development frameworks to build zero-knowledge system which Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
 image: /assets/article/cryptographie/signature/winternitz-cover.png
 isMath: true
 ---
