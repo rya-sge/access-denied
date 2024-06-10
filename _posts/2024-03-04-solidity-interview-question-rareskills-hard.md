@@ -188,7 +188,7 @@ References:
 
 ## Proxy
 
-If you want to build a contract for a proxy architecture, I made a summary of the most important points to think about: [Programming proxy contracts with OpenZeppelin | Summary](https://rya-sge.github.io/access-denied/2022/10/31/proxy-contract-summary/)
+If you want to build a contract for a proxy architecture, I made a summary of the most important points to think about: [Programming proxy contracts with OpenZeppelin - Summary](https://rya-sge.github.io/access-denied/2022/10/31/proxy-contract-summary/)
 
 ### EIP-1967 
 
