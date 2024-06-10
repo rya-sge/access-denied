@@ -8,7 +8,7 @@ last-update:
 categories: blockchain ethereum solidity
 tags: solidity ethereum smart-contract OpenZeppelin
 description: Summary of the most important points to think and check to program proxy contracts on Ethereum, with a focus on the OpenZeppelin library.
-isMath: false
+isMath: true
 image: /assets/article/blockchain/ethereum/proxy_schema-proxy_base.drawio.png
 ---
 
@@ -16,7 +16,7 @@ image: /assets/article/blockchain/ethereum/proxy_schema-proxy_base.drawio.png
 
 [TOC]
 
-Proxy contracts  are an architecture widely used within the Ethereum ecosystem. Basically, in this architecture, there is two main contracts:
+Proxy contracts  are an architecture widely used within the Ethereum ecosystem. Basically, in this architecture, there are two main contracts:
 
 - The proxy contract, which stores the memory and delegate its calls to another contract called logic or implementation contracts
 - This second contract contains all the smart contract logic. 
@@ -106,7 +106,7 @@ Reference: [[h. OpenZeppelin - Modifying your contracts](https://docs.openzeppel
 
 In principle, you can not have a constructor in your implementation contract
 
-If variables are initialied inside the constructor, the proxy has no way to see these values since :
+If variables are initialized inside the constructor, the proxy has no way to see these values since :
 
 - The constructor is not stored in the runtime bytecode, but only in the creation bytecode.
 - The implementation contract is not deployed in the context of the proxy.
