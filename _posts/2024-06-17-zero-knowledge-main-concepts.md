@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Overview of Zero-Knowledge development framework
-date:   2024-06-10
+title: Main Concept Behind Zero-Knowledge
+date:   2024-06-17
 lang: en
 locale: en-GB
 categories: cryptography blockchain

@@ -82,7 +82,7 @@ It uses the Groth16 Protocol (3 point only and 3 pairings), PLONK and FFLONK.
 
 Rapidsnark is a zkSnark proof generation written in C++ and intel/arm assembly. That generates proofs created in [circom](https://github.com/iden3/snarkjs) and [snarkjs](https://github.com/iden3/circom) very fast.
 
-Old version: https://github.com/iden3/rapidsnark-old
+Old version: [https://github.com/iden3/rapidsnark-old](https://github.com/iden3/rapidsnark-old)
 
 ## Polygon
 
