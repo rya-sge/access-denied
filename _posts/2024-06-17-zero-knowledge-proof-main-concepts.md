@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Main Concept Behind Zero-Knowledge
+title: Main Concept Behind Zero-Knowledge Proof
 date:   2024-06-17
 lang: en
 locale: en-GB
@@ -114,15 +114,15 @@ References:
 
 
 
-### Efficiency
+## Efficiency
 
 1. **Efficiency**: The measure of computational resources (time, space) required to generate and verify the proof, crucial for practical implementation.
 1. **Succinctness**: A feature of some ZKPs where the size of the proof is very small compared to the size of the statement or the witness, i.e., the size of the computation itself.
 3. Used in ZK-SNARKs and ZK-STARKs
 
-### Types of Zero-Knowledge Proofs
+## Types of Zero-Knowledge Proofs
 
-### **Interactive Zero-Knowledge Proofs**
+### Interactive Zero-Knowledge Proofs
 
 ZKP protocols that require back-and-forth communication between the prover and verifier. This generally involved three steps:
 
