@@ -64,7 +64,7 @@ There are the three main components:
 
 ## Security Properties
 
-### Main propreties
+### Main properties
 
 For our example, we take L – some language (usually not in P)
 
@@ -162,26 +162,20 @@ Reference: [Panther - Understanding Trusted Setups: A Guide](https://blog.panthe
 - [ic-people.epfl.ch - Zero Knowledge Proofs](https://ic-people.epfl.ch/~achiesa/docs/CS276-F2015/lecture-19.pdf)
 - [An Introduction to Zero-Knowledge Proofs in Blockchains
   and Economics](https://files.stlouisfed.org/files/htdocs/publications/review/2023/10/02/an-introduction-to-zero-knowledge-proofs-in-blockchains-and-economics.pdf)
-
 - [hacken - Zero-Knowledge Proof – How It Works](https://hacken.io/discover/zero-knowledge-proof/)
 - [Panther - Understanding Trusted Setups: A Guide](https://blog.pantherprotocol.io/a-guide-to-understanding-trusted-setups/), [zk-SNARKs: A Gentle Introduction](https://www.di.ens.fr/~nitulesc/files/Survey-SNARKs.pdf)
 -  [ZK FAQ: What's a trusted setup? What's a Structured Reference String? What's toxic waste?](https://www.cryptologie.net/article/560/zk-faq-whats-a-trusted-setup-whats-a-structured-reference-string-whats-toxic-waste/)
 -  [Chainlink - Commit-and-Prove ZKs](https://blog.chain.link/commit-and-prove-zks/)
-- [Commitment Schemes and Zero-Knowledge
+- [cwi.nl - Commitment Schemes and Zero-Knowledge
   Protocols](https://homepages.cwi.nl/~schaffne/courses/crypto/2014/papers/ComZK08.pdf) 
+- [mimuw - Commitment Schemes and Zero-Knowledge
+  Protocols](https://www.mimuw.edu.pl/~std/Dydaktyka/BISS09/BISS10.pdf)
 - [Zero-knowledge Proof: IZKs, NIZKs, SNARKS, STARKS Explained.](https://medium.com/coinmonks/zero-knowledge-proof-izks-nizks-snarks-starks-5bc06c96c7ee)
 - [Zero-knowledge proofs explained in 3 examples](https://www.circularise.com/blogs/zero-knowledge-proofs-explained-in-3-examples)
-
+- [zk-learning- Introduction to Modern SNARKs](https://zk-learning.org/assets/Lecture2-2023.pdf)
+- [Zero-knowledge proofs explained in 3 examples](https://www.circularise.com/blogs/zero-knowledge-proofs-explained-in-3-examples)
 - ChatGPT with the input "List a short explanation for the 15 most important terms to know about zero knowledge proof. Regroup them in difference topics"
 - ChatGPT with the input "In zero knowledge system, what is the meaning of Language L"
 
-Reference: 
 
-https://homepages.cwi.nl/~schaffne/courses/crypto/2014/papers/ComZK08.pdf
-
-https://zk-learning.org/assets/Lecture2-2023.pdf
-
-https://www.circularise.com/blogs/zero-knowledge-proofs-explained-in-3-examples
-
-https://www.mimuw.edu.pl/~std/Dydaktyka/BISS09/BISS10.pdf
 
