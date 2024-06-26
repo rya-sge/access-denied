@@ -11,7 +11,9 @@ image: /assets/article/cryptographie/zero-knowledge-proof/zcash-zec-logo.png
 isMath: true
 ---
 
-This article is a summary of the main zero-knowledge development framework. This article is mainly based on the following great article by Celo: [The Pantheon of Zero Knowledge Proof Development Frameworks (Updated!)](https://blog.celer.network/2023/08/04/the-pantheon-of-zero-knowledge-proof-development-frameworks/)
+This article is a summary of the main zero-knowledge development framework. 
+
+This article is mainly based on the following great article by Celo: [The Pantheon of Zero Knowledge Proof Development Frameworks (Updated!)](https://blog.celer.network/2023/08/04/the-pantheon-of-zero-knowledge-proof-development-frameworks/)
 
 [TOC]
 
@@ -46,7 +48,7 @@ Reference: [Consensys - Prove schemes and curves](https://docs.gnark.consensys.i
 
 ## [Halo2 (ZCash)](https://github.com/zcash/halo2)
 
-Halo2 is Zcash’s zk-SNARK implementation with Plonk. It is equipped with the Plonkish arithmetization that supports many useful  primitives, such as custom gates and lookup tables. We use a Halo2 fork  with KZG support from the Ethereum Foundation and Scroll.
+Halo2 is Zcash’s zk-SNARK implementation with Plonk. It is equipped with the Plonkish arithmetization that supports many useful primitives, such as custom gates and lookup tables.
 
 The arithmetization used by Halo 2 comes from [PLONK](https://eprint.iacr.org/2019/953), or more precisely its extension UltraPLONK that supports custom gates and lookup arguments. They call it [***PLONKish***](https://twitter.com/feministPLT/status/1413815927704014850).
 

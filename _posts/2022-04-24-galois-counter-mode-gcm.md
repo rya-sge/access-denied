@@ -18,7 +18,7 @@ isMath: true
 GCM pour `Galois/counter mode` est un mode opératoire permettant d'effectuer du chiffrement authentifié. Ainsi, en plus de la confidentialité, il permet de garantir l'authenticité et l'intégrité.
 
 - Construction : 
-  - Il mélange le *Galois message authentication code* avec le chiffrement par bloc CTR.
+  - Il mélange le *Galois message authentication code* avec le chiffrement par bloc CTR (voir mon [article](https://rya-sge.github.io/access-denied/2022/04/22/counter-mode-ctr/)).
   - La taille des blocs est de 128 bits.
 - Le message chiffré, C, a la même nombre de bits que le message clair.
 
