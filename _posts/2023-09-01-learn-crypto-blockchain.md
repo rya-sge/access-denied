@@ -13,13 +13,21 @@ description: Become a master of Blockchain and Crypto by following these free on
 
 This article presents several online courses to learn Blockchain and Crypto.
 
+
+
+[TOC]
+
+
+
 ## DeFi / General Concepts
 
 This section lists the course to learn the general concepts related to Defi.
 
 ### Beginner
 
-#### [Blockchain for everyone [Binance]](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
+#### Blockchain for everyone [Binance]
+
+Website: [Blockchain for everyone [Binance]](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
 
 **Certification:** yes (NFT)
 
@@ -31,7 +39,9 @@ This section lists the course to learn the general concepts related to Defi.
 
 *6 modules: Blockchain Fundamentals, Crypto Fundamentals, Decentralization, Web3 & Metaverse, Trading Fundamentals, Trading and Investing Strategies*
 
-#### [Digital Assets 101 [Fireblocks]](https://www.fireblocks.com/academy/)
+#### Digital Assets 101 [Fireblocks]
+
+Website: [Digital Assets 101 [Fireblocks]](https://www.fireblocks.com/academy/)
 
 **Certification:**  no
 
@@ -45,7 +55,9 @@ This section lists the course to learn the general concepts related to Defi.
 - *Part 2: Digital Assets and Protocols*
 - *Part 3: The Crypto Capital Markets*
 
-#### [Tokenization Online Course [dgishares]](https://digishares.io/tokenization-online-course)
+#### Tokenization Online Course [dgishares]
+
+Website: [Tokenization Online Course [dgishares]](https://digishares.io/tokenization-online-course)
 
 **Certification:** yes with Udemy
 
@@ -61,7 +73,9 @@ This section lists the course to learn the general concepts related to Defi.
 
 *Learn tokenization and the business skills to use blockchain technology for real-world assets*
 
-#### [Fit for DeFi[DefiGuide.ch]](https://defiguide.org/free-defi-course/) 
+#### Fit for DeFi[DefiGuide.org
+
+Website: [Fit for DeFi[DefiGuide.org]](https://defiguide.org/free-defi-course/) 
 
 **Certification:** yes, online exam
 
@@ -85,7 +99,9 @@ This section lists the course to learn the general concepts related to Defi.
 
 ### Cursus
 
-#### [Blockchain Series [University at Buffalo]](https://www.buffalo.edu/tcie/professional-education/course-list/blockchain-specialization-bs.html)
+#### Blockchain Series [University at Buffalo]
+
+Website: [Blockchain Series [University at Buffalo]](https://www.buffalo.edu/tcie/professional-education/course-list/blockchain-specialization-bs.html)
 
 **Certification:** yes
 
@@ -113,7 +129,9 @@ This section lists the course to learn the general concepts related to Defi.
 - *They are prepared to discuss permissioned blockchain architectures of Hyperledger and Microsoft Azure's blockchain as a service model and analyze the Augur and Grid+ decentralized application platforms.*
 -  *Course material includes emerging alternative decentralization models such as IPFS and Hashgraph*
 
-#### [Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
+#### Free MOOC: Digital Currency
+
+Website: [Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
 
 **Certification:** yes if you are part of a cohort
 
@@ -121,9 +139,9 @@ This section lists the course to learn the general concepts related to Defi.
 
 *BLOC-511DL: Digital Currency is the first free MOOC (Massive Open Online Course) on Cryptocurrencies and Blockchain technology globally, and the first  course of the MSc in Digital Currency degree programme.*
 
+#### Blockchain and Decentralized Technologies[distributed lab]
 
-
-#### [Blockchain and Decentralized Technologies[distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUDQI8VeWaZLRJFSsqqlHRP5)
+Website: [Blockchain and Decentralized Technologies[distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUDQI8VeWaZLRJFSsqqlHRP5)
 
 **Certification:** yes if you are part of a cohort
 
@@ -278,7 +296,7 @@ Mastering the Ethereum Virtual Machine and the Solidity Compiler
 
 A website with several ressources and lessons about Bitcoin.
 
-Lessons are in French.s
+Lessons are in French.
 
 ### Cosmos
 
@@ -401,29 +419,7 @@ You can learn Ligo with Javascript, Pascal or Camel.
 
 *An introduction to Tezos and how it is different from other blockchains like Ethereum* 
 
-
-
-**[Tezos SmartPy Developer Course [blockmatics]](https://blockmatics.teachable.com/courses/)**
-
-**Certification:** no
-
-**Cost:** free
-
-**Opinion:** interesting, but old and withtout certification
-
-Remark: the course is not up-to-date 
-
-**Description:**
-
-*While  in the full fledged course you will develop a distributed app (dapp), in this installment we focus on smart contracts needed for the course.* 
-
-- *You will learn the basics of SmartPy and the SmartPy IDE.* 
-
-- *You will write  some introductory programs on SmartPy with test cases and then compile  and deploy the contract to the test network and interact with such a  contract.* 
-
 ## Defi
-
-
 
 #### [Decentralized Finance [Distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUAuh4F9NVZWL8zvS6dbS2r1)
 

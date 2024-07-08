@@ -230,7 +230,7 @@ Moreover, at the beginning, they used their own hash function Curl, which has re
 
 They have finally switched in 2021 for ECDSA, which is not quantum safe but offers a better adaptability to the blockchain world.
 
-Reference: [lekkertech.net - IOTA IOTAs Multisig Problem](http://blog.lekkertech.net/blog/2018/03/07/iota-signatures/), [domschiener - Private Keys and Addresses](https://domschiener.gitbooks.io/iota-guide/content/chapter1/seeds-private-keys-and-addresses.html), [iota - introduction](https://wiki.iota.org/learn/protocols/introduction/), [Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367.)
+Reference: [lekkertech.net - IOTA IOTAs Multisig Problem](http://blog.lekkertech.net/blog/2018/03/07/iota-signatures/), [domschiener - Private Keys and Addresses](https://domschiener.gitbooks.io/iota-guide/content/chapter1/seeds-private-keys-and-addresses.html), [iota - introduction](https://wiki.iota.org/learn/protocols/introduction/), [Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367)
 
 ## Security
 
