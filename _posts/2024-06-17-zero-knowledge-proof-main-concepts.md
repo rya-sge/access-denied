@@ -13,7 +13,7 @@ isMath: true
 
 This article is a summary of the main concepts behind Zero-Knowledge Proof (ZKP).
 
-Zero knowledge proofs are increasingly present in the blockchain ecosystem. 
+**Zero knowledge proofs** are increasingly present in the blockchain ecosystem. 
 
 - They are used either to improve privacy, by the fact that they allow a statement to be proven without revealing any additional information about the data behind the statement
 -  Or to improve scalability/performance, for example with Ethereum layer2 (StarkNet, ZKsync, Polygon zkEVM)
