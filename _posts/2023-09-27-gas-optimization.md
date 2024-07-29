@@ -199,12 +199,12 @@ For example, this struct
 struct myStruct {
 	address account;
 	string myString;
-	uint 256 number;
+	uint8 number;
 	bool myBool;
 }
 ```
 
-can by optimize by moving the variable `myString`at the end of the struct because
+can by optimized by moving the variable `myString`at the end of the struct because
 
 account => 20 bytes
 
@@ -217,13 +217,15 @@ The total is 22 bytes and can be stored in only one slot.
 ```solidity
 struct myStruct {
 	address account;
-	uint 256 number;
+	uint8 number;
 	bool myBool;
 	string myString;
 }
 ```
 
 Reference: [www.rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
+
+My thanks to [Marcologonz](https://x.com/Marcologonz) for pointing out an error, now corrected, in this section.
 
 ### J. Use the optimizer to compile your contract
 
