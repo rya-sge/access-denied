@@ -13,17 +13,27 @@ description: This article summarizes the main and easier tricks to save gas with
 
 This article summarizes the main and easier tricks to save gas when you program smart contracts with **Solidity**.
 
-You will find a more accurate and complete list on [rareskills](https://www.rareskills.io/post/gas-optimization#viewer-7stcj), which is one of the main references for this article.
+Smart contract optimization is a key principle on EVM blockchain with Solidity, particularly for a deployment on Ethereum mainet where transactions fees are height. Optimizing gas cost allows to reduce the fees paid by the smart contract users, which is clearly better for their experience.
+
+You will find a more accurate and complete list on [RareSkills](https://www.rareskills.io/post/gas-optimization), which is one of the main references for this article. There is also a very good lesson on [Udemy](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/) by Jeffrey Scholz.
+
+To increase your knowledge, you can also see the RareSkills interview questions related to Gas where the answers are available in my articles: [Medium](https://rya-sge.github.io/access-denied/2024/02/14/solidity-interview-question-rareskills/#gas), [Hard](https://rya-sge.github.io/access-denied/2024/03/04/solidity-interview-question-rareskills-hard/#gas), [Advanced](https://rya-sge.github.io/access-denied/2024/05/06/solidity-interview-question-rareskills-advanced/#gas).
+
+The goal of this article is not to aggressively optimize the code and will not present all possible optimizations.
+
+[TOC]
+
+
 
 ## Key concepts
 
 Before that, here some key concepts
 
-- Gas cost : cost in gas to execute the smart contract.
+- Gas cost: cost in gas to execute the smart contract.
 
-The transaction gas cost is fixed and can be pre computed. And if it can be precomputed, it can be optimized...
+The transaction gas cost is fixed, it depends on the code of each opcode executed during the transaction and can be precomputed. And if it can be precomputed, it can be optimized...
 
-- gas price : actual price to pay to a validator (since Proof of Stake) to execute the smart contract and validate the transaction. The gas price is not fixed, it depends of the supply and demand.
+- Gas price: actual price to pay to a validator (since Proof of Stake) to execute the smart contract and validate the transaction. The gas price is not fixed, it depends on the supply and demand.
 
 Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/), [ethereum.org/en/developers/docs/gas/](https://ethereum.org/en/developers/docs/gas/), [ethereum.stackexchange.com - Why do we still pay gas in proof-of-stake?](https://ethereum.stackexchange.com/questions/141701/why-do-we-still-pay-gas-in-proof-of-stake)
 
@@ -32,7 +42,7 @@ Reference: [3. moralis](https://moralis.io/how-to-reduce-solidity-gas-costs-full
 ## Cheatsheet
 ### A. Use the keyword pure and view
 
-Without this keywords, even if you do nothing in your function, you will have gas cost to pay 
+Without this keyword, even if you do nothing in your function, you will have gas cost to pay 
 
 This allows you to avoid consuming gas when these functions are called from outside, for example from your client application.
 
@@ -50,11 +60,11 @@ Therefore, you should manually cache the variable to do exactly one storage read
 
 **For a loop**
 
-When you iterate over loop, you will have a condition, a limit number, to get out of the loop. This number is generally stored inside a storage variable.
+When you iterate over a loop, you will have a condition, a limit number, to get out of the loop. This number is generally stored inside a storage variable.
 
 A read operation can be expensive for a loop operation since this operation is performed for each iteration.
 
-The solution is to create a local variable to avoid fetch information on the blockchain.
+The solution is to create a local variable to avoid fetching information on the blockchain.
 
 See point F for an example
 
@@ -68,7 +78,7 @@ Use calldata instead of memory to pass as argument, e.g. an array
 function mintBatch(address[] calldata accounts,uint256[] calldata values) 
 ```
 
-Inside a constructor, unfortunatly it is not possible to use `calldata`, see [ethereum.stackexchange.com](https://ethereum.stackexchange.com/questions/125100/the-reason-why-cant-i-use-calldata-as-a-data-location-for-constructor-parameter) it is the reason why you will see the use of `memory as for this example from OpenZeppelin [ERC20.sol#L50C1-L54C1](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L50C1-L54C1)
+Inside a constructor, unfortunately it is not possible to use `calldata`, see [ethereum.stackexchange.com](https://ethereum.stackexchange.com/questions/125100/the-reason-why-cant-i-use-calldata-as-a-data-location-for-constructor-parameter) it is the reason why you will see the use of `memory as for this example from OpenZeppelin [ERC20.sol#L50C1-L54C1](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L50C1-L54C1)
 
 ```solidity
 constructor(string memory name_, string memory symbol_) 
@@ -79,7 +89,7 @@ constructor(string memory name_, string memory symbol_)
 
 
 
-Why ?
+Why?
 As indicated in the solidity doc *Calldata is a non-modifiable, non-persistent area where function arguments are stored, and behaves mostly like memory.*
 
 From the [Solidity doc](https://docs.soliditylang.org/en/v0.8.21/types.html#data-location)
@@ -94,9 +104,9 @@ Some additional lectures: [github.com/ethereum/solidity/issues/5545](https://git
 
 Since Solidity 0.8.0, all arithmetic operations revert on over- and underflow by default.
 
-This verifications add additional opcode and increase the gas cost of the transaction.
+This verification adds additional opcode and increase the gas cost of the transaction.
 
-If you are absolutely sure that an underflow/overflow will never happen you can wrap your operation inside an unchecked block.
+If you are absolutely sure that an underflow/overflow will never happen, you can wrap your operation inside an unchecked block.
 
 Example from the documentation
 
@@ -114,7 +124,7 @@ References
 - [github.com/ethereum/solidity/issues/10698](https://github.com/ethereum/solidity/issues/10698)
 - [docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#checked-or-unchecked-arithmetic)
 - [hackmd.io/@totomanov/gas-optimization-loops](https://hackmd.io/@totomanov/gas-optimization-loops)
-- [www.rareskills.io/post/gas-optimization#viewer-5f1pj](https://www.rareskills.io/post/gas-optimization#viewer-5f1pj)
+- [rareskills.io/post/gas-optimization#viewer-5f1pj](https://www.rareskills.io/post/gas-optimization#viewer-5f1pj)
 
 
 
@@ -149,7 +159,7 @@ for (uint256 i; i <= limit; ) {
 }
 ```
 
-Reference: [www.rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
+Reference: [rareskills.io/post/gas-optimization#viewer-8rekj](https://www.rareskills.io/post/gas-optimization#viewer-8rekj)
 
 **Exception**
 
@@ -171,21 +181,21 @@ See [Solidity 0.8.22 Release Announcement](https://soliditylang.org/blog/2023/10
 
 ### G. Most use condition in AND and OR
 
-Inside a condition, you should :
+Inside a condition, you should:
 
 For AND operation, put the most frequent condition (or the condition with the highest probability to fail) first since the second will not be evaluate if the first operation return 0
 
 For OR operation, same scenario, but in the first place it is the condition with the highest probability of success.
 
-Reference: [www.rareskills.io/post/gas-optimization#viewer-8ieel](https://www.rareskills.io/post/gas-optimization#viewer-8ieel)
+Reference: [rareskills.io/post/gas-optimization#viewer-8ieel](https://www.rareskills.io/post/gas-optimization#viewer-8ieel)
 
 ### H. Use custom errors instead of require
 
-For custom errors, solidity stores only the first 4 bytes of the hash of the error signature and returns only that.  Therefore during reverting, only 4 bytes needs to be stored in memory.
+For custom errors, solidity stores only the first 4 bytes of the hash of the error signature and returns only that.  Therefore, during reverting, only 4 bytes needs to be stored in memory.
 
-In the case of string messages in require statements, Solidity has to store(in memory) and revert with at least 64 bytes.
+In the case of string messages in require statements, Solidity must store(in memory) and revert with at least 64 bytes.
 
-Reference: [blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience](https://blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience), https://www.rareskills.io/post/gas-optimization#viewer-a0fm0
+Reference: [blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience](https://blog.openzeppelin.com/defining-industry-standards-for-custom-error-messages-to-improve-the-web3-developer-experience), [www.rareskills.io/post/gas-optimization#viewer-a0fm0](https://www.rareskills.io/post/gas-optimization#viewer-a0fm0)
 
 
 
@@ -223,7 +233,7 @@ struct myStruct {
 }
 ```
 
-Reference: [www.rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
+Reference: [rareskills.io/post/gas-optimization#viewer-f8m1r](https://www.rareskills.io/post/gas-optimization#viewer-f8m1r)
 
 My thanks to [Marcologonz](https://x.com/Marcologonz) for pointing out an error, now corrected, in this section.
 
@@ -261,21 +271,43 @@ References:
 
 - [hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler](https://hardhat.org/hardhat-runner/docs/guides/compile-contracts#configuring-the-compiler)
 - [docs.soliditylang.org/en/v0.8.17/internals/optimizer.html](https://docs.soliditylang.org/en/v0.8.17/internals/optimizer.html)
-- [www.rareskills.io/post/gas-optimization#viewer-d3ced](https://www.rareskills.io/post/gas-optimization#viewer-d3ced)
+- [rareskills.io/post/gas-optimization#viewer-d3ced](https://www.rareskills.io/post/gas-optimization#viewer-d3ced)
 
-## Others tips
+### K. Choose your data structure correctly
 
-- Cheap Contract Deployment Through Clones: [www.youtube.com/watch?v=3Mw-pMmJ7TA](https://www.youtube.com/watch?v=3Mw-pMmJ7TA)
+Choosing your data structure correctly is crucial.
+
+- Use a map or an array ?
+
+**map**, organized as key-value pairs, is less expensive for direct access since you don't need to iterate over the whole structure, contrary to an array. But a map is not iterable which may be lacking depending on your needs.
+
+Moreover, for **array**, solidity adds bytecode that checks that the index read is valid, otherwise the function is reverted with a panic error. It is however possible to avoid this length checks by using the function *unsafeAccess* function in Openzeppelin’s [Arrays.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Arrays.sol) library, but only if you are 100% sure that your index will always be valid.
+
+See [RareSkills - Using mapping instead of arrays to avoid length checks](https://www.rareskills.io/post/gas-optimization#viewer-87gqn), [RareSkills - Using unsafeAccess on arrays to avoid redundant length checks](https://www.rareskills.io/post/gas-optimization#viewer-do9b4), [Hacken - Gas Optimization In Solidity: Strategies For Cost-Effective Smart Contracts](https://hacken.io/discover/solidity-gas-optimization/)
+
+- If an array, keep the elements sorted or not ?
+
+With an unsorted array, you can easily add a new element because you do not need to care about the order of the array. But, if you want to search for an element, you must iterate through the whole array.
+
+The sorted array is the exact opposite: it is more efficient to perform research because you can use a binary search which is more optimized.
+
+I made an article to compare these two structures: [Access Denied - What to choose between sorted and unsorted array](https://rya-sge.github.io/access-denied/2023/01/06/sorted-unsorted-array/)
+
+## Other tips
+
+- Cheap Contract Deployment Through Clones: [youtube.com/watch?v=3Mw-pMmJ7TA](https://www.youtube.com/watch?v=3Mw-pMmJ7TA)
 
 - Utilizing Bitmaps to dramatically save on Gas: [soliditydeveloper.com/bitmaps](https://soliditydeveloper.com/bitmaps)
 
 ## Reference
 
-1. [https://www.rareskills.io/post/gas-optimization](https://www.rareskills.io/post/gas-optimization)
-2. [https://0xmacro.com/blog/solidity-gas-optimizations-cheat-sheet/](https://0xmacro.com/blog/solidity-gas-optimizations-cheat-sheet/)
-3. [https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/)
-4. [https://medium.com/coinmonks/solidity-storage-vs-memory-vs-calldata-8c7e8c38bce](https://medium.com/coinmonks/solidity-storage-vs-memory-vs-calldata-8c7e8c38bce)
-5. [https://docs.soliditylang.org/en/v0.8.21/types.html#data-location](https://docs.soliditylang.org/en/v0.8.21/types.html#data-location)
-6. [https://medium.com/coinmonks/optimizing-your-solidity-contracts-gas-usage-9d65334db6c7](https://medium.com/coinmonks/optimizing-your-solidity-contracts-gas-usage-9d65334db6c7)
-7. Estimate gas cost of a transaction: [https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost](https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost)
-8. [https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/](https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/)
+1. [rareskills.io - The RareSkills Book of Solidity Gas Optimization: 80+ Tips](https://www.rareskills.io/post/gas-optimization)
+2. [Udemy - Jeffrey Scholz - Advanced Solidity: Understanding and Optimizing Gas Costs](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/?couponCode=ST10MT8624)
+3. [0xmacro.com - Solidity Gas Optimizations Cheat Sheet](https://0xmacro.com/blog/solidity-gas-optimizations-cheat-sheet/)
+4. [moralis.io - How to Reduce Solidity Gas Costs – Full Guide](https://moralis.io/how-to-reduce-solidity-gas-costs-full-guide/)
+5. [coinmonks - Solidity — Storage vs Memory vs Calldata](https://medium.com/coinmonks/solidity-storage-vs-memory-vs-calldata-8c7e8c38bce)
+6. [docs.soliditylang.org/en/v0.8.21/types.html#data-location](https://docs.soliditylang.org/en/v0.8.21/types.html#data-location)
+7. [coinmonks - Optimizing your Solidity contract’s gas usage](https://medium.com/coinmonks/optimizing-your-solidity-contracts-gas-usage-9d65334db6c7)
+8. Estimate gas cost of a transaction: [https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost](https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost)
+9. [Hacken - Gas Optimization In Solidity: Strategies For Cost-Effective Smart Contracts](https://hacken.io/discover/solidity-gas-optimization/)
+10. [https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/](https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/)
