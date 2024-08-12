@@ -4,14 +4,16 @@ title:  Code4Arena Contest - Renzo Oracle
 date:   2024-05-30
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain ethereum defi
 tags: ethereum solidity security code4Arena
 description: This article presents the oracle implementation from Renzo made during the code4Arena contest
 image: /assets/article/blockchain/audit/renzoOracle-uml.png
 isMath: false
 ---
 
-This article presents the oracle implementation from `Renzo`. This analyze has been done for the [Code4Arena](https://github.com/code-423n4/2024-04-renzo) contest..
+This article presents the oracle implementation from `Renzo`. This analyze has been done for the [Code4Arena](https://github.com/code-423n4/2024-04-renzo) contest.
+
+The results from code4Arena are available here: [Renzo Mitigation Review](https://code4rena.com/audits/2024-06-renzo-mitigation-review)
 
 Since I have a limited time, I found that it could be interesting to focus only in one part in the [oracle implementation](https://github.com/code-423n4/2024-04-renzo/tree/main/contracts/Oracle) instead of the whole code.
 
@@ -416,6 +418,12 @@ event OracleAddressUpdated(IERC20 token, AggregatorV3Interface oracleAddress);
 Report:`latestRoundData()` is used to fetch the asset price from a  Chainlink aggregator, but it's missing additional validations to ensure  that the round is complete. 
 
 My comment: This is not necessary any more
+
+## Final result
+
+In the final report, majority of vulnerabilities reported by wardens concerned Withdrawals  functionalities and not directly the oracles analyzed in this article.
+
+See [2024-04-renzo-findings](https://github.com/code-423n4/2024-04-renzo-findings)
 
 ## References
 

@@ -450,6 +450,8 @@ Specification: https://github.com/stacksgov/sips/blob/main/sips/sip-010/sip-010-
 
 SIP-010 is the standard proposal for a fungible token interface for Stacks, in Clarity, the smart contract language used by Stacks.
 
+The interface is defined as a *trait*, a trait defines a group of functions to which a specific contract can choose to conform to. They are used to ensure compatibility of smart contracts with a given standard implementation.
+
 Available method: 
 
 - `transfer `
@@ -488,6 +490,8 @@ Implementation example:
   )
 )
 ```
+
+Further reading: [learnweb3 - SIP-010 Fungible Tokens & Traits](https://learnweb3.io/lessons/sip-010-fungible-tokens-and-traits/)
 
 ### Stellar (SEP: 0041)
 
