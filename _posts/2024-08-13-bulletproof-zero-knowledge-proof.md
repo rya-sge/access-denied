@@ -130,6 +130,7 @@ Reference: [Confidential Assets on MimbleWimble](https://eprint.iacr.org/2019/14
 
 #### Implementation
 
+- [MimbleWimble Extension Blocks](https://wenmweb.com/) (MWEB) is the MimbleWimble implementation on Litecoin.
 - [Grin](https://github.com/mimblewimble/grin) is an in-progress implementation of the Mimblewimble protocol. 
 - [beam](https://beam.mw) is a mimblewimble L1 privacy blockchain, completely concealing transactions
 - [Epic Cash](https://epiccash.com) is a MimbleWimble blockchain implementation that yields advances in scalability as a result of space efficient design that sheds redundant transaction data. 
@@ -168,9 +169,9 @@ This summary is taken from the project [Awesome zero knowledge proofs (zkp)](htt
 | - size estimate for 1 TX              | Tx: 200 bytes, Key: 50 MB                                    | 45 kB                               | 1.5 kb                                                       |
 | - size estimate for 10.000 TX         | Tx: 200 bytes, Key: 500 GB                                   | 135 kb                              | 2.5 kb                                                       |
 | Ethereum/EVM verification gas cost    | ~600k (Groth16)                                              | ~2.5M (estimate, no impl.)          | N/A                                                          |
-| Trusted setup required?               | YES 😒                                                        | NO 😄                                | NO 😄                                                         |
-| Post-quantum secure                   | NO 😒                                                         | YES 😄                               | NO 😒                                                         |
-| Crypto assumptions                    | DLP + secure bilinear pairing 😒                              | Collision resistant hashes 😄        | Discrete log 😏                                               |
+| Trusted setup required?               | YES                                                          | NO                                  | NO                                                           |
+| Post-quantum secure                   | NO                                                           | YES                                 | NO                                                           |
+| Crypto assumptions                    | DLP + secure bilinear pairing                                | Collision resistant hashes          | Discrete log                                                 |
 
 *Reference: [eprint.iacr.org/2019/099.pdf](https://eprint.iacr.org/2019/099.pdf), page 3
 
@@ -191,9 +192,6 @@ From [Matter labs - awesome-zero-knowledge-proofs ](https://github.com/matter-la
 - Specification: [crypto.stanford.edu/bulletproofs - Short Proofs for Confidential Transactions and More ](https://crypto.stanford.edu/bulletproofs/)
 - [crypto.stanford - Introduction and collection of resources](https://crypto.stanford.edu/bulletproofs/)
 - [tlu.tarilabs.com - The Bulletproof Protocols](https://tlu.tarilabs.com/cryptography/the-bulletproof-protocols)
-- ChatGpt with the input "what is the difference and link between Bulletproof, Bulletproof Commitment Scheme and pedersen commitment ?"
 - [From Zero (Knowledge) to Bulletproofs](https://github.com/AdamISZ/from0k2bp) - a long and very nice gradual explanation
-
-- [Bulletproofs](http://sikoba.com/docs/SKOR_DK_Bulletproofs_201905.pdf) - succinct and complete description of the protocol
-
-- https://github.com/Tongsuo-Project/Tongsuo)
+- [Dmitry Khovratovich - Bulletproofs](http://sikoba.com/docs/SKOR_DK_Bulletproofs_201905.pdf) - succinct and complete description of the protocol
+- ChatGpt with the input "What is the difference and link between Bulletproof, Bulletproof Commitment Scheme and pedersen commitment ?"

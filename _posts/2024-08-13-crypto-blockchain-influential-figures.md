@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain
 tags: blockchain
 description: list of influential figures who have had a significant impact on the cryptocurrency and blockchain ecosystem, through their innovation, investment, research or their own company.
-image:  /assets/article/blockchain/bitcoin/bitcoin.png
+image:  /assets/article/blockchain/bitcoin/Bitcoin.png
 isMath: false
 ---
 
@@ -101,6 +101,7 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Impact**: Introduced Ethereum, enabling smart contracts and decentralized applications, which expanded blockchain's potential beyond currency.
 - **X**: [@VitalikButerin](https://twitter.com/VitalikButerin)
 - **LinkedIn**:  not used
+- [Wikipedia](https://en.wikipedia.org/wiki/Vitalik_Buterin)
 
 ### Gavin Wood (Ethereum/Polkadot)
 
@@ -108,11 +109,13 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Impact**: Developed Polkadot, advancing blockchain interoperability, and contributed to Ethereum's technical design.
 - **X**: [@gavofyork](https://twitter.com/gavofyork)
 - **LinkedIn**: not used
+- [Gavin Wood](https://en.wikipedia.org/wiki/Gavin_Wood)
 
 ### Joseph Lubin (Ethereum / ConsenSys)
 
 - **Role**: Co-founder of Ethereum and founder of ConsenSys
 - **Impact**: Co-founded Ethereum and created ConsenSys, which builds infrastructure and applications for Ethereum.
+- [Wikipedia](https://en.wikipedia.org/wiki/Joseph_Lubin_(entrepreneur))
 
 ## Crypto Exchange
 
@@ -121,12 +124,14 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Role**: CEO of Coinbase
 - **Impact**: Co-founded Coinbase, a leading exchange that has helped drive mainstream crypto adoption.
 - **X**: [@brian_armstrong](https://twitter.com/brian_armstrong)
+- [Wikipedia](https://en.wikipedia.org/wiki/Brian_Armstrong_(businessman))
 
 ### Arthur Hayes (BitMEX)
 
 - **Role**: Co-founder of BitMEX
 - **Impact**: Co-founded BitMEX, a major platform for crypto derivatives trading, impacting market dynamics.
 - **X**: [@CryptoHayes](https://twitter.com/CryptoHayes)
+- [Wikipedia](https://en.wikipedia.org/wiki/Arthur_Hayes_(banker))
 
 ### Cameron and Tyler Winklevoss (Gemini)
 
@@ -140,11 +145,13 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Role**: Founder and Ex-CEO of Binance
 - **Impact**: Founded Binance, the largest cryptocurrency exchange, facilitating widespread crypto trading and liquidity.
 - **X**: [@cz_binance](https://twitter.com/cz_binance)
+- [Wikipedia](https://en.wikipedia.org/wiki/Changpeng_Zhao)
 
 ### Sam Bankman-Fried (Ex FTX)
 
 - **Role**: Former CEO of FTX
 - **X**: [@SBF_FTX](https://twitter.com/SBF_FTX)
+- [Wikipedia](https://en.wikipedia.org/wiki/Sam_Bankman-Fried)
 
 ## Law
 
@@ -153,12 +160,14 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Role**: SEC Commissioner
 - **Impact**: Known as "Crypto Mom," she has advocated for clear and supportive regulation of cryptocurrencies.
 - **X**: [@HesterPeirce](https://twitter.com/HesterPeirce)
+- [Wikipedia](https://en.wikipedia.org/wiki/Hester_Peirce)
 
 ### Gary Gensler (SEC)
 
 - **Role**: Chair of the U.S. Securities and Exchange Commission (SEC)
 - **Impact**: Gary Gensler is the current Chair of the SEC and a key figure in the regulation of cryptocurrencies and blockchain technology in the United States. 
 - **X**: [@GaryGensler](https://twitter.com/GaryGensler)
+- [Wikipedia](https://en.wikipedia.org/wiki/Gary_Gensler)
 
 ## Other
 
@@ -167,13 +176,14 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Role**: Creator of Litecoin
 - **Impact**: Developed Litecoin, enhancing Bitcoin’s technology with faster transactions and a different hashing algorithm.
 - **X**: [@SatoshiLite](https://twitter.com/SatoshiLite)
-- Wikipedia: [Charlie Lee](https://en.wikipedia.org/wiki/Charlie_Lee_(computer_scientist)) 
+- [Wikipedia](https://en.wikipedia.org/wiki/Charlie_Lee_(computer_scientist)) 
 
 ### Jed McCaleb (Ripple / Stellar)
 
 - **Role**: Co-founder of Ripple and Stellar
 - **Impact**: Founded Ripple and Stellar, focusing on facilitating cross-border payments and financial inclusivity.
 - **X**: [@JedMcCaleb](https://twitter.com/JedMcCaleb)
+- [Wikipedia](https://en.wikipedia.org/wiki/Jed_McCaleb)
 
 ### David Schwartz (Ripple)
 
@@ -186,6 +196,7 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Role**: Founder of Digital Currency Group
 - **Impact**: Founded Digital Currency Group, investing in and nurturing cryptocurrency startups and infrastructure.
 - **X**: [@BarrySilbert](https://twitter.com/BarrySilbert)
+- [bitcoinwiki](https://bitcoinwiki.org/wiki/barry-silbert)
 
 ### Justin Sun (Tron / BitTorrent)
 
@@ -194,6 +205,8 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **Impact**: Justin Sun is a prominent entrepreneur in the crypto space, known for founding TRON, a decentralized platform for digital content sharing and entertainment. He has also acquired and serves as the CEO of BitTorrent, integrating blockchain technology into the peer-to-peer file-sharing service. Sun is known for his marketing prowess and strategic acquisitions, which have significantly raised the profile of TRON in the cryptocurrency industry.
 
 - **X**: [@justinsuntron](https://twitter.com/justinsuntron)
+
+- [Wikipedia](https://en.wikipedia.org/wiki/Justin_Sun)
 
 
 ## Reference

@@ -8,7 +8,7 @@ description: Cet article présente les quelques astuces de bases pour configurer
 image: /assets/article/programmation/android/design/landscape-avd.PNG
 ---
 
-Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application **Android**, entre autre :
+Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application **Android**, entre autres :
 
 - Les textes à afficher sur l'application ;
 - Les langues afin que le texte puisse s'adapter en fonction de la langue de l'utilisateur ;
@@ -19,7 +19,7 @@ Cet article présente les quelques astuces de bases pour configurer et modifier 
 
 ## Les ressources
 
-Pour définir le design de notre application, Android offre la possibilités d'ajouter des ressources. Celles-ci sont les suivantes :
+Pour définir le design de notre application, Android offre la possibilité d'ajouter des ressources. Celles-ci sont les suivantes :
 
 - Les valeurs (*values*)
 - Les images (*drawables*)
@@ -87,7 +87,7 @@ programmation/![strings-language]({{site.url_complet}}/assets/article/programmat
 
 ## Les images (Drawables)
 
-Il existe plusieurs types de *drawables*, entre autre :
+Il existe plusieurs types de *drawables*, entre autres :
 
 - Fichier bitmap
 - Vector
@@ -113,7 +113,7 @@ Cette partie décrit comment créer un *layout* pour  le mode paysage pour l'act
 
 3) Sélectionner `Create landscape variation`
 
-4) Un fichier sera crée dans `layout-land/activity_main.xml`
+4) Un fichier sera créé dans `layout-land/activity_main.xml`
 
 ### Pour tester
 
@@ -160,7 +160,7 @@ Il est aussi possible de le faire avec l'interface graphique, comme pour l'email
 
 ##### Email
 
-Voici comment configurer l'email. Dans `InputType`, choisir `TextEmailAdress`. Cela va ajouter le code suivante dans le layout :
+Voici comment configurer l'email. Dans `InputType`, choisir `TextEmailAdress`. Cela va ajouter le code suivant dans le layout :
 
 ```xml
   android:inputType="textEmailAddress"
