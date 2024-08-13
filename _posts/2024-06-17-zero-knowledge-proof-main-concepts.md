@@ -4,7 +4,7 @@ title: Main Concept Behind Zero-Knowledge Proof
 date:   2024-06-17
 lang: en
 locale: en-GB
-categories: cryptography blockchain
+categories: cryptography blockchain ZeroKnowledgeProof
 tags: zeroknowledge zkp
 description: This article is a summary of the main concepts behind Zero-Knowledge Proof (ZKP).
 image: /assets/article/cryptographie/zero-knowledge-proof/zero-knowledge-proof.drawio.png

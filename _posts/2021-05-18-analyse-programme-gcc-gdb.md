@@ -3,7 +3,7 @@
 layout: post
 title:  "Analyse de programmes avec GCC et GDB"
 date:   2021-05-18 
-categories: security reverse 
+categories: security
 tags: gcc gdb buffer-overflow shellcode
 description: Compilation avec gcc et commandes de base de GDB
 image: /assets/article/outil-securite/gdb/fonction-breakpoint.PNG

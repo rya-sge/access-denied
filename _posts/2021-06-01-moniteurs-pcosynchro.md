@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Les moniteurs avec PcoSynchro"
+title:  Les moniteurs avec PcoSynchro
 date:   2021-06-01 
 categories: programmation
 tags: programmation concurrence pcosynchro hoare mesa 
@@ -250,5 +250,5 @@ if(nbWaiting){
 
 ## Sources
 
-- [https://gitlab.com/reds-public/pco-synchro](https://gitlab.com/reds-public/pco-synchro)
+- [gitlab.com/reds-public/pco-synchro](https://gitlab.com/reds-public/pco-synchro)
 - Cours de Programmation concurrente(PCO) enseigné à l'HEIG-VD en 2021

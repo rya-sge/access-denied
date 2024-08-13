@@ -1,11 +1,11 @@
 ---
 layout: home
-title: reverse
-permalink: /category/reverse/
+title: Zero Knowledge Proof
+permalink: /category/zeroKnowledgeProof/
 ---
 {% include header.html %}
 <div class="c-posts o-opacity">
-    {% for post in site.categories['reverse'] %}
+    {% for post in site.categories['zeroKnowledgeProof'] %}
  <article class="c-post">
     {% if post.image %}
     <a class="c-post-thumbnail o-opacity" style="background-image: url({{ site.baseurl | append : post.image}})"
@@ -22,6 +22,7 @@ permalink: /category/reverse/
           {{ post.content | strip_html | truncatewords: 15 }}
           {% endif %}
       </p>
+        <span class="c-post-date">{{post.date | date: '%Y, %b %d'}}&nbsp;&nbsp;&nbsp;—&nbsp;</span>
     </div>
   </article> <!-- /.c-post -->
   {% endfor %}
