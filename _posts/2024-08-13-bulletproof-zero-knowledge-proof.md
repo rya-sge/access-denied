@@ -4,7 +4,7 @@ title:  Zero Knowledge Proofs with Bulletproof
 date:   2024-08-13
 lang: en
 locale: en-GB
-categories: cryptography blockchain ZeroKnowledgeProof
+categories: cryptography blockchain ZKP
 tags: ethereum solidity security code4Arena
 description: Bulletproofs are efficient and compact zero-knowledge proofs. They're enhancing privacy and scalability in blockchain systems by reducing data size and verification time.
 image: /assets/article/blockchain/monero-symbol-on-white-480.png

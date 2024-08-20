@@ -4,7 +4,7 @@ title: Overview of Zero-Knowledge development framework
 date:   2024-06-10
 lang: en
 locale: en-GB
-categories: cryptography blockchain ZeroKnowledgeProof
+categories: cryptography blockchain ZKP
 tags: zeroknowledge zkp
 description: Overview of the main development frameworks to build zero-knowledge system which Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
 image: /assets/article/cryptographie/zero-knowledge-proof/zcash-zec-logo.png
@@ -17,7 +17,9 @@ This article is mainly based on the following great article by Celo: [The Panthe
 
 [TOC]
 
-## [Boojum (Matter labs)](https://github.com/matter-labs/era-boojum)
+## Boojum (Matter labs)
+
+[GitHub](https://github.com/matter-labs/era-boojum)
 
 Boojum is a Rust-based arithmetization & constraint library, based on the implementation developed for Plonky2.
 
@@ -34,7 +36,9 @@ $$
 
 Reference: [ZkSync - Boojum Upgrade: zkSync Era’s New High-performance Proof System for Radical Decentralization](https://zksync.mirror.xyz/HJ2Pj45EJkRdt5Pau-ZXwkV2ctPx8qFL19STM5jdYhc)
 
-## [gnark (Consensys)](https://github.com/ConsenSys/gnark)
+## gnark (Consensys)
+
+[Github](https://github.com/ConsenSys/gnark)
 
 Build by Consensys and written in Go, `gnark` is a fast zk-SNARK library that offers a high-level API to design circuits. 
 
@@ -46,7 +50,9 @@ y² = x^3+b (b∈Fp).
 $$
 Reference: [Consensys - Prove schemes and curves](https://docs.gnark.consensys.io/Concepts/schemes_curves)
 
-## [Halo2 (ZCash)](https://github.com/zcash/halo2)
+## Halo2 (ZCash)
+
+[GitHub](https://github.com/zcash/halo2)
 
 Halo2 is Zcash’s zk-SNARK implementation with Plonk. It is equipped with the Plonkish arithmetization that supports many useful primitives, such as custom gates and lookup tables.
 
@@ -59,7 +65,9 @@ Reference:
 - [halo2 - PLONKish Arithmetization](https://zcash.github.io/halo2/concepts/arithmetization.html#plonkish-arithmetization)
 - [zcash - halo2](https://zcash.github.io/halo2/)
 
-## [Nova](https://github.com/microsoft/Nova) (Microsoft)
+## Nova (Microsoft)
+
+[GitHub](https://github.com/microsoft/Nova)
 
 Nova is a recursive SNARK. A recursive  SNARK enables producing proofs that prove statements about prior  proofs).
 
@@ -74,13 +82,17 @@ The library implements also two commitment schemes and evaluation arguments:
 
 ## Iden3
 
-### [snarkjs](https://github.com/iden3/snarkjs)
+### snarkjs
+
+[GitHub](https://github.com/iden3/snarkjs)
 
 snarkjs is an implementation in JavaScript and WASM of zkSNARK and PLONK schemes.
 
 It uses the Groth16 Protocol (3 point only and 3 pairings), PLONK and FFLONK.
 
-### [rapidsnark](https://github.com/iden3/rapidsnark)
+### rapidsnark
+
+[GitHub](https://github.com/iden3/rapidsnark)
 
 Rapidsnark is a zkSnark proof generation written in C++ and intel/arm assembly. That generates proofs created in [circom](https://github.com/iden3/snarkjs) and [snarkjs](https://github.com/iden3/circom) very fast.
 
@@ -88,7 +100,9 @@ Old version: [https://github.com/iden3/rapidsnark-old](https://github.com/iden3/
 
 ## Polygon
 
-### [Plonky2](https://github.com/0xPolygonZero/plonky2)
+### Plonky2
+
+[Github](https://github.com/0xPolygonZero/plonky2)
 
 Plonky2 is a recursive SNARK natively compatible with Ethereum. It combines PLONK and [FRI](https://aszepieniec.github.io/stark-anatomy/fri.html)(*Fast Reed-Solomon IOP of Proximity*,):
 
@@ -99,7 +113,9 @@ Plonky2 is a recursive SNARK natively compatible with Ethereum. It combines PLON
 
 Reference: [Polygon Introducing Plonky2](https://polygon.technology/blog/introducing-plonky2)
 
-### [Starky](https://github.com/0xPolygonZero/plonky2/tree/main/starky)
+### Starky
+
+[GitHub](https://github.com/0xPolygonZero/plonky2/tree/main/starky)
 
 Starky is a highly performant STARK framework from Polygon Zero. 
 

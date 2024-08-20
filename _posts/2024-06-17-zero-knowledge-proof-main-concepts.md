@@ -4,7 +4,7 @@ title: Main Concept Behind Zero-Knowledge Proof
 date:   2024-06-17
 lang: en
 locale: en-GB
-categories: cryptography blockchain ZeroKnowledgeProof
+categories: cryptography blockchain ZKP
 tags: zeroknowledge zkp
 description: This article is a summary of the main concepts behind Zero-Knowledge Proof (ZKP).
 image: /assets/article/cryptographie/zero-knowledge-proof/zero-knowledge-proof.drawio.png
@@ -82,7 +82,7 @@ These properties are the base of all zero-knowledge system
 
 > The only thing that the verifier learns is that x ∈ L
 
-Reference: [www.mimuw.edu.pl - Commitment Schemes and Zero‐Knowledge Protocols](https://www.mimuw.edu.pl/~std/Dydaktyka/BISS09/BISS10.pdf)
+Reference: [mimuw.edu.pl - Commitment Schemes and Zero‐Knowledge Protocols](https://www.mimuw.edu.pl/~std/Dydaktyka/BISS09/BISS10.pdf)
 
 ### Others propreties
 
