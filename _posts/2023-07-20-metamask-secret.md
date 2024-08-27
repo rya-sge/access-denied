@@ -188,22 +188,30 @@ The application was also analyzed by a security engineer at CertiK in his blog.
 
 ## Reference
 
-1. [https://en.bitcoin.it/wiki/BIP_0039](https://en.bitcoin.it/wiki/BIP_0039)
-2. [https://support.metamask.io/hc/en-us/articles/360059952212](https://support.metamask.io/hc/en-us/articles/360059952212)
-3. [https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454](https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454)
-4. [https://support.metamask.io/hc/en-us/articles/360015489271](https://support.metamask.io/hc/en-us/articles/360015489271)
-5. [https://support.metamask.io/hc/en-us/articles/4405451730331](https://support.metamask.io/hc/en-us/articles/4405451730331)
-6. [https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities-](https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities-)
-7. [https://hackerone.com/metamask](https://hackerone.com/metamask)
-8. [https://github.com/MetaMask/vault-decryptor/tree/master](https://github.com/MetaMask/vault-decryptor/tree/master)
-9. [https://support.metamask.io/hc/en-us/articles/360018766351-How-to-recover-your-Secret-Recovery-Phrase](https://support.metamask.io/hc/en-us/articles/360018766351-How-to-recover-your-Secret-Recovery-Phrase)
-10. [https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask](https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask)
-11. [https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
-12. [https://ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path/107765#107765](https://ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path/107765#107765)
-13. [https://support.metamask.io/hc/en-us/articles/360015289612-How-to-restore-your-MetaMask-wallet-from-Secret-Recovery-Phrase](https://support.metamask.io/hc/en-us/articles/360015289612-How-to-restore-your-MetaMask-wallet-from-Secret-Recovery-Phrase)
-14. [https://dev.to/luislucena16/what-are-metamask-accounts-or-sub-accounts-and-why-are-they-not-as-private-as-they-are-supposed-to-be-2c58](https://dev.to/luislucena16/what-are-metamask-accounts-or-sub-accounts-and-why-are-they-not-as-private-as-they-are-supposed-to-be-2c58)
-15. [https://support.metamask.io/hc/en-us/articles/360060826432-What-is-a-Secret-Recovery-Phrase-and-how-to-keep-your-crypto-wallet-secure](https://support.metamask.io/hc/en-us/articles/360060826432-What-is-a-Secret-Recovery-Phrase-and-how-to-keep-your-crypto-wallet-secure)
-16. [https://community.metamask.io/t/access-metamask-seed-via-pc-files/1027](https://community.metamask.io/t/access-metamask-seed-via-pc-files/1027)
-17. [https://support.metamask.io/hc/en-us/articles/4404722782107](https://support.metamask.io/hc/en-us/articles/4404722782107)
-18. [https://www.wispwisp.com/index.php/2020/12/25/how-metamask-stores-your-wallet-secret/](https://www.wispwisp.com/index.php/2020/12/25/how-metamask-stores-your-wallet-secret/)
+### Metamask official
+
+- [2. support.metamask.io/hc/en-us/articles/360059952212](https://support.metamask.io/hc/en-us/articles/360059952212)
+
+- [3. https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454](https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454)
+
+- [4. support.metamask.io - How to add missing accounts after restoring with Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360015489271)
+- [5. support.metamask.io - Passwords and MetaMask](https://support.metamask.io/hc/en-us/articles/4405451730331)
+- [6. support.metamask.io - Does MetaMask have a bug bounty program for vulnerabilities?](https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities)
+- [8. github.com/MetaMask/vault-decryptor/tree/master](https://github.com/MetaMask/vault-decryptor/tree/master)
+- [9. support.metamask.io - How to recover your Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360018766351-How-to-recover-your-Secret-Recovery-Phrase)
+- [10. support.metamask.io - Basic Safety and Security Tips for MetaMask](https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask)
+- [13. support.metamask.io - How to restore your MetaMask wallet from Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360015289612-How-to-restore-your-MetaMask-wallet-from-Secret-Recovery-Phrase)
+- [15. support.metamask.io - What is a 'Secret Recovery Phrase' and how to keep your crypto wallet secure](https://support.metamask.io/hc/en-us/articles/360060826432-What-is-a-Secret-Recovery-Phrase-and-how-to-keep-your-crypto-wallet-secure)
+- [16. community.metamask.io - Access Metamask Seed via PC Files](https://community.metamask.io/t/access-metamask-seed-via-pc-files/1027)
+- [17. support.metamask.io - User Guide: Secret Recovery Phrase, password, and private keys](https://support.metamask.io/hc/en-us/articles/4404722782107)
+
+### Other
+
+- [1. en.bitcoin.it/wiki/BIP_0039](https://en.bitcoin.it/wiki/BIP_0039)
+
+- [7. hackerone.com/metamask](https://hackerone.com/metamask)
+- [11. cryptobook.nakov.com/mac-and-key-derivation/pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
+- [12. ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path/107765#107765](https://ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path/107765#107765)
+- [14. dev.to - What are MetaMask "Accounts" or "Sub-Accounts"? And why are they not as private as they are supposed to be?](https://dev.to/luislucena16/what-are-metamask-accounts-or-sub-accounts-and-why-are-they-not-as-private-as-they-are-supposed-to-be-2c58)
+- [18. wispwisp.com - How MetaMask stores your wallet secret ?](https://www.wispwisp.com/index.php/2020/12/25/how-metamask-stores-your-wallet-secret/)
 
