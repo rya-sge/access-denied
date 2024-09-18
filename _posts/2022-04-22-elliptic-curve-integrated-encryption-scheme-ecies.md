@@ -73,7 +73,7 @@ $$
 
 2.Calculer  un point `R` sur la courbe elliptique
 $$
-   R = rG
+R = rG
 $$
 
 3.On génère 2 clés `ke` et `Km` en appliquant la KDF sur r multiplié par la clé publique K.

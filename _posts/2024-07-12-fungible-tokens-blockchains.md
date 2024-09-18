@@ -61,6 +61,7 @@ Reference: [What Are Fungible Goods? Meaning, Examples, and How to Trade](https:
 | Hedera                                     | Same as Ethereum, see<br /> [docs.hedera.com - ERC-20 (Fungible Tokens)](https://docs.hedera.com/hedera/core-concepts/smart-contracts/tokens-managed-by-smart-contracts/erc-20-fungible-tokens) |
 | Hyperliquid                                | [HIP-1](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-1-native-token-standard) |
 | ICP                                        | [ICRC-1](https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-1/README.md) |
+| Mina                                       | [RFC-14](https://github.com/o1-labs/rfcs/blob/main/0014-fungible-token-standard.md) |
 | Near                                       | [NEP-141](https://github.com/near/NEPs/blob/master/neps/nep-0141.md) |
 | Neo                                        | [NEP-5](https://docs.neo.org/v2/docs/en-us/sc/write/nep5.html) |
 | Optimism<br />(Ethereum Layer2)            | Same as Ethereum                                             |
@@ -316,7 +317,7 @@ icrc1_fee : () -> (nat) query;
 
 ### NEO (NEP-5)
 
-Specification: [https://docs.neo.org/v2/docs/en-us/sc/write/nep5.html](https://docs.neo.org/v2/docs/en-us/sc/write/nep5.html)
+Specification: [docs.neo.org/v2/docs/en-us/sc/write/nep5.html](https://docs.neo.org/v2/docs/en-us/sc/write/nep5.html)
 
 NEO’s standard for creating tokens, similar to Ethereum’s ERC-20.
 
@@ -416,7 +417,7 @@ function ft_balance_of(
 
 ### Polkadot (PSP-22)
 
-Specification: [https://github.com/w3f/PSPs/blob/master/PSPs/psp-22.md](https://github.com/w3f/PSPs/blob/master/PSPs/psp-22.md)
+Specification: [github.com/w3f/PSPs/blob/master/PSPs/psp-22.md](https://github.com/w3f/PSPs/blob/master/PSPs/psp-22.md)
 
 A Polkadot Smart Contract Proposal (PSP) describes standards for smart contracts in the Polkadot ecosystem.
 
@@ -444,7 +445,7 @@ Reference implementation: [github.com/Brushfam/openbrush-contracts - psp22/psp22
 
 ### Stacks (SIP-010)
 
-Specification: https://github.com/stacksgov/sips/blob/main/sips/sip-010/sip-010-fungible-token-standard.md
+Specification: [github.com/stacksgov/sips/blob/main/sips/sip-010/sip-010-fungible-token-standard.md](https://github.com/stacksgov/sips/blob/main/sips/sip-010/sip-010-fungible-token-standard.md)
 
 > Stacks is a Bitcoin L2, bringing smart contract functionality to Bitcoin, without modifying Bitcoin itself.
 

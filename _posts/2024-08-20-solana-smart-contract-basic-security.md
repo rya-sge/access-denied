@@ -11,7 +11,7 @@ image:  /assets/article/blockchain/solana/solanaLogoMark.png
 isMath: false
 ---
 
-This article is a summary of the video [Security: Writing Secure Solana Programs](https://www.youtube.com/watch?v=Qkf9QwSfHAM) By Ackee Blockchain Security. This video is the lecture 6 of their cursus *School of Solana Season 5*.
+This article is a summary of the video [Security: Writing Secure Solana Programs](https://www.youtube.com/watch?v=Qkf9QwSfHAM) by Ackee Blockchain Security. This video is the lecture 6 of their cursus *School of Solana Season 5*.
 
 You can also find the written version on [GitHub](https://github.com/Ackee-Blockchain/school-of-solana/tree/master/6.lesson#signer-authorization).
 
@@ -84,7 +84,7 @@ An insecure version of that could be:
 user: AccountInf<'info>,
 ```
 
-This type is insecure because doesn't check anything. Anyone who know the public key can supply the correct user account and update the data of any users.
+This type is insecure because it doesn't check anything. Anyone who knows the public key can supply the correct user account and update the data of any users.
 
 Instead of
 
@@ -102,7 +102,7 @@ See also [Signer Authorization](https://solana.com/developers/courses/program-se
 
 As a reminder, with Solana Programming model, each program needs as input all account it will use (read and write).
 
-You have to verify that the accounts supplied are the ones you expect
+You must verify that the accounts supplied are the ones you expect
 
 #### Example
 
@@ -120,7 +120,7 @@ pub struct ConfigData {
 
 First account is the admin account who must sign the transaction
 
-In this case, it is insecure because the admin account is not bound to the config Account and to the data itself. You have to check that the admin account is the same as saved on the configData
+In this case, it is insecure because the admin account is not bound to the config Account and to the data itself. You must check that the admin account is the same as saved on the configData
 
 Here an attacker can supply any kind of account as an admin and sign the transaction, and supply the ConfigData on your programm,
 
@@ -139,7 +139,7 @@ pub struct UpdateConfig<'info>{
 
 **Secure version**
 
-We add here a constraint `has_one`. Here the name `admin`has to match the admin in the data structure. The admin provided must have the same public key that stored in the config.
+We add here a constraint `has_one`. Here the name `admin` has to match the admin in the data structure. The admin provided must have the same public key that stored in the config.
 
 ```rust
 #[derive(Accounts)]
@@ -157,7 +157,7 @@ pub struct UpdateConfig<'info>{
 
 Reminder:
 
-`has_one`is an anchor constraint which checks the `target_account` field on the account matches the key of the `target_account` field in the Account struct
+`has_one` is an anchor constraint which checks the `target_account` field on the account matches the key of the `target_account` field in the Account struct
 
 See [Anchor - account-constraints](https://www.anchor-lang.com/docs/account-constraints)
 
@@ -183,7 +183,7 @@ See also [Anchor-lang - account-types](https://www.anchor-lang.com/docs/account-
 
 Here `Config Account` might be owned by another program and any account with the required data structure might be supplied.
 
-```
+```rust
 #[derive(Account)]
 pub struct WithdawFees<'info>{
 	#[account(mut)]
@@ -220,7 +220,7 @@ We use Anchor's Account<'info, T> type that checks automatically the owner.
 
 The owner of this account should be your program to work.
 
-In some casey, if you want that the owner is a different program, you can use the owner constraint.
+In some case, if you want that the owner is a different program, you can use the owner constraint.
 
 Full code
 
@@ -248,7 +248,7 @@ Use Anchor's Program<`info, T>  type that checks the program's address.
 
 Programs that works out of the box are System, Token and AssociatedToken
 
-Others programs must have the CPI modules generated.
+Other programs must have the CPI modules generated.
 
 Example:
 

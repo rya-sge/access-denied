@@ -12,7 +12,7 @@ isMath: false
 image: /assets/article/blockchain/solana/introduction-cli/phantom-add-custom-token.PNG
 ---
 
-This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the `spl-token` command-line utility. It was made by following the Moralis course : https://aca[demy.moralis.io/courses/solana-programming-101](https://academy.moralis.io/courses/solana-programming-101)
+This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the `spl-token` command-line utility. It was made by following the Moralis course: [Solana Programming 101](https://academy.moralis.io/courses/solana-programming-101)
 
 - Create your own key with the command line
 - Create your own key with Phantom
@@ -36,14 +36,14 @@ When you use the spl-token command line, this generated key will be used
 solana-keygen new --force
 ```
 
-My result :Wrote new keypair to /home/YOUR_USER/.config/solana/id.json
+My result: Wrote new keypair to /home/<YOUR_USER>/.config/solana/id.json
 
 My public key is `BgAoyQvL1ejQNrj4BewgJxfTHZ2cLjgxq8tza5oTcxyK`
 
 - Getting the public key of a wallet
 
 
-```
+```bash
 solana-keygen pubkey
 ```
 
@@ -51,9 +51,9 @@ solana-keygen pubkey
 
 ### Install spl-token-cli
 
-As stated in the documentation: "The spl-token command-line utility can be used to experiment with SPL tokens."
+The spl-token command-line utility can be used to experiment with SPL tokens.
 
-You can find the documentation here : [https://spl.solana.com/token](https://spl.solana.com/token)
+You can find the documentation here: [https://spl.solana.com/token](https://spl.solana.com/token)
 
 - Install the cli tools
 
@@ -64,7 +64,7 @@ cargo install spl-token-cli
 
 During the installation, it is possible you have some errors with libudev. You can find more information with this link: [stackoverflow.com - libudev-development-package-not-found](https://stackoverflow.com/questions/55945023/libudev-development-package-not-found)
 
-the solution for me was to install libudev with this command :
+the solution for me was to install *libudev* with this command:
 
 ```bash
 sudo apt-get install libudev-dev
@@ -111,23 +111,21 @@ spl-token create-token -url devnet
 
 ![spl-create-token]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-create-token.PNG)
 
-The address of the token is :  `H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws`
+The address of the token is:  `H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws`
 
 #### Solana explorer
 
-Information about the token on Solana explorer : 
+Information about the token on Solana explorer: 
 
 [explorer.solana.com - tx](https://explorer.solana.com/address/H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws?cluster=devnet)
 
 ![info-token-solana-explorer]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/info-token-solana-explorer.PNG)
 
-#### 
-
 #### Create an account
 
-Account in a wallet holds a token. Accounts have to be created within wallets
+Account in a wallet holds a token. Accounts must be created within wallets
 
-Reminder : In Solana, everything is an account
+Reminder: In Solana, everything is an account
 
 ```bash
 spl-token create-account <TOKEN_ADDRESS> --url devnet
@@ -184,13 +182,13 @@ spl-token supply H3goZSZ99PjQCBmFqy93jX683G3hgSE1BSnyY5DBEvws --url devnet
 Check on Solana explorer
 
 
-Link : [explorer.solana.com - tx]( https://explorer.solana.com/tx/4cieBRVtpe4ivuAn41C26sTfRzJ3LDSYN9kEQ7kr6H14EYYwbi6eJhYK214d4vrXxTD9cvoeaTaDCyzaLtMxbYKL?cluster=devnet)
+Link: [explorer.solana.com - tx]( https://explorer.solana.com/tx/4cieBRVtpe4ivuAn41C26sTfRzJ3LDSYN9kEQ7kr6H14EYYwbi6eJhYK214d4vrXxTD9cvoeaTaDCyzaLtMxbYKL?cluster=devnet)
 
 ![mint-token-solana-explorer]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/mint-token-solana-explorer.PNG)
 
 ### Disable authorization
 
-- Renouncing the ability to mint tokens :
+- Renouncing the ability to mint tokens:
 
 
 ```bash
@@ -201,7 +199,7 @@ spl-token authorize <TOKEN_ADDRESS> mint --disable --url devnet
 
 
 
-- Check the result :
+- Check the result:
 
 ![spl-authorize-mint-disable-check]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-authorize-mint-disable-check.PNG)
 
@@ -233,9 +231,9 @@ Without the fund-recipient flag, you'd not be able to add balance to an unfunded
 
 For the next test, I created a new token with an account because I had revoked the authorizations for the previous one (not very smart haha)
 
-Token address : `EHNLcqxdBLGGMwqVSR3tf1PsSo6HxNgxftD4j3wnHNQL`
+Token address: `EHNLcqxdBLGGMwqVSR3tf1PsSo6HxNgxftD4j3wnHNQL`
 
-Account : `2dWvomUHStpCZbdVfLvxKC4neJmUYNEaozpru65kfHyH`
+Account: `2dWvomUHStpCZbdVfLvxKC4neJmUYNEaozpru65kfHyH`
 
 
 
@@ -258,7 +256,7 @@ We transfer some tokens
 
 ##### Solana explorer
 
-See on Solana explorer : [explorer.solana - tx](https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet)
+See on Solana explorer: [explorer.solana - tx](https://explorer.solana.com/tx/5ebyFnQTeLUAFLrLPkoVwffer1YQrRpnHBxPF34AZFxSr91cZNiugyqDGBgVEafQVZ5ZGxLXVHgsjmxjsVX6mUFb?cluster=devnet)
 
 
 
@@ -268,7 +266,7 @@ See on Solana explorer : [explorer.solana - tx](https://explorer.solana.com/tx/5
 
 ## References
 
-Main references are :
+Main references are:
 
 - SOLANA-LABS, 2022a. Token Program. *Solana Program Library*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: [https://spl.solana.com/token](https://spl.solana.com/token)
 - SOLANA-LABS, 2022b. Install the Solana Tool Suite. *Solana Documentation*. Online. 2022. [Accessed 3 August 2022]. Retrieved from: [https://docs.solana.com/cli/install-solana-cli-tools](https://docs.solana.com/cli/install-solana-cli-tools)

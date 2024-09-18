@@ -18,6 +18,7 @@ This article presents the architecture and the behavior of Compound V2,  an Ethe
 - [Compound whitepaper](https://compound.finance/documents/Compound.Whitepaper.pdf)
 - [Compound GitHub](https://github.com/compound-finance/compound-protocol)
 - [Understanding Compound protocol's interest rates](https://ianm.com/posts/2020-12-20-understanding-compound-protocols-interest-rates)
+- [RareSkills - DeFi Lending: Liquidations and Collateral](https://www.rareskills.io/post/defi-liquidations-collateral)
 
 [TOC]
 
@@ -29,17 +30,21 @@ This version has been replaced by Compound V3 (Comet) on [August 2022](https://t
 
 Here the main points come from the [whitepaper](https://compound.finance/documents/Compound.Whitepaper.pdf)
 
-Compound is a protocol initially based on the Ethereum blockchain that establishes money markets:
+Compound is a protocol initially based on the Ethereum blockchain that establishes **money markets**:
 
 - Money markets  are pools of assets with algorithmically derived interest rates, based on the supply and demand for the asset. 
 
 - Suppliers (and borrowers) of an asset interact directly with the protocol earning (and paying) a floating interest rate, without having to negotiate terms such as maturity, interest rate, or collateral with a peer or counterparty.
-- Each money market is unique to an Ethereum asset (such as Ether, an ERC-20 stablecoin such as Dai, or an ERC-20 utility token such as Augur.
-- Unlike an exchange or peer-to-peer platform, where a user’s assets are matched and lent to another user, the Compound protocol aggregates the supply of each user; when a user supplies an asset, it becomes a fungible resource. 
+- Each money market is unique to an Ethereum asset such as Ether or an ERC-20 such as Dai.
+- Unlike an exchange or peer-to-peer platform, where a user’s assets are matched and lent to another user, the Compound protocol aggregates the supply of each user; when a user supplies an asset, it becomes a [fungible resource](https://rya-sge.github.io/access-denied/2024/07/12/fungible-tokens-blockchains/). 
   - This approach offers significantly more liquidity than direct lending; 
   - unless every asset in a market is borrowed, users can withdraw their assets at any time, without waiting for a specific loan to mature.
 
-- Assets supplied to a market are represented by an ERC-20 token balance (“cToken”), which entitles the owner to an increasing quantity of the underlying asset. As the money market accrues interest, which is a function of borrowing demand, cTokens become convertible into an increasing amount of the underlying asset. In this way, earning interest is as simple as holding a ERC-20 cToken.
+- Assets supplied to a market are represented by an ERC-20 token balance (**cToken**), which entitles the owner to an increasing quantity of the underlying asset. As the money market accrues interest, which is a function of borrowing demand, cTokens become convertible into an increasing amount of the underlying asset. In this way, earning interest is as simple as holding a ERC-20 cToken.
+
+- Market scView for Tether
+
+![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-tether.png)
 
 ### Difference between V2 and V3
 
@@ -47,8 +52,8 @@ Compound V3 has been deployed on [August 2022](https://thedefiant.io/news/defi/c
 
 Here the main resource is the [Compound Academy](https://compound.education/guides/view/compound-v2-vs-v3-compound/1).
 
-- The most significant improvement was moving away from the pooled-risk model, which allowed users to borrow any asset but constantly rehypothecated collateral. This model was vulnerable to a single bad asset or oracle update draining all assets from the protocol.
-- In Compound III, each market deployment offers a single borrowable asset, and the supplied collateral remains the property of the borrower, except during liquidation. This new approach increases capital efficiency and reduces risk since the collateral is more "useful" when the borrower knows the specific asset being borrowed in advance. 
+- The most significant improvement was moving away from the **pooled-risk** model, which allowed users to borrow any asset but constantly rehypothecated collateral. This model was vulnerable to a single bad asset or oracle update draining all assets from the protocol.
+- In Compound III, each market deployment offers a **single borrowable asset**, and the supplied collateral remains the property of the borrower, except during liquidation. This new approach increases capital efficiency and reduces risk since the collateral is more "useful" when the borrower knows the specific asset being borrowed in advance. 
 - The first release of Compound III allows borrowing of USDC using ETH, WBTC, LINK, UNI, and COMP as collateral. Although borrowers will not earn interest on their collateral, they will be able to borrow more with lower risks of liquidation and penalties while spending less on gas fees.
 - wETH market is also live now, with `Coinbase Wrapped Staked ETH(cbETH)` and `Lido Staked ETH(stETH)` as collateral.
 
@@ -57,7 +62,7 @@ Here the main resource is the [Compound Academy](https://compound.education/guid
 - Concept of credit rating can not be apply because Ethereum account are pseudonymous. It is impossible to enforce repayment in the event of a loan default
 - As the result, all loans are overcollateralized in a collateral asset different from the one being borrowed.
 - If a borrower falls belows their collateralization ratio (CR), their position is liquidated to pay back their debt.
-- The debt can be liquidated by a keeper. The keeper received in return a bonus.
+- The debt can be liquidated by a **keeper**. The keeper received in return a bonus.
 
 
 
@@ -65,14 +70,14 @@ Here the main resource is the [Compound Academy](https://compound.education/guid
 
 - The CR is calculated via a collateral factor (CF)
 
+- The collateral factor is the percentage of the collateral value that can be borrowed
+
 - This CF is decided through a [gouvernance proposal](https://www.comp.xyz/t/historical-record-of-collateral-factors/1982)
 - Each ERC-20 asset on the platform has its own collateral factor ranging from zero to 90
 - A CR of zero means an asset cannot be used as collateral but it can still be borrowed
 - The required CR for a single collateral type is calculated as 100 divided by the CR
 - Volatile assets generally have lower collateral factors, which mandate higher CR due to increased risk of a price movement that could lead to undercollateralization
 - An account can use multiple collateral types at once, in which case the CR is calculated as 100 divided by the weighted average of the collateral types by their relative sizes(denominated in a common currency) in the portfolio
-
-https://www.linkedin.com/pulse/defi-lending-liquidations-collateral-rareskills-io-wko7c/
 
 See also [docs.compound.finance - collateral-factor](https://docs.compound.finance/v2/comptroller/#collateral-factor)
 
@@ -98,7 +103,9 @@ Example 2:
 
   
   $$
+  \begin{aligned}[b]
   100/(0.8*60 + 0.2 * 90) = 151\%
+  \end{aligned}
   $$
   
 
@@ -115,7 +122,9 @@ Example 2:
 
 All interest rates in Compound are determined as a function of a metric known as the **utilization rate**. The utilization rate U_a for a money market a is defined as:
 $$
+\begin{aligned}[b]
 U_a = Borrows_a / (Cash_a + Borrows_a - Reserves_a)
+\end{aligned}
 $$
 
 - Borrows_a refers to the amount of a borrowed.
@@ -163,7 +172,9 @@ Borrow = 100
 
 We have cash_a = 900 and borrows_a = 100
 $$
+\begin{aligned}[b]
 Ua = 100 / ( 900 + 100 - 0) = 100 / 1000 = 10%
+\end{aligned}
 $$
 
 
@@ -217,7 +228,9 @@ See [compound-finance - JumpRateModel.sol#L79](https://github.com/compound-finan
 ### Supply interest formula
 
 $$
+\begin{aligned}[b]
 Supply ~ interest ~ rate = ( ~utilisation \ ~ratio~x~borrow ~ interest ~rate)
+\end{aligned}
 $$
 
 - Reserve factor
@@ -283,7 +296,9 @@ maximum supplyy rate = utilization ratio * borrow interest rate
 - If the reserve factor is set to 10, then 10% of the borrow interest is diverted to a DAI reserve pool, lowering the supply interest rate to 2.7%
 
 $$
+\begin{aligned}[b]
 0.5 * 0.06 * (1-0.10) = 0.027
+.\end{aligned}
 $$
 
 | Label                      | Value            |
@@ -305,13 +320,17 @@ $$
 - The borrow interest rate
 
 $$
+\begin{aligned}[b]
 0.01 (base) + 0.8 * 0.1 (pre-kink) + 0.1 * 0.4 (post-kink) = 13\%
+\end{aligned}
 $$
 
 - The supplay rate (assuming a reserve factor of zero) is
 
 $$
+\begin{aligned}[b]
 0.9 * 0.13 = 11.7\%
+\end{aligned}
 $$
 
 
@@ -521,6 +540,12 @@ Compound solution: Transparent collateralization ratios of borrowers visible to 
 ## Screenshot
 
 From August 26, 2024
+
+- Dashboard view
+
+![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-dashboard-view.png)
+
+
 
 ![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-tether.png)
 
