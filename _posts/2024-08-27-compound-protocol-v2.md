@@ -42,7 +42,7 @@ Compound is a protocol initially based on the Ethereum blockchain that establish
 
 - Assets supplied to a market are represented by an ERC-20 token balance (**cToken**), which entitles the owner to an increasing quantity of the underlying asset. As the money market accrues interest, which is a function of borrowing demand, cTokens become convertible into an increasing amount of the underlying asset. In this way, earning interest is as simple as holding a ERC-20 cToken.
 
-- Market scView for Tether
+- Market View for Tether
 
 ![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-tether.png)
 
@@ -193,7 +193,9 @@ $$
 - Formula
 
 $$
+\begin{aligned}[b]
 Borrow~interest~rate = utilization ~ratio * multiplierPerBlock + baseRatePerBlock
+\end{aligned}
 $$
 
 

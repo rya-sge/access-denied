@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  Fiscalité des cryptomonnaies en Suisse
-date:   2024-08-13
+date:   2024-09-18
 lang: 
 locale: 
 categories: blockchain 
@@ -77,7 +77,9 @@ Ethereum:
 
 - En l'absence de cours d'évaluation, le jeton de paiement doit être déclaré à son prix d'achat initial converti en francs suisses.
 
-## Staking
+## Participation au consensus
+
+### Staking
 
 Le staking signifie que les jetons sont conservés (bloqués) dans une blockchain *Proof of Stake* pendant un certain temps à des fins de garantie. 
 
@@ -85,7 +87,7 @@ Dans le cadre de ce processus, une rémunération appelée indemnité selon l'ad
 
 L’administration fiscale fait une différence entre mettre à disposition des  jetons via des stacking-pools ou faire tourner soit-même validateur.
 
-### Staking pool
+#### Staking pool
 
 Type d'impôt: revenu de la fortune mobilière (indémnité) + fortune
 
@@ -99,13 +101,13 @@ Le montant à indiquer est la valeur marchande au moment de la réalisation (enc
 
 Voir aussi [www.mazanek.ch/cryptotax/](https://www.mazanek.ch/cryptotax/)
 
-### Validateur
+#### Validateur
 
 Type d'impôt: revenu provenant d’une activité lucrative indépendante (indémnité) + fortune
 
 Si le staking n’est pas effectué par un staking-pool, il faut vérifier, dans le cas de personnes physiques agissant comme validateurs, si l’on est en présence d’une activité lucrative indépendante. Si tel est le cas, ces indemnités sont imposables en tant que revenu provenant d’une activité lucrative indépendante
 
-## Mining
+### Minage (Mining)
 
 Type d'impôt: revenu , éventuellement  revenu provenant d’une activité lucrative indépendante
 
