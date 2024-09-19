@@ -37,7 +37,7 @@ There are three main type of accounts in Solana
 
 The data stored on every account on Solana has the following structure known as the [AccountInfo](https://github.com/solana-labs/solana/blob/27eff8408b7223bb3c4ab70523f8a8dca3ca6645/sdk/program/src/account_info.rs#L19).
 
-![account](/home/ryan/Downloads/me/brouillon-article/blockchain/assets/article/blockchain/solana/account.png)
+![account]({{site.url_complet}}/assets/article/blockchain/solana/account.png)
 
 #### Structure
 
@@ -176,7 +176,7 @@ Reference: [solana.com/docs/core/tokens](https://solana.com/docs/core/tokens)
 
 Example
 
-![solana-token-program.drawio](/home/ryan/Downloads/me/brouillon-article/blockchain/solana/solana-token-program.drawio.png)
+![solana-token-program.drawio]({{site.url_complet}}/assets/article/blockchain/solana/solana-token-program.drawio.png)
 
 We have our *Token Program* and our *System Program*
 
