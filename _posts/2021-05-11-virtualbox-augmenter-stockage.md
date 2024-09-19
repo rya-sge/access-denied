@@ -3,7 +3,7 @@ layout: post
 title:  "VirtualBox - augmenter l'espace de stockage"
 date:   2021-05-11
 last-update: 2021-13-10
-categories: virtualisation
+categories: programmation
 tags: virtualbox virtualisation
 description: Cet article est un tutoriel pour augmenter l'espace de stockage d'une machine virtuelle avec le logiciel de virtualisation VirtualBox. 
 image: /assets/article/virtualBox/gparted.JPG
@@ -111,7 +111,6 @@ Source _: [https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1
 - [https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/](https://www.malekal.com/virtualbox-reduire-augmenter-la-taille-du-disque-virtuel/)
 - [https://linuxhint.com/increase-virtualbox-disk-size/](https://linuxhint.com/increase-virtualbox-disk-size/)
 - [https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted](https://qastack.fr/ubuntu/175174/why-cant-i-increase-the-size-of-sda1-using-gparted)
-
 
 
 

@@ -3,8 +3,8 @@ layout: post
 title:  "Docker en bref"
 date:   2021-05-11
 last-update: 2021-12-29 
-categories: virtualisation 
-tags: docker 
+categories: programmation
+tags: docker virtualisation 
 description: Liste des principales commandes de Docker
 image: /assets/article/docker/docker-horizontal-monochromatic-white.png
 ---

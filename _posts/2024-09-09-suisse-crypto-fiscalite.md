@@ -131,9 +131,11 @@ Il n'a pas à payer pour les cryptomonnaies reçues lors d'un « airdrop ». **L
 
 ## Trading: consideration en tant que professionnel
 
-Le revenu sur la fortune mobilière privée n'est pas imposé en Suisse sauf si vous êtes considérés comme un professionel.
+Les gains réalisés dans le cadre de l'achat et la vente (*cash out*) de cryptomonnaies considérées comme faisant partie du patrimoine privé ne sont pas soumis à l’impôt sur le revenu (*tax-exempt capital gains)*, sauf s’il s’agit d’un négoce considéré comme professionnel.
 
-Tout dépend dès lors de ce qu’on appelle le patrimoine privé. Ce critère est essentiel car l'article 16, alinéa 3 de la loi fédérale sur l'impôt fédéral direct (LIFD) prévoit que les plus-values sur la fortune privée ne sont pas imposables. En principe, la loi fédérale considère qu'une plus-value provient en premier lieu de la fortune privée. Il faut désormais savoir ce qui permet de le rattacher au patrimoine non privé.
+Tout dépend dès lors de ce qu’on appelle le patrimoine privé. Ce critère est essentiel car l'article 16, alinéa 3 de la loi fédérale sur l'impôt fédéral direct (LIFD) prévoit que les plus-values sur la fortune privée ne sont pas imposables. En principe, la loi fédérale considère qu'une plus-value provient en premier lieu de la fortune privée. 
+
+Il faut désormais savoir ce qui permet de le rattacher au patrimoine privé:
 
 - Détention depuis au moins 6 mois,
 - Volume de trading qui n'atteint pas cinq fois la valeur totale de vos différents portefeuilles (par exemple CHF 100'000 si votre portefeuille valait CHF 20'000),

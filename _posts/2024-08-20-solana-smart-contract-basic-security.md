@@ -4,8 +4,8 @@ title:  Solana Programs - Basic Security with Anchor
 date:   2024-08-20
 lang: en
 locale: en-GB
-categories: blockchain security
-tags: solana programs security
+categories: blockchain security solana 
+tags: programs security
 description: Basic Security tips to write Secure Solana Programs, based on School of Solana Season 5 by Ackee Blockchain Security
 image:  /assets/article/blockchain/solana/solanaLogoMark.png
 isMath: false

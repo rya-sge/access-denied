@@ -5,8 +5,8 @@ date:   2022-08-06
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain 
-tags: solana spl-token airdrop phantom
+categories: blockchain solana 
+tags: spl-token airdrop phantom
 description: This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the spl-token command-line utility.
 isMath: false
 image: /assets/article/blockchain/solana/introduction-cli/phantom-add-custom-token.PNG

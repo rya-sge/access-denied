@@ -1,18 +1,25 @@
-# Solana Core Concept
+---
+layout: post
+title:  Solana Core Concept
+date:   2024-09-19
+lang: en
+locale: en-GB
+categories: blockchain solana
+tags: blockchain
+description: This article is an introduction to the core concept around Solana,Solana Account Mode, Accounts and programs on Solana, Transactions and Instructions, Program Derived Address, Cross Program Invocation
+image:  /assets/article/blockchain/solana/solanaLogoMark.png
+isMath: false
+---
 
 This article is an introduction to the core concept around Solana, notably:
 
 - Solana Account Model
 - Accounts and programs on Solana
 - Transactions and Instructions
-- Program Derived Address
-- Cross Program Invocation
+- Program Derived Address (PDA)
+- Cross Program Invocation (CPI)
 
-This is mainly based on video by Anchor Security
-
-Build a strong understanding of the core concepts that make Solana different from other blockchains. Understanding the "Solana programming model" through these core concepts is very important to maximize your success as a Solana blockchain developer.
-
-- [Solana programming model I](https://www.youtube.com/watch?v=Plp4y27LNWs)
+This is mainly based on several video by Ackee Blockchain Security: [Solana programming model I](https://www.youtube.com/watch?v=Plp4y27LNWs), [Solana Programming Model 2](https://youtu.be/Cai1Orc1NuI?si=VsYPmeAsgviSXhfrm), [SPL Tokens on Solana ◎ Bonus Lecture](https://www.youtube.com/watch?v=iwa8SPuAjIk)
 
 [TOC]
 
@@ -110,7 +117,6 @@ The `AccountInfo` for each account includes the following fields:
   - Charged every epoch(~2 days) and are determined by account size
   - Accounts with sufficient balance to cover 2 years of rent are exempt from fees
 
-  
 
 Reference: [Solana - accounts](https://solana.com/docs/core/accounts)
 
@@ -124,9 +130,7 @@ Reference: [Solana - accounts](https://solana.com/docs/core/accounts)
 - Anyone is allowed to credit lamports to a data account
 - The owner of an account may assign a new owner if the account's data is zeroed out
 
-
-
-## Programs on Solana
+## Programs on Solana [#](https://solana.com/docs/core#programs-on-solana)
 
 In the Solana ecosystem, "smart contracts" are called programs. Each [program](https://solana.com/docs/core/accounts#program-account) is an on-chain account that stores executable logic, organized into specific functions referred to as [instructions](https://solana.com/docs/core/transactions#instruction).
 
@@ -183,22 +187,38 @@ We have our *Token Program* and our *System Program*
    3. The *Token Program* contains several different fields related to fungible tokens: supply, decimal
 3. Alice with its wallet can ask the Mint account to burn and mint tokens from the Token Account to the Alice wallet
 
-## PDA Hand on Example
+### Program Derived Address [#](https://solana.com/docs/core#program-derived-address)
 
 Program Derived Addresses (PDAs) provide developers on Solana with two main use cases:
 
 - **Deterministic Account Addresses**: PDAs provide a mechanism to deterministically derive an address using a combination of optional "seeds" (predefined inputs) and a specific program ID.
 - **Enable Program Signing**: The Solana runtime enables programs to "sign" for PDAs which are derived from its program ID.
 
-[https://solana.com/docs/core/pda](
+You can think of PDAs as a way to create hashmap-like structures on-chain from a predefined set of inputs (e.g. strings, numbers, and other account addresses).
 
+Learn more about [Program Derived Address](https://solana.com/docs/core/pda) here.
 
-
-
+Reference: [RareSkills - PDA (Program Derived Address) vs Keypair Account in Solana](https://www.rareskills.io/post/solana-pda)
 
 ## Transactions and Instructions [#](https://solana.com/docs/core#transactions-and-instructions)
 
 On Solana, we send [transactions](https://solana.com/docs/core/transactions#transaction) to interact with the network. Transactions include one or more [instructions](https://solana.com/docs/core/transactions#instruction), each representing a specific operation to be processed. The execution logic for instructions is stored on [programs](https://solana.com/docs/core/programs) deployed to the Solana network, where each program stores its own set of instructions.
+
+### 5 commandments of Solana Transactions
+
+- All program input are potentially malicious
+  - User composes an instructions/transactions
+  - User provides all the accounts
+
+- Check the signers
+
+- Check the owner
+
+- Beware of unexpected order of instructions within transaction
+
+- Think of compute budget
+
+See also my article [Solana Programs - Basic Security with Anchor](https://rya-sge.github.io/access-denied/2024/08/20/solana-smart-contract-basic-security/)
 
 Learn more about [Transactions](https://solana.com/docs/core/transactions) and [Instructions](https://solana.com/docs/core/transactions#instruction) here.
 
@@ -210,28 +230,43 @@ The Solana blockchain has a few different types of fees and costs that are incur
 - [Prioritization Fees](https://solana.com/docs/core/fees#prioritization-fees) - An optional fee to boost transactions processing order
 - [Rent](https://solana.com/docs/core/fees#rent) - A withheld balance to keep data stored on-chain
 
+**Rent** is the fee deposited into every [Solana Account](https://solana.com/docs/core/accounts) to keep its associated data available on-chain.
+
+- This fee is withheld in the normal lamport balance on every account 
+- When an account's owner no longer desires to keep this data on-chain and available in the global state, the owner can close the account and reclaim the rent deposit.
+
 Learn more about [Fees on Solana](https://solana.com/docs/core/fees) here.
-
-## Programs on Solana [#](https://solana.com/docs/core#programs-on-solana)
-
-
-
-## Program Derived Address [#](https://solana.com/docs/core#program-derived-address)
-
-Program Derived Addresses (PDAs) provide developers on Solana with two main use cases:
-
-- **Deterministic Account Addresses**: PDAs provide a mechanism to deterministically derive an address using a combination of optional "seeds" (predefined inputs) and a specific program ID.
-- **Enable Program Signing**: The Solana runtime enables programs to "sign" for PDAs which are derived from its program ID.
-
-You can think of PDAs as a way to create hashmap-like structures on-chain from a predefined set of inputs (e.g. strings, numbers, and other account addresses).
-
-Learn more about [Program Derived Address](https://solana.com/docs/core/pda) here.
 
 ## Cross Program Invocation [#](https://solana.com/docs/core#cross-program-invocation)
 
 A Cross Program Invocation (CPI) refers to when one program invokes the instructions of another program. This mechanism allows for the composability of Solana programs.
 
-You can think of instructions as API endpoints that a program exposes to the network and a CPI as one API internally invoking another API.
+Each CPI instruction must specify the following information:
+
+- **Program address**: Specifies the program being invoked
+- **Accounts**: Lists every account the instruction reads from or writes to, including other programs
+- **Instruction Data**: Specifies which instruction on the program to invoke, plus any additional data required by the instruction (function arguments).
+
+Programs can execute CPIs using either `invoke` or `invoke_signed` within their instructions
+
+- `invoke` is used when all required signatures are accessible prior to invocation, without the need for PDAs to act as signers. This is the case when you use the original transaction signature that was passed into your program.
+- `invoke_signed` is used when PDAs from the calling program are required as signers in the CPI
+
+```rust
+// Used when there are not signatures for PDAs needed
+pub fn invoke(
+    instruction: &Instruction,
+    account_infos: &[AccountInfo<'_>]
+) -> ProgramResult
+ 
+// Used when a program must provide a 'signature' for a PDA, hence the signer_seeds parameter
+pub fn invoke_signed(
+    instruction: &Instruction,
+    account_infos: &[AccountInfo<'_>],
+    signers_seeds: &[&[&[u8]]]
+) -> ProgramResult
+```
 
 Learn more about [Cross Program Invocation](https://solana.com/docs/core/cpi) here.
 
+Reference: [Solanacookbook.com/core-concepts/cpi.html#facts](https://solanacookbook.com/core-concepts/cpi.html#facts)

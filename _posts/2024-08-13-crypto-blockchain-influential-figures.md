@@ -32,6 +32,12 @@ This list is also intended to be neutral. It does not indicate whether the impac
 - **X**: Not available (Satoshi Nakamoto's identity remains anonymous)
 - **LinkedIn**: Not available
 
+#### David Chaum (eCash / Blind Signature)
+
+- **Impact:** David Chaum’s pioneering work in cryptography and digital cash laid the groundwork for Bitcoin. He created **eCash**, an early form of anonymous digital currency, and developed **blind signatures**, enabling secure, private transactions. Though eCash was centralized, it influenced Bitcoin's decentralized design. Chaum's ideas on privacy and cryptography inspired the **cypherpunk movement**, which played a key role in Bitcoin’s development. While Bitcoin differs in its use of a decentralized ledger, it builds on Chaum's vision of privacy and secure digital payments.
+- **X:** [chaumdotcom](https://x.com/chaumdotcom)
+- [Wikipedia](https://en.wikipedia.org/wiki/David_Chaum)
+
 #### Adam Back (Hashcash / Blockstream)
 
 - **Role**: CEO of Blockstream
@@ -211,4 +217,4 @@ This list is also intended to be neutral. It does not indicate whether the impac
 
 ## Reference
 
-ChatGPT with the input "List me 20 people which have the most big impact in the crypto ecosystem. Give also their X account".
+ChatGPT with the inputs "List me 20 people which have the most big impact in the crypto ecosystem. Give also their X account",  "Precise the link between David Chaum and bitcoin".

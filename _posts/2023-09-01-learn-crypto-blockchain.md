@@ -513,7 +513,9 @@ List of resources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-bloc
 
 ### Course
 
-#### [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
+#### Advanced Web3 Security Course | Part 1 [Own Thurm]
+
+Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
 
 **Cost:** free
 
