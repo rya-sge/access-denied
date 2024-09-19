@@ -18,12 +18,12 @@ body {
 }
 
 /* 
-https://stackoverflow.com/questions/28806135/jekyll-kramdown-how-to-display-table-border
+* src: https://stackoverflow.com/questions/28806135/jekyll-kramdown-how-to-display-table-border
 */
 table{
     border-collapse: collapse;
     border-spacing: 0;
-    border:2px solid #ff0000;
+    border:2px solid #000000;
 }
 
 th{
@@ -34,9 +34,5 @@ td{
     border:1px solid #000000;
 }
 
-/* https://github.com/squidfunk/mkdocs-material/discussions/3952 */
-.md-typeset td:not([class]):not(:last-child) {
-    border-right: 1px solid magenta;
-}
 
 
