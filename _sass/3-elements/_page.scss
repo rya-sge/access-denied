@@ -16,3 +16,8 @@ body {
   color: $white-color;
   background-color: $primary-color;
 }
+
+/* https://github.com/squidfunk/mkdocs-material/discussions/3952 */
+.md-typeset td:not([class]):not(:last-child) {
+    border-right: 1px solid magenta;
+}
