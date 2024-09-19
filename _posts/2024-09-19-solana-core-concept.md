@@ -37,7 +37,7 @@ There are three main type of accounts in Solana
 
 The data stored on every account on Solana has the following structure known as the [AccountInfo](https://github.com/solana-labs/solana/blob/27eff8408b7223bb3c4ab70523f8a8dca3ca6645/sdk/program/src/account_info.rs#L19).
 
-![account]({{site.url_complet}}/assets/article/blockchain/solana/account.png)
+![account]({{site.url_complet}}/assets/article/blockchain/solana/solana-account.png)
 
 #### Structure
 
