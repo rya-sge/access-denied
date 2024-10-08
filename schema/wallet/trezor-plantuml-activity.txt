@@ -1,0 +1,32 @@
+@startuml
+start
+
+:User enters PIN;
+:Read Random Salt, EDEK, PVC from Flash Storage;
+
+:Gather device info (ProcessorID, serials);
+:Salt = Concatenate device info with Random Salt;
+
+:Compute KEK, KEIV using PBKDF2 with PIN and Salt;
+
+:(dek, tag) = Decrypt EDEK using ChaCha20Poly1305 (KEK, KEIV);
+
+if (Is PVC == tag[:65]) then (yes)
+  :Store DEK for further use;
+else (no)
+  :Fail decryption;
+  stop
+endif
+
+:Load IV, ENCRDATA, TAG from Flash Storage for the protected entry;
+
+:Decrypt entry using ChaCha20Poly1305 with (DEK, IV, (KEY || APP);
+
+if (Is TAG valid?) then (yes)
+  :Return decrypted data;
+else (no)
+  :Fail decryption;
+endif
+
+stop
+@enduml

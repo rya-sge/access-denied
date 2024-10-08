@@ -183,7 +183,9 @@ There are three main lessons
 
 ## Ethereum
 
-### [Patrick Collins](https://www.youtube.com/@PatrickAlphaC)
+### Patrick Collins
+
+[YouTube Channel](https://www.youtube.com/@PatrickAlphaC)
 
 **[Blockchain, Solidity, and Full Stack Web3](https://www.youtube.com/watch?v=gyMwXuJrbJQ)**
 
@@ -223,7 +225,9 @@ There are three main lessons
 
 *In this self-paced, 10 project course, you’ll learn from industry  experts on the cutting-edge of web3, meet fellow developers, supercharge your skills through real-world applications, and mint  Proof-of-Knowledge NFTs.*
 
-### [Ethereum Developer Degree [LearnWeb3]](https://learnweb3.io/degrees/ethereum-developer-degree/)
+### Ethereum Developer Degree [LearnWeb3]
+
+[Ethereum Developer Degree [LearnWeb3]](https://learnweb3.io/degrees/ethereum-developer-degree/)
 
 **Cost:** free
 
@@ -240,7 +244,9 @@ This degree is made of 4 lessons
 - Junior
 - Senior
 
-### [Advanced Solidity: Understanding and Optimizing Gas Costs](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/)
+### Advanced Solidity: Understanding and Optimizing Gas Costs
+
+[Advanced Solidity: Understanding and Optimizing Gas Costs](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/)
 
 **Cost:** paid (Udemy)
 
@@ -360,7 +366,7 @@ The course is divided into 6 modules
 
 *Module 6: Solana Program Security*
 
-[School of Solana](https://ackeeblockchain.com/school-of-solana)
+[School of Solana [Ackee Blockchain]](https://ackeeblockchain.com/school-of-solana)
 
 **Certification:** yes 
 
@@ -421,7 +427,9 @@ You can learn Ligo with Javascript, Pascal or Camel.
 
 ## Defi
 
-#### [Decentralized Finance [Distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUAuh4F9NVZWL8zvS6dbS2r1)
+#### Decentralized Finance [Distributed lab]
+
+[YouTube Playlist](https://www.youtube.com/playlist?list=PLhZQuknA7yUAuh4F9NVZWL8zvS6dbS2r1)
 
 **Certification:** yes if you are part of a cohort
 
@@ -439,7 +447,9 @@ You can learn Ligo with Javascript, Pascal or Camel.
 - *Decentralized Identity (Circom, Iden3,  Polygon ID),*
 - *Liquid Staking (Lido, Rocket Pool).* 
 
-#### [Decentralized Finance [UC Berkeley]](https://defi-learning.org/f22)
+#### Decentralized Finance [UC Berkeley]
+
+[Website](https://defi-learning.org/f22)
 
 Organisator: Members of UC Berkeley, Stanford
 

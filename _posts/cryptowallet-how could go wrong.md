@@ -1,6 +1,15 @@
-# Crypto wallet - What could go wrong ?
-
-[TOC]
+---
+layout: post
+title:  Crypto wallet - What could go wrong ?
+date:   2024-09-19
+lang: en
+locale: en-GB
+categories: blockchain cryptography
+tags: blockchain wallet
+description: This article is an introduction to Multi-Party Computation (MPC)
+image:  /assets/article/blockchain/solana/solanaLogoMark.png
+isMath: false
+---
 
 Crypto wallets are a key piece of blockchain and crypto infrastructures. These software are generally responsible to:
 
@@ -11,6 +20,10 @@ Crypto wallets are a key piece of blockchain and crypto infrastructures. These s
 Several hacks and vulnerabilities are related to crypto wallets. This paper provides an eye about the main hacks and vulnerabilities, having affected known crypto wallets.
 
 This paper does not consider vulnerabilities which target the user, e.g. to sign a malicious transaction. 
+
+[TOC]
+
+
 
 ## Cryptography implementation
 
@@ -29,6 +42,16 @@ To obtain “high-quality” pseudo-random numbers, BitcoinJS used this library 
 This function was designed to generate pseudo-random numbers that qualify for use in cryptography. To increase their entropy, *SecureRandom* relies on the browser function *window.crypto.random*.
 
 Unfortunataly, this function was not implemented in most of navigatore (only Netscape). As such, this call in JSBN fails silently when used by early versions of BitcoinJS and entropy is subsequently gathered from **Math.random()**, wich is not designed to produce secure random numbers.
+
+
+
+Use a secure random function (SecureRandom() )
+
+Generate pseudo-random numbers that qualify for use in cryptography.
+
+Relies on the browser function *window.crypto.random*.
+
+Only implemented in Netscape
 
 Reference:
 
@@ -96,7 +119,9 @@ As a result, when a user signs a transaction on an affected dapp, the funds were
 
 When this attack doesn't not affect directly the security of the hardware wallet, it demonstrates the importance to keep external library safe.
 
-Reference: [ledger.com - A letter from Ledger Chairman & CEO Pascal Gauthier Regarding Ledger Connect Kit Exploit](https://www.ledger.com/blog/a-letter-from-ledger-chairman-ceo-pascal-gauthier-regarding-ledger-connect-kit-exploit)
+Reference: [ledger.com - A letter from Ledger Chairman & CEO Pascal Gauthier Regarding Ledger Connect Kit Exploit](https://www.ledger.com/blog/a-letter-from-ledger-chairman-ceo-pascal-gauthier-regarding-ledger-connect-kit-exploit), https://hacken.io/insights/ledger-hack-explained/ https://www.ledger.com/blog/security-incident-report
+
+![img](https://cdn.prod.website-files.com/64ef149a1d50ae58a7c04212/657dfed1d65f297b75f26cb7_Screenshot%202023-12-16%20at%2021.47.19.png)
 
 ### IOTA Trinity wallet Hack (2020)
 

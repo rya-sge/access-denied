@@ -57,6 +57,15 @@ Here the main resource is the [Compound Academy](https://compound.education/guid
 - The first release of Compound III allows borrowing of USDC using ETH, WBTC, LINK, UNI, and COMP as collateral. Although borrowers will not earn interest on their collateral, they will be able to borrow more with lower risks of liquidation and penalties while spending less on gas fees.
 - wETH market is also live now, with `Coinbase Wrapped Staked ETH(cbETH)` and `Lido Staked ETH(stETH)` as collateral.
 
+| Compound II                                                  | Compound III                                                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Uses pools for assets with no separation                     | Each market has a base asset  and no assets are shared between the markets |
+| There is a single deployment of the protocol contracts on a blockchain | Each market is a separate instance of new Comet contracts    |
+| Risk Level of some hack draining all the funds is relatively high | Risk Level of some hack draining all the funds is relatively low as the markets are completely isolated |
+| Lender earns interest on all the assets that lent to the protocol | Only the base asset earns interest, while all other assets in the market act as collateral |
+
+Reference: [compound.education/guides - compound-v2-vs-v3-compound/4](https://compound.education/guides/view/compound-v2-vs-v3-compound/4)
+
 ## Overcollateralization
 
 - Concept of credit rating can not be apply because Ethereum account are pseudonymous. It is impossible to enforce repayment in the event of a loan default
@@ -136,7 +145,7 @@ $$
 See [compound-finance/compound-protocol - JumpRateModel.sol#L56C3-L62C8](https://github.com/compound-finance/compound-protocol/blob/a3214f67b73310d547e00fc578e8355911c9d376/contracts/JumpRateModel.sol#L56C3-L62C8)
 
 ```solidity
-  uint256 private constant BASE = 1e18; 
+uint256 private constant BASE = 1e18; 
   /**
      * @notice Calculates the utilization rate of the market: `borrows / (cash + borrows - reserves)`
      * @param cash The amount of cash in the market
@@ -144,7 +153,6 @@ See [compound-finance/compound-protocol - JumpRateModel.sol#L56C3-L62C8](https:/
      * @param reserves The amount of reserves in the market (currently unused)
      * @return The utilization rate as a mantissa between [0, BASE]
      */
-
 function utilizationRate(uint cash, uint borrows, uint reserves) public pure returns (uint) {
         // Utilization rate is 0 when there are no borrows
         if (borrows == 0) {
@@ -153,7 +161,6 @@ function utilizationRate(uint cash, uint borrows, uint reserves) public pure ret
 
         return borrows * BASE / (cash + borrows - reserves);
     }
-
 ```
 
 
@@ -180,7 +187,7 @@ $$
 
 ### Borrow rate formula
 
-- It is an Increasing linear function with a y-intercept known as the *base rate* that represents the borrow rate at 0% borrow demande a *slope* representing the rate of change of the rates
+- It is an increasing linear function with a y-intercept known as the *base rate* that represents the borrow rate at 0% borrow demand and a *slope* representing the rate of change of the rates
 - These parameters are different for each ERC-20 asset supported by the platforms
 - Some market includes also a *kink*: 
   - a kink is a utilization ratio beyond which the [slope](https://ftp.worldpossible.org/endless/eos-rachel/RACHEL/RACHEL/modules/en-boundless-static/www.boundless.com/finance/definition/slope/index.html) steepens.
@@ -270,21 +277,37 @@ $$
 
 In the DAI market, 100 million is supplied and 50 millions is borrowed.
 
-Base rate = 1%
+- Base rate = 1%
 
-Slope = 10%
+- Slope = 10%
 
 At 50 million borrowed, utilization is 50%
 
-borrow interest rate =  utilization * Slope + base rate ???
+$$
+\begin{aligned}[b]
+borrow~ interest~ rate =  utilization * Slope + base ~rate ???
+.\end{aligned}
+$$
 
-borrow interest rate =  0.5 (?) * 0.1 + 0.01 = 0.06 = 6%
+$$
+\begin{aligned}[b]
+borrow~ interest~ rate =  0.5 * 0.1 + 0.01 = 0.06 = 6\%
+.\end{aligned}
+$$
 
-maximum supply rate wtih  a reserve factor of zero:
+maximum supply rate wtih a reserve factor of zero:
 
-maximum supplyy rate = utilization ratio * borrow interest rate
+$$
+\begin{aligned}[b]
+maximum~supply ~rate = utilization~ ratio * borrow~ interest ~rate
+.\end{aligned}
+$$
 
-0.5 * 0.06 = 0.03 or 3%
+$$
+0.5 * 0.06 = 0.03 ~or~ 3\%
+$$
+
+
 
 #### Example 2
 
@@ -339,7 +362,7 @@ $$
 
 ### Advantage of Compound
 
-- Unlock value of asset without selling it (like a HELOC ?)
+- Unlock value of asset without selling it, like a *home equity line of credit *(HELOC)
 - Easily engineer levered long or short positions
 - Suppose you are bearing on price of ETH
   - Deposit stablecoin like USDC or DAI
@@ -352,7 +375,7 @@ $$
 - The compound protocol must escrow tokens as a depositor in order to mainthan that liquidity for the platform itself and to keep track of each person's ownership stake in each market
 - A naive approach woul be to keep track of the number inside a contract
 - A better approach would be to tokenize the user's share
-- Compound does this using a cToken, and this one of the platform's important innovations
+- Compound does this using a **cToken**, and this one of the platform's important innovations
 
 ### Burn and mint
 
@@ -361,8 +384,8 @@ cTokens are minted and burned
 - Compound's cToken is an ERC-20 in its own right that represents an ownership stake in the underlying Compound market
 
 - For example, 
-  - cDAI corresponds to the Compound DAI market 
-  - cETH corresponds to the Compound ETH market
+  - `cDAI` corresponds to the Compound DAI market 
+  - `cETH` corresponds to the Compound ETH market
 - Both tokens are minted and burned in proportion to the funds added and removed from the underlying market as a means to track the amount belonging to a specific investor
 
 ### cTokens can be traded
