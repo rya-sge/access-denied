@@ -6,12 +6,12 @@ lang: en
 locale: en-GB
 categories: blockchain
 tags: blockchain
-description: This article presents the architecture and the behavior of Compound V2,  an Ethereum smart contract for supplying or borrowing assets
+description: This article presents the architecture and the behavior of Compound V2, a DeFi protocol on Ethereum for supplying or borrowing assets
 image:  /assets/article/blockchain/defi/compound/compound-comp-logo.png
 isMath: true
 ---
 
-This article presents the architecture and the behavior of Compound V2,  an Ethereum smart contract for supplying or borrowing assets. The content of this article is mainly taken up and annotated from the following resources:
+This article presents the architecture and the behavior of Compound V2, a DeFi protocol on Ethereum for supplying or borrowing assets. The content of this article is mainly taken up and annotated from the following resources:
 
 - A  free [online course](https://www.youtube.com/playlist?list=PLE1Vu6ctbqa7Df5YJgMtH1xCcy0yX_dri) made by Cambell Harvey.
 - Compound V2 Documentation: [docs.compound.finance/v2/](https://docs.compound.finance/v2/)

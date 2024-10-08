@@ -1,7 +1,7 @@
 
 
 > layout: post
-> title: The different types of crypto wallets and their associated risks
+> title: Crypto Wallets Explained: Types, Risks, and How to select it
 > date:   2024-10-08
 > lang: en
 > locale: en-GB
