@@ -1,17 +1,15 @@
-
-
-> layout: post
-> title: Crypto Wallets Explained: Types, Risks, and How to select it
-> date:   2024-10-08
-> lang: en
-> locale: en-GB
-> categories: blockchain cryptography
-> tags: blockchain wallet trezor ledger metamask
-> description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
-> image: 
-> isMath: false
-
-
+---
+layout: post
+title: Crypto Wallets Explained: Types, Risks, and How to select it
+date:   2024-10-08
+lang: en
+locale: en-GB
+categories: blockchain cryptography
+tags: blockchain wallet trezor ledger metamask
+description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
+image: 
+isMath: false
+---
 
 Cryptocurrencies such as Bitcoin or Ethereum require a private key to prove ownership of the asset. Most often, this key is generated and stored by a software called a crypto wallet. 
 
@@ -81,7 +79,7 @@ Example: [bitget](https://web3.bitget.com/en), [cropty.io - web-wallet](https://
 
 ### 2. **Warm Wallets**
 
-This type of wallets is installed and stored the private keys on devices used in everyday life
+This type of wallets is installed and stored the private keys on devices generally used in everyday life.
 
 They are not permanently connected to internet, for example because the device can be turned off, but are subject to threats posed by internet, such as downloading malware.
 

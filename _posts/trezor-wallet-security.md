@@ -1,6 +1,28 @@
 ## **Trezor Crypto Wallet Security: An In-Depth Review**
 
-As the world of cryptocurrency continues to grow, the need for secure storage solutions has become paramount. Among the most popular and trusted hardware wallets for storing digital assets securely is **Trezor**, a product developed by SatoshiLabs. With a reputation built around security, Trezor offers two main models—Trezor One and Trezor Model T—each designed to provide users with a high level of protection for their cryptocurrency holdings. This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize, and the differences between their two models.
+Hardware wallets are physical devices that store private keys offline. 
+
+A **hardware wallet** is one of the most trusted tools for safeguarding cryptocurrencies yourself (self-custodial), providing robust security by keeping your private keys offline and away from online threats, protecting them from hacking and malware.
+
+Among the most popular and trusted hardware wallets for storing digital assets securely is **Trezor**, a product developed by SatoshiLabs. 
+
+Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with a high level of protection for their cryptocurrency holdings. 
+
+This article presents the different security features availabe, how your private key are protected, ...
+
+This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize,
+
+Firstly here a summary of the different option available depending of the models.
+
+| Model                                                        | Seed phrase backup               |  | Device Security       |         | Authentication                             |                              |
+| ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- |
+|                                                                              | &#x2611; | Multi Share |Pin & passphrase protection|Secure element|Two-factor authentication|FIDO2 Standard|
+| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
+| [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; |  | &#x2611;       | &#x2612; |
+| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
+| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
+
+
 
 ### **Core Security Features of Trezor Wallets**
 
@@ -52,10 +74,6 @@ https://docs.trezor.io/trezor-firmware/storage/index.html#pin-verification-and-d
 [PIN verification and decryption of protected entries in flash storage](https://docs.trezor.io/trezor-firmware/storage/index.html#pin-verification-and-decryption-of-protected-entries-in-flash-storage)
 
 ![trezor-pin-diagram-activity](/home/ryan/Downloads/me/access-denied/assets/article/cryptographie/wallet/trezor-pin-diagram-activity.png)
-
-
-
-
 
 
 
@@ -119,8 +137,6 @@ KEK || KEIV = *PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations
 
 
 
-
-
 #### 3. **HMAC-SHA512 for Password Stretching**
 
 When encrypting passwords or keys, Trezor uses **HMAC-SHA512** to “stretch” passwords, which makes brute-force attacks more difficult. HMAC  adds an extra layer of security when handling cryptographic keys, making it harder for attackers to recover the seed phrase or private keys from device data.
@@ -142,9 +158,7 @@ Trezor offers two primary models: **Trezor One** and **Trezor Model T**, both sh
 - **Security:** Provides robust security through features like PIN protection, recovery seed, and offline storage of private keys.
 - **Interface:** Trezor One has a **two-button interface** and a small monochrome screen, making it functional but minimalistic.
 
-#### 2. **Trezor Model T**
-
-- **Enhanced Security:** The Model T introduces an advanced feature with **Shamir Backup** (SLIP39), which splits your recovery seed into multiple parts, improving recovery safety.
+- 
 
 ### **Additional Security Considerations**
 
