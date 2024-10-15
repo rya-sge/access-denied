@@ -1,28 +1,24 @@
 ## **Trezor Crypto Wallet Security: An In-Depth Review**
 
-Hardware wallets are physical devices that store private keys offline. 
-
-A **hardware wallet** is one of the most trusted tools for safeguarding cryptocurrencies yourself (self-custodial), providing robust security by keeping your private keys offline and away from online threats, protecting them from hacking and malware.
+A **hardware wallet** is one of the most trusted tools for safeguarding cryptocurrencies yourself (self-custodial), providing robust security by keeping your private keys offline and away from online threats,  reducing the risk of hacking and malware.
 
 Among the most popular and trusted hardware wallets for storing digital assets securely is **Trezor**, a product developed by SatoshiLabs. 
 
-Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with a high level of protection for their cryptocurrency holdings. 
+Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with several functionalities to protects its assets.
 
-This article presents the different security features availabe, how your private key are protected, ...
+This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize,  how they protect the seed phrase and the private key.
 
-This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize,
+Firstly here a summary of the different options related to security available depending of the models.
 
-Firstly here a summary of the different option available depending of the models.
+| Model                                                        | Seed phrase backup         |  | Device Security       |        |         | Authentication                             |                              |
+| ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- |
+|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|Secure element protected|Two-factor authentication|FIDO2 Standard|
+| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; |  |  | &#x2611; | &#x2611; |
+| [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; | &#x2612; | &#x2612; | &#x2611;       | &#x2612; |
+| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | Certified Chip EAL6+ | &#x2611; | &#x2611; |
+| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | Certified Chip EAL6+ | &#x2611; | &#x2611; |
 
-| Model                                                        | Seed phrase backup               |  | Device Security       |         | Authentication                             |                              |
-| ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- |
-|                                                                              | &#x2611; | Multi Share |Pin & passphrase protection|Secure element|Two-factor authentication|FIDO2 Standard|
-| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
-| [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; |  | &#x2611;       | &#x2612; |
-| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
-| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; |  | &#x2611; | &#x2611; |
-
-
+See also https://trezor.io/compare
 
 ### **Core Security Features of Trezor Wallets**
 
@@ -59,7 +55,9 @@ References: [Trezor - How to use a recovery seed](https://trezor.io/learn/a/how-
 
 #### 5. **Firmware Updates**
 
-Trezor regularly releases **firmware updates** to fix bugs, patch vulnerabilities, and add new features. There are several protection to avoid a malicious updates:
+Trezor regularly releases **firmware updates** to fix bugs, patch vulnerabilities, and add new features.  In case of a compromission of the Trezor architecture, a malicious firmware update could have a disastrous result and compromise your funds.
+
+There are several protection put in place by Trezor to avoid a malicious updates:
 
 - These updates require user confirmation via the device’s screen, preventing unauthorized or malicious firmware installations. 
 - The firmware is also **signed** by SatoshiLabs, ensuring the authenticity of the update before installation.
@@ -148,17 +146,6 @@ Trezor follows industry-standard protocols, such as:
 - **BIP-32**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
 - **BIP-39**: Governs the creation of mnemonic seed phrases for easy wallet backups.
 - **BIP-44**: Allows for managing multiple cryptocurrency accounts from a single seed phrase, ensuring compatibility across different blockchain networks.
-
-### **Trezor One vs. Trezor Model T: A Security Comparison**
-
-Trezor offers two primary models: **Trezor One** and **Trezor Model T**, both sharing core security features but differing in their user experience and some advanced features.
-
-#### 1. **Trezor One**
-
-- **Security:** Provides robust security through features like PIN protection, recovery seed, and offline storage of private keys.
-- **Interface:** Trezor One has a **two-button interface** and a small monochrome screen, making it functional but minimalistic.
-
-- 
 
 ### **Additional Security Considerations**
 
