@@ -3,7 +3,7 @@ layout: post
 title:  "Tezos Academy - Overview"
 date:   2023-08-11
 last-update: 
-categories: blockchain programmation
+categories: blockchain
 lang: en
 locale: en-GB
 tags: tezos ligo blockchain JavaScript

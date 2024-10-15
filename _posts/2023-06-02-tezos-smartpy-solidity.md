@@ -5,7 +5,7 @@ date: 2023-06-02
 last-update: 
 locale: en-GB
 lang: en
-categories: blockchain programmation ethereum solidity
+categories: blockchain ethereum solidity
 tags: solidity tezos smartpy
 image:
 description: This articles describes a correspondence table between the smart contract languages Solidity (Ethereum) and SmartPy / Python (Tezos).

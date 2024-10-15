@@ -30,7 +30,7 @@ From a cryptography perspective, these blockchains use most often public key cry
 1. **Public Key**: This is similar to an account number. You can share your public key with others to receive payments.
 2. **Private Key**: The private key functions as a password, granting access to your crypto holdings. You must keep this key secure, as anyone with access to it can control your funds.
 
-![crypto-wallet-Page-2.drawio](/home/ryan/Downloads/me/access-denied/assets/article/cryptographie/wallet/crypto-wallet-Page-2.drawio.png)
+
 
 
 
