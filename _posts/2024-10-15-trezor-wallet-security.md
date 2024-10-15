@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Trezor Crypto Wallet Security: An In-Depth Review
+title: Trezor Crypto Wallet Security - An In-Depth Review
 date:   2024-10-15
 lang: en
 locale: en-GB
