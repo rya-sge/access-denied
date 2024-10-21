@@ -38,6 +38,8 @@ Crypto wallets come in various forms, each catering to different user needs base
 
 These categories classify wallets mainly based on their connectivity and their exposure to the internet, and consequently to cyber threats such as malware, phishing, etc.
 
+![account]({{site.url_complet}}/assets/article/blockchain/wallet/wallet-introduction/crypto-wallet-category.png)
+
 ### 1. **Hot Wallets**
 
 Hot wallets are connected to the internet and allow for quick and easy access to your crypto assets. These wallets are typically more user-friendly, making them ideal for beginners or frequent traders. However, their constant internet connection makes them vulnerable to hacking attempts.
@@ -48,8 +50,9 @@ There are two main types of hot wallets: web wallets and smart contract based wa
 
 - Centralized Web Wallets  
 
-
 They are hosted on cloud servers and can be accessed from any device with an internet connection. Web wallets are easy to set up but often require you to trust a third party with your private keys.
+
+Example: [bitget](https://web3.bitget.com/en), [cropty.io - web-wallet](https://www.cropty.io/web-wallet)
 
 - MPC wallet
 
@@ -57,13 +60,13 @@ These wallet uses MPC with a Multi-signature scheme. MPC wallet will split the p
 
 In principle, MPC wallets are always connected to the internet, but their access will most often be protected via firewall rules and governance rules. Additionally, the different shares used to compute the private key can be store in different ways, on an hardware device, similar to a cold wallet or on a mobile/computer device similar to a warm wallet.
 
-An example is [zengo wallet](https://zengo.com), which provide a self-custodial MPC wallet with tow shares: where one share is stored on Zengo's server and the other share is stored on the user mobile device
+An example is [zengo wallet](https://zengo.com), which provide a self-custodial MPC wallet with two shares: where one share is stored on Zengo's server and the other share is stored on the user mobile device
 
 Reference: [liminal - What are MultiSig and MPC Wallets?](https://www.liminalcustody.com/knowledge-center/what-are-multisig-and-mpc-wallets/)
 
 - smart contract based wallet
 
-These wallets are managed by smart contracts. They are mainly used for Ethereum and EVM blockchains. One of the most known wallet is the one from Safe which allows multi-signature access and are self-custodial. Since smart contracts are always accessible through blockchain, they are therefore considered as hot wallets.
+These wallets are managed by smart contracts. They are particularly present on Ethereum and EVM blockchains. One of the most known wallet is the one from [Safe](https://app.safe.global/welcome) which allows multi-signature access and are self-custodial. Since smart contracts are always accessible through blockchain, they are therefore considered as hot wallets.
 
 With account abstraction, some smart contract based wallets are used in conjunction with an MPC protocol
 
@@ -83,7 +86,7 @@ This type of wallets is installed and stored the private keys on devices general
 
 They are not permanently connected to internet, for example because the device can be turned off, but are subject to threats posed by internet, such as downloading malware.
 
-the use of [Metamask as a cold wallet](https://www.reddit.com/r/ethereum/comments/101tfe2/using_metamask_as_a_cold_wallet/)
+A warm wallet can be turned into a cold wallet if it is installed on a dedicated device but we don't see it very offen in practice. As an exemple, see [Metamask as a cold wallet](https://www.reddit.com/r/ethereum/comments/101tfe2/using_metamask_as_a_cold_wallet/)
 
 There are three way to have these wallets:
 

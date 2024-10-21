@@ -95,6 +95,10 @@ In their case, they decide to design their own hash function *Curl*. This hash f
 
 For their PoC, these researchers  managed to produce two payments in IOTA which are different, but hash to the same value, and thus have the same signature. 
 
+- Managed to produce two different payments in IOTA 
+- With the same hash value
+- Same valid signature
+
 This attack could be used by a bad actor to destroy or steal users’ funds.
 
 Reference: [Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367)
@@ -145,11 +149,19 @@ c.  Sent the seed and password to a server controlled by the attacker.
 
 Before transferring tokens out, the attacker awaited the release of a new Trinity version, which would overwrite Trinity’s cache files and thus remove the remaining traces of the hacker
 
+
+
+
+
+ersions of Moonpay’s software development kit (SDK), which was being loaded automatically from Moonpay’s servers (their content delivery network) when a user opened Trinity. The code was loaded into the local Trinity instance, and, after the user’s wallet was unlocked, decrypted the user’s seed and sent the seed and password to a server controlled by the attacker. Bef
+
 Reference:
 
 - [blog.iota - Trinity Attack Incident Part 1: Summary and next steps](https://blog.iota.org/trinity-attack-incident-part-1-summary-and-next-steps-8c7ccc4d81e8/)
 
 - [fullycrypto.com - IOTA Releases Comprehensive Trinity Wallet Hack Reports](https://fullycrypto.com/iota-releases-comprehensive-trinity-wallet-hack-reports)
+
+- https://medium.com/@iotafoundation/trinity-attack-incident-part-3-key-learnings-takeaways-c933de22fd0a
 
 ### MyAlgo (2023)
 
@@ -167,7 +179,32 @@ In 2017, an attacker exploited a critical vulnerability in the Parity multi-sign
 
 Reference: [The Parity Wallet Hack Explained](https://blog.openzeppelin.com/on-the-parity-wallet-multisig-hack-405a8c12e8f7), [An In-Depth Look at the Parity Multisig Bug](https://hackingdistributed.com/2017/07/22/deep-dive-parity-bug/)
 
+## selfdestruct
 
+https://github.com/openethereum/parity-ethereum/issues/6995
+
+1. [Original Security Alert](https://paritytech.io/blog/security-alert.html)
+2. [Parity Technologies Multi-Sig Wallet Issue Update](https://paritytech.io/blog/parity-technologies-multi-sig-wallet-issue-update.html)
+3. [A Postmortem on the Parity Multi-Sig Library Self-Destruct](https://paritytech.io/a-postmortem-on-the-parity-multi-sig-library-self-destruct/)
+4. [On Classes of Stuck Ether and Potential Solutions](https://paritytech.io/on-classes-of-stuck-ether-and-potential-solutions/)
+
+FYI, the transaction that was submitted here:
+https://etherscan.io/tx/0x05f71e1b2cb4f03e547739db15d080fd30c989eda04d37ce6264c5686e0722c9
+
+The transaction Successfully completed here:
+https://etherscan.io/tx/0x47f7cff7a5e671884629c93b368cb18f58a993f4b19c2a53a8662e3f1482f690
+
+https://www.slideshare.net/slideshow/smart-contract-security-and-honey-pots/120341143
+
+https://etherscan.io/tx/0x47f7cff7a5e671884629c93b368cb18f58a993f4b19c2a53a8662e3f1482f690
+
+https://blog.openzeppelin.com/parity-wallet-hack-reloaded
+
+https://medium.com/hackernoon/what-caused-the-latest-100-million-ethereum-bug-and-a-detection-tool-for-similar-bugs-7b80f8ab7279
+
+https://github.com/SolidCheck/parity-ethereum-hack
+
+https://www.elementus.io/blog-post/which-icos-are-affected-by-the-parity-wallet-bug
 
 ## Bad configuration
 
@@ -183,11 +220,19 @@ Quickly, a culprit emerged: Slope wallet
 
 After a more longer analysis,  several researchers found that the Slope crypo wallet leaked information about the seed phrase with the implementation of Sentry, a tool for logging events.
 
-Slope’s mobile app sends off mnemonics via TLS to their centralized Sentry server.  These mnemonics are then stored in plaintext, meaning anybody with access to Sentry could access user private keys.
+Cause: Slope’s mobile app sends off mnemonics via TLS to their centralized Sentry server.  These mnemonics are then stored in plaintext, meaning anybody with access to Sentry could access user private keys.
 
 ![](https://x.com/osec_io/status/1555087560887922688/photo/1)
 
 This was notably confirmed by the security firm OtterSec.
+
+Sentry:
+
+- provides automatic keyword filters on the basis of a blacklist
+- data logged is encrypted during transmission to the server
+- Stored on an encrypted and access-controlled database
+
+=> collection and encryption)
 
 Reference: [Ottersec tweet](https://x.com/osec_io/status/1555087560887922688?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1555087560887922688%7Ctwgr%5E853fa774d6163ab7cb03b5c9d01dbcade82d7131%7Ctwcon%5Es1_&ref_url=https%3A%2F%2Fdiscover.luno.com%2Fwhat-exactly-happened-in-the-slope-finance-hack%2F), [Slope Wallet Sentry Vulnerability — Digital Forensics and Incident Response Report](https://slope-finance.medium.com/slope-wallet-sentry-vulnerability-digital-forensics-and-incident-response-report-d7a5904e5a39)
 
@@ -207,7 +252,7 @@ The conclusion of their analysis is that it is possible to mount two profiled si
   
   The PIN verification function code extracted from the firmware source code is presented below:
   
-  ![https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png](https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png)
+  ![https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png](/home/ryan/Downloads/pincode.png)
   
   
 
@@ -217,6 +262,10 @@ In the funtion, two operations are sensitive to side channel attacks:
 - There is a particular sensitive value depending on the secret that  looks interesting: the value, at each step of the while loop of the  subtraction: `storageRom->pin[i] — presented_pin[i] for 0 ≤ i < 4`. This sensitive value handles both the secret and the input value,  allowing a side-channel attacker to induce differentiability.
 
 Reference: https://www.ledger.com/blog/Breaking-Trezor-One-with-SCA
+
+[[Side-Channel assessment of Open Source Hardware Wallets](https://www.sstic.org/2019/presentation/side_channel_assessment_hardware_wallets/)](https://www.sstic.org/2019/presentation/side_channel_assessment_hardware_wallets/)
+
+https://www.sstic.org/media/SSTIC2019/SSTIC-actes/side_channel_assessment_hardware_wallets/SSTIC2019-Article-side_channel_assessment_hardware_wallets-guillemet_san-pedro_servant.pdf
 
 ## Reference
 

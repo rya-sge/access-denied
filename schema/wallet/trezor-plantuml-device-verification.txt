@@ -1,0 +1,22 @@
+@startuml
+actor User
+participant "Trezor Suite" as Suite
+participant "Trezor Device" as Trezor
+participant "Secure Element" as SE
+
+User -> Suite: Starts device setup
+Suite -> Suite: Generates random challenge
+Suite -> Trezor: Sends random challenge
+
+Trezor -> SE: Request to sign random challenge
+SE -> Trezor: Signed challenge
+Trezor -> Suite: Sends signed challenge + device certificate
+
+Suite -> Suite: Verifies challenge signature
+Suite -> Suite: Verifies device certificate signature
+alt Valid Signatures
+    Suite -> User: Device authentication successful
+else Invalid Signatures
+    Suite -> User: Device authentication failed
+end
+@enduml

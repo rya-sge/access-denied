@@ -61,6 +61,10 @@ Deactivate SELFDESTRUCT by changing it to SENDALL. The [EIP-6780](https://ethere
 
 This section describes the common vulnerabilities and risks related to the use of `selfdestruct` in a contract.
 
+
+
+![selfdestruct.drawio]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/selfdestruct.drawio.png)
+
 ### Impossibility to work
 
 If a contract A called a contrat B (or a library) to execute code withtouh verifying that the contract is still in live (not destructed), a self destruct on the contract B can block the contract A for ever. 

@@ -80,7 +80,7 @@ Reference: [Security & safety in Trezor ](https://trezor.io/learn/a/security-saf
 
 This section is based on the following resource: [PIN verification and decryption of protected entries in flash storage](https://docs.trezor.io/trezor-firmware/storage/index.html#pin-verification-and-decryption-of-protected-entries-in-flash-storage)
 
-![trezor-pin-diagram-activity]({site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-pin-diagram-activity.png)
+![trezor-pin-diagram-activity]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-pin-diagram-activity.png)
 
 ### Main Cryptography algorithm
 
@@ -127,7 +127,7 @@ See [datatracker.ietf.org/doc/html/rfc4868#page-3](https://datatracker.ietf.org/
 
 Here's an explanation of the key terms used in Trezor's encryption and PIN verification process:
 
-### 1. **KEK (Key Encryption Key)**
+### 1. KEK (Key Encryption Key)
 
 - **What it is**: The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
 
@@ -137,19 +137,19 @@ KEK || KEIV = *PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations
 - **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
 - This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
 
-### 2. **KEIV (Key Encryption Initialization Vector)**
+### 2. KEIV (Key Encryption Initialization Vector)
 
 - **What it is**: The **KEIV** is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
 - **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
 - **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
 
-### 3. **DEK (Data Encryption Key)**
+### 3. DEK (Data Encryption Key)
 
 - **What it is**: The **DEK** is the actual key used to **encrypt and decrypt protected data** stored in flash storage.
 - **Purpose**: The DEK protects sensitive data entries in the device’s flash memory. It is derived by decrypting the **EDEK** with the KEK and KEIV.
 - **How it works**: The DEK is used to encrypt and decrypt specific entries (e.g., secrets, settings) in the storage. Without the correct DEK, these entries cannot be read or tampered with.
 
-### 4. **PVC (PIN Verification Code)**
+### 4. PVC (PIN Verification Code)
 
 - **What it is**: The **PVC** is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
 - **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
@@ -163,15 +163,37 @@ KEK || KEIV = *PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations
 - **DEK** is used for encrypting and decrypting sensitive data entries in flash storage.
 - **PVC** verifies whether the correct PIN was used for the entire process.
 
-#### 4. **BIP-32, BIP-39, and BIP-44 Standards**
+#### 4. BIP-32, BIP-39, and BIP-44 Standards
 
 Trezor follows industry-standard protocols, such as:
 
-- **BIP-32**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
-- **BIP-39**: Governs the creation of mnemonic seed phrases for easy wallet backups.
-- **BIP-44**: Allows for managing multiple cryptocurrency accounts from a single seed phrase, ensuring compatibility across different blockchain networks.
+- **[BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
+- **[BIP-3](https://en.bitcoin.it/wiki/BIP_0039)9**: Governs the creation of mnemonic seed phrases for easy wallet backups.
+- **[BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)**: Allows for managing multiple cryptocurrency accounts from a single seed phrase, ensuring compatibility across different blockchain networks.
 
-### **Additional Security Considerations**
+The derivation path used in BIP44 follows this structure: 
+
+` m / purpose' / coin_type' / account' / change / address_index`
+
+Thanks to `address_index`, you can have several different addresses for the same account, which is not possible with Ethereum
+
+See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=AfmBOopiSIUJDwPISXP5YbzFws1lFEToUwG52ITiM1Y72akbpyvNp8it)
+
+
+
+### Trezor Safe device authentication check
+
+https://trezor.io/learn/a/trezor-safe-device-authentication-check?srsltid=AfmBOop0W1xDHTDEwAC-EfOlqIFsRG0wLju-VK8r6bPw3ORQNcaFeD8c
+
+1. Trezor Suite generates a random challenge which is then sent to the Trezor.
+2. In response, the Trezor uses the Secure Element to sign this random challenge and returns both the signature and the device certificate.
+3. To confirm the authenticity of the device, Trezor Suite verifies the signatures of the challenge and the signature on the certificate.
+
+![trezor-secure-element](../assets/article/blockchain/wallet/trezor/trezor-secure-element.png)
+
+During the manufacturing process of the Trezor Safe hardware wallets, a unique certificate is issued to the new device before it leaves the production line. This certificate is stored in the Secure Element. When setting up your device,
+
+### Additional Security Considerations
 
 #### 1. **Physical Security**
 
