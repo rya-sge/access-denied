@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title:  Overview, security and applications of Multi-Party Computation (MPC)
 date:   2024-09-19
@@ -9,7 +9,7 @@ tags: blockchain wallet
 description: This article is an introduction to Multi-Party Computation (MPC)Mathematical Foundation of MPC
 image: 
 isMath: true
-```
+---
 
 **Multi-Party Computation (MPC)** is a cryptographic technique that enables multiple parties to jointly compute a function over their private inputs without revealing those inputs to one another. 
 
