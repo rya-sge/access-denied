@@ -8,7 +8,7 @@ categories: blockchain cryptography security
 tags: blockchain wallet trezor hardware
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
 image: 
-isMath: false
+isMath: true
 ---
 
 A **hardware wallet** is one of the most trusted tools for safeguarding cryptocurrencies yourself (self-custodial), providing robust security by keeping your private keys offline and away from online threats,  reducing the risk of hacking and malware.
@@ -131,7 +131,11 @@ Here's an explanation of the key terms used in Trezor's encryption and PIN verif
 
 - **What it is**: The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
 
-KEK || KEIV = *PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations = 10000, dkLen = 352 bits)*
+$$
+KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations = 10000, dkLen = 352 bits)
+$$
+
+
 
 - **Purpose**: The KEK is used to **decrypt the Encrypted Data Encryption Key (EDEK)**, allowing access to the actual Data Encryption Key (DEK).
 - **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
@@ -168,7 +172,7 @@ KEK || KEIV = *PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations
 Trezor follows industry-standard protocols, such as:
 
 - **[BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
-- **[BIP-3](https://en.bitcoin.it/wiki/BIP_0039)9**: Governs the creation of mnemonic seed phrases for easy wallet backups.
+- **[BIP-39](https://en.bitcoin.it/wiki/BIP_0039)**: Governs the creation of mnemonic seed phrases for easy wallet backups.
 - **[BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)**: Allows for managing multiple cryptocurrency accounts from a single seed phrase, ensuring compatibility across different blockchain networks.
 
 The derivation path used in BIP44 follows this structure: 
@@ -183,15 +187,17 @@ See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=Af
 
 ### Trezor Safe device authentication check
 
-https://trezor.io/learn/a/trezor-safe-device-authentication-check?srsltid=AfmBOop0W1xDHTDEwAC-EfOlqIFsRG0wLju-VK8r6bPw3ORQNcaFeD8c
-
 1. Trezor Suite generates a random challenge which is then sent to the Trezor.
 2. In response, the Trezor uses the Secure Element to sign this random challenge and returns both the signature and the device certificate.
 3. To confirm the authenticity of the device, Trezor Suite verifies the signatures of the challenge and the signature on the certificate.
 
-![trezor-secure-element](../assets/article/blockchain/wallet/trezor/trezor-secure-element.png)
+![trezor-secure-element]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-secure-element.png)
 
-During the manufacturing process of the Trezor Safe hardware wallets, a unique certificate is issued to the new device before it leaves the production line. This certificate is stored in the Secure Element. When setting up your device,
+During the manufacturing process of the Trezor Safe hardware wallets, a unique certificate is issued to the new device before it leaves the production line. This certificate is stored in the Secure Element. 
+
+Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+
+
 
 ### Additional Security Considerations
 
