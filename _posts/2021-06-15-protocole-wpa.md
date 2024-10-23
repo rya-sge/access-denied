@@ -10,6 +10,14 @@ image: /assets/article/reseau/wpa/wpa-schema.png
 
 Cet article résume les principaux points du protocole WPA.
 
+Le **WPA** (Wi-Fi Protected Access) est un protocole de sécurité destiné aux réseaux sans fil (Wi-Fi). 
+
+Introduit en 2003 par la Wi-Fi Alliance, il avait pour objectif de corriger les failles du protocole précédent, le WEP (Wired Equivalent Privacy), qui contenait de nombreuses vulnérabilités, notamment liées à son protocole de chiffrement [RC4](https://fr.wikipedia.org/wiki/RC4).  Pour plus de détail, voir mon [article](https://rya-sge.github.io/access-denied/2022/04/28/protocole-wep/) sur les vulnérabilités dans WEP.
+
+WPA apporte des améliorations significatives en termes de cryptographie et de gestion des clés, renforçant ainsi la sécurité des réseaux sans fil. 
+
+Il a été suivi par **WPA2** qui remplace l'algorithme TKIP par [CCMP](https://fr.wikipedia.org/wiki/Counter-Mode/CBC-Mac_protocol) et ensuite WPA3.
+
 ## Résumé
 
 - Nouveau contrôle intégrité *Message Integrity Code*
@@ -105,4 +113,6 @@ Les stations n'ont pas le droit d'envoyer elle-même des messages en *broadcast*
 
 ### Sources 
 
-Cours de Sécurité des Réseaux (SRX) enseigné à la HEIG-VD en 2021.
+- Cours de Sécurité des Réseaux (SRX) enseigné à la HEIG-VD en 2021.
+- [Wikipedia - Wi-Fi Protected Access](https://en.wikipedia.org/wiki/Wi-Fi_Protected_Access)
+- ChatGTP avec l'entrée "Ecris moi un article, en français sur WPA. Parle de la sécurité, cryptographie, etc."

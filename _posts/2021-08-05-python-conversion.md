@@ -43,7 +43,7 @@ produira la sortie suivante :
 
 Sources :
 
-- [https://docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
+- [docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
 
 #### bytes -> int
 
@@ -224,10 +224,10 @@ Dans le code d'exemple ci-dessus, j'ai ajouté [2:] pour ne  pas prendre le "0x"
 
 Ressources complémentaires :
 
-- Documentation python : [https://docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
+- Documentation python : [docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
 
 - [Convertir hexadécimal en octet en Python](https://www.delftstack.com/fr/howto/python/python-convert-hex-to-byte/)
-- [https://200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
+- [200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
 
 ## byte hexa string <-> bytes
 
@@ -248,13 +248,13 @@ produira la sortie suivante :
 
 
 
-Sources : [https://docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
+Sources : [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
 
 ## Sources
 
 - Documentation officielle de python :[https://docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
 - [stackoverflow.com - Convert hex string to int in Python](https://stackoverflow.com/questions/209513/convert-hex-string-to-int-in-python)
-- https://docs.python.org/fr/3.7/library/stdtypes.html)
+- [docs.python.org - stdtypes](https://docs.python.org/fr/3.7/library/stdtypes.html)
 
 - [Convertir hexadécimal en octet en Python](https://www.delftstack.com/fr/howto/python/python-convert-hex-to-byte/)
 - [https://200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)

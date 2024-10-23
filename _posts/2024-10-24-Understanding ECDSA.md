@@ -1,6 +1,21 @@
-# Understanding ECDSA (Elliptic Curve Digital Signature Algorithm)
+---
+layout: post
+title: Overview of ECDSA, the digital Signature Algorithm, and its mechanics
+date:   2024-10-23
+lang: en
+locale: en-GB
+categories: blockchain cryptography
+tags: blockchain wallet
+description: Learn how ECDSA (Elliptic Curve Digital Signature Algorithm) works, its role in digital signatures, and its different use cases, notably in Blockchain.
+image: 
+isMath: true
+---
 
-The **Elliptic Curve Digital Signature Algorithm (ECDSA)** is a widely used cryptographic algorithm for creating digital signatures. Based on **elliptic curve cryptography (ECC)**, ECDSA provides a high level of security with smaller key sizes compared to older algorithms like RSA, making it more efficient. This efficiency is a key reason why ECDSA is employed in secure communications, identity verification, and especially **blockchain** technologies.
+The **Elliptic Curve Digital Signature Algorithm (ECDSA)** is a widely used cryptographic algorithm for creating digital signatures. Based on **elliptic curve cryptography (ECC)**, ECDSA provides a high level of security with smaller key sizes compared to older algorithms like RSA, making it more efficient. 
+
+This efficiency is a key reason why ECDSA is employed in secure communications, identity verification, and especially **blockchain** technologies.
+
+[TOC]
 
 ## How ECDSA Works
 
@@ -10,15 +25,39 @@ y^2 = x^3 + ax + b \mod p
 $$
 Where `a`, `b`, and `p` are constants that define the specific elliptic curve. The points on the curve, along with a special point at infinity, form a group under an operation called **point addition**.
 
+### Summary
+
+1. Choose an elliptic curve, cryptographically secure
+2. Private key
+
+$$
+a ∈ \{1,...., n -1\}
+$$
+
+2. public key
+
+$$
+A = aG
+$$
+
+
+
 ### Key Generation
 
 To generate a key pair in ECDSA, the process follows these steps:
 
-1. **Private Key**: Randomly select a private key `d`, which is a number in the range `1 ≤ d ≤ n-1`, where `n` is the order of the base point `G` on the curve.
+1. **Private Key**: Randomly select a private key `a`, which is a number in the range `1 ≤ a ≤ n-1`, where `n` is the order of the base point `G` on the curve.
+
+$$
+a ∈ \{1,...., n -1\}
+$$
+
+
+
 2. **Public Key**: The corresponding public key is calculated as:
 
 $$
-Q = dG
+A = aG
 $$
 
 where `G` is the generator point of the elliptic curve, and `Q` is a point on the curve.
@@ -29,6 +68,13 @@ To sign a message `m`, the signer performs the following steps:
 
 1. **Hash the message**: Let `z` be the hash of the message `m`.
 2. Select a random integer `k` from `[1, n-1]`.
+
+$$
+k ∈ \{1, . . . , n − 1\}
+$$
+
+
+
 3. Calculate the point 
 
 $$
@@ -50,7 +96,7 @@ If `r = 0`, select a new `k` and repeat the process.
 5. The signature `s` is computed as:
 
 $$
-s = k^{-1}(z + dr) \mod n
+s = \frac{z + ar}{k} mod~ n = k^{-1}(z + ar)~mod ~n
 $$
 
 If `s = 0`, select a new `k` and repeat the process.
@@ -63,32 +109,43 @@ To verify a signature `(r, s)` on a message `m`, the verifier must perform the f
 
 1. Ensure that `r` and `s` are within the valid range `[1, n-1]`.
 2. Calculate `z`, the hash of the message.
-3. Calculate `w = s^{-1} \mod n`.
-4. Compute:
+3. Calculate 
 
 $$
-u_1 = zw \mod n \quad \text{and} \quad u_2 = rw \mod n
+u_1 = \frac{z}{s} mod ~ n = u_1 = z * s^{-1} \mod n
+$$
+
+$$
+
+$$
+
+$$
+u_2 = \frac{r}{s} mod ~ n
 $$
 
 
 
-5. Calculate the point:
+
+
+4. Calculate the point:
 
 $$
-(x_2, y_2) = u_1G + u_2Q
+(x_2, y_2) = u_1G + u_2A
 $$
 
 
 
-6. The signature is valid if:
+5. The signature is valid if:
 
 $$
-r \equiv x_2 \mod n
+r \equiv x_1 \mod n
 $$
 
 If this condition holds, the signature is valid; otherwise, it is invalid.
 
-## ECDSA in Blockchain
+## Use case
+
+### ECDSA in Blockchain
 
 ECDSA plays a critical role in **blockchain** technologies, particularly in **Bitcoin** and other cryptocurrencies. In blockchain systems, digital signatures are used to authorize transactions. When a user wants to transfer cryptocurrency, they sign the transaction using their private key, and others on the network can verify the signature using the corresponding public key.
 
@@ -99,7 +156,7 @@ In **Bitcoin**, for example:
 
 This ensures the integrity of the blockchain by making it computationally infeasible for anyone to forge signatures or tamper with transactions.
 
-### ECDSA in a Bitcoin Transaction
+#### ECDSA in a Bitcoin Transaction
 
 1. **Creating the transaction**: The owner uses their private key to sign the transaction, which includes details like the amount and the recipient's address.
 2. **Broadcasting the transaction**: The transaction is broadcast to the network.
@@ -118,7 +175,7 @@ The security of ECDSA relies on the hardness of two mathematical problems:
 
 While ECDSA is secure when implemented correctly, it can be compromised by poor implementation practices. A major issue is the use of weak or predictable random numbers for `k`, the ephemeral key in the signature generation process.
 
-If the same `k` is reused for multiple signatures, an attacker can extract the private key `d`. This is because the equations for different signatures would lead to a system of equations that can be solved to reveal `d`.
+If the same `k` is reused for multiple signatures, an attacker can extract the private key `a`. This is because the equations for different signatures would lead to a system of equations that can be solved to reveal `a`.
 
 An infamous example of this vulnerability occurred in 2010 when a programming flaw in the PlayStation 3's ECDSA implementation allowed hackers to break the system and extract Sony's private key. The issue arose because the same value of `k` was reused across signatures.
 
@@ -136,7 +193,7 @@ $$
 $$
 for messages `m_1` and `m_2` where the same `k` was used:
 $$
-s_1 - s_2 = k^{-1}(z_1 + dr) - k^{-1}(z_2 + dr)
+s_1 - s_2 = k^{-1}(z_1 + ar) - k^{-1}(z_2 + ar)
 $$
 This simplifies to:
 $$
@@ -158,6 +215,15 @@ This highlights the critical importance of using a secure random number generato
 
 ECDSA's security is currently based on the difficulty of solving the **Elliptic Curve Discrete Logarithm Problem (ECDLP)** using classical computers. However, the advent of **quantum computers** poses a significant threat to cryptographic algorithms, including ECDSA.
 
-Quantum algorithms like **Shor's Algorithm** could potentially solve the ECDLP in **polynomial time**, drastically reducing the computational difficulty. In theory, this would allow quantum computers to break ECDSA by recovering private keys from public keys within feasible timeframes. This makes ECDSA vulnerable to future quantum attacks.
+Quantum algorithms like **Shor's Algorithm** could potentially solve the ECDLP in **polynomial time**, drastically reducing the computational difficulty. 
 
-To mitigate this risk, cryptographic research is moving towards **post-quantum cryptography**, which aims to develop algorithms that are secure against both classical and quantum computers. For now, while quantum computers capable of breaking ECDSA are not yet realized, the potential threat requires ongoing preparation and adaptation in cryptographic protocols.
+In theory, this would allow quantum computers to break ECDSA by recovering private keys from public keys within feasible timeframes. This makes ECDSA vulnerable to future quantum attacks.
+
+To mitigate this risk, cryptographic research is moving towards **post-quantum cryptography**, which aims to develop algorithms that are secure against both classical and quantum computers.
+
+ For now, while quantum computers capable of breaking ECDSA are not yet realized, the potential threat requires ongoing preparation and adaptation in cryptographic protocols.
+
+## Reference
+
+- Cryptography course (CRY) taught at HEIG-VD in 2020
+- ChatGPT with the input "Write an article explaining ecdsa, Details some use case, notably in blockchain and a topic on its security and known bad implementation (e.g. in the random generation)"

@@ -160,6 +160,14 @@ $$
 - **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
 - Remark from the trezor documentation: The 64 bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
 
+5. ### ESAK (Storage authentication key)
+
+The storage authentication key (SAK) is used to authenticate the list of (APP, KEY) values for all protected entries that have been set in the storage. This prevents an attacker from erasing or adding entries to the storage.
+
+The key is encrypted with the key derived from the user's pin
+
+This key is stored encrypted in the storage.
+
 ### Summary of the Workflow:
 
 - **PIN** with salt → **PBKDF2** → Produces **KEK** and **KEIV**.
