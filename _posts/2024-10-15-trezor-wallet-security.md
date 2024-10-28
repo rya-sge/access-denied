@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography security
 tags: blockchain wallet trezor hardware
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
-image: 
+image: /assets/article/blockchain/wallet/trezor/trezor-secure-element.png
 isMath: true
 ---
 
