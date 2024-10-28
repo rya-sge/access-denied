@@ -85,7 +85,7 @@ In this [video](https://youtu.be/Adrh6BCc_Ao?si=sBlZDDaSsTvhBJ-T&t=616) from Sta
 - Simply aggregate proofs in each round and compute Fiat-Shamir challenge
 - Either log(n) rounds and log(n) communication
 
-
+------
 
 ## Implementation details
 
@@ -102,6 +102,8 @@ Reference:
 - [tlu.tarilabs.com - learning-paths/bulletproofs](https://tlu.tarilabs.com/learning-paths/bulletproofs)
 - [tlu.tarilabs.com - bulletproofs-and-mimblewimble](https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble)
 - [https://blog.pantherprotocol.io/bulletproofs-in-crypto-an-introduction-to-a-non-interactive-zk-proof/](https://blog.pantherprotocol.io/bulletproofs-in-crypto-an-introduction-to-a-non-interactive-zk-proof/)
+
+------
 
 ## Use
 
@@ -135,7 +137,7 @@ Reference: [Confidential Assets on MimbleWimble](https://eprint.iacr.org/2019/14
 - [beam](https://beam.mw) is a mimblewimble L1 privacy blockchain, completely concealing transactions
 - [Epic Cash](https://epiccash.com) is a MimbleWimble blockchain implementation that yields advances in scalability as a result of space efficient design that sheds redundant transaction data. 
 
-
+------
 
 ## Bulletproof Commitment Scheme
 
@@ -155,6 +157,8 @@ A Pedersen commitment (C) uses a point on an elliptic curve to create a one-way 
 
 Reference: [zk-learnin.org - Polynomial Commitments based on Pairing and Discrete Logarithm](https://zk-learning.org/assets/lecture6.pdf), p.40, [blog.rachitasrivastava - Bulletproof Commitment Schemes: Integrating Cryptography and Mathematics](https://blog.rachitasrivastava.com/bulletproof-commitment-schemes-integrating-cryptography-and-mathematics), [RareSkills - What are Pedersen Commitments and How They Work](https://www.rareskills.io/post/pedersen-commitment)
 
+------
+
 ## Comparison of the most popular zkp systems
 
 This summary is taken from the project [Awesome zero knowledge proofs (zkp)](https://github.com/matter-labs/awesome-zero-knowledge-proofs?tab=readme-ov-file#comparison-of-the-most-popular-zkp-systems) by Matter labs: 
@@ -169,15 +173,17 @@ This summary is taken from the project [Awesome zero knowledge proofs (zkp)](htt
 | - size estimate for 1 TX              | Tx: 200 bytes, Key: 50 MB                                    | 45 kB                               | 1.5 kb                                                       |
 | - size estimate for 10.000 TX         | Tx: 200 bytes, Key: 500 GB                                   | 135 kb                              | 2.5 kb                                                       |
 | Ethereum/EVM verification gas cost    | ~600k (Groth16)                                              | ~2.5M (estimate, no impl.)          | N/A                                                          |
-| Trusted setup required?               | YES                                                          | NO                                  | NO                                                           |
-| Post-quantum secure                   | NO                                                           | YES                                 | NO                                                           |
+| Trusted setup required?               | &#x2611;                                                     | &#x2612;                            | &#x2612;                                                     |
+| Post-quantum secure                   | &#x2612;                                                     | &#x2611;                            | &#x2612;                                                     |
 | Crypto assumptions                    | DLP + secure bilinear pairing                                | Collision resistant hashes          | Discrete log                                                 |
 
 *Reference: [eprint.iacr.org/2019/099.pdf](https://eprint.iacr.org/2019/099.pdf), page 3
 
 Other reference used: [ethereum.stackexchange - zk-SNARKs vs. Zk-STARKs vs. BulletProofs? (Updated)](https://ethereum.stackexchange.com/questions/59145/zk-snarks-vs-zk-starks-vs-bulletproofs-updated)
 
-## Know implementation
+------
+
+## Known implementation
 
 From [Matter labs - awesome-zero-knowledge-proofs ](https://github.com/matter-labs/awesome-zero-knowledge-proofs?tab=readme-ov-file#try) and [crypto.stanford.edu/bulletproofs/](https://crypto.stanford.edu/bulletproofs/)
 
@@ -186,6 +192,8 @@ From [Matter labs - awesome-zero-knowledge-proofs ](https://github.com/matter-la
 - [Implementation in C](https://github.com/Tongsuo-Project/Tongsuo)
 - [Prototype in Java](https://github.com/bbuenz/BulletProofLib)
 - [Prototype in Rust](https://github.com/chain/ristretto-bulletproofs)
+
+------
 
 ## References
 
