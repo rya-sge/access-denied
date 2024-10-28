@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography
 tags: blockchain wallet
 description: This article is an introduction to Multi-Party Computation (MPC)Mathematical Foundation of MPC
-image: 
+image: /assets/article/cryptographie/mpc/MPC.png
 isMath: true
 ---
 
