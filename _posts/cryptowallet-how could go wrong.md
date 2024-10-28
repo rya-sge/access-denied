@@ -103,6 +103,8 @@ This attack could be used by a bad actor to destroy or steal users’ funds.
 
 Reference: [Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367)
 
+https://eprint.iacr.org/2011/191.pdf
+
 ### Unfixable Seed Extraction on Trezor 
 
 The Donjon recently found a physical attack on the Trezor One  hardware wallet, which has been responsibly disclosed to Trezor. The  identified vulnerability allows an attacker with physical access to get  the master seed protected by the wallet if no strong passphrase is set.  After a deep evaluation of this vulnerability, it appears very clearly  that this vulnerability cannot be patched without making a complete  hardware redesign of the hardware wallet. When we first talked about  this attack, it has been said that the attack was too specialized, not  realistic and hard to reproduce. At first, it required heavy and  expensive equipment (worth more than $100.000) with a complete day of  work for a hardware security expert. Note: this is the typical setup we  use for challenging the security of our own hardware wallets.

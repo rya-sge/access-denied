@@ -23,27 +23,31 @@ Firstly here a summary of the different options related to security available de
 
 | Model                                                        | Seed phrase backup         |  | Device Security       |        |         | Authentication                             |                              |
 | ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- |
-|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|Secure element protected|Two-factor authentication|FIDO2 Standard|
-| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; |  |  | &#x2611; | &#x2611; |
+|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|Secure element protected<br />Certified Chip EAL6+|Two-factor authentication|FIDO2 Standard|
 | [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; | &#x2612; | &#x2612; | &#x2611;       | &#x2612; |
-| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | Certified Chip EAL6+ | &#x2611; | &#x2611; |
-| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | Certified Chip EAL6+ | &#x2611; | &#x2611; |
+| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; |
+| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; |
+| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; |
 
 See also [trezor.io/compare](https://trezor.io/compare)
 
-### **Core Security Features of Trezor Wallets**
+[TOC]
 
-#### 1. **Offline Private Key Storage**
+
+
+## Core Security Features of Trezor Wallets
+
+### 1. Offline Private Key Storage
 
 The cornerstone of Trezor’s security is the **offline storage** of private keys. Since Trezor is a hardware wallet, your private keys never leave the device, ensuring that they are not exposed to the internet. This **air-gapped** design protects against hacking attempts, phishing attacks, and malware, which are common on internet-connected (hot) wallets.
 
-#### 2. **PIN Protection**
+### 2. PIN Protection
 
 Every Trezor wallet requires a **PIN code** to access the device. This PIN is set by the user during initialization and is a critical layer of protection against unauthorized physical access. The PIN entry process is randomized on the Trezor screen, making it resistant to keylogging or screen capture attacks that can occur on compromised computers.
 
 References: [trezor - PIN protection on Trezor devices ](https://trezor.io/learn/a/pin-protection-on-trezor-devices), [Trezor suite protection against keyloggers?](https://forum.trezor.io/t/trezor-suite-protection-against-keyloggers/6386)
 
-#### 3. **Passphrase Support**
+### 3. Passphrase Support
 
 In addition to a PIN, Trezor provides the option to add an additional layer of security in the form of a **passphrase**. This passphrase essentially acts as a 25th word added to the standard 24-word recovery seed. 
 
@@ -58,13 +62,13 @@ recovery~seed + passphrase = hidden~ wallet
 $$
 Reference: [Trezor - Passphrases and hidden wallets](https://trezor.io/learn/a/passphrases-and-hidden-wallets)
 
-#### 4. **Recovery Seed**
+### 4. Recovery Seed
 
 When you initialize your Trezor wallet, you are provided with a **recovery seed**, which is a randomly generated 12-24 word phrase. This seed allows you to restore your wallet in case the device is lost or damaged. The seed is generated offline, and the user must write it down in a secure place, as it is the only way to recover the funds. Trezor implements a **BIP-39** mnemonic phrase standard for this recovery seed.
 
 References: [Trezor - How to use a recovery seed](https://trezor.io/learn/a/how-to-use-a-recovery-seed)
 
-#### 5. **Firmware Updates**
+### 5. Firmware Updates
 
 Trezor regularly releases **firmware updates** to fix bugs, patch vulnerabilities, and add new features.  In case of a compromission of the Trezor architecture, a malicious firmware update could have a disastrous result and compromise your funds.
 
@@ -76,7 +80,7 @@ There are several protection put in place by Trezor to avoid a malicious updates
 
 Reference: [Security & safety in Trezor ](https://trezor.io/learn/a/security-safety-in-trezor?srsltid=AfmBOoo-zyONXBVPkTbfQ1r552tSE6H8g2FruZ5JFBbCayxHWeTcCYg8)
 
-# Trezor's encryption Key terms
+## Trezor's encryption Key terms
 
 This section is based on the following resource: [PIN verification and decryption of protected entries in flash storage](https://docs.trezor.io/trezor-firmware/storage/index.html#pin-verification-and-decryption-of-protected-entries-in-flash-storage)
 
@@ -123,50 +127,58 @@ The receiver recalculates the hash value on the received message and checks that
 
 See [datatracker.ietf.org/doc/html/rfc4868#page-3](https://datatracker.ietf.org/doc/html/rfc4868#page-3), [Microsoft - HMACSHA512 Class](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.hmacsha512?view=net-8.0)
 
-### Key
+### Keys and PVC
 
-Here's an explanation of the key terms used in Trezor's encryption and PIN verification process:
+Here's an explanation of the different keys used in Trezor's encryption and PIN verification process
 
-### 1. KEK (Key Encryption Key)
+#### Trezor Storage
 
-- **What it is**: The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
+These elements are stored on the Trezor storage.
 
-$$
-KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations = 10000, dkLen = 352 bits)
-$$
-
-
-
-- **Purpose**: The KEK is used to **decrypt the Encrypted Data Encryption Key (EDEK)**, allowing access to the actual Data Encryption Key (DEK).
-- **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
-- This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
-
-### 2. KEIV (Key Encryption Initialization Vector)
-
-- **What it is**: The **KEIV** is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
-- **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
-- **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
-
-### 3. DEK (Data Encryption Key)
+##### (E)DEK (Data Encryption Key)
 
 - **What it is**: The **DEK** is the actual key used to **encrypt and decrypt protected data** stored in flash storage.
 - **Purpose**: The DEK protects sensitive data entries in the device’s flash memory. It is derived by decrypting the **EDEK** with the KEK and KEIV.
 - **How it works**: The DEK is used to encrypt and decrypt specific entries (e.g., secrets, settings) in the storage. Without the correct DEK, these entries cannot be read or tampered with.
 
-### 4. PVC (PIN Verification Code)
-
-- **What it is**: The **PVC** is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
-- **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
-- **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
-- Remark from the trezor documentation: The 64 bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
-
-5. ### ESAK (Storage authentication key)
+##### (E)SAK (Storage authentication key)
 
 The storage authentication key (SAK) is used to authenticate the list of (APP, KEY) values for all protected entries that have been set in the storage. This prevents an attacker from erasing or adding entries to the storage.
 
 The key is encrypted with the key derived from the user's pin
 
 This key is stored encrypted in the storage.
+
+##### PVC (PIN Verification Code)
+
+- **What it is**: The **PVC** is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
+- **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
+- **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
+- Remark from the trezor documentation: The 64 bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
+
+#### Compute
+
+##### KEK (Key Encryption Key)
+
+- **What it is**: The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
+
+$$
+\begin{aligned}
+KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations = 10000, dkLen = 352 bits)
+\end{aligned}
+$$
+
+- **Purpose**: The KEK is used to **decrypt the Encrypted Data Encryption Key (EDEK)**, allowing access to the actual Data Encryption Key (DEK).
+- **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
+- This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
+
+##### KEIV (Key Encryption Initialization Vector)
+
+- **What it is**: The **KEIV** is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
+- **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
+- **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
+
+
 
 ### Summary of the Workflow:
 
@@ -175,7 +187,7 @@ This key is stored encrypted in the storage.
 - **DEK** is used for encrypting and decrypting sensitive data entries in flash storage.
 - **PVC** verifies whether the correct PIN was used for the entire process.
 
-#### 4. BIP-32, BIP-39, and BIP-44 Standards
+## BIP-32, BIP-39, and BIP-44 Standards
 
 Trezor follows industry-standard protocols, such as:
 
@@ -191,9 +203,59 @@ Thanks to `address_index`, you can have several different addresses for the same
 
 See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=AfmBOopiSIUJDwPISXP5YbzFws1lFEToUwG52ITiM1Y72akbpyvNp8it)
 
+## Model specificity
+
+### On-Device entry
+
+The Trezor model one uses a blind matrix for PIN entry -- when required, a matrix of **dots** (instead of numbers) appears on your computer screen
+
+Contrary to the Trezor model One, the PIN for model 3, 5 and T is directly entered by tapping on the touchscreen of your Trezor Model
+
+Here some images from the Trezor website to compare:
+
+- Model One
+
+![trezor-model-one]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-model-one.png)
+
+- Model T
+
+![trezor-model-t]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-model-t.png)
+
+Reference: [Trezor - PIN protection on Trezor devices](https://trezor.io/learn/a/pin-protection-on-trezor-devices)
 
 
-### Trezor Safe device authentication check
+
+### Chips and Secure Element
+
+The Trezor Safe 5 and Safe 3 reinforce the security by using a Secure Element, certified CC EAL6+. 
+
+##### About the chips
+
+The chips used is the OPTIGA™ Trust M (V3). 
+
+Contrary to the firmware, the code is not open source but the producer does not restrict Trezor from freely publishing potential vulnerabilities.
+
+##### About the certification
+
+A chips EAL-6 means that the chips has been Semiformally Verified Design and Tested. Additional Security Considerations.
+
+Compared to EAL-5 certification, this certification requires:
+
+- more comprehensive analysis,
+-  a structured representation of the implementation, 
+- more architectural structure (e.g. layering), 
+- more comprehensive independent vulnerability analysis 
+- and improved configuration management and development environment controls.
+
+More information on the Trezor website [Secure Element in Trezor Safe Devices](https://trezor.io/learn/a/secure-element-in-trezor-safe-devices?srsltid=AfmBOopNYvU2RYB3hnl9iimVsinXd_54n730ovNmuu1DICq2aCCo8X1-)
+
+Reference:[commoncriteriaportal.org, p.22](https://www.commoncriteriaportal.org/files/ccfiles/CC2022PART5R1.pdf), [web archive - CESG.gov.uk ](https://web.archive.org/web/20041012181256/http://www.cesg.gov.uk/site/iacs/index.cfm?menuSelected=1&displayPage=13)
+
+See also [Ledger - What is Security Certification?](https://www.ledger.com/academy/security/the-importance-of-certification)
+
+#### Trezor Safe device authentication check
+
+The Secure Element plays an important role in verifying the authenticity of your device.
 
 1. Trezor Suite generates a random challenge which is then sent to the Trezor.
 2. In response, the Trezor uses the Secure Element to sign this random challenge and returns both the signature and the device certificate.
@@ -205,23 +267,35 @@ During the manufacturing process of the Trezor Safe hardware wallets, a unique c
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
 
-
-
 ### Additional Security Considerations
 
-#### 1. **Physical Security**
+### 1. Physical Security
 
 While Trezor hardware wallets are robust, they are not impervious to **physical attacks** if a device falls into the wrong hands. 
 
-However, a Trezor wallet is protected by the PIN, and the passphrase if set. The passphrase feature is especially useful because it creates an additional level of obfuscation, meaning even if someone manages to steal your device and get your PIN, they cannot access to your funds without the passphrase.
+However, a Trezor wallet is protected by the PIN, and the passphrase if set. 
 
-#### 2. **Supply Chain Attacks**
+The passphrase feature is especially useful because it creates an additional level of obfuscation, meaning even if someone manages to steal your device and get your PIN, they cannot access to your funds without the passphrase.
 
-To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements **tamper-evident packaging**. Users are encouraged to inspect the device for any signs of tampering, such as broken seals. 
+Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access to the fund if they don't manage to find the passphrase.
+
+### 2. Supply Chain Attacks
+
+To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures
+
+### Tamper-evident packaging
+
+Users are encouraged to inspect the device for any signs of tampering, such as broken seals. 
 
 Additionally, users can verify the authenticity of the firmware when initializing the device.
 
-### **Conclusion**
+### Trezor Safe device authentication check
+
+As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to helps to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
+
+Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+
+## Conclusion
 
 Trezor wallets are designed with a robust set of security features with a strong use of cryptography.
 

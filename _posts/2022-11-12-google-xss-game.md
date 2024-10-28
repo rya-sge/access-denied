@@ -11,7 +11,15 @@ image: /assets/article/web/xss/xss-game/xss-game-cover.PNG
 description: XSS-game was launched by Google to train for XSS vulnerabilities with 6 challenges to solve. This document summarizes the solutions for challenges 1 to 5.
 ---
 
-A few years ago, Google launched a site, [https://xss-game.appspot.com](https://xss-game.appspot.com) to train for XSS vulnerabilities by offering 6 challenges to solve. This document summarizes the possible solutions for challenges 1 to 5.
+A few years ago, Google launched a site, [xss-game.appspot.com](https://xss-game.appspot.com) to train for **XSS** vulnerabilities by offering 6 challenges to solve. This document summarizes the possible solutions for challenges 1 to 5.
+
+Quick summary of XSS:
+
+- An XSS (Cross-Site Scripting) attack is a security vulnerability that allows an attacker to inject malicious scripts into web pages viewed by other users. 
+
+- Consequence: These scripts can steal sensitive data (like cookies or session tokens), deface websites, or redirect users to malicious sites. 
+- Cause: XSS exploits occur when user input is improperly sanitized or validated, allowing attackers to inject their malicious script
+- There are three main types of XSS: **stored**, **reflected**, and **DOM-based**, each differing in how and where the malicious code is injected and executed.
 
 To begin, some useful resources
 
@@ -62,7 +70,7 @@ In this challenge, the website displays images that can be selected
 
 **Solution**
 
-Looking at the url after clicking an image, we can see that the website displays the image specified by the fragment value. With the following url: [https://xss-game.appspot.com/level3/frame#2](https://xss-game.appspot.com/level3/frame#2), the cloud2 image will be displayed. 
+Looking at the url after clicking an image, we can see that the website displays the image specified by the fragment value. With the following url: [xss-game.appspot.com/level3/frame#2](https://xss-game.appspot.com/level3/frame#2), the cloud2 image will be displayed. 
 
 Looking at the source code, we can see the following code:
 
@@ -135,3 +143,10 @@ href="/level5/frame/signup?next=javascript:alert('Hello')"
 ![xss-level5-bookmarklet]({{site.url_complet}}/assets/article/web/xss/xss-game/xss-level5-bookmarklet.PNG)
 
 Reference used for this challenge: [sagarvd01 - Learning XSS with Google’s XSS Game](https://sagarvd01.medium.com/learning-xss-with-googles-xss-game-f44ff8ee3d8b)
+
+## Reference
+
+- [xss-game.appspot.com](https://xss-game.appspot.com) 
+- [portswigger.net - Cross-site scripting (XSS) cheat sheet](https://portswigger.net/web-security/cross-site-scripting/cheat-sheet)
+
+- ChatGPT with the input "Write me a description of xss attack in a few line"
