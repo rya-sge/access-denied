@@ -86,6 +86,20 @@ Reference: [Security & safety in Trezor ](https://trezor.io/learn/a/security-saf
 
 This section is based on the following resource: [PIN verification and decryption of protected entries in flash storage](https://docs.trezor.io/trezor-firmware/storage/index.html#pin-verification-and-decryption-of-protected-entries-in-flash-storage)
 
+### Schema
+
+#### Data encryption Diagram
+
+What happens when the user choose a new PIN ?
+
+![trezor-encryption-pin.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png)
+
+#### Activity diagram
+
+What happens when the user enters its PIN ?
+
+
+
 ![trezor-pin-diagram-activity]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-pin-diagram-activity.png)
 
 ### Main Cryptography algorithm
