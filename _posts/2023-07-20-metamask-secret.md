@@ -30,7 +30,7 @@ They implement and use several standard and cryptography algorithms to generate 
 
 Reference: [17. User Guide: Secret Recovery Phrase, password, and private keys](https://support.metamask.io/hc/en-us/articles/4404722782107)
 
-
+[TOC]
 
 ## Secret Recovery Phrase ( SRP / Seed Phrase)
 
@@ -43,6 +43,11 @@ The secret Recovery phrase, or sometimes called a seed phrase,
 -  This phrase is made of 12 words taken from a list in a random way
 -  it will be used to generate the first private key of the wallet. 
    -  The result of the computation will be the same all the time. It is what we call this type of wallet a "deterministic wallet".
+-  Implementation:
+   -  To implement that, they use their own fork from the library [scure-bip39](https://github.com/paulmillr/scure-bip39).
+   -  This library uses the function `randomBytes`from another library written by the same author: [noble-hashes](https://github.com/paulmillr/noble-hashes/blob/314f90cc3e7e10bea270f90469c8cabc18511712/src/utils.ts#L250)
+   -  The Javascript function finally used to generate the pseudo-random numbers used as the seis [getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
+
 
 Reference: [4. What is a ‘Secret Recovery Phrase’ and how to keep your crypto wallet secure            ](https://support.metamask.io/hc/en-us/articles/360060826432-What-is-a-Secret-Recovery-Phrase-and-how-to-keep-your-crypto-wallet-secure)
 
@@ -58,7 +63,7 @@ In summary, Metamask
 - No email associated with accounts
 - Metamask can not access your wallet from their side => you are responsible to store the SRP in a safe place.
 
-Reference: [[2.MetaMask is a self-custodial wallet](https://support.metamask.io/hc/en-us/articles/360059952212    )], [[3. Why do I have the same seed phrase for all of my MetaMask addresses/accounts?](https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454)]     
+Reference: [[2.MetaMask is a self-custodial wallet](https://support.metamask.io/hc/en-us/articles/360059952212    )]
 
 ### SRP recovery
 
@@ -73,11 +78,11 @@ Typically, it is the case if your computer is broken
 
 Then, there may still be a *possibility* of recovering your Secret Recovery Phrase by using the vault decryptor tool provided by Metamask, see [8. github.com/MetaMask/vault-decryptor](https://github.com/MetaMask/vault-decryptor/tree/master) / [9. support.metamask.io](https://support.metamask.io/hc/en-us/articles/360018766351-How-to-recover-your-Secret-Recovery-Phrase).
 
-Others tools: [https://github.com/JesseBusman/FirefoxMetamaskWalletSeedRecovery](https://github.com/JesseBusman/FirefoxMetamaskWalletSeedRecovery)
+Others tools: [JesseBusman - FirefoxMetamaskWalletSeedRecovery](https://github.com/JesseBusman/FirefoxMetamaskWalletSeedRecovery)
 
 ### Deterministic wallets / Multiples accounts
 
-It is the reason why it is called "Recovery Phrase" by Metamask because all the private keys will be generated from this phrase, as indicated in the previous point see [13. https://support.metamask.io](https://support.metamask.io/hc/en-us/articles/360015289612-How-to-restore-your-MetaMask-wallet-from-Secret-Recovery-Phrase).
+It is the reason why it is called "Recovery Phrase" by Metamask because all the private keys will be generated from this phrase, as indicated in the previous point see [13. support.metamask.io](https://support.metamask.io/hc/en-us/articles/360015289612-How-to-restore-your-MetaMask-wallet-from-Secret-Recovery-Phrase).
 
 As the wallet is deterministic, it will always re-create the same accounts, in the same order.
 
@@ -101,7 +106,7 @@ Here a list of questions related to the secret Recovery Phrase
 
 - [What is a Secret Recovery Phrase and how do I keep my wallet safe?](https://support.metamask.io/hc/en-us/articles/360060826432)
 
-
+------
 
 ## Password
 
@@ -124,13 +129,13 @@ In the README, they indicate
 
 Here the most interesting files:
 
-a. [https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L87](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L87)
+a. [github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L87](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L87)
 
-b. [https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L230](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L230)
+b. [github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L230](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L230)
 
-c. [https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19)
+c. [github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19)
 
-d. [https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
+d. [developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
 
 For example, link b, you can see that the key is generated with the algorithm `PBKDF2`.
 
@@ -150,7 +155,7 @@ With the link c, you can see that the algorithm used is `AES-GCM`
 const DERIVED_KEY_FORMAT = 'AES-GCM';
 ```
 
-
+------
 
 ## Security consideration
 
@@ -186,14 +191,13 @@ The application was also analyzed by a security engineer at CertiK in his blog.
 
 [18. How MetaMask stores your wallet secret?](https://www.wispwisp.com/index.php/2020/12/25/how-metamask-stores-your-wallet-secret/)
 
+------
+
 ## Reference
 
 ### Metamask official
 
 - [2. support.metamask.io/hc/en-us/articles/360059952212](https://support.metamask.io/hc/en-us/articles/360059952212)
-
-- [3. https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454](https://community.metamask.io/t/why-do-i-have-the-same-seed-phrase-for-all-of-my-metamask-addresses-accounts/454)
-
 - [4. support.metamask.io - How to add missing accounts after restoring with Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360015489271)
 - [5. support.metamask.io - Passwords and MetaMask](https://support.metamask.io/hc/en-us/articles/4405451730331)
 - [6. support.metamask.io - Does MetaMask have a bug bounty program for vulnerabilities?](https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities)

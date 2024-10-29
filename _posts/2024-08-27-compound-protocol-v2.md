@@ -66,6 +66,8 @@ Here the main resource is the [Compound Academy](https://compound.education/guid
 
 Reference: [compound.education/guides - compound-v2-vs-v3-compound/4](https://compound.education/guides/view/compound-v2-vs-v3-compound/4)
 
+------
+
 ## Overcollateralization
 
 - Concept of credit rating can not be apply because Ethereum account are pseudonymous. It is impossible to enforce repayment in the event of a loan default
@@ -118,7 +120,7 @@ Example 2:
   $$
   
 
-
+------
 
 ## Supply and borrow rates
 
@@ -370,6 +372,8 @@ $$
   - Sell ETH for stablecoin
   - If price of ETH falls, you can use your stablecoin to buy (cheap) ETH to pay of debt
 
+------
+
 ## cTokens
 
 - The compound protocol must escrow tokens as a depositor in order to mainthan that liquidity for the platform itself and to keep track of each person's ownership stake in each market
@@ -418,7 +422,7 @@ Trader redeems 250 cDAI for 1,100 DAI
 - The trader can also deploy cDAI in the play of DAI so the DAI is not sitting idle but earning interest via the COmpound pool.
 - For example, the trader could deploy cDAI as the necessary collateral to open a perpetual futures position on DYdX or she could market male on Uniswap using a cDAI trading pair
 
-
+------
 
 ## Governance parameters
 
@@ -456,6 +460,8 @@ See [github.com/compound-finance - contracts/Governance/GovernorAlpha.sol#L8](ht
 - COMP is used to vote on protocol updates, such a parameter tuning, adding new asset support, and functionality upgrade (similar to MKR for MakerDAO)
 - On June 15, 2020, the 7th governance proposal passed which provider for distribution COMP tokens to users of the plateform based on the borrow volume per market.
   - The COMP token is distributed to both suppliers and borrowers, and acts as a subsidization of rates.
+
+------
 
 ## Liquidation
 
@@ -525,6 +531,8 @@ From [github.com/compound-finance - CToken.sol#L721](https://github.com/compound
 
 
 
+------
+
 ## Overview
 
 ### Other platform use Compound
@@ -561,6 +569,8 @@ From [github.com/compound-finance - CToken.sol#L721](https://github.com/compound
 Traditional finance problem: under collateralization of lending institutions
 
 Compound solution: Transparent collateralization ratios of borrowers visible to entire ecosystem
+
+------
 
 ## Screenshot
 

@@ -76,7 +76,8 @@ where `G` is the generator point of the elliptic curve, and `Q` is a point on th
 
 To sign a message `m`, the signer performs the following steps:
 
-1. **Hash the message**: Let `z` be the hash of the message `m`.
+1.**Hash the message**: Let `z` be the hash of the message `m`.
+
 2. Select a random integer `k` from `[1, n-1]`.
 
 $$
@@ -87,8 +88,7 @@ $$
 
 
 
-3. Calculate the point 
-
+3.Calculate the point 
 $$
 \begin{aligned}
 (x_1, y_1) = kG
@@ -127,6 +127,7 @@ To verify a signature `(r, s)` on a message `m`, the verifier must perform the f
 
 1. Ensure that `r` and `s` are within the valid range `[1, n-1]`.
 2. Calculate `z`, the hash of the message.
+
 3. Calculate 
 
 $$
@@ -136,21 +137,12 @@ u_1 = \frac{z}{s} mod ~ n = u_1 = z * s^{-1} \mod n
 $$
 
 $$
-
-$$
-
-$$
 \begin{aligned}
 u_2 = \frac{r}{s} mod ~ n
 \end{aligned}
 $$
 
-
-
-
-
-4. Calculate the point:
-
+4.Calculate the point:
 $$
 \begin{aligned}
 (x_2, y_2) = u_1G + u_2A
@@ -159,8 +151,7 @@ $$
 
 
 
-5. The signature is valid if:
-
+5.The signature is valid if:
 $$
 \begin{aligned}
 r \equiv x_1 \mod n
@@ -209,7 +200,7 @@ An infamous example of this vulnerability occurred in 2010 when a programming fl
 
 For each signature, the value of `k` must be chosen randomly and uniquely. Otherwise, if two signatures share the same `k`, an attacker can easily compute the private key.
 
-Given two signatures
+Given two signatures:
 $$
 \begin{aligned}
 (r, s_1)
@@ -221,12 +212,16 @@ $$
 (r, s_2)
 \end{aligned}
 $$
+
+
 for messages `m_1` and `m_2` where the same `k` was used:
 $$
 \begin{aligned}
 s_1 - s_2 = k^{-1}(z_1 + ar) - k^{-1}(z_2 + ar)
 \end{aligned}
 $$
+
+
 This simplifies to:
 $$
 \begin{aligned}
@@ -279,4 +274,5 @@ From the article:
 
 - Cryptography course (CRY) taught at HEIG-VD in 2020
 - Cryptography course (CRY) taught at HEIG-VD in 2023
+- [research.kudelskisecurity - QUANTUM ATTACK RESOURCE ESTIMATE: USING SHOR’S ALGORITHM TO BREAK RSA VS DH/DSA VS ECC](https://research.kudelskisecurity.com/2021/08/24/quantum-attack-resource-estimate-using-shors-algorithm-to-break-rsa-vs-dh-dsa-vs-ecc/)
 - ChatGPT with the input "Write an article explaining ecdsa, Details some use case, notably in blockchain and a topic on its security and known bad implementation (e.g. in the random generation)"

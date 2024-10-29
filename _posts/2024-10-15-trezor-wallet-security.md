@@ -33,7 +33,7 @@ See also [trezor.io/compare](https://trezor.io/compare)
 
 [TOC]
 
-
+------
 
 ## Core Security Features of Trezor Wallets
 
@@ -79,6 +79,8 @@ There are several protection put in place by Trezor to avoid a malicious updates
 - Downgrading the firmware, which could be used to install a vulnerable version of Trezor,  erases the memory as a result.
 
 Reference: [Security & safety in Trezor ](https://trezor.io/learn/a/security-safety-in-trezor?srsltid=AfmBOoo-zyONXBVPkTbfQ1r552tSE6H8g2FruZ5JFBbCayxHWeTcCYg8)
+
+------
 
 ## Trezor's encryption Key terms
 
@@ -187,6 +189,8 @@ $$
 - **DEK** is used for encrypting and decrypting sensitive data entries in flash storage.
 - **PVC** verifies whether the correct PIN was used for the entire process.
 
+------
+
 ## BIP-32, BIP-39, and BIP-44 Standards
 
 Trezor follows industry-standard protocols, such as:
@@ -294,6 +298,8 @@ Additionally, users can verify the authenticity of the firmware when initializin
 As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to helps to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+
+------
 
 ## Conclusion
 

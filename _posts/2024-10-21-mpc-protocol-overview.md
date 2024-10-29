@@ -196,25 +196,29 @@ Malicious parties could attempt to disrupt the computation by refusing to partic
 
 **1. MPC for Crypto Wallets:**
 
-- MPC, with a Threshold Signature Scheme (TSS), is widely used in **cryptocurrency wallets** to split private keys among multiple parties, preventing any single party from having complete control over the private key. 
+MPC, with a Threshold Signature Scheme (TSS), is widely used in **cryptocurrency wallets** to split private keys among multiple parties, preventing any single party from having complete control over the private key. 
+
 - **Example**: In a threshold cryptographic wallet, the private key is shared among multiple devices or service providers. When a transaction is signed, these parties jointly compute the signature without any one of them reconstructing the private key. This ensures higher security against key theft and misuse.
 - Company: [Fireblocks](https://www.fireblocks.com/secure-multi-party-computation-framework/), [Zengo](https://zengo.com/mpc-wallet/)
 
 **2. Privacy-Preserving Data Analytics:**
 
-- MPC enables organizations to compute joint analytics on sensitive data without sharing it.
+MPC enables organizations to compute joint analytics on sensitive data without sharing it.
+
 - **Example**: In healthcare, hospitals could use MPC to jointly analyze patient data across institutions to identify trends in disease outbreaks while keeping individual records private.
 
 **3. Secure Auctions:**
 
-- MPC could be used to implement **sealed-bid auctions**, where participants submit bids privately, and the auction is computed without revealing the actual bids.
+MPC could be used to implement **sealed-bid auctions**, where participants submit bids privately, and the auction is computed without revealing the actual bids.
+
 - **Example**: A secure auction system might use MPC to determine the highest bidder without revealing the bids of other participants.
 
 Reference: [Harvard - A Practical Implementation of Secure Auctions Based on Multiparty Integer Computation](http://www.eecs.harvard.edu/~cat/cs/diss/paperlinks/bogetoft06practical.pdf)
 
 **4. Private Set Intersection (PSI):**
 
-- MPC enables two or more parties to compute the intersection of their datasets without revealing the non-overlapping elements.
+MPC enables two or more parties to compute the intersection of their datasets without revealing the non-overlapping elements.
+
 - **Example**: 
   - Companies can use MPC to compare customer lists to identify shared clients without disclosing the entire list of customers. 
   - A concrete use is by Apple for its CSAM - Child Sexual Abuse Material. Apple uses a PSI to flag accounts exceeding a threshold number of images that match a known database of CSAM image hashes. As the result, Apple does not learn anything about images that do not match the known CSAM database and until a threshold of matches. 
@@ -225,7 +229,7 @@ Reference: [Taurus  MPC and smart contracts: same but different ](https://www.ta
 
 **5. Electronic Voting:**
 
-- MPC can be used in **secure electronic voting systems**, where voters’ ballots remain private, and the final tally is computed without revealing individual votes. This ensures both privacy and integrity of the election process.
+MPC can be used in **secure electronic voting systems**, where voters’ ballots remain private, and the final tally is computed without revealing individual votes. This ensures both privacy and integrity of the election process.
 
 ------
 
