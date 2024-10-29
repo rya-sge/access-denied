@@ -106,13 +106,13 @@ What happens when the user enters its PIN ?
 
 ####  PBKDF2 (Password-Based Key Derivation Function 2)
 
-- **PBKDF2** is a cryptographic key derivation function, which is resistant to [dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack) and [rainbow table attacks](https://en.wikipedia.org/wiki/Rainbow_table). 
+- **PBKDF2** is a cryptographic key derivation function, which is resistant to [dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack) and [rainbow table attacks](https://en.wikipedia.org/wiki/Rainbow_table) by using a salt. 
 
 - It is based on iteratively deriving **HMAC** many times with some padding. 
 - The **PBKDF2** algorithm is described in the Internet standard [RFC 2898 (PKCS #5)](http://ietf.org/rfc/rfc2898.txt). 
 
 - **What it is**: **PBKDF2** is a key derivation function that uses a password (in this case, the PIN), a salt (a random value), and multiple iterations of a cryptographic hash function to generate a derived key.
-- **Purpose** in Trezor: It is used to transform the user's **PIN** into a **strong cryptographic key** (in this case, the KEK and KEIV). The function also incorporates a salt to prevent precomputed attacks (such as rainbow tables).
+- **Purpose** in Trezor: It is used to transform the user's **PIN** into a strong cryptographic key (in this case, the KEK and KEIV). The function also incorporates a salt to prevent precomputed attacks (such as rainbow tables).
 - **How it works**: PBKDF2 uses the user's PIN as input and combines it with a salt derived from hardware identifiers (e.g., ProcessorID) and the random salt from flash storage. It runs the hash function (HMAC-SHA256) for 10,000 iterations (or more), producing 352 bits of output: the first 256 bits become the **KEK** and the last 96 bits form the **KEIV**.
 
 See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
@@ -153,7 +153,7 @@ These elements are stored on the Trezor storage.
 
 ##### (E)DEK (Data Encryption Key)
 
-- **What it is**: The **DEK** is the actual key used to **encrypt and decrypt protected data** stored in flash storage.
+- **What it is**: The **DEK** is the actual key used to encrypt and decrypt protected data stored in flash storage.
 - **Purpose**: The DEK protects sensitive data entries in the device’s flash memory. It is derived by decrypting the **EDEK** with the KEK and KEIV.
 - **How it works**: The DEK is used to encrypt and decrypt specific entries (e.g., secrets, settings) in the storage. Without the correct DEK, these entries cannot be read or tampered with.
 
@@ -167,7 +167,7 @@ This key is stored encrypted in the storage.
 
 ##### PVC (PIN Verification Code)
 
-- **What it is**: The **PVC** is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
+- **What it is**: The PVC is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
 - **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
 - **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
 - Remark from the trezor documentation: The 64 bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
@@ -184,13 +184,13 @@ KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations 
 \end{aligned}
 $$
 
-- **Purpose**: The KEK is used to **decrypt the Encrypted Data Encryption Key (EDEK)**, allowing access to the actual Data Encryption Key (DEK).
+- **Purpose**: The KEK is used to decrypt the Encrypted Data Encryption Key **(EDEK)**, allowing access to the actual Data Encryption Key (DEK).
 - **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
 - This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
 
 ##### KEIV (Key Encryption Initialization Vector)
 
-- **What it is**: The **KEIV** is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
+- **What it is**: The KEIV is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
 - **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
 - **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
 
