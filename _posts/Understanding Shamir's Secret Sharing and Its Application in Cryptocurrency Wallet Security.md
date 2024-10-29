@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Introduction to Shamir’s Secret Sharing: how to share a secret
+title:  Introduction to Shamir’s Secret Sharing - How to share a secret
 date:   2024-10-29
 lang: en
 locale: en-GB
