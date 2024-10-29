@@ -11,7 +11,7 @@ image:  /assets/article/blockchain/solana/solanaLogoMark.png
 isMath: false
 ---
 
-This article is an introduction to the core concept around Solana, notably:
+This article is an introduction to the core concept around the blockchain **Solana**, notably:
 
 - Solana Account Model
 - Accounts and programs on Solana
@@ -19,7 +19,9 @@ This article is an introduction to the core concept around Solana, notably:
 - Program Derived Address (PDA)
 - Cross Program Invocation (CPI)
 
-This is mainly based on several video by Ackee Blockchain Security: [Solana programming model I](https://www.youtube.com/watch?v=Plp4y27LNWs), [Solana Programming Model 2](https://youtu.be/Cai1Orc1NuI?si=VsYPmeAsgviSXhfrm), [SPL Tokens on Solana ◎ Bonus Lecture](https://www.youtube.com/watch?v=iwa8SPuAjIk)
+Solana’s ecosystem is centered on speed, scalability, and efficient smart contract development, using **Rust** as a primary programming languages. Additionally, Solana supports **Solana Program Library (SPL)**, a set of community-maintained on-chain programs providing standards for functions like token management and governance.
+
+This article is mainly based on several video by Ackee Blockchain Security: [Solana programming model I](https://www.youtube.com/watch?v=Plp4y27LNWs), [Solana Programming Model 2](https://youtu.be/Cai1Orc1NuI?si=VsYPmeAsgviSXhfrm), [SPL Tokens on Solana ◎ Bonus Lecture](https://www.youtube.com/watch?v=iwa8SPuAjIk)
 
 [TOC]
 
