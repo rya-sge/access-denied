@@ -1,0 +1,180 @@
+# TLS 1.3: A Comprehensive Overview
+
+Transport Layer Security (TLS) 1.3 is the latest version of the TLS protocol, designed to enhance internet security, speed, and privacy. Finalized in 2018, TLS 1.3 represents a significant improvement over previous versions by streamlining the protocol, improving security, and enhancing performance, especially in environments with higher latency. This article explores the key features, security mechanisms, and performance improvements of TLS 1.3.
+
+[TOC]
+
+## Why TLS 1.3?
+
+TLS 1.3 was developed to address several limitations and security concerns inherent in previous versions, particularly TLS 1.2, which had become vulnerable to various attacks due to the aging cryptographic primitives it used and the complex nature of its handshake process. Key motivations behind the upgrade to TLS 1.3 include:
+
+- **Increased security**: TLS 1.3 removes outdated and insecure cryptographic algorithms and introduces stronger encryption.
+- **Reduced latency**: TLS 1.3 reduces the number of round-trip communications required to establish a secure connection, speeding up the handshake process.
+- **Simplified protocol**: By removing legacy features and simplifying the handshake, TLS 1.3 is easier to implement and audit, making it more secure.
+
+
+
+### History
+
+| TLS version | Date | Note                                                         |
+| ----------- | ---- | ------------------------------------------------------------ |
+| TLS v1.0    | 1999 |                                                              |
+| TLS v1.1    | 2006 | RFC 4346. Tried to fix padding<br/>oracle attacks when using CBC<br/>mode. |
+| TLS v1.2    | 2008 | RFC 5246 and RFC 6176.                                       |
+| TLS v1.3    | 2018 | RFC 8446. Clean, fresh design.<br/>Four years of work. The most se-<br/>cure version. |
+
+## 2. Key Features of TLS 1.3
+
+TLS 1.3 introduces several new features and improvements over TLS 1.2, which we’ll discuss below.
+
+### 2.1 Simplified and Faster Handshake
+
+The TLS 1.3 handshake process has been streamlined significantly compared to TLS 1.2. In TLS 1.2, a complete handshake required two round trips (2-RTT) between the client and server. TLS 1.3 reduces this to one round trip (1-RTT) for new connections and even offers a **zero round-trip time (0-RTT)** option for resumed sessions, drastically reducing latency for repeated connections.
+
+**TLS 1.3 1-RTT Handshake Overview**:
+
+1. **Client Hello**: The client initiates the handshake, sending a list of supported cryptographic algorithms, a "random" value, and key share information.
+2. **Server Hello**: The server responds, selecting the algorithm and key share, and then sends its certificate and a “Finished” message.
+3. **Application Data**: At this point, both the client and server have sufficient information to establish encrypted communications, allowing data transmission to begin immediately.
+
+Image from [tlseminar.github.io/tls-13/]( https://tlseminar.github.io/tls-13/) & [cloudflare - 0-RTT Resumption](https://blog.cloudflare.com/tls-1-3-overview-and-q-and-a/)
+
+![tls1.3-handshake]({{site.url_complet}}/assets/article/reseau/tls/tls1.3-handshake.png)
+
+### 2.2 Zero Round-Trip Time Resumption (0-RTT)
+
+In scenarios where a client reconnects to a server with which it has previously established a session, TLS 1.3 enables 0-RTT, allowing encrypted data to be sent immediately without waiting for a full handshake. This feature is particularly useful for applications requiring low latency, such as real-time messaging, but it is limited to cases where both client and server trust previous connection states.
+
+**How it works:** 
+
+- When we resume a session, we can encrypt an initial message (0-RTT)
+- For this, we use the **resumption master secret**
+- Further messages are then encrypted using the key shares if we redo a DH
+- No forward secrecy before the DH.
+- Considered as a controversial addition in TLS 1.3
+
+**Security concerns**: While 0-RTT enhances performance, it has security trade-offs. Attackers may exploit 0-RTT to replay messages (**replay attacks**), so it’s not ideal for sensitive transactions. TLS 1.3 employs techniques such as anti-replay mechanisms to mitigate this risk.
+
+- Solution proposed in the RFC 8446, section 8
+- **Single-use tickets**: Once a ticket is used, remove it form database in the server
+- **Store** client hello values and check for duplicates
+
+Image from [Cloudflare - An overview of TLS 1.3 and Q&A](https://blog.cloudflare.com/tls-1-3-overview-and-q-and-a/)
+
+![TLS-1.3-rtt]({{site.url_complet}}/assets/article/reseau/tls/TLS-1.3-rtt.png)
+
+### 2.3 Stronger Cryptographic Primitives
+
+TLS 1.3 modernizes encryption by removing support for outdated and vulnerable algorithms. Notably, it:
+
+- **Eliminates weak ciphers** like CBC, RC4, 3DES, and MD5.
+- **Removes cipher suites that use RSA key exchange**, which is vulnerable to forward secrecy issues.
+- **Adopts secure algorithms** by default, such as CCM, AES-GCM and ChaCha20-Poly1305, which are Authenticated Encryption with Associated Data (AEAD) ciphers. These ciphers provide both encryption and integrity verification in a single step.
+- For authentication, no more Kerberos, LDAP
+- Group parameters for (EC)DHE are fixed
+
+### 2.4 Forward Secrecy by Default
+
+Forward secrecy (FS) is an essential security feature that ensures past sessions remain secure even if a server’s private key is compromised. TLS 1.3 enforces forward secrecy by mandating the use of **ephemeral Diffie-Hellman (DHE) key exchanges**, ensuring that a unique encryption key is generated for each session. This way, a compromised private key cannot decrypt past communications.
+
+### 2.5 Simplified Cipher Suites
+
+In TLS 1.3, the number of cipher suites is significantly reduced, simplifying configuration and improving security. Cipher suites in TLS 1.3 no longer include bulk encryption algorithms, MACs, and pseudorandom functions (PRFs) but instead rely on AEAD algorithms exclusively. The most common supported cipher suites are:
+
+- `TLS_AES_128_GCM_SHA256`
+- `TLS_AES_256_GCM_SHA384`
+- `TLS_CHACHA20_POLY1305_SHA256`
+
+These cipher suites offer strong encryption and integrity while reducing compatibility issues and potential security vulnerabilities associated with weaker options.
+
+### 2.6 Improved Key Derivation Process
+
+TLS 1.3 introduces a new key derivation method based on the **HMAC-based Extract-and-Expand Key Derivation Function (HKDF)**. HKDF strengthens the key derivation process, ensuring that keys are unique and non-reusable across sessions. This process involves generating multiple session keys (such as encryption keys and MAC keys) from a master secret, using hash functions to guarantee robustness.
+
+- Uses HMAC with the hash function described in the ciphersuite (SHA-256 or SHA-384)
+- Two functionalities: HKDF-extract and HKDF-expand
+- HKDF-extract: Extract a pseudo-random key from a secret and a salt
+- HKDF-expand: Make its output longer using some information model
+
+### 2.7 Enhanced Privacy
+
+TLS 1.3 encrypts more of the handshake process than previous versions, including sensitive information like certificate data. This ensures that eavesdroppers cannot see certain details of the session negotiation. Additionally, this feature reduces exposure to metadata, enhancing user privacy and thwarting traffic analysis attacks.
+
+## 3. Security Improvements in TLS 1.3
+
+The improved security model of TLS 1.3 addresses numerous vulnerabilities identified in earlier TLS versions. Below are some of the key security improvements.
+
+### Removal of Legacy Protocols and Vulnerable Ciphers
+
+TLS 1.3 discontinues support for insecure cryptographic primitives and older TLS/SSL versions. This action mitigates risks associated with attacks like BEAST, CRIME, and POODLE, which exploited weaknesses in SSL and earlier TLS versions.
+
+### Protection Against Downgrade Attacks
+
+Downgrade attacks occur when an attacker forces a client-server connection to use an older, less secure protocol version. To counter this, TLS 1.3 includes a “**downgrade protection**” mechanism where both client and server can detect and reject attempts to negotiate earlier versions of TLS.
+
+### Improved Replay Protection in 0-RTT Mode
+
+TLS 1.3 mitigates replay attacks in 0-RTT mode by implementing anti-replay measures, which are particularly important in applications sensitive to duplicate data. While 0-RTT mode does not fully prevent replays, servers can opt to use 0-RTT only for non-critical data, thereby balancing performance with security.
+
+## 4. Performance Benefits of TLS 1.3
+
+### Reduced Latency
+
+By reducing the handshake process from 2-RTT to 1-RTT, TLS 1.3 achieves faster connection establishment. This latency reduction is particularly beneficial in mobile and high-latency environments, where speed is critical to user experience.
+
+See [thousandeyes - Optimizing Web Performance with TLS 1.3](https://www.thousandeyes.com/blog/optimizing-web-performance-tls-1-3)
+
+### Lower CPU and Bandwidth Overheads
+
+With its simplified and efficient protocol, TLS 1.3 reduces CPU load and bandwidth requirements, enabling faster connections with less resource consumption. This optimization improves the efficiency of web servers, benefiting both server operators and users.
+
+### Better Resilience for Mobile Networks
+
+TLS 1.3’s streamlined handshake process makes it well-suited for mobile and wireless networks, which often experience high latency and intermittent connectivity. The reduction in round-trip times and the option for 0-RTT make TLS 1.3 a favorable protocol for real-time applications.
+
+## 5. Mathematical Foundations of TLS 1.3
+
+TLS 1.3 relies heavily on **Diffie-Hellman key exchange** (DHKE) and **elliptic curve Diffie-Hellman (ECDHE)**, cryptographic methods that provide forward secrecy. These methods rely on the difficulty of computing discrete logarithms and elliptic curve properties, providing robust security.
+
+### Diffie-Hellman Key Exchange (DHKE)
+
+In DHKE, both client and server agree on a shared secret 
+$$
+g^{ab} mod~ p
+$$
+by exchanging partial computations. In the elliptic curve variant (ECDHE), the computation occurs over an elliptic curve group E instead of a prime field, providing equivalent security with shorter key lengths.
+$$
+P_{shared} = d_1 * Q_2 = d_2 * Q_1
+$$
+
+
+where *d1* and *d2* are private keys and *Q1*, *Q2* are public keys on an elliptic curve.
+
+### HKDF for Key Derivation
+
+The **HMAC-based Extract-and-Expand Key Derivation Function (HKDF)** used in TLS 1.3 takes an initial secret and produces cryptographic keys through hashing. HKDF provides a secure, flexible, and efficient key derivation process, offering session keys that are unique to each communication session.
+
+- Uses HMAC with the hash function described in the
+  ciphersuite (SHA256 or SHA384)
+- Two functionalities : **HKDF-extract** and **HKDF-expand**.
+- **HKDF-extract** : Extract a pseudo-random key from a secret
+  and a salt.
+- **HKDF-expand** : Make its output longer using some
+  information label.
+
+## Two functionalities on top of HKFS
+
+- HKDF expand label and derive secret.
+- **HKDF expand labe**l : use the label name as information in
+  HKDF-expand. Additionally, inject context into info.
+- **Derive secret :**
+  Derive-Secret(Secret, Label, Messages) =
+  HKDF-Expand-Label(Secret, Label,Transcript-Hash(Messages))
+
+## 6. Adoption of TLS 1.3
+
+TLS 1.3 is now widely supported across browsers, web servers, and operating systems, making it a critical part of secure internet infrastructure. Browsers like Chrome, Firefox, and Safari, as well as web servers like Apache and NGINX, have adopted TLS 1.3 by default, driving its widespread use. Furthermore, major cloud providers and content delivery networks (CDNs) have enabled TLS 1.3, providing secure and fast connections to end-users.
+
+## 7. Conclusion
+
+TLS 1.3 marks a significant step forward in secure communications,

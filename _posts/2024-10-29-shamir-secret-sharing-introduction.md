@@ -13,7 +13,7 @@ isMath: true
 
 **Shamir's Secret Sharing** (SSS) is a cryptographic method developed by Israeli cryptographer Adi Shamir in 1979 in the paper *How to share a secret*. I
 
-t enables a secret to be divided into multiple parts, known as "shares," which can be distributed among participants. Only a subset of these shares, a threshold number, is required to reconstruct the original secret. 
+Shamir's Secret Sharing enables a secret to be divided into multiple parts, known as "shares," which can be distributed among participants. Only a subset of these shares, a threshold number, is required to reconstruct the original secret. 
 
 This technique provides a secure way to protect sensitive information by splitting it, ensuring that no single person can access the information alone unless they gather a specific number of shares.
 
@@ -28,6 +28,10 @@ The three main use cases are:
 - Multi-party computation
 - Protection against side-channel attack (masking)
 - Share a secret between different locations/people: unlock the secret requires to have enough shares
+
+[TOC]
+
+
 
 ### The Mechanics of Shamir’s Secret Sharing
 
@@ -48,7 +52,7 @@ $$
 S = f(0) = a_0 
 $$
 
-If fewer than t shares are available, there is not enough information to reconstruct the polynomial, and the secret remains safe.
+If fewer than `t` shares are available, there is not enough information to reconstruct the polynomial, and the secret remains safe.
 
 ### Share generation in Practice
 
@@ -58,7 +62,7 @@ If fewer than t shares are available, there is not enough information to reconst
 - The secret is often a chain of n bits. Then
 
 $$
-K ∈ GF(2^n)
+a_0 ∈ GF(2^n)
 $$
 
 This is also the case for the coefficients of the polynomial.
@@ -82,7 +86,7 @@ $$
 
 ### Security of Shamir’s Secret Sharing: A Threat Model
 
-Shamir’s Secret Sharing offers a high level of security and resilience against specific threats:
+Shamir’s Secret Sharing is relevant against these specific threats:
 
 1. **Confidentiality**: Since each share does not reveal any information about the secret by itself, unauthorized access to any subset with fewer than `t` shares provides no advantage in recovering the secret.
 2. **Integrity**: Shares can be validated during the reconstruction process, reducing the risk of tampering.
@@ -157,11 +161,11 @@ To ensure your backup’s security, a separate and independent company in differ
 
 - Colde storage (HSM)
 
- Additionally, each fragment backup provider uses a hardened, tamper-resistant server called a Hardware Security Module (HSM) to securely store these encrypted fragments.
+Additionally, each fragment backup provider uses a hardened, tamper-resistant server called a Hardware Security Module (HSM) to securely store these encrypted fragments.
 
 - Fragment validity with PVSS
 
-Ass a supplementary protection, contrary to SSS, PVSS also verifies the validity of the fragments received during reconstruction of the secret . Essentially, PVSS introduces additional variables alongside the creation of the secret which allows it to verify the fragments are consistent with the original secret. And it does so without revealing any intelligible information about the original secret. 
+As a supplementary protection, contrary to SSS, PVSS also verifies the validity of the fragments received during reconstruction of the secret . Essentially, PVSS introduces additional variables alongside the creation of the secret which allows it to verify the fragments are consistent with the original secret. And it does so without revealing any intelligible information about the original secret. 
 
 In short, this guarantees that custodians are sending the correct shares back during the secret’s reconstitution.
 
@@ -172,3 +176,16 @@ Reference: [Ledger - What is Shamir’s Secret Sharing?](https://www.ledger.com/
 ### Conclusion
 
 Shamir’s Secret Sharing provides a robust, theoretically sound method for protecting sensitive information by dividing it among multiple trusted participants. Its application in cryptocurrency wallets offers a valuable layer of security for both individual and institutional users, helping to secure private keys and seed phrases in a way that minimizes risks associated with insider threats, data loss, and external attacks. Although practical challenges exist, careful implementation and management can make Shamir’s Secret Sharing a powerful tool in safeguarding digital assets in the ever-evolving landscape of cryptocurrency security.
+
+## Reference
+
+- Cryptography course (CRY) taught at HEIG-VD in 2022
+
+- Ledger:
+
+  - [Ledger - What is Shamir’s Secret Sharing?](https://www.ledger.com/academy/topics/security/shamirs-secret-sharing)
+
+
+  - [Ledger Recover](https://www.ledger.com/academy/what-is-ledger-recover)
+
+- ChatGPT with the input "Write me an article about Shamir Secret Sharing. Talk also about its security with a thread model and its use for crypto wallet"
