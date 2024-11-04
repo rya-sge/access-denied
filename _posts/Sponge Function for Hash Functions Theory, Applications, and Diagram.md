@@ -36,12 +36,10 @@ A sponge function follows these steps:
 
 3. **Padding**: If the message length isn’t a multiple of `r`, apply padding to make the final block fit the size.
 
-4. Squeezing
-
-   :
+4. Squeezing:
 
    - Output `r` bits of the state.
-   - If more output is needed, reapply the function `f` to generate additional output blocks.
+- If more output is needed, reapply the function `f` to generate additional output blocks.
 
 ------
 
@@ -54,7 +52,6 @@ A sponge function for input `M` can be defined as follows:
    S = 0^b
    $$
    
-
 2. **Absorbing Phase**: For each message block `M_i` (where `M = M_1 || M_2 || ... || M_n` and `|M_i| = r`):
    $$
    S[:r] = S[:r] ⊕ M_i
@@ -64,7 +61,6 @@ A sponge function for input `M` can be defined as follows:
    S = f(S)
    $$
    
-
 3. **Squeezing Phase**: Repeat while more output is required:
    $$
    Z_i = S[:r]
@@ -91,7 +87,13 @@ To make the input fit into `r`-bit blocks, padding is applied to the message. Th
 2. **Rate and Capacity**: For SHA3-256 (256-bit output), `r = 1088` bits and `c = 512` bits.
 3. **Transformation Function**: A permutation function `f` designed for Keccak, based on bitwise operations and rotations.
 
-SHA-3 operates through the sponge structure by absorbing the message into the state with the XOR operation, permuting the state, and then squeezing out the output.
+SHA-3 operates through the sponge structure by:
+
+1.absorbing the message into the state with the XOR operation;
+
+2.permuting the state;
+
+3.and then squeezing out the output.
 
 ------
 
@@ -158,10 +160,4 @@ The following parameters influence the security of sponge functions:
 
 Sponge functions are foundational structures in cryptographic functions, enabling the creation of hash functions, stream ciphers, and random number generators. Their flexibility in input/output length and security properties makes them a cornerstone in modern cryptography. The SHA-3 function family is a testament to the practical and robust nature of the sponge construction.
 
-------
 
-
-
-
-
-4o

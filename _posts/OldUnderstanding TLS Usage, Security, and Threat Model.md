@@ -29,7 +29,6 @@ TLS offers the following functionalities:
 | TLS v1.1    | 2006 | RFC 4346. Tried to fix padding<br/>oracle attacks when using CBC<br/>mode. |      |
 | TLS v1.2    | 2008 | RFC 5246 and RFC 6176. Cur-<br/>rently, the most common version. |      |
 | TLS v1.3    | 2018 | RFC 8446. Clean, fresh design.<br/>Four years of work. The most se-<br/>cure version. |      |
-|             |      |                                                              |      |
 
 
 
