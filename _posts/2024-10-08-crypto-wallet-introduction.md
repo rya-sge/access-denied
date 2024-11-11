@@ -32,15 +32,17 @@ From a cryptography perspective, these blockchains use most often public key cry
 
 ![account]({{site.url_complet}}/assets/article/blockchain/wallet/wallet-introduction/crypto-wallet-origin.drawio.png)
 
-## Types of Crypto Wallets
+## Internet exposure of Crypto Wallets
 
-Crypto wallets come in various forms, each catering to different user needs based on convenience, security, and usage scenarios. The three main categories are **hot**, **warm** and cold wallets.
+Crypto wallets come in various forms, each catering to different user needs based on convenience, security, and usage scenarios. 
 
-These categories classify wallets mainly based on their connectivity and their exposure to the internet, and consequently to cyber threats such as malware, phishing, etc.
+Crypto wallets are generally categorized based on their connectivity and their exposure to the internet, and consequently to cyber threats such as malware, phishing, etc.
+
+The three main categories are **hot**, **warm** and cold wallets.
 
 ![account]({{site.url_complet}}/assets/article/blockchain/wallet/wallet-introduction/crypto-wallet-category.png)
 
-### 1. **Hot Wallets**
+### 1. Hot Wallets
 
 Hot wallets are connected to the internet and allow for quick and easy access to your crypto assets. These wallets are typically more user-friendly, making them ideal for beginners or frequent traders. However, their constant internet connection makes them vulnerable to hacking attempts.
 
@@ -72,7 +74,7 @@ With account abstraction, some smart contract based wallets are used in conjunct
 
 Example: [bitget](https://web3.bitget.com/en), [cropty.io - web-wallet](https://www.cropty.io/web-wallet)
 
-#### **Risks**
+#### Risks
 
 - **Hacking and Cyber Attacks**: Since hot wallets are connected to the internet, they are vulnerable to hacking, phishing, and malware attacks. If the wallet provider or your device gets compromised, attackers can steal your private keys and access your funds.
 - **Phishing Scams**: Fake websites, apps, or emails can trick users into entering their credentials, leading to the loss of their private keys.
@@ -80,7 +82,7 @@ Example: [bitget](https://web3.bitget.com/en), [cropty.io - web-wallet](https://
 - **Device Vulnerabilities**: If the device running the wallet (mobile phone or computer) is infected with malware or is physically stolen, your private keys and funds are at risk.
 - **Data Breaches**: Using hot wallets on centralized providers can expose your data to potential breaches, resulting in identity theft or loss of funds through a phishing attack against you.
 
-### 2. **Warm Wallets**
+### 2. Warm Wallets
 
 This type of wallets is installed and stored the private keys on devices generally used in everyday life.
 
@@ -95,7 +97,7 @@ There are three way to have these wallets:
 - **Mobile Wallets**: Mobile wallets are apps installed on smartphones. They are convenient for everyday use, allowing you to quickly transfer and receive crypto on the go. Examples include Trust Wallet or MetaMask.
 - **Desktop Wallets**: These are software programs downloaded and installed on your computer. Desktop wallets are more secure than web wallets, but they are still susceptible to malware and hacks if your computer is compromised.
 
-#### **Risks**
+#### Risks
 
 - **Limited Offline Protection**: While warm wallets may have certain offline features (such as two-factor authentication or hardware authentication), they are still exposed to online threats.
 - **Physical Security**: If you lose the device where the warm wallet is installed, your funds could be compromised unless you have recovery mechanisms (e.g., a recovery phrase or encrypted backups).
@@ -106,7 +108,7 @@ Reference:
 
 [Ceffu - Cold vs. Warm vs. Hot Wallets: Which Crypto Wallet Solution Should You Choose?](https://www.ceffu.com/blog/cold-warm-hot-wallet-which-crypto-wallet-solution-should-you-choose), [Fireblocks - Hot vs. cold vs. warm wallets: Which crypto wallet is right for me?](https://www.fireblocks.com/blog/hot-vs-warm-vs-cold-which-crypto-wallet-is-right-for-me/)
 
-### 3. **Cold Wallets**
+### 3. Cold Wallets
 
 Cold wallets are not connected to the internet, making them much safer from online threats like hacking. These are preferred for long-term storage of significant amounts of cryptocurrency. 
 
@@ -149,8 +151,6 @@ Some Hardware wallet (e.g Trezor or Ledger) support more blockchains than paper 
 - **Limited Access**: You need physical access to your hardware wallet to make transactions, which can be inconvenient if you need to make frequent transactions.
 - **Firmware Updates**: Requires periodic updates to support new features and eventually remain secure if a vulnerability is discovered, which can be a hassle for less tech-savvy users.
 
-
-
 ###### Ambivalent opinion
 
 - **Backup and Recovery**: 
@@ -182,7 +182,7 @@ See [airgap.it/offline-device/](https://airgap.it/offline-device/)
 
 Reference: [coinbase.com - What is an air-gapped wallet?](https://www.coinbase.com/learn/wallet/what-is-an-air-gapped-wallet)
 
-#### **Risks**
+#### Risks
 
 - **Physical Theft or Loss**: While cold wallets are secure from online attacks when there are not connected to a device, they are at risk of physical theft. If someone gains access to your hardware wallet, paper wallet, or air-gapped computer and knows the PIN, they can steal your funds.
 - **No Backup or Recovery**: If you lose your hardware wallet or paper wallet, or it is damaged, you may lose access to your funds permanently unless you have a secure backup of your recovery phrase. Paper wallets, in particular, are prone to damage and loss
@@ -204,21 +204,21 @@ Here the common to step to use a crypto wallet:
 
 While crypto wallets offer secure management of digital assets, they are not without risks. It’s crucial to be aware of potential pitfalls:
 
-### 1. **Scam and Phishing Attacks**
+### 1. Scam and Phishing Attacks
 
 Hot wallets, due to their internet connectivity, are susceptible to hacks. Attackers can steal private keys or use phishing attacks to trick users into giving up their credentials. Always double-check URLs when accessing web wallets and be cautious of unsolicited communication from exchanges or wallet providers.
 
 Scams in the crypto world are also common, with fraudsters luring victims through fake wallet apps, fraudulent exchanges, or Ponzi schemes. Use well-vetted wallets and platforms to avoid these risks.
 
-### 2. **Lost Private Keys**
+### 2. Lost Private Keys
 
 Unlike bank accounts, self-custodial crypto wallets (e.g Trezor) do not have a customer support number to recover lost credentials. If you lose access to your private key or seed phrase, you lose access to your funds permanently. Keeping a backup of your private key in a secure place is essential.
 
-### 3. **Malware **
+### 3. Malware
 
 Malware can infect your device and steal your private keys or reroute transactions to a scammer’s address. This particularly concerns warm wallets which are installed on a device used in everyday life, e.g. your personal computer or your telephone.
 
-### 4. **Human Error**
+### 4. Human Error
 
 Sending crypto to the wrong address or making mistakes in transactions is irreversible. Unlike traditional banking systems, there’s no centralized authority to reverse errors. Double-check all details before initiating transfers.
 
@@ -244,11 +244,11 @@ In practice, the majority of upgrades add new features and blockchains, and ther
 
 ### Summary Table of Risks
 
-| Wallet Type | Major Risks                                                 | Mitigation Strategies                                        |
-| ----------- | ----------------------------------------------------------- | ------------------------------------------------------------ |
-| **Hot**     | Hacking, phishing, malware, third-party risk                | Use strong passwords, 2FA, and only trusted services         |
-| **Warm**    | Malware, human error, physical device theft                 | Regular backups, secure the device, don't install random software and don't click on random link (phishing) |
-| **Cold**    | Physical theft, loss, no backups, malicious firmware update | Store securely, backup recovery phrase, use only trusted hardware |
+| Wallet Usage | Major Risks                                                 | Mitigation Strategies                                        |
+| ------------ | ----------------------------------------------------------- | ------------------------------------------------------------ |
+| **Hot**      | Hacking, phishing, malware, third-party risk                | Use strong passwords, 2FA, and only trusted services         |
+| **Warm**     | Malware, human error, physical device theft                 | Regular backups, secure the device, don't install random software and don't click on random link (phishing) |
+| **Cold**     | Physical theft, loss, no backups, malicious firmware update | Store securely, backup recovery phrase, use only trusted hardware |
 
 Each type of wallet has its strengths and weaknesses in terms of security and convenience. Users should carefully evaluate their own needs, balancing ease of access with the level of risk they are willing to take.
 

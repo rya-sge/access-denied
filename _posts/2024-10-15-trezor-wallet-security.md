@@ -287,7 +287,7 @@ Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/
 
 ### Additional Security Considerations
 
-### 1. Physical Security
+#### 1. Physical Security
 
 While Trezor hardware wallets are robust, they are not impervious to **physical attacks** if a device falls into the wrong hands. 
 
@@ -297,11 +297,11 @@ The passphrase feature is especially useful because it creates an additional lev
 
 Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access to the fund if they don't manage to find the passphrase.
 
-### 2. Supply Chain Attacks
+#### 2. Supply Chain Attacks
 
 To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures
 
-### Tamper-evident packaging
+#### Tamper-evident packaging
 
 Users are encouraged to inspect the device for any signs of tampering, such as broken seals. 
 

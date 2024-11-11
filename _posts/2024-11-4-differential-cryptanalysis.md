@@ -6,12 +6,12 @@ lang: en
 locale: en-GB
 categories: blockchain cryptography
 tags: cryptography
-description: Differential cryptanalysis is a technic to attack to target symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
+description: Differential cryptanalysis is a technic to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
 image:
 isMath: true
 ---
 
-Differential cryptanalysis is a technic to attack to target symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
+**Differential cryptanalysis** is a technic to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
 
 This technique, developed in the late 1980s by Eli Biham and Adi Shamir, is especially effective against algorithms that rely on substitution and permutation operations.  Researchers at IBM had already discovered similar techniques in 1974 but not to disclose them publicly.
 
@@ -57,9 +57,32 @@ Differential cryptanalysis has historically targeted block ciphers by analyzing 
 
 In block ciphers, input differences can often lead to patterns in the encryption process, which cryptanalysts exploit to reveal parts of the encryption key or the structure of the cipher.
 
-### Differential cryptanalysis against Feistel
+### Differential cryptanalysis against FEAl
 
+FEAL (Fast data Encipherment ALgorithm) is a [block cipher](https://en.wikipedia.org/wiki/Block_cipher) considered at the beginning as an alternative to the [Data Encryption Standard](https://en.wikipedia.org/wiki/Data_Encryption_Standard) (DES) but it is vulnerable to several attacks against it.
 
+- Feal-4 had four rounds. This version was broken by Den Boer using a chosen plaintext attack with 100 to 10000 ciphertexts and another attack by Sean Murphy uses [differential cryptanalysis](https://en.wikipedia.org/wiki/Differential_cryptanalysis) that needs only 20 chosen plaintexts
+-  For Feal-8, [Eli Biham](https://en.wikipedia.org/wiki/Eli_Biham) and [Adi Shamir](https://en.wikipedia.org/wiki/Adi_Shamir) described a differential attack on this version in 1989.
+
+#### FEAL-4
+
+FEAL-4 is a 4 round Feistel cipher with a 64 bit block size. This means that the algorithm encrypts/decrypts data in 64 bit chunks. 
+
+- The Feistel structure means that the blocks are actually split in half for processing
+- These halves are mixed together via XOR operations throughout the encryption. 
+- The non-linear component (the heart of the cipher) is called the **round function**
+  -  It is a one-way/trapdoor function that takes a 32 bit input and produces a 32 bit output. 
+  - This function is used 4 times during encryption: once for each round. 
+  - The strength of FEAL-4 against statistical attacks like differential cryptanalysis is dependent on the behavior of this round function.
+
+#### Comparison with DES
+
+- The structure of FEAL is similar to DES with a modified *F* function, initial and final permutations and key scheduling algorithm. 
+- In the *F* function, the *P* permutation and the S boxes of DES are replaced by byte rotations and addition operations
+
+- [theamazingking.com/crypto-feal.php](http://www.theamazingking.com/crypto-feal.php)
+- [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention)
+- [Wikipedia - FEAL](https://en.wikipedia.org/wiki/FEAL)
 
 ### Differential cryptanalysis against DES
 
@@ -96,7 +119,7 @@ In hash functions, the attacker’s objective is often to find a **collision**�
 
 Differential cryptanalysis was used by cryptography researchers to find collision on IOTA’s custom hash function Curl-P-27.
 
-OTA Signature Scheme (ISS) is based on Winternitz One-Time Signatures, see [my article](https://rya-sge.github.io/access-denied/2024/05/30/winternitz-signature-scheme/),
+OTA Signature Scheme (ISS) is based on Winternitz One-Time Signatures, see [my article](https://rya-sge.github.io/access-denied/2024/05/30/winternitz-signature-scheme/).
 
 In IOTA, users uses winternitz to sign the hash of a message. 
 
@@ -126,10 +149,17 @@ Spending from a multi-signature address requires one user to produce a payment f
 
 Given the effectiveness of differential cryptanalysis, modern cryptographic algorithms often incorporate design features specifically to thwart it:
 
-1. **Randomized Substitution-Permutation Layers:** Many modern ciphers use more complex S-boxes and mixing layers, minimizing the probability of predictable differential characteristics.
-2. **Increased Round Count:** By adding rounds, it becomes harder for attackers to track input-output differences, which decreases the effectiveness of differential attacks.
-3. **Advanced Hash Functions:** Secure hash algorithms like SHA-256 are designed to prevent differential characteristics from propagating through their iterative structures.
-4. **Key Schedule Improvements:** Algorithms now use complex key scheduling mechanisms to ensure that keys do not exhibit predictable patterns across rounds.
+1.**Randomized Substitution-Permutation Layers:** Many modern ciphers use more complex S-boxes and mixing layers, minimizing the probability of predictable differential characteristics. you need to prove that the Differentials don't go over a certain probability (the lower the better).
+
+2.**Increased Round Count:** By adding rounds, it becomes harder for attackers to track input-output differences, which decreases the effectiveness of differential attacks.
+
+For example, in the case of FEAL, they switched from 4 to 8 rounds and then to N rounds where N is chosen by the user. But similar attack  to differential cryptanalysis was still possible on the 8 round version
+
+3.**Advanced Hash Functions:** Secure hash algorithms like SHA-256 are designed to prevent differential characteristics from propagating through their iterative structures.
+
+4.**Key Schedule Improvements:** Algorithms now use complex key scheduling mechanisms to ensure that keys do not exhibit predictable patterns across rounds.
+
+Reference: [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention), [FEAL](https://en.wikipedia.org/wiki/FEAL)
 
 ## 5. Conclusion
 
