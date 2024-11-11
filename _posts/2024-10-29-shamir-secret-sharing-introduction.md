@@ -40,7 +40,9 @@ Shamir’s Secret Sharing is based on polynomial interpolation. A secret S is en
 1. **Define a polynomial**: For a given secret S, create a random polynomial 
 
 $$
+\begin{aligned}
 f(x) = a_0 + a_1x + a_2x² + a_3x³ + ... + a_{(t-1)}x^{(t-1)}
+\end{aligned}
 $$
 
 
@@ -49,7 +51,9 @@ $$
 2. **Reconstruction**: To reconstruct the secret, a subset of `t` or more shares is required. By using Lagrange interpolation, the participants can reconstruct the polynomial and, thus, the constant term a0=S which is the original secret.
 
 $$
+\begin{aligned}
 S = f(0) = a_0 
+\end{aligned}
 $$
 
 If fewer than `t` shares are available, there is not enough information to reconstruct the polynomial, and the secret remains safe.
@@ -62,14 +66,18 @@ If fewer than `t` shares are available, there is not enough information to recon
 - The secret is often a chain of n bits. Then
 
 $$
+\begin{aligned}
 a_0 ∈ GF(2^n)
+\end{aligned}
 $$
 
-This is also the case for the coefficients of the polynomial.
+This is\begin{aligned} also the case for the coefficients of the polynomial.
 
 The share is then an element of 
 $$
+\begin{aligned}
 (GF(2^n))²
+\end{aligned}
 $$
 
 ## Secret Recovery
