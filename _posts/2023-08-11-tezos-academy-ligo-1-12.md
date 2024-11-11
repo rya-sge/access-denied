@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Tezos Academy - Overview"
+title: Tezos Academy - Overview
 date:   2023-08-11
 last-update: 
 categories: blockchain
@@ -17,7 +17,7 @@ By default, Tezos smart contracts are written in [Michelson](https://tezos.gitla
 
 To help the programmer to understand LIGO, the different challenges are in Javascript (JsLigo)
 
-The path is available here: [https://academy.ligolang.org/](https://academy.ligolang.org/) & [https://academy.ligolang.org/js/chapter-about](https://academy.ligolang.org/js/chapter-about)
+The path is available here: [academy.ligolang.org/](https://academy.ligolang.org/) & [academy.ligolang.org/js/chapter-about](https://academy.ligolang.org/js/chapter-about)
 
 [TOC]
 

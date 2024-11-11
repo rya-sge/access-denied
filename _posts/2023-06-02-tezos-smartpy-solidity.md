@@ -36,7 +36,7 @@ This articles describes a correspondence table between the smart contract langua
 
 We use the keyword `contract`
 
-```
+```solidity
 contract MyEpicGame {}
 ```
 
