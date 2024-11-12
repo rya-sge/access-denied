@@ -19,7 +19,7 @@ This technique provides a secure way to protect sensitive information by splitti
 
 For example, if a business wants to protect its most critical secret, it can split it into multiple parts and set a rule where only a certain number of executives together can reconstruct it. 
 
-This principle is highly relevant in protecting sensitive data, like cryptographic keys in digital wallets.
+This principle is relevant in protecting sensitive data, like cryptographic keys in digital wallets.
 
 ### Use case
 
@@ -183,7 +183,11 @@ Reference: [Ledger - What is Shamir’s Secret Sharing?](https://www.ledger.com/
 
 ### Conclusion
 
-Shamir’s Secret Sharing provides a robust, theoretically sound method for protecting sensitive information by dividing it among multiple trusted participants. Its application in cryptocurrency wallets offers a valuable layer of security for both individual and institutional users, helping to secure private keys and seed phrases in a way that minimizes risks associated with insider threats, data loss, and external attacks. Although practical challenges exist, careful implementation and management can make Shamir’s Secret Sharing a powerful tool in safeguarding digital assets in the ever-evolving landscape of cryptocurrency security.
+Shamir’s Secret Sharing provides a method for protecting sensitive information by dividing it among multiple trusted participants. 
+
+Its application in cryptocurrency wallets offers a valuable layer of security for both individual and institutional users, helping to secure private keys and seed phrases in a way that minimizes risks associated with insider threats, data loss, and external attacks.
+
+Although practical challenges exist, careful implementation and management can make Shamir’s Secret Sharing a relevant tool in safeguarding digital assets in the crypto space.
 
 ## Reference
 

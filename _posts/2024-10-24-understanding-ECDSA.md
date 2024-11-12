@@ -46,8 +46,6 @@ A = aG
 \end{aligned}
 $$
 
-
-
 ### Key Generation
 
 To generate a key pair in ECDSA, the process follows these steps:
@@ -220,7 +218,7 @@ $$
 s1 = \frac{h1 + ar}{k} mod~ n = k^{-1}(h1 + ar)~mod ~n
 \end{aligned}
 $$
- 
+
 
 And
 $$

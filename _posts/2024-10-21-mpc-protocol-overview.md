@@ -49,7 +49,9 @@ At the core of MPC protocols are **cryptographic primitives** like **secret shar
   - To share a secret `s`, the dealer selects a random polynomial `f(x)` of degree <= `t−1` where `f(0)=s` . The dealer then distributes evaluations of the polynomial `f(i)` to participant `i`.
 
   $$
+\begin{aligned}
   f(x) = a_0 + a_1x + a_2x² + a_3x³ + ... + a_(t-1)x⁽t-1)
+\end{aligned}
   $$
 
   
@@ -57,7 +59,9 @@ At the core of MPC protocols are **cryptographic primitives** like **secret shar
   - The secret can be reconstructed using Lagrange interpolation if at least `t` participants collaborate:
 
   $$
+  \begin{aligned}
   s = f(0) = \sum_{i=1}^{t} s_i \cdot \lambda_i(0)
+  \end{aligned}
   $$
 
   where `λi(0)` are Lagrange basis polynomials.
@@ -83,7 +87,9 @@ Reference: [MPC - Oblivious Transfer](https://wiki.mpcalliance.org/Oblivious%20T
 - For example, a partially homomorphic encryption scheme like **Paillier** supports additive operations: 
 
 $$
+\begin{aligned}
 Enc(m_1) \cdot Enc(m_2) = Enc(m_1 + m_2)
+\end{aligned}
 $$
 
 

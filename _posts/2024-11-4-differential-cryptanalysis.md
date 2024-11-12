@@ -6,14 +6,14 @@ lang: en
 locale: en-GB
 categories: blockchain cryptography
 tags: cryptography
-description: Differential cryptanalysis is a technic to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
+description: Differential cryptanalysis is a method to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
 image:
 isMath: true
 ---
 
-**Differential cryptanalysis** is a technic to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
+**Differential cryptanalysis** is a method to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
 
-This technique, developed in the late 1980s by Eli Biham and Adi Shamir, is especially effective against algorithms that rely on substitution and permutation operations.  Researchers at IBM had already discovered similar techniques in 1974 but not to disclose them publicly.
+This method, developed in the late 1980s by Eli Biham and Adi Shamir, is especially effective against algorithms that rely on substitution and permutation operations.  Researchers at IBM had already discovered similar techniques in 1974 but they didn't publicly expose it.
 
 While initially applied to block ciphers, differential cryptanalysis can also be adapted to attack hash functions, which are essential in ensuring data integrity and digital signatures in modern cryptographic systems.
 
@@ -163,7 +163,9 @@ Reference: [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchan
 
 ## 5. Conclusion
 
-Differential cryptanalysis is a significant technique that has been used to create modern cryptography. While initially effective against early block ciphers like Festel, this attack has also driven the development of more robust encryption standards and secure hashing algorithms that resist such attacks. 
+Differential cryptanalysis is a significant technique that has been used to test the robustness of cryptographic algorithms.
+
+While initially effective against early block ciphers like Festel, this attack has also driven the development of more robust encryption standards and secure hashing algorithms that resist such attacks. 
 
 ## Reference
 
