@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Trezor Crypto Wallet Security - An In-Depth Review
+title: Trezor Crypto Wallet – Cryptography and Security
 date:   2024-10-15
 lang: en
 locale: en-GB
@@ -15,11 +15,11 @@ A **hardware wallet** is one of the most trusted tools for safeguarding cryptocu
 
 Among the most popular and trusted hardware wallets for storing digital assets securely is **Trezor**, a product developed by [SatoshiLabs](https://satoshilabs.com), Czech technology holding.
 
-Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with several functionalities to protects its assets.
+Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with several functionalities to protect its assets.
 
 This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize,  how they protect the seed phrase and the private keys.
 
-Firstly here a summary of the different options related to security available depending of the models.
+Firstly, here is a summary of the different options related to security available depending on the models.
 
 | Model                                                        | Seed phrase backup         |  | Device Security       |        |         | Authentication                             |                              |
 | ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- |
@@ -51,7 +51,7 @@ References: [trezor - PIN protection on Trezor devices ](https://trezor.io/learn
 
 In addition to a PIN, Trezor provides the option to add an additional layer of security in the form of a **passphrase**. This passphrase essentially acts as a 25th word added to the standard 24-word recovery seed. 
 
-A passphrase has two main purpose:
+A passphrase has two main purposes:
 
 - Even if someone gains access to the recovery seed, without knowing the passphrase, they will not be able to recover the wallet. 
 - Add your own entropy: even if there is a vulnerability in the random generation by the wallet, it will not possible to recover the wallet without the passphrase.
@@ -72,7 +72,7 @@ References: [Trezor - How to use a recovery seed](https://trezor.io/learn/a/how-
 
 Trezor regularly releases **firmware updates** to fix bugs, patch vulnerabilities, and add new features.  In case of a compromission of the Trezor architecture, a malicious firmware update could have a disastrous result and compromise your funds.
 
-There are several protection put in place by Trezor to avoid a malicious updates:
+There are several protections put in place by Trezor to avoid a malicious update:
 
 - These updates require user confirmation via the device’s screen, preventing unauthorized or malicious firmware installations. 
 - The firmware is also **signed** by SatoshiLabs, ensuring the authenticity of the update before installation.
@@ -90,15 +90,13 @@ This section is based on the following resource: [PIN verification and decryptio
 
 #### Data encryption Diagram
 
-What happens when the user choose a new PIN ?
+What happens when the user choose a new PIN?
 
 ![trezor-encryption-pin.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png)
 
 #### Activity diagram
 
-What happens when the user enters its PIN ?
-
-
+What happens when the user enters their PIN?
 
 ![trezor-pin-diagram-activity]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-pin-diagram-activity.png)
 
@@ -119,7 +117,7 @@ See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-der
 
 #### ChaCha20-Poly1305
 
-- **ChaCha20-Poly1305** provides both encryption by using the stream cipher ChaCha20 and authentication with Poly1305 as message authentication code(MAC)  in a single operation. The resulting algorithm is called an Authenticated Encryption with Additional Data cipher (AEAD)
+- **ChaCha20-Poly1305** provides both encryption by using the stream cipher ChaCha20 and authentication with Poly1305 as message authentication code (MAC)  in a single operation. The resulting algorithm is called an Authenticated Encryption with Additional Data cipher (AEAD)
   - It is defined in [**RFC 7539**](https://datatracker.ietf.org/doc/html/rfc7539.html) section 2.8.  
   - This combination offers strong integrity guarantees.
 
@@ -170,7 +168,7 @@ This key is stored encrypted in the storage.
 - **What it is**: The PVC is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
 - **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
 - **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
-- Remark from the trezor documentation: The 64 bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
+- Remark from the trezor documentation: The 64-bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
 
 #### Compute
 
@@ -221,6 +219,8 @@ Thanks to `address_index`, you can have several different addresses for the same
 
 See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=AfmBOopiSIUJDwPISXP5YbzFws1lFEToUwG52ITiM1Y72akbpyvNp8it)
 
+------
+
 ## Model specificity
 
 ### On-Device entry
@@ -251,7 +251,7 @@ The Trezor Safe 5 and Safe 3 reinforce the security by using a Secure Element, c
 
 The chips used is the OPTIGA™ Trust M (V3). 
 
-Contrary to the firmware, the code is not open source but the producer does not restrict Trezor from freely publishing potential vulnerabilities.
+Contrary to the firmware, the code is not open source, but the producer does not restrict Trezor from freely publishing potential vulnerabilities.
 
 ##### About the certification
 
@@ -299,7 +299,11 @@ Moreover, this passphrase is not stored inside the device, therefore if someone 
 
 #### 2. Supply Chain Attacks
 
-To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures
+To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures:
+
+- Seal on the device or the package.
+- A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (= secure boot).
+- Since 2022, individual chips are now glued onto the board
 
 #### Tamper-evident packaging
 
@@ -309,16 +313,74 @@ Additionally, users can verify the authenticity of the firmware when initializin
 
 ### Trezor Safe device authentication check
 
-As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to helps to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
+As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to help to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
 
 ------
 
+## Past attack and vulnerabilities
+
+### Supply Chain Attack
+
+Fake Trezor sold on the Russia Market through a popular website: Modification performed by the attacker(s):
+
+- They install a malicious firmware in the device
+- They removed the bootloader-checks to avoid detection at startup.
+- They replace the randomly generated seed phrase with a pre-generated seed phrases saved in the malicious firmware. 
+- This is the reason why chips are now glued on the board to make modifications more complicated:
+
+Reference: [Kaspersky.com - Case study: fake hardware cryptowallet](https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/)
+
+### Side-channel attack
+
+In the past, several side-channel attacks have been performed on Trezor wallets, notably:
+
+-  [Wallet.fail](https://www.youtube.com/watch?v=Y1OBIGslgGM) (2018)
+
+- [Ledger ](https://www.ledger.com/blog/breaking-trezor-one-with-sca)(2018-2019)
+
+#### Ledger Donjon Team
+
+Ledger identified several side-channel attack on the Trezor Model One.
+
+One concerned the PIN verification allowing an attacker with a stolen Trezor One to retrieve the correct value of the PIN within a few minutes.
+
+In the first versions of the Trezor Model One, the Pin verification was done like this:
+
+![Trezor code](https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png)
+
+As indicated by Ledger:
+
+The subtraction operation *storageRom->pin[i] — presented_pin[i]* contains 
+
+- The secret PIN value 
+- The user input value
+
+Thus, a side-channel attack is possible to induce differentiability. The Ledger Donjon Team measured the power consumption of the device, then they use Machine Learning to determine the most likely candidate for *storageRom->pin.*
+
+These vulnerabilities have conducted Satoshi Labs to propose a more robust version to encrypt the data stored in the device. This new version is the current version shown with the Data encryption Diagram above.
+
+### Kraken Security Labs
+
+Despite this new architecture, Kraken in 2020, managed to perform a fault injection attack on the device  to extract the entire flash-contents 
+
+- Since Trezor firmware uses an encrypted storage, they developed a script to crack the PIN of the dumped device.
+
+- The script was able to brute force any 4-digit pin in under two minutes.
+- As a reminder, a PIN brute-force is not directly possible directly on the device, because the storage is automatically wipes after 16 unsuccessful attempts.
+- To protect against this, Satoshi Labs answered, also in 2020, in a [article](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6) that the best solution is to set a long PIN (against the brute-force attack) and set a passphrase since the passphrase is not set in the device.
+
+Reference:
+
+[Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
+
+![trezor-fault-injection-protection]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-fault-injection-protection.png)
+
 ## Conclusion
 
-Trezor wallets are designed with a robust set of security features with a strong use of cryptography.
+Trezor wallets are designed with a robust set of security features with a strong use of cryptography to protect sensitive information such as the seed phrase.
 
-The fact that the firmware is open source, contrary to their main competitor, is also strong point in their favor.
+The fact that the firmware is open source is also a strong point in their favor.
 
 All these features make them one of the most trusted hardware wallets in the cryptocurrency space.

@@ -24,7 +24,7 @@ Hash values are cryptographic representations of data, typically file contents. 
 
 - Utility: Hash values are easy to identify and can be quickly flagged by antivirus or intrusion detection systems.
 
-- **Pain for Adversary**: Very low. Attackers can modify the file or change its contents to produce a new hash with little effort.
+- Pain for Adversary: Very low. Attackers can modify the file or change its contents to produce a new hash with little effort.
 
 Hashes are the simplest form of detection, and though useful for identifying known malicious files, they are relatively easy for attackers to bypass by making minor modifications to their files.
 
@@ -66,7 +66,7 @@ Unfortunately for defenders, many DNS providers have loose standards and provide
 
 #### Hosts Artifacts
 
-#### **Network Artifacts**
+#### Network Artifacts
 
 - **Definition**: Network artifacts include details of network traffic, such as HTTP headers, URI patterns, and user-agent strings used in malicious activities.
 - **Description**: These indicators are useful for identifying unusual traffic patterns and distinguishing normal traffic from malicious activity.
