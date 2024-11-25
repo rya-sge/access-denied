@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  CoW Protocol - meta-DEX aggregator protocol
+title:  CoW Protocol - Overview
 date:   2024-11-21
 lang: en
 locale: en-GB
@@ -41,6 +41,10 @@ The basic workflow is the following:
 - AMMs (e.g. Uniswap, Sushiswap, Balancer, Curve, etc.)
 - DEX Aggregators (e.g. 1inch, Paraswap, Matcha, etc.)
 - Private Market Makers
+
+[TOC]
+
+
 
 ## Main concepts
 
@@ -94,7 +98,7 @@ See [docs.cow - goverance](https://docs.cow.fi/cow-protocol/reference/core/aucti
 
 ## Flow of an order
 
-![cow-flow-of-an-order](../assets/article/blockchain/defi/cow-flow-of-an-order.png)
+![cow-flow-of-an-order]({{site.url_complet}}/assets/article/blockchain/defi/cow-flow-of-an-order.png)
 
 Rather than creating executable on-chain transactions, CoW Protocol users submit their orders as signed [*intent to trade*](https://docs.cow.fi/cow-protocol/concepts/introduction/intents) messages. This allows [solvers](https://docs.cow.fi/cow-protocol/concepts/introduction/solvers) to find the optimal execution path for the batch of orders before committing them on-chain.
 
@@ -137,23 +141,17 @@ CoWs allow users to bypass liquidity provider (LP) fees and also reduce gas fees
 
 CoWs can be full or partial. In a partial CoW, only one of the trades in a batch is completely filled with opposing liquidity, and solvers must source liquidity to fill the rest of the other trade.
 
-# CoW Protocol vs. CoW Swap
+## CoW Protocol vs. CoW Swap
 
 While the two are intertwined, there are important differences between CoW Protocol and CoW Swap.
 
-![cow-protocol-vs-swap](../assets/article/blockchain/defi/cow-protocol-vs-swap.png)
+![cow-protocol-vs-swap]({{site.url_complet}}/assets/article/blockchain/defi/cow-protocol-vs-swap.png)
 
 CoW Swap was the first trading interface built on top of CoW Protocol and is currently the most popular way for users to trade with CoW Protocol.
 
-Other trading apps and dApps, like Balancer, have also integrated CoW Protocol natively within their trading interfaces and advanced traders often place trades directly through the protocol.
+Other trading apps and dApps, like Balancer, have also integrated CoW Protocol natively within their trading interfaces and advanced traders often place trades directly through the protocol. See [Balancer V2 - Cow Protocol](https://balancer.gitbook.io/balancer-v2/products/balancer-cow-protocol)
 
-The UI of CoW Swap includes some unique features, such as:
-
-- Wallet history
-- User token balances
-- Games
-- The legendary "Moo" sound
-- Fortune cookies
+The UI of CoW Swap includes several features, such as: Wallet history, User token balances, Games, The legendary "Moo" sound and Fortune cookies
 
 CoW Swap works with many popular wallets, including [Rabby](https://rabby.io/), [MetaMask](https://metamask.io/), [Trust Wallet](https://trustwallet.com/), [Safe](https://safe.global/), [Trezor](https://trezor.io/), [Ledger](https://www.ledger.com/), and any wallet supporting [WalletConnect v2](https://walletconnect.com/).
 

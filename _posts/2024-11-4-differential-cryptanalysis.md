@@ -34,7 +34,9 @@ In differential cryptanalysis, let’s denote:
 - X and X′ as two different plaintexts,
 
 $$
+\begin{aligned}
 \Delta X = X \oplus X'
+\end{aligned}
 $$
 
 
@@ -42,10 +44,10 @@ $$
 - Y and Y′ as the outputs after encryption,
 
 $$
+\begin{aligned}
 \Delta Y = Y \oplus Y'
+\end{aligned}
 $$
-
-
 
 
 

@@ -348,12 +348,6 @@ One concerned the PIN verification allowing an attacker with a stolen Trezor One
 
 In the first versions of the Trezor Model One, the Pin verification was done like this:
 
-{% figure https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png My image caption %}
-
-{% endfigure %}
-
-
-
 ![Trezor code](https://ledger-wp-website-s3-prd.ledger.com/uploads/2024/03/pincode.png)
 
 As indicated by Ledger:
@@ -390,3 +384,4 @@ Trezor wallets are designed with a robust set of security features with a strong
 The fact that the firmware is open source is also a strong point in their favor.
 
 All these features make them one of the most trusted hardware wallets in the cryptocurrency space.
+

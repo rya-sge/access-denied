@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Overview of ECDSA, a Digital Signature Algorithm, and its mechanics
+title: Overview of ECDSA - Elliptic Curve Digital Signature Algorithm
 date:   2024-10-23
 lang: en
 locale: en-GB
