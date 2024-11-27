@@ -131,9 +131,11 @@ See [cryptography - AEAD](https://cryptography.io/en/stable/hazmat/primitives/ae
 
 #### HMAC-SHA256
 
-Hash-based Message Authentication Code
+HMAC stands for Hash-based Message Authentication Code
 
-When encrypting passwords or keys, Trezor uses **HMAC-SHA512** to “stretch” passwords, which makes brute-force attacks more difficult. HMAC  adds an extra layer of security when handling cryptographic keys, making it harder for attackers to recover the seed phrase or private keys from device data.
+To derive the Encryption Key (KEK), Trezor uses PBKDf2 with  **HMAC-SHA512** to check data integrity and authenticity , which makes brute-force attacks more difficult. 
+
+HMAC adds an extra layer of security when handling cryptographic keys, making it harder for attackers to recover the seed phrase or private keys from device data.
 
 The HMAC process mixes a secret key with the message data and hashes the result. An HMAC is useful to determine whether a message sent over a nonsecure channel has been tampered with.
 
@@ -301,15 +303,11 @@ Moreover, this passphrase is not stored inside the device, therefore if someone 
 
 To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures:
 
-- Seal on the device or the package.
+- Seal on the device or the package. Users are encouraged to inspect the device for any signs of tampering, such as broken seals (**Tamper-evident** packaging). 
 - A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (= secure boot).
+  - Thus users can verify the authenticity of the firmware when initializing the device.
+
 - Since 2022, individual chips are now glued onto the board
-
-#### Tamper-evident packaging
-
-Users are encouraged to inspect the device for any signs of tampering, such as broken seals. 
-
-Additionally, users can verify the authenticity of the firmware when initializing the device.
 
 ### Trezor Safe device authentication check
 
@@ -361,7 +359,7 @@ Thus, a side-channel attack is possible to induce differentiability. The Ledger 
 
 These vulnerabilities have conducted Satoshi Labs to propose a more robust version to encrypt the data stored in the device. This new version is the current version shown with the Data encryption Diagram above.
 
-### Kraken Security Labs
+#### Kraken Security Labs
 
 Despite this new architecture, Kraken in 2020, managed to perform a fault injection attack on the device  to extract the entire flash-contents 
 
@@ -379,7 +377,7 @@ Reference:
 
 ## Conclusion
 
-Trezor wallets are designed with a robust set of security features with a strong use of cryptography to protect sensitive information such as the seed phrase.
+Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2, ChaCha20-Poly1305, HMAC-SHA256) to protect sensitive information such as the seed phrase.
 
 The fact that the firmware is open source is also a strong point in their favor.
 

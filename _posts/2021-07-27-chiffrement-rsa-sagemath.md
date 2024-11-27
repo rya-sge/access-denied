@@ -132,4 +132,3 @@ main()
 - Ce code a été initialement écrit pour résoudre le challenge [Baby](https://ctftime.org/task/16441) lors du  [redpwnCTF 2021.](https://ctftime.org/event/1327)
   - Le message chiffré, n et e sont ceux du challenges.
 - Documentation Sage : [https://www.sagemath.org/fr/documentation.html](https://www.sagemath.org/fr/documentation.html).
-

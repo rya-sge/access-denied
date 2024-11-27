@@ -473,7 +473,7 @@ If the value of an account’s borrowing outstanding exceeds their borrowing cap
 - Any Ethereum address that possesses the borrowed asset may invoke the liquidation function, exchanging their asset for the borrower’s cToken collateral. 
 - As both users, both assets, and prices are all contained within the Compound protocol, liquidation is frictionless and does not rely on any outside systems or order-books.
 
-#### Code
+### Code
 
 From [github.com/compound-finance - CToken.sol#L721](https://github.com/compound-finance/compound-protocol/blob/a3214f67b73310d547e00fc578e8355911c9d376/contracts/CToken.sol#L721)
 

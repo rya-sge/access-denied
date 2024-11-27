@@ -1,11 +1,11 @@
 ---
 layout: post
 title: Convolutional Neural Networks (CNNs)- Overview with Key Concepts
-date:   2024-11-4
+date:   2024-11-19
 lang: en
 locale: en-GB
 categories: programmation
-tags: tls DHKE diffie-hellman hkdf ECDHE
+tags: cnn ML AI  neural-network convolutional
 description: Transport Layer Security (TLS) 1.3 is the latest version of the TLS protocol, designed to enhance internet security, speed, and privacy.
 image:
 isMath: true
@@ -49,7 +49,7 @@ As the image data progresses through the layers of the CNN, it starts to recogni
 - **Description**: Pooling layers reduce the spatial dimensions of feature maps, which helps to minimize computational requirements and reduce the risk of overfitting.
 - **Types**: Common pooling types include
   -  *max pooling*, which takes the maximum value within a defined region to send to the output array, 
-  - and *average pooling*, which calculates the average value to send to the output array.
+  - *average pooling*, which calculates the average value to send to the output array.
 - **Function**: Pooling layers effectively down-sample the data, preserving only the most prominent features. This not only reduces data size but also improves generalization, allowing the network to focus on the most significant aspects of an image and limit risk of overfitting. Nevertheless, there are a lot of information lost during the process.
 
 ### 3. Fully Connected Layer (FC Layer)
@@ -143,7 +143,7 @@ Convolutional Neural Networks (CNNs) allows machine learning to understand and a
 
 By leveraging key components like convolution layers, pooling layers, and fully connected layers, CNNs can be used to learn complex patterns and making accurate predictions in a range of applications. 
 
-## Reference
+## References
 
 - [IBM - What are convolutional neural networks?](https://www.ibm.com/topics/convolutional-neural-networks)
 - [Understanding Architecture Of Inception Network & Applying It To A Real-World Dataset](https://gghantiwala.medium.com/understanding-the-architecture-of-the-inception-network-and-applying-it-to-a-real-world-dataset-169874795540)

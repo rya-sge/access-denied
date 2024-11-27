@@ -196,7 +196,7 @@ The set of corrupted parties can be static or dynamic, across protocol runs.
 
 Malicious parties could attempt to disrupt the computation by refusing to participate or sending invalid data. Some MPC protocols are designed to be **Byzantine-fault-tolerant**, allowing the system to proceed even if a subset of parties is unresponsive or actively trying to sabotage the computation.
 
-### Use Cases of MPC
+## Use Cases of MPC
 
 ![MPC-useCase.drawio]({{site.url_complet}}/assets/article/cryptographie/mpc/MPC-useCase.drawio.png)
 
@@ -239,7 +239,7 @@ MPC can be used in **secure electronic voting systems**, where voters’ ballots
 
 ------
 
-### Conclusion
+## Conclusion
 
 **Multi-Party Computation (MPC)** provides a privacy-preserving method of collaborative computation, ensuring that data remains private while allowing useful joint computations. 
 

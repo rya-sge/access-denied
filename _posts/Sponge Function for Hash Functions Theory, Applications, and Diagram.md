@@ -160,4 +160,3 @@ The following parameters influence the security of sponge functions:
 
 Sponge functions are foundational structures in cryptographic functions, enabling the creation of hash functions, stream ciphers, and random number generators. Their flexibility in input/output length and security properties makes them a cornerstone in modern cryptography. The SHA-3 function family is a testament to the practical and robust nature of the sponge construction.
 
-

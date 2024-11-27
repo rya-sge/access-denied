@@ -17,7 +17,9 @@ This method, developed in the late 1980s by Eli Biham and Adi Shamir, is especia
 
 While initially applied to block ciphers, differential cryptanalysis can also be adapted to attack hash functions, which are essential in ensuring data integrity and digital signatures in modern cryptographic systems.
 
-## Understanding Differential Cryptanalysis
+[TOC]
+
+## Introduction
 
 Differential cryptanalysis focuses on how small changes in the input (plaintext) can create predictable changes in the output (ciphertext or hash output). It is especially effective in targeting the "confusion" and "diffusion" mechanisms within block ciphers and hash functions. The attack exploits certain properties within these mechanisms to find specific relationships, known as differential characteristics, that reveal patterns and weaknesses in the algorithm.
 
@@ -27,7 +29,9 @@ Differential cryptanalysis focuses on how small changes in the input (plaintext)
 2. **Differential Characteristics:** These are specific patterns or structures in the cipher that describe how differences in inputs relate to differences in outputs over multiple rounds. They help cryptanalysts track how differences propagate through rounds and layers of encryption or hashing.
 3. **Probability of Differences:** A key aspect of differential cryptanalysis is finding differences that occur with a high probability, as these differences are more likely to reveal underlying structures in the cryptographic algorithm.
 
-### Mathematical Foundation
+
+
+### Simplified version of the concept
 
 In differential cryptanalysis, let’s denote:
 
@@ -52,6 +56,8 @@ $$
 
 
 The goal of differential cryptanalysis is to find a differential characteristic (ΔX,ΔY) that has a high probability of occurring.
+
+----------------
 
 ## Differential Cryptanalysis Against Block Ciphers
 
@@ -82,6 +88,8 @@ FEAL-4 is a 4 round Feistel cipher with a 64 bit block size. This means that the
 - The structure of FEAL is similar to DES with a modified *F* function, initial and final permutations and key scheduling algorithm. 
 - In the *F* function, the *P* permutation and the S boxes of DES are replaced by byte rotations and addition operations
 
+Main references:
+
 - [theamazingking.com/crypto-feal.php](http://www.theamazingking.com/crypto-feal.php)
 - [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention)
 - [Wikipedia - FEAL](https://en.wikipedia.org/wiki/FEAL)
@@ -110,6 +118,8 @@ Reference:
 #### Example
 
 In this [article](https://medium.com/@jnaman806/breaking-des-using-differential-cryptanalysis-958e8118ff41), the author presents a working attack, but against 6-round DES
+
+----------------
 
 ## Differential Cryptanalysis against hash function
 
@@ -147,6 +157,8 @@ Spending from a multi-signature address requires one user to produce a payment f
 
 - [Official IOTA Foundation Response to the Digital Currency Initiative at the MIT Media Lab — Part 4 / 4](https://blog.iota.org/official-iota-foundation-response-to-the-digital-currency-initiative-at-the-mit-media-lab-part-4-11fdccc9eb6d/)
 
+----------------
+
 ## Countermeasures to Differential Cryptanalysis
 
 Given the effectiveness of differential cryptanalysis, modern cryptographic algorithms often incorporate design features specifically to thwart it:
@@ -163,7 +175,7 @@ For example, in the case of FEAL, they switched from 4 to 8 rounds and then to N
 
 Reference: [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention), [FEAL](https://en.wikipedia.org/wiki/FEAL)
 
-## 5. Conclusion
+## Conclusion
 
 Differential cryptanalysis is a significant technique that has been used to test the robustness of cryptographic algorithms.
 
@@ -177,4 +189,8 @@ While initially effective against early block ciphers like Festel, this attack h
   - [Neha - Cryptographic vulnerabilities in IOTA](https://medium.com/@neha/cryptographic-vulnerabilities-in-iota-9a6a9ddc4367)
   - [Blackhast - Cryptanalysis of Curl-P and Other Attacks on the IOTA Cryptocurrency](https://i.blackhat.com/us-18/Wed-August-8/us-18-Narula-Heilman-Cryptanalysis-of-Curl-P-wp.pdf)
   - [Official IOTA Foundation Response to the Digital Currency Initiative at the MIT Media Lab — Part 4 / 4](https://blog.iota.org/official-iota-foundation-response-to-the-digital-currency-initiative-at-the-mit-media-lab-part-4-11fdccc9eb6d/)
+- Feal:
+  - [theamazingking.com/crypto-feal.php](http://www.theamazingking.com/crypto-feal.php)
+  - [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention)
+  - [Wikipedia - FEAL](https://en.wikipedia.org/wiki/FEAL)
 - ChatGPT with the input "Write me an article about the attack DIFFERENTIAL CRYPTANALYSIS targeting hash function and cryptography algorithm. Give examples."
