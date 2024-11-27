@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Perceptron: a simple, binary neural network architecture
+title: Perceptron - a simple, binary neural network architecture
 date:   2024-11-25
 lang: en
 locale: en-GB
