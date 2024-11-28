@@ -26,9 +26,13 @@ The model consists of the following components:
 3. **Bias**: A constant added to the weighted sum to help the perceptron better fit the data.
 4. **Activation Function**: A function (e.g., step or sign function) that determines the output based on the weighted sum.
 
-Mathematically, a perceptron computes the output yyy as follows:
+Mathematically, a perceptron computes the output `y` as follows:
+
+
 $$
+\begin{aligned}
 y = f\left(\sum_{i=1}^{n} w_i x_i + b\right)
+\end{aligned}
 $$
 where `wi` are weights, `xi` are inputs, `b` is the bias, and `f` is the activation function.
 

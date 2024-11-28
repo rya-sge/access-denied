@@ -1,4 +1,17 @@
-### Mutual TLS (mTLS): Advantages and Disadvantages Compared to Classical TLS
+---
+layout: post
+title: Mutual TLS (mTLS) Overview
+date:   2024-11-29
+lang: en
+locale: en-GB
+categories: security
+tags: security threat incident-responder cybersecurity pyramid
+description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
+image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png
+isMath: false
+---
+
+
 
 Transport Layer Security (TLS) is widely used to ensure encrypted and secure communication between clients and servers. While traditional TLS focuses primarily on securing the server, **Mutual TLS (mTLS)** adds an additional layer by authenticating both the server and the client. This approach enhances security but introduces specific challenges. Let’s explore mTLS, its advantages, and how it compares to classical TLS.
 

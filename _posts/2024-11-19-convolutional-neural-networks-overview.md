@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Convolutional Neural Networks (CNNs)- Overview with Key Concepts
+title: Convolutional Neural Networks (CNNs)- Overview
 date:   2024-11-19
 lang: en
 locale: en-GB

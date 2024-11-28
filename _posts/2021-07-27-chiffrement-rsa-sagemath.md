@@ -22,22 +22,30 @@ Plus d'informations est disponible sur la documentation d'installation de Sage :
 
 Module de chiffrement
 $$
+\begin{aligned}
 n = p * q
+\end{aligned}
 $$
 
 Indicatrice d'Euler
 $$
+\begin{aligned}
 φ(n) = (p - 1)(q - 1)
+\end{aligned}
 $$
 
 Chiffrement
 $$
+\begin{aligned}
 c = m^e \ mod \ n
+\end{aligned}
 $$
 
 Déchiffrement
 $$
+\begin{aligned}
 m = c^d \ mod \ n
+\end{aligned}
 $$
 
 
