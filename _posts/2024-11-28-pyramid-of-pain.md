@@ -1,7 +1,7 @@
 ---
 layout: post
 title: The Pyramid of Pain in Cybersecurity
-date:   2024-11-29
+date:   2024-11-28
 lang: en
 locale: en-GB
 categories: security
