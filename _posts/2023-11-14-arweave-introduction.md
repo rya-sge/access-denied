@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Introduction to Arweave"
+title:  Introduction to Arweave, a decentralized storage layer
 date:   2023-11-14
 lang: en
 locale: en-GB

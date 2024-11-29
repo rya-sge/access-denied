@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  CoW Protocol - Overview
+title:  CoW Protocol - Intent & MEV protection
 date:   2024-11-21
 lang: en
 locale: en-GB

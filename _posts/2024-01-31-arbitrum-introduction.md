@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Introduction to Arbitrum"
+title:  Introduction to Arbitrum, an Optimistic rollup protocol
 date:   2024-01-31
 lang: en
 locale: en-GB
