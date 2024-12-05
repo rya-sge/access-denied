@@ -13,7 +13,7 @@ isMath: true
 
 The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of **artificial neural networks**. It is a simple yet powerful algorithm that mimics the decision-making process of neurons in the human brain. 
 
-### What is a Perceptron?
+## What is a Perceptron?
 
 A perceptron is a type of linear classifier that maps input features to an output decision using a weighted sum and an activation function. 
 
@@ -38,7 +38,7 @@ where `wi` are weights, `xi` are inputs, `b` is the bias, and `f` is the activat
 
 If the perceptron's output correctly classifies the input, no changes are made to the weights. Otherwise, the perceptron adjusts its weights using a learning rule to minimize errors. This iterative process, known as training, allows the perceptron to learn a decision boundary for classification.
 
-
+[TOC]
 
 ### Schema
 
@@ -98,6 +98,8 @@ In summary, while perceptrons laid the groundwork for modern machine learning, C
 
 Despite its simplicity, the perceptron has applications in tasks requiring linear classification. It is often used as a teaching tool to introduce concepts of supervised learning, gradient descent, and optimization. Additionally, it serves as a stepping stone to understanding advanced models like MLPs and CNNs.
 
+------
+
 ## Conclusion
 
 The perceptron is a historic and fundamental model that has influenced the field of machine learning profoundly. 
@@ -119,5 +121,3 @@ Understanding the perceptron provides a crucial first step in exploring the broa
 - [IBM Developer - A neural networks deep dive](https://developer.ibm.com/articles/cc-cognitive-neural-networks-deep-dive/)
 
 - [Deep learning basics — Part 2 — Perceptron](https://medium.com/@sasirekharameshkumar/understanding-deep-learning-basics-part-2-466a7422d24b)
-
-  

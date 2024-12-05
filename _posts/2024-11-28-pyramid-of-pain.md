@@ -41,6 +41,8 @@ From [attackiq.com - pyramid-of-pain/](https://www.attackiq.com/glossary/pyramid
 
 ![pyramid-of-pain]({{site.url_complet}}/assets/article/securite/pyramid-pain/pyramid-of-pain.png)
 
+------
+
 ### 1. Hash Values (Bottom of the Pyramid)
 
 Hash values are cryptographic representations of data, typically file contents. Common hashing algorithms include MD5 (deprecated), SHA-1 (deprecated), and SHA-256..
@@ -65,7 +67,7 @@ The hash of the executable used by WannaCry is `db349b97c37d22f5ea1d1841e3c89eb4
 
 See on [virustotal.com](https://www.virustotal.com/gui/file/24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c)
 
-
+------------
 
 ### 2. IP Addresses (Easy)
 
@@ -85,6 +87,8 @@ The purpose of using the Fast Flux network is to make the communication between 
 
 So, the primary concept of a Fast Flux network is having multiple IP addresses associated with a domain name, which is constantly changing. Palo Alto created a great fictional scenario to explain Fast Flux: ["](https://unit42.paloaltonetworks.com/fast-flux-101/)[Fast Flux 101: How Cybercriminals Improve the Resilience of Their Infrastructure to Evade Detection and Law Enforcement Takedowns"](https://unit42.paloaltonetworks.com/fast-flux-101/)
 
+---------------
+
 ### 3. Domain Names (Simple)
 
 Domain names are the website addresses used by attackers to deliver malware, conduct phishing campaigns, or establish command-and-control (C2) connections.
@@ -97,6 +101,8 @@ Moderate. Although changing domain names is relatively simple, it requires more 
 - Blocking malicious domains can disrupt an attacker’s infrastructure for longer than simply blocking an IP address, as attackers need to register new domains and reconfigure systems to resume operations.
 - Domain Names can be a little more of a pain for the attacker to change as they would most likely need to purchase the domain, register it and modify DNS records. 
 - Unfortunately for defenders, many DNS providers have loose standards and provide APIs to make it even easier for the attacker to change the domain.
+
+-------------
 
 ### 4. Artefacts (Annoying)
 
@@ -116,17 +122,17 @@ An attacker might use a User-Agent string that hasn’t been observed in your en
 
 Network artifacts can be detected in Wireshark PCAPs (file that contains the packet data of a network) by using a network protocol analyzer such as [TShark](https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark.html) or exploring IDS (Intrusion Detection System) logging from a source such as [Snort](https://www.snort.org/).
 
+You can also use [urlscan](https://urlscan.io) to find information (domain, stats, IP) related to an URL
+
+If you can detect the custom User-Agent strings that the attacker is using, you might be able to block them, creating more obstacles and making their attempt to compromise the network more annoying.
+
 These indicators are useful for identifying unusual traffic patterns and distinguishing normal traffic from malicious activity.
 
 **Pain for attacker**:  Network artifacts are harder to alter than domain names because attackers must re-engineer some of their tools or adjust how their malware communicates. Detecting and blocking these indicators can frustrate attackers and hinder their communication capabilities.
 
 In this level, the attacker will feel a little more annoyed and frustrated if you can detect the attack. The attacker would need to circle back at this detection level and change his attack tools and methodologies. This is very time-consuming for the attacker, and probably, he will need to spend more resources on his attacker tools.
 
-
-
-#### User-Agent
-
-If you can detect the custom User-Agent strings that the attacker is using, you might be able to block them, creating more obstacles and making their attempt to compromise the network more annoying.
+--------------------
 
 ### 5. Tools (Challenging)
 
@@ -147,6 +153,8 @@ Antivirus signatures, detection rules, and YARA rules can be great weapons for y
 For detection rules,[ SOC Prime Threat Detection Marketplace ](https://tdm.socprime.com/)is a great platform, where security professionals share their detection rules for different kinds of threats including the latest CVE's that are being exploited in the wild by adversaries. 
 
 Fuzzy hashing is also a strong weapon against the attacker's tools. Fuzzy hashing helps you to perform similarity analysis - match two files with minor differences based on the fuzzy hash values. One of the examples of fuzzy hashing is the usage of [SSDeep](https://ssdeep-project.github.io/ssdeep/index.html); on the SSDeep official website, you can also find the complete explanation for fuzzy hashing. 
+
+---------------------
 
 ### 6. Tactics, Techniques, and Procedures (TTPs) (Top of the Pyramid)
 
@@ -191,4 +199,4 @@ By aligning detection and response efforts with the Pyramid of Pain, security te
 
 - [attackiq.com - pyramid-of-pain/](https://www.attackiq.com/glossary/pyramid-of-pain/)
 - [Pyramid of Pain](ttps://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
-- ChatGPT with the input "write me an article about the pyramid of pain used in security"
+- ChatGPT with the input "Write me an article about the pyramid of pain used in security"

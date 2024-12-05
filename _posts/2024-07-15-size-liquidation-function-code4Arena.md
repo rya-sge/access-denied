@@ -55,11 +55,13 @@ There are three functions to perform a liquidation: liquidate, selfLiquidate, li
 
 ### Workflow
 
-All these functions have the modifier whenNotPaused and perform:
+All these functions have the modifier `whenNotPaused`and perform:
 
-1) Validate params
-2) Execute with params
-3) Validate the result
+1. Validate params
+2. Execute with params
+3. Validate the result
+
+   
 
 #### Liquidate
 
@@ -116,11 +118,11 @@ Validates the input parameters for liquidating a debt position.
 
 executeLiquidate: https://github.com/code-423n4/2024-06-size/blob/main/src/libraries/actions/Liquidate.sol#L75
 
-1) Get loan status
-2) Compute the collateral ratio
-3) Emit Event
-4) Determine Protocol Fee Percentage by Checking if the loan is both underwater and overtue
-5) Gets the assigned collateral and converts the debt value to collateral token value.
+1. Get loan status
+2. Compute the collateral ratio
+3. Emit Event
+4. Determine Protocol Fee Percentage by Checking if the loan is both underwater and overtue
+5. Gets the assigned collateral and converts the debt value to collateral token value.
 
 
 

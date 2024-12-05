@@ -96,6 +96,8 @@ Enforcing the [Ethereum Best Bid Offer (EBBO)](): Ensuring that the settlement s
 
 See [docs.cow - goverance](https://docs.cow.fi/cow-protocol/reference/core/auctions/competition-rules#governance)
 
+--------
+
 ## Flow of an order
 
 ![cow-flow-of-an-order]({{site.url_complet}}/assets/article/blockchain/defi/cow-flow-of-an-order.png)
@@ -125,6 +127,8 @@ Letting solvers do the heavy lifting means users don't have to worry about findi
 
 Solvers are also experts at avoiding MEV so users can rest assured their orders are protected from MEV bots that exploit their price through frontrunning and sandwich attacks.
 
+----------
+
 ## Coincidence of Wants
 
 **CoW (Coincidence of Wants)**: An economic phenomenon where two parties - each holding the asset that the other needs - exchange assets directly in an equivalent barter. 
@@ -141,6 +145,8 @@ CoWs allow users to bypass liquidity provider (LP) fees and also reduce gas fees
 
 CoWs can be full or partial. In a partial CoW, only one of the trades in a batch is completely filled with opposing liquidity, and solvers must source liquidity to fill the rest of the other trade.
 
+----------
+
 ## CoW Protocol vs. CoW Swap
 
 While the two are intertwined, there are important differences between CoW Protocol and CoW Swap.
@@ -154,6 +160,8 @@ Other trading apps and dApps, like Balancer, have also integrated CoW Protocol n
 The UI of CoW Swap includes several features, such as: Wallet history, User token balances, Games, The legendary "Moo" sound and Fortune cookies
 
 CoW Swap works with many popular wallets, including [Rabby](https://rabby.io/), [MetaMask](https://metamask.io/), [Trust Wallet](https://trustwallet.com/), [Safe](https://safe.global/), [Trezor](https://trezor.io/), [Ledger](https://www.ledger.com/), and any wallet supporting [WalletConnect v2](https://walletconnect.com/).
+
+----------
 
 ## Further reading
 

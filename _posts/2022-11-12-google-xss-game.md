@@ -15,11 +15,13 @@ A few years ago, Google launched a site, [xss-game.appspot.com](https://xss-game
 
 Quick summary of XSS:
 
-- An XSS (Cross-Site Scripting) attack is a security vulnerability that allows an attacker to inject malicious scripts into web pages viewed by other users. 
+An XSS (Cross-Site Scripting) attack is a security vulnerability that allows an attacker to inject malicious scripts into web pages viewed by other users. 
 
-- Consequence: These scripts can steal sensitive data (like cookies or session tokens), deface websites, or redirect users to malicious sites. 
-- Cause: XSS exploits occur when user input is improperly sanitized or validated, allowing attackers to inject their malicious script
-- There are three main types of XSS: **stored**, **reflected**, and **DOM-based**, each differing in how and where the malicious code is injected and executed.
+XSS exploits occur when user input is improperly sanitized or validated, allowing attackers to inject their malicious script
+
+These scripts can steal sensitive data (like cookies or session tokens), deface websites, or redirect users to malicious sites. 
+
+There are three main types of XSS: **stored**, **reflected**, and **DOM-based**, each differing in how and where the malicious code is injected and executed.
 
 To begin, some useful resources
 

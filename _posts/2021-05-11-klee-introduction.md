@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Introduction à Klee"
+title:  Introduction à Klee, dynamic symbolic execution engine
 date:   2021-05-11 
 categories: security
 tags: klee clang reverse sanitizer concolique analyse
