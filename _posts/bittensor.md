@@ -1,33 +1,40 @@
+
+
 Bittensor is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. 
 
 **You are rewarded in TAO** when you produce best digital commodities.
 
 ![Simplified Bittensor Network](https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg)
 
+[TOC]
+
+
+
+## Introduction
+
 The Bittensor ecosystem consists of the following three components (refer to the above diagram):
 
 1. **An incentive-based competition mechanism**: You can either create your custom incentive mechanism for your own competition or join a competition that already exists in the Bittensor ecosystem. Each such incentive-based competition market is called a **subnet**. Subnets constitute the core of the Bittensor ecosystem.
 
-TEXT PROMPTING SUBNET
+Example:
 
 For example, the [text prompting subnet](https://github.com/opentensor/prompting), developed by the Open Tensor foundation, incentivizes subnet miners that produce the best prompt completions in response to the prompts sent by the subnet validators in that subnet.
 
-1. A **blockchain** that runs the above subnets and supports their proper functioning so that the incentive-based competition market is decentralized, is permissionless and is collusion-resistant, i.e., is resistant to market manipulation.
-2. The **Bittensor API** that connects all the essential elements within the above two components, and also connects the subnets and the blockchain.
+2. A **blockchain** that runs the above subnets and supports their proper functioning so that the incentive-based competition market is decentralized, is permissionless and is collusion-resistant, i.e., is resistant to market manipulation.
 
-OPEN SOURCE TOOLS AND DOCUMENTATION
+3. The **Bittensor API** that connects all the essential elements within the above two components, and also connects the subnets and the blockchain.
 
-Bittensor provides all the open source tools, codebase and the documentation, with step-by-step tutorials and guides, to enable you to participate in the Bittensor ecosystem.
+![https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg](https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg)
+
+
 
 ## Participating in Bittensor ecosystem
 
-https://docs.bittensor.com/learn/introduction#participating-in-bittensor-ecosystem
-
 You participate in the Bittensor ecosystem by participating in a subnet.
 
-## How a subnet works
+See https://docs.bittensor.com/learn/introduction#participating-in-bittensor-ecosystem
 
-https://docs.bittensor.com/learn/introduction#how-a-subnet-works
+### How a subnet works
 
 Subnets exist to operationalize the incentive-based competition mechanisms. See the below diagram.
 
@@ -47,49 +54,57 @@ When you participate in the Bittensor ecosystem, most of your activity occurs wi
 
 You can use Python with the Bittensor API to write your incentive mechanism.
 
-## Bittensor personas
+See [docs.bittensor.com/learn/introduction#how-a-subnet-works](https://docs.bittensor.com/learn/introduction#how-a-subnet-works)
 
-[docs.bittensor.com/learn/introduction#bittensor-personas](https://docs.bittensor.com/learn/introduction#bittensor-personas)
+### Bittensor personas
 
 You can participate in the Bittensor ecosystem as the following personas:
 
-- **Subnet owner**: When you only want to create a subnet but transfer the tasks of operating the subnet to others.
-- **Subnet validator**: When you are responsible for running the subnet validator.
-- **Subnet miner**: When you are responsible for running the subnet miner.
-- **Blockchain operator**: When you run the blockchain. This mostly applies during the offline testing of your subnet and your incentive mechanism, when you need a local emulation of the Bittensor blockchain because you are disconnected from the Bittensor network.
+| Personas            | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Subnet owner        | When you only want to create a subnet but transfer the tasks of operating the subnet to others. |
+| Subnet validator    | When you are responsible for running the subnet validator.<br />each validator independently evaluates the task performed by the subnet miners. |
+| Subnet miner        | When you are responsible for running the subnet miner.       |
+| Blockchain operator | When you run the blockchain. This mostly applies during the offline testing of your subnet and your incentive mechanism, when you need a local emulation of the Bittensor blockchain because you are disconnected from the Bittensor network. |
 
-## Participating in a subnet
+See [docs.bittensor.com/learn/introduction#bittensor-personas](https://docs.bittensor.com/learn/introduction#bittensor-personas)
 
-[https://docs.bittensor.com/learn/introduction#participating-in-a-subnet](https://docs.bittensor.com/learn/introduction#participating-in-a-subnet)
+### Participating in a subnet
 
-When creating a subnet you should always start by first developing and testing the subnet incentive mechanism **locally**, then connecting to the Bittensor **testchain** and finally go live by connecting to the Bittensor **mainchain**. See the below conceptual deployment diagram showing the three stages.
+When creating a subnet you should always start by:
+
+1. Developing and testing the subnet incentive mechanism **locally**;
+2.  Then connecting to the Bittensor **testchain**;
+3.  And finally go live by connecting to the Bittensor **mainchain**. 
+
+See the below conceptual deployment diagram showing the three stages.
 
 Testing the incentive mechanism means running one or more validators and miners to ensure that rewards are distributed in the intended way.
 
-BEFORE YOU PARTICIPATE IN A SUBNET
-
-We recommend all subnet participants to become familiar with the incentive mechanism before joining a subnet or creating a new subnet.
-
 ![Simplified Bittensor Network](https://docs.bittensor.com/img/docs/subnet-deploy-stages.svg)
 
-# Bittensor Building Blocks
+See [docs.bittensor.com/learn/introduction#participating-in-a-subnet](https://docs.bittensor.com/learn/introduction#participating-in-a-subnet)
+
+## Bittensor Building Blocks
 
 The Bittensor API provides basic building blocks you can use to develop your incentive mechanism. This section presents:
 
 - An overview of a subnet.
 - Introduction to the Bittensor building blocks.
 
-## Subnet[](https://docs.bittensor.com/learn/bittensor-building-blocks#subnet)
+### Subnet
 
 A subnet closely follows how a classical feedforward neural network is connected. Consider the below diagram showing a comparison of a classical neural network with a subnet.
 
 ![Incentive Mechanism Big Picture](https://docs.bittensor.com/img/docs/building-blocks-first.svg)
 
-- A node in a neural network is represented in a Bittensor subnet as either a subnet validator or a subnet miner. A node is also referred as a **neuron** in a subnet terminology. A neuron is the basic computing node in a Bittensor subnet.
+https://docs.bittensor.com/learn/bittensor-building-blocks#subnet
 
-NODE REQUIREMENTS
+#### Node (Neurom)
 
-For example, see [Minimum compute requirements](https://github.com/opentensor/bittensor-subnet-template/blob/main/min_compute.yml) for compute, memory, bandwidth and storage requirements for a subnet node, i.e., for a subnet neuron.
+A node in a neural network is represented in a Bittensor subnet as either a subnet validator or a subnet miner. A node is also referred as a **neuron** in a subnet terminology. A neuron is the basic computing node in a Bittensor subnet.
+
+See [Minimum compute requirements](https://github.com/opentensor/bittensor-subnet-template/blob/main/min_compute.yml) for compute, memory, bandwidth and storage requirements for a subnet node, i.e., for a subnet neuron.
 
 - The classical neural network graph (shown on the left) is bipartite, i.e., a node in the input layer is connected only to a node in the next layer (hidden layer). A subnet graph (shown on the right) is also bipartite. Hence:
   - A subnet validator in a subnet is only connected to a subnet miner.
@@ -99,16 +114,37 @@ For example, see [Minimum compute requirements](https://github.com/opentensor/bi
   - Only subnet validators are allowed to connect to subnet miners, hence isolating subnet miners from the external world.
 - **Many-to-many bidirectional**: Notice that in the classical neural network shown on the left, the connection from input layer to the hidden layer is only feedforward. However, in a Bittensor subnet, shown on the right, a subnet miner can directly communicate to the subnet validator. This bidirectional communication between a subnet validator and a subnet miner forms the core of a protocol in an incentive mechanism. This closely resembles the architecture of a [Restricted Boltzmann Machine (RBM)](https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine).
 
-## Neuron-to-neuron communication[](https://docs.bittensor.com/learn/bittensor-building-blocks#neuron-to-neuron-communication)
+### Neuron-to-neuron communication
 
 Neurons exchange information by:
 
 - Encapsulating the information in a Synapse object.
 - Instantiating server (Axon) and client (dendrite) network elements and exchanging Synapse objects using this server-client (Axon-dendrite) protocol. See the below diagram.
 
+#### Tab
+
+
+
+| Term      | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| Neuron    | A neuron is the basic computing node in a Bittensor subnet.  |
+| Synapse   | Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. T |
+| Axon      |                                                              |
+| Dentrite  |                                                              |
+| Metagraph | A metagraph is a data structure that contains comprehensive information about current state of the subnet. |
+| Subtensor | A subtensor is a Bittensor object that handles the interactions with the blockchain, whether the chain is local or testchain or mainchain. |
+
+
+
+#### Schema
+
+
+
 ![Incentive Mechanism Big Picture](https://docs.bittensor.com/img/docs/second-building-blocks.svg)
 
-### Axon[](https://docs.bittensor.com/learn/bittensor-building-blocks#axon)
+See https://docs.bittensor.com/learn/bittensor-building-blocks#neuron-to-neuron-communication
+
+#### Axon
 
 The `axon` module in Bittensor API uses FastAPI library to create and run API servers. For example, when a subnet miner calls,
 
@@ -122,7 +158,9 @@ then an API server with the name `axon` is spawned on the subnet miner node. Thi
 
 Similarly, in your subnet miner code you must use the `axon` API to spawn an API server to receive incoming Synapse objects from the subnet validators.
 
-### Dendrite[](https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite)
+See https://docs.bittensor.com/learn/bittensor-building-blocks#axon
+
+#### Dendrite
 
 Axon is a **server** instance. Hence, a subnet validator will instantiate a `dendrite` **client** on itself to transmit information to axons that are on the subnet miners. For example, when a subnet validator runs the below code fragment:
 
@@ -142,39 +180,44 @@ then the subnet validator:
 - Transmitted `synapse` objects to a set of `axons` (that are attached to subnet miners).
 - Waits until `timeout` expires.
 
-### Synapse[](https://docs.bittensor.com/learn/bittensor-building-blocks#synapse)
+See https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite
+
+### Synapse
 
 Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. The Synapse class inherits from the `BaseModel` of the Pydantic data validation library.
 
 For example, in the [Text Prompting Subnet](https://github.com/opentensor/prompting/blob/6c493cbce0c621e28ded203d947ce47a9ae062ea/prompting/protocol.py#L27), the subnet validator creates a Synapse object, called Prompting, with three fields. The fields `roles` and `messages` are set by the subnet validator during the initialization of this Prompting data object, and they cannot be changed after that. A third field, `completion`, is mutable. When a subnet miner receives this Prompting object from the subnet validator, the subnet miner updates this `completion` field. The subnet validator then reads this updated `completion` field.
 
-## Metagraph[](https://docs.bittensor.com/learn/bittensor-building-blocks#metagraph)
+See [docs.bittensor.com/learn/bittensor-building-blocks#synapse](https://docs.bittensor.com/learn/bittensor-building-blocks#synapse)
+
+### Metagraph
 
 A metagraph is a data structure that contains comprehensive information about current state of the subnet. When you inspect the metagraph of a subnet, you will find detailed information on all the nodes (neurons) in the subnet. A subnet validator should first sync with a subnet's metagraph to know all the subnet miners that are in the subnet. The metagraph can be inspected without participating in a subnet.
 
-## Subtensor[](https://docs.bittensor.com/learn/bittensor-building-blocks#subtensor)
+See [docs.bittensor.com/learn/bittensor-building-blocks#metagraph](https://docs.bittensor.com/learn/bittensor-building-blocks#metagraph)
+
+## Subtensor
 
 A subtensor is a Bittensor object that handles the interactions with the blockchain, whether the chain is local or testchain or mainchain.
 
-# Anatomy of Incentive Mechanism
+See [docs.bittensor.com/learn/bittensor-building-blocks#subtensor](https://docs.bittensor.com/learn/bittensor-building-blocks#subtensor)
 
-This section describes a conceptual “anatomy” of a subnet incentive mechanism. Read this for how to think about a subnet incentive mechanism before you begin coding it.
+## Anatomy of Incentive Mechanism
 
-BEFORE YOU PROCEED
+This section describes a conceptual “anatomy” of a subnet incentive mechanism.
 
-Before you proceed, read the following sections:
-
-- [Introduction](https://docs.bittensor.com/learn/introduction) that describes how subnets form the heartbeat of the Bittensor network.
-- [Bittensor Building Blocks](https://docs.bittensor.com/learn/bittensor-building-blocks) that presents the basic building blocks you use to develop your incentive mechanism.
-
-## Overview[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#overview)
+### Overview
 
 In a Bittensor subnet:
 
 - The task-performing entities are called **subnet miners**.
 - Entities that create the tasks, score the output of the subnet miners and reward them, are called **subnet validators**.
 
-Incentive mechanisms are a fundamental part of Bittensor. They drive the behaviour of the subnet miners and govern the consensus amongst the subnet validators. Each subnet has its own incentive mechanism. Subnet developers should design incentive mechanisms carefully so that these mechanisms comprehensively and explicitly promote all the desired behaviors and penalize undesired behaviors.
+Incentive mechanisms are a fundamental part of Bittensor. 
+
+- They drive the behaviour of the subnet miners and govern the consensus amongst the subnet validators. 
+- Each subnet has its own incentive mechanism. 
+- Subnet developers should design incentive mechanisms carefully so that these mechanisms comprehensively and explicitly promote all the desired behaviors and penalize undesired behaviors.
 
 MACHINE LEARNING ANALOGY
 
@@ -182,18 +225,24 @@ In machine learning analogy, incentive mechanisms are effectively loss functions
 
 A subnet incentive mechanism, when running optimally on a subnet, will continuously produce high quality results because the subnet miners and subnet validators are incentivized to do so. Furthermore, a good incentive mechanism will encourage **continuous improvement** of the subnet as a whole by leveraging the competition between miners to attain ever higher scores.
 
-## Subnet owner responsibilities[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-owner-responsibilities)
+See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#overview](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#overview)
+
+### Subnet owner responsibilities
 
 A subnet owner is responsible for:
 
 - Defining the specific digital task to be performed by the subnet miners.
 - Implementing an incentive mechanism that aligns miners with the desired task outcomes.
 
-### Design with Yuma Consensus as a black box[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#design-with-yuma-consensus-as-a-black-box)
+See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-owner-responsibilities](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-owner-responsibilities)
+
+### Design with Yuma Consensus as a black box
 
 Though a subnet incentive mechanism works in conjunction with the Yuma Consensus in the Bittensor network, you must design your subnet incentive mechanism **by treating Yuma Consensus as a black box**.
 
-### Make it easy for participation[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#make-it-easy-for-participation)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#design-with-yuma-consensus-as-a-black-box
+
+### Make it easy for participation[]()
 
 To attract high-performing subnet miners and subnet validators, make sure that you publish sufficient documentation on your subnet.
 
@@ -206,13 +255,17 @@ After a subnet validator registers into your subnet, they will run the validator
 - [Running a validator](https://github.com/opentensor/prompting/blob/main/docs/SN1_validation.md).
 - [Running a miner](https://github.com/opentensor/prompting/blob/main/docs/stream_miner_template.md).
 
-## Components of incentive mechanism[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#components-of-incentive-mechanism)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#make-it-easy-for-participation
+
+## Components of incentive mechanism[]()
 
 A subnet incentive mechanism must contain the definition and implementation of the following behaviors. See the numbered items in the below diagram:
 
 ![Components of Incentive Mechanism](https://docs.bittensor.com/img/docs/components-of-incentive-mechanism.svg)
 
-### Subnet protocol[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-protocol)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#components-of-incentive-mechanism
+
+### Subnet protocol
 
 See **1** and **3** in the above diagram. A subnet protocol, which is unique to the subnet, must define how a subnet validator will query the subnet miners, and how a subnet miner should respond to the query.
 
@@ -222,7 +275,9 @@ Use the Bittensor building blocks Axon, dendrite and Synapse to develop your sub
 
 For example, a subnet validator might send a query containing the task description to the subnet miners. The subnet miners will perform the task and then respond to the subnet validators with the results of the task the miners performed. Note, however, that query-response is only one of the ways of subnet miner-and-subnet validator interaction. An alternative example is when the subnet validators and subnet miners use additional shared resources such as databases, and these resources can be used to evaluate miner performance.
 
-### Subnet task[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-protocol
+
+### Subnet task
 
 See **2** in the above diagram. The task is one of the key components of any incentive mechanism as it defines what miners will perform as work. The task should be chosen so that miners are maximally effective at the intended use case for the subnet. In other words, **the task should mimic an intended user interaction with a subnet**. Examples of tasks are responding to natural language prompts and storing encrypted files.
 
@@ -230,7 +285,9 @@ ALIGNING MINERS WITH THE SUBNET GOALS
 
 The task defines the scope of work that miners will undertake, and what utility the subnet can provide to users. In some cases this should be very specific (such as storage) and in other cases it can be varied (many types of natural language query).
 
-### Subnet reward model[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-reward-model)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task
+
+### Subnet reward model
 
 See **4** and **5** in the above diagram. Just as the task describes **what** miners should do, the reward model dictates **how** it should be done. Similarly, just as tasks should mimic user interactions, reward models should mimic user preferences or desired outcomes.
 
@@ -244,13 +301,17 @@ THE ZEN OF INCENTIVE MECHANISMS
 
 Subnets should be endlessly improving.
 
-### Discourage exploits[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#discourage-exploits)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-reward-model
+
+### Discourage exploits
 
 The incentive mechanism is ultimately the judge of subnet miner performance. When the incentive mechanism is well calibrated, it can result in a virtuous cycle in which the subnet miners continuously improve at the desired task due to competition.
 
 On the contrary, a poorly designed incentive mechanism can result in exploits and shortcuts, which can detrimentally impact the overall quality of the subnet and discourage fair miners.
 
-## Distribution of rewards[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rewards)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#discourage-exploits
+
+## Distribution of rewards
 
 ### Example[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#example)
 
@@ -275,10 +336,14 @@ ALL REWARD TAO TOKENS ARE NEWLY MINTED.
 
 1. Finally, the YC calculates a consensus distribution of TAO (the ‘emission’) and distributes the newly minted reward TAO immediately into the accounts associated with the UIDs.
 
-### Tempo[](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo)
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rewards
+
+### Tempo
 
 Note that subnet validators can transmit their rank weight vectors to the blockchain any time. However, for any user-created subnet, the YC for the subnet begins at every 360 blocks (=4320 seconds or 72 minutes, at 12 seconds per block) using the latest weight matrix available at the YC for the subnet.
 
 If a ranking weight vector from the subnet validator arrives after the start of a 360-block period, then this weight vector will be used in the subsequent YC start, i.e., after the current 360 blocks have elapsed.
 
 At the end of any 360-block period, called **tempo**, the YC concludes and the emissions (distribution of reward TAO) are complete. This tempo value of 360 blocks is the same for all the user-created subnets. However, the YC-starts for each user-created subnet can commence at different times.
+
+See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo
