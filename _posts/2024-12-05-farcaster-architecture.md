@@ -6,16 +6,18 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum 
 tags: social
-description: Farcaster is a sufficiently decentralized social network built on Ethereum. It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. What sets it apart is that users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
+description: Farcaster is a sufficiently decentralized social network built on Ethereum. It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. Users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
 image: 
 isMath: false
 ---
 
 Farcaster is a [sufficiently decentralized](https://www.varunsrinivasan.com/2022/01/11/sufficient-decentralization-for-social-networks) social network built on Ethereum.
 
-It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. What sets it apart is that users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
+It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. Users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
 
-This article is mainly taken from the Farcaster documentation part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) with a few modification of my part.
+> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+>
+> This article is mainly taken from the Farcaster documentation part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) with a few modification of my part.
 
 [TOC]
 
@@ -88,7 +90,7 @@ The IdRegistry lets users register, transfer and recover Farcaster accounts.
 
 See [docs.farcaster - id-registry](https://docs.farcaster.xyz/learn/architecture/contracts#id-registry) & [github.com/farcasterxyz - IdRegistry.sol](https://github.com/farcasterxyz/contracts/blob/0451f3f1c2219db467fa128a06d5938392d2974a/src/IdRegistry.sol)
 
-![farcaster-id-registry](../assets/article/blockchain/social/farcaster/farcaster-id-registry.png)
+![farcaster-id-registry]({{site.url_complet}}/assets/article/blockchain/social/farcaster/farcaster-id-registry.png)
 
 ### Storage Registry
 
@@ -99,7 +101,7 @@ The Storage Registry lets accounts rent [storage](https://docs.farcaster.xyz/lea
 
 See [docs.farcaster - storage-registry](https://docs.farcaster.xyz/learn/architecture/contracts#storage-registry)  & [farcasterxyz/contracts - StorageRegistry.sol](https://github.com/farcasterxyz/contracts/blob/1aceebe916de446f69b98ba1745a42f071785730/src/StorageRegistry.sol)
 
-![farcaster-storage-registry](../assets/article/blockchain/social/farcaster/farcaster-storage-registry.png)
+![farcaster-storage-registry]({{site.url_complet}}/assets/article/blockchain/social/farcaster/farcaster-storage-registry.png)
 
 
 
@@ -112,7 +114,7 @@ The Key Registry lets accounts issue keys to apps, so that they can publish mess
 
 See [docs.farcaster - key-registry](https://docs.farcaster.xyz/learn/architecture/contracts#key-registry) & [github.com/farcasterxyz - KeyRegistry.sol](https://github.com/farcasterxyz/contracts/blob/0451f3f1c2219db467fa128a06d5938392d2974a/src/KeyRegistry.sol)
 
-![farcaster-key-registry](../assets/article/blockchain/social/farcaster/farcaster-key-registry.png)
+![farcaster-key-registry]({{site.url_complet}}/assets/article/blockchain/social/farcaster/farcaster-key-registry.png)
 
 
 
@@ -263,3 +265,5 @@ To learn more about how Fnames work, see [ENSIP-16](https://docs.ens.domains/ens
 See [docs.farcaster.xyz - registry](https://docs.farcaster.xyz/learn/architecture/ens-names#registry)
 
 ## Reference
+
+See [Farcaster doc](https://docs.farcaster.xyz/)

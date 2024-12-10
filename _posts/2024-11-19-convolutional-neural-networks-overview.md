@@ -7,7 +7,7 @@ locale: en-GB
 categories: programmation
 tags: cnn ML AI  neural-network convolutional
 description: Transport Layer Security (TLS) 1.3 is the latest version of the TLS protocol, designed to enhance internet security, speed, and privacy.
-image:
+image: /assets/article/mlg/MLG-CNN.drawio.png
 isMath: true
 ---
 
@@ -27,7 +27,7 @@ CNN has three main types of layers, which are:
 
 - Convolutional layer
 - Pooling layer (or downsampling)
-- Fully-connected (FC) layerFully-connected (FC) layer
+- Fully-connected (FC) layer
 
 With each layer, the CNN increases in its complexity, identifying greater portions of the image. 
 
@@ -57,6 +57,12 @@ As the image data progresses through the layers of the CNN, it starts to recogni
 - **Description**: Fully connected layers are typically positioned near the end of the CNN architecture and are responsible for the final decision-making process.
 - **Structure**: In these layers, each neuron connects to every neuron in the previous layer, allowing the model to consolidate information from all parts of the feature map.
 - **Function**: By combining features learned from previous layers, fully connected layers enable the model to make final classifications or predictions based on the synthesized features.
+
+### Schema
+
+Made from a diagram available in the following article[An Introduction to Convolutional Neural Network (CNN)](https://medium.com/sfu-cspmp/an-introduction-to-convolutional-neural-network-cnn-207cdb53db97)
+
+![MLG-CNN.drawio]({{site.url_complet}}/assets/article/mlg/MLG-CNN.drawio.png)
 
 ## Key Processes
 

@@ -102,24 +102,40 @@ What happens when the user enters their PIN?
 
 ### Main Cryptography algorithm
 
-####  PBKDF2 (Password-Based Key Derivation Function 2)
+####  PBKDF2 (Password-Based Key Derivation Function 2) with HMAC
 
-- **PBKDF2** is a cryptographic key derivation function, which is resistant to [dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack) and [rainbow table attacks](https://en.wikipedia.org/wiki/Rainbow_table) by using a salt. 
+**PBKDF2** is a cryptographic key derivation function, which is resistant to [dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack) and [rainbow table attacks](https://en.wikipedia.org/wiki/Rainbow_table) by using a salt. 
 
-- It is based on iteratively deriving **HMAC** many times with some padding. 
-- The **PBKDF2** algorithm is described in the Internet standard [RFC 2898 (PKCS #5)](http://ietf.org/rfc/rfc2898.txt). 
+In summary,it is a key derivation function that uses a password (in this case, the PIN), a salt (a random value), and multiple iterations of a cryptographic hash function (e.g **HMAC**) to generate a derived key.
 
-- **What it is**: **PBKDF2** is a key derivation function that uses a password (in this case, the PIN), a salt (a random value), and multiple iterations of a cryptographic hash function to generate a derived key.
+- It is described in the Internet standard [RFC 2898 (PKCS #5)](http://ietf.org/rfc/rfc2898.txt). 
 - **Purpose** in Trezor: It is used to transform the user's **PIN** into a strong cryptographic key (in this case, the KEK and KEIV). The function also incorporates a salt to prevent precomputed attacks (such as rainbow tables).
 - **How it works**: PBKDF2 uses the user's PIN as input and combines it with a salt derived from hardware identifiers (e.g., ProcessorID) and the random salt from flash storage. It runs the hash function (HMAC-SHA256) for 10,000 iterations (or more), producing 352 bits of output: the first 256 bits become the **KEK** and the last 96 bits form the **KEIV**.
 
 See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
 
+### HMAC
+
+Here some supplementary defails about HMAC used by PBKDF2
+
+#### HMAC-SHA256
+
+HMAC stands for Hash-based Message Authentication Code
+
+To derive the Encryption Key (KEK), Trezor uses PBKDf2 with **HMAC-SHA512** to make brute-force attacks more difficult. 
+
+HMAC adds an extra layer of security when handling cryptographic keys, making it harder for attackers to recover the seed phrase or private keys from device data (brute-force attack). 
+
+To obtain that, the HMAC process mixes a secret key, in the case of trezor, the salt, with the message data and hashes the result.
+
+See [datatracker.ietf.org/doc/html/rfc4868#page-3](https://datatracker.ietf.org/doc/html/rfc4868#page-3), [Microsoft - HMACSHA512 Class](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.hmacsha512?view=net-8.0)
+
 #### ChaCha20-Poly1305
 
-- **ChaCha20-Poly1305** provides both encryption by using the stream cipher ChaCha20 and authentication with Poly1305 as message authentication code (MAC)  in a single operation. The resulting algorithm is called an Authenticated Encryption with Additional Data cipher (AEAD)
-  - It is defined in [**RFC 7539**](https://datatracker.ietf.org/doc/html/rfc7539.html) section 2.8.  
-  - This combination offers strong integrity guarantees.
+**ChaCha20-Poly1305** provides both encryption by using the stream cipher ChaCha20 and authentication with Poly1305 as message authentication code (MAC)  in a single operation. The resulting algorithm is called an Authenticated Encryption with Additional Data cipher (AEAD)
+
+- It is defined in [**RFC 7539**](https://datatracker.ietf.org/doc/html/rfc7539.html) section 2.8.  
+- This combination offers strong integrity guarantees.
 
 - **Purpose**: It is used to **encrypt and decrypt data securely**, ensuring both confidentiality and integrity of the data. In Trezor, it is used to encrypt the **EDEK** and the protected entries stored in the flash.
 - **How it works:**
@@ -128,20 +144,6 @@ See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-der
 - ChaCha20-Poly1305 ensures that even if an attacker modifies the encrypted data or its associated metadata (like the IV), the decryption process will fail due to a tag mismatch.
 
 See [cryptography - AEAD](https://cryptography.io/en/stable/hazmat/primitives/aead/), [cloudflare - chacha0Poly1305](https://blog.cloudflare.com/it-takes-two-to-chacha-poly/) and [Wikipedia - ChaCha20-Poly1305](https://en.wikipedia.org/wiki/ChaCha20-Poly1305), [Proton - ChaCha20](https://protonvpn.com/blog/chacha20)
-
-#### HMAC-SHA256
-
-HMAC stands for Hash-based Message Authentication Code
-
-To derive the Encryption Key (KEK), Trezor uses PBKDf2 with  **HMAC-SHA512** to check data integrity and authenticity , which makes brute-force attacks more difficult. 
-
-HMAC adds an extra layer of security when handling cryptographic keys, making it harder for attackers to recover the seed phrase or private keys from device data.
-
-The HMAC process mixes a secret key with the message data and hashes the result. An HMAC is useful to determine whether a message sent over a nonsecure channel has been tampered with.
-
-The receiver recalculates the hash value on the received message and checks that the computed HMAC matches the transmitted HMAC.
-
-See [datatracker.ietf.org/doc/html/rfc4868#page-3](https://datatracker.ietf.org/doc/html/rfc4868#page-3), [Microsoft - HMACSHA512 Class](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.hmacsha512?view=net-8.0)
 
 ### Keys and PVC
 
@@ -153,7 +155,8 @@ These elements are stored on the Trezor storage.
 
 ##### (E)DEK (Data Encryption Key)
 
-- **What it is**: The **DEK** is the actual key used to encrypt and decrypt protected data stored in flash storage.
+The **DEK** is the actual key used to encrypt and decrypt protected data stored in flash storage.
+
 - **Purpose**: The DEK protects sensitive data entries in the device’s flash memory. It is derived by decrypting the **EDEK** with the KEK and KEIV.
 - **How it works**: The DEK is used to encrypt and decrypt specific entries (e.g., secrets, settings) in the storage. Without the correct DEK, these entries cannot be read or tampered with.
 
@@ -161,13 +164,14 @@ These elements are stored on the Trezor storage.
 
 The storage authentication key (SAK) is used to authenticate the list of (APP, KEY) values for all protected entries that have been set in the storage. This prevents an attacker from erasing or adding entries to the storage.
 
-The key is encrypted with the key derived from the user's pin
+- The key is encrypted with the key derived from the user's pin
 
-This key is stored encrypted in the storage.
+- This key is stored encrypted in the storage.
 
 ##### PVC (PIN Verification Code)
 
-- **What it is**: The PVC is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
+The PVC is a **64-bit code** stored in the flash memory and used to verify if the correct PIN was used during decryption.
+
 - **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
 - **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
 - Remark from the trezor documentation: The 64-bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
@@ -176,25 +180,24 @@ This key is stored encrypted in the storage.
 
 ##### KEK (Key Encryption Key)
 
-- **What it is**: The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
-
+The **KEK** is a 256-bit key derived from the user’s PIN and a salt using the **PBKDF2** algorithm.
 $$
 \begin{aligned}
 KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations = 10000, dkLen = 352 bits)
 \end{aligned}
 $$
 
-- **Purpose**: The KEK is used to decrypt the Encrypted Data Encryption Key **(EDEK)**, allowing access to the actual Data Encryption Key (DEK).
+The KEK is used to decrypt the Encrypted Data Encryption Key **(EDEK)**, allowing access to the actual Data Encryption Key (DEK).
+
 - **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
 - This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
 
 ##### KEIV (Key Encryption Initialization Vector)
 
-- **What it is**: The KEIV is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
+The KEIV is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
+
 - **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
 - **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
-
-
 
 ### Summary of the Workflow:
 
@@ -207,7 +210,7 @@ $$
 
 ## BIP-32, BIP-39, and BIP-44 Standards
 
-Trezor follows industry-standard protocols, such as:
+Trezor follows several BIP standards, widely used inside the industry, such as:
 
 - **[BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
 - **[BIP-39](https://en.bitcoin.it/wiki/BIP_0039)**: Governs the creation of mnemonic seed phrases for easy wallet backups.
@@ -221,13 +224,15 @@ Thanks to `address_index`, you can have several different addresses for the same
 
 See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=AfmBOopiSIUJDwPISXP5YbzFws1lFEToUwG52ITiM1Y72akbpyvNp8it)
 
+To understand how an address is generated in bitcoin you can read my article: [Bitcoin Keys 101 - From seed phrase to address](https://rya-sge.github.io/access-denied/2024/10/28/bitcoin-keys-101/)
+
 ------
 
 ## Model specificity
 
 ### On-Device entry
 
-The Trezor model one uses a blind matrix for PIN entry -- when required, a matrix of **dots** (instead of numbers) appears on your computer screen
+The [Trezor Model One](https://trezor.io/trezor-model-one) uses a blind matrix for PIN entry -- when required, a matrix of **dots** (instead of numbers) appears on your computer screen
 
 Contrary to the Trezor model One, the PIN for model 3, 5 and T is directly entered by tapping on the touchscreen of your Trezor Model
 
@@ -267,7 +272,7 @@ Compared to EAL-5 certification, this certification requires:
 - more comprehensive independent vulnerability analysis 
 - and improved configuration management and development environment controls.
 
-More information on the Trezor website [Secure Element in Trezor Safe Devices](https://trezor.io/learn/a/secure-element-in-trezor-safe-devices?srsltid=AfmBOopNYvU2RYB3hnl9iimVsinXd_54n730ovNmuu1DICq2aCCo8X1-)
+More information on the Trezor website [Secure Element in Trezor Safe Devices](https://trezor.io/learn/a/secure-element-in-trezor-safe-devices)
 
 Reference:[commoncriteriaportal.org, p.22](https://www.commoncriteriaportal.org/files/ccfiles/CC2022PART5R1.pdf), [web archive - CESG.gov.uk ](https://web.archive.org/web/20041012181256/http://www.cesg.gov.uk/site/iacs/index.cfm?menuSelected=1&displayPage=13)
 
@@ -295,9 +300,9 @@ While Trezor hardware wallets are robust, they are not impervious to **physical 
 
 However, a Trezor wallet is protected by the PIN, and the passphrase if set. 
 
-The passphrase feature is especially useful because it creates an additional level of obfuscation, meaning even if someone manages to steal your device and get your PIN, they cannot access to your funds without the passphrase.
+The passphrase feature is especially useful because it creates an additional level of obfuscation, meaning even if someone manages to steal your device and get your PIN, they cannot access your funds without the passphrase.
 
-Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access to the fund if they don't manage to find the passphrase.
+Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access the funds if they don't manage to find the passphrase.
 
 #### 2. Supply Chain Attacks
 
@@ -325,10 +330,10 @@ Fake Trezor sold on the Russia Market through a popular website: Modification pe
 
 - They install a malicious firmware in the device
 - They removed the bootloader-checks to avoid detection at startup.
-- They replace the randomly generated seed phrase with a pre-generated seed phrases saved in the malicious firmware. 
+- They replace the randomly generated seed phrase with a pre-generated seed phrase saved in the malicious firmware. 
 - This is the reason why chips are now glued on the board to make modifications more complicated:
 
-Reference: [Kaspersky.com - Case study: fake hardware cryptowallet](https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/)
+Reference: [Kaspersky.com - Case study: fake hardware cryptowallet](https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/), [Trezor - Stay safe shopping for hardware wallets](https://blog.trezor.io/stay-safe-shopping-for-hardware-wallets-543f144e3d24)
 
 ### Side-channel attack
 
@@ -340,7 +345,7 @@ In the past, several side-channel attacks have been performed on Trezor wallets,
 
 #### Ledger Donjon Team
 
-Ledger identified several side-channel attack on the Trezor Model One.
+Ledger identified several side-channel attacks on the Trezor Model One.
 
 One concerned the PIN verification allowing an attacker with a stolen Trezor One to retrieve the correct value of the PIN within a few minutes.
 
@@ -355,15 +360,15 @@ The subtraction operation *storageRom->pin[i] — presented_pin[i]* contains
 - The secret PIN value 
 - The user input value
 
-Thus, a side-channel attack is possible to induce differentiability. The Ledger Donjon Team measured the power consumption of the device, then they use Machine Learning to determine the most likely candidate for *storageRom->pin.*
+Thus, a side-channel attack is possible to induce differentiability. The Ledger Donjon Team measured the power consumption of the device, then they used Machine Learning to determine the most likely candidate for *storageRom->pin.*
 
-These vulnerabilities have conducted Satoshi Labs to propose a more robust version to encrypt the data stored in the device. This new version is the current version shown with the Data encryption Diagram above.
+These vulnerabilities have led Satoshi Labs, the company behind the wallet, to propose a more robust version to encrypt the data stored in the device. This new version is the current version shown with the Data encryption Diagram above.
 
 #### Kraken Security Labs
 
-Despite this new architecture, Kraken in 2020, managed to perform a fault injection attack on the device  to extract the entire flash-contents 
+Despite this new architecture, Kraken in 2020, managed to perform a fault injection attack on the device  to extract the entire flash-contents of the microcontroller’s flash memory
 
-- Since Trezor firmware uses an encrypted storage, they developed a script to crack the PIN of the dumped device.
+- Since Trezor firmware uses encrypted storage, they developed a script to crack the PIN of the dumped device.
 
 - The script was able to brute force any 4-digit pin in under two minutes.
 - As a reminder, a PIN brute-force is not directly possible directly on the device, because the storage is automatically wipes after 16 unsuccessful attempts.
@@ -371,15 +376,35 @@ Despite this new architecture, Kraken in 2020, managed to perform a fault inject
 
 Reference:
 
-[Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
+[Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets), [Trezor - Our Response to the Read Protection Downgrade Attack](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6)
 
 ![trezor-fault-injection-protection]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-fault-injection-protection.png)
 
 ## Conclusion
 
-Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2, ChaCha20-Poly1305, HMAC-SHA256) to protect sensitive information such as the seed phrase.
+Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2, ChaCha20-Poly1305, HMAC-SHA256) to protect sensitive information such as the seed phrase against several different attack:
+
+Theft/burglary => PIN, Passphrase
+Side-channel attack => PIN with PBKDF2 & HMAC-SHA-256, Passphrase
 
 The fact that the firmware is open source is also a strong point in their favor.
 
 All these features make them one of the most trusted hardware wallets in the cryptocurrency space.
 
+## References
+
+- Official website [trezor.io](https://trezor.io)
+  - [Trezor - Compare](https://trezor.io/compare)
+  - [Secure Element in Trezor Safe Devices](https://trezor.io/learn/a/secure-element-in-trezor-safe-devices)
+  - [Trezor - How to use a recovery seed](https://trezor.io/learn/a/how-to-use-a-recovery-seed)
+  - [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+  - [Security & safety in Trezor ](https://trezor.io/learn/a/security-safety-in-trezor?srsltid=AfmBOoo-zyONXBVPkTbfQ1r552tSE6H8g2FruZ5JFBbCayxHWeTcCYg8)
+  - [trezor - PIN protection on Trezor devices ](https://trezor.io/learn/a/pin-protection-on-trezor-devices), [Trezor suite protection against keyloggers?](https://forum.trezor.io/t/trezor-suite-protection-against-keyloggers/6386)
+- Supply-chain attack
+  - [Kaspersky.com - Case study: fake hardware cryptowallet](https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/)
+  - [Trezor - Stay safe shopping for hardware wallets](https://blog.trezor.io/stay-safe-shopping-for-hardware-wallets-543f144e3d24)
+- Side-channel attack:
+  - [Wallet.fail](https://www.youtube.com/watch?v=Y1OBIGslgGM) (2018)
+  - [BREAKING TREZOR ONE WITH SIDE CHANNEL ATTACKS](https://www.ledger.com/blog/breaking-trezor-one-with-sca)
+  - [Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
+  - [Trezor - Our Response to the Read Protection Downgrade Attack](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6)

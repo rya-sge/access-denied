@@ -21,7 +21,11 @@ This well-renowned concept is being applied to cybersecurity solutions like [Cis
 
 Understanding the Pyramid of Pain concept as a Threat Hunter, Incident Responder, or SOC Analyst is important.
 
-This article was made with ChatGPT and the room [Pyramid of Pain](ttps://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
+> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+>
+> This article was made with ChatGPT and the room [Pyramid of Pain](ttps://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
+
+
 
 [TOC]
 

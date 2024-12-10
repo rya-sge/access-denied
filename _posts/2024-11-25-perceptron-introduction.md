@@ -11,7 +11,7 @@ image: /assets/article/mlg/perceptron.drawio.png
 isMath: true
 ---
 
-The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of **artificial neural networks**. It is a simple yet powerful algorithm that mimics the decision-making process of neurons in the human brain. 
+The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of **artificial neural networks**. It is an algorithm that mimics the decision-making process of neurons in the human brain. 
 
 ## What is a Perceptron?
 

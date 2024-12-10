@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Virtual Protocol - Co-contribution and provenance
+title:  Virtual Protocol, create co-ownership AI agents
 date:   2024-12-5
 lang: en
 locale: en-GB
@@ -15,7 +15,9 @@ Virtuals Protocol is a co-ownership layer for AI agents in gaming and entertainm
 
 This article is about one specific point of the protocol:Co-contribution and provenance
 
-The content is mainly taken from Virtual Protocol documentation, part [Virtual Protocol - Co-contribution and provenance](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance) with a few modification of my part.
+> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+>
+> The content is mainly taken from Virtual Protocol documentation, part [Virtual Protocol - Co-contribution and provenance](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance) with a few modification of my part.
 
 The Virtual protocol want to achieve  for
 
