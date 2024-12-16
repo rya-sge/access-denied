@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: programmation
 tags: ML AI perceptron neural-network
-description: The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of **artificial neural networks**.
+description: The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of artificial neural networks.
 image: /assets/article/mlg/perceptron.drawio.png
 isMath: true
 ---
@@ -121,3 +121,5 @@ Understanding the perceptron provides a crucial first step in exploring the broa
 - [IBM Developer - A neural networks deep dive](https://developer.ibm.com/articles/cc-cognitive-neural-networks-deep-dive/)
 
 - [Deep learning basics — Part 2 — Perceptron](https://medium.com/@sasirekharameshkumar/understanding-deep-learning-basics-part-2-466a7422d24b)
+
+- ChatGPT with the input "Write me an article about Perceptron. Include a paragraph to explain the difference/similarity with CNN"

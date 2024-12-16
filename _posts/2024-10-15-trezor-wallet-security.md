@@ -208,9 +208,11 @@ The KEIV is a 96-bit value derived alongside the KEK using the **PBKDF2** algori
 
 ------
 
-## BIP-32, BIP-39, and BIP-44 Standards
+## Backup
 
-Trezor follows several BIP standards, widely used inside the industry, such as:
+### BIP-32, BIP-39, and BIP-44 Standards
+
+To make backup and restoration on a new wallet easier, Trezor implements several known standards. They are also at the origin of some of them (BIP-39 & BIP-44)
 
 - **[BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)**: Enables the creation of **hierarchical deterministic (HD) wallets**, which allow users to derive multiple private and public keys from a single seed.
 - **[BIP-39](https://en.bitcoin.it/wiki/BIP_0039)**: Governs the creation of mnemonic seed phrases for easy wallet backups.
@@ -225,6 +227,24 @@ Thanks to `address_index`, you can have several different addresses for the same
 See [Trezor - What is BIP44?](https://trezor.io/learn/a/what-is-bip44?srsltid=AfmBOopiSIUJDwPISXP5YbzFws1lFEToUwG52ITiM1Y72akbpyvNp8it)
 
 To understand how an address is generated in bitcoin you can read my article: [Bitcoin Keys 101 - From seed phrase to address](https://rya-sge.github.io/access-denied/2024/10/28/bitcoin-keys-101/)
+
+### Multi-share Backup
+
+To perform a multi-share backup, SatoshiLabs has written its own proposal [SLIP39](https://github.com/satoshilabs/slips/blob/master/slip-0039.md) to implement a multi-share backup with **Shamir’s Secret-Sharing**
+
+SLIP39  is a multi-party alternative to Bitcoin Improvement Proposal [BIP39](https://trezor.io/learn/a/what-is-bip39).
+
+This advanced backup method splits your w**allet backup** (recovery seed) into multiple parts, called **shares**, and requires a minimum number of these, the **threshold**, to restore the wallet.
+
+By distributing these shares between different locations and/or trusted individuals, you can significantly reduce the risk of *total* loss or theft. 
+
+=> Even if some shares are lost, your wallet remains secure as long as the threshold number of shares is intact. 
+
+=> Moreover, if some shares fall into the wrong hands, your wallet is still secure as long as less than the threshold number of shares are compromised.
+
+You can fin more information about Shamir's Secret Sharing in my article [MPC - Shamir Secret-Sharing](https://rya-sge.github.io/access-denied/2024/10/21/mpc-protocol-overview/#secret-sharing)
+
+Main reference: [Trezor - Slip39](https://content.trezor.io/slip39)
 
 ------
 
@@ -254,13 +274,13 @@ Reference: [Trezor - PIN protection on Trezor devices](https://trezor.io/learn/a
 
 The Trezor Safe 5 and Safe 3 reinforce the security by using a Secure Element, certified CC EAL6+. 
 
-##### About the chips
+#### About the chips
 
 The chips used is the OPTIGA™ Trust M (V3). 
 
 Contrary to the firmware, the code is not open source, but the producer does not restrict Trezor from freely publishing potential vulnerabilities.
 
-##### About the certification
+#### About the certification
 
 A chips EAL-6 means that the chips has been Semiformally Verified Design and Tested. Additional Security Considerations.
 
@@ -292,29 +312,29 @@ During the manufacturing process of the Trezor Safe hardware wallets, a unique c
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
 
-### Additional Security Considerations
+## Additional Security Considerations
 
-#### 1. Physical Security
+### 1. Physical Security
 
 While Trezor hardware wallets are robust, they are not impervious to **physical attacks** if a device falls into the wrong hands. 
 
-However, a Trezor wallet is protected by the PIN, and the passphrase if set. 
+However, a Trezor wallet is protected by the `PIN`, and the `passphrase` if set. 
 
 The passphrase feature is especially useful because it creates an additional level of obfuscation, meaning even if someone manages to steal your device and get your PIN, they cannot access your funds without the passphrase.
 
 Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access the funds if they don't manage to find the passphrase.
 
-#### 2. Supply Chain Attacks
+### 2. Supply Chain Attacks
 
 To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures:
 
 - Seal on the device or the package. Users are encouraged to inspect the device for any signs of tampering, such as broken seals (**Tamper-evident** packaging). 
-- A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (= secure boot).
+- A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (=secure boot).
   - Thus users can verify the authenticity of the firmware when initializing the device.
 
 - Since 2022, individual chips are now glued onto the board
 
-### Trezor Safe device authentication check
+#### Trezor Safe device authentication check
 
 As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to help to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
 
@@ -382,10 +402,9 @@ Reference:
 
 ## Conclusion
 
-Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2, ChaCha20-Poly1305, HMAC-SHA256) to protect sensitive information such as the seed phrase against several different attack:
+Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2 with HMAC-SHA256, ChaCha20-Poly1305, ) to protect sensitive information such as the seed phrase against several different attack:
 
-Theft/burglary => PIN, Passphrase
-Side-channel attack => PIN with PBKDF2 & HMAC-SHA-256, Passphrase
+![trezor-Trezor-threat-protection.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-Trezor-threat-protection.drawio.png)
 
 The fact that the firmware is open source is also a strong point in their favor.
 

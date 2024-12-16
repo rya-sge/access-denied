@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Les liens physiques et symboliques avec Linux"
+title: Les liens physiques et symboliques avec Linux
 date:   2021-06-15
 last-update: 2021-12-10 
 categories: linux
@@ -9,15 +9,15 @@ description: Cet article présente les liens symboliques et physiques sur un sys
 image: /assets/article/linux/lien/schema-lien-physique.png
 ---
 
-Cet article présente les liens symboliques et physiques. 
+Cet article présente les liens symboliques et physiques.  
+
+Les liens **physiques (hard links)** et les liens **symboliques (symbolic links ou symlinks)** sont deux méthodes pour faire référence à des fichiers ou des répertoires, mais ils fonctionnent différemment.
 
 Les manipulations ont été effectués sur une machine Ubuntu 20.04 *LTS*
 
-
-
 ## Petit rappel sur les fichiers  
 
-Un fichier correspond à une entrée dans le répertoire où il se trouve. Celui-ci contient le nom du fichier ainsi que son numéro d'inode.
+Un fichier correspond à une entrée dans le répertoire où il se trouve. Celui-ci contient le nom du fichier ainsi que son numéro **d'inode**.
 
 Que permet le numéro d'inode ?
 
@@ -25,9 +25,21 @@ L'inode contient les métadonnées et des pointeurs vers les blocs de contenus. 
 
 
 
-## Lien physique 
+## Lien physique (hard link)
 
 ![schema-lien-physique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-physique.png)
+
+### Description
+
+C'est une autre référence au même fichier sur le disque. Il associe un nom de fichier à l'inode (l'identifiant unique du fichier).
+
+- Si le fichier original est supprimé, le lien physique continue d'exister et reste fonctionnel tant qu'au moins un lien vers l'inode subsiste.
+
+- Les liens physiques ne fonctionnent que sur le même système de fichiers (partition).
+
+- Ils ne peuvent pas pointer vers des répertoires afin de notamment éviter des boucles dans le système de fichiers.
+
+### Détails
 
 Commande :
 
@@ -63,9 +75,20 @@ Conséquence :
 
 
 
-## Lien symbolique 
+## Lien symbolique (symlink)
 
 ![schema-lien-symbolique]({{site.url_complet}}/assets/article/linux/lien/schema-lien-symbolique.png)
+
+### Description
+
+C'est un fichier spécial qui contient un chemin vers un autre fichier ou répertoire. Il agit comme un raccourci.
+
+- Si le fichier cible est supprimé ou déplacé, le lien symbolique devient cassé (dangling link) et ne fonctionne plus.
+
+- Les liens symboliques peuvent pointer vers des fichiers ou des répertoires, et ils fonctionnent même à travers différentes partitions.
+- Ils sont plus flexibles mais aussi plus fragiles que les liens physiques.
+
+### Détails
 
 Commande :
 
@@ -101,19 +124,19 @@ Dans ce cas-là, on modifie l'entrée du répertoire du fichier source, c'est-à
 
 Pour réaliser les exemples, on créer d'abord un
 
--  Un fichier source file_1
-- Un lien physique file_2 à partir de  file_1
-- Un lien symbolique file_3 à partir de file_1
+-  Un fichier source `file_1`
+- Un lien physique `file_2` à partir de `file_1`
+- Un lien symbolique `file_3` à partir de `file_1`
 
-A l'affichage, on peut remarquer que file_3 est coloré en bleu et qu'avec la commande ls, on a une petite flèche -> sur le fichier source.
+A l'affichage, on peut remarquer que `file_3` est coloré en bleu et qu'avec la commande `ls`, on a une petite flèche -> sur le fichier source.
 
 ![affichage-lien]({{site.url_complet}}/assets/article/linux/lien/affichage-lien.PNG)
 
 ### 2) Modification
 
-Lorsqu'on modifie file_2(lien physique), on peut constater que cela modifie également file_1
+Lorsqu'on modifie `file_2`(lien physique), on peut constater que cela modifie également `file_1`
 
-On observe le même comportement avec file_1
+On observe le même comportement avec `file_1`
 
 Conclusion : Que ça soit avec un lien physique ou symbolique, bien que l'implémentation soit différente, le résultat pour l'utilisateur est le même.
 
@@ -129,22 +152,34 @@ mv file-4 file_1
 
 va modifier l'inode de l'entrée de file_1 dans le répertoire. 
 
-- Cette modification sera prise en compte par le lien symbolique, car celui-ci pointe sur file_1 (l'entrée).
--  Alors que le lien physique, lui il pointe toujours sur l'inode d'origine, celui auquel file_1 pointait au début.
+- Cette modification sera prise en compte par le lien symbolique, car celui-ci pointe sur `file_1` (l'entrée).
+-  Alors que le lien physique, lui il pointe toujours sur l'inode d'origine, celui auquel `file_1`pointait au début.
 
 ![mv-lien]({{site.url_complet}}/assets/article/linux/lien/mv-lien.PNG)
 
 ### 4) Suppression avec rm
 
-En supprimant file_1, on supprime en réalité l'entrée dans le répertoire de file_1, cette suppression sera reportée directement sur file_3 car celui-ci pointe sur file_1.
+En supprimant `file_1`, on supprime en réalité l'entrée dans le répertoire de `file_1`, cette suppression sera reportée directement sur `file_3` car celui-ci pointe sur `file_1`.
 
-On peut aussi constater un affichage en rouge pour file_3 indiquant que le lien est mort.
+On peut aussi constater un affichage en rouge pour `file_3` indiquant que le lien est mort.
 
-Le lien physique ne sera pas affecté car celui-ci ne pointe pas directement sur file_1 mais avait repris l'inode sur lequel pointait file_1.
+Le lien physique ne sera pas affecté car celui-ci ne pointe pas directement sur `file_1` mais avait repris l'inode sur lequel pointait `file_1`.
 
 ![rm-lien]({{site.url_complet}}/assets/article/linux/lien/rm-lien.PNG)
 
+## Résumé des différences
 
+| **Critères**            | **Lien physique**              | **Lien symbolique**          |
+| ----------------------- | ------------------------------ | ---------------------------- |
+| Référence               | Directe vers l'inode           | Chemin vers le fichier cible |
+| Survie à la suppression | Oui (tant qu'un lien subsiste) | Non (devient cassé)          |
+| Partitions              | Limité à la même partition*    | Traversent les partitions*   |
+| Répertoires             | Non autorisés                  | Autorisés                    |
+| Flexibilité             | Moins flexible                 | Plus flexible                |
+
+Ces deux types de liens sont utiles dans différents contextes, selon les besoins en termes de structure de fichiers, d'accès ou de robustesse.
+
+*Référence: [Ubuntu - Syntaxe des liens physiques ou symboliques](https://doc.ubuntu-fr.org/lien_physique_et_symbolique)
 
 ## Sources
 
@@ -152,3 +187,5 @@ Le lien physique ne sera pas affecté car celui-ci ne pointe pas directement sur
 - Cours d'Administration système(ADS) enseigné à l'HEIG-VD en 2021
 - Cours d'Administration IT(AIT) enseigné à l'HEIG-VD en 2021
 - [inux-note.com - commande-ln-creation-de-liens/](https://linux-note.com/commande-ln-creation-de-liens/)
+- [Ubuntu - Syntaxe des liens physiques ou symboliques](https://doc.ubuntu-fr.org/lien_physique_et_symbolique)
+- ChatGPT avec l'entrée suivante: "Décris brièvement ce que sont un lien physiques et symboliques avec Linux et leurs principales différences"

@@ -155,3 +155,4 @@ By leveraging key components like convolution layers, pooling layers, and fully 
 - [Understanding Architecture Of Inception Network & Applying It To A Real-World Dataset](https://gghantiwala.medium.com/understanding-the-architecture-of-the-inception-network-and-applying-it-to-a-real-world-dataset-169874795540)
 - [Medium - AlexNet Architecture Explained](https://medium.com/@siddheshb008/alexnet-architecture-explained-b6240c528bd5)
 - [unibas - Deep Neural Networks - Hyperparameters](https://dmi.unibas.ch/fileadmin/user_upload/dmi/Studium/Computer_Science/Vorlesung_HS19/Pattern_Recongnition/09_Deep_Neural_Networks_hyperparameters_2019.pdf) 
+- ChatGPT with the following inputs: "Write me an article about CNN with key terms", "What are hyperparameters in a CNN"

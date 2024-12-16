@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Farcaster - Architecture of this decentralized social platform
+title:  Decentralizing Social Platform - Exploring Farcaster’s Architecture
 date:   2024-12-05
 lang: en
 locale: en-GB

@@ -28,25 +28,35 @@ They implement and use several standard and cryptography algorithms to generate 
 - To encrypt the SRP and private keys inside the application, Metamask used a password defined by the user. From this password, a key is derived with the algorithm [PBKDF2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2), a derivation key algorithm. The behavior is similar to a password manager.
 - With this key, the data are encrypted using the algorithm [AES-GCM](https://www.cryptosys.net/pki/manpki/pki_aesgcmauthencryption.html#:~:text=AES%20with%20Galois%2FCounter%20Mode,38D%20%5BSP800-38D%5D.), a well known algorithm to perform authenticated encryption (confidentiality and authentication).
 
+
+
+![crypto-wallet-Metamask.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/metamask/crypto-wallet-Metamask.drawio.png)
+
+
+
 Reference: [17. User Guide: Secret Recovery Phrase, password, and private keys](https://support.metamask.io/hc/en-us/articles/4404722782107)
 
 [TOC]
 
 ## Secret Recovery Phrase ( SRP / Seed Phrase)
 
+### Presentation
+
 The secret Recovery phrase, or sometimes called a seed phrase,
 
--  It is inspired by the [BIP_0039](https://en.bitcoin.it/wiki/BIP_0039) from Bitcoin [[1.BIP_0039](https://en.bitcoin.it/wiki/BIP_0039)]
+-  It is inspired by the [BIP_0039](https://en.bitcoin.it/wiki/BIP_0039) from Bitcoin
    -  This BIP describes the implementation of a mnemonic code / seed phrase -- a group of easy to remember words -- for the generation of deterministic wallets.
    -  It consists of two parts: generating the mnemonic and converting it into a binary seed.
    -  This seed can be later used to generate deterministic wallets using BIP-0032 or similar methods. Unfortunately, I do not know which standard is used by Metamask to generate Deterministic wallet. 
--  This phrase is made of 12 words taken from a list in a random way
--  it will be used to generate the first private key of the wallet. 
-   -  The result of the computation will be the same all the time. It is what we call this type of wallet a "deterministic wallet".
--  Implementation:
-   -  To implement that, they use their own fork from the library [scure-bip39](https://github.com/paulmillr/scure-bip39).
-   -  This library uses the function `randomBytes`from another library written by the same author: [noble-hashes](https://github.com/paulmillr/noble-hashes/blob/314f90cc3e7e10bea270f90469c8cabc18511712/src/utils.ts#L250)
-   -  The Javascript function finally used to generate the pseudo-random numbers used as the seis [getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
+   -  You can find more details about BIP-32 and BIP-39 on my article: [Bitcoin Keys 101 - From seed phrase to address](https://rya-sge.github.io/access-denied/2024/10/28/bitcoin-keys-101/)
+-  This phrase is made of 12 words taken from a list in a random way and will be used to generate the first private key of the wallet. 
+-  The result of the computation will be the same all the time. It is what we call this type of wallet a "deterministic wallet".
+
+### Implementation
+
+-  To implement that, they use their own fork from the library [scure-bip39](https://github.com/paulmillr/scure-bip39).
+-  This library uses the function `randomBytes`from another library written by the same author: [noble-hashes](https://github.com/paulmillr/noble-hashes/blob/314f90cc3e7e10bea270f90469c8cabc18511712/src/utils.ts#L250)
+-  The Javascript function finally used to generate the pseudo-random numbers used as the seed [getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
 
 
 Reference: [4. What is a ‘Secret Recovery Phrase’ and how to keep your crypto wallet secure            ](https://support.metamask.io/hc/en-us/articles/360060826432-What-is-a-Secret-Recovery-Phrase-and-how-to-keep-your-crypto-wallet-secure)
@@ -54,8 +64,7 @@ Reference: [4. What is a ‘Secret Recovery Phrase’ and how to keep your crypt
 
 ### Conservation & Access 
 
-- MetaMask does not keep your SRP in their server, but locally in the application.
-- It is why MetaMask is a self-custodial wallet 
+MetaMask does not keep your SRP in their server, but locally in the application. It is why MetaMask is a self-custodial wallet 
 
 In summary, Metamask 
 
@@ -119,7 +128,7 @@ The browser extension is made as following:
 - The password is used to derive a private key by using the algorithm [PBKDF2 [11]](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
 - The data are encrypted with the algorithm AES-GCM
 
-Reference: [5. https://support.metamask.io](https://support.metamask.io/hc/en-us/articles/4405451730331)
+Reference: [Support - Passwords and MetaMask (5)](https://support.metamask.io/hc/en-us/articles/4405451730331)
 
 To know how the private key is encrypted, MetaMask have published on GitHub a module called [Browser Passworder](https://github.com/MetaMask/browser-passworder). It is a module for encrypting & decrypting JavaScript objects with a password in the browser.
 
@@ -135,7 +144,7 @@ b. [github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L230](https://
 
 c. [github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19](https://github.com/MetaMask/browser-passworder/blob/main/src/index.ts#L19)
 
-d. [developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
+d. [developer.mozilla - Crypto: getRandomValues() method](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
 
 For example, link b, you can see that the key is generated with the algorithm `PBKDF2`.
 
@@ -161,18 +170,16 @@ const DERIVED_KEY_FORMAT = 'AES-GCM';
 
 ### Bug bounties
 
-Metamask has a bug bounties proogram  through the platform **HackerOne** [7. https://support.metamask.io](https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities-) /[8. hackerone.com/metamask](https://hackerone.com/metamask)
+Metamask has a bug bounties proogram  through the platform **HackerOne** 
+
+See [Metamask - Security (7)](https://metamask.io/security/) and [hackerone.com - metamask (8)](https://hackerone.com/metamask)
 
 ### Basic safety and Security tips
 
-- **Never share your Secret Recovery Phrase or private keys with anyone**
-- *If you have a large value of tokens in your account(s), consider getting a hardware wallet.**
+- Never share your Secret Recovery Phrase or private keys with anyone
+- If you have a large value of tokens in your account(s), consider getting a hardware wallet
 
-You can also read [consensys.net/blog/metamask/metamask-secret-seed-phrase-and-password-management/](https://consensys.net/blog/metamask/metamask-secret-seed-phrase-and-password-management/) to get more information.
-
-Reference: 
-
-[10. support.metamask.io](https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask)
+Reference: [10. support.metamask.io](https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask)
 
 ### Files directory
 
@@ -185,9 +192,9 @@ and
 
 See also [11. ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path](https://ethereum.stackexchange.com/questions/52658/where-does-metamask-store-the-wallet-seed-file-path/107765#107765) & [16. community.metamask.io/t/access-metamask-seed-via-pc-files/1027/5](https://community.metamask.io/t/access-metamask-seed-via-pc-files/1027/5)
 
-### Bonus
+### Further reading
 
-The application was also analyzed by a security engineer at CertiK in his blog.
+The application was also analyzed by a security engineer at CertiK on his blog in 2020.
 
 [18. How MetaMask stores your wallet secret?](https://www.wispwisp.com/index.php/2020/12/25/how-metamask-stores-your-wallet-secret/)
 
@@ -200,7 +207,7 @@ The application was also analyzed by a security engineer at CertiK in his blog.
 - [2. support.metamask.io/hc/en-us/articles/360059952212](https://support.metamask.io/hc/en-us/articles/360059952212)
 - [4. support.metamask.io - How to add missing accounts after restoring with Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360015489271)
 - [5. support.metamask.io - Passwords and MetaMask](https://support.metamask.io/hc/en-us/articles/4405451730331)
-- [6. support.metamask.io - Does MetaMask have a bug bounty program for vulnerabilities?](https://support.metamask.io/hc/en-us/articles/6000270235291-Does-MetaMask-have-a-bug-bounty-program-for-vulnerabilities)
+- [7. Metamask - Security](https://metamask.io/security/)
 - [8. github.com/MetaMask/vault-decryptor/tree/master](https://github.com/MetaMask/vault-decryptor/tree/master)
 - [9. support.metamask.io - How to recover your Secret Recovery Phrase](https://support.metamask.io/hc/en-us/articles/360018766351-How-to-recover-your-Secret-Recovery-Phrase)
 - [10. support.metamask.io - Basic Safety and Security Tips for MetaMask](https://support.metamask.io/hc/en-us/articles/360015489591-Basic-Safety-and-Security-Tips-for-MetaMask)
