@@ -1,19 +1,25 @@
 ---
 layout: post
 title: Mutual TLS (mTLS) Overview
-date:   2024-11-29
+date:   2024-12-16
 lang: en
 locale: en-GB
-categories: security
-tags: security threat incident-responder cybersecurity pyramid
-description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
-image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png
+categories: security cryptography
+tags: tls mtls cloud
+description: Mutual TLS (mTLS) is an extension of the standard TLS protocol which requires both the client and server to present and validate certificates, enabling mutual authentication.  
+image: 
 isMath: false
 ---
 
+Transport Layer Security (TLS) is widely used to ensure encrypted and secure communication between clients and servers. While traditional TLS focuses primarily on securing the server, **Mutual TLS (mTLS)** adds an additional layer by authenticating both the server and the client. mTLS is often used in a [Zero Trust](https://www.cloudflare.com/learning/security/glossary/what-is-zero-trust/) security framework 
 
+This approach enhances security but introduces specific challenges. 
 
-Transport Layer Security (TLS) is widely used to ensure encrypted and secure communication between clients and servers. While traditional TLS focuses primarily on securing the server, **Mutual TLS (mTLS)** adds an additional layer by authenticating both the server and the client. This approach enhances security but introduces specific challenges. Let’s explore mTLS, its advantages, and how it compares to classical TLS.
+This article explores mTLS, its advantages, and how it compares to classical TLS.
+
+If you want to know more about TLS, particulary the version 1.3, you can also read my article [TLS 1.3 - Overview](https://rya-sge.github.io/access-denied/2024/11/04/TLS1.3-overview/)
+
+> Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT.  Its content should become more personal later.
 
 ------
 
@@ -77,15 +83,16 @@ This ensures that both parties in the communication are trusted.
 
 #### **Comparison: mTLS vs. Classical TLS**
 
-| Feature            | Classical TLS                                     | mTLS                                                  |
-| ------------------ | ------------------------------------------------- | ----------------------------------------------------- |
-| **Authentication** | Server-only authentication                        | Mutual (client and server)                            |
-| **Security**       | Secure communication                              | Enhanced security through mutual verification         |
-| **Complexity**     | Simple to implement and manage                    | High complexity, requires PKI                         |
-| **Scalability**    | Scales well with many clients                     | Requires additional effort for certificate management |
-| **Use Cases**      | Web browsing, general client-server communication | API security, microservices, zero-trust environments  |
+| Feature            | Classical TLS                                                | mTLS                                                         |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **Authentication** | Server-only authentication                                   | Mutual (client and server)                                   |
+| **Security**       | Secure communication for data transit                        | Enhanced security through mutual verification, protecting against man-in-the-middle attacks |
+| **Role of CA**     | CAs issue and sign only server certificates                  | CAs issue and sign both server and client certificates       |
+| **Complexity**     | Easier since only the server must be authenticate, a self-signed root can be used | More complex since the client must  be authenticated too     |
+| **Scalability**    | Scales well with many clients                                | Requires additional effort for certificate management        |
+| **Use Cases**      | Web browsing, general client-server communication            | API security, microservices, zero-trust environments         |
 
-------
+Reference: [SSL2Buy - What is mTLS? How Does It Differ From TLS?](https://www.ssl2buy.com/wiki/what-is-mtls-how-does-it-differ-from-tls)
 
 #### **Use Cases for mTLS**
 
@@ -103,3 +110,9 @@ This ensures that both parties in the communication are trusted.
 #### **Conclusion**
 
 mTLS offers significant advantages in terms of security and trust, making it a powerful tool in environments where authentication and data integrity are paramount. However, its complexity, cost, and scalability challenges mean it’s not always the right choice for every application. Organizations must carefully evaluate their security needs, infrastructure, and resources when deciding between mTLS and classical TLS architectures. For highly sensitive or distributed systems, the benefits of mTLS often outweigh its challenges, ensuring robust, end-to-end protection.
+
+## References
+
+- [What is mTLS? How Does It Differ From TLS?](https://www.ssl2buy.com/wiki/what-is-mtls-how-does-it-differ-from-tls)
+- [Cloudflare - What is mutual TLS (mTLS)?](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/)
+- ChatGPT with the input "Write me an article about mTLS, its advantage and disadvatange compare to a classical TLS architecture"

@@ -15,9 +15,8 @@ Farcaster is a [sufficiently decentralized](https://www.varunsrinivasan.com/2022
 
 It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. Users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
 
-> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+> Warning: this article is still in draft state and its content is still mainly taken from the Farcaster documentation, part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) . Its content should become more personal later.
 >
-> This article is mainly taken from the Farcaster documentation part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) with a few modification of my part.
 
 [TOC]
 
