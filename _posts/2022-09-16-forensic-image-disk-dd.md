@@ -18,7 +18,9 @@ If you have a disk image file (dd file), here is a presentation of some tools to
 
 - file
 
-Documentation : [https://linux.die.net/man/1/file](https://linux.die.net/man/1/file)
+Determine file type
+
+Documentation : [linux.die.net/man/1/file](https://linux.die.net/man/1/file)
 
 ```bash
  file <filename>.dd
@@ -26,7 +28,9 @@ Documentation : [https://linux.die.net/man/1/file](https://linux.die.net/man/1/f
 
 - minfo
 
-Documentation : [https://linux.die.net/man/1/minfo](https://linux.die.net/man/1/minfo)
+Print the parameters of a MSDOS filesystem
+
+Documentation : [linux.die.net/man/1/minfo](https://linux.die.net/man/1/minfo)
 
 ```bash
 minfo -i  <filename>.dd
@@ -34,7 +38,9 @@ minfo -i  <filename>.dd
 
 - fstat
 
-Documentation : [https://linux.die.net/man/3/fstat](https://linux.die.net/man/3/fstat)
+Get file status
+
+Documentation : [linux.die.net/man/3/fstat](https://linux.die.net/man/3/fstat)
 
 ```bash
 fstat <filename>.dd
@@ -46,7 +52,7 @@ Reference : [[Azad 2020b](https://linuxhint.com/usb_forensics/)]
 
 With the fls command you can list the files contained in the disk image
 
-Manpage : [http://www.sleuthkit.org/sleuthkit/man/fls.html](http://www.sleuthkit.org/sleuthkit/man/fls.html)
+Manpage : [sleuthkit.org/sleuthkit/man/fls.html](http://www.sleuthkit.org/sleuthkit/man/fls.html)
 
 - fat32
 
@@ -70,7 +76,7 @@ Reference : [[Azad 2020b](https://linuxhint.com/usb_forensics/)]
 
 You can mount the image with the command `mount`.
 
-Documentation : [https://linux.die.net/man/8/mount](https://linux.die.net/man/8/mount)
+Documentation : [linux.die.net/man/8/mount](https://linux.die.net/man/8/mount)
 
 ```bash
 mkdir /mnt/image
@@ -83,7 +89,7 @@ Reference : [[Mohan 2016](https://technewskb.com/mount-dd-image-linux-using-term
 
 ## Recover Files - Photorec
 
-Photorec is a utility to recover files from a disk image. The interest of photorec is that it also recovers deleted files. You can find a presentation of the tool here :  [https://www.cgsecurity.org/wiki/PhotoRec](https://www.cgsecurity.org/wiki/PhotoRec)
+Photorec is a utility to recover files from a disk image. The interest of photorec is that it also recovers deleted files. You can find a presentation of the tool here :  [cgsecurity.org - PhotoRec](https://www.cgsecurity.org/wiki/PhotoRec)
 
 ```bash
 photorec <filename>.dd

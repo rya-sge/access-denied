@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Mutual TLS (mTLS) Overview
+title: Mutual TLS (mTLS) - Overview
 date:   2024-12-16
 lang: en
 locale: en-GB
@@ -23,7 +23,7 @@ If you want to know more about TLS, particulary the version 1.3, you can also re
 
 ------
 
-#### **What is mTLS?**
+#### What is mTLS?
 
 Mutual TLS (mTLS) is an extension of the standard TLS protocol. 
 
@@ -35,7 +35,7 @@ This ensures that both parties in the communication are trusted.
 
 ------
 
-#### **How mTLS Works**
+#### How mTLS Works
 
 1. **Handshake Process**:
    - Both parties exchange their certificates during the TLS handshake.
@@ -49,21 +49,26 @@ This ensures that both parties in the communication are trusted.
 
 ------
 
-#### **Advantages of mTLS**
+#### Advantages of mTLS
 
 1. **Enhanced Security**:
    - By requiring mutual authentication, mTLS protects against unauthorized access from both ends.
    - It is particularly effective in preventing **man-in-the-middle attacks** and ensuring the authenticity of both parties.
 2. **Ideal for Zero Trust Architectures**:
-   - In a zero-trust model, no entity is trusted by default. mTLS fits perfectly by requiring verification of every entity communicating within the network.
+
+In a zero-trust model, no entity is trusted by default. mTLS fits perfectly by requiring verification of every entity communicating within the network.
+
 3. **Resistance to Credential Theft**:
-   - Since authentication relies on certificates rather than usernames and passwords, it mitigates risks associated with stolen or weak credentials.
+
+Since authentication relies on certificates rather than usernames and passwords, it mitigates risks associated with stolen or weak credentials.
+
 4. **Improved Trust in APIs**:
-   - In microservices and API ecosystems, mTLS ensures secure service-to-service communication by verifying every microservice.
+
+In microservices and API ecosystems, mTLS ensures secure service-to-service communication by verifying every microservice.
 
 ------
 
-#### **Disadvantages of mTLS**
+#### Disadvantages of mTLS
 
 1. **Complexity of Implementation**:
    - Deploying mTLS requires managing certificates for both clients and servers, significantly increasing operational complexity.
@@ -81,7 +86,7 @@ This ensures that both parties in the communication are trusted.
 
 ------
 
-#### **Comparison: mTLS vs. Classical TLS**
+#### Comparison: mTLS vs. Classical TLS
 
 | Feature            | Classical TLS                                                | mTLS                                                         |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -97,17 +102,24 @@ Reference: [SSL2Buy - What is mTLS? How Does It Differ From TLS?](https://www.ss
 #### **Use Cases for mTLS**
 
 1. **Microservices and APIs**:
-   - Ensures secure communication in distributed systems where multiple services interact.
+
+Ensures secure communication in distributed systems where multiple services interact.
+
 2. **Critical Systems**:
-   - Used in environments requiring stringent access control, such as banking or healthcare systems.
+
+Used in environments requiring stringent access control, such as banking or healthcare systems.
+
 3. **IoT Devices**:
-   - Prevents unauthorized devices from connecting to critical infrastructure.
+
+Prevents unauthorized devices from connecting to critical infrastructure.
+
 4. **Zero Trust Networks**:
-   - Enforces authentication for every connection within the network, adhering to zero-trust principles.
+
+Enforces authentication for every connection within the network, adhering to zero-trust principles.
 
 ------
 
-#### **Conclusion**
+#### Conclusion
 
 mTLS offers significant advantages in terms of security and trust, making it a powerful tool in environments where authentication and data integrity are paramount. However, its complexity, cost, and scalability challenges mean it’s not always the right choice for every application. Organizations must carefully evaluate their security needs, infrastructure, and resources when deciding between mTLS and classical TLS architectures. For highly sensitive or distributed systems, the benefits of mTLS often outweigh its challenges, ensuring robust, end-to-end protection.
 

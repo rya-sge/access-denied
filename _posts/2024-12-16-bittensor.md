@@ -39,13 +39,26 @@ For example, the [text prompting subnet](https://github.com/opentensor/prompting
 
 ![https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg](https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg)
 
-
+------
 
 ## Participating in Bittensor ecosystem
 
-You participate in the Bittensor ecosystem by participating in a subnet.
+You can participate in the Bittensor ecosystem by participating in a subnet.
 
 See [docs.bittensor.com#participating-in-bittensor-ecosystem](https://docs.bittensor.com/learn/introduction#participating-in-bittensor-ecosystem)
+
+### Bittensor personas
+
+You can participate in the Bittensor ecosystem as the following personas:
+
+| Personas            | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Subnet owner        | When you only want to create a subnet but transfer the tasks of operating the subnet to others. |
+| Subnet validator    | When you are responsible for running the subnet validator.<br />each validator independently evaluates the task performed by the subnet miners. |
+| Subnet miner        | When you are responsible for running the subnet miner. Each miners perform a useful task, i.e., solve some problem, as defined in the incentive mechanism of the subnet. |
+| Blockchain operator | When you run the blockchain. This mostly applies during the offline testing of your subnet and your incentive mechanism, when you need a local emulation of the Bittensor blockchain because you are disconnected from the Bittensor network. |
+
+See [docs.bittensor.com/learn/introduction#bittensor-personas](https://docs.bittensor.com/learn/introduction#bittensor-personas)
 
 ### How a subnet works
 
@@ -69,18 +82,7 @@ You can use Python with the Bittensor API to write your incentive mechanism.
 
 See [docs.bittensor.com/learn/introduction#how-a-subnet-works](https://docs.bittensor.com/learn/introduction#how-a-subnet-works)
 
-### Bittensor personas
 
-You can participate in the Bittensor ecosystem as the following personas:
-
-| Personas            | Description                                                  |
-| ------------------- | ------------------------------------------------------------ |
-| Subnet owner        | When you only want to create a subnet but transfer the tasks of operating the subnet to others. |
-| Subnet validator    | When you are responsible for running the subnet validator.<br />each validator independently evaluates the task performed by the subnet miners. |
-| Subnet miner        | When you are responsible for running the subnet miner.       |
-| Blockchain operator | When you run the blockchain. This mostly applies during the offline testing of your subnet and your incentive mechanism, when you need a local emulation of the Bittensor blockchain because you are disconnected from the Bittensor network. |
-
-See [docs.bittensor.com/learn/introduction#bittensor-personas](https://docs.bittensor.com/learn/introduction#bittensor-personas)
 
 ### Participating in a subnet
 
@@ -97,6 +99,8 @@ Testing the incentive mechanism means running one or more validators and miners 
 ![Simplified Bittensor Network](https://docs.bittensor.com/img/docs/subnet-deploy-stages.svg)
 
 See [docs.bittensor.com/learn/introduction#participating-in-a-subnet](https://docs.bittensor.com/learn/introduction#participating-in-a-subnet)
+
+--------
 
 ## Bittensor Building Blocks
 
@@ -215,6 +219,8 @@ A subtensor is a Bittensor object that handles the interactions with the blockch
 
 See [docs.bittensor.com/learn/bittensor-building-blocks#subtensor](https://docs.bittensor.com/learn/bittensor-building-blocks#subtensor)
 
+-------
+
 ## Anatomy of Incentive Mechanism
 
 This section describes a conceptual “anatomy” of a subnet incentive mechanism.
@@ -274,6 +280,8 @@ For example, see the following documents in the text prompting subnet for a quic
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#make-it-easy-for-participation](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#make-it-easy-for-participation)
 
+-------
+
 ## Components of incentive mechanism
 
 A subnet incentive mechanism must contain the definition and implementation of the following behaviors. See the numbered items in the below diagram:
@@ -328,6 +336,8 @@ The incentive mechanism is ultimately the judge of subnet miner performance. Whe
 On the contrary, a poorly designed incentive mechanism can result in exploits and shortcuts, which can detrimentally impact the overall quality of the subnet and discourage fair miners.
 
 See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#discourage-exploits
+
+------
 
 ## Distribution of rewards
 

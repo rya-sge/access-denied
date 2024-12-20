@@ -21,13 +21,13 @@ This article explores the key security features of Trezor wallets, the cryptogra
 
 Firstly, here is a summary of the different options related to security available depending on the models.
 
-| Model                                                        | Seed phrase backup         |  | Device Security       |        |         | Authentication                             |                              |
-| ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- |
-|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|Secure element protected<br />Certified Chip EAL6+|Two-factor authentication|FIDO2 Standard|
-| [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; | &#x2612; | &#x2612; | &#x2611;       | &#x2612; |
-| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; |
-| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; |
-| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; |
+| Model                                                        | Seed phrase backup         |  | Device Security       |        |  |         | Authentication                             |                              |
+| ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- | ------- |
+|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|MicroSD card support|Secure element protected<br />Certified Chip EAL6+|Two-factor authentication|FIDO2 Standard|
+| [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; | &#x2612; | &#x2612; | &#x2612; | &#x2611;       | &#x2612; |
+| [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; |
+| [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; | &#x2611; |
+| [Trezor Safe 5](https://trezor.io/trezor-safe-5)             | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; | &#x2611; |
 
 See also [trezor.io/compare](https://trezor.io/compare)
 
@@ -58,7 +58,9 @@ A passphrase has two main purposes:
 
 The wallet obtained by adding a passphrase is called a `hidden wallet`
 $$
+\begin{aligned}
 recovery~seed + passphrase = hidden~ wallet
+\end{aligned}
 $$
 Reference: [Trezor - Passphrases and hidden wallets](https://trezor.io/learn/a/passphrases-and-hidden-wallets)
 
@@ -114,11 +116,9 @@ In summary,it is a key derivation function that uses a password (in this case, t
 
 See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
 
-### HMAC
-
-Here some supplementary defails about HMAC used by PBKDF2
-
 #### HMAC-SHA256
+
+Here some supplementary defails about HMAC used by PBKDF2.
 
 HMAC stands for Hash-based Message Authentication Code
 
@@ -250,6 +250,8 @@ Main reference: [Trezor - Slip39](https://content.trezor.io/slip39)
 
 ## Model specificity
 
+This section describes the specific features of certain models
+
 ### On-Device entry
 
 The [Trezor Model One](https://trezor.io/trezor-model-one) uses a blind matrix for PIN entry -- when required, a matrix of **dots** (instead of numbers) appears on your computer screen
@@ -311,6 +313,22 @@ The Secure Element plays an important role in verifying the authenticity of your
 During the manufacturing process of the Trezor Safe hardware wallets, a unique certificate is issued to the new device before it leaves the production line. This certificate is stored in the Secure Element. 
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+
+### Encrypt PIN with MicroSD card
+
+Trezor allows also to encrypt your [PIN](https://trezor.io/learn/a/pin-protection-on-trezor-devices) using a microSD card for the Trezor Model T and Trezor Safe 5. 
+
+This provides extra protection against physical attacks.
+
+When enabled, a randomly-generated secret is stored on the microSD card.
+
+ When checking your PIN or using your PIN to unlock your Trezor, this secret is combined with the PIN to decrypt data stored on the device (note: with which algorithm?). 
+
+As a result, the device gets 'bound' to the microSD card, and cannot be unlocked without it until you intentionally disable the feature or factory-reset your device.
+
+Reference: [Trezor - Encrypt PIN with MicroSD card](https://trezor.io/learn/a/encrypt-pin-with-microsd-card?srsltid=AfmBOorwzwQVVwkOQHzutC5PezE_Ghbq3CRdoBchOu9-PQFVt_0-H-zw)
+
+
 
 ## Additional Security Considerations
 
@@ -427,3 +445,5 @@ All these features make them one of the most trusted hardware wallets in the cry
   - [BREAKING TREZOR ONE WITH SIDE CHANNEL ATTACKS](https://www.ledger.com/blog/breaking-trezor-one-with-sca)
   - [Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
   - [Trezor - Our Response to the Read Protection Downgrade Attack](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6)
+- ChatGPT
+  - 

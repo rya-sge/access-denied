@@ -120,7 +120,7 @@ In today's diverse data landscape, relevant datasets come in various formats: te
 
 Currently, the central character core predominantly relies on text-based Large Language Models (LLMs) and, as such, primarily incorporates text-based training data. 
 
-Consequently, if training data exist in non-textual formats like videos or audio, they need to be transcribed into text for model training.  Standard data processing rules will be applied prior to model training.
+Consequently, if training data exist in non-textual formats like videos or audio, they need to be transcribed into text for model training. Standard data processing rules will be applied prior to model training.
 
 - **Data Cleaning**: In this step, datasets are cleaned to remove any noise and nullities. Data rules are applied to maintain data integrity and improve data quality.
 - **Data Transformation**: Datasets undergo transformation and standardization to become interpretable and usable for model training.
@@ -135,7 +135,7 @@ The system is designed to reliably identify each user and their respective conve
 
 - **Long Conversation Storage and Memory Processing**:
 
-Managing and storing extended conversations presents a challenge in terms of memory processing. The system is tailored to handle these long dialogues efficiently.
+Managing and storing extended conversations presents a challenge in terms of memory processing. The system is tailored to handle these long dialogues efficiently (how ?).
 
 #### Unique Identifier
 
@@ -171,7 +171,7 @@ Before model is trained, data processing is performed.
 
 The Visual Core gives the agent a 3D visual appearance. 
 
-- Unlike other chatbots, VIRTUAL Agent comes with a rigged 3D character (MMD file format) with animation and facial expressions.
+- VIRTUAL Agent comes with a rigged 3D character (MMD file format) with animation and facial expressions.
 - With the output, dApps can utilise frontend frameworks such as ThreeJS MMD loader to display the 3D Characters. 
 
 Contributions to this core enhance how the agent looks and moves, providing more immersive interactions.
@@ -191,7 +191,7 @@ Future Cores like Skillset Cores allow AI to own other skillsets for example, im
 
 ### Why this?
 
-1. **Transparency**: The Virtuals Protocol places a strong emphasis on transparency, which is fundamental to its operations. This commitment ensures that all aspects of AI development, from the initial data to the evolving code, are openly accessible for review. 
+1. **Transparency**: The Virtuals Protocol has also taken several measures to be transparent:
    - By utilizing a public blockchain, the Virtuals Protocol guarantees that the entire development process is transparent and accountable. 
    - This level of openness is crucial for preventing misuse and maintaining the integrity of the system, as it allows for the tracking and verification of every output produced by the AI.
 2. **Composability**: The Virtuals Protocol employs the principle of composability to encourages a collaborative environment where developers and creators can build upon and enhance the work done within the protocol. 
@@ -203,27 +203,32 @@ Future Cores like Skillset Cores allow AI to own other skillsets for example, im
 
 **Immutable Contribution Vault (ICV): A Multilayered On-Chain Repository**
 
-The ICV represents a core component of the Virtuals Protocol, functioning as a protocol-owned vault that archives all historically approved contributions of VIRTUAL agents on-chain. This smart contract wallet is not merely a storage facility; it embodies the essence of transparency and historical tracking in the Virtuals ecosystem.
+The ICV represents a core component of the Virtuals Protocol, functioning as a protocol-owned vault that archives all historically approved contributions of VIRTUAL agents on-chain. This smart contract wallet allows transparency and historical tracking in the Virtuals ecosystem.
 
 ![virtual-protocol-immutable-contribution-vault]({{site.url_complet}}/assets/article/blockchain/ai/virtual-protocol/virtual-protocol-immutable-contribution-vault.png)
-
-Immutable Contribution Vault
 
 **Multilayered Structure of the ICV**
 
 1. **First Layer - Smart Contract Wallet Ownership (the ICV)**:
-   - The foundational layer is a smart contract wallet, known as ICV, that asserts ownership over all subsequent layers, ensuring unified and secure management.
+
+The foundational layer is a smart contract wallet, known as ICV, that asserts ownership over all subsequent layers, ensuring unified and secure management.
+
 2. **Second Layer - Individual VIRTUAL agent as ERC-6551 NFTs**:
-   - Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) NFT, which also serves as a unique wallet address. This dual functionality underscores the fusion of identity and transactional capability in the Virtual ecosystem.
+
+Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) NFT, which also serves as a unique wallet address. This dual functionality underscores the fusion of identity and transactional capability in the Virtual ecosystem.
+
 3. **Third Layer - Core Components of VIRTUAL agents**:
-   - Beneath each VIRTUAL agent, five core elements are housed: cognitive, voice & visual cores. These cores will be registered in the smart contract.
+
+Beneath each VIRTUAL agent, five core elements are housed: cognitive, voice & visual cores. These cores will be registered in the smart contract.
+
 4. **Fourth Layer - Service NFTs within Each Core**:
-   - Within each Virtual agent, approved contributions are stored in the form of service NFTs, and the relationship between these service NFTs and the Core is registered through a smart contract.
+
+Within each Virtual agent, approved contributions are stored in the form of service NFTs, and the relationship between these service NFTs and the Core is registered through a smart contract.
 
 **Key Functions and Benefits of the ICV**
 
 - **Real-Time and Historical Insights**: The ICV elegantly presents the current state of each VIRTUAL agent and traces its historical evolution on-chain. This feature is crucial for both provenance and root cause analysis across every module within the Virtuals ecosystem.
-- **Transparency and Composability**: By open-sourcing the codebase models for VIRTUAL agents, the ICV fosters an environment of transparency. It facilitates composability, allowing developers and contributors to build upon and integrate with existing VIRTUAL agents seamlessly.
+- **Transparency and Composability**: By open-sourcing the codebase models for VIRTUAL agents, the ICV facilitates transparency and composability, allowing developers and contributors to build upon and integrate with existing VIRTUAL agents seamlessly.
 
 ### ERC-6551
 
