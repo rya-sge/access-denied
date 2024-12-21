@@ -55,7 +55,7 @@ Remove gas refunds for SSTORE and SELFDESTRUCT. It was replaced by [EIP-3529](ht
 
 Deactivate SELFDESTRUCT by changing it to SENDALL. The [EIP-6780](https://ethereum-magicians.org/t/eip-6780-deactivate-selfdestruct-except-where-it-occurs-in-the-same-transaction-in-which-a-contract-was-created/13539) has been preferred to the solution proposed by this EIP.
 
-
+-------
 
 ## Common vulnerability
 
@@ -139,6 +139,8 @@ The principle is also similar in this report from [Code4Arena](https://github.co
 
 > As was seen in the Astaria beacon proxy [issue](https://x.com/apoorvlathey/status/1671308196743647232?s=20), an attacker is able to forge the calldata that the proxy normally would forward, and can cause the implementation to `selfdestruct()` itself via a `delegatecall()`. The current code has a very similar vulnerability, in that every escrow performs a `delegatecall()` to an address coming from the factory, which is a forgeable immutable argument.
 
+-----
+
 ## Motivation to use selfdestruct
 
 This section uses as reference this [research paper](https://soarsmu.github.io/papers/2021/tosem216.pdf) from the [Monash University](https://www.monash.edu/), which provides the reason behind the use of `selfdestruct`. The paper dates from 2021, but it keeps to be very relevant.
@@ -209,13 +211,15 @@ The only requirement is that the contract has to be deployed with `create2` in t
 
 
 
+----
+
 ## Fun Fact
 
 On April 2022, a hacker after successfully hacked over $1 million in Crypto assets, destructed the smart contract which hold the stolen funds before withdrawing the funds from the smart contract.
 
 Reference: [cointelegraph - Hacker bungles DeFi exploit: Leaves stolen $1M in contract set to self destruct ](https://cointelegraph.com/news/hacker-bungles-defi-exploit-leaves-stolen-1m-in-contract-set-to-self-destruct)
 
-
+-----
 
 ## Breaking control check with selfdestruct
 
@@ -235,6 +239,8 @@ Contrary to what happened with the [Parity multig sig wallet bug](https://www.pa
 
 But the end of `selfdestruct` does not mean that a `behaviour` of a contract can not be changed, e.g. through the call of functions or with the proxy architecture.
 
+-------
+
 ## Conclusion
 
 The opcode `selfdestruct` has been initially a good idea. It allowed to reduce the quantity of bytecode stored on the blockchain and provided an interesting tool to developpers to remove unused code and retrieve ethers from a contract.
@@ -245,7 +251,7 @@ Moreover, its use to change the bytecode of a deployed contract (possible with `
 
 Therefore, the security risk posed by this sensible operation makes it better to disable it and find better alternative to fill the different use case where this opcode has been used.
 
-
+------
 
 ## References
 

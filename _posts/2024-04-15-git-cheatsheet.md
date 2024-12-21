@@ -17,6 +17,10 @@ As a reminder, **Git** is a free and open source distributed version control sys
 
 Some definition are simplified, see the documentation for a more precise description.
 
+[TOC]
+
+
+
 ## Command list
 
 > List of useful commands
@@ -66,6 +70,8 @@ git status -uall
   ```bash
   git push
   ```
+
+-----
 
 ## Submodule
 
@@ -130,7 +136,20 @@ git push
 
 Reference: [educative.io/answers/how-to-delete-a-git-submodule](https://www.educative.io/answers/how-to-delete-a-git-submodule)
 
+------
+
 ## Undo change
+
+### Before git add
+
+```
+git checkout HEAD -- my-file.txt
+```
+
+See [Hard reset of a single file](https://stackoverflow.com/questions/7147270/hard-reset-of-a-single-file)
+
+### After git add
+
 - **Unstage Changes** 
 
 => After git add
@@ -145,6 +164,8 @@ git checkout README.md
 Reference :
 [earthdatascience.org -  Lesson 5. Undo Local Changes With Git](https://www.earthdatascience.org/courses/intro-to-earth-data-science/git-github/version-control/git-undo-local-changes/)
 
+### After git commit
+
 - **Go back**
 
 ```bash
@@ -154,6 +175,8 @@ git push --force
 
 Warning : this command will delete all files created after the commit.
 Reference: [stackoverflow - How to force a git revert](https://stackoverflow.com/questions/48975429/how-to-force-a-git-revert)
+
+-------
 
 ## Cherry pick
 
