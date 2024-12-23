@@ -75,7 +75,7 @@ It can also be the case in a proxy architecture, see the paragraph "Proxy implem
 
 - Architecture
 
-![crypto-wallet-parity-wallet-architecture.drawio](../../{{site.url_complet}}/assets/article/blockchain/wallet/parity-wallet/crypto-wallet-parity-wallet-architecture.drawio.png)
+![crypto-wallet-parity-wallet-architecture.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/parity-wallet/crypto-wallet-parity-wallet-architecture.drawio.png)
 
 - "Attack" step
 
