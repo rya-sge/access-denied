@@ -15,7 +15,7 @@ Bittensor is an open source platform on which you can produce competitive digita
 
 Providers of digital commodities are rewarder in **TAO**, the native token of Bittensor
 
-> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+> Warning: this article is still in draft state and its content is still mainly taken from the documentation with a few edits of my own. Its content should become more personal later.
 
 ![Simplified Bittensor Network](https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg)
 

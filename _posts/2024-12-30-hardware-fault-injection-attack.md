@@ -1,17 +1,33 @@
-**Fault Injection Attacks: Understanding the Threat to Modern Systems**
+---
+layout: post
+title: Hardware Security: Understanding Fault Injection Attack
+date:   2024-12-30
+lang: en
+locale: en-GB
+categories: security cryptography fault-injection side-channel hardware crypto-wallet
+tags: tls mtls cloud
+description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences.
+image: 
+isMath: false
+---
 
 Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences. 
 
-Fault attacks have been introduced by Boneh, DeMillo and
-Lipton at Eurocrypt’97.
+This article delves into fault injection attacks, their mechanisms, targets, and the defenses against them.
+
+> Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT with a few modifications of my part. Its content should become more personal later.
+
+[TOC]
+
+## Introduction
+
+Fault attacks have been introduced by Boneh, DeMillo and Lipton at Eurocrypt’97.
 
 - The goal consists in perturbing the computation of
   cryptographic operations and to observe the erroneous result.
 - Perturbation can occur in many different ways  !
 
 Unlike traditional attacks that rely on exploiting software bugs or network vulnerabilities, fault injection seeks to compromise a system by inducing errors, thereby opening the door for malicious activities. 
-
-This article delves into fault injection attacks, their mechanisms, targets, and the defenses against them.
 
 ### What is a Fault Injection Attack?
 
@@ -164,16 +180,14 @@ fault induction time,.
 
 ### Conclusion
 
-Fault injection attacks represent a ophisticated threat in the world of cybersecurity, particularly as more sensitive tasks are entrusted to hardware devices in IoT, finance, and other critical sectors. 
+Fault injection attacks represent a sophisticated threat against hardware devices used in IoT, finance, and other critical sectors. 
 
 While the techniques for inducing faults have become more refined, defense mechanisms are also evolving, with hardware and software developers working to mitigate the risks posed by such attacks. 
 
-Understanding the mechanics of fault injection, as well as its potential impacts, is crucial for the ongoing development of secure systems. 
-
-As always, staying ahead of attackers requires a combination of robust design, continuous monitoring, and innovative defensive strategies.
+Understanding the mechanics of fault injection, as well as its potential impacts, is crucial for the ongoing development of secure hardware based-systems. 
 
 ## References
 
 - [Dekra -Fault Injection Attacks](https://www.dekra.com/en/fault-injection-attacks/)
-- 
-  Cryptography course (CRY) taught at HEIG-VD in 2023
+- Cryptography course (CRY) taught at HEIG-VD in 2023
+- ChatGPT with the input "Write me an article about fault injection attack"

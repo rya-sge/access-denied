@@ -19,7 +19,7 @@ This article explores mTLS, its advantages, and how it compares to classical TLS
 
 If you want to know more about TLS, particulary the version 1.3, you can also read my article [TLS 1.3 - Overview](https://rya-sge.github.io/access-denied/2024/11/04/TLS1.3-overview/)
 
-> Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT.  Its content should become more personal later.
+> Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT with a few edits of my own. Its content should become more personal later.
 
 ------
 

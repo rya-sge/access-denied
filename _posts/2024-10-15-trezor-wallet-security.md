@@ -21,9 +21,9 @@ This article explores the key security features of Trezor wallets, the cryptogra
 
 Firstly, here is a summary of the different options related to security available depending on the models.
 
-| Model                                                        | Seed phrase backup         |  | Device Security       |        |  |         | Authentication                             |                              |
+| Model                                                        | Seed phrase backup         |  | Device Security       |        |  |         | Trezor as an authentication device |                              |
 | ------------------------------------------------------------ | -------------------------------- | ------------------ | --------------------------- | ------------------------------------------ | ------- | ------- | ------- | ------- |
-|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|MicroSD card support|Secure element protected<br />Certified Chip EAL6+|Two-factor authentication|FIDO2 Standard|
+|                                                                              | 12-, 20- & 24-word wallet backup | Multi Share |Pin & passphrase protection|On device entry|Authentication with MicroSD card support|Secure element protected<br />Certified Chip EAL6+|Two-factor authentication (U2F)|FIDO2 Standard|
 | [Trezor Model One](https://trezor.io/trezor-model-one)       | &#x2611; | &#x2612;         | &#x2611; | &#x2612; | &#x2612; | &#x2612; | &#x2611;       | &#x2612; |
 | [Trezor Model T](https://trezor.io/trezor-model-t)           | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; |
 | [Trezor Safe 3](https://trezor.io/trezor-safe-3-cosmic-black) | &#x2611; | &#x2611;        | &#x2611; | &#x2611; | &#x2612; | &#x2611; | &#x2611; | &#x2611; |
@@ -54,7 +54,7 @@ In addition to a PIN, Trezor provides the option to add an additional layer of s
 A passphrase has two main purposes:
 
 - Even if someone gains access to the recovery seed, without knowing the passphrase, they will not be able to recover the wallet. 
-- Add your own entropy: even if there is a vulnerability in the random generation by the wallet, it will not possible to recover the wallet without the passphrase.
+- Add your own entropy: even if there is a vulnerability in the random generation by the wallet, it will not be possible to recover the wallet without the passphrase.
 
 The wallet obtained by adding a passphrase is called a `hidden wallet`
 $$
@@ -92,7 +92,7 @@ This section is based on the following resource: [PIN verification and decryptio
 
 #### Data encryption Diagram
 
-What happens when the user choose a new PIN?
+What happens when the user chooses a new PIN?
 
 ![trezor-encryption-pin.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png)
 
@@ -118,7 +118,7 @@ See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-der
 
 #### HMAC-SHA256
 
-Here some supplementary defails about HMAC used by PBKDF2.
+Here are some supplementary details about HMAC used by PBKDF2.
 
 HMAC stands for Hash-based Message Authentication Code
 
@@ -174,7 +174,7 @@ The PVC is a **64-bit code** stored in the flash memory and used to verify if th
 
 - **Purpose**: It serves as a **verification mechanism** to ensure the PIN entered by the user is correct. After the EDEK is decrypted, the PVC is compared with a tag value derived during the decryption process.
 - **How it works**: If the PVC matches the computed tag, it confirms that the decryption was performed using the correct PIN. If the PVC doesn’t match, the decryption fails, indicating an incorrect PIN.
-- Remark from the trezor documentation: The 64-bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
+- Remark from the Trezor documentation: The 64-bit PVC means that there is less than a 1 in 1019 chance that a wrong PIN will happen to have the same PVC as the correct PIN. The existence of false PINs does not pose a security weakness since a false PIN cannot be used to decrypt the protected entries.
 
 #### Compute
 
@@ -232,17 +232,17 @@ To understand how an address is generated in bitcoin you can read my article: [B
 
 To perform a multi-share backup, SatoshiLabs has written its own proposal [SLIP39](https://github.com/satoshilabs/slips/blob/master/slip-0039.md) to implement a multi-share backup with **Shamir’s Secret-Sharing**
 
-SLIP39  is a multi-party alternative to Bitcoin Improvement Proposal [BIP39](https://trezor.io/learn/a/what-is-bip39).
+SLIP39 is a multi-party alternative to Bitcoin Improvement Proposal [BIP39](https://trezor.io/learn/a/what-is-bip39).
 
 This advanced backup method splits your w**allet backup** (recovery seed) into multiple parts, called **shares**, and requires a minimum number of these, the **threshold**, to restore the wallet.
 
-By distributing these shares between different locations and/or trusted individuals, you can significantly reduce the risk of *total* loss or theft. 
+By distributing these shares between different locations and/or trusted individuals, you can reduce the risk of *total* loss or theft. 
 
 => Even if some shares are lost, your wallet remains secure as long as the threshold number of shares is intact. 
 
 => Moreover, if some shares fall into the wrong hands, your wallet is still secure as long as less than the threshold number of shares are compromised.
 
-You can fin more information about Shamir's Secret Sharing in my article [MPC - Shamir Secret-Sharing](https://rya-sge.github.io/access-denied/2024/10/21/mpc-protocol-overview/#secret-sharing)
+You can find more information about Shamir's Secret Sharing in my article [MPC - Shamir Secret-Sharing](https://rya-sge.github.io/access-denied/2024/10/21/mpc-protocol-overview/#secret-sharing)
 
 Main reference: [Trezor - Slip39](https://content.trezor.io/slip39)
 
@@ -324,15 +324,27 @@ When enabled, a randomly-generated secret is stored on the microSD card.
 
  When checking your PIN or using your PIN to unlock your Trezor, this secret is combined with the PIN to decrypt data stored on the device (note: with which algorithm?). 
 
-As a result, the device gets 'bound' to the microSD card, and cannot be unlocked without it until you intentionally disable the feature or factory-reset your device.
+As a result, the device gets 'bound' to the microSD card and cannot be unlocked without it until you intentionally disable the feature or factory-reset your device.
 
 Reference: [Trezor - Encrypt PIN with MicroSD card](https://trezor.io/learn/a/encrypt-pin-with-microsd-card?srsltid=AfmBOorwzwQVVwkOQHzutC5PezE_Ghbq3CRdoBchOu9-PQFVt_0-H-zw)
 
+### Use Trezor as 2FA device
 
+It is also possible to use Trezor as a 2FA device.
+
+#### U2F
+
+Trezor supports U2F, an open authentication standard that strengthens and simplifies two-factor authentication (2FA). When logging into a website, the user generally authenticates himself by providing a username and a password. With Trezor and U2F, the user will have to additionally confirm the login with a click of the button on the Trezor device.
+
+More information here [Trezor - What is u2F](https://trezor.io/learn/a/what-is-u2f)
+
+#### FIDO2
+
+Some Trezor wallets can also be used to perform authentication with FIDO2. More information here [Trezor - What is FIDO2](https://trezor.io/learn/a/what-is-fido2)
 
 ## Additional Security Considerations
 
-### 1. Physical Security
+### Physical Security
 
 While Trezor hardware wallets are robust, they are not impervious to **physical attacks** if a device falls into the wrong hands. 
 
@@ -342,13 +354,13 @@ The passphrase feature is especially useful because it creates an additional lev
 
 Moreover, this passphrase is not stored inside the device, therefore if someone manages to break physically your Trezor Wallet (e.g. with a side-channel attack), they can not access the funds if they don't manage to find the passphrase.
 
-### 2. Supply Chain Attacks
+### Supply Chain Attacks
 
 To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures:
 
 - Seal on the device or the package. Users are encouraged to inspect the device for any signs of tampering, such as broken seals (**Tamper-evident** packaging). 
 - A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (=secure boot).
-  - Thus users can verify the authenticity of the firmware when initializing the device.
+  - Thus, users can verify the authenticity of the firmware when initializing the device.
 
 - Since 2022, individual chips are now glued onto the board
 
@@ -357,6 +369,14 @@ To address concerns over possible **supply chain attacks** (where the hardware i
 As indicated in the previous paragraph dedicated to the Secure Element. Trezor Sage 3 and Safe 5 uses it to help to verify the authenticity of the Trezor Safe 3 or Safe 5, and makes it significantly more difficult for it to be tampered with. 
 
 Reference: [Trezor - Trezor Safe device authentication check](https://trezor.io/learn/a/trezor-safe-device-authentication-check)
+
+### Privacy
+
+The Trezor Suite App offers several features to protect your provicy
+
+- [Tor](https://trezor.io/learn/a/tor-in-trezor-suite) to enable anonymous communication
+- A discreet mode to hide your sensitive information on the screen
+- For Bitcoin, a [Coin Control feature](https://trezor.io/learn/a/coin-control-in-trezor-suite) to make a manual coin selection for an outgoing transaction, rather than relying on your wallet making an automatic selection for you. It is useful again [dust attack](https://trezor.io/support/a/dusting-attacks-airdrop-scam-tokens) where an attacker send you small amount of Satoshis to trace your transactions and link addresses together in case of a consolidation.
 
 ------
 
@@ -409,7 +429,7 @@ Despite this new architecture, Kraken in 2020, managed to perform a fault inject
 - Since Trezor firmware uses encrypted storage, they developed a script to crack the PIN of the dumped device.
 
 - The script was able to brute force any 4-digit pin in under two minutes.
-- As a reminder, a PIN brute-force is not directly possible directly on the device, because the storage is automatically wipes after 16 unsuccessful attempts.
+- As a reminder, a PIN brute-force is not directly possible directly on the device, because the storage is automatically wiped after 16 unsuccessful attempts.
 - To protect against this, Satoshi Labs answered, also in 2020, in a [article](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6) that the best solution is to set a long PIN (against the brute-force attack) and set a passphrase since the passphrase is not set in the device.
 
 Reference:
@@ -446,4 +466,5 @@ All these features make them one of the most trusted hardware wallets in the cry
   - [Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
   - [Trezor - Our Response to the Read Protection Downgrade Attack](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6)
 - ChatGPT
-  - 
+  - With the input "Write me an article about the security of the crypto wallet Trezor, the protection put in place, the difference between the models and the algorithm cryptographic used"
+  - PlantUML diagram have been also partially made with the help of ChatGPT 

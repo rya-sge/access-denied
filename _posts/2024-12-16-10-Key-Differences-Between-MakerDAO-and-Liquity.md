@@ -6,14 +6,12 @@ lang: en
 locale: en-GB
 categories: security cryptography
 tags: tls mtls cloud
-description: Mutual TLS (mTLS) is an extension of the standard TLS protocol which requires both the client and server to present and validate certificates, enabling mutual authentication.  
+description: Dives deep and explains how Liquity differs from Maker DAO.  
 image: 
 isMath: false
 ---
 
-
-
-This article comes from a [presnetation video](https://www.youtube.com/watch?v=bXLTE-5BkhA) made by  Robert Lauko in 2021 to explain how Liquity differs from Maker DAO.
+This article comes from a [presentation video](https://www.youtube.com/watch?v=bXLTE-5BkhA) made by  Robert Lauko in 2021 to explain how Liquity differs from Maker DAO.
 
 Since the video is rather old, it is possible that some information is no longer completely up to date. However, I found it very interesting to understand Liquity and the first version of MakerDAO (now [Sky](https://sky.money))
 
@@ -100,7 +98,7 @@ MakerDAO relies on the MKR token as a lender of last resort. In extreme scenario
 
 > Personal note
 
-This was indeed the case in 2020: a rapid price declines has provoked a $4 million shortfall on MakerDAO. In order to bring the system back to a healthy state, MKRhas been created and auctioned off to make up for the lost collateral value.
+This was indeed the case in 2020: a rapid price declines has provoked a $4 million shortfall on MakerDAO. In order to bring the system back to a healthy state, MKR tokens has been created and auctioned off to make up for the lost collateral value.
 
 See [Messari - MakerDAO releases plans to recapitalize the protocol through MKR auction](https://messari.io/report/makerdao-releases-plans-to-recapitalize-the-protocol-through-mkr-auction)
 
@@ -118,4 +116,4 @@ Liquity uses a recovery mode that temporarily relaxes liquidation conditions whe
 
 ### **Conclusion**
 
-While both MakerDAO and Liquity aim to provide stablecoin solutions and DeFi lending, their approaches differ significantly in governance, collateral management, liquidation mechanisms, and system design. Liquity’s emphasis on algorithmic governance, single collateralization, and instantaneous liquidations offers a fresh perspective, appealing to users seeking a more efficient and decentralized protocol.
+While both MakerDAO and Liquity aim to provide stablecoin solutions and DeFi lending, their approaches differ significantly in governance, collateral management, liquidation mechanisms, and system design. Liquity’s emphasis on algorithmic governance, single collateralization, and instantaneous liquidations.
