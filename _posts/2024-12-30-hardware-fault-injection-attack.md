@@ -1,11 +1,11 @@
 ---
 layout: post
-title: Hardware Security: Understanding Fault Injection Attack
+title: Hardware Security - Understanding Fault Injection Attack
 date:   2024-12-30
 lang: en
 locale: en-GB
-categories: security cryptography fault-injection side-channel hardware crypto-wallet
-tags: tls mtls cloud
+categories: security cryptography 
+tags: fault-injection side-channel hardware crypto-wallet
 description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences.
 image: 
 isMath: false

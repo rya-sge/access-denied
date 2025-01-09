@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Arbre recouvrant de poids minimum (MST / ACM)"
+title:  Arbre recouvrant de poids minimum (MST / ACM)
 date:   2021-08-22
 categories: programmation
 tags:  acm mst minimum-spanning-tree kruskal boruvka prim
@@ -205,7 +205,7 @@ On refait le même processus en choisissant l'arrête (3, 5) de poids 5, poids l
 
 Les graphes en début d'article ont été réalisé avec cet outil en ligne. J'ai préféré faire le reste à la main car je ne le trouvais pas très pratique, mes graphes se décomposaient régulièrement.
 
-- [https://csacademy.com/app/graph_editor/](https://csacademy.com/app/graph_editor/)
+- [csacademy.com/app/graph_editor/](https://csacademy.com/app/graph_editor/)
 
 
 
