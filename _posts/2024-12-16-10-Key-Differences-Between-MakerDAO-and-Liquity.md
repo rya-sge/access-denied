@@ -4,8 +4,8 @@ title: 10 Key Differences Between MakerDAO and Liquity
 date:   2024-12-16
 lang: en
 locale: en-GB
-categories: security cryptography
-tags: tls mtls cloud
+categories: blockchain defi
+tags: makerDAO liquity stablecoin
 description: Dives deep and explains how Liquity differs from Maker DAO.  
 image: 
 isMath: false
@@ -40,9 +40,9 @@ In contrast, Liquity employs a fully algorithmic governance system. Parameters l
 
 MakerDAO supports a multi-collateral system, allowing various ERC-20 tokens as collateral. While this provides flexibility, it introduces risks, as many tokens depend on issuers or are vulnerable to security exploits.
 
-Liquity adopts a single-collateral approach, accepting only Ether (ETH) as collateral. This choice aligns with its belief in Ether as the most trustless, risk-free asset on the Ethereum network. By focusing on Ether, Liquity minimizes complexity and potential vulnerabilities.
+Liquity V1 adopts a single-collateral approach, accepting only Ether (ETH) as collateral. This choice aligns with its belief in Ether as the most trustless, risk-free asset on the Ethereum network. By focusing on Ether, Liquity minimizes complexity and potential vulnerabilities.
 
-------
+Liquity V2 with its new stablecoin BOLD will also allow leading liquid staking tokens (LSTs) –Lido wrapped staked ETH and Rocket Pool staked ETH– as collateral in addition to Ether. See [Liquity V2 Whitepaper](https://liquity.gitbook.io/v2-whitepaper)
 
 ### **3. Decentralized Frontends**
 
@@ -72,7 +72,7 @@ MakerDAO applies a `stability fee`, which functions as an interest rate, accruin
 
 MakerDAO’s minimum collateralization ratio for Ether is either 130% or 150%, depending on the specific parameters. Higher ratios provide a buffer but limit capital efficiency.
 
-Liquity’s system requires only a 110% minimum collateralization ratio, enabled by its innovative liquidation mechanism. This lower requirement increases capital efficiency while maintaining system stability.
+Liquity’s system (V1) requires only a 110% minimum collateralization ratio, enabled by its innovative liquidation mechanism. This lower requirement increases capital efficiency while maintaining system stability. See [Liquity CR](https://www.liquity.org/features/collaterization-ratio)
 
 ------
 
