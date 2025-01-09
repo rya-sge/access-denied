@@ -203,13 +203,20 @@ See https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite
 
 Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. The Synapse class inherits from the `BaseModel` of the Pydantic data validation library.
 
-For example, in the [Text Prompting Subnet](https://github.com/opentensor/prompting/blob/6c493cbce0c621e28ded203d947ce47a9ae062ea/prompting/protocol.py#L27), the subnet validator creates a Synapse object, called Prompting, with three fields. The fields `roles` and `messages` are set by the subnet validator during the initialization of this Prompting data object, and they cannot be changed after that. A third field, `completion`, is mutable. When a subnet miner receives this Prompting object from the subnet validator, the subnet miner updates this `completion` field. The subnet validator then reads this updated `completion` field.
+For example, in the [Text Prompting Subnet](https://github.com/opentensor/prompting/blob/6c493cbce0c621e28ded203d947ce47a9ae062ea/prompting/protocol.py#L27), the subnet validator creates a Synapse object, called Prompting, with three fields. 
+
+- The fields `roles` and `messages` are set by the subnet validator during the initialization of this Prompting data object, and they cannot be changed after that. 
+- A third field, `completion`, is mutable. When a subnet miner receives this Prompting object from the subnet validator, the subnet miner updates this `completion` field. The subnet validator then reads this updated `completion` field.
 
 See [docs.bittensor.com/learn/bittensor-building-blocks#synapse](https://docs.bittensor.com/learn/bittensor-building-blocks#synapse)
 
 ### Metagraph
 
-A metagraph is a data structure that contains comprehensive information about current state of the subnet. When you inspect the metagraph of a subnet, you will find detailed information on all the nodes (neurons) in the subnet. A subnet validator should first sync with a subnet's metagraph to know all the subnet miners that are in the subnet. The metagraph can be inspected without participating in a subnet.
+A metagraph is a data structure that contains comprehensive information about current state of the subnet. 
+
+When you inspect the metagraph of a subnet, you will find detailed information on all the nodes (neurons) in the subnet. 
+
+A subnet validator should first sync with a subnet's metagraph to know all the subnet miners that are in the subnet. The metagraph can be inspected without participating in a subnet.
 
 See [docs.bittensor.com/learn/bittensor-building-blocks#metagraph](https://docs.bittensor.com/learn/bittensor-building-blocks#metagraph)
 
@@ -242,7 +249,7 @@ Incentive mechanisms are a fundamental part of Bittensor.
 
 In machine learning analogy, incentive mechanisms are effectively loss functions that steer the behaviour of subnet miners towards desirable outcomes. 
 
-Miner earnings are dependent on their loss value, hence the miners are incentivized to act in ways that minimize such loss value. Furthermore, competition between subnet miners will drive the miners to seek optimal strategies within the given subnet incentive landscape.
+**Miner** earnings are dependent on their **loss value**, hence the miners are incentivized to act in ways that minimize such loss value. Furthermore, competition between subnet miners will drive the miners to seek optimal strategies within the given subnet incentive landscape.
 
 A subnet incentive mechanism, when running optimally on a subnet, will continuously produce high quality results because the subnet miners and subnet validators are incentivized to do so. 
 
@@ -307,11 +314,9 @@ See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-protocol](ht
 
 See **2** in the above diagram. The task is one of the key components of any incentive mechanism as it defines what miners will perform as work. The task should be chosen so that miners are maximally effective at the intended use case for the subnet. In other words, **the task should mimic an intended user interaction with a subnet**. Examples of tasks are responding to natural language prompts and storing encrypted files.
 
-ALIGNING MINERS WITH THE SUBNET GOALS
-
 The task defines the scope of work that miners will undertake, and what utility the subnet can provide to users. In some cases this should be very specific (such as storage) and in other cases it can be varied (many types of natural language query).
 
-See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task
+See [docs.bittensor.com - subnet-task](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task)
 
 ### Subnet reward model
 
@@ -323,11 +328,7 @@ Operationally, it is the mathematical object that converts miner responses into 
 
 Miners will continuously compete to achieve the highest reward possible. If the reward is capped at an upper limit, miners may not be motivated to improve further. Hence care should be taken to enable continuous improvement of the miner, rather than stagnation.
 
-THE ZEN OF INCENTIVE MECHANISMS
-
-Subnets should be endlessly improving.
-
-See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-reward-model
+See [docs.bittensor.com - subnet-reward-model](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-reward-model)
 
 ### Discourage exploits
 
@@ -335,7 +336,7 @@ The incentive mechanism is ultimately the judge of subnet miner performance. Whe
 
 On the contrary, a poorly designed incentive mechanism can result in exploits and shortcuts, which can detrimentally impact the overall quality of the subnet and discourage fair miners.
 
-See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#discourage-exploits
+See [doc.bittensor.com - discourage-exploits](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#discourage-exploits)
 
 ------
 
@@ -360,13 +361,13 @@ The item numbers below correspond to the circled numbers in the above diagram.
 
 ALL REWARD TAO TOKENS ARE NEWLY MINTED.
 
-1. Finally, the YC calculates a consensus distribution of TAO (the ‘emission’) and distributes the newly minted reward TAO immediately into the accounts associated with the UIDs.
+4. Finally, the YC calculates a consensus distribution of TAO (the ‘emission’) and distributes the newly minted reward TAO immediately into the accounts associated with the UIDs.
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rewards](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rewards)
 
 ### Tempo
 
-Note that subnet validators can transmit their rank weight vectors to the blockchain any time. However, for any user-created subnet, the YC for the subnet begins at every 360 blocks (=4320 seconds or 72 minutes, at 12 seconds per block) using the latest weight matrix available at the YC for the subnet.
+Note that subnet validators can transmit their rank weight vectors to the blockchain any time. However, for any user-created subnet, the Yuma Consensus (YC) for the subnet begins at every 360 blocks (=4320 seconds or 72 minutes, at 12 seconds per block) using the latest weight matrix available at the YC for the subnet.
 
 If a ranking weight vector from the subnet validator arrives after the start of a 360-block period, then this weight vector will be used in the subsequent YC start, i.e., after the current 360 blocks have elapsed.
 

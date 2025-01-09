@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography security
 tags: blockchain wallet trezor hardware
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
-image: /assets/article/blockchain/wallet/trezor/trezor-secure-element.png
+image: /assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png
 isMath: true
 ---
 
@@ -17,7 +17,7 @@ Among the most popular and trusted hardware wallets for storing digital assets s
 
 Trezor offers several different models, —Trezor One and Trezor Model T for example—each designed to provide users with several functionalities to protect its assets.
 
-This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize,  how they protect the seed phrase and the private keys.
+This article explores the key security features of Trezor wallets, the cryptographic algorithms they utilize, how they protect the seed phrase and the private keys. This article was partly produced to prepare a talk on the security of Crypto wallets at [Black Alps 2024](https://www.youtube.com/watch?v=wJryrYR_NJY).
 
 Firstly, here is a summary of the different options related to security available depending on the models.
 
@@ -440,13 +440,15 @@ Reference:
 
 ## Conclusion
 
-Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2 with HMAC-SHA256, ChaCha20-Poly1305, ) to protect sensitive information such as the seed phrase against several different attack:
-
-![trezor-Trezor-threat-protection.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-Trezor-threat-protection.drawio.png)
+Trezor wallets are designed with a robust set of security features with a strong use of cryptography (PBKDF2 with HMAC-SHA256, ChaCha20-Poly1305) to protect sensitive information such as the seed phrase against several different attacks.
 
 The fact that the firmware is open source is also a strong point in their favor.
 
 All these features make them one of the most trusted hardware wallets in the cryptocurrency space.
+
+![trezor-Trezor-threat-protection.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-Trezor-threat-protection.drawio.png)
+
+
 
 ## References
 
