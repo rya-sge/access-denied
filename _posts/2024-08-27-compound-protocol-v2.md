@@ -4,7 +4,7 @@ title:  Compound V2 Overview
 date:   2024-08-27
 lang: en
 locale: en-GB
-categories: blockchain
+categories: blockchain defi
 tags: blockchain
 description: This article presents the architecture and the behavior of Compound V2, a DeFi protocol on Ethereum for supplying or borrowing assets
 image:  /assets/article/blockchain/defi/compound/compound-comp-logo.png

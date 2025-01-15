@@ -46,6 +46,8 @@ In simpler terms, fault injection can be thought of as corrupting the normal fun
 
 For example, an attacker might inject faults into a cryptographic process, causing it to leak cryptographic keys or skip essential authentication steps.
 
+-------
+
 ## How Fault Injection Attacks Work
 
 Fault injection attacks are executed by creating a controlled environment where faults are artificially introduced. 
@@ -88,6 +90,8 @@ Fault injection attacks are primarily used against hardware devices, especially 
 - **Cryptographic Devices**: Fault injection can target hardware security modules (HSMs) or devices performing encryption and decryption operations. By inducing errors, attackers may extract encryption keys, allowing them to decrypt sensitive data.
 - **Trusted Execution Environments (TEEs)**: TEEs, such as ARM’s TrustZone, are designed to run secure code isolated from the rest of the system. Fault injection can compromise the isolation, enabling attackers to gain access to protected areas of memory or manipulate sensitive operations.
 
+-----
+
 ## Consequences of Fault Injection Attacks
 
 The potential consequences of fault injection attacks can be severe, depending on the system being targeted. Here are a few critical outcomes:
@@ -96,6 +100,8 @@ The potential consequences of fault injection attacks can be severe, depending o
 - **Authentication Bypass**: In many systems, fault injection can disable or corrupt authentication mechanisms, allowing attackers to bypass password or PIN verification steps.
 - **System Integrity Violation**: In embedded systems or industrial control units, fault injection can cause unpredictable behavior, potentially leading to malfunctions that can disrupt service or even cause physical damage.
 - **Tampering with Software**: Fault injection can also lead to the execution of arbitrary code, allowing attackers to modify or tamper with software running on a system. This can lead to a full compromise of the device’s functionality.
+
+------
 
 ## Methods to Prevent Fault Injection Attacks
 
@@ -132,6 +138,8 @@ duplicate parts of the hardware to perform computation in parallel. If the attac
 #### Physical Security (special encapsulations)
 
 Strengthening the physical security of devices, such as enclosing critical components in tamper-resistant casings, can make it more difficult for attackers to manipulate hardware directly.
+
+-----
 
 ## Cryptography case study
 
@@ -178,6 +186,8 @@ fault induction time,.
 - Masking.
 - Many protection mechanisms are patented !
 
+------
+
 ### Conclusion
 
 Fault injection attacks represent a sophisticated threat against hardware devices used in IoT, finance, and other critical sectors. 
@@ -185,6 +195,8 @@ Fault injection attacks represent a sophisticated threat against hardware device
 While the techniques for inducing faults have become more refined, defense mechanisms are also evolving, with hardware and software developers working to mitigate the risks posed by such attacks. 
 
 Understanding the mechanics of fault injection, as well as its potential impacts, is crucial for the ongoing development of secure hardware based-systems. 
+
+-------
 
 ## References
 

@@ -134,8 +134,6 @@ These indicators are useful for identifying unusual traffic patterns and disting
 
 **Pain for attacker**:  Network artifacts are harder to alter than domain names because attackers must re-engineer some of their tools or adjust how their malware communicates. Detecting and blocking these indicators can frustrate attackers and hinder their communication capabilities.
 
-In this level, the attacker will feel a little more annoyed and frustrated if you can detect the attack. The attacker would need to circle back at this detection level and change his attack tools and methodologies. This is very time-consuming for the attacker, and probably, he will need to spend more resources on his attacker tools.
-
 --------------------
 
 ### 5. Tools (Challenging)
@@ -156,7 +154,7 @@ Antivirus signatures, detection rules, and YARA rules can be great weapons for y
 
 For detection rules,[ SOC Prime Threat Detection Marketplace ](https://tdm.socprime.com/)is a great platform, where security professionals share their detection rules for different kinds of threats including the latest CVE's that are being exploited in the wild by adversaries. 
 
-Fuzzy hashing is also a strong weapon against the attacker's tools. Fuzzy hashing helps you to perform similarity analysis - match two files with minor differences based on the fuzzy hash values. One of the examples of fuzzy hashing is the usage of [SSDeep](https://ssdeep-project.github.io/ssdeep/index.html); on the SSDeep official website, you can also find the complete explanation for fuzzy hashing. 
+**Fuzzy hashing** is also a strong weapon against the attacker's tools. Fuzzy hashing helps you to perform similarity analysis - match two files with minor differences based on the fuzzy hash values. One of the examples of fuzzy hashing is the usage of [SSDeep](https://ssdeep-project.github.io/ssdeep/index.html); on the SSDeep official website, you can also find the complete explanation for fuzzy hashing. 
 
 ---------------------
 
@@ -193,11 +191,35 @@ The Pyramid of Pain is a valuable framework for security teams to prioritize the
 
 ## Conclusion
 
-The Pyramid of Pain emphases the importance of strategic detection over simple blocking. By focusing on the top layers of the pyramid—especially TTPs—cybersecurity teams can inflict maximum disruption to adversaries and create stronger, more resilient defenses. 
+The Pyramid of Pain emphases the importance of strategic detection over simple blocking. 
+
+Contrary to other framework (Cyber Kill Chain, Unified Kill Chain, MITRE), this framework looks at how to make it difficult for an adversary to change their approach when detected.
+
+By focusing on the top layers of the pyramid—especially TTPs—cybersecurity teams can inflict maximum disruption to adversaries and create stronger, more resilient defenses. 
 
 In a field where attackers constantly adapt, the Pyramid of Pain offers a roadmap for defenders to stay one step ahead, focusing on the indicators that are hardest for attackers to change and forcing them into a position where they must reconsider or even abandon their attack strategies.
 
 By aligning detection and response efforts with the Pyramid of Pain, security teams can make their adversaries' lives significantly harder, improving the organization’s overall resilience to cyber threats.
+
+## Questions
+
+Some questions from the room [Pyramid of Pain](ttps://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
+
+- Domain Names
+
+> What type of attack uses Unicode characters in the domain name to imitate the a known domain?
+
+Answer: Punycode attack
+
+- Tools
+
+> Provide the method used to determine similarity between the files 
+
+Answer: Fuzzy hashing
+
+> Provide the alternative name for fuzzy hashes without the abbreviation 
+
+Answer: context triggered piecewise hashes
 
 ## Reference
 

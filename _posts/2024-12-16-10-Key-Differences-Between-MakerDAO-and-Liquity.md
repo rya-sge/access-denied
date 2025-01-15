@@ -23,7 +23,7 @@ Here’s an exploration of the 10 key differences between MakerDAO and Liquity.
 
 ------
 
-### **1. Governance**
+### 1. Governance
 
 MakerDAO operates on a human governance model, where key parameters like `interest rates` and `collateralization ratios` are adjusted through community votes. These votes require holding the Maker (MKR) token, which grants voting rights. However, challenges such as low voter turnout and the potential for manipulation, such as through flash loans, can affect the system's efficiency.
 
@@ -36,7 +36,7 @@ In contrast, Liquity employs a fully algorithmic governance system. Parameters l
 
 ------
 
-### **2. Collateral Approach**
+### 2. Collateral Approach
 
 MakerDAO supports a multi-collateral system, allowing various ERC-20 tokens as collateral. While this provides flexibility, it introduces risks, as many tokens depend on issuers or are vulnerable to security exploits.
 
@@ -44,7 +44,7 @@ Liquity V1 adopts a single-collateral approach, accepting only Ether (ETH) as co
 
 Liquity V2 with its new stablecoin BOLD will also allow leading liquid staking tokens (LSTs) –Lido wrapped staked ETH and Rocket Pool staked ETH– as collateral in addition to Ether. See [Liquity V2 Whitepaper](https://liquity.gitbook.io/v2-whitepaper)
 
-### **3. Decentralized Frontends**
+### 3. Decentralized Frontends
 
 MakerDAO relies on centralized frontends, often hosted on specific servers, which could pose censorship risks. 
 
@@ -52,7 +52,7 @@ Liquity, on the other hand, supports a decentralized network of frontends. Anyon
 
 ------
 
-### **4. Stablecoin Redemption**
+### 4. Stablecoin Redemption
 
 Liquity’s stablecoin, LUSD, is fully redeemable against Ether at face value, ensuring a direct and transparent peg to the US dollar. This mechanism creates a hard price floor, as holders can arbitrage any deviation below $1 by redeeming LUSD for Ether.
 
@@ -60,7 +60,7 @@ In contrast, MakerDAO’s DAI lacks direct redeemability for collateral. Instead
 
 ------
 
-### **5. Interest-Free Loans**
+### 5. Interest-Free Loans
 
 Liquity offers loans without recurring interest. Borrowers only pay a `one-time` issuance fee when opening a loan, and there are no ongoing costs. This allows users to keep their debt positions open indefinitely without accumulating additional charges.
 
@@ -68,7 +68,7 @@ MakerDAO applies a `stability fee`, which functions as an interest rate, accruin
 
 ------
 
-### **6. Collateralization Ratios**
+### 6. Collateralization Ratios
 
 MakerDAO’s minimum collateralization ratio for Ether is either 130% or 150%, depending on the specific parameters. Higher ratios provide a buffer but limit capital efficiency.
 
@@ -76,7 +76,7 @@ Liquity’s system (V1) requires only a 110% minimum collateralization ratio, en
 
 ------
 
-### **7. Liquidation Mechanisms**
+### 7. Liquidation Mechanisms
 
 MakerDAO utilizes an auction-based liquidation process, which can take up to six hours. This delay requires higher collateral buffers to account for potential price fluctuations during the auction.
 
@@ -84,7 +84,7 @@ Liquity employs instantaneous liquidations. A stability pool pre-funds the repay
 
 ------
 
-### **8. Savings and Incentives**
+### 8. Savings and Incentives
 
 MakerDAO offers the `DAI Savings Rate (DSR)`, allowing users to earn interest on their DAI holdings. However, the rate is determined by human governance and is currently set at 0%.
 
@@ -92,7 +92,7 @@ Liquity does not have a direct savings feature but offers two alternative mechan
 
 ------
 
-### **9. Secondary Token Role**
+### 9. Secondary Token Role
 
 MakerDAO relies on the MKR token as a lender of last resort. In extreme scenarios, MKR tokens can be minted and sold to recapitalize the system, potentially diluting existing holders.
 
@@ -106,7 +106,7 @@ Liquity avoids this approach by employing a redistribution mechanism. If the Sta
 
 ------
 
-### **10. Emergency Shutdown vs. Recovery Mode**
+### 10. Emergency Shutdown vs. Recovery Mode
 
 MakerDAO employs an emergency shutdown mechanism to wind down the system in case of extreme under-collateralization. While effective, it results in the complete cessation of the protocol.
 
@@ -114,6 +114,6 @@ Liquity uses a recovery mode that temporarily relaxes liquidation conditions whe
 
 ------
 
-### **Conclusion**
+### Conclusion
 
 While both MakerDAO and Liquity aim to provide stablecoin solutions and DeFi lending, their approaches differ significantly in governance, collateral management, liquidation mechanisms, and system design. Liquity’s emphasis on algorithmic governance, single collateralization, and instantaneous liquidations.

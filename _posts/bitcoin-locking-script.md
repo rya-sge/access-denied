@@ -1,6 +1,10 @@
 # Exploring Advanced Locking Scripts in Bitcoin: P2WPKH, P2WSH, and P2TR
 
-Bitcoin’s versatility and security come from its ability to handle different transaction types using its built-in scripting language. Over time, Bitcoin has evolved from basic transaction scripts to more sophisticated and efficient mechanisms. Among the advanced locking scripts are **P2WPKH (Pay-to-Witness-Public-Key-Hash)**, **P2WSH (Pay-to-Witness-Script-Hash)**, and **P2TR (Pay-to-Taproot)**, which leverage Segregated Witness (SegWit) and Taproot improvements to enhance scalability, security, and privacy. 
+Bitcoin’s versatility and security come from its ability to handle different transaction types using its built-in scripting language. 
+
+Over time, Bitcoin has evolved from basic transaction scripts to more sophisticated and efficient mechanisms. 
+
+Among the advanced locking scripts are **P2WPKH (Pay-to-Witness-Public-Key-Hash)**, **P2WSH (Pay-to-Witness-Script-Hash)**, and **P2TR (Pay-to-Taproot)**, which leverage Segregated Witness (SegWit) and Taproot improvements to enhance scalability, security, and privacy. 
 
 This article will delve into these three locking scripts, how they function, and their unique advantages.
 

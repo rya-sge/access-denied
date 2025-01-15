@@ -1,0 +1,122 @@
+# Main Security Models - Owerview
+
+Here’s an explanation of the three models—**Bell-LaPadula**, **Biba**, and **Clark-Wilson**—which are foundational in computer security.
+
+This is the room https://tryhackme.com/r/room/securityprinciples
+
+There are many additional security models if you want to explore more. Examples include:
+
+- Brewer and Nash model
+- Goguen-Meseguer model
+- Sutherland model
+- Graham-Denning model
+- Harrison-Ruzzo-Ullman model
+
+------
+
+### **1. Bell-LaPadula Model**
+
+The Bell-LaPadula (BLP) model focuses on **confidentiality** and controlling access to classified information.
+
+#### Key Principles:
+
+1. **Simple Security Property (no read-up, "ss-property"):**
+
+   - A subject (user or process) at a lower security level cannot read data at a higher security level.
+   - This prevents unauthorized access to confidential data above the authorized level.
+
+2. ***-Property (no write-down):**
+
+   - A subject at a higher security level cannot write data to a lower security level.
+   - This ensures sensitive data is not leaked to less secure levels.
+
+3. **Discretionary Security Property:**
+
+   - Access controls can be defined and enforced to limit users' permissions further. 
+   - This property uses an access matrix to allow read and write operations. An example access matrix is shown in the table below and used in conjunction with the first two properties.
+
+   | Subjects  | Object A   | Object B  |
+   | --------- | ---------- | --------- |
+   | Subject 1 | Write      | No access |
+   | Subject 2 | Read/Write | Read      |
+
+#### Use Case:
+
+Common in military or government systems where confidentiality and prevention of information leaks are paramount.
+
+#### Conclusion and limitation
+
+The first two properties can be summarized as “write up, read down.” You can share confidential information with people of higher security clearance (write up), and you can receive confidential information from people with lower security clearance (read down).
+
+There are certain limitations to the Bell-LaPadula model. For example, it was not designed to handle file-sharing.
+
+------
+
+### **2. Biba Integrity Model**
+
+The Biba model emphasizes **data integrity**, ensuring that information is not improperly modified.
+
+#### Key Principles:
+
+1. **Simple Integrity Property (no read-down):**
+   - A subject cannot read data at a lower integrity level.
+   - This prevents contamination of high-integrity processes with low-integrity data.
+2. **Integrity \*-Property (no write-up):**
+   - A subject cannot write data to a higher integrity level.
+   - This prevents low-integrity processes from corrupting high-integrity data.
+
+#### Variants:
+
+Biba also includes the **low-water-mark principle** and **ring policy** for additional flexibility in enforcing integrity.
+
+#### Use Case:
+
+Common in financial or healthcare systems where data accuracy and reliability are crucial.
+
+#### Conclusion and limitation
+
+These two properties can be summarized as “read up, write down.” This rule is in contrast with the Bell-LaPadula Model, and this should not be surprising as one is concerned with confidentiality while the other is with integrity.
+
+Biba Model suffers from various limitations. One example is that it does not handle internal threats (insider threat).
+
+------
+
+### **3. Clark-Wilson Model**
+
+The Clark-Wilson model enforces both **data integrity** and **well-formed transactions**, focusing on realistic business environments.
+
+The Clark-Wilson Model also aims to achieve integrity by using the following concepts:
+
+- **Constrained Data Item (CDI)**: This refers to the data type whose integrity we want to preserve.
+- **Unconstrained Data Item (UDI)**: This refers to all data types beyond CDI, such as user and system input.
+- **Transformation Procedures (TPs)**: These procedures are programmed operations, such as read and write, and should maintain the integrity of CDIs.
+- **Integrity Verification Procedures (IVPs)**: These procedures check and ensure the validity of CDIs.
+
+#### Key Principles:
+
+1. **Separation of Duties:**
+   - Users are limited to specific roles, ensuring no single individual has unchecked control over sensitive data.
+2. **Well-Formed Transactions:**
+   - Operations must follow specific steps to transition the system from one valid state to another.
+   - This ensures only authorized changes are made.
+3. **Access Triple (Subject, Transformation Procedure, Object):**
+   - A subject (user) can only access an object (data) through a transformation procedure (authorized application or process).
+   - This prevents direct, unrestricted access to data.
+4. **Auditability:**
+   - Every action is logged to provide traceability and accountability.
+
+#### Use Case:
+
+- Often used in commercial systems (e.g., banking) to enforce proper workflows, prevent fraud, and ensure compliance with regulations.
+
+------
+
+### Summary Comparison:
+
+| **Model**     | **Focus**                      | **Key Rules**                                  | **Use Case**                 |
+| ------------- | ------------------------------ | ---------------------------------------------- | ---------------------------- |
+| Bell-LaPadula | Confidentiality                | No read-up, no write-down                      | Military/Government systems  |
+| Biba          | Integrity                      | No read-down, no write-up                      | Financial/Healthcare systems |
+| Clark-Wilson  | Integrity + Business Workflows | Well-formed transactions, separation of duties | Business/Commercial systems  |
+
+Each model addresses different security needs and is tailored to specific types of threats and environments.

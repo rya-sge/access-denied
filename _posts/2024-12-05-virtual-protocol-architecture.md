@@ -53,7 +53,54 @@ The Modular Consensus Framework standardizes and facilitates various processes f
    - **Strategy and Resource Allocation**: Liquidity providers determine the strategic direction of the protocol by staking on specific Agents, influencing DAO resource allocation based on staking weightage.
    - **Validation and Finalization**: Utilizing a **Delegated Proof of Stake** mechanism, token holders delegate tokens to qualified validators, who are responsible for finalizing the state of each Agent.
 
-------
+## Global overview
+
+Overview from [Virtual Protocol](https://www.virtuals.io/protocol)
+
+![virtual-architecture](../assets/article/blockchain/ai/virtual-protocol/virtual-architecture.png)
+
+### Virtual Agent Composer
+
+#### Agentic Behavior
+
+This framework defines the AI agents' core capabilities. 
+
+- The Perception Subsystem processes sensory data;
+- The Action Executor translates commands into actions, 
+- The Strategic Planning Engine optimizes multi-step plans using algorithms like MDPs. The Learning Module refines behavior through reinforcement learning. 
+- Additionally, agents manage on-chain activities via the On-Chain Wallet Operator for digital assets and transactions.
+
+#### Long Term Memory Processor
+
+A subsystem dedicated to the storage, retrieval, and management of persistent data structures, such as knowledge graphs or memory embeddings, enabling agents to maintain continuity and contextual awareness across sessions.
+
+#### Stateful AI Runner (SAR)
+
+Stateful AI Runners are servers hosting AI agents' personalities, voices, and visuals. They include Sequencer that processes and links models sequentially or in parallel to achieve desired outcomes; and various Models like LLMs, Text-to-Speech, Audio-to-Facial, Audio-to-Gesture, Music-to-Dance, and Image Generation models for creating multimodal AI agents.
+
+#### Model Storage
+
+A decentralized, distributed storage solution for persisting AI models, ensuring high availability and redundancy.
+
+##### Modular Stateful AI Runner (SAR)
+
+These are modular, containerized instances of SAR, packaged for deployment across heterogeneous virtual environments or GPU clusters, allowing for scalable and flexible integration into different infrastructure ecosystems.
+
+#### Long Term Memory
+
+A component dedicated to archiving historical data, decisions, and interactions. It employs persistent storage technologies to ensure the security and accessibility of data, enabling agents to utilize past experiences in future decisions.
+
+### On-Chain
+
+#### Real-Time Value Streaming
+
+Each AI agent is equipped with an ERC 6551 wallet, enabling continuous revenue accrual and seamless distribution back to the owners.
+
+#### Immutable Contribution Vault
+
+Users can upload custom models and datasets, securely stored in the Immutable Contribution Vault (ICV) on the blockchain. The Model Enrichment Pipeline enhances AI models with new data, secured through cryptographic proofs and stored immutably. The Voice and Text Data Repositories within the ICV ensure data integrity and provenance through decentralized blockchain storage.
+
+----
 
 ## Decentralized contribution
 
@@ -116,7 +163,7 @@ If the dataset is smaller, the information is stored in a vector database. This 
 
 #### Data Pre-processing
 
-In today's diverse data landscape, relevant datasets come in various formats: text (from textbooks, forums, wikis), videos, and audio. 
+Relevant datasets come in various formats: text (from textbooks, forums, wikis), videos, and audio. 
 
 Currently, the central character core predominantly relies on text-based Large Language Models (LLMs) and, as such, primarily incorporates text-based training data. 
 
@@ -230,7 +277,7 @@ Within each Virtual agent, approved contributions are stored in the form of serv
 - **Real-Time and Historical Insights**: The ICV elegantly presents the current state of each VIRTUAL agent and traces its historical evolution on-chain. This feature is crucial for both provenance and root cause analysis across every module within the Virtuals ecosystem.
 - **Transparency and Composability**: By open-sourcing the codebase models for VIRTUAL agents, the ICV facilitates transparency and composability, allowing developers and contributors to build upon and integrate with existing VIRTUAL agents seamlessly.
 
-### ERC-6551
+### ERC-6551: Non-fungible Token Bound Accounts
 
 Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551), but what is this standard ?
 
@@ -248,6 +295,9 @@ Reference: [eips.ethereum.org/EIPS/eip-6551](https://eips.ethereum.org/EIPS/eip-
 
 ## Reference
 
+- Official documentation:
+  - [Whitepaper](https://whitepaper.virtuals.io/)
+  - [Virtual Protocol](https://www.virtuals.io/protocol)
 - [Shoal - Virtuals Protocol: Launching AI Agents with the Pump.fun Model](https://www.shoal.gg/p/virtuals-protocol-launching-ai-agents)
 - [0xCygaar Tweet](https://x.com/0xCygaar/status/1864182285278355881?t=LBINpmIuUA8rpnzxS2nNmw&s=35)
 - [Eli5Defi Tweet](https://x.com/eli5_defi/status/1765330652470338018)

@@ -1,4 +1,13 @@
-# GMX Trading V1
+> layout: post
+> title: GMX Trading V1
+> date:   2025-01-13
+> lang: en
+> locale: en-GB
+> categories: security cryptography 
+> tags: fault-injection side-channel hardware crypto-wallet
+> description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences.
+> image: 
+> isMath: false
 
 GMX is a decentralized crypto exchange allowing trading .
 
@@ -6,19 +15,21 @@ To use the platform, you don't need for a username or password but instead will 
 
 The platform uses a price feed based on an aggregate of exchanges which reduces the risk of liquidations from temporary wicks.
 
-The two supported blockchains are Arbitrum or Avalance, so you need  to have ETH in your Arbitrum account or AVAX in your Avalanche account to start trading.
+The two supported blockchains are Arbitrum or Avalanche, so you need  to have ETH in your Arbitrum account or AVAX in your Avalanche account to start trading.
+
+[TOC]
+
+
 
 ## Swaps
-
-[https://docs.gmx.io/docs/trading/v1#swaps](https://docs.gmx.io/docs/trading/v1#swaps)
 
 GMX supports both swaps and leverage trading. 
 
 For leverage trading, please see the below sections for more information.
 
-## Opening a Position
+See [GMX Swaps](https://docs.gmx.io/docs/trading/v1#swaps)
 
-https://docs.gmx.io/docs/trading/v1#opening-a-position
+## Opening a Position
 
 Long position:
 
@@ -34,6 +45,8 @@ After selecting your side, key in the amount you want to pay and the leverage yo
 
 Below the swap box you would see the "Exit Price", which is the price that is used to calculate profits if you open and then immediately close a position. The exit price will change with the price of the token you are longing or shorting.
 
+See [GMX Opening a position](https://docs.gmx.io/docs/trading/v1#opening-a-position)
+
 ### Fees
 
 The trading fee to open a position is 0.1% of the position size, similarly there is a 0.1% fee when closing the position.
@@ -46,13 +59,13 @@ While there are no price impacts for trades, there can be slippage due to price 
 
 ## Managing Positions
 
-[docs.gmx.io/docs/trading/v1#managing-positions](https://docs.gmx.io/docs/trading/v1#managing-positions)
-
 After opening a trade, you would be able to view it under your Positions list, you can also click on "Edit" to deposit or withdraw collateral, this allows you to manage your leverage and liquidation price.
 
 When you open a position or deposit collateral, a snapshot of the USD price of your collateral is taken, so e.g. if your collateral is 0.1 ETH and the price of ETH is 5000 USD at the time, then your collateral is 500 USD and will not change even if the price of ETH changes.
 
 The amount of profit and loss you make will be proportional to your position size. 
+
+See [docs.gmx.io/docs/trading/v1#managing-positions](https://docs.gmx.io/docs/trading/v1#managing-positions)
 
 ### Long Position
 
@@ -76,8 +89,6 @@ Note that when depositing collateral into a long position, there is a 0.3% depos
 
 ## Closing a Position
 
-[docs.gmx.iov1#closing-a-position](https://docs.gmx.io/docs/trading/v1#closing-a-position)
-
 You can close a position partially or completely by clicking on the "Close" button in the position row.
 
 For long positions, profits are paid in the asset you are longing, e.g. if you long ETH you would get your profits as ETH.
@@ -86,9 +97,9 @@ For short positions, profits will be paid out in the same stablecoin that you us
 
 You can customize the token to be received by changing the "Receive" token in the "Close Position" menu. Note that this may perform a swap from your profit token to the token you select if needed, the swap fees will be shown in the "Close Position" menu.
 
-## Stop-Loss / Take-Profit Orders[
+See [docs.gmx.iov1#closing-a-position](https://docs.gmx.io/docs/trading/v1#closing-a-position)
 
-[docs.gmx.io/v1#stop-loss--take-profit-orders](https://docs.gmx.io/docs/trading/v1#stop-loss--take-profit-orders)
+## Stop-Loss / Take-Profit Orders
 
 You can set stop-loss and take-profit orders by clicking on the "Close" button and selecting the "Trigger" tab.
 
@@ -105,9 +116,9 @@ Note that orders are not guaranteed to execute, this can occur in a few situatio
 
 Additionally, trigger orders are market orders and are not guaranteed to execute at the trigger price.
 
-## Liquidations
+See [docs.gmx.io/v1#stop-loss--take-profit-orders](https://docs.gmx.io/docs/trading/v1#stop-loss--take-profit-orders)
 
-[docs.gmx.io/v1#liquidations](https://docs.gmx.io/docs/trading/v1#liquidations)
+## Liquidations
 
 If an ETH long position is opened and the position size is larger than the collateral value, then there would be a price at which the position's loss amount is very close to the collateral value.
 
@@ -119,9 +130,9 @@ Collateral can be deposited using the "Edit" button in the position row, this wi
 
 When a position is liquidated, any collateral remaining after deducting losses and fees would be returned to your account.
 
-## Pricing
+See [docs.gmx.io/v1#liquidations](https://docs.gmx.io/docs/trading/v1#liquidations)
 
-[docs.gmx.io/v1#pricing](https://docs.gmx.io/docs/trading/v1#pricing)
+## Pricing
 
 There is no price impact for trades on GMX V1, so you can execute large trades exactly at the mark price. During times of high volatility there may be a spread from the Chainlink price to the median price of reference exchanges.
 
@@ -129,11 +140,13 @@ The mark prices are displayed next to the market name, long positions will be op
 
 The chart will indicate the average of the two mark prices.
 
+See [docs.gmx.io/v1#pricing](https://docs.gmx.io/docs/trading/v1#pricing)
+
 ## Fees
 
-[docs.gmx.io/docs/trading/v1#fees](https://docs.gmx.io/docs/trading/v1#fees)
+### Protocol fees
 
-The cost to open / close a position is 0.1% of the position size.
+The cost to open / close a position is **0.1%** of the position size.
 
 The collateral of long positions is the token being longed, for ETH longs the collateral is ETH and for BTC longs the collateral is WBTC, etc.
 
@@ -143,9 +156,9 @@ If a swap is needed when opening or closing a position then the regular swap fee
 
 There is also a network fee detailed below, which is used to pay for the blockchain network costs.
 
-## Network Fee
+See [docs.gmx.io/docs/trading/v1#fees](https://docs.gmx.io/docs/trading/v1#fees)
 
-[docs.gmx.io/v1#network-fee](https://docs.gmx.io/docs/trading/v1#network-fee)
+### Network Fee
 
 There are two transactions involved in opening / closing / editing a position:
 
@@ -153,6 +166,8 @@ There are two transactions involved in opening / closing / editing a position:
 - Keepers observe the blockchain for these requests then execute them
 
 The cost of the second transaction is displayed in the interface as the "Network Fee". This network cost is paid to the blockchain network.
+
+See [docs.gmx.io/v1#network-fee](https://docs.gmx.io/docs/trading/v1#network-fee)
 
 ## Stablecoin Pricing
 
