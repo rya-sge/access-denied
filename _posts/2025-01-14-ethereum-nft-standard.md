@@ -4,7 +4,7 @@ title: NFT Standards on Ethereum - ERC-721 and Beyond
 date:   2025-01-14
 lang: en
 locale: en-GB
-categories: cryptography blockchain zkp
+categories: blockchain solidity ethereum
 tags: ERC-721 NFT ERC-1155 royalty ERC-2981 ERC-4907 ERC-998 ERC-6551
 description: Non-Fungible Tokens (NFTs) enable unique, verifiable ownership of digital and real-world items on the blockchain. While ERC-721 remains the main standard to represent NFTs on Ethereum and EVM blockchains, several other standards (ERC-1155, ERC-2981, ERC-4907,...) have emerged to meet various use cases and improve functionality. 
 image: 

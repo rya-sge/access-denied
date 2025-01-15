@@ -4,7 +4,7 @@ title: Chainlink DECO, zkTLS oracle
 date:   2025-01-13
 lang: en
 locale: en-GB
-categories: cryptography blockchain zkp
+categories: cryptography blockchain ZKP
 tags: chainlink oracle
 description: DECO is a zkTLS-oracle made by Chainlink for authenticating and verifying web data in a privacy-preserving manner.
 image: /assets/article/cryptographie/zero-knowledge-proof/deco/deco-tls-k.drawio.png
