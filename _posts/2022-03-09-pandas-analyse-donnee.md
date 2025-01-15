@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "L'analyse de données avec pandas"
+title:  L'analyse de données avec pandas
 date:   2022-03-07
 last-update: 
-categories: programmation
+categories: programmation ai
 tags: machine-learning panda python
 image: /assets/article/programmation/python/pandas/pandas-head.PNG
 description: Pandas est une librairie python permettant de faire de l'analyse de donnée. Elle est beaucoup utilisée pour traiter les données dans le cadre du Machine Learning.
