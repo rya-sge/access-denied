@@ -4,7 +4,7 @@ title: Perceptron - a simple, binary neural network architecture
 date:   2024-11-25
 lang: en
 locale: en-GB
-categories: programmation
+categories: ai
 tags: ML AI perceptron neural-network
 description: The perceptron, developed by Frank Rosenblatt in 1958, is one of the earliest and simplest models of artificial neural networks.
 image: /assets/article/mlg/perceptron.drawio.png

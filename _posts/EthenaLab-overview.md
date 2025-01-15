@@ -1,18 +1,25 @@
-# USDe Overview
+---
+layout: post
+title: USDe Overview
+date:   2025-01-15
+lang: en
+locale: en-GB
+categories: programmation cryptography
+tags: machine-learning zama ML
+description: Concrete ML is an open source, privacy-preserving, machine learning framework based on Fully Homomorphic Encryption (FHE)
+image: 
+isMath: false
+---
 
-Ethena enables the creation and redemption of a delta-neutral synthetic dollar, *USDe*, crypto's first fully-backed, onchain, scalable, and censorship-resistant form of money. 
+Ethena enables the creation and redemption of a delta-neutral synthetic dollar, *USDe*,
 
 The mechanism backing *USDe* enables sUSDe, the first "Internet Bond" offering a crypto-native, reward-accruing asset, derived from staked asset returns (to the extent utilized in backing) and the funding and basis spread available in perpetual and futures markets.
 
 ## Peg Stability Mechanism
 
-
-
 *USDe* derives its relative peg stability from executing automated and programmatic delta-neutral hedges with respect to the underlying backing assets. 
 
 Hedging the price change risk of the backing asset in the same size minimizes fluctuations in the backing asset price as the change in value of the collateral asset is generally offset by the change in value of the hedge. 
-
-This enables the synthetic USD value of the backing to remain relatively stable in most market conditions.
 
 Ethena does not use any material leverage to margin the delta hedging derivatives positions beyond the natural state as a result of exchanges applying slight discounts to the value of backing assets to the extent used as backing and margin collateral on the initial hedge and issuance of *USDe*. 
 
@@ -43,7 +50,11 @@ Revenue from staked assets is floating by nature and denominated in the native a
 
 The funding and basis spread can be floating or fixed depending upon if the protocol uses non-deliverable or deliverable derivatives positions to hedge the backing asset delta.
 
-The funding and basis spread has historically generated a positive return given the mismatch in demand and supply for leverage in crypto as well as the existence of positive baseline funding.  If funding rates are deeply negative for a sustained period of time, such that the staked asset revenue cannot cover the funding and basis spread cost, the Ethena "reserve fund" is designed to bear the cost.
+The funding and basis spread has historically generated a positive return given the mismatch in demand and supply for leverage in crypto as well as the existence of positive baseline funding.  
+
+### Negative funding rate
+
+If funding rates are deeply negative for a sustained period of time, such that the staked asset revenue cannot cover the funding and basis spread cost, the Ethena "reserve fund" is designed to bear the cost.
 
 [Learn more about the protocol revenue.](https://docs.ethena.fi/solution-overview/protocol-revenue-explanation)
 
@@ -66,7 +77,7 @@ Every element of the Ethena design has been formulated with risk mitigation in m
 
 Please refer to the [*USDe* Risk](https://docs.ethena.fi/solution-overview/risks) section for more information.
 
-# Delta-Neutral Stability
+## Delta-Neutral Stability
 
 ### What is "delta"?
 
@@ -178,8 +189,6 @@ Currently, *BTC* funding rates closely mirror *ETH’s*, with funding being paid
 # Censorship Resistance
 
 ### How *USDe furthers* censorship resistance
-
-
 
 Assets backing USDe remain in "Off-Exchange Settlement" institutional grade solutions at all times. The only time collateral flows between custody and exchange is to settle funding or realized P&L.
 

@@ -4,7 +4,7 @@ title: Bittensor, decentralized production of artificial intelligence
 date:   2024-12-16
 lang: en
 locale: en-GB
-categories: blockchain
+categories: blockchain ai
 tags: machine-learning bittensor tao
 description: Bittensor is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. 
 image: 
@@ -13,7 +13,7 @@ isMath: false
 
 Bittensor is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. 
 
-Providers of digital commodities are rewarder in **TAO**, the native token of Bittensor
+Providers of digital commodities are rewarded in **TAO**, the native token of Bittensor
 
 > Warning: this article is still in draft state and its content is still mainly taken from the documentation with a few edits of my own. Its content should become more personal later.
 
@@ -197,7 +197,7 @@ then the subnet validator:
 - Transmitted `synapse` objects to a set of `axons` (that are attached to subnet miners).
 - Waits until `timeout` expires.
 
-See https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite
+See [docs.bittensor.com/learn/bittensor-building-blocks#dendrite](https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite)
 
 ### Synapse
 
@@ -264,7 +264,7 @@ A subnet owner is responsible for:
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-owner-responsibilities](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-owner-responsibilities)
 
-### Design with Yuma Consensus as a black box
+### Consensus
 
 Though a subnet incentive mechanism works in conjunction with the Yuma Consensus in the Bittensor network, you must design your subnet incentive mechanism **by treating Yuma Consensus as a black box**.
 
@@ -299,34 +299,44 @@ See https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#components-o
 
 ### Subnet protocol
 
-See **1** and **3** in the above diagram. A subnet protocol, which is unique to the subnet, must define how a subnet validator will query the subnet miners, and how a subnet miner should respond to the query.
+> 1) How to query a subnet minder
+>
+> 3) How should a subnet miner respond
 
-For example:
+See **1** and **3** in the above diagram. 
 
-1.  A subnet validator might send a query containing the task description to the subnet miners.
-2. The subnet miners will perform the task and then respond to the subnet validators with the results of the task the miners performed. 
+Subnet protocols, unique to each subnet, define how subnet validators query miners and how miners should respond. For instance:
 
-Note, however, that query-response is only one of the ways of subnet miner-and-subnet validator interaction. An alternative example is when the subnet validators and subnet miners use additional shared resources such as databases, and these resources can be used to evaluate miner performance.
+1. Validators may send a query containing a task description to miners.
+2. Miners then perform the task and respond with the results.
+
+Query-response is just one interaction method. Alternatively, validators and miners might use shared resources, like databases, to evaluate miner performance.
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-protocol](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-protocol) and also [Neuron to neuron communication](https://docs.bittensor.com/learn/bittensor-building-blocks#neuron-to-neuron-communication).
 
 ### Subnet task
 
-See **2** in the above diagram. The task is one of the key components of any incentive mechanism as it defines what miners will perform as work. The task should be chosen so that miners are maximally effective at the intended use case for the subnet. In other words, **the task should mimic an intended user interaction with a subnet**. Examples of tasks are responding to natural language prompts and storing encrypted files.
+> 2) What task should a subnet miner perform
 
-The task defines the scope of work that miners will undertake, and what utility the subnet can provide to users. In some cases this should be very specific (such as storage) and in other cases it can be varied (many types of natural language query).
+See **2** in the above diagram. 
+
+The task is a key component of any incentive mechanism, defining the work miners perform. Tasks should align with the subnet's intended use case, mimicking user interactions. Examples include responding to natural language prompts or storing encrypted files.
+
+Tasks establish the scope of miners' work and the utility provided by the subnet, which can range from specific (e.g., storage) to varied (e.g., handling diverse natural language queries).
 
 See [docs.bittensor.com - subnet-task](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task)
 
 ### Subnet reward model
 
-See **4** and **5** in the above diagram. Just as the task describes **what** miners should do, the reward model dictates **how** it should be done. Similarly, just as tasks should mimic user interactions, reward models should mimic user preferences or desired outcomes.
+> 4. How should a subnet validator evaluate the subnet miner response
+>
+> 5. How sould a subnet miner be rewarded for its response
 
-As with any machine learning model, a subnet has an objective function that it is continuously optimizing. The reward model defines the quality of all miner behaviour in the subnet (both intended and unintended).
+See **4** and **5** in the above diagram. 
 
-Operationally, it is the mathematical object that converts miner responses into numerical scores. A reward model can in fact contain as many different reward mechanisms as are necessary to align miners with the intended task.
+The reward model dictates **how** miners should perform tasks, mirroring user preferences or desired outcomes, while tasks describe **what** should be done. Like any machine learning model, the reward model serves as the objective function, defining the quality of miner behavior in a subnet, including both intended and unintended actions.
 
-Miners will continuously compete to achieve the highest reward possible. If the reward is capped at an upper limit, miners may not be motivated to improve further. Hence care should be taken to enable continuous improvement of the miner, rather than stagnation.
+Operationally, it converts miner responses into numerical scores and can incorporate multiple reward mechanisms to align miners with the intended tasks. Miners compete to achieve the highest rewards, so the model should encourage continuous improvement rather than stagnation by avoiding capped upper limits on rewards.
 
 See [docs.bittensor.com - subnet-reward-model](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-reward-model)
 
@@ -367,10 +377,58 @@ See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rew
 
 ### Tempo
 
-Note that subnet validators can transmit their rank weight vectors to the blockchain any time. However, for any user-created subnet, the Yuma Consensus (YC) for the subnet begins at every 360 blocks (=4320 seconds or 72 minutes, at 12 seconds per block) using the latest weight matrix available at the YC for the subnet.
+Subnet validators can update their rank weight vectors on the blockchain at any time. However, Yuma Consensus (YC) for a subnet begins every 360 blocks (72 minutes, assuming 12 seconds per block) using the latest weight matrix available at that start time.
 
-If a ranking weight vector from the subnet validator arrives after the start of a 360-block period, then this weight vector will be used in the subsequent YC start, i.e., after the current 360 blocks have elapsed.
-
-At the end of any 360-block period, called **tempo**, the YC concludes and the emissions (distribution of reward TAO) are complete. This tempo value of 360 blocks is the same for all the user-created subnets. However, the YC-starts for each user-created subnet can commence at different times.
+If a weight vector arrives after the start of a 360-block period, it will apply to the next YC period. At the end of each 360-block period, known as a **tempo**, the YC concludes, and rewards (TAO emissions) are distributed. While the tempo duration is consistent across user-created subnets, YC start times can vary between subnets.
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo)
+
+## Subnet example
+
+### Targon: Deterministic Verification of LLM
+
+[GitHub - Targon](https://github.com/manifold-inc/targon)
+
+Targon (Bittensor Subnet 4) is a deterministic verification mechanism that is used to incentivize miners to run openai compliant endpoints and serve synthetic and organic queries.
+
+Validators send queries to miners that are then scored for speed, and verified by comparing the logprobs of the responses to a validators own model.
+
+#### Role of a Miner
+
+A miner is a node that is responsible for generating a output from a query, both organic and synthetic.
+
+#### Role of a Validator
+
+A validator is a node that is responsible for verifying a miner's output. The validator will send an openai compliant request to a miner with. The miner will then send back a response with the output. The validator will then use the log prob values of the response to verify that each miners response is accurate. Validators will keep score of each miners response time and use their averages to assign scores each epoch. Specifically, miner scores are the sum of the average TPS per model.
+
+### S&P 500 Oracle
+
+[GitHub - snpOracle](https://github.com/foundryservices/snpOracle)
+
+Foundry Digital is launching the Foundry S&P 500 Oracle. This subnet incentivizes accurate short term price forecasts of the S&P 500 during market trading hours.
+
+**Miners**
+
+Miners use Neural Network model architectures to perform short term price predictions on the S&P 500. All models and input data must be open sourced on HuggingFace to receive emissions.
+
+**Validators**
+
+Validators store price forecasts for the S&P 500 and compare these predictions against the true price of the S&P 500 as the predictions mature.
+
+### Virtuals Protocol's Audio-to-Animation (A2A) Bittensor Subnet
+
+Audio-to-Animation (A2A), also referred to as audio-driven animation, generates visuals that dynamically respond to audio inputs. This technology finds applications across a wide range of domains including gaming AI agents, livestreaming AI idols, virtual companions, metaverses, and more.
+
+This Bittensor subnet offers a platform for democratizing the creation of A2A models, gathering the help of the wider ML community in Bittensor to generate the best animated motions and bring life to on-chain AI agents.
+
+1. **Subnet owner:** Virtuals Protocol as the subnet owner, creates the modules for miners and validators to train and evaluate the generated animation. Subnet Owner also decides on the parameters involved in evaluating the animation’s performance.
+2. **Miners:** Generate animations with A2A models using reference models or other models.
+3. **Validators:** Provide audio prompts to miners and evaluate the submitted animation from miners based on the parameters suggested by the subnet owner.
+4. **Bittensor protocol:** Aggregate weights using Yuma Consensus and determine the final weights and allocation ratios for each miner and validator.
+
+![https://github.com/Virtual-Protocol/tao-vpsubnet/raw/main/docs/images/a2a-mechanism.png](https://github.com/Virtual-Protocol/tao-vpsubnet/raw/main/docs/images/a2a-mechanism.png)
+
+## References
+
+- [Bittensor doc](https://docs.bittensor.com)
+- ChatGPT to summarize some paragraph

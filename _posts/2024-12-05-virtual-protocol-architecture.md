@@ -4,7 +4,7 @@ title:  Virtual Protocol, create co-ownership AI agents
 date:   2024-12-5
 lang: en
 locale: en-GB
-categories: blockchain ethereum defi
+categories: blockchain ethereum defi ai
 tags: ai virtual agent
 description: Virtuals Protocol is a co-ownership layer for AI agents in gaming and entertainment. These agents can operate across a wide range of applications and games, significantly expanding their revenue surface area. AI agents can be to be tokenized and co-owned via blockchain.
 image: /assets/article/blockchain/ai/virtual-protocol/virtual-protocol.png

@@ -4,7 +4,7 @@ title:  "Deep dive into MetaMask Secrets"
 date:   2023-07-20
 lang: en
 locale: en-GB
-categories: blockchain cryptography
+categories: blockchain blockchainBestOf cryptography
 tags: crypto wallet blockchain cryptography
 description: This article focuses on the different secrets available on Metamask, one of the most used crypto wallets.
 image: /assets/article/blockchain/wallet/metamask/MetaMask.png

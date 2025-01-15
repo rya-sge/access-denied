@@ -4,7 +4,7 @@ title:  EIP-6780, selfdestruct, we won't miss you
 date:   2024-03-13
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain blockchainBestOf ethereum
 tags: ethereum solidity opcode assembly
 description: The Ethereum Dencun upgrade introduces the EIP-6780 which updates the opcode selfdestruct to deactivates the destruction of the contract, except if the contract is destructed in the same transaction as created.
 image: /assets/article/blockchain/ethereum/solidity/solidity-selfdestruct-meme.png

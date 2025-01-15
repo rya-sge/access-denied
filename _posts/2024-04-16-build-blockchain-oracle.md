@@ -4,7 +4,7 @@ title:  How to build a blockchain oracle
 date:   2024-04-16
 lang: en
 locale: en-GB
-categories: blockchain ethereum
+categories: blockchain blockchainBestOf ethereum
 tags: chainlink oracle blockchain
 description: This article presents the reasoning to build a blockchain oracle providing external information (e.g. price of an asset) to a smart contract. 
 image: /assets/article/blockchain/oracle/chainlink-price-feed.png

@@ -4,7 +4,7 @@ title:  RareSkills Solidity Interview Answers - Advanced
 date:   2024-05-06
 lang: en
 locale: en-GB
-categories: blockchain ethereum solidity
+categories: blockchain blockchainBestOf ethereum solidity
 tags: ethereum solidity interview security gas
 description: Solidity Interview Questions - Advanced, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.png

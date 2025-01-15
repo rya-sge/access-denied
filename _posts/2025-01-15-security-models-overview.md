@@ -1,8 +1,21 @@
-# Main Security Models - Owerview
+---
+layout: post
+title: Main Security Models - Overview
+date:   2024-11-28
+lang: en
+locale: en-GB
+categories: security
+tags: security threat Bell-LaPadula Clark-Wilson Biba tryhackme
+description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
+image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png
+isMath: false
+---
 
 Here’s an explanation of the three models—**Bell-LaPadula**, **Biba**, and **Clark-Wilson**—which are foundational in computer security.
 
-This is the room https://tryhackme.com/r/room/securityprinciples
+> Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
+>
+> This article was made with ChatGPT and the room [Security Principles](https://tryhackme.com/r/room/securityprinciples) by TryHackMe
 
 There are many additional security models if you want to explore more. Examples include:
 
@@ -12,13 +25,17 @@ There are many additional security models if you want to explore more. Examples 
 - Graham-Denning model
 - Harrison-Ruzzo-Ullman model
 
+[TOC]
+
+
+
 ------
 
-### **1. Bell-LaPadula Model**
+### Bell-LaPadula Model
 
 The Bell-LaPadula (BLP) model focuses on **confidentiality** and controlling access to classified information.
 
-#### Key Principles:
+#### Key Principles
 
 1. **Simple Security Property (no read-up, "ss-property"):**
 
@@ -52,7 +69,7 @@ There are certain limitations to the Bell-LaPadula model. For example, it was no
 
 ------
 
-### **2. Biba Integrity Model**
+### Biba Integrity Model
 
 The Biba model emphasizes **data integrity**, ensuring that information is not improperly modified.
 
@@ -65,11 +82,11 @@ The Biba model emphasizes **data integrity**, ensuring that information is not i
    - A subject cannot write data to a higher integrity level.
    - This prevents low-integrity processes from corrupting high-integrity data.
 
-#### Variants:
+#### Variants
 
 Biba also includes the **low-water-mark principle** and **ring policy** for additional flexibility in enforcing integrity.
 
-#### Use Case:
+#### Use Case
 
 Common in financial or healthcare systems where data accuracy and reliability are crucial.
 
@@ -81,7 +98,7 @@ Biba Model suffers from various limitations. One example is that it does not han
 
 ------
 
-### **3. Clark-Wilson Model**
+### Clark-Wilson Model
 
 The Clark-Wilson model enforces both **data integrity** and **well-formed transactions**, focusing on realistic business environments.
 
@@ -92,22 +109,29 @@ The Clark-Wilson Model also aims to achieve integrity by using the following con
 - **Transformation Procedures (TPs)**: These procedures are programmed operations, such as read and write, and should maintain the integrity of CDIs.
 - **Integrity Verification Procedures (IVPs)**: These procedures check and ensure the validity of CDIs.
 
-#### Key Principles:
+#### Key Principles
 
 1. **Separation of Duties:**
-   - Users are limited to specific roles, ensuring no single individual has unchecked control over sensitive data.
+
+Users are limited to specific roles, ensuring no single individual has unchecked control over sensitive data.
+
 2. **Well-Formed Transactions:**
-   - Operations must follow specific steps to transition the system from one valid state to another.
-   - This ensures only authorized changes are made.
+
+- Operations must follow specific steps to transition the system from one valid state to another.
+- This ensures only authorized changes are made.
+
 3. **Access Triple (Subject, Transformation Procedure, Object):**
-   - A subject (user) can only access an object (data) through a transformation procedure (authorized application or process).
-   - This prevents direct, unrestricted access to data.
+
+- A subject (user) can only access an object (data) through a transformation procedure (authorized application or process).
+- This prevents direct, unrestricted access to data.
+
 4. **Auditability:**
-   - Every action is logged to provide traceability and accountability.
 
-#### Use Case:
+Every action is logged to provide traceability and accountability.
 
-- Often used in commercial systems (e.g., banking) to enforce proper workflows, prevent fraud, and ensure compliance with regulations.
+#### Use Case
+
+Often used in commercial systems (e.g., banking) to enforce proper workflows, prevent fraud, and ensure compliance with regulations.
 
 ------
 
@@ -120,3 +144,8 @@ The Clark-Wilson Model also aims to achieve integrity by using the following con
 | Clark-Wilson  | Integrity + Business Workflows | Well-formed transactions, separation of duties | Business/Commercial systems  |
 
 Each model addresses different security needs and is tailored to specific types of threats and environments.
+
+## References
+
+- ChatGPT with the input *Explain these different models: Bell-LaPadula Model The Biba Integrity Model The Clark-Wilson Model*
+- [TryHackMe - Security Principles](https://tryhackme.com/r/room/securityprinciples)

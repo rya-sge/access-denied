@@ -71,6 +71,8 @@ function balanceOf(address _owner) external view returns (uint256);
 - **Collectibles:** CryptoKitties, the first major NFT project, uses this standard to create unique digital cats.
 - **Gaming:** In-game items like skins, weapons, or avatars can be represented as ERC-721 NFTs.
 
+
+
 ### ERC-1155: Multi-Token Standard
 
 [EIP Reference](https://eips.ethereum.org/EIPS/eip-1155)

@@ -4,7 +4,7 @@ title:  CoW Protocol - Intent & MEV protection
 date:   2024-11-21
 lang: en
 locale: en-GB
-categories: blockchain
+categories: blockchain defi
 tags: blockchain
 description: The CoW protocol allows users to trade assets through signed messages (intents)instead of direct on-chain transaction to save gas, find optimal prices and protect orders from MEV.
 image: /assets/article/blockchain/defi/patrick-baum-hB9vo06o9z8-unsplash.jpg

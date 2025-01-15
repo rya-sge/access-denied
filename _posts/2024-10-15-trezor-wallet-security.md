@@ -4,7 +4,7 @@ title: Trezor Crypto Wallet – Cryptography and Security
 date:   2024-10-15
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain blockchainBestOf cryptography security
 tags: blockchain wallet trezor hardware
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
 image: /assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png

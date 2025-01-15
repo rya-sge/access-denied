@@ -4,7 +4,7 @@ title: Convolutional Neural Networks (CNNs) - Overview
 date:   2024-11-19
 lang: en
 locale: en-GB
-categories: programmation
+categories: ai
 tags: cnn ML AI  neural-network convolutional
 description: Transport Layer Security (TLS) 1.3 is the latest version of the TLS protocol, designed to enhance internet security, speed, and privacy.
 image: /assets/article/mlg/MLG-CNN.drawio.png

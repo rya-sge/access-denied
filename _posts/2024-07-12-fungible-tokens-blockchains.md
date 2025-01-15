@@ -4,7 +4,7 @@ title: Fungible Tokens across blockchains
 date:   2024-07-12
 lang: en
 locale: en-GB
-categories: blockchain ethereum defi
+categories: blockchain blockchainBestOf ethereum defi
 tags: erc20 fungible token
 description: Representation of fungible tokens in the various existing blockchains. On Ethereum, its largest representative is the ERC-20 standard.
 image: /assets/article/blockchain/defi/money-2180330_640.jpg

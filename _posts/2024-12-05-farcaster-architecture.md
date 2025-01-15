@@ -4,7 +4,7 @@ title:  Decentralizing Social Platform - Exploring Farcaster’s Architecture
 date:   2024-12-05
 lang: en
 locale: en-GB
-categories: blockchain ethereum 
+categories: blockchain ethereum ai
 tags: social
 description: Farcaster is a sufficiently decentralized social network built on Ethereum. It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. Users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
 image: 

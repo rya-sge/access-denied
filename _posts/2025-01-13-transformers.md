@@ -4,7 +4,7 @@ title: Transformers - Attention is All You Need
 date:   2025-01-13
 lang: en
 locale: en-GB
-categories: programmation
+categories: ai
 tags: neural-network-architecture transformer cnn rnn
 description: Introduced in 2017 in the paper Attention is All You Need, transformers address the limitations of earlier architectures by leveraging a self-attention mechanism to process sequential and structured data more effectively. 
 image: /assets/article/mlg/transformer-architecture-whitepaper.png
@@ -65,11 +65,15 @@ To this end, the transformer architecture adds "positional encodings" to the inp
 ####  Scaled Dot-Product Attention
 
 With this method, the relevance score is computed as: 
+
+
 $$
 \begin{aligned}
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
 \end{aligned}
 $$
+
+
 The input consists of queries and keys of dimension `dk` and Values of dimension `dv`. 
 
 We compute the dot products of the query with all keys, divide each by the root of `dk`, and apply a softmax function to obtain the weights on the values. 
@@ -96,11 +100,15 @@ The two most commonly used attention functions are additive attention, and dot-p
 Each position undergoes a fully connected layer for further feature extraction.
 
 In addition to attention sub-layers, each of the layers in the encoders and decoders contains a fully connected feed-forward network, which is applied to each position separately and identically. This consists of two linear transformations with a ReLU activation in between. 
+
+
 $$
 \begin{aligned}
 FFN(x) = max(0, xW_1 + b_1)W_2 + b_2
 \end{aligned}
 $$
+
+
 While the linear transformations are the same across different positions, they use different parameters from layer to layer
 
 ### Encoder-Decoder Interaction

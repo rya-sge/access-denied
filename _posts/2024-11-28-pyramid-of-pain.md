@@ -5,7 +5,7 @@ date:   2024-11-28
 lang: en
 locale: en-GB
 categories: security
-tags: security threat incident-responder cybersecurity pyramid
+tags: security threat incident-responder cybersecurity pyramid tryhackme
 description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
 image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png
 isMath: false
@@ -23,7 +23,7 @@ Understanding the Pyramid of Pain concept as a Threat Hunter, Incident Responder
 
 > Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
 >
-> This article was made with ChatGPT and the room [Pyramid of Pain](ttps://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
+> This article was made with ChatGPT and the room [Pyramid of Pain](https://tryhackme.com/r/room/pyramidofpainax) by TryHackMe
 
 
 

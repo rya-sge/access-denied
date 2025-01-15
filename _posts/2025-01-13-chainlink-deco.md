@@ -141,7 +141,7 @@ However, this creates a security problem
 
 This is possible because encryption algorithms in modern TLS are not committing, which means that a ciphertext can be decrypted in multiple ways. This may allow the prover to decrypt the ciphertext to something the server has never sent, causing a soundness violation. 
 
-The solution in DECO is to ask the prover to show a `key binding proof` to prove that the commitment [K][�] to the session key is generated correctly.
+The solution in DECO is to ask the prover to show a `key binding proof` to prove that the commitment `K` to the session key is generated correctly.
 
 The goal of a key binding proof is for the prover to convince the verifier that a session key K is uniquely bound to the session recorded by the verifier. 
 

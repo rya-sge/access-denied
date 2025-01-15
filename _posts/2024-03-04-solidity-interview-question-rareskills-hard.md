@@ -4,7 +4,7 @@ title:  RareSkills Solidity Interview Answers - Hard
 date:   2024-03-04
 lang: en
 locale: en-GB
-categories: blockchain ethereum solidity
+categories: blockchain blockchainBestOf ethereum solidity
 tags: ethereum solidity interview security gas
 description: Solidity Interview questions - Hard, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
@@ -33,9 +33,11 @@ The kink parameter is a point limit for the utilization rate. If this limit is e
 
 In the code, I suppose it is stored in the variable [borrowKink](https://github.com/compound-finance/comet/blob/22cf923b6263177555272dde8b0791703895517d/contracts/Comet.sol#L49).
 
-The corresponding term for *AAVE V3* is “optimal utilization"
+The corresponding term for *AAVE V3* is “optimal utilization".
 
-Reference: [docs.compound.finance/interest-rates/](https://docs.compound.finance/interest-rates/), [rareskills.io/post/compound-finance-interest-rate-model](https://www.rareskills.io/post/compound-finance-interest-rate-model)
+For more details on *Compound*, see my article [Compound V2 Overview](https://rya-sge.github.io/access-denied/2024/08/27/compound-protocol-v2/)
+
+Reference: [docs.compound.finance/interest-rates/](https://docs.compound.finance/interest-rates/), [RareSkills - Compound V3 Interest Per Second](https://www.rareskills.io/post/compound-finance-interest-rate-model)
 
 ### Uniswap v3
 
@@ -51,7 +53,7 @@ Reference: [docs.uniswap.org/concepts/protocol/concentrated-liquidity#ticks](htt
 
 The risk-free rate of return is the interest rate an investor can expect to earn on an investment that carries zero risk
 
-Reference: [corporatefinanceinstitute.com/resources/valuation/risk-free-rate](https://corporatefinanceinstitute.com/resources/valuation/risk-free-rate/#:~:text=The%20risk-free%20rate%20of,investment%20an%20investor%20can%20make).
+Reference: [CFI - Risk-Free Rate](https://corporatefinanceinstitute.com/resources/valuation/risk-free-rate/#:~:text=The%20risk-free%20rate%20of,investment%20an%20investor%20can%20make).
 
 ### Fixed point arithmetic
 

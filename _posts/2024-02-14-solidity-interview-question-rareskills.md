@@ -4,7 +4,7 @@ title:  RareSkills Solidity Interview Answers - Medium
 date:   2024-02-14
 lang: en
 locale: en-GB
-categories: blockchain ethereum solidity
+categories: blockhain blockchainBestOf ethereum solidity
 tags: ethereum solidity interview security gas
 description: Solidity Interview questions - Medium, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
@@ -470,9 +470,11 @@ On UniswapV2, to swap this type of token, you have to call a specific function w
 
 ### Token standard
 
-#### [ERC-777](https://eips.ethereum.org/EIPS/eip-777) 
+#### ERC-777 
 
 >  What danger do ERC-777 tokens pose?
+
+[EIP reference](https://eips.ethereum.org/EIPS/eip-777)
 
 --ERC-777 allows a sender of a transaction specified a contract to call, which can be used to perform reentrancy attack.
 
@@ -491,15 +493,19 @@ This contract is determined through a registry.
 
 Reference: [A Dive With ERC-777 And Risk Mitigations](https://medium.com/coinmonks/a-dive-with-erc-777-and-risk-mitigations-9f3ffcac0f78), [ERC777 implementation and security clarifications](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/1749), [ERC-777 callback issue](https://consensys.io/diligence/audits/2020/01/skale-token/#erc-777-callback-issue)
 
-#### [ERC-721](https://eips.ethereum.org/EIPS/eip-721)
+#### ERC-721
 
 > How does safeMint differ from mint in the OpenZeppelin ERC721 implementation? 
 
+[EIP reference](https://eips.ethereum.org/EIPS/eip-721)
+
 The safeMint function will check if the destination contract can support ERC-721 token. If not, the call will revert
 
-#### [ERC-721A](https://www.erc721a.org/)
+#### ERC-721A
 
 > What does ERC-721A do to reduce mint costs? What is the tradeoff?
+
+[Offical website](https://www.erc721a.org/)
 
 Enable minting multiple NFTs for essentially the same cost of minting a single NFT.
 
