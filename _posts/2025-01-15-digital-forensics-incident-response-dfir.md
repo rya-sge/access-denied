@@ -4,7 +4,7 @@ title: Digital Forensics and Incident Response (DFIR) - Introduction
 date:   2025-01-15
 lang: en
 locale: en-GB
-categories: security
+categories: security tryhackme
 tags: security threat incident-responder cybersecurity pyramid
 description: DFIR stands for **Digital Forensics and Incident Response**. This field covers the collection of forensic artifacts from digital devices such as computers, media devices, and smartphones to investigate an incident. 
 image: /assets/article/securite/dfir-sans-picerl.png

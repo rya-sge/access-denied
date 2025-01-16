@@ -18,6 +18,10 @@ This article is an introduction to the Solana ecosystem, the Solana Tool Suite a
 - Create your own key with Phantom
 - Operation on token with the cli
 
+If you want to explore Solana more, I have written 2 other articles: [Solana Core Concept](https://rya-sge.github.io/access-denied/2024/09/19/solana-core-concept/) & [Solana Programs - Basic Security with Anchor](https://rya-sge.github.io/access-denied/2024/08/20/solana-smart-contract-basic-security/)
+
+[TOC]
+
 
 
 ## Installation
@@ -99,7 +103,7 @@ On the screenshot below, you can see the balance is unchanged.
 
 ![solana-airdrop-dev-unchanged]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/solana-airdrop-dev-unchanged.PNG)
 
-
+-----
 
 ## Spl-token
 
@@ -143,7 +147,7 @@ There is one account by token. An error is generated if you try to create a seco
 
 
 
-
+-------
 
 ### Mint
 
@@ -186,6 +190,8 @@ Link: [explorer.solana.com - tx]( https://explorer.solana.com/tx/4cieBRVtpe4ivuA
 
 ![mint-token-solana-explorer]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/mint-token-solana-explorer.PNG)
 
+------
+
 ### Disable authorization
 
 - Renouncing the ability to mint tokens:
@@ -203,6 +209,8 @@ spl-token authorize <TOKEN_ADDRESS> mint --disable --url devnet
 
 ![spl-authorize-mint-disable-check]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-authorize-mint-disable-check.PNG)
 
+-----
+
 ### Burn token
 
 Only our own tokens can be burned
@@ -213,7 +221,7 @@ spl-token burn <ACCOUNT_ADDRESS> <number> --url devnet
 
 ![spl-token-burn]({{site.url_complet}}/assets/article/blockchain/solana/introduction-cli/spl-token-burn.PNG)
 
-
+-----
 
 ### Send token to another account
 

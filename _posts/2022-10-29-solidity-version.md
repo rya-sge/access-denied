@@ -9,7 +9,7 @@ categories: blockchain solidity
 tags: solidity ethereum smart-contract
 description: There are different way to indicate the solidity version of the compiler. This article presents the advantages and disadvantages of each
 isMath: false
-image: 
+image: /assets/article/blockchain/ethereum/solidity/solidity_logo.svg
 ---
 
 There are many ways to indicate the solidity version of the compiler.

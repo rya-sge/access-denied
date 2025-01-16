@@ -1,5 +1,50 @@
 # Staking with Everstake
 
+[everstake - ethereum](https://stake.everstake.one/ethereum/)
+
+| Label                        | Value                                                        |
+| ---------------------------- | ------------------------------------------------------------ |
+| Reward fee                   | 10%                                                          |
+| Minimum amount to stake      | 0.1 ETH                                                      |
+| Annual percentage rate (APR) | 4-10%<br />                                                  |
+| APY                          | Through Trezor: 4.05%                                        |
+| Stakers                      | ?                                                            |
+| Wallet Integration           | Trezor and Zengo wallet                                      |
+| Security                     | Solution audited by [ChainSecurity](https://chainsecurity.com/security-audit/everstake-eth-b2c-staking/) and [Ackee](https://ackeeblockchain.com/blog/everstake-ethereum-staking-protocol-audit-summary/) |
+
+Through Trezor
+
+| Minimum amount to stake | 0.1 ETH    |
+| ----------------------- | ---------- |
+| APY                     | 4.05%br /> |
+| Time to unstake         | 9 days     |
+|                         |            |
+
+Reware are automatcally restaked
+
+
+
+
+
+Minimum amount to stake: 
+
+Integration: partnered with 
+
+See 
+
+- [How to stake ETH via Trezor Suite](https://everstake.one/blog/how-to-stake-eth-via-trezor-suite)
+- [How to stake ETH via Zengo Wallet](https://everstake.one/blog/how-to-stake-eth-via-zengo-wallet)
+
+Security
+
+https://x.com/everstake_pool/status/1783101315305894335
+
+https://stake.everstake.one/ethereum/
+
+Solution audited
+
+### 
+
 ## How it works
 
 - Everstake 0.1+ ETH staking solution is a protocol enabling one to stake amounts under 32 ETH.

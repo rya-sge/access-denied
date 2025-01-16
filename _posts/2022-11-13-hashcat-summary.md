@@ -4,7 +4,7 @@ title: Recover your passwords with Hashcat
 date:  2022-11-13
 locale: en-GB
 lang: en
-categories: security
+categories: security tryhackme
 tags: hashcat hash
 description: Hashcat is a security tool allowing to recover passwords form a hash on a large number of hash functions (md5, sha1, sha256)
 image: /assets/article/outil-securite/hashcat/tryHackMe-hashid-2.PNG
@@ -29,13 +29,13 @@ Other possible options
 
 --increment-min and--increment-max allow to set an interval for the length of the password
 
-The different *hash modes* are available here: [https://hashcat.net/wiki/doku.php?id=hashcat](https://hashcat.net/wiki/doku.php?id=hashcat)
+The different *hash modes* are available here: [hashcat.net/wiki/doku.php?id=hashcat](https://hashcat.net/wiki/doku.php?id=hashcat)
 
 ### Format
 
 It is possible to use hashcat on PCAPNG, PCAP or CAP files by converting them to the correct format with [cap2hashcat](https://hashcat.net/cap2hashcat/)
 
-CTF challenges on this principle: [https://ctftime.org/writeup/29552](https://ctftime.org/writeup/29552)
+CTF challenges on this principle: [ctftime.org/writeup/29552](https://ctftime.org/writeup/29552)
 
 
 
@@ -110,8 +110,8 @@ Some rules : `/usr/share/hashcat/rules/leetspeak.rule`
 
 References
 
-- [https://hashcat.net/wiki/doku.php?id=rule_based_attack](https://hashcat.net/wiki/doku.php?id=rule_based_attack)
-- [https://ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf](https://ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf)
+- [hashcat.net/wiki/doku.php?id=rule_based_attack](https://hashcat.net/wiki/doku.php?id=rule_based_attack)
+- [ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf](https://ensiwiki.ensimag.fr/images/c/c6/Hashcatvsjtr.pdf)
 
 #### Example
 
@@ -123,7 +123,7 @@ The challenge data indicated "He likes animals, he likes to speak like he's a ha
 hashcat --stdout animals.txt -r /usr/share/hashcat/rules/leetspeak.rule  > animal_leet.txt
 ```
 
-Reference: [https://ctftime.org/writeup/24404](https://ctftime.org/writeup/24404)
+Reference: [ctftime.org/writeup/24404](https://ctftime.org/writeup/24404)
 
 ## Challenge 
 
@@ -174,7 +174,7 @@ hashcat -m 0 33f966f258879f252d582d45cef37e5e /usr/share/wordlists/rockyou.txt
 
 Result: `33f966f258879f252d582d45cef37e5e:bad4ever`
 
-Reference: [https://ctftime.org/task/11011](https://ctftime.org/task/11011)
+Reference: [ctftime.org/task/11011](https://ctftime.org/task/11011)
 
 #### Salty 357
 
@@ -196,7 +196,7 @@ hashcat -m 20  5eaff45e09bec5222a9cfa9502a4740d:1337 /usr/share/wordlists/rockyo
 
 Result with hashcat : 5eaff45e09bec5222a9cfa9502a4740d:1337:treetop   
 
-Reference: [https://ctftime.org/task/11049](https://ctftime.org/task/11049)
+Reference: [ctftime.org/task/11049](https://ctftime.org/task/11049)
 
 
 
@@ -213,7 +213,7 @@ Result in hashcat :
 `$6$HRMJoyGA$26FIgg6CU0bGUOfqFB0Qo9AE2LRZxG8N3H.3BK8t49wGlYbkFbxVFtGOZqVIq3qQ6k0oetDbn2aVzdhuVQ6US.:hellokitty`
                                                  
 
-Reference: [https://ctftime.org/task/6820](https://ctftime.org/task/6820)
+Reference: [ctftime.org/task/6820](https://ctftime.org/task/6820)
 
 ### TryHackeMe
 
@@ -269,7 +269,7 @@ Softwares : [John the Ripper](https://www.openwall.com/john/), [RainbowCrack](ht
 
 RainbowCrack provides the ability to find/recover passwords using rainbow tables. It is implemented by Philippe Oechslin
 
-Online: [https://crackstation.net](https://crackstation.net)
+Online: [crackstation.net](https://crackstation.net)
 
 This site contains a massive table of pre-computed hashes. These were made from the Wikipedia database as well as dictionaries. However, the hash must not have been salted to be able to be found.
 
@@ -277,5 +277,6 @@ Online: [https://md5decrypt.net](https://md5decrypt.net), [https://hashkiller.io
 
 ## Reference
 
-- [https://hashcat.net/hashcat/](https://hashcat.net/hashcat/)
+- [hashcat.net/hashcat/](https://hashcat.net/hashcat/)
+- [TryHackMe - Hashing - Crypto 101](https://tryhackme.com/room/hashingcrypto101)
 

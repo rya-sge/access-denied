@@ -21,7 +21,11 @@ This article explores ERC-721, its compatible extensions, and other NFT standard
 
 ### ERC-721: The Foundation of NFTs
 
-[EIP Reference](https://eips.ethereum.org/EIPS/eip-721)
+> [EIP Reference](https://eips.ethereum.org/EIPS/eip-721)
+>
+> Status: final
+>
+> OpenZeppelin implementation: yes
 
 The **ERC-721** standard was the first to introduce a blueprint for non-fungible tokens on Ethereum. Published in January 2018, ERC-721 defines NFTs as unique, indivisible assets that can be transferred and tracked on the Ethereum blockchain. Each token under this standard has a distinct ID, making it different from any other token.
 
@@ -71,11 +75,102 @@ function balanceOf(address _owner) external view returns (uint256);
 - **Collectibles:** CryptoKitties, the first major NFT project, uses this standard to create unique digital cats.
 - **Gaming:** In-game items like skins, weapons, or avatars can be represented as ERC-721 NFTs.
 
+#### Extension
+
+These extensions add several functionalities to the standard ERC-721
+
+##### ERC-4906: EIP-721 Metadata Update Extension
+
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+>
+> Status: final
+>
+> OpenZeppelin implementation: yes
+
+This standard is an extension of [EIP-721](https://eips.ethereum.org/EIPS/eip-721). It adds a `MetadataUpdate` event to EIP-721 tokens.
+
+```solidity
+/// @title EIP-721 Metadata Update Extension
+interface IERC4906 is IERC165, IERC721 {
+    /// @dev This event emits when the metadata of a token is changed.
+    /// So that the third-party platforms such as NFT market could
+    /// timely update the images and related attributes of the NFT.
+    event MetadataUpdate(uint256 _tokenId);
+
+    /// @dev This event emits when the metadata of a range of tokens is changed.
+    /// So that the third-party platforms such as NFT market could
+    /// timely update the images and related attributes of the NFTs.    
+    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+}
+```
+
+##### ERC-6093: Custom errors for commonly-used tokens
+
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+>
+> Status: last call
+>
+> OpenZeppelin implementation: yes
+
+This EIP defines a standard set of custom errors for commonly-used tokens, which are defined as [ERC-20](https://eips.ethereum.org/EIPS/eip-20), [ERC-721](https://eips.ethereum.org/EIPS/eip-721), and [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens.
+
+See also [OpenZeppelin - interfaces/draft-IERC6093.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.1.0/contracts/interfaces/draft-IERC6093.sol)
+
+```solidity
+/**
+* @dev Indicates that an address can't be an owner. For example, `address(0)` is a forbidden owner in ERC-20.
+* Used in balance queries.
+*/
+error ERC721InvalidOwner(address owner);
+
+/**
+* @dev Indicates a `tokenId` whose `owner` is the zero address.
+*/
+error ERC721NonexistentToken(uint256 tokenId);
+
+/**
+* @dev Indicates an error related to the ownership over a particular token. Used in transfers.
+*/
+error ERC721IncorrectOwner(address sender, uint256 tokenId, address owner);
+
+/**
+* @dev Indicates a failure with the token `sender`. Used in transfers.
+*/
+error ERC721InvalidSender(address sender);
+
+/**
+* @dev Indicates a failure with the token `receiver`. Used in transfers.
+*/
+error ERC721InvalidReceiver(address receiver);
+
+/**
+* @dev Indicates a failure with the `operator`’s approval. Used in transfers.
+*/
+error ERC721InsufficientApproval(address operator, uint256 tokenId);
+
+/**
+* @dev Indicates a failure with the `approver` of a token to be approved. Used in approvals.
+*/
+error ERC721InvalidApprover(address approver);
+
+/**
+* @dev Indicates a failure with the `operator` to be approved. Used in approvals.
+*/
+error ERC721InvalidOperator(address operator);
+
+```
+
 
 
 ### ERC-1155: Multi-Token Standard
 
-[EIP Reference](https://eips.ethereum.org/EIPS/eip-1155)
+> [EIP Reference](https://eips.ethereum.org/EIPS/eip-1155)
+>
+> Status: final
+>
+> OpenZeppelin implementation: yes
+
+
 
 ERC-1155, also known as the "multi-token standard," was introduced by Enjin. It enables the creation of **fungible, semi-fungible, and non-fungible tokens** within a single contract. This significantly reduces gas fees and enhances efficiency.
 
@@ -114,7 +209,11 @@ function isApprovedForAll(address _owner, address _operator) external view retur
 
 ### ERC-2981: Royalty Standard
 
-[EIP Reference](https://eips.ethereum.org/EIPS/eip-2981)
+> [EIP Reference](https://eips.ethereum.org/EIPS/eip-2981)
+>
+> Status: final
+>
+> OpenZeppelin implementation: yes
 
 ERC-2981 standardizes royalty payments for NFTs, allowing creators to automatically receive a percentage of sales whenever their NFT is resold on a secondary marketplace.
 
@@ -149,7 +248,11 @@ function royaltyInfo(
 
 ### ERC-4907: Rentable NFTs (ERC-721 ext)
 
-[EIP Reference](https://eips.ethereum.org/EIPS/eip-4907)
+> [EIP Reference](https://eips.ethereum.org/EIPS/eip-4907)
+>
+> Status: final
+>
+> OpenZeppelin implementation: no
 
 ERC-4907 introduces the concept of "rentable NFTs." This standard allows NFTs to be rented for a specified time period without transferring full ownership.
 
@@ -187,7 +290,11 @@ While ERC-721 paved the way, other standards have emerged to address additional 
 
 ### ERC-998: Composable NFTs
 
-[EIP reference](https://eips.ethereum.org/EIPS/eip-998)
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-998)
+>
+> Status: draft
+>
+> OpenZeppelin implementation: no
 
 ERC-998 allows NFTs to own other ERC-721 or ERC-20 tokens. This "composability" enables hierarchical ownership structures.
 
@@ -296,6 +403,12 @@ function getChild(
 
 ### ERC-721A: Gas-Optimized ERC-721 (ERC-721 ext)
 
+> [ERC-721a](https://www.erc721a.org)
+>
+> Status: draft
+>
+> OpenZeppelin implementation: no
+
 ERC-721A is an extension of the ERC-721 standard designed for gas efficiency when minting multiple NFTs in a single transaction. It was introduced by the Azuki NFT team to solve the cost challenge for large NFT drops.
 
 The code is available on the [Chiru Labs GitHub](https://github.com/chiru-labs/ERC721A)**Key Features:**
@@ -311,7 +424,11 @@ See also [ERC-721a](https://www.erc721a.org)
 
 ### ERC-6551: Non-fungible Token Bound Accounts
 
-[EIP reference](https://eips.ethereum.org/EIPS/eip-6551)
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-6551)
+>
+> Status: Review
+>
+> OpenZeppelin implementation: no
 
 NFTs represented as [ERC-721](https://eips.ethereum.org/EIPS/eip-721) cannot act as agents or associate with other on-chain assets. This limitation makes it difficult to represent many real-world non-fungible assets as NFTs. For example:
 
@@ -412,15 +529,15 @@ function execute(address to, uint256 value, bytes calldata data, uint8 operation
 
 ## Summary Table: Ethereum NFT Standards
 
-| **Standard**                                            | **Description**                         | **Primary Use Cases**                         | **Key Feature**                       | Protocol Use                                                 |
-| ------------------------------------------------------- | --------------------------------------- | --------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| [**ERC-721**](https://eips.ethereum.org/EIPS/eip-721)   | The original NFT standard.              | Digital art, gaming, collectibles.            | Uniqueness and ownership tracking.    | [OpenSea](https://docs.opensea.io/docs/metadata-standards), [LooksRare](https://docs.looksrare.org/about/welcome-to-looksrare), Rarible |
-| [**ERC-721A**](https://www.erc721a.org)                 | Gas-optimized ERC-721 extension.        | High-volume NFT minting (PFP collections).    | Efficient batch minting.              | [Azuki](https://www.azuki.com/en/erc721a)                    |
-| [**ERC-1155**](https://eips.ethereum.org/EIPS/eip-1155) | Multi-token standard (fungible + NFTs). | Gaming assets, batch transfers.               | Batch operations and lower gas costs. | [OpenSea](https://docs.opensea.io/docs/metadata-standards)   |
-| [**ERC-998**](https://eips.ethereum.org/EIPS/eip-998)   | Composable NFTs with nested ownership.  | Asset bundling, complex ownership structures. | NFTs owning other tokens.             | [ZKPass](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9) |
-| [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907) | Rentable NFTs with usage rights.        | Renting digital real estate, gaming assets.   | Temporary usage with expiration.      | [Double Protocol](https://double.one)                        |
-| [**ERC-2981**](https://eips.ethereum.org/EIPS/eip-2981) | Standardized royalty payments for NFTs. | Secondary sales royalties for creators.       | Automatic royalty payouts.            | [LooksRare](https://docs.looksrare.org/developers/protocol/looksrare-v2-protocol-overview) |
-| [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551)     | Token-bound accounts for NFTs.          | Gaming assets, metaverse, identity solutions. | NFTs acting as wallets.               | [Virtual Protocol](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance/immutable-contribution-vault) |
+| **Standard**                                            | Status | **Description**                         | **Primary Use Cases**                         | **Key Feature**                       | Protocol Use                                                 |
+| ------------------------------------------------------- | ------ | --------------------------------------- | --------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
+| [**ERC-721**](https://eips.ethereum.org/EIPS/eip-721)   | Final  | The original NFT standard.              | Digital art, gaming, collectibles.            | Uniqueness and ownership tracking.    | [OpenSea](https://docs.opensea.io/docs/metadata-standards), [LooksRare](https://docs.looksrare.org/about/welcome-to-looksrare), Rarible |
+| [**ERC-721A**](https://www.erc721a.org)                 | -      | Gas-optimized ERC-721 extension.        | High-volume NFT minting (PFP collections).    | Efficient batch minting.              | [Azuki](https://www.azuki.com/en/erc721a)                    |
+| [**ERC-1155**](https://eips.ethereum.org/EIPS/eip-1155) | Final  | Multi-token standard (fungible + NFTs). | Gaming assets, batch transfers.               | Batch operations and lower gas costs. | [OpenSea](https://docs.opensea.io/docs/metadata-standards)   |
+| [**ERC-998**](https://eips.ethereum.org/EIPS/eip-998)   | Draft  | Composable NFTs with nested ownership.  | Asset bundling, complex ownership structures. | NFTs owning other tokens.             | [ZKPass](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9) |
+| [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907) | Final  | Rentable NFTs with usage rights.        | Renting digital real estate, gaming assets.   | Temporary usage with expiration.      | [Double Protocol](https://double.one)                        |
+| [**ERC-2981**](https://eips.ethereum.org/EIPS/eip-2981) | Final  | Standardized royalty payments for NFTs. | Secondary sales royalties for creators.       | Automatic royalty payouts.            | [LooksRare](https://docs.looksrare.org/developers/protocol/looksrare-v2-protocol-overview) |
+| [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551)     | Review | Token-bound accounts for NFTs.          | Gaming assets, metaverse, identity solutions. | NFTs acting as wallets.               | [Virtual Protocol](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance/immutable-contribution-vault) |
 
 ## Final Thoughts
 

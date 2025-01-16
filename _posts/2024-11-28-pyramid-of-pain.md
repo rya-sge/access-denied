@@ -4,7 +4,7 @@ title: The Pyramid of Pain in Cybersecurity
 date:   2024-11-28
 lang: en
 locale: en-GB
-categories: security
+categories: security tryhackme
 tags: security threat incident-responder cybersecurity pyramid tryhackme
 description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
 image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png

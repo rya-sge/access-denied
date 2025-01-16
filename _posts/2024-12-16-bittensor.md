@@ -27,15 +27,26 @@ Providers of digital commodities are rewarded in **TAO**, the native token of Bi
 
 The Bittensor ecosystem consists of the following three components (refer to the above diagram):
 
-1. **An incentive-based competition mechanism**: You can either create your custom incentive mechanism for your own competition or join a competition that already exists in the Bittensor ecosystem. Each such incentive-based competition market is called a **subnet**. Subnets constitute the core of the Bittensor ecosystem.
+### An incentive-based competition mechanism (subnet)
+
+A **subnet** is an incentive-driven competition market and the core building block of the Bittensor ecosystem. Subnets enable the creation and management of tasks and rewards within the network.
+
+- **Subnet miners** are entities tasked with performing specific jobs within a subnet.
+- **Subnet validators** are responsible for creating tasks, evaluating the performance of miners, and distributing rewards based on the quality of their work.
+
+Participants can either design custom incentive mechanisms for their subnets or join existing ones in the ecosystem.
 
 Example:
 
 For example, the [text prompting subnet](https://github.com/opentensor/prompting), developed by the Open Tensor foundation, incentivizes subnet miners that produce the best prompt completions in response to the prompts sent by the subnet validators in that subnet.
 
-2. A **blockchain** that runs the above subnets and supports their proper functioning so that the incentive-based competition market is decentralized, is permissionless and is collusion-resistant, i.e., is resistant to market manipulation.
+### A blockchain
 
-3. The **Bittensor API** that connects all the essential elements within the above two components, and also connects the subnets and the blockchain.
+A **blockchain** that runs the above subnets and supports their proper functioning so that the incentive-based competition market is decentralized, is permissionless and is collusion-resistant, i.e., is resistant to market manipulation.
+
+### Bittensor API
+
+The **Bittensor API** that connects all the essential elements within the above two components, and also connects the subnets and the blockchain.
 
 ![https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg](https://docs.bittensor.com/img/docs/bittensor-block-diagram.svg)
 
@@ -361,9 +372,7 @@ Distribution of rewards among the subnet miners and subnet validators works like
 
 The item numbers below correspond to the circled numbers in the above diagram.
 
-1. Each subnet validator maintains a vector of weights. Each element of the vector represents the weight assigned to a subnet miner. This weight represents how well the subnet miner is performing **according to this subnet validator**.
-
-   Each subnet validator ranks all the subnet miners by means of this weight vector. Each subnet validator within the subnet, acting independently, transmits its miner ranking weight vector to the blockchain. These ranking weight vectors can arrive at the blockchain at different times. Typically each subnet validator transmits an updated ranking weight vector to the blockchain every 100-200 blocks.
+1. Each subnet validator maintains a weight vector where each element reflects a miner's performance as evaluated by that validator. Validators rank miners using this vector and independently transmit their updated rankings to the blockchain, usually every 100-200 blocks. These updates may arrive at different times.
 
 2. The blockchain (subtensor) waits until the latest ranking weight vectors from all the subnet validators of the given subnet arrive at the blockchain. A ranking weight matrix formed from these ranking weight vectors is then provided as input to the Yuma Consensus module on-chain.
 
@@ -382,6 +391,8 @@ Subnet validators can update their rank weight vectors on the blockchain at any 
 If a weight vector arrives after the start of a 360-block period, it will apply to the next YC period. At the end of each 360-block period, known as a **tempo**, the YC concludes, and rewards (TAO emissions) are distributed. While the tempo duration is consistent across user-created subnets, YC start times can vary between subnets.
 
 See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#tempo)
+
+-----
 
 ## Subnet example
 

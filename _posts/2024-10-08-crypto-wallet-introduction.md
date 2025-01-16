@@ -32,6 +32,8 @@ From a cryptography perspective, these blockchains use most often public key cry
 
 ![account]({{site.url_complet}}/assets/article/blockchain/wallet/wallet-introduction/crypto-wallet-origin.drawio.png)
 
+----
+
 ## Internet exposure of Crypto Wallets
 
 Crypto wallets come in various forms, each catering to different user needs based on convenience, security, and usage scenarios. 
@@ -129,7 +131,7 @@ Example: [Ledger](https://www.ledger.com/), [Trezor](https://trezor.io/), and [K
 
 ##### Hardware wallet
 
-Hardware wallets are physical devices that store private keys offline. These are considered one of the safest methods to store crypto. Examples include devices from brands like Ledger or Trezor.
+Hardware wallets are physical devices that store private keys offline. These are considered one of the safest methods to store crypto. Examples include devices from brands like Ledger or Trezor. If you are interested about Trezor, you can read my article [Trezor Crypto Wallet – Cryptography and Security](https://rya-sge.github.io/access-denied/2024/10/15/trezor-wallet-security/)
 
 It looks like a USB with an OLED screen and side buttons to perform actions with the private keys
 
@@ -191,6 +193,8 @@ Reference: [coinbase.com - What is an air-gapped wallet?](https://www.coinbase.c
   - New firmware update can also introduce new vulnerability through a new features or a supply chain attack (malicious firmware update)
 - **Counterfeit Devices**: Purchasing hardware wallets from unofficial or third-party sources may expose you to the risk of counterfeit devices designed to steal your private keys.
 
+-----
+
 ## How to Use a Crypto Wallet
 
 Here the common to step to use a crypto wallet:
@@ -199,6 +203,8 @@ Here the common to step to use a crypto wallet:
 2. **Receiving crypto**: Share your public key (wallet address) with the sender. Once the transaction is initiated, the cryptocurrency will appear in your wallet after the network verifies it.
 3. **Sending crypto**: Enter the recipient’s public key, specify the amount, and confirm the transaction. The process takes a few minutes to hours, depending on the network's congestion and the blockchain you are using.
 4. **Monitoring your balance**: Use your wallet interface to check your balance and track incoming and outgoing transactions. You can also interact with decentralized applications (dApps) or stake your assets (depending on the blockchain) using your wallet if it is supported.
+
+-----
 
 ## Main Risks and Security Concerns
 
@@ -221,6 +227,8 @@ Malware can infect your device and steal your private keys or reroute transactio
 ### 4. Human Error
 
 Sending crypto to the wrong address or making mistakes in transactions is irreversible. Unlike traditional banking systems, there’s no centralized authority to reverse errors. Double-check all details before initiating transfers.
+
+-----
 
 ## Best Practices for Wallet Security
 

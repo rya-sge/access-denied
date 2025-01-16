@@ -4,10 +4,10 @@ title: Main Security Models - Overview
 date:   2024-11-28
 lang: en
 locale: en-GB
-categories: security
+categories: security tryhackme
 tags: security threat Bell-LaPadula Clark-Wilson Biba tryhackme
 description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
-image: /assets/article/securite/pyramid-pain/pyramid-of-pain.png
+image: /assets/article/securite/security-model/security-models-bell-lapadula-model.drawio.png
 isMath: false
 ---
 
@@ -31,9 +31,11 @@ There are many additional security models if you want to explore more. Examples 
 
 ------
 
-### Bell-LaPadula Model
+### Bell-LaPadula Model (Confidentiality)
 
 The Bell-LaPadula (BLP) model focuses on **confidentiality** and controlling access to classified information.
+
+![security-models-bell-lapadula-model.drawio]({{site.url_complet}}/assets/article/securite/security-model/security-models-bell-lapadula-model.drawio.png)
 
 #### Key Principles
 
@@ -42,7 +44,7 @@ The Bell-LaPadula (BLP) model focuses on **confidentiality** and controlling acc
    - A subject (user or process) at a lower security level cannot read data at a higher security level.
    - This prevents unauthorized access to confidential data above the authorized level.
 
-2. ***-Property (no write-down):**
+2. ***-Security Property (no write-down):**
 
    - A subject at a higher security level cannot write data to a lower security level.
    - This ensures sensitive data is not leaked to less secure levels.
@@ -67,20 +69,33 @@ The first two properties can be summarized as “write up, read down.” You can
 
 There are certain limitations to the Bell-LaPadula model. For example, it was not designed to handle file-sharing.
 
+References:
+
+[YouTube - Mike Chapple - CertMike Explains The Bell LaPadula Model](https://www.youtube.com/watch?v=G1FWTfJsK6k)
+
 ------
 
 ### Biba Integrity Model
 
 The Biba model emphasizes **data integrity**, ensuring that information is not improperly modified.
 
+![security-models-biba-integrity-model.drawio]({{site.url_complet}}/assets/article/securite/security-model/security-models-biba-integrity-model.drawio.png)
+
 #### Key Principles:
 
-1. **Simple Integrity Property (no read-down):**
-   - A subject cannot read data at a lower integrity level.
-   - This prevents contamination of high-integrity processes with low-integrity data.
-2. **Integrity \*-Property (no write-up):**
-   - A subject cannot write data to a higher integrity level.
-   - This prevents low-integrity processes from corrupting high-integrity data.
+**Simple Integrity Property (no read-down):**
+
+This principle prohibits people from reading information below their clearance level.
+
+- A subject cannot read data at a lower integrity level.
+
+- This prevents contamination of high-integrity processes with low-integrity data.
+- But why ? This information may be incorrect since it came from a lower level
+
+**Integrity \*-Property (no write-up):**
+
+- A subject cannot write data to a higher integrity level.
+- This prevents low-integrity processes from corrupting high-integrity data.
 
 #### Variants
 
@@ -88,13 +103,17 @@ Biba also includes the **low-water-mark principle** and **ring policy** for addi
 
 #### Use Case
 
-Common in financial or healthcare systems where data accuracy and reliability are crucial.
+Common in military, financial or healthcare systems where data accuracy and reliability are crucial.
 
 #### Conclusion and limitation
 
 These two properties can be summarized as “read up, write down.” This rule is in contrast with the Bell-LaPadula Model, and this should not be surprising as one is concerned with confidentiality while the other is with integrity.
 
 Biba Model suffers from various limitations. One example is that it does not handle internal threats (insider threat).
+
+#### References
+
+[YouTube - Mike Chapple - CertMike Explains the Biba Integrity Model](https://www.youtube.com/watch?v=nfmwSGtyzV0)
 
 ------
 

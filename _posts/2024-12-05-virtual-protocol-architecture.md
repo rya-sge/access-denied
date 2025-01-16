@@ -29,12 +29,13 @@ to benefit from their co-contributions and the productive enablement of AI agent
 
 Hence, they have implemented the following:
 
-1. **Modular Consensus Framework**:
-   - This framework forms the foundational architecture of the Virtual Protocol. It provides a comprehensive suite of tools and libraries essential for contributors in the Virtuals ecosystem.
-   - The framework's primary objective is to facilitate the construction, maintenance, governance, hosting, and utilization of VIRTUAL agents managed by the protocol.
-   - Its modular nature allows for transparency and composability, enabling stakeholders to tailor their interactions with the VIRTUAL agents according to their specific needs and objectives.
-2. **Immutable Contribution Vault** (ICV):
-   - The protocol possesses all validated contributions, represented in the form of **Non-Fungible Tokens (NFTs)**, securely stored within the Immutable Contribution Vault (ICV). This collection of contribution NFTs is a testament to the collaborative efforts and intellectual contributions within the ecosystem.
+**Modular Consensus Framework**:
+
+The Virtual Protocol framework provides tools and libraries for building, managing, governing, hosting, and using VIRTUAL agents. Its modular design ensures transparency, flexibility, and customization for stakeholders to meet their specific needs.
+
+**Immutable Contribution Vault** (ICV):
+
+The protocol possesses all validated contributions, represented in the form of **Non-Fungible Tokens (NFTs)**, securely stored within the Immutable Contribution Vault (ICV). This collection of contribution NFTs is a testament to the collaborative efforts and intellectual contributions within the ecosystem.
 
 This diagram explains how Modular Consensus Framework works with Protocol and the components within each stack. 
 
@@ -104,7 +105,7 @@ Users can upload custom models and datasets, securely stored in the Immutable Co
 
 ## Decentralized contribution
 
-Decentralized contribution is a fundamental aspect of the ecosystem, allowing external contributors to help drive exponential growth by enhancing the capabilities of AI agents. Contributors can improve various aspects of an agent’s functionality, and successful contributions are minted as NFTs and transferred to the contributor. This serves as proof of contribution and facilitates reward distribution. 
+Decentralized contribution allows external contributors to help drive exponential growth by enhancing the capabilities of AI agents. Contributors can improve various aspects of an agent’s functionality, and successful contributions are minted as NFTs and transferred to the contributor. This serves as proof of contribution and facilitates reward distribution. 
 
 ### Overview
 
@@ -141,15 +142,15 @@ See also [whitepaper.virtuals.io - agent-contribution#contributing-to-core-capab
 
 ### Cognitive Core
 
-The Cognitive Core is the central component of a VIRTUAL agent, leveraging a Large Language Model (LLM) for task execution and embodying the VIRTUAL agent's unique personality & central intelligence.  
-
-The Cognitive Core acts as the "brain" of the AI agent, defining its central intelligence and personality. Contributions to this core can involve fine-tuning large language models (LLMs) or providing domain-specific datasets.
+The Cognitive Core is the central component  of a VIRTUAL agent, acts as its "brain" and powered by a Large Language Model (LLM). It defines the agent's intelligence, personality, and task-execution abilities. Contributions to this core can involve fine-tuning large language models (LLMs) or providing domain-specific datasets.
 
 #### Large Language Models (LLMs) 
 
 The current LLM leverages on open sourced models. Each Virtual agent personality and central intelligence are being incorporated using the approach below:
 
-- **Personality Development** The backstory, lore, personality traits, and characteristics of each Virtual agent are developed using the **Retrieval-Augmented Generation (RAG)** method. This approach combines the generative capabilities of a language model with a retrieval mechanism, allowing the AI to pull in relevant information from a knowledge base to enrich its responses. This technique is particularly effective for creating a Virtual agent's unique and engaging personality, as it can draw upon a wide range of data to make the character's interactions more diverse and lifelike.
+- **Personality Development**
+
+  The backstory, personality, and traits of a Virtual agent are crafted using the **Retrieval-Augmented Generation (RAG)** method. This combines a language model's generative power with a retrieval system to pull relevant knowledge, enabling diverse, lifelike, and engaging interactions.
 
 - **Central Intelligence**
 
@@ -163,11 +164,7 @@ If the dataset is smaller, the information is stored in a vector database. This 
 
 #### Data Pre-processing
 
-Relevant datasets come in various formats: text (from textbooks, forums, wikis), videos, and audio. 
-
-Currently, the central character core predominantly relies on text-based Large Language Models (LLMs) and, as such, primarily incorporates text-based training data. 
-
-Consequently, if training data exist in non-textual formats like videos or audio, they need to be transcribed into text for model training. Standard data processing rules will be applied prior to model training.
+Relevant datasets include text, videos, and audio, but text-based Large Language Models (LLMs) primarily rely on text data. Non-text formats, like videos or audio, must be transcribed into text and processed before training. Standard data processing rules will be applied prior to model training.
 
 - **Data Cleaning**: In this step, datasets are cleaned to remove any noise and nullities. Data rules are applied to maintain data integrity and improve data quality.
 - **Data Transformation**: Datasets undergo transformation and standardization to become interpretable and usable for model training.
@@ -210,9 +207,11 @@ The VITS model allows for this level of customization and quality in voice synth
 
 Before model is trained, data processing is performed. 
 
-1. **Format Consistency**: Having all audio files in the same format (WAV) and specifications (22050 Hz, mono) ensures consistency, which is essential for machine learning models to perform optimally. Inconsistent audio formats can lead to variability in the input data, which can confuse the model and degrade performance.
-2. **Sampling Rate Normalization (22050 Hz)**: The sampling rate determines how many samples per second are in the audio file. A standard sampling rate like 22050 Hz is often used because it's sufficient to capture the frequency range of human speech while keeping the file size manageable. It also aligns with the Nyquist theorem for capturing all frequencies up to 11025 Hz, which covers most of the human hearing range.
-3. **Mono Channel**: Converting stereo or multi-channel audio files to mono ensures that the model trains on a single channel, which simplifies the learning process. 
+For optimal machine learning performance, audio data must follow these standards:
+
+- **format consistency** (all files as WAV, 22050 Hz, mono) prevents variability that can confuse models  and degrade performance; 
+- **sampling rate normalization** (22050 Hz): the sampling rate determines how many samples per second are in the audio file. A standard sampling rate like 22050 Hz is often used because it's sufficient to capture the frequency range of human speech while keeping the file size manageable. It also aligns with the Nyquist theorem for capturing all frequencies up to 11025 Hz, which covers most of the human hearing range.
+- **mono channel**: Converting stereo or multi-channel audio files to mono ensures that the model trains on a single channel, which simplifies the learning process. 
 
 ### Visual Core
 
@@ -281,11 +280,15 @@ Within each Virtual agent, approved contributions are stored in the form of serv
 
 Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551), but what is this standard ?
 
+#### ERC-721 limitation
+
 NFTs represented as  [ERC-721](https://eips.ethereum.org/EIPS/eip-721) cannot act as agents or associate with other on-chain assets. This limitation makes it difficult to represent many real-world non-fungible assets as NFTs. For example:
 
 - A character in a role-playing game that accumulates assets and abilities over time based on actions they have taken
 - An automobile composed of many fungible and non-fungible components
 - An investment portfolio composed of multiple fungible assets
+
+#### ERC-6551 solution
 
 This standard aims to give every NFT the same rights as an Ethereum user. This includes the ability to self-custody assets, execute arbitrary operations, control multiple independent accounts, and use accounts across multiple chains. By doing so, this proposal allows complex real-world assets to be represented as NFTs using a common pattern that mirrors Etherem’s existing ownership model.
 
@@ -301,3 +304,4 @@ Reference: [eips.ethereum.org/EIPS/eip-6551](https://eips.ethereum.org/EIPS/eip-
 - [Shoal - Virtuals Protocol: Launching AI Agents with the Pump.fun Model](https://www.shoal.gg/p/virtuals-protocol-launching-ai-agents)
 - [0xCygaar Tweet](https://x.com/0xCygaar/status/1864182285278355881?t=LBINpmIuUA8rpnzxS2nNmw&s=35)
 - [Eli5Defi Tweet](https://x.com/eli5_defi/status/1765330652470338018)
+- ChatGPT to summarize some paragraph

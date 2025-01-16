@@ -92,7 +92,7 @@ $$
 $$
 . This allows for variable exposure to different assets in the pool and enables swaps between any of the pool’s assets.
 
-See also[Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.link/education-hub/what-is-an-automated-market-maker-amm)
+See also [Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.link/education-hub/what-is-an-automated-market-maker-amm)
 
 #### How It Works:
 
@@ -109,28 +109,56 @@ See also[Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.lin
 - **Complexity**: Requires more sophisticated calculations.
 - **Higher Gas Costs**: Computationally intensive, leading to increased transaction fees.
 
-------
+
+
+
 
 ### 4. **StableSwap (Curve)**
+
+[StableSwap whitepaper](https://docs.curve.fi/assets/pdf/stableswap-paper.pdf)
 
 Curve Finance introduced the **StableSwap** formula, optimized for assets with similar prices, such as stablecoins or wrapped tokens. Its formula combines constant sum and constant product mechanisms, ensuring minimal slippage.
 
 [Curve](http://curve.fi/) AMMs combine both a CPMM and CSMM to offers  offers low-price-impact swaps between tokens that have a relatively stable 1:1 exchange rate
 
-#### How It Works:
+#### How It Works
 
 - At small price deviations, it behaves like a constant sum AMM, reducing slippage.
 - For larger deviations, it transitions to a constant product AMM to maintain stability.
 
-#### Advantages:
+#### Pros/Cons
+
+##### Advantages
 
 - **Low Slippage**: Ideal for stablecoin trading.
 - **Efficient Liquidity Use**: Concentrates liquidity near the equilibrium price.
 
-#### Limitations:
+##### Limitations
 
 - **Specialized Use Case**: Not versatile for uncorrelated assets.
 - **Complex Implementation**: Requires precise calibration.
+
+#### Details
+
+ The **constant D** represents the total amount of coins in the pool when their prices are equal. To minimize price slippage, an "amplified" invariant should have low curvature, leading to smaller price changes. A "zero slippage" invariant corresponds to infinite leverage, but it’s essentially a constant-price or constant-sum invariant. On the other hand, a constant-product invariant corresponds to zero leverage.
+
+To find a balance between these two extremes, the proposed solution introduces a dimensionless **leverage parameter (χ)**. By adjusting χ, the invariant can smoothly transition between a constant-product invariant (when χ = 0) and a constant-sum invariant (when χ = ∞). To ensure consistency, the constant-sum invariant is multiplied by χDn−1, where D represents the total value of coins in the pool and n is the number of coins. This results in an invariant that incorporates both characteristics and allows for flexible adjustment of leverage.
+
+![curve-formula](../assets/article/blockchain/defi/curve/curve-formula.png)
+
+#### Graph
+
+Graphs are from the StableSwap whitepaper
+
+ Comparison of StableSwap invariant with Uniswap (constant-product) and constant price invariants. The portfolio consists of coins X and Y which have the “ideal” price of 1.0. There are x = 5 and y = 5 coins loaded up initially. As x decreases, y increases, and the price is the derivative dy/dx.
+
+![curve-graph](../assets/article/blockchain/defi/curve/curve-graph.png)
+
+The price slippage (Fig. 2) is much smaller, if compared to constant-product invariant. The StableSwap invariant has an “amplification coefficient” parameter: the lower it is, the closer the invariant is to the constant product. When calculating slippage, we use a practical value of A = 100. This is somewhat comparable to using Uniswap with 100x leverage.
+
+Price slippage: Uniswap invariant (dashed line) vs Stableswap (solid line)
+
+![curve-price-slippage](../assets/article/blockchain/defi/curve/curve-price-slippage.png)
 
 ------
 
