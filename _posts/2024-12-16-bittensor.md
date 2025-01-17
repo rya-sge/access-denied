@@ -134,12 +134,18 @@ A node in a neural network is represented in a Bittensor subnet as either a subn
 
 See [Minimum compute requirements](https://github.com/opentensor/bittensor-subnet-template/blob/main/min_compute.yml) for compute, memory, bandwidth and storage requirements for a subnet node, i.e., for a subnet neuron.
 
-- The classical neural network graph (shown on the left) is bipartite, i.e., a node in the input layer is connected only to a node in the next layer (hidden layer). A subnet graph (shown on the right) is also bipartite. Hence:
-  - A subnet validator in a subnet is only connected to a subnet miner.
-  - No two subnet validators are connected. Similarly, no two subnet miners are connected.
-- In the classical neural network, the inputs from the external world are connected only to the input layer, and the hidden nodes are isolated from the external world (hence, "hidden"). Similarly, in a Bittensor subnet:
-  - Inputs from the external world can connect only to the subnet validators.
-  - Only subnet validators are allowed to connect to subnet miners, hence isolating subnet miners from the external world.
+A subnet graph in Bittensor (shown on the right) mirrors the bipartite structure of a classical neural network graph (shown on the left),  i.e.
+
+a)  In the classical neural network, a node in the input layer is connected only to a node in the next layer (hidden layer).
+
+In a Bittensor subnet, connections are limited between specific groups: 
+
+Subnet validators connect only to subnet miners, with no direct connections among the same type of actors (validators <-> validators and miners <-> miners).
+
+b) In the classical neural network, the inputs from the external world are connected only to the input layer, and the hidden nodes are isolated from the external world (hence, "hidden").
+
+In a Bittensor subnet, inputs from the external world connect only to subnet validators, while subnet miners remain isolated from external inputs, similar to how hidden nodes in a neural network are isolated.
+
 - **Many-to-many bidirectional**: 
 
 Notice that in the classical neural network shown on the left, the connection from input layer to the hidden layer is only feedforward. 
@@ -176,6 +182,8 @@ See [docs.bittensor.com/learn/bittensor-building-blocks#neuron-to-neuron-communi
 
 #### Axon
 
+> Axon is an API **server** instance to receives incoming Synapse objects
+
 The `axon` module in Bittensor API uses FastAPI library to create and run API servers. For example, when a subnet miner calls,
 
 ```python
@@ -190,7 +198,11 @@ See [docs.bittensor.com/learn/bittensor-building-blocks#axon](https://docs.bitte
 
 #### Dendrite
 
-Axon is a **server** instance. Hence, a subnet validator will instantiate a `dendrite` **client** on itself to transmit information to axons that are on the subnet miners. For example, when a subnet validator runs the below code fragment:
+> Subnet validators or miners set up a `dendrite` **client** to transmit information to the Axons hosted by the subnet miners or validators
+
+A subnet validator will instantiate a `dendrite` **client** on itself to transmit information to axons that are on the subnet miners. 
+
+For example, when a subnet validator runs the below code fragment:
 
 ```python
     responses: List[bt.Synapse] = await self.dendrite(
@@ -212,7 +224,9 @@ See [docs.bittensor.com/learn/bittensor-building-blocks#dendrite](https://docs.b
 
 ### Synapse
 
-Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. The Synapse class inherits from the `BaseModel` of the Pydantic data validation library.
+> Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. 
+
+The Synapse class inherits from the `BaseModel` of the Pydantic data validation library.
 
 For example, in the [Text Prompting Subnet](https://github.com/opentensor/prompting/blob/6c493cbce0c621e28ded203d947ce47a9ae062ea/prompting/protocol.py#L27), the subnet validator creates a Synapse object, called Prompting, with three fields. 
 
@@ -223,7 +237,7 @@ See [docs.bittensor.com/learn/bittensor-building-blocks#synapse](https://docs.bi
 
 ### Metagraph
 
-A metagraph is a data structure that contains comprehensive information about current state of the subnet. 
+>  A metagraph is a data structure that contains comprehensive information about current state of the subnet. 
 
 When you inspect the metagraph of a subnet, you will find detailed information on all the nodes (neurons) in the subnet. 
 

@@ -12,24 +12,41 @@ This article will delve into these three locking scripts, how they function, and
 
 ## Pay-to-Witness-Public-Key-Hash (P2WPKH)
 
+> [BIP 141: Segregated Witness](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki)
+
 ### Overview
 
-P2WPKH is the SegWit equivalent of the traditional Pay-to-Public-Key-Hash (P2PKH) script. It locks funds to a hashed public key, requiring the spender to provide the corresponding public key and a valid signature. However, unlike P2PKH, P2WPKH separates the witness data (signature and public key) from the transaction structure, improving efficiency and security.
+P2WPKH is the SegWit equivalent of the traditional Pay-to-Public-Key-Hash (P2PKH) script. It locks funds to a hashed public key, requiring the spender to provide the corresponding public key and a valid signature. 
+
+However, unlike P2PKH, P2WPKH gets **unlocked via the [Witness](https://learnmeabitcoin.com/technical/transaction/witness/) field** instead of the [ScriptSig](https://learnmeabitcoin.com/technical/transaction/input/scriptsig/).
+
+The benefit of using P2WPKH over P2PKH is that Witness field data has less [weight](https://learnmeabitcoin.com/technical/transaction/size/#weight) than the ScriptSig field data, so when you come to unlock a P2WPKH you will pay slightly less in transaction [fees](https://learnmeabitcoin.com/technical/transaction/fee/).
 
 ### ScriptPubKey Format
+
+#### Lock
 
 The P2WPKH locking script has the following format:
 
 ```
-php
-
-
-Copy code
-OP_0 <PubKeyHash>
+OP_0
+OP_PUSHBYTES_20  <PubKeyHash>
 ```
 
 - **OP_0**: Indicates the use of SegWit.
 - **<PubKeyHash>**: A 20-byte hash of the recipient’s public key.
+
+#### Unlock
+
+To unlock a P2WPKH, you need to provide a valid signature followed by the original public key in the [witness](https://learnmeabitcoin.com/technical/transaction/witness/) field for the transaction input.
+
+```
+<signature><PubKey>
+```
+
+**The Witness field is not Script.** It uses [Compact Size](https://learnmeabitcoin.com/technical/general/compact-size/) fields for indicating the number of items, and the size of the signature and public key. This is instead of using data push opcodes (e.g. `OP_PUSHBYTES_33`) as you would do when unlocking a P2PKH.
+
+**Only compressed public keys are accepted in P2WPKH.** So when you create the public key hash for the ScriptPubKey, make sure it's the hash of a *compressed* public key and not an uncompressed public key, otherwise it will be considered non-standard and will not be relayed by nodes (although it's still technically valid and could get [mined](https://learnmeabitcoin.com/technical/mining/) into the [blockchain](https://learnmeabitcoin.com/technical/blockchain/) if you can send it directly to a miner). This is different to P2PKH, where uncompressed public keys *are* allowed.
 
 ### How It Works
 
@@ -42,7 +59,11 @@ OP_0 <PubKeyHash>
 
 - **Reduced Transaction Size:** Lower fees and faster processing.
 - **Malleability Resistance:** Signature data does not alter the transaction hash.
-- **Backward Compatibility:** Works with non-SegWit-aware wallets via wrapped P2SH.
+- **Backward Compatibility:** Works with non-SegWit-aware wallets via wrapped P2SH ???
+
+### References
+
+[learnmebitcoin - P2WPKH](https://learnmeabitcoin.com/technical/script/p2wpkh/)
 
 ------
 
