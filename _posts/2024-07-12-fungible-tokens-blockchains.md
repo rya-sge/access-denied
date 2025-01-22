@@ -153,7 +153,7 @@ This standard tries to improve the [ERC-20](https://eips.ethereum.org/EIPS/eip-2
 6. Every token transaction contains `data` and `operatorData` bytes fields to be used freely to pass data from the holder and the operator, respectively.
 7. It is backward compatible with wallets that do not contain the `tokensReceived` hook function by deploying a proxy contract implementing the `tokensReceived` hook for the wallet.
 
-
+----
 
 ####  Binance Smart Chain (BEP-20)
 
@@ -190,6 +190,8 @@ function getOwner() external view returns (address);
 
 Reference: [Binance Academy - BEP-20](https://academy.binance.com/en/glossary/bep-20), [bnb chain doc - Introduction](https://docs.bnbchain.org/bnb-smart-chain/developers/overview/), https://www.ledger.com/academy/glossary/bep-20
 
+----
+
 #### Tron (TRC-20)
 
 Specification: [developers.tron.network - trc20-protocol-interface](https://developers.tron.network/docs/trc20-protocol-interface)
@@ -214,6 +216,8 @@ event Approval(address indexed _owner, address indexed _spender, uint _value);
 ```
 
 Reference: [https://developers.tron.network/docs/getting-start](https://developers.tron.network/docs/getting-start)
+
+-----
 
 ### Cosmos
 
@@ -268,7 +272,7 @@ This standard is not strictly speaking a standard for defining a fungible token 
 
 Further reading: [tutorials.cosmos.network - IBC Token Transfer](https://tutorials.cosmos.network/academy/3-ibc/7-token-transfer.html)
 
-
+----
 
 ### ICP (ICRC-1)
 
@@ -315,6 +319,8 @@ Returns the default transfer fee.
 icrc1_fee : () -> (nat) query;
 ```
 
+----
+
 ### NEO (NEP-5)
 
 Specification: [docs.neo.org/v2/docs/en-us/sc/write/nep5.html](https://docs.neo.org/v2/docs/en-us/sc/write/nep5.html)
@@ -324,7 +330,7 @@ NEO’s standard for creating tokens, similar to Ethereum’s ERC-20.
 - Different from UTXO, the NEP5 assets are recorded in the contract storage area, through updating account balance in the storage area, to complete the transaction.
 - The interface is similar to ERC-20 and provides the following functions: totalSupply, name, symbol, decimals, balanceOf, transfer and a Transfer Event.
 
-
+----
 
 ### TON (Jettons)
 
@@ -347,6 +353,8 @@ Jettons are organized as follows:
 Each Jetton has a master smart contract which is used to mint new jettons, account for circulating supply and provide common information.
 
 Example: if you release a Jetton with circulating supply of 200 jetton which are owned by 3 people, then you will deploy 4 contracts: 1 Jetton-master and 3 jetton-wallets.
+
+----
 
 ### NEAR (NEP-148)
 
@@ -413,7 +421,7 @@ function ft_balance_of(
 ): string {}
 ```
 
-
+----
 
 ### Polkadot (PSP-22)
 
@@ -442,6 +450,8 @@ token_decimals() ➔ u8
 The interface is very similar to the ERC-20 interface but adds two functions: `increase_allowance` and `decrease_allowance` which are a good improvement to avoid the [approval front-running](https://scsfg.io/hackers/approvals/) risk.
 
 Reference implementation: [github.com/Brushfam/openbrush-contracts - psp22/psp22.rs](https://github.com/Brushfam/openbrush-contracts/blob/main/contracts/src/token/psp22/psp22.rs)
+
+----
 
 ### Stacks (SIP-010)
 
@@ -494,6 +504,8 @@ Implementation example:
 
 Further reading: [learnweb3 - SIP-010 Fungible Tokens & Traits](https://learnweb3.io/lessons/sip-010-fungible-tokens-and-traits/)
 
+----
+
 ### Stellar (SEP: 0041)
 
 This proposal defines a standard contract interface for tokens. The interface is a subset of the Stellar Asset contract, and compatible with its descriptive and token interfaces defined in [CAP-46-6](https://github.com/stellar/stellar-protocol/blob/master/core/CAP-0046-06.md).
@@ -534,7 +546,7 @@ pub trait TokenInterface {
 }
 ```
 
-
+----
 
 ### Tezos (FA1.2/FA2)
 
@@ -596,6 +608,10 @@ transfer
 
 Reference: [opentezos.com/defi/token-standards/#fa12, https://opentezos.com/defi/token-standards/](https://opentezos.com/defi/token-standards/#fa12, https://opentezos.com/defi/token-standards/)
 
+----
+
+-----
+
 ## Integrated program
 
 ### Algorand (ASAs)
@@ -631,6 +647,8 @@ Others references:
 - [Algorand Request for Comments for standards](https://developer.algorand.org/docs/get-details/asa/)  
 - The asset creation transaction can be created using any of [Algorands SDKs](https://developer.algorand.org/docs/sdks/). 
 - Code demonstrating creating an Asset is available in the [ASA documentation](https://developer.algorand.org/docs/get-details/asa/#creating-an-asset).
+
+----
 
 ### Aptos (Fungible Asset Standard)
 
@@ -676,6 +694,8 @@ struct FungibleAsset {
 }
 ```
 
+----
+
 ### Canton Network (Asset Model)
 
 Specification: [docs.daml.com/daml-finance/concepts/asset-model.html](https://docs.daml.com/daml-finance/concepts/asset-model.html)
@@ -711,6 +731,8 @@ The term used is an instrument, which describes the economic terms (rights and o
   - TransferableFungible: Holdings that are both transferable and fungible.
   - BaseHolding: Holdings that are neither transferable nor fungible.
 
+----
+
 ### Hyperliquid (HIP-1)
 
 Specification: [hyperliquid.gitbook.io - HIP-1: Native token standard](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-1-native-token-standard)
@@ -734,6 +756,8 @@ The sender of the token genesis transaction will specify the following:
 The deployment transaction of the token will generate a globally unique hash by which the L1 will index the token.
 
 References: [hyperliquid.gitbook.io - About Hyperliquid](https://hyperliquid.gitbook.io/hyperliquid-docs)
+
+---
 
 ###  Solana (SPL token)
 
@@ -761,6 +785,8 @@ This program comes with several different instructions included:
 - [`Transfer`](https://github.com/solana-labs/solana-program-library/blob/b1c44c171bc95e6ee74af12365cb9cbab68be76c/token/program/src/processor.rs#L228): Transfer units of a specific type of token from one token account to another.
 
 Reference: [solana.com/docs/core/tokens](https://solana.com/docs/core/tokens)
+
+----
 
 ### Stellar (cap-0046-06)
 
@@ -847,7 +873,7 @@ fn create_asset_contract(asset: Object) -> Result<Object, Error>;
 fn init_asset(asset_bytes: Bytes) -> Result<(), Error>;
 ```
 
-
+-----
 
 ### Sui (Coin Standard)
 
@@ -896,6 +922,8 @@ Further reading: [Creating a Fungible Token on Sui: A Step-by-Step Guide](https:
 Specification: [Sui - Closed-Loop Token](https://docs.sui.io/standards/closed-loop-token)
 
 An alternative to create fungible token is the **Closed-Loop  standard**. With this standard, you can limit the applications that can use the token  and set up custom policies for transfers, spends, and conversions. The [`sui::token` module](https://github.com/MystenLabs/sui/blob/main/crates/sui-framework/docs/sui-framework/token.md) in the Sui framework defines the standard.
+
+----
 
 ### XRP
 
@@ -955,7 +983,9 @@ References:
 - [Ripple CTO Clarifies XRP Ledger's Token Naming and Fungibility](https://www.binance.com/en-NG/square/post/2024-06-20-ripple-cto-clarifies-xrp-ledger-s-token-naming-and-fungibility-9715949986545)
 - [XRP Ledger](https://xrpl.org/docs/tutorials/how-tos/use-tokens/issue-a-fungible-token/)
 
+----
 
+----
 
 ## Bitcoin (BRC-20, SRC-20, Runes)
 
@@ -964,8 +994,6 @@ Finally, I decided to create a specific category for Bitcoin, which its developm
 Moreover, the different way to represent fungible tokens on Bitcoin are propositions from various persons and projects rather than a common standard incorporated into the network.
 
 https://blockspace.media/insight/how-bitcoins-runes-actually-work/
-
-
 
 ### BRC-20
 
@@ -1019,7 +1047,7 @@ There are three main operations:
 
 Further reading: [academy.binance.com - SRC-20 Tokens](https://academy.binance.com/ph/glossary/src-20-tokens)
 
-
+---
 
 ### SRC-20
 
@@ -1067,6 +1095,8 @@ SRC-20 transaction must be signed and broadcast onto BTC by the address that hol
 ```
 
 Further reading: [academy.binance.com - SRC-20 Tokens](https://academy.binance.com/ph/glossary/src-20-tokens), [docs.openstamp.io - src20-protocol](https://docs.openstamp.io/introduction/src20-protocol)
+
+----
 
 ### Runes
 

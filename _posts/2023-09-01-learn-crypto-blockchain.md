@@ -11,9 +11,9 @@ image:
 description: Become a master of Blockchain and Crypto by following these free online courses
 ---
 
-This article presents several online courses to learn Blockchain and Crypto.
+This article presents several online courses to learn Blockchain and Crypto
 
-
+A list of courses is also available on my GitHub in the form of a Gist: [Awesome blockchain learning resources](https://gist.github.com/rya-sge/db2da04cab1e0c284783c33f3435a183)
 
 [TOC]
 
@@ -27,7 +27,7 @@ This section lists the course to learn the general concepts related to Defi.
 
 #### Blockchain for everyone [Binance]
 
-Website: [Blockchain for everyone [Binance]](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
+[Website](https://academy.binance.com/en/courses/track/beginner-track/blockchain-fundamentals/introduction-to-blockchain-technology)
 
 **Certification:** yes (NFT)
 
@@ -41,7 +41,7 @@ Website: [Blockchain for everyone [Binance]](https://academy.binance.com/en/cour
 
 #### Digital Assets 101 [Fireblocks]
 
-Website: [Digital Assets 101 [Fireblocks]](https://www.fireblocks.com/academy/)
+[Website](https://www.fireblocks.com/academy/digital-assets-101/)
 
 **Certification:**  no
 
@@ -57,7 +57,7 @@ Website: [Digital Assets 101 [Fireblocks]](https://www.fireblocks.com/academy/)
 
 #### Tokenization Online Course [dgishares]
 
-Website: [Tokenization Online Course [dgishares]](https://digishares.io/tokenization-online-course)
+[Website](https://digishares.io/tokenization-online-course)
 
 **Certification:** yes with Udemy
 
@@ -73,9 +73,9 @@ Website: [Tokenization Online Course [dgishares]](https://digishares.io/tokeniza
 
 *Learn tokenization and the business skills to use blockchain technology for real-world assets*
 
-#### Fit for DeFi[DefiGuide.org
+#### Fit for DeFi[DefiGuide.org]
 
-Website: [Fit for DeFi[DefiGuide.org]](https://defiguide.org/free-defi-course/) 
+[Website](https://defiguide.org/free-defi-course/) 
 
 **Certification:** yes, online exam
 
@@ -101,7 +101,7 @@ Website: [Fit for DeFi[DefiGuide.org]](https://defiguide.org/free-defi-course/)
 
 #### Blockchain Series [University at Buffalo]
 
-Website: [Blockchain Series [University at Buffalo]](https://www.buffalo.edu/tcie/professional-education/course-list/blockchain-specialization-bs.html)
+[Website](https://www.buffalo.edu/tcie/professional-education/course-list/blockchain-specialization-bs.html)
 
 **Certification:** yes
 
@@ -131,7 +131,7 @@ Website: [Blockchain Series [University at Buffalo]](https://www.buffalo.edu/tci
 
 #### Free MOOC: Digital Currency
 
-Website: [Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mooc/)
+[Website](https://www.unic.ac.cy/blockchain/free-mooc/)
 
 **Certification:** yes if you are part of a cohort
 
@@ -141,15 +141,17 @@ Website: [Free MOOC: Digital Currency](https://www.unic.ac.cy/blockchain/free-mo
 
 #### Blockchain and Decentralized Technologies[distributed lab]
 
-Website: [Blockchain and Decentralized Technologies[distributed lab]](https://www.youtube.com/playlist?list=PLhZQuknA7yUDQI8VeWaZLRJFSsqqlHRP5)
+[Website](https://www.youtube.com/playlist?list=PLhZQuknA7yUDQI8VeWaZLRJFSsqqlHRP5)
 
 **Certification:** yes if you are part of a cohort
 
 **Cost:** free
 
-**Course link**: [https://distributed.education/blockchain-course](https://distributed.education/blockchain-course)
+**Course link**: [distributed.education/blockchain-course](https://distributed.education/blockchain-course)
 
 *The course "Blockchain and Decentralized  Technologies" is aimed at training a wide range of students. You will  learn about blockchain technology, how bitcoin and other  cryptocurrencies work (technical aspects), decentralized systems,  information security threats, the Ethereum platform, smart contracts,  how decentralized finance (DeFi) works, and what trends the industry  offers*
+
+-------
 
 ## Development
 
@@ -157,7 +159,9 @@ This section is more focus on the development part
 
 ### Generic Platform
 
-#### [LearnWeb3Dao](https://learnweb3.io/)
+#### LearnWeb3Dao
+
+[website](https://learnweb3.io/)
 
 *LearnWeb3 is the leading educational ecosystem in Web3. We offer a wide range of  educational courses, resources, and tools that are designed to help  developers learn and grow in the Web3 space.*
 
@@ -165,7 +169,9 @@ This section is more focus on the development part
 
 **Certificate:** yes (NFT)
 
-#### [Cryptozombie](https://cryptozombies.io/it/course)
+#### Cryptozombie
+
+[website](https://cryptozombies.io/it/course)
 
 **Cost:** free
 
@@ -181,9 +187,24 @@ There are three main lessons
 - Chainlink: Decentralized Oracles
 - Advanced Solidity: Get In-depth Knowledge
 
+#### Cyfrin updraft
+
+[Website](https://updraft.cyfrin.io/courses/)
+
+- [Blockchain basics](https://updraft.cyfrin.io/courses/blockchain-basics)
+- [Smart contract development with Solidity](https://updraft.cyfrin.io/courses/solidity)
+- [Foundry 101](https://updraft.cyfrin.io/courses/foundry)
+- [Advanced Foundry](https://updraft.cyfrin.io/courses/advanced-foundry)
+- [Assembly and Formal Verification](https://updraft.cyfrin.io/courses/formal-verification)
+- [Ethereum Smart Contract Security](https://academy.moralis.io/courses/ethereum-smart-contract-security)
+
+------
+
 ## Ethereum
 
 ### Patrick Collins
+
+> More up-to-date courses are available on its e-learning platform [Cyfrin](https://updraft.cyfrin.io/courses/)
 
 [YouTube Channel](https://www.youtube.com/@PatrickAlphaC)
 
@@ -193,6 +214,8 @@ There are three main lessons
 
 **Certification:** possible (NFT)
 
+Date: 05/2022
+
 **Description:** *Learn Blockchain, Solidity, and Full Stack Web3 Development with JavaScript – 32-Hour Course :* 
 
 **[Solidity, Blockchain Development, & Smart Contracts](https://www.youtube.com/watch?v=umepbfKp5rI)**
@@ -200,6 +223,8 @@ There are three main lessons
 **Cost:** free
 
 **Certification:** possible (NFT)
+
+**Date**: 06/2023
 
 **Description:**
 
@@ -211,11 +236,9 @@ There are three main lessons
 
 **Cost:** free
 
-**Certification:**  possible (NFT), see [https://twitter.com/AlchemyLearn/status/1638211112654065666](https://twitter.com/AlchemyLearn/status/1638211112654065666)
+**Certification:**  possible (NFT), see [twitter.com/AlchemyLearn/status/1638211112654065666](https://twitter.com/AlchemyLearn/status/1638211112654065666)
 
 *The Ethereum Developer Bootcamp is a comprehensive course that teaches  you the fundamentals of web3 development from 0 to 100. The course  includes everything from cryptography to smart contracts to fully  functional dApp development. This is the #1 resource to jumpstart your  web3 career and a MUST if you want to learn Ethereum.* 
-
-[https://university.alchemy.com/#eth-bootcamp](https://university.alchemy.com/#eth-bootcamp)
 
 [**Road to web3**](https://docs.alchemy.com/docs/welcome-to-the-road-to-web3)
 
@@ -227,7 +250,7 @@ There are three main lessons
 
 ### Ethereum Developer Degree [LearnWeb3]
 
-[Ethereum Developer Degree [LearnWeb3]](https://learnweb3.io/degrees/ethereum-developer-degree/)
+[Website](https://learnweb3.io/degrees/ethereum-developer-degree/)
 
 **Cost:** free
 
@@ -246,7 +269,7 @@ This degree is made of 4 lessons
 
 ### Advanced Solidity: Understanding and Optimizing Gas Costs
 
-[Advanced Solidity: Understanding and Optimizing Gas Costs](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/)
+[Website](https://www.udemy.com/course/advanced-solidity-understanding-and-optimizing-gas-costs/)
 
 **Cost:** paid (Udemy)
 
@@ -265,6 +288,8 @@ Mastering the Ethereum Virtual Machine and the Solidity Compiler
 - Learn how to debug execution costs for smart contracts
 
 - Learn what designs to avoid that lead to high execution costs
+
+------
 
 ## Other Blockchains
 
@@ -304,6 +329,8 @@ A website with several ressources and lessons about Bitcoin.
 
 Lessons are in French.
 
+-------
+
 ### Cosmos
 
 **[What is the Interchain?](https://tutorials.cosmos.network/academy/1-what-is-cosmos/#)**
@@ -326,8 +353,8 @@ Lessons are in French.
 
 **Link:**
 
-- [https://ida.interchain.io/]( https://ida.interchain.io/)
-- [https://ida.interchain.io/ida-course/LPs/week-0/](https://ida.interchain.io/ida-course/LPs/week-0/)
+- [ida.interchain.io/]( https://ida.interchain.io/)
+- [ida.interchain.io/ida-course/LPs/week-0/](https://ida.interchain.io/ida-course/LPs/week-0/)
 
 **Description:**
 
@@ -339,6 +366,8 @@ Lessons are in French.
  - *You will learn how to build frontend and backend applications using CosmJS;*  
  - *Operate nodes and validate on an Interchain blockchain;* 
  - *Run a  relaying infrastructure between IBC-connected chains*
+
+---------
 
 ### Solana
 
@@ -387,6 +416,8 @@ The course is divided into 6 modules
 *Front-end for Solana Programs*
 *Security*
 
+-------
+
 ### Tezos
 
 **[OpenTezos](https://opentezos.com/)**
@@ -424,6 +455,8 @@ You can learn Ligo with Javascript, Pascal or Camel.
 **Description**
 
 *An introduction to Tezos and how it is different from other blockchains like Ethereum* 
+
+--------
 
 ## Defi
 
@@ -474,7 +507,7 @@ Organisator: Members of UC Berkeley, Stanford
  - *The systemic risks stemming from Miner  Extractable Value (MEV) and how MEV can be minimized by design.* 
  -  *Decentralized governance provides power to a pseudonymous collective,  and we will explore how governance works, and how it may be attacked.*
 
-
+---------
 
 ## Math & Cryptography
 
@@ -517,9 +550,11 @@ The goal of this course is to explore Zero-Knowledge Proofs (ZKP).
    - *(3) zkBridge to build a secure foundation for multi-chain  interoperability;* 
    - *(4) other applications in machine learning, program  analysis, and network traffic analysis*
 
+-------
+
 ## Security
 
-List of resources: [https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
+List of resources: [linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7](https://www.linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activity-7097200724815622144-keh7)
 
 ### Course
 
@@ -548,7 +583,9 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 - Yul Masterclass - [10:00:47](https://www.youtube.com/watch?v=DRZogmD647U&t=36047s) 
 - Calldata Masterclass - [10:40:41](https://www.youtube.com/watch?v=DRZogmD647U&t=38441s)
 
-#### [Blockchain Security [InfoSec]](https://www.coursera.org/learn/blockchain-security#modules)
+#### Blockchain Security [InfoSec]
+
+[Website](https://www.coursera.org/learn/blockchain-security#modules)
 
 **Cost:** free
 
@@ -558,7 +595,9 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 ### Challenge
 
-#### [Ethernaut [OpenZeppelin]](https://ethernaut.openzeppelin.com)
+#### Ethernaut [OpenZeppelin]
+
+[Website](https://ethernaut.openzeppelin.com)
 
 **Cost:** free
 
@@ -568,7 +607,9 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 *The Ethernaut is a Web3/Solidity based wargame inspired by [overthewire.org](https://overthewire.org/), played in the Ethereum Virtual Machine. Each level is a smart contract that needs to be 'hacked'. The game is 100% open source and all levels are contributions made by other players.* 
 
-#### [Damn Vulnerable DeFi](https://www.damnvulnerabledefi.xyz/)
+#### Damn Vulnerable DeFi
+
+[Website](https://www.damnvulnerabledefi.xyz/)
 
 **Cost:** free
 
@@ -584,7 +625,9 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 #### Moralis Academy
 
-##### [Bitcoin Vulnerabilities](https://academy.moralis.io/courses/bitcoin-attacks)
+##### Bitcoin Vulnerabilities
+
+[Website](https://academy.moralis.io/courses/bitcoin-attacks)
 
 **cost:** paid (subscription)
 
@@ -594,7 +637,9 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 *Ivan will show you how, despite having vulnerabilities, the Bitcoin Network stays secure. You'll gain deep knowledge of the type of attacks the network might face, and how they might be executed. Many Blockchain networks share similar characteristics.* 
 
-##### [Ethereum Smart Contract Security](https://academy.moralis.io/courses/ethereum-smart-contract-security)
+##### Ethereum Smart Contract Security
+
+##### [Website](https://academy.moralis.io/courses/ethereum-smart-contract-security)
 
 **cost:** paid (subscription)
 
@@ -604,7 +649,7 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 *The smallest oversight in Smart Contract programming could lead to a multi-million dollar exploit. Ivan explains the mindset you'll need for Web3 development, and how secure your Smart Contracts effectively. You'll learn essential software design principles, risk management, how to build upgradable contracts, and lots more.*
 
-
+------
 
 ## YouTube
 

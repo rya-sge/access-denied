@@ -21,6 +21,38 @@ Since the video is rather old, it is possible that some information is no longer
 
 Here’s an exploration of the 10 key differences between MakerDAO and Liquity.
 
+## Introduction
+
+### MakerDAO (DAI)
+
+[MakerDAO](https://makerdao.com/en/) is a decentralized autonomous organization managing and issuing the **stablecoin** DAI, which is designed to maintain a 1:1 peg with the US Dollar.
+
+Unlike traditional fiat-backed stablecoins that rely on a centralized entity to hold reserves, Dai is generated through a process called **collateralized debt positions (CDPs)**. 
+
+Users lock up collateral, in the form of Ethereum (ETH), in a smart contract, and in return, they receive Dai. 
+
+This process ensures that Dai is always backed by collateral, maintaining its stability.
+
+You can find more information in my article: [Introduction to MakerDAO](https://rya-sge.github.io/access-denied/2023/11/21/makerdao/)
+
+### Liquity V1
+
+Liquity is a decentralized borrowing protocol that allows you to draw [interest-free](https://app.gitbook.com/@liquity/s/liquity-docs/faq/borrowing#how-can-you-offer-borrowing-at-a-0-interest-rate) loans against Ether used as [collateral](https://docs.liquity.org/liquity-v1/faq/borrowing#what-do-you-mean-by-collateral). 
+
+Loans are paid out in LUSD (a USD pegged stablecoin) and need to maintain a [minimum collateral ratio](https://docs.liquity.org/liquity-v1/faq/borrowing#what-is-the-minimum-collateral-ratio-mcr-and-the-recommended-collateral-ratio) of 110%.
+
+In addition to the collateral, the loans are secured by a Stability Pool containing LUSD and by borrowers collectively acting as guarantors of last resort. 
+
+Liquity as a protocol is non-custodial, immutable, and governance-free.
+
+Reference: Liquity is a decentralized borrowing protocol that allows you to draw [interest-free](https://app.gitbook.com/@liquity/s/liquity-docs/faq/borrowing#how-can-you-offer-borrowing-at-a-0-interest-rate) loans against Ether used as [collateral](https://docs.liquity.org/liquity-v1/faq/borrowing#what-do-you-mean-by-collateral). Loans are paid out in LUSD (a USD pegged stablecoin) and need to maintain a [minimum collateral ratio](https://docs.liquity.org/liquity-v1/faq/borrowing#what-is-the-minimum-collateral-ratio-mcr-and-the-recommended-collateral-ratio) of 110%.
+
+In addition to the collateral, the loans are secured by a Stability Pool containing LUSD and by fellow borrowers collectively acting as guarantors of last resort. Learn more about these mechanisms in our documentation.
+
+Liquity as a protocol is non-custodial, immutable, and governance-free.
+
+Reference: [Liquity V1](https://docs.liquity.org/liquity-v1)
+
 ------
 
 ### 1. Governance
@@ -56,6 +88,8 @@ Liquity, on the other hand, supports a decentralized network of frontends. Anyon
 
 Liquity’s stablecoin, LUSD, is fully redeemable against Ether at face value, ensuring a direct and transparent peg to the US dollar. This mechanism creates a hard price floor, as holders can arbitrage any deviation below $1 by redeeming LUSD for Ether.
 
+See [docs.liquity.org - lusd-redemptions](https://docs.liquity.org/liquity-v1/faq/lusd-redemptions)
+
 In contrast, MakerDAO’s DAI lacks direct redeemability for collateral. Instead, it employs indirect stability mechanisms, resulting in a soft peg that may be less resilient under extreme market conditions.
 
 ------
@@ -65,6 +99,8 @@ In contrast, MakerDAO’s DAI lacks direct redeemability for collateral. Instead
 Liquity offers loans without recurring interest. Borrowers only pay a `one-time` issuance fee when opening a loan, and there are no ongoing costs. This allows users to keep their debt positions open indefinitely without accumulating additional charges.
 
 MakerDAO applies a `stability fee`, which functions as an interest rate, accruing over time. This recurring cost can be a significant consideration for long-term borrowers.
+
+See [Maker DAO archive - stability-fee](https://rya-sge.github.io/maker-dao-community-archive/faqs/stability-fee/)
 
 ------
 
@@ -109,6 +145,14 @@ Liquity avoids this approach by employing a redistribution mechanism. If the Sta
 ### 10. Emergency Shutdown vs. Recovery Mode
 
 MakerDAO employs an emergency shutdown mechanism to wind down the system in case of extreme under-collateralization. While effective, it results in the complete cessation of the protocol.
+
+What happens during an Emergency Shutdown?
+
+1. An emergency Shutdown stops CDP creation and freezes the Price Feed.
+2. Collateral Claims are processed: After Emergency Shutdown is activated, a time period is needed to allow the processing of the proportional collateral claims of all CDP owners. After this processing is done, all CDP owners will be able to claim a fixed amount of ETH with their CDPs. Dai holders can access their collateral claims immediately.
+3. Dai and CDP owners claim collateral: Each Dai holder and CDP owner can exchange their Dai and CDPs directly for a fixed amount of ETH that corresponds to the calculated value of their assets.
+
+See [Maker DAO archive - Emergency Shutdown](https://rya-sge.github.io/maker-dao-community-archive/scd-faqs/emergency-shutdown/#what-is-an-emergency-shutdown)
 
 Liquity uses a recovery mode that temporarily relaxes liquidation conditions when the total collateralization ratio drops below 150%. This mode allows the system to stabilize and return to normal operation without shutting down, ensuring continuous functionality.
 

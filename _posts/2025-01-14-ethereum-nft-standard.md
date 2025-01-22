@@ -160,7 +160,7 @@ error ERC721InvalidOperator(address operator);
 
 ```
 
-
+------
 
 ### ERC-1155: Multi-Token Standard
 
@@ -207,6 +207,8 @@ function isApprovedForAll(address _owner, address _operator) external view retur
 - Gaming assets like weapons and currencies (e.g., Enjin-powered games).
 - Collectibles where multiple items share a similar design but with variations.
 
+------
+
 ### ERC-2981: Royalty Standard
 
 > [EIP Reference](https://eips.ethereum.org/EIPS/eip-2981)
@@ -244,7 +246,7 @@ function royaltyInfo(
     );
 ```
 
-
+------
 
 ### ERC-4907: Rentable NFTs (ERC-721 ext)
 
@@ -399,7 +401,7 @@ function getChild(
 }
 ```
 
-
+------
 
 ### ERC-721A: Gas-Optimized ERC-721 (ERC-721 ext)
 
@@ -421,6 +423,8 @@ The code is available on the [Chiru Labs GitHub](https://github.com/chiru-labs/E
 - NFT projects with mass minting events (e.g., profile picture (PFP) collections like Azuki).
 
 See also [ERC-721a](https://www.erc721a.org)
+
+-----
 
 ### ERC-6551: Non-fungible Token Bound Accounts
 
@@ -525,7 +529,7 @@ function execute(address to, uint256 value, bytes calldata data, uint8 operation
         returns (bytes memory);
 ```
 
-
+----
 
 ## Summary Table: Ethereum NFT Standards
 

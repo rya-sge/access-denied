@@ -25,6 +25,10 @@ This field helps Security Professionals identify:
 >
 > This article is based on the room [DFIR: An Introduction](https://tryhackme.com/r/room/introductoryroomdfirmodule) by TryHackMe
 
+[TOC]
+
+
+
 ## The need for DFIR
 
 DFIR helps security professionals in various ways, some of which are summarized below:
@@ -36,6 +40,8 @@ DFIR helps security professionals in various ways, some of which are summarized 
 - Understanding attacker behavior to pre-emptively block further intrusion attempts by the attacker.
 - Sharing information about the attacker with the community.
 
+-----
+
 ## Who performs DFIR?
 
 As the name suggests, DFIR requires expertise in both Digital Forensics and Incident Response. Dividing these two fields this way, the following skillset is needed to become a DFIR professional:
@@ -44,6 +50,10 @@ As the name suggests, DFIR requires expertise in both Digital Forensics and Inci
 - **Incident Response:** Incident responders are experts in cybersecurity and leverage forensic information to identify the activity of interest from a security perspective. 
 
 DFIR professionals know about Digital Forensics and cybersecurity and combine these domains to achieve their goals. Digital Forensics and Incident Response domains are often combined because they are highly interdependent. Incident Response leverages knowledge gained from Digital Forensics. Similarly, Digital Forensics takes its goals and scope from the Incident Response process, and the IR process defines the extent of forensic investigation.
+
+
+
+------
 
 ## The Incident Response Process
 
@@ -77,7 +87,7 @@ While NIST combines Containment, Eradication, and Recovery, SANS separates them 
 
 Now that we understand that the two processes are similar let's learn briefly what the different steps mean. We explain the PICERL steps as they are easier to remember by the acronym, but as described above, they are identical to the steps defined by NIST.
 
-![dfir-sans-picerl](../assets/article/securite/dfir-sans-picerl.png)
+![dfir-sans-picerl]({{site.url_complet}}/assets/article/securite/dfir-sans-picerl.png)
 
 1. **Preparation**: Before an incident happens, preparation needs to be done so that everyone is ready in case of an incident. Preparation includes having the required people, processes, and technology to prevent and respond to incidents.
 2. **Identification**: An incident is identified through some indicators in the identification phase. These indicators are then analyzed for False Positives, documented, and communicated to the relevant stakeholders.
@@ -85,6 +95,10 @@ Now that we understand that the two processes are similar let's learn briefly wh
 4. **Eradication**: Next, the threat is eradicated from the network. It has to be ensured that a proper forensic analysis is performed and the threat is effectively contained before eradication. For example, if the entry point of the threat actor into the network is not plugged, the threat will not be effectively eradicated, and the actor can gain a foothold again.
 5. **Recovery**: Once the threat is removed from the network, the services that had been disrupted are brought back as they were before the incident happened.
 6. **Lessons Learned**: Finally, a review of the incident is performed, the incident is documented, and steps are taken based on the findings from the incident to make sure that the team is better prepared for the next time an incident occurs.
+
+
+
+------
 
 ## DFIR Tools
 
@@ -154,6 +168,6 @@ Recovery
 
 Eradication
 
-What is the NIST-equivalent of the step called "Lessons learned" in the SANS process?
+> What is the NIST-equivalent of the step called "Lessons learned" in the SANS process?
 
-> Post-incident Activity
+Post-incident Activity
