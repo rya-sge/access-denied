@@ -1,0 +1,27 @@
+@startmindmap
+
+* Security Models
+** Bell-LaPadula Model
+*** Focus: Confidentiality
+*** Rules:
+**** No read-up (Simple Security Property)
+**** No write-down (*-Property)
+*** Use Case Example: Military/Government systems
+
+** Biba Integrity Model
+*** Focus: Integrity
+*** Rules:
+**** No read-down (Simple Integrity Property)
+**** No write-up (Integrity *-Property)
+*** Use Case Example: Financial/Healthcare systems
+
+** Clark-Wilson Model
+*** Focus: Integrity + Business Workflow
+*** Principles:
+**** Well-formed transactions
+**** Separation of duties
+**** Access through transformation procedures
+**** Audit logging
+*** Use Case Example: Business/Commercial systems
+
+@endmindmap

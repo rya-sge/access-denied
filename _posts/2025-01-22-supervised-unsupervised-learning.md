@@ -7,10 +7,9 @@ lang: en
 locale: en-GB
 categories: ai
 tags: supervised unsupervised learning machine-learning
-description: this article explains the difference between supervised and unsupervised learning in Machine Mearning with several examples
+description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples
 image: /assets/article/mlg/supervised-unsupervided-learning.png
 isMath: true
-
 ​---
 ---
 
@@ -107,38 +106,6 @@ The choice between supervised and unsupervised learning depends on the type of d
 Made with ChatGPT and [PlantUML](https://www.plantuml.com/plantuml/)
 
 ![supervised-unsupervided-learning]({{site.url_complet}}/assets/article/mlg/supervised-unsupervided-learning.png)
-
-```
-@startmindmap
-* Machine Learning
-** Supervised Learning
-*** Characteristics
-**** Labeled Data
-**** Predictive Models
-*** Examples
-**** Spam Filter
-**** Medical Diagnosis
-*** Applications
-**** Classification
-***** Binary (e.g., Spam/Not Spam)
-***** Multiclass (e.g., Image Recognition)
-**** Regression
-***** Continuous Output (e.g., House Prices)
-
-** Unsupervised Learning
-*** Characteristics
-**** Unlabeled Data
-**** Pattern Discovery
-*** Examples
-**** News Article Grouping
-**** Market Segmentation
-*** Applications
-**** Clustering
-***** Finding Groups (e.g., Market Segmentation)
-**** Anomaly Detection
-***** Identifying Outliers (e.g., Fraud Detection)
-@endmindmap
-```
 
 
 

@@ -6,14 +6,14 @@ lang: en
 locale: en-GB
 categories: security ai
 tags: security threat ai
-description:  AI brings with it a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the emergence of unregulated "Shadow AI" systems.
+description:  Artificial Intelligence(AI) and Machine Learning Models bring with them a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of "Shadow AI" systems inside an organization.
 image: /assets/article/blockchain/ai/chatbot/chatbot-car.png
 isMath: false
 ---
 
 Artificial Intelligence (AI) has become an integral part of modern life, driving advancements across industries and reshaping how we interact with technology. 
 
-However, as AI continues to evolve, it brings with it a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of "Shadow AI" systems inside an organisation, these issues highlight the need for vigilance and proactive measures. 
+However, as AI continues to evolve, it brings with it a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of "Shadow AI" systems inside an organization, these issues highlight the need for vigilance and proactive measures. 
 
 This article examines the potential risks posed by AI technologies and considers strategies to address them effectively.
 

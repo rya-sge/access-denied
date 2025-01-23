@@ -1,0 +1,29 @@
+@startmindmap
+* Machine Learning
+** Supervised Learning
+*** Characteristics
+**** Labeled Data
+**** Predictive Models
+*** Examples
+**** Spam Filter
+**** Medical Diagnosis
+*** Applications
+**** Classification
+***** Binary (e.g., Spam/Not Spam)
+***** Multiclass (e.g., Image Recognition)
+**** Regression
+***** Continuous Output (e.g., House Prices)
+
+** Unsupervised Learning
+*** Characteristics
+**** Unlabeled Data
+**** Pattern Discovery
+*** Examples
+**** News Article Grouping
+**** Market Segmentation
+*** Applications
+**** Clustering
+***** Finding Groups (e.g., Market Segmentation)
+**** Anomaly Detection
+***** Identifying Outliers (e.g., Fraud Detection)
+@endmindmap

@@ -1,0 +1,59 @@
+@startmindmap
+* CreateBondingCurve Accounts
+** mint
+*** Type: Box<Account<'info, Mint>>
+*** Initialized: Yes
+*** Payer: creator
+*** Mint Decimals: From `global.mint_decimals`
+*** Authority: bonding_curve
+*** Freeze Authority: bonding_curve
+** creator
+*** Type: Signer<'info>
+*** Mutability: Mutable
+** bonding_curve
+*** Type: Box<Account<'info, BondingCurve>>
+*** Initialized: Yes
+*** Payer: creator
+*** Seeds: `[BondingCurve::SEED_PREFIX, mint.key()]`
+*** Bump: Yes
+*** Space: `8 + BondingCurve::INIT_SPACE`
+** bonding_curve_token_account
+*** Type: Box<Account<'info, TokenAccount>>
+*** Initialized: If needed
+*** Payer: creator
+*** Associated Token Mint: mint
+*** Associated Token Authority: bonding_curve
+** bonding_curve_sol_escrow
+*** Type: AccountInfo<'info>
+*** Seeds: `[BondingCurve::SOL_ESCROW_SEED_PREFIX, mint.key()]`
+*** Bump: Yes
+*** Description: PDA to hold SOL for bonding curve
+** global
+*** Type: Box<Account<'info, Global>>
+*** Seeds: `[Global::SEED_PREFIX]`
+*** Bump: Yes
+*** Constraint: `global.initialized == true`
+** whitelist
+*** Type: Option<Account<'info, Whitelist>>
+*** Seeds: `[Whitelist::SEED_PREFIX, creator.key()]`
+*** Bump: Yes
+** metadata
+*** Type: UncheckedAccount<'info>
+*** Mutability: Mutable
+*** Description: Using seed to validate metadata account
+** system_program
+*** Type: UncheckedAccount<'info>
+*** Description: System program account
+** token_program
+*** Type: Program<'info, Token>
+*** Description: Token program account
+** associated_token_program
+*** Type: UncheckedAccount<'info>
+*** Description: Associated token program account
+** token_metadata_program
+*** Type: UncheckedAccount<'info>
+*** Description: Token metadata program account
+** rent
+*** Type: UncheckedAccount<'info>
+*** Description: Rent program account
+@endmindmap

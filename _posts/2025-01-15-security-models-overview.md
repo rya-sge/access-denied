@@ -1,17 +1,19 @@
 ---
 layout: post
 title: Main Security Models - Overview
-date:   2024-11-28
+date: 2025-01-15
 lang: en
 locale: en-GB
 categories: security tryhackme
 tags: security threat Bell-LaPadula Clark-Wilson Biba tryhackme
-description: The Pyramid of Pain visually organizes six types of indicators used to detect and mitigate cyber threats, illustrating how targeting each type of indicator affects the attacker’s ability to operate.
+description: This article provides a comprehensive overview of three foundational security models: Bell-LaPadula, Biba, and Clark-Wilson.
 image: /assets/article/securite/security-model/security-models-bell-lapadula-model.drawio.png
 isMath: false
 ---
 
-Here’s an explanation of the three models—**Bell-LaPadula**, **Biba**, and **Clark-Wilson**—which are foundational in computer security.
+This article provides a comprehensive overview of three foundational security models: **Bell-LaPadula**, **Biba**, and **Clark-Wilson**.
+
+ It explains their core principles and applications, focusing on how each model addresses different aspects of security—confidentiality, integrity, and workflow enforcement. 
 
 > Warning: this article is still in draft state and its content is still mainly taken from the documentation. Its content should become more personal later.
 >
@@ -154,7 +156,7 @@ Often used in commercial systems (e.g., banking) to enforce proper workflows, pr
 
 ------
 
-### Summary Comparison:
+## Summary Comparison
 
 | **Model**     | **Focus**                      | **Key Rules**                                  | **Use Case**                 |
 | ------------- | ------------------------------ | ---------------------------------------------- | ---------------------------- |
@@ -164,7 +166,17 @@ Often used in commercial systems (e.g., banking) to enforce proper workflows, pr
 
 Each model addresses different security needs and is tailored to specific types of threats and environments.
 
+### Mindmap
+
+![security-models-mindmap]({{site.url_complet}}/assets/article/securite/security-model/security-models-mindmap.png)
+
 ## References
 
-- ChatGPT with the input *Explain these different models: Bell-LaPadula Model The Biba Integrity Model The Clark-Wilson Model*
+- ChatGPT with the inputs: *Explain these different models: Bell-LaPadula Model The Biba Integrity Model The Clark-Wilson Model*,  "Create a plantuml mindmap to summarize it"
 - [TryHackMe - Security Principles](https://tryhackme.com/r/room/securityprinciples)
+- Mike Chapple (YouTube):
+
+  - [CertMike Explains the Biba Integrity Model](https://www.youtube.com/watch?v=nfmwSGtyzV0)
+  - [The Bell LaPadula Model](https://www.youtube.com/watch?v=G1FWTfJsK6k)
+
+  ### 

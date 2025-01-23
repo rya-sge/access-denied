@@ -59,6 +59,10 @@ You have traditionally two types of oracles:
 
 Chainlink provides a pull based oracle ([Chainlink data streams (3)](https://docs.chain.link/data-streams)) and a push based oracle ([Chainlink data feeds](https://chain.link/data-feeds))
 
+Here a schema from [Chainlink documentation](https://docs.chain.link/data-streams)
+
+![chainlink-push-pull-oracle]({{site.url_complet}}/assets/article/blockchain/oracle/chainlink-push-pull-oracle.png)
+
 The reasoning taken in this article is mainly based on the push base oracle with the [Price Feeds (4)](https://docs.chain.link/data-feeds#price-feeds), but can also apply to a pull base oracle.
 
 Reference: [5. Arbitrum - Oracle overview](https://docs.arbitrum.io/build-decentralized-apps/oracles/overview)                                                                         
@@ -229,4 +233,4 @@ In the case of Chainlink, there are several different nodes maintained by known 
 
 - [12. stackoverflow - Is Chainlink's price reference data free to consume?](https://ethereum.stackexchange.com/questions/87473/is-chainlinks-price-reference-data-free-to-consume)
 - [14. ethereum stackexchange - Chainlink Stale Data latestRoundData() guide](https://ethereum.stackexchange.com/questions/154261/chainlink-stale-data-latestrounddata-guide)
-- [www.rareskills.io - How Chainlink Price Feeds Work](https://www.rareskills.io/post/chainlink-price-feed-contract)
+- [rareskills.io - How Chainlink Price Feeds Work](https://www.rareskills.io/post/chainlink-price-feed-contract)
