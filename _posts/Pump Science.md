@@ -1,10 +1,36 @@
 # Pump Science
 
-## Create_bonding_curve
+## Administrative Roles
 
+### Curve Creator
 
+- Can initialize new bonding curves
+- Sets initial parameters and optional whitelist
+- Configures launch timing and initial purchases
 
+### Admin
 
+- Can modify protocol parameters
+- Manages fee settings
+- Controls whitelist status
+
+### Fee Recipients
+
+- Protocol Multisig (`3bM4hewuZFZgNXvLWwaktXMa8YHgxsnnhaRfzxJV944P`)
+  - Receives trading fees
+  - Has authority over locked LP tokens
+  - Receives swapped USDC from liquidity migrations
+
+## Create a Bonding Curve
+
+To create a new bonding curve:
+
+1. Initialize curve parameters
+2. Optional: Enable whitelist
+3. Set launch timing
+4. Configure initial purchases
+
+Trading is enabled along the bonding curve until 85 SOL are raised and all 793,100,000 tokens are sold.
 
 
 
@@ -78,7 +104,9 @@ pub struct CreateBondingCurve<'info> {
 
 
 
+Open question: why 8 for the constant seed
 
+### Details
 
 This Solana program struct, `CreateBondingCurve`, defines the accounts and constraints necessary for initializing a bonding curve in a decentralized application. 
 
@@ -138,8 +166,6 @@ Here's a step-by-step explanation of the code's functionality and a review of po
         - Ensure proper constraints or checks are added for these accounts.
    2. **SOL Escrow PDA**:
       - The `bonding_curve_sol_escrow` account is also marked with `CHECK`. If the seed derivation logic is incorrect or predictable, attackers might exploit it to intercept funds.
-   3. **Whitelist Logic**:
-      - The `whitelist` account is optional, which might weaken access control. If a whitelist is intended for security purposes, it should be mandatory with proper validation.
    4. **Token and Mint Authority**:
       - The `bonding_curve` account is given full authority over the mint. If the `bonding_curve` account is compromised, the attacker could manipulate token minting and freezing.
    5. **Lack of Metadata Validation**:
@@ -148,24 +174,23 @@ Here's a step-by-step explanation of the code's functionality and a review of po
       - The global account checks the `initialized` field. If this constraint fails, the error (`ContractError::NotInitialized`) must be well-defined and provide sufficient information to avoid confusion.
    7. **Improper PDA Bump Usage**:
       - While bump seeds are used, ensure that they are properly derived and predictable only by the program to avoid collisions or unintended PDA generation.
-
+   
    ------
 
    ### **Recommendations**:
 
    - Add explicit validations for `CHECK` accounts, especially the `metadata` and `SOL escrow` accounts.
-   - Make the `whitelist` mandatory if it's meant to restrict access, or ensure its absence doesn't weaken the system.
-   - Use robust error handling for constraints to provide meaningful feedback.
+- Use robust error handling for constraints to provide meaningful feedback.
    - Ensure bump seeds and PDA derivations are thoroughly tested for security and predictability.
    - Conduct additional auditing for token authority and minting logic to prevent privilege escalation.
-
+   
    This analysis highlights key features and potential areas for improvement. Let me know if you need a deeper dive into specific aspects or additional clarifications!
-
    
 
    
 
    
+
 
 ### **Function Overview**
 
@@ -511,3 +536,14 @@ The `validate` function ensures the parameters provided for creating a bonding c
 ------
 
 The function is well-structured for its primary purpose but would benefit from additional safeguards and validations to make it more robust against edge cases and malicious inputs. Let me know if you'd like further refinements or additional insights!
+
+## Migration
+
+Code: https://github.com/code-423n4/2025-01-pump-science/tree/main/programs/pump-science/src/instructions/migration
+
+Migration is a critical process that occurs once the bonding curve has completed and the tokens are empty. It involves:
+
+1. Minting the remaining 206,900,000 tokens
+2. Sending the experiment fee to the multisig wallet
+3. A CPI (Cross-Program Invocation) call to create a Meteora Dynamic AMM (Automated Market Maker). It uses 206,900,000 matched with 85SOL - experiment fee
+4. A separate instruction CPI call that locks the liquidity in the AMM and creates an escrow from which the multisig can claim trading fees.
