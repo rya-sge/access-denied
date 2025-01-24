@@ -70,17 +70,31 @@ While AI chatbots hold immense promise for simplifying information retrieval, th
 
 ## What is Shadow AI? The Dark Horse of Cybersecurity Threats
 
-> Shadow AI refers to the unsanctioned or unmonitored use of artificial intelligence tools within an organization. These are AI systems or models that employees or teams deploy without the approval, knowledge, or oversight of the organization's IT or security departments. While Shadow AI can stem from well-intentioned efforts to innovate or streamline workflows, it introduces significant risks to cybersecurity, compliance, and operational integrity.
+> Shadow AI refers to the unsanctioned or unmonitored use of artificial intelligence tools within an organization. 
 
-It’s 2 o’clock in the morning, and here’s a question: do you know where your AI is? Many organizations assume they have full control over the AI tools within their environments, but the reality is often more complex. Enter Shadow AI—the unsanctioned or untracked use of AI systems within a corporate environment.
+These are AI systems or models that employees or teams deploy without the approval, knowledge, or oversight of the organization's IT or security departments. 
 
-Generative AI's potential has inspired employees to explore ways to leverage it for various tasks. However, not all of these initiatives are approved or monitored by IT and security teams. These shadow projects, while innovative, pose significant cybersecurity risks, including the potential for data leaks or exposure to vulnerabilities. Organizations must discover and assess all instances of AI in their environments—especially the ones flying under the radar—to secure and manage them effectively.
+While Shadow AI can stem from well-intentioned efforts to innovate or streamline workflows, it introduces significant risks to cybersecurity, compliance, and operational integrity.
+
+To introduce this paragraph, here’s a question: do you know where your AI is ? 
+
+Many organizations assume they have full control over the AI tools within their environments, but the reality is often more complex. 
+
+Generative AI's potential has inspired employees to explore ways to leverage it for various tasks. However, not all of these initiatives are approved or monitored by IT and security teams. 
+
+These shadow projects, while innovative, pose significant cybersecurity risks, including the potential for **data leaks** or exposure to **vulnerabilities**. 
+
+Organizations must discover and assess all instances of AI in their environments—especially the ones flying under the radar—to secure and manage them effectively.
 
 ### First step - Discovery
 
-To tackle this challenge, the first step is discovery. Businesses should start by mapping out the cloud environments they operate, as these are common locations for hosting powerful, compute-intensive AI models. Shadow AI deployments often involve a model, data used for training and tuning, and applications leveraging the model. Identifying these components is crucial.
+To tackle this challenge, the first step is discovery. Businesses should start by mapping out the cloud environments they operate, as these are common locations for hosting powerful, compute-intensive AI models. 
 
-Furthermore, open-source models downloaded from platforms like Hugging Face may not follow the same security protocols as full-fledged AI platforms such as IBM’s watsonx. These differences necessitate tailored approaches for securing various AI implementations. By using automated tools for discovery and visualization, companies can illuminate the dark corners where Shadow AI operates.
+Shadow AI deployments often involve a model, data used for training and tuning, and applications leveraging the model. Identifying these components is crucial.
+
+Furthermore, there are also disparities between models (open source or closed source) with regard to guarantees in terms of security and respect for data. It is important to make an assessment before accepting the use of a model within the company.
+
+These differences necessitate tailored approaches for securing various AI implementations. By using automated tools for discovery and visualization, companies can illuminate the dark corners where Shadow AI operates.
 
 ### Second step - Secure against risk
 
