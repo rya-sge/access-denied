@@ -1,12 +1,12 @@
 ---
 layout: post
 title: AI security and threats
-date:   2025-01-22
+date: 2025-01-22
 lang: en
 locale: en-GB
 categories: security ai
 tags: security threat ai
-description:  Artificial Intelligence(AI) and Machine Learning Models bring with them a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of "Shadow AI" systems inside an organization.
+description:  Artificial Intelligence(AI) and Machine Learning Models bring with them a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of Shadow AI systems inside an organization.
 image: /assets/article/blockchain/ai/chatbot/chatbot-car.png
 isMath: false
 ---
