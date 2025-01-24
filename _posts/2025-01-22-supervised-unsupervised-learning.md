@@ -1,19 +1,15 @@
 ---
-​---
 layout: post
 title: Machine Learning - Supervised vs. Unsupervised Learning
-date:   2025-01-22
+date: 2025-01-22
 lang: en
 locale: en-GB
 categories: ai
 tags: supervised unsupervised learning machine-learning
 description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples.
-image: /assets/article/mlg/supervised-unsupervided-learning.png
+image: /assets/article/mlg/supervised-unsupervised-learning.png
 isMath: true
-​---
 ---
-
-
 
 Machine learning models are transforming how we analyze data, make predictions, and uncover patterns. 
 
