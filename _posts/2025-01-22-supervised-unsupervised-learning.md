@@ -101,7 +101,7 @@ The choice between supervised and unsupervised learning depends on the type of d
 
 Made with ChatGPT and [PlantUML](https://www.plantuml.com/plantuml/)
 
-![supervised-unsupervided-learning]({{site.url_complet}}/assets/article/mlg/supervised-unsupervided-learning.png)
+![supervised-unsupervised-learning]({{site.url_complet}}/assets/article/mlg/supervised-unsupervised-learning.png)
 
 
 
