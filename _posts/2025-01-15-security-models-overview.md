@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: security tryhackme
 tags: security threat Bell-LaPadula Clark-Wilson Biba tryhackme
-description: This article provides a comprehensive overview of three foundational security models: Bell-LaPadula, Biba, and Clark-Wilson.
+description: "This article provides a comprehensive overview of three foundational security models: Bell-LaPadula, Biba, and Clark-Wilson."
 image: /assets/article/securite/security-model/security-models-bell-lapadula-model.drawio.png
 isMath: false
 ---

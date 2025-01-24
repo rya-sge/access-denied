@@ -69,6 +69,8 @@ This section describes the common vulnerabilities and risks related to the use o
 
 If a contract A called a contrat B (or a library) to execute code without verifying that the contract is still in live (not destructed), a self destruct on the contract B can block the contract A for ever. 
 
+#### Parity multisig wallet
+
 A famous example concerns the [Parity multi sig wallet](https://www.parity.io/blog/a-postmortem-on-the-parity-multi-sig-library-self-destruct/). On 2017, a `selfdestruct`has been triggerd by an anonymous user on a library used by the wallet.  As a result, funds in 587 wallets, about 513,774.16 Ether as well as additional tokens, are blocked forever in the contract.
 
 It can also be the case in a proxy architecture, see the paragraph "Proxy implementation not protected" for more details.

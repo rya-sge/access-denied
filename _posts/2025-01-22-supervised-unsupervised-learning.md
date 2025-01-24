@@ -7,7 +7,7 @@ lang: en
 locale: en-GB
 categories: ai
 tags: supervised unsupervised learning machine-learning
-description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples
+description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples.
 image: /assets/article/mlg/supervised-unsupervided-learning.png
 isMath: true
 ​---
