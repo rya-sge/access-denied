@@ -50,23 +50,6 @@ Trading is enabled along the bonding curve until 85 SOL are raised and all 793,1
 
 #### Validate
 
-##### **Function Overview**
-
-The `validate` function is a precondition check for creating a bonding curve. It ensures that input parameters and relevant accounts meet specific criteria before proceeding with the operation.
-
-The key validations performed are:
-
-1. **Start Time Validation**:
-   - Ensures the `params.start_slot` is not in the past and is within a defined delay range (`MAX_START_SLOT_DELAY`).
-2. **Whitelist Validation**:
-   - If whitelisting is enabled (`global.whitelist_enabled`)
-     - Ensures a whitelist exists (`self.whitelist.is_some()`).
-     - Ensures the `creator` account matches the whitelist's `creator` field.
-3. **Global Configuration Validation**:
-   - Verifies that the global configuration is not outdated by calling `self.global.is_config_outdated()`.
-
-If all validations pass, the function returns `Ok(())`. Otherwise, it returns an error.
-
 ```rust
     pub fn validate(&self, params: &CreateBondingCurveParams) -> Result<()> {
         let clock = Clock::get()?;
@@ -97,6 +80,27 @@ If all validations pass, the function returns `Ok(())`. Otherwise, it returns an
     }
 ```
 
+
+
+##### **Function Overview**
+
+The `validate` function is a precondition check for creating a bonding curve. It ensures that input parameters and relevant accounts meet specific criteria before proceeding with the operation.
+
+The key validations performed are:
+
+1. **Start Time Validation**:
+   - Ensures the `params.start_slot` is not in the past and is within a defined delay range (`MAX_START_SLOT_DELAY`).
+2. **Whitelist Validation**:
+   - If whitelisting is enabled (`global.whitelist_enabled`)
+     - Ensures a whitelist exists (`self.whitelist.is_some()`).
+     - Ensures the `creator` account matches the whitelist's `creator` field.
+3. **Global Configuration Validation**:
+   - Verifies that the global configuration is not outdated by calling `self.global.is_config_outdated()`.
+
+If all validations pass, the function returns `Ok(())`. Otherwise, it returns an error.
+
+
+
 #### Handler
 
 ##### **Function Overview**
@@ -123,6 +127,14 @@ The `handler` function is responsible for creating and initializing a bonding cu
    - Emits an event (`CreateEvent`) with bonding curve details for external tracking and logging.
 7. **Log Success**:
    - Logs a success message and returns `Ok(())`.
+
+
+
+##### Code
+
+###### Code4Arena
+
+https://github.com/code-423n4/2025-01-pump-science/blob/ebfd2c6a91c443c75b9bdd08c25ab64714ed9c9f/programs/pump-science/src/instructions/curve/create_bonding_curve.rs#L131
 
 ```rust
  pub fn handler(
@@ -191,6 +203,31 @@ The `handler` function is responsible for creating and initializing a bonding cu
         Ok(())
     }
 ```
+
+###### Before Pashow Audit group
+
+Partial code snippet
+
+```rust
+// In create_bonding_curve.rs
+pub fn handler(
+	ctx:Context<CreateBondingCurve>,
+	params:CreateBondingCurveParams
+) -> Result<(
+// real_sol_reserves initialized to 0
+ctx.accounts.bonding_curve.update_from_params(...);
+// Invariant check will fail if escrow has SOL
+BondingCurve::invariant(locker)?;
+}
+// In curve.rs
+pub fn invariant<'info>(ctx: &mut BondingCurveLockerCtx<'info>) -> Result<()> {
+if sol_escrow_lamports != bonding_curve.real_sol_reserves {
+return Err(ContractError::BondingCurveInvariant.into());
+}
+}
+```
+
+
 
 #### Initialize meta
 
@@ -361,6 +398,391 @@ Here's a step-by-step explanation of the code's functionality and a review of po
    ### 
 
 
+
+## Swap
+
+https://github.com/code-423n4/2025-01-pump-science/blob/ebfd2c6a91c443c75b9bdd08c25ab64714ed9c9f/programs/pump-science/src/instructions/curve/swap.rs
+
+### Validate
+
+```rust
+pub fn validate(&self, params: &SwapParams) -> Result<()> {
+        let SwapParams {
+            base_in: _,
+            exact_in_amount,
+            min_out_amount: _,
+        } = params;
+        let clock = Clock::get()?;
+
+        let is_dev_buy = clock.slot == self.bonding_curve.start_slot
+            && self.user.key() == self.bonding_curve.creator;
+
+        if !is_dev_buy {
+            require!(
+                self.bonding_curve.is_started(&clock),
+                ContractError::CurveNotStarted
+            );
+        }
+
+        require!(exact_in_amount > &0, ContractError::MinSwap);
+
+        require!(
+            self.fee_receiver.key() == self.global.fee_receiver,
+            ContractError::InvalidFeeReceiver
+        );
+
+        require!(
+            !self.global.is_config_outdated()?,
+            ContractError::ConfigOutdated
+        );
+
+        Ok(())
+    }
+```
+
+
+
+### **Main Steps**
+
+1. **Extract Parameters**:
+
+   - The 
+
+     ```
+     SwapParams
+     ```
+
+      struct is unpacked, retrieving:
+
+     - `base_in`: Not used in this function.
+     - `exact_in_amount`: The amount of the base token being swapped.
+     - `min_out_amount`: Not used in this function.
+
+2. **Fetch Current Slot**:
+
+   - The current Solana blockchain slot is retrieved using `Clock::get()`.
+
+3. **Developer Buy Condition**:
+
+   - Checks if the current slot matches the bonding curve's `start_slot` **and** if the user performing the swap is the bonding curve's creator. This defines a "developer buy" condition.
+
+4. **Curve Activation Check**:
+
+   - If the "developer buy" condition is not met, it validates whether the bonding curve has started using `is_started`.
+
+5. **Input Amount Validation**:
+
+   - Ensures the `exact_in_amount` is greater than `0`.
+
+6. **Fee Receiver Check**:
+
+   - Verifies that the contract's `fee_receiver` matches the global configuration's `fee_receiver`.
+
+7. **Configuration Validity**:
+
+   - Checks whether the global configuration is outdated using `is_config_outdated`.
+
+### Handler
+
+```rust
+pub fn handler(ctx: Context<Swap>, params: SwapParams) -> Result<()> {
+        let SwapParams {
+            base_in,
+            exact_in_amount,
+            min_out_amount,
+        } = params;
+
+        msg!(
+            "Swap started. BaseIn: {}, AmountIn: {}, MinOutAmount: {}",
+            base_in,
+            exact_in_amount,
+            min_out_amount
+        );
+        let bonding_curve = ctx.accounts.bonding_curve.clone();
+        let locker: &mut BondingCurveLockerCtx = &mut ctx
+            .accounts
+            .into_bonding_curve_locker_ctx(ctx.bumps.bonding_curve);
+        locker.unlock_ata()?;
+
+        let sol_amount: u64;
+        let token_amount: u64;
+        let fee_lamports: u64;
+
+        if base_in {
+            // Sell tokens
+            require!(
+                ctx.accounts.user_token_account.amount >= exact_in_amount,
+                ContractError::InsufficientUserTokens,
+            );
+
+            let sell_result = ctx
+                .accounts
+                .bonding_curve
+                .apply_sell(exact_in_amount)
+                .ok_or(ContractError::SellFailed)?;
+
+            msg!("SellResult: {:#?}", sell_result);
+
+            sol_amount = sell_result.sol_amount;
+            token_amount = sell_result.token_amount;
+
+            let clock = Clock::get()?;
+            fee_lamports = bonding_curve.calculate_fee(sol_amount, clock.slot)?;
+            msg!("Fee: {} SOL", fee_lamports);
+
+            Swap::complete_sell(&ctx, sell_result.clone(), min_out_amount, fee_lamports)?;
+        } else {
+            // Buy tokens
+            let rent = Rent::get()?;
+            let min_rent = rent.minimum_balance(0); // 0 for data size since this is just a native SOL account
+            require!(
+                ctx.accounts.user.get_lamports() >= exact_in_amount.checked_add(min_rent).unwrap(),
+                ContractError::InsufficientUserSOL,
+            );
+
+            let clock = Clock::get()?;
+            let buy_amount_applied: u64;
+
+            // Check if slot is start slot and buyer is bonding_curve creator
+            if clock.slot == bonding_curve.start_slot
+                && ctx.accounts.user.key() == bonding_curve.creator
+            {
+                msg!("Dev buy");
+                fee_lamports = 0;
+                buy_amount_applied = exact_in_amount;
+            } else {
+                fee_lamports = bonding_curve.calculate_fee(exact_in_amount, clock.slot)?;
+                msg!("Fee: {} SOL", fee_lamports);
+                buy_amount_applied = exact_in_amount - fee_lamports;
+            }
+
+            let buy_result = ctx
+                .accounts
+                .bonding_curve
+                .apply_buy(buy_amount_applied)
+                .ok_or(ContractError::BuyFailed)?;
+
+            msg!("BuyResult: {:#?}", buy_result);
+
+            sol_amount = buy_result.sol_amount;
+            token_amount = buy_result.token_amount;
+
+            Swap::complete_buy(&ctx, buy_result.clone(), min_out_amount, fee_lamports)?;
+        }
+
+        BondingCurve::invariant(
+            &mut ctx
+                .accounts
+                .into_bonding_curve_locker_ctx(ctx.bumps.bonding_curve),
+        )?;
+        let bonding_curve = &ctx.accounts.bonding_curve;
+
+        // Emit trade event used for indexing
+        emit_cpi!(TradeEvent {
+            mint: *ctx.accounts.mint.to_account_info().key,
+            sol_amount: sol_amount,
+            token_amount: token_amount,
+            fee_lamports: fee_lamports,
+            is_buy: !base_in,
+            user: *ctx.accounts.user.to_account_info().key,
+            timestamp: Clock::get()?.unix_timestamp,
+            virtual_sol_reserves: bonding_curve.virtual_sol_reserves,
+            virtual_token_reserves: bonding_curve.virtual_token_reserves,
+            real_sol_reserves: bonding_curve.real_sol_reserves,
+            real_token_reserves: bonding_curve.real_token_reserves,
+        });
+
+        // Emit complete event when bonding curve is completed
+        if bonding_curve.complete {
+            emit_cpi!(CompleteEvent {
+                user: *ctx.accounts.user.to_account_info().key,
+                mint: *ctx.accounts.mint.to_account_info().key,
+                virtual_sol_reserves: bonding_curve.virtual_sol_reserves,
+                virtual_token_reserves: bonding_curve.virtual_token_reserves,
+                real_sol_reserves: bonding_curve.real_sol_reserves,
+                real_token_reserves: bonding_curve.real_token_reserves,
+                timestamp: Clock::get()?.unix_timestamp,
+            });
+        }
+
+        msg!("{:#?}", bonding_curve);
+
+        Ok(())
+    }
+```
+
+
+
+### Complete_buy
+
+```rust
+pub fn complete_buy(
+        ctx: &Context<Swap>,
+        buy_result: BuyResult,
+        min_out_amount: u64,
+        fee_lamports: u64,
+    ) -> Result<()> {
+        let bonding_curve = &ctx.accounts.bonding_curve;
+
+        require!(
+            buy_result.token_amount >= min_out_amount,
+            ContractError::SlippageExceeded,
+        );
+
+        // Transfer tokens to user
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.bonding_curve_token_account.to_account_info(),
+            to: ctx.accounts.user_token_account.to_account_info(),
+            authority: bonding_curve.to_account_info(),
+        };
+
+        let signer = BondingCurve::get_signer(
+            &ctx.bumps.bonding_curve,
+            ctx.accounts.mint.to_account_info().key,
+        );
+        let signer_seeds = &[&signer[..]];
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                cpi_accounts,
+                signer_seeds,
+            ),
+            buy_result.token_amount,
+        )?;
+        let locker = &mut ctx
+            .accounts
+            .into_bonding_curve_locker_ctx(ctx.bumps.bonding_curve);
+        locker.lock_ata()?;
+        msg!("Token transfer complete");
+
+        // Transfer SOL to bonding curve
+        let transfer_instruction = system_instruction::transfer(
+            ctx.accounts.user.key,
+            ctx.accounts.bonding_curve_sol_escrow.to_account_info().key,
+            buy_result.sol_amount,
+        );
+
+        anchor_lang::solana_program::program::invoke_signed(
+            &transfer_instruction,
+            &[
+                ctx.accounts.user.to_account_info(),
+                ctx.accounts.bonding_curve_sol_escrow.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            &[],
+        )?;
+        msg!("SOL to bonding curve transfer complete");
+
+        // Transfer SOL to fee recipient
+        let fee_transfer_instruction = system_instruction::transfer(
+            ctx.accounts.user.key,
+            &ctx.accounts.fee_receiver.key(),
+            fee_lamports,
+        );
+
+        anchor_lang::solana_program::program::invoke_signed(
+            &fee_transfer_instruction,
+            &[
+                ctx.accounts.user.to_account_info(),
+                ctx.accounts.fee_receiver.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            &[],
+        )?;
+        msg!("Fee transfer to fee_receiver complete");
+
+        Ok(())
+    }
+
+```
+
+
+
+### Complete sell
+
+```rust
+  pub fn complete_sell(
+        ctx: &Context<Swap>,
+        sell_result: SellResult,
+        min_out_amount: u64,
+        fee_lamports: u64,
+    ) -> Result<()> {
+        // Sell tokens
+        let sell_amount_minus_fee = sell_result.sol_amount - fee_lamports;
+
+        require!(
+            sell_amount_minus_fee >= min_out_amount,
+            ContractError::SlippageExceeded,
+        );
+
+        // Transfer tokens to bonding curve
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.user_token_account.to_account_info(),
+            to: ctx.accounts.bonding_curve_token_account.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        token::transfer(
+            CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts),
+            sell_result.token_amount,
+        )?;
+        let locker = &mut ctx
+            .accounts
+            .into_bonding_curve_locker_ctx(ctx.bumps.bonding_curve);
+        locker.lock_ata()?;
+
+        msg!("Token to bonding curve transfer complete");
+
+        // Transfer SOL to user
+        let sol_escrow_signer = BondingCurve::get_sol_escrow_signer(
+            &ctx.bumps.bonding_curve_sol_escrow,
+            &ctx.accounts.mint.to_account_info().key,
+        );
+        let sol_escrow_signer_seeds = &[&sol_escrow_signer[..]];
+
+        let sol_ix = system_instruction::transfer(
+            &ctx.accounts.bonding_curve_sol_escrow.to_account_info().key,
+            &ctx.accounts.user.to_account_info().key,
+            sell_amount_minus_fee,
+        );
+
+        invoke_signed(
+            &sol_ix,
+            &[
+                ctx.accounts
+                    .bonding_curve_sol_escrow
+                    .to_account_info()
+                    .clone(),
+                ctx.accounts.user.to_account_info().clone(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            sol_escrow_signer_seeds,
+        )?;
+        msg!("SOL to user transfer complete");
+
+        if fee_lamports > 0 {
+            let fee_transfer_instruction = system_instruction::transfer(
+                &ctx.accounts.bonding_curve_sol_escrow.to_account_info().key,
+                &ctx.accounts.fee_receiver.to_account_info().key,
+                fee_lamports,
+            );
+
+            invoke_signed(
+                &fee_transfer_instruction,
+                &[
+                    ctx.accounts.bonding_curve_sol_escrow.to_account_info(),
+                    ctx.accounts.fee_receiver.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                sol_escrow_signer_seeds,
+            )?;
+
+            msg!("Fee to fee_vault transfer complete");
+        }
+        Ok(())
+```
+
+
+
 ## Migration
 
 Code: https://github.com/code-423n4/2025-01-pump-science/tree/main/programs/pump-science/src/instructions/migration
@@ -371,3 +793,256 @@ Migration is a critical process that occurs once the bonding curve has completed
 2. Sending the experiment fee to the multisig wallet
 3. A CPI (Cross-Program Invocation) call to create a Meteora Dynamic AMM (Automated Market Maker). It uses 206,900,000 matched with 85SOL - experiment fee
 4. A separate instruction CPI call that locks the liquidity in the AMM and creates an escrow from which the multisig can claim trading fees.
+
+### Initialize pool
+
+```rust
+pub fn initialize_pool_with_config(ctx: Context<InitializePoolWithConfig>) -> Result<()> {
+    let quote_mint: Pubkey = Pubkey::from_str(QUOTE_MINT).unwrap();
+
+    require!(
+        !ctx.accounts.global.is_config_outdated()?,
+        ContractError::ConfigOutdated
+    );
+
+    require!(
+        ctx.accounts.bonding_curve.mint.key() == ctx.accounts.token_b_mint.key(),
+        ContractError::NotBondingCurveMint
+    );
+
+    require!(
+        quote_mint.key() == ctx.accounts.token_a_mint.key(),
+        ContractError::NotSOL
+    );
+
+    require!(
+        ctx.accounts.fee_receiver.key() == ctx.accounts.global.fee_receiver.key(),
+        ContractError::InvalidFeeReceiver
+    );
+
+    require!(
+        ctx.accounts.global.meteora_config.key() == ctx.accounts.config.key(),
+        ContractError::InvalidConfig
+    );
+
+    require!(
+        ctx.accounts.payer.key() == ctx.accounts.global.migration_authority.key(),
+        ContractError::InvalidMigrationAuthority
+    );
+    require!(
+        ctx.accounts.bonding_curve.complete,
+        ContractError::NotCompleted
+    );
+
+    require!(
+        ctx.accounts.meteora_program.key() == Pubkey::from_str(METEORA_PROGRAM_KEY).unwrap(),
+        ContractError::InvalidMeteoraProgram
+    );
+
+    let mint_b = ctx.accounts.token_b_mint.key();
+
+    let bonding_curve_signer = BondingCurve::get_signer(&ctx.bumps.bonding_curve, &mint_b);
+    let bonding_curve_signer_seeds = &[&bonding_curve_signer[..]];
+
+    let sol_escrow_signer =
+        BondingCurve::get_sol_escrow_signer(&ctx.bumps.bonding_curve_sol_escrow, &mint_b);
+    let sol_escrow_signer_seeds = &[&sol_escrow_signer[..]];
+
+    let token_a_amount = ctx
+        .accounts
+        .bonding_curve
+        .real_sol_reserves
+        .checked_sub(ctx.accounts.global.migrate_fee_amount)
+        .ok_or(ContractError::ArithmeticError)?
+        .checked_sub(40_000_000)
+        .ok_or(ContractError::ArithmeticError)?;
+
+    msg!("Token A Amount: {}", token_a_amount);
+
+    let token_b_amount = ctx
+        .accounts
+        .bonding_curve
+        .token_total_supply
+        .checked_sub(ctx.accounts.global.initial_real_token_reserves)
+        .ok_or(ContractError::ArithmeticError)?
+        .checked_sub(ctx.accounts.global.migration_token_allocation)
+        .ok_or(ContractError::ArithmeticError)?;
+
+    msg!("Token B Amount: {}", token_b_amount);
+
+    // Unlock Ata before transfer
+    let locker: &mut BondingCurveLockerCtx = &mut ctx
+        .accounts
+        .into_bonding_curve_locker_ctx(ctx.bumps.bonding_curve);
+    locker.unlock_ata()?;
+
+    // Transfer Mint B to payer token b - Bonding Curve is Signer
+    let cpi_accounts = Transfer {
+        from: ctx.accounts.bonding_curve_token_account.to_account_info(),
+        to: ctx.accounts.payer_token_b.to_account_info(),
+        authority: ctx.accounts.bonding_curve.to_account_info(),
+    };
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            cpi_accounts,
+            bonding_curve_signer_seeds,
+        ),
+        token_b_amount,
+    )?;
+
+    // Transfer and wrap sol to payer token a - Sol Escrow is Signer
+    // Transfer
+    let sol_ix = system_instruction::transfer(
+        &ctx.accounts.bonding_curve_sol_escrow.to_account_info().key,
+        &ctx.accounts.payer_token_a.to_account_info().key,
+        token_a_amount,
+    );
+
+    invoke_signed(
+        &sol_ix,
+        &[
+            ctx.accounts
+                .bonding_curve_sol_escrow
+                .to_account_info()
+                .clone(),
+            ctx.accounts.payer_token_a.to_account_info().clone(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        sol_escrow_signer_seeds,
+    )?;
+
+    // Sync Native mint ATA
+    let cpi_accounts = token::SyncNative {
+        account: ctx.accounts.payer_token_a.to_account_info(),
+    };
+
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, sol_escrow_signer_seeds);
+    token::sync_native(cpi_ctx)?;
+
+    // Create pool
+    let mut accounts = vec![
+        AccountMeta::new(ctx.accounts.pool.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.config.key(), false),
+        AccountMeta::new(ctx.accounts.lp_mint.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.token_a_mint.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.token_b_mint.key(), false),
+        AccountMeta::new(ctx.accounts.a_vault.key(), false),
+        AccountMeta::new(ctx.accounts.b_vault.key(), false),
+        AccountMeta::new(ctx.accounts.a_token_vault.key(), false),
+        AccountMeta::new(ctx.accounts.b_token_vault.key(), false),
+        AccountMeta::new(ctx.accounts.a_vault_lp_mint.key(), false),
+        AccountMeta::new(ctx.accounts.b_vault_lp_mint.key(), false),
+        AccountMeta::new(ctx.accounts.a_vault_lp.key(), false),
+        AccountMeta::new(ctx.accounts.b_vault_lp.key(), false),
+        AccountMeta::new(ctx.accounts.payer_token_a.key(), false),
+        AccountMeta::new(ctx.accounts.payer_token_b.key(), false),
+        AccountMeta::new(ctx.accounts.payer_pool_lp.key(), false),
+        AccountMeta::new(ctx.accounts.protocol_token_a_fee.key(), false),
+        AccountMeta::new(ctx.accounts.protocol_token_b_fee.key(), false),
+        AccountMeta::new(ctx.accounts.bonding_curve_sol_escrow.key(), true), // Bonding Curve is the sol_escrow
+        AccountMeta::new_readonly(ctx.accounts.rent.key(), false),
+        AccountMeta::new(ctx.accounts.mint_metadata.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.metadata_program.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.vault_program.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.token_program.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.associated_token_program.key(), false),
+        AccountMeta::new_readonly(ctx.accounts.system_program.key(), false),
+    ];
+
+    accounts.extend(ctx.remaining_accounts.iter().map(|acc| AccountMeta {
+        pubkey: *acc.key,
+        is_signer: false,
+        is_writable: true,
+    }));
+
+    let data = get_pool_create_ix_data(token_a_amount, token_b_amount);
+
+    let instruction = Instruction {
+        program_id: ctx.accounts.meteora_program.key(),
+        accounts,
+        data,
+    };
+
+    invoke_signed(
+        &instruction,
+        &[
+            ctx.accounts.pool.to_account_info(),
+            ctx.accounts.config.to_account_info(),
+            ctx.accounts.lp_mint.to_account_info(),
+            ctx.accounts.token_a_mint.to_account_info(),
+            ctx.accounts.token_b_mint.to_account_info(),
+            ctx.accounts.a_vault.to_account_info(),
+            ctx.accounts.b_vault.to_account_info(),
+            ctx.accounts.a_token_vault.to_account_info(),
+            ctx.accounts.b_token_vault.to_account_info(),
+            ctx.accounts.a_vault_lp_mint.to_account_info(),
+            ctx.accounts.b_vault_lp_mint.to_account_info(),
+            ctx.accounts.a_vault_lp.to_account_info(),
+            ctx.accounts.b_vault_lp.to_account_info(),
+            ctx.accounts.payer_token_a.to_account_info(),
+            ctx.accounts.payer_token_b.to_account_info(),
+            ctx.accounts.payer_pool_lp.to_account_info(),
+            ctx.accounts.protocol_token_a_fee.to_account_info(),
+            ctx.accounts.protocol_token_b_fee.to_account_info(),
+            ctx.accounts.bonding_curve_sol_escrow.to_account_info(), // Signer is the SOL Escrow
+            ctx.accounts.rent.to_account_info(),
+            ctx.accounts.mint_metadata.to_account_info(),
+            ctx.accounts.metadata_program.to_account_info(),
+            ctx.accounts.vault_program.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.associated_token_program.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        sol_escrow_signer_seeds, // Signer is the SOL Escrow
+    )?;
+
+    // Fee transfer
+    let sol_ix = system_instruction::transfer(
+        &ctx.accounts.bonding_curve_sol_escrow.to_account_info().key,
+        &ctx.accounts.fee_receiver.to_account_info().key,
+        ctx.accounts.global.migrate_fee_amount,
+    );
+
+    invoke_signed(
+        &sol_ix,
+        &[
+            ctx.accounts
+                .bonding_curve_sol_escrow
+                .to_account_info()
+                .clone(),
+            ctx.accounts.fee_receiver.to_account_info().clone(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        sol_escrow_signer_seeds,
+    )?;
+
+    // Transfer community allocation to fee_receiver
+    let cpi_accounts = Transfer {
+        from: ctx.accounts.bonding_curve_token_account.to_account_info(),
+        to: ctx.accounts.fee_receiver_token_account.to_account_info(),
+        authority: ctx.accounts.bonding_curve.to_account_info(),
+    };
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            cpi_accounts,
+            bonding_curve_signer_seeds,
+        ),
+        ctx.accounts.global.migration_token_allocation,
+    )?;
+
+    locker.revoke_freeze_authority()?;
+    Ok(())
+}
+```
+
+##### Workflow 
+
+Diagram made by ChatGPT
+
+![pump-science-migrate-workflow](../assets/article/blockchain/solana/pump-science/pump-science-migrate-workflow.png)
+

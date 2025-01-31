@@ -1,6 +1,10 @@
 ### Exploring the Different Formulas Used to Build Automated Market Makers (AMMs)
 
-Automated Market Makers (AMMs) are a cornerstone of decentralized finance (DeFi), enabling seamless peer-to-peer trading without intermediaries. Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards, making them the backbone of liquidity pools. This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
+Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi), enabling to swap crypto assets without intermediaries. 
+
+Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards, making them the backbone of liquidity pools. 
+
+This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
 
 ------
 
@@ -108,8 +112,6 @@ See also [Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.li
 
 - **Complexity**: Requires more sophisticated calculations.
 - **Higher Gas Costs**: Computationally intensive, leading to increased transaction fees.
-
-
 
 
 

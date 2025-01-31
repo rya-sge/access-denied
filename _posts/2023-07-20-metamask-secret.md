@@ -24,9 +24,9 @@ Metamask has three different **secrets** that are used in different ways :
 
 They implement and use several standard and cryptography algorithms to generate these three secrets used inside the application (SRP/seed phrase, private key and password) and keep them safe.
 
-- To generate the recovery Phrase, Metamask implements the standard BIP_0039 from Bitcoin
+- To generate the recovery Phrase, Metamask implements the standard [BIP_0039](https://en.bitcoin.it/wiki/BIP_0039) from Bitcoin
 - To encrypt the SRP and private keys inside the application, Metamask used a password defined by the user. From this password, a key is derived with the algorithm [PBKDF2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2), a derivation key algorithm. The behavior is similar to a password manager.
-- With this key, the data are encrypted using the algorithm [AES-GCM](https://www.cryptosys.net/pki/manpki/pki_aesgcmauthencryption.html#:~:text=AES%20with%20Galois%2FCounter%20Mode,38D%20%5BSP800-38D%5D.), a well known algorithm to perform authenticated encryption (confidentiality and authentication).
+- With this key, the data are encrypted using the algorithm [AES-GCM](https://www.cryptosys.net/pki/manpki/pki_aesgcmauthencryption.html), a well known algorithm to perform authenticated encryption (confidentiality and authentication).
 
 
 
@@ -47,7 +47,7 @@ The secret Recovery phrase, or sometimes called a seed phrase,
 -  It is inspired by the [BIP_0039](https://en.bitcoin.it/wiki/BIP_0039) from Bitcoin
    -  This BIP describes the implementation of a mnemonic code / seed phrase -- a group of easy to remember words -- for the generation of deterministic wallets.
    -  It consists of two parts: generating the mnemonic and converting it into a binary seed.
-   -  This seed can be later used to generate deterministic wallets using BIP-0032 or similar methods. Unfortunately, I do not know which standard is used by Metamask to generate Deterministic wallet. 
+   -  This seed can be later used to generate deterministic wallets using [BIP-0032](https://en.bitcoin.it/wiki/BIP_0032) or similar methods. Unfortunately, I do not know which standard is used by Metamask to generate Deterministic wallet. 
    -  You can find more details about BIP-32 and BIP-39 on my article: [Bitcoin Keys 101 - From seed phrase to address](https://rya-sge.github.io/access-denied/2024/10/28/bitcoin-keys-101/)
 -  This phrase is made of 12 words taken from a list in a random way and will be used to generate the first private key of the wallet. 
 -  The result of the computation will be the same all the time. It is what we call this type of wallet a "deterministic wallet".
@@ -126,7 +126,7 @@ The password is local to the application.
 The browser extension is made as following:
 
 - The password is used to derive a private key by using the algorithm [PBKDF2 [11]](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
-- The data are encrypted with the algorithm AES-GCM
+- The data are encrypted with the algorithm [AES-GCM](https://www.cryptosys.net/pki/manpki/pki_aesgcmauthencryption.html).
 
 Reference: [Support - Passwords and MetaMask (5)](https://support.metamask.io/hc/en-us/articles/4405451730331)
 

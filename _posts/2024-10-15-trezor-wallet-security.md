@@ -39,7 +39,7 @@ See also [trezor.io/compare](https://trezor.io/compare)
 
 ### 1. Offline Private Key Storage
 
-The cornerstone of Trezor’s security is the **offline storage** of private keys. Since Trezor is a hardware wallet, your private keys never leave the device, ensuring that they are not exposed to the internet. This **air-gapped** design protects against hacking attempts, phishing attacks, and malware, which are common on internet-connected (hot) wallets.
+Trezor provides an **offline storage** of private keys. Since Trezor is a hardware wallet, your private keys never leave the device, ensuring that they are not exposed to the internet. This **air-gapped** design protects against hacking attempts, phishing attacks, and malware, which are common on internet-connected (hot) wallets.
 
 ### 2. PIN Protection
 

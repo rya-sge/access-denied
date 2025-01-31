@@ -1,0 +1,36 @@
+@startuml
+start
+:Retrieve `QUOTE_MINT` and `METEORA_PROGRAM_KEY`;
+:Validate Global Configuration;
+if (Global Config Outdated?) then (Yes)
+    stop
+    :Throw `ConfigOutdated` Error;
+else (No)
+endif
+
+:Validate Accounts;
+if (Mints and Fee Receiver Valid?) then (No)
+    stop
+    :Throw Validation Error;
+else (Yes)
+endif
+
+:Calculate Token A and B Amounts;
+if (Arithmetic Error?) then (Yes)
+    stop
+    :Throw `ArithmeticError`;
+else (No)
+endif
+
+:Unlock Associated Token Account;
+:Transfer Token B (Bonding Curve -> Payer);
+:Transfer SOL (Escrow -> Payer);
+:Sync Native Token Account;
+
+:Prepare Accounts for Pool Creation;
+:Create Pool via `invoke_signed`;
+:Transfer Fee to Receiver;
+
+:Revoke Freeze Authority;
+stop
+@enduml

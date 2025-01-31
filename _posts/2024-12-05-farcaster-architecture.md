@@ -15,18 +15,40 @@ Farcaster is a [sufficiently decentralized](https://www.varunsrinivasan.com/2022
 
 It is a public social network similar to Twitter and Reddit. Users can create profiles, share posts known as "casts," and follow others. Users have full ownership of their accounts and connections, allowing them the freedom to transition between different apps.
 
-> Warning: this article is still in draft state and its content is still mainly taken from the Farcaster documentation, part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) . Its content should become more personal later.
+> Warning: this article is still in draft state and its content is still mainly taken from 
 >
+> - the Farcaster documentation, part [architecture](https://docs.farcaster.xyz/learn/architecture/overview#architecture) . 
+>
+> - [LearnWeb3Dao - Farcaster](https://learnweb3.io/minis/introduction-to-farcaster/)
+>   Its content should become more personal later.
+
+
+
+So what 
 
 [TOC]
-
-
 
 ## Overview
 
 Farcaster has a hybrid architecture that stores identity onchain and data offchain.
 
 ![Architecture](https://docs.farcaster.xyz/assets/architecture.BPu0I8Sc.png)
+
+###  Farcaster decentralization
+
+> What does sufficiently decentralized mean?
+
+ A sufficiently decentralized network exists when two users can find each other and communicate, even if the rest of the network wants to prevent that from happening. 
+
+This implies that users can always reach their audience, which can only be true if developers can build many clients on the network. 
+
+Three features need to be achieved for this to be possible:
+
+1. The ability to claim a unique username
+2. The ability to post messages under that name
+3. The ability to read messages from any valid name
+
+Farcaster is not fully decentralized, see the off-chain part to offer a better user experience.
 
 ### Onchain
 
@@ -52,6 +74,32 @@ Farcaster's offchain system is a peer-to-peer network of servers called [Hubs](h
 Actions are performed offchain when performance and cost are critical. Use of offchain actions is typically preferred when consistency isn't a strict requirement. Offchain systems achieve security by relying on signatures from onchain systems.
 
 See [docs.farcaster.xyz - overview#offchain](https://docs.farcaster.xyz/learn/architecture/overview#offchain)
+
+### Main concept
+
+#### User Identity
+
+A user is identified by a numeric identifier like `12345`, called a`Farcaster IDs` or `fids, that is controlled by a keypair on Farcaster. A smart contract registry is used to map identifiers to key pairs.
+
+- The use of the registry allows for key rotation in case someone believes they keypair to have been exposed, and smart contract wallets can even allow for recovery and protect against key loss in the first place.
+
+- Users can associate these `fids` with human-readable names when using clients (ENS Name), therefore separating the identity and namespace layer allowing identity to be easier to decentralize.
+
+#### Messages
+
+A message is a user action like posting an update, liking a post, commenting on a post, or updating their profile. Each message can contain some text and metadata, and is uniquely identified by the hash of its contents.
+
+Each message must also contain an implicit or explicit resource id to handle conflicts, and must include a timestamp for ordering.
+
+For example, a message updating the display name of user `123` can include the identifier `123.display_name`. If multiple messages have the same identifier, the network keeps the one with the highest order based on timestamp comparisons.
+
+#### Authentication
+
+Each message must also include the `fid` of the user and require the user to sign that message with their keypair. This makes the message tamper-proof and self-authenticating. Recipients can look up the key pair associated with the `fid` in the smart contract registry and verify the signature.
+
+If the `fid` moves to a new keypair due to key rotation, all messages must be re-signed with the new key-pair.
+
+Users can also delegate the ability to sign messages to a third party keypair called the signer. This allows applications to create messages on behalf of their users but does not give them control of the user's identity. A user needs to approve each signer manually.
 
 ## Contracts
 
@@ -79,7 +127,7 @@ The contracts are deployed at the following addresses:
 
 See [docs.farcaster.xyz - contracts](https://docs.farcaster.xyz/learn/architecture/contracts#contracts)
 
-### Id Registry
+### Id Registry ()
 
 The IdRegistry lets users register, transfer and recover Farcaster accounts. 
 
@@ -119,7 +167,9 @@ See [docs.farcaster - key-registry](https://docs.farcaster.xyz/learn/architectur
 
 ## Hubs
 
-Hubs are a distributed network of servers that store and validate Farcaster data.
+Hubs are a distributed network of servers that store and validate Farcaster data. 
+
+Hubs accept messages from users and replicate them to each other in real-time in a peer to peer fashion. It will store all active messages, and can be used to submit new messages.
 
 - A computer can run software to become a Farcaster Hub. It will download onchain Farcaster data from Ethereum and offchain Farcaster data from other Hubs. 
 
@@ -134,6 +184,8 @@ See [docs.farcaster - hubs](https://docs.farcaster.xyz/learn/architecture/hubs#h
 ### Design
 
 A Hub starts by syncing data from Farcaster contracts on the Optimism blockchain. It becomes aware of every user's account and their account keys.
+
+#### Message
 
 A message is a cryptographically signed binary data object that represents a delta-operation on the Farcaster network.
 
