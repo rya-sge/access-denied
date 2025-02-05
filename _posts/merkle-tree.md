@@ -110,6 +110,33 @@ In cryptography, Merkle trees are utilized in **zero-knowledge proofs**, which a
 
 ## Example
 
+Merkle Proof Generator and Validator in Solidity
+
+Murky contains contracts that can generate merkle roots and proofs. Murky also performs inclusion verification. A couple of default implementations are available out-of-the-box:
+
+1. [`Merkle.sol`](https://github.com/dmfxyz/murky/blob/main/src/Merkle.sol) is the original Murky implementation. It implements the tree as a [Full Binary Tree](https://xlinux.nist.gov/dads/HTML/fullBinaryTree.html).
+2. [`CompleteMerkle.sol`](https://github.com/dmfxyz/murky/blob/main/src/CompleteMerkle.sol) is a merkle tree implementation using [Complete Binary Trees](https://xlinux.nist.gov/dads/HTML/completeBinaryTree.html). Some external libraries, particulary front-end or off-chain ones, use this type of tree.
+
+
+
+The function `checkInWhitelist`perform the following actions
+
+- Compute the data leaf from the argument. The leaf is the hash of `msg.sender`and the maximum allowed to mint for this address
+
+```solidity
+bytes32 leaf = keccak256(abi.encodePacked(msg.sender, maxAllowanceToMint));  
+```
+
+- Verify that the leaf belongs to the merkle root by calling the function `verifyProof`from the library `Merke` If the leaf is in the merkle root and return the result in the variable `newVerified`
+
+```solidity
+bool newVerified= m.verifyProof(merkleRoot,proof,leaf );
+```
+
+
+
+- returns the result
+
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
@@ -133,7 +160,25 @@ contract Whitelist {
     }
 ```
 
+## Edge case
 
+As already briefly discussed above, Bitcoin and similar cryptocurrencies make use of Merkle trees to summarize and validate the transactions in a block, and embed the Merkle root into their block header as a summary of it all. The following figure illustrates this:
+
+Each block has an ID value, which is the hash of its header fields. A part of this is the Merkle root. Another part is the previous block ID (*Parent* in above figure). By linking with the previous block ID, and including that as part of the next block ID, the blocks form a blockchain. By embedding the Merkle root in it, they make an immutable record of transactions in the block.
+
+### Handling An Unbalanced Merkle Tree
+
+https://medium.com/coinmonks/merkle-trees-concepts-and-use-cases-5da873702318
+
+The above example illustrates the very basic case of a Merkle tree. It is a convenient example, as at every level there are just the right number of nodes to form exact pairs. What happens if you have an uneven (odd) number of leaf (data) nodes? For example, what happens to the above example if you have 5 Data nodes? You can hash Data1+Data2 together to form a Merkle branch, and same for Data3+Data4. But Data 5 is left without a pair to hash into a new branch.
+
+Different approaches can be taken to address this. For example, in this situation Bitcoin simply copies the un-pairable (odd) hash, and uses the duplicate as a pair (the [odd hash is paired with itself](https://bitcoin.stackexchange.com/questions/37223/pairing-pattern-of-txids-in-merkle-tree)). The following figure illustrates this:
+
+## Monero
+
+From https://medium.com/coinmonks/merkle-trees-concepts-and-use-cases-5da873702318
+
+The Monero approach could be described as converting the hash tree to a [perfect binary tree](https://cs.stackexchange.com/questions/32397/is-there-a-difference-between-perfect-full-and-complete-tree). It hashes enough leaf nodes in the first iteration, so that the following iterations will always have some variant of 2ˣ (a power of 2)
 
 ## FAQ
 

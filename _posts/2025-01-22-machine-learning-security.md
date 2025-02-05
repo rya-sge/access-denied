@@ -194,11 +194,9 @@ If technology alone can’t solve the problem, what can we do?
 4. **Healthy Skepticism**
    Adopting a cautious mindset is essential. Treat any unverified audio or video as suspect, particularly when it prompts urgent action like transferring money or sharing sensitive information.
 
-#### Preparing for the Future
+#### Conclusion
 
-Deepfakes represent a significant escalation in the cyber arms race. The technology is improving rapidly, and while detection tools may not always keep pace, vigilance and critical thinking remain vital. By educating the public, verifying information, and fostering skepticism, we can mitigate the risks posed by generative AI deception.
-
-As the saying goes, forewarned is forearmed. Deepfakes may create uncertainty, but awareness and proactive measures can help us navigate this new frontier securely.
+Deepfakes represent a new tools in the hand of malicious actors to perform their attacks whether for financial fraud, phishing or more political with disinformation.
 
 ## References
 

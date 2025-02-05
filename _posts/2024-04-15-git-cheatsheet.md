@@ -19,7 +19,22 @@ Some definition are simplified, see the documentation for a more precise descrip
 
 [TOC]
 
+## Summary tab
 
+| **Command**                | **Description**                                             | **Additional Notes**                        |
+| -------------------------- | ----------------------------------------------------------- | ------------------------------------------- |
+| `git init`                 | Initializes a new Git repository.                           | Creates a `.git` directory.                 |
+| `git clone <repo_url>`     | Copies an existing repository to your local machine.        | Used to download projects from GitHub.      |
+| `git status`               | Shows the status of the working directory and staging area. | Helps track changes before committing.      |
+| `git add <file>`           | Stages changes for the next commit.                         | Use `.` to stage all changes.               |
+| `git commit -m "message"`  | Records changes in the repository with a message.           | Use `-S` to sign commits.                   |
+| `git push origin <branch>` | Uploads local changes to a remote repository.               | Default branch is often `main` or `master`. |
+| `git pull origin <branch>` | Fetches and merges changes from a remote repository.        | Keeps your local repo up to date.           |
+| `git branch`               | Lists all local branches.                                   | Use `-a` to see remote branches too.        |
+| `git checkout <branch>`    | Switches to another branch.                                 | Use `-b` to create and switch.              |
+| `git merge <branch>`       | Merges another branch into the current one.                 | Helps integrate changes.                    |
+
+Reference: ChatGPT with the input "Create me a tab with 10 most commands used for git. The tab has two columns: command and the description. If relevants, add more columns"
 
 ## Command list
 
@@ -192,3 +207,134 @@ git push <your-fork-alias>
 ```
 
 Reference: [gist.github.com/bhumphrey/3764983](https://gist.github.com/bhumphrey/3764983), [git-scm.com - git-cherry-pick](https://git-scm.com/docs/git-cherry-pick)
+
+-----
+
+## Sign commit
+
+### Retroactively sign commit
+
+**retroactively sign (`-S`) the last `N` commits** in a repository.
+
+This command is typically used to **retroactively sign (`-S`) the last `N` commits** in a repository, ensuring that all commits in that range are GPG-signed without modifying their content.
+
+```bash
+git rebase --interactive --exec "git commit --amend --no-edit -S" HEAD~N
+```
+
+
+
+#### Explanation
+
+1. **`git rebase --interactive (or -i)`**
+   This starts an **interactive rebase**, allowing you to modify a sequence of commits.
+
+2. **`--exec "git commit --amend --no-edit -S"`**
+
+   - The `--exec` flag runs the specified command **after** each commit is applied during the rebase.
+
+   - In this case, the command being executed is:
+
+     ```bash
+     git commit --amend --no-edit -S
+     ```
+
+   - `git commit --amend --no-edit`:
+
+     - `--amend` modifies the last commit without changing its content.
+     - `--no-edit` prevents opening the commit message editor, keeping the message unchanged.
+
+   - `-S`
+
+      (sign commit):
+
+     - This cryptographically signs the commit using GPG (if GPG signing is enabled in your Git config).
+     - Ensures commits are verified as signed by you.
+
+3. **`HEAD~N`**
+
+   - This specifies that the rebase should start from **N** commits before `HEAD` (i.e., the last `N` commits).
+   - All `N` commits will be sequentially amended and signed.
+
+#### Example Usage
+
+If you want to sign the last **5** commits:
+
+```
+git rebase -i --exec "git commit --amend --no-edit -S" HEAD~5
+```
+
+After executing this command, Git will:
+
+1. Start an interactive rebase on the last **5** commits.
+2. For each commit, run `git commit --amend --no-edit -S`, signing it.
+3. Continue through all 5 commits automatically.
+4. Complete the rebase process.
+
+
+
+References: ChatGPT with the input "Can you explain this command: git rebase --interactive --exec "git commit --amend --no-edit -S" HEAD~N"
+
+## Git Push 
+
+This part has been made with ChatGPT
+
+> For git push, in general I don't indicate "origin". Do you know why ?
+
+
+
+Firstly, what is `origin`?
+
+`origin` is the default name given to the remote repository when you clone a repository and acts as a shorthand for the remote repository’s URL. See [Zero to Hero - Understanding git push origin main](https://zerotohero.dev/inbox/git-push-origin-main/)
+
+You don’t need to explicitly specify `origin` when running `git push` due to **Git's upstream tracking configuration**.
+
+### Why You Can Omit "origin":
+
+1. **Upstream (Tracking) Branch is Set**
+
+   - When you clone a repository or use `git push -u origin <branch>`, Git sets up an **upstream branch** (also called a **tracking branch**).
+   - After this, simply running `git push` will default to pushing to the tracked remote (`origin` by default).
+
+2. **Git's Default Push Behavior**
+
+   - The behavior depends on your Git configuration:
+
+     ```bash
+     git config --get push.default
+     ```
+
+   - If set to `simple` (default in newer Git versions), `git push` will push the current branch to the remote branch with the same name, but only if it has been set as an upstream branch.
+
+   - If set to `current`, it pushes to the remote branch with the same name.
+
+Reference: [betterstack - Default Behavior of “Git Push” without a Branch Specified](https://betterstack.com/community/questions/default-behavior-of-push-withour-branch-specified/)
+
+### How to Check Your Tracking Branch:
+
+```bash
+git branch -vv
+```
+
+This will show which remote branch your local branch is tracking.
+
+### Example:
+
+1. First-time push with upstream tracking:
+
+   ```bash
+   git push -u origin main
+   ```
+
+2. After that, just use:
+
+   ```bash
+   git push
+   ```
+
+   No need to specify `origin`every time!
+
+### TL;DR:
+
+- You don’t need `origin` because your branch already tracks a remote branch.
+- Git automatically knows where to push based on upstream settings.
