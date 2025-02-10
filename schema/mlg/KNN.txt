@@ -1,0 +1,43 @@
+@startmindmap
+* K-Nearest Neighbors (KNN)
+** Basics
+*** Non-parametric
+*** Instance-based
+*** Used for Classification & Regression
+** Requirements
+*** Labeled dataset
+*** Distance metric (Euclidean, Manhattan, Minkowski)
+*** Number of neighbors (K)
+** Computational Complexity
+*** Time Complexity: O(N * d)
+*** Space Complexity: O(N)
+*** High computational cost
+** Choosing K
+*** Small K → Sensitive to noise, overfitting
+*** Large K → Smooth decision boundaries
+*** Too large K → Overgeneralization
+*** Special cases:
+**** K=1 → Overfitting
+**** K=N → Assigns majority class to all
+** Handling Issues
+*** Tie-break Strategies:
+**** Reduce K
+**** Weighted voting
+**** Majority class in dataset
+*** Imbalanced Training Set:
+**** Weighted voting
+**** Resampling
+**** Adjust decision thresholds
+** KNN Variants
+*** KNN Classifier
+*** KNN Regressor
+**** Predicts continuous values
+**** Averages K nearest values
+*** Use Cases
+**** MNIST (Digit Recognition)
+**** Image Classification (Limited due to scalability)
+** Curse of Dimensionality
+*** Distances become meaningless
+*** High-dimensional space degrades performance
+*** Mitigation: PCA, Feature Selection
+@endmindmap

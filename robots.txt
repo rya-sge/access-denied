@@ -12,3 +12,11 @@ Disallow: /
 Disallow: /
 User-agent: ClaudeBot
 Disallow: /
+User-agent: Applebot-Extended
+Disallow: /
+User-agent: Meta-ExternalAgent
+Disallow: /
+User-agent: Meta-ExternalFetcher
+Disallow: /
+User-agent: Amazonbot
+Disallow: /

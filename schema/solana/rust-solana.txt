@@ -1,0 +1,23 @@
+@startmindmap
+* Rust Concepts
+** Ownership and References
+*** self and &self
+**** self: Consumes instance
+**** &self: Borrowed access
+*** & and &mut
+**** &: Immutable reference
+**** &mut: Mutable reference
+*** as_ref()
+**** Converts wrapper type to reference
+** Option and Result Types
+*** Some() and is_Some()
+**** Some(): Contains a value
+**** is_Some(): Checks for value presence
+*** unwrap
+**** Extracts value; panics on None or Err
+*** Ok(())
+**** Represents success in Result
+** Context in Solana (Anchor)
+*** ctx
+**** Context structure for accounts and program information
+@endmindmap

@@ -68,7 +68,7 @@ A = aG
 \end{aligned}
 $$
 
-where `G` is the generator point of the elliptic curve, and `Q` is a point on the curve.
+where `G` is the generator point of the elliptic curve, and the result`A` is a point on the curve.
 
 ### Signing
 
@@ -308,9 +308,82 @@ From the article:
 | 128                                | 6146                                         | 2330                                                         |
 | 192                                | 15362                                        | 3484                                                         |
 
+
+
+## FAQ
+
+Quiz on ECC (Elliptic Curve Cryptography) from [Bill Buchanan - ECC questions](https://billatnapier.medium.com/elliptic-curve-cryptography-ecc-questions-9aa67c147c9b)
+
+> Who was a co-inventor of ECC:
+> A. Neal Koblitz
+> B. Ron Rivest
+> C. Adi Shamir
+> D. Shafi Goldwasser
+> E. Tahir ElGamal
+
+Answer: A
+
+See
+
+> Which curve did Satoshi Nakamoto select for Bitcoin:
+> A. secp128r1
+> B. secp160r1
+> C. secp256k1
+> D. secp256r1
+> E. secp521r1
+
+Answer:
+
+ C -secp256k1
+
+> Which curve is used for P256 - as used in TLS:
+> A. secp128r1
+> B. secp160r1
+> C. secp256k1
+> D. secp256r1
+> E. secp521r1
+
+Answer: D-secp256r1
+
+> Which curve gives has 256-bit equivalent security:
+> A. secp128r1
+> B. secp160r1
+> C. secp256k1
+> D. secp256r1
+> E. secp521r1
+
+Answer: E-secp256r1
+
+> Which is true about a private key in ECC:
+> A. It is a random scalar value
+> B. It is a non-changing scalar value
+> C. It is a point on the curve
+
+A-it is a random scalar value
+
+> Which is true about a public key in ECC:
+> A. It is a random scalar value
+> B. It is a non-changing scalar value
+> C. It is a point on the curve
+
+Answer
+
+C. It is a point on the curve
+
+> Which signing method is used in Bitcoin and Ethereum:
+> A. ECDSA
+> B. EdDSA
+> C. RSA
+> D. ElGamal
+
+A. ECDSA
+
+More details is available in this article ECC: [bill's security - ECC](https://asecuritysite.com/cryptojs/crytojs_ecc)
+
 ## Reference
 
 - Cryptography course (CRY) taught at HEIG-VD in 2020
 - Cryptography course (CRY) taught at HEIG-VD in 2023
 - [research.kudelskisecurity - QUANTUM ATTACK RESOURCE ESTIMATE: USING SHOR’S ALGORITHM TO BREAK RSA VS DH/DSA VS ECC](https://research.kudelskisecurity.com/2021/08/24/quantum-attack-resource-estimate-using-shors-algorithm-to-break-rsa-vs-dh-dsa-vs-ecc/)
+- [Bill Buchanan - ECC questions](https://billatnapier.medium.com/elliptic-curve-cryptography-ecc-questions-9aa67c147c9b)
 - ChatGPT with the input "Write an article explaining ecdsa, Details some use case, notably in blockchain and a topic on its security and known bad implementation (e.g. in the random generation)"

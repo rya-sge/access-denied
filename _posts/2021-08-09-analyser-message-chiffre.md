@@ -12,7 +12,9 @@ image: /assets/article/cryptographie/analyse-chiffrement/01-dcode-2.PNG
 
 Cet article présente les manières d'analyser un message dont on ne connait pas la méthode de chiffrement employé. Il se concentre  sur les chiffrements classiques : substitution mono-alphabétique (César, Vigenère) et la transposition comme le chiffre de RailFence.
 
+Tous ces algorithmes de chiffrement sont bien entendu considérés comme cassés et ne sont pas utilisés dans la pratique pour faire du chiffrement.
 
+[TOC]
 
 ## Introduction
 
@@ -20,9 +22,9 @@ Cet article présente les manières d'analyser un message dont on ne connait pas
 
 Parfois il est nécessaire de traiter le message chiffré, boxentriq.com propose de nombreux outils pour cela, comme un qui supprime automatique les espaces.
 
-Supprimer les espaces : [www.boxentriq.com - remove-spaces](https://www.boxentriq.com/code-breaking/remove-spaces)
+Supprimer les espaces : [boxentriq.com - remove-spaces](https://www.boxentriq.com/code-breaking/remove-spaces)
 
-Page avec tous les outils proposée : [www.boxentriq.com/code-breaking](https://www.boxentriq.com/code-breaking)
+Page avec tous les outils proposée : [boxentriq.com/code-breaking](https://www.boxentriq.com/code-breaking)
 
 
 
@@ -32,8 +34,8 @@ Ces différents sites ou logiciels proposent tout une gamme d'outils permettant 
 
 En ligne : 
 
-- [http://www.cryptoprograms.com](http://www.cryptoprograms.com)
-- [https://quipqiup.com](https://quipqiup.com)
+- [cryptoprograms.com](http://www.cryptoprograms.com)
+- [quipqiup.com](https://quipqiup.com)
 
 Logiciel :
 
@@ -45,15 +47,17 @@ En plus d'installer le logiciel, il faut aussi configurer les dictionnaires dans
 
 ![05-options]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/05-options.PNG)
 
+-------
+
 ## Analyser le texte chiffré
 
 ### Avec des outils en ligne
 
 Certains outils en ligne peuvent être utilisé pour faire une première analyse afin de connaitre quel chiffre a été utilisé. Ceux-ci ne garantissent pas toujours le résultat mais peuvent vous faire gagner du temps si elles fonctionnent.
 
-- boxentriq.com propose un outil pour l'identification. Il ne fonctionne pas toujours mais si il trouve, cela sera un gain de temps considérable : [www.boxentriq.com - cipher-identifier](https://www.boxentriq.com/code-breaking/cipher-identifier)
+- boxentriq.com propose un outil pour l'identification. Il ne fonctionne pas toujours mais si il trouve, cela sera un gain de temps considérable : [boxentriq.com - cipher-identifier](https://www.boxentriq.com/code-breaking/cipher-identifier)
 
-- bionsgadget propose également un outil analyse, que je trouve plus efficace que boxentriq.com : [https://bionsgadgets.appspot.com](https://bionsgadgets.appspot.com/gadget_forms/refscore_extended.html)
+- bionsgadget propose également un outil analyse, que je trouve plus efficace que boxentriq.com : [bionsgadgets.appspot.com](https://bionsgadgets.appspot.com/gadget_forms/refscore_extended.html)
 
 ### Manuellement
 
@@ -63,7 +67,7 @@ La première étape est de calculer l'indice de coïncidence. Celui-pourra indiq
 
 Plus d'informations ici : [Wikipedia.org - Indice_de_coïncidence](https://fr.wikipedia.org/wiki/Indice_de_coïncidence)
 
-On peut calculer l'indice de coïncidence avec dcode : [https://www.dcode.fr/indice-coincidence](https://www.dcode.fr/indice-coincidence)
+On peut calculer l'indice de coïncidence avec dcode : [dcode.fr - indice-coincidence](https://www.dcode.fr/indice-coincidence)
 
 Selon Wikipédia :
 
@@ -86,9 +90,9 @@ On peut calculer la fréquence des lettres avec dcode ou avec cryptage. Ce derni
 
 - [dcode.fr - frequency-analysis](https://www.dcode.fr/frequency-analysis)
 
+----
 
-
-## 2 familles de chiffrements classiques
+## Familles de chiffrements classiques
 
 ### Substitution mono-alphabétique
 
@@ -102,9 +106,9 @@ Pour plus d'informations : [fr.wikipedia.org - Chiffrement_par_substitution](htt
 
 Quelques outils pour décrypter le chiffrement par substitution
 
-- **quipqiup** possède une interface épurée et clair. Le gros avantage c'est qu'il traite le texte déchiffré, on aura alors des phrases intelligibles : [https://quipqiup.com](https://quipqiup.com)
+- **quipqiup** possède une interface épurée et clair. Le gros avantage c'est qu'il traite le texte déchiffré, on aura alors des phrases intelligibles : [hquipqiup.com](https://quipqiup.com)
 
-- Dcode fait aussi bien le travail. Néanmoins, il ne traite pas les espaces et le résultat ce qui peut entrainé une plus grande difficulté pour lire les résultats : [www.dcode.fr - monoalphabetic-substitution](https://www.dcode.fr/monoalphabetic-substitution)
+- Dcode fait aussi bien le travail. Néanmoins, il ne traite pas les espaces et le résultat ce qui peut entrainé une plus grande difficulté pour lire les résultats : [dcode.fr - monoalphabetic-substitution](https://www.dcode.fr/monoalphabetic-substitution)
 
 - [cryptoprograms.com - monoalph](http://www.cryptoprograms.com/subsolve/monoalph)
 
@@ -116,7 +120,7 @@ Pour résoudre des messages chiffrés avec Vigenere, le site Gubulla propose un 
 
 Désavantage : Ne met pas en forme le texte, ce qui peut rendre plus difficile la compréhension du résultat.
 
-Lien : [www.guballa.de - vigenere-solver](https://www.guballa.de/vigenere-solver)
+Lien : [guballa.de - vigenere-solver](https://www.guballa.de/vigenere-solver)
 
 Petite remarque : avec Vigenere, l'indice de coïncidence calculée sur le message chiffré peut être très loin de la langue d'origine. 
 
@@ -131,9 +135,9 @@ Un exemple connu de chiffre par transposition est le RailFence
 Quelques sites proposent des outils pour résoudre automatiquement des chiffrements par transposition :
 
 - [tholman.com - transposition](https://tholman.com/other/transposition/)
-- [www.cryptoprograms.com - columnar](http://www.cryptoprograms.com/transsolve/columnar)
+- [cryptoprograms.com - columnar](http://www.cryptoprograms.com/transsolve/columnar)
 
-
+------
 
 ## Exemples
 
@@ -182,13 +186,13 @@ Avec [dcode](https://www.dcode.fr/substitution-monoalphabetique), la solution es
 
 
 
-Un autre site permet aussi de trouver la solution mais supprime tous les espace ce qui rend sa compréhension plus difficile : [www.cryptoprograms.com/subsolve/monoalph](http://www.cryptoprograms.com/subsolve/monoalph)
+Un autre site permet aussi de trouver la solution mais supprime tous les espace ce qui rend sa compréhension plus difficile : [cryptoprograms.com - monoalph](http://www.cryptoprograms.com/subsolve/monoalph)
 
 
 
 Sources :
 
-[https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/01](https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/01)
+[github.com/deut-erium/WriteUps/tree/master/ractf/crypto/01](https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/01)
 
 ### Challenge 02
 
@@ -214,7 +218,7 @@ Sources :
 
 Avec ce message chiffré, [quipqiup.com]( https://quipqiup.com) n'était pas capable de le casser directement.
 
-En faisant un calcul de coïncidence, on obtient rien de tangible, là 0.04, bien éloigné de l'anglais et proche de l'aléatoire. J'ai utilisé l'outil en ligne  [planetcalc.com](https://fr.planetcalc.com/7944/) pour obtenir le résultat.
+En faisant un calcul de coïncidence, on obtient rien de tangible, là 0.04, bien éloigné de l'anglais et proche de l'aléatoire. J'ai utilisé l'outil en ligne [planetcalc.com](https://fr.planetcalc.com/7944/) pour obtenir le résultat.
 
 ![02-planetcalc]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/02-planetcalc.PNG)
 
@@ -224,7 +228,7 @@ Vu qu'on n'a rien de tangible, on peut justement tester Vigenere. On teste avec 
 
 Sources :
 
-[https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/02](https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/02)
+[github.com/deut-erium/WriteUps/tree/master/ractf/crypto/02](https://github.com/deut-erium/WriteUps/tree/master/ractf/crypto/02)
 
 ### Challenge 03
 
@@ -343,6 +347,8 @@ Avec l'outil  [bionsgadgets](  https://bionsgadgets.appspot.com/gadget_forms/ref
 La consigne fournit le nombre 143526 qu'on peut alors tester comme clé avec CryptoCrack pour le chiffre de Gromark, périodique. Le gromak simple n'ayant pas donné de résultat.
 
 ![06-crypto-crack]({{site.url_complet}}/assets/article/cryptographie/analyse-chiffrement/06-crypto-crack.PNG)
+
+------
 
 ## Sources 
 

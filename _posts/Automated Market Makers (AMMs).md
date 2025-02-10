@@ -1,10 +1,32 @@
-### Exploring the Different Formulas Used to Build Automated Market Makers (AMMs)
+---
+layout: post
+title: Automated Market Makers (AMMs) - Overview
+date: 2025-02-07
+lang: en
+locale: en-GB
+categories: defi blockchain ethereum
+tags: automated-market-maker amm defi
+description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples.
+image: /assets/article/mlg/supervised-unsupervised-learning.png
+isMath: true
+---
 
 Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi), enabling to swap crypto assets without intermediaries. 
 
 Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards, making them the backbone of liquidity pools. 
 
 This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
+
+## Brief history
+
+The original AMMs based on ‘constant product market makers’ were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to fix several challenges:
+
+- High spreads, often 10% or even higher, notably because market making is very expensive, as creating an order and removing an order both take gas fees, even if the orders are never "finalized". 
+- State channel-based solutions could theoretically resolve this, but are far from being implemented. My proposed solution is to use the style of "on-chain automated market maker" 
+
+Its proposition was based  on concepts already used in prediction markets and also a first proposable by  [Nick Johnson's proposal here](https://www.reddit.com/r/ethereum/comments/54l32y/euler_the_simplest_exchange_and_currency/)
+
+
 
 ------
 
@@ -30,7 +52,6 @@ The result is a **hyperbola** where liquidity is always available but at increas
 
 - Traders interact with the pool by adding or removing liquidity, causing `x` or `y` to adjust.
 - The product of the two reserves (`k`) remains constant during a trade.
-- Graph:  
 
 #### Advantages:
 
@@ -74,6 +95,10 @@ The result graph is a function affine, which means that this model does not prov
 
 - **Vulnerability to Arbitrage**: Can be drained easily if asset prices deviate significantly.
 - **Limited Use Cases**: Not suitable for volatile or uncorrelated assets.
+
+See also:
+
+https://en.wikipedia.org/wiki/Constant_function_market_maker
 
 ------
 
@@ -182,6 +207,12 @@ Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that co
 - **Technical Risks**: Increased likelihood of bugs or vulnerabilities.
 
 
+
+## Hybrid Constant Function Market Maker (HCFMM)
+
+
+
+https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2021/10/crypto-insights-part-2-decentralised-exchanges-and-automated-market-makers.pdf
 
 ## Summary tab
 

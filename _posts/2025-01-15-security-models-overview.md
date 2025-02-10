@@ -154,6 +154,16 @@ Every action is logged to provide traceability and accountability.
 
 Often used in commercial systems (e.g., banking) to enforce proper workflows, prevent fraud, and ensure compliance with regulations.
 
+Example:
+
+The main goal is consistency among the various components of the system state
+
+In a bank, the funds at the beginning of the day plus the funds deposited minus the funds withdrawn should equal funds on hand at the end of the day.
+
+Reference: [cs.utexas.edu - lecture24-4up.pdf](https://www.cs.utexas.edu/~byoung/cs361/lecture24-4up.pdf)
+
+See also [YouTube - Security Models Pt 3 Clark-Wilson, Brewer and Nash, Graham-Denning (CISSP Free by Skillset.com)](https://www.youtube.com/watch?v=4esHgEOmTqU)
+
 ------
 
 ## Summary Comparison
@@ -165,6 +175,10 @@ Often used in commercial systems (e.g., banking) to enforce proper workflows, pr
 | Clark-Wilson  | Integrity + Business Workflows | Well-formed transactions, separation of duties | Business/Commercial systems  |
 
 Each model addresses different security needs and is tailored to specific types of threats and environments.
+
+### Schema
+
+![security-models-summary.drawio]({{site.url_complet}}/assets/article/securite/security-model/security-models-summary.drawio.png)
 
 ### Mindmap
 

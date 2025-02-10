@@ -1,0 +1,30 @@
+---
+layout: home
+title: tryhackme
+permalink: /category/tryhackme/
+---
+{% include header.html %}
+<div class="c-posts o-opacity">
+    {% for post in site.categories['tryhackme'] %}
+ <article class="c-post">
+    {% if post.image %}
+    <a class="c-post-thumbnail o-opacity" style="background-image: url({{ site.baseurl | append : post.image}})"
+        href="{{post.url | prepend: site.baseurl}}"></a>
+    {% else %} {% endif %}
+    <div class="c-post-content">
+      <h2 class="c-post-title">
+        <a href="{{post.url | prepend: site.baseurl}}">{{post.title}}</a>
+      </h2>
+      <p>
+          {% if post.description %}
+          {{ post.description }}
+          {% else %}
+          {{ post.content | strip_html | truncatewords: 15 }}
+          {% endif %}
+      </p>
+        <span class="c-post-date">{{post.date | date: '%Y, %b %d'}}&nbsp;&nbsp;&nbsp;—&nbsp;</span>
+    </div>
+  </article> <!-- /.c-post -->
+  {% endfor %}
+</div>
+{% include categories.html %}
