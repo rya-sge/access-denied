@@ -6,7 +6,6 @@ lang: en
 locale: en-GB
 categories: solana
 tags: solana rust code code4Arena
-classification
 description: This article explains the basic knowledge of Rust to understand and write Solana Programs
 image: /assets/article/blockchain/solana/rust-solana.png
 isMath: false
