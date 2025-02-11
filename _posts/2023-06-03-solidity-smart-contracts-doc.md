@@ -54,7 +54,7 @@ You can use it as a standalone library or as a hardhat plugin
 
 Installation:
 
-```
+```bash
 npm install -g surya
 ```
 
@@ -72,7 +72,7 @@ The `graph` command outputs a DOT-formatted graph of the control flow.
 
 ### ftrace 
 
-The `ftrace` command outputs a *treefied* function call trace stemming from the defined "CONTRACT::FUNCTION" and traversing "all|internal|external" types of calls.
+The `ftrace` command outputs a *treefied* function call trace stemming from the defined "CONTRACT::FUNCTION" and traversing "all/internal/external" types of calls.
 
 ![](https://user-images.githubusercontent.com/4008213/42409007-61473d12-81f1-11e8-8fee-1867cfd66822.png)
 
@@ -138,11 +138,13 @@ dot -Tpng YOUR_CONTRACT.dot -o YOUR_CONTRACT.png
 
 [Sol2uml](https://github.com/naddison36/sol2uml)
 
-> A visualisation tool for [Solidity](https://solidity.readthedocs.io/) contracts featuring:
->
-> 1. [Unified Modeling Language (UML)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) [class diagram](https://en.wikipedia.org/wiki/Class_diagram) generator for Solidity contracts.
-> 2. Contract storage layout diagrams.
->
+> A visualisation tool for [Solidity](https://solidity.readthedocs.io/) contracts
+
+It features:
+
+- [Unified Modeling Language (UML)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) [class diagram](https://en.wikipedia.org/wiki/Class_diagram) generator for Solidity contracts.
+
+- Contract storage layout diagrams.
 
 Example:
 
@@ -166,7 +168,9 @@ This feature is directly available if you install the vscode extension [Solidity
 
 [mythril](https://github.com/Consensys/mythril)
 
-> Mythril is a security analysis tool for EVM bytecode. It uses symbolic execution, SMT solving and taint analysis to detect a variety of security vulnerabilities.
+> Mythril is a security analysis tool for EVM bytecode. 
+
+It uses symbolic execution, SMT solving and taint analysis to detect a variety of security vulnerabilities.
 
 Usage
 
@@ -199,9 +203,9 @@ The command is then:
 
 [Slither](https://github.com/crytic/slither)
 
-Slither is a very good tool to perform a static analysis on the smart contract and generate a vulnerability report.
+> Slither is a very good tool to perform a static analysis on the smart contract and generate a vulnerability report.
 
->Slither is a Solidity static analysis framework written in Python3. It runs a suite of vulnerability detectors, prints visual information about contract details, and provides an API to easily write custom analyses.
+Slither is a Solidity static analysis framework written in Python3. It runs a suite of vulnerability detectors, prints visual information about contract details, and provides an API to easily write custom analyses.
 
 You can filter the libraries and test files to prevent them from also being analyzed by slither.
 

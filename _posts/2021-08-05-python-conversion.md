@@ -14,6 +14,10 @@ Cet article décrit différentes façons de convertir des données représentée
 
 Lors des CTF(Capture the flags), il m'arrivait souvent de perdre du temps dans les conversion et de me mélanger les pinceaux, d'où cet article pour faciliter la compréhension.
 
+[TOC]
+
+
+
 ## Conversion int <->Bytes
 
 ### Nativement
@@ -110,7 +114,7 @@ produira la sortie suivante :
 a =  16 b = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 ```
 
-
+----
 
 ## int <-> string
 
@@ -146,6 +150,8 @@ produira l'erreur suivante :
 
 
 
+------
+
 ## int <-> hex
 
 Pour convertir des nombres hexadécimaux sous forme de string en  int et inversement, il existe les fonctions suivantes :
@@ -172,9 +178,9 @@ produira la sortie suivante :
 >
 > int -> string hexa :  2000 -> 0x7d0
 
+-----
+
 ## hexa string <-> bytes
-
-
 
 ### hexa string -> bytes
 
@@ -229,6 +235,8 @@ Ressources complémentaires :
 - [Convertir hexadécimal en octet en Python](https://www.delftstack.com/fr/howto/python/python-convert-hex-to-byte/)
 - [200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
 
+-----
+
 ## byte hexa string <-> bytes
 
 ### binascii
@@ -250,6 +258,8 @@ produira la sortie suivante :
 
 Sources : [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
 
+-----
+
 ## Sources
 
 - Documentation officielle de python :[https://docs.python.org/fr/3.7/library/stdtypes.html](https://docs.python.org/fr/3.7/library/stdtypes.html)
@@ -257,5 +267,5 @@ Sources : [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/l
 - [docs.python.org - stdtypes](https://docs.python.org/fr/3.7/library/stdtypes.html)
 
 - [Convertir hexadécimal en octet en Python](https://www.delftstack.com/fr/howto/python/python-convert-hex-to-byte/)
-- [https://200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
-- [https://docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
+- [200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
+- [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
