@@ -11,7 +11,7 @@ image: /assets/article/blockchain/solana/rust-solana.png
 isMath: false
 ---
 
-In computer science and cryptography, Merkle trees are widely used for ensuring data integrity and efficient verification. 
+In computer science and cryptography, Merkle trees are widely used for ensuring data integrity and efficient verification. Merkle Trees were invented in 1979 by  Ralph Merkle.
 
 Various adaptations of this structure have been developed to address different computational and storage challenges. 
 
@@ -58,9 +58,9 @@ For example, if we have four data blocks A, B, C, and D, the steps would look li
 
 ------
 
-### Beyond the Merkle Tree: Variants and Their Applications
+### Merkle Tree Variation
 
-The classic binary Merkle tree is a foundational concept, but its variants offer more flexibility and functionality, tailored to meet the demands of modern applications. Below are some of the most prominent variations.
+In practice, ofthen the Merkle Tree is adapted to offer more flexibility and functionality and to meet the demands of specific use case. Below are some of the most known variations.
 
 #### Merkle DAG (Directed Acyclic Graph)
 
@@ -76,7 +76,9 @@ In a traditional Merkle tree, the structure is a strict binary tree. In contrast
 
 ##### IPFS details
 
-A Merkle DAG is a DAG where each node has an identifier, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA256. This brings some important considerations:
+A Merkle DAG is a DAG where each node has an identifier, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA256. 
+
+As a result:
 
 - Merkle DAGs can only be constructed from the leaves, that is, from nodes without children. Parents are added after children because the children's identifiers must be computed in advance to be able to link them.
 - Every node in a Merkle DAG is the root of a (sub)Merkle DAG itself, and this subgraph is *contained* in the parent DAG.
@@ -86,23 +88,53 @@ For example, the previous linked list, assuming that the payload of each node is
 
 *A=Hash(B)→B=Hash(C)→C=Hash(∅)*. 
 
-- **no cycles**: The properties of the hash function ensure that no cycles can exist when creating Merkle DAGs. (Note: Hash functions are one-way functions. Creating a cycle should then be impossibly difficult unless some weakness is discovered and exploited.)
+- **no cycles**: The properties of the hash function ensure that no cycles can exist when creating Merkle DAGs. Hash functions are one-way functions. Creating a cycle should then be impossibly difficult unless some weakness is discovered and exploited. 
 - Merkle DAGs are *self-verified* structures. The CID of a node is univocally linked to the contents of its payload and those of all its descendants. Thus two nodes with the same CID univocally represent exactly the same DAG. This will be a key property to efficiently sync Merkle-CRDTs (Conflict-free Replicated Data Types) without having to copy the full DAG, as exploited by systems like IPFS.
 
-From [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
+Reference:  [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
 
 See also [IPFS - Lesson: Turn a File into a Tree of Hashes](https://dweb-primer.ipfs.io/ipfs-dag/files-as-dags)
 
-#### Patricia Tree
+#### Patricia Merkle Tree
+
+##### Patricia tree
+
+https://blockchain-academy.hs-mittweida.de/patricia-tree-simulator/
+
+https://www.cs.usfca.edu/~galles/visualization/RadixTree.html
+
+![step1](../assets/article/cryptographie/merkle-tree/radix/step1.png)
+
+![step2](../assets/article/cryptographie/merkle-tree/radix/step2.png)
+
+
+
+![step3](../assets/article/cryptographie/merkle-tree/radix/step3.png)
+
+
+
+![step4](../assets/article/cryptographie/merkle-tree/radix/step4.png)
+
+
 
 The **Patricia Tree** (Practical Algorithm to Retrieve Information Coded in Alphanumeric) is a specialized variation of a Merkle tree designed to handle large key-value mappings efficiently. It combines a **trie** (prefix tree) with Merkle hashing for integrity.
 
 - **How It Works**: Keys are encoded into a trie, where nodes represent common prefixes, and the structure is hashed to produce a Merkle root. This hybrid structure is optimized for sparse data.
+
 - Benefits:
   - Compact representation of large datasets.
   - Efficient querying and key-value pair retrieval.
+  
 - Applications:
+
 - **Ethereum**: Uses a variation of the Patricia tree, called the **Merkle Patricia Trie**, to manage its state database (accounts, balances, and smart contracts). This structure allows nodes to verify specific state changes without downloading the entire blockchain.
+
+  - Ethereum makes use of a data structure called a [radix trie, also referred to as a Patricia trie or a radix tree](https://www.cs.usfca.edu/~galles/visualization/RadixTree.html) and combines this data structure with a Merkle tree to create a **Patricia Merkle Trie**.
+  - Radix trees support insertion, deletion, and searching operations
+  - "Trie" comes from the word "retrieval"
+  - **A radix trie is a tree-like data structure that is used to retrieve a string value by traversing down a branch of nodes that store associated references (keys) that together lead to the end value that can be returned**:
+
+  
 
 #### Sparse Merkle Tree
 
