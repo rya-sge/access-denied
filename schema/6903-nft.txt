@@ -1,0 +1,34 @@
+@startmindmap
+* ERC-6093 (ERC-721) Errors
+** Ownership Errors
+*** ERC721InvalidOwner
+**** Address can't be an owner (e.g., address(0))
+**** Used in balance queries
+**** NOT for transfers (use ERC721IncorrectOwner instead)
+*** ERC721NonexistentToken
+**** Token ID does not exist (not minted or burned)
+** Transfer Errors
+*** ERC721IncorrectOwner
+**** Sender is not the current owner
+**** Used in transfers, NOT approvals
+*** ERC721InvalidSender
+**** Disallowed transfers from address(0)
+**** NOT for approvals or ownership checks
+**** Use ERC721IncorrectOwner or ERC721InsufficientApproval instead
+*** ERC721InvalidReceiver
+**** Disallowed transfers to address(0)
+**** Used when recipient is a non-ERC721Receiver contract
+**** NOT for approvals
+** Approval Errors
+*** ERC721InsufficientApproval
+**** Operator lacks approval for transfer
+**** isApprovedForAll(owner, operator) MUST be false
+**** getApproved(tokenId) MUST NOT be the operator
+*** ERC721InvalidApprover
+**** Token owner can't approve from address(0)
+**** NOT for transfers
+*** ERC721InvalidOperator
+**** Disallowed approvals to address(0)
+**** Operator MUST NOT be the token owner
+**** NOT for transfers (use ERC721InsufficientApproval instead)
+@endmindmap

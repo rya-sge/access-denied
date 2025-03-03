@@ -36,6 +36,10 @@ The tree culminates in a **Merkle root**, representing the entire dataset's inte
 
 This structure allows for the verification of the contents of a large set of data without the need to access every individual element. Instead, a **Merkle root** — the hash at the top of the tree — can be used to represent the entire dataset. By hashing the data in a way that each node depends on the integrity of its children, any change in the data results in a completely different Merkle root, allowing for easy detection of any tampering.
 
+Schema from [Wikipedia](https://en.wikipedia.org/wiki/Merkle_tree)
+
+![wikipedia_hash_hree](../assets/article/cryptographie/merkle-tree/wikipedia_hash_hree.png)
+
 ### How Do Merkle Trees Work?
 
 The process of constructing a Merkle tree involves several steps:
@@ -76,6 +80,8 @@ In a traditional Merkle tree, the structure is a strict binary tree. In contrast
 
 ##### IPFS details
 
+
+
 A Merkle DAG is a DAG where each node has an identifier, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA256. 
 
 As a result:
@@ -90,6 +96,26 @@ For example, the previous linked list, assuming that the payload of each node is
 
 - **no cycles**: The properties of the hash function ensure that no cycles can exist when creating Merkle DAGs. Hash functions are one-way functions. Creating a cycle should then be impossibly difficult unless some weakness is discovered and exploited. 
 - Merkle DAGs are *self-verified* structures. The CID of a node is univocally linked to the contents of its payload and those of all its descendants. Thus two nodes with the same CID univocally represent exactly the same DAG. This will be a key property to efficiently sync Merkle-CRDTs (Conflict-free Replicated Data Types) without having to copy the full DAG, as exploited by systems like IPFS.
+
+### Example
+
+Here an example of a merkle dag
+
+One change we could make to this directory is to delete the "fish" directory, replacing it with a directory called "dogs". Since it is not possible to remove a directory, these change will create a new DAG, representing an updated state of the directory. 
+
+However, all of the nodes representing the "cats" directory and its files are common to both DAGs. Therefore, we can reuse them, as depicted below, where:
+
+- The orange nodes represent nodes that are only used in the original DAG,
+- The green nodes represent those that are common to both, 
+- and the blue nodes represent the extra nodes needed for the new state.
+
+Schema from https://proto.school/merkle-dags/07
+
+![merkle-dag-deduplication](../assets/article/cryptographie/merkle-tree/merkle-dag-deduplication.png)
+
+
+
+
 
 Reference:  [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
 
@@ -186,3 +212,7 @@ These variations provide several improvements over the classic Merkle tree:
 ### Conclusion
 
 While Merkle trees provide a robust foundation for data integrity, their variations — such as Merkle DAGs, Patricia Trees, and Sparse Merkle Trees — offer enhanced functionality for specific use cases. From IPFS and Git to Ethereum and cryptographic proofs, these variants demonstrate the versatility of Merkle structures in modern computing. As technology advances, these structures will continue to evolve, playing a critical role in secure, scalable, and efficient data verification.
+
+## References:
+
+https://en.wikipedia.org/wiki/Merkle_tree

@@ -1,0 +1,47 @@
+@startmindmap
+* ERC-721 (Non-Fungible Token Standard)
+** Core Interface (ERC721)
+*** Events
+**** Transfer - Emitted when an NFT is transferred, minted, or burned
+**** Approval - Emitted when an NFT's approved address changes
+**** ApprovalForAll - Emitted when an operator is enabled/disabled for an owner
+*** Functions
+**** Balance
+***** balanceOf - Returns the number of NFTs owned by an address
+***** ownerOf - Returns the owner of a given NFT
+**** Approval
+***** approve - Approves another address to transfer a specific NFT
+***** setApprovalForAll - Grants/revokes operator access for all NFTs of an owner
+***** getApproved - Returns the approved address for a specific NFT
+***** isApprovedForAll - Checks if an operator is approved for all NFTs of an owner
+**** Transfe
+***** safeTransferFrom (with data) - Securely transfers an NFT, checks recipient contract
+***** safeTransferFrom - Transfers an NFT safely, ensuring recipient supports ERC-721
+***** transferFrom - Transfers an NFT (no recipient check, risk of lost tokens)
+** Metadata Extension (ERC721Metadata)
+*** Functions
+**** name - Returns the collection name
+**** symbol - Returns the ticker symbol
+**** tokenURI - Returns a unique URI pointing to NFT metadata
+** Token Receiver (ERC721TokenReceiver)
+*** Functions
+**** onERC721Received - Ensures recipient contracts can handle ERC-721 tokens
+*** Security Considerations
+**** Must return `0x150b7a02` to accept NFT transfers
+**** Prevent lost NFTs by always using `safeTransferFrom`
+**** Avoid malicious contracts that accept NFTs but lock them
+** Security Considerations
+*** Safe Transfers
+**** Always use `safeTransferFrom` to prevent NFTs from being locked in non-compliant contracts
+**** Verify recipient contract implements `onERC721Received`
+**** Risk of Re-Entrancy
+*** Approval Management
+**** Reset approvals on transfers to prevent unauthorized actions
+**** Be cautious when using `setApprovalForAll`, as it grants full access
+*** Metadata Handling
+**** Store metadata on decentralized networks like IPFS or Arweave
+**** Avoid centralized metadata to prevent censorship and broken links
+*** Re-Entrancy Protection
+**** Follow the Checks-Effects-Interactions pattern
+**** Use OpenZeppelin’s `ReentrancyGuard` if needed
+@endmindmap
