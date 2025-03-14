@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: defi blockchain ethereum
 tags: automated-market-maker amm defi
-description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples.
+description: Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi). This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
 image: /assets/article/mlg/supervised-unsupervised-learning.png
 isMath: true
 ---
@@ -19,20 +19,25 @@ This article delves into the most commonly used formulas in AMM design, their be
 
 ## Brief history
 
-The original AMMs based on ‘constant product market makers’ were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to fix several challenges:
+The original AMMs based on `constant product market makers`were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread (often 10% or even higher) during a trade on the plaform available at that moment (MKR market, etherdelta). 
 
-- High spreads, often 10% or even higher, notably because market making is very expensive, as creating an order and removing an order both take gas fees, even if the orders are never "finalized". 
-- State channel-based solutions could theoretically resolve this, but are far from being implemented. My proposed solution is to use the style of "on-chain automated market maker" 
+The spreads were high because market making is very expensive, as creating an order and removing an order both take gas fees, even if the orders are never "finalized". 
 
-Its proposition was based  on concepts already used in prediction markets and also a first proposable by  [Nick Johnson's proposal here](https://www.reddit.com/r/ethereum/comments/54l32y/euler_the_simplest_exchange_and_currency/)
+State channel-based solutions could theoretically resolve this, but are far from being implemented in 2017. Vitalik proposed to use instead a style of "on-chain automated market maker" 
 
+Its proposition was based  on concepts already used in prediction markets and also a first proposable by [Nick Johnson's proposal here](https://www.reddit.com/r/ethereum/comments/54l32y/euler_the_simplest_exchange_and_currency/)
 
+After that, the first [**xy=k liquidity pool**](https://blog.bancor.network/gnosis-bancor-partner-on-the-first-ever-token-changer-gnobnt-63fb14b65653) was deployed by Bancor in 2017 with **BNT and GNO**. See also this [video](https://www.youtube.com/watch?v=ySeir-M2nj0) by Bancor dated from March 2017.
+
+Reference: [Jennifer Albert - A historical account with Dr. Mark Richardson, Bancor Project Lead ](https://www.linkedin.com/pulse/how-bancor-revolutionized-defi-first-constant-product-jennifer-albert-p9d0c/)
 
 ------
 
 ### 1. **Constant Product Market Maker (CPMM)**
 
-The **constant product formula** is the most popular AMM model, popularized by Uniswap and Bancor, the first AMM-based Dex. It uses the equation:
+The **constant product formula** is the most popular AMM model, popularized by Uniswap and Bancor, the first AMM-based Dex. 
+
+The equation implemented and used by Uniswap V2 is the following:
 $$
 x⋅y=k
 $$
@@ -41,6 +46,25 @@ Here:
 - `x` represents the quantity of one token in the pool.
 - `y` represents the quantity of another token in the pool.
 - `k` is a constant.
+
+### Price
+
+With this formula, tokens (`x`, `y`) are priced in terms of each other. 
+
+For example: in a ETH/USDC pool, ETH is priced in terms of USDC, and USDC is priced in terms of ETH. 
+
+If 1 ETH costs 1000 USDC, then 1 USDC costs 0.001 ETH. 
+
+The prices of tokens in a pool are determined by the supply of the tokens, that is by **the amounts of reserves of the tokens** that the pool is holding. Token prices are simply relations of reserves:
+$$
+P_x = y/x
+$$
+
+$$
+P_y = x/y
+$$
+
+Where `Px` and  `Px`are prices of tokens in terms of the other token
 
 #### Graph
 
@@ -64,9 +88,84 @@ The result is a **hyperbola** where liquidity is always available but at increas
 - **Price Impact**: Large trades result in significant slippage, making it unsuitable for high-volume trades.
 - **Impermanent Loss**: Liquidity providers may suffer temporary losses compared to simply holding the assets.
 
+
+
+## Implementation
+
+
+
+```
+    uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
+```
+
+https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol#L28
+
+
+
+There are four variables inside the `require` statement:
+
+- `balance0Adjusted`: Reserves of **x** after the trader sends tokensX to the pool minus 0.3% of the amount sent.
+- `balance1Adjusted`: Reserves of **y** after the tokensY are sent to the trader from the pool.
+- `_reserve0`: Reserves of token `x` prior to the swap.
+- `_reserve1`: Reserves of token `y `prior to the swap.
+
+https://medium.com/better-programming/uniswap-v2-in-depth-98075c826254
+$$
+x * y = k
+$$
+
+$$
+x' * y' = k
+$$
+
+$$
+x * y = x' * y'
+$$
+
+
+
+```
+balance0Adjusted * balance1Adjusted >= _reserve0 * _reserve1
+```
+
+
+
 #### Example 
 
 Uniswap V2: https://uniswapv3book.com/milestone_0/constant-function-market-maker.html
+
+https://app.uniswap.org/whitepaper.pdf
+
+https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works
+
+https://medium.com/@chaisomsri96/defi-math-about-uniswap-v2-lazy-liquidity-d73f9ef9d6e7
+
+https://medium.com/@kinaumov/back-to-the-basics-uniswap-balancer-curve-e930c3ad9046
+
+### Bancor - Smart token
+
+Smart tokens are standard ERC20 tokens which implements the Bancor Protocol.
+
+A smart token holds a balance of least one other reserve token, which can be a different smart token, any ERC20 standard token or Ether.
+
+Smart tokens are issued when purchased and destroyed when liquidiation
+
+Bancor uses the term of CRR to design K: Constant Reserve Ratio.
+
+This constant was set by the smart token creator, for each reserve token and uses in price calcalation.
+$$
+Price = Balance / Supply * CRR
+$$
+
+- When smarts token are purchased, the payment is added to the reserve balance.
+
+Based on the calculation price, new smart tokens are issued to the buyed.
+
+- When smart token are liquidates, they are removed from the supply (destroed).
+
+Based on the current price, reserve tokens are transfereed to the liquidator.
+
+See [Bancor whitepaper](https://www.securities.io/bancor-whitepaper/)
 
 ------
 

@@ -146,13 +146,13 @@ See [The Washington Post - The clever trick that turns ChatGPT into its evil twi
 
 ----
 
-## Unmask the DeepFake: Defending Against Generative AI Deception
+## DeepFake: Defending Against Generative AI Deception
 
 > A **deepfake** is a synthetic media created using artificial intelligence (AI) to manipulate or replicate a person’s likeness, voice, or mannerisms in a highly realistic way. The term "deepfake" is derived from the combination of "deep learning," a type of AI that enables the technology, and "fake," indicating the fabricated nature of the content.
 
-"Hi, this is Jeff, and you are listening to a deepfake of my voice." 
+Deepfakes—AI-generated audio, video, or images that convincingly replicate real people—are no longer science fiction. They are a growing threat, accessible to anyone with basic technology skills and a phone.
 
-If that sentence made you pause, then it’s done its job. It’s an example of how generative AI can convincingly mimic someone’s voice, turning a few seconds of audio into a tool for deception. Deepfakes—AI-generated audio, video, or images that convincingly replicate real people—are no longer science fiction. They are a growing threat, accessible to anyone with basic technology skills and a phone.
+Audio Deepfake is an example of how generative AI can convincingly mimic someone’s voice, turning a few seconds of audio into a tool for deception. 
 
 #### How DeepFakes Work
 

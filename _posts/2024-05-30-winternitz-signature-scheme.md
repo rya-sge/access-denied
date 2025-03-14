@@ -39,8 +39,8 @@ Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.p
   - For example, the 256-bit hash can be produced with SHA-256.
 - Winternitz does not sign bit by bit, but sign bytes
 - The Winternitz parameter (`w`) defines the amount of numbers those bits can represent (w = 2^{bits}). 
-- Private key is a set of 32 seeds (sk0).
-- Public key is a set of 32 values (pk). This is also the last value computed with the different hash operation.
+- Private key is a set of 32 seeds (`sk0`).
+- Public key is a set of 32 values (`pk`). This is also the last value computed with the different hash operation.
 - Signatures are (32 + checksum) elements.
 - Storing all lists makes too large keys → compute them on
   the fly using the hash function.
@@ -259,7 +259,15 @@ The cidectf has a nice challenge on that and you can find a writeup [here](https
 
 ## WOTS+
 
-According to [this document](csrc.nist.gov/csrc/media/Presentations/2022/crclub-2022-10-19a/20221020-crypto-club-kelsey-slides-MD-hash-sigs.pdf), WOTS+  is specific variant of Winternitz used in SPHINCS+ for one-time signature.
+According to [this document](https://csrc.nist.gov/csrc/media/Presentations/2022/crclub-2022-10-19a/20221020-crypto-club-kelsey-slides-MD-hash-sigs.pdf), WOTS+  is specific variant of Winternitz used in SPHINCS+, XMSS, LMS for one-time signature.
+
+According to [this document](https://eprint.iacr.org/2011/191.pdf), W-OTS is suitable for combining it with Merkle’s tree authentication scheme (MSS) because of the following reason:
+
+- The small verification key size
+- The flexible trade-off between signature size and signature generation time. 
+- Further it is possible to compute the corresponding verification key given a W-OTS signature. So a MSS signature does not need to contain the verification key. T
+
+See also [Revisiting the Constant-sum Winternitz One-time Signature with Applications to SPHINCS+ and XMSS](https://eprint.iacr.org/2023/850.pdf)
 
 ## Reference
 
