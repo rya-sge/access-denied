@@ -264,7 +264,7 @@ Each type of wallet has its strengths and weaknesses in terms of security and co
 
 Crypto wallets are a fundamental part of participating in the cryptocurrency ecosystem, providing users with the tools to manage, store, and secure their digital assets. Understanding the different types of wallets and the security risks associated with each helps you choose the best option for your needs.
 
-Whether you are a casual user or an investor looking to store large sums of crypto, it's vital to approach wallet management with caution and find the right balance between your constraints, your desires and security. Ideally, always prioritize security. 
+Whether you are a casual user or an investor looking to store large sums of crypto, it's vital to approach wallet management with caution and find the right balance between your own competence, constraints, desires and security. Ideally, always prioritize security. 
 
 Finally, if you want to know if your Bitcoin wallet is truly open-source and secure, you can visit this excellent website [wallet scrutiny](https://walletscrutiny.com)
 
