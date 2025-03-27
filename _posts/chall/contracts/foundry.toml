@@ -1,9 +1,0 @@
-[profile.default]
-src = "src"
-out = "out"
-fs_permissions = [{ access = 'read-write', path = '/'}]
-
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
-
-[profile.dependencies]
-forge-std = "1.9.5"
