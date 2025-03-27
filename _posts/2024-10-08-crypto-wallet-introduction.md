@@ -222,7 +222,7 @@ Unlike bank accounts, self-custodial crypto wallets (e.g Trezor) do not have a c
 
 ### 3. Malware
 
-Malware can infect your device and steal your private keys or reroute transactions to a scammer’s address. This particularly concerns warm wallets which are installed on a device used in everyday life, e.g. your personal computer or your telephone.
+Malware can infect your device and steal your private keys or reroute transactions to a scammer’s address. This particularly concerns `warm/hot wallets` which are installed and accessed on a device used in everyday life, e.g. your personal computer or your telephone.
 
 ### 4. Human Error
 
@@ -233,11 +233,11 @@ Sending crypto to the wrong address or making mistakes in transactions is irreve
 ## Best Practices for Wallet Security
 
 - **Use Strong Passwords**: For wallets that require passwords, use strong, unique passwords
-  - For hot wallet, when available, enable two-factor authentication (2FA).
+  - For hot wallet, when available, enable two-factor authentication (2FA). If not available, the question of using this wallet should arise.
   - For warm wallet, the password is often used to encrypt your seed phrase and private keys locally on our machine, it is for example the case for Metamask, see my article [Deep dive into MetaMask Secrets](https://rya-sge.github.io/access-denied/2023/07/20/metamask-secret/)
 
 - **Backup Your Wallet**: Keep multiple backups of your wallet’s recovery phrase or private key in secure locations like a safe or encrypted storage device.
-- **Use Cold  Wallet**: For large amounts of crypto or long-term holdings, use cold wallet to minimize exposure to online threats. Prefer using hardware devices instead of Paper wallets which are generally not recommended.
+- **Use Cold  Wallet**: For large amounts of crypto or long-term holdings, use cold wallet to minimize exposure to online threats. Prefer using hardware devices instead of Paper wallets which are generally not recommended and also more difficult to install and manage.
 - **Be Cautious with Links**: Always access wallets via official channels, and avoid clicking on random links in emails or messages related to your wallet.
 
 ### Ambivalent opinion
