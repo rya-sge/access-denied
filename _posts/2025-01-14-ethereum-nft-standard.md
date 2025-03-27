@@ -29,53 +29,72 @@ The different NFT standards extends the possibility to create NFT and use it:
 
 All these standard show that Ethereum is a real sandbox to build innovative applications.
 
-
 Here a list of use case and their corresponding standards:
 
+Independent token standard:
+
 - Multi-token standard (fungible + NFTs): [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155)
+- Fractionally Represented Non-Fungible Token ([ERC-7651](https://eips.ethereum.org/EIPS/eip-7651))
+- Minimal Multi-Token Interface: [ERC-6909](https://eips.ethereum.org/EIPS/eip-6909)
+
+ERC-721 extensions or compatible
+
+- Semi-Fungible tokens: [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525): 
 - Royalty payment: [ERC-2771](https://eips.ethereum.org/EIPS/eip-2771)
-- Gas optimized NFTs: [ERC-721A](https://www.erc721a.org)
+- Extendable NFT metadata protocol: [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)
 - Rentable NFTs: [ERC-4907](https://eips.ethereum.org/EIPS/eip-4907)
 - Non-transferable NFT: [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192)
 - Multi-privilege Management NFT Extension: [ERC-5496](https://eips.ethereum.org/EIPS/eip-5496)
-- Token-bound accounts for NFTs: [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551)
-- Extendable NFT metadata protocol: [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)
 - Custom errors for commonly-used tokens: [ERC-6093](https://eips.ethereum.org/EIPS/eip-6093)
+- Token-bound accounts for NFTs: [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551)
+- Dual Nature Token Pair (DN-404): [ERC-7631](https://eips.ethereum.org/EIPS/eip-7631)
+- Soulbound NFT: [ERC-5114](https://eips.ethereum.org/EIPS/eip-5114), [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192), [ERC-5484](https://eips.ethereum.org/EIPS/eip-5484), 
+
+Specific implementation:
+- Gas optimized NFTs: [ERC-721A](https://www.erc721a.org)
+- [ERC-404](https://github.com/Pandora-Labs-Org/erc404)
+
 
 ### Table
 
-| **Standard**                                                 | Status    | ERC-721 extension (or compatible) | OpenZeppelinV5 impl                                          | [ERC-165 ID](https://eips.ethereum.org/EIPS/eip-165) | **Description**                                              | **Primary Use Cases**                                        | **Key Feature**                                              | Protocol Use                                                 |
-| ------------------------------------------------------------ | --------- | --------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [**ERC-721**](https://eips.ethereum.org/EIPS/eip-721)<br />(2018) | Final     | -                                 | ☑<br />[doc](https://docs.openzeppelin.com/contracts/5.x/erc721) | 0x80ac58cd                                           | The original NFT standard.                                   | Digital art, gaming, collectibles, Liquidity position (see Uniswap) | Uniqueness and ownership tracking.                           | [OpenSea](https://docs.opensea.io/docs/metadata-standards), [LooksRare](https://docs.looksrare.org/about/welcome-to-looksrare), Rarible,<br />[Uniswap v3/v4](https://docs.uniswap.org/contracts/v4/quickstart/manage-liquidity/mint-position) |
-| [**ERC-721A**](https://www.erc721a.org)                      | ☒         | ☑                                 | ☒                                                            | Same as ERC-721                                      | Gas-optimized ERC-721 implementation.                        | High-volume NFT minting (PFP collections).                   | Efficient batch minting.                                     | [Azuki](https://www.azuki.com/en/erc721a)                    |
-| [**ERC-1155**](https://eips.ethereum.org/EIPS/eip-1155)<br />(2018) | Final     | ☒                                 | ☑<br />[doc](https://docs.openzeppelin.com/contracts/5.x/erc1155) | 0xd9b67a26                                           | Multi-token standard (fungible + NFTs).                      | Gaming assets, batch transfers.                              | Batch operations and lower gas costs.                        | [OpenSea](https://docs.opensea.io/docs/metadata-standards)   |
-| [**ERC-998**](https://eips.ethereum.org/EIPS/eip-998)<br />(2018) | Draft     | ☑                                 | ☒                                                            | 0xcde244d9                                           | Composable NFTs with nested ownership.                       | Asset bundling, complex ownership structures.                | NFTs owning other tokens.                                    | [ZKPass](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9) |
-| [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907)<br />(2022) | Final     | ☑                                 | ☒                                                            | 0xad092b5c                                           | Rentable NFTs with usage rights.                             | Renting digital real estate, gaming assets.                  | Temporary usage with expiration.                             | [Double Protocol](https://double.one)<br />(nft rental protocol) |
-| [**ERC-2981**](https://eips.ethereum.org/EIPS/eip-2981)<br />(2020) | Final     | ☑<br />(also ERC-1155)            | [doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721Royalty) | 0x2a55205a                                           | Standardized royalty payments information for NFTs.<br />(don't force/guarantee payment for NFt creators) | Secondary sales royalties for creators.                      | Allow NFT marketplace to provide automatic royalty payouts.  | NFT markplac-Eg:[LooksRare](https://docs.looksrare.org/developers/protocol/looksrare-v2-protocol-overview) |
-| [**ERC-6551**](https://eips.ethereum.org/EIPS/eip-6551)<br />(2023) | Review    | ☑                                 | ☒                                                            | 0x6faff5f1<br />(IERC6551Account)                    | Token-bound accounts for NFTs.                               | Gaming assets, metaverse, identity solutions,<br /> [automated investment portfolio](https://mundus.dev/blog/tpost/1t1euygmi1-eip-6551-overview-token-bounds-accounts) | NFTs acting as wallets.                                      | [Virtual Protocol](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance/immutable-contribution-vault) |
-| [**ERC-5496**](https://eips.ethereum.org/EIPS/eip-5496)<br />(2022) | Last Call | ☑                                 | ☒                                                            | 0x076e1bbb                                           | Multi-privilege Management NFT Extension                     | Privileges use-case (voting rights, permission to claim airdrop, coupon discount) | Linked privilege rights to an ERC-721 token                  |                                                              |
-| [**ERC-3664**](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)<br />(2022) | Draft     | ☑<br />(also ERC-1155)            | ☒                                                            | yes <br />but value unknown                          | Extendable NFT metadata protocol                             | Game, metaverse                                              | Better descriptive power for attributes metadata with ERC-721 and ERC-1155 | [DRepublic Labs](https://github.com/DRepublic-io) (project abandoned) |
-| [**ERC-3525**](https://eips.ethereum.org/EIPS/eip-3525)<br />(2020) | Final     | ☑                                 | ☒                                                            | 0xd5358140                                           | Define Semi-Fungible tokens                                  | Monetary gifts, Certificates of deposit (CDs) and annuity, Debt instruments, Structured products | Semi-Fungible tokens                                         | [Solv finance](https://github.com/solv-finance)              |
-| [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192)<br />(2022) | Final     | ☑                                 | ☒                                                            | 0xb45a3c0e                                           | Define non-transferrable, non-fungible tokens                | award, certificate of achievement                            | Non-transferable NFT                                         |                                                              |
-| [ERC-4906](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                           | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | Metadata tracking change                                     | -                                                            |
-| [ERC-6093](https://eips.ethereum.org/EIPS/eip-6093)<br />(2023) | Last Call | ☑<br />(also ERC-1155 and ERC-20) | ☑                                                            | ☒                                                    | Custom errors for commonly-used tokens                       | Standardized errors allow users to expect more consistent error messages across applications or testing environments, | Standardized errors                                          | OpenZeppelin                                                 |
+| **Standard**                                                 | Status    | Key feature                                                  | ERC-721 extension (or compatible) | OpenZeppelinV5 impl                                          | [ERC-165 ID](https://eips.ethereum.org/EIPS/eip-165)         | **Description**                                              | Primary Use Cases                                            | Protocol Use                                                 |
+| ------------------------------------------------------------ | --------- | ------------------------------------------------------------ | --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [**ERC-721**](https://eips.ethereum.org/EIPS/eip-721)<br />(2018) | Final     | Uniqueness and ownership tracking.                           | -                                 | ☑<br />[doc](https://docs.openzeppelin.com/contracts/5.x/erc721) | 0x80ac58cd                                                   | The original NFT standard.                                   | Digital art, gaming, collectibles, Liquidity position (see Uniswap) | [OpenSea](https://docs.opensea.io/docs/metadata-standards), [LooksRare](https://docs.looksrare.org/about/welcome-to-looksrare), Rarible,<br />[Uniswap v3/v4](https://docs.uniswap.org/contracts/v4/quickstart/manage-liquidity/mint-position) |
+| [ERC-721A](https://www.erc721a.org)                          | ☒         | Efficient batch minting.                                     | ☑                                 | ☒                                                            | Same as ERC-721                                              | Gas-optimized ERC-721 implementation.                        | High-volume NFT minting (PFP collections).                   | [Azuki](https://www.azuki.com/en/erc721a)                    |
+| [**ERC-1155**](https://eips.ethereum.org/EIPS/eip-1155)<br />(2018) | Final     | Batch operations and lower gas costs.                        | ☒                                 | ☑<br />[doc](https://docs.openzeppelin.com/contracts/5.x/erc1155) | 0xd9b67a26                                                   | Multi-token standard (fungible + NFTs).                      | Gaming assets, batch transfers.                              | [OpenSea](https://docs.opensea.io/docs/metadata-standards)   |
+| [ERC-998](https://eips.ethereum.org/EIPS/eip-998)<br />(2018) | Draft     | NFTs owning other tokens.                                    | ☑                                 | ☒                                                            | 0xcde244d9                                                   | Composable NFTs with nested ownership.                       | Asset bundling, complex ownership structures.                | [ZKPass](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9) |
+| [**ERC-2981**](https://eips.ethereum.org/EIPS/eip-2981)<br />(2020) | Final     | Allow NFT marketplace to provide automatic royalty payouts.  | ☑<br />(also ERC-1155)            | ☑<br /><br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721Royalty) | 0x2a55205a                                                   | Standardized royalty payments information for NFTs.<br />(don't force/guarantee payment for NFt creators) | Secondary sales royalties for creators.                      | NFT markplac-Eg:[LooksRare](https://docs.looksrare.org/developers/protocol/looksrare-v2-protocol-overview) |
+| [**ERC-3525**](https://eips.ethereum.org/EIPS/eip-3525)<br />(2020) | Final     | Semi-Fungible tokens                                         | ☑                                 | ☒                                                            | 0xd5358140                                                   | Define Semi-Fungible tokens                                  | Monetary gifts, Certificates of deposit (CDs) and annuity, Debt instruments, Structured products | [Solv finance](https://github.com/solv-finance)              |
+| [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)<br />(2022) | Draft     | Better descriptive power for attributes metadata with ERC-721 and ERC-1155 | ☑<br />(also ERC-1155)            | ☒                                                            | yes <br />but value unknown                                  | Extendable NFT metadata protocol                             | Game, metaverse                                              | [DRepublic Labs](https://github.com/DRepublic-io) (project abandoned) |
+| [**ERC-4400**](https://eips.ethereum.org/EIPS/eip-4400)      | Final     | Add a consumer role that grants permissions for utilising/consuming a given NFT instance | ☑                                 | ☒                                                            | 0x953c8dfa                                                   | `consumer` role for instance(s) of [ERC-721](https://eips.ethereum.org/EIPS/eip-721) | Metaverses  with lend (renting), NFT-based yield-farming.    |                                                              |
+| [**ERC-4906**](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | Metadata tracking change                                     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                                   | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | -                                                            |
+| [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907)<br />(2022) | Final     | Temporary usage with expiration.                             | ☑                                 | ☒                                                            | 0xad092b5c                                                   | Rentable NFTs with usage rights.                             | Renting digital real estate, gaming assets.                  | [Double Protocol](https://double.one)<br />(nft rental protocol) |
+| [**ERC-5192**](https://eips.ethereum.org/EIPS/eip-5192)<br />(2022) | Final     | Non-transferable NFT                                         | ☑                                 | ☒                                                            | 0xb45a3c0e                                                   | Define non-transferrable, non-fungible tokens                | award, certificate of achievement                            |                                                              |
+| [**ERC-5496**](https://eips.ethereum.org/EIPS/eip-5496)<br />(2022) | Last Call | Linked privilege rights to an ERC-721 token                  | ☑                                 | ☒                                                            | 0x076e1bbb                                                   | Multi-privilege Management NFT Extension                     | Privileges use-case (voting rights, permission to claim airdrop, coupon discount) |                                                              |
+| [**ERC-6093**](https://eips.ethereum.org/EIPS/eip-6093)<br />(2023) | Last Call | Standardized errors                                          | ☑<br />(also ERC-1155 and ERC-20) | ☑<br />See [doc](https://docs.openzeppelin.com/contracts/5.x/api/interfaces#IERC721Errors) | ☒                                                            | Custom errors for commonly-used tokens                       | Standardized errors allow users to expect more consistent error messages across applications or testing environments, | OpenZeppelin                                                 |
+| [ERC-6909](https://eips.ethereum.org/EIPS/eip-6909)<br />(2023) | Review    | Minimal Multi-Token Interface                                | ☒                                 | In dev.                                                      | 0x0f632fb3                                                   | Simplified token standard for Multi-Token                    | Simplified interface, Gas efficiency, Improved transfer delegation, reduce code size | [Uniswap V4](https://docs.uniswap.org/contracts/v4/guides/ERC-6909) |
+| [**ERC-6551**](https://eips.ethereum.org/EIPS/eip-6551)<br />(2023) | Review    | NFTs acting as wallets.                                      | ☑                                 | ☒                                                            | 0x6faff5f1<br />(IERC6551Account)                            | Token-bound accounts for NFTs.                               | [automated investment portfolio](https://mundus.dev/blog/tpost/1t1euygmi1-eip-6551-overview-token-bounds-accounts) | [Virtual Protocol](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance/immutable-contribution-vault) |
+| [ERC-7631](https://eips.ethereum.org/EIPS/eip-7631)<br />(DN-404) | Review    | Dual Nature Token Pair                                       | ☑<br />(also ERC-20)              | ☒                                                            | ☒<br /><br />(call specific method `mirrorERC721` and `baseERC20` instead) | Native ERC-721 fractionalization, wherein acquiring ERC-20 tokens leads to the automatic issuance of ERC-721 tokens, proportional to the ERC-20 balance | Gaming assets, metaverse, identity solutions                 | [DN-404](https://github.com/Vectorized/dn404)                |
+| [ERC-7651](https://eips.ethereum.org/EIPS/eip-7651)<br />(ERC-404) | Draft     | fractionally Represented Non-Fungible Token                  | ☒                                 | ☒                                                            | yes <br />but value unknown                                  | Enables NFTs to coexist with an underlying fungible representation seamlessly, enhancing liquidity and access without dividing the NFT itself, or requiring an explicit conversion step. |                                                              | [Pandora ERC-404](https://www.pandora.build)                 |
 
 
 ## Final Standard
 
-### ERC-721: The Foundation of NFTs
+### ERC-721: main standard for NFTs
 
 > [EIP Reference](https://eips.ethereum.org/EIPS/eip-721)
 >
 > Status: final
 >
 > OpenZeppelin implementation: yes
+>
+> Other implementation: [solmate](https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC721.sol)
 
 The **ERC-721** standard was the first to introduce a blueprint for non-fungible tokens on Ethereum. Published in January 2018, ERC-721 defines NFTs as unique, indivisible assets that can be transferred and tracked on the Ethereum blockchain. Each token under this standard has a distinct ID, making it different from any other token.
 
 For more details, you can read my article [ERC-721 (NFT) Overview: Implementation, Security, and Best Practices](https://rya-sge.github.io/access-denied/2025/03/03/erc721-overview/)
 
-#### Key Features of ERC-721:
+#### Key Features
 
 - **Uniqueness:** Each token is unique and distinguishable by its ID.
 - **Transferability:** Tokens can be transferred between accounts.
@@ -141,7 +160,7 @@ interface ERC721Metadata /* is ERC721 */ {
 
 
 
-#### Examples of ERC-721 Use Cases:
+#### Use Cases
 
 - **Digital Art and collectibles:** 
   - Platforms like OpenSea and Rarible use ERC-721 for trading unique art piece
@@ -153,6 +172,44 @@ interface ERC721Metadata /* is ERC721 */ {
 #### Extension
 
 These extensions add several functionalities to the standard ERC-721
+
+##### ERC-2309: ERC-721 Consecutive Transfer Extension
+
+> Status: final
+>
+> OpenZeppelin implementation: yes
+>
+> Also implemented by [ERC-721A](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/ERC721A.sol#L884) (Azuki)
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-2309), [ethereum magicians](https://github.com/ethereum/EIPs/issues/2309)
+
+A standardized event emitted when creating/transferring one, or many non-fungible tokens using consecutive token identifiers.
+
+The optional ERC-721 Consecutive Transfer Extension provides a standardized event which could be emitted during the creation/transfer of one, or many non-fungible tokens. 
+
+This standard does not set the expectation of how you might create/transfer many tokens it is only concerned with the event emitted after the creation, or transfer of ownership of these tokens. 
+
+This extension assumes that token identifiers are in consecutive order.
+
+###### Motivation
+
+This extension provides even more scalibility of the [ERC-721 specification](https://eips.ethereum.org/EIPS/eip-721). It is possible to create, transfer, and burn 2^256 non-fungible tokens in one transaction. However, it is not possible to emit that many `Transfer` events in one transaction. The `Transfer` event is part of the original specification which states:
+
+> ##### This emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any number of NFTs may be created and assigned without emitting Transfer. At the time of any transfer, the approved address for that NFT (if any) is reset to none.
+
+This allows for the original `Transfer` event to be emitted for one token at a time, which in turn gives us O(n) time complexity. Minting one billion NFTs can be done in one transaction using efficient data structures, but in order to emit the `Transfer` event - according to the original spec - one would need a loop with one billion iterations which is bound to run out of gas, or exceed transaction timeout limits. This cannot be accomplished with the current spec. This extension solves that problem.
+
+Comment from the author in this article from [coincentral](https://coincentral.com/cargo-nft-ethereum/) (2020)
+
+> Cargo is the only platform that allows users to deploy smart contracts which enable them to create an infinite amount of NFTs in one transaction for the same cost as creating one NFT on other platforms. ERC-2309, an open standard on Ethereum that makes this possible, was spearheaded by myself because I realized early on that to scale NFTs we’d need a way to create and transfer large amounts at one time for a price that worked. 
+
+###### Specification
+
+Add a single events, emits during the contract creation in case of batch transfer.
+
+```solidity
+event ConsecutiveTransfer(uint256 indexed fromTokenId, uint256 toTokenId, address indexed fromAddress, address indexed toAddress);
+```
 
 ##### ERC-4906: EIP-721 Metadata Update Extension
 
@@ -244,15 +301,17 @@ error ERC721InvalidOperator(address operator);
 > Status: final
 >
 > OpenZeppelin implementation: yes
+>
+> Other implementation: [solmate](https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC1155.sol)
 
-ERC-1155, also known as the "multi-token standard," was introduced by Enjin. It enables the creation of **fungible, semi-fungible, and non-fungible tokens** within a single contract. This significantly reduces gas fees and enhances efficiency.
+ERC-1155, also known as the "multi-token standard," was introduced by [Enjin](https://enjin.io/blog/erc-1155-token-standard-ethereum) (Witek Radomski) in 2018. It enables the creation of **fungible, semi-fungible, and non-fungible tokens** within a single contract. This significantly reduces gas fees and enhances efficiency.
 
 **Key Features:**
 
 - **Batch Transfers:** Multiple tokens can be transferred in a single transaction.
 - **Lower Costs:** Reduced gas fees by optimizing token operations.
 - **Flexibility:** Supports fungible (e.g., in-game currency) and non-fungible (e.g., unique items) assets.
-- Note that contrary to [ERC-1400](https://github.com/ethereum/EIPs/issues/1411) and [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525), you don't have a decimal field attached to a specific token. Therefore you can several amount of a specific token, represented by its tokenId, but from the outside, it will be a whole number.
+- Note that contrary to [ERC-1400](https://github.com/ethereum/EIPs/issues/1411) and [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525), you don't have a decimal field attached to a specific token. Therefore you can have several amount of a specific token, represented by its tokenId, but from the outside, it will be a whole number.
 
 #### Main functions
 
@@ -278,12 +337,24 @@ function isApprovedForAll(address _owner, address _operator) external view retur
 
 **Popular Use Cases:**
 
-- Gaming assets like weapons and currencies (e.g., Enjin-powered games).
+- Gaming assets like weapons and currencies.
 - Collectibles where multiple items share a similar design but with variations.
+
+#### ERC-6093: Custom errors for commonly-used tokens
+
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+>
+> Status: last call
+>
+> OpenZeppelin implementation: yes
+
+This EIP defines a standard set of custom errors for commonly-used tokens, which are defined as [ERC-20](https://eips.ethereum.org/EIPS/eip-20), [ERC-721](https://eips.ethereum.org/EIPS/eip-721), and [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens.
+
+See also [OpenZeppelin - interfaces/draft-IERC6093.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.1.0/contracts/interfaces/draft-IERC6093.sol)
 
 ------
 
-### ERC-2981: Royalty Standard
+### ERC-2981: Royalty Standard (ERC-721/1155 ext)
 
 > [EIP Reference](https://eips.ethereum.org/EIPS/eip-2981)
 >
@@ -320,123 +391,7 @@ function royaltyInfo(
 
 ------
 
-### ERC-4907: Rentable NFTs (ERC-721 ext)
-
-> [EIP Reference](https://eips.ethereum.org/EIPS/eip-4907)
->
-> Status: final
->
-> OpenZeppelin implementation: no
->
-> Video details: [What is Double Protocol and how does it work? - Unlock the Liquidity of NFTs with ERC-490](https://www.youtube.com/watch?v=sZZ1JgtpcL4&t=183s)
-
-ERC-4907 introduces the concept of "rentable NFTs." This standard allows NFTs to be rented for a specified time period without transferring full ownership.
-
-This standard is an extension of [EIP-721](https://eips.ethereum.org/EIPS/eip-721). It proposes an additional role (`user`) which can be granted to addresses, and a time where the role is automatically revoked (`expires`). The `user` role represents permission to “use” the NFT, but not the ability to transfer it or set users.
-
-**Key Features:**
-
-- **Dual Roles:** Separates ownership (owner) and usage rights (user).
-- **Automated Expiration:** Usage rights automatically expire after the rental period.
-- **Use Case Focus:** Perfect for gaming, metaverse items, and digital real estate rentals.
-
-**Popular Use Cases:**
-
-- Renting in-game assets (e.g., rare weapons or avatars).
-- Leasing virtual land in the metaverse for a specific time frame.
-
-#### Main functions
-
-```solidity
-/// @notice set the user and expires of an NFT
-function setUser(uint256 tokenId, address user, uint64 expires) external;
-
-/// @notice Get the user address of an NFT
-function userOf(uint256 tokenId) external view returns(address);
-
-/// @notice Get the user expires of an NFT
-function userExpires(uint256 tokenId) external view returns(uint256);
-```
-
-### ERC-5496 (ERC-721 extension)
-
-> Status: last call
->
-> OpenZeppelin implementation: no
->
-> [ERC specification](https://eips.ethereum.org/EIPS/eip-5496),[Example](https://github.com/wnft/wnft-contracts/blob/main/contracts/ERC5496/ERC5496.sol), [ethereum-magicians.org](https://ethereum-magicians.org/t/eip-5496-multi-privilege-management-extension-for-erc-721/10427)
-
-This EIP defines an interface extending [EIP-721](https://eips.ethereum.org/EIPS/eip-721) to provide shareable multi-privileges for NFTs.
-
-Privileges may be:
-
-- on-chain: voting rights, permission to claim an airdrop
--  Off-chain: a coupon for an online store, a discount at a local restaurant, access to VIP lounges in airports.
-
-Each NFT may contain many privileges, and the holder of a privilege can verifiably transfer that privilege to others. 
-
-Privileges may be non-shareable or shareable. Shareable privileges can be cloned, with the provider able to adjust the details according to the spreading path. Expiration periods can also be set for each privilege.
-
-#### Motivation
-
-**ERC-721 limitation**
-
-[EIP-721](https://eips.ethereum.org/EIPS/eip-721) only records the ownership and its transfer, the privileges of an NFT are not recorded on-chain. This extension would allow merchants/projects to give out a certain privilege to a specified group of people, and owners of the privileges can manage each one of the privileges independently. This facilitates a great possibility for NFTs to have real usefulness.
-
-**Example**
-
-For example, an airline company issues a series of [EIP-721](https://eips.ethereum.org/EIPS/eip-721)/[EIP-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens to Crypto Punk holders to give them privileges, in order to attract them to join their club. However, since these tokens are not bound to the original NFT, if the original NFT is transferred, these privileges remain in the hands of the original holders, and the new holders cannot enjoy the privileges automatically. So, we propose a set of interfaces that can bind the privileges to the underlying NFT, while allowing users to manage the privileges independently.
-
-
-
-#### Shareable priviliges
-
-The number of privilege holders is limited by the number of NFTs if privileges are non-shareable. A shareable privilege means the original privilege holder can copy the privilege and give it to others, not transferring his/her own privilege to them. 
-
-This mechanism greatly enhances the spread of privileges as well as the adoption of NFTs.
-
-Example:
-
-For example, a local pizza shop offers a 30% off Coupon and the owner of the shop encourages their consumers to share the coupon with friends, then the friends can get the coupon. Let’s say Tom gets 30% off Coupon from the shop and he shares the coupon with Alice. Alice gets the coupon too and Alice’s referrer is Tom. For some certain cases, Tom may get more rewards from the shop. This will help the merchants in spreading the promotion among consumers.
-
-If the owner of the NFT transfers ownership to another user, there is no impact on “privileges”. But errors may occur if the owner tries to withdraw the original [EIP-721](https://eips.ethereum.org/EIPS/eip-721) token from the wrapped NFT through `unwrap()` if any available privileges are still ongoing. 
-
-We protect the rights of holders of the privileges to check the last expiration date of the privilege.
-
-```solidity
-function unwrap(uint256 tokenId, address to) external {
-    require(getBlockTimestamp() >= privilegeBook[tokenId].lastExpiresAt, "privilege not yet expired");
-
-    require(ownerOf(tokenId) == msg.sender, "not owner");
-
-    _burn(tokenId);
-
-    IERC721(nft).transferFrom(address(this), to, tokenId);
-
-    emit Unwrap(nft, tokenId, msg.sender, to);
-}
-```
-
-
-
-#### Main functions
-
-```solidity
-/// @title multi-privilege extension for EIP-721
-///  Note: the EIP-165 identifier for this interface is 0x076e1bbb
-interface IERC5496{
-    /// @notice set the privilege holder of a NFT.
-    function setPrivilege(uint256 tokenId, uint256 privilegeId, address user, uint256 expires) external;
-
-    /// @notice Return the expiry timestamp of a privilege
-    function privilegeExpires(uint256 tokenId, uint256 privilegeId) external view returns(uint256);
-
-    /// @notice Check if a user has a certain privilege
-    function hasPrivilege(uint256 tokenId, uint256 privilegeId, address user) external view returns(bool);
-}
-```
-
-### ERC-3525: Semi-Fungible tokens
+### ERC-3525: Semi-Fungible tokens (ERC-721 ext)
 
 > Status: final
 >
@@ -521,6 +476,246 @@ This standard introduces an `<ID, SLOT, VALUE>` triple scalar model that represe
 }
 ```
 
+
+
+### ERC-4400: Consumable Extension (ERC-721 ext)
+
+> Status: final
+>
+> OpenZeppelin implementation: no, 
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-4400), [Ethereum magicians](https://ethereum-magicians.org/t/erc-4400-erc-721-consumer-extension/7371)
+
+This specification defines standard functions outlining a `consumer` role for instance(s) of [EIP-721](https://eips.ethereum.org/EIPS/eip-721). An implementation allows reading the current `consumer` for a given NFT (`tokenId`) along with a standardized event for when an `consumer` has changed. 
+
+The proposal depends on and extends the existing [EIP-721](https://eips.ethereum.org/EIPS/eip-721).
+
+#### Motivation
+
+Many [EIP-721](https://eips.ethereum.org/EIPS/eip-721) contracts introduce their own custom role that grants permissions for utilising/consuming a given NFT instance. The need for that role stems from the fact that other than owning the NFT instance, there are other actions that can be performed on an NFT. For example, various metaverses use `operator` / `contributor` roles for Land (EIP-721), so that owners of the land can authorise other addresses to deploy scenes to them (f.e. commissioning a service company to develop a scene).
+
+It is common for NFTs to have utility other than ownership. That being said, it requires a separate standardized consumer role, allowing compatibility with user interfaces and contracts, managing those contracts.
+
+Example of kinds of contracts and applications that can benefit from this standard are:
+
+- metaverses that have land and other types of digital assets in those metaverses (scene deployment on land, renting land / characters / clothes / passes to events etc.)
+- NFT-based yield-farming. Adopting the standard enables the “staker” (owner of the NFT) to have access to the utility benefits even after transferring his NFT to the staking contract
+
+#### Specification
+
+```solidity
+interface IEIP721Consumable /* is EIP721 */ {
+    /// @notice Emitted when `owner` changes the `consumer` of an NFT
+    event ConsumerChanged(address indexed owner, address indexed consumer, uint256 indexed tokenId);
+
+    /// @notice Get the consumer address of an NFT
+    function consumerOf(uint256 _tokenId) view external returns (address);
+
+    /// @notice Change or reaffirm the consumer address for an NFT
+    function changeConsumer(address _consumer, uint256 _tokenId) external;
+}
+```
+
+----
+
+### ERC-4907: Rentable NFTs (ERC-721 ext)
+
+> [EC Reference](https://eips.ethereum.org/EIPS/eip-4907), [Ethereum magicians](https://ethereum-magicians.org/t/eip4907-erc-721-user-and-expires-extension/8572)
+>
+> Status: final
+>
+> OpenZeppelin implementation: no, see [this issue](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3735)
+>
+> Video details: [What is Double Protocol and how does it work? - Unlock the Liquidity of NFTs with ERC-490](https://www.youtube.com/watch?v=sZZ1JgtpcL4&t=183s)
+
+ERC-4907 introduces the concept of "rentable NFTs." This standard allows NFTs to be rented for a specified time period without transferring full ownership.
+
+This standard is an extension of [EIP-721](https://eips.ethereum.org/EIPS/eip-721). It proposes an additional role (`user`) which can be granted to addresses, and a time where the role is automatically revoked (`expires`). The `user` role represents permission to “use” the NFT, but not the ability to transfer it or set users.
+
+**Key Features:**
+
+- **Dual Roles:** Separates ownership (owner) and usage rights (user).
+- **Automated Expiration:** Usage rights automatically expire after the rental period.
+- **Use Case Focus:** Perfect for gaming, metaverse items, and digital real estate rentals.
+
+**Popular Use Cases:**
+
+- Renting in-game assets (e.g., rare weapons or avatars).
+- Leasing virtual land in the metaverse for a specific time frame.
+
+#### Main functions
+
+```solidity
+/// @notice set the user and expires of an NFT
+function setUser(uint256 tokenId, address user, uint64 expires) external;
+
+/// @notice Get the user address of an NFT
+function userOf(uint256 tokenId) external view returns(address);
+
+/// @notice Get the user expires of an NFT
+function userExpires(uint256 tokenId) external view returns(uint256);
+```
+
+
+
+----
+
+### ERC-5496: Multi-privilege Management NFT (ERC-721 ext.)
+
+> Status: last call
+>
+> OpenZeppelin implementation: no
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-5496),[Example](https://github.com/wnft/wnft-contracts/blob/main/contracts/ERC5496/ERC5496.sol), [ethereum-magicians.org](https://ethereum-magicians.org/t/eip-5496-multi-privilege-management-extension-for-erc-721/10427)
+
+This EIP defines an interface extending [EIP-721](https://eips.ethereum.org/EIPS/eip-721) to provide shareable multi-privileges for NFTs.
+
+Privileges may be:
+
+- on-chain: voting rights, permission to claim an airdrop
+-  Off-chain: a coupon for an online store, a discount at a local restaurant, access to VIP lounges in airports.
+
+Each NFT may contain many privileges, and the holder of a privilege can verifiably transfer that privilege to others. 
+
+Privileges may be non-shareable or shareable. Shareable privileges can be cloned, with the provider able to adjust the details according to the spreading path. Expiration periods can also be set for each privilege.
+
+#### Motivation
+
+**ERC-721 limitation**
+
+[EIP-721](https://eips.ethereum.org/EIPS/eip-721) only records the ownership and its transfer, the privileges of an NFT are not recorded on-chain. This extension would allow merchants/projects to give out a certain privilege to a specified group of people, and owners of the privileges can manage each one of the privileges independently. This facilitates a great possibility for NFTs to have real usefulness.
+
+**Example**
+
+For example, an airline company issues a series of [EIP-721](https://eips.ethereum.org/EIPS/eip-721)/[EIP-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens to Crypto Punk holders to give them privileges, in order to attract them to join their club. However, since these tokens are not bound to the original NFT, if the original NFT is transferred, these privileges remain in the hands of the original holders, and the new holders cannot enjoy the privileges automatically. So, we propose a set of interfaces that can bind the privileges to the underlying NFT, while allowing users to manage the privileges independently.
+
+
+
+#### Shareable priviliges
+
+The number of privilege holders is limited by the number of NFTs if privileges are non-shareable. A shareable privilege means the original privilege holder can copy the privilege and give it to others, not transferring his/her own privilege to them. 
+
+This mechanism greatly enhances the spread of privileges as well as the adoption of NFTs.
+
+Example:
+
+For example, a local pizza shop offers a 30% off Coupon and the owner of the shop encourages their consumers to share the coupon with friends, then the friends can get the coupon. Let’s say Tom gets 30% off Coupon from the shop and he shares the coupon with Alice. Alice gets the coupon too and Alice’s referrer is Tom. For some certain cases, Tom may get more rewards from the shop. This will help the merchants in spreading the promotion among consumers.
+
+If the owner of the NFT transfers ownership to another user, there is no impact on “privileges”. But errors may occur if the owner tries to withdraw the original [EIP-721](https://eips.ethereum.org/EIPS/eip-721) token from the wrapped NFT through `unwrap()` if any available privileges are still ongoing. 
+
+We protect the rights of holders of the privileges to check the last expiration date of the privilege.
+
+```solidity
+function unwrap(uint256 tokenId, address to) external {
+    require(getBlockTimestamp() >= privilegeBook[tokenId].lastExpiresAt, "privilege not yet expired");
+
+    require(ownerOf(tokenId) == msg.sender, "not owner");
+
+    _burn(tokenId);
+
+    IERC721(nft).transferFrom(address(this), to, tokenId);
+
+    emit Unwrap(nft, tokenId, msg.sender, to);
+}
+```
+
+
+
+#### Main functions
+
+```solidity
+/// @title multi-privilege extension for EIP-721
+///  Note: the EIP-165 identifier for this interface is 0x076e1bbb
+interface IERC5496{
+    /// @notice set the privilege holder of a NFT.
+    function setPrivilege(uint256 tokenId, uint256 privilegeId, address user, uint256 expires) external;
+
+    /// @notice Return the expiry timestamp of a privilege
+    function privilegeExpires(uint256 tokenId, uint256 privilegeId) external view returns(uint256);
+
+    /// @notice Check if a user has a certain privilege
+    function hasPrivilege(uint256 tokenId, uint256 privilegeId, address user) external view returns(bool);
+}
+```
+
+### ERC-6909: Minimal Multi-Token Interface
+
+>  Status: last call
+>
+> OpenZeppelin implementation: yes
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-6909), [Ethereum magician](https://ethereum-magicians.org/t/erc-6909-multi-token-standard/13891)
+
+This standard specifies a multi-token contract as a simplified alternative to the [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) Multi-Token Standard. 
+
+#### Difference with ERC-1155
+
+In contrast to ERC-1155, callbacks and batching have been removed from the interface and the permission system is a hybrid operator-approval scheme for granular and scalable permissions. Functionally, the interface has been reduced to the bare minimum required to manage multiple tokens under the same contract.
+
+According to [Uniswap doc](https://docs.uniswap.org/contracts/v4/concepts/erc6909):
+
+ERC-6909 offers several advantages over ERC-1155:
+
+1. Simplified interface: ERC-6909 removes unnecessary safe transfer callbacks and batching constraints presented in ERC-1155.
+2. Improved transfer delegation: ERC-6909 provides a more efficient system for transfer delegation.
+3. Gas efficiency: ERC-6909 reduces gas costs for deployment, transfers, and burning operations.
+4. Reduced code size: Implementing ERC-6909 results in smaller contract sizes compared to ERC-1155.
+
+However, it's worth noting that ERC-6909 does introduce a `totalSupply` variable, which leads to an additional disk write on mint and burn operations.
+
+#### Method
+
+From [OpenZeppelin  - draft-IERC6909.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/5a5867e548d2501c8c9aaeba69afec93ced8ff0c/contracts/interfaces/draft-IERC6909.sol)
+
+```solidity
+ /**
+     * @dev Returns the amount of tokens of type `id` owned by `owner`.
+     */
+    function balanceOf(address owner, uint256 id) external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens of type `id` that `spender` is allowed to spend on behalf of `owner`.
+     *
+     * NOTE: Does not include operator allowances.
+     */
+    function allowance(address owner, address spender, uint256 id) external view returns (uint256);
+
+    /**
+     * @dev Returns true if `spender` is set as an operator for `owner`.
+     */
+    function isOperator(address owner, address spender) external view returns (bool);
+
+    /**
+     * @dev Sets an approval to `spender` for `amount` tokens of type `id` from the caller's tokens.
+     *
+     * Must return true.
+     */
+    function approve(address spender, uint256 id, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Grants or revokes unlimited transfer permission of any token id to `spender` for the caller's tokens.
+     *
+     * Must return true.
+     */
+    function setOperator(address spender, bool approved) external returns (bool);
+
+    /**
+     * @dev Transfers `amount` of token type `id` from the caller's account to `receiver`.
+     *
+     * Must return true.
+     */
+    function transfer(address receiver, uint256 id, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Transfers `amount` of token type `id` from `sender` to `receiver`.
+     *
+     * Must return true.
+     */
+    function transferFrom(address sender, address receiver, uint256 id, uint256 amount) external returns (bool);
+}
+
+```
+
 ### Soulbound NFT
 
 #### ERC-5192 - Minimal Soulbound NFTs (ERC-721 ext)
@@ -564,7 +759,7 @@ interface IERC5192 {
 
 
 
-#### ERC-5484: Consensual Soulbound Tokens
+#### ERC-5484: Consensual Soulbound Tokens (ERC-721 ext.)
 
 > Status: 
 >
@@ -596,11 +791,6 @@ interface IERC5484 {
     }
 
     /// @notice Emitted when a soulbound token is issued.
-    /// @dev This emit is an add-on to nft's transfer emit in order to distinguish sbt 
-    /// from vanilla nft while providing backward compatibility.
-    /// @param from The issuer
-    /// @param to The receiver
-    /// @param tokenId The id of the issued token
     event Issued (
         address indexed from,
         address indexed to,
@@ -610,7 +800,6 @@ interface IERC5484 {
 
     /// @notice provides burn authorization of the token id.
     /// @dev unassigned tokenIds are invalid, and queries do throw
-    /// @param tokenId The identifier for a token.
     function burnAuth(uint256 tokenId) external view returns (BurnAuth);
 }
 ```
@@ -628,8 +817,6 @@ interface IERC5484 {
 > See also [Cyfrin - What is a Soulbound Token? - ERC-5114 & ERC-5484](https://www.cyfrin.io/blog/what-is-a-soulbound-token)
 
 A soulbound badge is a token that, when minted, is bound to another Non-Fungible Token (NFT), and cannot be transferred/moved after that.
-
-Warning: contrary
 
 By requiring that badges can never move, we both guarantee non-separability and non-mergeability among collections of soulbound badges that are bound to a single NFT while simultaneously allowing users to aggressively cache results.
 
@@ -673,7 +860,7 @@ interface IERC5114 {
 
 While ERC-721 paved the way, other standards have emerged to address additional functionality, scalability, and versatility in NFTs. Here are the most prominent ones:
 
-### ERC-998: Composable NFTs
+### ERC-998: Composable NFTs (ERC-721 ext.)
 
 > [ERC reference](https://eips.ethereum.org/EIPS/eip-998)
 >
@@ -893,7 +1080,7 @@ function execute(address to, uint256 value, bytes calldata data, uint8 operation
 
 
 
-### ERC-3664: Metaverse NFTs (ERC-721/1155 extension). 
+### ERC-3664: Metaverse NFTs (ERC-721/1155 ext.). 
 
 > Status: draft
 >
@@ -978,7 +1165,7 @@ NFT standards such as ERC721 and ERC1155 are now widely recognized and utilized,
 }
 ```
 
-### ERC-7771:  Fractionally Represented Non-Fungible Token
+### ERC-7651:  Fractionally Represented Non-Fungible Token
 
 > Status: draft
 >
@@ -1032,51 +1219,28 @@ interface IERC7651 is IERC165 {
   function decimals() external view returns (uint8 decimals);
 
   /// @notice The total supply of a token in fractional representation
-  /// @dev The total supply of NFTs may be recovered by computing
-  ///      `totalSupply() / 10 ** decimals()`
-  /// @return Total supply of the token in fractional representation
   function totalSupply() external view returns (uint256 totalSupply);
 
   /// @notice Balance of a given address in fractional representation
-  /// @dev The total supply of NFTs may be recovered by computing
-  ///      `totalSupply() / 10 ** decimals()`
-  /// @param owner_ The address that owns the tokens
-  /// @return Balance of a given address in fractional representation
   function balanceOf(address owner_) external view returns (uint256 balance);
 
   /// @notice Query if an address is an authorized operator for another address
-  /// @param owner_ The address that owns the NFTs
-  /// @param operator_ The address being checked for approval to act on behalf of the owner
-  /// @return True if `operator_` is an approved operator for `owner_`, false otherwise
   function isApprovedForAll(
     address owner_,
     address operator_
   ) external view returns (bool isApproved);
 
   /// @notice Query the allowed amount an address can spend for another address
-  /// @param owner_ The address that owns tokens in fractional representation
-  /// @param spender_ The address being checked for allowance to spend on behalf of the owner
-  /// @return The amount of tokens `spender_` is approved to spend on behalf of `owner_`
   function allowance(
     address owner_,
     address spender_
   ) external view returns (uint256 allowance);
 
   /// @notice Query the owner of a specific NFT.
-  /// @dev Tokens owned by the zero address are considered invalid and should revert on
-  ///      ownership query.
-  /// @param id_ The unique identifier for an NFT.
-  /// @return The address of the token's owner.
   function ownerOf(uint256 id_) external view returns (address owner);
 
   /// @notice Set approval for an address to spend a fractional amount,
   ///         or to spend a specific NFT.
-  /// @dev There must be no overlap between valid ids and fractional values.
-  /// @dev Throws unless `msg.sender` is the current NFT owner, or an authorized
-  ///      operator of the current owner if an id is provided.
-  /// @dev Throws if the id is not a valid NFT
-  /// @param spender_ The spender of a given token or value.
-  /// @param amountOrId_ A fractional value or id to approve.
   /// @return Whether the approval operation was successful or not.
   function approve(
     address spender_,
@@ -1085,20 +1249,9 @@ interface IERC7651 is IERC165 {
 
   /// @notice Set approval for a third party to manage all of the callers
   ///         non-fungible assets
-  /// @param operator_ Address to add to the callers authorized operator set
-  /// @param approved_ True if the operator is approved, false if not approved
   function setApprovalForAll(address operator_, bool approved_) external;
 
   /// @notice Transfer fractional tokens or an NFT from one address to another
-  /// @dev There must be no overlap between valid ids and fractional values
-  /// @dev The operation should revert if the caller is not `from_` or is not approved
-  ///      to spent the tokens or NFT owned by `from_`
-  /// @dev The operation should revert if value is less than the balance of `from_` or
-  ///      if the NFT is not owned by `from_`
-  /// @dev Throws if the id is not a valid NFT
-  /// @param from_ The address to transfer fractional tokens or an NFT from
-  /// @param to_ The address to transfer fractional tokens or an NFT to
-  /// @param amountOrId_ The fractional value or a distinct NFT id to transfer
   /// @return True if the operation was successful
   function transferFrom(
     address from_,
@@ -1107,26 +1260,10 @@ interface IERC7651 is IERC165 {
   ) external returns (bool success);
 
   /// @notice Transfer fractional tokens from one address to another
-  /// @dev The operation should revert if amount is less than the balance of `from_`
-  /// @param to_ The address to transfer fractional tokens to
-  /// @param amount_ The fractional value to transfer
   /// @return True if the operation was successful
   function transfer(address to_, uint256 amount_) external returns (bool success);
 
   /// @notice Transfers the ownership of an NFT from one address to another address
-  /// @dev Throws unless `msg.sender` is the current owner, an authorized
-  ///      operator, or the approved address for this NFT
-  /// @dev Throws if `from_` is not the current owner
-  /// @dev Throws if `to_` is the zero address
-  /// @dev Throws if `tokenId_` is not a valid NFT
-  /// @dev When transfer is complete, this function checks if `to_` is a
-  ///      smart contract (code size > 0). If so, it calls `onERC721Received`
-  ///      on `to_` and throws if the return value is not
-  ///      `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
-  /// @param from_ The address to transfer the NFT from
-  /// @param to_ The address to transfer the NFT to
-  /// @param tokenId_ The NFT to transfer
-  /// @param data_ Additional data with no specified format, sent in call to `to_`
   function safeTransferFrom(
     address from_,
     address to_,
@@ -1135,28 +1272,16 @@ interface IERC7651 is IERC165 {
   ) external;
 
   /// @notice Transfers the ownership of an NFT from one address to another address
-  /// @dev This is identical to the above function safeTransferFrom interface
-  ///      though must pass empty bytes as data to `to_`
-  /// @param from_ The address to transfer the NFT from
-  /// @param to_ The address to transfer the NFT to
-  /// @param tokenId_ The NFT to transfer
   function safeTransferFrom(address from_, address to_, uint256 id_) external;
 }
 
 interface IERC165 {
     /// @notice Query if a contract implements an interface
-    /// @param interfaceID_ The interface identifier, as specified in ERC-165
-    /// @dev Interface identification is specified in ERC-165. This function
-    ///      uses less than 30,000 gas.
-    /// @return `true` if the contract implements `interfaceID` and
-    ///         `interfaceID` is not 0xffffffff, `false` otherwise
     function supportsInterface(bytes4 interfaceID_) external view returns (bool);
 }
 ```
 
-https://eips.ethereum.org/EIPS/eip-7651
-
-### ERC-7631: Dual Nature Token pair
+### ERC-7631: Dual Nature Token pair (DN-404)
 
 > Status: review
 >
@@ -1201,7 +1326,19 @@ interface IERC7631Mirror {
 }
 ```
 
+#### Implementation (DN-404)
 
+> Status: not an ERC
+>
+> OpenZeppelin implementation: no
+>
+> [Reference implementation](https://github.com/Vectorized/dn404)
+
+DN404 is an implementation of a co-joined ERC20 and ERC721 pair (ERC-7631).
+
+- Full compliance with the ERC20 and ERC721 specifications.
+- Transfers on one side will be reflected on the other side.
+- Pretty optimized.
 
 ## Custom implementation
 
@@ -1215,7 +1352,9 @@ interface IERC7631Mirror {
 
 ERC-721A is an extension of the ERC-721 standard designed for gas efficiency when minting multiple NFTs in a single transaction. It was introduced by the Azuki NFT team to solve the cost challenge for large NFT drops.
 
-The code is available on the [Chiru Labs GitHub](https://github.com/chiru-labs/ERC721A)
+The code is available on the [Chiru Labs GitHub](https://github.com/chiru-labs/ERC721A).
+
+They implement also several other ERC related to NFT, such as [ERC-4097](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/extensions/ERC4907A.sol) or [ERC-2309](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/ERC721A.sol#L884)
 
 **Key Features:**
 
@@ -1236,22 +1375,7 @@ See also [ERC-721a](https://www.erc721a.org)
 >
 > OpenZeppelin implementation: no
 >
-> [reference implementation](https://github.com/0xacme/ERC404)
+> Reference implementation: [0xacme](https://github.com/0xacme/ERC404), [Pandora-Labs-Org - erc404](https://github.com/Pandora-Labs-Org/erc404)
 
 ERC404 is an experimental, mixed ERC20 / ERC721 implementation with native liquidity and fractionalization. While these two standards are not designed to be mixed, this implementation strives to do so in as robust a manner as possible while minimizing tradeoffs.https://hacken.io/discover/erc-404/
 
-### DN-404
-
-> Status: not an ERC
->
-> OpenZeppelin implementation: no
->
-> [Reference implementation](https://github.com/Vectorized/dn404)
-
-DN404 is an implementation of a co-joined ERC20 and ERC721 pair.
-
-To learn more about these dual nature token pairs, you can read the full [ERC-7631 spec](https://eips.ethereum.org/EIPS/eip-7631).
-
-- Full compliance with the ERC20 and ERC721 specifications.
-- Transfers on one side will be reflected on the other side.
-- Pretty optimized.

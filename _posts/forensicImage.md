@@ -1,0 +1,1 @@
+exiftool letter-image.jpg | grep GPS

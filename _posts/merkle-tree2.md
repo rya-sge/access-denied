@@ -25,7 +25,7 @@ This article explores the foundational concept of Merkle trees, examines their k
 
 ------
 
-### What is a Merkle Tree?
+## What is a Merkle Tree?
 
 A **Merkle tree**, also called a **hash tree**, is a data structure that efficiently and securely verifies the integrity of large datasets. At its core, a Merkle tree organizes data into a hierarchical structure:
 
@@ -40,7 +40,7 @@ Schema from [Wikipedia](https://en.wikipedia.org/wiki/Merkle_tree)
 
 ![wikipedia_hash_hree](../assets/article/cryptographie/merkle-tree/wikipedia_hash_hree.png)
 
-### How Do Merkle Trees Work?
+## How Do Merkle Trees Work?
 
 The process of constructing a Merkle tree involves several steps:
 
@@ -62,86 +62,83 @@ For example, if we have four data blocks A, B, C, and D, the steps would look li
 
 ------
 
-### Merkle Tree Variation
+## Merkle Tree Variation
 
 In practice, ofthen the Merkle Tree is adapted to offer more flexibility and functionality and to meet the demands of specific use case. Below are some of the most known variations.
 
-#### Merkle DAG (Directed Acyclic Graph)
+### Merkle DAG (Directed Acyclic Graph)
 
 In a traditional Merkle tree, the structure is a strict binary tree. In contrast, a **Merkle DAG** allows for multiple parents and does not enforce a strict tree-like structure. This variant is used in systems like the **InterPlanetary File System (IPFS)** and **Git** for version control.
 
-- **How It Works**: A Merkle DAG is a graph where nodes are hashes of data or other nodes, and edges represent relationships. The "acyclic" nature ensures no loops, maintaining a directional flow of data dependency.
+- **How It Works**: A Merkle DAG is a graph where nodes are hashes of data (e.g with SHA256) or other nodes, and edges represent relationships. The "acyclic" nature ensures no loops, maintaining a directional flow of data dependency.
 - Benefits:
   - Efficient storage: Data deduplication is inherent as identical subgraphs share the same nodes.
   - Flexibility: It supports non-linear and more complex relationships.
 - Applications:
   - **IPFS**: Organizes files as a Merkle DAG, allowing for efficient file sharing, content-addressing, and deduplication.
   - **Git**: Uses a Merkle DAG to track changes in codebases, enabling efficient versioning and collaboration.
+- Properties
+  - **no cycles**: The properties of the hash function ensure that no cycles can exist when creating Merkle DAGs. Hash functions are one-way functions. Creating a cycle should then be impossibly difficult unless some weakness is discovered and exploited. 
+  - Merkle DAG nodes are *immutable*. Any change in a node would alter its identifier and thus affect all the ascendants in the DAG, essentially creating a different DAG.
+
 
 ##### IPFS details
 
+A Merkle DAG in IPFS is a DAG where each node has an identifier, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA-226. 
 
-
-A Merkle DAG is a DAG where each node has an identifier, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA256. 
-
-As a result:
-
-- Merkle DAGs can only be constructed from the leaves, that is, from nodes without children. Parents are added after children because the children's identifiers must be computed in advance to be able to link them.
+- Merkle DAGs can only be constructed from the leaves, that is, from nodes without children. 
+- Parents are added after children because the children's identifiers must be computed in advance to be able to link them.
 - Every node in a Merkle DAG is the root of a (sub)Merkle DAG itself, and this subgraph is *contained* in the parent DAG.
-- Merkle DAG nodes are *immutable*. Any change in a node would alter its identifier and thus affect all the ascendants in the DAG, essentially creating a different DAG.
 
-For example, the previous linked list, assuming that the payload of each node is just the CID of its descendant, would be: 
-
-*A=Hash(B)→B=Hash(C)→C=Hash(∅)*. 
-
-- **no cycles**: The properties of the hash function ensure that no cycles can exist when creating Merkle DAGs. Hash functions are one-way functions. Creating a cycle should then be impossibly difficult unless some weakness is discovered and exploited. 
 - Merkle DAGs are *self-verified* structures. The CID of a node is univocally linked to the contents of its payload and those of all its descendants. Thus two nodes with the same CID univocally represent exactly the same DAG. This will be a key property to efficiently sync Merkle-CRDTs (Conflict-free Replicated Data Types) without having to copy the full DAG, as exploited by systems like IPFS.
+
+Reference:  [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
 
 ### Example
 
-Here an example of a merkle dag
+This example came from [https://proto.school/merkle-dags/07](https://proto.school/merkle-dags/07)
 
-One change we could make to this directory is to delete the "fish" directory, replacing it with a directory called "dogs". Since it is not possible to remove a directory, these change will create a new DAG, representing an updated state of the directory. 
+Here an example of a Merkle Dag:
 
-However, all of the nodes representing the "cats" directory and its files are common to both DAGs. Therefore, we can reuse them, as depicted below, where:
+For an example of small-scale data duplication, consider the use case of tracking changes files in a directory over time (this is often called *versioning*).
+
+We have this dag, constructed from a file directory `pics`which contain two folders inside: `fish`and `cats`.
+
+![T0008L04-complete-dag](../assets/article/cryptographie/merkle-tree/T0008L04-complete-dag.svg)
+
+From [ProtoSchool - merkle-dags/04](https://proto.school/merkle-dags/04)
+
+One change we could make to this directory is to delete the `fish` directory, replacing it with a directory called `dogs`. Since it is not possible to remove a directory, these change will create a new DAG, representing an updated state of the directory. 
+
+However, all of the nodes representing the `cats` directory and its files are common to both DAGs. Therefore, we can reuse them, as depicted below, where:
 
 - The orange nodes represent nodes that are only used in the original DAG,
 - The green nodes represent those that are common to both, 
 - and the blue nodes represent the extra nodes needed for the new state.
 
-Schema from https://proto.school/merkle-dags/07
+
 
 ![merkle-dag-deduplication](../assets/article/cryptographie/merkle-tree/merkle-dag-deduplication.png)
 
-
-
-
-
-Reference:  [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
+From [ProtoSchool - merkle-dags/07](https://proto.school/merkle-dags/07)
 
 See also [IPFS - Lesson: Turn a File into a Tree of Hashes](https://dweb-primer.ipfs.io/ipfs-dag/files-as-dags)
 
-#### Patricia Merkle Tree
+#### Patricia Merkle Trie (MPT)
 
-##### Patricia tree
+Patricia Merkle Tries combine a radix trie with a Merkle tree to store key-value pairs, similar to a hash table and verify data integrity, ideal for editing and storing ephemeral data.
 
-https://blockchain-academy.hs-mittweida.de/patricia-tree-simulator/
+- A radix trie is a tree-like data structure that is used to retrieve a string value by traversing down a branch of nodes that store associated references (keys) that together lead to the end value that can be returned. According to [Wikipedia](https://en.wikipedia.org/wiki/Radix_tree), a `patricia trie` is a special variant of the radix 2 (binary) trie, in which rather than explicitly store every bit of every key, the nodes store only the position of the first bit which differentiates two sub-trees.
+- At its essence, the MPT is a tree where each node has a unique hash value, derived from its content. This structure ensures both efficient data storage (thanks to the Patricia Trie) and robust data verification (courtesy of the Merkle Tree).
 
-https://www.cs.usfca.edu/~galles/visualization/RadixTree.html
+Reference: [Alchemy - What are Patricia Merkle Tries?](https://docs.alchemy.com/docs/patricia-merkle-tries)
 
-![step1](../assets/article/cryptographie/merkle-tree/radix/step1.png)
+**Ethereum**: Uses a variation of the Patricia tree, called the **Merkle Patricia Trie**, to manage its state database (accounts, balances, and smart contracts). This structure allows nodes to verify specific state changes without downloading the entire blockchain.
 
-![step2](../assets/article/cryptographie/merkle-tree/radix/step2.png)
+- Permanent: Once a transaction occurs, that record is sealed forever. This means that once you locate a transaction in a block’s transaction trie, you can return to the same path over and over to retrieve the same result
+- **Ephemeral**: In the case of Ethereum, account states change all the time! (ie. A user receives some ether, interacts with a contract, etc):`nonce`, `balance`, `storageRoot`, `codeHash`
 
-
-
-![step3](../assets/article/cryptographie/merkle-tree/radix/step3.png)
-
-
-
-![step4](../assets/article/cryptographie/merkle-tree/radix/step4.png)
-
-
+ The state trie is just a mapping that uses an address as the key and the account state (nonce, balance, etc) as the value returned.
 
 The **Patricia Tree** (Practical Algorithm to Retrieve Information Coded in Alphanumeric) is a specialized variation of a Merkle tree designed to handle large key-value mappings efficiently. It combines a **trie** (prefix tree) with Merkle hashing for integrity.
 
@@ -153,14 +150,15 @@ The **Patricia Tree** (Practical Algorithm to Retrieve Information Coded in Alph
   
 - Applications:
 
-- **Ethereum**: Uses a variation of the Patricia tree, called the **Merkle Patricia Trie**, to manage its state database (accounts, balances, and smart contracts). This structure allows nodes to verify specific state changes without downloading the entire blockchain.
+- 
 
   - Ethereum makes use of a data structure called a [radix trie, also referred to as a Patricia trie or a radix tree](https://www.cs.usfca.edu/~galles/visualization/RadixTree.html) and combines this data structure with a Merkle tree to create a **Patricia Merkle Trie**.
   - Radix trees support insertion, deletion, and searching operations
   - "Trie" comes from the word "retrieval"
-  - **A radix trie is a tree-like data structure that is used to retrieve a string value by traversing down a branch of nodes that store associated references (keys) that together lead to the end value that can be returned**:
+  - 
 
-  
+
+
 
 #### Sparse Merkle Tree
 

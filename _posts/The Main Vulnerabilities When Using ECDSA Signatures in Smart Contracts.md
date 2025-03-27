@@ -10,27 +10,32 @@ In this article, we will explore the key vulnerabilities associated with ECDSA i
 
 ## OpenZeppelin
 
-OpenZeppelin provides an ECDSA library which functions can be used to verify that a message was signed by the holder of the private keys of a given address.
+OpenZeppelin provides an ECDSA library which functions can be used to verify that a message was signed by the holder of the private keys of a given address. The documentation of the version 5 is vailable [here](https://docs.openzeppelin.com/contracts/5.x/api/utils#ECDSA-recover-bytes32-bytes-)
 
-OpenZeppelin v5 doc: [https://docs.openzeppelin.com/contracts/5.x/api/utils#ECDSA-recover-bytes32-bytes-](https://docs.openzeppelin.com/contracts/5.x/api/utils#ECDSA-recover-bytes32-bytes-)
-
-Difference between `recover` and `tryRecover`
+There are two main functions which can be used to verify the signature`recover` and `tryRecover`
 
 1. `ECDSA.recover` - This doesn't return an error if something wrong with the signature. It will only return the `address` of the signer. In this case you can see returning `address(0)` when an error occurs.
 2. `ECDSA.tryRecover` - This returns the `address`, `error`, and *details related to the error*. There will be no such cases like returning `address(0)`
 
-https://ethereum.stackexchange.com/questions/156467/ecdsa-recover-versus-ecdsa-tryrecover
+See also [ethereum.stackexchange - ECDSA.recover versus ECDSA.tryRecover](https://ethereum.stackexchange.com/questions/156467/ecdsa-recover-versus-ecdsa-tryrecover)
 
 ### Protection against signature malleability
 
-The `ecrecover` EVM precompile allows for malleable (non-unique) signatures: this function rejects them by requiring the `s` value to be in the lower half order, and the `v` value to be either 27 or 28.
+The `ecrecover` EVM precompile allows for malleable (non-unique) signatures. OpenZeppelin function rejects them by:
+
+- requiring the `s` value to be in the lower half order, 
+- requiring the `v` value to be either 27 or 28.
 
 ### Important
 
 - `hash` *must* be the result of a hash operation for the verification to be secure: it is possible to craft signatures that recover to arbitrary addresses for non-hashed data. A safe way to ensure this is by receiving a hash of the original message (which may otherwise be too long), and then calling [`MessageHashUtils.toEthSignedMessageHash`](https://docs.openzeppelin.com/contracts/5.x/api/utils#MessageHashUtils-toEthSignedMessageHash-bytes-) on it.
 - OpenZeppelin v4 was vulnerable to signature malleability.
 
-## Checklist
+
+
+## Use
+
+### Checklist
 
 |                           |                                               | Solition                                            |
 | ------------------------- | --------------------------------------------- | --------------------------------------------------- |
@@ -43,7 +48,7 @@ The `ecrecover` EVM precompile allows for malleable (non-unique) signatures: thi
 
 
 
-## Missing Validation[¶](https://scsfg.io/hackers/signature-attacks/#missing-validation)
+### Missing Validation[¶](https://scsfg.io/hackers/signature-attacks/#missing-validation)
 
 One of the most common vulnerabilities is missing validation when `ecrecover` encounters errors and returns an invalid address.
 
@@ -63,7 +68,7 @@ A crucial check for `address(0)` is absent in this instance. This omission allow
 
 Even better, OpenZeppelin's `ECDSA` library should be used because it automatically reverts when invalid signatures are encountered.
 
-## Replay Attacks[¶](https://scsfg.io/hackers/signature-attacks/#replay-attacks)
+### Replay Attacks[¶](https://scsfg.io/hackers/signature-attacks/#replay-attacks)
 
 Replay attacks occur when a signature and the system consuming it have no deduplication mechanism. A cause for replay attack vulnerabilities is when signatures are not properly invalidated or a nonce is absent from the system. 
 
@@ -102,7 +107,7 @@ In this scenario, an attacker possessing the owner's signature can perform the s
 
 Other example: https://medium.com/cryptronics/signature-replay-vulnerabilities-in-smart-contracts-3b6f7596df57
 
-### Mitigation
+#### Mitigation
 
 To mitigate this issue, a mapping can invalidate each submitted signature after its first execution. 
 
@@ -143,7 +148,7 @@ contract OwnerAction {
 
 Even this enhanced contract is not entirely secure. If the system is deployed on multiple chains or if the signer address is used in other contexts on different chains, signature replay attacks are still a potential threat.
 
-### Mitigation with nonce
+#### Mitigation with nonce
 
 - keep track of a [nonce](https://ethereum.stackexchange.com/questions/136224/how-to-use-nonce-to-prevent-signature-replication),
 - make the current nonce available to signers,
@@ -154,7 +159,7 @@ https://dacian.me/signature-replay-attacks
 
 https://dacian.me/signature-replay-attacks
 
-### Cross-chain Replay Attacks[¶](https://scsfg.io/hackers/signature-attacks/#cross-chain-replay-attacks)
+#### Cross-chain Replay Attacks[¶](https://scsfg.io/hackers/signature-attacks/#cross-chain-replay-attacks)
 
 Cross-chain replay attacks arise when signatures can be reused across different blockchain systems. Once a signature has been used and invalidated on one chain, an attacker can still copy it, use it on another, and trigger an unwanted state change. This poses a significant threat to smart contract systems deployed across chains with identical code.
 
@@ -184,7 +189,7 @@ Since a UserOperation is not signed nor verified using the chain_id, a valid sig
 
 To prevent [cross-chain signature replay attacks](https://code4rena.com/reports/2023-01-biconomy#m-03-cross-chain-signature-replay-attack), smart contracts must validate the signature using the chain_id, and users must [include the chain_id in the message to be signed](https://ethereum.stackexchange.com/questions/116970/how-to-prevent-cross-chain-signed-message-replay). More examples: [[1](https://github.com/sherlock-audit/2022-09-harpie-judging/blob/main/004-M/1-report.md), [2](https://solodit.xyz/issues/unlimitedpricefeed-is-vulnerable-to-crosschain-signature-replay-attacks-halborn-unlimited-network-unlimited-leverage-pdf)]
 
-### Mitigation
+#### Mitigation
 
 To mitigate this risk, the chain ID should be encoded in the signature payload and validated against the current chain ID where the action is executed.
 
@@ -226,11 +231,11 @@ It's worth noting that when signatures are used with EIP712 typed data payloads,
 
 
 
-## Frontrunning[¶](https://scsfg.io/hackers/signature-attacks/#frontrunning)
+### Frontrunning[¶](https://scsfg.io/hackers/signature-attacks/#frontrunning)
 
 Another common issue is frontrunning. Attackers can monitor the mempool for transactions using ECDSA signatures in certain systems, such as those where a reward is paid out for third parties executing a payload. Depending on the information in the signature payload, an attacker can frontrun the original transaction, manipulate specific parameters, and exploit the system.
 
-### Missing parameter from signature
+#### Missing parameter from signature
 
 Regarding the example above, a signature vulnerable to frontrunning attacks would emerge if the valid signature hash were to be calculated as follows:
 

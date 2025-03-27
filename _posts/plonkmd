@@ -1,0 +1,117 @@
+**From Programs to Arithmetic Circuits and Constraint Systems: The Foundation of zk-SNARKs**
+
+### Introduction
+
+In the realm of cryptographic proofs, particularly zk-SNARKs (Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge), one of the fundamental steps involves transforming computational problems into a mathematical structure. This process begins with converting a given program into an **arithmetic circuit**. The goal is to establish a mathematical foundation upon which cryptographic proofs can be constructed, ensuring efficiency, correctness, and the ability to verify computations without revealing sensitive information.
+
+### The Need for Arithmetic Circuits
+
+Consider a scenario where a prover wants to convince a verifier that they know a valid solution to a problem, such as a **Sudoku puzzle**. The simplest protocol would be for the prover to directly send the solution to the verifier, who can then check its correctness using a known verification program. However, this approach is inefficient and, more critically, does not preserve **zero-knowledge**, meaning the prover exposes the solution itself.
+
+To construct a proof system that maintains confidentiality while still allowing verification, we must first **mathematize** the problem. Since a typical verification program is a sequence of computational steps, it needs to be expressed in a purely mathematical form—this is where **arithmetic circuits** come into play.
+
+### Understanding Arithmetic Circuits
+
+An arithmetic circuit is a structured way of representing computations using mathematical operations. These circuits are analogous to electronic circuits, but instead of logical gates (AND, OR, XOR), they use arithmetic operations such as **addition and multiplication**. The key components of an arithmetic circuit include:
+
+- **Inputs:** Known as **public inputs** (e.g., the Sudoku puzzle itself) and **private inputs** (e.g., the solution that must remain secret).
+- **Gates:** Nodes that perform basic operations like addition (`+`) and multiplication (`×`).
+- **Intermediate Values:** Computed results that pass through various gates.
+- **Output:** A final computed result, often a binary value (`1` for true, `0` for false), indicating whether the computation holds.
+
+Arithmetic circuits operate within a **finite field**, meaning all operations are constrained by a predefined mathematical structure. This ensures that the circuit remains mathematically well-defined and suitable for cryptographic applications.
+
+
+
+
+
+![arithmetic-circuit-gate-example.drawio](../assets/article/cryptographie/zero-knowledge-proof/plonk/arithmetic-circuit-gate-example.drawio.png)
+
+### Constructing an Arithmetic Circuit
+
+To convert a standard verification program into an arithmetic circuit:
+
+1. **Replace logical operations with arithmetic equivalents.** Logical conditions can often be rewritten using polynomial equations.
+2. **Ensure the circuit maintains correctness.** Every step of computation should preserve the original intent of the verification.
+3. **Maintain input privacy where necessary.** This is crucial for zero-knowledge proofs.
+
+For example, consider a small computation:
+
+- Inputs: `7` and `3` (representing part of a Sudoku solution)
+- Operations: `7 + 5 = 12`, `3 × 4 = 12`
+- Then you can have an additional operation `1`.
+
+So we have 12 + 12 + 1 = 25
+
+- Then you can have an additional operation `1`. 
+
+In this case, since F = 26, the result gives 0
+
+- Final check: `12 + 12 + 1 + 1=  0`
+
+These arithmetic operations replace conditional checks from the original program, allowing the computation to be expressed entirely in mathematical terms.
+
+![arithmetic-circuit-gate-example2.drawio](../assets/article/cryptographie/zero-knowledge-proof/plonk/arithmetic-circuit-gate-example2.drawio.png)
+
+### Moving Toward zk-SNARKs
+
+Arithmetic circuits serve as the foundation for zk-SNARKs. Once a program is transformed into an arithmetic circuit, the next step is to convert it into a **constraint system**, which further refines how validity is checked. This constraint system is crucial for proving statements efficiently without revealing sensitive information.
+
+By structuring computations in this way, cryptographic protocols can ensure that verifiers can check correctness without learning anything beyond the validity of the computation itself. This principle is at the core of zk-SNARKs, enabling privacy-preserving applications in blockchain, authentication, and beyond.
+
+### From Arithmetic Circuits to Constraint Systems
+
+Once an arithmetic circuit is defined, the next step is to encode it into a **constraint system**. A constraint system is a set of equations that enforce correctness in a computation. Consider the example where a prover wants to prove knowledge of a value `a` such that `b - 1 = a²`. This can be expressed as an arithmetic circuit with two gates:
+
+1. A multiplication gate that computes `a × a = a²`.
+2. An addition gate that computes `a² + 1 = b`.
+
+However, when defining arithmetic circuits, a key challenge arises: **wiring constraints**. Specifically:
+
+- A single wire cannot be used as both a left and right input in multiplication.
+- An output wire cannot be directly reused as an input without an explicit constraint.
+
+To manage this, **copy constraints** are introduced, ensuring:
+
+- The left and right inputs of the multiplication gate are equal (`l1 = r1`).
+- The output of the multiplication gate feeds into the addition gate (`o1 = l2`).
+
+### Defining a Constraint System
+
+We translate the circuit into a set of equations:
+
+1. `l1 × r1 - o1 = 0` (multiplication constraint)
+2. `l2 + 1 - o2 = 0` (addition constraint)
+
+Additionally, copy constraints ensure that:
+
+- `l1 = r1`
+- `o1 = l2`
+
+This formalizes the constraints that maintain correctness in the proof system.
+
+### Standardizing Constraints in PLONK
+
+To facilitate cryptographic proofs, PLONK introduces a **universal equation format** for all gates:
+$$
+ql × li + qr × ri + qo × oi + qm × li × ri + qc = 0
+$$
+
+
+Where:
+
+- `ql, qr, qo, qm, qc` are **selector values** that toggle different operations.
+- Setting them to `1` or `0` enables or disables specific terms.
+
+For our example:
+
+- First equation (`a × a = b - 1`):
+  - `qm = 1`, `ql = 0`, `qr = 0`, `qo = -1`, `qc = 0`
+- Second equation (`b - 1 + 1 = b`):
+  - `ql = 1`, `qr = 0`, `qo = -1`, `qc = 1`
+
+These equations maintain equivalence with the original circuit while being structured for cryptographic verification.
+
+### Conclusion
+
+Transforming programs into arithmetic circuits and then into constraint systems is a fundamental process in zk-SNARKs. Constraint systems provide a standardized way to encode correctness, and PLONK’s equation format further streamlines cryptographic verification. The next step is to convert these equations into polynomials, enabling efficient proof generation and verification.

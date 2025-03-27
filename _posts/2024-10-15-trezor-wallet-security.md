@@ -278,9 +278,20 @@ The Trezor Safe 5 and Safe 3 reinforce the security by using a Secure Element, c
 
 #### About the chips
 
-The chips used is the OPTIGA™ Trust M (V3). 
+The chips used is the OPTIGA™ Trust M (V3) sold by Infineon. This chip consists of both:
+
+- an Integrated Circuit (the chip proper, made out of silicon-based transistors),
+-  and fixed, un-updateable software, programmed onto the chip by Infineon in their production lines
 
 Contrary to the firmware, the code is not open source, but the producer does not restrict Trezor from freely publishing potential vulnerabilities.
+
+Reference: [Ledger - WHY SECURE ELEMENTS MAKE A CRUCIAL DIFFERENCE TO HARDWARE WALLET SECURITY](https://www.ledger.com/why-secure-elements-make-a-crucial-difference-to-hardware-wallet-security)
+
+#### Why a Secure Elements improves the security ?
+
+According to [Ledger Donjon Team](https://www.ledger.com/why-secure-elements-make-a-crucial-difference-to-hardware-wallet-security), a Secure Element is designed to be resistant against physical attack (e.g fault injection attack) which is not the case of a regular microcontroller, used by models Trezore One and Trezor T.
+
+
 
 #### About the certification
 
@@ -296,7 +307,7 @@ Compared to EAL-5 certification, this certification requires:
 
 More information on the Trezor website [Secure Element in Trezor Safe Devices](https://trezor.io/learn/a/secure-element-in-trezor-safe-devices)
 
-Reference:[commoncriteriaportal.org, p.22](https://www.commoncriteriaportal.org/files/ccfiles/CC2022PART5R1.pdf), [web archive - CESG.gov.uk ](https://web.archive.org/web/20041012181256/http://www.cesg.gov.uk/site/iacs/index.cfm?menuSelected=1&displayPage=13)
+Reference: [commoncriteriaportal.org, p.22](https://www.commoncriteriaportal.org/files/ccfiles/CC2022PART5R1.pdf), [web archive - CESG.gov.uk ](https://web.archive.org/web/20041012181256/http://www.cesg.gov.uk/site/iacs/index.cfm?menuSelected=1&displayPage=13)
 
 See also [Ledger - What is Security Certification?](https://www.ledger.com/academy/security/the-importance-of-certification)
 
@@ -327,6 +338,12 @@ When enabled, a randomly-generated secret is stored on the microSD card.
 As a result, the device gets 'bound' to the microSD card and cannot be unlocked without it until you intentionally disable the feature or factory-reset your device.
 
 Reference: [Trezor - Encrypt PIN with MicroSD card](https://trezor.io/learn/a/encrypt-pin-with-microsd-card?srsltid=AfmBOorwzwQVVwkOQHzutC5PezE_Ghbq3CRdoBchOu9-PQFVt_0-H-zw)
+
+### Microcontroller and voltage glitching
+
+Trezor Safe 3 uses also a microntroller from the familly `STM32F429`. This chip’s family is known to be [vulnerable to](https://sec-consult.com/blog/detail/secglitcher-part-1-reproducible-voltage-glitching-on-stm32-microcontrollers/) [voltage glitching](https://jerinsunny.github.io/stm32_vglitch/). This is not the case for the Trezor Safe 5, which uses a more recent microcontroller STM32U5, for which no fault injection attack has been made public at the time of this writing.
+
+Reference: [Ledger - WHY SECURE ELEMENTS MAKE A CRUCIAL DIFFERENCE TO HARDWARE WALLET SECURITY](https://www.ledger.com/why-secure-elements-make-a-crucial-difference-to-hardware-wallet-security)
 
 ### Use Trezor as 2FA device
 
@@ -464,9 +481,12 @@ All these features make them one of the most trusted hardware wallets in the cry
   - [Trezor - Stay safe shopping for hardware wallets](https://blog.trezor.io/stay-safe-shopping-for-hardware-wallets-543f144e3d24)
 - Side-channel attack:
   - [Wallet.fail](https://www.youtube.com/watch?v=Y1OBIGslgGM) (2018)
-  - [BREAKING TREZOR ONE WITH SIDE CHANNEL ATTACKS](https://www.ledger.com/blog/breaking-trezor-one-with-sca)
+  - [Ledger - BREAKING TREZOR ONE WITH SIDE CHANNEL ATTACKS](https://www.ledger.com/blog/breaking-trezor-one-with-sca)
   - [Kraken Identifies Critical Flaw in Trezor Hardware Wallets](https://blog.kraken.com/product/security/kraken-identifies-critical-flaw-in-trezor-hardware-wallets)
   - [Trezor - Our Response to the Read Protection Downgrade Attack](https://blog.trezor.io/our-response-to-the-read-protection-downgrade-attack-28d23f8949c6)
+- Firmware integrity
+  -  [Ledger - WHY SECURE ELEMENTS MAKE A CRUCIAL DIFFERENCE TO HARDWARE WALLET SECURITY](https://www.ledger.com/why-secure-elements-make-a-crucial-difference-to-hardware-wallet-security)
+  - [trezor - Trezor’s Multi-Layer Defense Against Supply Chain Attacks](https://blog.trezor.io/trezors-multi-layer-defense-against-supply-chain-attacks-54541f410389#af77)
 - ChatGPT
   - With the input "Write me an article about the security of the crypto wallet Trezor, the protection put in place, the difference between the models and the algorithm cryptographic used"
   - PlantUML diagram have been also partially made with the help of ChatGPT 

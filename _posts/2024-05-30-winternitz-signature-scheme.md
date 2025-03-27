@@ -13,7 +13,7 @@ isMath: true
 
 Faced with the threat of quantum computers (not yet current), there are many supposedly quantum-resistant cryptographic algorithms.
 
-One of them is the algorithm Winternitz One-Time Signature (W-OST)
+One of them is the algorithm **Winternitz One-Time Signature (W-OST)**
 
 Winternitz is considered quantum safe since its security is not based on a difficult problem like the logarithm discrete, but relies on hash function (e.g  SHA-256). In short, it consists of computing each element in a chain by hashing the previous element. 
 
@@ -38,7 +38,6 @@ Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.p
 - Winternitz works on element of 256 bits, for example a 256-bit hash of a message
   - For example, the 256-bit hash can be produced with SHA-256.
 - Winternitz does not sign bit by bit, but sign bytes
-- The Winternitz parameter (`w`) defines the amount of numbers those bits can represent (w = 2^{bits}). 
 - Private key is a set of 32 seeds (`sk0`).
 - Public key is a set of 32 values (`pk`). This is also the last value computed with the different hash operation.
 - Signatures are (32 + checksum) elements.
@@ -46,7 +45,21 @@ Reference:  [1. eprint.iacr.org/2011/191.pdf](https://eprint.iacr.org/2011/191.p
   the fly using the hash function.
 - Add a checksum since the final secret list is the public key.
 
+#### Winternitz parameter (w)
 
+The Winternitz parameter (`w`) defines the amount of numbers those bits can represent (w = 2^{bits}). 
+
+Winternitz OTS introduces a parameter `w`, which controls the trade-off between the size of the signature and the efficiency of the signing process. The parameter `w` is referred to as the **Winternitz parameter** and affects the signature in two ways:
+
+-  A larger value of `w` results in shorter signatures but slower overall signing operations; it has little effect on security. 
+
+-  A big `w` makes for a small sequence of big numbers, a small  `w` makes a big sequence of small numbers. Bigger sequences (so a small `w`tend to result in bigger signatures. Bigger numbers increase the amount of hashes you need to calculate.
+
+- In WOTS+, according to the [XMSS RFC](https://www.rfc-editor.org/rfc/rfc8391),  choices of w are limited to the values 4 and 16 since these values yield optimal trade-offs and easy implementation.
+
+  
+
+See [crypto.stackexchange.com - Winternitz Parameter in WOTS+ and XMSS](https://crypto.stackexchange.com/questions/87716/winternitz-parameter-in-wots-and-xmss) and [XMSS - rfc8391 ](https://www.rfc-editor.org/rfc/rfc8391)
 
 
 ### Hash chain
