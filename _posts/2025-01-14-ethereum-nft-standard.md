@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Ethereum NFT Standards: ERC-721, ERC-1155, ERC-6551, and More
+title: "Ethereum NFT Standards: ERC-721, ERC-1155, ERC-6551, and More"
 date:   2025-01-14
 lang: en
 locale: en-GB
