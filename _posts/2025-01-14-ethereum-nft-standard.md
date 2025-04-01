@@ -15,6 +15,8 @@ Non-Fungible Tokens (NFTs) enable unique, verifiable ownership of digital and re
 
 While ERC-721 remains the main standard to represent NFTs, several other standards (ERC-1155, ERC-2981, ERC-4907,...) have emerged to meet various use cases and improve functionality. This article lists the different standards to represent NFT and their extensions on Ethereum.
 
+Acknowledge: I discovered several standards, thanks to [Sandesh B Suvarna](https://www.linkedin.com/in/sandeshbsuvarna/) Linkedin posts. 
+
 [TOC]
 
 ----
@@ -31,13 +33,13 @@ All these standard show that Ethereum is a real sandbox to build innovative appl
 
 Here a list of use case and their corresponding standards:
 
-Independent token standard:
+**Independent token standard**:
 
 - Multi-token standard (fungible + NFTs): [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155)
 - Fractionally Represented Non-Fungible Token ([ERC-7651](https://eips.ethereum.org/EIPS/eip-7651))
 - Minimal Multi-Token Interface: [ERC-6909](https://eips.ethereum.org/EIPS/eip-6909)
 
-ERC-721 extensions or compatible
+**ERC-721 extensions or compatible**:
 
 - Semi-Fungible tokens: [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525): 
 - Royalty payment: [ERC-2771](https://eips.ethereum.org/EIPS/eip-2771)
@@ -61,8 +63,8 @@ ERC-721 extensions or compatible
   - Parent-Governed Nestable Non-Fungible Tokens: [ERC-6059](https://eips.ethereum.org/EIPS/eip-6059),
   - Composable NFTs utilizing Equippable Parts: [ERC-6220](https://eips.ethereum.org/EIPS/eip-6220)
 
+**Specific implementation:**
 
-Specific implementation:
 - Gas optimized NFTs: [ERC-721A](https://www.erc721a.org)
 - [ERC-404](https://github.com/Pandora-Labs-Org/erc404)
 
@@ -81,7 +83,7 @@ Made with the help of ChatGPT and [PlantUML](https://www.plantuml.com)
 | [**ERC-1155**](https://eips.ethereum.org/EIPS/eip-1155)<br />(2018) | Final     | Batch operations and lower gas costs.                        | ☒                                 | ☑<br />[doc](https://docs.openzeppelin.com/contracts/5.x/erc1155) | 0xd9b67a26                                                   | Multi-token standard (fungible + NFTs).                      | Gaming assets, batch transfers.                              | [OpenSea](https://docs.opensea.io/docs/metadata-standards)   |
 | [ERC-998](https://eips.ethereum.org/EIPS/eip-998)<br />(2018) | Draft     | NFTs owning other tokens.                                    | ☑                                 | ☒                                                            | 0xcde244d9                                                   | Composable NFTs with nested ownership.                       | Asset bundling, complex ownership structures.                | [ZKPass](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9) |
 | [**ERC-2981**](https://eips.ethereum.org/EIPS/eip-2981)<br />(2020) | Final     | Allow NFT marketplace to provide automatic royalty payouts.  | ☑<br />(also ERC-1155)            | ☑<br /><br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721Royalty) | 0x2a55205a                                                   | Standardized royalty payments information for NFTs.<br />(don't force/guarantee payment for NFt creators) | Secondary sales royalties for creators.                      | NFT markplac-Eg:[LooksRare](https://docs.looksrare.org/developers/protocol/looksrare-v2-protocol-overview) |
-| [**ERC-3525**](https://eips.ethereum.org/EIPS/eip-3525)<br />(2020) | Final     | Semi-Fungible tokens                                         | ☑                                 | ☒                                                            | 0xd5358140                                                   | Define Semi-Fungible tokens                                  | Monetary gifts, Certificates of deposit (CDs) and annuity, Debt instruments, Structured products | [Solv finance](https://github.com/solv-finance)              |
+| [**ERC-3525**](https://eips.ethereum.org/EIPS/eip-3525)<br />(2020) | Final     | Semi-Fungible tokens                                         | ☑                                 | ☒                                                            | 0xd5358140                                                   | Define Semi-Fungible tokens                                  | Monetary gifts, Certificates of deposit (CDs) and annuity, Debt instruments, Structured products | [Solv finance](https://github.com/solv-finance), [sftlabs](https://sftlabs.io) |
 | [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)<br />(2022) | Draft     | Better descriptive power for attributes metadata with ERC-721 and ERC-1155 | ☑<br />(also ERC-1155)            | ☒                                                            | yes <br />but value unknown                                  | Extendable NFT metadata protocol                             | Game, metaverse                                              | [DRepublic Labs](https://github.com/DRepublic-io) (project abandoned) |
 | [**ERC-4400**](https://eips.ethereum.org/EIPS/eip-4400)      | Final     | Add a consumer role that grants permissions for utilising/consuming a given NFT instance | ☑                                 | ☒                                                            | 0x953c8dfa                                                   | `consumer` role for instance(s) of [ERC-721](https://eips.ethereum.org/EIPS/eip-721) | Metaverses  with lend (renting), NFT-based yield-farming.    |                                                              |
 | [**ERC-4906**](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | Metadata tracking change                                     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                                   | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | -                                                            |
@@ -215,7 +217,7 @@ This extension assumes that token identifiers are in consecutive order.
 
 This extension provides even more scalibility of the [ERC-721 specification](https://eips.ethereum.org/EIPS/eip-721). It is possible to create, transfer, and burn 2^256 non-fungible tokens in one transaction. However, it is not possible to emit that many `Transfer` events in one transaction. The `Transfer` event is part of the original specification which states:
 
-> ##### This emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any number of NFTs may be created and assigned without emitting Transfer. At the time of any transfer, the approved address for that NFT (if any) is reset to none.
+> This emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any number of NFTs may be created and assigned without emitting Transfer. At the time of any transfer, the approved address for that NFT (if any) is reset to none.
 
 This allows for the original `Transfer` event to be emitted for one token at a time, which in turn gives us O(n) time complexity. Minting one billion NFTs can be done in one transaction using efficient data structures, but in order to emit the `Transfer` event - according to the original spec - one would need a loop with one billion iterations which is bound to run out of gas, or exceed transaction timeout limits. This cannot be accomplished with the current spec. This extension solves that problem.
 
@@ -319,6 +321,7 @@ error ERC721InvalidOperator(address operator);
 > [EIP Reference](https://eips.ethereum.org/EIPS/eip-1155)
 >
 > Status: final
+> Requires: [EIP-165](https://eips.ethereum.org/EIPS/eip-165)
 >
 > OpenZeppelin implementation: yes
 >
@@ -362,9 +365,11 @@ function isApprovedForAll(address _owner, address _operator) external view retur
 
 #### ERC-6093: Custom errors for commonly-used tokens
 
-> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-6093)
 >
 > Status: last call
+>
+> Requires: [EIP-20](https://eips.ethereum.org/EIPS/eip-20) or [EIP-721](https://eips.ethereum.org/EIPS/eip-721) or [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155)
 >
 > OpenZeppelin implementation: yes
 
@@ -379,6 +384,8 @@ See also [OpenZeppelin - interfaces/draft-IERC6093.sol](https://github.com/OpenZ
 > [EIP Reference](https://eips.ethereum.org/EIPS/eip-2981)
 >
 > Status: final
+>
+> Require: [EIP-165](https://eips.ethereum.org/EIPS/eip-165)
 >
 > OpenZeppelin implementation: yes
 
@@ -415,9 +422,13 @@ function royaltyInfo(
 
 > Status: final
 >
+> Requires: [EIP-165](https://eips.ethereum.org/EIPS/eip-165), [EIP-721](https://eips.ethereum.org/EIPS/eip-721)
+>
 > OpenZeppelin implementation: no, see [https://forum.openzeppelin.com/t/plans-to-adopt-erc3525-semi-fungible-tokens-sfts/33522](https://forum.openzeppelin.com/t/plans-to-adopt-erc3525-semi-fungible-tokens-sfts/33522)
 >
 > [ERC specification](https://eips.ethereum.org/EIPS/eip-3525), [implementation example](https://github.com/solv-finance/erc-3525), [ethereum magicians](https://ethereum-magicians.org/t/eip-3525-the-semi-fungible-token/9770)
+>
+> See also [myantokengeek - https://myantokengeek.medium.com/sft-whitepaper-01-overview-what-is-an-sft-78ab27a0ca82](https://myantokengeek.medium.com/sft-whitepaper-01-overview-what-is-an-sft-78ab27a0ca82)
 
 This standard defines semi-fungible tokens, compatible with [ERC-721](https://eips.ethereum.org/EIPS/eip-721) standard. 
 
