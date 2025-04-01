@@ -1,13 +1,13 @@
 ---
 layout: post
-title: NFT Standards on Ethereum - ERC-721 and Beyond
+title: Ethereum NFT Standards: ERC-721, ERC-1155, ERC-6551, and More
 date:   2025-01-14
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum
 tags: ERC-721 NFT ERC-1155 royalty ERC-2981 ERC-4907 ERC-998 ERC-6551
 description: Non-Fungible Tokens (NFTs) enable unique, verifiable ownership of digital and real-world items on the blockchain. While ERC-721 remains the main standard to represent NFTs on Ethereum and EVM blockchains, several other standards (ERC-1155, ERC-2981, ERC-4907,...) have emerged to meet various use cases and improve functionality. 
-image: 
+image: /assets/article/blockchain/ethereum/token/nft-standard-mindmap.png
 isMath: false
 ---
 
@@ -47,13 +47,30 @@ ERC-721 extensions or compatible
 - Multi-privilege Management NFT Extension: [ERC-5496](https://eips.ethereum.org/EIPS/eip-5496)
 - Custom errors for commonly-used tokens: [ERC-6093](https://eips.ethereum.org/EIPS/eip-6093)
 - Token-bound accounts for NFTs: [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551)
-- Dual Nature Token Pair (DN-404): [ERC-7631](https://eips.ethereum.org/EIPS/eip-7631)
-- Soulbound NFT: [ERC-5114](https://eips.ethereum.org/EIPS/eip-5114), [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192), [ERC-5484](https://eips.ethereum.org/EIPS/eip-5484), 
+- ERC-20/ERC-721 pair:
+  - Dual Nature Token Pair (DN-404): [ERC-7631](https://eips.ethereum.org/EIPS/eip-7631)
+  - Fractionally Represented Non-Fungible Token: ERC-7651
+
+- Soulbound NFT: 
+  - Soulbound Badge: [ERC-5114](https://eips.ethereum.org/EIPS/eip-5114)
+  - Minimal Soulbound NFTs: [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192)
+  - Consensual Soulbound Tokens: [ERC-5484](https://eips.ethereum.org/EIPS/eip-5484)
+
+- Composable NFT: 
+  - Context-Dependent Multi-Asset Token: [ERC-5773](https://eips.ethereum.org/EIPS/eip-5773)
+  - Parent-Governed Nestable Non-Fungible Tokens: [ERC-6059](https://eips.ethereum.org/EIPS/eip-6059),
+  - Composable NFTs utilizing Equippable Parts: [ERC-6220](https://eips.ethereum.org/EIPS/eip-6220)
+
 
 Specific implementation:
 - Gas optimized NFTs: [ERC-721A](https://www.erc721a.org)
 - [ERC-404](https://github.com/Pandora-Labs-Org/erc404)
 
+### Mindmap
+
+![nft-standard-mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/token/nft-standard-mindmap.png)
+
+Made with the help of ChatGPT and [PlantUML](https://www.plantuml.com)
 
 ### Table
 
@@ -70,12 +87,15 @@ Specific implementation:
 | [**ERC-4906**](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | Metadata tracking change                                     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                                   | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | -                                                            |
 | [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907)<br />(2022) | Final     | Temporary usage with expiration.                             | ☑                                 | ☒                                                            | 0xad092b5c                                                   | Rentable NFTs with usage rights.                             | Renting digital real estate, gaming assets.                  | [Double Protocol](https://double.one)<br />(nft rental protocol) |
 | [**ERC-5192**](https://eips.ethereum.org/EIPS/eip-5192)<br />(2022) | Final     | Non-transferable NFT                                         | ☑                                 | ☒                                                            | 0xb45a3c0e                                                   | Define non-transferrable, non-fungible tokens                | award, certificate of achievement                            |                                                              |
-| [**ERC-5496**](https://eips.ethereum.org/EIPS/eip-5496)<br />(2022) | Last Call | Linked privilege rights to an ERC-721 token                  | ☑                                 | ☒                                                            | 0x076e1bbb                                                   | Multi-privilege Management NFT Extension                     | Privileges use-case (voting rights, permission to claim airdrop, coupon discount) |                                                              |
+| [**ERC-5496**](https://eips.ethereum.org/EIPS/eip-5496)<br />(2022) | Last Call | Linked privilege rights to an ERC-721 token                  | ☑                                 | ☒                                                            | 0x076e1bbb                                                   | Multi-privilege Management NFT Extension                     | Privileges use-case (voting rights, permission to claim airdrop, coupon discount) | -                                                            |
+| [ERC-5773](https://eips.ethereum.org/EIPS/eip-5773)          | Final     | Context-Dependent Multi-Asset Token                          | ☑                                 | ☒                                                            | 0x06b4329a                                                   | Display the asset based on how the token is being accessed   | Cross-metaverse compatibility, Multi-media output, Media redundancy, NFT evolution | ?                                                            |
+| [ERC-6059](https://eips.ethereum.org/EIPS/eip-6059)          | Final     | Parent-Governed Nestable NFT                                 | ☑                                 | ☒                                                            | 0x42b0e56f.                                                  | This proposal establishes the framework for the parent-child relationships of NFTs. | Bundling<br/>Collecting<br/>Membership<br/>Delegation        | ?                                                            |
+| [ERC-6220](https://eips.ethereum.org/EIPS/eip-6220)          | Final     | Composable NFTs utilizing Equippable Parts                   | ☑                                 | ☒                                                            | 0x28bc9ae4                                                   | Equip other tokens and be composed from a set of available parts | Composing<br/>Token progression<br/>Merit tracking<br/>Provable Digital Scarcity | ?                                                            |
 | [**ERC-6093**](https://eips.ethereum.org/EIPS/eip-6093)<br />(2023) | Last Call | Standardized errors                                          | ☑<br />(also ERC-1155 and ERC-20) | ☑<br />See [doc](https://docs.openzeppelin.com/contracts/5.x/api/interfaces#IERC721Errors) | ☒                                                            | Custom errors for commonly-used tokens                       | Standardized errors allow users to expect more consistent error messages across applications or testing environments, | OpenZeppelin                                                 |
 | [ERC-6909](https://eips.ethereum.org/EIPS/eip-6909)<br />(2023) | Review    | Minimal Multi-Token Interface                                | ☒                                 | In dev.                                                      | 0x0f632fb3                                                   | Simplified token standard for Multi-Token                    | Simplified interface, Gas efficiency, Improved transfer delegation, reduce code size | [Uniswap V4](https://docs.uniswap.org/contracts/v4/guides/ERC-6909) |
 | [**ERC-6551**](https://eips.ethereum.org/EIPS/eip-6551)<br />(2023) | Review    | NFTs acting as wallets.                                      | ☑                                 | ☒                                                            | 0x6faff5f1<br />(IERC6551Account)                            | Token-bound accounts for NFTs.                               | [automated investment portfolio](https://mundus.dev/blog/tpost/1t1euygmi1-eip-6551-overview-token-bounds-accounts) | [Virtual Protocol](https://whitepaper.virtuals.io/the-protocol/co-contribution-and-provenance/immutable-contribution-vault) |
 | [ERC-7631](https://eips.ethereum.org/EIPS/eip-7631)<br />(DN-404) | Review    | Dual Nature Token Pair                                       | ☑<br />(also ERC-20)              | ☒                                                            | ☒<br /><br />(call specific method `mirrorERC721` and `baseERC20` instead) | Native ERC-721 fractionalization, wherein acquiring ERC-20 tokens leads to the automatic issuance of ERC-721 tokens, proportional to the ERC-20 balance | Gaming assets, metaverse, identity solutions                 | [DN-404](https://github.com/Vectorized/dn404)                |
-| [ERC-7651](https://eips.ethereum.org/EIPS/eip-7651)<br />(ERC-404) | Draft     | fractionally Represented Non-Fungible Token                  | ☒                                 | ☒                                                            | yes <br />but value unknown                                  | Enables NFTs to coexist with an underlying fungible representation seamlessly, enhancing liquidity and access without dividing the NFT itself, or requiring an explicit conversion step. |                                                              | [Pandora ERC-404](https://www.pandora.build)                 |
+| [ERC-7651](https://eips.ethereum.org/EIPS/eip-7651)<br />(ERC-404) | Draft     | fractionally Represented Non-Fungible Token                  | ☒                                 | ☒                                                            | yes <br />but value unknown                                  | Enables NFTs to coexist with an underlying fungible representation seamlessly, enhancing liquidity and access without dividing the NFT itself, or requiring an explicit conversion step. |                                                              | [Pandora ERC-404](https://www.pandora.build) ?               |
 
 
 ## Final Standard
@@ -139,7 +159,7 @@ function balanceOf(address _owner) external view returns (uint256);
 
 The **metadata extension** is OPTIONAL for ERC-721 smart contracts. This allows your smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
 
-```json
+```solidity
 /// @title ERC-721 Non-Fungible Token Standard, optional metadata extension
 /// @dev See https://eips.ethereum.org/EIPS/eip-721
 ///  Note: the ERC-165 identifier for this interface is 0x5b5e139f.
@@ -638,13 +658,17 @@ interface IERC5496{
 }
 ```
 
+
+
 ### ERC-6909: Minimal Multi-Token Interface
 
 >  Status: last call
 >
-> OpenZeppelin implementation: yes
+>  OpenZeppelin implementation: yes, since version [v5.3.0-rc.0](https://github.com/OpenZeppelin/openzeppelin-contracts/releases/tag/v5.3.0-rc.0)
 >
-> [ERC specification](https://eips.ethereum.org/EIPS/eip-6909), [Ethereum magician](https://ethereum-magicians.org/t/erc-6909-multi-token-standard/13891)
+>  [ERC specification](https://eips.ethereum.org/EIPS/eip-6909), [Ethereum magician](https://ethereum-magicians.org/t/erc-6909-multi-token-standard/13891)
+>
+>  Other implementation: [solmate](https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC6909.sol)
 
 This standard specifies a multi-token contract as a simplified alternative to the [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) Multi-Token Standard. 
 
@@ -715,6 +739,523 @@ From [OpenZeppelin  - draft-IERC6909.sol](https://github.com/OpenZeppelin/openze
 }
 
 ```
+
+### Composable NFTs (ERC-721 ext.)
+
+#### ERC-5773: Context-Dependent Multi-Asset Tokens
+
+> Status: final
+>
+> OpenZeppelin implementation: no
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-5773), [ethereum magicians](https://ethereum-magicians.org/t/eip-5773-context-dependent-multi-asset-tokens/11326)
+>
+> Requires: [EIP-165](https://eips.ethereum.org/EIPS/eip-165), [EIP-721](https://eips.ethereum.org/EIPS/eip-721)
+
+An interface for Multi-Asset tokens with context dependent asset type output controlled by owner's preference.
+
+The Multi-Asset NFT standard allows for the construction of a new primitive: context-dependent output of information per single NFT.
+
+The context-dependent output of information means that the asset in an appropriate format is displayed based on how the token is being accessed. I.e. 
+
+- if the token is being opened in an e-book reader, the PDF asset is displayed,
+- if the token is opened in the marketplace, the PNG or the SVG asset is displayed, 
+- if the token is accessed from within a game, the 3D model asset is accessed
+- if the token is accessed by the (Internet of Things) IoT hub, the asset providing the necessary addressing and specification information is accessed.
+
+An NFT can have multiple assets (outputs), which can be any kind of file to be served to the consumer, and orders them by priority. They do not have to match in mimetype or tokenURI, nor do they depend on one another. Assets are not standalone entities, but should be thought of as “namespaced tokenURIs” that can be ordered at will by the NFT owner, but only modified, updated, added, or removed if agreed on by both the owner of the token and the issuer of the token.
+
+##### Main functions
+
+```solidity
+interface IERC5773 /* is ERC165 */ {
+    /**
+     * @notice Accepts an asset at from the pending array of given token.
+     */
+    function acceptAsset(
+        uint256 tokenId,
+        uint256 index,
+        uint64 assetId
+    ) external;
+
+    /**
+     * @notice Rejects an asset from the pending array of given token.
+     */
+    function rejectAsset(
+        uint256 tokenId,
+        uint256 index,
+        uint64 assetId
+    ) external;
+
+    /**
+     * @notice Rejects all assets from the pending array of a given token.
+     */
+    function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
+
+    /**
+     * @notice Sets a new priority array for a given token.
+     */
+    function setPriority(uint256 tokenId, uint64[] calldata priorities)
+        external;
+
+    /**
+     * @notice Used to retrieve IDs of the active assets of given token.
+     */
+    function getActiveAssets(uint256 tokenId)
+        external
+        view
+        returns (uint64[] memory);
+
+    /**
+     * @notice Used to retrieve IDs of the pending assets of given token.
+     */
+    function getPendingAssets(uint256 tokenId)
+        external
+        view
+        returns (uint64[] memory);
+
+    /**
+     * @notice Used to retrieve the priorities of the active assets of a given token.
+     */
+    function getActiveAssetPriorities(uint256 tokenId)
+        external
+        view
+        returns (uint64[] memory);
+
+    /**
+     * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array
+     */
+    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
+        external
+        view
+        returns (uint64);
+
+    /**
+     * @notice Used to fetch the asset metadata of the specified token's active asset with the given index.
+     */
+    function getAssetMetadata(uint256 tokenId, uint64 assetId)
+        external
+        view
+        returns (string memory);
+
+    /**
+     * @notice Used to grant permission to the user to manage token's assets.
+     */
+    function approveForAssets(address to, uint256 tokenId) external;
+
+    /**
+     * @notice Used to retrieve the address of the account approved to manage assets of a given token.
+     */
+    function getApprovedForAssets(uint256 tokenId)
+        external
+        view
+        returns (address);
+
+    /**
+     * @notice Used to add or remove an operator of assets for the caller.
+     */
+    function setApprovalForAllForAssets(address operator, bool approved)
+        external;
+
+    /**
+     * @notice Used to check whether the address has been granted the operator role by a given address or not.
+    function isApprovedForAllForAssets(address owner, address operator)
+        external
+        view
+        returns (bool);
+}
+```
+
+
+
+#### ERC-6059: Parent-Governed Nestable Non-Fungible Tokens
+
+> Status: final
+>
+> OpenZeppelin implementation: no
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-6059), [ethereum magicians](https://ethereum-magicians.org/t/eip-6059-parent-governed-nestable-non-fungible-tokens/11914)
+>
+> Requires: [EIP-165](https://eips.ethereum.org/EIPS/eip-165), [EIP-721](https://eips.ethereum.org/EIPS/eip-721)
+
+The Parent-Governed Nestable NFT standard extends [ERC-721](https://eips.ethereum.org/EIPS/eip-721) by allowing for a new inter-NFT relationship and interaction.
+
+At its core, the idea behind the proposal is simple: the owner of an NFT does not have to be an Externally Owned Account (EOA) or a smart contract, it can also be an NFT.
+
+The process of nesting an NFT into another is functionally identical to sending it to another user. The process of sending a token out of another one involves issuing a transaction from the account owning the parent token.
+
+An NFT can be owned by a single other NFT, but can in turn have a number of NFTs that it owns. This proposal establishes the framework for the parent-child relationships of NFTs. A parent token is the one that owns another token. A child token is a token that is owned by another token. A token can be both a parent and child at the same time. Child tokens of a given token can be fully managed by the parent token’s owner, but can be proposed by anyone.
+
+![eip-6059-nestable-tokens](../assets/article/blockchain/ethereum/token/eip-6059-nestable-tokens.png)
+
+##### Interface
+
+```solidity
+interface IERC6059 /* is ERC165 */ {
+    /**
+     * @notice The core struct of ownership.
+     */
+    struct DirectOwner {
+        uint256 tokenId;
+        address ownerAddress;
+    }
+
+    /**
+     * @notice The core child token struct, holding the information about the child tokens.
+     */
+    struct Child {
+        uint256 tokenId;
+        address contractAddress;
+    }
+
+    /**
+     * @notice Used to retrieve the *root* owner of a given token.
+     */
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+
+    /**
+     * @notice Used to retrieve the immediate owner of the given token.
+     */
+    function directOwnerOf(uint256 tokenId)
+        external
+        view
+        returns (
+            address,
+            uint256,
+            bool
+        );
+
+    /**
+     * @notice Used to burn a given token.
+     */
+    function burn(uint256 tokenId, uint256 maxRecursiveBurns)
+        external
+        returns (uint256);
+
+    /**
+     * @notice Used to add a child token to a given parent token.
+     */
+    function addChild(uint256 parentId, uint256 childId) external;
+
+    /**
+     * @notice Used to accept a pending child token for a given parent token.
+     */
+    function acceptChild(
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
+    ) external;
+
+    /**
+     * @notice Used to reject all pending children of a given parent token.
+     */
+    function rejectAllChildren(uint256 parentId, uint256 maxRejections) external;
+
+    /**
+     * @notice Used to transfer a child token from a given parent token.
+     */
+    function transferChild(
+        uint256 tokenId,
+        address to,
+        uint256 destinationId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
+        bool isPending,
+        bytes data
+    ) external;
+
+    /**
+     * @notice Used to retrieve the active child tokens of a given parent token.
+     */
+    function childrenOf(uint256 parentId)
+        external
+        view
+        returns (Child[] memory);
+
+    /**
+     * @notice Used to retrieve the pending child tokens of a given parent token.
+     */
+    function pendingChildrenOf(uint256 parentId)
+        external
+        view
+        returns (Child[] memory);
+
+    /**
+     * @notice Used to retrieve a specific active child token for a given parent token.
+     */
+    function childOf(uint256 parentId, uint256 index)
+        external
+        view
+        returns (Child memory);
+
+    /**
+     * @notice Used to retrieve a specific pending child token from a given parent token.
+     */
+    function pendingChildOf(uint256 parentId, uint256 index)
+        external
+        view
+        returns (Child memory);
+
+    /**
+     * @notice Used to transfer the token into another token.
+     */
+    function nestTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId
+    ) external;
+}
+```
+
+#### ERC-6220: Composable NFTs utilizing Equippable Parts
+
+> Status: final
+>
+> OpenZeppelin implementation: no
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-6220), [ethereum magicians](https://ethereum-magicians.org/t/erc-7651-fractionally-represented-non-fungible-token/19176)
+>
+> Requires: [EIP-165](https://eips.ethereum.org/EIPS/eip-165), [EIP-721](https://eips.ethereum.org/EIPS/eip-721), [EIP-5773](https://eips.ethereum.org/EIPS/eip-5773), [EIP-6059](https://eips.ethereum.org/EIPS/eip-6059)
+
+The Composable NFTs utilizing equippable parts standard extends [ERC-721](https://eips.ethereum.org/EIPS/eip-721) by allowing the NFTs to selectively add parts to themselves via equipping.
+
+Tokens can be composed by cherry picking the list of parts from a Catalog for each NFT instance, and are able to equip other NFTs into slots, which are also defined within the Catalog. Catalogs contain parts from which NFTs can be composed.
+
+This proposal introduces two types of parts:slot type of parts and fixed type of parts. 
+
+- The slot type of parts allow for other NFT collections to be equipped into them
+- Fixed parts are full components with their own metadata.
+
+Equipping a part into an NFT doesn’t generate a new token, but rather adds another component to be rendered when retrieving the token.
+
+
+
+#####  Motivation
+
+Having the ability for tokens to equip other tokens and be composed from a set of available parts allows for greater utility, usability and forward compatibility.
+
+This EIP improves upon ERC-721 in the following areas:
+
+- [Composing](https://eips.ethereum.org/EIPS/eip-6220#composing)
+- [Token progression](https://eips.ethereum.org/EIPS/eip-6220#token-progression)
+- [Merit tracking](https://eips.ethereum.org/EIPS/eip-6220#merit-tracking)
+- [Provable Digital Scarcity](https://eips.ethereum.org/EIPS/eip-6220#provable-digital-scarcity)
+
+##### Specification
+
+###### Equippable tokens
+
+The interface of the core smart contract of the equippable tokens.
+
+Struct
+
+```solidity
+    /**
+     * @notice Used to store the core structure of the `Equippable` component.
+     * @return assetId The ID of the asset equipping a child
+     * @return childAssetId The ID of the asset used as equipment
+     * @return childId The ID of token that is equipped
+     * @return childEquippableAddress Address of the collection to which the child asset belongs to
+     */
+    struct Equipment {
+        uint64 assetId;
+        uint64 childAssetId;
+        uint256 childId;
+        address childEquippableAddress;
+    }
+
+    /**
+     * @notice Used to provide a struct for inputing equip data.
+     * @dev Only used for input and not storage of data.
+     * @return tokenId ID of the token we are managing
+     * @return childIndex Index of a child in the list of token's active children
+     * @return assetId ID of the asset that we are equipping into
+     * @return slotPartId ID of the slot part that we are using to equip
+     * @return childAssetId ID of the asset that we are equipping
+     */
+    struct IntakeEquip {
+        uint256 tokenId;
+        uint256 childIndex;
+        uint64 assetId;
+        uint64 slotPartId;
+        uint64 childAssetId;
+    }
+
+```
+
+
+
+Function
+
+```solidity
+interface IERC6220 is IERC5773 /*, ERC165 */ {
+    /**
+     * @notice Used to equip a child into a token.
+    function equip(
+        IntakeEquip memory data
+    ) external;
+
+    /**
+     * @notice Used to unequip child from parent token.
+     */
+    function unequip(
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 slotPartId
+    ) external;
+
+    /**
+     * @notice Used to check whether the token has a given child equipped.
+     * @return bool The boolean value indicating whether the child token is equipped into the given token or not
+     */
+    function isChildEquipped(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) external view returns (bool);
+
+    /**
+     * @notice Used to verify whether a token can be equipped into a given parent's slot.
+     */
+    function canTokenBeEquippedWithAssetIntoSlot(
+        address parent,
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 slotId
+    ) external view returns (bool);
+
+    /**
+     * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
+     * @return struct The `Equipment` struct containing data about the equipped object
+     */
+    function getEquipment(
+        uint256 tokenId,
+        address targetCatalogAddress,
+        uint64 slotPartId
+    ) external view returns (Equipment memory);
+
+    /**
+     * @notice Used to get the asset and equippable data associated with given `assetId`.
+     */
+    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
+        external
+        view
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address catalogAddress,
+            uint64[] calldata partIds
+        );
+}
+```
+
+###### Catalog
+
+The interface of the Catalog containing the equippable parts. Catalogs are collections of equippable fixed and slot parts and are not restricted to a single collection, but can support any number of NFT collections.
+
+```solidity
+
+
+    
+    /**
+     * @notice The integral structure of a standard RMRK catalog item defining it.
+     * @dev Requires a minimum of 3 storage slots per catalog item, equivalent to roughly 60,000 gas as of Berlin hard fork
+     *  (April 14, 2021), though 5-7 storage slots is more realistic, given the standard length of an IPFS URI. This
+     *  will result in between 25,000,000 and 35,000,000 gas per 250 assets--the maximum block size of Ethereum
+     *  mainnet is 30M at peak usage.
+     * @return itemType The item type of the part
+     * @return z The z value of the part defining how it should be rendered when presenting the full NFT
+     * @return equippable The array of addresses allowed to be equipped in this part
+     * @return metadataURI The metadata URI of the part
+     */
+    struct Part {
+        ItemType itemType; //1 byte
+        uint8 z; //1 byte
+        address[] equippable; //n Collections that can be equipped into this slot
+        string metadataURI; //n bytes 32+
+    }
+
+    /**
+     * @notice The structure used to add a new `Part`.
+     * @dev The part is added with specified ID, so you have to make sure that you are using an unused `partId`,
+     *  otherwise the addition of the part vill be reverted.
+     * @dev The full `IntakeStruct` looks like this:
+     *  [
+     *          partID,
+     *      [
+     *          itemType,
+     *          z,
+     *          [
+     *               permittedCollectionAddress0,
+     *               permittedCollectionAddress1,
+     *               permittedCollectionAddress2
+     *           ],
+     *           metadataURI
+     *       ]
+     *   ]
+     * @return partId ID to be assigned to the `Part`
+     * @return part A `Part` to be added
+     */
+    struct IntakeStruct {
+        uint64 partId;
+        Part part;
+    }
+
+    /**
+     * @notice Used to return the metadata URI of the associated catalog.
+     * @return string Base metadata URI
+     */
+    function getMetadataURI() external view returns (string memory);
+
+    /**
+     * @notice Used to return the `itemType` of the associated catalog
+     * @return string `itemType` of the associated catalog
+     */
+    function getType() external view returns (string memory);
+
+    /**
+     * @notice Used to check whether the given address is allowed to equip the desired `Part`.
+     * @dev Returns true if a collection may equip asset with `partId`.
+     * @param partId The ID of the part that we are checking
+     * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
+     * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
+     */
+    function checkIsEquippable(uint64 partId, address targetAddress)
+        external
+        view
+        returns (bool);
+
+    /**
+     * @notice Used to check if the part is equippable by all addresses.
+     * @dev Returns true if part is equippable to all.
+     * @param partId ID of the part that we are checking
+     * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
+     */
+    function checkIsEquippableToAll(uint64 partId) external view returns (bool);
+
+    /**
+     * @notice Used to retrieve a `Part` with id `partId`
+     * @param partId ID of the part that we are retrieving
+     * @return struct The `Part` struct associated with given `partId`
+     */
+    function getPart(uint64 partId) external view returns (Part memory);
+
+    /**
+     * @notice Used to retrieve multiple parts at the same time.
+     * @param partIds An array of part IDs that we want to retrieve
+     * @return struct An array of `Part` structs associated with given `partIds`
+     */
+    function getParts(uint64[] calldata partIds)
+        external
+        view
+        returns (Part[] memory);
+}
+```
+
+
 
 ### Soulbound NFT
 

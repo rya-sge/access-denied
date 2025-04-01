@@ -1,0 +1,21 @@
+@startuml
+actor User
+participant "Client Device\n(with Passkey)" as Client
+participant "Web Service\n(Server)" as Server
+
+== Registration ==
+
+User -> Client : Initiate registration
+Client -> Client : Generate key pair\n(Public Key + Private Key)
+Client -> Server : Send Public Key
+Server -> Server : Store Public Key
+
+== Authentication ==
+
+User -> Client : Request login
+Server -> Client : Send authentication challenge
+Client -> Client : Sign challenge with Private Key
+Client -> Server : Send signed challenge
+Server -> Server : Verify with stored Public Key
+Server -> Client : Authentication success
+@enduml

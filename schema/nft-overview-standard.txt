@@ -1,0 +1,37 @@
+@startmindmap
+* NFT Standards on Ethereum
+** ERC-721
+*** Unique tokens with ownership
+*** Basis for most NFTs
+*** Supports metadata and transfer
+** ERC-1155
+*** Multi-token standard
+*** Supports both fungible and non-fungible tokens
+*** Batch transfers
+** Semi-Fungible Tokens
+*** ERC-3525: Supports partial ownership and fungibility
+** Rentable NFTs
+*** ERC-4907: Time-based ownership with rental roles
+** Soulbound NFTs
+*** ERC-5114: Soulbound Badge - Non-transferable identity tokens
+*** ERC-5192: Minimal Soulbound NFTs - No transfer functionality
+*** ERC-5484: Consensual Soulbound Tokens - Explicit binding agreement
+** Composable NFTs
+*** ERC-998: Parent-child NFT relationships
+*** ERC-5773: Context-Dependent Multi-Asset Token
+*** ERC-6059: Parent-Governed Nestable NFTs
+*** ERC-6220: Equippable Parts for Composable NFTs
+** Extendable Metadata
+*** ERC-3664: Extensible metadata system for NFTs
+** Royalty Payment
+*** ERC-2771: Standardized royalty payments for creators
+** Multi-Privilege Management
+*** ERC-5496: Additional privileges and roles in NFTs
+** Custom Errors for NFTs
+*** ERC-6093: Common error handling for token transactions
+** Token-Bound Accounts
+*** ERC-6551: Smart contract wallets for NFTs
+** ERC-20/ERC-721 Pair
+*** ERC-7631: DN-404 - Dual Nature Token Pair (Fungible & Non-Fungible)
+*** ERC-7651: Fractionally Represented Non-Fungible Token
+@endmindmap

@@ -4,6 +4,12 @@ From: https://www.youtube.com/watch?v=_k5fKlKBWV4
 
 EIP 7702 has taken center stage in discussions about Ethereum's evolution, particularly regarding account abstraction. Introduced during a breakout call on Ethereum’s future, this proposal aims to unify user experiences, facilitate smart contract wallet adoption, and build on the foundation laid by previous efforts such as EIP 3074.
 
+
+
+Advantage:
+
+, transaction bundling or granting limited permissions to a sub-key.
+
 ## Introduction
 
 ### Status of Account Abstraction standard
@@ -90,11 +96,57 @@ Full native AA will hit L1:
 
 Such things take yeaesar
 
+## Foundry
+
+Foundry already includes several command to craft and sign EIP-7702 transaction
+
+- Get the contract address associated with an EOA address, 0x if no contract associated
+
+```bash
+cast code
+```
+
+Reference: [book.getfoundry - cast/code](https://book.getfoundry.sh/reference/cli/cast/code)
+
+- sign an EIP-7702  authorization
+
+```bash
+cast wallet sign-auth [OPTIONS] <ADDRESS>
+```
+
+With private key indicated
+
+```bash
+SIGNED_AUTH=$(cast wallet sign-auth <delegate contract address> --private-key <private key)
+```
+
+
+
+See [book.getfoundry.sh - sign-auth](https://book.getfoundry.sh/reference/cli/cast/wallet/sign-auth)
+
+- Send an EIP-7720 transaction
+
+```bash
+cast send <address> "<function signature>" "<function argument>" --private-key <private key> --auth <signed auth>
+```
+
+Option:
+
+ --auth <AUTH>          EIP-7702 authorization list.                    Can be either a hex-encoded signed authorization or an address.
+
+Reference: [book.getfoundry.sh - cast/send](https://book.getfoundry.sh/reference/cli/cast/send)
+
 ## Example
 
-This example demonstrates how EIP-7702 allows Alice to authorize a smart contract to execute a transaction on her behalf, with Bob sponsoring the gas fees for a seamless experience.
 
-From: https://github.com/ithacaxyz/odyssey-examples/blob/main/chapter1/contracts/src/SimpleDelegateContract.sol
+
+### Simple delegate contract
+
+This example demonstrates how EIP-7702 allows Alice to authorize a smart contract to execute a transaction on her behalf, with Bob sponsoring the gas fees for a seamless experience. 
+
+Here the smart contract code, which delegates calls from the user and executes on their behalf. 
+
+From: [src - SimpleDelegateContract.sol](https://github.com/ithacaxyz/odyssey-examples/blob/main/chapter1/contracts/src/SimpleDelegateContract.sol)
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -122,19 +174,50 @@ contract SimpleDelegateContract {
 }
 ```
 
-##### delegation
+##### Steps
 
-If Alice wants to delegate to Bob, here the step
+- Configure the private key for tests
 
-1) We need to deploy a contract which delegates calls from the user and executes on their behalf. 
-2) Alice (delegator) can sign a message which will delegate all calls to her address to the bytecode of smart contract we've just deployed.
-3) Alice  (delegator)  can sign an EIP-7702 authorization using its wallets by specifying Bob address, With Foundry, it is possible with the following command
-
+```bash
+# using anvil dev accounts 
+export ALICE_ADDRESS= <address>
+export ALICE_PK= <PK>
+export BOB_PK= <PK>
 ```
-cast wallet sign-auth
+
+- Deploy the contract `SimpleDelegateContract`.
+
+```bash
+forge create SimpleDelegateContract --private-key <deployer private key>
+
+export SIMPLE_DELEGATE_ADDRESS="<enter-contract-address>"
 ```
 
-### Remark
+- Alice (delegator) sign an EIP-7702 authorization using its wallets by specifying Bob address, With Foundry, it is possible with the following command: `
+
+```bash
+SIGNED_AUTH=$(cast wallet sign-auth $SIMPLE_DELEGATE_ADDRESS --private-key $ALICE_PK)
+```
+
+- Bob can now sign and send the transaction to execute calls on on Alice's behalf.
+
+He will pay the gas price.
+
+```bash
+cast send $ALICE_ADDRESS "execute((bytes,address,uint256)[])" "[("0x",$(cast az),0)]" --private-key $BOB_PK --auth $SIGNED_AUTH
+```
+
+### Delegate an account to a P256 Key
+
+The traditional flow of crypto onboarding experience can feel cumbersome: Users have to setup a wallet, back up their mnemonic phrase and make sure to keep it safe. What if there was a simpler and more secure way to manage private keys? Passkeys have already solved this problem by allowing users to authenticate using methods like Touch ID while keeping passwords safe. These keys are generated within secure hardware modules, such as Apple's Secure Enclave or a Trusted Platform Module (TPM), which are isolated from the operating system to protect them from being exposed.
+
+EIP-7212 introduces a precompile for the **secp256r1** elliptic curve, a curve that is widely used in protocols like [Apple Secure Enclave](https://support.apple.com/en-au/guide/security/sec59b0b31ff/web) and [WebAuthn](https://webauthn.io/). 
+
+This example demonstrates how the upcoming EIP's EIP-7702 and EIP-7212 (already live in Odyssey's Chapter 1), will enable you to use a passkey to sign an onchain message, improving the onboarding experience for crypto novices using your Dapp.
+
+https://github.com/ithacaxyz/odyssey-examples/tree/main/chapter1/delegate-p256
+
+### Note
 
 This example is not secure because: 
 
