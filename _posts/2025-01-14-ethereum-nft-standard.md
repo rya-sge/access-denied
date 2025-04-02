@@ -11,7 +11,7 @@ image: /assets/article/blockchain/ethereum/token/nft-standard-mindmap.png
 isMath: false
 ---
 
-Non-Fungible Tokens (NFTs) enable unique, verifiable ownership of digital and real-world items on the blockchain. The Ethereum network pioneered this movement through its robust and flexible smart contract standards. 
+Non-Fungible Tokens (NFTs) are used to represent unique items on the blockchain. As you may know, the most well-known standard on Ethereum and other compatible EVM blockchains is ERC-721.
 
 While ERC-721 remains the main standard to represent NFTs, several other standards (ERC-1155, ERC-2981, ERC-4907,...) have emerged to meet various use cases and improve functionality. This article lists the different standards to represent NFT and their extensions on Ethereum.
 

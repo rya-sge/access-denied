@@ -151,3 +151,5 @@ Enables calling multiple methods in a single call to the contract
 https://docs.uniswap.org/contracts/v3/reference/periphery/base/Multicall
 
 ### MakerDAO multicall
+
+https://ethereum-magicians.org/t/eip-6357-single-contract-multi-delegatecall/12621
