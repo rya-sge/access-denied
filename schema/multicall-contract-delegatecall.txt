@@ -1,0 +1,18 @@
+@startuml
+actor EOA
+participant ContractA
+participant Multicall3
+participant TargetContract
+
+EOA -> ContractA: execute()
+ContractA -> Multicall3: delegatecall(aggregate)
+Multicall3 -> TargetContract: call(callData)
+note right of TargetContract
+msg.sender = ContractA
+end note
+TargetContract -> Multicall3: returns data
+Multicall3 -> ContractA: returns data
+ContractA -> EOA: returns data
+
+
+@enduml

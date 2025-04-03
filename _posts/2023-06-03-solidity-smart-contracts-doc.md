@@ -80,8 +80,6 @@ The `ftrace` command outputs a *treefied* function call trace stemming from the 
 
 The `flatten` command outputs a flattened version of the  source code, with all import statements replaced by the corresponding  source code. "
 
-
-
 ### describe
 
 The `describe` command shows a summary of the contracts and methods in the files provided.
@@ -150,7 +148,7 @@ Example:
 
 ![](https://raw.githubusercontent.com/naddison36/sol2uml/master/examples/OpenZeppelinERC20.svg)
 
-### Alternative
+### Alternative (plantuml)
 
 - Run a Plantuml server on your local machine, see [github.com/plantuml/plantuml-server](https://github.com/plantuml/plantuml-server)
 
@@ -160,9 +158,61 @@ This feature is directly available if you install the vscode extension [Solidity
 
 ![solidity-visual-auditor-uml]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/solidity-visual-auditor-uml.png)
 
+## Solc Documentation output
+
+> Generate NatSpec documentation
+
+Solidity contracts can use a special form of comments to provide rich documentation for functions, return variables and more. This special form is named the Ethereum Natural Language Specification Format (NatSpec).
+
+See [docs - natspec-format](https://docs.soliditylang.org/en/latest/natspec-format.html) for more information
+
+When parsed by the compiler, documentation such as the one from the above example will produce two different JSON files. 
+
+- user doc: this doc is meant to be consumed by the end user as a notice when a function is executed 
+
+```bash
+solc --userdoc ex1.sol
+```
+
+- dev doc:  this doc is meant to be consumed by the developer.
+
+```bash
+solc --devdoc ex1.sol
+```
+
+- User doc
+
+- All
+
+```
+solc --devdoc ex1.sol
+```
+
+
+
+- With Foundry, `solc`can generate the following error: `Source "OZ/access/IAccessControl.sol" not found: File not found. Searched the following locations: "".`
+
+To resolve this, you can pass the content of `remappings.txt`in the command:
+
+```bash
+solc OZ/=lib/openzeppelin-contracts/contracts/ --userdoc src/ex1.sol 
+```
+
 
 
 ## Auditor tool
+
+### Aderyn [Cyfrin]
+
+> Solidity static analyzer
+
+Aderyn is an open-source public good developer tool. It is a Rust-based solidity smart contract static analyzer designed to help protocol engineers and security researchers find vulnerabilities in Solidity code bases.
+
+```bash
+aderyn --output aderyn-report.md
+```
+
+See [Cyfrin/aderyn](https://github.com/Cyfrin/aderyn)
 
 ### Mythril [ConsenSys]
 

@@ -301,7 +301,11 @@ This behavior can lead to incorrect assumptions in emitted data if not caught. T
 
 ------
 
+## Gas
 
+According to aderyn: 
+
+Index event fields make the field more quickly accessible to off-chain tools that parse events. However, note that each index field costs extra gas during emission, so it's not necessarily best to index the maximum allowed per event (three fields). Each event should use three indexed fields if there are three or more fields, and gas usage is not particularly of concern for the events in question. If there are fewer than three fields, all of the fields should be indexed.
 
 ## Popular example
 
@@ -401,7 +405,34 @@ event URI(string _value, uint256 indexed _id);
 
 
 
+### ERC-6909
 
+https://eips.ethereum.org/EIPS/eip-6909
+
+```solidity
+/// @dev Thrown when owner balance for id is insufficient.
+    /// @param owner The address of the owner.
+    /// @param id The id of the token.
+    error InsufficientBalance(address owner, uint256 id);
+
+    /// @dev Thrown when spender allowance for id is insufficient.
+    /// @param spender The address of the spender.
+    /// @param id The id of the token.
+    error InsufficientPermission(address spender, uint256 id);
+
+    /// @notice The event emitted when a transfer occurs.
+    /// @param sender The address of the sender.
+    /// @param receiver The address of the receiver.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    event Transfer(address caller, address indexed sender, address indexed receiver, uint256 indexed id, uint256 amount);
+
+    /// @notice The event emitted when an operator is set.
+    /// @param owner The address of the owner.
+    /// @param spender The address of the spender.
+    /// @param approved The approval status.
+    event OperatorSet(address indexed owner, address indexed spender, bool approved);
+```
 
 
 

@@ -11,8 +11,6 @@ image: /assets/article/blockchain/ethereum/solidity/solidity-selfdestruct-meme.p
 isMath: false
 ---
 
-
-
 `selfdestruct`is an opcode which, originally, destroyed the contract bytecode from the blockchain and sends the ether balance of the contract to an address passed in parameter.
 
 The `Dencun upgrade` introduces the [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) ([ethereum-magicians](https://ethereum-magicians.org/t/eip-6780-deactivate-selfdestruct-except-where-it-occurs-in-the-same-transaction-in-which-a-contract-was-created/13539)) which updates the opcode `selfdestruct` to deactivate the destruction of the contract, except if the contract is destructed in the same transaction as created.
@@ -240,6 +238,59 @@ Fortunately,  you will still have the possibility to resolve nice [CTF challenge
 Contrary to what happened with the [Parity multig sig wallet bug](https://www.parity.io/blog/a-postmortem-on-the-parity-multi-sig-library-self-destruct/), the upgrade will ensure that when a contract/library has been deployed, its code cannot be deleted from the blockchain or its behavior modified by combining `create2 `and `selfdestruct`. After the upgrade, you will no longer have to worry about whether the contract  has been destructed or not.
 
 But the end of `selfdestruct` does not mean that a `behaviour` of a contract can not be changed, e.g. through the call of functions or with the proxy architecture.
+
+## Static analyser - Detector
+
+Several static analyzer tools use specific detectors to detect the use of `self destruct` inside a contract
+
+### Slither
+
+[crytic/slither](https://github.com/crytic/slither)
+
+`slither`has a specfic detector (id 12) to detect the use of `self destruct` in a public function.
+
+>  Id: 12
+>
+> Impact: High
+>
+> Confidence: high
+
+Template used:
+
+```solidity
+contract selfdestruct{
+    function kill() public{
+        selfdestruct(msg.sender);
+    }
+}
+```
+
+Note: even if the contract can no longer be destructed now, you can still use `selfdestruct`to transfer the balance in ether contained in the contract
+
+Reference: [slither - Detector-Documentation](https://github.com/crytic/slither/wiki/Detector-Documentation#suicidal)
+
+### Aderyn
+
+[Cyfrin/aderyn](https://github.com/Cyfrin/aderyn)
+
+Aderyn has also a detector to detect the use of `selfdestruct`and indicate that this opcode is deprecated with the following message `selfdestruct is Deprecated`. 
+
+Severity: high
+
+Template used:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
+
+contract SelfdestructContract {
+    function dangerous(address sink) external {
+        selfdestruct(payable(sink));
+    }
+}
+```
+
+See [Cyfrin/aderyn - high/selfdestruct.rs](https://github.com/Cyfrin/aderyn/blob/dev/aderyn_core/src/detect/high/selfdestruct.rs) & [Cyfrin/aderyn - UsingSelfdestruct.sol](https://github.com/Cyfrin/aderyn/blob/dev/tests/contract-playground/src/UsingSelfdestruct.sol)
 
 -------
 
