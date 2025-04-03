@@ -63,6 +63,15 @@ Contrary to `call`, perform a `delegatecall`won't change the context of the call
 
 It's important to note that you cannot directly delegatecall from an EOA—an EOA can only call a contract, not delegatecall it.
 
+#### Summary tab
+
+| Feature               | `call`            | `staticcall`      | `delegatecall`              |
+| --------------------- | ----------------- | ----------------- | --------------------------- |
+| State Change          | ✅ Yes             | ❌ No              | ✅ Yes (in caller’s storage) |
+| Execution Context     | Target contract   | Target contract   | Caller’s contract           |
+| Uses `msg.sender`     | Target contract’s | Target contract’s | Caller’s                    |
+| Allows Ether Transfer | ✅ Yes             | ❌ No              | ✅ Yes                       |
+
 ### Implementation
 
 There are two main ways to implement and perform a multicall
@@ -81,7 +90,7 @@ There are two main ways to implement and perform a multicall
 | Read call from a contract  | &#x2611;               | &#x2611;                    |
 | Work with all contract     | &#x2612;               | &#x2611;                    |
 
-
+-----
 
 #### OpenZeppelin multicall
 
@@ -180,6 +189,8 @@ Schema from OpenZeppelin post-mortem:
 
 Reference: [Arbitrary Address Spoofing Attack: ERC2771Context Multicall Public Disclosure](https://blog.openzeppelin.com/arbitrary-address-spoofing-vulnerability-erc2771context-multicall-public-disclosure)
 
+-----
+
 #### Multicall3
 
 > Initial project by MakerDAO (archive): [makerdao/multicall](https://github.com/makerdao/multicall)
@@ -248,7 +259,7 @@ Contract -> multicall with `call`
 
 ![multicall-contract-call]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/multicall/multicall-contract-call.png)
 
-
+------
 
 #### Uniswap V3 multicall
 
@@ -316,6 +327,8 @@ If `result.length` is less than 68, then the transaction failed silently (withou
 
 From [ethereum.stackexchange - How can I get the revert reason of a call in Solidity so that I can use it in the same on-chain transaction? (2020)](https://ethereum.stackexchange.com/questions/83528/how-can-i-get-the-revert-reason-of-a-call-in-solidity-so-that-i-can-use-it-in-th)
 
+------
+
 ### ERC-6357: Single-contract Multi-delegatecall
 
 > [ERC specification](https://eips.ethereum.org/EIPS/eip-6357), [Ethereum magicians](https://ethereum-magicians.org/t/eip-6357-single-contract-multi-delegatecall/12621)
@@ -371,3 +384,4 @@ abstract contract Multicall is IMulticall {
 
 - [cyborgDennet - Ethereum Multicall Tutorial](https://blog.blockmagnates.com/ethereum-multicall-tutorial-5893d870f5ef)
 - [smart contract tips - Multicall functions in Smart Contracts](https://smartcontract.tips/en/post/multicall-functions-in-smart-contracts)
+- [0xmantle - Solidity Series Part 3: Call vs Delegatecall](https://medium.com/0xmantle/solidity-series-part-3-call-vs-delegatecall-8113b3c76855)
