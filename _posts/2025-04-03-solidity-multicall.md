@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Multicall in Solidity: CALL vs DELEGATECALL Explained
+title: "Multicall in Solidity: CALL vs DELEGATECALL Explained"
 date:   2025-04-03
 lang: en
 locale: en-GB
