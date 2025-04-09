@@ -94,7 +94,7 @@ A Merkle DAG in IPFS is a DAG where each node has an identifier, and this is the
 
 Reference:  [IPFS Merke Directed Acyclic Graphs](https://docs.ipfs.tech/concepts/merkle-dag/)
 
-### Example
+##### Example
 
 This example came from [https://proto.school/merkle-dags/07](https://proto.school/merkle-dags/07)
 
@@ -124,7 +124,7 @@ From [ProtoSchool - merkle-dags/07](https://proto.school/merkle-dags/07)
 
 See also [IPFS - Lesson: Turn a File into a Tree of Hashes](https://dweb-primer.ipfs.io/ipfs-dag/files-as-dags)
 
-#### Patricia Merkle Trie (MPT)
+### Patricia Merkle Trie (MPT)
 
 Patricia Merkle Tries combine a radix trie with a Merkle tree to store key-value pairs, similar to a hash table and verify data integrity, ideal for editing and storing ephemeral data.
 
@@ -157,10 +157,10 @@ The **Patricia Tree** (Practical Algorithm to Retrieve Information Coded in Alph
   - "Trie" comes from the word "retrieval"
   - 
 
+https://developer.electroneum.com/advanced/data-structures-and-encoding/patricia-merkle-trie
 
 
-
-#### Sparse Merkle Tree
+### Sparse Merkle Tree
 
 A **Sparse Merkle Tree** is designed to handle extremely large datasets with many empty slots. Instead of explicitly storing all possible entries, it represents absent data as default hashes.
 
@@ -172,11 +172,15 @@ A **Sparse Merkle Tree** is designed to handle extremely large datasets with man
 
 **Cryptographic Proofs**: Used in rollups (layer 2 solutions for Ethereum) and other scalability mechanisms to validate data availability.
 
+https://ethresear.ch/t/optimizing-sparse-merkle-trees/3751
 
-
-
+https://medium.com/@kelvinfichter/whats-a-sparse-merkle-tree-acda70aeb837
 
 https://eprint.iacr.org/2016/683.pdf
+
+https://docs.iden3.io/publications/pdfs/Merkle-Tree.pdf
+
+https://docs.polygon.technology/zkEVM/concepts/sparse-merkle-trees/sparse-merkle-tree/#keys-and-navigating-a-merkle-tree
 
 ------
 

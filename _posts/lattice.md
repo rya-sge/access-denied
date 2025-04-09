@@ -1,0 +1,5 @@
+Lattices are regular arrangements of points in Euclidean space. They naturally occur in many settings, like crystallography, sphere packings (stacking oranges), etc. 
+
+They have many applications in computer science and mathematics, including the solution of integer programming problems, diophantine approximation, cryptanalysis, the design of error correcting codes for multi antenna systems, and many more. 
+
+Recently, lattices have also attracted much attention as a source of computational hardness for the design of secure cryptographic functions. This course oers an introduction to lattices. We will study the best currently known algorithms to solve the most important lattice problems, and how lattices are used in several representative applications. We begin with the denition of lattices and their most important mathematical properties

@@ -5,7 +5,7 @@ date:   2024-10-23
 lang: en
 locale: en-GB
 categories: blockchain cryptography
-tags: blockchain wallet
+tags: blockchain wallet ecdsa elliptic-curve
 description: Learn how ECDSA (Elliptic Curve Digital Signature Algorithm) works, its role in digital signatures, and its different use cases, notably in Blockchain.
 image: 
 isMath: true
