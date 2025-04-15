@@ -1,4 +1,4 @@
-# Seucrity Search Respources
+# OSINT and Other security research tools
 
 This article is a summary of the TryHackMe room [Search Skills](https://tryhackme.com/room/searchskills).
 
@@ -17,7 +17,7 @@ The goal of this room is to teach:
 
 ## Search engines
 
-Every one of us has used an Internet search engine; however, not everyone has tried to harness the full power of an Internet search engine. Almost every Internet search engine allows you to carry out advanced searches. Consider the following examples:
+Almost every Internet search engine allows you to carry out advanced searches. Consider the following examples:
 
 - [Google](https://www.google.com/advanced_search)
 - [Bing](https://support.microsoft.com/en-us/topic/advanced-search-options-b92e25f1-0085-4271-bdf9-14aaea720930)
@@ -30,11 +30,7 @@ Let’s consider the search operators supported by Google.
 - `-`: The minus sign allows you to omit search results that contain a particular word or phrase. For example, you might be interested in learning about the pyramids, but you don’t want to view tourism websites; one approach is to search for `pyramids -tourism` or `-tourism pyramids`.
 - `filetype:`: This search operator is indispensable for finding files instead of web pages. Some of the file types you can search for using Google are Portable Document Format (PDF), Microsoft Word Document (DOC), Microsoft Excel Spreadsheet (XLS), and Microsoft PowerPoint Presentation (PPT). For example, to find cyber security presentations, try searching for `filetype:ppt cyber security`.
 
-How would you limit your Google search to PDF files containing the terms **cyber warfare report**?
 
-filetype:pdf cyber warfare report
-
-ou are familiar with Internet search engines; however, how much are you familiar with specialized search engines? By that, we refer to search engines used to find specific types of results.
 
 ### FAQ
 
@@ -42,13 +38,9 @@ ou are familiar with Internet search engines; however, how much are you familiar
 
 filetype:pdf cyber warfare report
 
-> What phrase does the Linux command `ss` stand for?
-
-Socket Statistics
-
 ## Specialized Search Engines
 
-### Shodan
+### Shodan (connected devices)
 
 [Shodan](https://www.shodan.io/) is a search engine for devices connected to the Internet. It allows you to search for specific types and versions of servers, networking equipment, industrial control systems, and IoT devices. 
 
@@ -60,7 +52,7 @@ You may want to see how many servers are still running Apache 2.4.1 and the dist
 
 - Further ressource: [Shodan trends](https://trends.shodan.io/) for historical insights if you have a subscription.
 
-### Censys
+### Censys (hosts, website, certificates)
 
 At first glance, [Censys](https://search.censys.io/) appears similar to Shodan. 
 
@@ -69,7 +61,7 @@ At first glance, [Censys](https://search.censys.io/) appears similar to Shodan.
 - Censys, on the other hand, focuses on Internet-connected hosts, websites, certificates, and other Internet assets. 
 - Further ressource: [Censys Search Use Cases](https://support.censys.io/hc/en-us/articles/20720064229140-Censys-Search-Use-Cases).
 
-### VirusTotal
+### VirusTotal (Files Virus scanning)
 
 [VirusTotal](https://www.virustotal.com/) is an online website that provides a virus-scanning service for files using multiple antivirus engines.
 
@@ -78,11 +70,11 @@ At first glance, [Censys](https://search.censys.io/) appears similar to Shodan.
 
 The screenshot below shows the result of checking the submitted file against 67 antivirus engines. Furthermore, one can check the community's comments for more insights. Occasionally, a file might be flagged as a virus or a Trojan; however, this might not be accurate for various reasons, and that's when community members can provide a more in-depth explanation.
 
-### Have I Been Pwned
+### Have I Been Pwned (email)
 
 [Have I Been Pwned](https://haveibeenpwned.com/) (HIBP) does one thing; it tells you if an email address has appeared in a leaked data breach. Finding one’s email within leaked data indicates leaked private information and, more importantly, passwords. Many users use the same password across multiple platforms, if one platform is breached, their password on other platforms is also exposed. Indeed, passwords are usually stored in encrypted format; however, many passwords are not that complex and can be recovered using a variety of attacks.
 
-### FAQ
+### Exercise
 
 > What is the top country with **lighttpd** servers?
 
@@ -104,9 +96,9 @@ The MITRE Corporation maintains the CVE system. For more information and to sear
 
 ### Exploit Database
 
-There are many reasons why you would want to exploit a vulnerable application; one would be assessing a company’s security as part of its red team. Needless to say, we should not try to exploit a vulnerable system unless we are given permission, usually via a legally binding agreement.
+The [Exploit Database](https://www.exploit-db.com/). lists exploit codes from various authors; some of these exploit codes are tested and marked as verified.
 
-Now that we have permission to exploit a vulnerable system, we might need to find a working exploit code. One resource is the [Exploit Database](https://www.exploit-db.com/). The Exploit Database lists exploit codes from various authors; some of these exploit codes are tested and marked as verified.
+Note that you should not try to exploit a vulnerable system unless you are given permission, usually via a legally binding agreement.
 
 ![The results of the search for heartbleed on the Exploit Database website](https://tryhackme-images.s3.amazonaws.com/user-uploads/5f04259cf9bf5b57aed2c476/room-content/5f04259cf9bf5b57aed2c476-1718112752814)
 
@@ -126,15 +118,13 @@ xz
 
 ### Linux Manual Pages
 
-Long before the Internet was everywhere, how would you get help using a command in a Linux or Unix-like system? The answer would be checking the manual page, man page for short. On Linux and every Unix-like system, each command is expected to have a man page. In fact, man pages also exist for system calls, library functions, and even configuration files.
+ On Linux and every Unix-like system, each command is expected to have a man page. In fact, man pages also exist for system calls, library functions, and even configuration files.
 
-Let’s say we want to check the manual page for the command `ip`. We issue the command `man ip`. The screenshot below shows the page we received. You might want to start the AttackBox and run `man ip` on the terminal. Press `q` to quit.
+Let’s say we want to check the manual page for the command `ip`. We issue the command `man ip`. The screenshot below shows the page we received.
 
 ![The Manual page of the ip command](https://tryhackme-images.s3.amazonaws.com/user-uploads/5f04259cf9bf5b57aed2c476/room-content/5f04259cf9bf5b57aed2c476-1718112797192)
 
 If you prefer to read the man page of `ip` in your web browser, just type `man ip` in your favourite search engine. This [page](https://linux.die.net/man/8/ip) might be at the top of the results.
-
-The **AttackBox** is a Linux system accessible from your browser. Clicking on the **Start AttackBox** button will display the AttackBox in a split screen, making it convenient to read the task text and apply the instructions within the same browser window. If you hide the AttackBox window, you can show it again by clicking the blue Show Split View button at the top. In this task, you can start the AttackBox and use it to try Linux commands such as `man`.
 
 ### Microsoft Windows
 
@@ -160,7 +150,7 @@ Concatenate
 
 ## Social media
 
-There are billions of users registered on social media platforms such as [Facebook](https://www.facebook.com/people/Tryhackme/100069557747714/), [Twitter](https://twitter.com/RealTryHackMe), and [LinkedIn](https://www.linkedin.com/company/tryhackme/). We expect you to be familiar with popular platforms. However, if you are aware of any platform you are not familiar with, we recommend that you check it out and learn about it. Ideally, one would want to explore a platform without creating an account; however, this severely limits your experience. Instead, one recommendation is to use a temporary email address to discover these platforms without linking them to your real email addresses; once done, you can terminate the accounts and associated email addresses. One reason for not using your primary account is that you don’t want your contacts to start connecting with you there when you are only temporarily exploring a platform.
+There are billions of users registered on social media platforms such as [Facebook](https://www.facebook.com/people/Tryhackme/100069557747714/), [X](https://x.com/), and [LinkedIn](https://www.linkedin.com/). 
 
 The power of social media is that it allows you to connect with companies and people you are interested in. Furthermore, social media offers a wealth of information for cyber security professionals, whether they are searching for people or technical information. Why is searching for people important, you ask?
 

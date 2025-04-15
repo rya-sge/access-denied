@@ -1,4 +1,15 @@
-# Fixed-Point Numbers in Solidity - Overview
+---
+layout: post
+title: "Fixed-Point Numbers in Solidity - Overview"
+date: 2025-04-09
+lang: en
+locale: en-GB
+categories: blockchain programmation
+tags: ipfs merkle-tree merkle-dag dag graph git
+description: Learn what a Merkle DAG is and how it used in distributed systems like IPFS and Git. This overview explains the structure, key benefits, and use cases of Merkle DAGs in content-addressed storage and version control.
+image: /assets/article/cryptographie/merkle-tree/merkle-dag-deduplication.png
+isMath: false
+---
 
 ## What Are Fixed-Point Numbers in Solidity?
 

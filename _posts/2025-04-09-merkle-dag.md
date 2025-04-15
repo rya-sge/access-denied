@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "An Overview of Merkle DAGs in Distributed Systems Like Git and IPFS"
+title: "Merkle DAGs(IPFS, GIT) - Overview"
 date: 2025-04-09
 lang: en
 locale: en-GB

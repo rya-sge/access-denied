@@ -334,7 +334,7 @@ ERC-1155, also known as the "multi-token standard," was introduced by [Enjin](ht
 - **Batch Transfers:** Multiple tokens can be transferred in a single transaction.
 - **Lower Costs:** Reduced gas fees by optimizing token operations.
 - **Flexibility:** Supports fungible (e.g., in-game currency) and non-fungible (e.g., unique items) assets.
-- Note that contrary to [ERC-1400](https://github.com/ethereum/EIPs/issues/1411) and [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525), you don't have a decimal field attached to a specific token. Therefore you can have several amount of a specific token, represented by its tokenId, but from the outside, it will be a whole number.
+- Note that contrary to [ERC-1400](https://github.com/ethereum/EIPs/issues/1411) and [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525), you don't have a decimal field attached to a specific token. Therefore you can have several amount of a specific token, represented by its tokenId, but from the outside, it will be a whole number. If you want more info about ERC-1400, you can read my article written as part of my work at Taurus SA: [ERC-1400 for Tokenized Securities: Analysis and Deployment with Taurus-CAPITAL](https://www.taurushq.com/blog/erc-1400-for-tokenized-securities-analysis-and-deployment-with-taurus-capital/)
 
 #### Main functions
 

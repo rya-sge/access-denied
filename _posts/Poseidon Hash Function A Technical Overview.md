@@ -1,14 +1,31 @@
-## Poseidon Hash Function: A Technical Overview
-
-### Introduction
+---
+layout: post
+title: "Poseidon Hash Function - Overview"
+date: 2025-04-09
+lang: en
+locale: en-GB
+categories: blockchain programmation
+tags: ipfs merkle-tree merkle-dag dag graph git
+description: Learn what a Merkle DAG is and how it used in distributed systems like IPFS and Git. This overview explains the structure, key benefits, and use cases of Merkle DAGs in content-addressed storage and version control.
+image: /assets/article/cryptographie/merkle-tree/merkle-dag-deduplication.png
+isMath: false
+---
 
 The Poseidon hash function is a cryptographic hash function specifically designed for use in **zero-knowledge proof systems** like SNARKs and STARKs. Unlike general-purpose hashes like SHA-2 or SHA-3, Poseidon is optimized for **efficient arithmetic circuits**, particularly over finite fields, which makes it highly suitable for zk-SNARK-friendly applications.
 
 The posidion hash function is defined in this paper [POSEIDON: A New Hash Function for Zero-Knowledge Proof Systems (Updated Version)](https://eprint.iacr.org/2019/458.pdf) with the following author:  Lorenzo Grassi, Dmitry Khovratovich, Christian Rechberger, Arnab Roy, and Markus Schofnegger.
 
-Note filecoin:
 
-The Posiedon hash function takes a preimage of t−1  prime field Z*p* elements to a single field element. 
+
+[TOC]
+
+
+
+## Introduction
+
+### Global overview
+
+The Posiedon hash function takes a preimage of `t−1`  prime field Z*p* elements to a single field element. 
 
 Poseidon operates on an internal state `state`of `t` field elements which, in the unoptimized algorithm, are transformed over *R* number of rounds of: 
 
@@ -57,7 +74,7 @@ Depedning of the use case, it exits several Poseidon Sponge instance,
 - Until no more chunks are left, add them into the state and apply the permutation. 
 - Output `o` output elements out of the rate part of the state. If needed, iterate the permutation more times.
 
-From the [officail paper](https://eprint.iacr.org/2019/458.pdf)
+Reference: [official paper](https://eprint.iacr.org/2019/458.pdf)
 
 ### Permutation Function
 
@@ -72,12 +89,13 @@ The permutation is the core of Poseidon. It consists of:
 
 
 
-| Terms | Description   |
-| ----- | ------------- |
-| Rf    | Full Round    |
-| Rp    | Partial Round |
-| M     | Matrix        |
-| S     |               |
+| Terms | Description                                           |
+| ----- | ----------------------------------------------------- |
+| Rf    | Full Round                                            |
+| Rp    | Partial Round                                         |
+| M     | Matrix                                                |
+| ARC   | addition of a round-key                               |
+| S     | non-linear function <br />A substitution box or S-box |
 
 Cryptographic permutations usually consist of an efficient round function which is applied sufficiently many times in order to make the permutation behave like a randomly drawn one.
 
@@ -89,14 +107,14 @@ More precisely, we mix rounds with full `S-box layers` and rounds with `partial 
 
 The motivation to have different types of rounds is that:
 
-- Full S-box layers are expensive in software and ZK proof systems but are a good protection against statistical attacks
-- Partial layers are relatively cheap but are, in some cases, similarly good as full ones against algebraic attacks. 
+- **Full S-box** layers are expensive in software and ZK proof systems but are a good protection against statistical attacks
+- **Partial layers** are relatively cheap but are, in some cases, similarly good as full ones against algebraic attacks. 
 
 The HADES design strategy consists of `Rf`full rounds in the beginning, in which S-boxes are applied to the full state. 
 
 After these rounds, RP rounds in the middle contain only a single S-box in each round, and the rest of the state goes through the nonlinear layer unchanged (i.e., identity functions are used instead of the missing Sboxes). 
 
-Finally, Rf rounds at the end are applied by again using S-boxes for the full state. 
+Finally, `Rf` rounds at the end are applied by again using S-boxes for the full state. 
 
 ##### Statistical attacks 
 
@@ -104,7 +122,7 @@ The idea of this approach is to provide arguments for the security against stati
 
 #####  Algebraic attacks
 
-On the other hand, the RP rounds with partial S-box layers are a more efficient way to increase the degree of the overall function, and are mainly used for arguments against algebraic attacks.
+On the other hand, the `RP` rounds with partial S-box layers are a more efficient way to increase the degree of the overall function, and are mainly used for arguments against algebraic attacks.
 
 ### Parameterization
 
@@ -119,7 +137,7 @@ Poseidon allows tuning the following parameters:
   t∈Z^+
   $$
 
-�*t* is a number of S-box routines in one round. It also specifies an input dimension: hash function supports up to �*t* input numbers.
+*t* is a number of S-box routines in one round. It also specifies an input dimension: hash function supports up to *t* input numbers.
 
 - Number of full rounds:
   $$
@@ -152,7 +170,7 @@ https://spec.filecoin.io/#section-algorithms.crypto.poseidon.mds-matrix
 
 ### Core Components
 
-#### 1. **S-box Layer (Non-linear)**
+#### S-box Layer (Non-linear)
 
 The S-box is defined as:
 $$
@@ -177,7 +195,7 @@ In general, the S-BOX used is the following:
 $$
 x↦x^5
 $$
-THis S-Box is suitable for the most popular prime fields in ZK applications,concretely the prime subfields of the scalar field of the BLS12-381 and BN254
+THis S-Box is suitable for the most popular prime fields in ZK applications,concretely the prime subfields of the scalar field of the BLS12-381 and BN254 or Ed25519.
 
 or more generally:
 
@@ -185,7 +203,7 @@ This step provides **non-linearity**, crucial for security.
 
 ------
 
-#### 2. **MDS Matrix (Linear Mixing)**
+#### MDS Matrix (Linear Mixing)
 
 A Maximum Distance Separable (MDS) matrix is used to mix the state elements linearly. If:
 $$
@@ -210,7 +228,7 @@ According to the [official paper](https://eprint.iacr.org/2019/458.pdf), page 6:
 
 ------
 
-#### 3. **Round Constants**
+#### Round Constants
 
 Each round adds precomputed constants to break symmetry and resist attacks:
 $$
@@ -245,13 +263,16 @@ We suggest POSEIDON for all applications of zero-knowledgefriendly hashing, conc
 - Sovrin uses POSEIDON for Merkle-tree based revocation
 - Loopring uses POSEIDON for private trading on Ethereum
 
-## Select the right use Poseido
+## Select the right use Poseidon
 
-## Poseidon in Your Application
+### Poseidon in Your Application
 
 In order to determine the right version of Poseidon for your scenario, you need to know the following:
 
-- The *field* F, over which the arithmetic statements that use Poseidon are defined. It is often determined by the ZK proof system.  Most likely, it is a prime-order subgroup of the group of points of an elliptic curve,  where the curve is BLS12-381, BN254, or Ed25519.  Poseidon maps sequences of F elements to a fixed length sequence of F elements.
+- The *field* F, over which the arithmetic statements that use Poseidon are defined. It is often determined by the ZK proof system.  Most likely, it is a prime-order subgroup of the group of points of an elliptic curve,  where the curve is BLS12-381, BN254, or Ed25519.  
+
+Poseidon maps sequences of `F` elements to a fixed length sequence of `F`elements.
+
 - You hash messages of *arbitrary* length or *fixed* length (like in a Merkle tree, where almost always 2 elements are hashed).
 - The *security level*  M against collision and preimage attacks (most  likely, 128 bits).
 
@@ -260,11 +281,11 @@ With this information, you determine the *width w,* measured in the number of F 
 - Reserve c elements for capacity so that c elements of F contain 2M or more bits.
 - If messages have fixed length l which is reasonably small (10 or less), then set w = c+l.
 
-Then you figure out which S-box is compatible with the curve.  For the curves BLS12-381, BN254, or Ed25519 the S-box x^5 is optimal.
+Then you figure out which S-box is compatible with the curve.  For the curves BLS12-381, BN254, or Ed25519 the S-box `x^5` is optimal.
 
-From https://www.poseidon-hash.info
+Reference: [poseidon-hash.info](https://www.poseidon-hash.info)
 
-## DIfferense with pedersen hash
+## Difference with pedersen hash
 
 According to the paper,  POSEIDON uses up to 8x fewer constraints per message bit than Pedersen Hash.
 
@@ -279,31 +300,35 @@ Poseidon provides strong resistance to:
 - **Differential and linear cryptanalysis**
 - **Algebraic and Gröbner basis attacks**
 
-### Arkwork Poseidon Spoind
+### Arkwork Poseidon Sponge
 
-Fuzzzing Labs found two impactful bugs in the **ArkWorks** library’s implementation of the Poseidon Sponge.
+Fuzzzing Labs found two impactful bugs in the **ArkWorks** library’s implementation of the Poseidon Sponge construction.
 
 Poseidon is based on the sponge construction. It means that there is a `squeeze`operations.
 
-When the function **`squeeze()` `0`** elements, the right result is that nothing is happening, *i.e.* there is no `permutation` (the internal `**state**` of the sponge remains intact) and no element is output.
+When the function **`squeeze()` `0`** elements, the right result is that nothing is happening, *i.e.* there is no `permutation` (the internal `state` of the sponge remains intact) and no element is output.
 
 But in their implementation, calling `squeeze` (`squeeze_native_field_elements` in the code) on `0` right after an `absorb` results in a `permutation` on the internal `state` (instead of doing nothing).
 
-https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/
-
-https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/
+Reference: [fuzzinglabs - POSEIDON SPONGE BUGS IN ARKWORKS - Avoiding Cryptographic Failures in Hashing](https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/)
 
 ### Iden3 vulnerability
 
-The issue is basically that padding is incorrectly applied in their scheme, the input will be padded to the next 32 bytes with 0's instead of the industry standard of a 1 followed by 0's. This leads to the following hash collisions:
+Date: 01/2025
 
+According to [MariusVanDerWijden](https://x.com/vdWijden), a hash collision was present in the [GO poseidon](https://github.com/iden3/go-iden3-crypto) implementation by iden3.
 
+A padding was incorrectly applied in their scheme: the input will be padded to the next 32 bytes with 0's instead of the industry standard of a 1 followed by 0's. This leads to the following hash collisions:
 
-Note: this vulnerability only applies to variable size poseidon hashing, which is not common because circuits in zk they use to be fixed sized by design. 
+![poseidon-hash-collision](../assets/article/cryptographie/hash/poseidon/poseidon-hash-collision.png)
+
+Reference: [MariusVanDerWijden - X](https://x.com/vdWijden/status/1877046148386451732)
+
+This vulnerability only applies to variable size poseidon hashing, which is not common because circuits in zk they use to be fixed sized by design. 
 
 All the circomlib is designed with this in mind and assume this fixed size. It’s true that same projects may use this library incorrectly and may hash variable sized data without adding any padding protocol. If so, projects will needs to be corrected. 
 
-https://x.com/jbaylina/status/1877418809595732297
+Reference: [Jordi Baylina - baylina.eth](https://x.com/jbaylina/status/1877418809595732297)
 
 ### Security levels
 
@@ -345,7 +370,7 @@ We define poseidon (a1,...., an) to be the first coordinate of H(a1,...,an;0,0,0
 
 
 
-
+#### Code
 
 ```rust
 func poseidon_hash_many{poseidon_ptr: PoseidonBuiltin*}(n: felt, elements: felt*) -> (res: felt) {
@@ -372,11 +397,10 @@ https://docs.starknet.io/architecture-and-concepts/cryptography/
 
 Neptune is a Rust implementation of the [Poseidon hash function](https://www.poseidon-hash.info/) tuned for [Filecoin](https://filecoin.io/).
 
-Neptune was initially specialized to the [BLS12-381 curve](https://electriccoin.co/blog/new-snark-curve/). 
+- Neptune was initially specialized to the [BLS12-381 curve](https://electriccoin.co/blog/new-snark-curve/). 
 
-Filecoin's Poseidon specification is published in the Filecoin specification document [here](https://spec.filecoin.io/#section-algorithms.crypto.poseidon). 
-
-https://github.com/lurk-lab/neptune
+- Filecoin's Poseidon specification is published in the Filecoin specification document [here](https://spec.filecoin.io/#section-algorithms.crypto.poseidon). 
+- [github.com - urk-lab/neptune](https://github.com/lurk-lab/neptune)
 
 ## Mindmap
 
@@ -384,9 +408,7 @@ https://github.com/lurk-lab/neptune
 
 ![poseidon-hash-function-minmap](/home/ryan/Downloads/me/access-denied/assets/article/cryptographie/hash/poseidon-hash-function-minmap.png)
 
-
-
-
+## Reference
 
 https://autoparallel.github.io/poseidon/index.html
 
@@ -401,3 +423,7 @@ https://www.zellic.io/blog/algebraic-attacks-on-zk-hash-functions/
 https://docs.zkbob.com/implementation/untitled/the-poseidon-hash
 
 Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(@startuml) to explain this. And another diagram (plantuml) to explain the flow
+
+https://docs.polygon.technology/zkEVM/architecture/zkprover/hashing-state-machines/poseidon-sm/#execution-of-poseidon-actions
+
+https://autoparallel.github.io/poseidon/index.html
