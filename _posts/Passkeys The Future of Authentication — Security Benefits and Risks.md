@@ -204,8 +204,38 @@ As support grows, passkeys could help move the web toward a truly **passwordless
 
 Write me a technical article about passkey, talk about the security and risk Give some example
 
+Terms
+
+A passkey provider is responsible for the creation and management of a user’s passkeys. A passkey provider can be a browser or operating system vendor where passkeys are stored and synced within the built in credential manager (such as iCloud keychain or Google password manager), or a third party provider where passkeys are stored and synced within a third party app or browser extension (such as 1Password or Dashlane).
+
+https://fidoalliance.org/passkeys/
+
+HOW DOES A PASSKEY BECOME AVAILABLE ACROSS A USER’S DEVICES?
+
+When a user creates a passkey on any of their devices, it gets synced to all the user’s other devices using the same passkey provider that is also signed into the same user’s account. Thus, passkeys created on one device become available on all devices.
+
+Notably, if the user gets a new device and sets it up with their passkey provider, the user’s passkeys are synced and available for sign-in on the new device.
+
+## Google
+
+Do I have to set up a passkey on all my devices individually? Will there be separate passkeys on my phone and laptop?
+
+
+
+If Google detects that you don’t have a passkey on a device yet, we’ll prompt you to create one. You’ll need one passkey per device, unless the device has some mechanism to “synchronize” passkeys to other devices already, like with Apple iCloud. In this case only a single passkey for all your iCloud devices is required.
+
+What is the account recovery process if I’m locked out and don’t have my phone, say it’s lost or broken and I can’t verify my identity?
+
+
+
+You can always fall back to legacy authentication options such as passwords and traditional 2-step-verification. In a case where you can no longer remember your password, you can also go through Google’s Account recovery flow. We encourage you to add your email and phone number to ensure you can always access your account.
+
+https://safety.google/authentication/passkey/
+
 ## Reference:
 
 https://webauthn.guide
 
 https://www.youtube.com/watch?v=knrEje81f68
+
+https://fidoalliance.org/passkeys/
