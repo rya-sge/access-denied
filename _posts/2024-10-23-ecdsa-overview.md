@@ -130,7 +130,7 @@ To verify a signature `(r, s)` on a message `m`, the verifier must perform the f
 
 $$
 \begin{aligned}
-u_1 = \frac{h}{s} mod ~ n = u_1 = h * s^{-1} \mod n
+u_1 = \frac{h}{s} mod ~ n = h * s^{-1} \mod n
 \end{aligned}
 $$
 
@@ -255,10 +255,10 @@ $$
 k = \frac{h_1 - h_2}{s_1 - s_2} \mod n
 \end{aligned}
 $$
-Once `k` is known, the private key `d` can be computed as:
+Once `k` is known, the private key `a` can be computed as:
 $$
 \begin{aligned}
-d = \frac{s_1k - h_1}{r} \mod n
+a = \frac{s_1k - h_1}{r} \mod n
 \end{aligned}
 $$
 This highlights the critical importance of using a secure random number generator for `k`.
@@ -308,7 +308,11 @@ From the article:
 | 128                                | 6146                                         | 2330                                                         |
 | 192                                | 15362                                        | 3484                                                         |
 
+## Mindmap
 
+Made with the help of ChatGPT
+
+![ecdsa-mindmap-schema]({{site.url_complet}}/assets/article/cryptographie/ecdsa/ecdsa-mindmap-schema.png)
 
 ## FAQ
 
@@ -321,7 +325,7 @@ Quiz on ECC (Elliptic Curve Cryptography) from [Bill Buchanan - ECC questions](h
 > D. Shafi Goldwasser
 > E. Tahir ElGamal
 
-Answer: A
+Answer: A - Neal Koblitz
 
 See
 
@@ -332,9 +336,7 @@ See
 > D. secp256r1
 > E. secp521r1
 
-Answer:
-
- C -secp256k1
+Answer: C - secp256k1
 
 > Which curve is used for P256 - as used in TLS:
 > A. secp128r1
@@ -352,23 +354,21 @@ Answer: D-secp256r1
 > D. secp256r1
 > E. secp521r1
 
-Answer: E-secp256r1
+Answer: E-secp521r1
 
 > Which is true about a private key in ECC:
 > A. It is a random scalar value
 > B. It is a non-changing scalar value
 > C. It is a point on the curve
 
-A-it is a random scalar value
+Answer: A-it is a random scalar value
 
 > Which is true about a public key in ECC:
 > A. It is a random scalar value
 > B. It is a non-changing scalar value
 > C. It is a point on the curve
 
-Answer
-
-C. It is a point on the curve
+Answer: C - It is a point on the curve
 
 > Which signing method is used in Bitcoin and Ethereum:
 > A. ECDSA

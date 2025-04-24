@@ -23,6 +23,18 @@ The posidion hash function is defined in this paper [POSEIDON: A New Hash Functi
 
 ## Introduction
 
+## Historic remark
+
+The design of POSEIDON started in the fall of 2018. The design of POSEIDON was inspired by :
+
+- The LowMC cipher with a partial S-box layer
+- The block cipher SHARK with its inverse S-box and its MDS matrix as the linear layer, 
+- MiMC with its algebraically simple approach of using the cube S-box. 
+
+Apartial S-box layer has been immediately considered for most of the rounds in order to gain performance and safe constraints. The S-box was initially either the inverse or a power map (as the cube function), but the author later found out that the inverse function does not provide a sufficiently fast degree growth.
+
+Reference: [official paper](https://eprint.iacr.org/2019/458.pdf), page 4
+
 ### Global overview
 
 The Posiedon hash function takes a preimage of `t−1`  prime field Z*p* elements to a single field element. 
@@ -74,7 +86,7 @@ Depedning of the use case, it exits several Poseidon Sponge instance,
 - Until no more chunks are left, add them into the state and apply the permutation. 
 - Output `o` output elements out of the rate part of the state. If needed, iterate the permutation more times.
 
-Reference: [official paper](https://eprint.iacr.org/2019/458.pdf)
+Reference: [official paper](https://eprint.iacr.org/2019/458.pdf), page 5
 
 ### Permutation Function
 

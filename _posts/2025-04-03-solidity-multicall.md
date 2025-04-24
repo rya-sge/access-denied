@@ -265,7 +265,7 @@ Contract -> multicall with `call`
 
 > Code: [github.com/Uniswap - Multicall.sol](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/Multicall.sol)
 >
-> Reference: [docs.uniswap.org/contracts/v3/reference/overview](https://docs.uniswap.org/contracts/v3/reference/overview), [docs.uniswap.org - periphery/base/Multicall](https://docs.uniswap.org/contracts/v3/reference/periphery/base/Multicall)
+> Reference: [docs.uniswap.org/contracts - overview](https://docs.uniswap.org/contracts/v3/reference/overview), [docs.uniswap.org - periphery/base/Multicall](https://docs.uniswap.org/contracts/v3/reference/periphery/base/Multicall)
 
 A `multicall`contract is available as a periphery contract. The periphery is a constellation of smart contracts designed to support domain-specific interactions with the core. As the Uniswap protocol is a permissionless system, the contracts described below have no special privileges and are only a small subset of possible periphery-like contracts.
 

@@ -1,0 +1,37 @@
+@startmindmap
+* ECDSA
+** Key Concepts
+*** Elliptic Curve Cryptography (ECC)
+*** Digital signature algorithm
+*** Uses private/public key pair
+** Key Generation
+*** Private key: a ∈ [1, n−1]
+*** Public key: A = a × G
+*** G: Generator point on elliptic curve
+** Signing
+*** Hash message: h = hash(m)
+*** Select random k ∈ [1, n−1]
+*** Compute point R = k × G
+*** r = R.x mod n
+*** s = k⁻¹ × (h + a × r) mod n
+*** Signature: (r, s)
+** Verification
+*** Hash message: h = hash(m)
+*** Compute w = s⁻¹ mod n
+*** u₁ = h × w mod n
+*** u₂ = r × w mod n
+*** Point = u₁ × G + u₂ × A
+*** Signature valid if r ≡ Point.x mod n
+** Use Cases
+*** Cryptocurrency (e.g. Bitcoin, Ethereum)
+*** Digital identity & authentication
+*** Secure communications
+** Vulnerabilities
+*** Reusing k reveals private key
+*** Insecure RNG = critical flaw
+*** Real-world case: PS3 ECDSA bug
+** Quantum Threat
+*** Shor’s algorithm breaks ECC
+*** Quantum computers = future risk
+*** Push for post-quantum cryptography
+@endmindmap

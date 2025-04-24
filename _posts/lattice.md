@@ -1,8 +1,6 @@
 # Introduction to Lattices
 
-
-
-Lattices are regular arrangements of points in Euclidean space. They naturally occur in many settings, like crystallography, sphere packings (stacking oranges), etc. 
+**Lattices** are regular arrangements of points in Euclidean space. They naturally occur in many settings, like crystallography, sphere packings (stacking oranges), etc. 
 
 They have many applications in computer science and mathematics, including the solution of integer programming problems, diophantine approximation, cryptanalysis, the design of error correcting codes for multi antenna systems, and many more. 
 
@@ -10,7 +8,7 @@ Recently, lattices have also attracted much attention as a source of computation
 
 Definition 1. 
 
-A lattice is a discrete additive subgroup of R n , i.e., it is a subset Λ ⊆ R n satisfying the following properties: 
+A lattice is a discrete additive subgroup of `Rn` , i.e., it is a subset Λ ⊆ R n satisfying the following properties: 
 
 - **subgroup** 
 
@@ -74,6 +72,18 @@ A variant of the LWE, Ring-LWE operates in a `ring` (a set with two operations s
 
 1. NTRUEncrypt is a lattice-based public-key cryptosystem that is fast and maintains security levels even against quantum computers. It is considered one of the most practical and efficient lattice-based cryptographic schemes available.
 
+### Cryptography schee
+
+Kyber and Dilithium are post-quantum safe algorithm based on lattice
+
+The security of Kyber is based on the hardness of the Decisional-Module-Learning With Errors (D-MLWE) problem, which in turn is related to the hardness of the Module Learning (MLWE) problem
+
+FIPS 203 and FIPS 204
+
+Reference: https://www.youtube.com/watch?v=SsKfGn1YKlg&list=PLA1qgQLL41STNFDvPJRqrHtuz0PIEJ4a8&index=1
+
+
+
 https://medium.com/@ashfaqe.sa12/a-deep-dive-into-lattice-based-cryptography-navigating-the-quantum-future-d11261d3da4f
 
 https://math.hawaii.edu/~jb/lat1-6.pdf
@@ -89,3 +99,5 @@ https://math.libretexts.org/Bookshelves/Combinatorics_and_Discrete_Mathematics/A
 https://simons.berkeley.edu/sites/default/files/docs/14953/intro.pdf
 
 https://pub.math.leidenuniv.nl/~stevenhagenp/ANTproc/06hwl.pdf
+
+https://www.youtube.com/playlist?list=PLA1qgQLL41STNFDvPJRqrHtuz0PIEJ4a8

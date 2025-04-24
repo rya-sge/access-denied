@@ -558,9 +558,9 @@ List of resources: [linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activ
 
 ### Course
 
-#### Advanced Web3 Security Course | Part 1 [Own Thurm]
+#### Advanced Web3 Security Course - Part 1 [Own Thurm]
 
-Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
+[Website](https://youtu.be/DRZogmD647U?si=IQlNqraUDmBatFAY)
 
 **Cost:** free
 
@@ -639,7 +639,7 @@ Link: [Advanced Web3 Security Course | Part 1 [Own Thurm]](https://youtu.be/DRZo
 
 ##### Ethereum Smart Contract Security
 
-##### [Website](https://academy.moralis.io/courses/ethereum-smart-contract-security)
+[Website](https://academy.moralis.io/courses/ethereum-smart-contract-security)
 
 **cost:** paid (subscription)
 

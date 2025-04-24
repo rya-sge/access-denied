@@ -86,9 +86,9 @@ Made with the help of ChatGPT and [PlantUML](https://www.plantuml.com)
 | [**ERC-3525**](https://eips.ethereum.org/EIPS/eip-3525)<br />(2020) | Final     | Semi-Fungible tokens                                         | ☑                                 | ☒                                                            | 0xd5358140                                                   | Define Semi-Fungible tokens                                  | Monetary gifts, Certificates of deposit (CDs) and annuity, Debt instruments, Structured products | [Solv finance](https://github.com/solv-finance), [sftlabs](https://sftlabs.io) |
 | [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)<br />(2022) | Draft     | Better descriptive power for attributes metadata with ERC-721 and ERC-1155 | ☑<br />(also ERC-1155)            | ☒                                                            | yes <br />but value unknown                                  | Extendable NFT metadata protocol                             | Game, metaverse                                              | [DRepublic Labs](https://github.com/DRepublic-io) (project abandoned) |
 | [**ERC-4400**](https://eips.ethereum.org/EIPS/eip-4400)      | Final     | Add a consumer role that grants permissions for utilising/consuming a given NFT instance | ☑                                 | ☒                                                            | 0x953c8dfa                                                   | `consumer` role for instance(s) of [ERC-721](https://eips.ethereum.org/EIPS/eip-721) | Metaverses  with lend (renting), NFT-based yield-farming.    |                                                              |
-| [**ERC-4906**](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | Metadata tracking change                                     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                                   | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | -                                                            |
+| [**ERC-4906**](https://eips.ethereum.org/EIPS/eip-4906)<br />(2022) | Final     | Metadata tracking change                                     | ☑                                 | ☑<br /> [code]( https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.2.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)<br />[doc](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721URIStorage) | 0x49064906                                                   | EIP-721 Metadata Update Extension                            | Allow third-party platforms  (e.g NFT marketplace) to track metadata change | [OpenSea](https://docs.opensea.io/docs/metadata-standards#metadata-updates) |
 | [**ERC-4907**](https://eips.ethereum.org/EIPS/eip-4907)<br />(2022) | Final     | Temporary usage with expiration.                             | ☑                                 | ☒                                                            | 0xad092b5c                                                   | Rentable NFTs with usage rights.                             | Renting digital real estate, gaming assets.                  | [Double Protocol](https://double.one)<br />(nft rental protocol) |
-| [**ERC-5192**](https://eips.ethereum.org/EIPS/eip-5192)<br />(2022) | Final     | Non-transferable NFT                                         | ☑                                 | ☒                                                            | 0xb45a3c0e                                                   | Define non-transferrable, non-fungible tokens                | award, certificate of achievement                            |                                                              |
+| [**ERC-5192**](https://eips.ethereum.org/EIPS/eip-5192)<br />(2022) | Final     | Non-transferable NFT                                         | ☑                                 | ☒                                                            | 0xb45a3c0e                                                   | Define non-transferrable, non-fungible tokens                | award, certificate of achievement                            | [OpenSea](https://docs.opensea.io/docs/metadata-standards#disable-trading-for-staked-or-locked-tokens) |
 | [**ERC-5496**](https://eips.ethereum.org/EIPS/eip-5496)<br />(2022) | Last Call | Linked privilege rights to an ERC-721 token                  | ☑                                 | ☒                                                            | 0x076e1bbb                                                   | Multi-privilege Management NFT Extension                     | Privileges use-case (voting rights, permission to claim airdrop, coupon discount) | -                                                            |
 | [ERC-5773](https://eips.ethereum.org/EIPS/eip-5773)          | Final     | Context-Dependent Multi-Asset Token                          | ☑                                 | ☒                                                            | 0x06b4329a                                                   | Display the asset based on how the token is being accessed   | Cross-metaverse compatibility, Multi-media output, Media redundancy, NFT evolution | ?                                                            |
 | [ERC-6059](https://eips.ethereum.org/EIPS/eip-6059)          | Final     | Parent-Governed Nestable NFT                                 | ☑                                 | ☒                                                            | 0x42b0e56f.                                                  | This proposal establishes the framework for the parent-child relationships of NFTs. | Bundling<br/>Collecting<br/>Membership<br/>Delegation        | ?                                                            |
@@ -199,7 +199,7 @@ These extensions add several functionalities to the standard ERC-721
 
 > Status: final
 >
-> OpenZeppelin implementation: yes
+> OpenZeppelin implementation: yes, see [ERC721Consecutive.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.3.0/contracts/token/ERC721/extensions/ERC721Consecutive.sol)
 >
 > Also implemented by [ERC-721A](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/ERC721A.sol#L884) (Azuki)
 >
@@ -235,13 +235,15 @@ event ConsecutiveTransfer(uint256 indexed fromTokenId, uint256 toTokenId, addres
 
 ##### ERC-4906: EIP-721 Metadata Update Extension
 
-> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+> [ERC reference](https://eips.ethereum.org/EIPS/eip-4906)
 >
 > Status: final
 >
-> OpenZeppelin implementation: yes
+> OpenZeppelin implementation: yes, see [ERC721URIStorage.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.3.0/contracts/token/ERC721/extensions/ERC721URIStorage.sol)
 
 This standard is an extension of [EIP-721](https://eips.ethereum.org/EIPS/eip-721). It adds a `MetadataUpdate` event to EIP-721 tokens.
+
+It is for example supported by [OpenSea](https://docs.opensea.io/docs/metadata-standards#metadata-updates) and allows to refresh token metadata on the marketplace.
 
 ```solidity
 /// @title EIP-721 Metadata Update Extension
@@ -1364,7 +1366,7 @@ interface IERC5484 {
 >
 > OpenZeppelin implementation: no
 >
-> [EIP specification](https://eips.ethereum.org/EIPS/eip-5114), [ethereum magicians](https://ethereum-magicians.org/t/eip-5114-soulbound-badges/9417)
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-5114), [ethereum magicians](https://ethereum-magicians.org/t/eip-5114-soulbound-badges/9417)
 >
 > See also [Cyfrin - What is a Soulbound Token? - ERC-5114 & ERC-5484](https://www.cyfrin.io/blog/what-is-a-soulbound-token)
 
@@ -1405,8 +1407,6 @@ interface IERC5114 {
 	function metadataFormat() external pure returns (string format);
 }
 ```
-
-
 
 ## Draft ERCs
 
@@ -1524,6 +1524,59 @@ function getChild(
 ```
 
 
+
+#### ERC-5753: Lockable Extension  (ERC-721 ext.)
+
+> Status: Stagnant
+> OpenZeppelin implementation: no
+>
+> [ERC specification](https://eips.ethereum.org/EIPS/eip-5753), [Ethereum magicians](https://ethereum-magicians.org/t/lockable-nfts-extension/8800)
+
+This standard is an extension of  ERC-721 which introduces lockable NFTs. 
+
+The locked asset can be used in any way except by selling and/or transferring it. 
+
+The owner or operator can lock the token. 
+
+When a token is locked, the unlocker address (an EOA or a contract) is set. Only the unlocker is able to `unlock` the token.
+
+##### Interface
+
+```solidity
+pragma solidity >=0.8.0;
+
+/// @dev Interface for the Lockable extension
+
+interface ILockable {
+
+    /**
+     * @dev Emitted when `id` token is locked, and `unlocker` is stated as unlocking wallet.
+     */
+    event Lock (address indexed unlocker, uint256 indexed id);
+
+    /**
+     * @dev Emitted when `id` token is unlocked.
+     */
+    event Unlock (uint256 indexed id);
+
+    /**
+     * @dev Locks the `id` token and gives the `unlocker` address permission to unlock.
+     */
+    function lock(address unlocker, uint256 id) external;
+
+    /**
+     * @dev Unlocks the `id` token.
+     */
+    function unlock(uint256 id) external;
+
+    /**
+     * @dev Returns the wallet, that is stated as unlocking wallet for the `tokenId` token.
+     * If address(0) returned, that means token is not locked. Any other result means token is locked.
+     */
+    function getLocked(uint256 tokenId) external view returns (address);
+
+}
+```
 
 -----
 

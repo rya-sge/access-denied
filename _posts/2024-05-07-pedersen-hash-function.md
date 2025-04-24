@@ -276,6 +276,7 @@ Reference:
 
 - [9. crypto.stackexchange - Is it possible to get the negative point with −x in that version of the Pedersen hash over the BaybyJubJub curve?](https://crypto.stackexchange.com/questions/107320/is-it-possible-to-get-the-negative-point-with-−x-in-that-version-of-the-pedersen)
 - [10. Twisted Edwards Elliptic Curves for Zero-Knowledge Circuits](https://upcommons.upc.edu/bitstream/handle/2117/361741/mathematics-09-03022.pdf?sequence=1), page 7
+- [MixBytes - zkSNARKS, Circom (Part 2)](https://mixbytes.io/blog/zksnarks-circom-and-go-practice-part-2)
 
 ###  Pseudorandom function (PRF) 
 

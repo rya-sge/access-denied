@@ -1,0 +1,30 @@
+@startmindmap
+* Short Integer Solution (SIS)
+** Definition
+*** Find short vector x
+*** Given matrix A over ℤ_q
+*** A·x ≡ 0 mod q
+*** ‖x‖ ≤ β
+** Parameters
+*** A ∈ ℤ_q^(m×n)
+*** x ∈ ℤ^n, non-zero
+*** q: modulus
+*** β: norm bound
+** Hardness
+*** Based on lattice problems
+*** Reduces to worst-case SVP
+*** Believed hard even for quantum
+** Cryptographic Applications
+*** Hash functions
+**** Collision-resistant
+*** Digital signatures
+**** Lyubashevsky's scheme
+*** Zero-knowledge proofs
+*** Commitment schemes
+** SIS vs LWE
+*** SIS: signatures, integrity
+*** LWE: encryption, confidentiality
+** Relevance
+*** Post-quantum secure
+*** NIST PQC candidate basis
+@endmindmap

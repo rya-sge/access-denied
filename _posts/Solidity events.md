@@ -101,6 +101,12 @@ Here the advantage of anonymous events:
 
 - It also allows you to declare four indexed arguments rather than three.
 
+```
+    event SomeEvent(uint256 blocknum, uint256 timestamp) anonymous;
+```
+
+https://www.rareskills.io/post/ethereum-events
+
 ### Note
 
 Since the transaction log only stores the event data and not the type, you have to know the type of the event, including which parameter is indexed and if the event is anonymous in order to correctly interpret the data. In particular, it is possible to “fake” the signature of another event using an anonymous event.
@@ -114,6 +120,22 @@ Example
 3. **Searchability:** The Keccak-256 hash is unique for unique inputs. Even small changes in a string result in vastly different hashes, making it straightforward to differentiate between different strings when filtering logs.
 
 Reference: [coinsbench - Understanding Indexed Strings in Solidity Events](https://coinsbench.com/understanding-indexed-strings-in-solidity-events-19ba75986de6), [What does the indexed keyword do?](https://ethereum.stackexchange.com/questions/8658/what-does-the-indexed-keyword-do)
+
+## Retrieve events off-chain
+
+Events on the other hand can be retrieved much more easily. Here are the Ethereum client options:
+
+- `events`
+- `events.allEvents`
+- `getPastEvents`
+
+Each of these require specifying the smart contract address the querier wishes to examine, and returns a subset (or all) of the events a smart contract emitted according to the query parameters specified.
+
+To summarize: Ethereum does not provide a mechanism to get all transactions for a smart contract, but it does provide a mechanism for getting all events from a smart contract.
+
+Why is this? Making events quickly retrievable requires additional storage overhead. If Ethereum did this for every transaction, this would make the chain considerably larger. With events, solidity programmers can be selective about what kind of information is worth paying the additional storage overhead for, to enable quick off-chain retrieval.
+
+https://www.rareskills.io/post/ethereum-events
 
 ------
 
@@ -442,9 +464,29 @@ Events are a fundamental part of Ethereum smart contract development, allowing f
 
 
 
+## Gas cost
 
+Events are substantially cheaper than writing to storage variables. Events are not intended to be accessible by smart contracts, so the relative lack of overhead justifies a lower [gas cost](https://rareskills.io/post/gas-optimization).
 
+The formula for how much gas an event costs is as follows ([source](https://github.com/wolflo/evm-opcodes/blob/main/gas.md#a8-log-operations)):
 
+```markdown
+375 + 375 * num_topics + 8 * data_size + mem_expansion_cost
+```
+
+Each event costs at least 375 gas. 
+
+An additional 375 is paid for each indexed parameter. A non-anonymous event has the event selector as an indexed parameter, so that cost is included most of the time. 
+
+Then we pay 8 times the number of 32 byte words written to the chain. Because this region is stored in memory before being emitted, the memory expansion cost must be accounted for also.
+
+The most significant factor in an event’s gas cost is the number of indexed events, so don’t index the variables if it isn’t necessary.
+
+https://github.com/wolflo/evm-opcodes/blob/main/gas.md#a8-log-operations
+
+```
+gas_cost = 375 + 375 * num_topics + 8 * data_size + mem_expansion_cost
+```
 
 
 
@@ -468,3 +510,6 @@ An event is broken down like so:
 
 https://blog.chain.link/events-and-logging-in-solidity/
 
+## Reference
+
+https://www.rareskills.io/post/ethereum-events
