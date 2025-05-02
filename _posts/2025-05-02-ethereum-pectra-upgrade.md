@@ -29,13 +29,15 @@ Here an overview of all EIP included in Ethereum Pectra upgrade with their descr
 
 Reference: [Coinbase - The Ultimate Guide to Ethereum's Pectra Upgrade](https://www.coinbase.com/blog/the-ultimate-guide-to-ethereums-pectra-upgrade)
 
-### EIP-2537: Precompile for BLS12-381 curve operations
+[TOC]
+
+## EIP-2537: Precompile for BLS12-381 curve operations
 
 Add functionality to efficiently perform operations over the BLS12-381 curve, including those for BLS signature verification.
 
 Along with the curve arithmetic, multi-scalar-multiplication operations are included to efficiently aggregate public keys or individual signer’s signatures during BLS signature verification.
 
-### EIP-2935: Serve historical block hashes from state
+## EIP-2935: Serve historical block hashes from state
 
 Store last `HISTORY_SERVE_WINDOW` historical block hashes in the storage of a system contract as part of the block processing logic. Furthermore this EIP has no impact on `BLOCKHASH` resolution mechanism (and hence its range/costs etc).
 
@@ -48,8 +50,6 @@ This proposal aims to make Casper FFG clients more efficient by reducing the ave
 ## EIP-7623: Increase calldata cost
 
 The current calldata pricing permits EL payloads of up to 7.15 MB, while the average size is much smaller at around 100 KB. This EIP proposes adjusting the calldata cost to reduce the maximum possible block size and its variance without negatively impacting regular users. This is achieved by increasing calldata costs for transactions that predominantly post data.
-
-
 
 ## EIP-7685: General purpose execution layer requests
 
