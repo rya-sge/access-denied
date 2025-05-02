@@ -40,40 +40,48 @@ The parameter `K` determines the number of nearest neighbors to consider for mak
 
 To find the `K`-nearest neighbors of a data point, a distance metric is used. Commonly used metrics include:
 
-- [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance):
-  $$
-  \begin{aligned}
-  d(\mathbf{x}, \mathbf{y}) = \sqrt{\sum_{i=1}^n (x_i - y_i)^2}
-  \end{aligned}
-  $$
+#### Euclidean distance
+
+$$
+\begin{aligned}
+d(\mathbf{x}, \mathbf{y}) = \sqrt{\sum_{i=1}^n (x_i - y_i)^2}
+\end{aligned}
+$$
 
 The Euclidean distance measures the shortest possible line between two points.
 
+See [Wikipedia - Euclidean_distance](https://en.wikipedia.org/wiki/Euclidean_distance)
+
+#### Manhattan distance
+
+$$
+\begin{aligned}
+d(\mathbf{x}, \mathbf{y}) = \sum_{i=1}^n |x_i - y_i|
+\end{aligned}
+$$
 
 
-- Manhattan distance:
-  $$
-  \begin{aligned}
-  d(\mathbf{x}, \mathbf{y}) = \sum_{i=1}^n |x_i - y_i|
-  \end{aligned}
-  $$
-  Manhattan distance measures the sum of the [absolute differences](https://www.datacamp.com/tutorial/python-absolute-value-a-quick-tutorial) between the coordinates of the points.
+Manhattan distance measures the sum of the [absolute differences](https://www.datacamp.com/tutorial/python-absolute-value-a-quick-tutorial) between the coordinates of the points.
 
-  
+
 
 Reference: [datacamp - What is Manhattan Distance?](https://www.datacamp.com/tutorial/manhattan-distance)
 
 
 
-- Minkowski distance:
+#### Minkowski distance
 
-  A generalized form of distance metrics:
-  $$
-  \begin{aligned}
-  d(\mathbf{x}, \mathbf{y}) = \left( \sum_{i=1}^n |x_i - y_i|^p \right)^{1/p}
-  \end{aligned}
-  $$
-  Minkowski distance provides a way to measure the distance between two points in a multi-dimensional space. It adds a parameter `p` which determines the type of distance (p ≥ 1). By testing different values of `p` during cross-validation, you can determine which value provides the best model performance for your specific dataset.
+A generalized form of distance metrics:
+
+
+$$
+\begin{aligned}
+d(\mathbf{x}, \mathbf{y}) = \left( \sum_{i=1}^n |x_i - y_i|^p \right)^{1/p}
+\end{aligned}
+$$
+
+
+Minkowski distance provides a way to measure the distance between two points in a multi-dimensional space. It adds a parameter `p` which determines the type of distance (p ≥ 1). By testing different values of `p` during cross-validation, you can determine which value provides the best model performance for your specific dataset.
 
 Reference: [datacamp - Minkowski Distance: A Comprehensive Guide](https://www.datacamp.com/tutorial/minkowski-distance)
 

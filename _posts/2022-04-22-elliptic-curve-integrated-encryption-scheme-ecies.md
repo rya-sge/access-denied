@@ -108,7 +108,7 @@ $$
 
 ## Déchiffrement
 
-On a R||c||T  ainsi que la clé secrète `k`
+On a `R||c||T`  ainsi que la clé secrète `k`
 
 1. On doit dériver les clés, pour cela on a besoin d'une valeur équivalente à  `r * K`. Vu qu'on n'a pas en notre possession `r`, on va pouvoir remplacer `r * k`par `k * R` grâce au raisonnement suivant :<br>
    

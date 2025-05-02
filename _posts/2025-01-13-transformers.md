@@ -73,10 +73,11 @@ $$
 \end{aligned}
 $$
 
-
 The input consists of queries and keys of dimension `dk` and Values of dimension `dv`. 
 
-We compute the dot products of the query with all keys, divide each by the root of `dk`, and apply a softmax function to obtain the weights on the values. 
+We compute the dot products of the query with all keys, divide each by the root of `dk`, and apply a `softmax` function to obtain the weights on the values. 
+
+The function [softmax](https://en.wikipedia.org/wiki/Softmax_function) ensures that the attention scores are transformed into a valid probability distribution, with all values between 0 and 1 and the sum equal to 1.  See [Why do we use Softmax in Transformers?](https://medium.com/@maitydi567/why-do-we-use-softmax-in-transformers-fdfd50f5f4c1)
 
 In practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix Q. 
 

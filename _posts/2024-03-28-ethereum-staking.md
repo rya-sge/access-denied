@@ -134,9 +134,125 @@ To process incoming validator deposits from the execution layer (formerly 'Eth1'
 
 ## Staking deposit contract
 
-The Ethereum staking deposit contract is available at the following [address](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa). This contract receives the staked funds.
+The Ethereum staking deposit contract is available at the following address:  [`0x00000000219ab540356cbb839cbe05303d7705fa`](https://etherscan.io/address/0x00000000219ab540356cbb839cbe05303d7705fa). 
+
+This contract receives the staked funds.
+
+- The deposit contract is the protocol's entry point for staking.
+- Anybody may permissionlessly stake 32 ETH via the contract.
+- On receiving a valid deposit the contract emits a receipt.
+- An incremental Merkle tree maintains a Merkle root of all deposits.
+- The deposit contract cannot verify a deposit's BLS signature.
+- The balance of the deposit contract never decreases.
+- Ether sent to the deposit contract should be considered burned.
 
 Its address is published on the ethereum Foundation [website](https://ethereum.org/en/staking/deposit-contract/). As indicated on the website "Sending ETH to the address on this page will not make you a staker and will result in a failed transaction."
+
+### Functions
+
+
+
+
+
+Reference: [eth2book - The Deposit Contract](https://eth2book.info/capella/part2/deposits-withdrawals/contract/)
+
+## Related EIP
+
+See also [Ethereum - History](https://ethereum.org/en/history/)
+
+### EIP-3675: Upgrade consensus to Proof-of-Stake (Paris/2022)
+
+[EIP specification](https://eips.ethereum.org/EIPS/eip-3675), [Paris Upgrade specification](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/paris.md)
+
+This EIP deprecates Proof-of-Work (PoW) and supersedes it with the new Proof-of-Stake consensus mechanism (PoS) driven by the beacon chain. Information on the bootstrapping of the new consensus mechanism is documented in [EIP-2982](https://eips.ethereum.org/EIPS/eip-2982). Full specification of the beacon chain can be found in the `ethereum/consensus-specs` repository.
+
+This document specifies the set of changes to the block structure, block processing, fork choice rule and network interface introduced by the consensus upgrade.
+
+### EIP-4895: Beacon chain push withdrawals as operations (Shanghai/2023)
+
+[EIP specification](https://eips.ethereum.org/EIPS/eip-4895), [Shanghai Network Upgrade Specification](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/shanghai.md)
+
+Introduce a system-level “operation” to support validator withdrawals that are “pushed” from the beacon chain to the EVM.
+
+These operations create unconditional balance increases to the specified recipients.
+
+This EIP provides a way for validator withdrawals made on the beacon chain to enter into the EVM. The architecture is “push”-based, rather than “pull”-based, where withdrawals are required to be processed in the execution layer as soon as they are dequeued from the consensus layer.
+
+Withdrawals are represented as a new type of object,  called a `withdrawal` , in the execution payload – an “operation” – that separates the withdrawals feature from user-level transactions. 
+
+`Withdrawal`s provide key information from the consensus layer:
+
+1. a monotonically increasing `index`, starting from 0, as a `uint64` value that increments by 1 per withdrawal to uniquely identify each withdrawal
+2. the `validator_index` of the validator, as a `uint64` value, on the consensus layer the withdrawal corresponds to
+3. a recipient for the withdrawn ether `address` as a 20-byte value
+4. a nonzero `amount` of ether given in Gwei (1e9 wei) as a `uint64` value.
+
+*NOTE*: the `index` for each withdrawal is a global counter spanning the entire sequence of withdrawals.
+
+### EIP-4788: Beacon block root in the EVM
+
+Commit to the hash tree root of each beacon chain block in the corresponding execution payload header.
+
+Store each of these roots in a smart contract.
+
+See also [Consensys - Ethereum Evolved: Dencun Upgrade Part 3, EIP-4788](https://consensys.io/blog/ethereum-evolved-dencun-upgrade-part-3-eip-4788)
+
+### EIP-6110: Supply validator deposits on chain (Last call)
+
+[EIP reference](https://eips.ethereum.org/EIPS/eip-6110)
+
+Appends validator deposits to the Execution Layer block structure. This shifts responsibility of deposit inclusion and validation to the Execution Layer and removes the need for deposit (or `eth1data`) voting from the Consensus Layer.
+
+Validator deposits list supplied in a block is obtained by parsing deposit contract log events emitted by each deposit transaction included in a given block.
+
+### EIP-7002: Execution layer triggerable withdrawals (Last call)
+
+[EIP reference](https://eips.ethereum.org/EIPS/eip-7002)
+
+Adds a new mechanism to allow validators to trigger withdrawals and exits from their execution layer (0x01) withdrawal credentials.
+
+These new execution layer exit messages are appended to the execution layer block and then processed by the consensus layer.
+
+Validators have two keys – an active key and a withdrawal credential. 
+
+- The active key takes the form of a BLS key, whereas the withdrawal credential can either be a BLS key (0x00) or an execution layer address (0x01). 
+- The active key is “hot”, actively signing and performing validator duties, whereas the withdrawal credential can remain “cold”, only performing limited operations in relation to withdrawing and ownership of the staked ETH. 
+- Due to this security relationship, the withdrawal credential ultimately is the key that owns the staked ETH and any rewards.
+
+As currently specified, only the active key can initiate a validator exit. This means that in any non-standard custody relationships (i.e. active key is separate entity from withdrawal credentials), that the ultimate owner of the funds – the possessor of the withdrawal credentials – cannot independently choose to exit and begin the withdrawal process. 
+
+This leads to:
+
+-  either trust issues (e.g. ETH can be “held hostage” by the active key owner) 
+- insufficient work-arounds such as pre-signed exits. 
+- Additionally, in the event that active keys are lost, a user should still be able to recover their funds by using their cold withdrawal credentials.
+
+To ensure that the withdrawal credentials (owned by both EOAs and smart contracts) can trustlessly control the destiny of the staked ETH, this specification enables exits triggerable by 0x01 withdrawal credentials.
+
+Note, 0x00 withdrawal credentials can be changed into 0x01 withdrawal credentials with a one-time signed message. Thus any functionality enabled for 0x01 credentials is defacto enabled for 0x00 credentials.
+
+## 
+
+### EIP-7251: Increase the MAX_EFFECTIVE_BALANCE (Last call)
+
+[EIP reference](https://eips.ethereum.org/EIPS/eip-7251)
+
+This EIP increases the constant `MAX_EFFECTIVE_BALANCE`, while keeping the minimum staking balance `32 ETH`. This permits large node operators to consolidate into fewer validators while also allowing solo-stakers to earn compounding rewards and stake in more flexible increments.
+
+MAX_EFFECTIVE_BALANCE is changed from 32 ETH t0 2,048 ETH
+
+This offers new opportunities for staking operations:
+
+- More efficient validator management for large ETH holders
+- Potential cost reduction in operational overhead
+- Greater flexibility in stake deployment strategies
+- Compounding for balances greater than 32 ETH
+
+Reference: [Figment - What The Pectra And Fusaka Ethereum Upgrades Mean For Institutional Staking](https://figment.io/insights/what-the-pectra-and-fusaka-ethereum-upgrades-mean-for-institutional-staking/)
+
+## 
+
+
 
 ## References
 

@@ -17,6 +17,8 @@ As a reminder, **Git** is a free and open source distributed version control sys
 
 Some definition are simplified, see the documentation for a more precise description.
 
+Interested in how Git manages and stores content? Check out my article: [Merkle DAGs(IPFS, GIT) - Overview](https://rya-sge.github.io/access-denied/2024/04/15/git-cheatsheet/)
+
 [TOC]
 
 ## Summary tab

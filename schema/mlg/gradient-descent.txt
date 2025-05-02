@@ -1,0 +1,43 @@
+@startmindmap
+* Gradient Descent
+** Purpose
+*** Optimization algorithm
+*** Minimize cost/loss function
+** Types
+*** Batch
+**** Uses entire dataset
+**** Slow but stable
+*** Stochastic (SGD)
+**** One sample at a time
+**** Fast but noisy
+*** Mini-Batch
+**** Small batch of data
+**** Balanced approach
+** Concepts
+*** Cost Function
+**** Average error across dataset
+*** Loss Function
+**** Error for one sample
+*** Update Rule
+**** θ = θ - α * ∇J(θ)
+*** Learning Rate
+**** Controls step size
+**** Too high → overshoot
+**** Too low → slow
+** Convex vs Non-Convex
+*** Convex
+**** One global minimum
+*** Non-Convex
+**** Local minima
+**** Saddle points
+** Challenges
+*** Local minima
+*** Saddle points
+*** Plateaus
+** Solutions
+*** Momentum
+*** RMSProp
+*** Adam / AdamW
+*** Noisy Gradients
+**** Helps escape local minima/saddle
+@endmindmap

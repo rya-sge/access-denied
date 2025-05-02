@@ -15,7 +15,13 @@ The Poseidon hash function is a cryptographic hash function specifically designe
 
 The posidion hash function is defined in this paper [POSEIDON: A New Hash Function for Zero-Knowledge Proof Systems (Updated Version)](https://eprint.iacr.org/2019/458.pdf) with the following author:  Lorenzo Grassi, Dmitry Khovratovich, Christian Rechberger, Arnab Roy, and Markus Schofnegger.
 
+There are several different version of the specification:
 
+- First version: [Usenix -Poseidon: A New Hash Function for Zero-Knowledge Proof Systems](https://www.usenix.org/system/files/sec21-grassi.pdf) (2021)
+- Updated version: [eprint - POSEIDON: A New Hash Function for Zero-Knowledge Proof Systems (Updated Version)](https://eprint.iacr.org/2019/458.pdf)
+- [eprint - Poseidon2: A Faster Version of the Poseidon Hash Function](https://eprint.iacr.org/2023/323) (2023)
+
+This article is mainly based on the update version.
 
 [TOC]
 
@@ -348,6 +354,8 @@ According to [filecoin documentation](https://spec.filecoin.io/#section-algorith
 
 ## Implementation
 
+<list library>
+
 ### Starknet
 
 Poseidon is a family of hash functions designed to be very efficient as algebraic circuits. As such, they can be very useful in ZK-proving systems such as STARKs.
@@ -422,20 +430,17 @@ Neptune is a Rust implementation of the [Poseidon hash function](https://www.pos
 
 ## Reference
 
-https://autoparallel.github.io/poseidon/index.html
+- Specification: 
+  - First version: [Usenix -Poseidon: A New Hash Function for Zero-Knowledge Proof Systems](https://www.usenix.org/system/files/sec21-grassi.pdf) (2021)
+  - Updated version: [eprint - POSEIDON: A New Hash Function for Zero-Knowledge Proof Systems (Updated Version)](https://eprint.iacr.org/2019/458.pdf)
+  - [eprint - Poseidon2: A Faster Version of the Poseidon Hash Function](https://eprint.iacr.org/2023/323) (2023)
+-  [poseidon-hash.info](https://www.poseidon-hash.info)
+- [autoparallel - poseidon](https://autoparallel.github.io/poseidon/index.html)
+- Poseidon - plonk: https://drive.google.com/file/d/1bZZvKMQHaZGA4L9eZhupQLyGINkkFG_b/view
+- Hades design ? https://dl.acm.org/doi/10.1007/978-3-030-77886-6_2
 
-Poseidon - plonk: https://drive.google.com/file/d/1bZZvKMQHaZGA4L9eZhupQLyGINkkFG_b/view
-
-Hades design ? https://dl.acm.org/doi/10.1007/978-3-030-77886-6_2
-
-https://www.usenix.org/system/files/sec21-grassi.pdf
-
-https://www.zellic.io/blog/algebraic-attacks-on-zk-hash-functions/
-
-https://docs.zkbob.com/implementation/untitled/the-poseidon-hash
-
-Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(@startuml) to explain this. And another diagram (plantuml) to explain the flow
-
-https://docs.polygon.technology/zkEVM/architecture/zkprover/hashing-state-machines/poseidon-sm/#execution-of-poseidon-actions
-
-https://autoparallel.github.io/poseidon/index.html
+- [Zellic - Algebraic Attacks on ZK-Friendly Hash Functions](https://www.zellic.io/blog/algebraic-attacks-on-zk-hash-functions/)
+- [fuzzinglabs - POSEIDON SPONGE BUGS IN ARKWORKS - Avoiding Cryptographic Failures in Hashing](https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/)
+- [docs.zkbob - The Poseidon Hash](https://docs.zkbob.com/implementation/untitled/the-poseidon-hash)
+- [docs.polygon.technology - poseidon-sm/#execution-of-poseidon-actions](https://docs.polygon.technology/zkEVM/architecture/zkprover/hashing-state-machines/poseidon-sm/#execution-of-poseidon-actions)
+- Chatgpt with the following input "Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(@startuml) to explain this. And another diagram (plantuml) to explain the flow"

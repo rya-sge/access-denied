@@ -17,7 +17,7 @@ This approach enhances security but introduces specific challenges.
 
 This article explores mTLS, its advantages, and how it compares to classical TLS.
 
-If you want to know more about TLS, particulary the version 1.3, you can also read my article [TLS 1.3 - Overview](https://rya-sge.github.io/access-denied/2024/11/04/TLS1.3-overview/)
+If you want to know more about TLS, particulary the version 1.3, you can also read my article [TLS 1.3 - Overview](https://rya-sge.github.io/access-denied/2024/11/04/TLS1.3-overview/) and [rfc8446](https://datatracker.ietf.org/doc/html/rfc8446)
 
 > Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT with a few edits of my own. Its content should become more personal later.
 
@@ -117,6 +117,26 @@ Prevents unauthorized devices from connecting to critical infrastructure.
 
 Enforces authentication for every connection within the network, adhering to zero-trust principles.
 
+## Kubernates with MTLS
+
+In Kubernetes, **mTLS** (mutual TLS) can be added across services by using a **service mesh** like **Istio**,**[Linkerd](https://linkerd.io/2-edge/features/automatic-mtls/)**, **[Hashicorp - Consul Connect](https://developer.hashicorp.com/consul/docs/connect/ca)**, or **[Kuma](https://kuma.io/docs/2.10.x/policies/mutual-tls/)**.
+ Here’s the big picture:
+
+- Kubernetes **by itself** doesn’t enforce mTLS between Pods/Services.
+- A **service mesh** injects **sidecar proxies** (e.g., Envoy) next to your apps and **automatically encrypts** all service-to-service communication with **mutual TLS**.
+- This way, all internal traffic is authenticated and encrypted **without** the applications themselves having to deal with certificates directly.
+
+For example, with **Istio**:
+
+- You install Istio on your cluster.
+- It injects an **Envoy proxy** next to each Pod (transparent sidecar).
+- The proxies negotiate certificates issued by Istio’s built-in **CA** (Certificate Authority).
+- Then, all traffic between services happens **over mTLS**, even if the apps know nothing about TLS.
+
+And bonus: you can define **fine-grained policies** — like saying "only service A can call service B".
+
+See also: [Secure Application Communications with Mutual TLS and Istio](https://istio.io/latest/blog/2023/secure-apps-with-istio/)
+
 ------
 
 #### Conclusion
@@ -127,4 +147,5 @@ mTLS offers significant advantages in terms of security and trust, making it a p
 
 - [What is mTLS? How Does It Differ From TLS?](https://www.ssl2buy.com/wiki/what-is-mtls-how-does-it-differ-from-tls)
 - [Cloudflare - What is mutual TLS (mTLS)?](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/)
-- ChatGPT with the input "Write me an article about mTLS, its advantage and disadvatange compare to a classical TLS architecture"
+- [Secure Application Communications with Mutual TLS and Istio](https://istio.io/latest/blog/2023/secure-apps-with-istio/)
+- ChatGPT with the input "Write me an article about mTLS, its advantage and disadvatange compare to a classical TLS architecture", "how can add mtls to kubernates through a service mesh"

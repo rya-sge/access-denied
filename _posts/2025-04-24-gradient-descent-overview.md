@@ -7,11 +7,13 @@ locale: en-GB
 categories: ai
 tags: 
 description: Gradient descent is an optimization algorithm used to find the minimum of a function—typically a cost function or loss function in machine learning. 
-image: /assets/article/mlg/ibm-gradient-descent.png
+image: /assets/article/mlg/gradient-descent-mindmap.png
 isMath: true
 ---
 
 Gradient descent is one of the most important algorithms in machine learning and optimization. It It is used in supervised learning to minimize errors (`loss function`) and improving performance.
+
+> This article comes primarily from ChatGPT with some modifications on my part. I hope to make it more personal in the future
 
 ## What is Gradient Descent?
 
@@ -149,7 +151,7 @@ Gradient descent  comes with its own set of challenges, depending notably if it 
                \|/
               \   /
                \_/
-        
+
 
 
   ​    
@@ -211,6 +213,12 @@ To deal with these, several enhancements exist, such as:
 - **Momentum**: Adds a fraction of the previous update to the current one.
 - **RMSProp** and **Adam**: Adaptive learning rates that adjust over time for each parameter.
 
+
+
+
+
+![gradient-descent-mindmap]({{site.url_complet}}/assets/article/mlg/gradient-descent-mindmap.png)
+
 ## FAQ
 
 ### Stochastic gradient descent
@@ -223,7 +231,9 @@ To deal with these, several enhancements exist, such as:
    this example. 
 
 $$
-  θi ← θi − α(h_θ (x_nn ) − y_n )x_n,i
+\begin{aligned}
+θi ← θi − α(h_θ (x_nn ) − y_n )x_n,i
+\end{aligned}
 $$
 
 

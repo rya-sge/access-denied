@@ -21,7 +21,7 @@ This article is mainly based on the following great article by Celo: [The Panthe
 
 [GitHub](https://github.com/matter-labs/era-boojum)
 
-Boojum is a Rust-based arithmetization & constraint library, based on the implementation developed for Plonky2.
+Boojum is a Rust-based arithmetization & constraint library, based on the implementation developed for Plonky2 (recursive SNARK).
 
 - According to ZkSync, Boojum provers only require 16 GB of RAM.
 - Use the FRI commitment scheme
@@ -29,7 +29,9 @@ Boojum is a Rust-based arithmetization & constraint library, based on the implem
 - Boojum by default operates over the following prime field 
 
 $$
+\begin{aligned}
 2^{64} - 2^{32} + 1
+\end{aligned}
 $$
 
 - Boojum provides also implementations of the corresponding field-bound  primitives like the Poseidon2 hash function, as well as SHA256, Keccak256 and Blake2s.
@@ -46,7 +48,9 @@ Build by Consensys and written in Go, `gnark` is a fast zk-SNARK library that of
 
 All these curves are defined over a finite field Fp and have an equation of the form 
 $$
+\begin{aligned}
 y² = x^3+b (b∈Fp).
+\end{aligned}
 $$
 Reference: [Consensys - Prove schemes and curves](https://docs.gnark.consensys.io/Concepts/schemes_curves)
 
@@ -80,6 +84,14 @@ The library implements also two commitment schemes and evaluation arguments:
 1. Pedersen commitments with IPA-based evaluation argument (supported on all three curve cycles), and
 2. HyperKZG commitments and evaluation argument (supported on curves with pairings e.g., BN254).
 
+## ZoKrates
+
+[zokrates.github.io/](https://zokrates.github.io/)
+
+ZoKrates is a toolbox for zkSNARKs on Ethereum. It helps you use verifiable computation in your DApp, from the specification of your program in a high level language to generating proofs of computation to verifying those proofs in Solidity.
+
+
+
 ## Iden3
 
 ### snarkjs
@@ -112,6 +124,14 @@ Plonky2 is a recursive SNARK natively compatible with Ethereum. It combines PLON
  Plonky2 uses a small Goldilocks field and supports efficient recursion. 
 
 Reference: [Polygon Introducing Plonky2](https://polygon.technology/blog/introducing-plonky2)
+
+### Plonky3
+
+[github.com/Plonky3/Plonky3](https://github.com/Plonky3/Plonky3)
+
+Plonky3 is a toolkit which provides a set of primitives, such as polynomial commitment schemes, for implementing polynomial IOPs (PIOPs). It is mainly used to power STARK-based zkVMs, though in principle it may be used for PLONK-based circuits or other PIOPs.
+
+See also [polygon.technology - plonky3](https://polygon.technology/plonky3)
 
 ### Starky
 
