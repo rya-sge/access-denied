@@ -1,14 +1,14 @@
 ---
 layout: post
 title: "Poseidon Hash Function - Overview"
-date: 2025-04-09
+date: 2025-05-27
 lang: en
 locale: en-GB
-categories: blockchain programmation
-tags: ipfs merkle-tree merkle-dag dag graph git
-description: Learn what a Merkle DAG is and how it used in distributed systems like IPFS and Git. This overview explains the structure, key benefits, and use cases of Merkle DAGs in content-addressed storage and version control.
-image: /assets/article/cryptographie/merkle-tree/merkle-dag-deduplication.png
-isMath: false
+categories: cryptography zkp
+tags: poseidon hash 
+description: The Poseidon hash function is a cryptographic hash function specifically designed for use in zero-knowledge proof systems like SNARKs and STARKs.
+image: /assets/article/cryptographie/hash/poseidon/poseidon-sponge.png
+isMath: true
 ---
 
 The Poseidon hash function is a cryptographic hash function specifically designed for use in **zero-knowledge proof systems** like SNARKs and STARKs. Unlike general-purpose hashes like SHA-2 or SHA-3, Poseidon is optimized for **efficient arithmetic circuits**, particularly over finite fields, which makes it highly suitable for zk-SNARK-friendly applications.
@@ -79,7 +79,7 @@ Poseidon is a **sponge construction**, composed of a **permutation-based design*
 2. **Linear layer (MDS matrix multiplication)**
 3. **Addition of round constants**
 
-![poseidon-sponge](../assets/article/cryptographie/hash/poseidon/poseidon-sponge.png)
+![poseidon-sponge]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon/poseidon-sponge.png)
 
 
 
@@ -103,9 +103,9 @@ The permutation is the core of Poseidon. It consists of:
 
 #### The HADES Design Strategy for Hashing
 
-![poseidon-hash-hades](../assets/article/cryptographie/hash/poseidon/poseidon-hash-hades.png)
+![poseidon-hash-hades]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon/poseidon-hash-hades.png)
 
-
+Reference: [official paper](https://eprint.iacr.org/2019/458.pdf), page 6
 
 | Terms | Description                                           |
 | ----- | ----------------------------------------------------- |
@@ -152,37 +152,43 @@ Poseidon allows tuning the following parameters:
 
 - State size:
   $$
+  \begin{aligned}
   t∈Z^+
+  \end{aligned}
   $$
 
 *t* is a number of S-box routines in one round. It also specifies an input dimension: hash function supports up to *t* input numbers.
 
 - Number of full rounds:
   $$
+  \begin{aligned}
   Rf∈Z^+
+  \end{aligned}
   $$
   (*t* S-box routines)
 
 - Number of partial rounds:
   $$
+  \begin{aligned}
   Rp∈Z^+
+  \end{aligned}
   $$
   (single S-box routine)
 
 - S-box exponent:
   $$
+  \begin{aligned}
   α∈{3,5,7,…}
+  \end{aligned}
   $$
 
 - Finite field:
 
   Fp, where p is primee
 
+Reference: [spec.filecoin.io - crypto.poseidon.mds-matrix](https://spec.filecoin.io/#section-algorithms.crypto.poseidon.mds-matrix), [docs.rs/poseidon-parameters/ - struct.PoseidonParameters.html](https://docs.rs/poseidon-parameters/latest/poseidon_parameters/v2/struct.PoseidonParameters.html)
 
 
-?https://docs.rs/poseidon-parameters/latest/poseidon_parameters/v2/struct.PoseidonParameters.html
-
-https://spec.filecoin.io/#section-algorithms.crypto.poseidon.mds-matrix
 
 ------
 
@@ -192,16 +198,15 @@ https://spec.filecoin.io/#section-algorithms.crypto.poseidon.mds-matrix
 
 The S-box is defined as:
 $$
-S:Z 
-p
-​
- →Z 
-p
-​
+\begin{aligned}
+S:Zp → Zp
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 S(x) ↦ x^α
+\end{aligned}
 $$
 where:
 
@@ -211,7 +216,9 @@ where α ≥ 3 is the smallest positive integer that satisfies gcd(α, p − 1) 
 
 In general, the S-BOX used is the following:
 $$
+\begin{aligned}
 x↦x^5
+\end{aligned}
 $$
 THis S-Box is suitable for the most popular prime fields in ZK applications,concretely the prime subfields of the scalar field of the BLS12-381 and BN254 or Ed25519.
 
@@ -225,15 +232,21 @@ This step provides **non-linearity**, crucial for security.
 
 A Maximum Distance Separable (MDS) matrix is used to mix the state elements linearly. If:
 $$
+\begin{aligned}
 M=MDS ~matrix
+\end{aligned}
 $$
 $$
+\begin{aligned}
 s=state~ vector
+\end{aligned}
 $$
 
 Then the mixing is performed as:
 $$
+\begin{aligned}
 s_{new}=M⋅s
+\end{aligned}
 $$
 This ensures **diffusion**, so a change in one input affects all outputs.
 
@@ -250,7 +263,9 @@ According to the [official paper](https://eprint.iacr.org/2019/458.pdf), page 6:
 
 Each round adds precomputed constants to break symmetry and resist attacks:
 $$
+\begin{aligned}
 s_{new}=s+c
+\end{aligned}
 $$
 Where `c` is a vector of constants for that round.
 
@@ -266,12 +281,18 @@ Where `c` is a vector of constants for that round.
 - Merkle trees in zkApps
 - Commitments in blockchain smart contracts
 
-We suggest POSEIDON for all applications of zero-knowledgefriendly hashing, concretely: 
+The paper suggests POSEIDON for all applications of zero-knowledgefriendly hashing, concretely: 
 
-• Using POSEIDON for commitments in various protocols, where the knowledge of the committed value is proven in zero knowledge: For this we suggest a singlecall permutation-based hashing with POSEIDON-128 and widths from 2 to 5 field elements. The advantage over the Pedersen hash, for example, is that POSEIDON is faster and can also be used in signature schemes which allows for a smaller code footprint. 
+- Using POSEIDON for **commitments** in various protocols, where the knowledge of the committed value is proven in zero knowledge
+  - For this the paper suggests a singlecall permutation-based hashing with POSEIDON-128 and widths from 2 to 5 field elements. 
+  - The advantage over the Pedersen hash, for example, is that POSEIDON is faster and can also be used in signature schemes which allows for a smaller code footprint. 
 
-- Hashing multi-element objects with certain fields encoded as field elements, so that statements about these fields are proven in zero knowledge: We suggest variablelength sponge-based hashing with POSEIDON-128 or POSEIDON-80 with width 5 (and rate 4). 
-- Using POSEIDON in Merkle trees to enable zeroknowledge proofs of knowledge of a leaf in the tree with optional statements about the leaf content: We recommend Merkle trees of arity 4 (i.e., width 5) with POSEIDON-128 as the most performant, but trees of more conventional arities can be used as well. 
+- Hashing multi-element objects with certain fields encoded as field elements, so that statements about these fields are proven in zero knowledge: 
+  - The paper suggests variable length sponge-based hashing with POSEIDON-128 or POSEIDON-80 with width 5 (and rate 4). 
+
+- Using POSEIDON in **Merkle trees** to enable zeroknowledge proofs of knowledge of a leaf in the tree with optional statements about the leaf content
+  - The paper recommends Merkle trees of arity 4 (i.e., width 5) with POSEIDON-128 as the most performant, but trees of more conventional arities can be used as well. 
+
 - Verifiable encryption with POSEIDON within Integrated Encryption Scheme : Put POSEIDON inside the DuplexSponge authenticated encryption framework and initialize it with a session key based on the recipient’s public key. Then one can prove that the recipient can decrypt the ciphertext into a plaintext with certain properties.
 
  There exist several third-party protocols that already use POSEIDON in these use cases: 
@@ -407,9 +428,7 @@ func poseidon_hash_many{poseidon_ptr: PoseidonBuiltin*}(n: felt, elements: felt*
 
 ```
 
-https://github.com/starkware-libs/cairo-lang/blob/12ca9e91bbdc8a423c63280949c7e34382792067/src/starkware/cairo/common/builtin_poseidon/poseidon.cairo#L28
-
-https://docs.starknet.io/architecture-and-concepts/cryptography/
+Reference: [starkware-libs/cairo-lang/blob/12ca9e91bbdc8a423c63280949c7e34382792067/src/starkware/cairo/common/builtin_poseidon/poseidon.cairo#L28]( https://github.com/starkware-libs/cairo-lang/blob/12ca9e91bbdc8a423c63280949c7e34382792067/src/starkware/cairo/common/builtin_poseidon/poseidon.cairo#L28), [Starknet - cryptography/](https://docs.starknet.io/architecture-and-concepts/cryptography/)
 
 
 

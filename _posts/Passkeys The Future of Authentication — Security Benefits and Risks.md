@@ -1,8 +1,6 @@
-# **Passkeys: The Future of Authentication — Security Benefits and Risks**
+# Passkeys (WebAuthn) - Overview
 
-In the evolving landscape of digital security, **passkeys** are emerging as a promising alternative to traditional passwords. Developed under the **FIDO2** standard and supported by tech giants like Apple, Google, and Microsoft, passkeys aim to eliminate phishing, password reuse, and credential stuffing — problems that plague traditional authentication systems.
-
-Video
+**Passkeys** are a passwordless authentication method based on the **FIDO2** standard, using public-key cryptography to verify user identity. Supported by major platforms including Apple, Google, and Microsoft, passkeys are designed to prevent common attacks such as phishing, credential stuffing, and password reuse by eliminating shared secrets between users and services.Video
 
 ------
 
@@ -19,13 +17,16 @@ They use **WebAuthn**, a standard API that enables public-key-based authenticati
 
 ### What is WebAuthn ?
 
-
-
 The Web Authentication API (also known as WebAuthn) is a [specification](https://w3c.github.io/webauthn/) written by the [W3C](https://www.w3.org/) and [FIDO](https://fidoalliance.org/), with the participation of Google, Mozilla, Microsoft, Yubico, and others. The API allows servers to register and authenticate users using public key cryptography instead of a password.
 
-https://webauthn.guide
+### Example
 
+t allows servers to integrate with the strong authenticators now built into devices, like Windows Hello or Apple’s Touch ID. Instead of a password, a private-public keypair (known as a **credential**) is created for a website. 
 
+- The private key is stored securely on the user’s device; a public key and randomly generated credential ID is sent to the server for storage. The server can then use that public key to prove the user’s identity.
+- The public key is not secret, because it is effectively useless without the corresponding private key. The fact that the server receives no secret has far-reaching implications for the security of users and organizations. Databases are no longer as attractive to hackers, because the public keys aren’t useful to them.
+
+From: [webauthn.guide](https://webauthn.guide)
 
 ------
 
@@ -47,7 +48,7 @@ No secrets are transmitted or stored server-side, significantly reducing attack 
 
 ------
 
-Other schema:  https://youtu.be/wqobiN4KJGo?feature=shared&t=2088
+Other schema:  [https://youtu.be/wqobiN4KJGo?feature=shared&t=2088](https://youtu.be/wqobiN4KJGo?feature=shared&t=2088)
 
 ## Challenge
 
@@ -60,8 +61,6 @@ After authenticating with a phone, the system may ask if you'd like to create a 
 This can get confusing. Users might not remember where they’ve created passkeys, or which ones are still valid. The speaker emphasized the need for *passkey management*, similar to session management in apps like Gmail — users should be able to audit and revoke credentials.
 
 Example: if you saved a passkey on your partner’s laptop and later break up, you probably don’t want them accessing your bank account. But today, there are few good tools to manage this kind of scenario.
-
-
 
 ## The Code Behind Passkeys
 
@@ -76,10 +75,6 @@ const credential = await navigator.credentials.create({
     publicKey: publicKeyCredentialCreationOptions
 });
 ```
-
-
-
-
 
 The `publicKeyCredentialCreationOptions` object contains a number of required and optional fields that a server specifies to create a new credential for a user.
 
@@ -190,6 +185,17 @@ PayPal has enabled passkey support for accounts in the U.S., offering login via 
 
 ------
 
+## Passkey with smart contract
+
+https://docs.zerodev.app/sdk/advanced/passkeys
+
+ZeroDev/Kernel supports using passkeys as signers. The support comes in two flavors:
+
+- **Native passkeys** using the [ERC-7212 precompile](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md). Native passkeys are the best option when available, since it uses the least amount of gas (only 3450 gas for verifying a P256 signature). Currently only a small number of networks support ERC-7212, but it's expected that most networks will support it over time.
+- **Smart contract passkeys** using either the [Daimo](https://github.com/daimo-eth/p256-verifier) or [FCL](https://github.com/rdubois-crypto/FreshCryptoLib) implementation. Smart contract passkeys can work on all EVM networks, but they are expensive (300-400k gas for verifying a P256 signature).
+
+ZeroDev implements passkey supports through a **progressive passkey validator**, which uses native passkeys if ERC-7212 is available, and falls back to smart contract passkeys otherwise. Notably, this means that if you use passkeys on a network where ERC-7212 isn't available, and the network later adds support for ERC-7212, you don't need to upgrade your validator -- it will automatically start taking advantage of the ERC-7212 precompile.
+
 ## **Conclusion**
 
 **Passkeys represent a transformative step forward** in authentication — offering strong protection against phishing, credential theft, and user friction. However, as with any new tech, they come with transitional challenges and implementation risks.
@@ -202,7 +208,7 @@ Organizations should:
 
 As support grows, passkeys could help move the web toward a truly **passwordless future** — one that’s more secure and user-friendly.
 
-Write me a technical article about passkey, talk about the security and risk Give some example
+
 
 Terms
 
@@ -234,8 +240,8 @@ https://safety.google/authentication/passkey/
 
 ## Reference:
 
-https://webauthn.guide
+- [webauthn.guide](https://webauthn.guide)
+- [https://www.youtube.com/watch?v=knrEje81f68](https://www.youtube.com/watch?v=knrEje81f68)
+- [fidoalliance - passkeys/](https://fidoalliance.org/passkeys/)
 
-https://www.youtube.com/watch?v=knrEje81f68
-
-https://fidoalliance.org/passkeys/
+ChatGPT with the following article "Write me a technical article about passkey, talk about the security and risk Give some example"

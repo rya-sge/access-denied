@@ -1,8 +1,24 @@
 # ERC-4337 - EntryPoint
 
-**EntryPoint** - a singleton contract to execute bundles of `UserOperations`. Bundlers MUST whitelist the supported `EntryPoint`.
+ERC-4337 is an account abstraction proposal which completely avoids the need for consensus-layer protocol changes. Instead of adding new protocol features and changing the bottom-layer transaction type, this proposal instead introduces a higher-layer pseudo-transaction object called a `UserOperation`. 
+
+Users send `UserOperation` objects into a separate mempool. A special class of actor called bundlers package up a set of these objects into a transaction making a `handleOps` call to a special contract, and that transaction then gets included in a block.
+
+
+
+**EntryPoint** - a singleton contract to execute bundles of `UserOperations`. 
+
+Bundlers MUST whitelist the supported `EntryPoint`.
+
+
+
+https://eips.ethereum.org/EIPS/eip-4337
 
 https://github.com/eth-infinitism/account-abstraction/tree/develop
+
+[TOC]
+
+# EntryPoint
 
 ## Functions
 
@@ -108,15 +124,6 @@ receive() external payable;
 function withdrawTo(address payable withdrawAddress, uint256 withdrawAmount) external;
 ```
 
-## Security Considerations
-
-The `EntryPoint` contract will need to be audited and formally verified, because it will serve as a central trust point for *all* [ERC-4337]. In total, this architecture reduces auditing and formal verification load for the ecosystem, because the amount of work that individual *accounts* have to do becomes much smaller (they need only verify the `validateUserOp` function and its “check signature and pay fees” logic) and check that other functions are `msg.sender == ENTRY_POINT` gated (perhaps also allowing `msg.sender == self`), but it is nevertheless the case that this is done precisely by concentrating security risk in the `EntryPoint` contract that needs to be verified to be very robust.
-
-Verification would need to cover two primary claims (not including claims needed to protect paymasters, and claims needed to establish p2p-level DoS resistance):
-
-- **Safety against arbitrary hijacking**: The `EntryPoint` only calls to the `sender` with `userOp.calldata` and only if `validateUserOp` to that specific `sender` has passed.
-- **Safety against fee draining**: If the `EntryPoint` calls `validateUserOp` and passes, it also must make the generic call with calldata equal to `userOp.calldata`
-
 ### handleOps
 
 Here the different step:
@@ -168,6 +175,17 @@ function handleOps(
 ### UML
 
 ![erc4337-entrypoint-uml](/home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/erc-4337/erc4337-entrypoint-uml.png)
+
+
+
+## Security Considerations
+
+The `EntryPoint` contract will need to be audited and formally verified, because it will serve as a central trust point for *all* [ERC-4337]. In total, this architecture reduces auditing and formal verification load for the ecosystem, because the amount of work that individual *accounts* have to do becomes much smaller (they need only verify the `validateUserOp` function and its “check signature and pay fees” logic) and check that other functions are `msg.sender == ENTRY_POINT` gated (perhaps also allowing `msg.sender == self`), but it is nevertheless the case that this is done precisely by concentrating security risk in the `EntryPoint` contract that needs to be verified to be very robust.
+
+Verification would need to cover two primary claims (not including claims needed to protect paymasters, and claims needed to establish p2p-level DoS resistance):
+
+- **Safety against arbitrary hijacking**: The `EntryPoint` only calls to the `sender` with `userOp.calldata` and only if `validateUserOp` to that specific `sender` has passed.
+- **Safety against fee draining**: If the `EntryPoint` calls `validateUserOp` and passes, it also must make the generic call with calldata equal to `userOp.calldata`
 
 
 
