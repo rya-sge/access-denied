@@ -375,8 +375,6 @@ According to [filecoin documentation](https://spec.filecoin.io/#section-algorith
 
 ## Implementation
 
-<list library>
-
 ### Starknet
 
 Poseidon is a family of hash functions designed to be very efficient as algebraic circuits. As such, they can be very useful in ZK-proving systems such as STARKs.
@@ -407,7 +405,7 @@ We define poseidon (a1,...., an) to be the first coordinate of H(a1,...,an;0,0,0
 
 
 
-![file:///home/ryan/Downloads/me/access-denied/assets/article/cryptographie/hash/poseidon/starknet-poseidon.png](file:///home/ryan/Downloads/me/access-denied/assets/article/cryptographie/hash/poseidon/starknet-poseidon.png)
+![starknet-poseidon.png]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon/starknet-poseidon.png)
 
 
 
@@ -430,8 +428,6 @@ func poseidon_hash_many{poseidon_ptr: PoseidonBuiltin*}(n: felt, elements: felt*
 
 Reference: [starkware-libs/cairo-lang/blob/12ca9e91bbdc8a423c63280949c7e34382792067/src/starkware/cairo/common/builtin_poseidon/poseidon.cairo#L28]( https://github.com/starkware-libs/cairo-lang/blob/12ca9e91bbdc8a423c63280949c7e34382792067/src/starkware/cairo/common/builtin_poseidon/poseidon.cairo#L28), [Starknet - cryptography/](https://docs.starknet.io/architecture-and-concepts/cryptography/)
 
-
-
 ### Filecoin Neptune
 
 Neptune is a Rust implementation of the [Poseidon hash function](https://www.poseidon-hash.info/) tuned for [Filecoin](https://filecoin.io/).
@@ -443,9 +439,7 @@ Neptune is a Rust implementation of the [Poseidon hash function](https://www.pos
 
 ## Mindmap
 
-
-
-![poseidon-hash-function-minmap](/home/ryan/Downloads/me/access-denied/assets/article/cryptographie/hash/poseidon-hash-function-minmap.png)
+![poseidon-hash-function-minmap]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon-hash-function-minmap.png)
 
 ## Reference
 
@@ -455,11 +449,10 @@ Neptune is a Rust implementation of the [Poseidon hash function](https://www.pos
   - [eprint - Poseidon2: A Faster Version of the Poseidon Hash Function](https://eprint.iacr.org/2023/323) (2023)
 -  [poseidon-hash.info](https://www.poseidon-hash.info)
 - [autoparallel - poseidon](https://autoparallel.github.io/poseidon/index.html)
-- Poseidon - plonk: https://drive.google.com/file/d/1bZZvKMQHaZGA4L9eZhupQLyGINkkFG_b/view
-- Hades design ? https://dl.acm.org/doi/10.1007/978-3-030-77886-6_2
-
+- Poseidon - plonk: [https://drive.google.com/file/d/1bZZvKMQHaZGA4L9eZhupQLyGINkkFG_b/view](https://drive.google.com/file/d/1bZZvKMQHaZGA4L9eZhupQLyGINkkFG_b/view)
+- [Mind the Middle Layer: The HADES Design Strategy Revisited](https://dl.acm.org/doi/10.1007/978-3-030-77886-6_2)
 - [Zellic - Algebraic Attacks on ZK-Friendly Hash Functions](https://www.zellic.io/blog/algebraic-attacks-on-zk-hash-functions/)
 - [fuzzinglabs - POSEIDON SPONGE BUGS IN ARKWORKS - Avoiding Cryptographic Failures in Hashing](https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/)
 - [docs.zkbob - The Poseidon Hash](https://docs.zkbob.com/implementation/untitled/the-poseidon-hash)
 - [docs.polygon.technology - poseidon-sm/#execution-of-poseidon-actions](https://docs.polygon.technology/zkEVM/architecture/zkprover/hashing-state-machines/poseidon-sm/#execution-of-poseidon-actions)
-- Chatgpt with the following input "Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(@startuml) to explain this. And another diagram (plantuml) to explain the flow"
+- Chatgpt with the following input "Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(startuml) to explain this. And another diagram (plantuml) to explain the flow"
