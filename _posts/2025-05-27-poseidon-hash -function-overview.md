@@ -393,7 +393,7 @@ According to [MariusVanDerWijden](https://x.com/vdWijden), a hash collision was 
 
 A padding was incorrectly applied in their scheme: the input will be padded to the next 32 bytes with 0's instead of the industry standard of a 1 followed by 0's. This leads to the following hash collisions:
 
-![poseidon-hash-collision](../assets/article/cryptographie/hash/poseidon/poseidon-hash-collision.png)
+![poseidon-hash-collision]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon/poseidon-hash-collision.png)
 
 Reference: [MariusVanDerWijden - X](https://x.com/vdWijden/status/1877046148386451732)
 

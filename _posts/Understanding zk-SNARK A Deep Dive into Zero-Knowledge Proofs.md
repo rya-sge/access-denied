@@ -69,70 +69,122 @@ An arithemetic circuit is:
 - Fix a finite Field 
 
 $$
+\begin{aligned}
 F = {0,..., p-1} ~for~some~prime~p >2
+\end{aligned}
 $$
 
 
 $$
+\begin{aligned}
 C: F^n - >F
+\end{aligned}
 $$
 Example:
 
-![zk-snark-arithmetic-circuit.drawio](../assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark-arithmetic-circuit.drawio.png)
+![zk-snark-arithmetic-circuit.drawio]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark-arithmetic-circuit.drawio.png)
 
-
+Reference: [rdi.berkeley.edu - Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 18
 
 #### Structured vs. unstructured circuits 
 
-An unstructured circuit: a circuit with arbitrary wires input ⋯ output 
+- An unstructured circuit: a circuit with arbitrary wires 
+- A structured circuit
+
+![zk-snark-structured-circuit.drawio]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark-structured-circuit.drawio.png)
+
+M is often called virtual Machine (VM) -- one step of a processor
 
 Some SNARK techniques only apply to structured circuits
 
-
+Reference: [rdi.berkeley.edu - Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 20
 
 ### NARK: Non-interactive ARgument of Knowledge (preprocessing)
 
 A preprocessing NARK is a triple (S, P, V):
 
 - S(C) -> public parameters (pp, vp) for prover and verifier
-- P(PP, x, w) -> Proof PI
-- V(vp, x, PI) -> accept or reject 
+- P(PP, x, w) -> Proof π
+- V(vp, x, π) -> accept or reject 
 
 where
 
-- x is a public statement in Fn
+- x is a public statement in `Fn`
 
-- w is a secret witness in F^m
+- w is a secret witness in `F^m`
+
+![zk-snark-NARK.drawio]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark-NARK.drawio.png)
+
+Reference: [rdi.berkeley.edu - Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 21
 
 ### SNARK: a Succinct ARgument of Knowledge
 
-A succing preprocessing NARK is a triple (S, P, V):
+#### Succinct
+
+A succinct preprocessing NARK is a triple (S, P, V):
 
 - S(C) -> public parameters (pp, vp) for prover and verifier
-- P(PP, x, w) -> **short** Proof PI
+- P(PP, x, w) -> **short** Proof π
 
 $$
+\begin{aligned}
 len(PI) = sublinear(|w|)
+\end{aligned}
 $$
 
 
 
-- V(vp, x, PI) ->  fast to verify
+- V(vp, x, π) ->  fast to verify
 
 $$
-time(V) = O_gamm(|x|), sublinera(|C|)
+\begin{aligned}
+time(V) = O_\lambda(|x|), sublinera(|C|)
+\end{aligned}
 $$
 
 Example sublinera function
 $$
+\begin{aligned}
 f(n) = \sqrt(n)
+\end{aligned}
 $$
+
+Reference: [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 24
+
+#### Strongly succinct
+
+A strongly succinct preprocessing NARK is a triple (S, P, V):
+
+- S(C) -> public parameters (pp, vp) for prover and verifier
+- P(PP, x, w) -> **short** Proof π
+
+$$
+\begin{aligned}
+len(π) = log(|C|)
+\end{aligned}
+$$
+
+
+
+- V(vp, x, π) ->  fast to verify
+
+$$
+\begin{aligned}
+time(V) = O_\lambda(|x|), log(|C|)
+\end{aligned}
+$$
+
+
+
+Reference: [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 25
 
 ### Types of preprocessing Setup (trusted setup)
 
 The Trusted Setup is a crucial step where parameters are generated. These parameters are public and enable the creation of proofs, but their security depends on the assumption that the private "toxic waste" from the setup remains undisclosed. "As such, trusted setups are commonly run with many participants to render the possibility of this occurrence low enough."
 
 Recall setup for circuit C: S(C) -> public parameters (Sp, Sv)
+
+![zk-snark-preprocessing-setup]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark-preprocessing-setup.png)
 
 #### Trusted setup per circuit
 
@@ -142,17 +194,21 @@ If the trusted setup is compromises => can prove false statements
 
 
 
-#### Trusted but universal (updated) setup
+#### Trusted but universal (updatable) setup
 
-- secrets in S(C) are independent of C
+- secrets in `S(C)` are independent of `C`
 
 $$
+\begin{aligned}
 S = (S_{init}, S_{pre})
+\end{aligned}
 $$
 
-- Transparent setup
+#### Transparent setup
 
 S(C) does not use secret data (no trusted setup)
+
+Reference: [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 28
 
 ### Snark and zk-snark difference
 
@@ -166,7 +222,9 @@ zk-SNARK: a SNARK that is also zero knowledge
 
 A QAP encodes the correctness of the circuit into polynomial form. For a valid computation, the polynomials P(x), Q(x), and Z(x) must satisfy:
 $$
+\begin{aligned}
 P(x) \cdot Q(x) = h(x) \cdot Z(x)
+\end{aligned}
 $$
 Where:
 
@@ -178,7 +236,9 @@ Where:
 
 zk-SNARKs use elliptic curve pairings to create verifiable commitments. Given two cyclic groups G1  and G2, and a bilinear pairing e:G1×G2→GT :  we have:
 $$
+\begin{aligned}
 e(aP, bQ) = e(P, Q)^{ab}
+\end{aligned}
 $$
 This property is used to verify polynomial relationships without revealing the witness.
 
@@ -286,16 +346,18 @@ As the development of quantum computers progresses, systems based on zk-SNARKs w
 
 It exists several different proving schemes. Here a quick list:
 
-| Scheme                                      | Curves                                   | Universal |
-| ------------------------------------------- | ---------------------------------------- | --------- |
-| [G16](https://eprint.iacr.org/2016/260)     | ALTBN_128, BLS12_381                     | No        |
-| [GM17](https://eprint.iacr.org/2017/540)    | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | No        |
-| [Marlin](https://eprint.iacr.org/2019/1047) | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | Yes       |
+| Scheme                                      | Curves                                   | Setup                   | Post-quantum |
+| ------------------------------------------- | ---------------------------------------- | ----------------------- | ------------ |
+| [G16](https://eprint.iacr.org/2016/260)     | ALTBN_128, BLS12_381                     | trusted per circuit     | no           |
+| [GM17](https://eprint.iacr.org/2017/540)    | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | No universal            | ?            |
+| [Marlin](https://eprint.iacr.org/2019/1047) | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | universal trusted setup | no           |
+| Bulletproofs                                |                                          | Transparent             | no           |
+| STARK                                       |                                          | Transparent             | Yes          |
 
 - All schemes have a circuit-specific setup phase called `setup`. 
 - Universal schemes also feature a preliminary, circuit-agnostic step called `universal-setup`. The advantage of universal schemes is that only the `universal-setup` step requires trust, so that it can be run a single time and reused trustlessly for many programs.
 
-Reference: [zokrates.github.io - proving_schemes.html](https://zokrates.github.io/toolbox/proving_schemes.html), [Schemes](https://zokrates.github.io/toolbox/proving_schemes.html#schemes)
+Reference: [zokrates.github.io - proving_schemes.html](https://zokrates.github.io/toolbox/proving_schemes.html), [Schemes](https://zokrates.github.io/toolbox/proving_schemes.html#schemes), [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 29
 
 ### Variant
 
@@ -329,13 +391,11 @@ https://zkplabs.network/blog/Introduce-PLONK-Revolutionizing-ZK-SNARK-Technology
 
 #### Conclusion
 
-zk-SNARKs are a revolutionary tool in the cryptographic landscape, enabling privacy-preserving, efficient, and scalable solutions across various domains. 
+zk-SNARKs enables privacy-preserving, efficient, and scalable solutions across various domains. 
 
-However, the reliance on trusted setups and their vulnerability to quantum computers are notable challenges. 
+However, the reliance on trusted setups and their vulnerability to quantum computers are notable challenges. zk-STARKs and Bulletproofs offer alternatives with distinct trade-offs.
 
-While zk-STARKs and Bulletproofs offer alternatives with distinct trade-offs, zk-SNARKs remain a cornerstone of zero-knowledge proof technology, pushing the boundaries of what is possible in privacy and security.
-
-Future advancements in quantum-resistant algorithms and decentralized trusted setups will likely shape the evolution of zk-SNARKs, ensuring their relevance in a post-quantum era.
+Future advancements in quantum-resistant algorithms and decentralized trusted setups will likely shape the evolution of zk-SNARKs, ensuring their relevance against quantum computer.
 
 
 
