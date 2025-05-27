@@ -11,8 +11,6 @@ image: /assets/article/cryptographie/zero-knowledge-proof/zcash-zec-logo.png
 isMath: true
 ---
 
-
-
 zk-SNARK stands for **Zero-Knowledge Succinct Non-Interactive Argument of Knowledge**. 
 
 They were introduced in a [2012 paper](https://dl.acm.org/doi/10.1145/2090236.2090263) co-authored by Nir Bitansky, Ran Canetti, Alessandro Chiesa, and Eran Tromer.
@@ -23,13 +21,9 @@ Zero-Knowledge  Proof are widely used in blockchain technology to enhance privac
 
 **Core properties:**
 
-- **Zero-Knowledge**: No knowledge beyond the validity of the statement is revealed.
+- **Zero-Knowledge**: No knowledge beyond the validity of the statement (validity of the claim) is revealed.
 - **Succinct**: The proofs are very small and quick to verify.
-- **Non-Interactive**: A single message from the prover is sufficient.
-
-- The "zero-knowledge" aspect ensures that no information other than the validity of the claim is shared
-- "succinct" implies that the proof is small and verifiable quickly
--  "non-interactive" means the proof does not require back-and-forth communication between the prover and verifier after its generation.
+- **Non-Interactive**: A single message from the prover is sufficient. The proof does not require back-and-forth communication between the prover and verifier after its generation.
 
 [TOC]
 
@@ -131,7 +125,7 @@ $$
 
 Example sublinera function
 $$
-f(n) = racine n
+f(n) = \sqrt(n)
 $$
 
 ### Types of preprocessing Setup (trusted setup)

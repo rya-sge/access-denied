@@ -208,19 +208,33 @@ $$
 S(x) ↦ x^α
 \end{aligned}
 $$
-where:
 
-where α ≥ 3 is the smallest positive integer that satisfies gcd(α, p − 1) = 1
+
+
+
+where α ≥ 3 is the smallest positive integer that satisfies 
+$$
+\begin{aligned}
+gcd(α, p − 1) = 1
+\end{aligned}
+$$
+
 
 α∈Z+
 
 In general, the S-BOX used is the following:
+
+
 $$
 \begin{aligned}
 x↦x^5
 \end{aligned}
 $$
-THis S-Box is suitable for the most popular prime fields in ZK applications,concretely the prime subfields of the scalar field of the BLS12-381 and BN254 or Ed25519.
+
+
+
+
+This S-Box is suitable for the most popular prime fields in ZK applications,concretely the prime subfields of the scalar field of the BLS12-381 and BN254 or Ed25519.
 
 or more generally:
 
@@ -242,12 +256,16 @@ s=state~ vector
 \end{aligned}
 $$
 
+
+
 Then the mixing is performed as:
 $$
 \begin{aligned}
 s_{new}=M⋅s
 \end{aligned}
 $$
+
+
 This ensures **diffusion**, so a change in one input affects all outputs.
 
 ##### Avoiding Insecure Matrices
@@ -275,7 +293,9 @@ Where `c` is a vector of constants for that round.
 
 ------
 
-### Applications
+## Applications
+
+### Use case
 
 - Zero-Knowledge Proof Systems (SNARKs, STARKs)
 - Merkle trees in zkApps
@@ -283,24 +303,33 @@ Where `c` is a vector of constants for that round.
 
 The paper suggests POSEIDON for all applications of zero-knowledgefriendly hashing, concretely: 
 
-- Using POSEIDON for **commitments** in various protocols, where the knowledge of the committed value is proven in zero knowledge
-  - For this the paper suggests a singlecall permutation-based hashing with POSEIDON-128 and widths from 2 to 5 field elements. 
-  - The advantage over the Pedersen hash, for example, is that POSEIDON is faster and can also be used in signature schemes which allows for a smaller code footprint. 
+#### Commitments
 
-- Hashing multi-element objects with certain fields encoded as field elements, so that statements about these fields are proven in zero knowledge: 
-  - The paper suggests variable length sponge-based hashing with POSEIDON-128 or POSEIDON-80 with width 5 (and rate 4). 
+Using POSEIDON for **commitments** in various protocols, where the knowledge of the committed value is proven in zero knowledge
+- For this the paper suggests a singlecall permutation-based hashing with POSEIDON-128 and widths from 2 to 5 field elements. 
+- The advantage over the Pedersen hash, for example, is that POSEIDON is faster and can also be used in signature schemes which allows for a smaller code footprint. 
 
-- Using POSEIDON in **Merkle trees** to enable zeroknowledge proofs of knowledge of a leaf in the tree with optional statements about the leaf content
-  - The paper recommends Merkle trees of arity 4 (i.e., width 5) with POSEIDON-128 as the most performant, but trees of more conventional arities can be used as well. 
+#### Hashing multi-element
 
-- Verifiable encryption with POSEIDON within Integrated Encryption Scheme : Put POSEIDON inside the DuplexSponge authenticated encryption framework and initialize it with a session key based on the recipient’s public key. Then one can prove that the recipient can decrypt the ciphertext into a plaintext with certain properties.
+Hashing multi-element objects with certain fields encoded as field elements, so that statements about these fields are proven in zero knowledge: 
+- The paper suggests variable length sponge-based hashing with POSEIDON-128 or POSEIDON-80 with width 5 (and rate 4). 
+
+#### Merkle trees
+
+Using POSEIDON in **Merkle trees** to enable zeroknowledge proofs of knowledge of a leaf in the tree with optional statements about the leaf content
+- The paper recommends Merkle trees of arity 4 (i.e., width 5) with POSEIDON-128 as the most performant, but trees of more conventional arities can be used as well. 
+
+#### Verifiable encryption within IES 
+
+Verifiable encryption with POSEIDON within Integrated Encryption Scheme : Put POSEIDON inside the DuplexSponge authenticated encryption framework and initialize it with a session key based on the recipient’s public key. Then one can prove that the recipient can decrypt the ciphertext into a plaintext with certain properties.
+
+### Protocols
 
  There exist several third-party protocols that already use POSEIDON in these use cases: 
 
 - [Filecoin](https://github.com/lurk-lab/neptune) employs POSEIDON for Merkle tree proofs with different arities and for two-value commitments.
-- [Dusk Network](https://github.com/dusk-network/Poseidon252) uses POSEIDON to build a Zcash-like protocol for securities trading.It also uses POSEIDON for encryption as described above. 
-- Sovrin uses POSEIDON for Merkle-tree based revocation
-- Loopring uses POSEIDON for private trading on Ethereum
+- [Dusk Network](https://github.com/dusk-network/Poseidon252) uses POSEIDON to build a Zcash-like protocol for securities trading. It also uses POSEIDON for encryption as described above. 
+- Not yet implemented, but there is a draft EIP ([EIP-5988](https://eips.ethereum.org/EIPS/eip-5988)) to add a precompiled contract which implements Poseidon in the EVM. See also [www.poseidon-initiative.info](https://www.poseidon-initiative.info)
 
 ## Select the right use Poseidon
 
@@ -317,8 +346,13 @@ Poseidon maps sequences of `F` elements to a fixed length sequence of `F`element
 
 With this information, you determine the *width w,* measured in the number of F elements, of Poseidon permutation as follows:
 
-- Reserve c elements for capacity so that c elements of F contain 2M or more bits.
-- If messages have fixed length l which is reasonably small (10 or less), then set w = c+l.
+- Reserve `c` elements for capacity so that c elements of F contain 2M or more bits.
+
+- If messages have fixed length `l` which is reasonably small (10 or less), then set 
+  $$
+  w = c+l.
+  $$
+  
 
 Then you figure out which S-box is compatible with the curve.  For the curves BLS12-381, BN254, or Ed25519 the S-box `x^5` is optimal.
 
@@ -381,11 +415,15 @@ Poseidon is a family of hash functions designed to be very efficient as algebrai
 
 Starknet’s version of the Poseidon hash function is based on a three-element state Hades permutation and defined of up to 2 elements by:
 $$
+\begin{aligned}
 poseidon(x):= [hades\_permutation(x,0,1)]_0
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 poseidon(x,y) := [hades\_permutation(x,y,2)]_0
+\end{aligned}
 $$
 
 
@@ -397,7 +435,9 @@ Where [⋅]_j denotes taking the j'th coordinate of a tuple.
 
 Let hades:
 $$
+\begin{aligned}
 F{^3_P}-> F{^3_P}
+\end{aligned}
 $$
  denote the Hades permutation with Starknet’s parameters, then given an array `a1,......an`of n field elements.
 
