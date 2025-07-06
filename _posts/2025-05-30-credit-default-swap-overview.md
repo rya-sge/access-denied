@@ -21,7 +21,7 @@ Since their inception in the early 1990s, CDS contracts have played a pivotal ro
 
 ------
 
-### How a Credit Default Swap Works
+## How a Credit Default Swap Works
 
 In a CDS agreement, there are typically two parties:
 
@@ -37,7 +37,7 @@ The seller of a CDS is obliged to buy the bonds for their face value when the cr
 
 For example, if Company X issues bonds and an investor fears that X may default, they can buy a CDS from a bank. If X defaults, the bank pays the investor the face value of the bond. If no default occurs, the bank keeps the premiums.
 
-#### Key terms
+### Key terms
 
 - The company subject to default is known as reference entity
 - THe default is called credit event
@@ -164,19 +164,19 @@ Reference: ChatGPT + [CFI - Naked Credit Default Swaps](https://corporatefinance
 
 ------
 
-### CDS as a Double-Edged Sword
+## CDS risk
 
 CDS markets can enhance liquidity and allow institutions to manage risk efficiently. However, they also pose significant **systemic risks**, which became especially evident during the 2008 financial crisis. Some major risks include:
 
-#### Counterparty Risk
+### Counterparty Risk
 
 The protection seller may itself default, rendering the CDS protection worthless. This is what happened with AIG in 2008, which had sold massive amounts of CDS without sufficient capital backing.
 
-#### Lack of Transparency
+### Lack of Transparency
 
 Traditionally, CDS contracts have been traded over-the-counter (OTC), meaning they are privately negotiated and not standardized. This obscures the true extent of exposures and interconnections in the financial system.
 
-#### Speculation and Leverage
+### Speculation and Leverage
 
 CDSs can be used not only for hedging but also for speculation. Investors can buy CDS contracts on debt they don’t actually own—akin to buying insurance on a neighbor’s house. This speculative use can amplify losses in a downturn.
 
@@ -200,7 +200,7 @@ Reference: [U.S Department of the Treasury - AIG](https://home.treasury.gov/data
 
 ------
 
-### Bringing CDS to the Blockchain: Is It Feasible?
+## Bringing CDS to the Blockchain: Is It Feasible?
 
 The application of **blockchain technology** to credit default swaps is increasingly being explored as a way to address transparency and efficiency issues.
 

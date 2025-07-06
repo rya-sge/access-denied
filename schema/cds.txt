@@ -1,0 +1,39 @@
+@startmindmap
+* Credit Default Swap (CDS)
+** Definition
+*** Financial derivative
+*** Protection against default
+*** Buyer pays premium, seller pays if credit event
+** Risks
+*** Counterparty risk
+*** Lack of transparency (OTC trading)
+*** Speculation / leverage
+** AIG Case (2008)
+*** Sold CDS on mortgage debt
+*** No capital backing
+*** Required to post collateral
+*** US government bailout ($180B)
+** Regional Differences
+*** US
+**** Regulated by CFTC (Dodd-Frank)
+**** Central clearing required
+**** Naked CDS allowed (incl. sovereign)
+**** Uses ISDA (New York law)
+*** EU
+**** Regulated under EMIR, MiFID II, SSR
+**** Central clearing required
+**** Naked sovereign CDS banned
+**** ISDA often under English law (legacy)
+**** Shift toward French/Irish law post-Brexit
+** Blockchain Potential
+*** Benefits
+**** Transparency via public ledger
+**** Smart contracts automate payouts
+**** Reduce counterparty risk (DeFi)
+**** Improved auditability
+*** Challenges
+**** Oracle reliability
+**** Legal complexity of credit events
+**** Regulatory uncertainty
+**** Liquidity limitations
+@endmindmap
