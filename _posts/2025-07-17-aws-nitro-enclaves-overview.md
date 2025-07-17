@@ -1,4 +1,4 @@
-```
+---
 layout: post
 title: "AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data"
 date: 2025-07-17
@@ -9,7 +9,7 @@ tags: amazon enclave nitro secure-environement
 description: AWS Nitro Enclaves, a feature of Amazon EC2,  aims to offer highly isolated and secure execution environments.
 image: /assets/article/virtualization/amazon/nitro_enclaves_eks.png
 isMath: false
-```
+---
 
 As organizations increasingly migrate sensitive workloads to the cloud, ensuring data security during processing becomes a mission-critical challenge. 
 
