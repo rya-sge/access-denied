@@ -25,8 +25,6 @@ Reference: [Merkle-DAGs meet CRDTs](https://hector.link/presentations/merkle-crd
 
 [TOC]
 
-
-
 ------
 
 ### Understanding Merkle DAGs

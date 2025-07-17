@@ -1,0 +1,60 @@
+@startmindmap
+* Amazon Nitro Enclaves
+** Overview
+*** Isolated compute environments (VMs inside EC2 instances)
+*** Use cases: sensitive data processing, cryptographic operations
+*** No external networking; communicates via vsock
+
+** Key Features
+*** Hardware isolation
+*** No persistent storage or external network
+*** Integration with AWS KMS
+*** Cryptographic attestation
+
+** Attestation
+*** Ensures integrity of enclave
+*** Uses signed attestation documents
+*** Validates enclave image digest (PCRs)
+
+** Integration with AWS KMS
+*** Supported APIs
+**** kms-decrypt
+**** generate-data-key
+**** generate-random
+*** Enclaves attach attestation to KMS requests
+*** KMS evaluates using:
+**** kms:RecipientAttestation:ImageSha384
+**** kms:RecipientAttestation:PCRx (e.g. PCR0–PCR8)
+
+** KMS Key Policy Example
+*** Uses IAM role with condition keys
+*** Allows only trusted enclaves to perform:
+**** Decrypt
+**** GenerateDataKey
+**** GenerateRandom
+
+** Logging with AWS CloudTrail
+*** Nitro Enclave KMS calls are logged
+*** Event types:
+**** Decrypt
+**** GenerateDataKey
+**** GenerateRandom
+*** Additional log fields:
+**** attestationDocumentModuleId
+**** attestationDocumentEnclaveImageDigest
+*** Logs can be viewed in:
+**** CloudTrail Event History
+**** S3 (with a trail)
+
+** Data Preparation Workflow
+*** Create KMS key
+*** Generate plaintext + encrypted data key
+*** Encrypt secret data using plaintext data key
+*** Store encrypted data (e.g. S3)
+*** Enclave retrieves and decrypts using KMS
+
+** Use Cases
+*** Secure key management
+*** Processing confidential data
+*** Privacy-preserving workloads
+@endmindmap

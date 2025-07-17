@@ -7,7 +7,7 @@ locale: en-GB
 categories: 
 tags: CDS credit-default-swap derivative
 description: A Credit Default Swap (CDS) is a financial derivative that functions as a form of insurance against the default of a borrower. 
-image: 
+image: /assets/article/finance/credit-default-swap-mindmap.png
 isMath: true
 ---
 
@@ -53,7 +53,9 @@ The **CDS spread** is nothing more than the total amount paid every year by the 
   - In general, we can compute the average PD of the reference entity, conditional on no previous default, as
 
 $$
+\begin{aligned}
 PD = \frac {CS} {1 - R}
+\end{aligned}
 $$
 
 Where:
@@ -78,7 +80,9 @@ Suppose that a 5-year CDS spread (CS) for a given company (the reference entity)
 - The average (yearly) PD over the 5-year period, conditional on no earlier default is estimated as:
 
 $$
+\begin{aligned}
 \frac{0.024}{1-0.4} = 0.04 = 4%
+\end{aligned}
 $$
 
 
@@ -92,13 +96,17 @@ Suppose that, for the same reference entity, the 3-year CDS spread is 50 bps whi
 
 The average PD between year 3 and year 5 is:
 $$
+\begin{aligned}
 \frac {5 * 0.0125 - 3 * 0.015}2 = 0.01875 = 1.875%
+\end{aligned}
 $$
 
 - The general formula for inferring the intermediate average PD between an y-ear CDS and x-year CDS, with y > x, is
 
 $$
+\begin{aligned}
 \frac{y * PD_y - x * PD_x}{y-x}
+\end{aligned}
 $$
 
 Where PDx is the average PD for the x-year CDS.
@@ -206,8 +214,8 @@ The application of **blockchain technology** to credit default swaps is increasi
 
 #### Benefits of CDS on Blockchain
 
-- **Transparency**: A blockchain ledger can make CDS positions and exposures visible in real-time (while maintaining privacy with zero-knowledge proofs or permissioned chains).
-- **Smart Contracts**: CDS terms could be codified into smart contracts, ensuring automatic execution of payouts when predefined events are triggered.
+- **Transparency**: A blockchain ledger can make CDS positions and exposures visible in real-time through the use of public blockchain.
+- **Smart Contracts**: CDS terms could be codified into smart contracts, ensuring automatic execution of payouts when predefined transactions are triggered.
 - **Reduced Counterparty Risk**: Using decentralized finance (DeFi) principles and collateralized protocols, blockchain-based CDS could reduce the risk of one party defaulting.
 - **Auditability and Traceability**: Each transaction is permanently recorded, making audits simpler and reducing potential fraud.
 
@@ -299,6 +307,14 @@ While CDS contracts in the US and EU share the same core mechanics, their **regu
 -  The **US allows greater flexibility**, especially for hedge funds and speculative investors. 
 
 These differences impact **how investors hedge, speculate, and manage risk** across jurisdictions.
+
+### Mindmap
+
+Made with the help of ChatGPT
+
+![credit-default-swap-mindmap]({{site.url_complet}}/assets/article/finance/credit-default-swap-mindmap.png)
+
+
 
 ## Reference
 

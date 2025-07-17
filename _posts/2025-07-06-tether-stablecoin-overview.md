@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "#Tether USDT smart contract Overview"
+title: "Tether USDT smart contract - Overview"
 date: 2025-07-06
 lang: en
 locale: en-GB
@@ -28,6 +28,10 @@ USDT operates through a Solidity-based smart contract first deployed on Ethereum
 
 USDT operates across multiple chains (Ethereum, Tron, Solana, and others), but the original Ethereum contract remains a useful reference for understanding how USDT works.
 
+[TOC]
+
+
+
 ## Overview
 
 ### High-Level Overview
@@ -51,18 +55,7 @@ USDT operates across multiple chains (Ethereum, Tron, Solana, and others), but t
 
 ------
 
-#### Ownable ContractHigh-Level Overview
-Name: TetherToken
-
-Deployed: November 2017
-
-Language: Solidity ^0.4.17
-
-ERC Standard: Implements ERC20 with custom extensions
-
-Design Pattern: Inherits from multiple base contracts (Ownable, Pausable, BlackList, StandardToken)
-
-Purpose: Mintable, burnable stablecoin backed by fiat (off-chain), with owernship controls for upgrades, blacklisting, and pausing.
+#### Ownable Contract
 
 - Provides owner-only access control.
 - Enables ownership transfer.
@@ -742,13 +735,13 @@ contract TetherToken is Pausable, StandardToken, BlackList {
 
 USDT is a centralized stablecoin as shown in the following table:
 
-| Feature                           | Centralization Risk? | Notes                                 |
-| --------------------------------- | -------------------- | ------------------------------------- |
-| `pause()`                         | ✅                    | Owner can halt all transfers          |
-| `blacklist` & `destroyBlackFunds` | ✅                    | Owner can confiscate user funds       |
-| `issue()` / `redeem()`            | ✅                    | Mint and burn at will by owner        |
-| `deprecated` upgrade path         | ✅                    | Users can't opt out of upgrade        |
-| `fees`                            | ✅                    | Can be changed within limits by owner |
+| Feature                           | Centralization Risk? | Notes                                         |
+| --------------------------------- | -------------------- | --------------------------------------------- |
+| `pause()`                         | &#x2611;             | &#x2611;Owner can halt all transfers          |
+| `blacklist` & `destroyBlackFunds` | &#x2611;             | &#x2611;Owner can confiscate user funds       |
+| `issue()` / `redeem()`            | &#x2611;             | &#x2611;Mint and burn at will by owner        |
+| `deprecated` upgrade path         | &#x2611;             | &#x2611;Users can't opt out of upgrade        |
+| `fees`                            | &#x2611;             | &#x2611;Can be changed within limits by owner |
 
 
 
