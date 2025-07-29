@@ -1,27 +1,27 @@
 ---
 layout: post
-title: "AWS re:Invent 2024 - Blockchain wallets on AWS: Secure, smart, and scalable"
-date: 2025-07-17
+title: "Blockchain wallets on AWS with Fireblocks and Circle"
+date: 2025-07-29
 lang: en
 locale: en-GB
-categories: security
-tags: amazon enclave nitro secure-environement
-description: AWS Nitro Enclaves, a feature of Amazon EC2,  aims to offer highly isolated and secure execution environments.
-image: /assets/article/virtualization/amazon/nitro_enclaves_eks.png
+categories: security cryptography
+tags: amazon enclave nitro secure-environement fireblocks circle wallet
+description: Deep dive into blockchain wallets with Circle and Fireblocks and explore how they use AWS services such as AWS Nitro Enclave
+image: /assets/article/virtualization/amazon/circle-amazon.png
 isMath: false
 ---
 
-###### 
+This article explores how to build wallet solutions using AWS procucts.
 
-# 
+AWS Nitro Enclaves enables confidential computing for secure key management in blockchain applications. Learn how **Circle** leverages AWS to support USDC, Programmable Wallets, and global financial services, and how **Fireblocks** uses Nitro Enclaves to strengthen multi-party computation (MPC) wallet infrastructure. 
 
-> This article is a summary of the following video [AWS re:Invent 2024 - Blockchain wallets on AWS: Secure, smart, and scalable](https://www.youtube.com/watch?v=hKZtadwZgw8) made with noteGPT and with a few annotation by me
+This article is a summary of the following video [AWS re:Invent 2024 - Blockchain wallets on AWS: Secure, smart, and scalable](https://www.youtube.com/watch?v=hKZtadwZgw8) made with [NoteGPT](https://notegpt.io) and with a few annotation by me.
 
 [TOC]
 
 
 
-### **Building Blocks of Blockchain Wallets**
+## Building Blocks of Blockchain Wallets
 
 Developing blockchain wallets demands a secure and scalable architecture. Key components include:
 
@@ -38,7 +38,7 @@ Developing blockchain wallets demands a secure and scalable architecture. Key co
 
 ---
 
-### Amazon product
+## Amazon product
 
 ### AWS Lambda
 
@@ -64,6 +64,16 @@ There are no additional charges for using AWS Nitro Enclaves other than the use 
 
 See also my article [AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data](https://rya-sge.github.io/access-denied/2025/07/17/aws-nitro-enclaves-overview/)
 
+#### AWS Nitro Enclaves for Blockchain Workloads
+
+AWS Nitro Enclaves enhance security and isolation for blockchain applications. These lightweight, constrained virtual machines operate independently within an EC2 instance, ensuring:
+
+- **Data Protection**: No external networking or administrator access.
+- **Isolation**: Enclaves are entirely separate from the parent instance.
+- **Ephemeral Storage**: All data exists only in memory, ensuring transient security.
+
+Nitro Enclaves support cryptographic attestation, allowing enclaves to verify their integrity and state. This feature integrates seamlessly with KMS policies, ensuring only trusted applications access sensitive keys.
+
 ### Implementing Blockchain Wallets on AWS
 
 1. **Hot Wallets**
@@ -73,7 +83,7 @@ See also my article [AWS Nitro Enclaves: Secure and Isolated Compute for Sensiti
 
 ---
 
-### Advanced Wallet Solutions by Circle
+## Advanced Wallet Solutions by Circle
 
 Circle offers  programmable wallets built on its blockchain infrastructure. Their solutions cater to developers with varying expertise, from crypto-native to Web2 developers unfamiliar with blockchain intricacies. Key offerings include:
 
@@ -87,9 +97,9 @@ Circle’s architecture integrates AWS KMS and MPC servers for robust key manage
 
 
 
-![circle-amazon](../assets/article/virtualization/amazon/circle-amazon.png)
+![circle-amazon]({{site.url_complet}}/assets/article/virtualization/amazon/circle-amazon.png)
 
-### Fireblocks and Nitro Enclaves for Institutional Blockchain Infrastructure
+## Fireblocks and Nitro Enclaves for Institutional Blockchain Infrastructure
 
 Fireblocks provide blockchain infrastructure and wallet services to institutional clients like Bank of New York Mellon and ANZ. Handling such high transaction volumes requires robust and secure systems, which is where **Nitro Enclaves** and confidential computing come into play.
 
@@ -108,38 +118,28 @@ Fireblocks customers can choose to utilize an `AWS Nitro Enclave` for their API 
 
 To enhance security, all operations involving these shards are performed within secure environments, such as AWS Nitro Enclaves, ensuring that sensitive data is never exposed nor manipulated, whether in storage or in use.
 
-![FB-AWS-Nitro](../assets/article/virtualization/amazon/FB-AWS-Nitro.jpg)
+![FB-AWS-Nitro]({{site.url_complet}}/assets/article/virtualization/amazon/FB-AWS-Nitro.jpg)
 
 Reference: [Fireblocks - Support for AWS Nitro Enclaves on Fireblocks](https://www.fireblocks.com/blog/support-for-aws-nitro-enclaves-on-fireblocks/)
 
-#### Transaction Flow and Security Focus
+### Transaction Flow and Security Focus
 
 1. **Transaction Initialization**: Transactions are created via a web UI or API and processed by the policy engine, which enforces user-defined rules.
 2. **Serialization and Signing**: Protocol-specific serialization converts the transaction into the correct format before signing with private keys.
 
 Critical stages like the policy engine, serialization, and signing are fortified with confidential computing.
 
-#### Multiparty Computation (MPC) and Key Security
+### Multiparty Computation (MPC) and Key Security
 
 - MPC ensures no single point of failure by splitting keys into logical shards managed by multiple co-signers.
 - Key shards are distributed among Fireblocks’ co-signers and a customer-hosted co-signer, eliminating the risk of key theft from a single location.
 
-#### Co-Signer Architecture
+### Co-Signer Architecture
 
 1. **Setup**: Customers configure S3 buckets, Nitro-enabled EC2 instances, and AWS KMS keys.
 2. **Encrypted Database (KMS keys)**: Key shards stored in S3 are encrypted using KMS keys.
 3. **Attestation and Decryption**: The enclave verifies its integrity via KMS attestation before decrypting the database.
 4. **Signing Transactions**: The co-signer fetches transactions, participates in MPC communications, and signs securely.
-
-### AWS Nitro Enclaves for Blockchain Workloads
-
-AWS Nitro Enclaves enhance security and isolation for blockchain applications. These lightweight, constrained virtual machines operate independently within an EC2 instance, ensuring:
-
-- **Data Protection**: No external networking or administrator access.
-- **Isolation**: Enclaves are entirely separate from the parent instance.
-- **Ephemeral Storage**: All data exists only in memory, ensuring transient security.
-
-Nitro Enclaves support cryptographic attestation, allowing enclaves to verify their integrity and state. This feature integrates seamlessly with KMS policies, ensuring only trusted applications access sensitive keys.
 
 
 
@@ -150,5 +150,3 @@ Nitro Enclaves support cryptographic attestation, allowing enclaves to verify th
 Blockchain wallets are the backbone of decentralized applications, and implementing them securely is critical. 
 
 The goal of AWS services, particularly Nitro Enclaves, is to provide a framework for developing wallets that are secure, smart, and scalable. 
-
-## 
