@@ -37,21 +37,21 @@ Reference: [AWS - What is Nitro Enclaves?](https://docs.aws.amazon.com/enclaves/
 
 Nitro Enclaves are built on the **AWS Nitro System**, the same hypervisor that powers EC2, ensuring performance, security, and hardware-level isolation. Here's how the architecture works:
 
-### 🔹 Parent Instance
+### Parent Instance
 
 A Nitro-based EC2 instance that hosts the enclave. It allocates dedicated vCPUs and memory for the enclave and is the only entity allowed to communicate with it—via a secure local channel called **vsock**.
 
 Reference: [Nitro Enclaves concepts - Parent instance](https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave-concepts.html#term-parent)
 
-### 🔹 Enclave
+### Enclave
 
 The enclave is a separate VM with its own kernel, vCPUs, and memory. It is launched using an **Enclave Image File (.eif)**, which contains the OS, libraries, and enclave application. Once created, the enclave is isolated from both the parent instance and the external world.
 
-### 🔹 Vsock (Virtual Socket)
+### Vsock (Virtual Socket)
 
 Since there’s no network access, **vsock** serves as the only communication channel between the parent instance and its enclaves. It allows local inter-process communication in a secure and controlled way.
 
-### 🔹 Nitro CLI & SDK
+### Nitro CLI & SDK
 
 - **Nitro CLI**: Command-line interface used to create, manage, and terminate enclaves.
 - **Nitro Enclaves SDK**: A developer toolkit to write enclave-aware applications and interact with services like **AWS KMS** using **attestation**.

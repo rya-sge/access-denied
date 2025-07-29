@@ -1,6 +1,17 @@
-# Understanding `abi.encode`, `abi.encodePacked`, and `abi.encodeWithSignature` in Solidity
+---
+layout: post
+title: Solidity ABI Encoding – Overview
+date: 2025-07-29
+lang: en
+locale: en-GB
+categories: solidity ethereum blockchain
+tags: abiencode encodePacked encodeWithSignature ABI
+description: This article presents the differences between abi.encode, abi.encodePacked, and abi.encodeWithSignature in Solidity. Use cases, examples, and security tips.
+image: 
+isMath: 
+---
 
-In Solidity, the Ethereum smart contract programming language, **ABI encoding** is crucial when dealing with low-level interactions such as function calls, hashing, or interacting with other contracts. 
+In Solidity, **ABI encoding** is crucial when dealing with low-level interactions such as function calls, hashing, or interacting with other contracts. 
 
 Solidity provides three commonly used encoding functions:
 
@@ -13,8 +24,6 @@ Each serves a specific purpose, and choosing the right one is important—not ju
 
 
 ## Summary Table
-
-
 
 | Function                       | Encodes?       | Output Size | Use For                                       | Use                                                       | Security Notes                |
 | ------------------------------ | -------------- | ----------- | --------------------------------------------- | --------------------------------------------------------- | ----------------------------- |
@@ -35,8 +44,6 @@ Each serves a specific purpose, and choosing the right one is important—not ju
 `abi.encode(...)` encodes data according to the Ethereum ABI (Application Binary Interface). This format is used when calling functions, returning data, or interacting with contracts in a standard way.
 
 Each argument gets padded to a fixed 32-byte size, reducing the risk of ambiguity between arguments.
-
-https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity
 
 ### Characteristics:
 
@@ -92,6 +99,8 @@ If you use `keccak256(abi.encodePacked(a, b))` and both `a` and `b` are dynamic 
 
 If you use `abi.encodePacked` for signatures, authentication or data integrity, make sure to always use the same types and check that **at most one** of them is dynamic. Unless there is a compelling reason, `abi.encode` should be preferred.
 
+See also [Nethermind - Understanding Hash Collisions: abi.encodePacked in Solidity](https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity)
+
 #### Example:
 
 Another example from [aderyn](https://github.com/Cyfrin/aderyn/blob/aderyn-v0.5.8/aderyn_core/src/detect/high/abi_encode_packed_hash_collision.rs): 
@@ -142,7 +151,36 @@ Several static analyzer tools use specific detectors to detect a bad use of `abi
 
 [crytic/slither](https://github.com/crytic/slither)
 
-see [slithe - #abi-encodePacked-collision](https://github.com/crytic/slither/wiki/Detector-Documentation#abi-encodePacked-collision)
+See [Slither - #abi-encodePacked-collision](https://github.com/crytic/slither/wiki/Detector-Documentation#abi-encodePacked-collision) and [Slither - Encode_packed.py](https://github.com/crytic/slither/blob/master/slither/detectors/operations/encode_packed.py)
+
+```python
+def _detect_abi_encodePacked_collision(contract: Contract):
+    """
+    Args:
+        contract (Contract)
+    Returns:
+        list((Function), (list (Node)))
+    """
+    ret = []
+    # pylint: disable=too-many-nested-blocks
+    for f in contract.functions_and_modifiers_declared:
+        for ir in f.solidity_calls:
+            if ir.function == SolidityFunction("abi.encodePacked()"):
+                dynamic_type_count = 0
+                for arg in ir.arguments:
+                    if is_tainted(arg, contract) and _is_dynamic_type(arg):
+                        dynamic_type_count += 1
+                    elif dynamic_type_count > 1:
+                        ret.append((f, ir.node))
+                        dynamic_type_count = 0
+                    else:
+                        dynamic_type_count = 0
+                if dynamic_type_count > 1:
+                    ret.append((f, ir.node))
+    return ret
+```
+
+
 
 ### Aderyn 
 
@@ -200,20 +238,10 @@ abi.encodeWithSelector(bytes4(keccak256("transfer(address,uint256)")), recipient
 
 ### Safe To Use?
 
-✅ Yes, **but**:
+ Yes, **but**:
 
 - You must make sure the function signature string is **correctly spelled and formatted**.
 - **Does not check if the target contract actually has that function**. You’re sending raw bytes to a low-level `call`.
-
-------
-
-## 
-
-|      |      |      |      |      |
-| ---- | ---- | ---- | ---- | ---- |
-|      |      |      |      |      |
-|      |      |      |      |      |
-|      |      |      |      |      |
 
 ------
 
@@ -232,14 +260,9 @@ Solidity's encoding functions are powerful tools for interacting with smart cont
 
 If you’re building anything with signature verification, unique identifiers, or low-level contract calls, **choose your encoding method carefully**. The wrong choice could lead to **critical security vulnerabilities**.
 
+## Reference 
 
-
-
-
-abi.encodeCall ?
-
-https://www.cyfrin.io/glossary/abi-encode-solidity-code-example
-
-https://medium.com/@scourgedev/deep-dive-into-abi-encode-types-padding-and-disassembly-84472f1b4543
-
-https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity
+-  [Nethermind - Understanding Hash Collisions: abi.encodePacked in Solidity](https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity)
+- [Cyfrin - ABI Encode (Solidity Code Example)](https://www.cyfrin.io/glossary/abi-encode-solidity-code-example)
+- [0xScourgedev - Deep Dive into abi.encode: Types, Padding, and Disassembly](https://medium.com/@scourgedev/deep-dive-into-abi-encode-types-padding-and-disassembly-84472f1b4543)
+- [RareSkills - Understanding ABI encoding for function calls](https://rareskills.io/post/abi-encoding)

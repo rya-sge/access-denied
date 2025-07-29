@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs"
-date:   2024-06-10
+date:   2025-07-29
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP
-tags: zeroknowledge zkp
-description: Overview of the main development frameworks to build zero-knowledge system which Plonky2(Polygon), Halo2(Zcash), Boojum (Matter Labs),...
-image: /assets/article/cryptographie/zero-knowledge-proof/zcash-zec-logo.png
+tags: zeroknowledge zkp zk-snark
+description: This article explains the cryptography behind zk-SNARKs and compares them to other zero-knowledge proofs like STARKs and Bulletproofs.
+image: /assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark.drawio.png
 isMath: true
 ---
 
@@ -29,7 +29,7 @@ Zero-Knowledge  Proof are widely used in blockchain technology to enhance privac
 
 
 
-![zk-snark.drawio](../assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark.drawio.png)
+![zk-snark.drawio]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark.drawio.png)
 
 ------
 
@@ -306,17 +306,15 @@ Reference: [Mina Protocol - What are zk-SNARKs?](https://minaprotocol.com/blog/w
 
 Enables proving identity attributes (e.g., age or citizenship) without revealing detailed personal data.
 
-## Who Use snark:
+## Who Use snark
 
-Starkware, Aztec, MatterLabs, Espresso systems, Risk Zero, Scroll, Polyon, Alexo Suppra National, INgonyama
-
-
+--> To do 
 
 ### Atzec - Plonk
 
 ------
 
-#### Comparison with Other Zero-Knowledge Systems
+## Comparison with Other Zero-Knowledge Systems
 
 | **Feature**            | **zk-SNARK**                         | **zk-STARK**                      | **Bulletproofs**                  |
 | ---------------------- | ------------------------------------ | --------------------------------- | --------------------------------- |
@@ -332,7 +330,7 @@ Starkware, Aztec, MatterLabs, Espresso systems, Risk Zero, Scroll, Polyon, Alexo
 
 ------
 
-#### Security of zk-SNARKs Against Quantum Computers
+## Security of zk-SNARKs Against Quantum Computers
 
 The security of zk-SNARKs relies on cryptographic primitives like elliptic curve pairings and discrete logarithms. These problems are computationally hard for classical computers but susceptible to attacks by quantum computers, particularly with Shor's algorithm. A sufficiently powerful quantum computer could compromise the integrity of zk-SNARK-based systems.
 
@@ -373,19 +371,21 @@ Reference: [zokrates.github.io - proving_schemes.html](https://zokrates.github.i
 
 ### Plonk
 
-Universal and Updateable Trusted Setup: 
+> Universal and Updateable Trusted Setup
 
-Like many other zero-knowledge proof schemes, PLONK still requires a trusted setup procedure. In a trusted setup, a set of initial parameters is generated, and the security of the scheme depends on keeping these parameters secret.
+PLONK requires a **trusted setup** procedure. In a trusted setup, a set of initial parameters is generated, and the security of the scheme depends on keeping these parameters secret.
 
 - PLONK's trusted setup is universal and updateable. This means that instead of needing a separate trusted setup for each program to be proven, there is one single trusted setup that can be used with any program (up to a certain maximum size defined during setup). 
 - The trusted setup can involve multiple parties, and it remains secure as long as at least one of the participants is honest. 
 - This multi-party procedure is sequential, allowing participants to be added over time, which increases the safety of the setup in practice.
 
-PLONK relies on a single standardized component called a "polynomial commitment." Polynomial commitments are cryptographic tools that enable efficient verification of polynomial equations. PLONK uses "Kate commitments," which are based on trusted setups and elliptic curve pairings. However, the scheme is flexible, allowing alternative schemes like FRI or DARK to be used instead. This means that different trade-offs between proof size and security assumptions can be achieved by swapping out the polynomial commitment scheme. The ability to choose different schemes caters to various use cases and developer preferences.
+PLONK relies on a single standardized component called a **polynomial commitment**. 
 
-https://zkplabs.network/blog/Introduce-PLONK-Revolutionizing-ZK-SNARK-Technology-for-Efficiency-and-Privacy
+- Polynomial commitments are cryptographic tools that enable efficient verification of polynomial equations. 
+- PLONK uses **Kate commitments**, which are based on trusted setups and elliptic curve pairings. However, the scheme is flexible, allowing alternative schemes like FRI or DARK to be used instead. 
+- This means that different trade-offs between proof size and security assumptions can be achieved by swapping out the polynomial commitment scheme. 
 
-## Use Case
+Reference: [zkplabs - Introduce PLONK: Revolutionizing ZK-SNARK Technology for Efficiency and Privacy](https://zkplabs.network/blog/Introduce-PLONK-Revolutionizing-ZK-SNARK-Technology-for-Efficiency-and-Privacy)
 
 ------
 
@@ -395,9 +395,7 @@ zk-SNARKs enables privacy-preserving, efficient, and scalable solutions across v
 
 However, the reliance on trusted setups and their vulnerability to quantum computers are notable challenges. zk-STARKs and Bulletproofs offer alternatives with distinct trade-offs.
 
-Future advancements in quantum-resistant algorithms and decentralized trusted setups will likely shape the evolution of zk-SNARKs, ensuring their relevance against quantum computer.
-
-
+Future advancements in quantum-resistant algorithms and decentralized trusted setups will likely be the main point for the evolution of zk-SNARKs.
 
 ## Library
 

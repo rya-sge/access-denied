@@ -1,13 +1,13 @@
 ---
 layout: post
 title: Automated Market Makers (AMMs) - Overview
-date: 2025-02-07
+date: 2025-07-29
 lang: en
 locale: en-GB
 categories: defi blockchain ethereum
 tags: automated-market-maker amm defi
 description: Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi). This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
-image: /assets/article/mlg/supervised-unsupervised-learning.png
+image: /assets/article/blockchain/defi/curve/curve-formula.png
 isMath: true
 ---
 
@@ -39,7 +39,9 @@ The **constant product formula** is the most popular AMM model, popularized by U
 
 The equation implemented and used by Uniswap V2 is the following:
 $$
+\begin{aligned}
 x⋅y=k
+\end{aligned}
 $$
 Here:
 
@@ -57,11 +59,15 @@ If 1 ETH costs 1000 USDC, then 1 USDC costs 0.001 ETH.
 
 The prices of tokens in a pool are determined by the supply of the tokens, that is by **the amounts of reserves of the tokens** that the pool is holding. Token prices are simply relations of reserves:
 $$
+\begin{aligned}
 P_x = y/x
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 P_y = x/y
+\end{aligned}
 $$
 
 Where `Px` and  `Px`are prices of tokens in terms of the other token
@@ -70,7 +76,11 @@ Where `Px` and  `Px`are prices of tokens in terms of the other token
 
 The result is a **hyperbola** where liquidity is always available but at increasingly higher prices, which approach infinity at both ends.
 
-![https://cdn.prod.website-files.com/5f75fe1dce99248be5a892db/63989f611320ebd8802b8422_63752abf0dbac21f659e13db_quantity%2520of%2520assets.png](https://cdn.prod.website-files.com/5f75fe1dce99248be5a892db/63989f611320ebd8802b8422_63752abf0dbac21f659e13db_quantity%2520of%2520assets.png)
+![uniswap-amm]({{site.url_complet}}/assets/article/blockchain/defi/uniswap/uniswap-amm.png)
+
+Reference image: [Dmitriy Berenzon - DeFi’s “Zero to One” Innovation](https://medium.com/bollinger-investment-group/constant-function-market-makers-defis-zero-to-one-innovation-968f77022159)
+
+See also [Uniswap - How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
 
 #### How It Works:
 
@@ -92,15 +102,11 @@ The result is a **hyperbola** where liquidity is always available but at increas
 
 ## Implementation
 
+Here the implementation from Uniswap V2, function [swap](https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol#L182)
 
-
+```solidity
+ require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'UniswapV2: K');
 ```
-    uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
-```
-
-https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol#L28
-
-
 
 There are four variables inside the `require` statement:
 
@@ -109,38 +115,53 @@ There are four variables inside the `require` statement:
 - `_reserve0`: Reserves of token `x` prior to the swap.
 - `_reserve1`: Reserves of token `y `prior to the swap.
 
-https://medium.com/better-programming/uniswap-v2-in-depth-98075c826254
+
+
+The simplify version gives the following formula:
 $$
+balance0Adjusted * balance1Adjusted >= \_reserve0 * \_reserve1
+$$
+In equation, it gives:
+
+
+$$
+\begin{aligned}
 x * y = k
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 x' * y' = k
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 x * y = x' * y'
+\end{aligned}
 $$
 
 
 
-```
-balance0Adjusted * balance1Adjusted >= _reserve0 * _reserve1
-```
+Where
+
+- `x` is `reserve0` and  `x'`  is  `balance0Adjusted`
+- `y`is `reserve1`and `y'`is `balance1Adjusted`
 
 
 
-#### Example 
+The smart contract stores also the `k`value in the public variable [KLast](https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol#L28)
 
-Uniswap V2: https://uniswapv3book.com/milestone_0/constant-function-market-maker.html
+See also [Uniswap V2 in Depth](https://medium.com/better-programming/uniswap-v2-in-depth-98075c826254)
 
-https://app.uniswap.org/whitepaper.pdf
+#### Resources:
 
-https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works
-
-https://medium.com/@chaisomsri96/defi-math-about-uniswap-v2-lazy-liquidity-d73f9ef9d6e7
-
-https://medium.com/@kinaumov/back-to-the-basics-uniswap-balancer-curve-e930c3ad9046
+- [Constant Function Market Makers](https://uniswapv3book.com/milestone_0/constant-function-market-maker.html#constant-function-market-makers)
+- [Uniswap Whitepaper](https://app.uniswap.org/whitepaper.pdf)
+- [Uniswap V2 - How Uniswap works](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works)
+- [Chaisomsri - [DeFi Math] About Uniswap V2 Lazy Liquidity](https://medium.com/@chaisomsri96/defi-math-about-uniswap-v2-lazy-liquidity-d73f9ef9d6e7)
+- [Kirill Naumov - Back to the Basics: Uniswap, Balancer, Curve](https://medium.com/@kinaumov/back-to-the-basics-uniswap-balancer-curve-e930c3ad9046)
 
 ### Bancor - Smart token
 
@@ -150,7 +171,7 @@ A smart token holds a balance of least one other reserve token, which can be a d
 
 Smart tokens are issued when purchased and destroyed when liquidiation
 
-Bancor uses the term of CRR to design K: Constant Reserve Ratio.
+Bancor uses the term of CRR to design K: `Constant Reserve Ratio`.
 
 This constant was set by the smart token creator, for each reserve token and uses in price calcalation.
 $$
@@ -173,7 +194,9 @@ See [Bancor whitepaper](https://www.securities.io/bancor-whitepaper/)
 
 The **constant sum formula** is expressed as:
 $$
-x+y=k
+\begin{aligned}
+x + y = k
+\end{aligned}
 $$
 This model is less common but ensures no slippage for trades until the pool is depleted.
 
@@ -195,9 +218,7 @@ The result graph is a function affine, which means that this model does not prov
 - **Vulnerability to Arbitrage**: Can be drained easily if asset prices deviate significantly.
 - **Limited Use Cases**: Not suitable for volatile or uncorrelated assets.
 
-See also:
-
-https://en.wikipedia.org/wiki/Constant_function_market_maker
+See also:[Wikipedia - Constant function market maker](https://en.wikipedia.org/wiki/Constant_function_market_maker)
 
 ------
 
@@ -216,7 +237,9 @@ Example:
 
 For a liquidity pool with three assets, the equation would be the following
 $$
-(x*y*z)^{⅓}=k
+\begin{aligned}
+(x*y*z)^{⅓} = k
+\end{aligned}
 $$
 . This allows for variable exposure to different assets in the pool and enables swaps between any of the pool’s assets.
 
@@ -270,7 +293,7 @@ Curve Finance introduced the **StableSwap** formula, optimized for assets with s
 
 To find a balance between these two extremes, the proposed solution introduces a dimensionless **leverage parameter (χ)**. By adjusting χ, the invariant can smoothly transition between a constant-product invariant (when χ = 0) and a constant-sum invariant (when χ = ∞). To ensure consistency, the constant-sum invariant is multiplied by χDn−1, where D represents the total value of coins in the pool and n is the number of coins. This results in an invariant that incorporates both characteristics and allows for flexible adjustment of leverage.
 
-![curve-formula](../assets/article/blockchain/defi/curve/curve-formula.png)
+![curve-formula]({{site.url_complet}}/assets/article/blockchain/defi/curve/curve-formula.png)
 
 #### Graph
 
@@ -278,13 +301,13 @@ Graphs are from the StableSwap whitepaper
 
  Comparison of StableSwap invariant with Uniswap (constant-product) and constant price invariants. The portfolio consists of coins X and Y which have the “ideal” price of 1.0. There are x = 5 and y = 5 coins loaded up initially. As x decreases, y increases, and the price is the derivative dy/dx.
 
-![curve-graph](../assets/article/blockchain/defi/curve/curve-graph.png)
+![curve-graph]({{site.url_complet}}/assets/article/blockchain/defi/curve/curve-graph.png)
 
 The price slippage (Fig. 2) is much smaller, if compared to constant-product invariant. The StableSwap invariant has an “amplification coefficient” parameter: the lower it is, the closer the invariant is to the constant product. When calculating slippage, we use a practical value of A = 100. This is somewhat comparable to using Uniswap with 100x leverage.
 
 Price slippage: Uniswap invariant (dashed line) vs Stableswap (solid line)
 
-![curve-price-slippage](../assets/article/blockchain/defi/curve/curve-price-slippage.png)
+![curve-price-slippage]({{site.url_complet}}/assets/article/blockchain/defi/curve/curve-price-slippage.png)
 
 ------
 
@@ -307,20 +330,20 @@ Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that co
 
 
 
-## Hybrid Constant Function Market Maker (HCFMM)
+**Hybrid Constant Function Market Maker (HCFMM)** is mentioned in a [KPMG report](https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2021/10/crypto-insights-part-2-decentralised-exchanges-and-automated-market-makers.pdf), but I haven't really found any further explanation
 
 
-
-https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2021/10/crypto-insights-part-2-decentralised-exchanges-and-automated-market-makers.pdf
 
 ## Summary tab
 
-| **Formula Type**             | **Formula**                             | Graph           | **Best Use Case**                       | **Advantages**                                | **Limitations**                                         |
-| ---------------------------- | --------------------------------------- | --------------- | --------------------------------------- | --------------------------------------------- | ------------------------------------------------------- |
-| **Constant Product (CPMM)**  | x⋅y=k                                   | Hyperbole       | General-purpose, token swaps            | Simple, continuous liquidity, price discovery | High slippage for large trades, impermanent loss        |
-| **Constant Sum**             | x+y=k                                   | Function affine | Stablecoin or tightly correlated assets | No slippage within the pool                   | Vulnerable to arbitrage, unsuitable for volatile assets |
-| **Constant Mean (Balancer)** | See article                             |                 | Multi-token pools                       | Diversified liquidity, custom weighting       | Complex, higher gas fees                                |
-| **StableSwap**               | Combination of constant sum and product | hyperbola       | Stablecoins, low-volatility pairs       | Low slippage, efficient liquidity             | Limited to specific asset types (e.g stablecoin)        |
+Here is a summary of the different formula
+
+| **Formula Type**            | Apps            | **Formula**                             | Graph           | **Best Use Case**                       | **Advantages**                                | **Limitations**                                         |
+| --------------------------- | --------------- | --------------------------------------- | --------------- | --------------------------------------- | --------------------------------------------- | ------------------------------------------------------- |
+| **Constant Product (CPMM)** | Uniswap, bancor | x⋅y=k                                   | Hyperbole       | General-purpose, token swaps            | Simple, continuous liquidity, price discovery | High slippage for large trades, impermanent loss        |
+| **Constant Sum**            |                 | x+y=k                                   | Function affine | Stablecoin or tightly correlated assets | No slippage within the pool                   | Vulnerable to arbitrage, unsuitable for volatile assets |
+| **Constant Mean **          | Balancer        | See article                             |                 | Multi-token pools                       | Diversified liquidity, custom weighting       | Complex, higher gas fees                                |
+| **StableSwap**              |                 | Combination of constant sum and product | hyperbola       | Stablecoins, low-volatility pairs       | Low slippage, efficient liquidity             | Limited to specific asset types (e.g stablecoin)        |
 
 ------
 
