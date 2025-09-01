@@ -17,6 +17,12 @@ Unlike traditional order book-based exchanges, AMMs use mathematical formulas to
 
 This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
 
+
+
+[TOC]
+
+
+
 ## Brief history
 
 The original AMMs based on `constant product market makers`were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread (often 10% or even higher) during a trade on the plaform available at that moment (MKR market, etherdelta). 
@@ -33,7 +39,7 @@ Reference: [Jennifer Albert - A historical account with Dr. Mark Richardson, Ban
 
 ------
 
-### 1. **Constant Product Market Maker (CPMM)**
+### Constant Product Market Maker (CPMM)
 
 The **constant product formula** is the most popular AMM model, popularized by Uniswap and Bancor, the first AMM-based Dex. 
 
@@ -190,7 +196,7 @@ See [Bancor whitepaper](https://www.securities.io/bancor-whitepaper/)
 
 ------
 
-### 2. **Constant Sum Market Maker** (CSMM)
+### Constant Sum Market Maker (CSMM)
 
 The **constant sum formula** is expressed as:
 $$
@@ -222,7 +228,7 @@ See also:[Wikipedia - Constant function market maker](https://en.wikipedia.org/w
 
 ------
 
-### 3. **Constant Mean Market Maker (CMMM / Balancer)**
+### Constant Mean Market Maker (CMMM / Balancer)
 
 Balancer pools generalize the constant product formula by allowing multiple assets with custom weightings. The formula is:
 $$
@@ -262,7 +268,7 @@ See also [Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.li
 
 
 
-### 4. **StableSwap (Curve)**
+### StableSwap (Curve)
 
 [StableSwap whitepaper](https://docs.curve.fi/assets/pdf/stableswap-paper.pdf)
 
@@ -311,7 +317,7 @@ Price slippage: Uniswap invariant (dashed line) vs Stableswap (solid line)
 
 ------
 
-### 5. **Hybrid Models**
+### Hybrid Models
 
 Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that combine elements of the above models or introduce innovative mechanisms. These include:
 

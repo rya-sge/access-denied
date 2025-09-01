@@ -35,8 +35,6 @@ Each serves a specific purpose, and choosing the right one is important—not ju
 
 
 
-------
-
 ## `abi.encode(...)`
 
 ### What It Does:
@@ -101,6 +99,18 @@ If you use `abi.encodePacked` for signatures, authentication or data integrity, 
 
 See also [Nethermind - Understanding Hash Collisions: abi.encodePacked in Solidity](https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity)
 
+#### Dynamic types in Solidity
+
+Here a list of dynamic types:
+
+1. **`bytes`** (dynamically sized byte array)
+2. **`string`** (UTF-8 encoded, dynamically sized)
+3. **`T[]` dynamic arrays** (for any type `T`, including nested dynamic arrays like `uint[][]`)
+4. **`mapping`** (conceptually dynamic, but cannot be directly encoded)
+5. **`structs` containing any of the above dynamic types**
+
+*(Note: `bytes1`…`bytes32` and fixed-size arrays are **static types** and do not pose this specific risk.)*
+
 #### Example:
 
 Another example from [aderyn](https://github.com/Cyfrin/aderyn/blob/aderyn-v0.5.8/aderyn_core/src/detect/high/abi_encode_packed_hash_collision.rs): 
@@ -141,7 +151,7 @@ let hash : [ u8 ; 32] = keccak256 ( data . as_bytes ());
 }
 ```
 
-https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity
+See also [Understanding Hash Collisions: abi.encodePacked in Solidity](https://www.nethermind.io/blog/understanding-hash-collisions-abi-encodepacked-in-solidity)
 
 #### Static analyser - Detector
 

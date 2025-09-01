@@ -1,0 +1,61 @@
+@startmindmap
+* Sky Protocol - RWA Vault
+** Background
+*** 2024: MakerDAO rebrands to Sky Ecosystem
+*** Launch of USDS (new stablecoin)
+*** USDS: Similar to Dai, soft-pegged, Ethereum IOU via 'vat'
+** RWA Vaults
+*** Introduction
+**** Sky pioneers RWAs in DeFi collateral
+*** Real World Assets
+**** Tokenized off-chain assets: real estate, bonds, loans, etc.
+**** Benefits: stability, diversification, liquidity
+**** Challenges: legal enforcement, valuation, risk mgmt
+*** Vault Mechanism
+**** Traditional Vaults
+***** On-chain assets (ETH, WBTC)
+***** Automated price feed & liquidation
+**** RWA Vaults
+***** Based on MIP21
+***** Use off-chain collateral & legal agreements
+***** Governance-approved deployment into RWAs
+***** Custodians, off-chain oracles, complex compliance
+** Components
+*** RWA Urn
+**** Actual vault instance
+**** Only created by Governance
+**** Operated by approved counterparties
+**** Governed by legal agreements
+*** RWA Token
+**** Tokenized off-chain asset
+**** Not transferable or redeemable
+**** Priced by RWA Oracle
+*** RWA Oracle
+**** Controlled by Governance
+**** Stores price, legal doc (IPFS), liquidation status
+*** Helper Components
+**** RWA Output Conduit
+***** Post-Dai draw processing
+***** Includes conversions or authorizations
+**** RWA Input Conduit
+***** Pre-Dai repayment processing
+***** Allows 3rd party actions or stablecoin swaps
+**** RWA Jar
+***** Used when on-chain stability fee = 0
+***** Collects off-chain fees for Surplus Buffer
+** Liquidation Process
+*** Soft Liquidation
+**** Deal terms breached, fixable
+**** Grace period may apply
+*** Hard Liquidation
+**** Deal unrecoverable
+**** Debt written off from Surplus Buffer
+**** Flop Auctions if needed to restore buffer
+** Future of RWA Vaults
+*** RWA = key for diversification
+*** Managed by "Stars" (independent entities)
+**** Use Allocation System
+**** Borrow from Sky Protocol
+**** Targeted allocations into DeFi & tokenized RWAs
+**** Subject to risk management
+@endmindmap

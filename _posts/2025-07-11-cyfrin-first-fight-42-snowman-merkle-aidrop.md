@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
-description: First Fight 41 - Airdrop protocol on Ethereum.
+description: First Fight 42 - Snowman Merkle Airdrop.
 image: 
 isMath: false
 ---
