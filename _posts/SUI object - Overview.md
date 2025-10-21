@@ -1,12 +1,16 @@
-# SUI object - Overview
+# SUI objects - Overview
 
 [TOC]
 
 ## Summary
 
+On the Sui blockchain, the fundamental building block is the **object**. Unlike traditional account-based blockchains that store state as key-value pairs inside user accounts, Sui organizes all on-chain data around uniquely identifiable objects. Each object is defined and governed by Sui Move smart contracts, and can represent anything from a token or game asset to a complex programmable resource.
+
 ### Reminder
 
-![sui-ability.drawio](C:\Users\super\Documents\github\access-denied\assets\article\blockchain\sui\sui-ability.drawio.png)
+![sui-ability.drawio](../assets/article/blockchain/sui/sui-ability.drawio.png)
+
+
 
 ### Tab
 
@@ -368,3 +372,8 @@ Wrapping allows one Sui object to contain another, turning the inner object into
 - Wrapped objects **cannot be independently mutated**; access is only through the wrapper.
 - Wrapping enforces **ownership control** and is cheaper than using shared objects.
 - Wrapping supports **modular design**: objects can be nested, optional, or in collections.
+
+## Reference
+
+- SUI documentation: 
+- ChatGPT

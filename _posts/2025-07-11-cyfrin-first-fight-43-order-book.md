@@ -79,6 +79,8 @@ L-04. Inconsistent Order State Management - Expired Orders Remain Active[Selecte
 
 L-05. No Token Transfer Check in emergencyWithdrawERC20[Selected submission](https://codehawks.cyfrin.io/c/2025-07-orderbook/s/cmcpcg9wb0005l504qtguxqka) by [evmninja](https://profiles.cyfrin.io/u/evmninja)
 
+---
+
 ## Valid submissions
 
 ### H01-No slippage protection in buyOrder
@@ -171,6 +173,10 @@ if (!order.isActive) revert OrderNotActive();
 
 // rest of the code
 ```
+
+
+
+---
 
 
 
@@ -423,7 +429,7 @@ contract OrderBook is Ownable {
 
 ### Low
 
-### List
+#### List
 
 - L-01. Protocol Suffers Potential Revenue Leakage due to Precision Loss in Fee Calculation[Selected submission](https://codehawks.cyfrin.io/c/2025-07-orderbook/s/cmcugsp0a0005js041oovkzyb) by [hosam](https://profiles.cyfrin.io/u/hosam)
 
@@ -439,23 +445,25 @@ contract OrderBook is Ownable {
 
 
 
-### Protocol Suffers Potential Revenue Leakage due to Precision Loss in Fee Calculation
+#### Protocol Suffers Potential Revenue Leakage due to Precision Loss in Fee Calculation
 
-#### Summary
+##### Summary
 
 The protocol's fee calculation, which uses integer division with low precision (`/ 100`), creates a rounding error that can be exploited. For any trade priced at 33 wei of USDC or less, the calculated 3% fee rounds down to zero, allowing the trade to be processed fee-free. While the high gas cost of performing many small transactions makes a large-scale economic attack impractical today, this represents a fundamental design flaw that causes a **verifiable and permanent leakage of protocol revenue**. This flaw undermines the economic model and should be remediated as a matter of protocol robustness and best practice.
 
-#### Finding Description
+##### Finding Description
 
 The `buyOrder` function calculates the protocol fee using the formula `(order.priceInUSDC * 3) / 100`. Due to Solidity's integer division, any result with a remainder is truncated. Consequently, if the numerator `(order.priceInUSDC * 3)` is less than `100`, the resulting `protocolFee` is `0`. This is true for any `priceInUSDC` value between 1 and 33.
 
+```solidity
 // src/OrderBook.sol:203
 
 uint256 protocolFee = (order.priceInUSDC * FEE) / PRECISION; // FEE = 3, PRECISION = 100
+```
 
 This creates a scenario where users can intentionally price their orders just below the 34 wei threshold to avoid fees. Although a single such transaction has a negligible impact, it establishes a pattern of value leakage that is built into the protocol's core logic.
 
-#### Impact
+##### Impact
 
 The primary impact is a **direct, albeit small, loss of protocol revenue on certain trades**. While the economic viability of a large-scale attack is questionable due to gas costs, the existence of this flaw has several negative consequences:
 
@@ -463,11 +471,11 @@ The primary impact is a **direct, albeit small, loss of protocol revenue on cert
 - **Design Flaw:** It demonstrates a weakness in the handling of financial calculations. In DeFi, even minor rounding errors can be aggregated or combined with other exploits to cause significant issues.
 - **Future Risk:** A reduction in L2 gas fees or the introduction of new protocol features could potentially make this exploit more economically viable in the future.
 
-#### Likelihood
+##### Likelihood
 
 **Medium.** From a technical standpoint, the flaw is easy to trigger. Any user can create a low-priced order. However, the economic incentive to do so at scale is currently low, which reduces the practical likelihood of a major exploit.
 
-#### Proof of Concept
+##### Proof of Concept
 
 The following test demonstrates that an order priced at 33 wei of USDC results in zero fees being collected by the protocol, confirming the rounding vulnerability.
 
@@ -583,7 +591,7 @@ Logs:
 
 The successful test confirms that it is possible to execute a trade without paying any fees, validating the existence of the revenue leakage flaw.
 
-#### **Recommended Mitigation**
+##### Recommended Mitigation
 
 The standard industry practice to prevent such rounding issues is to increase the precision of the calculation by using basis points (1 bp = 0.01%).
 

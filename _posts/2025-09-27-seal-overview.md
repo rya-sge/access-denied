@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Seal: Identity-Based Encryption for Onchain Access Control
+title: "Seal: Identity-Based Encryption for Onchain Access Control"
 date:   2025-09-27
 lang: en
 locale: en-GB
@@ -8,7 +8,7 @@ categories: blockchain cryptography
 tags: sui walrus move seal KEM DEK
 description: Seal is a framework that allows developers to encrypt data using Identity-Based Encryption (IBE) while enforcing onchain access policies on Sui. 
 image:
-isMath: 
+isMath: true
 ---
 
 Seal is a framework that allows developers to encrypt data using **Identity-Based Encryption (IBE)** while enforcing **onchain access policies** on Sui. The system abstracts away cryptographic details from users and developers, ensuring data confidentiality even from Seal itself.
@@ -33,7 +33,9 @@ An IBE scheme consists of four algorithms:
 
 **Correctness:**
 $$
+\begin{aligned}
 Decrypt(Derive(msk, id), Encrypt(mpk, id, m)) = m
+\end{aligned}
 $$
 The **identity domain is arbitrary**, allowing Seal to bind onchain strings to IBE identities.
 
@@ -41,7 +43,7 @@ The **identity domain is arbitrary**, allowing Seal to bind onchain strings to I
 
 ## **Seal Components**
 
-### 1. **Onchain Access Policies**
+### Onchain Access Policies
 
 - Each Move package (`PkgId`) controls a namespace `[PkgId]*`.
 - Developers implement `seal_approve` to define authorization.
@@ -59,7 +61,7 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 ------
 
-### 2. **Off-Chain Key Servers**
+### Off-Chain Key Servers
 
 - Hold the **IBE master secret key**.
 - Only return derived keys if **onchain policies approve**.
@@ -74,7 +76,7 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 ------
 
-### 3. **User Sessions**
+### User Sessions
 
 - Users approve key access per package via wallet.
 - Session keys allow **temporary retrieval** of derived keys without repeated confirmations.

@@ -333,9 +333,13 @@ This provides extra protection against physical attacks.
 
 When enabled, a randomly-generated secret is stored on the microSD card.
 
- When checking your PIN or using your PIN to unlock your Trezor, this secret is combined with the PIN to decrypt data stored on the device (note: with which algorithm?). 
+ When checking your PIN or using your PIN to unlock your Trezor, this secret is combined with the PIN to decrypt data stored on the device.
 
 As a result, the device gets 'bound' to the microSD card and cannot be unlocked without it until you intentionally disable the feature or factory-reset your device.
+
+![trezor-trezor-MicroSD.drawio]({{site.url_complet}}/assets/article/blockchain/wallet/trezor/trezor-trezor-MicroSD.drawio.png)
+
+
 
 Reference: [Trezor - Encrypt PIN with MicroSD card](https://trezor.io/learn/a/encrypt-pin-with-microsd-card?srsltid=AfmBOorwzwQVVwkOQHzutC5PezE_Ghbq3CRdoBchOu9-PQFVt_0-H-zw)
 

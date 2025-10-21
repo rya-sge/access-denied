@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AI Crawler bots (Claude, ChatGPT, Google) - Overview"
-date:   2025-07-29
+date:   2025-09-01
 lang: en
 locale: en-GB
 categories: 
@@ -19,8 +19,8 @@ List of AI crawler bot use for AI training and user actions such as GPTBot, Clau
 
 | User Agent      | Description                                                  | Use  to train models | Use in search result | Use in user actions |
 | --------------- | ------------------------------------------------------------ | -------------------- | -------------------- | ------------------- |
-| PerplexityBot   | `PerplexityBot` is designed to surface and link websites in search results on Perplexity. It is not used to crawl content for AI foundation models. To ensure your site appears in search results, we recommend allowing `PerplexityBot` in your site’s `robots.txt` file and permitting requests from our published IP ranges listed below.  Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`  Published IP addresses: https://www.perplexity.com/perplexitybot.json | No                   | Yes                  | Probably            |
-| Perplexity‑User | `Perplexity-User` supports user actions within Perplexity. When users ask Perplexity a question, it might visit a web page to help provide an accurate answer and include a link to the page in its response. `Perplexity-User` controls which sites these user requests can access. It is not used for web crawling or to collect content for training AI foundation models.  Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Perplexity-User/1.0; +https://perplexity.ai/perplexity-user)`  Published IP addresses: https://www.perplexity.com/perplexity-user.json  Since a user requested the fetch, this fetcher generally ignores robots.txt rules. | No                   | No                   | Yes                 |
+| PerplexityBot   | `PerplexityBot` is designed to surface and link websites in search results on Perplexity. It is not used to crawl content for AI foundation models. To ensure your site appears in search results, we recommend allowing `PerplexityBot` in your site’s `robots.txt` file and permitting requests from our published IP ranges listed below.  Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`  Published IP addresses: [https://www.perplexity.com/perplexitybot.json](https://www.perplexity.com/perplexitybot.json) | No                   | Yes                  | Probably            |
+| Perplexity‑User | `Perplexity-User` supports user actions within Perplexity. When users ask Perplexity a question, it might visit a web page to help provide an accurate answer and include a link to the page in its response. `Perplexity-User` controls which sites these user requests can access. It is not used for web crawling or to collect content for training AI foundation models.  Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Perplexity-User/1.0; +https://perplexity.ai/perplexity-user)`  Published IP addresses: [https://www.perplexity.com/perplexity-user.json](https://www.perplexity.com/perplexity-user.json)  Since a user requested the fetch, this fetcher generally ignores robots.txt rules. | No                   | No                   | Yes                 |
 
 Reference: [docs.perplexity.ai/guides/bots](https://docs.perplexity.ai/guides/bots)
 
@@ -42,7 +42,7 @@ Reference: [platform.openai.com/docs/bots](https://platform.openai.com/docs/bots
 | Claude-User      | Claude-User supports Claude AI users. When individuals ask questions to Claude, it may access websites using a Claude-User agent. | Claude-User allows site owners to control which sites can be accessed through these user-initiated requests. Disabling Claude-User on your site prevents our system from retrieving your content in response to a user query, which may reduce your site's visibility for user-directed web search. | -                    | -                    | Yes                 |
 | Claude-SearchBot | Claude-SearchBot navigates the web to improve search result quality for users. It analyzes online content specifically to enhance the relevance and accuracy of search responses. | Disabling Claude-SearchBot on your site prevents our system from indexing your content for search optimization, which may reduce your site's visibility and accuracy in user search results. | -                    | Yes                  | -                   |
 
-Reference: [https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+Reference: [support.anthropic.com - Does Anthropic crawl data from the web, and how can site owners block the crawler?](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
 
 
 
@@ -52,7 +52,7 @@ Reference: [https://support.anthropic.com/en/articles/8896518-does-anthropic-cra
 
 > Today we’re announcing [Google-Extended](https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers), a new control that web publishers can use to manage whether their sites help improve[ Bard](https://bard.google.com/) and[ Vertex AI](https://cloud.google.com/vertex-ai) generative APIs, including future generations of models that power those products. By using Google-Extended to control access to content on a site, a website administrator can choose whether to help these AI models become more accurate and capable over time.
 
-Reference: https://blog.google/technology/ai/an-update-on-web-publisher-controls/
+Reference: [blog.google - An update on web publisher controls](https://blog.google/technology/ai/an-update-on-web-publisher-controls/)
 
 ## Meta Web Crawlers
 
@@ -62,7 +62,7 @@ Reference: https://blog.google/technology/ai/an-update-on-web-publisher-controls
 
 > The Meta-ExternalAgent crawler crawls the web for use cases such as training AI models or improving products by indexing content directly.
 
-Reference:[https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/](https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/)
+Reference: [developers.facebook.com - Meta Web Crawlers](https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/)
 
 
 
@@ -72,11 +72,11 @@ Reference:[https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/
 
 The data crawled by Applebot may also be used to help train Apple foundation models powering generative AI features across Apple products, including Apple Intelligence, Services, and Developer Tools. Web publishers can opt-out from having their content used to train generative foundation models by disallowing [Applebot-Extended](https://support.apple.com/en-us/119829#extended) in the robots.txt file.
 
-Reference: [https://support.apple.com/en-us/119829](https://support.apple.com/en-us/119829)
+Reference: [support.apple.com - About Applebot](https://support.apple.com/en-us/119829)
 
 ## Amazonbot
 
-https://developer.amazon.com/amazonbot
+See [developer.amazon.com - About Amazonbot](https://developer.amazon.com/amazonbot)
 
 ## Robots.txt
 

@@ -66,7 +66,7 @@ You can find the documentation here: [https://spl.solana.com/token](https://spl.
 cargo install spl-token-cli
 ```
 
-During the installation, it is possible you have some errors with libudev. You can find more information with this link: [stackoverflow.com - libudev-development-package-not-found](https://stackoverflow.com/questions/55945023/libudev-development-package-not-found)
+During the installation, it is possible you have some errors with `libudev`. You can find more information with this link: [stackoverflow.com - libudev-development-package-not-found](https://stackoverflow.com/questions/55945023/libudev-development-package-not-found)
 
 the solution for me was to install *libudev* with this command:
 
@@ -78,7 +78,7 @@ sudo apt-get install libudev-dev
 
 ### Airdrop 
 
-To perform operator, you need to have some SOL in your wallet. It is possible to have some SOL on devnet with the command airdrop
+To perform operations, you need to have some SOL in your wallet. It is possible to have some SOL on devnet with the command airdrop
 
 - Command
 
