@@ -11,19 +11,11 @@ image:
 isMath: false
 ---
 
-# 
-
-[TOC]
-
-
-
-### 
-
 RAILGUN is a privacy system built on Ethereum and other EVM-compatible blockchains. It introduces a suite of smart contracts that shield user activity — making **sender**, **recipient**, **token type**, and **amount** completely private — without sacrificing composability or smart contract functionality.
 
 RAILGUN is a privacy system built on Ethereum and other EVM-compatible blockchains. It introduces a suite of smart contracts that shield user activity — making sender, recipient, token type, and amount completely private — without sacrificing composability or smart contract functionality.
 
-Unlike mixers or simple transaction obfuscation tools, RAILGUN enables users to **interact privately with decentralized finance (DeFi)** protocols while maintaining compatibility with existing ERC-20, ERC-721, and ERC-1155 tokens.
+Unlike mixers or simple transaction obfuscation tools, RAILGUN enables users to interact privately with decentralized finance (DeFi) protocols while maintaining compatibility with existing ERC-20, ERC-721, and ERC-1155 tokens.
  This is achieved through a combination of **zk-SNARK cryptography**, **Merkle Tree–based state management**, and **community broadcasters** that mask on-chain identities.
 
 > Warning: this article is still in draft state and its content is still mainly taken from the [documentation](https://docs.railgun.org/wiki) summarized with the help of ChatGPT. Its content should become more personal later.
@@ -201,7 +193,7 @@ Viewing keys can be scoped by block range, allowing for transparent yet privacy-
 | **UTXO Model**                          | Private Merkle Tree UTXOs                   | Native UTXO model           | Native UTXO model              | N/A (pool-based deposits)                                    |
 | **Private Smart Contract Interactions** | &#x2611; (DeFi composability)               | &#x2612;                    | &#x2612;                       | &#x2612;                                                     |
 | **Supported Assets**                    | Any ERC-20, ERC-721, ERC-1155               | Native ZEC only             | Native XMR only                | Supported ERC-20 only                                        |
-| **Broadcasters (Relayers)**             | Yes, decentralized Broadcaster network      | No                          | No                             | Interaction directly on the smart contracts or through Centralized front-end/relayers (in some cases) |
+| **Broadcasters (Relayers)**             | &#x2611;decentralized Broadcaster network   | &#x2612;                    | &#x2612;                       | Interaction directly on the smart contracts or through Centralized front-end/relayers (in some cases) |
 | **Gas Payment Options**                 | Any token (meta-transactions)               | N/A                         | N/A                            | ETH only                                                     |
 | **Viewing Key System**                  | &#x2611;<br />Scoped and selective          | &#x2611;<br />Viewing keys  | &#x2612;                       | &#x2612;                                                     |
 | **NFT Privacy Support**                 | &#x2611;                                    | &#x2612;                    | &#x2612;                       | &#x2612;                                                     |
