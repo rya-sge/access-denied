@@ -30,6 +30,15 @@ This article is a summary of the Aptos Documentation [Move Security Guidelines](
 -  Apply `#[view]` to read-only functions that should not modify state.
 -  Confirm no sensitive logic is exposed through `public` functions unnecessarily.
 
+**Reminder:**
+
+|                | Module itself | Other Modules                              | Aptos CLI/SDK |
+| -------------- | ------------- | ------------------------------------------ | ------------- |
+| private        | &#x2611;      | &#x2612;                                   | &#x2612;      |
+| public(friend) | &#x2611;      | &#x2611;if friend<br /> &#x2612; otherwise | &#x2612;      |
+| public         | &#x2611;      | &#x2611;                                   | &#x2612;      |
+| entry          | &#x2611;      | &#x2612;                                   | &#x2611;      |
+
 ### Type Safety and Generics
 
 -  Validate generic types explicitly; do not trust unchecked generics.
@@ -50,6 +59,15 @@ This article is a summary of the Aptos Documentation [Move Security Guidelines](
 -  Assign `store` only to data meant to persist in global storage.
 -  Assign `key` only to resources that need to be globally accessible.
 
+**Reminder:**
+
+| Ability | Description                                                  |
+| ------- | ------------------------------------------------------------ |
+| copy    | Permits the duplication of values, allowing them to be used multiple times within the contract. |
+| drop    | Allows values to be discarded from memory, which is necessary for controlling resources and preventing leaks. |
+| store   | Enables data to be saved in the global storage, critical to persist data across transactions. |
+| key     | Grants data the ability to serve as a key in global storage operations, important for data retrieval and manipulation. |
+
 ### Arithmetic Safety
 
 -  Handle integer truncation for division; ensure fees or calculations cannot round down to zero.
@@ -58,7 +76,9 @@ This article is a summary of the Aptos Documentation [Move Security Guidelines](
 
 ### Aptos Objects
 
--  Never expose `ConstructorRef` publicly.
+-  ConstructorRef leak
+   -  When creating objects ensure to never expose publicly the object’s `ConstructorRef` as it allows adding resources to an object.
+
 -  Keep objects in separate accounts when multiple objects are created together.
 -  Prevent ownership leaks or unauthorized transfers of grouped objects.
 
@@ -71,7 +91,9 @@ This article is a summary of the Aptos Documentation [Move Security Guidelines](
   -  Use multiple oracles to determine prices.
   -  Implement fallback mechanisms if primary oracle fails.
 - **Token Identifier Collision**
-  -  Use unique `object::object_address` identifiers rather than concatenated strings.
+  - When dealing with tokens, ensure that the method for comparing token structs to establish a deterministic ordering does not lead to collisions. 
+  - Use unique `object::object_address` identifiers rather than concatenated strings.
+
 
 ## Reference
 

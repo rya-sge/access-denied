@@ -22,7 +22,7 @@ In summary:
 
 ------
 
-## **Identity-Based Encryption (IBE)**
+## Identity-Based Encryption (IBE)
 
 An IBE scheme consists of four algorithms:
 
@@ -41,7 +41,7 @@ The **identity domain is arbitrary**, allowing Seal to bind onchain strings to I
 
 ------
 
-## **Seal Components**
+## Seal Components
 
 ### Onchain Access Policies
 
@@ -83,15 +83,15 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 ------
 
-## **Cryptographic Primitives**
+## Cryptographic Primitives
 
-### **KEM (Key Encapsulation Mechanism)**
+### KEM (Key Encapsulation Mechanism)
 
 - **Boneh-Franklin IBE on BLS12-381**
 - Encrypts a **symmetric key** (DEK) under an identity.
 - Allows threshold/MPC setups and identity-based key management.
 
-### **DEM (Data Encapsulation Mechanism)**
+### DEM (Data Encapsulation Mechanism)
 
 - Encrypts the **actual data** using the DEK.
 - Current options:
@@ -107,7 +107,7 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 ------
 
-## **Decentralization and Trust Model**
+## Decentralization and Trust Model
 
 - Users select one or more key servers based on trust assumptions.
 - Threshold encryption ensures privacy and liveness.
@@ -116,14 +116,14 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 ------
 
-## **Security Assumptions**
+## Security Assumptions
 
 1. **Key server integrity:** Fewer than the threshold of servers are compromised.
 2. **Correct access policies:** Package code enforces rules accurately. Policy changes are onchain and transparent.
 
 ------
 
-## **Use Cases**
+## Use Cases
 
 - Time-lock encryption for MEV-resistant trading
 - Secure voting

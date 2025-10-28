@@ -1,0 +1,81 @@
+@startmindmap
+* GMX V2 Protocol Mechanics
+** Overview
+*** Decentralized protocol for perpetual swaps & spot trading
+*** Core participants: Traders, Liquidity Providers (LPs), Keepers
+*** Two-step order process: Create → Execute
+*** Uses Oracles for accurate price data
+
+** Core Participants
+*** Traders
+**** Perform swaps or open leveraged long/short positions
+**** Pay execution & funding fees
+**** Profit added to account; loss deducted from collateral
+*** Liquidity Providers (LPs)
+**** Provide assets (e.g. ETH, USDC) to GM Pools
+**** Earn share of protocol fees
+**** Risk exposure when traders are profitable
+**** Deposit/withdraw liquidity via orders
+*** Keepers
+**** Automated executors (bots)
+**** Execute orders on-chain
+**** Submit oracle price feeds
+**** Compensated through execution fees
+
+** Two-Step Order Execution
+*** Step 1: Create Order
+**** User (Trader or LP) creates order & pays execution fee
+*** Step 2: Execute Order
+**** Keeper executes order on-chain
+**** Enables efficient gas usage & timing flexibility
+
+** Liquidity Provision
+*** Deposit Order
+**** LP specifies token & long/short backing, pays fee
+**** Keeper executes deposit into GM Pool
+*** Withdraw Order
+**** Reverse process to remove liquidity
+**** Also executed by Keeper
+
+** Trading Process
+*** Swaps
+**** Exchange tokens using GM Pool liquidity & oracle prices
+*** Long Positions
+**** Opened against GM Pool using collateral
+**** Profit if price increases
+*** Short Positions
+**** Opened against GM Pool using collateral
+**** Profit if price decreases
+*** Closing Positions
+**** Also uses create + execute order pattern
+
+** Profit & Loss Handling
+*** Trader Profit
+**** Paid from GM Pool (LP liquidity)
+*** Trader Loss
+**** Deducted from collateral; remains in pool → benefits LPs
+
+** Fees
+*** Execution Fee
+**** Paid by both Traders & LPs
+**** Compensates Keepers for gas costs
+**** Excess refunded automatically
+*** Funding Fee
+**** Applies to open long/short positions
+**** Balances open interest (longs vs shorts)
+**** Side with higher open interest pays the other
+
+** Keepers & Oracles
+*** Keepers monitor & execute pending orders
+*** Submit up-to-date market prices via Oracles
+*** Ensure accurate swaps, PnL, and liquidation pricing
+*** Critical for maintaining protocol integrity
+
+** Interdependencies & Risks
+*** Traders depend on LP liquidity
+*** LPs depend on trader activity & fees
+*** Both rely on Keepers for execution
+*** Risks
+**** Traders: lose collateral on failed trades
+**** LPs: lose liquidity if traders are consistently profitable
+@endmindmap

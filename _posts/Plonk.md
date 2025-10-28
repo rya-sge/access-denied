@@ -1,23 +1,77 @@
 # Plonk
 
-ll details). Our universal SNARK requires the prover to compute 5 polynomial commitments, combined with two opening proofs to evaluate the polynomial commitments at a random challenge point. 
+## Concept
+
+### Lagrange Basis
+
+The Lagrange Basis is a method of representing polynomials using a set of basis polynomials known as Lagrange polynomials. These basis polynomials are constructed such that each polynomial evaluates to 1 at one specific point and 0 at all other points. The Lagrange Basis provides a unique polynomial representation for a given set of interpolation points.
+
+https://hackmd.io/@rishotics/HyasCiuSn
+
+
+
+### Lagrange interpolation
+
+"Lagrange interpolation" [here](https://blog.ethereum.org/2014/08/16/secret-sharing-erasure-coding-guide-aspiring-dropbox-decentralizer/) for a more detailed explanation). The key building block of the basic strategy is that for any domain D and point x, we can construct a polynomial that returns 1 for x and 0 for any value in D other than x. 
+
+For example, if D=[1,2,3,4] and x=1, the polynomial is:
+$$
+y = (x-2)(x-3)(x-4)/frac(1-2)(1-3)(1-4)
+$$
+
+
+https://vitalik.eth.limo/general/2019/05/12/fft.html
+
+
+
+### FFT
+
+FFTs are a key building block in many algorithms, including [extremely fast multiplication of large numbers](http://www.math.clemson.edu/~sgao/papers/GM10.pdf), multiplication of polynomials, and extremely fast generation and recovery of [erasure codes](https://blog.ethereum.org/2014/08/16/secret-sharing-erasure-coding-guide-aspiring-dropbox-decentralizer). 
+
+With Plonk t's a ***discrete Fourier transform*** over *finite fields* 
+
+Contraints:
+
+- you cannot choose any arbitrary field and any arbitrary domain
+  - with an FFT, you have to use a finite field, and the domain must be a *multiplicative subgroup* of the field (that is, a list of powers of some "generator" value)
+  - Futhermore, the multiplicative subgroup must have size 2^n
+-  Whereas with Lagrange interpolation, you could choose whatever x coordinates and y coordinates you wanted, and whatever field you wanted (you could even do it over plain old real numbers), and you could get a polynomial that passes through them
+
+https://vitalik.eth.limo/general/2019/05/12/fft.html
+
+### KZG Poly-commit scheme
+
+Polynomial commitment schemes allow one party to prove to another the correct evaluation of a polynomial at some set of points, without revealing any other information about the polynomial.
+
+https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf
+
+
+
+Their universal SNARK requires the prover to compute:
+
+- `5` polynomial commitments;
+
+- combined with two opening proofs to evaluate the polynomial commitments at a random challenge point. 
 
 There are two “flavours”of PlonK to suit the tastes of the user. 
 
 - By increasing the proof size by two group elements, the total prover computations can be reduced by ≈ 10%. 
-- The combined degree of the polynomials is either **9**(n + a) (larger proofs) or **11**(n + a) (smaller proofs, reduced verifier work), where `n` is the number of multiplication gates and `a` is the number of addition gates. 
-- Currently, the most efficient fully-succinct SNARK construction available is Groth’s 2016 construction, which requires a unique, non-updateable CRS per circuit. 
+- The combined degree of the polynomials is either **9**(n + a) (larger proofs) or **11**(n + a) (smaller proofs, reduced verifier work), where:
+  -  `n` is the number of multiplication gates
+  -  `a` is the number of addition gates. 
+
+- Currently, the most efficient fully-succinct SNARK construction available (at the time of the paper) is `Groth’s 2016` construction, which requires a unique, non-updateable CRS per circuit. 
   - Proof construction times are dominated by 3n + m G1 and n G2 group exponentiations, where m is formally the number of R1CS variables, and is typically bounded by n (for the rest of this section, the reader may assume m = n for simplicity). 
   - If we assume that one G2 exponentiation is equivalent to three G1 exponentiations, this yields 6n + m equivalent G1 group exponentiations
 
 
 
-## Fast Fouriter transforms (FFT)
+## Fast Fourier transforms (FFT)
 
 When constructing proofs, the time taken to perform the required fast fourier transforms is comparable to the time taken for elliptic curve scalar multiplications. 
 
 - The number of field multiplications in table 1 is obtained from 8 FFTs of size 4n, 5 FFTs of size 2n and 12 FFTs of size n. 
-- The number of FFT transforms can be significantly reduced, if a circuit’s preprocessed polynomials are provided as evaluations over the 4n’th roots of unity (instead of in Lagrange-base form).  However, given this dramatically increases the amount of information required to construct proofs, we omit this optimisation from our benchmarks. We conclude the introduction with a comparision to relevant concurrent work.
+- The number of FFT transforms can be significantly reduced, if a circuit’s preprocessed polynomials are provided as evaluations over the 4n’th roots of unity (instead of in Lagrange-base form).  However, given this dramatically increases the amount of information required to construct proofs,this optimisation was omit from the benchmarks. 
 
 
 
@@ -27,10 +81,10 @@ Concrete comparison to Marlin
 
 While **Fractal** leverages the sparse bi-variate evaluation technique in the context of transparent recursive SNARKs, Marlin focuses on constructing a fully succinct (universal) SNARK as in this paper.
 
--  It is not completely straightforward to compare this work and Marlin, as we are in the realm of concrete constants, and the basic measure both works use is different. While we take our main parameter n to be the number of addition and multiplication gates in a fan-in two circuit; - 
+-  It is not completely straightforward to compare Plonk and Marlin, as we are in the realm of concrete constants, and the basic measure both works use is different. The paper take the main parameter `n` to be the number of addition and multiplication gates in a fan-in two circuit:
   - Marlin uses as their main parameter the maximal number of non-zeroes in one of the three matrices describing an R1CS. 
   - For the same value of `n`, PlonK outperforms Marlin, e.g. by roughly a 2x factor in prover group operations and proof size. In the extreme case of a circuit with only multiplication gates, this would indeed represent the performance difference between the two systems.
-  - However, in constraint systems with “frequent large addition fan-in” Marlin may outperform the currently specified variant7 of PlonK. For example, this happens in the extreme case of one “fully dense” R1CS constraint
+  - However, in constraint systems with “frequent large addition fan-in” Marlin may outperform the currently specified variant of PlonK. For example, this happens in the extreme case of one “fully dense” R1CS constraint
 
 https://eprint.iacr.org/2019/1047
 
@@ -164,3 +218,5 @@ https://www.maya-zk.com/blog/plonk-round1
 https://coingeek.com/how-plonk-works-part-1/
 
 https://vitalik.eth.limo/general/2019/09/22/plonk.html
+
+https://hackmd.io/@rishotics/HyasCiuSn

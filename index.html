@@ -12,7 +12,7 @@ layout: home
 
 {% include header.html %}
 <div class="c-posts o-opacity" data-page="{{ currentPage }}" data-totalPages="{{ paginator.total_pages }}">
-  {% for post in site.posts  %}
+  {% for post in site.posts limit:site.paginate offset:offset %}
   {% if post.exclude %}
   {% else %}
     <article class="c-post">
