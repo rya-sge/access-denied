@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum zkp
 tags: railgun zk-snark zeroknwoledgeproof
 description: RAILGUN brings full privacy to DeFi using zk-SNARK cryptography, shielding senders, recipients, and tokens for untraceable blockchain transactions.
-image: 
+image: /assets/article/blockchain/defi/railgun/railgun-mindmap.png
 isMath: false
 ---
 
@@ -179,11 +179,11 @@ Each RAILGUN wallet consists of:
 
 Viewing keys can be scoped by block range, allowing for transparent yet privacy-preserving reporting (e.g., for taxation).
 
-
+## Summary
 
 ------
 
-## Summary Table: RAILGUN vs Other Confidential Systems
+### Summary Table: RAILGUN vs Other Confidential Systems
 
 | **Feature**                             | **RAILGUN**                                 | **Zcash**                   | **Monero**                     | **Tornado Cash**                                             |
 | --------------------------------------- | ------------------------------------------- | --------------------------- | ------------------------------ | ------------------------------------------------------------ |
@@ -202,6 +202,12 @@ Viewing keys can be scoped by block range, allowing for transparent yet privacy-
 | **Decentralization Level**              | High – Smart contract & broadcaster network | Protocol-level              | Protocol-level                 | Contract-based (limited governance)                          |
 
 ------
+
+### Mindmap
+
+
+
+![railgun-mindmap.png]({{site.url_complet}}/assets/article/blockchain/defi/railgun/railgun-mindmap.png)
 
 ## Conclusion
 

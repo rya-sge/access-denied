@@ -1,0 +1,55 @@
+@startmindmap
+* RAILGUN Privacy System
+** Core Concepts
+*** Zero-Knowledge Proofs (zk-SNARKs)
+**** Groth16 Protocol
+**** Elliptic Curve Cryptography (ECC)
+**** Proof Verification On-Chain
+*** Private Balances & Privacy Set
+**** Shielded Transactions
+**** Token Amounts Hidden
+**** Expanding Privacy Set = Stronger Anonymity
+*** UTXO & Merkle Tree Model
+**** Encrypted UTXOs
+**** Merkle Root Updates
+**** Nullifiers Prevent Double-Spends
+** Smart Contract Layer
+*** Deployed on EVM Chains
+**** Ethereum
+**** Polygon
+**** BSC
+*** Contract Functions
+**** shield() - Enter Private Pool
+**** transact() - Private Transfers
+**** unshield() - Exit to Public Address
+** Trusted Setup
+*** Perpetual Powers of Tau
+**** Multi-Party Computation (MPC)
+**** Generates Common Reference String (CRS)
+**** Required for New Circuits
+** Circuit Architecture
+*** 54 zk-SNARK Circuits
+**** Input/Output Variants (1→2, 7→1, etc.)
+**** Supports Multiple Tokens
+**** Enables NFT Shielding (ERC-721, ERC-1155)
+** Wallets & Keys
+*** 0x Public Address (Transparent)
+*** 0zk Private Address (Shielded)
+*** Key Types
+**** Spending Key (Baby Jubjub Curve)
+**** Viewing Key (Ed25519)
+***** Selective Disclosure
+***** Block Range Auditing
+** Broadcasters & Privacy Relayers
+*** Transaction Submission by Third Parties
+*** Hide Sender Identity
+*** Communicate via Waku Protocol
+*** Meta-Transactions
+**** Pay Gas in Any Token
+**** "Gasless" User Experience
+** Use Cases
+*** Private Token Transfers
+*** Private Swaps (DEX)
+*** Private Liquidity Provision
+*** Private NFT Trading
+@endmindmap

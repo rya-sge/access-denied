@@ -1,0 +1,65 @@
+@startmindmap
+* Aztec: Privacy-First Layer 2
+** Architecture
+*** PXE (Private Execution Environment)
+*** AVM (Aztec Virtual Machine)
+*** Rollup Sequencer & Prover Network
+*** Ethereum Bridge Contract
+** Execution Model
+*** Private Execution (client-side)
+**** Encrypted computation
+**** Proof generation (ZK)
+**** Runs before public execution
+*** Public Execution (network-side)
+**** Transparent state updates
+**** Verified by AVM
+** State Model
+*** Private State
+**** Notes (UTXOs)
+**** Commitments & Nullifiers
+**** Encrypted and unlinkable
+*** Public State
+**** Transparent variables
+**** Stored in public Merkle tree
+** Core Components
+*** PXE
+**** Executes private functions
+**** Manages keys & notes
+**** Synchronizes with network
+*** AVM
+**** Executes public functions
+**** Proof-friendly opcode set
+*** Noir
+**** ZK DSL for circuits
+**** Portable across systems
+*** Circuits
+**** Kernel Circuit → validates TXs
+**** Rollup Circuit → aggregates proofs
+**** Squisher Circuit → compresses proofs
+** Accounts & Keys
+*** Smart Contract Accounts (AA)
+*** Key Types
+**** Nullifier Key
+**** Incoming Viewing Key
+**** Outgoing Viewing Key
+** Wallet Architecture
+*** Proof generation (local)
+*** Note tracking
+*** Authwit management
+*** Fee payment & nonce control
+** Privacy Enforcement
+*** Hidden execution via ZK circuits
+*** Encrypted state updates
+*** Nullifier checks (no double spend)
+*** UTXO anonymity
+** Developer Considerations
+*** Private ↔ Public composability
+*** Noir optimization
+*** Paymasters & sponsored fees
+*** Custom nonce logic
+** Summary
+*** Hybrid execution & state model
+*** Full account abstraction
+*** Verified on Ethereum via rollup proofs
+*** Only system offering composable programmable privacy
+@endmindmap
