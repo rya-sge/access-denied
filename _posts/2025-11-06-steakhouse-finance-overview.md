@@ -5,15 +5,15 @@ date:   2025-11-06
 lang: en
 locale: en-GB
 categories: blockchain ethereum zkp
-tags: railgun zk-snark zeroknwoledgeproof
-description: RAILGUN brings full privacy to DeFi using zk-SNARK cryptography, shielding senders, recipients, and tokens for untraceable blockchain transactions.
-image: /assets/article/blockchain/defi/railgun/railgun-mindmap.png
+tags: steakhouse-finance defi blockchain
+description: Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
+image: 
 isMath: false
 ---
 
 Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
 
-Reference used: [steakhouse.financial](https://www.steakhouse.financial) / [hackmd.io/@SteakhouseFi](https://hackmd.io/@SteakhouseFi) / [Aribtrum forum](https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829) / [ENS discussion](https://discuss.ens.domains/t/ens-financial-reporting-by-steakhouse/16601/21).)
+Reference used: [steakhouse.financial](https://www.steakhouse.financial) / [hackmd.io/@SteakhouseFi](https://hackmd.io/@SteakhouseFi) / [Aribtrum forum](https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829) / [ENS discussion](https://discuss.ens.domains/t/ens-financial-reporting-by-steakhouse/16601/21).
 
 [TOC]
 
