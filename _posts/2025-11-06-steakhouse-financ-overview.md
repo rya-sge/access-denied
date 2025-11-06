@@ -1,27 +1,21 @@
-# SteakHouse Finance
+---
+layout: post
+title: "Vault Curator - Steak House Finance"
+date:   2025-11-06
+lang: en
+locale: en-GB
+categories: blockchain ethereum zkp
+tags: railgun zk-snark zeroknwoledgeproof
+description: RAILGUN brings full privacy to DeFi using zk-SNARK cryptography, shielding senders, recipients, and tokens for untraceable blockchain transactions.
+image: /assets/article/blockchain/defi/railgun/railgun-mindmap.png
+isMath: false
+---
 
-Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become the premier DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
+Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
 
-Steakhouse has deep expertise in credit underwriting, as well as RWA structuring & advisory, having made invaluable contributions to the growth of the RWA ecosystem at Sky, including spearheading [the initiative](https://forum.sky.money/t/request-for-proposal-rfp-tokenized-money-market-fund-short-duration-us-t-bill-asset-managers-for-sparkdao/24884) to underwrite and purchase over $1bn of Tokenized RWAs.
-
-
-
-The Steakhouse team was founded by DAO contributors, for DAO contributors. We are leaders in blockchain-based financial reporting, and created some of the first widely used [blockchain-based financial statements](https://dune.com/steakhouse/makerdao) and [financial reports dating back to early 2021](https://forum.makerdao.com/t/financial-report-2021-03/7286). We actively report on and monitor MakerDAO’s >$2.5bn RWA portfolio and protocol financials, as well as [ENS’s >$100mm endowment](https://discuss.ens.domains/t/ens-financial-reporting-by-steakhouse/16601/21).
-
-https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829
-
-Reference: [steakhouse.financial](https://www.steakhouse.financial) / [hackmd.io/@SteakhouseFi](https://hackmd.io/@SteakhouseFi)
+Reference used: [steakhouse.financial](https://www.steakhouse.financial) / [hackmd.io/@SteakhouseFi](https://hackmd.io/@SteakhouseFi) / [Aribtrum forum](https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829) / [ENS discussion](https://discuss.ens.domains/t/ens-financial-reporting-by-steakhouse/16601/21).)
 
 [TOC]
-
-## MakerDAO
-
-See 
-
-- [steakhouse.financial - MakerDAO Financial Report 2023](https://kitchen.steakhouse.financial/p/makerdao-financial-report-2023)
-- [MIPS - Rewards Plan budget for the Strategic Finance Core Unit (SF-001) / Steakhouse Financial.](https://mips.makerdao.com/mips/details/MIP40c3SP94)
-
-
 
 ## Kamino Finance
 
@@ -126,9 +120,16 @@ Reference: [Introducing the Smokehouse product line: bbqUSDC and bbqDAI](https:/
 
 ## MakerDAO / SKY
 
+Reference
+
+- [steakhouse.financial - MakerDAO Financial Report 2023](https://kitchen.steakhouse.financial/p/makerdao-financial-report-2023)
+- [MIPS - Rewards Plan budget for the Strategic Finance Core Unit (SF-001) / Steakhouse Financial.](https://mips.makerdao.com/mips/details/MIP40c3SP94)
+
+
+
 ### Grove (Sky)
 
-Steakhouse Financial is building `Grove`, an institutional-grade credit protocol to unlock USDS's full potential by bridging DeFi and traditional finance. 
+Steakhouse Financial is building `Grove`, an institutional-grade credit protocol to unlock USDS's full potential by bridging DeFi and traditional finance.
 
 It will enable Sky to scale offchain credit, create new farming opportunities, and offer USDS holders better savings rates with diversified real-world assets. 
 
@@ -154,14 +155,22 @@ Steakhouse is an oracle provider to Chronicle Protocol's decentralized validator
 
 Reference: [The Block - Bitcoin Suisse, Steakhouse Financial and Block Analitica join as validators for oracle provider Chronicle Protocol - The Block](https://www.theblock.co/post/338141/bitcoin-suisse-steakhouse-financial-block-analitica-validators-oracle-chronicle-protocol), [Chronicle Labs - The Security of DeFi Grows Stronger: Steakhouse Financial, Block Analitica, and Bitcoin Suisse Join Chronicle](https://chroniclelabs.org/blog/the-security-of-defi-grows-stronger-steakhouse-financial-block-analitica-and-bitcoin-suisse-join)
 
-## Arbitrum
+## Other
 
-https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829
+### Arbitrum
 
+See [Aribtrum forum](https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829)
 
+### Lido
 
+[2022]
 
+Lido DAO onboards Steakhouse Financial as the Finance unit, partnering with Lido DAO contributors to build out full financial statements; develop, manage, and execute payroll processes end-to-end in concert with operations and legal workstreams; create standardized financial reports for the entire DAO including cash flow, grants, operating expenses; and develop financing and operating plans to support long-term growth of Lido DAO.
 
-https://research.lido.fi/t/lido-dao-finance-workstream-proposal-steakhouse-financial/2823
+Status: [passed](https://snapshot.org/#/s:lido-snapshot.eth/proposal/0xa7a8d9f42f72405a72f91d8124f970815028526197b9cc186a1882fae2d17e05)
 
-https://kitchen.steakhouse.financial/p/the-curious-case-of-on-chain-private
+See [Lido - research](https://research.lido.fi/t/lido-dao-finance-workstream-proposal-steakhouse-financial/2823)
+
+### Blog
+
+- [Steakhouse Financial - The Curious Case of On-Chain Private Credit Repo](https://kitchen.steakhouse.financial/p/the-curious-case-of-on-chain-private)

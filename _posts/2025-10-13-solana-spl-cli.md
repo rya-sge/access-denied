@@ -20,6 +20,10 @@ You can find more details and steps in my article: [Introduction to Solana and t
 
 This article contains the list of available command with the Solana CLI.
 
+[TOC]
+
+
+
 ## Solana concept - Reminder
 
 - Tokens on Soana are digital assets that represent ownership over diverse categories of assets.
@@ -119,7 +123,7 @@ pub struct Account {
 | `disable-cpi-guard`                       |                                            | Disable CPI Guard for token account                          |
 | `disable-non-confidential-credits`        |                                            | Disable non-confidential transfers for token account         |
 | `disable-required-transfer-memos`         |                                            | Disable required transfer memos for token account            |
-| `display`                                 |                                            | Query details of an SPL Token mint, account, or multisig by address |
+| `display`                                 | Token mint                                 | Query details of an SPL Token mint, account, or multisig by address |
 | `enable-confidential-credits`             |                                            | Enable confidential transfers for token account (use `configure...` first) |
 | `enable-cpi-guard`                        |                                            | Enable CPI Guard for token account                           |
 | `enable-non-confidential-credits`         |                                            | Enable non-confidential transfers for token account          |
@@ -178,7 +182,9 @@ spl-token burn [OPTIONS] <TOKEN_ACCOUNT_ADDRESS> <TOKEN_AMOUNT>
 
 Close a token account
 
- spl-token close [OPTIONS] [--] [TOKEN_MINT_ADDRESS]
+```bash
+spl-token close [OPTIONS] [--] [TOKEN_MINT_ADDRESS]
+```
 
 - `create-account`
 
@@ -198,6 +204,14 @@ spl-token create-multisig [OPTIONS] <MINIMUM_SIGNERS> <MULTISIG_MEMBER_PUBKEY>
 
 ```
 spl-token create-token [OPTIONS] [--] [TOKEN_KEYPAIR]
+```
+
+- `display`
+
+Query details of an SPL Token mint, account, or multisig by address
+
+```
+spl-token display [OPTIONS] <TOKEN_ADDRESS>
 ```
 
 - `enable-cpi-guard`
@@ -292,6 +306,14 @@ spl-token thaw [OPTIONS] <TOKEN_ACCOUNT_ADDRESS>
 
 ```rust
 spl-token transfer [OPTIONS] <TOKEN_MINT_ADDRESS> <TOKEN_AMOUNT> <RECIPIENT_WALLET_ADDRESS or RECIPIENT_TOKEN_ACCOUNT_ADDRESS>
+```
+
+- `update-default-account-state`
+
+Updates default account state for the mint. Requires the default account state extension.
+
+```
+ spl-token update-default-account-state [OPTIONS] <TOKEN_MINT_ADDRESS> <STATE>
 ```
 
 - `update-group-address`

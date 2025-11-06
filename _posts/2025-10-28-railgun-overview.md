@@ -128,6 +128,8 @@ This model mirrors Bitcoin’s UTXO structure — but with full zero-knowledge e
 Both rely on RAILGUN’s `shield()` and `transact()` smart contract functions, which leverage Poseidon hashing and zk-SNARK validation.
  While shielding and unshielding are visible on-chain, the internal transfers remain fully confidential.
 
+You can find more information about the Poseidon hash function in my article: [Poseidon Hash Function - Overview](https://rya-sge.github.io/access-denied/2025/05/27/poseidon-hash-function-overview/)
+
 ------
 
 ### Privacy in Action
@@ -211,10 +213,9 @@ Viewing keys can be scoped by block range, allowing for transparent yet privacy-
 
 ## Conclusion
 
-RAILGUN represents the next generation of on-chain privacy infrastructure — integrating zero-knowledge cryptography directly into DeFi workflows.
- Its combination of **zk-SNARK circuits**, **meta-transaction gas abstraction**, and **private smart contract composability** provides a powerful framework for confidential finance.
+RAILGUN is a privacy protocol that applies zero-knowledge cryptography to decentralized finance (DeFi) workflows. By combining **zk-SNARK** circuits, meta-transaction gas abstraction, and private smart contract composability, it offers a framework for conducting transactions and interactions on-chain with enhanced confidentiality.
 
-Where earlier systems like Zcash and Monero excelled at private payments, RAILGUN extends these capabilities to the full DeFi stack — enabling truly private swaps, lending, liquidity, and NFT management without leaving Layer 1.
+While earlier privacy systems such as Zcash and Monero focus primarily on shielding payment data, RAILGUN extends similar principles to a broader range of **DeFi** activities — including token swaps, lending, liquidity provision, and NFT management — while operating directly on Layer 1 networks.
 
 ## Reference
 
