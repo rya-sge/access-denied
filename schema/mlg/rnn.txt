@@ -1,0 +1,44 @@
+@startmindmap
+* Recurrent Neural Network (RNN)
+** Definition
+*** Processes sequential data
+*** Maintains hidden state (memory)
+*** Handles temporal dependencies
+** Core Equations
+*** Hidden State Update
+**** h_t = φ(W_xh x_t + W_hh h_{t-1} + b_h)
+*** Output Computation
+**** y_t = W_hy h_t + b_y
+** Components
+*** x_t: Input vector (dimension d_x)
+*** h_t: Hidden state (dimension d_h)
+*** y_t: Output logits (dimension d_y)
+*** W_xh: Input → Hidden weights
+*** W_hh: Recurrent weights
+*** W_hy: Hidden → Output weights
+*** b_h, b_y: Bias terms
+** Functions
+*** Activation Functions
+**** tanh (classic)
+**** ReLU (modern, reduces vanishing gradient)
+*** Output Functions
+**** Softmax for classification
+*** Loss Function
+**** Cross-entropy for sequence prediction
+** Variants
+*** LSTM
+**** Forget, Input, Output Gates
+**** Better handling of long-term dependencies
+*** GRU
+**** Update + Reset Gates
+**** Simplified alternative to LSTM
+** Limitations
+*** Vanishing/exploding gradients
+*** Sequential processing → slow, not parallel
+*** Replaced by Transformers in many NLP tasks
+** Applications
+*** NLP (language modeling, translation)
+*** Time-series prediction
+*** Speech recognition
+*** Sequence classification
+@endmindmap

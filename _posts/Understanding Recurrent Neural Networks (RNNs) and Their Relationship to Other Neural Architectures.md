@@ -1,4 +1,15 @@
-# Understanding Recurrent Neural Networks (RNNs) and Their Relationship to Other Neural Architectures
+---
+layout: post
+title: "Recurrent Neural Networks (RNNs) - Overview"
+date:   2025-11-13
+lang: en
+locale: en-GB
+categories: ai
+tags: mlg RNN ANN CNN perceptron transformer
+description: USD₮0 is an Omnichain Fungible Token (OFT) built on LayerZero, enabling cross-chain transfers of USDT. Learn how USD₮0 works, its architecture, and the Legacy Mesh that connects existing USDT networks.
+image: 
+isMath: false
+---
 
 Artificial neural networks (ANNs) have evolved into a diverse family of architectures designed to process various types of data and tasks. Among these, **Recurrent Neural Networks (RNNs)** are known for their ability to model **sequential and temporal dependencies**, making them fundamental in natural language processing (NLP), speech recognition, and time-series prediction.
 
@@ -18,15 +29,37 @@ Unlike feedforward networks that assume inputs are independent, **RNNs** introdu
 
 ### Mathematical Formulation
 
-Given a sequence of inputs x1,x2,…,xTx_1, x_2, \dots, x_Tx1,x2,…,xT, an RNN computes:
+Given a sequence of inputs x1,x2,…,xT, an RNN computes:
 
-ht=f(Wxhxt+Whhht−1+bh)h_t = f(W_{xh}x_t + W_{hh}h_{t-1} + b_h)ht=f(Wxhxt+Whhht−1+bh)yt=g(Whyht+by)y_t = g(W_{hy}h_t + b_y)yt=g(Whyht+by)
+ht=f(Wxhxt+Whhht−1+bh)
 
 Where:
 
-- hth_tht is the hidden state at time ttt,
+- ht is the hidden state at time t,
 - Wxh,Whh,WhyW_{xh}, W_{hh}, W_{hy}Wxh,Whh,Why are weight matrices,
-- fff and ggg are activation functions (typically tanh or ReLU).
+- `f` and `g` are activation functions (typically tanh or ReLU).
+
+### Activation Functions and Loss in RNNs
+
+#### ReLU (Rectified Linear Unit)
+
+Introduces non-linearity in the network, allowing it to learn complex patterns. ReLU outputs zero for negative inputs and passes positive inputs unchanged.
+
+- **Usage in RNNs:** Often applied in the **hidden layers** or hidden state transformations to help mitigate the vanishing gradient problem and speed up training. While traditional RNNs use tanh or sigmoid, ReLU is sometimes preferred in modern variants for efficiency.
+
+#### Softmax
+
+Converts the raw output of the network into a **probability distribution** over multiple classes. Each value is between 0 and 1, and the sum across all classes equals 1.
+
+- **Usage in RNNs:** Typically applied at the **output layer** when predicting categorical sequences, such as words in language modeling or discrete classes in classification tasks.
+
+#### Cross-Entropy Loss
+
+Measures the difference between the predicted probability distribution (from Softmax) and the true labels. It penalizes incorrect predictions more heavily the more confident the network is in them.
+
+- **Usage in RNNs:** Used as the **loss function** during training, guiding the network to adjust weights so that the predicted probabilities align with the actual sequence labels. This is essential for tasks like language modeling, sequence classification, and speech recognition.
+
+------
 
 ### Training and Limitations
 
@@ -107,4 +140,6 @@ However, they are gradually being supplanted by **attention-based architectures*
 
 ------
 
-### 
+## Reference
+
+https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks

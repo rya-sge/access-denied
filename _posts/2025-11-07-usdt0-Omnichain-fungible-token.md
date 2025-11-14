@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "USD₮0: An Omnichain Fungible Token"
+title: "USD₮0 - Omnichain Fungible Token"
 date:   2025-11-07
 lang: en
 locale: en-GB

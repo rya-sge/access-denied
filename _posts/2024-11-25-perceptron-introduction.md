@@ -82,15 +82,17 @@ Both perceptrons and convolutional neural networks (CNNs) are inspired by biolog
 
 1. **Similarities**:
    - Both use weights, biases, and activation functions to compute outputs.
-   - They are trained using optimization techniques, such as gradient descent.
-   - Both aim to minimize a loss function during training to improve performance.
+   - They are trained using optimization techniques, such as **gradient descent**.
+   - Both aim to minimize a **loss function** during training to improve performance.
 2. **Differences**:
-   - **Architecture**: A perceptron is a single-layer linear model, while CNNs are deep networks that include multiple layers, such as convolutional layers, pooling layers, and fully connected layers.
-   - **Data Handling**: Perceptrons are suitable for structured data with fixed input sizes, whereas CNNs are specifically designed to handle high-dimensional data like images by extracting spatial hierarchies of features.
-   - **Complexity**: While a perceptron is simple and interpretable, CNNs are more complex, capable of capturing intricate patterns through their hierarchical design.
-   - **Applicability**: A perceptron performs basic linear classification, whereas CNNs excel in computer vision tasks such as image recognition, object detection, and segmentation.
+   - **Architecture**: A perceptron is a **single**-layer linear model, while CNNs are **deep** networks that include multiple layers, such as convolutional layers, pooling layers, and fully connected layers.
+   - **Data Handling**: Perceptrons are suitable for structured data with **fixed** input sizes, whereas CNNs are specifically designed to handle **high-dimensional** data like images by extracting spatial hierarchies of features.
+   - **Complexity**: While a perceptron is **simple** and interpretable, CNNs are more **complex**, capable of capturing intricate patterns through their hierarchical design.
+   - **Applicability**: A perceptron performs **basic linear classification**, whereas CNNs excel in computer vision tasks such as image recognition, object detection, and segmentation.
 
 In summary, while perceptrons laid the groundwork for modern machine learning, CNNs build on that foundation to solve far more complex problems, particularly in the domain of image processing.
+
+See also my article: [Convolutional Neural Networks (CNNs) - Overview](https://rya-sge.github.io/access-denied/2024/11/19/convolutional-neural-networks-overview/)
 
 ------
 
