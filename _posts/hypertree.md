@@ -1,9 +1,19 @@
-
-
-
+---
+layout: post
+title: Hypergraph and Hypertree - Overview
+date:   2025-11-19
+locale: en-GB
+lang: en
+last-update: 
+categories: programmation
+tags: graph hypertreee hypergraph tree
+description: Tornado Cash is one of Ethereum’s pioneering privacy protocols build on zk-SNARK and Circom zero-knowledge circuits.
+isMath: false
+image: /assets/article/cryptographie/zero-knowledge-proof/tornado_cash/tornado_cash_deposit.drawio.png
+---
 
 A **hypergraph** is a generalization of a graph where an edge may connect **any number of vertices**, not just two.
- Formally, it is a pair `H=(V,E)`where `V` is a set of vertices and each **hyperedge** e∈Ee\in Ee∈E is a subset of `V`.
+ Formally, it is a pair `H=(V,E)`where `V` is a set of vertices and each **hyperedge** `e∈E` is a subset of `V`.
 
 Examples:
 
@@ -95,7 +105,7 @@ A **Berge cycle** is an alternating sequence:
 $$
 (v_1,e_1,v_2,e_2,\dots,v_k,e_k)
 $$
-with all viv_ivi distinct, all eie_iei distinct, and:
+with all `v_i` distinct, all `e_i` distinct, and:
 
 $$
 v_i, v_{i+1} \in e_i \quad (1 \le i \le k,\; \text{indices mod } k).
@@ -197,8 +207,6 @@ Each bag is covered by the hyperedges assigned to that node:
 $$
 \chi(t) \subseteq \bigcup_{e\in \lambda(t)} e.
 $$
-
-
 Variants (generalized, fractional) modify condition 3 to allow fractional or more flexible coverings.
 
 ------
@@ -279,8 +287,6 @@ E =
 \{3,5,6\}
 \Big\}
 $$
-
-
 Every set in E has 3 elements ⇒ the Fano plane is a **3-uniform hypergraph**.
 
 ------
@@ -315,11 +321,11 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 
 | Concept              | Does the Fano plane satisfy it? | Why                                        |
 | -------------------- | ------------------------------- | ------------------------------------------ |
-| Hypergraph           | ✔ Yes                           | points = vertices, lines = hyperedges      |
-| 3-uniform hypergraph | ✔ Yes                           | each line has 3 points                     |
-| Linear hypergraph    | ✔ Yes                           | any two lines meet in ≤1 point             |
-| Hypertree            | ❌ No                            | strongly cyclic, fails Helly, no join tree |
-| Acyclic hypergraph   | ❌ No                            | contains cycles                            |
+| Hypergraph           | &#x2611;                        | points = vertices, lines = hyperedges      |
+| 3-uniform hypergraph | &#x2611;                        | each line has 3 points                     |
+| Linear hypergraph    | &#x2611;                        | any two lines meet in ≤1 point             |
+| Hypertree            | &#x2612;                        | strongly cyclic, fails Helly, no join tree |
+| Acyclic hypergraph   | &#x2612;                        | contains cycles                            |
 
 ------
 

@@ -474,5 +474,6 @@ Here is a summary from the documentation:
 - [Tornado cash github](https://github.com/tornadocash/tornado-core/)
 
 - [Tornado Cash - Circuit](https://github.com/tornadocash/docs/blob/en/circuits/core-deposit-circuit.md)
+- [Tornado Cash Whitepaper](https://berkeley-defi.github.io/assets/material/Tornado%20Cash%20Whitepaper.pdf)
 - [RareSkills - How Tornado Cash Works (Line by Line for Devs)](https://rareskills.io/post/how-does-tornado-cash-work)
 - ChatGPT to summarize the documentation
