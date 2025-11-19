@@ -7,13 +7,15 @@ locale: en-GB
 categories: blockchain ethereum 
 tags: defi stablecoin
 description: USD₮0 is an Omnichain Fungible Token (OFT) built on LayerZero, enabling cross-chain transfers of USDT. Learn how USD₮0 works, its architecture, and the Legacy Mesh that connects existing USDT networks.
-image: 
+image: /assets/article/blockchain/defi/ustd0/usdt0-diagram.png
 isMath: false
 ---
 
+USD₮0 is an **Omnichain Fungible Token (OFT)** designed to operate seamlessly across multiple blockchains. 
 
+Built on the OFT standard from LayerZero, USD₮0 enables cross-chain transfers while maintaining **full backing with USD₮**. 
 
-USD₮0 is an **Omnichain Fungible Token (OFT)** designed to operate seamlessly across multiple blockchains. Built on the OFT standard from LayerZero, USD₮0 enables secure and efficient cross-chain transfers while maintaining **full backing with USD₮**. Its architecture separates token functionality from messaging, allowing consistent behavior across all supported chains and enabling independent upgrades of its components.
+Its architecture separates token functionality from messaging, allowing consistent behavior across all supported chains and enabling independent upgrades of its components.
 
 ------
 
@@ -29,6 +31,10 @@ USD₮0 operates using a **lock-and-mint mechanism** supported by the OFT standa
     An advanced messaging layer enables efficient, cost-effective transfers between chains. Unlike bridges relying on fragmented liquidity, USD₮0 allows users to move tokens quickly and reliably.
 4. **Redemption:**
     USD₮0 can be redeemed by unlocking the corresponding USD₮ on Ethereum, maintaining a consistent relationship between minted and locked assets.
+
+From the [documentation](https://docs.usdt0.to/technical-documentation/developer): 
+
+![usdt0-diagram]({{site.url_complet}}/assets/article/blockchain/defi/ustd0/usdt0-diagram.png)
 
 ------
 
@@ -106,15 +112,17 @@ More details: [LayerZero DVN Documentation](https://docs.layerzero.network/v2/ho
 
 USD₮0 is deployed across multiple chains. Some key deployments include:
 
-| Chain        | Component                              | Address   |
-| ------------ | -------------------------------------- | --------- |
-| Ethereum     | OAdapterUpgradeable                    | 0x6C96dE… |
-| Arbitrum One | OUpgradeable / ArbitrumExtensionV2     | 0x14E4A…  |
-| Polygon PoS  | OUpgradeable / UChildUSDT0             | 0x6BA10…  |
-| Optimism     | OUpgradeable / TetherTokenOFTExtension | 0xF03b4…  |
-| Berachain    | OUpgradeable / TetherTokenOFTExtension | 0x3Dc96…  |
+| Chain        | Component           | Address                                                      |
+| ------------ | ------------------- | ------------------------------------------------------------ |
+| Ethereum     | OAdapterUpgradeable | [`0x6C96dE32CEa08842dcc4058c14d3aaAD7Fa41dee`](https://etherscan.io/address/0x6C96dE32CEa08842dcc4058c14d3aaAD7Fa41dee) |
+| Arbitrum One | OUpgradeable /      | [0x14E4A1B13bf7F943c8ff7C51fb60FA964A298D92](https://arbiscan.io/address/0x14E4A1B13bf7F943c8ff7C51fb60FA964A298D92) |
+| Polygon PoS  | OUpgradeable        | [0x6BA10300f0DC58B7a1e4c0e41f5daBb7D7829e13](https://polygonscan.com/address/0x6BA10300f0DC58B7a1e4c0e41f5daBb7D7829e13) |
+| Optimism     | OUpgradeable        | [`0xF03b4d9AC1D5d1E7c4cEf54C2A313b9fe051A0aD`](https://optimistic.etherscan.io/address/0xF03b4d9AC1D5d1E7c4cEf54C2A313b9fe051A0aD) |
+| Berachain    | OUpgradeable        | OUpgradeable: [0x3Dc96399109df5ceb2C226664A086140bD0379cB](https://berascan.com/address/0x3Dc96399109df5ceb2C226664A086140bD0379cB) |
 
 Full deployments also include Ink, Unichain, Corn, Sei, Flare, HyperEVM, Rootstock, XLayer, and Plasma.
+
+See [docs.usdt0.to - usdt0-deployments](https://docs.usdt0.to/technical-documentation/developer/usdt0-deployments)
 
 ------
 

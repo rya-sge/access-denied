@@ -5,7 +5,7 @@ date:   2024-11-19
 lang: en
 locale: en-GB
 categories: ai
-tags: cnn ML AI  neural-network convolutional
+tags: cnn ML AI neural-network convolutional fcl
 description: Transport Layer Security (TLS) 1.3 is the latest version of the TLS protocol, designed to enhance internet security, speed, and privacy.
 image: /assets/article/mlg/MLG-CNN.drawio.png
 isMath: true
@@ -155,4 +155,5 @@ By leveraging key components like convolution layers, pooling layers, and fully 
 - [Understanding Architecture Of Inception Network & Applying It To A Real-World Dataset](https://gghantiwala.medium.com/understanding-the-architecture-of-the-inception-network-and-applying-it-to-a-real-world-dataset-169874795540)
 - [Medium - AlexNet Architecture Explained](https://medium.com/@siddheshb008/alexnet-architecture-explained-b6240c528bd5)
 - [unibas - Deep Neural Networks - Hyperparameters](https://dmi.unibas.ch/fileadmin/user_upload/dmi/Studium/Computer_Science/Vorlesung_HS19/Pattern_Recongnition/09_Deep_Neural_Networks_hyperparameters_2019.pdf) 
+- [Stanford - Convolutional Neural Networks cheatsheet](https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-convolutional-neural-networks)
 - ChatGPT with the following inputs: "Write me an article about CNN with key terms", "What are hyperparameters in a CNN"

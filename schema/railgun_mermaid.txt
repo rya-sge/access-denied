@@ -1,0 +1,27 @@
+flowchart TD
+    A[Public Signals] -->|merkleRoot, boundParamsHash, nullifiers, commitmentsOut| B[Message Hash]
+    B --> C[EDDSA Signature Verification]
+    
+    D[Private Signals] -->|token, publicKey, randomIn, valueIn, pathElements, leavesIndices, nullifyingKey| E[Master Public Key]
+    E --> F[Compute Note Public Keys NPKs]
+    F --> G[Compute Note Commitments Poseidon NPK token valueIn]
+    
+    G --> H[Verify Input Merkle Proofs]
+    H --> I[Nullifier Check]
+    I --> J[Prevent Double-Spend]
+    
+    K[Output Private Signals] -->|npkOut, valueOut| L[Verify Output Values Num2Bits]
+    L --> M[Compute Output Commitments Poseidon npkOut token valueOut]
+    
+    G --> N[Sum Input Values]
+    M --> O[Sum Output Values]
+    N --> P[Check Balance Property sumIn === sumOut]
+    O --> P
+    
+    P --> Q[Transaction Valid]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+    style K fill:#bfb,stroke:#333,stroke-width:2px
+    style Q fill:#ffb,stroke:#333,stroke-width:2px
+
