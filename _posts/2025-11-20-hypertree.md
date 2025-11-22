@@ -20,9 +20,13 @@ Examples:
 - Ordinary graphs → hypergraphs where all edges have size 2
 - Fano plane → a 3-uniform hypergraph (all edges have size 3)
 
+[TOC]
+
+
+
 ------
 
-# **Hypertree (in a few words)**
+### Hypertree (in a few words)
 
 A **hypertree** is a *tree-like hypergraph*.
  It is a hypergraph that can be arranged on an underlying tree so that each hyperedge forms a connected subtree.
@@ -70,13 +74,13 @@ $$
 
 Several classical graphs derived from a hypergraph are used to study structural properties.
 
-### **Incidence graph**
+### Incidence graph
 
 $$
 I(H) = (V \cup E,\; \{(v,e)\mid v\in e\})
 $$
 
-### **2-section (primal graph)**
+### 2-section (primal graph)
 
 Two vertices are adjacent if they co-occur in some hyperedge:
 
@@ -94,34 +98,19 @@ $$
 
 ------
 
-# Cycles and Acyclicity in Hypergraphs
+## Cycles and Acyclicity in Hypergraphs
 
 Unlike graphs, hypergraphs admit multiple inequivalent definitions of acyclicity.
 
-## Berge Cycles
 
-A **Berge cycle** is an alternating sequence:
-
-$$
-(v_1,e_1,v_2,e_2,\dots,v_k,e_k)
-$$
-with all `v_i` distinct, all `e_i` distinct, and:
-
-$$
-v_i, v_{i+1} \in e_i \quad (1 \le i \le k,\; \text{indices mod } k).
-$$
-A hypergraph is **Berge-acyclic** if no such cycle exists.
-
-Equivalent characterization:
- `H` is Berge-acyclic **iff* the incidence graph I(H)is a forest.
 
 ------
 
-## **2.2 Fagin’s Acyclicity Notions (α,β,γ\alpha,\beta,\gammaα,β,γ)**
+## Fagin’s Acyclicity Notions (α,β,γ\alpha,\beta,\gammaα,β,γ)
 
 These definitions are fundamental in database theory.
 
-### **α\alphaα-acyclicity**
+### α\alphaα-acyclicity
 
 A hypergraph H=(V,E)H=(V,E)H=(V,E) is **α\alphaα-acyclic** if it admits a **join tree**:
  a tree whose nodes are hyperedges such that for every vertex v∈Vv\in Vv∈V, the set:
@@ -133,7 +122,7 @@ induces a connected subtree.
 
 α\alphaα-acyclicity is the strongest widely used database notion of hypergraph acyclicity.
 
-### **β\betaβ-acyclicity and γ\gammaγ-acyclicity**
+### β\betaβ-acyclicity and γ\gammaγ-acyclicity
 
 Stronger acyclicity notions, each eliminating additional forms of cycle-like structures.
  They satisfy:
@@ -145,20 +134,20 @@ $$
 
 ------
 
-# Hypertrees
+## Hypertrees
 
 A **hypertree** is a hypergraph that can be represented by a host tree.
 
-## **3.1 Host-tree definition**
+## Host-tree definition
 
-A hypergraph H=(V,E) is a **hypertree** if there exists a tree `T` with vertex set containing `V` such that every hyperedge e∈Ee\in Ee∈E induces a **connected** subtree of T:
+A hypergraph H=(V,E) is a **hypertree** if there exists a tree `T` with vertex set containing `V` such that every hyperedge `e∈E` induces a **connected** subtree of T:
 
 $$
 \forall e\in E,\quad T[e]\ \text{is connected}.
 $$
 
 
-## **3.2 Helly property**
+## Helly property
 
 Hypertrees satisfy the **Helly property**:
 
@@ -167,13 +156,13 @@ $$
 \quad\text{then}\quad \bigcap \mathcal{F}\neq\varnothing.
 $$
 
-## **3.3 Duality characterization**
+## Duality characterization
 
 A hypergraph is a hypertree **if** its **dual hypergraph** is α\alphaα-acyclic.
 
 ------
 
-# **4. Hypertree Decompositions**
+## Hypertree Decompositions
 
 Hypertree decompositions generalize graph tree decompositions to hypergraphs.
 
@@ -185,22 +174,22 @@ A **hypertree decomposition** of H=(V,E) consists of:
 
 such that:
 
-### 1. Edge coverage
+### Edge coverage
 
 $$
 \forall e\in E,\;\exists t\in V(T):\; e\subseteq \chi(t).
 $$
 
-### 2. Running intersection property
+### Running intersection property
 
-For every vertex v∈Vv\in Vv∈V, the set of nodes containing vvv is connected:
+For every vertex `v∈V`, the set of nodes containing `v` is connected:
 
 $$
 \{\, t \in V(T) \mid v \in \chi(t) \,\}
 \text{ induces a connected subtree of } T.
 $$
 
-### 3. Bag coverage by hyperedges
+### Bag coverage by hyperedges
 
 Each bag is covered by the hyperedges assigned to that node:
 
@@ -211,7 +200,7 @@ Variants (generalized, fractional) modify condition 3 to allow fractional or mor
 
 ------
 
-# **5. Hypertree Width**
+## Hypertree Width
 
 Given a hypertree decomposition (T,χ,λ)(T,\chi,\lambda)(T,χ,λ), the **width** is:
 
@@ -230,13 +219,13 @@ $$
 |\lambda(t)|.
 $$
 
-### **Fractional hypertree width**
+### Fractional hypertree width
 
 Allows fractional covers and is always ≤ generalized hypertree width.
 
 ------
 
-# **6. Algorithmic Implications**
+### Algorithmic Implications
 
 If a CSP or conjunctive query has hypergraph `H` with:
 
@@ -248,7 +237,7 @@ then evaluation is polynomial-time for fixed `k`.
 
 
 
-## Example
+### Example
 
 #### Why the Fano plane is a hypergraph
 
@@ -329,7 +318,7 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 
 ------
 
-# **7. Worked Example**
+## Worked Example
 
 Let:
 
@@ -361,7 +350,7 @@ $$
 
 ------
 
-# **8. References (hyperlinks)**
+## References (hyperlinks)
 
 - **Hypergraph — Wikipedia**
    [https://en.wikipedia.org/wiki/Hypergraph](https://en.wikipedia.org/wiki/Hypergraph?utm_source=chatgpt.com)

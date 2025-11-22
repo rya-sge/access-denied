@@ -177,8 +177,6 @@ This ensures the integrity of the blockchain by making it computationally infeas
 2. **Broadcasting the transaction**: The transaction is broadcast to the network.
 3. **Verification**: Miners and nodes verify the signature using the sender's public key before accepting the transaction as valid.
 
-By relying on ECDSA, blockchain systems can maintain decentralized trust and security.
-
 ## Security of ECDSA
 
 The security of ECDSA relies on the hardness of two mathematical problems:

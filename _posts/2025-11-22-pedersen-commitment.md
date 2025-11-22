@@ -1,11 +1,18 @@
-# The Pedersen Commitment
+---
+layout: post
+title: The Pedersen Commitment - Overview
+date: 2025-11-22
+lang: en
+locale: en-GB
+categories: cryptography
+tags: pedersen commitment secret sharing
+description: 
+image: 
+isMath: true
+---
 
-https://eprint.iacr.org/2004/201.pdf
-
-The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.”*
+The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“[Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.](https://eprint.iacr.org/2004/201.pdf)”*
  It provides a way to *commit* to a secret value while keeping it hidden, and ensures the value cannot be changed later.
-
-https://dl.acm.org/doi/10.5555/646756.705507
 
 ------
 
@@ -47,7 +54,7 @@ $$
 Because **t** is random, the commitment **c** hides **s**.
 Even if someone sees **c**, they cannot determine **s** because there are many possible pairs **(s, t)** that yield the same **c**.
 
-### 2. Binding
+### Binding
 
 Under the discrete logarithm assumption, it is infeasible to find another pair **(s', t')** such that:
 
@@ -73,9 +80,6 @@ Then their product is:
 $$
 c1 * c2 = g^{s1 + s2} * h^{t1 + t2}
 $$
-
-
-****
 
 This means **(c1 \* c2)** is a commitment to **(s1 + s2)**, using blinding factor **(t1 + t2)**.
 
@@ -104,7 +108,7 @@ Such schemes are critical in applications like:
 
 Because Pedersen commitments are both *hiding* and *homomorphic*, they are used in many privacy-preserving blockchain systems.
 
-### 1. Monero
+### Monero
 
 Monero uses Pedersen commitments in its **Ring Confidential Transactions (RingCT)** protocol.
  Transaction amounts are hidden with commitments **(c = g^s \* h^t)**, but validators can still verify that:
@@ -121,21 +125,17 @@ When you spend Monero, the value of the inputs that you are spending and the val
 - Pedersen commitments allow you to send Monero without revealing the value of the transactions. 
 - Pedersen commitments also make it possible for people to verify that transactions on the blockchain are valid and not creating Monero out of thin air.
 
-https://www.getmonero.org/resources/moneropedia/pedersen-commitment.html
+Reference: [Monero - Pedersen Commitment](https://www.getmonero.org/resources/moneropedia/pedersen-commitment.html) / [Ring - Confidential Transactions](https://eprint.iacr.org/2015/1098.pdf)
 
+#### Other
 
+##### Project Khokha
 
-https://eprint.iacr.org/2015/1098.pdf
+2018 / PoC: The South African Reserve Bank’s **Project Khokha**, built on ConsenSys’ Quorum blockchain, used Pedersen commitments and range proofs for **confidential interbank settlements** — allowing banks to transact privately but still maintain regulatory assurance.
 
-### 2. MobileCoin
+[https://consensys.io/blockchain-use-cases/finance/project-khokha](https://consensys.io/blockchain-use-cases/finance/project-khokha)
 
-MobileCoin, a project inspired by Monero, also uses Pedersen commitments combined with range proofs to hide transaction amounts while maintaining auditability.
-
-### 3. Project Khokha
-
-The South African Reserve Bank’s **Project Khokha**, built on ConsenSys’ Quorum blockchain, used Pedersen commitments and range proofs for **confidential interbank settlements** — allowing banks to transact privately but still maintain regulatory assurance.
-
-### 4. Other Uses
+### Other Uses
 
 Pedersen commitments are also standard building blocks in:
 
@@ -171,6 +171,9 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 
 ## Reference
 
-[RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
+- [eprint - Non-Interactive and Information-Theoretic Secure Publicly Verifiable Secret Sharing](https://eprint.iacr.org/2004/201.pdf)
 
-https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment
+- [RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
+
+- https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment
+- https://dl.acm.org/doi/10.5555/646756.705507
