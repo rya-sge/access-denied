@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: cryptography
 tags: pedersen commitment secret sharing
-description: 
+description: Pedersen commitment provides a way to commit to a secret value while keeping it hidden, and ensures the value cannot be changed later.
 image: 
 isMath: true
 ---
@@ -14,7 +14,9 @@ isMath: true
 The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“[Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.](https://eprint.iacr.org/2004/201.pdf)”*
  It provides a way to *commit* to a secret value while keeping it hidden, and ensures the value cannot be changed later.
 
-------
+[TOC]
+
+
 
 ## Core Idea
 
@@ -22,7 +24,9 @@ We work in a finite cyclic group **G** of prime order **q**, where the **discret
 
 We select two generators **g** and **h** in **G**, such that no one knows a value **a** where 
 $$
+\begin{aligned}
 h = g^a
+\end{aligned}
 $$
 
 
@@ -34,14 +38,18 @@ To commit to a secret value **s**, with **0 ≤ s < q**, we:
 
    
    $$
+   \begin{aligned}
    c = g^s * h^t
+   \end{aligned}
    $$
    
 
 The value **c** is the commitment to **s**.
  To open the commitment, you reveal **(s, t)**, and anyone can verify:
 $$
+\begin{aligned}
 c = g^s * h^t
+\end{aligned}
 $$
 
 
@@ -69,16 +77,22 @@ If you could do that, you would effectively solve the discrete logarithm problem
 Pedersen commitments are **additively homomorphic**.
  If you have two commitments:
 $$
+\begin{aligned}
 c1 = g^{s1} * h^{t1}
+\end{aligned}
 $$
 
 $$
+\begin{aligned}
 c2 = g^{s2} * h^{t2}
+\end{aligned}
 $$
 
 Then their product is:
 $$
+\begin{aligned}
 c1 * c2 = g^{s1 + s2} * h^{t1 + t2}
+\end{aligned}
 $$
 
 This means **(c1 \* c2)** is a commitment to **(s1 + s2)**, using blinding factor **(t1 + t2)**.
@@ -175,5 +189,5 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 
 - [RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
 
-- https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment
-- https://dl.acm.org/doi/10.5555/646756.705507
+- [https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment)
+- [https://dl.acm.org/doi/10.5555/646756.705507](https://dl.acm.org/doi/10.5555/646756.705507)

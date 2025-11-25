@@ -93,16 +93,18 @@ Bitcoin adopted Schnorr signatures as part of the **Taproot upgrade** in 2021. T
 
 Schnorr’s linearity allows multiple participants to produce a **single aggregated signature**. Suppose participants have public keys P1,P2,…,PnP_1, P_2, \dots, P_nP1,P2,…,Pn and signatures s1,s2,…,sns_1, s_2, \dots, s_ns1,s2,…,sn. The aggregated signature is:
 
-```
-\[ s_\text{agg} = \sum_{i=1}^{n} s_i \]
-\[ R_\text{agg} = \sum_{i=1}^{n} R_i \]
-```
+$$
+s_\text{agg} = \sum_{i=1}^{n} s_i
+R_\text{agg} = \sum_{i=1}^{n} R_i
+$$
+
 
 This satisfies:
 
-```
-\[ s_\text{agg} G = R_\text{agg} + e \sum_{i=1}^{n} P_i \]
-```
+$$
+s_\text{agg} G = R_\text{agg} + e \sum_{i=1}^{n} P_i
+$$
+
 
 ### 3. Cross-Chain Atomic Swaps and Layer-2 Solutions
 
