@@ -9,7 +9,7 @@ categories: blockchain solidity zkp
 tags: solidity zkp zk-snark verifier
 description: This article summarizes the essential points to verify when reviewing a Solidity verifier contract using in zk-proof systems
 isMath: false
-image: /assets/article/blockchain/ethereum/erc-4337/erc4337-openzeppelin-account-mindmap.png
+image: 
 ---
 
 Zero-knowledge proof (ZKP) verifier contracts — typically used in zk-SNARK or zk-proof systems — play a fundamental role in ensuring that proofs submitted on-chain are valid. 

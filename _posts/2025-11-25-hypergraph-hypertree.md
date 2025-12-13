@@ -120,11 +120,23 @@ Example:
 
 **Helly**
 
-H having V (H) = {1, 2, 3, 4} and E(H) = {{1, 2},{1, 3}, {1, 4}} is Helly
+H having 
+$$
+V (H) = {1, 2, 3, 4}
+$$
+
+$$
+E(H) = {{1, 2},{1, 3}, {1, 4}}
+$$
+
+are  Helly
 
 **Not-Helly**
 
-E(H) = {{1, 2}, {1, 3}, {2, 3}} then H is not Helly.
+$$
+E(H) = {{1, 2}, {1, 3}, {2, 3}}
+$$
+then H is not Helly.
 
 [Alain Bretto - Hypergraph Theory](https://www.math.ucdavis.edu/~saito/data/tensor/bretto_hypergraph-theory.pdf), page. 30
 
