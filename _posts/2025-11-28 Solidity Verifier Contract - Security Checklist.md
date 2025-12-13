@@ -1,6 +1,24 @@
-# Solidity Verifier Contract - Security Checklist
+---
+layout: post
+title: "Solidity Verifier Contract - Security Checklist"
+date:   2025-11-28
+locale: en-GB
+lang: en
+last-update: 
+categories: blockchain solidity zkp
+tags: solidity zkp zk-snark verifier
+description: This article summarizes the essential points to verify when reviewing a Solidity verifier contract using in zk-proof systems
+isMath: false
+image: /assets/article/blockchain/ethereum/erc-4337/erc4337-openzeppelin-account-mindmap.png
+---
 
-Zero-knowledge proof (ZKP) verifier contracts — typically used in zk-SNARK or zk-proof systems — play a fundamental role in ensuring that proofs submitted on-chain are valid. Although the cryptography behind ZKPs is strong, real-world vulnerabilities have frequently originated from incorrect implementation, missing bound checks, or improper integration with higher-level smart-contract logic.
+Zero-knowledge proof (ZKP) verifier contracts — typically used in zk-SNARK or zk-proof systems — play a fundamental role in ensuring that proofs submitted on-chain are valid. 
+
+Although the cryptography behind ZKPs is strong, real-world vulnerabilities have frequently originated from:
+
+-  incorrect implementation, 
+- missing bound checks, 
+- or improper integration with higher-level smart-contract logic.
 
 This article summarizes the essential points to verify when reviewing a Solidity verifier contract.
 
@@ -46,7 +64,7 @@ means:
 
 ### Details
 
-Curve coordinates live in the base field `q` (check coordinates `< q`), while public *scalar* inputs are elements of the scalar field `r` (check `0 ≤ pub < r`). Confusing these two fields is a common and dangerous mistake.” [xn--2-umb.com+1](https://xn--2-umb.com/23/bn254-compression/?utm_source=chatgpt.com)
+Curve coordinates live in the base field `q` (check coordinates `< q`), while public *scalar* inputs are elements of the scalar field `r` (check `0 ≤ pub < r`). Confusing these two fields is a common and dangerous mistake.” [xn--2-umb.com+1](https://xn--2-umb.com/23/bn254-compression/)
 
 ## Proof-Element Validation Before Cryptographic Operations
 
@@ -72,7 +90,7 @@ See also [RareSkills - Ethereum precompiled contracts](https://rareskills.io/pos
 
 ### Details
 
- “recompiles expect well-formed points, *but their exact behavior (curve membership vs subgroup checks) depends on the chain and precompile version*. Do not rely on failure semantics alone — prefer explicit, deterministic Solidity checks when portability is required.” [ZK Nation Forum+1](https://forum.zknation.io/t/zip-11-v28-precompile-upgrade/679?utm_source=chatgpt.com)
+ “recompiles expect well-formed points, *but their exact behavior (curve membership vs subgroup checks) depends on the chain and precompile version*. Do not rely on failure semantics alone — prefer explicit, deterministic Solidity checks when portability is required.” [ZK Nation Forum+1](https://forum.zknation.io/t/zip-11-v28-precompile-upgrade/679)
 
 ------
 
@@ -206,7 +224,7 @@ Fuzzers should be run not just on the Solidity contract but also on the client-s
 
 ### Details
 
-Test `pub = r`, `pub = r+1`, `pub = r-1`. Also test proofs where proof points are valid base-field elements but **not** in the required subgroup (if chain doesn’t enforce subgroup). [oxor.io+1](https://oxor.io/blog/common-vulnerabilities-in-zk-proof/?utm_source=chatgpt.com)
+Test `pub = r`, `pub = r+1`, `pub = r-1`. Also test proofs where proof points are valid base-field elements but **not** in the required subgroup (if chain doesn’t enforce subgroup). [oxor.io+1](https://oxor.io/blog/common-vulnerabilities-in-zk-proof/)
 
 ## System-Level Context: The Verifier Is Only One Layer
 
@@ -229,10 +247,11 @@ Therefore, verify:
 
 # References
 
-- [arXiv - SoK: What Don’t We Know? Understanding Security of SNARK-Based Systems](https://arxiv.org/html/2402.15293v1?utm_source=chatgpt.com)
+- [arXiv - SoK: What Don’t We Know? Understanding Security of SNARK-Based Systems](https://arxiv.org/html/2402.15293v1)
 -  [arXiv - Zero-Knowledge Proof Frameworks: A Systematic Survey](https://arxiv.org/pdf/2502.07063v2)
-- [OXORIO - Common Vulnerabilities in ZK Proof](https://blog.oxor.io/common-vulnerabilities-in-zk-proof-5ba7620dfa2f?utm_source=chatgpt.com)
--  [Crypto StackExchange - What is required to verify a zk-SNARK?](https://crypto.stackexchange.com/questions/99054/what-is-required-to-verify-a-zk-snark?utm_source=chatgpt.com)
-- [ScienceDirect - A Survey of Smart Contract Security](https://www.sciencedirect.com/science/article/pii/S2666389920302439?utm_source=chatgpt.com)
--  [Medium - Solidity Security Best Practices](https://medium.com/@joichiro.sai/solidity-security-best-practices-mastering-the-checks-effects-interactions-pattern-ddfa38b8816d?utm_source=chatgpt.com)
-- https://docs.circom.io/getting-started/proving-circuits/?utm_source=chatgpt.com
+- [OXORIO - Common Vulnerabilities in ZK Proof](https://blog.oxor.io/common-vulnerabilities-in-zk-proof-5ba7620dfa2f)
+-  [Crypto StackExchange - What is required to verify a zk-SNARK?](https://crypto.stackexchange.com/questions/99054/what-is-required-to-verify-a-zk-snark)
+- [ScienceDirect - A Survey of Smart Contract Security](https://www.sciencedirect.com/science/article/pii/S2666389920302439)
+-  [Medium - Solidity Security Best Practices](https://medium.com/@joichiro.sai/solidity-security-best-practices-mastering-the-checks-effects-interactions-pattern-ddfa38b8816d)
+- [docs.circom.io - proving-circuits/](https://docs.circom.io/getting-started/proving-circuits/)
+- ChatGPT to summarize the different resources and articles

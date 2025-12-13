@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Hypergraph and Hypertree - Overview
+title: "Hypergraph and Hypertree - Overview"
 date:   2025-11-25
 locale: en-GB
 lang: en
