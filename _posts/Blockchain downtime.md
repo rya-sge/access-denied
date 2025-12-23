@@ -13,24 +13,87 @@ isMath: false
 
 
 
-| Blockchain                    | Check<br />Current status                            | Date of downtime / major halt                                | Notes                                                        |
-| ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Bitcoin (mainnet)             | [bitcoin.org](https://bitcoin.org/en/alerts)         | Various historical incidents: e.g., a network split bug in 2013 that lasted ~6 hours. [Reddit - Has the Bitcoin Blockchain been functional 100% of the time? If not, when?](https://www.reddit.com/r/BitcoinBeginners/comments/o7gog6?) | Broadly the Bitcoin network is considered to have extremely high uptime; exact formal “downtime” events are rare and often partial rather than full halts. |
-| Ethereum (mainnet)            | [Ethereum status](https://ethstats.dev)              | -                                                            | https://www.binance.com/en/square/post/27551231402098        |
-| Avalanche (C-Chain / Mainnet) | [Avalanche status](https://status.avax.network)      | ~ February 23, 2024 — ~5 hour outage due to a client‐code bug. [Blockworks](https://blockworks.co/news/avalanche-blockchain-downtime)<br />[Official source](https://status.avax.network/incidents/qmx0s7zk6gkm) / [Official source 2](https://status.avax.network/incidents/4vq54hv6b9t4) | The C-Chain stopped producing blocks around 6:30 am ET and resumed about 5 hours later. [Blockworks](https://blockworks.co/news/avalanche-blockchain-downtime) |
-| Cardano                       |                                                      |                                                              |                                                              |
-| Linea                         |                                                      |                                                              | https://spectrum-search.com/insights/ethereum-layer-2-outages-expose-fragile-foundations-of-blockchain-resilience-and-trust |
-| Polygon PoS                   | [Polygon Stautus](https://status.polygon.technology) | **July 2025**<br />~ July 30, 2025 — no blocks produced for ~2 hours. [finway.com.ua](https://finway.com.ua/en/polygon-pos-network-experiences-outage/)<br /><br />[Mainnet heimdall halted](https://status.polygon.technology/incidents/ll8nkw7q8x5k)<br />**September 10, 2025** — delayed finality (10-15 minutes) rather than full halt. [CryptoRank](https://cryptorank.io/news/feed/02add-polygon-pos-network-faces-10-15-minute-transaction-delays-due-to-node-bug)<br />[Official source - Polygon to Ethereum Asset Withdrawals Impacted](https://status.polygon.technology/incidents/cflvgc1zkbk9) & [Consensus Finalization Delay – Temporary Issue](https://status.polygon.technology/incidents/c8nc05x3qvmg) |                                                              |
-| Solana                        | [Solana status](https://status.solana.com)           | February 6, 2024 — ~4 h 46 m outage. [Solana](https://solana.com/en/news/network-performance-report-march-2024) | Earlier outages also in Solana’s history (e.g., Sept 14, 2021 for ~17 hours) [OKX](https://www.okx.com/learn/solana-outage-guide) |
-| Polkadot                      |                                                      | -                                                            | A reddit comment states “Polkadot has consistently produced blocks … there has never been a chain halt” as of 2023. [Reddit](https://www.reddit.com/r/Polkadot/comments/10z061g) |
-| Cosmos Hub                    | [Atom scan](https://atomscan.com)                    | June 5, 2024 — ~4 hour outage due to vulnerability in the Liquid Staking Module during v17 upgrade. [ForkLog+1](https://forklog.com/en/cosmos-hub-resumes-operations-after-four-hour-outage/) | Block production halted until validators applied patch.      |
-| Sui                           | [Sui status](https://status.sui.io)                  | November 21, 2024 — >1 hour outage (block production halted after ~9:15 am UTC). [Cointelegraph](https://cointelegraph.com/news/sui-down-no-blocks-produced-1-hour) | The network was restored after approximately 2 hours.        |
-| Aptos                         |                                                      | October 19, 2023 — outage for over 5 hours. [The Crypto Times](https://www.cryptotimes.io/2023/10/19/aptos-suffers-major-outage-for-over-5-hours-on-its-birthday/) | Block production stopped at block height 104,621,314.        |
-| ICP                           |                                                      |                                                              |                                                              |
+This article summarizes the main blockchain outage. Blockchain outages can have serverail diffferent cause, notably:
+
+- Vulnerability discovered in the sfotware node or consenss requirint to halt the blockhchain,
+- A bug which halt the prochain during an upgrade(e.g. Cosmos)
+- A pic of transaction which halt the blockchain or some key components (e.g centralized sequencer for Layer 2)
+
+Example: Bitcoin,
+
+
+
+
+
+
+
+
+
+### Summary tab
+
+### Summary tab
+
+| Blockchain                    | Check<br />Current status                                    | Date of downtime / major halt                                | Notes                                                        |
+| ----------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Aptos                         | [Aptos explorer](https://explorer.aptoslabs.com/?network=mainnet) | **October 19, 2023** — outage for over 5 hours ([10/18/23 Aptos Mainnet Incident Report](https://aptosnetwork.com/currents/10-18-23-aptos-mainnet-incident-report)) | Block production stopped at block height 104,621,314, due to a bug in the Aptos-core code base (charge / refund for a transaction) |
+| Arbitrum                      | [Arbitrum status](https://status.arbitrum.io) & [Arbiscan](https://arbiscan.freshstatus.io) |                                                              |                                                              |
+| Avalanche (C-Chain / Mainnet) | [Avalanche status](https://status.avax.network)              | **~February 23, 2024** — ~5 h outage due to consensus stall. [Blockworks](https://blockworks.co/news/avalanche-blockchain-downtime), [Official source](https://status.avax.network/incidents/qmx0s7zk6gkm) / [Official source 2](https://status.avax.network/incidents/4vq54hv6b9t4) | Validator networking bug halted finalization until fix.      |
+| Bitcoin (mainnet)             | [bitcoin.org](https://bitcoin.org/en/alerts)<br />[Bitcoin uptime tracker](https://bitbo.io/uptime/) | **2010**: Value Overflow Incident;<br />**2013**: Client fork divergence | Extremely rare halts; formal downtime events are historical. |
+| Cardano                       | [Cardano status (general)](https://cardanoscan.io)           | **January 22–23, 2023** — Brief node disruption/automatic restarts. [updates.cardano.intersectmbo.org+1](https://updates.cardano.intersectmbo.org/2023-04-17-ledger/?utm_source=chatgpt.com) | No confirmed full network downtime; block production continued with automatic recovery. [KuCoin](https://www.kucoin.com/news/flash/cardano-clarifies-no-network-downtime-mainnet-continues-stable-block-production?utm_source=chatgpt.com) |
+| Cosmos Hub                    | [Atom scan](https://atomscan.com)                            | **June 5, 2024** — ~4 h 40 min outage during v17 upgrade made to patch a vulnerability in the Liquid Staking Module . [ForkLog](https://forklog.com/en/cosmos-hub-resumes-operations-after-four-hour-outage/) | Block production halted while validators applied a fix.      |
+| Ethereum (mainnet)            | [Ethereum status](https://ethstats.dev)                      | –                                                            | No prolonged network halt documented; occasional client issues historically. |
+| Hedera                        | [Hedera status](https://status.hedera.com)                   | **September 3–5, 2023** — ~2 day proxy disablement post-exploit. [status.hedera.com](https://status.hedera.com/incidents/j27rmgv4plcl) | Mainnet proxies were turned off to stop exploit; resumed after patch. |
+| ICP                           | [ICP Analytics](https://icpanalytics.statuspage.io)          | –                                                            | No significant public chain halt reported.                   |
+| Linea (L2)                    | [linea.statuspage.io](https://linea.statuspage.io)           | –                                                            | Sequencer/prover outages have occurred but no extended halt documented. |
+| Polygon PoS                   | [Polygon Status](https://status.polygon.technology)          | **July 30, 2025** — Heimdall unresponsive ([Mainnet heimdall halted](https://status.polygon.technology/incidents/ll8nkw7q8x5k));<br />**Sep 10, 2025** — delayed finality ()[Official source - Polygon to Ethereum Asset Withdrawals Impacted](https://status.polygon.technology/incidents/cflvgc1zkbk9) & [Consensus Finalization Delay – Temporary Issue](https://status.polygon.technology/incidents/c8nc05x3qvmg)). | Consensus and finality service degradation issues noted.     |
+| Polkadot                      | [Polkadot status](https://polkadot.subscan.io)               | –                                                            | No confirmed relay chain halt to date; isolated parachain issues possible. |
+| Solana                        | [Solana status](https://status.solana.com)                   | **Feb 6, 2024** — ~4 h 46 min outage; multiple past outages. | Consensus stalls requiring cluster restarts.                 |
+| Sui                           | [Sui status](https://status.sui.io)                          | **Nov 21, 2024** — ~2.5 h outage. [status.sui.io](https://status.sui.io/incidents/f2yz7qzwcc94) | Validator crash loop; congestion control code bug.           |
+| XRP Ledger                    | [livenet.xrpl.org](https://livenet.xrpl.org)                 | –                                                            | Historically brief consensus stalls but no major downtime.   |
+| Berachain (L1)                | –                                                            | **Nov 2025** — coordinated halt for emergency hard fork.     | Validators paused consensus to mitigate exploit fallout.     |
+
+
+
+
 
 https://dune.com/vcryptojack/blockchain-downtime
 
+## Aptos
 
+### 10/18/2023
+
+> Start: 4:15 pm PDT
+> End: 9:18 PM PDT
+> Duration: 4 hours
+
+On October 18, 2023 the Aptos network delayed transactions at approximately 4:15 PM PDT. Transaction load was not an issue for this incident – no committed transactions were lost and no fork occurred. Non-deterministic code led to the issue and a fix was deployed. The issue was resolved at approximately 9:30 PM PDT.
+
+Reference: [Aptos Network - 10/18/23 Aptos Mainnet Incident Report](https://aptosnetwork.com/currents/10-18-23-aptos-mainnet-incident-report), [Forklog - Aptos network resumes operation after five-hour outage](https://forklog.com/en/aptos-network-resumes-operation-after-five-hour-outage/), [Aptos Hit With 5-Hour Outage on Blockchain's First Birthday](https://decrypt.co/202340/aptos-hit-5-hour-outage-blockchains-first-birthday)
+
+### Arbitrum
+
+Arbitrum is an Ethereum Layer-2 optimistic rollup designed to improve scalability and throughput while retaining security anchored on Ethereum. It relies on a *sequencer* to order transactions and produce blocks before submitting batched data to L1.
+
+### Sequencer & Feed Issues (Arbitrum One) (2023/12/15)
+
+> Start: 10:29 am EST (2023/12/15)
+>
+> End: 1:57 AM EST.
+
+The Arbitrum One Sequencer and Feed stalled at 10:29 AM ET during a significant surge in network traffic. 
+
+Status: [Sequencer & Feed Issues (Arbitrum One)](https://status.arbitrum.io/clq6te1l142387b8n5bmllk9es)
+
+### Hardware failure in the main Sequencer node (2022/09/01).
+
+Arbitrum experienced a period during which its sequencer stopped processing transactions following a hardware failure on the primary sequencer node. Failover redundancies failed due to an ongoing software upgrade, temporarily preventing new transaction acceptance. Restoration required careful replay and posting of pending transactions.
+
+Reference: [Offchain labs - Today’s Arbitrum Sequencer Downtime: What Happened?](https://offchain.medium.com/todays-arbitrum-sequencer-downtime-what-happened-6382a3066fbc)
+
+### Notes
+
+- As an optimistic rollup, Arbitrum’s design *does not require sequencer liveness* for eventual transaction inclusion; users can fall back to submitting transactions via Ethereum L1 contracts if sequencers fail.  
+- Historical issues largely relate to sequencer availability rather than fundamental consensus faults, and there are *no recent officially acknowledged full chain halts*.
 
 ## Avalanche
 
@@ -40,7 +103,7 @@ https://dune.com/vcryptojack/blockchain-downtime
 
 Reference: [Incident Report - Block Finalization Stall](https://status.avax.network/incidents/qmx0s7zk6gkm)
 
-See aslo [The Blocks - Avalanche confirms block finalization stall](https://www.theblock.co/post/278816/avalanche-block-finalization-stall), [decrypt - AVAX Dips as Avalanche Network Faces Block Production Halt](https://decrypt.co/218758/avalanche-network-block-production-halt-avax-dips)
+See also [The Blocks - Avalanche confirms block finalization stall](https://www.theblock.co/post/278816/avalanche-block-finalization-stall), [decrypt - AVAX Dips as Avalanche Network Faces Block Production Halt](https://decrypt.co/218758/avalanche-network-block-production-halt-avax-dips)
 
 
 
@@ -66,25 +129,150 @@ Due to an issue with an infrastructure provider, block ingestion across the Prim
 
 
 
+## Berachain (cosmos-based)
 
+**Overview:** Berachain is a relatively new Cosmos-based smart contract platform that augments liquidity-oriented consensus and DeFi integration. It is distinct from Ethereum L2 rollups and is a *standalone Layer-1 chain*.  
 
+**Major Network Halt:**  
 
+- **3 November 2025:** Validators *purposefully halted network operations* and initiated an **emergency hard fork** to respond to a large exploit impacting Balancer V2 liquidity pools, with losses across multiple chains estimated between ~$70M and ~$128M. Validators agreed to pause consensus to mitigate further loss and prepare protective rollbacks/hard fork binary distribution. :contentReference[oaicite:11]{index=11}
 
+**Technical Notes:**  
 
+- The pause was coordinated rather than accidental, representing a governance-level response to a *smart contract systemic exploit* with cross-chain effects.  
+- Recovery efforts included distributing the emergency hard fork binary to validators and updating infrastructure before resuming block production. :contentReference[oaicite:12]{index=12}
+
+**Implications:**  
+
+- This event highlights the tension between *decentralization and pragmatic emergency response*; halting an L1 highlights risks when large protocol vulnerabilities are exploited.  
+- Networking governance and validator coordination are central to resuming operations post-incident.
+
+---
+
+## 
 
 ## Bitcoin
 
-:) 
+Reference: [bitbo - downtime](https://bitbo.io/calendar/downtime/)
 
-### Cosmos hub
+### 2010/08/15
+
+> Duration: 8 hours and 27 minutes.
+
+Bitcoin went down in 2010 due to something [called](https://en.bitcoin.it/wiki/Value_overflow_incident) *The Value Overflow Incident* (also known as [CVE-2010-5139](https://www.cve.org/CVERecord?id=CVE-2010-5139)).
+
+On August 15, 2010 block 74638 was created and it contained a transaction that created 184,467,440,737.09551616 bitcoins for three different addresses. Since one of Bitcoin’s main features is its 21 million limit, this was an obvious bug.
+
+The reason the bug was able to happen was because there was, at the time, no check to make sure that values so large could not be sent.
+
+Bitcoin’s founder, Satoshi Nakamoto, posted a code update for this bug around 5 hours after the bug was discovered.
+
+The extra bitcoins sent in that transaction no longer exist.
+
+https://en.bitcoin.it/wiki/Value_overflow_incident
+
+### 2013
+
+> Duration: 6 hours and 20 minutes.
+
+The 2013 Bitcoin downtime (also called [CVE-2013-3220](https://www.cve.org/CVERecord?id=CVE-2013-3220)) event was very different than 2010’s bug.
+
+In 2010, someone temporarily “created” new bitcoins. In 2013, there was a network split where Bitcoin’s network temporarily split into two separate networks.
+
+Versions 0.7 and 0.8 of the Bitcoin software diverged from each other, causing the block chain to “fork” into two.
+
+Unlike 2010, by 2013 there were already a good number of people using Bitcoin. The 2013 bug being discovered caused the Bitcoin price to [fall](https://arstechnica.com/information-technology/2013/03/major-glitch-in-bitcoin-network-sparks-sell-off-price-temporarily-falls-23/) by 23%.
+
+https://en.bitcoin.it/wiki/BIP_0050
+
+### Cosmos Hub
+
+#### 2024/06/05
+
+> Start: On June 5th, 2024, at 19:21 (UTC), the *Cosmos Hub* chain halted,
+> End: The chain resumed on June 6th, 2024, at 0:02 (UTC).
+>
+> Total: the total time the chain was halted was around 4 hours and 40 minutes.
 
 Cosmos Hub saw a temporary halt to block production as validators patched a security vulnerability with the Liquid Staking Module (LSM) during the v17 upgrade.
 
 Cosmos developers identified and deployed a fix for the bug within the next two hours, but the chain did not resume producing blocks until the majority of validators had implemented the patch.
 
-[Cosmos Hub Resumes Block Production After 4-Hour Outage](https://unchainedcrypto.com/cosmos-hub-resumes-block-production-after-4-hour-outage/), [Cosmos - X annoucement](https://x.com/cosmoshub/status/1798459903289553148)
+[Cosmos Hub Resumes Block Production After 4-Hour Outage](https://unchainedcrypto.com/cosmos-hub-resumes-block-production-after-4-hour-outage/), [Cosmos - X annoucement](https://x.com/cosmoshub/status/1798459903289553148), [Cosmos Hub v17.1 Chain Halt - Post-mortem](https://forum.cosmos.network/t/cosmos-hub-v17-1-chain-halt-post-mortem/13899)
 
-## Polygon
+#### 2020/02/27
+
+https://iqlusion.blog/postmortem-2020-02-27-cosmos-hub-validator-outage
+
+## Hedera
+
+### 2023/09/03
+
+> Start: 03/09/2023 - 20:14 UTC
+>
+> End: 03/11/2023 - 02:08 UTC
+>
+> Duration: 2 days
+
+Attackers exploited the Smart Contract Service code of the Hedera mainnet to transfer Hedera Token Service tokens held by victims’ accounts to their own account. 
+
+The attacker targeted accounts used as liquidity pools at multiple DEXes that use Uniswap v2-derived contract code ported over to use the Hedera Token Service, including Pangolin, SaucerSwap, and HeliSwap. When the attackers moved tokens obtained through these attacks over the Hashport bridge, the bridge operators detected the activity and took swift action to disable it.
+
+To prevent the attacker from being able to steal more tokens, Hedera turned off mainnet proxies, which removed user access to the mainnet. 
+
+After that the root cause has been identified, Hedera Council members have signed transactions to approve the deployment of the code on mainnet to patch the vulnerabilities and mainnet proxies have been turned back on, allowing normal activity to resume.
+
+Reference: [status.hedera.com - Mainnet network proxies disabled](https://status.hedera.com/incidents/j27rmgv4plcl)
+
+### 2020/03/08 (Mainet Upgrade)
+
+> Start: 03/09/2023 - 20:14 UTC
+>
+> End: 03/11/2023 - 02:08 UTC
+>
+> Duration: 2 days
+
+Mainet upgrade to v0.6.0 which has taken approx. 150 minutes to complete, during which time all network services have been offline.
+
+[status.hedera.com - Mainnet Upgrade to v0.6.0](https://status.hedera.com/incidents/dvng86d1tgn3)
+
+### 2020/06/18 (mainet upgrade)
+
+Mainnet upgrade to 0.5.8 (150 minutes)
+
+[Status - Mainnet upgrade to 0.5.8](https://status.hedera.com/incidents/20n97k7j2ls9)
+
+### 2010/06/18 (mainet upgrade)
+
+## Linea
+
+Linea is an Ethereum zk-rollup with a centralized sequencer and prover.
+
+- Multiple outages between 2023–2024
+- Primarily caused by prover failures and sequencer downtime
+
+These incidents exposed **operational centralization risks** in early zk-rollup deployments.
+
+
+
+## Optimism
+
+**Overview:** Optimism is another modular Ethereum L2 built on the OP Stack with a centralized sequencer managed by OP Labs (transitioning over time towards decentralization). Sequencer function is critical to fast block production and transaction ordering. :contentReference[oaicite:7]{index=7}
+
+**Notable Outages / Incidents:**  
+
+- **15 February 2024:** Optimism Mainnet experienced *sequencer outage and instabilities* starting ~06:00 ET. The sequencer stopped producing blocks (“unsafe head stall”), and subsequent patches were applied to restore operations. Community reports indicate additional node restarts were required by operators, suggesting deeper issues beyond initial fixes. :contentReference[oaicite:8]{index=8}
+
+**Mechanics of Outages:**  
+
+- Sequencer downtime occurs when the machine responsible for batching and posting transactions to Ethereum cannot process L2 submissions; this appears to users as the network “stuck” at a particular block height.  
+- Optimism’s documentation distinguishes between *sequencer downtime outages* and *transaction submission outages*, both of which have different implications for L2 liveness and user options. :contentReference[oaicite:9]{index=9}
+
+**Mitigation:**  
+
+- Users can bypass sequencer outages by submitting transactions directly to the *OptimismPortal* contract on Ethereum L1, ensuring transaction inclusion even if the sequencer is offline.
+
+## Polygon PoS
 
 > [Polygon Status](https://status.polygon.technology)
 > See all [accidents](https://status.polygon.technology/history)
@@ -96,7 +284,29 @@ Polygon PoS network which uses Ethereum for settlement is composed of the follow
 
 Reference: [Polygon PoS]( https://docs.polygon.technology/pos/overview/)
 
-**July  30, 2025**
+### 2025/12/18 - Incident Report for Polygon
+
+Partial Bor Halt
+
+https://status.polygon.technology/incidents/9ysh9zczb8ml
+
+### 2025/09/10 - Delayed finality
+
+delayed finality (10-15 minutes) rather than full halt. 
+
+*On September 10, 2025, at 04:30 UTC, the Polygon network experienced a degradation in its milestone finalization mechanism.*
+
+*A rare race condition between milestone processing and block importing caused an incompatible milestone to be recorded in some validator nodes, leading to extended delays in milestone based finality.*
+
+*While blocks continued to be finalised via checkpoints, providing finality in around 20 minutes, a hard fork based fix was required to remediate the incorrect milestone, and restore usual milestone based finality (4 - 5 seconds). The network resumed normal operation following this emergency hard fork at 15:00.*
+
+*Following a detailed post-mortem, the development team have released a new version of bor as an additional safety guards to prevent any reoccurrence. We advise upgrading t*o v2.2.11 to ensure continued compatibility and performance, detailed here: https://github.com/0xPolygon/bor/releases/tag/v2.2.11
+
+[Official source - Polygon to Ethereum Asset Withdrawals Impacted](https://status.polygon.technology/incidents/cflvgc1zkbk9) & [Consensus Finalization Delay – Temporary Issue](https://status.polygon.technology/incidents/c8nc05x3qvmg), [Bor v2.2.11-beta2 and Heimdall v0.3.1 hot fix release for Polygon Mainnet](https://forum.polygon.technology/t/bor-v2-2-11-beta2-and-heimdall-v0-3-1-hot-fix-release-for-polygon-mainnet/21284), [X annoucement](https://x.com/sandeepnailwal/status/1965821862358683955), [X - Polygon Foundation ](https://x.com/0xPolygonFdn/status/1965776869917151626)
+
+Other reference: [CryptoRank](https://cryptorank.io/news/feed/02add-polygon-pos-network-faces-10-15-minute-transaction-delays-due-to-node-bug)
+
+### 2025/07/30 - Bug in consensus
 
 > Cause: Bug in consensus
 
@@ -110,25 +320,9 @@ Reference:
 - [Official source - Mainnet heimdall halted](https://status.polygon.technology/incidents/ll8nkw7q8x5k)
 - Other ressources: [The block.com - Polygon suffers hour-long outage weeks after complex hard fork](https://www.theblock.co/post/364913/polygon-suffers-hour-long-outage-weeks-after-complex-hard-fork), [finway.com.ua](https://finway.com.ua/en/polygon-pos-network-experiences-outage/),
 
-**September 10, 2025** — delayed finality (10-15 minutes) rather than full halt. 
-
-*On September 10, 2025, at 04:30 UTC, the Polygon network experienced a degradation in its milestone finalization mechanism.*
-
-*A rare race condition between milestone processing and block importing caused an incompatible milestone to be recorded in some validator nodes, leading to extended delays in milestone based finality.*
-
-*While blocks continued to be finalised via checkpoints, providing finality in around 20 minutes, a hard fork based fix was required to remediate the incorrect milestone, and restore usual milestone based finality (4 - 5 seconds). The network resumed normal operation following this emergency hard fork at 15:00.*
-
-*Following a detailed post-mortem, the development team have released a new version of bor as an additional safety guards to prevent any reoccurrence. We advise upgrading t*o v2.2.11 to ensure continued compatibility and performance, detailed here: https://github.com/0xPolygon/bor/releases/tag/v2.2.11
-
-
-
-[Official source - Polygon to Ethereum Asset Withdrawals Impacted](https://status.polygon.technology/incidents/cflvgc1zkbk9) & [Consensus Finalization Delay – Temporary Issue](https://status.polygon.technology/incidents/c8nc05x3qvmg), [Bor v2.2.11-beta2 and Heimdall v0.3.1 hot fix release for Polygon Mainnet](https://forum.polygon.technology/t/bor-v2-2-11-beta2-and-heimdall-v0-3-1-hot-fix-release-for-polygon-mainnet/21284), [X annoucement](https://x.com/sandeepnailwal/status/1965821862358683955), [X - Polygon Foundation ](https://x.com/0xPolygonFdn/status/1965776869917151626)
-
-Other reference: [CryptoRank](https://cryptorank.io/news/feed/02add-polygon-pos-network-faces-10-15-minute-transaction-delays-due-to-node-bug)
-
 ## Solana
 
-### 02/06/2024 - outage
+### 2024/02/06 - outage
 
 The outage began at approximately 09:53 UTC, lasting 5 hours. 
 
@@ -136,35 +330,35 @@ Block production on Solana mainnet beta resumed at 14:57 UTC, following a succes
 
 https://status.solana.com/incidents/n5kcgs8dl9pj
 
-### 02/26/2023 - degraded performance
+### 2023/02/26 - degraded performance
 
  Slow root production on mainnet beta.
 
-https://status.solana.com/incidents/ymr0gyj9xqyz
+[status.solana.com/incidents/ymr0gyj9xqyz](https://status.solana.com/incidents/ymr0gyj9xqyz)
 
 
 
-### 02/07/2023 - outage
+### 2023/02/06 - outage
 
 The outage began at approximately 09:53 UTC, lasting 5 hours. Core contributors are working on a root cause report, which will be made available once complete.
 
-https://status.solana.com/incidents/n5kcgs8dl9pj
+Reference: [status.solana.com/incidents/n5kcgs8dl9pj](https://status.solana.com/incidents/n5kcgs8dl9pj)
 
 
 
-**06/2022 - outage**
+### 06/2022 - outage
 
 Validator operators successfully completed a cluster restart of Mainnet Beta at 9:00 PM UTC, following a roughly 4 and a half hour outage after the network failed to reach consensus. Network operators and dapps will continue to restore client services over the next several hours.
 
-https://status.solana.com/incidents/ymr0gyj9xqyz
+Reference: [status.solana.com/incidents/ymr0gyj9xqyz](https://status.solana.com/incidents/ymr0gyj9xqyz)
 
 
 
-**01/06/2022 - degraded perform**
+### 01/06/2022 - degraded perform
 
 The Solana Network is currently experiencing degraded performance due to an increase in high compute transactions, which is reducing network capacity to several thousand transactions per second
 
-https://status.solana.com/incidents/3cvfj59zzrgs
+Reference: [status.solana.com/incidents/3cvfj59zzrgs](https://status.solana.com/incidents/3cvfj59zzrgs)
 
 ## Sui
 
@@ -178,6 +372,11 @@ An `assert!` in congestion control code (described below) erroneously caused val
 
 We recently upgraded our congestion control system to improve shared object utilization by more accurately estimating the complexity of a transaction. The code for the new mode, `TotalGasBudgetWithCap`, had a bug that caused this issue.
 
-https://blog.sui.io/sui-mainnet-outage-resolution/
+[Sui Mainnet Outage Resolution - Sui Mainnet Outage Resolution](https://blog.sui.io/sui-mainnet-outage-resolution/)
 
 https://status.sui.io/incidents/f2yz7qzwcc94
+
+
+
+
+
