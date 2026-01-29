@@ -22,6 +22,8 @@ Although the cryptography behind ZKPs is strong, real-world vulnerabilities have
 
 This article summarizes the essential points to verify when reviewing a Solidity verifier contract.
 
+> This article is mainly written by ChatGPT and the references used with a few edition of my part.
+
 [TOC]
 
 

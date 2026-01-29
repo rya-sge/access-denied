@@ -14,6 +14,8 @@ isMath: true
 The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“[Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.](https://eprint.iacr.org/2004/201.pdf)”*
  It provides a way to *commit* to a secret value while keeping it hidden, and ensures the value cannot be changed later.
 
+> This article has been written with the help of ChatGPT
+
 [TOC]
 
 
@@ -145,9 +147,9 @@ Reference: [Monero - Pedersen Commitment](https://www.getmonero.org/resources/mo
 
 ##### Project Khokha
 
-2018 / PoC: The South African Reserve Bank’s **Project Khokha**, built on ConsenSys’ Quorum blockchain, used Pedersen commitments and range proofs for **confidential interbank settlements** — allowing banks to transact privately but still maintain regulatory assurance.
+2018 / PoC: The South African Reserve Bank’s **Project Khokha**, built on ConsenSys’ Quorum blockchain, used Pedersen commitments and range proofs for a Proof Of Concept of**confidential interbank settlements**. This could allow banks to transact privately but still maintain regulatory assurance.
 
-[https://consensys.io/blockchain-use-cases/finance/project-khokha](https://consensys.io/blockchain-use-cases/finance/project-khokha)
+Reference: [consensys.io - Project Khokha: Blockchain Case Study for Central Banking in South Africa](https://consensys.io/blockchain-use-cases/finance/project-khokha)
 
 ### Other Uses
 
@@ -189,5 +191,6 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 
 - [RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
 
-- [https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment)
+- [crypto.stackexchange.com - What is a Pedersen commitment?](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment)
+
 - [https://dl.acm.org/doi/10.5555/646756.705507](https://dl.acm.org/doi/10.5555/646756.705507)
