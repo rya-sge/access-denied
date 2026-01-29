@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Flexible Access Control in smart contract (CMTAT)"
+title: "Flexible Access Control in smart contracts (CMTAT)"
 date:   2026-01-27
 locale: en-GB
 lang: en
@@ -9,10 +9,8 @@ categories: blockchain solidity
 tags: solidity CMTAT RWA access-control RBAC
 description: This article describes how CMTAT implements flexible access control by separating business logic from authorization policy, allowing deployments to choose between RBAC, ownership, OpenZeppelin AccessManager, or custom policies.
 isMath: false
-image: 
+image: /assets/article/blockchain/ethereum/cmtat/access-control-snipet.png
 ---
-
-
 
 Security‑token systems must adapt to heterogeneous regulatory and organizational setups. In this context, the **same tokenization logic** may need to be governed by different access‑control models (role based, ownership based, external manager, etc.), depending on the deployment environment.
 
@@ -83,7 +81,7 @@ You can see the different internal function available such as `_authorizePause()
 
 The key point to notice is that all externally callable state-changing functions are protected by modifiers that defer authorization to internal hooks. No role or ownership logic appears in the module itself.
 
-![file:///home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/cmtat/PauseModule.png](file:///home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/cmtat/PauseModule.png)
+![PauseModule.png]({{site.url_complet}}/assets/article/blockchain/ethereum/cmtat/PauseModule.png)
 
 #### Contracts Description Table
 
@@ -115,7 +113,7 @@ The key point to notice is that all externally callable state-changing functions
 
 Here is the UML for CMTAT Base Access Control
 
-![file:///home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/cmtat/CMTATBaseAccessControl.png](file:///home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/cmtat/CMTATBaseAccessControl.png)
+![fCMTATBaseAccessControl.png]({{site.url_complet}}/assets/article/blockchain/ethereum/cmtat/blockchain/ethereum/cmtat/CMTATBaseAccessControl.png)
 
 #### Contracts Description Table
 
