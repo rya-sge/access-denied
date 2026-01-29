@@ -113,7 +113,7 @@ The key point to notice is that all externally callable state-changing functions
 
 Here is the UML for CMTAT Base Access Control
 
-![fCMTATBaseAccessControl.png]({{site.url_complet}}/assets/article/blockchain/ethereum/cmtat/blockchain/ethereum/cmtat/CMTATBaseAccessControl.png)
+![CMTATBaseAccessControl.png]({{site.url_complet}}/assets/article/blockchain/ethereum/cmtat/CMTATBaseAccessControl.png)
 
 #### Contracts Description Table
 
