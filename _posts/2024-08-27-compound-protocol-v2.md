@@ -165,11 +165,11 @@ Example 2:
 - The total supply balance is now $500, with 80% being ETH and 20% being DAI. The required CR is
 
 
-  $$
+$$
   \begin{aligned}[b]
   100/(0.8*60 + 0.2 * 90) = 151\%
   \end{aligned}
-  $$
+$$
 
 
 ------
@@ -283,11 +283,15 @@ $$
 
 Where
 $$
+\begin{aligned}[b]
 U = \frac{B}{C + B - R}
+\end{aligned}[b]
 $$
 
 $$
+\begin{aligned}[b]
 \text{BASE} = 10^{18}
+\end{aligned}[b]
 $$
 
 
@@ -350,13 +354,17 @@ Here are the differences with the formula:
 
 In Solidity, all values are stored as **scaled integers**, typically with:
 $$
+\begin{aligned}[b]
 Base = 10^{18}
+\end{aligned}[b]
 $$
 
 
 So the real implementation is:
 $$
+\begin{aligned}[b]
 SupplyRate=\frac {U⋅rb⋅(BASE−f)}{BASE2}
+\end{aligned}[b]
 $$
 
 - U: `Utilisation rate`
@@ -367,7 +375,9 @@ $$
 ###### Utilisation rate
 
 $$
+\begin{aligned}[b]
 U = \frac{B}{C + B - R}
+\end{aligned}[b]
 $$
 
 where:
@@ -432,11 +442,13 @@ maximum supply rate with a reserve factor of zero:
 $$
 \begin{aligned}[b]
 maximum~supply ~rate = utilization~ ratio * borrow~ interest ~rate
-.\end{aligned}
+\end{aligned}
 $$
 
 $$
+\begin{aligned}[b]
 0.5 * 0.06 = 0.03 ~or~ 3\%
+\end{aligned}[b]
 $$
 
 
