@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain security
 tags: blockchain soroban stellar smart-contracts security audit
 description: A deep dive into Soroban's three storage types, TTL mechanics, and the Protocol 23 auto-restoration model — with a focus on how archival semantics affect smart contract security analysis.
-image:
+image: assets/article/blockchain/stellar/stellar-state.png
 isMath: false
 ---
 
@@ -236,6 +236,10 @@ When auditing Soroban smart contracts for TTL-related vulnerabilities, apply the
 Soroban's state archival model is a meaningful departure from EVM storage semantics. The three-state distinction — Absent, Live, Archived — and the Protocol 23 auto-restoration mechanism together create a system where persistent data is never silently lost or reset: it is either live (accessible), archived (recoverable to original value), or absent (was never written). Only `Temporary` storage is truly ephemeral.
 
 For security analysts, the key takeaway is that TTL expiry of a `Persistent` entry does not cause it to return a default value — it causes restoration to its original value before the contract executes. The `#[default]` annotation only applies to genuinely absent keys. Any finding that relies on the default-after-expiry assumption for persistent storage is invalid under the current Stellar protocol.
+
+![stellar-state](../assets/article/blockchain/stellar/stellar-state.png)
+
+
 
 ```
 @startmindmap

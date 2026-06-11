@@ -1,13 +1,13 @@
 ---
 layout: post
-title: Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge
+title: "Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge"
 date: 2026-05-11
 lang: en
 locale: en-GB
 categories: blockchain defi security
 tags: htlc atomic-swap cross-chain bridge bitcoin defi security solidity
-description: A deep-dive into Hash Time-Locked Contracts (HTLCs): how they work cryptographically, how Garden Finance uses them for a trustless Bitcoin bridge, and the threat model behind the protocol.
-image:
+description: A deep-dive into Hash Time-Locked Contracts (HTLCs) - how they work cryptographically, how Garden Finance uses them for a trustless Bitcoin bridge, and the threat model behind the protocol.
+image: /assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png
 isMath: true
 ---
 
@@ -289,6 +289,10 @@ The Code4rena audit (November–December 2025) identified one medium-severity vu
 ---
 
 ## Summary
+
+![garden_finance_mindmap](../assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png)
+
+
 
 ```plantuml
 @startmindmap
