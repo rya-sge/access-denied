@@ -58,10 +58,13 @@ layout: default
         {% else %}
         {% endif %}
         {% if site.social-linkedin %}
-          <li class="c-social__item"><a href="https://in.linkedin.com/in/{{site.social-linkedin}}" target="_blank"><div data-icon='ei-sc-linkedin' data-size='s'></div></a></li>
+          <li class="c-social__item"><a href="https://www.linkedin.com/in/{{site.social-linkedin}}" target="_blank"><div data-icon='ei-sc-linkedin' data-size='s'></div></a></li>
         {% else %}
         {% endif %}
-        <li class="c-social__item"><a href="https://bsky.app/profile/ad403.bsky.social" target="_blank"><div>bsky</div></a></li>
+        {% if site.social-bluesky %}
+          <li class="c-social__item"><a href="https://bsky.app/profile/{{site.social-bluesky}}" target="_blank"><div>bsky</div></a></li>
+        {% else %}
+        {% endif %}
       </ul>
     </div>
     <div class="c-copyright">

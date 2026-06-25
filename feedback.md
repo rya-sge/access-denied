@@ -25,25 +25,29 @@ This will appear in Google search results with the wrong snippet.
 
 ## SEO Issues
 
-### 4. Canonical URL Tag Commented Out
-In `_includes/head.html:17`, the canonical `<link>` is commented out. Without it, search engines may index duplicate URLs (e.g. `/page/1/` vs `/`).
+> **Important context:** `_config.yml` enables the `jekyll-seo-tag` plugin and `_includes/head.html:31` invokes `{% seo %}`. The site is hosted on GitHub Pages (`rya-sge.github.io/access-denied`), where `jekyll-seo-tag`, `jekyll-feed`, and `jekyll-sitemap` are auto-provided even though they are not listed in the `Gemfile`. This plugin auto-generates the canonical and meta-description tags, which changes the assessment of issues #4 and #5 below.
 
-### 5. Meta Description Not Injected for Posts
-The logic in `_includes/head.html` is:
+### 4. Canonical URL Tag Commented Out — *observation true, no real impact*
+In `_includes/head.html:17`, the hand-written canonical `<link>` is commented out. However, `jekyll-seo-tag` (`{% seo %}` at `_includes/head.html:31`) emits its own `<link rel="canonical">` on every page, so a canonical tag **is** present in the rendered output. The commented-out manual tag is redundant; commenting it out has no SEO effect. **Not an actual problem.**
+
+### 5. Meta Description Not Injected for Posts — *inaccurate; proposed fix would be harmful*
+The hand-written logic in `_includes/head.html` is:
 ```liquid
 {% unless page.description %}
   <meta name='description' content="{{ site.description }}">
 {% endunless %}
 ```
-This outputs the **site description** when there is no page description — but outputs **nothing** when there is one. Posts with a description field get no `<meta name="description">` tag at all.
+It is true that this manual block emits a description only when the page has none. But `jekyll-seo-tag` independently generates `<meta name="description">` from `page.description` (falling back to `page.excerpt`, then `site.description`), so posts with a description **do** get a meta description tag.
 
-Fix: change to `{% if page.description %}...{% else %}...{% endif %}`.
+⚠️ The previously suggested fix (`{% if page.description %}...{% else %}...{% endif %}`) would emit a **second, duplicate** description tag alongside the plugin's. Do not apply it. If anything, the redundant manual block could be removed and the description left entirely to `jekyll-seo-tag`.
 
-### 6. Non-Zero-Padded Date in Filename
-`2024-11-4-TLS1.3-overview.md` uses a non-padded day (`4` instead of `04`). While Jekyll may handle this, it's inconsistent and can cause unexpected permalink behavior.
+### 6. Non-Zero-Padded Date in Filename — *accurate, low impact*
+`2024-11-4-TLS1.3-overview.md` uses a non-padded day (`4` instead of `04`); it is the only such file. Jekyll's filename matcher accepts a 1–2 digit day, so the post renders fine (its permalink is `/2024/11/4/...`). This is a consistency nit rather than a true SEO defect, but renaming to `2024-11-04-...` keeps the corpus uniform.
 
-### 7. Global `lang` Mismatch
-`_config.yml` sets `lang: "fr_FR"` but the vast majority of posts have `lang: en`. This can affect SEO (Google may classify the site as French) and any locale-specific formatting.
+### 7. Global `lang` Mismatch — *facts correct, impact overstated, root cause is different*
+`_config.yml:6` sets `lang: "fr_FR"` while 136 posts declare `lang: en`. However, this is **not** what Google reads for language classification: `_layouts/default.html:2-6` sets `<html lang>` **per post** from `page.lang`, so English posts correctly render `<html lang="en">`. `site.lang` is never used for `<html lang>` (the `{% else %}` branch hardcodes `"fr"`); its only effect is `og:locale` via `jekyll-seo-tag`, a minor signal.
+
+The genuine issue is different: **50 of 187 posts have no `lang` field at all**, so they fall into the `{% else %}` branch and render as `<html lang="fr">` despite English content. Fix by adding `lang: en` to those posts (and optionally aligning `site.lang` to a sensible default such as `en`).
 
 ---
 
