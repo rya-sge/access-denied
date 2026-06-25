@@ -317,7 +317,15 @@ Two factors compound. First, margining is continuous and liquidation is automate
 
 **Q: Under what condition does the futures price equal the forward price, and why does the distinction matter otherwise?**
 
-When the risk-free interest rate is constant (more generally, deterministic), the futures price equals the forward price, $$f(0,T) = F(0,T)$$. The two can differ when interest rates are stochastic, because a future's daily mark-to-market cash flows are reinvested or financed at the prevailing rate, so the correlation between the rate and the underlying price affects the value of those intermediate flows. A forward, settled only once at maturity, has no such intermediate cash flows.
+When the risk-free interest rate is constant (more generally, deterministic), the futures price equals the forward price, $$f(0,T) = F(0,T)$$. A forward is settled only once, at maturity, so it has no intermediate cash flows.
+
+When interest rates are stochastic, the two prices diverge because a future's daily mark-to-market gains and losses are reinvested or financed at the rate prevailing that day, and that rate is now random. What matters is its correlation with the underlying price:
+
+- **Positive correlation** (the rate tends to rise when the underlying rises): a long future earns its mark-to-market gains exactly when reinvestment rates are high, and funds its losses when rates are low. This timing is favourable to the long, so the futures price is set slightly **above** the forward price.
+- **Negative correlation**: the timing works against the long, so the futures price sits slightly **below** the forward.
+- **Zero correlation**: the effect cancels on average and $$f(0,T) \approx F(0,T)$$.
+
+In practice the gap is small for short-dated contracts and widens with maturity and rate volatility.
 
 ## References
 
