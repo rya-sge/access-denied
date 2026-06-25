@@ -467,7 +467,7 @@ The result is one of the most influential and technically sophisticated privacy 
 
 Here is a summary from the documentation:
 
-![tornado_cash_diagram](../assets/article/cryptographie/zero-knowledge-proof/tornado_cash/tornado_cash_diagram.png)
+![tornado_cash_diagram]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/tornado_cash/tornado_cash_diagram.png)
 
 ## Reference
 

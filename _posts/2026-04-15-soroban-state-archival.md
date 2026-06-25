@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain security
 tags: blockchain soroban stellar smart-contracts security audit
 description: A deep dive into Soroban's three storage types, TTL mechanics, and the Protocol 23 auto-restoration model — with a focus on how archival semantics affect smart contract security analysis.
-image: assets/article/blockchain/stellar/stellar-state.png
+image: /assets/article/blockchain/stellar/stellar-state.png
 isMath: false
 ---
 

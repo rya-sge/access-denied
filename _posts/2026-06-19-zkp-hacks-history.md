@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain security defi zkp
 tags: zkp zero-knowledge-proof exploit hack vulnerability bug-bounty
 description: A chronological record of confirmed hacks, disclosed vulnerabilities, and bug bounties in zero-knowledge proof protocols from 2023 to 2026, with technical root cause analysis for each incident.
-image:
+image: /assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.png
 isMath: true
 ---
 
@@ -386,6 +386,8 @@ Detection occurred within 24 hours via Socket's supply chain monitoring. This in
 ## Conclusion
 
 Across the 15 incidents documented here, eight involved a direct vulnerability in the ZK proof system (trusted setup, Fiat-Shamir binding, circuit soundness, proof verification bypass, settlement boundary). The remaining seven involved the surrounding protocol infrastructure on ZK chains or ecosystems. The total value lost in confirmed exploits is approximately $19$M at the application layer, with an additional $1.9$B+ in peak at-risk TVL for the three largest disclosed vulnerabilities.
+
+![ZKP hacks 2023–2026 mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.png)
 
 ```
 @startmindmap

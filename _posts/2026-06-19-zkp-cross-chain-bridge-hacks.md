@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain security zkp defi
 tags: zkp zero-knowledge-proof cross-chain bridge exploit bug-bounty rollup
 description: An analysis of security incidents in ZK-rollup bridges from 2023 to 2026, covering confirmed exploits, circuit-level vulnerability disclosures, and bug bounties targeting ZK withdrawal and settlement mechanisms.
-image:
+image: /assets/article/blockchain/zkp/2026-06-19-zkp-cross-chain-bridge-hacks-mindmap.png
 isMath: true
 ---
 
@@ -392,6 +392,8 @@ The disclosed-but-unexploited category represents approximately $1.9$B in at-ris
 ZK-rollup bridge security depends on the integrity of multiple layers, and each layer has failed in production. The most architecturally novel failures are those where the ZK proof was valid but the system was still exploited: the Aztec Connect June 2026 boundary bypass (the proof did not commit to `numRealTxs`) and the zkSync Era mantissa bug (the proof did not constrain the upper bits of withdrawal amounts). These incidents show that a correct ZK proof is a necessary but insufficient condition for bridge security. The proof must commit to all parameters that govern fund movement on L1.
 
 The disclosed vulnerabilities demonstrate that production ZK bridge circuits contain exploitable soundness errors, and that bug bounty programs are a functional mechanism for finding them before exploitation. The three circuits that were fixed pre-exploitation (Aztec Connect claim proof, zkSync Era RAM Permutation, zkSync Lite mantissa) covered a combined at-risk value exceeding $1.9$B.
+
+![ZK Bridge Security mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-cross-chain-bridge-hacks-mindmap.png)
 
 ```
 @startmindmap

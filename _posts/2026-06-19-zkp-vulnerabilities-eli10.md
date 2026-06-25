@@ -7,7 +7,7 @@ locale: en-GB
 categories: cryptography security zkp
 tags: zkp zero-knowledge-proof vulnerability analogy explainer
 description: A simple guide to the main ways zero-knowledge proof systems have been broken, explained with everyday analogies about magic locks, bakers, and inspectors.
-image:
+image: /assets/article/blockchain/zkp/2026-06-19-zkp-vulnerabilities-eli10-mindmap.png
 isMath: false
 ---
 
@@ -169,6 +169,8 @@ The good news is that four of the five bugs were found by security researchers b
 ## Summary
 
 Zero-knowledge proof systems let you prove you know a secret without revealing the secret. Real systems have been broken in five main ways: forgetting to set up the random secret, letting the prover peek at the test questions, creating form fields without checking what goes in them, the inspector rubber-stamping every proof, and the main blockchain processing fewer transactions than the proof covers. Some of these bugs were exploited and money was stolen. Others were found by researchers first and fixed safely.
+
+![ZK proof bugs (ELI10) mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-vulnerabilities-eli10-mindmap.png)
 
 ```plantuml
 @startmindmap

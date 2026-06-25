@@ -7,7 +7,7 @@ locale: en-GB
 categories: cryptography
 tags: pedersen commitment secret sharing
 description: Pedersen commitment provides a way to commit to a secret value while keeping it hidden, and ensures the value cannot be changed later.
-image: 
+image: /assets/article/cryptographie/pedersen/2025-11-22-pedersen-commitment-mindmap.png
 isMath: true
 ---
 
@@ -184,6 +184,44 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 - MobileCoin (for private payments)
 - Project Khokha (for interbank settlement privacy)
 - Various zero-knowledge proof frameworks (like Bulletproofs)
+
+![Pedersen commitment mindmap]({{site.url_complet}}/assets/article/cryptographie/pedersen/2025-11-22-pedersen-commitment-mindmap.png)
+
+```
+@startmindmap
+* Pedersen Commitment\nc = g^s * h^t
+** Setup
+*** Cyclic group G of prime order q
+*** Generators g, h in G
+*** No known a such that h = g^a
+** Commit
+*** Secret s, 0 <= s < q
+*** Random blinding factor t in Z_q
+*** Compute c = g^s * h^t
+** Open / Verify
+*** Reveal (s, t)
+*** Anyone checks c = g^s * h^t
+** Properties
+*** Hiding (information-theoretic)
+**** Random t masks s
+**** Many (s, t) yield same c
+*** Binding (computational)
+**** Relies on discrete log hardness
+*** Additively homomorphic
+**** c1 * c2 commits to s1 + s2
+**** Blinding t1 + t2
+** Applications
+*** Monero RingCT
+*** MobileCoin
+*** Project Khokha
+*** Bulletproofs / range proofs
+*** Confidential assets, voting
+** Limitations
+*** g, h relation must stay unknown
+*** Binding breaks if DLP easy (quantum)
+*** Needs range proofs for valid values
+@endmindmap
+```
 
 ## Reference
 

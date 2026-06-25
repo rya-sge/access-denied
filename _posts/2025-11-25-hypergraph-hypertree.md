@@ -9,7 +9,7 @@ categories: programmation
 tags: graph hypertreee hypergraph tree
 description: A hypergraph is a generalization of a graph where an edge may connect any number of vertices, not just two.
 isMath: true
-image: 
+image: /assets/article/programmation/hypergraph/2025-11-25-hypergraph-hypertree-mindmap.png
 ---
 
 A **hypergraph** is a generalization of a graph where an edge may connect **any number of vertices**, not just two.
@@ -239,6 +239,41 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 
 - [Hypergraph Neural Networks: An In-Depth and Step-By-Step Guide](https://sites.google.com/view/hnn-tutorial)
 - [YouTube  - Hypergraph Neural Networks: An In-depth and Step-By-Step Guide (Teaser)](https://www.youtube.com/watch?v=yQRzCkHZFu4)
+
+## Summary
+
+![Hypergraph and hypertree mindmap]({{site.url_complet}}/assets/article/programmation/hypergraph/2025-11-25-hypergraph-hypertree-mindmap.png)
+
+```
+@startmindmap
+* Hypergraph & Hypertree
+** Hypergraph H = (V, E)
+*** Hyperedge connects any number of vertices
+*** Hyperedge e is a subset of V
+*** k-uniform: every |e| = k
+*** Ordinary graph = 2-uniform hypergraph
+** Acyclicity
+*** Graham reduction removes hyperedges
+*** alpha-acyclic: reduces to empty
+*** alpha-cyclic: process gets stuck
+** Hypertree
+*** Tree-like / arboreal hypergraph
+*** Host tree T: each e induces a connected subtree
+*** Helly and line graph is chordal
+*** Satisfies the Helly property
+** Helly Property
+*** Pairwise-intersecting family shares a vertex
+*** Contains a triangle => not Helly
+** Fano Plane (example)
+*** 3-uniform, linear, regular, symmetric
+*** Steiner system S(2,3,7)
+*** Strongly cyclic, NOT a hypertree
+*** Fails Helly, no join-tree
+** Use cases
+*** Hypergraph neural networks
+*** CSPs and databases
+@endmindmap
+```
 
 ## Reference
 

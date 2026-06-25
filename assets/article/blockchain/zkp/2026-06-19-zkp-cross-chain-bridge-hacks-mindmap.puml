@@ -1,0 +1,37 @@
+@startmindmap
+* ZK Bridge Security
+** Confirmed Exploits
+*** Aztec Connect $2.28M (Jun 2026)
+**** numRealTxs not in ZK public inputs
+**** Deprecated 3 years, no oversight
+*** ZKSwap $5M (Jul 2025)
+**** return true in verifyExitProof
+**** Emergency path not tested
+*** ZKSpace ~$4M (~Jul 2025)
+**** Proxy contract exploit
+** Disclosed / Bounties
+*** zkSync Era (Sep 2023)
+**** $1.9B at risk
+**** 50K USDC bounty
+**** LinearCombination not enforced
+**** Withdrawal amount forgeable
+*** zkSync Lite (Oct 2023)
+**** $200K bounty
+**** AllocatedNum::alloc() unconstrained
+**** Withdrawal amount forgeable
+*** Aztec Claim Proof (Sep 2023)
+**** $5M TVL at risk
+**** $450K bounty
+**** Remainder unconstrained
+**** Multiple-spend on output pool
+** Attack Surface
+*** ZK Circuit Layer
+**** Under-constrained witnesses
+**** Missing public input binding
+*** L1 Settlement Layer
+**** Dead verification code
+**** Calldata vs. proof parameter split
+*** Bridge Lifecycle
+**** Dormant contracts stay live
+**** Emergency paths under-tested
+@endmindmap
