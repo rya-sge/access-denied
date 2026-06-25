@@ -1,0 +1,20 @@
+@startmindmap
+* Cross-chain Token Standards
+** ERC-7281 (xERC20)
+*** Burn / mint by allowlisted bridges
+*** Configurable rate limits per bridge
+**** minting / burning max and current limit
+*** Lockbox wrapper for existing ERC20
+*** Token-issuer sovereignty
+** ERC-7802 (Crosschain Token Interface)
+*** Minimal IERC7802 (IERC165)
+*** crosschainMint / crosschainBurn
+*** CrosschainMint / CrosschainBurn events
+*** Optimism SuperchainERC20
+**** SuperchainTokenBridge 0x42..28
+**** Same address on every chain
+** ERC-7905 (minimal xERC20)
+*** Streamlined xERC20-native
+*** Mint / burn + limit views only
+*** No Lockbox, no extra config
+@endmindmap

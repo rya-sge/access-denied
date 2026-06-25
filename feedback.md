@@ -67,8 +67,8 @@ The introductory paragraph contains several typos:
 | `pic of transaction` | `spike of transactions` |
 | `liquidied` | `liquidated` |
 
-### 9. Typo in 404 Page
-`404.html` reads: `"Back to the bLog"` — the capital `L` is unintentional.
+### 9. Typo in 404 Page — ✅ Fixed
+`404.html` read: `"Back to the bLog"` — the capital `L` was unintentional. Corrected to `"Back to the blog"` (`404.html:37`).
 
 ---
 
@@ -80,15 +80,16 @@ The introductory paragraph contains several typos:
 ### 11. "You might also enjoy" Silently Skips Posts Without Images
 In `_layouts/post.html:71-83`, the related posts section only renders articles that have an `image` field. Posts without images are silently excluded. With 13+ posts having an empty `image:` field, this section will often show fewer than 4 suggestions or appear empty.
 
-### 12. LinkedIn URL Uses Wrong Domain
-In `_layouts/home.html:61`, the LinkedIn link points to `https://in.linkedin.com/in/...` (the Indian subdomain). It should be `https://www.linkedin.com/in/...`.
+### 12. LinkedIn URL Uses Wrong Domain — ✅ Fixed
+In `_layouts/home.html:61`, the LinkedIn link pointed to `https://in.linkedin.com/in/...` (the Indian subdomain). Changed to `https://www.linkedin.com/in/...`.
 
-### 13. Bluesky Link is Hardcoded in Template
-`_layouts/home.html:64` has the Bluesky profile URL hardcoded directly in the template:
+### 13. Bluesky Link is Hardcoded in Template — ✅ Fixed
+`_layouts/home.html:64` had the Bluesky profile URL hardcoded directly in the template. The handle is now stored in `_config.yml` as `social-bluesky: ad403.bsky.social`, and the template references it behind an `{% if site.social-bluesky %}` guard (consistent with the other social links):
 ```html
-<a href="https://bsky.app/profile/ad403.bsky.social" ...>bsky</a>
+{% if site.social-bluesky %}
+  <a href="https://bsky.app/profile/{{site.social-bluesky}}" ...>bsky</a>
+{% endif %}
 ```
-It should be extracted to `_config.yml` as `social-bluesky` for consistency and maintainability.
 
 ### 14. Share Buttons Only Cover Twitter/Facebook
 Post share options in `_layouts/post.html` only include Twitter and Facebook, despite the author also having LinkedIn and Bluesky profiles. Consider adding those.

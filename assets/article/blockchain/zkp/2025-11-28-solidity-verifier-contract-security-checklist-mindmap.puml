@@ -1,0 +1,34 @@
+@startmindmap
+* Solidity Verifier Security Checklist
+** Public-Input Bound Checks
+*** 0 <= value < r (scalar field)
+*** Prevents field overflow / wraparound
+*** Validate before linear combinations
+** Proof-Element Validation
+*** Coordinates < base field q
+*** ECADD / ECMUL / Pairing precompiles
+*** EIP-196 / EIP-197
+*** Explicit checks, not just precompile failure
+*** Subgroup membership where needed
+** Verification-Key Consistency
+*** VK constants match trusted setup (.zkey)
+*** alpha, beta, gamma, delta, IC points
+*** vk_x = IC0 + sum(pub[i] * IC[i])
+*** Wrong VK -> cross-circuit verification
+** Gas and Loop Structure
+*** Bound number of inputs
+*** No unbounded / user-controlled loops
+** Solidity Version Safety
+*** Pin pragma (^0.8.20)
+*** Overflow / underflow protection
+** Testing and Fuzzing
+*** Reject corrupted proofs (A, B, C)
+*** pub out of range (>= r)
+*** Out-of-curve / wrong-subgroup points
+*** Reordered proof elements
+** System-Level Context
+*** Under-constrained circuits
+*** Verification != authorization
+*** Replay / proof uniqueness
+*** Defense in depth
+@endmindmap

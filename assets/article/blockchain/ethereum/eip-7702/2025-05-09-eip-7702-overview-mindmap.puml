@@ -1,0 +1,33 @@
+@startmindmap
+* EIP-7702: Set Code for EOAs
+** Motivation
+*** Batching (atomic multi-op)
+*** Sponsorship (X pays for Y)
+*** Privilege de-escalation (sub-keys)
+** Mechanism
+*** New tx type 0x04 (SET_CODE_TX_TYPE)
+*** authorization_list of tuples
+**** [chain_id, address, nonce, y_parity, r, s]
+*** Delegation indicator: 0xef0100 || address
+*** chain_id = 0 -> all chains
+** Behavior
+*** Processed before execution, after nonce++
+*** ecrecover authority; verify nonce and code
+*** CODESIZE / CODECOPY use executing code
+*** Precompile target -> empty code
+*** Delegation chains: follow only first
+** Gas
+*** PER_AUTH_BASE_COST = 12500
+*** PER_EMPTY_ACCOUNT_COST = 25000
+*** Worst-case charged upfront, refund if account exists
+** Backwards Compatibility
+*** Balance can decrease via external call
+*** Nonce can increase mid-tx
+*** tx.origin == msg.sender invariant broken
+** Security Considerations
+*** Delegate must sign nonce / value / gas / target
+*** Front-running initialization
+*** Storage collisions on migration (ERC-7201)
+*** Sponsored relayer griefing
+*** Transaction propagation limits
+@endmindmap

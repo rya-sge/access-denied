@@ -9,10 +9,10 @@ categories: blockchain solidity zkp
 tags: solidity zkp zk-snark verifier
 description: This article summarizes the essential points to verify when reviewing a Solidity verifier contract using in zk-proof systems
 isMath: false
-image: 
+image: /assets/article/blockchain/zkp/2025-11-28-solidity-verifier-contract-security-checklist-mindmap.png
 ---
 
-Zero-knowledge proof (ZKP) verifier contracts — typically used in zk-SNARK or zk-proof systems — play a fundamental role in ensuring that proofs submitted on-chain are valid. 
+Zero-knowledge proof (ZKP) verifier contracts (typically used in zk-SNARK or zk-proof systems) play a fundamental role in ensuring that proofs submitted on-chain are valid. 
 
 Although the cryptography behind ZKPs is strong, real-world vulnerabilities have frequently originated from:
 
@@ -66,7 +66,7 @@ means:
 
 ### Details
 
-Curve coordinates live in the base field `q` (check coordinates `< q`), while public *scalar* inputs are elements of the scalar field `r` (check `0 ≤ pub < r`). Confusing these two fields is a common and dangerous mistake.” [xn--2-umb.com+1](https://xn--2-umb.com/23/bn254-compression/)
+Curve coordinates live in the base field `q` (check coordinates `< q`), while public *scalar* inputs are elements of the scalar field `r` (check `0 ≤ pub < r`). Confusing these two fields is a common and dangerous mistake. See [BN254 point compression](https://xn--2-umb.com/23/bn254-compression/).
 
 ## Proof-Element Validation Before Cryptographic Operations
 
@@ -92,7 +92,7 @@ See also [RareSkills - Ethereum precompiled contracts](https://rareskills.io/pos
 
 ### Details
 
- “recompiles expect well-formed points, *but their exact behavior (curve membership vs subgroup checks) depends on the chain and precompile version*. Do not rely on failure semantics alone — prefer explicit, deterministic Solidity checks when portability is required.” [ZK Nation Forum+1](https://forum.zknation.io/t/zip-11-v28-precompile-upgrade/679)
+Precompiles expect well-formed points, but their exact behavior (curve membership versus subgroup checks) depends on the chain and precompile version. Do not rely on failure semantics alone; prefer explicit, deterministic Solidity checks when portability is required. See the [ZK Nation precompile upgrade discussion](https://forum.zknation.io/t/zip-11-v28-precompile-upgrade/679).
 
 ------
 
@@ -112,7 +112,7 @@ Things to confirm:
 3. Negation of `A` is properly applied if required by the protocol.
 4. The order and layout of pairing arguments match the specification of the ZKP scheme.
 
-Small deviations — such as swapped x/y coordinates, wrong G1/G2 ordering, or missing negation — break the verifier
+Small deviations (such as swapped x/y coordinates, wrong G1/G2 ordering, or missing negation) break the verifier.
 
 
 
@@ -247,7 +247,72 @@ Therefore, verify:
 
 
 
-# References
+## Conclusion
+
+A Solidity verifier is correct only when every layer holds. Public inputs must be range-checked against the scalar field `r`, proof points must be valid base-field (and where required, subgroup) elements, and the embedded verification key must match the trusted setup exactly, since a structurally wrong key enables cross-circuit forgery. Beyond the contract itself, soundness depends on the circuit being fully constrained and on the consuming protocol not treating "proof verified" as "action authorized". The checklist below summarizes the points to review.
+
+![Solidity verifier security checklist mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2025-11-28-solidity-verifier-contract-security-checklist-mindmap.png)
+
+```
+@startmindmap
+* Solidity Verifier Security Checklist
+** Public-Input Bound Checks
+*** 0 <= value < r (scalar field)
+*** Prevents field overflow / wraparound
+*** Validate before linear combinations
+** Proof-Element Validation
+*** Coordinates < base field q
+*** ECADD / ECMUL / Pairing precompiles
+*** EIP-196 / EIP-197
+*** Explicit checks, not just precompile failure
+*** Subgroup membership where needed
+** Verification-Key Consistency
+*** VK constants match trusted setup (.zkey)
+*** alpha, beta, gamma, delta, IC points
+*** vk_x = IC0 + sum(pub[i] * IC[i])
+*** Wrong VK -> cross-circuit verification
+** Gas and Loop Structure
+*** Bound number of inputs
+*** No unbounded / user-controlled loops
+** Solidity Version Safety
+*** Pin pragma (^0.8.20)
+*** Overflow / underflow protection
+** Testing and Fuzzing
+*** Reject corrupted proofs (A, B, C)
+*** pub out of range (>= r)
+*** Out-of-curve / wrong-subgroup points
+*** Reordered proof elements
+** System-Level Context
+*** Under-constrained circuits
+*** Verification != authorization
+*** Replay / proof uniqueness
+*** Defense in depth
+@endmindmap
+```
+
+## Frequently Asked Questions
+
+**Q: Why must every public input satisfy `0 ≤ value < r` before use?**
+
+All arithmetic inside a SNARK circuit happens in the scalar field `F_r`, where `r` is a large prime and every value is taken modulo `r`. A public input greater than or equal to `r` is silently reduced modulo `r`, so two distinct inputs can map to the same field element. If the verifier does not reject out-of-range inputs before folding them into the linear combination, a prover can exploit this wraparound to satisfy the pairing check with values the circuit never intended, bypassing its constraints.
+
+**Q: What is the difference between the base field `q` and the scalar field `r`, and why does it matter?**
+
+Curve point coordinates live in the base field `q`, while scalars (such as public inputs) are elements of the scalar field `r`; for BN254 these are different primes. Coordinate checks must use `q` and scalar checks must use `r`. Confusing the two, for example range-checking a public input against `q` instead of `r`, leaves a gap an attacker can use, which is why the article calls it a common and dangerous mistake.
+
+**Q: How can a wrong verification key let invalid proofs verify?**
+
+The verification key (α, β, γ, δ, and the IC points) is hardcoded in the contract and must byte-for-byte match the trusted setup output. If the constants are merely wrong, proofs simply never verify and the system is unusable. But if they are *structurally* wrong, such as shifted IC indices, swapped G2 components, or a key copied from a different circuit, the pairing equation can be satisfied by proofs for a different or weaker circuit. This "cross-circuit verification" lets an attacker submit a valid proof for the wrong statement.
+
+**Q: Why isn't relying on the EVM precompiles to fail on malformed points sufficient?**
+
+The ECADD, ECMUL, and pairing precompiles (EIP-196 / EIP-197) do reject some malformed inputs, but their exact behavior, particularly whether they enforce subgroup membership, depends on the chain and the precompile version. Code that relies only on precompile failure is therefore non-portable and can behave differently across L1 and L2s. Explicit, deterministic Solidity checks on coordinates and points give predictable reverts everywhere.
+
+**Q: If a verifier contract is provably correct, is the system secure?**
+
+No. A correct verifier only proves that a submitted proof satisfies the circuit. The circuit itself may be under-constrained, letting a prover "prove" something false. Separately, the contract consuming the verifier may treat verification as authorization, lack replay protection so a valid proof can be reused, or mishandle the commitment to public signals. Verifier correctness is necessary but not sufficient; the whole protocol must follow defense in depth.
+
+## References
 
 - [arXiv - SoK: What Don’t We Know? Understanding Security of SNARK-Based Systems](https://arxiv.org/html/2402.15293v1)
 -  [arXiv - Zero-Knowledge Proof Frameworks: A Systematic Survey](https://arxiv.org/pdf/2502.07063v2)

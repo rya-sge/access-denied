@@ -1,13 +1,13 @@
 ---
 layout: post
 title: Cross-chain tokens Standard (ERC-7281, xERC20) - Overview
-date:  2025-05-02
+date:  2025-05-07
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum
 tags: cross-chain erc20 erc7281 erc7802
 description: This article presents the different standards to represent cross-chain token on Ethereum and EVM blockchain, notably ERC-7281(xERC20) & ERC-7802
-image: 
+image: /assets/article/blockchain/ethereum/cross-chain-token/2025-05-07-cross-chain-token-overview-mindmap.png
 isMath: false
 ---
 
@@ -165,7 +165,7 @@ The interface also defines two standardized events, `CrosschainMint` and `Crossc
 
 These events facilitate deterministic indexing and monitoring of crosschain activities by off-chain agents, such as indexers, analytics tools, and auditors.
 
-`IERC7802` is intentionally lightweight, ensuring minimal overhead for implementation. Its modular design enables extensibility, allowing additional features—such as mint/burn limits, transfer fees, or bridge-specific access control mechanisms—to be layered on top without modifying the base interface.
+`IERC7802` is intentionally lightweight, ensuring minimal overhead for implementation. Its modular design enables extensibility, allowing additional features (such as mint/burn limits, transfer fees, or bridge-specific access control mechanisms) to be layered on top without modifying the base interface.
 
 ### Optimism superchain ERC20
 
@@ -267,4 +267,63 @@ interface IERC7905 {
     function burn(address _user, uint256 _amount) external;
 }
 ```
+
+## Conclusion
+
+The three standards address cross-chain token representation at different levels of scope. ERC-7281 (xERC20) gives the token issuer sovereignty over which bridges can mint or burn, with per-bridge rate limits and an optional Lockbox to wrap an existing ERC-20. ERC-7802 reduces the surface to a minimal `crosschainMint` / `crosschainBurn` interface intended as a common entry point for bridge logic, and is the basis for Optimism's `SuperchainERC20`. ERC-7905 keeps the xERC20 limit model but drops the Lockbox and configuration functions for a smaller footprint. All three are still at Draft status.
+
+![Cross-chain token standards mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/cross-chain-token/2025-05-07-cross-chain-token-overview-mindmap.png)
+
+```
+@startmindmap
+* Cross-chain Token Standards
+** ERC-7281 (xERC20)
+*** Burn / mint by allowlisted bridges
+*** Configurable rate limits per bridge
+**** minting / burning max and current limit
+*** Lockbox wrapper for existing ERC20
+*** Token-issuer sovereignty
+** ERC-7802 (Crosschain Token Interface)
+*** Minimal IERC7802 (IERC165)
+*** crosschainMint / crosschainBurn
+*** CrosschainMint / CrosschainBurn events
+*** Optimism SuperchainERC20
+**** SuperchainTokenBridge 0x42..28
+**** Same address on every chain
+** ERC-7905 (minimal xERC20)
+*** Streamlined xERC20-native
+*** Mint / burn + limit views only
+*** No Lockbox, no extra config
+@endmindmap
+```
+
+## Frequently Asked Questions
+
+**Q: What core problem does ERC-7281 (xERC20) try to solve?**
+
+It addresses token sovereignty, fungibility, and security across chains. Rather than each bridge issuing its own incompatible wrapped representation, xERC20 lets the token issuer keep a single canonical token and allowlist which bridges may mint or burn it, each with configurable rate limits. This caps the damage a single compromised bridge can do.
+
+**Q: What is the Lockbox in ERC-7281, and why is it useful?**
+
+The Lockbox is a wrapper contract that holds the home-chain liquidity of an existing ERC-20 and issues the xERC20 representation against it. It gives already-deployed tokens an adoption path to xERC20 without having to migrate holders to a new token contract.
+
+**Q: How does ERC-7802 differ from ERC-7281?**
+
+ERC-7802 is deliberately minimal: it defines only `crosschainMint` and `crosschainBurn` (plus matching events) as standardized entry points for authorized bridges, and leaves features such as rate limits or fees to be layered on top. ERC-7281 is broader, bundling the Lockbox, rate-limit structs, and configuration functions into the standard itself.
+
+**Q: What two steps make a token compatible with Optimism's SuperchainERC20?**
+
+First, grant the `SuperchainTokenBridge` (at `0x4200000000000000000000000000000000000028`) permission to call `crosschainMint` and `crosschainBurn`. Second, deploy the `SuperchainERC20` contract at the same address on every Superchain chain where the token should be available; chains where it is not deployed cannot receive the token.
+
+**Q: Why does ERC-7905 exist if ERC-7281 already covers xERC20?**
+
+ERC-7281 carries Lockbox wrappers, structs, and extensive configuration functions that exceed the minimum needed for core interoperability. ERC-7905 strips this down to the essential xERC20-native functionality (mint, burn, and the limit views), giving a smaller and more focused interface for tokens that do not need the full ERC-7281 machinery.
+
+## References
+
+- [ERC-7281: Sovereign Bridged Tokens (Ethereum Magicians)](https://ethereum-magicians.org/t/erc-7281-sovereign-bridged-tokens/14979)
+- [ERC-7802: Crosschain Token Interface (Ethereum Magicians)](https://ethereum-magicians.org/t/erc-7802-crosschain-token-interface/21508)
+- [ERC-7905: minimal xERC20 (Ethereum ERCs PR #961)](https://github.com/ethereum/ERCs/pull/961/)
+- [defi-wonderland — crosschainERC20 implementation](https://github.com/defi-wonderland/crosschainERC20)
+- [Optimism Docs — SuperchainERC20](https://docs.optimism.io/interop/superchain-erc20)
 
