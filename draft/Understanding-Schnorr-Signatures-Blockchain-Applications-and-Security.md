@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Understanding Schnorr Signatures: Blockchain Applications and Security
+title: "Understanding Schnorr Signatures: Blockchain Applications and Security"
 date:   2025-11-22
 lang: en
 locale: en-GB
@@ -8,7 +8,7 @@ categories: cryptography blockchain
 tags: signature ecdsa schnorr
 description: Presentation of Winternitz One-Time Signature (W-OST), a post quantum algorithm which relies on hash function (e.g  SHA-256)
 image: /assets/article/cryptographie/signature/winternitz-cover.png
-isMath: tru
+isMath: true
 ---
 
 
