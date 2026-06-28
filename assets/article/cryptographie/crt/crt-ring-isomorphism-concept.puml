@@ -1,0 +1,25 @@
+@startuml
+title Chinese Remainder Theorem - Ring Isomorphism (main concept)
+
+skinparam componentStyle rectangle
+
+package "Z_mn world" {
+  [x  (single residue mod mn)] as Zmn
+}
+
+package "Z_m x Z_n world" {
+  [(a, b) = (x mod m, x mod n)] as Prod
+  note bottom of Prod
+    componentwise + and x
+    inverses componentwise
+  end note
+}
+
+Zmn -right-> Prod : forward (cheap)\nreduce mod m and mod n
+Prod -left-> Zmn : reverse (CRT reconstruction)\nx = a (n^-1 mod m) n + b (m^-1 mod n) m  (mod mn)
+
+note top of Zmn
+  gcd(m, n) = 1  =>  Z_mn  isomorphic to  Z_m x Z_n
+  bijective, preserves + and x
+end note
+@enduml

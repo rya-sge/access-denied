@@ -172,32 +172,6 @@ Zero-knowledge proof systems let you prove you know a secret without revealing t
 
 ![ZK proof bugs (ELI10) mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-vulnerabilities-eli10-mindmap.png)
 
-```plantuml
-@startmindmap
-* ZK Proof Bugs (ELI10)
-** Bug 1: Default password not changed
-*** Like a bike lock still on 0-0-0-0
-*** Veil Cash $5K stolen (2026)
-*** FoomCash $2.26M stolen (2026)
-** Bug 2: Peeking at test questions
-*** Like seeing the exam the night before
-*** Found in 6 ZK systems (2025-2026)
-*** Found twice in Solana (2025)
-*** No money stolen (found in time)
-** Bug 3: Form field with no check
-*** Like writing anything in a recipe checker
-*** zkSync Lite: $200K reward (2023)
-*** zkSync Era: $50K reward, $1.9B at risk (2023)
-*** Aztec claim proof: $450K reward (2023)
-** Bug 4: Inspector stamps everything approved
-*** Like a rubber-stamp guard
-*** ZKSwap: $5M stolen (2025)
-** Bug 5: Teacher only grades page 1
-*** Like fake deposits on pages 2-32
-*** Aztec Connect: $2.28M stolen (2026)
-@endmindmap
-```
-
 ---
 
 ## Frequently Asked Questions

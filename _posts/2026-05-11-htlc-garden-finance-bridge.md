@@ -292,38 +292,6 @@ The Code4rena audit (November–December 2025) identified one medium-severity vu
 
 ![garden_finance_mindmap](../assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png)
 
-
-
-```plantuml
-@startmindmap
-* HTLC Bridge
-** Core Mechanism
-*** Hash lock (SHA-256 secret)
-*** Time lock (block / slot / ms)
-*** Atomic swap (2-party)
-*** Refund on expiry
-** Garden Finance
-*** HTLCRegistry (factory)
-*** HTLC / ArbHTLC (ERC-20)
-*** NativeHTLC (ETH)
-*** UDA (CREATE2 deposit addr)
-*** initiateWithSignature (EIP-712)
-*** instantRefund (EIP-712)
-*** 5-chain deployment
-**** EVM (blocks)
-**** Arbitrum (arbBlockNumber)
-**** Starknet (ms)
-**** Sui (ms, 7-day cap)
-**** Solana (slots)
-** Threat Model (Code4rena Nov 2025)
-*** MEDIUM
-**** UDA unchecked approve() → funds locked
-*** LOW
-**** Solana redeemer == refundee allowed
-**** Project-wide identifier typos (ABI impact)
-@endmindmap
-```
-
 ---
 
 ## Reference

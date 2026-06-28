@@ -145,8 +145,6 @@ interface IXERC20 {
 }
 ```
 
-
-
 ## ERC-7802: Token With Mint/Burn Access Across Chains
 
 > [ERC specification](https://eips.ethereum.org/EIPS/eip-7802)
@@ -273,29 +271,6 @@ interface IERC7905 {
 The three standards address cross-chain token representation at different levels of scope. ERC-7281 (xERC20) gives the token issuer sovereignty over which bridges can mint or burn, with per-bridge rate limits and an optional Lockbox to wrap an existing ERC-20. ERC-7802 reduces the surface to a minimal `crosschainMint` / `crosschainBurn` interface intended as a common entry point for bridge logic, and is the basis for Optimism's `SuperchainERC20`. ERC-7905 keeps the xERC20 limit model but drops the Lockbox and configuration functions for a smaller footprint. All three are still at Draft status.
 
 ![Cross-chain token standards mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/cross-chain-token/2025-05-07-cross-chain-token-overview-mindmap.png)
-
-```
-@startmindmap
-* Cross-chain Token Standards
-** ERC-7281 (xERC20)
-*** Burn / mint by allowlisted bridges
-*** Configurable rate limits per bridge
-**** minting / burning max and current limit
-*** Lockbox wrapper for existing ERC20
-*** Token-issuer sovereignty
-** ERC-7802 (Crosschain Token Interface)
-*** Minimal IERC7802 (IERC165)
-*** crosschainMint / crosschainBurn
-*** CrosschainMint / CrosschainBurn events
-*** Optimism SuperchainERC20
-**** SuperchainTokenBridge 0x42..28
-**** Same address on every chain
-** ERC-7905 (minimal xERC20)
-*** Streamlined xERC20-native
-*** Mint / burn + limit views only
-*** No Lockbox, no extra config
-@endmindmap
-```
 
 ## Frequently Asked Questions
 

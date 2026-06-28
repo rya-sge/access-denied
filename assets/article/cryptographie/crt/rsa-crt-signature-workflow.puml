@@ -1,0 +1,29 @@
+@startuml
+title RSA-CRT Signature - Workflow
+
+start
+:Input message representative m, private key (d, p, q), n = pq;
+:Reduce into the two factors\nm_p = m mod p,  m_q = m mod q;
+
+fork
+  :d_p = d mod (p - 1);
+  :s_p = m_p ^ d_p mod p;
+fork again
+  :d_q = d mod (q - 1);
+  :s_q = m_q ^ d_q mod q;
+end fork
+
+:Recombine via CRT\ns = ( s_p (q^-1 mod p) q + s_q (p^-1 mod q) p ) mod n;
+
+if (verify s^e == m (mod n)?) then (ok)
+  :Release signature s;
+  stop
+else (fault detected)
+  :Discard s;
+  note right
+    single-branch fault could leak factorization
+    via gcd(s^e - m, n) = p
+  end note
+  stop
+endif
+@enduml

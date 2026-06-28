@@ -239,50 +239,6 @@ This has no effect on CREATE address prediction (which depends on the EVM nonce)
 
 ![smart-wallet-nonce-mindmap.png]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/smart-wallet-nonce-mindmap.png)
 
-
-
-```
-@startmindmap
-* Nonce & CREATE2\nin Smart Wallets
-** Dual Nonce System
-*** EntryPoint Nonce
-**** Replay protection
-**** 192-bit key + 64-bit sequence
-**** Parallel channels (key 0, 1, ...)
-**** No effect on CREATE
-*** EVM Account Nonce
-**** Used by CREATE opcode
-**** Incremented per CREATE
-**** Determines deployed address
-**** Independent from EntryPoint
-** Contract Deployment
-*** CREATE
-**** address = keccak256(rlp([deployer, nonce]))
-**** Non-deterministic
-**** Nonce tracking required
-**** Fragile with EIP-7702
-*** CREATE2
-**** address = keccak256(0xff ++ deployer ++ salt ++ bytecode_hash)
-**** Fully deterministic
-**** No nonce dependency
-**** Cross-chain reproducible
-** EIP-7702 Specifics
-*** vm.etch does not set nonce
-**** Fresh address = nonce 0
-**** Use vm.getNonce at runtime
-*** Real chain: EOA nonce history
-**** Auth tuple increments nonce
-**** Prior transactions count
-*** address(this) = EOA
-**** EOA is the deployer
-**** EOA nonce is used
-** Recommendations
-*** Prefer CREATE2 for known addresses
-*** Use CREATE for simple deployments
-*** Query nonce at runtime, never hardcode
-@endmindmap
-```
-
 ## Reference
 
 - [Claude Code](https://claude.com/product/claude-code)

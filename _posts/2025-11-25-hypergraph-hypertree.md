@@ -22,8 +22,6 @@ Examples:
 
 [TOC]
 
-
-
 ------
 
 ### Introduction
@@ -61,8 +59,6 @@ $$
 \forall e \in E,\quad |e| = k.
 \end{aligned}
 $$
-
-
 
 Reference:
 
@@ -141,8 +137,6 @@ then H is not Helly.
 [Alain Bretto - Hypergraph Theory](https://www.math.ucdavis.edu/~saito/data/tensor/bretto_hypergraph-theory.pdf), page. 30
 
 [Alain Bretto - Hypergraph Theory](https://www.math.ucdavis.edu/~saito/data/tensor/bretto_hypergraph-theory.pdf), page.6
-
-
 
 ### Example
 
@@ -231,8 +225,6 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 
 ------
 
-
-
 ## Use case
 
 ### Hypergrpah Neural network
@@ -243,37 +235,6 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 ## Summary
 
 ![Hypergraph and hypertree mindmap]({{site.url_complet}}/assets/article/programmation/hypergraph/2025-11-25-hypergraph-hypertree-mindmap.png)
-
-```
-@startmindmap
-* Hypergraph & Hypertree
-** Hypergraph H = (V, E)
-*** Hyperedge connects any number of vertices
-*** Hyperedge e is a subset of V
-*** k-uniform: every |e| = k
-*** Ordinary graph = 2-uniform hypergraph
-** Acyclicity
-*** Graham reduction removes hyperedges
-*** alpha-acyclic: reduces to empty
-*** alpha-cyclic: process gets stuck
-** Hypertree
-*** Tree-like / arboreal hypergraph
-*** Host tree T: each e induces a connected subtree
-*** Helly and line graph is chordal
-*** Satisfies the Helly property
-** Helly Property
-*** Pairwise-intersecting family shares a vertex
-*** Contains a triangle => not Helly
-** Fano Plane (example)
-*** 3-uniform, linear, regular, symmetric
-*** Steiner system S(2,3,7)
-*** Strongly cyclic, NOT a hypertree
-*** Fails Helly, no join-tree
-** Use cases
-*** Hypergraph neural networks
-*** CSPs and databases
-@endmindmap
-```
 
 ## Reference
 

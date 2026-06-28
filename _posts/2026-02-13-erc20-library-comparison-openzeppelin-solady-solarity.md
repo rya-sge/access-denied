@@ -505,29 +505,6 @@ The three libraries follow different philosophies: OpenZeppelin favors safety, m
 
 ![file:///home/ryan/Downloads/me/access-denied/assets/article/blockchain/ethereum/solidity/erc20-lib-mindmap.png]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/erc20-lib-mindmap.png)
 
-```plantuml
-@startmindmap
-* ERC-20 Library Selection
-** OpenZeppelin
-*** Comprehensive extensions
-*** Context for meta-tx
-*** Strict validation
-*** SafeERC20 (forceApprove, ERC-1363)
-*** Widest adoption
-** Solady
-*** Gas-optimized (assembly)
-*** EIP-2612 built-in
-*** Permit2 integration (default)
-*** SafeTransferLib (ETH + ERC20 + Permit2)
-*** Fewer extensions
-** Solarity solidity-lib
-*** Builds on OpenZeppelin ERC-20
-*** Bridge / staking / vesting / registry
-*** DecimalsConverter utility
-*** Uses Solady for non-token utilities
-@endmindmap
-```
-
 ## References
 
 - Library

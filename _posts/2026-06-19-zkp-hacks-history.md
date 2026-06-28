@@ -389,40 +389,6 @@ Across the 15 incidents documented here, eight involved a direct vulnerability i
 
 ![ZKP hacks 2023–2026 mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.png)
 
-```
-@startmindmap
-* ZKP Hacks 2023–2026
-** Part I: Direct ZK Exploits
-*** Trusted Setup (Groth16)
-**** Veil Cash ~$5K (Feb 2026)
-**** FoomCash $2.26M (Feb 2026)
-*** Range Proof
-**** Haven Protocol (Dec 2024)
-*** Bypassed Verifier
-**** ZKSwap $5M (Jul 2025)
-*** ZK Key-Reset
-**** HermesVault $29K (May 2026)
-*** Settlement Boundary
-**** Aztec Connect $2.28M (Jun 2026)
-** Part II: ZK Chain / Contract Bugs
-*** Proxy Exploit
-**** ZKSpace ~$4M (~Jul 2025)
-*** Precision Loss
-**** zkLend $9.57M (Feb 2025)
-** Part III: Disclosed / Bounties
-*** Fiat-Shamir
-**** Solana ZK ElGamal #1 (Apr 2025)
-**** Solana ZK ElGamal #2 (Jun 2025)
-**** OtterSec 6 zkVMs (2025-2026)
-*** Under-Constrained Witness
-**** Aztec Claim Proof $450K bounty (Sep 2023)
-**** zkSync Era $50K bounty (Sep 2023)
-**** zkSync Lite $200K bounty (Oct 2023)
-*** Supply Chain
-**** dYdX npm/PyPI (Jan 2026)
-@endmindmap
-```
-
 ## Frequently Asked Questions
 
 **Q: What is the difference between a "direct ZK exploit" and a "ZK-rollup protocol exploit" as used in this article?**

@@ -1,0 +1,23 @@
+@startmindmap
+* Chinese Remainder Theorem
+** Statement
+*** moduli pairwise coprime
+*** unique solution mod m = m_1...m_n
+*** constructive formula\nsum a_i (M_i^-1 mod m_i) M_i
+** Ring isomorphism
+*** Z_mn = Z_m x Z_n
+*** forward: x -> (x mod m, x mod n) cheap
+*** reverse: CRT reconstruction
+*** componentwise + and x
+** RSA-CRT signatures
+*** s_p = m^(d mod p-1) mod p
+*** s_q = m^(d mod q-1) mod q
+*** recombine via CRT
+*** ~4x speedup
+*** fault attack -> verify before release
+** Square roots mod pq
+*** field: at most 2 roots
+*** Z_pq: 0 or 4 roots
+*** 1 -> {1,4,11,14} in Z_15
+*** root extraction = factoring
+@endmindmap

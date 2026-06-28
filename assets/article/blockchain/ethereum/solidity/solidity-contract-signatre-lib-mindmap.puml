@@ -1,0 +1,42 @@
+@startmindmap
+* Signature Verification
+** OpenZeppelin
+*** SignatureChecker library
+**** ECDSA + ERC-1271 + ERC-7913
+**** Batch verification
+*** AbstractSigner hierarchy
+**** SignerECDSA
+**** SignerERC7913
+**** MultiSignerERC7913
+**** MultiSignerERC7913Weighted
+*** Verifier contracts
+**** ERC7913P256Verifier
+**** ERC7913RSAVerifier
+**** ERC7913WebAuthnVerifier
+** Solady
+*** SignatureCheckerLib (assembly)
+**** ECDSA + ERC-1271
+**** EIP-2098 compact signatures
+**** ERC-6492 counterfactual
+*** ERC1271 mixin
+**** ERC-7739 nested EIP-712
+**** Safe caller bypass
+*** No ERC-7913 support
+** Coinbase Smart Wallet
+*** Custom ERC1271 (based on Solady)
+**** Simple EIP-712 anti-replay
+**** No ERC-7739
+*** MultiOwnable (index-based)
+**** Address owners (ECDSA)
+**** P256 owners (WebAuthn)
+*** Uses Solady internally
+**** SignatureCheckerLib
+**** UUPSUpgradeable
+** Solarity solidity-lib
+*** Custom curve libraries
+**** ECDSA256 / ECDSA384 / ECDSA512
+**** Schnorr256
+**** RSASSAPSS / ED256
+*** No ERC-1271 / ERC-7913
+*** Building blocks for custom logic
+@endmindmap

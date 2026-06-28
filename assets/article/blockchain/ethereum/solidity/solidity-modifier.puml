@@ -1,0 +1,42 @@
+@startmindmap
+* Solidity Modifier Patterns
+** Pattern 1: Inline (Classic)
+*** Code duplicated per function
+*** Optimal runtime gas
+*** Best for 1-3 uses
+*** Self-contained readability
+*** Used by: Solady, Smart Wallets
+** Pattern 2: Wrapped Function
+*** Code exists once (JUMP)
+*** +8-10 gas per call
+*** Best for 4+ uses
+*** Requires following reference
+*** Used by: OpenZeppelin v5
+** Pattern 3: No Modifier
+*** Direct inline checks
+*** Risk of inconsistency
+*** Best for unique checks
+*** Scattered guard logic
+** Pattern 4: Virtual Override
+*** Customizable via inheritance
+*** Template method pattern
+*** Requires inheritance analysis
+*** Combined with Pattern 2: Authorization hooks
+*** Real-world: CMTAT security token framework
+*** Deprecated in Solidity 0.9 (use Pattern 2+4 instead)
+** Trade-off Axes
+*** Runtime gas vs. Bytecode size
+*** Readability vs. Reusability
+*** Audit clarity vs. DRY principle
+** Compiler Behavior
+*** Modifier code is inlined at call sites
+*** via-ir may deduplicate (not guaranteed)
+*** High optimizer runs favor inlining
+** Security Concerns
+*** Modifier ordering (left to right)
+*** Hidden state changes
+*** Reentrancy guard (pre + post logic)
+**** Storage-based (deprecated in OZ v5.5.0)
+**** Transient storage (EIP-1153, recommended)
+**** Transient: cheaper, no init, proxy-safe
+@endmindmap

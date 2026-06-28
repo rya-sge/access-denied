@@ -401,40 +401,6 @@ The extension system is well-layered:
 
 ![openzeppelin_confidential_token_mindmap]({{site.url_complet}}/assets/article/blockchain/zamafhe/openzeppelin_confidential_token_mindmap.png)
 
-```
-@startmindmap
-* ERC-7984 Core
-** Storage
-*** euint64 _balances (encrypted)
-*** euint64 _totalSupply (encrypted)
-*** uint48 _operators (plaintext, timestamp)
-** _update
-*** Mint (from = address(0))
-*** Burn (to = address(0))
-*** Transfer (both non-zero)
-*** FHE.select → silent zero on failure
-** FHESafeMath
-*** tryIncrease (overflow via wrapping)
-*** tryDecrease (underflow via ge check)
-** ACL Management
-*** FHE.allow (permanent)
-*** FHE.allowTransient (tx-scoped)
-*** FHE.makePubliclyDecryptable
-** Dual Overloads
-*** externalEuint64 + ZKPoK
-*** euint64 + isAllowed check
-** Operators
-*** Time-bounded (uint48)
-*** Amount-unlimited
-** Extensions
-*** ObserverAccess (1 observer slot/account)
-*** Freezable (encrypted partial freeze)
-*** Restricted (cleartext blocklist/allowlist)
-*** Rwa (Freezable + Restricted + Pausable)
-*** Omnibus (off-chain sub-account settlement)
-@endmindmap
-```
-
 ---
 
 ## References

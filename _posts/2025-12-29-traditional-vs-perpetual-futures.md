@@ -255,44 +255,6 @@ The perpetual model provides continuous liquidity and avoids contract rollovers,
 
 ![Traditional vs perpetual futures mindmap]({{site.url_complet}}/assets/article/blockchain/defi/perpetual-futures/2025-12-29-traditional-vs-perpetual-futures-mindmap.png)
 
-```
-@startmindmap
-* Futures: Traditional vs Perpetual
-** Foundations
-*** No-arbitrage principle
-*** Long / short positions
-*** Spot price S(t)
-** Forward contract
-*** OTC, private agreement
-*** Counterparty risk
-*** Settled once at delivery T
-*** F(0,T) = S(0)e^rT
-** Traditional futures
-*** Exchange-traded, standardized
-*** Clearing house (no default risk)
-*** Marked to market daily
-*** Fixed expiry T
-*** f(0,T) = F(0,T) if r constant
-*** Basis -> 0 as t -> T
-** Perpetual futures
-*** No expiration date
-*** Funding rate anchors P to S
-**** P > S: longs pay shorts (f > 0)
-**** P < S: shorts pay longs (f < 0)
-*** Continuous margining
-*** Origin: BitMEX XBTUSD (2016)
-** Pricing
-*** Cost of carry: F = S e^(r+c-y)(T-t)
-*** Convergence vs funding tether
-** Risk and liquidation
-*** Daily mark-to-market (traditional)
-*** Liquidation when equity < maintenance
-*** Auto-deleveraging (ADL)
-**** Bybit / Binance ranking
-*** High leverage (up to 100x)
-@endmindmap
-```
-
 ## Frequently Asked Questions
 
 **Q: What is the defining structural difference between a traditional future and a perpetual future?**

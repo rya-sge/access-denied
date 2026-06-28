@@ -440,47 +440,6 @@ Following these principles converts Pyth from a latency risk into a genuine comp
 
 ![pyth-network-security]({{site.url_complet}}/assets/article/blockchain/oracle/pyth-network-security.png)
 
-```
-@startmindmap
-* Pyth Integration Security
-** Architecture
-*** Pull oracle model
-*** Pythnet aggregation
-*** Wormhole VAA / Hermes
-*** Fixed-point (price × 10^exponent)
-** EVM Integration
-*** updatePriceFeeds (required)
-*** getUpdateFee (pay correctly)
-*** getPriceNoOlderThan (not getPrice)
-*** parsePriceFeedUpdates (delayed settlement)
-** Solana Integration
-*** PriceUpdateV2 account
-*** Account owner check (Anchor auto)
-*** get_price_no_older_than
-*** Full vs Partial verification
-** Critical Vulnerabilities
-*** No staleness check
-*** Feed ID not validated
-*** No owner check (Solana)
-*** Same-block open/close
-** High Vulnerabilities
-*** Confidence interval ignored
-*** Adversarial VAA selection
-*** Exponent not applied
-*** updatePriceFeeds skippable
-** Medium Vulnerabilities
-*** EMA used for spot
-*** Market hours not handled
-*** Admin can swap oracle address
-** Best Practices
-*** Conservative price bounds (price ± conf)
-*** Circuit breaker on wide confidence
-*** Commit-reveal / delayed settlement
-*** Minimum holding period
-*** Immutable Pyth contract address
-@endmindmap
-```
-
 ---
 
 ## Reference

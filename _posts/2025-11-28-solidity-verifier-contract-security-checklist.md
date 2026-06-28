@@ -26,8 +26,6 @@ This article summarizes the essential points to verify when reviewing a Solidity
 
 [TOC]
 
-
-
 ## Public-Input Bound Checks
 
 Every public input (often called *public signals*) must be validated to lie within the appropriate scalar field.
@@ -114,8 +112,6 @@ Things to confirm:
 
 Small deviations (such as swapped x/y coordinates, wrong G1/G2 ordering, or missing negation) break the verifier.
 
-
-
 ### Verification-Key Constants Must Match Exactly
 
 The verifier hardcodes the elliptic-curve points that define the **verification key (VK)**:
@@ -178,8 +174,6 @@ If vk_x is computed incorrectly, the pairing equation can become satisfied even 
 3. Fuzz input ordering to ensure mismatches cause verification failure.
 4. Ensure every public input is validated: `0 ≤ pub[i] < r`.
 
-
-
 ## Gas Costs and Loop Structure
 
 While verifiers are generally static and predictable, some implementations iterate over public inputs or verification-key entries. Key points:
@@ -188,8 +182,6 @@ While verifiers are generally static and predictable, some implementations itera
 - Avoid user-controlled loops or unbounded iteration.
 - Consider the gas implications on the target network (L1 vs L2).
 - For large public-input vectors, consider alternatives such as recursive proofs, compression, or verifying aggregated proofs.
-
-
 
 ## Solidity Versioning and Language Safety Features
 
@@ -207,8 +199,6 @@ pragma solidity ^0.8.20;
 ```
 
 This ensures predictable compiler behavior and reduces attack surface.
-
-
 
 ## Testing, Fuzzing, and Robust Negative Cases
 
@@ -245,50 +235,11 @@ Therefore, verify:
 - Proofs cannot be reused in unintended contexts
 - The full protocol follows defense-in-depth principles
 
-
-
 ## Conclusion
 
 A Solidity verifier is correct only when every layer holds. Public inputs must be range-checked against the scalar field `r`, proof points must be valid base-field (and where required, subgroup) elements, and the embedded verification key must match the trusted setup exactly, since a structurally wrong key enables cross-circuit forgery. Beyond the contract itself, soundness depends on the circuit being fully constrained and on the consuming protocol not treating "proof verified" as "action authorized". The checklist below summarizes the points to review.
 
 ![Solidity verifier security checklist mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2025-11-28-solidity-verifier-contract-security-checklist-mindmap.png)
-
-```
-@startmindmap
-* Solidity Verifier Security Checklist
-** Public-Input Bound Checks
-*** 0 <= value < r (scalar field)
-*** Prevents field overflow / wraparound
-*** Validate before linear combinations
-** Proof-Element Validation
-*** Coordinates < base field q
-*** ECADD / ECMUL / Pairing precompiles
-*** EIP-196 / EIP-197
-*** Explicit checks, not just precompile failure
-*** Subgroup membership where needed
-** Verification-Key Consistency
-*** VK constants match trusted setup (.zkey)
-*** alpha, beta, gamma, delta, IC points
-*** vk_x = IC0 + sum(pub[i] * IC[i])
-*** Wrong VK -> cross-circuit verification
-** Gas and Loop Structure
-*** Bound number of inputs
-*** No unbounded / user-controlled loops
-** Solidity Version Safety
-*** Pin pragma (^0.8.20)
-*** Overflow / underflow protection
-** Testing and Fuzzing
-*** Reject corrupted proofs (A, B, C)
-*** pub out of range (>= r)
-*** Out-of-curve / wrong-subgroup points
-*** Reordered proof elements
-** System-Level Context
-*** Under-constrained circuits
-*** Verification != authorization
-*** Replay / proof uniqueness
-*** Defense in depth
-@endmindmap
-```
 
 ## Frequently Asked Questions
 

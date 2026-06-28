@@ -1,0 +1,95 @@
+PlantUML source registry
+========================
+
+This file maps each article (in _posts/) to the PlantUML (.puml) source files
+that produced its diagrams, and where those sources live under assets/article/.
+
+Why this file exists:
+- PlantUML diagram SOURCE (.puml) is NEVER embedded in an article anymore.
+  Only the rendered PNG is embedded. The mindmap PNG appears in the article's
+  Conclusion/Summary and in the frontmatter `image:` field; supporting concept
+  and workflow PNGs (when present) are kept as standalone assets only.
+- Because the .puml source is no longer in the .md file, this registry is the
+  way to find the original source when an article is later modified, so the
+  diagram can be edited and re-rendered instead of reverse-engineered from PNG.
+
+Convention:
+- Each article has exactly one mindmap .puml (tag: mindmap).
+- It may also have supporting diagrams (tags: concept, workflow, ...).
+- Mindmap source is usually named after the article or with a -mindmap suffix.
+- Supporting diagrams use descriptive kebab-case names (e.g. *-concept.puml).
+- Each .puml has a sibling .png produced by: plantuml -tpng <file>.puml
+
+Registry (article  ->  .puml sources)
+-------------------------------------
+
+_posts/2025-05-07-cross-chain-token-overview.md
+  assets/article/blockchain/ethereum/cross-chain-token/2025-05-07-cross-chain-token-overview-mindmap.puml   (mindmap)
+
+_posts/2025-05-09-eip-7702-overview.md
+  assets/article/blockchain/ethereum/eip-7702/2025-05-09-eip-7702-overview-mindmap.puml                     (mindmap)
+
+_posts/2025-11-22-pedersen-commitment.md
+  assets/article/cryptographie/pedersen/2025-11-22-pedersen-commitment-mindmap.puml                         (mindmap)
+
+_posts/2025-11-25-hypergraph-hypertree.md
+  assets/article/programmation/hypergraph/2025-11-25-hypergraph-hypertree-mindmap.puml                      (mindmap)
+
+_posts/2025-11-28-solidity-verifier-contract-security-checklist.md
+  assets/article/blockchain/zkp/2025-11-28-solidity-verifier-contract-security-checklist-mindmap.puml       (mindmap)
+
+_posts/2025-12-29-traditional-vs-perpetual-futures.md
+  assets/article/blockchain/defi/perpetual-futures/2025-12-29-traditional-vs-perpetual-futures-mindmap.puml (mindmap)
+
+_posts/2026-02-13-erc1271-erc7913-signature-verification-comparison.md
+  assets/article/blockchain/ethereum/solidity/solidity-contract-signatre-lib-mindmap.puml                   (mindmap)
+
+_posts/2026-02-13-erc20-library-comparison-openzeppelin-solady-solarity.md
+  assets/article/blockchain/ethereum/solidity/erc20-lib-mindmap.puml                                        (mindmap)
+
+_posts/2026-02-17-eip-7702-security-threat-model.md
+  assets/article/blockchain/ethereum/eip-7702/EIP-7702-threat-model.puml                                    (mindmap)
+
+_posts/2026-02-17-nonce-management-create2-smart-wallets-erc4337.md
+  assets/article/blockchain/ethereum/erc-4337/smart-wallet-nonce-mindmap.puml                               (mindmap)
+
+_posts/2026-02-18-solidity-modifier-patterns-gas-bytecode-security.md
+  assets/article/blockchain/ethereum/solidity/solidity-modifier.puml                                        (mindmap)
+
+_posts/2026-02-24-erc7984-openzeppelin-analysis.md
+  assets/article/blockchain/zamafhe/openzeppelin_confidential_token_mindmap.puml                            (mindmap)
+
+_posts/2026-03-13-fuzzing-solana-programs-with-trident.md
+  assets/article/blockchain/solana/solana-fuzzing-trident.puml                                              (mindmap)
+
+_posts/2026-03-13-pyth-integration-security.md
+  assets/article/blockchain/oracle/pyth-network-security.puml                                               (mindmap)
+
+_posts/2026-03-13-solana-anchor-introduction.md
+  assets/article/blockchain/solana/anchor-framework.puml                                                    (mindmap)
+
+_posts/2026-04-15-soroban-state-archival.md
+  assets/article/blockchain/stellar/stellar-state.puml                                                      (mindmap)
+
+_posts/2026-05-11-htlc-garden-finance-bridge.md
+  assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.puml                                 (mindmap)
+
+_posts/2026-05-12-canton-network-architecture.md
+  assets/article/blockchain/canton/canton-mindmap.puml                                                      (mindmap)
+
+_posts/2026-06-19-zkp-cross-chain-bridge-hacks.md
+  assets/article/blockchain/zkp/2026-06-19-zkp-cross-chain-bridge-hacks-mindmap.puml                        (mindmap)
+
+_posts/2026-06-19-zkp-hacks-history.md
+  assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.puml                                   (mindmap)
+
+_posts/2026-06-19-zkp-vulnerabilities-eli10.md
+  assets/article/blockchain/zkp/2026-06-19-zkp-vulnerabilities-eli10-mindmap.puml                           (mindmap)
+
+_posts/2026-06-19-zkp-vulnerability-taxonomy.md
+  assets/article/blockchain/zkp/2026-06-19-zkp-vulnerability-taxonomy-mindmap.puml                          (mindmap)
+
+_posts/2026-06-28-chinese-remainder-theorem-cryptography.md
+  assets/article/cryptographie/crt/2026-06-28-chinese-remainder-theorem-cryptography.puml                   (mindmap)
+  assets/article/cryptographie/crt/crt-ring-isomorphism-concept.puml                                        (concept)
+  assets/article/cryptographie/crt/rsa-crt-signature-workflow.puml                                          (workflow)

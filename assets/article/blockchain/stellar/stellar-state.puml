@@ -1,0 +1,31 @@
+@startmindmap
+* Soroban State Archival
+** Storage Types
+*** Temporary\n(deleted on TTL expiry)
+**** Cannot be restored
+**** Returns default after expiry
+**** Use: short-lived / recreatable data
+*** Persistent\n(archived on TTL expiry)
+**** Restored to original value
+**** Protocol 23: auto-restoration
+**** Use: balances, replay protection
+*** Instance\n(archived with contract)
+**** Shared TTL with contract
+**** Restored to original value
+**** Use: admin, config
+** Protocol 23
+*** simulateTransaction detects archived entries
+*** Returns restorePreamble
+*** Simulation succeeds (as-if restored)
+*** Client submits restoration then retries
+** Security Implications
+*** Default-value fallacy (INVALID for Persistent)
+*** Absent ≠ Archived
+*** Temporary IS vulnerable to TTL reset
+*** Anti-replay must use Persistent storage
+** TTL Extension
+*** extend_ttl(threshold, extend_to)
+*** No-op if current TTL > threshold
+*** Must extend on read AND write
+*** Instance and Persistent have separate TTL clocks
+@endmindmap

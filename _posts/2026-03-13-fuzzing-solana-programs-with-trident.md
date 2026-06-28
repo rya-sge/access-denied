@@ -611,53 +611,6 @@ fn main() {
 
 ![solana-fuzzing-trident]({{site.url_complet}}/assets/article/blockchain/solana/solana-fuzzing-trident.png)
 
-
-
-```
-@startmindmap
-* Trident Fuzzing\nfor Solana
-** Core Concepts
-*** Guided fuzzing
-*** Iteration lifecycle
-*** Flow randomization
-** Test Structure
-*** #[init] setup
-*** #[flow] operations
-*** #[end] teardown
-*** FuzzTest::fuzz(iter, flows)
-** Instruction Construction
-*** types.rs (auto-generated)
-*** data() builder
-*** accounts() builder
-*** process_transaction()
-** Address Storage
-*** insert() random keypair
-*** insert() PDA with seeds
-*** get() reuse existing
-** Random Generation
-*** random_from_range()
-*** random_pubkey()
-*** random_keypair()
-*** random_bool()
-*** random_string()
-** Invariants
-*** Capture before/after state
-*** get_account_with_type()
-*** assert state transitions
-*** handle expected errors
-** Advanced Features
-*** Multi-instruction transactions
-*** Regression testing
-*** Code coverage (llvm-cov)
-*** External programs & accounts
-** Execution
-*** trident fuzz run
-*** Seed reproducibility
-*** TRIDENT_LOG=1
-*** Trident.toml config
-@endmindmap
-```
-
 ---
 
 ## Reference
