@@ -1,0 +1,28 @@
+@startuml
+title ML-KEM lifecycle - KeyGen, Encaps, Decaps
+skinparam shadowing false
+|KeyGen|
+start
+:d, z <- random 32 bytes each;
+:(ek_PKE, dk_PKE) = K-PKE.KeyGen(d);
+:ek = ek_PKE;
+:dk = dk_PKE || ek || H(ek) || z;
+|Encaps|
+:check ek (type + modulus round-trip);
+:m <- random 32 bytes;
+:(K, r) = G(m || H(ek));
+:c = K-PKE.Encrypt(ek, m, r);
+:output (K, c);
+|Decaps|
+:check dk (type + hash) and ciphertext length;
+:m' = K-PKE.Decrypt(dk_PKE, c);
+:(K', r') = G(m' || h);  K_bar = J(z || c);
+:c' = K-PKE.Encrypt(ek, m', r');
+if (c == c' ?) then (yes)
+  :return K';
+  stop
+else (no)
+  :return K_bar (implicit reject);
+  stop
+endif
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+title ML-DSA key structure and the public relation t = A s1 + s2
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+package "Seed expansion" {
+  [xi (32 bytes)] as XI
+  [rho (32)] as RHO
+  [rho' (64)] as RHOP
+  [K (32)] as K
+  XI --> RHO
+  XI --> RHOP
+  XI --> K
+}
+
+package "Derived objects over R_q" {
+  [A = ExpandA(rho)\nk x l matrix] as A
+  [s1, s2 = ExpandS(rho')\nshort vectors] as S
+  [t = A s1 + s2] as T
+  [(t1, t0) = Power2Round(t, d)] as SPLIT
+  RHO --> A
+  RHOP --> S
+  A --> T
+  S --> T
+  T --> SPLIT
+}
+
+package "Public key pk" {
+  [rho] as PKR
+  [t1 (high bits)] as PKT
+}
+
+package "Private key sk" {
+  [rho, K] as SKRK
+  [tr = H(pk, 64)] as SKTR
+  [s1, s2] as SKS
+  [t0 (low bits)] as SKT0
+}
+
+RHO --> PKR
+SPLIT --> PKT : high bits public
+SPLIT --> SKT0 : low bits kept secret-side
+S --> SKS
+K --> SKRK
+@enduml

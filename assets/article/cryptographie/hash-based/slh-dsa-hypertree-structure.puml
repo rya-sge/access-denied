@@ -1,0 +1,37 @@
+@startuml
+title SLH-DSA structure - FORS certified up the hypertree (d layers)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+package "Hypertree (HT): d layers of XMSS trees" {
+  [PK.root  (top XMSS root = public key)] as ROOT
+  package "Layer d-1 : single XMSS tree" {
+    [WOTS+ key signs root below] as L2
+  }
+  package "Layer 1 : 2^(d-2)h' XMSS trees" {
+    [WOTS+ key signs root below] as L1
+  }
+  package "Layer 0 : 2^(d-1)h' XMSS trees" {
+    [WOTS+ key signs FORS public key] as L0
+  }
+  ROOT --> L2
+  L2 --> L1 : WOTS+ sig + auth path
+  L1 --> L0 : WOTS+ sig + auth path
+}
+
+package "FORS (few-time, k trees of 2^a leaves)" {
+  [FORS public key] as FPK
+  [k revealed secrets + auth paths] as FSIG
+  FPK --> FSIG
+}
+
+L0 --> FPK : WOTS+ sig certifies FORS key
+FSIG --> [Message digest md] : signs
+
+note right of ROOT
+  Only PK.root (n bytes) is published.
+  Everything below is regenerated
+  from SK.seed on demand.
+end note
+@enduml

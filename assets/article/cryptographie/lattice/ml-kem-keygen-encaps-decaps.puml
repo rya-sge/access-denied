@@ -1,0 +1,25 @@
+@startuml
+title ML-KEM.Encaps / Decaps over the wire
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+participant "Bob (Encaps)" as B
+participant "Alice (Decaps)\nholds dk" as A
+
+== Encaps(ek) ==
+B -> B : m <- random 32 bytes
+B -> B : (K, r) = G(m || H(ek))
+B -> B : c = K-PKE.Encrypt(ek, m, r)
+B -> A : ciphertext c   (keeps K)
+
+== Decaps(dk, c) ==
+A -> A : m' = K-PKE.Decrypt(dk_PKE, c)
+A -> A : (K', r') = G(m' || h)
+A -> A : K_bar = J(z || c)
+A -> A : c' = K-PKE.Encrypt(ek, m', r')
+alt c == c'
+  A -> A : return K' (== K)
+else c != c'
+  A -> A : return K_bar (implicit reject)
+end
+@enduml

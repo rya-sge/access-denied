@@ -1,0 +1,25 @@
+@startuml
+title slh_sign_internal - single deterministic pass (no retry)
+skinparam shadowing false
+start
+:opt_rand = addrnd (hedged) or PK.seed (deterministic);
+:R = PRF_msg(SK.prf, opt_rand, M);
+:digest = H_msg(R, PK.seed, PK.root, M);
+split
+  :md = first ceil(k*a/8) bytes;
+  note right: which FORS leaves to open
+split again
+  :idx_tree, idx_leaf = remaining digest bits;
+  note right: which bottom XMSS tree + leaf
+end split
+:SIG_FORS = fors_sign(md, SK.seed, PK.seed, ADRS);
+:PK_FORS = fors_pkFromSig(SIG_FORS, md, ...);
+:SIG_HT = ht_sign(PK_FORS, SK.seed, PK.seed, idx_tree, idx_leaf);
+note right
+  d XMSS signatures chained:
+  each tree root signed by
+  the WOTS+ key one layer up
+end note
+:SIG = R || SIG_FORS || SIG_HT;
+stop
+@enduml

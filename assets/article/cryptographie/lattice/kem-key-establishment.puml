@@ -1,0 +1,25 @@
+@startuml
+title ML-KEM key establishment (one message)
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+participant "Alice\n(key owner)" as A
+participant "Bob\n(encapsulator)" as B
+
+== Setup ==
+A -> A : (ek, dk) = ML-KEM.KeyGen()
+A -> B : encapsulation key ek (public)
+
+== Encapsulation ==
+B -> B : (K, c) = ML-KEM.Encaps(ek)\nK = fresh 256-bit shared secret
+B -> A : ciphertext c
+
+== Decapsulation ==
+A -> A : K' = ML-KEM.Decaps(dk, c)
+
+note over A, B
+  K' == K : both sides now hold the
+  same 256-bit shared secret key.
+  Use it directly for symmetric crypto.
+end note
+@enduml

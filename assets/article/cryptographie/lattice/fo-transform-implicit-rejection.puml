@@ -1,0 +1,28 @@
+@startuml
+title ML-KEM.Decaps_internal - Fujisaki-Okamoto with implicit rejection
+skinparam shadowing false
+start
+:parse dk = (dk_PKE || ek_PKE || h || z);
+:m' = K-PKE.Decrypt(dk_PKE, c);
+:(K', r') = G(m' || h);
+:K_bar = J(z || c);
+:c' = K-PKE.Encrypt(ek_PKE, m', r');
+note right
+  Re-encrypt with the re-derived
+  randomness r'. Honest ciphertexts
+  are reproduced exactly.
+end note
+if (c == c' ?) then (yes: valid)
+  :K' = K'  (real shared secret);
+else (no: tampered/malformed)
+  :K' = K_bar  (implicit rejection);
+  note right
+    Pseudorandom, unrelated key.
+    No observable failure -> defeats
+    chosen-ciphertext attacks.
+  end note
+endif
+:destroy the secret compare flag;
+:return K';
+stop
+@enduml

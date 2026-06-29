@@ -1,0 +1,51 @@
+@startmindmap
+* ML-KEM (FIPS 203)
+** Context
+*** Post-quantum key encapsulation
+*** Standardized CRYSTALS-Kyber
+*** Published 13 Aug 2024
+*** Replaces Diffie-Hellman / RSA transport
+*** Default: ML-KEM-768
+** What a KEM is
+*** KeyGen / Encaps / Decaps
+*** Encaps makes shared secret K + ciphertext c
+*** Decaps recovers K from c
+*** Transports a random key, not chosen data
+** Hard problem
+*** Module-LWE (MLWE)
+*** Public key = noisy system t = A s + e
+*** Security goal: IND-CCA2
+left side
+** Algebra
+*** Ring R_q = Z_q[X]/(X^256+1)
+*** q = 3329 = 2^8*13 + 1
+*** NTT, zeta = 17, 128 degree-2 factors
+*** No floating point
+** K-PKE (IND-CPA)
+*** Not approved standalone
+*** KeyGen: t = A s + e
+*** Encrypt: u, v with compression
+*** Decrypt: w = v - s^T u
+** FO transform
+*** (K, r) = G(m || H(ek))
+*** Derandomized re-encryption
+*** Decaps re-encrypts, checks c = c'
+*** Implicit reject: K_bar = J(z || c)
+*** Defeats chosen-ciphertext attacks
+** Algorithms
+*** ek = ek_PKE
+*** dk = dk_PKE || ek || H(ek) || z
+*** Encaps: m random -> (K, c)
+*** Decaps: decrypt -> re-encrypt -> compare
+*** Input checks on ek, dk, ciphertext
+** Parameters
+*** 512 (k=2) cat 1
+*** 768 (k=3) cat 3
+*** 1024 (k=4) cat 5
+*** ek 800/1184/1568, ct 768/1088/1568
+*** shared secret always 32 bytes
+** Context of use
+*** Confidentiality only, no authentication
+*** Pair with ML-DSA / SLH-DSA signature
+*** Hybrid with X25519
+@endmindmap

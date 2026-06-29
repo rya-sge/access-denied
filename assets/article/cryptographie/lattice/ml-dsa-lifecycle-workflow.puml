@@ -1,0 +1,35 @@
+@startuml
+title ML-DSA lifecycle - KeyGen, Sign, Verify
+skinparam shadowing false
+|KeyGen|
+start
+:draw seed xi (32 bytes);
+:expand xi -> rho, rho', K;
+:A = ExpandA(rho);
+:(s1, s2) = ExpandS(rho');
+:t = A s1 + s2;
+:(t1, t0) = Power2Round(t, d);
+:publish pk = (rho, t1);
+:store sk = (rho, K, tr, s1, s2, t0);
+|Sign|
+:format M' (domain separator + ctx + M);
+:mu = H(tr || M', 64);
+repeat
+  :sample mask y, w = A y;
+  :c~ = H(mu || HighBits(w));
+  :z = y + c*s1, compute hint h;
+backward:reject (bias / hint too large);
+repeat while (validity checks fail ?) is (yes)
+->no;
+:output sigma = (c~, z, h);
+|Verify|
+:recompute mu from pk and M';
+:reconstruct w'1 from z, t1, h;
+if (||z|| < gamma1 - beta\nand c~ matches ?) then (yes)
+  :accept;
+  stop
+else (no)
+  :reject;
+  stop
+endif
+@enduml

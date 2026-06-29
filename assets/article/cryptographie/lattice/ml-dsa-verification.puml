@@ -1,0 +1,21 @@
+@startuml
+title ML-DSA.Verify_internal - reconstruct the commitment
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+participant "pk = (rho, t1)" as PK
+participant "sigma = (c~, z, h)" as SIG
+participant "Verifier" as V
+
+SIG -> V : c~, z, h
+PK -> V : rho, t1
+V -> V : if h not encoded -> return false
+V -> V : A = ExpandA(rho)
+V -> V : tr = H(pk, 64)
+V -> V : mu = H(tr || M', 64)
+V -> V : c = SampleInBall(c~)
+V -> V : w'Approx = A z - c*t1*2^d
+V -> V : w'1 = UseHint(h, w'Approx)
+V -> V : c' = H(mu || w1Encode(w'1), lambda/4)
+V -> V : accept iff\n||z|| < gamma1 - beta\nand c~ = c'
+@enduml

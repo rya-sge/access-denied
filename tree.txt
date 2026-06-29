@@ -93,3 +93,26 @@ _posts/2026-06-28-chinese-remainder-theorem-cryptography.md
   assets/article/cryptographie/crt/2026-06-28-chinese-remainder-theorem-cryptography.puml                   (mindmap)
   assets/article/cryptographie/crt/crt-ring-isomorphism-concept.puml                                        (concept)
   assets/article/cryptographie/crt/rsa-crt-signature-workflow.puml                                          (workflow)
+
+_posts/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.md
+  assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.puml          (mindmap)
+  assets/article/cryptographie/lattice/fiat-shamir-aborts-protocol.puml                                 (concept, in-section)
+  assets/article/cryptographie/lattice/ml-dsa-signing-loop.puml                                         (workflow, in-section)
+  assets/article/cryptographie/lattice/ml-dsa-verification.puml                                         (workflow, in-section)
+  assets/article/cryptographie/lattice/ml-dsa-key-structure-concept.puml                                (concept, asset-only)
+  assets/article/cryptographie/lattice/ml-dsa-lifecycle-workflow.puml                                   (workflow, asset-only)
+
+_posts/2026-06-29-slh-dsa-fips-205-hash-based-signatures.md
+  assets/article/cryptographie/hash-based/2026-06-29-slh-dsa-fips-205-hash-based-signatures.puml        (mindmap)
+  assets/article/cryptographie/hash-based/slh-dsa-hypertree-structure.puml                              (concept, in-section)
+  assets/article/cryptographie/hash-based/slh-dsa-signing-flow.puml                                     (workflow, in-section)
+  assets/article/cryptographie/hash-based/wots-plus-hash-chain-concept.puml                             (concept, in-section)
+  assets/article/cryptographie/hash-based/slh-dsa-verification-workflow.puml                            (workflow, asset-only)
+
+_posts/2026-06-29-ml-kem-fips-203-post-quantum-key-encapsulation.md
+  assets/article/cryptographie/lattice/2026-06-29-ml-kem-fips-203-post-quantum-key-encapsulation.puml     (mindmap)
+  assets/article/cryptographie/lattice/kem-key-establishment.puml                                         (concept, in-section)
+  assets/article/cryptographie/lattice/fo-transform-implicit-rejection.puml                               (workflow, in-section)
+  assets/article/cryptographie/lattice/ml-kem-keygen-encaps-decaps.puml                                   (workflow, in-section)
+  assets/article/cryptographie/lattice/ml-kem-component-concept.puml                                      (concept, asset-only)
+  assets/article/cryptographie/lattice/ml-kem-keygen-workflow.puml                                        (workflow, asset-only)

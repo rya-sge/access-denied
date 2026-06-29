@@ -1,0 +1,53 @@
+@startmindmap
+* ML-DSA (FIPS 204)
+** Context
+*** Post-quantum signature
+*** Derived from CRYSTALS-Dilithium
+*** Published 13 Aug 2024
+*** Resists Shor (factoring/DLOG broken)
+** Hard problems
+*** MLWE => key recovery
+*** SelfTargetMSIS => forgery
+*** Security goal: SUF-CMA
+** Algebra
+*** Ring R_q = Z_q[X]/(X^256+1)
+*** q = 8380417 = 2^23 - 2^13 + 1
+*** NTT isomorphism (zeta = 1753)
+*** No floating point
+** Construction
+*** Schnorr + Fiat-Shamir
+*** Fiat-Shamir with Aborts
+*** Rejection sampling removes bias
+*** Module structure + NTT
+left side
+** Key generation
+*** Seed xi -> rho, rho', K
+*** A = ExpandA(rho)
+*** t = A s1 + s2
+*** Compress: (t1, t0) Power2Round
+*** pk = (rho, t1)
+*** sk = (rho, K, tr, s1, s2, t0)
+** Signing loop
+*** mu binds message + key
+*** y = ExpandMask, w = A y
+*** c~ = H(mu || w1), c = SampleInBall
+*** z = y + c s1
+*** Reject if z or r0 too large
+*** Hint h = MakeHint
+*** sigma = (c~, z, h)
+** Verification
+*** w'Approx = A z - c t1 2^d
+*** w1' = UseHint(h, w'Approx)
+*** Check ||z|| < gamma1 - beta
+*** Check c~ = H(mu || w1')
+** Parameters
+*** ML-DSA-44: (4,4), category 2
+*** ML-DSA-65: (6,5), category 3
+*** ML-DSA-87: (8,7), category 5
+*** Sig 2420 / 3309 / 4627 bytes
+** Variants
+*** Hedged (default, rnd random)
+*** Deterministic (rnd = 0)
+*** Pure vs HashML-DSA
+*** Domain separator + context
+@endmindmap

@@ -1,0 +1,46 @@
+@startmindmap
+* SLH-DSA (FIPS 205)
+** Context
+*** Stateless hash-based signature
+*** Standardized SPHINCS+
+*** Published 13 Aug 2024
+*** Most conservative PQC choice
+** Security
+*** Hash preimage/collision only
+*** No lattice / number theory
+*** EUF-CMA up to 2^64 signatures
+*** n = 16/24/32 -> cat 1/3/5
+left side
+** Building blocks
+*** WOTS+ : one-time (hash chains + checksum)
+*** XMSS : 2^h' uses via Merkle tree
+*** Hypertree : d layers of XMSS
+*** FORS : few-time, signs the digest
+** Keys
+*** SK = (SK.seed, SK.prf, PK.seed, PK.root) = 4n
+*** PK = (PK.seed, PK.root) = 2n
+*** PK.root = top XMSS root
+*** pk only 32/48/64 bytes
+** Signing
+*** R = PRF_msg(SK.prf, opt_rand, M)
+*** digest = H_msg(R, PK.seed, PK.root, M)
+*** md -> FORS, idx_tree/idx_leaf
+*** FORS sign -> PK_FORS
+*** ht_sign certifies PK_FORS
+*** SIG = R || SIG_FORS || SIG_HT
+*** no rejection loop
+** Verification
+*** recompute digest + indices
+*** rebuild PK_FORS from SIG_FORS
+*** ht_verify up d layers
+*** accept iff root = PK.root
+** Parameters
+*** 12 sets = 6 x (SHA2 / SHAKE)
+*** s = small sig, slow sign
+*** f = fast sign, big sig
+*** sig 7856 .. 49856 bytes
+** Variants
+*** Hedged (default) vs deterministic
+*** Pure vs HashSLH-DSA
+*** domain separator + context
+@endmindmap

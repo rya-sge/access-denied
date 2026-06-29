@@ -1,0 +1,28 @@
+@startuml
+title ML-DSA.Sign_internal - rejection sampling loop
+skinparam shadowing false
+start
+:mu = H(tr || M', 64);
+:rho'' = H(K || rnd || mu, 64);
+:kappa = 0;
+repeat
+  :y = ExpandMask(rho'', kappa);
+  :w = A y;
+  :w1 = HighBits(w);
+  :c~ = H(mu || w1Encode(w1), lambda/4);
+  :c = SampleInBall(c~);
+  :z = y + c*s1;
+  :r0 = LowBits(w - c*s2);
+  if (||z|| >= gamma1 - beta\nor ||r0|| >= gamma2 - beta ?) then (reject)
+    :kappa = kappa + l;
+  else (pass)
+    :h = MakeHint(-c*t0, w - c*s2 + c*t0);
+    if (||c*t0|| >= gamma2\nor ones(h) > omega ?) then (reject)
+      :kappa = kappa + l;
+    else (accept)
+      :sigma = sigEncode(c~, z mod q, h);
+      stop
+    endif
+  endif
+repeat while (signature not produced) is (retry)
+@enduml

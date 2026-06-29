@@ -1,0 +1,27 @@
+@startuml
+title slh_verify_internal - reconstruct and compare to PK.root
+skinparam shadowing false
+start
+if (|SIG| == (1 + k(1+a) + h + d*len)*n ?) then (no)
+  :return false;
+  stop
+else (yes)
+endif
+:parse SIG = R || SIG_FORS || SIG_HT;
+:digest = H_msg(R, PK.seed, PK.root, M);
+:md, idx_tree, idx_leaf  <- digest;
+:PK_FORS = fors_pkFromSig(SIG_FORS, md, PK.seed, ADRS);
+repeat :layer = 0 .. d-1;
+  :rebuild WOTS+ pubkey from this layer's sig;
+  :hash up the XMSS tree with auth path -> candidate root;
+  :candidate root becomes payload for next layer;
+repeat while (more layers ?) is (yes)
+->no;
+if (candidate root at layer d-1 == PK.root ?) then (yes)
+  :return true;
+  stop
+else (no)
+  :return false;
+  stop
+endif
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title WOTS+ hash chain for one base-w digit (w = 16, lg_w = 4)
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+rectangle "sk_i\n(secret start)" as SK
+rectangle "F(sk_i)" as C1
+rectangle "..." as C2
+rectangle "chain value at\nposition = digit\n(the signature)" as SIG
+rectangle "F^(w-1)(sk_i)\n(public chain end)" as PK
+
+SK -right-> C1 : F
+C1 -right-> C2 : F
+C2 -right-> SIG : F (digit times)
+SIG -right-> PK : F (w-1-digit times)
+
+note bottom of SIG
+  Signing reveals the chain element at
+  height = message digit. Verifier hashes
+  it forward to the public end.
+  A checksum over all digits stops an
+  attacker advancing chains to forge.
+end note
+
+note right of PK
+  T_l compresses every chain end
+  into the WOTS+ public key.
+  One-time only: two signatures leak forgery.
+end note
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title Fiat-Shamir with Aborts (lattice identification, non-interactive)
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+participant "Signer\n(knows s1, s2)" as P
+participant "Hash H\n(challenge oracle)" as H
+participant "Verifier\n(knows A, t)" as V
+
+== Commitment ==
+P -> P : sample mask y (small)
+P -> P : w = A y\nw1 = HighBits(w)
+
+== Challenge (derived, not interactive) ==
+P -> H : mu || w1
+H --> P : c~  then  c = SampleInBall(c~)
+
+== Response ==
+P -> P : z = y + c*s1
+note right of P
+  Reject and restart if
+  ||z|| >= gamma1 - beta
+  or ||r0|| >= gamma2 - beta
+end note
+P -> V : sigma = (c~, z, h)
+
+== Check ==
+V -> V : w'1 from A z - c*t1*2^d + hint
+V -> V : accept iff\n||z|| < gamma1 - beta\nand c~ = H(mu || w'1)
+@enduml

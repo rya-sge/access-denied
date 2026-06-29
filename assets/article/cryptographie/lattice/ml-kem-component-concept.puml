@@ -1,0 +1,32 @@
+@startuml
+title ML-KEM composition - K-PKE wrapped by the FO transform
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+package "ML-KEM (IND-CCA2 KEM)" {
+  package "K-PKE (IND-CPA, internal only)" {
+    [K-PKE.KeyGen\nt = A s + e] as KG
+    [K-PKE.Encrypt\nu, v compressed] as EN
+    [K-PKE.Decrypt\nw = v - s^T u] as DE
+  }
+  package "FO transform glue" {
+    [G = SHA3-512\n(K, r) = G(m || H(ek))] as G
+    [H = SHA3-256\nhash of ek] as H
+    [J = SHAKE256\nK_bar = J(z || c)] as J
+    [re-encrypt + compare\nc == c' ?] as RE
+  }
+}
+
+KG --> EN : ek (public)
+EN --> DE : ciphertext c
+H --> G
+G --> EN : randomness r
+DE --> RE : m'
+RE --> G : re-derive (K', r')
+RE --> J : on mismatch -> implicit reject
+note bottom of J
+  z = secret 32-byte value in dk.
+  Mismatch returns a pseudorandom key,
+  never an error.
+end note
+@enduml
