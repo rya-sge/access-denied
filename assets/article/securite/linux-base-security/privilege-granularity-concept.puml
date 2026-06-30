@@ -1,0 +1,40 @@
+@startuml
+title Privilege granularity — from coarse to fine
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Coarse: root/user duality" {
+  [root\n(all privileges)] as root
+  [user\n(no privilege)] as user
+}
+
+package "Middle: SUID / SGID" {
+  [SUID binary\nruns as file owner] as suid
+  [SGID binary/dir\nruns as / inherits file group] as sgid
+}
+
+package "Fine: capabilities" {
+  [CAP_NET_BIND_SERVICE\nbind ports < 1024] as bind
+  [CAP_NET_RAW\nraw/packet sockets] as raw
+  [CAP_NET_ADMIN\ninterfaces, firewall, routing] as admin
+  [~40 other CAP_* units] as other
+}
+
+root --> suid : split a task off\nfrom all-or-nothing
+user --> suid
+suid --> bind : decompose root\ninto single rights
+sgid --> raw
+suid --> admin
+sgid --> other
+
+note bottom of root
+  Two levels only: a SUID-root tool
+  gets ALL of root just to do one job.
+end note
+
+note bottom of bind
+  setcap cap_net_raw+ep /usr/bin/tcpdump
+  grants exactly one right, no SUID-root.
+end note
+@enduml

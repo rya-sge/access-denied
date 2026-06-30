@@ -1,0 +1,27 @@
+@startmindmap
+* Linux Isolation\n(Defense in Depth)
+** Threat model shift
+*** Castle model insufficient
+*** Compromise assumed
+*** Least privilege internally
+** Filesystem
+*** mount options\n(nosuid, noexec, nodev, ro)
+*** chroot\n(not a security boundary)
+** Network
+*** netfilter\n(iptables, nftables, ufw, bpfilter)
+** Resources
+*** cgroups\n(cpu, memory, pids, devices)
+** Kernel partitioning
+*** namespaces\n(mnt, pid, net, ipc, uts, user, cgroup, time)
+*** Plan 9 heritage
+*** clone / unshare / setns
+** Virtualization
+*** Containers\n(shared kernel)
+*** Type-2 hypervisor\n(hosted)
+*** Type-1 hypervisor\n(bare metal)
+*** Qubes OS\n(security by compartmentalization)
+** Composition cost
+*** Primitives combine like legos
+*** Exponential complexity
+*** Security by obscurity risk
+@endmindmap

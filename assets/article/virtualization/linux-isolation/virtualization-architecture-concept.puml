@@ -1,0 +1,51 @@
+@startuml
+title Virtualization architectures and their trust boundaries
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Containers (shared kernel)" {
+  [App A] as ca
+  [App B] as cb
+  [Host kernel\n(single shared kernel)] as ck
+  [Hardware] as ch
+  ca --> ck
+  cb --> ck
+  ck --> ch
+}
+
+package "Type-2 hypervisor (hosted)" {
+  [Guest OS A\nkernel + apps] as g2a
+  [Guest OS B\nkernel + apps] as g2b
+  [Hypervisor process] as h2
+  [Host OS kernel] as ho2
+  [Hardware] as hw2
+  g2a --> h2
+  g2b --> h2
+  h2 --> ho2
+  ho2 --> hw2
+}
+
+package "Type-1 hypervisor (bare metal)" {
+  [Guest OS A\nkernel + apps] as g1a
+  [Guest OS B\nkernel + apps] as g1b
+  [Thin hypervisor\n(minimal TCB)] as h1
+  [Hardware] as hw1
+  g1a --> h1
+  g1b --> h1
+  h1 --> hw1
+}
+
+note bottom of ck
+  A kernel bug can be a
+  container escape: one
+  compromised app reaches
+  the others.
+end note
+
+note bottom of h1
+  Smaller attack surface:
+  only the thin hypervisor
+  is shared. Used by Qubes OS.
+end note
+@enduml

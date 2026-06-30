@@ -116,3 +116,27 @@ _posts/2026-06-29-ml-kem-fips-203-post-quantum-key-encapsulation.md
   assets/article/cryptographie/lattice/ml-kem-keygen-encaps-decaps.puml                                   (workflow, in-section)
   assets/article/cryptographie/lattice/ml-kem-component-concept.puml                                      (concept, asset-only)
   assets/article/cryptographie/lattice/ml-kem-keygen-workflow.puml                                        (workflow, asset-only)
+
+_posts/2026-06-29-linux-isolation-primitives-defense-in-depth.md
+  assets/article/virtualization/linux-isolation/2026-06-29-linux-isolation-primitives-defense-in-depth.puml   (mindmap)
+  assets/article/virtualization/linux-isolation/isolation-spectrum-concept.puml                               (concept, in-section)
+  assets/article/virtualization/linux-isolation/container-creation-workflow.puml                              (workflow, in-section)
+  assets/article/virtualization/linux-isolation/virtualization-architecture-concept.puml                      (concept, in-section)
+
+_posts/2026-06-29-linux-base-security-primitives.md
+  assets/article/securite/linux-base-security/2026-06-29-linux-base-security-primitives.puml             (mindmap)
+  assets/article/securite/linux-base-security/posix-permission-resolution-workflow.puml                 (workflow, in-section)
+  assets/article/securite/linux-base-security/suid-privilege-elevation-workflow.puml                    (workflow, in-section)
+  assets/article/securite/linux-base-security/privilege-granularity-concept.puml                        (concept, in-section)
+
+_posts/2026-06-29-linux-advanced-security-seccomp-lsm.md
+  assets/article/securite/linux-advanced-security/2026-06-29-linux-advanced-security-seccomp-lsm.puml      (mindmap)
+  assets/article/securite/linux-advanced-security/seccomp-bpf-filter-workflow.puml                         (workflow, in-section)
+  assets/article/securite/linux-advanced-security/lsm-hook-architecture-concept.puml                       (concept, in-section)
+  assets/article/securite/linux-advanced-security/selinux-type-enforcement-concept.puml                    (concept, in-section)
+
+_posts/2026-06-29-linux-adversary-boot-and-exploitation.md
+  assets/article/securite/linux-adversary/2026-06-29-linux-adversary-boot-and-exploitation.puml      (mindmap)
+  assets/article/securite/linux-adversary/stack-overflow-mitigations-concept.puml                     (concept, in-section)
+  assets/article/securite/linux-adversary/boot-sequence-threats-workflow.puml                         (workflow, in-section)
+  assets/article/securite/linux-adversary/attack-kill-chain-workflow.puml                             (workflow, in-section)

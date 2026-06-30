@@ -1,0 +1,40 @@
+@startuml
+title POSIX permission check — first matching class decides
+
+start
+:Process requests an access\n(read / write / execute) on a file;
+if (process EUID == file owner UID?) then (yes)
+  :Use the OWNER (u) bits only;
+  if (requested bit set in u?) then (yes)
+    #90ee90:Access granted;
+    stop
+  else (no)
+    #ff9999:Access denied;
+    note right
+      The owner class is decisive even
+      when it denies: a file mode of
+      ---rwxrwx blocks the owner while
+      letting group and others in.
+    end note
+    stop
+  endif
+elseif (process is in the file's group?) then (yes)
+  :Use the GROUP (g) bits only;
+  if (requested bit set in g?) then (yes)
+    #90ee90:Access granted;
+    stop
+  else (no)
+    #ff9999:Access denied;
+    stop
+  endif
+else (neither)
+  :Use the OTHER (o) bits;
+  if (requested bit set in o?) then (yes)
+    #90ee90:Access granted;
+    stop
+  else (no)
+    #ff9999:Access denied;
+    stop
+  endif
+endif
+@enduml

@@ -267,5 +267,3 @@ ML-DSA recasts the Schnorr signature over module lattices. Its security reduces 
 - [CRYSTALS-Dilithium — Algorithm Specifications and Supporting Documentation](https://pq-crystals.org/dilithium/)
 - [NIST Post-Quantum Cryptography Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
 - [Claude Code](https://claude.com/product/claude-code)
-</content>
-</invoke>

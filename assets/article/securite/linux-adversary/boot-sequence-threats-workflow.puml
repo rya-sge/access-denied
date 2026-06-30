@@ -1,0 +1,40 @@
+@startuml
+title Linux boot chain and the physical-access adversary
+
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #f5f5f5
+}
+
+start
+:BIOS / UEFI;
+note right
+  Critical first stage. UEFI is complex/proprietary.
+  Out-of-band engines (Intel AMT, AMD PSP, IPMI, iLO)
+  run beneath the OS. Alternatives: coreboot, Libreboot.
+end note
+:Bootloader (GRUB / LILO / Syslinux);
+note right
+  First binary of the distribution. Can edit kernel
+  boot options -> evil maid attack. GRUB can unlock
+  encrypted partitions; protect boot params + integrity.
+end note
+:initramfs (/boot, cpio, tmpfs);
+note right
+  Loads drivers/modules so init can run.
+  Unlocks the encrypted root (LUKS, TPM-sealed key).
+end note
+:Kernel (/boot/vmlinuz);
+note right
+  Launched with parameters passed by the bootloader.
+end note
+:init (/sbin/init -> systemd);
+:Runlevel / services\n(System V, systemd, OpenRC);
+note right
+  Starts system services and processes.
+  Chain of trust relies on proprietary tooling:
+  SecureBoot, TPM, OPAL self-encrypting drives.
+  Mitigation also means disabling unused OOB services.
+end note
+stop
+@enduml

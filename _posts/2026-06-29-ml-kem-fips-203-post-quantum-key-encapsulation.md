@@ -35,7 +35,11 @@ The flow is one-directional and needs only a single message. Alice generates a k
 
 ![KEM key establishment flow]({{site.url_complet}}/assets/article/cryptographie/lattice/kem-key-establishment.png)
 
-The shared secret is generated *inside* Encaps, not chosen by Bob. This is the key difference from public-key encryption: a KEM transports a random key, not arbitrary data, which is exactly what is needed to set up a session and is simpler to make secure.
+The shared secret is generated *inside* Encaps, not chosen by Bob. The two halves of that definition (not chosen-message encryption, not interactive key exchange) are worth making explicit, because each one is a deliberate design choice that makes the primitive easier to secure.
+
+**Why not encryption of a chosen message.** In public-key encryption the sender picks the plaintext and encrypts it under the recipient's key. A KEM removes that choice: the secret $K$ is produced inside Encaps as a fresh random value, and neither party selects it. This matters because attacker-influenced plaintexts are the raw material of most chosen-ciphertext attacks against lattice encryption. By transporting a value that is random by construction, and (as shown later) deriving the encryption randomness deterministically from that value, ML-KEM removes the degrees of freedom an active attacker would otherwise probe. A KEM is therefore best read as encryption of a random key the algorithm chose, not of data the sender chose, which is both sufficient for session setup and simpler to prove secure.
+
+**Why not an interactive key exchange.** In Diffie-Hellman both parties contribute a value and the secret is derived jointly from a two-message round trip. A KEM is one-directional: only the key owner holds a long-term key pair, the secret originates entirely on the encapsulator's side, and a single ciphertext travels back. That asymmetry is what lets ML-KEM slot into protocols organized around a published public key (a TLS certificate, for example) without adding an interactive round, and it is why a KEM composes cleanly with a separate signature for authentication. Put together, a KEM does the *job* of Diffie-Hellman (agree on a session key) using the *shape* of public-key encryption (publish a key, return a ciphertext), while carrying a random secret rather than a chosen one. That precise shape is what the Fujisaki-Okamoto transform in the later sections is built to protect.
 
 ## The Hard Problem: Module-LWE
 
@@ -215,4 +219,3 @@ ML-KEM is the post-quantum replacement for Diffie-Hellman key establishment. It 
 - [NIST SP 800-227 — Recommendations for Key-Encapsulation Mechanisms](https://csrc.nist.gov/publications/sp)
 - [NIST Post-Quantum Cryptography Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
 - [Claude Code](https://claude.com/product/claude-code)
-</content>

@@ -1,0 +1,28 @@
+@startuml
+title SUID at exec — temporary identity change
+
+actor "User alice\n(RUID 1000)" as alice
+participant "Shell\nEUID 1000" as shell
+participant "Kernel\nexecve()" as kernel
+participant "passwd process\n-rwsr-xr-x root root" as proc
+database "/etc/shadow\nowner root, mode 0600" as shadow
+
+alice -> shell : run /usr/bin/passwd
+shell -> kernel : execve("/usr/bin/passwd")
+kernel -> kernel : SUID bit set?\nset EUID = file owner (root)
+kernel -> proc : start with RUID 1000, EUID 0
+proc -> shadow : write new password hash
+note right of shadow
+  Permitted because the
+  check uses EUID (root),
+  not RUID (alice).
+end note
+shadow --> proc : OK
+proc --> shell : exit, back to EUID 1000
+note over proc
+  Risk: any flaw in a SUID-root
+  binary runs with root rights.
+  This is why SUID is the most
+  dangerous of the base primitives.
+end note
+@enduml

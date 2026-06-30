@@ -235,4 +235,3 @@ SLH-DSA turns a hash function into a stateless signature by layering four constr
 - [FIPS 202 — SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions](https://doi.org/10.6028/NIST.FIPS.202)
 - [NIST Post-Quantum Cryptography Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
 - [Claude Code](https://claude.com/product/claude-code)
-</content>

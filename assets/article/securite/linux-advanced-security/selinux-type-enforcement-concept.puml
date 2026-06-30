@@ -1,0 +1,28 @@
+@startuml
+title SELinux type enforcement — access decided by labels, not UID
+
+skinparam shadowing false
+skinparam rectangle {
+  BackgroundColor #f5f5f5
+}
+
+rectangle "Executable\n/bin/passwd\ntype: passwd_exec_t" as exec
+rectangle "Subject (process domain)\npasswd_t" as subj
+rectangle "Object\n/etc/shadow\ntype: shadow_t" as obj
+
+rectangle "Policy rule\nallow passwd_t shadow_t:file { read write };" as rule
+
+exec --> subj : exec triggers a\ndomain transition\nto passwd_t
+subj --> rule : request read/write
+rule --> obj : permitted because a\nmatching allow rule exists
+
+note bottom of rule
+  Label format on every subject/object:
+  user:role:type:range
+  e.g. system_u:object_r:etc_t:s0
+
+  With no matching allow rule the access
+  is refused even for root. Type
+  enforcement, derived from MULTICS MLS.
+end note
+@enduml

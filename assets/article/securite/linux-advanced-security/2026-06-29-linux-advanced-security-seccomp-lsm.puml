@@ -1,0 +1,42 @@
+@startmindmap
+* Advanced GNU/Linux\nSecurity
+** Program <-> kernel
+*** syscalls (synchronous)
+*** signals (async, SIGKILL/SIGSEGV)
+*** strace to observe
+** Problem
+*** a process can call ALL syscalls
+*** execution not fixed\n(buffer overflow, hidden options)
+*** UNIX rule #2: do one thing well
+** SECCOMP
+*** Andrea Arcangeli, 2005
+*** mode 1 strict\n(exit/sigreturn/read/write)
+*** mode 2 seccomp-bpf (filters)
+*** whitelist / blacklist
+*** adopters: Chrome, Firefox,\nOpenSSH, qemu
+*** needs recompile, arch-dependent
+** LSM (framework)
+*** hooks on kernel functions
+*** generic interface (2002)
+*** DAC vs MAC (TCSEC, 1993)
+** SELinux
+*** NSA, MLS from MULTICS
+*** type enforcement\nuser:role:type:range
+*** labels via extended attributes
+*** Disabled/Permissive/Enforcing
+*** most complete, hardest
+** AppArmor
+*** path-based (not inodes)
+*** profiles in /etc/apparmor.d/
+*** enforce / complain modes
+*** simpler, no labels
+** Other LSMs
+*** SMACK, TOMOYO
+*** Yama, LoadPin, SafeSetID, Lockdown
+*** stackable (major/minor)
+** Takeaway
+*** many adversary models\n-> complex tool suite
+*** MULTICS syndrome (entropy up)
+*** castle model no longer enough
+*** least privilege -> defense in depth\n-> isolation/virtualization
+@endmindmap

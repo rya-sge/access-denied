@@ -1,0 +1,41 @@
+@startuml
+title Stack frame, the overflow, and the three mitigations
+
+skinparam shadowing false
+skinparam rectangle {
+  BackgroundColor #f5f5f5
+}
+
+rectangle "Higher addresses" as hi
+rectangle "RET\n(saved return address)" as ret #ffd0d0
+rectangle "saved RBP\n(frame pointer)" as rbp
+rectangle "stack canary\n(random guard value)" as canary #d0ffd0
+rectangle "char buf[64]\n(local buffer)" as buf
+rectangle "Lower addresses" as lo
+
+hi -down-> ret
+ret -down-> rbp
+rbp -down-> canary
+canary -down-> buf
+buf -down-> lo
+
+note right of buf
+  strcpy(buf, argv[1]) copies without a bound.
+  Writes grow UPWARD toward saved RBP and RET,
+  so an over-long argv[1] overwrites the return
+  address and redirects control flow on return.
+end note
+
+note right of canary
+  CANARY: a random value placed before RET; checked
+  on return. An overflow that reaches RET also
+  corrupts it, so the mismatch aborts the program.
+end note
+
+note right of ret
+  NX: mark the stack non-executable, so injected
+  shellcode in buf cannot run (MULTICS idea).
+  ASLR: randomize segment base addresses, so the
+  attacker cannot predict where to jump.
+end note
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+title LSM hooks — DAC first, then mandatory access control
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Process" as p
+rectangle "System call\n(open, exec, socket, ...)" as sc
+rectangle "Standard DAC check\n(POSIX rwx / owner / capabilities)" as dac
+rectangle "LSM hook\nplaced on the kernel function" as hook
+
+package "Active security module(s)" {
+  rectangle "MAC modules (one major)\nSELinux | AppArmor | SMACK | TOMOYO" as mac
+  rectangle "Targeted modules (stackable)\nYama | LoadPin | SafeSetID | Lockdown" as minor
+}
+
+rectangle "Access granted\n(only if DAC AND every module allow)" as grant
+rectangle "Access denied" as deny
+
+p --> sc
+sc --> dac
+dac --> deny : DAC says no
+dac --> hook : DAC says yes
+hook --> mac
+hook --> minor
+mac --> deny : policy denies
+minor --> deny : module denies
+mac --> grant : policy allows
+minor --> grant : module allows
+
+note bottom of mac
+  MAC decision does not depend on the
+  object owner: even root is bound by
+  the policy. This is the DAC->MAC shift.
+end note
+@enduml

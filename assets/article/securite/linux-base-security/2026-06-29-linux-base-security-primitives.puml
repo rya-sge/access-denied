@@ -1,0 +1,39 @@
+@startmindmap
+* GNU/Linux\nBase Security
+** Heritage
+*** MULTICS (up to 8 levels)
+*** UNIX simplifies\n(root/user, rwx)
+*** UNIX too permissive\n-> new mechanisms
+** Login / Authentication
+*** terminal (virtual)
+*** telnet (port 23, cleartext)
+*** SSH (port 22, encrypted)
+*** PAM (pluggable modules)
+*** shared secret\n(password, key, fingerprint)
+** POSIX file permissions
+*** rwx for u / g / o
+*** octal (chmod 755)
+*** symbolic (chmod u+x)
+*** sticky bit (/tmp)
+*** SGID file/dir
+*** SUID (dangerous)
+** POSIX ACL
+*** finer granularity
+*** getfacl / setfacl
+*** mask + default entries
+*** filesystem-dependent (32 on ext2/3)
+** Extended attributes
+*** chattr / lsattr
+*** immutable (i)
+*** append-only (a)
+*** root can clear them
+** Capabilities
+*** decompose root
+*** CAP_NET_RAW / ADMIN / BIND_SERVICE
+*** getcap / setcap
+*** Permitted/Effective/Inheritable
+** Ordering (granularity)
+*** Permissions < ACL < xattr
+*** root/user < SUID/SGID < capabilities
+*** weaker than MULTICS
+@endmindmap

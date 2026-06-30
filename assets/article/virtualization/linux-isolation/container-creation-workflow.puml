@@ -1,0 +1,23 @@
+@startuml
+title Creating an isolated process with namespaces and cgroups
+
+start
+:Parent process holds default\nnamespaces and full view;
+if (Create new process or detach current?) then (new process)
+  :clone() with CLONE_NEW* flags\n(NEWPID, NEWNET, NEWNS, NEWUSER, ...);
+else (detach current)
+  :unshare() with the same flags;
+endif
+:Child runs in fresh namespaces\n(own PID 1, own network stack,\nown mount table);
+:Attach child to a cgroup\n(cpu / memory / pids limits);
+:Set up the mount namespace\n(pivot_root or chroot, bind mounts,\nnosuid / noexec / nodev);
+:Apply seccomp filter\n(restrict syscalls);
+:Drop capabilities;
+:exec() the target program;
+note right
+  setns() lets another process
+  later join these namespaces
+  (for example, docker exec)
+end note
+stop
+@enduml

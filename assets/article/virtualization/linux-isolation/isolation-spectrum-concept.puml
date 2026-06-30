@@ -1,0 +1,35 @@
+@startuml
+title Isolation strength vs. shared trusted computing base
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+rectangle "Weaker isolation\nlarger shared kernel surface" as weak #fdd
+rectangle "Stronger isolation\nsmaller shared surface" as strong #dfd
+
+package "Same kernel, same userspace" {
+  [mount options\nnosuid / noexec / nodev / ro]
+  [chroot\napparent root change]
+}
+
+package "Same kernel, partitioned view" {
+  [cgroups\nresource limits]
+  [namespaces\nresource partitioning]
+  [Containers\nlxc / docker / firejail]
+}
+
+package "Separate kernels" {
+  [Type-2 hypervisor\nVirtualBox / VMware Workstation]
+  [Type-1 hypervisor\nXen / ESXi]
+  [Qubes OS\ncompartmentalized desktop]
+}
+
+weak --> [mount options\nnosuid / noexec / nodev / ro]
+[chroot\napparent root change] --> [Containers\nlxc / docker / firejail]
+[namespaces\nresource partitioning] --> [Containers\nlxc / docker / firejail]
+[cgroups\nresource limits] --> [Containers\nlxc / docker / firejail]
+[Containers\nlxc / docker / firejail] --> [Type-2 hypervisor\nVirtualBox / VMware Workstation]
+[Type-2 hypervisor\nVirtualBox / VMware Workstation] --> [Type-1 hypervisor\nXen / ESXi]
+[Type-1 hypervisor\nXen / ESXi] --> [Qubes OS\ncompartmentalized desktop]
+[Qubes OS\ncompartmentalized desktop] --> strong
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+title Remote attack kill chain, with the lecture's concrete case
+
+skinparam shadowing false
+
+|Adversary|
+start
+:Reconnaissance\n(input, services, portscan);
+:Attack vector\nexploit WordPress plugin to drop a .php file,\nrun a PHP script to get a shell;
+note right
+  Lands as the web service user
+  (e.g. www-data), not root.
+end note
+:Privilege elevation\nexploit sudoedit CVE-2021-3156 (Baron Samedit)\nto obtain root;
+:Persistence\ninstall a backdoor;
+:Cleanup\nerase logs and traces;
+:Expansion\npivot to other hosts;
+stop
+
+|Defender (primitives)|
+:File / exec / read rights\n(LSM, ACL, extended attributes, permissions);
+note left
+  Limit what the web-service user can
+  read, write, or execute.
+end note
+:Process isolation\n(namespaces, chroot, LSM, capabilities);
+note left
+  An isolated web process cannot reach the
+  programs a privesc exploit needs, so the
+  CVE-2021-3156 path is cut off.
+end note
+stop
+@enduml

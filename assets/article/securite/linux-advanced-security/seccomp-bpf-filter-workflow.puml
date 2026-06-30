@@ -1,0 +1,32 @@
+@startuml
+title seccomp-bpf — filtering a system call
+
+start
+:Process issues a system call\n(syscall number + arguments);
+if (seccomp filter installed?) then (no)
+  #lightgray:Normal kernel processing;
+  stop
+else (yes)
+endif
+:Kernel runs the attached BPF program\non the syscall number/args;
+switch (filter verdict)
+case (SECCOMP_RET_ALLOW)
+  #90ee90:Execute the syscall;
+  stop
+case (SECCOMP_RET_ERRNO)
+  #ffd27f:Skip syscall, return an error code;
+  stop
+case (SECCOMP_RET_TRAP)
+  #ffd27f:Deliver SIGSYS to the process;
+  stop
+case (SECCOMP_RET_KILL)
+  #ff9999:Terminate the process;
+  note right
+    Strict mode (mode 1) is the
+    degenerate filter: only read,
+    write, exit, sigreturn pass;
+    everything else is KILL.
+  end note
+  stop
+endswitch
+@enduml
