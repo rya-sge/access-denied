@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+title Validator evaluation on spend
+
+actor "User\n(off-chain app)" as User
+participant "Wallet\n(CIP-30)" as Wallet
+participant "Cardano node\nledger rules" as Node
+participant "spend handler\n(compiled UPLC)" as Val
+
+User -> User : find UTXO locked at\nscript address (+ its datum)
+User -> User : build transaction\n(inputs, outputs, redeemer)
+User -> Wallet : sign
+Wallet --> User : signed tx
+User -> Node : submit tx
+
+Node -> Node : phase-1: structure & fees valid?
+Node -> Val : phase-2: run handler\n(datum, redeemer, own_ref, tx)
+Val -> Val : evaluate constraints\nagainst the whole transaction
+alt returns True
+  Val --> Node : approve
+  Node --> User : accepted, UTXO spent
+else returns False / fail / budget exceeded
+  Val --> Node : reject
+  Node --> User : rejected, no state change
+end
+@enduml

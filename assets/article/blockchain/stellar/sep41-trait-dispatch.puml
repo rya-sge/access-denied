@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+}
+skinparam package {
+  BackgroundColor #FDFDFD
+  BorderColor #999999
+}
+
+title How a call is routed through ContractType
+
+package "Contract author's crate" {
+  component "MyToken\ncontractimpl(contracttrait)" as MyToken #FFF6E0
+}
+
+package "stellar-tokens::fungible" {
+  component "FungibleToken\n(contracttrait)" as FT #FFF6E0
+  component "ContractOverrides\n(internal plumbing)" as CO #FFF6E0
+
+  component "Base" as Base
+  component "AllowList" as AL
+  component "BlockList" as BL
+  component "RWA" as RWA
+
+  component "storage.rs\nBase::transfer\nBase::mint\nBase::approve ..." as Storage
+}
+
+MyToken -down-> FT : implements and picks\nthe ContractType
+
+FT -down-> CO : each method delegates to\nSelf::ContractType::<method>
+
+CO <|.. Base
+CO <|.. AL
+CO <|.. BL
+CO <|.. RWA
+
+Base -down-> Storage : vanilla logic
+AL -down-> Storage : allowlist check,\nthen vanilla logic
+BL -down-> Storage : blocklist check,\nthen vanilla logic
+RWA -down-> Storage : compliance and\nidentity checks
+
+note right of FT
+  ContractType is a single associated type.
+
+  FungibleAllowList requires
+    FungibleToken<ContractType = AllowList>
+  FungibleBlockList requires
+    FungibleToken<ContractType = BlockList>
+
+  Implementing both on one contract
+  cannot type-check.
+end note
+
+@enduml

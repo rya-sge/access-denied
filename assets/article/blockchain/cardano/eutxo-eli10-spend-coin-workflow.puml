@@ -1,0 +1,22 @@
+@startuml
+skinparam shadowing false
+title How you pay with coins and get change
+
+start
+:You want to buy a toy for 45;
+:Look in your jar for coins;
+:Pick a 30 coin and a 20 coin
+(that is 50, enough);
+:Hand both whole coins to the shop;
+:Shop keeps 45 for the toy
+and 2 for the helper fee;
+:You get a brand-new 3 coin back
+as change;
+note right
+  Coins in (50) = coins out (48)
+  plus the fee (2).
+end note
+:Your old 30 and 20 coins are gone
+for good and cannot be used again;
+stop
+@enduml

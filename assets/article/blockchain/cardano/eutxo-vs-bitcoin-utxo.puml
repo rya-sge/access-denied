@@ -1,0 +1,30 @@
+@startmindmap
+* eUTXO vs Bitcoin UTXO
+** Shared foundation (UTXO)
+*** Value as discrete coins, not balances
+*** Consume whole inputs, create outputs
+*** Change like physical cash
+*** Inputs = outputs + fee (exact)
+*** UTXO immutable, spent once
+*** UTXO set = current state
+** Bitcoin output
+*** Value + locking script (scriptPubKey)
+*** Unlock with scriptSig / witness
+*** Script: stack-based, not Turing-complete
+*** Sees mainly the unlocking data
+*** Time locks: nLockTime, CLTV, CSV
+*** No per-UTXO state, no native assets
+** What "Extended" adds
+*** Datum: state attached to a UTXO
+*** Redeemer: argument at spend time
+*** Script context: whole-transaction view
+** Consequences
+*** Expressive validators (Plutus / Aiken)
+*** Stateful contracts (consume + recreate)
+*** Native multi-asset UTXOs
+*** Covenants natural (constrain outputs)
+** Preserved from UTXO
+*** Deterministic validation
+*** Fail-fast, atomic, no partial state
+*** Explicit concurrency (fan-out, batching)
+@endmindmap

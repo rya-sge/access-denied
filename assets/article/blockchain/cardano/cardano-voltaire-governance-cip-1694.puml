@@ -1,0 +1,35 @@
+@startmindmap
+* Voltaire (CIP-1694)
+** Three bodies
+*** Constitutional Committee (constitutionality)
+*** DReps (ADA holders' voice)
+*** SPOs (hard forks, some params)
+** Seven action types
+*** No-confidence
+*** Update committee / threshold
+*** New constitution / guardrails
+*** Hard-fork initiation
+*** Protocol parameter change
+*** Treasury withdrawal
+*** Info (non-binding)
+** Ratification
+*** Per-type threshold mix
+*** Security params need extra SPO vote
+*** Thresholds are governance-set
+** Lifecycle
+*** Live for govActionLifetime (6 epochs)
+*** Ratified at epoch boundary
+*** Enacted next boundary
+*** Expired if thresholds unmet
+** Participation
+*** Register DRep (500 ADA deposit)
+*** Delegate vote (separate from stake)
+*** Abstain / No Confidence built-ins
+*** Vote Yes / No / Abstain
+*** Propose (refundable deposit)
+** For developers
+*** Governance = ordinary transactions
+*** Params affect your contracts
+*** Treasury funds development
+*** Plutus V3 Voting / Proposing purposes
+@endmindmap

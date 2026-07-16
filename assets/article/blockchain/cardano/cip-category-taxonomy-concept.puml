@@ -1,0 +1,30 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title The nine CIP categories
+
+package "Protocol internals" {
+  [Ledger (25)] as L
+  [Consensus (4)] as CO
+  [Network (3)] as N
+  [Plutus (25)] as P
+}
+
+package "Application & ecosystem standards" {
+  [Wallets (26)] as W
+  [Tokens (9)] as T
+  [Metadata (21)] as M
+  [Tools (21)] as TO
+}
+
+package "Governance of the process" {
+  [Meta (6)] as ME
+}
+
+ME ..> L : documents\nprocess
+note bottom of P
+  Plutus and Ledger changes
+  follow their own sub-processes
+  (CIP-0035 and CIP-0084)
+end note
+@enduml

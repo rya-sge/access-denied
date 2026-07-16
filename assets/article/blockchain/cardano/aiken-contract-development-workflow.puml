@@ -1,0 +1,39 @@
+@startuml
+skinparam shadowing false
+title Aiken contract development workflow
+
+|Design|
+start
+:read the eUTXO model
+(validators are judges,
+off-chain is the lawyer);
+:model datum / redeemer types;
+:express rule as constraints
+on the Transaction;
+
+|On-chain|
+:aiken new owner/name;
+:set plutusVersion = v3
+aiken add aiken-lang/stdlib;
+:write handler(s)
+spend / mint / ...;
+:write test + property tests;
+repeat
+  :aiken check;
+repeat while (tests fail\nor ex-units too high?) is (yes) not (no)
+
+|Package|
+:aiken build -> plutus.json;
+:aiken blueprint apply
+(parameters);
+:derive address / policy id;
+
+|Off-chain|
+:generate types from blueprint;
+:build & submit transactions;
+
+|Assurance|
+:security pass vs eUTXO
+vulnerability catalog;
+stop
+@enduml

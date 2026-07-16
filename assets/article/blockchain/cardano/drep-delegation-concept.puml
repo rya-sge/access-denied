@@ -1,0 +1,30 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title Stake delegation and vote delegation are independent
+
+[Your stake credential\n(part of your address)] as SC
+
+package "Stake delegation" {
+  [Stake pool\n(block production + rewards)] as POOL
+}
+
+package "Vote delegation" {
+  [A specific DRep] as DREP
+  [Abstain (built-in)] as AB
+  [No Confidence (built-in)] as NC
+}
+
+SC --> POOL : delegate stake
+SC --> DREP : delegate vote
+SC ..> AB : or
+SC ..> NC : or
+
+note bottom of SC
+  You can stake to one pool and vote-delegate
+  to a different DRep, and change either without
+  touching the other. In the Conway era, rewards
+  accrue but can only be withdrawn once the stake
+  credential has delegated its vote.
+end note
+@enduml

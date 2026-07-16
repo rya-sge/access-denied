@@ -1,0 +1,32 @@
+@startuml
+skinparam shadowing false
+title Verification in layers (cheapest to strongest)
+
+start
+:write the validator;
+:unit tests
+(the bugs you thought of);
+if (pass?) then (no)
+  :fix; back to tests;
+  detach
+else (yes)
+endif
+:property-based testing
+(thousands of random inputs
+against invariants:
+"no tx extracts more than deposited");
+if (invariants hold?) then (no)
+  :shrink counterexample; fix;
+  detach
+else (yes)
+endif
+:professional audit
+(line-by-line review,
+attack-surface analysis,
+testnet penetration testing);
+:optional: formal verification
+(prove a property for all inputs);
+:deploy to mainnet
+only after these layers pass;
+stop
+@enduml

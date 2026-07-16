@@ -1,0 +1,31 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title UTXO transaction flow (shared by Bitcoin and Cardano)
+
+package "UTXO set (before)" {
+  [UTXO_1\n3,000] as U1
+  [UTXO_2\n2,000] as U2
+  [other UTXOs...] as UX
+}
+
+rectangle "Transaction\ninputs = outputs + fee" as TX
+
+package "UTXO set (after)" {
+  [To Bob\n4,500 (new)] as O1
+  [Change to Alice\n300 (new)] as O2
+  [other UTXOs...] as UX2
+}
+
+U1 --> TX : consumed
+U2 --> TX : consumed
+TX --> O1 : created
+TX --> O2 : created
+UX -[hidden]-> UX2
+
+note bottom of TX
+  Consumed UTXOs leave the set permanently;
+  each is spendable exactly once. New outputs
+  become available for future transactions.
+end note
+@enduml

@@ -1,0 +1,31 @@
+@startmindmap
+* Unified Risk Layer for DeFi
+** Response-path frictions
+*** On-chain governance\nslow, human consensus, not scalable
+*** Delegated operators\nefficient but trust-based
+*** On-chain controllers\nreal-time but narrow data
+** The risk layer
+*** sits above the oracle network
+*** ingests diverse signals\nliquidity, volatility, macro, credit
+*** defines thresholds + responses
+*** outputs
+**** risk-managed pricing
+**** risk-managed responses\ncircuit breakers, param changes
+** Aave's journey
+*** 2020 on-chain governance
+*** 2023 manual risk stewards
+*** 2024 first-gen risk oracles
+*** black-box limitation\nopaque, silent failure, manipulable
+** Protocol-owned infra (CRE)
+*** credibly neutral, node-validated
+*** off-chain workflow owned by protocol
+*** transparent to team + auditors
+** Pendle PT use case
+*** PT = zero-coupon bond, fixed maturity
+*** linear discount = unused efficiency
+*** time-varying risk profile
+**** volatile early, deterministic late
+*** optimize discount + liquidation params
+*** inputs: AMM price + parameter registry
+*** CRE writes via Llama Guard oracle
+@endmindmap

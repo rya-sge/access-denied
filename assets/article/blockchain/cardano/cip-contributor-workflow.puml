@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title Proposing a CIP
+
+start
+:identify a problem or change;
+if (problem is broad /\nsolution not yet clear?) then (yes)
+  :write a CPS
+(Cardano Problem Statement);
+else (no)
+endif
+:copy .github/CIP-TEMPLATE.md;
+:assign a Category
+(Meta / Ledger / ... / Tools);
+:write required sections
+(Abstract, Motivation,
+Specification, Rationale,
+Path to Active);
+:open a pull request
+(this is the "draft");
+repeat
+  :CIP editors + experts review
+in bi-weekly meetings;
+repeat while (changes requested?) is (yes) not (no)
+:merged as Proposed;
+:implementors follow
+the Path to Active;
+if (acceptance criteria met?) then (yes)
+  :status becomes Active;
+else (abandoned / superseded)
+  :status becomes Inactive;
+endif
+stop
+@enduml

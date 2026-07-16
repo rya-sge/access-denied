@@ -1,0 +1,38 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam rectangle {
+  BorderColor #4A78B5
+  BackgroundColor #EEF5FF
+}
+
+title ERC-8004 — Three Per-Chain Singleton Registries
+
+actor "Agent owner\n/ operator" as Owner
+actor "Client\n(human or agent)" as Client
+component "Validator\ncontract" as Validator
+
+package "ERC-8004 (per-chain singletons)" {
+  rectangle "Identity Registry\n(ERC-721 + URIStorage)\nagentId, agentURI,\nagentWallet metadata" as ID
+  rectangle "Reputation Registry\ngiveFeedback,\nsigned value + tags,\nrevoke / appendResponse" as REP
+  rectangle "Validation Registry\nvalidationRequest,\nvalidationResponse 0-100" as VAL
+}
+
+cloud "Registration file\n(IPFS / HTTPS / data URI)\nservices, supportedTrust" as FILE
+
+Owner --> ID : register() / setAgentURI()
+ID --> FILE : agentURI resolves to
+Client --> REP : giveFeedback(agentId, value, ...)
+Owner --> VAL : validationRequest(validator, agentId, ...)
+Validator --> VAL : validationResponse(requestHash, 0-100)
+REP ..> ID : getIdentityRegistry()
+VAL ..> ID : getIdentityRegistry()
+
+note bottom of FILE
+  supportedTrust:
+  reputation, crypto-economic,
+  tee-attestation
+end note
+
+@enduml

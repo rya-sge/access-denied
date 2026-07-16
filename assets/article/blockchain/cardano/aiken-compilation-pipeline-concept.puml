@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title Everything compiles to UPLC
+
+package "Source languages (on-chain)" {
+  [Aiken] as AK
+  [Plinth / Plutus Tx\n(Haskell)] as PL
+  [Plutarch] as PT
+  [OpShin\n(Python)] as OP
+  [Scalus\n(Scala 3)] as SC
+  [Marlowe\n(DSL)] as MW
+}
+
+[UPLC\nUntyped Plutus\nLambda Calculus] as UPLC
+[CIP-57 blueprint\nplutus.json] as BP
+node "Cardano node\nPlutus V3 evaluator" as NODE
+
+AK --> UPLC
+PL --> UPLC
+PT --> UPLC
+OP --> UPLC
+SC --> UPLC
+MW --> UPLC
+
+UPLC --> BP : compiled code +\ndatum/redeemer schema
+BP --> NODE : deployed script
+UPLC --> NODE : executed per script input
+
+note bottom of AK
+  Aiken emits the blueprint
+  automatically on every build
+end note
+@enduml

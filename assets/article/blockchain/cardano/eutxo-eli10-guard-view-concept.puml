@@ -1,0 +1,30 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title What the guard is allowed to look at
+
+package "Bitcoin guard" {
+  [The key you hand over] as BK
+  [A simple lock check] as BL
+}
+note bottom of BL
+  The guard sees almost nothing else.
+  It cannot read a note or the receipt.
+end note
+
+package "Cardano guard (Validator)" {
+  [The sticky note on the chest\n(Datum)] as D
+  [The note you hand over\n(Redeemer)] as R
+  [The WHOLE shopping receipt\n(Context)] as C
+  [Coins going in] as IN
+  [Coins going out] as OUT
+  [Who signed] as S
+}
+C --> IN
+C --> OUT
+C --> S
+note bottom of C
+  The guard reads the whole receipt,
+  but not other people's chests.
+end note
+@enduml

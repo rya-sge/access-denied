@@ -1,0 +1,31 @@
+@startuml
+title Golden Ticket — from DC compromise to persistent access
+
+participant "Attacker" as ATK
+participant "Domain Controller\n(LSASS / krbtgt)" as DC
+participant "Workstation\n(attacker-controlled)" as WS
+participant "Target service\n(e.g. file server)" as SVC
+
+== One-time theft on the DC ==
+ATK -> DC : privilege::debug
+ATK -> DC : lsadump::lsa /inject /name:krbtgt
+DC --> ATK : krbtgt NTLM/AES hash + domain SID
+
+== Later, from anywhere ==
+ATK -> WS : kerberos::golden\n(domain, SID, krbtgt hash,\nuser, id) /ptt
+note over WS
+  Forged TGT injected into the
+  current session. No contact
+  with the DC was needed to mint it.
+end note
+WS -> SVC : present forged TGT -> request service ticket
+SVC -> DC : (normal Kerberos validation)
+DC --> SVC : ticket valid (encrypted with krbtgt key)
+SVC --> WS : access granted as the impersonated identity
+
+note over ATK, SVC
+  Persists until the krbtgt password
+  is reset TWICE. A single reset is
+  not enough (password history = 2).
+end note
+@enduml

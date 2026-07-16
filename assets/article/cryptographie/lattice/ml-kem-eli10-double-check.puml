@@ -1,0 +1,13 @@
+@startuml
+skinparam backgroundColor transparent
+start
+:open the box with the key;
+:read the secret number;
+:re-lock a fresh box\nthe exact same way;
+if (does it match Bob's box?) then (yes)
+  :use the real shared key;
+else (no)
+  :quietly hand back a fake key\n(built from Alice's own\nsecret ingredient);
+endif
+stop
+@enduml

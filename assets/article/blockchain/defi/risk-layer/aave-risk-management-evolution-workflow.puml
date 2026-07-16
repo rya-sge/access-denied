@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title Aave Risk-Management Evolution
+
+start
+:2020 - On-chain governance;
+note right
+  Risk managers recommend,
+  stakeholders vote, timelock.
+  Resilient but slow, not scalable.
+end note
+
+:2023 - Manual risk stewards;
+note right
+  Delegate bounded parameters
+  to a trusted operator.
+  Efficient but trust-based.
+end note
+
+:2024 - First-gen risk oracles;
+note right
+  Automated operator, encoded
+  methodology, bounded updates.
+  But an opaque black box.
+end note
+
+:Protocol-owned risk oracle (CRE);
+note right
+  Transparent, node-validated,
+  workflow owned by the protocol.
+end note
+
+stop
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title From source to deployable script
+
+start
+:Write validator(s) in validators/;
+:aiken check
+(type-check + run tests);
+if (green?) then (no)
+  :fix code / tests;
+  detach
+else (yes)
+endif
+:aiken build;
+:plutus.json blueprint (CIP-57)
+generated;
+if (validator takes\ncompile-time parameters?) then (yes)
+  :aiken blueprint apply
+(bake in each parameter);
+else (no)
+endif
+fork
+  :aiken blueprint address
+(spend -> script address);
+fork again
+  :aiken blueprint policy
+(mint -> policy id);
+end fork
+:off-chain app reads plutus.json
+(Lucid / Mesh / PyCardano);
+:build & submit transactions
+the validator will approve;
+stop
+@enduml

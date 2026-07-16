@@ -1,0 +1,23 @@
+@startuml
+title Skeleton Key — patching LSASS to accept a master password
+
+start
+:Attacker has SYSTEM on the Domain Controller;
+:privilege::debug (acquire debug right on LSASS);
+:misc::skeleton\n(patch the LSASS authentication routine in memory);
+note right
+  In-memory only. The patch does
+  NOT survive a reboot of the DC.
+end note
+:LSASS now accepts a hidden master password
+for ANY domain account, alongside the real one;
+fork
+  :Legitimate user logs in\nwith their real password;
+  :Authentication succeeds (unchanged);
+fork again
+  :Attacker logs in as any user\nwith the master password;
+  :Authentication succeeds (backdoor);
+end fork
+:Defender resets the DC / monitors LSASS\ndebug access to detect and remove it;
+stop
+@enduml

@@ -1,0 +1,27 @@
+@startmindmap
+* Windows Advanced\nAuthentication
+** Password issues
+*** Guessable patterns
+*** Reuse across sites
+*** Phishing exposure
+** Smartcards
+*** Asymmetric keys\nnon-exportable
+*** PIN = 2nd factor
+*** Embedded CPU + EEPROM
+*** Kerberos PKINIT\n(RFC 4556 / MS-PKCA)
+*** Drawbacks: PKI,\nreaders, lockout
+** Virtual smartcards
+*** TPM-backed
+*** Non-exportability
+*** Isolated crypto
+*** Anti-hammering
+*** Always inserted
+** Hello for Business
+*** TPM-protected keys
+*** PIN + biometrics
+*** Fingerprint / face / iris
+** Residual exposure
+*** NTLM hash in PAC
+*** Kerberos ticket theft
+*** Modern: FIDO2 /\npasskeys, NTLM\ndeprecation
+@endmindmap

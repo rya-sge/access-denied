@@ -1,0 +1,40 @@
+@startmindmap
+* Ouroboros PoS
+** The problem
+*** Agree on one chain, no coordinator
+*** Byzantine fault tolerance
+*** Who / what / when
+** PoW vs PoS
+*** PoW: cost is electricity
+*** PoS: cost is staked capital
+*** Attack cost = 51% of stake
+** Time structure
+*** Slot = 1 second
+*** Epoch = 432,000 slots (5 days)
+*** ~1 block / 20 seconds
+** Slot leader election
+*** VRF evaluated locally per slot
+*** Private until block published
+*** Proportional to stake
+*** Verifiable via VRF proof
+*** Zero or many leaders per slot
+** Stake snapshot
+*** Taken 2 epochs earlier
+*** Blocks rapid-stake attacks
+** Chain selection
+*** Longest chain rule
+*** Praos tie-break by leader VRF
+*** k = 2160 settlement bound
+** Block-production keys
+*** VRF key (election)
+*** KES key (forward-secure signing)
+*** Cold keys (offline root)
+** Incentives
+*** Rewards from fees + expansion
+*** k0 = 500 target pools
+*** Saturation caps oversized pools
+*** Pledge resists Sybil
+** Finality
+*** Probabilistic
+*** ~5-10 min practical
+@endmindmap

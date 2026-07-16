@@ -1,0 +1,68 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FEFEFE
+    LineColor #4A6FA5
+  }
+  :depth(1) {
+    BackgroundColor #E8F0FA
+  }
+}
+</style>
+* SEP-41 Fungible Token\non Stellar with\nOpenZeppelin
+
+** The standard
+*** 10 required functions
+*** i128 amounts
+*** approve carries\nlive_until_ledger
+*** burn is mandatory
+*** total_supply and mint\nare NOT in SEP-41
+
+** Deployment paths
+*** Classic asset + SAC
+**** No Rust, no Wasm
+**** Native DEX, anchors,\npath payments
+**** Trustlines, 7 decimals
+*** Custom Soroban token
+**** stellar-tokens crate
+**** Full control of logic
+**** No native DEX listing
+*** Classic asset\n+ OZ SAC admin
+**** Wrapper: explicit\nadmin entry points
+**** Generic: __check_auth
+
+** Library architecture
+*** FungibleToken trait\n(contracttrait)
+*** type ContractType
+**** Base
+**** AllowList
+**** BlockList
+**** RWA
+*** ContractOverrides\nroutes each method
+*** Extensions are mutually\nexclusive at compile time
+*** High-level fns vs\n_no_auth low-level fns
+
+** Extensions
+*** Burnable\n(needed for SEP-41)
+*** Capped\n(check_cap before mint)
+*** Ownable\n(only_owner macro)
+*** Pausable\n(when_not_paused macro)
+*** Votes, Vault
+
+** Build and deploy
+*** stellar contract build
+**** cargo build fails:\nspec_shaking_v2
+*** stellar keys generate --fund
+*** stellar contract deploy\n-- <constructor args>
+*** stellar contract invoke
+
+** Storage and TTL
+*** instance:\nMeta, TotalSupply, Cap
+*** persistent:\nBalance(Address)
+*** temporary:\nAllowance(owner, spender)
+*** Reads extend TTL,\nwrites do not
+*** instance TTL is the\ndeveloper's responsibility
+*** stellar contract extend
+
+@endmindmap

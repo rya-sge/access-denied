@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam sequence {
+  ArrowColor #4A6FA5
+  LifeLineBorderColor #4A6FA5
+  ParticipantBackgroundColor #E8F0FA
+  ParticipantBorderColor #4A6FA5
+}
+
+title Build, deploy and invoke a SEP-41 token
+
+actor Developer
+participant "stellar CLI" as CLI
+participant "Friendbot" as FB
+participant "Soroban RPC" as RPC
+participant "Ledger" as L
+participant "MyToken\ncontract" as C
+
+== Key setup ==
+Developer -> CLI : stellar keys generate alice\n--network testnet --fund
+CLI -> FB : fund G-account
+FB --> L : create + fund account
+
+== Build ==
+Developer -> CLI : stellar contract build
+note right of CLI
+  Not `cargo build`: the workspace enables
+  soroban-sdk `experimental_spec_shaking_v2`,
+  which requires stellar-cli >= 25.2.0.
+end note
+CLI --> Developer : target/wasm32v1-none/release/my_token.wasm
+
+== Deploy ==
+Developer -> CLI : stellar contract deploy --wasm ...\n-- --owner alice --name "My Token"\n--symbol MTK --cap 1000000
+CLI -> RPC : upload Wasm + create contract
+RPC -> C : __constructor(owner, name, symbol, cap)
+activate C
+C -> C : Base::set_metadata(e, 7, name, symbol)
+C -> C : capped::set_cap(e, cap)
+C -> C : ownable::set_owner(e, &owner)
+deactivate C
+RPC --> CLI : contract id C...
+
+== Invoke ==
+Developer -> CLI : stellar contract invoke --id C...\n-- mint --to bob --amount 1000
+CLI -> RPC : simulate, then submit
+RPC -> C : mint(to, amount)
+activate C
+C -> C : #[only_owner] -> owner.require_auth()
+C -> C : #[when_not_paused] -> paused? panic 1000
+C -> C : check_cap(e, amount, total_supply)
+C -> C : Base::mint(e, &to, amount)
+C --> L : emit Mint { to, amount }
+deactivate C
+RPC --> Developer : success
+
+@enduml

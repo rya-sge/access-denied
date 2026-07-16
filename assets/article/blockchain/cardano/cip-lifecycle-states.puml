@@ -1,0 +1,31 @@
+@startuml
+skinparam shadowing false
+title CIP status lifecycle
+
+[*] --> Draft : opened as a\npull request
+
+Draft : not merged
+Draft : aims for a target status
+
+Draft --> Proposed : merged; meets structure,\nquality, technical soundness,\nvalid Path to Active
+Draft --> Inactive : rejected or\nabandoned in review
+
+Proposed : accepted design
+Proposed : not yet realised
+
+Proposed --> Active : Path to Active met\n(implemented / on mainnet /\nadopted)
+Proposed --> Inactive : abandoned, superseded,\nor lost interest
+
+Active : complete, production-ready
+Active --> Inactive : superseded by\na later CIP
+
+Inactive : abandoned or superseded
+Inactive --> [*]
+Active --> [*]
+
+note right of Draft
+  There is no "Draft" status
+  field; a draft is simply an
+  unmerged PR.
+end note
+@enduml

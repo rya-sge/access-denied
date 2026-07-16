@@ -1,0 +1,21 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title The three governance bodies as checks and balances
+
+[Constitutional Committee\n(CC)\nchecks constitutionality] as CC
+[Delegated Representatives\n(DReps)\nvoice of ADA holders] as DR
+[Stake Pool Operators\n(SPOs)\nhard forks + some params] as SPO
+
+rectangle "Governance action" as GA
+
+DR --> GA : vote (most types)
+CC --> GA : vote (constitutionality)
+SPO --> GA : vote (hard fork, security params)
+
+note bottom of GA
+  Each of the seven action types needs a
+  different mix of these three bodies to
+  meet its ratification thresholds.
+end note
+@enduml

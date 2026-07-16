@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+title Slot leader election (per pool, per slot)
+
+start
+:new slot S in epoch E;
+:read epoch_nonce (fixed for E)
+and this pool's VRF key;
+:vrf_output, vrf_proof =
+VRF_eval(pool_vrf_key,
+epoch_nonce + slot_number);
+:threshold =
+f(pool_stake / total_stake);
+if (vrf_output < threshold?) then (yes)
+  :this pool IS a slot leader for S;
+  :select transactions, build block,
+  sign with KES key,
+  publish block + vrf_proof;
+  :other nodes verify the VRF proof,
+  KES signature, and every transaction;
+else (no)
+  :not elected this slot;
+  :stay silent (election is private);
+endif
+stop
+@enduml

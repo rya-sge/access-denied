@@ -1,0 +1,25 @@
+@startuml
+skinparam shadowing false
+title Stateful contract by consume-and-recreate
+
+participant "Off-chain builder" as B
+participant "Script UTXO\n(old datum)" as OLD
+participant "Validator\n(pure function)" as V
+participant "Script UTXO\n(new datum)" as NEW
+
+B -> OLD : reference by (TxId, index)\nas an input, with a redeemer
+B -> B : construct tx: also create a\nnew output at the same address\nwith the updated datum
+B -> V : submit
+V -> V : check datum + redeemer + context
+V -> V : does the tx recreate this\nscript address with a valid\nnext-state datum?
+alt all conditions hold
+  V --> NEW : approve; old UTXO consumed,\nnew state UTXO created
+else any condition fails
+  V --> B : reject atomically; no state change
+end
+note over OLD, NEW
+  There is no in-place update. State moves
+  forward by destroying one UTXO and
+  creating its successor.
+end note
+@enduml

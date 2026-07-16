@@ -1,0 +1,25 @@
+@startmindmap
+* Windows DC\nPersistence
+** Premise
+*** Attacker already has\nDC / SYSTEM access
+*** Goal: regain access\nlater, stealthily
+*** Classic backdoors +\nDC-specific techniques
+** Golden Ticket
+*** Forged TGT
+*** krbtgt hash = signing key
+*** DC is stateless,\ntrusts any valid TGT
+*** Forge for any user,\neven non-existent
+*** mimikatz kerberos::golden\n/ Metasploit / Rubeus
+*** Evolutions: Diamond,\nSapphire tickets
+** Skeleton Key
+*** LSASS in-memory patch
+*** Master password for\nany account
+*** Real password still works
+*** mimikatz misc::skeleton
+*** Volatile (lost on reboot)
+** Detection & mitigation
+*** Monitor LSASS debug\naccess
+*** Rotate krbtgt yearly\n+ on admin departure
+*** Reset twice (pw history = 2)
+*** LSA Protection /\nCredential Guard
+@endmindmap

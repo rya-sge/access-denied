@@ -1,0 +1,29 @@
+@startmindmap
+* ML-DSA\n(a stamp a quantum computer cannot fake)
+** The problem
+*** Quantum computers can fake today's stamps
+*** We need a lock built from a different puzzle
+** Hiding the secret
+*** Small secret numbers
+*** Multiply by a big public grid
+*** Add "fuzz" so nobody can divide it back
+** Signing (the 3-move game)
+*** Random scribble = commitment
+*** Blend message + scribble = surprise question
+*** Stir secret in = the answer
+** Staying inside the lines
+*** Toss any answer that leans too far
+*** Retry with a fresh scribble (about 4-5 times)
+*** Keeps the secret from leaking
+** The sticky note (hint)
+*** Public key is shrunk to save space
+*** Hint tells the checker how to fix the rounding
+** Checking
+*** Redo the math from the public key
+*** Run the same blender on the message
+*** Numbers match = real signature
+** Three sizes
+*** ML-DSA-44 / 65 / 87
+*** Bigger = safer but heavier
+*** Cost: bigger keys and signatures
+@endmindmap

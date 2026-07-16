@@ -1,0 +1,40 @@
+@startuml
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFF3D6
+  DiamondBorderColor #B58A2E
+}
+
+title ERC-8004 — Agent Lifecycle Across the Registries
+
+start
+:Owner publishes registration file\n(name, services, supportedTrust);
+:register(agentURI) mints ERC-721\nagentId assigned incrementally;
+note right: emits Registered + Transfer\n+ MetadataSet(agentWallet)
+:setAgentURI() to update the file later;
+
+if (Receive payments?) then (yes)
+  :setAgentWallet(agentId, newWallet,\ndeadline, signature);
+  note right: EIP-712 (EOA) or\nERC-1271 (smart wallet)
+else (no)
+endif
+
+:Agent operates and completes tasks;
+
+fork
+  :Client calls giveFeedback\n(value, valueDecimals, tags);
+  note right: submitter must not be\nowner or operator
+  :Reputation stored on-chain\n+ optional off-chain file (IPFS);
+fork again
+  :Owner calls validationRequest\n(validator, requestURI, requestHash);
+  :Validator returns validationResponse\n(0-100, optional evidence);
+  note right: staking / zkML / TEE
+end fork
+
+:Consumers read getSummary\nfiltered by client / validator / tag;
+stop
+
+@enduml

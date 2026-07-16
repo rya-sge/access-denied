@@ -1,0 +1,23 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title Two ways to keep your money
+
+package "Bank balance (the other way)" {
+  [One number on a list:\nAlice = 50] as BAL
+}
+note bottom of BAL
+  To pay, the bank changes the number.
+  Nobody holds real coins.
+end note
+
+package "Jar of coins (Cardano's way)" {
+  [A 30 coin] as C1
+  [A 20 coin] as C2
+  [A 5 coin] as C3
+}
+note bottom of C3
+  You hold real, separate coins.
+  To pay, you hand some over.
+end note
+@enduml

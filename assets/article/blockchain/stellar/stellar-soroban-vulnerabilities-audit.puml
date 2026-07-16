@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FEFEFE
+    LineColor #4A6FA5
+  }
+  :depth(1) {
+    BackgroundColor #E8F0FA
+  }
+}
+</style>
+* Three Soroban\nvulnerabilities\n(OpenZeppelin audits)
+
+** 1. Self-recovery inflation\n(Critical, v0.5.0 C-01)
+*** RWA token, recovery_address
+*** lost_wallet == new_wallet
+*** read-read-write on one key\nb + b = 2b
+*** bypasses Base::update\n-> total_supply untouched
+*** no auth -> repeat (A, A)\n-> b, 2b, 4b, 8b ...
+*** Fix: route through\nforced_transfer -> Base::update\n+ identity-continuity check
+
+** 2. Signer aliasing\n(Critical, v0.5.0 C-03)
+*** Smart accounts,\ned25519 / webauthn verifiers
+*** key_data length >= N,\nsilently truncated
+*** (verifier, key||junk)\n= a distinct signer identity
+*** one real key ->\nmany "signers"
+*** one signature satisfies\nan M-of-N threshold
+*** Fix: BytesN<32> fixed type,\nexact-length by construction
+
+** 3. approve_for_all\nTTL underflow\n(High, v0.2.0 H-01)
+*** NFT, approve_for_all
+*** revoke via\nlive_until_ledger = 0
+*** u32: 0 - sequence\n-> underflow -> huge TTL\n-> host panic
+*** revocation bricked
+*** test at ledger seq 0\nnever triggered it
+*** Fix: early return\nwhen live_until_ledger == 0
+
+** Cross-cutting lessons
+*** Route balance changes\nthrough the canonical update
+*** Make invalid states\nunrepresentable (types)
+*** Guard every\nledger_target - ledger_now
+*** Test at a realistic,\nnon-zero ledger sequence
+*** 2 Critical + 1 High,\nall resolved
+
+@endmindmap

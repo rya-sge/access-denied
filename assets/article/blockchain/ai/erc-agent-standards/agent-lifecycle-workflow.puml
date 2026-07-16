@@ -1,0 +1,40 @@
+@startuml
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFF3D6
+  DiamondBorderColor #B58A2E
+}
+
+title End-to-End Lifecycle of an On-Chain AI Agent
+
+start
+:Register agent identity\n(ERC-8004 Identity Registry);
+:Attach discovery metadata\n(ERC-8122 / ERC-8041);
+
+:Run verification processes\n(ERC-8126: ETV, MCV, SCV, WAV, WV);
+:Publish risk score & attestation\nto Validation Registry;
+
+if (Trust path sufficient?\n(ERC-8107 web of trust)) then (yes)
+  :Coordinate intent & acceptances\n(ERC-8001);
+else (no)
+  :Reject participation;
+  stop
+endif
+
+:Client opens & funds a job\n(ERC-8183: Open -> Funded);
+:Agent executes via policy-bound wallet\n(ERC-8196 / ERC-8199);
+
+if (Action authorized?\n(ERC-8273 attestation +\nERC-8226 mandate)) then (yes)
+  :Submit work\n(ERC-8183: Submitted);
+  :Evaluator attests completion;
+  :Update reputation\n(ERC-8004 Reputation Registry);
+  stop
+else (no)
+  :Transaction reverts;
+  stop
+endif
+
+@enduml

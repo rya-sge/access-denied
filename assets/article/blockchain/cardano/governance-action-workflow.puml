@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title Governance action, end to end
+
+|Proposer|
+start
+:author one of the seven action types;
+:attach an anchor (metadata URL + hash)
+and a refundable deposit (govActionDeposit);
+:submit as an on-chain transaction;
+
+|Voting bodies|
+:action goes Live for govActionLifetime
+(6 epochs on mainnet);
+fork
+  :DReps vote Yes / No / Abstain;
+fork again
+  :CC votes (constitutionality);
+fork again
+  :SPOs vote (their action types);
+end fork
+
+|Ledger|
+if (thresholds met for this type?) then (yes)
+  :Ratified at the epoch boundary;
+  :Enacted at the next boundary
+(change takes effect);
+else (no)
+  :Expired;
+endif
+:deposit returned to the
+proposer's reward account;
+stop
+@enduml

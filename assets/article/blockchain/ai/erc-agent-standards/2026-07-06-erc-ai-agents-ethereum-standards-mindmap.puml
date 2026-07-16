@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* ERC Standards\nfor AI Agents
+** Identity &\nRegistration
+*** ERC-8004\nTrustless Agents
+*** ERC-8122\nMinimal Agent Registry
+*** ERC-8041\nFixed-Supply Collections
+*** ERC-8217\nAgent NFT Bindings
+** Verification &\nTrust
+*** ERC-8126\nAgent Verification (ZKP)
+*** ERC-8107\nENS Trust Registry
+*** ERC-8001\nCoordination Framework
+** Execution &\nAuthorization
+*** ERC-8196\nAuthenticated Wallet
+*** ERC-8199\nSandboxed Smart Wallet
+*** ERC-8273\nAttestation-Gated Actions
+*** ERC-8257\nAgent Tool Registry
+** Commerce &\nCompliance
+*** ERC-8183\nAgentic Commerce
+*** ERC-8033\nAgent Council Oracles
+*** ERC-8226\nRegulated Agent Mandate
+** Agents as\nTokenized Assets
+*** ERC-7662\nAI Agent NFTs
+*** ERC-7857\nPrivate-Metadata NFTs
+** Verifiable\nAI Compute
+*** ERC-7007\nVerifiable AIGC (zkML/opML)
+*** ERC-7992\nVerifiable ML Inference
+*** ERC-7517\nContent Consent for AI/ML
+@endmindmap

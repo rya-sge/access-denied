@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+}
+skinparam package {
+  BackgroundColor #FDFDFD
+  BorderColor #888888
+}
+
+title Where each bug lives in the Soroban contract stack
+
+package "Contract logic" {
+  component "RWA token\nrecovery_address" as RWA
+  component "NFT\napprove_for_all" as NFT
+}
+
+package "Reusable modules" {
+  component "fungible: Base::update\n(canonical balance path)" as UPDATE
+  component "smart accounts:\nsigners + rules + policies" as SA
+}
+
+package "Soroban host primitives" {
+  component "i128 / u32 arithmetic" as MATH
+  component "instance / persistent /\ntemporary storage + TTL" as STORAGE
+  component "ed25519 / secp256r1\nverifiers" as CRYPTO
+}
+
+RWA ..> UPDATE : Vuln 1 BYPASSED this,\ndid raw read-read-write
+NFT ..> STORAGE : Vuln 3 fed an underflowed\nu32 into extend_ttl
+SA ..> CRYPTO : Vuln 2 trusted non-canonical\nkey bytes as identity
+
+note bottom of MATH
+  Vuln 1 = supply invariant (i128 balances)
+  Vuln 2 = cryptographic identity (key bytes)
+  Vuln 3 = ledger arithmetic (u32 sequence)
+  Three different layers, three different classes.
+end note
+
+@enduml

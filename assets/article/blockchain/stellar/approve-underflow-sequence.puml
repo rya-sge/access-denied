@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam sequence {
+  ArrowColor #4A6FA5
+  LifeLineBorderColor #4A6FA5
+  ParticipantBackgroundColor #E8F0FA
+  ParticipantBorderColor #4A6FA5
+}
+
+title Revoking an operator via approve_for_all (vulnerable v0.2.0 H-01)
+
+actor Owner
+participant "NFT contract\napprove_for_all" as C
+participant "Soroban host\n(storage TTL)" as H
+
+Owner -> C : approve_for_all(owner, operator,\n  live_until_ledger = 0)
+note right of Owner
+  live_until_ledger = 0 is the
+  documented way to REVOKE.
+end note
+
+C -> C : remove operator from the\napproved-operators list
+
+C -> C : live_for =\nlive_until_ledger - e.ledger().sequence()\n= 0 - seq
+note right of C
+  Both are u32. 0 - seq underflows
+  to ~4.29e9 instead of a small value.
+end note
+
+C -> H : extend_ttl(key, live_for, live_for)\nwith live_for ~= u32::MAX
+H -->x C : panic: requested TTL exceeds\nthe maximum allowed
+note over C, H #FADBD8
+  The whole transaction reverts.
+  Revocation is impossible.
+end note
+
+C -->x Owner : transaction failed
+
+@enduml

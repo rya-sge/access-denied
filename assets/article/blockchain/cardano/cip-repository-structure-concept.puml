@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title Structure of the CIP repository
+
+folder "cardano-foundation/CIPs" {
+  [README.md\nmaster index] as IDX
+  folder "CIP-XXXX/" {
+    [README.md\nproposal text] as CIPR
+    [supporting assets] as ASSET
+  }
+  folder "CPS-XXXX/" {
+    [README.md\nproblem statement] as CPSR
+  }
+  [CIP-0001\nCIP process] as C1
+  [CIP-9999\nCPS process] as C9999
+  [.github/CIP-TEMPLATE.md\nCPS-TEMPLATE.md] as TMPL
+}
+
+IDX --> CIPR : lists number,\ntitle, status
+IDX --> CPSR : lists CPSs
+C1 ..> CIPR : governs
+C9999 ..> CPSR : governs
+TMPL ..> CIPR : scaffolds
+CPSR --> CIPR : "Proposed Solutions" /\n"Solution To" links
+
+note bottom of CIPR
+  Header carries the
+  Category field: one of
+  Meta, Ledger, Consensus,
+  Network, Wallets, Tokens,
+  Metadata, Plutus, Tools
+end note
+@enduml

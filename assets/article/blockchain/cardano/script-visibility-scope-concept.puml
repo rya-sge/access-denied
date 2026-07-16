@@ -1,0 +1,35 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title What a script can see when validating a spend
+
+package "Bitcoin script" {
+  [Unlocking data\n(scriptSig / witness)] as U
+  [Signature check over the tx\n(scoped by SIGHASH flags)] as SIG
+  [Relative / absolute time locks\n(CSV / CLTV)] as TL
+}
+note bottom of TL
+  No datum, and no general read of
+  the other inputs and outputs.
+end note
+
+package "Cardano validator" {
+  [Datum\n(state on the spent UTXO)] as D
+  [Redeemer\n(spender argument)] as R
+  [Script Context] as C
+  [All inputs] as IN
+  [All outputs] as OUT
+  [Fee] as FEE
+  [Validity interval] as VI
+  [Signatories] as S
+}
+C --> IN
+C --> OUT
+C --> FEE
+C --> VI
+C --> S
+note bottom of C
+  Sees the whole transaction, but not
+  arbitrary global chain state.
+end note
+@enduml

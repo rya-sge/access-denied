@@ -1,0 +1,25 @@
+@startuml
+skinparam componentStyle rectangle
+title Why a Golden Ticket works — the krbtgt key as root of trust
+
+package "Domain Controller (KDC)" {
+  [krbtgt account] as KRBTGT
+  [krbtgt password hash\n= TGT signing/encryption key] as KEY
+  [KDC: stateless,\nkeeps no list of issued TGTs] as KDC
+}
+
+[TGT\n(user, groups/SIDs,\nvalidity)] as TGT
+
+KRBTGT --> KEY
+KEY --> TGT : encrypts & signs
+KDC ..> TGT : "is this TGT encrypted\nwith my krbtgt key?\n-> trust its contents"
+
+note bottom of KDC
+  The DC does not verify the user
+  still exists or that the TGT was
+  ever issued. Possession of the
+  krbtgt hash = ability to mint a
+  TGT for ANY identity, including
+  fabricated ones.
+end note
+@enduml

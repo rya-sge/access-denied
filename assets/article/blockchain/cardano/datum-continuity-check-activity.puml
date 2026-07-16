@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title Datum-continuity validation on a continuing UTXO
+
+start
+:spend the script UTXO
+(input datum = current state);
+:transaction creates a continuing
+output back at the script address;
+:read the output datum
+(proposed next state);
+if (output actually at THIS script address?) then (no)
+  :reject;
+  stop
+else (yes)
+endif
+if (immutable fields unchanged?\ne.g. owner) then (no)
+  :reject (datum hijacking attempt);
+  stop
+else (yes)
+endif
+if (mutable fields changed only\nper the allowed transition rules?) then (no)
+  :reject;
+  stop
+else (yes)
+endif
+if (value preserved:\nout = in - authorized withdrawals?) then (no)
+  :reject;
+  stop
+else (yes)
+endif
+:approve the spend;
+stop
+@enduml

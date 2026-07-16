@@ -1,0 +1,31 @@
+@startuml
+skinparam shadowing false
+title Producing and diffusing a block
+
+|Elected pool|
+start
+:won the VRF lottery for this slot;
+:select transactions from the mempool;
+:assemble the block body;
+:sign the header with the KES key
+(forward-secure);
+:attach the VRF proof of election;
+:publish the block to peers;
+
+|Network|
+:block diffuses to other nodes
+(target ~5 seconds);
+
+|Every receiving node|
+:verify the VRF proof (legitimate leader?);
+:verify the KES signature;
+:validate every transaction;
+if (all checks pass?) then (yes)
+  :append block; extend the chain;
+else (no)
+  :reject the block;
+endif
+:apply chain-selection rule
+(longest chain; Praos tie-break by VRF);
+stop
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title What is inside a Cardano treasure chest
+
+package "One chest (a UTXO)" {
+  [Coins inside\n(and other tokens too)] as V
+  [A label saying who it belongs to] as A
+  [A sticky note with extra facts\n(Datum)] as D
+}
+
+package "Only shown when you open it" {
+  [The note you hand over\n(Redeemer)] as R
+  [The whole receipt the guard reads\n(Context)] as C
+}
+
+V -[hidden]-> A
+A -[hidden]-> D
+note bottom of D
+  Bitcoin's chest has only coins and a lock.
+  Cardano's chest also carries a sticky note.
+end note
+@enduml

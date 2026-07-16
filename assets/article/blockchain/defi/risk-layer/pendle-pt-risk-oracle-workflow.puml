@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+title Pendle PT Risk-Oracle Workflow on Chainlink CRE
+
+|Data inputs|
+start
+:Pendle AMM price;
+:Parameter registry\n(per-asset config for every\nasset with a PT price feed);
+
+|CRE workflow (protocol-owned)|
+:Load inputs into workflow;
+:Run risk methodology\n(evaluate threshold conditions);
+if (Optimisation identified?) then (yes)
+  :Compute risk-managed price\n+ liquidation parameters;
+  |On-chain|
+  :CRE pushes value via\nLlama Guard oracle;
+  :Authorise updates to\ntarget Aave market\n+ market oracle;
+  stop
+else (no)
+  |CRE workflow (protocol-owned)|
+  :No update pushed;
+  stop
+endif
+@enduml

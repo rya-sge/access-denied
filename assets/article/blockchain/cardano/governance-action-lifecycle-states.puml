@@ -1,0 +1,24 @@
+@startuml
+skinparam shadowing false
+title Governance action lifecycle
+
+[*] --> Live : proposed on-chain\nwith a refundable deposit
+
+Live : bodies vote for
+Live : govActionLifetime (6 epochs on mainnet)
+
+Live --> Ratified : thresholds met for its type
+Live --> Expired : lifetime elapses\nwithout meeting thresholds
+
+Ratified : added to the enactment set\nat the epoch boundary
+Ratified --> Enacted : next epoch boundary\nchange takes effect
+
+Expired --> [*] : deposit returned
+Enacted --> [*] : deposit returned
+
+note right of Live
+  Deposit is returned to the proposer's
+  reward account once the action leaves
+  the Live state (ratified or expired).
+end note
+@enduml

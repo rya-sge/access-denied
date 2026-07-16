@@ -1,0 +1,43 @@
+@startmindmap
+* Cardano CIPs
+** Process (Meta)
+*** CIP-0001 process
+*** CIP-9999 CPS process
+*** Status: Proposed / Active / Inactive
+*** CPS = problem statements
+** Ledger
+*** CIP-1694 governance
+*** CIP-0019 addresses
+*** Protocol params (0009/0028/0055)
+*** Collateral, fees, rewards
+** Consensus
+*** Ouroboros Peras (0140)
+*** Leios (0164), Phalanx (0161)
+** Network
+*** Message queue (0137)
+*** Block compression (0150)
+** Wallets
+*** CIP-0030 dApp bridge
+*** CIP-1852 HD wallets
+*** CIP-0105 Conway keys
+*** URI schemes
+** Tokens
+*** CIP-0025 NFT metadata
+*** CIP-0068 datum metadata
+*** CIP-0027 royalties
+*** CIP-0014 fingerprint
+** Metadata
+*** CIP-0010 label registry
+*** CIP-0020 tx messages
+*** Governance metadata (0100/0108/0119)
+** Plutus
+*** Reference inputs (0031)
+*** Inline datums (0032)
+*** Reference scripts (0033)
+*** Builtins & crypto (0049/0381)
+** Tools
+*** CIP-0057 blueprint
+*** CIP-0008 message signing
+*** CIP-0005 bech32 prefixes
+*** Query layer (0139)
+@endmindmap

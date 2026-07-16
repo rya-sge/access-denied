@@ -1,0 +1,32 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title A UTXO in Bitcoin vs in Cardano
+
+package "Bitcoin UTXO" {
+  [Value\n(satoshis)] as BV
+  [Locking script\nscriptPubKey] as BS
+}
+note bottom of BS
+  Unlocked by scriptSig / witness.
+  Script sees the unlocking data
+  and signature checks; no attached
+  state, no view of sibling outputs.
+end note
+
+package "Cardano eUTXO" {
+  [Value\n(ADA + native assets)] as EV
+  [Address\n(payment + staking credential)] as EA
+  [Datum\nstate attached to the output] as ED
+}
+note bottom of ED
+  At spend time the validator also
+  receives a Redeemer (argument) and
+  the Script Context (the whole tx).
+end note
+
+BV -[hidden]-> BS
+EV -[hidden]-> EA
+EA -[hidden]-> ED
+BS ..> EV : Cardano extends\nthe same coin with
+@enduml

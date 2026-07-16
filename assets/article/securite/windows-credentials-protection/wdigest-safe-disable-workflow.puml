@@ -1,0 +1,17 @@
+@startuml
+title Safely disabling WDigest (audit before change)
+
+start
+:Enable "Audit Credential Validation"\nadvanced audit policy;
+:Collect security events on DCs\nwith Event ID 4776;
+if (any 4776 where parameter 1\ncontains "WDigest"?) then (yes)
+  :A service still relies on WDigest;
+  :Identify and migrate that service\nto a modern auth method;
+  :Re-audit;
+else (no)
+  :WDigest is unused on the domain;
+endif
+:Set registry UseLogonCredential = 0\n(HKLM\\...\\SecurityProviders\\WDigest);
+:No cleartext password kept in LSASS\nfor interactive logon;
+stop
+@enduml

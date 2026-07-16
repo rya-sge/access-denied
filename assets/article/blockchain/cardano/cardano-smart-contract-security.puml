@@ -1,0 +1,28 @@
+@startmindmap
+* Cardano contract security
+** Removed by the eUTXO model
+*** Reentrancy impossible (atomic tx)
+*** Double-spend prevented by ledger
+*** Determinism kills MEV / front-running
+*** Native assets share ledger security
+** Vulnerabilities that remain
+*** Double satisfaction
+*** Datum hijacking / arbitrary datum
+*** Token forgery (one-shot, other-name)
+*** Missing UTXO authentication
+*** Time handling (interval bounds)
+*** Resource exhaustion (unbounded value/datum/inputs)
+*** Insufficient staking control
+*** Other redeemer / missed input
+** Defensive patterns
+*** State / beacon token
+*** Value-preservation check
+*** Datum-continuity validation
+*** Deadline via validity range
+*** Minimal on-chain logic
+** Verification (defense in depth)
+*** Unit tests
+*** Property-based testing
+*** Professional audit
+*** Formal verification
+@endmindmap

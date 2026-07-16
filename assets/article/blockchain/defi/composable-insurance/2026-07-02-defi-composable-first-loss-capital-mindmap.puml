@@ -1,0 +1,32 @@
+@startmindmap
+* Composable\nFirst-Loss Capital
+** The Problem
+*** Composability weaponized
+*** Cross-chain + bridge + lending
+*** Bad debt from unbacked assets
+** Attack Anatomy (rETH)
+*** Forge bridge message
+*** Mint unbacked supply
+*** Accepted as lending collateral
+*** Borrow real assets
+*** Bad debt at destination
+** Endpoint Insurance
+*** Junior / first-loss pools
+*** Aave Umbrella and similar
+*** Covers only the destination
+*** Tragedy of the commons
+left side
+** Flow Reframing
+*** Attack graph of factors
+*** Bridge, oracle, minting signer
+*** Insure paths, not endpoints
+*** Coverage proportional to usage
+** Capital Efficiency
+*** Attribute loss to each factor
+*** Optimize the insurance budget
+*** Fewer funds, same coverage
+** Guarantees
+*** Per-path CDS-like objects
+*** Shared-coverage incentives
+*** Formal, live-verifiable bounds
+@endmindmap

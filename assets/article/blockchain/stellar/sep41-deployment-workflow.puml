@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+  DiamondBackgroundColor #FFF6E0
+  DiamondBorderColor #C79100
+}
+
+title End-to-end workflow - custom SEP-41 token with OpenZeppelin
+
+|Local|
+start
+:cargo new --lib my-token;
+:Cargo.toml\ncrate-type = ["cdylib"]\nstellar-tokens = "=0.7.1"\nstellar-access, stellar-contract-utils,\nstellar-macros;
+:Write the contract\nimpl FungibleToken (ContractType = Base)\nimpl FungibleBurnable\nimpl Ownable, Pausable\ncapped::set_cap + check_cap;
+:cargo test;
+
+if (tests pass?) then (no)
+  :fix;
+  detach
+else (yes)
+endif
+
+:stellar contract build;
+note right
+  `cargo build --target wasm32v1-none`
+  fails when soroban-sdk enables
+  `experimental_spec_shaking_v2`.
+end note
+
+|Testnet|
+:stellar keys generate alice\n--network testnet --fund;
+:stellar contract deploy --wasm ...\n--source-account alice --network testnet\n-- --owner alice --name ... --symbol ... --cap ...;
+:contract id C...;
+:stellar contract invoke -- mint / transfer / balance;
+:stellar contract extend --id C...\n--ledgers-to-extend ... --durability persistent;
+
+|Mainnet|
+if (audited and reviewed?) then (yes)
+  :deploy with --network mainnet;
+  :hand ownership to a\nmultisig or timelock\n(transfer_ownership +\naccept_ownership);
+  :monitor instance TTL;
+  stop
+else (no)
+  :iterate;
+  detach
+endif
+
+@enduml

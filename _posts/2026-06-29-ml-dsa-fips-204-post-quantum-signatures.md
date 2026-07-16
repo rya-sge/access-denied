@@ -17,6 +17,22 @@ ML-DSA is the digital signature scheme standardized by NIST in [FIPS 204](https:
 
 [TOC]
 
+## In Plain Terms
+
+Strip away the algebra and ML-DSA comes down to five moves:
+
+1. **Key generation** hides a small secret inside a noisy public equation $$\mathbf{t} = \mathbf{A}\mathbf{s}_1 + \mathbf{s}_2$$. The equation is public, the small secret $$\mathbf{s}_1, \mathbf{s}_2$$ is not, and recovering it is a lattice problem no quantum computer is known to solve.
+
+2. **Signing** throws in a random "mask", builds a commitment from it, and hashes that commitment together with the message to get a challenge — a lattice version of the classic Schnorr trick.
+
+3. **Rejection sampling** keeps the secret from leaking. The response mixes the mask with the secret, so publishing it as-is would slowly reveal the secret. Instead the signer only releases a response that lands in a safe range, and otherwise throws it away and retries (about 4–5 tries on average).
+
+4. **A hint** is bolted onto the signature so the verifier can undo a size-saving compression of the public key.
+
+5. **Verification** recomputes the commitment from the signature and the public key, then checks that hashing it reproduces the same challenge. If it matches, the signature is genuine.
+
+The trade-off versus today's ECDSA/Ed25519 is size: keys and signatures grow from tens of bytes to a few kilobytes, in exchange for staying secure against quantum attacks.
+
 ## From the Quantum Threat to a Standard
 
 Public-key cryptography deployed today rests on two number-theoretic assumptions: that factoring a large integer is hard, and that computing discrete logarithms in a finite group is hard. Both assumptions fail against a cryptographically relevant quantum computer running Shor's algorithm. A signature produced by RSA or ECDSA today can be forged by an adversary who later obtains such a machine, which threatens any signature that must remain valid for a long time (firmware roots of trust, certificate authorities, long-lived legal documents).
@@ -27,11 +43,18 @@ ML-DSA is the recommended general-purpose post-quantum signature because it offe
 
 ## The Hard Problems: MLWE and SelfTargetMSIS
 
-The security of lattice signatures is usually phrased in terms of two problems. The **Learning With Errors (LWE)** problem asks an adversary to recover a secret vector $$\mathbf{s}$$ from a system of noisy linear equations $$\mathbf{A}\mathbf{s} + \mathbf{e} = \mathbf{b}$$, where $$\mathbf{A}$$ and $$\mathbf{b}$$ are given and the error $$\mathbf{e}$$ is small but unknown. The **Short Integer Solution (SIS)** problem asks for a non-zero short vector $$\mathbf{t}$$ satisfying $$\mathbf{A}\mathbf{t} = \mathbf{0}$$ over $$\mathbb{Z}_q$$. For appropriate parameters, both are intractable for the best known techniques, including lattice reduction and Gaussian elimination.
+The security of lattice signatures is usually phrased in terms of two problems. 
+
+- The **Learning With Errors (LWE)** problem asks an adversary to recover a secret vector $$\mathbf{s}$$ from a system of noisy linear equations $$\mathbf{A}\mathbf{s} + \mathbf{e} = \mathbf{b}$$, where $$\mathbf{A}$$ and $$\mathbf{b}$$ are given and the error $$\mathbf{e}$$ is small but unknown. 
+
+- The **Short Integer Solution (SIS)** problem asks for a non-zero short vector $$\mathbf{t}$$ satisfying $$\mathbf{A}\mathbf{t} = \mathbf{0}$$ over $$\mathbb{Z}_q$$. For appropriate parameters, both are intractable for the best known techniques, including lattice reduction and Gaussian elimination.
 
 ML-DSA does not work over plain integer vectors. It replaces the module $$\mathbb{Z}_q^n$$ with a module over a polynomial ring $$R_q$$, which yields the **Module-LWE (MLWE)** and **Module-SIS (MSIS)** variants. Working over a ring lets the scheme use structured matrices and the Number Theoretic Transform for fast multiplication, which shrinks key sizes and accelerates arithmetic relative to an unstructured LWE scheme.
 
-The unforgeability of ML-DSA rests on two assumptions. Key recovery (finding the secret from the public key) is an MLWE problem. Forging a signature without the secret is a non-standard variant of MSIS that NIST calls **SelfTargetMSIS**, which captures the way the challenge is bound to the message through a hash. ML-DSA is designed to be **strongly existentially unforgeable under chosen-message attack (SUF-CMA)**: even an adversary that can request signatures on messages of its choice cannot produce any new valid message-signature pair, including a second signature on a message that was already signed.
+The unforgeability of ML-DSA rests on two assumptions. 
+
+- Key recovery (finding the secret from the public key) is an MLWE problem. Forging a signature without the secret is a non-standard variant of MSIS that NIST calls **SelfTargetMSIS**, which captures the way the challenge is bound to the message through a hash. 
+- ML-DSA is designed to be **strongly existentially unforgeable under chosen-message attack (SUF-CMA)**: even an adversary that can request signatures on messages of its choice cannot produce any new valid message-signature pair, including a second signature on a message that was already signed.
 
 ## The Algebraic Setting: Rings, Modules, and the NTT
 
@@ -69,7 +92,13 @@ The Fiat-Shamir heuristic turns this interactive protocol into a signature by re
 2. **Challenge.** Receive a small polynomial $$c$$.
 3. **Response.** Return $$\mathbf{z} = \mathbf{y} + c\mathbf{s}_1$$, and the verifier checks that $$\mathbf{z}$$ is short and that $$\mathbf{A}\mathbf{z} - c\mathbf{t} \approx \mathbf{w}$$.
 
-There is a problem the discrete-log version does not have. The response $$\mathbf{z} = \mathbf{y} + c\mathbf{s}_1$$ is biased in a direction that depends on the secret $$\mathbf{s}_1$$. Releasing many such responses would leak the secret. The fix is **rejection sampling**: the signer only releases $$\mathbf{z}$$ when every coefficient falls inside a fixed safe range $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$, and otherwise discards the attempt and restarts with a fresh mask $$\mathbf{y}$$. Conditioned on passing the test, the distribution of $$\mathbf{z}$$ is independent of the secret. This is the **Fiat-Shamir with Aborts** paradigm: the signer may abort and retry an attempt many times before it produces a publishable signature. The expected number of iterations is small (between roughly 4 and 5 for the standardized parameters), but it is not fixed.
+### Rejection sampling
+
+There is a problem the discrete-log version does not have. The response $$\mathbf{z} = \mathbf{y} + c\mathbf{s}_1$$ is biased in a direction that depends on the secret $$\mathbf{s}_1$$. Releasing many such responses would leak the secret. 
+
+The fix is **rejection sampling**: the signer only releases $$\mathbf{z}$$ when every coefficient falls inside a fixed safe range $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$, and otherwise discards the attempt and restarts with a fresh mask $$\mathbf{y}$$. 
+
+Conditioned on passing the test, the distribution of $$\mathbf{z}$$ is independent of the secret. This is the **Fiat-Shamir with Aborts** paradigm: the signer may abort and retry an attempt many times before it produces a publishable signature. The expected number of iterations is small (between roughly 4 and 5 for the standardized parameters), but it is not fixed.
 
 ![ML-DSA Fiat-Shamir with Aborts identification protocol]({{site.url_complet}}/assets/article/cryptographie/lattice/fiat-shamir-aborts-protocol.png)
 
@@ -85,7 +114,11 @@ ML-DSA layers several engineering refinements on top of this core idea:
 
 Key generation starts from a single 32-byte seed $$\xi$$ drawn from an approved random bit generator. Everything else is derived deterministically, which means the entire private key can later be regenerated from the seed alone.
 
-The seed is expanded with SHAKE256 (the function $$\mathsf{H}$$) into three values: a 32-byte public seed $$\rho$$, a 64-byte private seed $$\rho'$$, and a 32-byte signing seed $$K$$. From these:
+The seed is expanded with SHAKE256 (the function $$\mathsf{H}$$) into three values: 
+
+- a 32-byte public seed $$\rho$$,
+-  a 64-byte private seed $$\rho'$$, 
+- and a 32-byte signing seed $$K$$. From these:
 
 $$
 \begin{aligned}
@@ -96,7 +129,11 @@ $$
 \end{aligned}
 $$
 
-The public key is $$pk = (\rho, \mathbf{t}_1)$$, and the private key is $$sk = (\rho, K, tr, \mathbf{s}_1, \mathbf{s}_2, \mathbf{t}_0)$$, where $$tr = \mathsf{H}(pk, 64)$$ is a 64-byte hash of the public key kept for fast use during signing. The compression of $$\mathbf{t}$$ into $$\mathbf{t}_1$$ is an efficiency optimization, not a security measure: the low-order bits of $$\mathbf{t}$$ can be recovered from a handful of signatures, so they are not treated as secret, but they are kept in the private key because the signer needs them to compute the hint.
+- The public key is $$pk = (\rho, \mathbf{t}_1)$$, 
+
+- and the private key is $$sk = (\rho, K, tr, \mathbf{s}_1, \mathbf{s}_2, \mathbf{t}_0)$$, where $$tr = \mathsf{H}(pk, 64)$$ is a 64-byte hash of the public key kept for fast use during signing. 
+
+The compression of $$\mathbf{t}$$ into $$\mathbf{t}_1$$ is an efficiency optimization, not a security measure: the low-order bits of $$\mathbf{t}$$ can be recovered from a handful of signatures, so they are not treated as secret, but they are kept in the private key because the signer needs them to compute the hint.
 
 ## Signing: The Rejection Sampling Loop
 
@@ -139,7 +176,13 @@ The activity diagram below traces one pass through the loop, including the three
 
 ## Verification
 
-Verification is deterministic and does not retry. The verifier decodes $$pk = (\rho, \mathbf{t}_1)$$ and the signature $$\sigma = (\tilde{c}, \mathbf{z}, \mathbf{h})$$. If the hint was not properly byte-encoded, verification returns false immediately. The verifier then regenerates $$\mathbf{A}$$ from $$\rho$$, recomputes the message representative $$\mu$$ in exactly the same way the signer did, and recovers the challenge $$c = \mathsf{SampleInBall}(\tilde{c})$$.
+Verification is deterministic and does not retry. 
+
+The verifier decodes $$pk = (\rho, \mathbf{t}_1)$$ and the signature $$\sigma = (\tilde{c}, \mathbf{z}, \mathbf{h})$$.
+
+ If the hint was not properly byte-encoded, verification returns false immediately. 
+
+The verifier then regenerates $$\mathbf{A}$$ from $$\rho$$, recomputes the message representative $$\mu$$ in exactly the same way the signer did, and recovers the challenge $$c = \mathsf{SampleInBall}(\tilde{c})$$.
 
 The central step reconstructs the signer's commitment. The verifier computes
 
@@ -202,7 +245,11 @@ These are considerably larger than the 32-to-64-byte keys and 64-byte signatures
 
 The mask $$\mathbf{y}$$ must never repeat across two signatures and must not be guessable. Reusing $$\mathbf{y}$$ for two different challenges allows recovery of $$\mathbf{s}_1$$ by subtracting the two responses, the same structural failure that nonce reuse causes in ECDSA. ML-DSA derives the randomness for $$\mathbf{y}$$ from the per-signature seed $$\rho''$$, which mixes the signing key $$K$$, the message representative $$\mu$$, and a value $$rnd$$.
 
-Two variants differ only in how $$rnd$$ is chosen. In the default **hedged** variant, $$rnd$$ is 32 fresh random bytes from a random bit generator. In the optional **deterministic** variant, $$rnd$$ is the all-zero string, so signing becomes a pure function of the key and message. The hedged variant is preferred: the fresh randomness helps mitigate side-channel and fault attacks, while the dependence on $$\mu$$ and $$K$$ means that even a weak or failing random source does not immediately break security. The deterministic variant makes fault attacks easier to mount and should not be used where side channels are a concern. Both variants are verified by the same algorithm, so interoperability does not require implementing the deterministic path.
+Two variants differ only in how $$rnd$$ is chosen. In the default **hedged** variant, $$rnd$$ is 32 fresh random bytes from a random bit generator. In the optional **deterministic** variant, $$rnd$$ is the all-zero string, so signing becomes a pure function of the key and message. 
+
+The hedged variant is preferred: the fresh randomness helps mitigate side-channel and fault attacks, while the dependence on $$\mu$$ and $$K$$ means that even a weak or failing random source does not immediately break security. 
+
+The deterministic variant makes fault attacks easier to mount and should not be used where side channels are a concern. Both variants are verified by the same algorithm, so interoperability does not require implementing the deterministic path.
 
 ## Pre-Hash ML-DSA and Domain Separation
 
@@ -254,7 +301,15 @@ Both variants derive the mask from $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu
 
 ## Conclusion
 
-ML-DSA recasts the Schnorr signature over module lattices. Its security reduces to MLWE for key recovery and to SelfTargetMSIS for forgery, and it achieves SUF-CMA security against quantum adversaries. The signing algorithm follows the Fiat-Shamir with Aborts pattern: it samples a mask, forms a commitment, derives a challenge by hashing, computes a response, and uses rejection sampling to strip the secret-dependent bias before release, retrying until an attempt passes. Key compression and the verifier's hint keep the public key small while preserving exact verification. The three parameter sets trade size for security category, and the choice between hedged and deterministic signing, together with the pure and pre-hash message formats, lets implementers match the scheme to their platform and threat model. The main practical cost relative to elliptic-curve signatures is size: kilobyte-scale keys and signatures in place of the tens of bytes used today.
+ML-DSA recasts the Schnorr signature over module lattices. Its security reduces to MLWE for key recovery and to SelfTargetMSIS for forgery, and it achieves SUF-CMA security against quantum adversaries. 
+
+The signing algorithm follows the Fiat-Shamir with Aborts pattern: it samples a mask, forms a commitment, derives a challenge by hashing, computes a response, and uses rejection sampling to strip the secret-dependent bias before release, retrying until an attempt passes. 
+
+Key compression and the verifier's hint keep the public key small while preserving exact verification. 
+
+The three parameter sets trade size for security category, and the choice between hedged and deterministic signing, together with the pure and pre-hash message formats, lets implementers match the scheme to their platform and threat model. 
+
+eThe main practical cost relative to elliptic-curve signatures is size: kilobyte-scale keys and signatures in place of the tens of bytes used today.
 
 ![ML-DSA FIPS 204 mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.png)
 

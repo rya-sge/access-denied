@@ -1,0 +1,30 @@
+@startuml
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequence {
+  ArrowColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ParticipantBorderColor #4A78B5
+  ParticipantBackgroundColor #EEF5FF
+}
+
+title ERC-8004 — Validation Request and Response
+
+actor "Agent owner\n/ operator" as Owner
+participant "Validation\nRegistry" as VR
+participant "Validator\ncontract" as Validator
+actor "Consumer" as Consumer
+
+Owner -> VR : validationRequest(validatorAddress,\nagentId, requestURI, requestHash)
+note right of VR: emits ValidationRequest\nrequestHash = keccak256(payload)
+VR -> Validator : ValidationRequest event
+
+Validator -> Validator : re-execute / verify proof\n(staking, zkML, TEE)
+Validator -> VR : validationResponse(requestHash,\nresponse 0-100, responseURI, tag)
+note right of VR: may be called again\n(soft then hard finality)
+VR --> Validator : ValidationResponse event
+
+Consumer -> VR : getValidationStatus(requestHash)
+VR --> Consumer : validatorAddress, agentId,\nresponse, tag, lastUpdate
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title Cardano contract threat model
+
+package "Removed by the model (structural)" {
+  [Reentrancy\n(atomic transaction)] as RE
+  [Double-spend\n(ledger removes spent UTXO)] as DS
+  [MEV / front-running\n(deterministic outcome)] as MEV
+  [Token-contract surface\n(native assets)] as NA
+}
+
+package "Your responsibility (validator logic)" {
+  [Double satisfaction] as DSAT
+  [Datum hijacking] as DH
+  [Token forgery] as TF
+  [Missing UTXO auth] as MUA
+  [Time-bound handling] as TH
+  [Resource exhaustion] as RX
+}
+
+package "Network layer (Ouroboros defends)" {
+  [51% / long-range / eclipse] as NET
+}
+
+RE -[hidden]down-> DSAT
+@enduml

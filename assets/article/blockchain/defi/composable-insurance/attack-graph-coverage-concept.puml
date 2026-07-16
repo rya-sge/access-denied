@@ -1,0 +1,33 @@
+@startuml
+title Attack graph: shared factors feeding composable protocols
+skinparam shadowing false
+skinparam rectangle {
+  BackgroundColor #EEE8D5
+  BorderColor #657B83
+  FontColor #073642
+}
+left to right direction
+
+rectangle "Bridge\n(shared factor)" as bridge #FFD9B3
+rectangle "Minting\nSigner" as signer #FFD9B3
+rectangle "Oracle\n(shared factor)" as oracle #FFD9B3
+rectangle "Unbacked\nCollateral" as coll
+
+rectangle "Aave\n(~40% usage)" as aave #B3E5B3
+rectangle "Morpho\n(~30% usage)" as morpho #B3E5B3
+rectangle "Spark\n(~30% usage)" as spark #B3E5B3
+
+bridge --> signer
+signer --> coll
+oracle --> coll
+coll --> aave
+coll --> morpho
+coll --> spark
+
+note bottom of signer
+  First-loss coverage is allocated
+  to each shared factor in proportion
+  to the protocol usage that flows
+  through it, not only at the endpoints.
+end note
+@enduml

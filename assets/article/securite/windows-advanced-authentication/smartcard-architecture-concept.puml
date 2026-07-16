@@ -1,0 +1,31 @@
+@startuml
+skinparam componentStyle rectangle
+title Smartcard / TPM credential isolation
+
+actor User
+node "Client workstation" {
+  [LSASS] as LSASS
+  [Cryptographic API\n(CNG / minidriver)] as CAPI
+}
+
+package "Secure cryptoprocessor" {
+  database "Protected key store" as KS {
+    [Private key\n(non-exportable)] as PK
+  }
+  [On-board crypto engine] as ENGINE
+  [PIN / anti-hammering\ncounter] as PIN
+}
+
+User --> PIN : unlock with PIN / biometric
+LSASS --> CAPI
+CAPI --> ENGINE : "sign(challenge)"
+ENGINE --> PK : use key in place
+ENGINE --> CAPI : signature
+PK -[hidden]-> KS
+
+note bottom of ENGINE
+  Private key never leaves the
+  cryptoprocessor. Only signatures
+  and the public certificate exit.
+end note
+@enduml

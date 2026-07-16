@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+}
+skinparam package {
+  BackgroundColor #FDFDFD
+  BorderColor #999999
+}
+
+title One key, many "signers" (vulnerable v0.5.0 C-03)
+
+component "Real Ed25519 key K\n(32 bytes)" as K #FFF6E0
+
+package "Signer identities registered on the smart account" {
+  component "signer 1\n(ed25519_verifier, K)" as S1
+  component "signer 2\n(ed25519_verifier, K || 0x00)" as S2
+  component "signer 3\n(ed25519_verifier, K || 0xDEAD)" as S3
+}
+
+K --> S1
+K --> S2 : append junk
+K --> S3 : append junk
+
+package "Verifier (vulnerable)" {
+  component "accepts key_data of length >= 32,\ntruncates to first 32 bytes" as V
+}
+
+S1 --> V
+S2 --> V
+S3 --> V
+
+component "underlying key used\nfor verification = K" as KV #D6EAD6
+V --> KV
+
+note bottom of KV
+  All three "distinct" signers resolve to K.
+  A single signature by K authenticates as
+  signer 1 AND signer 2 AND signer 3.
+  An M-of-N threshold or a weighted policy is
+  satisfied with ONE real key.
+end note
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+title DeFi Oracle Stack with the Risk Layer
+
+package "Risk Layer (missing piece)" #E8F5E9 {
+  [Ingest diverse signals\nliquidity, volatility, macro,\nderivatives, credit ratings] as RL_in
+  [Define thresholds\n+ response actions] as RL_logic
+  [Outputs:\nrisk-managed pricing /\nrisk-managed responses] as RL_out
+  RL_in --> RL_logic
+  RL_logic --> RL_out
+}
+
+package "Oracle Network" #E3F2FD {
+  [Query data providers] as ON_q
+  [Aggregate + internal consensus\n(distributed nodes)] as ON_c
+  ON_q --> ON_c
+}
+
+package "Raw Data Layer" #FFF3E0 {
+  [Market price data\n(and other signals)] as RD
+}
+
+package "DeFi Protocol" #F3E5F5 {
+  [Consumes price /\nparameters on-chain] as PROTO
+}
+
+RD --> ON_q
+ON_c --> RL_in : verified data
+RL_out --> PROTO : on-chain feed
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+title Composable attack: from bridge forgery to bad debt
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDF6E3
+  BorderColor #657B83
+  FontColor #073642
+}
+start
+:Attacker forges the cross-chain\nmessage the bridge relies on;
+:Bridge wrongfully attests that\nremote collateral exists and is real;
+:Mint an unbacked amount of the\nasset on the destination chain\n(fake supply);
+:Deposit the unbacked asset as\ncollateral in a lending vault that\nalready whitelisted it;
+:Borrow real assets against the\nunbacked collateral;
+:Attacker exits with the real assets;
+:Lending protocol is left with\nbad debt;
+stop
+@enduml

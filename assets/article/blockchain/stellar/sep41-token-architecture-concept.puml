@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+}
+skinparam package {
+  BackgroundColor #FDFDFD
+  BorderColor #888888
+}
+
+title OpenZeppelin Stellar Contracts - crates involved in a fungible token
+
+package "soroban-sdk 26.1.0" {
+  component "Env, Address, MuxedAddress" as SdkTypes
+  component "contract / contractimpl\ncontracttrait / contractevent" as SdkMacros
+  component "storage:\ninstance / persistent / temporary" as SdkStorage
+}
+
+package "stellar-tokens" {
+  package "fungible" {
+    component "FungibleToken trait" as FT
+    component "Base / AllowList /\nBlockList contract types" as CT
+    package "extensions" {
+      component "burnable" as Burn
+      component "capped" as Cap
+      component "allowlist" as AlEx
+      component "blocklist" as BlEx
+      component "votes" as Votes
+    }
+    package "utils" {
+      component "sac_admin_wrapper" as SacW
+      component "sac_admin_generic" as SacG
+    }
+  }
+  component "rwa" as Rwa
+  component "vault" as Vault
+}
+
+package "stellar-access" {
+  component "ownable" as Ownable
+  component "access_control" as AccessControl
+  component "role_transfer" as RoleTransfer
+}
+
+package "stellar-contract-utils" {
+  component "pausable" as Pausable
+  component "upgradeable" as Upgradeable
+  component "merkle_distributor" as Merkle
+}
+
+package "stellar-macros" {
+  component "only_owner" as MOnlyOwner
+  component "only_role / has_role" as MOnlyRole
+  component "when_not_paused" as MPaused
+}
+
+component "Stellar Asset Contract\n(built into the network)" as SAC
+
+FT --> CT : ContractType
+CT --> SdkStorage
+Burn ..> CT
+Cap ..> SdkStorage : Cap in instance storage
+MOnlyOwner ..> Ownable : expands to\nenforce_owner_auth(e)
+MOnlyRole ..> AccessControl
+MPaused ..> Pausable : expands to\nwhen_not_paused(e)
+Ownable ..> RoleTransfer : 2-step handover
+SacW ..> SAC : forwards mint, clawback,\nset_authorized, set_admin
+SacG ..> SAC : custom __check_auth
+
+note bottom of SAC
+  Represents a classic Stellar asset inside Soroban.
+  Its admin can be handed to an OpenZeppelin
+  SAC-admin contract to gain roles and custom rules.
+end note
+
+@enduml

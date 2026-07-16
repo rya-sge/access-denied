@@ -1,0 +1,38 @@
+@startmindmap
+* Aiken on Cardano
+** eUTXO model
+*** Validator, not actor
+*** f(datum, redeemer, context)
+*** Returns Bool: approve or reject
+*** Deterministic evaluation
+** Language & target
+*** Purpose-built for validators
+*** Rust/Elm/Gleam syntax
+*** Compiles to UPLC
+*** Alternatives: Plinth, Plutarch, OpShin, Scalus, Marlowe
+** Toolchain (single binary)
+*** aiken new / build / check
+*** Formatter + LSP
+*** Built-in test runner
+*** aikup version manager
+** Validator anatomy (Plutus V3)
+*** Handlers: spend, mint, withdraw
+*** publish, vote, propose
+*** else fallback (fail)
+*** datum is Option in V3
+** Parameters
+*** Compile-time parameters
+*** Unique policy id / address
+*** One-shot minting policy
+*** blueprint apply
+** Testing
+*** test keyword returns Bool
+*** Property tests via Fuzzer
+*** fail expectations
+*** bench, reports ex-units
+** Deploy artifact
+*** CIP-57 plutus.json blueprint
+*** blueprint address / policy / hash
+*** Off-chain hand-off
+*** Lucid / Mesh / PyCardano / Blaze
+@endmindmap

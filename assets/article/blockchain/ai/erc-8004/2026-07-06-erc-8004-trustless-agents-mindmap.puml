@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* ERC-8004\nTrustless Agents
+** Purpose
+*** Discover agents\nacross organisations
+*** Trust without\npre-existing relationship
+*** Per-chain singleton\nregistries
+** Identity Registry
+*** ERC-721 + URIStorage
+*** agentId = tokenId
+*** agentURI -> registration file\n(ipfs / https / data)
+*** CAIP id\nnamespace:chainId:registry
+*** on-chain metadata\ngetMetadata / setMetadata
+*** reserved agentWallet\n(EIP-712 / ERC-1271)
+** Reputation Registry
+*** giveFeedback\nvalue int128 + valueDecimals
+*** tag1 / tag2 filters
+*** on-chain score\n+ off-chain file (IPFS)
+*** revokeFeedback\nappendResponse
+*** getSummary\nclient-filtered (anti-Sybil)
+*** gas sponsorship\nEIP-7702
+** Validation Registry
+*** validationRequest\n(owner / operator)
+*** validationResponse\n0-100
+*** validators\nstaking / zkML / TEE
+*** progressive validation\nsoft / hard finality
+** Trust models
+*** reputation
+*** crypto-economic
+*** TEE attestation
+*** zkML
+** Adoption
+*** authors: MetaMask, EF,\nGoogle, Coinbase
+*** mainnet Jan 2026\nTaiko L2
+*** MetaMask server wallets\nOasis ROFL
+*** x402 payments
+@endmindmap

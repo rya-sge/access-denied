@@ -1,0 +1,13 @@
+@startuml
+skinparam backgroundColor transparent
+skinparam sequenceMessageAlign center
+actor "Alice\n(owns the key)" as A
+actor "Bob\n(shares a secret)" as B
+A -> B : open padlock\n(public key)
+note right of B : Bob rolls a random\nsecret number
+B -> A : locked box\n(ciphertext)
+note left of A : Alice unlocks it\nwith her key and\nreads the number
+A -> A : turn the number\ninto the final key
+B -> B : turn the number\ninto the final key
+note over A, B : both now hold the\nsame secret key
+@enduml

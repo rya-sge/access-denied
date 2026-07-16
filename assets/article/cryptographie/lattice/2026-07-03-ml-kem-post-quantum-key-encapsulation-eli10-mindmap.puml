@@ -1,0 +1,30 @@
+@startmindmap
+* ML-KEM\n(agree on a secret code a quantum computer cannot steal)
+** The problem
+*** Two people must agree on a secret while everyone listens
+*** A spy can record now and crack later
+*** Quantum computers will break today's method
+** The padlock idea
+*** Alice hands out an open padlock (public key)
+*** Bob locks a random secret in a box (ciphertext)
+*** Only Alice's key opens it
+** The padlock a robot cannot pick
+*** Secret numbers times a big public grid
+*** Add "fuzz" so nobody can work backwards
+*** This is the puzzle quantum computers cannot solve
+** A dice roll, not a chosen note
+*** Bob locks a random number, never a chosen one
+*** Nothing for a cheater to craft
+** The double-check
+*** Alice re-locks the box the same way and compares
+*** Match means honest
+*** Mismatch: quietly hand back a fake key, never an error
+** Three sizes
+*** ML-KEM-512 / 768 / 1024
+*** Bigger is safer but heavier
+*** 768 is the recommended default
+** Keeps secrets, does not check who
+*** No proof of who sent the padlock
+*** Add a signature to know who
+*** Often paired with an older lock as a backup
+@endmindmap

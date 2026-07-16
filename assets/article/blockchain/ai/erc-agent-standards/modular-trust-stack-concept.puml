@@ -1,0 +1,43 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam rectangle {
+  BorderColor #4A78B5
+  BackgroundColor #EEF5FF
+}
+
+title Modular Trust Stack for On-Chain AI Agents
+
+package "Layer 1 — Register" as L1 {
+  rectangle "ERC-8004\nIdentity Registry\nReputation Registry\nValidation Registry" as ERC8004
+  rectangle "ERC-8122\nMinimal Agent Registry" as ERC8122
+  rectangle "ERC-8041 / ERC-8217\nCollections & NFT Bindings" as ERC8041
+}
+
+package "Layer 2 — Verify" as L2 {
+  rectangle "ERC-8126\nAgent Verification\n(ZKP risk score 0-100)" as ERC8126
+  rectangle "ERC-8107\nENS Trust Registry\n(web of trust)" as ERC8107
+}
+
+package "Layer 3 — Execute" as L3 {
+  rectangle "ERC-8196\nAuthenticated Wallet\n(policy-bound)" as ERC8196
+  rectangle "ERC-8273\nAttestation-Gated Actions\n(EIP-1153 transient)" as ERC8273
+  rectangle "ERC-8199\nSandboxed Smart Wallet" as ERC8199
+}
+
+package "Coordination & Commerce" as CC {
+  rectangle "ERC-8001\nCoordination Framework" as ERC8001
+  rectangle "ERC-8183\nAgentic Commerce (jobs)" as ERC8183
+  rectangle "ERC-8226\nRegulated Agent Mandate" as ERC8226
+}
+
+ERC8004 --> ERC8126 : registered identity
+ERC8126 --> ERC8196 : risk-scored agent
+ERC8107 --> ERC8001 : trust paths gate participation
+ERC8004 --> ERC8001 : discoverable agents
+ERC8196 --> ERC8183 : executes funded jobs
+ERC8273 --> ERC8196 : per-tx authorization
+ERC8226 --> ERC8196 : scoped compliance mandate
+
+@enduml

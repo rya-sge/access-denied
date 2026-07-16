@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+title eUTXO transaction validation
+
+start
+:off-chain builder names exact inputs
+by (TxId, index), sets redeemers,
+fixes all script arguments;
+:builder can evaluate scripts locally
+before submitting (fail-fast);
+:submit transaction;
+
+partition "Phase 1 (structural)" {
+  if (inputs exist, unspent,\nbalanced, fees ok?) then (no)
+    :reject; costs nothing;
+    stop
+  else (yes)
+  endif
+}
+
+partition "Phase 2 (scripts)" {
+  :run each validator
+(datum, redeemer, context);
+  if (all return True?) then (no)
+    :reject; collateral consumed;
+    stop
+  else (yes)
+  endif
+}
+
+:apply atomically: consume inputs,
+create outputs, update UTXO set;
+stop
+@enduml

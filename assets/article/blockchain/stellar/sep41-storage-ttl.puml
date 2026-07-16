@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam state {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+}
+
+title Storage tiers and TTL for a SEP-41 token
+
+state "instance" as I : Meta { decimals, name, symbol }\nTotalSupply\nCap\n--\nTTL extension is the\ncontract developer's job
+state "persistent" as P : Balance(Address)\n--\nLibrary extends TTL on every read:\nextend_ttl(&key,\n  BALANCE_TTL_THRESHOLD,\n  BALANCE_EXTEND_AMOUNT)
+state "temporary" as T : Allowance(owner, spender)\n--\nExpires with live_until_ledger.\nNever restorable.
+
+I -[hidden]right-> P
+P -[hidden]right-> T
+
+state "Persistent entry lifecycle" as LC {
+  [*] --> Live : write
+  Live --> Live : read\n(TTL extended by\n30 days of ledgers)
+  Live --> Archived : TTL reaches 0\nwithout a read
+  Archived --> Live : restore\n(original value preserved)
+  Archived --> [*] : (temporary entries are\ndeleted instead)
+}
+
+note bottom of LC
+  DAY_IN_LEDGERS = 17280
+  BALANCE_EXTEND_AMOUNT  = 30 * DAY_IN_LEDGERS
+  BALANCE_TTL_THRESHOLD  = BALANCE_EXTEND_AMOUNT - DAY_IN_LEDGERS
+  INSTANCE_EXTEND_AMOUNT = 7 * DAY_IN_LEDGERS
+  INSTANCE_TTL_THRESHOLD = INSTANCE_EXTEND_AMOUNT - DAY_IN_LEDGERS
+
+  Writes do NOT extend TTL. A token that only ever
+  receives transfers out of one balance will let the
+  other balances drift toward archival.
+end note
+
+@enduml

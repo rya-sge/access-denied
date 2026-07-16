@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+  DiamondBackgroundColor #FFF6E0
+  DiamondBorderColor #C79100
+}
+<style>
+.bad { BackgroundColor #FADBD8 }
+.good { BackgroundColor #D6EAD6 }
+</style>
+
+title Life of a finding in a differential audit
+
+start
+:new feature merged\n(RWA, smart accounts, NFT extension);
+:auditors diff HEAD against\nthe previously-audited BASE commit;
+
+if (invariant broken?) then (yes)
+  :finding written\n(severity, root cause, PoC path);
+  :remediation proposed\n(e.g. route through Base::update,\nuse BytesN<32>, early-return on 0);
+  :fix merged in a PR;
+  :re-audit the fix;
+  if (fix introduces a new invariant bug?) then (yes)
+    :new finding\n(e.g. v0.5.0 re-audit:\ncounter exhaustion, dangling keys); <<bad>>
+    detach
+  else (no)
+    :resolved; <<good>>
+  endif
+else (no)
+  :next feature;
+  detach
+endif
+
+stop
+
+@enduml

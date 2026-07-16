@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #E8F0FA
+  BorderColor #4A6FA5
+  DiamondBackgroundColor #FFF6E0
+  DiamondBorderColor #C79100
+}
+
+title Choosing a fungible-token path on Stellar
+
+start
+
+:Token must exist on Stellar;
+
+if (Needs native DEX, path payments,\nanchors, trustline semantics?) then (yes)
+  if (Needs custom admin logic:\nroles, rate limits, timelocks?) then (yes)
+    #D6EAD6:**Path 3**\nClassic asset + SAC,\nSAC admin transferred to an\nOpenZeppelin SAC-admin contract;
+    note right
+      sac_admin_wrapper (explicit entry points)
+      or sac_admin_generic (__check_auth)
+    end note
+  else (no)
+    #D6EAD6:**Path 1**\nClassic asset + its\nStellar Asset Contract (SAC);
+    note right
+      No Rust, no Wasm.
+      stellar contract asset deploy
+      Admin = issuer G-account.
+    end note
+  endif
+else (no)
+  #D6EAD6:**Path 2**\nCustom Soroban token on\nstellar-tokens::fungible;
+  note right
+      Full control of transfer logic.
+      Extensions: Burnable, Capped,
+      AllowList / BlockList, Votes, Vault.
+      Not tradable on the classic DEX.
+  end note
+endif
+
+stop
+
+@enduml

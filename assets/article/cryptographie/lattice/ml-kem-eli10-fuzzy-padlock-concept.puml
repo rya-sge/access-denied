@@ -1,0 +1,15 @@
+@startuml
+skinparam backgroundColor transparent
+skinparam rectangle {
+  BackgroundColor #F5F5F5
+  BorderColor #555555
+}
+rectangle "secret small numbers\n(the key, kept private)" as S
+rectangle "big public grid" as G
+rectangle "a little fuzz" as F
+rectangle "PUBLIC PADLOCK\n(safe to show everyone)" as P #E8F0FE
+S --> P : multiply, then add fuzz\n(easy, one direction)
+G --> P
+F --> P
+P ..> S : un-fuzz back to the key?\nBLOCKED, too hard even for a quantum robot
+@enduml

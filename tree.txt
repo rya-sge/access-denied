@@ -102,6 +102,15 @@ _posts/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.md
   assets/article/cryptographie/lattice/ml-dsa-key-structure-concept.puml                                (concept, asset-only)
   assets/article/cryptographie/lattice/ml-dsa-lifecycle-workflow.puml                                   (workflow, asset-only)
 
+_posts/2026-07-03-ml-dsa-post-quantum-signatures-eli10.md
+  assets/article/cryptographie/lattice/2026-07-03-ml-dsa-post-quantum-signatures-eli10-mindmap.puml    (mindmap)
+
+_posts/2026-07-03-ml-kem-post-quantum-key-encapsulation-eli10.md
+  assets/article/cryptographie/lattice/2026-07-03-ml-kem-post-quantum-key-encapsulation-eli10-mindmap.puml  (mindmap)
+  assets/article/cryptographie/lattice/ml-kem-eli10-fuzzy-padlock-concept.puml                              (concept, in-section)
+  assets/article/cryptographie/lattice/ml-kem-eli10-locked-box-handoff.puml                                (workflow, in-section)
+  assets/article/cryptographie/lattice/ml-kem-eli10-double-check.puml                                       (workflow, in-section)
+
 _posts/2026-06-29-slh-dsa-fips-205-hash-based-signatures.md
   assets/article/cryptographie/hash-based/2026-06-29-slh-dsa-fips-205-hash-based-signatures.puml        (mindmap)
   assets/article/cryptographie/hash-based/slh-dsa-hypertree-structure.puml                              (concept, in-section)
@@ -140,3 +149,112 @@ _posts/2026-06-29-linux-adversary-boot-and-exploitation.md
   assets/article/securite/linux-adversary/stack-overflow-mitigations-concept.puml                     (concept, in-section)
   assets/article/securite/linux-adversary/boot-sequence-threats-workflow.puml                         (workflow, in-section)
   assets/article/securite/linux-adversary/attack-kill-chain-workflow.puml                             (workflow, in-section)
+
+_posts/2026-06-30-windows-advanced-authentication.md
+  assets/article/securite/windows-advanced-authentication/2026-06-30-windows-advanced-authentication.puml   (mindmap)
+  assets/article/securite/windows-advanced-authentication/smartcard-architecture-concept.puml               (concept, in-section)
+  assets/article/securite/windows-advanced-authentication/pkinit-smartcard-logon-workflow.puml              (workflow, in-section)
+  assets/article/securite/windows-advanced-authentication/virtual-smartcard-deployment-workflow.puml        (workflow, in-section)
+
+_posts/2026-06-30-windows-credentials-protection.md
+  assets/article/securite/windows-credentials-protection/2026-06-30-windows-credentials-protection.puml   (mindmap)
+  assets/article/securite/windows-credentials-protection/credential-protection-layers-concept.puml        (concept, in-section)
+  assets/article/securite/windows-credentials-protection/wdigest-safe-disable-workflow.puml               (workflow, in-section)
+  assets/article/securite/windows-credentials-protection/credential-guard-vbs-workflow.puml               (workflow, in-section)
+
+_posts/2026-06-30-windows-persistence.md
+  assets/article/securite/windows-persistence/2026-06-30-windows-persistence.puml   (mindmap)
+  assets/article/securite/windows-persistence/golden-ticket-trust-concept.puml      (concept, in-section)
+  assets/article/securite/windows-persistence/golden-ticket-workflow.puml           (workflow, in-section)
+  assets/article/securite/windows-persistence/skeleton-key-workflow.puml            (workflow, in-section)
+
+_posts/2026-07-02-defi-composable-first-loss-capital-insurance.md
+  assets/article/blockchain/defi/composable-insurance/2026-07-02-defi-composable-first-loss-capital-mindmap.puml   (mindmap)
+  assets/article/blockchain/defi/composable-insurance/attack-graph-coverage-concept.puml                          (concept, in-section)
+  assets/article/blockchain/defi/composable-insurance/composable-attack-workflow.puml                             (workflow, in-section)
+
+_posts/2026-07-02-defi-unified-risk-layer-llama-guard.md
+  assets/article/blockchain/defi/risk-layer/2026-07-02-defi-unified-risk-layer-llama-guard-mindmap.puml           (mindmap)
+  assets/article/blockchain/defi/risk-layer/oracle-stack-risk-layer-concept.puml                                 (concept, in-section)
+  assets/article/blockchain/defi/risk-layer/aave-risk-management-evolution-workflow.puml                          (workflow, in-section)
+  assets/article/blockchain/defi/risk-layer/pendle-pt-risk-oracle-workflow.puml                                  (workflow, in-section)
+
+_posts/2026-07-06-erc-ai-agents-ethereum-standards.md
+  assets/article/blockchain/ai/erc-agent-standards/2026-07-06-erc-ai-agents-ethereum-standards-mindmap.puml   (mindmap)
+  assets/article/blockchain/ai/erc-agent-standards/modular-trust-stack-concept.puml                           (concept, in-section)
+  assets/article/blockchain/ai/erc-agent-standards/agent-lifecycle-workflow.puml                              (workflow, in-section)
+  assets/article/blockchain/ai/erc-agent-standards/agentic-commerce-job-state.puml                            (state, in-section)
+
+_posts/2026-07-06-erc-8004-trustless-agents.md
+  assets/article/blockchain/ai/erc-8004/2026-07-06-erc-8004-trustless-agents-mindmap.puml   (mindmap)
+  assets/article/blockchain/ai/erc-8004/three-registry-architecture-concept.puml           (concept, in-section)
+  assets/article/blockchain/ai/erc-8004/agent-registration-lifecycle-workflow.puml         (workflow, in-section)
+  assets/article/blockchain/ai/erc-8004/validation-request-response-sequence.puml          (sequence, in-section)
+
+_posts/2026-07-09-stellar-fungible-token-openzeppelin-sep41.md
+  assets/article/blockchain/stellar/stellar-openzeppelin-sep41.puml                        (mindmap)
+  assets/article/blockchain/stellar/sep41-token-architecture-concept.puml                  (concept, asset only)
+  assets/article/blockchain/stellar/sep41-deployment-workflow.puml                         (workflow, asset only)
+  assets/article/blockchain/stellar/sep41-path-decision.puml                               (activity, in-section)
+  assets/article/blockchain/stellar/sep41-trait-dispatch.puml                              (component, in-section)
+  assets/article/blockchain/stellar/sep41-deploy-sequence.puml                             (sequence, in-section)
+  assets/article/blockchain/stellar/sep41-storage-ttl.puml                                 (state, in-section)
+
+_posts/2026-07-10-stellar-soroban-vulnerabilities-audit.md
+  assets/article/blockchain/stellar/stellar-soroban-vulnerabilities-audit.puml            (mindmap)
+  assets/article/blockchain/stellar/recovery-inflation-flow.puml                          (activity, in-section)
+  assets/article/blockchain/stellar/signer-aliasing-concept.puml                          (component, in-section)
+  assets/article/blockchain/stellar/approve-underflow-sequence.puml                       (sequence, in-section)
+  assets/article/blockchain/stellar/soroban-vuln-taxonomy-concept.puml                    (concept, asset only)
+  assets/article/blockchain/stellar/differential-audit-workflow.puml                      (workflow, asset only)
+
+_posts/2026-07-16-aiken-smart-contracts-cardano.md
+  assets/article/blockchain/cardano/aiken-smart-contracts-cardano.puml            (mindmap)
+  assets/article/blockchain/cardano/aiken-compilation-pipeline-concept.puml       (concept, in-section)
+  assets/article/blockchain/cardano/aiken-validator-evaluation-sequence.puml      (sequence, in-section)
+  assets/article/blockchain/cardano/aiken-blueprint-deploy-activity.puml          (activity, in-section)
+  assets/article/blockchain/cardano/aiken-toolchain-architecture-concept.puml     (concept, asset only)
+  assets/article/blockchain/cardano/aiken-contract-development-workflow.puml       (workflow, asset only)
+
+_posts/2026-07-16-cardano-cip-categories.md
+  assets/article/blockchain/cardano/cardano-cip-categories.puml                  (mindmap)
+  assets/article/blockchain/cardano/cip-repository-structure-concept.puml         (concept, in-section)
+  assets/article/blockchain/cardano/cip-lifecycle-states.puml                     (state, in-section)
+  assets/article/blockchain/cardano/cip-category-taxonomy-concept.puml            (concept, asset only)
+  assets/article/blockchain/cardano/cip-contributor-workflow.puml                 (workflow, asset only)
+
+_posts/2026-07-16-eutxo-vs-bitcoin-utxo.md
+  assets/article/blockchain/cardano/eutxo-vs-bitcoin-utxo.puml                    (mindmap)
+  assets/article/blockchain/cardano/utxo-vs-eutxo-structure-concept.puml          (concept, in-section)
+  assets/article/blockchain/cardano/script-visibility-scope-concept.puml          (concept, in-section)
+  assets/article/blockchain/cardano/eutxo-stateful-spend-sequence.puml            (sequence, in-section)
+  assets/article/blockchain/cardano/utxo-transaction-flow-concept.puml            (concept, asset only)
+  assets/article/blockchain/cardano/eutxo-validation-workflow.puml                (workflow, asset only)
+
+_posts/2026-07-16-ouroboros-proof-of-stake.md
+  assets/article/blockchain/cardano/ouroboros-proof-of-stake.puml                 (mindmap)
+  assets/article/blockchain/cardano/pow-vs-pos-concept.puml                       (concept, asset only)
+  assets/article/blockchain/cardano/ouroboros-slot-leader-election-activity.puml  (activity, in-section)
+  assets/article/blockchain/cardano/ouroboros-epoch-timeline-concept.puml         (concept, in-section)
+  assets/article/blockchain/cardano/ouroboros-block-production-workflow.puml       (workflow, asset only)
+
+_posts/2026-07-16-cardano-smart-contract-security.md
+  assets/article/blockchain/cardano/cardano-smart-contract-security.puml          (mindmap)
+  assets/article/blockchain/cardano/eutxo-threat-model-concept.puml               (concept, asset only)
+  assets/article/blockchain/cardano/double-satisfaction-attack-concept.puml       (concept, in-section)
+  assets/article/blockchain/cardano/datum-continuity-check-activity.puml          (activity, in-section)
+  assets/article/blockchain/cardano/security-verification-workflow.puml           (workflow, asset only)
+
+_posts/2026-07-16-cardano-voltaire-governance-cip-1694.md
+  assets/article/blockchain/cardano/cardano-voltaire-governance-cip-1694.puml     (mindmap)
+  assets/article/blockchain/cardano/governance-bodies-concept.puml                (concept, in-section)
+  assets/article/blockchain/cardano/governance-action-lifecycle-states.puml       (state, in-section)
+  assets/article/blockchain/cardano/drep-delegation-concept.puml                  (concept, asset only)
+  assets/article/blockchain/cardano/governance-action-workflow.puml               (workflow, asset only)
+
+_posts/2026-07-16-eutxo-explained-eli10.md
+  assets/article/blockchain/cardano/eutxo-explained-eli10.puml                    (mindmap)
+  assets/article/blockchain/cardano/eutxo-eli10-coin-vs-balance-concept.puml      (concept, in-section)
+  assets/article/blockchain/cardano/eutxo-eli10-guard-view-concept.puml           (concept, in-section)
+  assets/article/blockchain/cardano/eutxo-eli10-treasure-chest-concept.puml       (concept, asset only)
+  assets/article/blockchain/cardano/eutxo-eli10-spend-coin-workflow.puml          (workflow, asset only)

@@ -1,0 +1,25 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title Double satisfaction: one output, two obligations
+
+rectangle "Attacker's transaction" as TX {
+  package "Inputs" {
+    [DEX pool UTXO\nValidator A:\n\"need an output with 100 USDx\"] as A
+    [Lending pool UTXO\nValidator B:\n\"need an output with 100 USDx\"] as B
+  }
+  package "Outputs" {
+    [ONE output\n100 USDx] as O
+  }
+}
+
+A --> O : sees it, considers itself satisfied
+B --> O : sees the SAME output, satisfied too
+
+note bottom of O
+  Both validators check "some output meets
+  the condition", so a single 100 USDx output
+  discharges two obligations. Fix: require YOUR
+  specific output, tagged with a beacon token.
+end note
+@enduml

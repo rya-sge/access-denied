@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title How three epochs feed one epoch's block production
+
+rectangle "Epoch N-2" as E2 {
+  [Stake snapshot taken\n= active stake for epoch N]
+}
+rectangle "Epoch N-1" as E1 {
+  [VRF outputs accumulate\ninto the epoch nonce for N]
+}
+rectangle "Epoch N" as EN {
+  [Per slot: pools check VRF;\nelected pool builds + KES-signs\n+ publishes block]
+}
+rectangle "Epoch N boundary" as EB {
+  [Distribute rewards,\ntake a new snapshot,\napply parameter changes,\nprocess pool (de)registrations]
+}
+
+E2 -right-> EN : active stake
+E1 -right-> EN : epoch nonce
+EN -right-> EB
+note bottom of E2
+  The 2-epoch delay stops an attacker
+  from acquiring stake and using it at once.
+end note
+@enduml

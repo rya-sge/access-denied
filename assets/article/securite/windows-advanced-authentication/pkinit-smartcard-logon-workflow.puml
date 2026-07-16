@@ -1,0 +1,24 @@
+@startuml
+title Smartcard logon via Kerberos PKINIT
+
+actor User
+participant "Client (LSASS)" as Client
+participant "Smartcard / TPM" as Card
+participant "KDC\n(Domain Controller)" as KDC
+
+User -> Card : insert card, enter PIN
+Client -> Card : request signature over\npre-auth data (timestamp)
+Card -> Card : sign with non-exportable\nprivate key
+Card --> Client : signed AS-REQ pre-auth
+Client -> KDC : AS-REQ (PKINIT)\n+ user certificate
+KDC -> KDC : validate cert chain\nagainst trusted PKI
+KDC -> KDC : check revocation (CRL/OCSP)
+KDC --> Client : AS-REP\n(TGT + session key,\nPAC_CREDENTIAL_INFO with NTLM)
+Client -> KDC : TGS-REQ (with TGT)
+KDC --> Client : service ticket
+note over Client, KDC
+  From here the flow is ordinary
+  Kerberos: tickets behave the
+  same as password-based logon.
+end note
+@enduml

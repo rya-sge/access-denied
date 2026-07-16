@@ -1,0 +1,37 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+title Aiken single-binary toolchain
+
+package "aiken CLI" {
+  [Type checker\n& compiler] as CC
+  [Formatter\n(aiken fmt)] as FMT
+  [Test runner\n(test / bench)] as TR
+  [Docs generator\n(aiken docs)] as DOC
+  [Blueprint tools\n(apply/address/policy/hash)] as BPT
+  [Package manager\n(add/upgrade)] as PKG
+  [LSP server\n(aiken lsp)] as LSP
+  [UPLC tools\n(eval/encode/...)] as UP
+}
+
+folder "Project" {
+  [aiken.toml] as TOML
+  [validators/] as V
+  [lib/] as LIB
+  [env/] as ENV
+}
+
+[aiken-lang/stdlib v2] as STD
+[plutus.json\nCIP-57 blueprint] as BP
+
+TOML --> CC
+V --> CC
+LIB --> CC
+ENV --> CC
+PKG --> STD
+STD --> CC
+CC --> BP : aiken build
+TR --> CC : shares compiled code
+BPT --> BP : reads / rewrites
+LSP --> CC : incremental checks
+@enduml

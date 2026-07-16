@@ -1,0 +1,18 @@
+@startuml
+title TPM virtual smartcard deployment
+
+start
+:Install / configure a Certificate Authority (CA);
+:Create a certificate template for smartcard logon;
+:Publish (allow) the template on the CA;
+:Create the TPM virtual smartcard on the device\n(tpmvscmgr create);
+:Enroll the logon certificate onto the\nTPM virtual smartcard;
+if (TPM present and provisioned?) then (yes)
+  :Key pair generated and sealed in the TPM;
+  :User logs on with PIN against the\n"always-inserted" virtual card;
+  stop
+else (no)
+  :Deployment fails\n(no hardware-backed key store);
+  stop
+endif
+@enduml

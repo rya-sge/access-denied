@@ -1,0 +1,35 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+title Proof of Work vs Proof of Stake
+
+package "Proof of Work" {
+  [Hardware] as HW
+  [Electricity] as EL
+  [Solve hash puzzle] as SP
+  [Produce block] as BW
+  HW --> EL
+  EL --> SP
+  SP --> BW
+}
+
+package "Proof of Stake (Ouroboros)" {
+  [Stake ADA] as ST
+  [VRF lottery\n(stake-weighted)] as VR
+  [Slot leader] as SL
+  [Produce block] as BS
+  ST --> VR
+  VR --> SL
+  SL --> BS
+}
+
+note bottom of BW
+  Security budget = energy spent.
+  Attack cost = 51% of hash power.
+end note
+note bottom of BS
+  Security budget = staked capital.
+  Attack cost = 51% of staked ADA,
+  and attacking destroys its value.
+end note
+@enduml

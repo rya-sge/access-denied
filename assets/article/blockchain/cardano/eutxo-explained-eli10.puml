@@ -1,0 +1,24 @@
+@startmindmap
+* Money as coins (eUTXO)
+** Two ways to keep money
+*** Bank balance (one big number)
+*** Jar of real coins (Cardano's way)
+** How a coin is spent
+*** You hand over whole coins
+*** You get change back as a new coin
+*** Coins in equals coins out plus fee
+*** A coin can be spent only once
+** Bitcoin's treasure chest
+*** A coin and a simple lock
+*** The guard sees almost nothing
+** What Cardano adds
+*** Sticky note on the chest (Datum)
+*** The note you hand over (Redeemer)
+*** Guard reads the whole receipt (Context)
+** The guard is a referee
+*** Only says yes or no
+*** Never grabs or sends money
+** Why it is nice
+*** You know the answer before you go
+*** Other tokens ride in the same chest
+@endmindmap
