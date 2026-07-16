@@ -13,7 +13,7 @@ isMath: false
 
 Imagine you have some pocket money. There are two ways your family could keep track of it. One way is to write a number on the fridge, like "you have 50". The other way is to keep real coins in a jar that you can hold. Both tell you how much you have. But they work in very different ways once you start spending. Cardano, a kind of digital money, chose the jar of coins. Bitcoin did too, a long time before. This article explains how the coin jar works, and how Cardano made its coins a little bit smarter than Bitcoin's.
 
-> This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and the custom skill `create-article-eli10`
+> This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
 
