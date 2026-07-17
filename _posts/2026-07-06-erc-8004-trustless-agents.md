@@ -4,7 +4,7 @@ title: "ERC-8004 Trustless Agents - Identity, Reputation and Validation for On-C
 date:   2026-07-06
 lang: en
 locale: en-GB
-categories: AI blockchain ethereum
+categories: ai blockchain ethereum
 tags: ethereum erc-8004 ai-agent identity reputation validation
 description: A technical deep dive into ERC-8004 Trustless Agents - its three registries for agent identity, reputation and validation, the pluggable trust models, and how the standard is being deployed.
 image: /assets/article/blockchain/ai/erc-8004/2026-07-06-erc-8004-trustless-agents-mindmap.png

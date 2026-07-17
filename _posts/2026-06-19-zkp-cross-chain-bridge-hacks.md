@@ -4,7 +4,7 @@ title: "Zero-Knowledge Proof Failures in Cross-Chain Bridges — Exploits, Vulne
 date: 2026-06-19
 lang: en
 locale: en-GB
-categories: blockchain security zkp defi
+categories: blockchain security ZKP defi
 tags: zkp zero-knowledge-proof cross-chain bridge exploit bug-bounty rollup
 description: An analysis of security incidents in ZK-rollup bridges from 2023 to 2026, covering confirmed exploits, circuit-level vulnerability disclosures, and bug bounties targeting ZK withdrawal and settlement mechanisms.
 image: /assets/article/blockchain/zkp/2026-06-19-zkp-cross-chain-bridge-hacks-mindmap.png

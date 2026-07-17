@@ -4,7 +4,7 @@ title: "Poseidon Hash Function - Overview"
 date: 2025-05-27
 lang: en
 locale: en-GB
-categories: cryptography zkp
+categories: cryptography ZKP
 tags: poseidon hash 
 description: The Poseidon hash function is a cryptographic hash function specifically designed for use in zero-knowledge proof systems like SNARKs and STARKs.
 image: /assets/article/cryptographie/hash/poseidon/poseidon-sponge.png

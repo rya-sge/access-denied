@@ -5,7 +5,7 @@ date:   2026-01-13
 locale: en-GB
 lang: en
 last-update: 
-categories: AI security
+categories: ai security
 tags: claude security ai
 description: technical overview of Claude Code’s security model, including its permission system, sandboxing architecture, identity and access management (IAM), and operational best practices.
 isMath: false

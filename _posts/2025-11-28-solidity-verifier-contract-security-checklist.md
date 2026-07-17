@@ -5,7 +5,7 @@ date:   2025-11-28
 locale: en-GB
 lang: en
 last-update: 
-categories: blockchain solidity zkp
+categories: blockchain solidity ZKP
 tags: solidity zkp zk-snark verifier
 description: This article summarizes the essential points to verify when reviewing a Solidity verifier contract using in zk-proof systems
 isMath: false

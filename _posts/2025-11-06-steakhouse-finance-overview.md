@@ -4,7 +4,7 @@ title: "Vault Curator - Steak House Finance"
 date:   2025-11-06
 lang: en
 locale: en-GB
-categories: blockchain ethereum zkp
+categories: blockchain ethereum ZKP
 tags: steakhouse-finance defi blockchain
 description: Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
 image: 

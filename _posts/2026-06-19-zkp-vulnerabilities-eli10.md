@@ -4,7 +4,7 @@ title: "How Zero-Knowledge Proofs Get Hacked — Explained for a 10-Year-Old"
 date: 2026-06-19
 lang: en
 locale: en-GB
-categories: cryptography security zkp
+categories: cryptography security ZKP
 tags: zkp zero-knowledge-proof vulnerability analogy explainer
 description: A simple guide to the main ways zero-knowledge proof systems have been broken, explained with everyday analogies about magic locks, bakers, and inspectors.
 image: /assets/article/blockchain/zkp/2026-06-19-zkp-vulnerabilities-eli10-mindmap.png

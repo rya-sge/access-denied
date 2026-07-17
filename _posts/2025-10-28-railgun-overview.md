@@ -4,7 +4,7 @@ title: "RAILGUN: Privacy Infrastructure for DeFi"
 date:   2025-10-28
 lang: en
 locale: en-GB
-categories: blockchain ethereum zkp
+categories: blockchain ethereum ZKP
 tags: railgun zk-snark zeroknwoledgeproof
 description: RAILGUN brings full privacy to DeFi using zk-SNARK cryptography, shielding senders, recipients, and tokens for untraceable blockchain transactions.
 image: /assets/article/blockchain/defi/railgun/railgun-mindmap.png

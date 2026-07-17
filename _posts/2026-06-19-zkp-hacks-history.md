@@ -4,7 +4,7 @@ title: "Zero-Knowledge Proof Hacks — A Documented Record of Exploits and Vulne
 date: 2026-06-19
 lang: en
 locale: en-GB
-categories: blockchain security defi zkp
+categories: blockchain security defi ZKP
 tags: zkp zero-knowledge-proof exploit hack vulnerability bug-bounty
 description: A chronological record of confirmed hacks, disclosed vulnerabilities, and bug bounties in zero-knowledge proof protocols from 2023 to 2026, with technical root cause analysis for each incident.
 image: /assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.png

@@ -4,7 +4,7 @@ title: "ERC Standards for AI Agents - The On-Chain Agent Stack on Ethereum"
 date:   2026-07-06
 lang: en
 locale: en-GB
-categories: AI blockchain ethereum
+categories: ai blockchain ethereum
 tags: ethereum erc ai-agent erc-8004 identity zkml
 description: A technical survey of the Ethereum ERC standards for AI agents, from ERC-8004 Trustless Agents to verification, coordination, commerce, and verifiable ML inference.
 image: /assets/article/blockchain/ai/erc-agent-standards/2026-07-06-erc-ai-agents-ethereum-standards-mindmap.png

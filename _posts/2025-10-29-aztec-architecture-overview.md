@@ -4,7 +4,7 @@ title: "Aztec: A Privacy-First Layer 2 for Ethereum"
 date:   2025-10-29
 lang: en
 locale: en-GB
-categories: blockchain ethereum zkp
+categories: blockchain ethereum ZKP
 tags: zk aztec circuit
 description: Aztec L2 enables private, composable smart contracts on Ethereum using zero-knowledge proofs and hybrid public/private state.
 image: /assets/article/blockchain/aztec/aztec-mindmap.png
