@@ -1,0 +1,22 @@
+@startuml
+title Anatomy of a camt.053 Bank-to-Customer Statement
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #E4F1F5
+  BorderColor #2C7A8C
+}
+skinparam ArrowColor #2C7A8C
+
+rectangle "camt.053 BankToCustomerStatement" as M {
+  rectangle "GrpHdr — Group Header\nmessage id, creation date/time" as G
+  rectangle "Stmt — Statement (1..n)\nid, account (Acct), servicer" as S
+  rectangle "Bal — Balances\nopening (OPBD), closing (CLBD)" as B
+  rectangle "Ntry — Entries (0..n)\namount, CdtDbtInd, status,\nbooking date, value date" as E
+  rectangle "NtryDtls > TxDtls\nreferences, parties, remittance info" as T
+}
+G -down-> S
+S -down-> B
+S -down-> E
+E -down-> T
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+title Anatomy of a catp message (withdrawal request shown)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #FBF0E4
+  BorderColor #C77D2E
+}
+skinparam ArrowColor #C77D2E
+
+rectangle "catp.001 ATMWithdrawalRequest" as M {
+  rectangle "Hdr (Header31)\nMsgFctn, PrtcolVrsn, XchgId,\nCreDtTm, InitgPty" as H
+  rectangle "Body, exactly one of:\nATMWdrwlReq (clear)  |  PrtctdATMWdrwlReq (encrypted)" as B
+  rectangle "SctyTrlr\nMAC computed over the message" as T
+}
+H -down-> B
+B -down-> T
+@enduml

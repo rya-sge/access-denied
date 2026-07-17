@@ -1,0 +1,29 @@
+@startuml
+title ATM cash withdrawal as a two-phase catp exchange
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #C77D2E
+  ParticipantBorderColor #A5641F
+  ParticipantFontColor white
+  LifeLineBorderColor #C77D2E
+  ArrowColor #C77D2E
+}
+skinparam noteBackgroundColor #FBF0E4
+skinparam noteBorderColor #C77D2E
+
+actor Cardholder as U
+participant "ATM" as A
+participant "ATM Manager\n(host)" as H
+
+U -> A : insert card, enter PIN, request cash
+A -> H : catp.001 ATMWithdrawalRequest\n(encrypted PIN and card data)
+H -> H : authorise (route to issuer)
+H -> A : catp.002 ATMWithdrawalResponse (approved)
+A -> U : dispense cash
+note over A : physical outcome now known\n(dispensed, partial, or failed)
+A -> H : catp.003 ATMWithdrawalCompletionAdvice\n(actual outcome)
+H -> A : catp.004 ATMWithdrawalCompletionAcknowledgement
+== on any unprocessable message ==
+H -> A : catp.005 ATMReject
+@enduml

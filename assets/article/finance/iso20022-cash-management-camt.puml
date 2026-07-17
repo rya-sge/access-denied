@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E4F1F5
+    LineColor #2C7A8C
+  }
+  :depth(1) {
+    BackgroundColor #2C7A8C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nCash Management (camt)
+** Account reporting
+*** 052 Account Report (intraday)
+*** 053 Statement (end of day)
+*** 054 Debit/Credit Notification
+*** 060 Account Reporting Request
+** Exceptions and Investigations
+*** 055 Customer Payment Cancellation
+*** 056 FI-to-FI Cancellation
+*** 087 Request to Modify Payment
+*** 029 Resolution of Investigation
+*** 110/111 Investigation Req/Rsp
+*** 026-039 Case management
+** Liquidity
+*** 050 Liquidity Credit Transfer
+*** 051 Liquidity Debit Transfer
+*** 057/058/059 Notification to Receive
+** Market infrastructure mgmt
+*** Get / Return / Modify / Delete / Create
+*** Accounts, Transactions, Limits
+*** Members, Reservations
+*** Standing orders, Business day
+** Intra-balance movement
+*** 066-085 (T2S cash)
+** Other domains
+*** 040-045 Fund cash forecast
+*** 061-063 Pay-in (CLS)
+*** 076/077/086 Billing
+*** 105/106 Charges
+*** 107-109 Cheques
+*** 113-116 Cash deposit/withdrawal
+** Standard
+*** MX replacing MT (940/942/900/910)
+*** camt.053.001.14 identifier
+@endmindmap

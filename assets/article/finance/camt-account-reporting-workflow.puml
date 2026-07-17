@@ -1,0 +1,24 @@
+@startuml
+title Account reporting: request, intraday, and end of day
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #2C7A8C
+  ParticipantBorderColor #215E6C
+  ParticipantFontColor white
+  LifeLineBorderColor #2C7A8C
+  ArrowColor #2C7A8C
+}
+skinparam noteBackgroundColor #E4F1F5
+skinparam noteBorderColor #2C7A8C
+
+participant "Customer\n(corporate)" as C
+participant "Account servicer\n(bank)" as B
+
+C -> B : camt.060 AccountReportingRequest
+B -> C : camt.052 Account Report (intraday)
+... during the day, as postings occur ...
+B -> C : camt.054 Debit/Credit Notification
+... end of business day ...
+B -> C : camt.053 Bank-to-Customer Statement
+@enduml

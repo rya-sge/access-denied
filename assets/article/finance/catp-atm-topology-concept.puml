@@ -1,0 +1,35 @@
+@startuml
+title Where the catp protocol sits
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #FBF0E4
+  BorderColor #C77D2E
+}
+skinparam package {
+  BackgroundColor #FEF9F3
+  BorderColor #C77D2E
+}
+skinparam ArrowColor #C77D2E
+skinparam noteBackgroundColor #FBF0E4
+skinparam noteBorderColor #C77D2E
+
+actor Cardholder as U
+
+package "ATM protocol (catp)" {
+  [ATM\n(terminal)] as ATM
+  [ATM Manager\n(host)] as HOST
+}
+
+package "Card scheme rails" {
+  [Acquirer] as ACQ
+  [Issuer] as ISS
+}
+
+U --> ATM : card + PIN
+ATM --> HOST : catp request / completion advice
+HOST --> ATM : catp response / acknowledgement
+HOST --> ACQ : authorisation (other rails)
+ACQ --> ISS : issuer authorisation
+note bottom of HOST : catm (ATM management) handles\nconfiguration and key download
+@enduml

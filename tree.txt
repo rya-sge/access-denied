@@ -268,3 +268,15 @@ _posts/2026-07-17-iso20022-collateral-management-colr.md
   assets/article/finance/iso20022-collateral-management-colr.puml                 (mindmap)
   assets/article/finance/colr-collateral-architecture-concept.puml                (concept, in-section)
   assets/article/finance/colr-margin-call-workflow.puml                           (workflow, in-section)
+
+_posts/2026-07-17-iso20022-atm-card-transactions-catp.md
+  assets/article/finance/iso20022-atm-card-transactions-catp.puml                 (mindmap)
+  assets/article/finance/catp-atm-topology-concept.puml                           (concept, in-section)
+  assets/article/finance/catp-message-anatomy-concept.puml                        (concept, in-section)
+  assets/article/finance/catp-withdrawal-workflow.puml                            (workflow, in-section)
+
+_posts/2026-07-17-iso20022-cash-management-camt.md
+  assets/article/finance/iso20022-cash-management-camt.puml                        (mindmap)
+  assets/article/finance/camt-statement-anatomy-concept.puml                       (concept, in-section)
+  assets/article/finance/camt-account-reporting-workflow.puml                      (workflow, in-section)
+  assets/article/finance/camt-cancellation-investigation-workflow.puml             (workflow, in-section)

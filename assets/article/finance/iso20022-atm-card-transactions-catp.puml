@@ -1,0 +1,55 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FBF0E4
+    LineColor #C77D2E
+  }
+  :depth(1) {
+    BackgroundColor #C77D2E
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nATM Card Transactions (catp)
+** Actors
+*** ATM (terminal)
+*** ATM Manager / host
+*** Acquirer and issuer (beyond)
+** Message anatomy
+*** Header (MsgFctn, XchgId)
+*** Clear or Protected body
+*** Security trailer (MAC)
+** Interaction pattern
+*** Request / Response (authorise)
+*** Completion Advice / Ack (confirm)
+*** Two-phase: authorise then confirm
+** Withdrawal
+*** 001 Request
+*** 002 Response
+*** 003 Completion Advice
+*** 004 Completion Ack
+** Inquiry
+*** 006 Request
+*** 007 Response
+** Generic completion
+*** 008 Completion Advice
+*** 009 Completion Ack
+** PIN management
+*** 010 Request
+*** 011 Response
+** Deposit
+*** 012 Request
+*** 013 Response
+*** 014 Completion Advice
+*** 015 Completion Ack
+** Transfer
+*** 016 Request
+*** 017 Response
+** Error handling
+*** 005 ATM Reject
+** Security
+*** Envelope encryption of body
+*** MAC authentication
+*** Encrypted PIN block
+@endmindmap

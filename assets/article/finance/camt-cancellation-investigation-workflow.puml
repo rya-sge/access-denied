@@ -1,0 +1,28 @@
+@startuml
+title Payment cancellation and investigation
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #2C7A8C
+  ParticipantBorderColor #215E6C
+  ParticipantFontColor white
+  LifeLineBorderColor #2C7A8C
+  ArrowColor #2C7A8C
+}
+skinparam noteBackgroundColor #E4F1F5
+skinparam noteBorderColor #2C7A8C
+
+participant "Debtor" as D
+participant "Debtor agent\n(bank A)" as A
+participant "Creditor agent\n(bank B)" as B
+
+D -> A : camt.055 CustomerPaymentCancellationRequest
+A -> B : camt.056 FIToFIPaymentCancellationRequest
+alt funds recoverable
+  B -> A : camt.029 ResolutionOfInvestigation (accepted)
+else further enquiry needed
+  A -> B : camt.110 InvestigationRequest
+  B -> A : camt.111 InvestigationResponse
+  B -> A : camt.029 ResolutionOfInvestigation
+end
+@enduml
