@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F1ECF9
+    LineColor #6E4FA8
+  }
+  :depth(1) {
+    BackgroundColor #6E4FA8
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nAcquirer to Issuer Card Transactions (cain)
+** Role
+*** Acquirer to issuer legs
+*** ISO 20022 successor to ISO 8583
+*** Complements caaa (terminal) and catp (ATM)
+** Core lifecycle
+*** 001/002 Authorisation
+*** 003/004 Financial (clearing)
+*** 005/006 Reversal
+** Disputes
+*** 021/022 Retrieval
+*** 014/015 Retrieval Fulfilment
+*** 027/028 Chargeback
+** Supporting
+*** 016/017 Inquiry Verification
+*** 025/026 Addendum
+*** 020 Amendment
+*** 023/024 Card Management
+** Message shape
+*** Hdr (Header72, MsgFctn)
+*** Transaction characteristics, amounts
+*** Acquirer, context
+** Security
+*** Protected PAN / PIN / track data
+*** Message authentication
+@endmindmap

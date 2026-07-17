@@ -1,0 +1,23 @@
+@startuml
+title Where cain sits in the four-corner card model
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #F1ECF9
+  BorderColor #6E4FA8
+}
+skinparam ArrowColor #6E4FA8
+skinparam noteBackgroundColor #F1ECF9
+skinparam noteBorderColor #6E4FA8
+
+actor Cardholder as CH
+[Acceptor\n(merchant / ATM)] as ACC
+[Acquirer] as ACQ
+[Issuer] as ISS
+
+CH --> ACC : presents card
+ACC --> ACQ : caaa (POS) / catp (ATM)
+ACQ --> ISS : cain messages
+ISS --> CH : holds the account
+note bottom of ACQ : cain carries the acquirer-to-issuer legs\n(often via a card scheme network)
+@enduml

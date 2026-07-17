@@ -1,0 +1,21 @@
+@startuml
+title Anatomy of a semt.002 securities balance (holdings) report
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EFF3E3
+  BorderColor #6E8B2E
+}
+skinparam ArrowColor #6E8B2E
+
+rectangle "semt.002 SecuritiesBalanceCustodyReport" as M {
+  rectangle "Pgntn — Pagination" as P
+  rectangle "StmtGnlDtls — Statement general details\nreport id, dates, frequency" as S
+  rectangle "Account owner + Safekeeping account" as A
+  rectangle "Balance per security (ISIN)\nquantity, price, market value" as B
+  rectangle "Sub-balances\nblocked, pledged, on loan, ..." as SB
+}
+S -down-> A
+A -down-> B
+B -down-> SB
+@enduml

@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EFF3E3
+    LineColor #6E8B2E
+  }
+  :depth(1) {
+    BackgroundColor #6E8B2E
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSecurities Management (semt)
+** Holdings statements
+*** 002 Custody Balance Report
+*** 003 Accounting Balance Report
+*** 024 Total Portfolio Valuation
+*** 041/042 Balance Transparency
+** Transaction statements
+*** 017 Transaction Posting Report
+*** 018 Transaction Pending Report
+*** 019 Allegement Report
+*** 022 Audit Trail Report
+*** 044 Transaction Penalties (CSDR)
+** Intra-position movement
+*** 013 Instruction
+*** 014 Status Advice
+*** 015 Confirmation
+*** 016 Posting Report
+** Investment fund
+*** 006 Statement of Fund Transactions
+** Queries and responses
+*** 021 Statement Query
+*** 025/040 Account Position
+*** 026/027 Transaction
+*** 030/031 Conditions Modification
+*** 032/033 Cancellation Request
+** Housekeeping
+*** 001 Message Rejection
+*** 020 Cancellation Advice
+*** 023 End of Process
+@endmindmap

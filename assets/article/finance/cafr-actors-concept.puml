@@ -1,0 +1,27 @@
+@startuml
+title Fraud reporting and disposition between card parties (cafr)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #FBEAEA
+  BorderColor #B23A3A
+}
+skinparam package {
+  BackgroundColor #FDF4F4
+  BorderColor #B23A3A
+}
+skinparam ArrowColor #B23A3A
+skinparam noteBackgroundColor #FBEAEA
+skinparam noteBorderColor #B23A3A
+
+package "Four-corner card model" {
+  [Acquirer] as ACQ
+  [Issuer] as ISS
+}
+[Card scheme /\nfraud system] as SCH
+
+ISS --> SCH : cafr.001 report fraud
+ACQ --> SCH : cafr.001 report fraud
+SCH --> ISS : cafr.002 / cafr.003 / cafr.004
+note bottom of SCH : the scheme collates reports and\ncommunicates the disposition
+@enduml

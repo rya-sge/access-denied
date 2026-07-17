@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FBEAEA
+    LineColor #B23A3A
+  }
+  :depth(1) {
+    BackgroundColor #B23A3A
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nFraud Reporting and Disposition (cafr)
+** Purpose
+*** Report card fraud between parties
+*** Communicate disposition / outcome
+*** Feed scheme fraud databases
+** Actors
+*** Acquirer
+*** Issuer
+*** Card scheme / fraud system
+** Reporting flow
+*** 001 Fraud Reporting Initiation
+*** 002 Fraud Reporting Response
+** Disposition flow
+*** 003 Fraud Disposition Initiation
+*** 004 Fraud Disposition Response
+** Message content
+*** Hdr (Header72)
+*** Reported fraud (RptdFrd)
+*** Fraudulent transaction data
+** Security
+*** Protected sensitive data
+*** Message authentication
+@endmindmap

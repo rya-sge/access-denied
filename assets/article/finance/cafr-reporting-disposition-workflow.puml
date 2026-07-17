@@ -1,0 +1,23 @@
+@startuml
+title Fraud reporting then disposition
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #B23A3A
+  ParticipantBorderColor #8C2C2C
+  ParticipantFontColor white
+  LifeLineBorderColor #B23A3A
+  ArrowColor #B23A3A
+}
+skinparam noteBackgroundColor #FBEAEA
+skinparam noteBorderColor #B23A3A
+
+participant "Reporting party\n(issuer / acquirer)" as R
+participant "Receiving party\n(scheme / counterparty)" as V
+
+R -> V : cafr.001 FraudReportingInitiation\n(reported fraud + fraudulent transaction data)
+V -> R : cafr.002 FraudReportingResponse (acknowledged)
+... investigation and decision ...
+V -> R : cafr.003 FraudDispositionInitiation\n(classification and action taken)
+R -> V : cafr.004 FraudDispositionResponse
+@enduml

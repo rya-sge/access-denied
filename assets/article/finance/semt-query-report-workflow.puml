@@ -1,0 +1,27 @@
+@startuml
+title Requesting and receiving securities statements
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #6E8B2E
+  ParticipantBorderColor #566E22
+  ParticipantFontColor white
+  LifeLineBorderColor #6E8B2E
+  ArrowColor #6E8B2E
+}
+skinparam noteBackgroundColor #EFF3E3
+skinparam noteBorderColor #6E8B2E
+
+participant "Account owner" as O
+participant "Account servicer\n(custodian / CSD)" as C
+
+O -> C : semt.021 Securities Statement Query
+C -> O : semt.002 Custody Balance Report (holdings)
+C -> O : semt.017 Transaction Posting Report
+C -> O : semt.018 Transaction Pending Report
+... reporting cycle ...
+C -> O : semt.044 Transaction Penalties Report (CSDR)
+opt query cannot be processed
+  C -> O : semt.001 Securities Message Rejection
+end
+@enduml

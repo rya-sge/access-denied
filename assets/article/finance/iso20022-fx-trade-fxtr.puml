@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAECF7
+    LineColor #4B57A8
+  }
+  :depth(1) {
+    BackgroundColor #4B57A8
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nForeign Exchange Trade (fxtr)
+** Scope
+*** FX post-trade
+*** Spot, forward, swap, NDF
+*** Counterparties, matching platform, CLS
+** Trade instruction and status
+*** 014 Trade Instruction
+*** 015 Amendment
+*** 016 Cancellation
+*** 013 Withdrawal Notification
+*** 008 Status Notification
+*** 017 Status and Details Notification
+*** 030 Bulk Status Notification
+** Trade capture
+*** 031 Capture Report
+*** 032 Capture Report Request
+*** 033 Capture Report Acknowledgement
+** Confirmation
+*** 034 Confirmation Request
+*** 035 Confirmation Amendment Request
+*** 036 Confirmation Cancellation Request
+*** 037 Confirmation Status Advice
+*** 038 Status Advice Acknowledgement
+** Net settlement
+*** camt.088 Net Report
+@endmindmap

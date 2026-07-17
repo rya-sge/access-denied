@@ -1,0 +1,29 @@
+@startuml
+title FX trade capture, confirmation, and status
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #4B57A8
+  ParticipantBorderColor #39447F
+  ParticipantFontColor white
+  LifeLineBorderColor #4B57A8
+  ArrowColor #4B57A8
+}
+skinparam noteBackgroundColor #EAECF7
+skinparam noteBorderColor #4B57A8
+
+participant "Party / submitter" as P
+participant "FX matching and\nconfirmation service" as M
+
+P -> M : fxtr.032 Trade Capture Report Request
+M -> P : fxtr.031 Trade Capture Report
+M -> P : fxtr.033 Capture Report Acknowledgement
+P -> M : fxtr.014 Trade Instruction
+opt amend or cancel
+  P -> M : fxtr.015 Amendment / fxtr.016 Cancellation
+end
+M -> P : fxtr.008 Status Notification
+M -> P : fxtr.017 Status and Details Notification
+M -> P : fxtr.037 Confirmation Status Advice
+P -> M : fxtr.038 Status Advice Acknowledgement
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+title FX post-trade flow and where the fxtr messages fit
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #EAECF7
+  BorderColor #4B57A8
+}
+skinparam package {
+  BackgroundColor #F5F6FC
+  BorderColor #4B57A8
+}
+skinparam ArrowColor #4B57A8
+
+[Counterparty A] as A
+[Counterparty B] as B
+[Matching and\nconfirmation service] as M
+[Settlement\n(CLS / correspondent)] as S
+
+A --> M : fxtr.014 Trade Instruction
+B --> M : fxtr.014 Trade Instruction
+M --> A : fxtr.017 Status and Details
+M --> B : fxtr.037 Confirmation Status Advice
+M --> S : matched trades
+S --> A : camt.088 Net Report
+@enduml

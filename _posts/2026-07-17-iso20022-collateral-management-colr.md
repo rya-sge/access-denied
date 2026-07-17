@@ -127,7 +127,14 @@ Everything above assumes the two counterparties administer collateral between th
 
 ![Component view of bilateral and triparty collateral flows]({{site.url_complet}}/assets/article/finance/colr-collateral-architecture-concept.png)
 
-The `colr.019` to `colr.024` messages plus `reda.074` serve this model. A party sends a `TripartyCollateralTransactionInstruction` (`colr.019`) to open or adjust a collateral transaction, and the agent replies with a `TripartyCollateralTransactionInstructionProcessingStatusAdvice` (`colr.020`). Where one side has instructed and the agent needs the other to match it, a `TripartyCollateralAllegementNotification` (`colr.021`) alleges the transaction against that counterparty, and a `TripartyCollateralAllegementNotificationCancellationAdvice` (`colr.024`) withdraws the allegement if needed. The agent reports holdings and exposure through the `TripartyCollateralAndExposureReport` (`colr.022`) and the state of individual transactions through the `TripartyCollateralStatusAdvice` (`colr.023`). Finally, `reda.074`, a `TripartyCollateralUnilateralRemovalRequest`, lets a party request removal of collateral on its own initiative. The triparty set carries pagination (`Pgntn`) and general parameters (`GnlParams`) because an agent's reports can span many positions across many clients.
+The `colr.019` to `colr.024` messages plus `reda.074` serve this model, each covering one part of the exchange with the agent:
+
+- **Instruct.** A party sends a `TripartyCollateralTransactionInstruction` (`colr.019`) to open or adjust a collateral transaction, and the agent replies with a `TripartyCollateralTransactionInstructionProcessingStatusAdvice` (`colr.020`).
+- **Allege.** Where one side has instructed and the agent needs the other to match it, a `TripartyCollateralAllegementNotification` (`colr.021`) alleges the transaction against that counterparty, and a `TripartyCollateralAllegementNotificationCancellationAdvice` (`colr.024`) withdraws the allegement if needed.
+- **Report.** The agent reports holdings and exposure through the `TripartyCollateralAndExposureReport` (`colr.022`) and the state of individual transactions through the `TripartyCollateralStatusAdvice` (`colr.023`).
+- **Remove.** Finally, `reda.074`, a `TripartyCollateralUnilateralRemovalRequest`, lets a party request removal of collateral on its own initiative.
+
+The triparty set carries pagination (`Pgntn`) and general parameters (`GnlParams`) because an agent's reports can span many positions across many clients.
 
 ## Conclusion
 

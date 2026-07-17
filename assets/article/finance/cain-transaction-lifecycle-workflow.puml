@@ -1,0 +1,33 @@
+@startuml
+title Card transaction and dispute lifecycle expressed with cain messages
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #6E4FA8
+  ParticipantBorderColor #573E86
+  ParticipantFontColor white
+  LifeLineBorderColor #6E4FA8
+  ArrowColor #6E4FA8
+}
+skinparam noteBackgroundColor #F1ECF9
+skinparam noteBorderColor #6E4FA8
+
+participant "Acquirer" as A
+participant "Issuer" as I
+
+A -> I : cain.001 AuthorisationInitiation
+I -> A : cain.002 AuthorisationResponse (approve/decline)
+A -> I : cain.003 FinancialInitiation (clearing)
+I -> A : cain.004 FinancialResponse
+opt correction
+  A -> I : cain.005 ReversalInitiation
+  I -> A : cain.006 ReversalResponse
+end
+== later: cardholder disputes the transaction ==
+I -> A : cain.021 RetrievalInitiation (request record)
+A -> I : cain.022 RetrievalResponse
+A -> I : cain.014 RetrievalFulfilmentInitiation (document)
+I -> A : cain.015 RetrievalFulfilmentResponse
+I -> A : cain.027 ChargeBackInitiation
+A -> I : cain.028 ChargeBackResponse
+@enduml

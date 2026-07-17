@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSecurities Settlement (sese)
+** Settlement transaction
+*** 023 Settlement Instruction
+*** 024 Status Advice
+*** 025 Confirmation
+*** 026 Reversal Advice
+*** 032 Generation Notification
+** Matching and allegement
+*** 028 Allegement Notification
+*** 029 Allegement Removal
+** Modify and cancel
+*** 030/031 Conditions Modification
+*** 038/039 Modification Request
+*** 020/027 Cancellation Request
+*** 040 Counterparty Response
+** Securities financing
+*** 033 Financing Instruction
+*** 034 Status Advice
+*** 035 Confirmation
+*** 036 Modification
+** Regulatory
+*** 041/042 Buy-in Regulatory Advice (CSDR)
+** Transfers
+*** 001-011 Transfer In/Out
+*** 012-014 Portfolio Transfer
+*** 037/043 Portfolio Transfer Notif/Completion
+*** 018/019 Account Holding Information
+** Model
+*** Matching at the CSD
+*** DvP / FoP, intended settlement date
+*** T2S settlement
+@endmindmap
