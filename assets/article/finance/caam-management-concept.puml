@@ -1,0 +1,22 @@
+@startuml
+title ATM management plane (caam)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #DEEEF0
+  BorderColor #1F7A8C
+}
+skinparam ArrowColor #1F7A8C
+skinparam noteBackgroundColor #DEEEF0
+skinparam noteBorderColor #1F7A8C
+
+[ATM] as ATM
+[ATM manager\n(host)] as H
+
+H --> ATM : caam.002 Device Control / caam.014 Configuration Control
+ATM --> H : caam.001 Device Report / caam.013 Configuration Report
+H --> ATM : caam.003 Key Download Request
+ATM --> H : caam.004 Key Download Response
+ATM --> H : caam.009 Reconciliation Advice
+note bottom of H : caam manages the machine;\ncatp carries its transactions
+@enduml

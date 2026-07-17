@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #DEEEF0
+    LineColor #1F7A8C
+  }
+  :depth(1) {
+    BackgroundColor #1F7A8C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nATM Management (caam)
+** Role
+*** Manage the ATM, not its transactions
+*** Sibling of catp (ATM transactions)
+*** ATM to ATM manager
+** Device
+*** 001 Device Report
+*** 002 Device Control
+** Keys
+*** 003 Key Download Request
+*** 004 Key Download Response
+** Diagnostic
+*** 005 Diagnostic Request
+*** 006 Diagnostic Response
+** Host to ATM
+*** 007 Host to ATM Request
+*** 008 Acknowledgement
+** Reconciliation
+*** 009/010 Advice / Acknowledgement
+*** 015/016 Request / Response
+** Exception
+*** 011 Exception Advice
+*** 012 Exception Acknowledgement
+** Configuration
+*** 013 Configuration Report
+*** 014 Configuration Control
+@endmindmap

@@ -1,0 +1,27 @@
+@startuml
+title Maintaining a security's reference data (reda)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #4E7A5C
+  ParticipantBorderColor #3C5E48
+  ParticipantFontColor white
+  LifeLineBorderColor #4E7A5C
+  ArrowColor #4E7A5C
+}
+skinparam noteBackgroundColor #E8F0E9
+skinparam noteBorderColor #4E7A5C
+
+participant "Data maintainer" as M
+participant "Reference data\nplatform" as R
+participant "Data consumer" as C
+
+M -> R : reda.006 Security Creation Request
+R -> M : reda.008 Security Creation Status Advice
+R -> C : reda.009 Security Activity Advice
+C -> R : reda.010 Security Query
+R -> C : reda.012 Security Report
+... later ...
+M -> R : reda.007 Security Maintenance Request
+R -> M : reda.029 Security Maintenance Status Advice
+@enduml

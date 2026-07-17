@@ -154,11 +154,11 @@ The lifecycle below strings the `secl` messages together in the order a member t
 - **BuyInResponse** (`secl.008`, member → CCP) is the member's reply and the only member-to-CCP message in the set. It can quantify the position with `Unit`, `FaceAmt` or `AmtsdVal`, together with `UnitCcy`, `QtdCcy`, `XchgRate` and a `RsltgAmt`, typically to signal a late delivery that cures the fail or to acknowledge the buy-in.
 - **BuyInConfirmation** (`secl.009`, CCP → member) reports the outcome once the CCP has executed in the market, carrying the `BuyInDtls` and the `SttlmAmt` the member now owes.
 
-The amount charged back is, in essence, the market cost of sourcing the securities plus the price difference against the original trade:
+The amount charged back, the buy-in cost $$C_{\text{buyin}}$$, is in essence the market cost of sourcing the securities plus the price difference against the original trade:
 
 $$
 \begin{aligned}
-\text{Cost}_{\text{buy-in}} = Q \cdot (P_{\text{market}} - P_{\text{trade}}) + \text{fees and penalties}
+C_{\text{buyin}} = Q \cdot (P_{\text{market}} - P_{\text{trade}}) + \text{fees and penalties}
 \end{aligned}
 $$
 

@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E7EAEE
+    LineColor #4A5A70
+  }
+  :depth(1) {
+    BackgroundColor #4A5A70
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nTerminal Management (catm)
+** Role
+*** Terminal management system (TMS)
+*** Configure and maintain POI terminals
+*** Manage keys and certificates
+** Status and plan
+*** 001 Status Report
+*** 002 Management Plan Replacement
+** Configuration
+*** 003 Acceptor Configuration Update
+*** 004 Terminal Management Rejection
+** Maintenance
+*** 005 Maintenance Delegation Request
+*** 006 Maintenance Delegation Response
+** Certificates
+*** 007 Certificate Management Request
+*** 008 Certificate Management Response
+@endmindmap

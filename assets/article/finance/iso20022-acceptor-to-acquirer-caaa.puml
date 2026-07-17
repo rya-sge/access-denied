@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FBF0E4
+    LineColor #C77D2E
+  }
+  :depth(1) {
+    BackgroundColor #C77D2E
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nAcceptor to Acquirer (caaa)
+** Role
+*** Merchant terminal to acquirer
+*** Card acceptance (POS)
+*** nexo acquirer protocol
+** Authorisation
+*** 001 Authorisation Request
+*** 002 Authorisation Response
+** Completion
+*** 003 Completion Advice
+*** 004 Completion Advice Response
+** Cancellation
+*** 005/006 Request / Response
+*** 007/008 Advice / Response
+** Reconciliation and batch
+*** 009/010 Reconciliation
+*** 011/012 Batch Transfer
+*** 026/027 Batch File Exchange
+** Currency conversion (DCC)
+*** 016/017 Request / Response
+*** 018/019 Advice / Response
+** Other
+*** 013/014 Diagnostic
+*** 020/021 Transaction Advice
+*** 022/023 Non-Financial
+*** 024/025 Transaction Log Report
+*** 015 Rejection
+@endmindmap

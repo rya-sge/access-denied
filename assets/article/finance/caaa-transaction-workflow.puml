@@ -1,0 +1,30 @@
+@startuml
+title A card acceptance transaction (caaa)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #C77D2E
+  ParticipantBorderColor #A5641F
+  ParticipantFontColor white
+  LifeLineBorderColor #C77D2E
+  ArrowColor #C77D2E
+}
+skinparam noteBackgroundColor #FBF0E4
+skinparam noteBorderColor #C77D2E
+
+participant "POI / acceptor" as P
+participant "Acquirer" as A
+
+P -> A : caaa.001 Authorisation Request
+A -> P : caaa.002 Authorisation Response (approve/decline)
+note over P : goods handed over
+P -> A : caaa.003 Completion Advice (final amount)
+A -> P : caaa.004 Completion Advice Response
+opt cancellation
+  P -> A : caaa.005 Cancellation Request
+  A -> P : caaa.006 Cancellation Response
+end
+... end of day ...
+P -> A : caaa.009 Reconciliation Request
+A -> P : caaa.010 Reconciliation Response
+@enduml

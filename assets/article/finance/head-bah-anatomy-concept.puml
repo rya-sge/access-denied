@@ -1,0 +1,16 @@
+@startuml
+title The BAH wraps a business message
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #E9E9EC
+  BorderColor #3F3F4A
+}
+skinparam ArrowColor #3F3F4A
+
+rectangle "Business message exchange" as OUT {
+  rectangle "head.001 Business Application Header\nFr, To, BizMsgIdr, MsgDefIdr, CreDt,\nBizSvc, Prty, Sgntr, Rltd" as BAH
+  rectangle "Business message (the payload)\ne.g. pacs.008, camt.053, sese.023" as MSG
+}
+BAH -down-> MSG : accompanies and describes
+@enduml

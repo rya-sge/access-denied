@@ -1,0 +1,27 @@
+@startuml
+title Registering parties, assigning invoices, and financing
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #8A6D3B
+  ParticipantBorderColor #6E5730
+  ParticipantFontColor white
+  LifeLineBorderColor #8A6D3B
+  ArrowColor #8A6D3B
+}
+skinparam noteBackgroundColor #F0E9E1
+skinparam noteBorderColor #8A6D3B
+
+participant "Supplier" as S
+participant "Bank / financier" as B
+
+S -> B : tsin.009 Party Registration and Guarantee Request
+B -> S : tsin.010 Status / tsin.012 Acknowledgement
+S -> B : tsin.006 Invoice Assignment Request
+B -> S : tsin.007 Assignment Status
+S -> B : tsin.001 Invoice Financing Request
+B -> S : tsin.002 Financing Request Status
+opt withdraw
+  S -> B : tsin.003 Financing Cancellation Request
+end
+@enduml

@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E8F0E9
+    LineColor #4E7A5C
+  }
+  :depth(1) {
+    BackgroundColor #4E7A5C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nReference Data (reda)
+** Prices
+*** 001 Price Report
+*** 004 Fund Reference Data Report
+** Securities / instruments
+*** 006 Security Creation Request
+*** 007 Maintenance Request
+*** 012 Security Report
+*** 010 Query
+** Parties
+*** 014 Party Creation Request
+*** 017 Party Report
+*** 042/043 Audit Trail
+** Securities accounts
+*** 018 Account Creation Request
+*** 021 Account Report
+*** 036/037 Audit Trail
+** Collateral and eligibility
+*** 024 Collateral Value Creation
+*** 025 Eligible Securities Creation
+*** 027 Close Link Creation
+** Links
+*** 045 Security CSD Link
+*** 049 Account Link
+** Standing settlement instructions
+*** 056 SSI
+*** 058 SSI Status Advice
+** Other
+*** 060/061 Netting Cut-Off
+*** 064/065 Calendar
+*** 066-073 Request to Pay enrolment
+@endmindmap

@@ -1,0 +1,38 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FCEBE3
+    LineColor #C85C3C
+  }
+  :depth(1) {
+    BackgroundColor #C85C3C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSale to POI (casp)
+** Role
+*** Cash register to payment terminal
+*** Sale system drives the POI
+*** nexo retailer protocol
+** Actors
+*** Sale system (ECR / till)
+*** POI (Point of Interaction)
+** Service
+*** 001 Service Request (payment, refund)
+*** 002 Service Response
+** Session and admin
+*** 005/006 Session Management
+*** 007/008 Administrative
+*** 003/004 Reconciliation
+** Devices
+*** 016/017 Device Request/Response
+*** print, input, display
+** Reporting and control
+*** 009/010 Report
+*** 011 Abort
+*** 012 Event Notification
+*** 014/015 Message Status
+*** 013 Message Rejection
+@endmindmap

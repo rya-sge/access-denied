@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F0E9E1
+    LineColor #8A6D3B
+  }
+  :depth(1) {
+    BackgroundColor #8A6D3B
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nTrade Services Management (tsmt)
+** Role
+*** Bank Payment Obligation (BPO)
+*** Trade Services Utility (TSU)
+*** Bank-to-bank via a matching engine
+** Baseline
+*** 019 Initial Baseline Submission
+*** 010 Baseline Match Report
+*** 011 Baseline Report
+*** 009 Amendment Request
+*** 012 Re-Submission
+** Data set matching
+*** 014 Data Set Submission
+*** 013 Data Set Match Report
+*** 020/022 Mismatch Acceptance / Rejection
+** Status management
+*** 025/026 Status Change
+*** 031-036 Status Extension
+*** 040 Time Out Notification
+** Reports
+*** 002 Activity Report
+*** 041 Transaction Report
+*** 018 Full Push-Through Report
+*** 015 Delta Report
+** Other
+*** 044 Intent to Pay
+*** 049 Role and Baseline Acceptance
+*** 053 Invoice Payment Reconciliation
+@endmindmap

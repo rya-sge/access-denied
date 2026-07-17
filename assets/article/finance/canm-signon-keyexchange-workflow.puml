@@ -1,0 +1,25 @@
+@startuml
+title Sign-on, key exchange, and keep-alive
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #1F7A8C
+  ParticipantBorderColor #175E6B
+  ParticipantFontColor white
+  LifeLineBorderColor #1F7A8C
+  ArrowColor #1F7A8C
+}
+skinparam noteBackgroundColor #DEEEF0
+skinparam noteBorderColor #1F7A8C
+
+participant "Terminal" as T
+participant "Acquirer host" as H
+
+T -> H : canm.001 Network Management Initiation (sign-on)
+H -> T : canm.002 Network Management Response (accepted)
+T -> H : canm.003 Key Exchange Initiation
+H -> T : canm.004 Key Exchange Response (new keys)
+... periodically ...
+T -> H : canm.001 Network Management Initiation (echo test)
+H -> T : canm.002 Network Management Response
+@enduml

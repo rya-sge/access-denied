@@ -1,0 +1,26 @@
+@startuml
+title The BPO model: two banks and a matching engine (tsmt)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #F0E9E1
+  BorderColor #8A6D3B
+}
+skinparam ArrowColor #8A6D3B
+skinparam noteBackgroundColor #F0E9E1
+skinparam noteBorderColor #8A6D3B
+
+[Buyer] as BUY
+[Buyer bank\n(obligor)] as BB
+[Matching engine\n(TSU)] as TSU
+[Seller bank\n(recipient)] as SB
+[Seller] as SEL
+
+BUY --> BB : purchase order data
+BB --> TSU : tsmt.019 Initial Baseline Submission
+SB --> TSU : tsmt.019 Initial Baseline Submission
+TSU --> BB : tsmt.010 Baseline Match Report
+SEL --> SB : ships goods, submits data
+SB --> TSU : tsmt.014 Data Set Submission
+TSU --> BB : tsmt.013 Data Set Match Report
+@enduml

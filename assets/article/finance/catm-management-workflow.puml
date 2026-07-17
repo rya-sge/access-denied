@@ -1,0 +1,26 @@
+@startuml
+title A terminal management exchange (catm)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #4A5A70
+  ParticipantBorderColor #374151
+  ParticipantFontColor white
+  LifeLineBorderColor #4A5A70
+  ArrowColor #4A5A70
+}
+skinparam noteBackgroundColor #E7EAEE
+skinparam noteBorderColor #4A5A70
+
+participant "POI" as P
+participant "TMS" as T
+
+P -> T : catm.001 Status Report (contact the TMS)
+T -> P : catm.002 Management Plan Replacement (what to do next)
+T -> P : catm.003 Acceptor Configuration Update
+T -> P : catm.007 Certificate Management Request
+P -> T : catm.008 Certificate Management Response
+opt cannot apply
+  P -> T : catm.004 Terminal Management Rejection
+end
+@enduml

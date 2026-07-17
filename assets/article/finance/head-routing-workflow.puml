@@ -1,0 +1,23 @@
+@startuml
+title How the BAH routes a message through an intermediary
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #3F3F4A
+  ParticipantBorderColor #2C2C34
+  ParticipantFontColor white
+  LifeLineBorderColor #3F3F4A
+  ArrowColor #3F3F4A
+}
+skinparam noteBackgroundColor #E9E9EC
+skinparam noteBorderColor #3F3F4A
+
+participant "Sender" as S
+participant "Intermediary\n(routing only)" as I
+participant "Receiver" as R
+
+S -> I : BAH (Fr, To, MsgDefIdr) + business message
+note over I : reads only the BAH to route;\nneed not parse the payload
+I -> R : forwards BAH + business message
+R -> R : validates Sgntr, reads MsgDefIdr,\nthen processes the payload
+@enduml

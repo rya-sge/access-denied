@@ -1,0 +1,28 @@
+@startuml
+title A card payment driven from the sale system (casp)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #C85C3C
+  ParticipantBorderColor #A2472C
+  ParticipantFontColor white
+  LifeLineBorderColor #C85C3C
+  ArrowColor #C85C3C
+}
+skinparam noteBackgroundColor #FCEBE3
+skinparam noteBorderColor #C85C3C
+
+participant "Sale system" as S
+participant "POI (terminal)" as P
+
+S -> P : casp.005 Session Management Request (login)
+P -> S : casp.006 Session Management Response
+S -> P : casp.001 Service Request (payment, amount)
+note over P : POI authorises with the acquirer\n(cain), then completes
+P -> S : casp.002 Service Response (approved)
+S -> P : casp.016 Device Request (print receipt)
+P -> S : casp.017 Device Response
+... end of day ...
+S -> P : casp.003 Reconciliation Request
+P -> S : casp.004 Reconciliation Response (totals)
+@enduml

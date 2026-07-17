@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F0E9E1
+    LineColor #8A6D3B
+  }
+  :depth(1) {
+    BackgroundColor #8A6D3B
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nTrade Services Initiation (tsin)
+** Role
+*** Corporate to bank front end
+*** Supply chain finance
+*** Feeds trade services (tsrv)
+** Invoice financing
+*** 001 Financing Request
+*** 002 Financing Request Status
+*** 003 Cancellation Request
+** Invoice assignment (factoring)
+*** 006 Assignment Request
+*** 007 Assignment Status
+*** 008 Assignment Notification
+*** 013 Assignment Acknowledgement
+** Party registration and guarantee
+*** 009 Registration and Guarantee Request
+*** 010 Status
+*** 011 Notification
+*** 012 Acknowledgement
+** Undertaking
+*** 005 Undertaking Application
+*** applies for a guarantee (tsrv)
+@endmindmap

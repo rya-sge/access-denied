@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EBDD
+    LineColor #9C7A3C
+  }
+  :depth(1) {
+    BackgroundColor #9C7A3C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSettlement Reporting (casr)
+** Purpose
+*** Report card settlement positions
+*** Between card parties
+*** Totals and net amounts
+** Messages
+*** 001 Settlement Reporting Initiation
+*** 002 Settlement Reporting Response
+** Message shape
+*** Hdr (Header72)
+*** Settlement data
+*** Amounts and currency
+** Security
+*** Protected data
+*** Message authentication
+** Family
+*** Sits with cain, cafc, canm
+@endmindmap

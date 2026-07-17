@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E9E9EC
+    LineColor #3F3F4A
+  }
+  :depth(1) {
+    BackgroundColor #3F3F4A
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nBusiness Application Header (head)
+** Role
+*** Routing envelope for a message
+*** Separates routing from payload
+*** head.001 BAH, head.002 File Header
+** Routing fields
+*** Fr — From (sender)
+*** To — receiver
+*** BizMsgIdr — Business Message Identifier
+*** MsgDefIdr — Message Definition Identifier
+*** CreDt — Creation date-time
+** Context fields
+*** BizSvc — Business Service
+*** MktPrctc — Market Practice
+*** Prty — Priority
+*** BizPrcgDt — Business Processing Date
+** Integrity and linking
+*** Sgntr — Signature
+*** Rltd — Related (prior header)
+*** CpyDplct / PssblDplct
+** Business File Header
+*** head.002 groups many messages
+*** PyldDesc — Payload Description
+@endmindmap

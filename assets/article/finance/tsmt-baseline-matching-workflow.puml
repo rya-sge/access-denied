@@ -1,0 +1,31 @@
+@startuml
+title Baseline establishment and data set matching (tsmt)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #8A6D3B
+  ParticipantBorderColor #6E5730
+  ParticipantFontColor white
+  LifeLineBorderColor #8A6D3B
+  ArrowColor #8A6D3B
+}
+skinparam noteBackgroundColor #F0E9E1
+skinparam noteBorderColor #8A6D3B
+
+participant "Buyer bank" as BB
+participant "Matching engine\n(TSU)" as T
+participant "Seller bank" as SB
+
+BB -> T : tsmt.019 Initial Baseline Submission
+SB -> T : tsmt.019 Initial Baseline Submission
+T -> BB : tsmt.010 Baseline Match Report (matched)
+T -> SB : tsmt.010 Baseline Match Report (matched)
+note over T : the BPO is now established
+SB -> T : tsmt.014 Data Set Submission (invoice, transport)
+T -> BB : tsmt.013 Data Set Match Report
+alt data matches baseline
+  BB -> T : tsmt.025 Status Change Notification (obligation due)
+else mismatch
+  BB -> T : tsmt.022 Mismatch Rejection
+end
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title Managing an ATM: keys, configuration, reconciliation
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #1F7A8C
+  ParticipantBorderColor #175E6B
+  ParticipantFontColor white
+  LifeLineBorderColor #1F7A8C
+  ArrowColor #1F7A8C
+}
+skinparam noteBackgroundColor #DEEEF0
+skinparam noteBorderColor #1F7A8C
+
+participant "ATM" as A
+participant "ATM manager" as H
+
+A -> H : caam.001 Device Report (status)
+H -> A : caam.003 Key Download Request
+A -> H : caam.004 Key Download Response
+H -> A : caam.014 Configuration Control
+A -> H : caam.013 Configuration Report
+opt fault
+  A -> H : caam.011 Exception Advice
+  H -> A : caam.012 Exception Acknowledgement
+end
+... end of day ...
+A -> H : caam.009 Reconciliation Advice
+H -> A : caam.010 Reconciliation Acknowledgement
+@enduml

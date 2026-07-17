@@ -1,0 +1,22 @@
+@startuml
+title Terminal management between a TMS and a POI (catm)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #E7EAEE
+  BorderColor #4A5A70
+}
+skinparam ArrowColor #4A5A70
+skinparam noteBackgroundColor #E7EAEE
+skinparam noteBorderColor #4A5A70
+
+[POI\n(payment terminal)] as POI
+[Terminal management\nsystem (TMS)] as TMS
+
+POI --> TMS : catm.001 Status Report
+TMS --> POI : catm.002 Management Plan Replacement
+TMS --> POI : catm.003 Acceptor Configuration Update
+TMS --> POI : catm.007 Certificate Management Request
+POI --> TMS : catm.008 Certificate Management Response
+note bottom of TMS : catm manages the terminal;\ncaaa carries its transactions
+@enduml

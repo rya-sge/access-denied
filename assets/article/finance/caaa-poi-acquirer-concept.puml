@@ -1,0 +1,22 @@
+@startuml
+title Where caaa sits: acceptor to acquirer
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #FBF0E4
+  BorderColor #C77D2E
+}
+skinparam ArrowColor #C77D2E
+skinparam noteBackgroundColor #FBF0E4
+skinparam noteBorderColor #C77D2E
+
+actor Cardholder as CH
+[POI / acceptor\n(merchant terminal)] as POI
+[Acquirer] as ACQ
+[Issuer] as ISS
+
+CH --> POI : presents card
+POI --> ACQ : caaa authorisation / completion
+ACQ --> ISS : cain to the issuer
+note bottom of POI : caaa is the acceptor-to-acquirer leg;\ncasp drives the POI from the till
+@enduml

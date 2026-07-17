@@ -1,0 +1,21 @@
+@startuml
+title Settlement reporting request and response
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #9C7A3C
+  ParticipantBorderColor #7C6030
+  ParticipantFontColor white
+  LifeLineBorderColor #9C7A3C
+  ArrowColor #9C7A3C
+}
+skinparam noteBackgroundColor #F3EBDD
+skinparam noteBorderColor #9C7A3C
+
+participant "Reporting party\n(acquirer / scheme)" as R
+participant "Receiving party\n(scheme / issuer)" as V
+
+R -> V : casr.001 Settlement Reporting Initiation\n(settlement positions and totals)
+V -> R : casr.002 Settlement Reporting Response (accepted / rejected)
+note over R, V : same protected card-message envelope\nas the cain transaction messages
+@enduml

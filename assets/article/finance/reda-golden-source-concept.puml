@@ -1,0 +1,33 @@
+@startuml
+title Reference data distribution and the CRUD pattern (reda)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #E8F0E9
+  BorderColor #4E7A5C
+}
+skinparam package {
+  BackgroundColor #F3F8F4
+  BorderColor #4E7A5C
+}
+skinparam ArrowColor #4E7A5C
+
+package "Golden source" {
+  [Issuer / CSD /\nnumbering agency] as SRC
+}
+package "Reference data domains" {
+  [Securities] as SEC
+  [Parties] as PTY
+  [Accounts] as ACC
+  [SSIs, links, calendars] as OTH
+}
+[Data consumers\n(participants)] as CON
+
+SRC --> SEC : create / maintain / delete
+SRC --> PTY : create / maintain / delete
+SRC --> ACC : create / maintain / delete
+SEC --> CON : report / query response
+PTY --> CON : report
+ACC --> CON : report
+OTH --> CON : report
+@enduml

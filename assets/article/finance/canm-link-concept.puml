@@ -1,0 +1,21 @@
+@startuml
+title Network management between a terminal and its host (canm)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #DEEEF0
+  BorderColor #1F7A8C
+}
+skinparam ArrowColor #1F7A8C
+skinparam noteBackgroundColor #DEEEF0
+skinparam noteBorderColor #1F7A8C
+
+[Terminal / acceptor] as T
+[Acquirer host] as H
+
+T --> H : canm.001 Network Management Initiation\n(sign-on, echo test)
+H --> T : canm.002 Network Management Response
+T --> H : canm.003 Key Exchange Initiation
+H --> T : canm.004 Key Exchange Response
+note bottom of H : keeps the session up and the\ncryptographic keys current for cain traffic
+@enduml

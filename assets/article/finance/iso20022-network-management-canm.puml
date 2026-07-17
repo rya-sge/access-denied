@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #DEEEF0
+    LineColor #1F7A8C
+  }
+  :depth(1) {
+    BackgroundColor #1F7A8C
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nNetwork Management (canm)
+** Role
+*** Card terminal to acquirer host
+*** Keep the link healthy and keyed
+*** Part of the card family
+** Network management
+*** 001 Initiation
+*** 002 Response
+*** sign-on / sign-off
+*** echo test (keep-alive)
+*** cutover / status
+** Key exchange
+*** 003 Key Exchange Initiation
+*** 004 Key Exchange Response
+*** load and rotate keys
+** Message shape
+*** Hdr (Header72, MsgFctn)
+*** System trace audit number
+*** Transmission date-time
+** Security
+*** Protected key material
+*** Message authentication
+@endmindmap

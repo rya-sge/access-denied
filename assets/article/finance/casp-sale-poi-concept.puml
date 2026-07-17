@@ -1,0 +1,23 @@
+@startuml
+title Where casp sits: sale system, POI, and acquirer
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #FCEBE3
+  BorderColor #C85C3C
+}
+skinparam ArrowColor #C85C3C
+skinparam noteBackgroundColor #FCEBE3
+skinparam noteBorderColor #C85C3C
+
+actor Cardholder as CH
+[Sale system\n(cash register)] as SALE
+[POI\n(payment terminal)] as POI
+[Acquirer host] as ACQ
+
+CH --> POI : presents card
+SALE --> POI : casp service / device requests
+POI --> SALE : casp responses and events
+POI --> ACQ : cain / canm to the acquirer
+note bottom of POI : casp is the sale-to-POI leg only;\nthe POI talks to the acquirer separately
+@enduml
