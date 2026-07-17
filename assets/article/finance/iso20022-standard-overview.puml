@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E9EDF5
+    LineColor #26386B
+  }
+  :depth(1) {
+    BackgroundColor #26386B
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nFinancial Messaging Standard
+** What it is
+*** Methodology
+*** Central dictionary
+*** Syntax (XML, JSON, ASN.1)
+*** Identifier: area.number.variant.version
+*** Business Application Header (head)
+** Payments
+*** pacs — clearing and settlement
+*** camt — cash management
+** Securities
+*** secl — clearing
+*** sese — settlement
+*** semt — management
+*** seev — events (corporate actions)
+*** colr — collateral
+** Trade and FX
+*** fxtr — FX trade
+*** tsrv — trade services
+*** tsin — trade services initiation
+*** tsmt — trade services management (BPO)
+** Cards
+*** catp / caaa / cain — transactions
+*** casp — sale to POI
+*** canm / caam / catm — management
+*** cafr / cafc / casr — fraud, fees, settlement
+** Regulatory and reference
+*** auth — authorities
+*** reda — reference data
+@endmindmap

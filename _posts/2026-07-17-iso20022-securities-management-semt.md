@@ -4,7 +4,7 @@ title: "ISO 20022 for Securities Management — The semt Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 securities semt custody statement reporting
 description: A tour of ISO 20022's semt (securities management) business area, the custody reporting layer that carries holdings statements, transaction statements, intra-position movements, penalties, and account queries between an account owner and its custodian or CSD.
 image: /assets/article/finance/iso20022-securities-management-semt.png

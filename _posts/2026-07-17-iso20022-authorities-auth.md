@@ -4,7 +4,7 @@ title: "ISO 20022 for Regulatory Reporting — The auth Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 regulatory mifir emir sftr auth reporting
 description: A guided tour of ISO 20022's auth (authorities) business area, the regulatory-reporting messages that carry MiFIR, EMIR, SFTR, money-market, CCP, and settlement-fails data from firms and infrastructures to their competent authorities.
 image: /assets/article/finance/iso20022-authorities-auth.png

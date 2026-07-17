@@ -4,7 +4,7 @@ title: "ISO 20022 for Trade Services — The tsrv Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 trade-finance guarantee standby tsrv undertaking
 description: How ISO 20022 models bank guarantees and standby letters of credit through the tsrv business area, covering the issuance, amendment, demand, and termination of an undertaking between applicant, guarantor, advising party, and beneficiary.
 image: /assets/article/finance/iso20022-trade-services-tsrv.png

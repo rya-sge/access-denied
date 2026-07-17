@@ -1,0 +1,27 @@
+@startuml
+title The structure of ISO 20022
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #E9EDF5
+  BorderColor #26386B
+}
+skinparam package {
+  BackgroundColor #F4F6FA
+  BorderColor #26386B
+}
+skinparam ArrowColor #26386B
+
+package "The standard" {
+  [Methodology\n(how messages are designed)] as MET
+  [Central dictionary\n(reusable business concepts)] as DIC
+  [Syntax\n(XML, JSON, ASN.1)] as SYN
+}
+[Business message\ne.g. pacs.008, camt.053, sese.023] as MSG
+[Business Application Header\n(head.001) envelope] as BAH
+
+MET --> DIC : governs
+DIC --> MSG : concepts assembled into
+SYN --> MSG : serialised as
+BAH --> MSG : wraps and routes
+@enduml

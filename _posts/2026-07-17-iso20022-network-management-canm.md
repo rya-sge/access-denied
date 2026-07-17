@@ -4,7 +4,7 @@ title: "ISO 20022 for Card Network Management — The canm Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards canm network-management key-exchange
 description: How ISO 20022 models card network management through the canm business area, a four-message set that keeps the link between a terminal and its acquirer host signed on, keyed, and alive so that card transactions can flow.
 image: /assets/article/finance/iso20022-network-management-canm.png

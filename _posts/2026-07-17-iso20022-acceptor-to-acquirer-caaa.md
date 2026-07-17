@@ -4,7 +4,7 @@ title: "ISO 20022 for Acceptor-to-Acquirer Card Transactions — The caaa Messag
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards caaa pos acquirer acceptance
 description: How ISO 20022 models the merchant-terminal-to-acquirer leg of a card payment through the caaa business area, covering authorisation, completion, cancellation, reconciliation, currency conversion, and batch transfer.
 image: /assets/article/finance/iso20022-acceptor-to-acquirer-caaa.png

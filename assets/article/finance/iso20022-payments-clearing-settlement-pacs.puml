@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #E7ECF9
+    LineColor #2E4EA0
+  }
+  :depth(1) {
+    BackgroundColor #2E4EA0
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nPayments Clearing and Settlement (pacs)
+** Role
+*** Interbank payments
+*** Heart of the MT to MX migration
+*** CBPR+ and RTGS (T2, CHAPS, Fedwire)
+** Credit transfers
+*** 008 FIToFI Customer Credit Transfer (MT103)
+*** 009 FI Credit Transfer (MT202)
+** Direct debits
+*** 003 FIToFI Customer Direct Debit
+*** 010 FI Direct Debit
+** Status and exceptions
+*** 002 Payment Status Report
+*** 028 Payment Status Request
+*** 004 Payment Return
+*** 007 Payment Reversal
+** Settlement
+*** 029 Multilateral Settlement Request
+** Neighbours
+*** pain (initiation)
+*** camt (reporting)
+@endmindmap

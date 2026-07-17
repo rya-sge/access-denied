@@ -1,0 +1,28 @@
+@startuml
+title An interbank credit transfer with status and return (pacs)
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #2E4EA0
+  ParticipantBorderColor #223C7C
+  ParticipantFontColor white
+  LifeLineBorderColor #2E4EA0
+  ArrowColor #2E4EA0
+}
+skinparam noteBackgroundColor #E7ECF9
+skinparam noteBorderColor #2E4EA0
+
+participant "Debtor agent\n(bank A)" as A
+participant "Clearing / RTGS" as R
+participant "Creditor agent\n(bank B)" as B
+
+A -> R : pacs.008 FIToFI Customer Credit Transfer
+R -> B : pacs.008 forwarded
+B -> A : pacs.002 Payment Status Report (accepted)
+opt cannot apply the funds
+  B -> A : pacs.004 Payment Return
+end
+opt sent in error
+  A -> B : pacs.007 Payment Reversal
+end
+@enduml

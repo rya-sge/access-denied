@@ -4,7 +4,7 @@ title: "ISO 20022 for Securities Clearing — The secl Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 swift securities clearing ccp post-trade
 description: How ISO 20022 models securities clearing through the secl business area, from trade leg notification and netting to margin, default fund, and buy-in messaging exchanged between a CCP and its clearing members.
 image: /assets/article/finance/iso20022-securities-clearing-secl.png

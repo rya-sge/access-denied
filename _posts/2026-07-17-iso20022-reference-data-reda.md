@@ -4,7 +4,7 @@ title: "ISO 20022 for Reference Data — The reda Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 reference-data reda securities ssi calendar
 description: A tour of ISO 20022's reda (reference data) business area, the messages that create, maintain, query, and report the static data behind transactions, from securities, parties, and accounts to standing settlement instructions, calendars, and prices.
 image: /assets/article/finance/iso20022-reference-data-reda.png

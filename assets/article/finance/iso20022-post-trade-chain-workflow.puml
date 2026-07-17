@@ -1,0 +1,27 @@
+@startuml
+title How the areas connect: two end-to-end chains
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #E9EDF5
+  BorderColor #26386B
+  DiamondBackgroundColor #E9EDF5
+  DiamondBorderColor #26386B
+}
+skinparam ArrowColor #26386B
+
+|Payment chain|
+start
+:pain — customer initiates a payment;
+:pacs — banks clear and settle it;
+:camt — balances and entries reported;
+stop
+
+|Securities chain|
+start
+:secl — CCP clears the trade;
+:colr — collateral covers the exposure;
+:sese — securities and cash settle;
+:semt — holdings and transactions reported;
+:auth — the activity is reported to regulators;
+stop
+@enduml

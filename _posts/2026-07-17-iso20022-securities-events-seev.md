@@ -4,7 +4,7 @@ title: "ISO 20022 for Securities Events — The seev Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 securities seev corporate-actions proxy-voting
 description: A tour of ISO 20022's seev (securities events) business area, covering corporate actions, general meetings and proxy voting, shareholder identification, market claims, and buyer protection across the custody chain.
 image: /assets/article/finance/iso20022-securities-events-seev.png

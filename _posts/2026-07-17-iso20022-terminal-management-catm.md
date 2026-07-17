@@ -4,7 +4,7 @@ title: "ISO 20022 for Terminal Management — The catm Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards catm terminal-management tms certificate
 description: How ISO 20022 models the management of payment terminals through the catm business area, covering status reporting, management plans, configuration updates, maintenance delegation, and certificate management between a terminal and its management system.
 image: /assets/article/finance/iso20022-terminal-management-catm.png

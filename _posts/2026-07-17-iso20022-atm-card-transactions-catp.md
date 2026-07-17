@@ -4,7 +4,7 @@ title: "ISO 20022 for ATM Card Transactions — The catp Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 atm cards catp payments security
 description: How ISO 20022 models ATM card transactions through the catp business area, covering the withdrawal, deposit, transfer, inquiry and PIN management flows between an ATM and its host, and the message-level encryption and MAC that protect them.
 image: /assets/article/finance/iso20022-atm-card-transactions-catp.png

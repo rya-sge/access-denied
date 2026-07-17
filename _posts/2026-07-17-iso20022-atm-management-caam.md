@@ -4,7 +4,7 @@ title: "ISO 20022 for ATM Management — The caam Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards caam atm management key-download
 description: How ISO 20022 models the management of automated teller machines through the caam business area, covering device control, key download, diagnostics, configuration, reconciliation, and exception handling between an ATM and its manager.
 image: /assets/article/finance/iso20022-atm-management-caam.png

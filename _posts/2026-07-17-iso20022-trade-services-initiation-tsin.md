@@ -4,7 +4,7 @@ title: "ISO 20022 for Trade Services Initiation — The tsin Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 trade-finance supply-chain factoring tsin invoice
 description: How ISO 20022 models the corporate-to-bank front end of trade finance through the tsin business area, covering invoice financing, invoice assignment for factoring, party registration and guarantee, and undertaking applications.
 image: /assets/article/finance/iso20022-trade-services-initiation-tsin.png

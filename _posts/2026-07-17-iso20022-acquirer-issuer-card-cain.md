@@ -4,7 +4,7 @@ title: "ISO 20022 for Acquirer-to-Issuer Card Transactions — The cain Message 
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards cain iso8583 authorisation chargeback
 description: How ISO 20022 models the acquirer-to-issuer card rails through the cain business area, the modern successor to ISO 8583, covering authorisation, clearing, reversal, retrieval, and chargeback between an acquirer and an issuer.
 image: /assets/article/finance/iso20022-acquirer-issuer-card-cain.png

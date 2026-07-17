@@ -373,3 +373,13 @@ _posts/2026-07-17-iso20022-trade-services-management-tsmt.md
   assets/article/finance/iso20022-trade-services-management-tsmt.puml                (mindmap)
   assets/article/finance/tsmt-bpo-concept.puml                                      (concept, in-section)
   assets/article/finance/tsmt-baseline-matching-workflow.puml                       (workflow, in-section)
+
+_posts/2026-07-17-iso20022-payments-clearing-settlement-pacs.md
+  assets/article/finance/iso20022-payments-clearing-settlement-pacs.puml             (mindmap)
+  assets/article/finance/pacs-payment-chain-concept.puml                            (concept, in-section)
+  assets/article/finance/pacs-credit-transfer-workflow.puml                         (workflow, in-section)
+
+_posts/2026-07-17-iso20022-standard-overview.md
+  assets/article/finance/iso20022-standard-overview.puml                            (mindmap)
+  assets/article/finance/iso20022-three-pillars-concept.puml                        (concept, in-section)
+  assets/article/finance/iso20022-post-trade-chain-workflow.puml                    (workflow, in-section)

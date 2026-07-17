@@ -4,7 +4,7 @@ title: "ISO 20022 for Card Fraud Reporting — The cafr Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards fraud cafr payments security
 description: How ISO 20022 models card fraud reporting through the cafr business area, a compact four-message set that lets card parties report fraudulent transactions and communicate their disposition in a structured, machine-readable form.
 image: /assets/article/finance/iso20022-fraud-reporting-cafr.png

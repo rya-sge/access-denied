@@ -4,7 +4,7 @@ title: "ISO 20022 for Sale to POI — The casp Message Set"
 date:   2026-07-17
 lang: en
 locale: en-GB
-categories: network programmation
+categories: network programmation ISO20022
 tags: iso20022 cards casp point-of-interaction retail pos
 description: How ISO 20022 models the interface between a retailer's sale system and its payment terminal through the casp business area, covering the service, session, device, reconciliation, and reporting messages of the sale-to-POI protocol.
 image: /assets/article/finance/iso20022-sale-to-poi-casp.png

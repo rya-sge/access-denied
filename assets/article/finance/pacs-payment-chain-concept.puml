@@ -1,0 +1,29 @@
+@startuml
+title Where pacs sits in the payment chain
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #E7ECF9
+  BorderColor #2E4EA0
+}
+skinparam package {
+  BackgroundColor #F4F6FC
+  BorderColor #2E4EA0
+}
+skinparam ArrowColor #2E4EA0
+
+[Debtor\n(payer)] as D
+package "Debtor agent (bank A)" {
+  [Initiation: pain] as PAIN
+}
+[Clearing / RTGS\n(T2, CHAPS, Fedwire)] as CLR
+package "Creditor agent (bank B)" {
+  [Reporting: camt] as CAMT
+}
+[Creditor\n(payee)] as C
+
+D --> PAIN : pain.001 credit transfer initiation
+PAIN --> CLR : pacs.008 FIToFI Customer Credit Transfer
+CLR --> CAMT : pacs.008 delivered to creditor agent
+CAMT --> C : camt.054 credit notification
+@enduml
