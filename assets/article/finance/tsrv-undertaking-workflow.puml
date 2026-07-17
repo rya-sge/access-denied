@@ -1,0 +1,35 @@
+@startuml
+title Life of an undertaking: issue, amend, demand
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #8A6D3B
+  ParticipantBorderColor #6E5730
+  ParticipantFontColor white
+  LifeLineBorderColor #8A6D3B
+  ArrowColor #8A6D3B
+}
+skinparam noteBackgroundColor #F0E9E1
+skinparam noteBorderColor #8A6D3B
+
+participant "Applicant" as AP
+participant "Guarantor" as GT
+participant "Beneficiary" as BE
+
+AP -> GT : request issuance
+GT -> BE : tsrv.001 Undertaking Issuance / tsrv.003 Notification
+opt amendment
+  AP -> GT : tsrv.004 Amendment Request
+  GT -> BE : tsrv.005 Amendment
+  BE -> GT : tsrv.008 Amendment Response
+end
+... on a call event ...
+BE -> GT : tsrv.013 Undertaking Demand
+alt extend or pay
+  GT -> BE : tsrv.014 Extend or Pay Request
+  BE -> GT : tsrv.015 Extend or Pay Response
+else refuse
+  GT -> BE : tsrv.016 Demand Refusal Notification
+end
+GT -> BE : tsrv.019 Undertaking Status Report
+@enduml

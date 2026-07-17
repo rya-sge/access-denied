@@ -290,3 +290,37 @@ _posts/2026-07-17-iso20022-acquirer-issuer-card-cain.md
   assets/article/finance/iso20022-acquirer-issuer-card-cain.puml                   (mindmap)
   assets/article/finance/cain-four-corner-concept.puml                             (concept, in-section)
   assets/article/finance/cain-transaction-lifecycle-workflow.puml                  (workflow, in-section)
+
+_posts/2026-07-17-iso20022-fx-trade-fxtr.md
+  assets/article/finance/iso20022-fx-trade-fxtr.puml                               (mindmap)
+  assets/article/finance/fxtr-posttrade-concept.puml                              (concept, in-section)
+  assets/article/finance/fxtr-capture-confirm-workflow.puml                       (workflow, in-section)
+
+_posts/2026-07-17-iso20022-securities-management-semt.md
+  assets/article/finance/iso20022-securities-management-semt.puml                  (mindmap)
+  assets/article/finance/semt-holdings-report-concept.puml                         (concept, in-section)
+  assets/article/finance/semt-query-report-workflow.puml                           (workflow, in-section)
+
+_posts/2026-07-17-iso20022-securities-settlement-sese.md
+  assets/article/finance/iso20022-securities-settlement-sese.puml                  (mindmap)
+  assets/article/finance/sese-instruction-anatomy-concept.puml                     (concept, in-section)
+  assets/article/finance/sese-settlement-lifecycle-workflow.puml                   (workflow, in-section)
+
+_posts/2026-07-17-iso20022-trade-services-tsrv.md
+  assets/article/finance/iso20022-trade-services-tsrv.puml                          (mindmap)
+  assets/article/finance/tsrv-parties-concept.puml                                  (concept, in-section)
+  assets/article/finance/tsrv-undertaking-workflow.puml                             (workflow, in-section)
+
+_posts/2026-07-17-iso20022-securities-events-seev.md
+  assets/article/finance/iso20022-securities-events-seev.puml                       (mindmap)
+  assets/article/finance/seev-domains-concept.puml                                  (concept, in-section)
+  assets/article/finance/seev-corporate-action-workflow.puml                        (workflow, in-section)
+
+_posts/2026-07-17-iso20022-authorities-auth.md
+  assets/article/finance/iso20022-authorities-auth.puml                             (mindmap)
+  assets/article/finance/auth-reporting-topology-concept.puml                       (concept, in-section)
+  assets/article/finance/auth-report-status-workflow.puml                           (workflow, in-section)
+
+_posts/2026-07-17-iso20022-fee-collection-cafc.md
+  assets/article/finance/iso20022-fee-collection-cafc.puml                          (mindmap)
+  assets/article/finance/cafc-fee-collection-workflow.puml                          (workflow, in-section)

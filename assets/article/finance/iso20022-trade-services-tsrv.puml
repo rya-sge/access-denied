@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F0E9E1
+    LineColor #8A6D3B
+  }
+  :depth(1) {
+    BackgroundColor #8A6D3B
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nTrade Services (tsrv)
+** Scope
+*** Demand guarantees
+*** Standby letters of credit
+*** Undertakings (URDG / ISP98)
+** Parties
+*** Applicant
+*** Guarantor / obligor
+*** Advising party
+*** Beneficiary
+** Issuance
+*** 001 Undertaking Issuance
+*** 002 Issuance Advice
+*** 003 Issuance Notification
+** Amendment
+*** 004 Amendment Request
+*** 005 Amendment
+*** 006/007 Advice / Notification
+*** 008/009 Response
+** Ending
+*** 010 Non-Extension Request
+*** 011 Non-Extension Notification
+*** 012 Termination Notification
+** Demand (claim)
+*** 013 Undertaking Demand
+*** 014 Extend or Pay Request
+*** 015 Extend or Pay Response
+*** 016 Demand Refusal
+*** 017 Demand Withdrawal
+** Status
+*** 018 Trade Status Report
+*** 019 Undertaking Status Report
+@endmindmap

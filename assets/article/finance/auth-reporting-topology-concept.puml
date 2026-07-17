@@ -1,0 +1,35 @@
+@startuml
+title Who reports to whom under the auth area
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #EAECEF
+  BorderColor #4A5568
+}
+skinparam package {
+  BackgroundColor #F4F5F7
+  BorderColor #4A5568
+}
+skinparam ArrowColor #4A5568
+
+package "Reporting entities" {
+  [Investment firm] as IF
+  [Trading venue] as TV
+  [Trade repository] as TR
+  [CCP] as CCP
+  [CSD] as CSD
+}
+
+package "Authorities" {
+  [Competent authority\n(NCA)] as NCA
+  [ESMA] as ESMA
+  [Central bank] as CB
+}
+
+IF --> NCA : MiFIR transaction reports (auth.016)
+TV --> NCA : transparency and market data
+TR --> ESMA : EMIR / SFTR trade reports
+CCP --> NCA : CCP supervisory reports
+CSD --> NCA : settlement internaliser (auth.072)
+IF --> CB : money market statistics (MMSR)
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+title The seev sub-domains and the custody chain
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #F6E9F2
+  BorderColor #A03C7A
+}
+skinparam package {
+  BackgroundColor #FBF3F8
+  BorderColor #A03C7A
+}
+skinparam ArrowColor #A03C7A
+
+[Issuer] as ISS
+[Issuer agent] as AG
+[CSD] as CSD
+[Custodian] as CUS
+[Investor\n(account holder)] as INV
+
+ISS --> AG : event terms
+AG --> CSD : seev.009+ Agent CA messages
+CSD --> CUS : seev.031 CA Notification\nseev.001 Meeting Notification
+CUS --> INV : notify and collect elections
+INV --> CUS : seev.033 CA Instruction / seev.004 Meeting Instruction
+CUS --> CSD : forward elections and votes
+@enduml

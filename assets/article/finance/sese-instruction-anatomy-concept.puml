@@ -1,0 +1,24 @@
+@startuml
+title Anatomy of a sese.023 securities settlement instruction
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+
+rectangle "sese.023 SecuritiesSettlementTransactionInstruction" as M {
+  rectangle "TxId — Transaction identification" as T
+  rectangle "SttlmTpAndAddtlParams\nDvP / FoP, deliver / receive" as ST
+  rectangle "TradDtls — trade date, settlement date (ISD)" as TD
+  rectangle "FinInstrmId — instrument (ISIN)" as FI
+  rectangle "QtyAndAcctDtls — quantity, safekeeping account" as Q
+  rectangle "SttlmParams + delivering/receiving parties + amount" as SP
+}
+T -down-> ST
+ST -down-> TD
+TD -down-> FI
+FI -down-> Q
+Q -down-> SP
+@enduml

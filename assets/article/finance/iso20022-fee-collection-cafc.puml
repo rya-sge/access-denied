@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FBF3E0
+    LineColor #B8891E
+  }
+  :depth(1) {
+    BackgroundColor #B8891E
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nFee Collection (cafc)
+** Purpose
+*** Collect fees between card parties
+*** Scheme and service fees
+*** Card-domain settlement of charges
+** Messages
+*** 001 Fee Collection Initiation
+*** 002 Fee Collection Response
+** Message shape
+*** Hdr (Header72, MsgFctn)
+*** Acquirer (Acqrr)
+*** Transaction id (TxId)
+*** Transaction amounts (TxAmts)
+** Security
+*** Protected sensitive data
+*** Message authentication
+** Family
+*** Sits with cain, caaa, cafr
+@endmindmap

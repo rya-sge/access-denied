@@ -1,0 +1,21 @@
+@startuml
+title Fee collection request and response
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #B8891E
+  ParticipantBorderColor #8F6A16
+  ParticipantFontColor white
+  LifeLineBorderColor #B8891E
+  ArrowColor #B8891E
+}
+skinparam noteBackgroundColor #FBF3E0
+skinparam noteBorderColor #B8891E
+
+participant "Collecting party\n(scheme / processor)" as C
+participant "Charged party\n(acquirer / issuer)" as P
+
+C -> P : cafc.001 Fee Collection Initiation\n(Acqrr, TxId, TxAmts)
+P -> C : cafc.002 Fee Collection Response (accepted / rejected)
+note over C, P : same protected card-message envelope\nas the cain transaction messages
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+title Regulatory reporting and an authority information request
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #4A5568
+  ParticipantBorderColor #374151
+  ParticipantFontColor white
+  LifeLineBorderColor #4A5568
+  ArrowColor #4A5568
+}
+skinparam noteBackgroundColor #EAECEF
+skinparam noteBorderColor #4A5568
+
+participant "Reporting entity" as R
+participant "Authority / TR" as A
+
+R -> A : auth.016 Transaction Report (or auth.030 / auth.052)
+A -> R : auth.031 Reporting Status Advice (accepted / rejected)
+opt reconciliation (EMIR / SFTR)
+  A -> R : auth.091 / auth.080 Reconciliation Status
+end
+== authority-initiated ==
+A -> R : auth.001 Information Request Opening
+R -> A : auth.002 Information Request Response
+A -> R : auth.003 Status Change Notification
+@enduml

@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F6E9F2
+    LineColor #A03C7A
+  }
+  :depth(1) {
+    BackgroundColor #A03C7A
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSecurities Events (seev)
+** General meetings / proxy voting
+*** 001 Meeting Notification
+*** 003 Entitlement Notification
+*** 004 Meeting Instruction
+*** 006 Instruction Status
+*** 007 Vote Execution Confirmation
+*** 008 Result Dissemination
+** Agent corporate actions
+*** 009-030 issuer agent to CSD
+*** notification, election, movement
+** Corporate action distribution
+*** 031 CA Notification
+*** 033 CA Instruction (election)
+*** 034 Instruction Status Advice
+*** 035 Movement Preliminary Advice
+*** 036 Movement Confirmation
+*** 037 Movement Reversal Advice
+*** 039 Cancellation Advice
+** Shareholder identification
+*** 045 Disclosure Request (SRD II)
+*** 047 Disclosure Response
+** Market claims
+*** 050 Market Claim Creation
+*** 052 Status Advice
+** Buyer protection
+*** 060 Buyer Protection Instruction
+*** 061 Status Advice
+** Event types
+*** Mandatory
+*** Mandatory with choice
+*** Voluntary (election)
+@endmindmap

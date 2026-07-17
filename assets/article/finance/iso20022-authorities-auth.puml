@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAECEF
+    LineColor #4A5568
+  }
+  :depth(1) {
+    BackgroundColor #4A5568
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nAuthorities (auth)
+** Money market (MMSR)
+*** 012 Secured
+*** 013 Unsecured
+*** 014 FX Swaps
+*** 015 Overnight Index Swaps
+** MiFIR / MiFID II
+*** 016 Transaction Report
+*** 017 Reference Data
+*** 032/033 Transparency
+*** 040/041 Trading Activity
+*** 113 Order Book
+*** 122-124 Market Data
+** EMIR derivatives
+*** 030 Trade Report
+*** 090 Position Set
+*** 091 Reconciliation
+*** 108 Margin Data
+** SFTR securities financing
+*** 052 Transaction Report
+*** 070 Margin Data
+*** 071 Reused Collateral
+*** 079 Transaction State
+** CCP supervision
+*** 054-056 members / obligations
+*** 057/058 stress testing
+*** 067 collateral
+** CSDR settlement
+*** 072 Internaliser Report
+*** 100/101 Settlement Fails
+** Other
+*** 001-003 Information Request
+*** 018-027 Currency control
+*** 034 Invoice Tax
+*** 077 Benchmark Report
+@endmindmap

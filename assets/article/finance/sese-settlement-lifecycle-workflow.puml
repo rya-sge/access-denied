@@ -1,0 +1,30 @@
+@startuml
+title Securities settlement: instruct, match, settle
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #2E8B67
+  ParticipantBorderColor #256F52
+  ParticipantFontColor white
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam noteBackgroundColor #EAF6F0
+skinparam noteBorderColor #2E8B67
+
+participant "Participant A\n(deliverer)" as A
+participant "CSD" as C
+participant "Participant B\n(receiver)" as B
+
+A -> C : sese.023 Settlement Instruction (deliver vs payment)
+B -> C : sese.023 Settlement Instruction (receive vs payment)
+C -> A : sese.024 Status Advice (matched)
+note over C : if only one side has instructed
+C -> B : sese.028 Allegement Notification
+... on the intended settlement date ...
+C -> A : sese.025 Settlement Confirmation
+C -> B : sese.025 Settlement Confirmation
+opt hold / release / cancel
+  A -> C : sese.030 Conditions Modification / sese.020 Cancellation
+end
+@enduml

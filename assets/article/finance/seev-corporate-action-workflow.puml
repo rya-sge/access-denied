@@ -1,0 +1,30 @@
+@startuml
+title Corporate action lifecycle expressed with seev messages
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #A03C7A
+  ParticipantBorderColor #7F2F61
+  ParticipantFontColor white
+  LifeLineBorderColor #A03C7A
+  ArrowColor #A03C7A
+}
+skinparam noteBackgroundColor #F6E9F2
+skinparam noteBorderColor #A03C7A
+
+participant "Account servicer\n(CSD / custodian)" as C
+participant "Account holder\n(investor)" as H
+
+C -> H : seev.031 Corporate Action Notification
+C -> H : seev.032 Event Processing Status Advice
+alt elective event
+  H -> C : seev.033 Corporate Action Instruction (election)
+  C -> H : seev.034 Instruction Status Advice
+end
+C -> H : seev.035 Movement Preliminary Advice
+... on payment date ...
+C -> H : seev.036 Movement Confirmation
+opt entitlement on an in-flight trade
+  C -> H : seev.050 Market Claim Creation
+end
+@enduml

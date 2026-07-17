@@ -1,0 +1,23 @@
+@startuml
+title Parties to a demand guarantee (tsrv)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #F0E9E1
+  BorderColor #8A6D3B
+}
+skinparam ArrowColor #8A6D3B
+skinparam noteBackgroundColor #F0E9E1
+skinparam noteBorderColor #8A6D3B
+
+[Applicant\n(instructs, owes obligation)] as AP
+[Guarantor\n(issues undertaking)] as GT
+[Advising party\n(passes it on)] as AD
+[Beneficiary\n(can demand payment)] as BE
+
+AP --> GT : requests issuance
+GT --> AD : tsrv.001 Undertaking Issuance
+AD --> BE : tsrv.003 Issuance Notification
+BE --> GT : tsrv.013 Undertaking Demand
+note bottom of GT : the guarantor pays the beneficiary\non a compliant demand
+@enduml
