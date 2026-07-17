@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nSecurities Clearing (secl)
+** Standard
+*** MX (XML) vs legacy MT (FIN)
+*** ID: secl.004.001.04\n(area.number.variant.version)
+*** Business Application Header\n(head.001)
+** Actors
+*** Central Counterparty (CCP)
+*** Clearing members
+*** Settlement agents / CSD
+** Clearing functions
+*** Novation
+*** Multilateral netting
+*** Margining
+*** Default fund
+** secl messages
+*** 001 TradeLegNotification
+*** 002 TradeLegNotifCancellation
+*** 003 TradeLegStatement
+*** 004 NetPosition
+*** 005 MarginReport
+*** 006 DefaultFundContributionReport
+*** 007 BuyInNotification
+*** 008 BuyInResponse
+*** 009 BuyInConfirmation
+*** 010 SettlementObligationReport
+** Related areas
+*** setr (trade)
+*** sese (settlement)
+*** colr (collateral)
+*** semt (reporting)
+@endmindmap

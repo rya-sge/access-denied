@@ -1,0 +1,34 @@
+@startuml
+title Post-trade clearing lifecycle expressed with secl messages
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #2E8B67
+  ParticipantBorderColor #256F52
+  ParticipantFontColor white
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam noteBackgroundColor #EAF6F0
+skinparam noteBorderColor #2E8B67
+participant "Trading venue" as V
+participant "CCP" as C
+participant "Clearing member" as M
+participant "CSD" as S
+
+V -> C : matched trade
+C -> C : novation (CCP interposed)
+C -> M : secl.001 TradeLegNotification
+C -> M : secl.003 TradeLegStatement
+C -> C : multilateral netting
+C -> M : secl.004 NetPosition
+C -> M : secl.005 MarginReport
+M -> C : deliver collateral (colr)
+C -> M : secl.006 DefaultFundContributionReport
+C -> M : secl.010 SettlementObligationReport
+M -> S : sese settlement instruction
+note over S : settlement fails\n(securities not delivered)
+C -> M : secl.007 BuyInNotification
+M -> C : secl.008 BuyInResponse
+C -> M : secl.009 BuyInConfirmation
+@enduml

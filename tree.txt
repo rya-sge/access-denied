@@ -258,3 +258,13 @@ _posts/2026-07-16-eutxo-explained-eli10.md
   assets/article/blockchain/cardano/eutxo-eli10-guard-view-concept.puml           (concept, in-section)
   assets/article/blockchain/cardano/eutxo-eli10-treasure-chest-concept.puml       (concept, asset only)
   assets/article/blockchain/cardano/eutxo-eli10-spend-coin-workflow.puml          (workflow, asset only)
+
+_posts/2026-07-17-iso20022-securities-clearing-secl.md
+  assets/article/finance/iso20022-securities-clearing-secl.puml                   (mindmap)
+  assets/article/finance/secl-clearing-architecture-concept.puml                  (concept, in-section)
+  assets/article/finance/secl-clearing-workflow.puml                              (workflow, in-section)
+
+_posts/2026-07-17-iso20022-collateral-management-colr.md
+  assets/article/finance/iso20022-collateral-management-colr.puml                 (mindmap)
+  assets/article/finance/colr-collateral-architecture-concept.puml                (concept, in-section)
+  assets/article/finance/colr-margin-call-workflow.puml                           (workflow, in-section)

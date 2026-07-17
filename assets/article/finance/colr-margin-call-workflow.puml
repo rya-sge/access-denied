@@ -1,0 +1,32 @@
+@startuml
+title Daily bilateral margin call cycle expressed with colr messages
+autonumber
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #4A78B5
+  ParticipantBorderColor #3A6091
+  ParticipantFontColor white
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+skinparam noteBackgroundColor #EEF5FF
+skinparam noteBorderColor #4A78B5
+participant "Party A\n(calling)" as A
+participant "Party B\n(delivering)" as B
+
+A -> A : mark-to-market exposure E\nversus collateral held C
+A -> B : colr.003 MarginCallRequest (VM / IM)
+alt call agreed
+  B -> A : colr.004 MarginCallResponse (agree)
+  B -> A : colr.007 CollateralProposal (specific assets)
+  A -> B : colr.008 CollateralProposalResponse (accept)
+  B -> A : deliver collateral (sese settlement)
+else amount disputed
+  B -> A : colr.009 MarginCallDisputeNotification
+end
+... later in the life of the trade ...
+B -> A : colr.010 CollateralSubstitutionRequest
+A -> B : colr.011 CollateralSubstitutionResponse
+B -> A : colr.012 CollateralSubstitutionConfirmation
+A -> B : colr.015 InterestPaymentStatement (interest on cash)
+@enduml

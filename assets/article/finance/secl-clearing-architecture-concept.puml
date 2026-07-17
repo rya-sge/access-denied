@@ -1,0 +1,37 @@
+@startuml
+title Securities clearing message flows around a CCP (secl business area)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #F6FBF8
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+
+package "Trade capture (setr)" {
+  [Trading venue / OTC] as venue
+}
+
+package "Clearing (secl)" {
+  [Central Counterparty\n(CCP)] as ccp
+  [Clearing member A] as cmA
+  [Clearing member B] as cmB
+}
+
+package "Settlement (sese) / Reporting (semt)" {
+  [CSD / Settlement agent] as csd
+}
+
+venue --> ccp : matched trades
+ccp --> cmA : secl.001 TradeLegNotification\nsecl.004 NetPosition\nsecl.005 MarginReport
+ccp --> cmB : secl.003 TradeLegStatement\nsecl.010 SettlementObligationReport
+cmA --> ccp : collateral (colr)
+cmB --> ccp : collateral (colr)
+ccp --> cmA : secl.006 DefaultFundContributionReport
+cmA --> csd : sese settlement instruction
+cmB --> csd : sese settlement instruction
+@enduml

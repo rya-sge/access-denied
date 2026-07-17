@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* ISO 20022\nCollateral Management (colr)
+** Purpose
+*** Mitigate counterparty credit risk
+*** OTC derivatives, repo, sec lending
+*** CSA / ISDA, UMR margin rules
+** Concepts
+*** Variation margin (VM)
+*** Initial margin (IM)\nSegregated Independent Amount
+*** Threshold and MTA
+*** Haircut
+*** Eligible collateral
+** Bilateral messages
+*** 001/002 Collateral Value Query/Report
+*** 003/004 Margin Call Request/Response
+*** 009 Margin Call Dispute
+*** 007/008 Collateral Proposal/Response
+*** 010/011/012 Substitution
+*** 013/014/015 Interest Payment
+*** 016 Collateral and Exposure Report
+*** 005/006 Cancellation Request/Status
+** Triparty messages
+*** 019 Transaction Instruction
+*** 020 Processing Status Advice
+*** 021 Allegement Notification
+*** 022 Collateral and Exposure Report
+*** 023 Status Advice
+*** 024 Allegement Cancellation
+*** reda.074 Unilateral Removal
+** Actors
+*** Two counterparties
+*** Triparty agent (custodian/CSD)
+@endmindmap

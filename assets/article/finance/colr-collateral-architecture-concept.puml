@@ -1,0 +1,31 @@
+@startuml
+title Bilateral and triparty collateral management (colr business area)
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "Bilateral exchange" {
+  [Party A\n(exposed, calls margin)] as A
+  [Party B\n(posts collateral)] as B
+}
+
+package "Triparty service" {
+  [Triparty agent\n(custodian / CSD)] as T
+}
+
+A --> B : colr.003 MarginCallRequest
+B --> A : colr.004 MarginCallResponse
+B --> A : colr.007 CollateralProposal
+A --> B : colr.008 CollateralProposalResponse
+A --> T : colr.019 Triparty instruction
+T --> A : colr.022 Report / colr.023 Advice
+note bottom of T : Party B instructs the agent\nand is reported to symmetrically
+@enduml
