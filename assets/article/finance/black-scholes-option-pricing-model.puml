@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Black-Scholes\n(1973)
+** Problem
+*** Earlier formulas
+*** Arbitrary parameters
+*** Unknown expected return
+** Ideal conditions
+*** Constant rate r
+*** Lognormal stock
+*** No dividends
+*** European exercise
+*** No frictions
+** Hedging argument
+*** One share long
+*** 1/w1 options short
+*** Continuous rebalance
+*** Riskless return = r
+** Differential equation
+*** w2 = rw - r x w1 - 1/2 v2 x2 w11
+*** Maturity payoff
+*** Heat equation
+** Closed form
+*** w = x N(d1) - c e^r(t-t*) N(d2)
+*** delta = N(d1)
+*** No expected return
+*** Volatility v is key input
+** Extensions
+*** Put-call parity
+*** CAPM derivation
+*** Corporate liabilities
+*** Default risk discount
+*** Compound options
+** Empirical test
+*** Buyers overpay
+*** Transaction costs
+@endmindmap

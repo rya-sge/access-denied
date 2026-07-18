@@ -1,0 +1,26 @@
+@startuml
+title Qualitative option value by stock price relative to exercise price c
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF6F0
+skinparam ActivityBorderColor #2E8B67
+skinparam ActivityDiamondBackgroundColor #F5FBF8
+skinparam ActivityDiamondBorderColor #2E8B67
+skinparam ArrowColor #2E8B67
+
+start
+:Compare stock price x\nwith exercise price c;
+if (x much greater than c ?) then (yes)
+  :Deep in the money;
+  :Almost certain to be exercised;
+  :Value approaches\nx minus discount bond\nof face value c;
+elseif (x much less than c ?) then (yes)
+  :Deep out of the money;
+  :Exercise unlikely;
+  :Value near zero;
+else (x near c)
+  :Near the money;
+  :Convex curve between\nmax(x - c, 0) and the 45 line;
+  :Falls toward payoff\nas maturity approaches;
+endif
+stop
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+title Corporate liabilities as options on the firm's assets
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #2E8B67
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #F5FBF8
+  BorderColor #2E8B67
+}
+
+[Firm assets\nvalue x, variance v2] as ASSETS
+
+package "Stockholders" {
+  [Common stock\n= call on assets\nstrike c] as STOCK
+}
+package "Bondholders" {
+  [Discount bonds\n= assets minus call\nface value c] as BONDS
+}
+
+ASSETS --> STOCK : at maturity receive\nmax(x - c, 0)
+ASSETS --> BONDS : receive min(x, c)
+STOCK -[hidden]right- BONDS
+BONDS --> [Default-risk discount\n= default-free value - bond value]
+STOCK --> [Coupon debt\n=> compound option]
+@enduml

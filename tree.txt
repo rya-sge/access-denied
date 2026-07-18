@@ -383,3 +383,10 @@ _posts/2026-07-17-iso20022-standard-overview.md
   assets/article/finance/iso20022-standard-overview.puml                            (mindmap)
   assets/article/finance/iso20022-three-pillars-concept.puml                        (concept, in-section)
   assets/article/finance/iso20022-post-trade-chain-workflow.puml                    (workflow, in-section)
+
+_posts/2026-07-18-black-scholes-option-pricing-model.md
+  assets/article/finance/black-scholes-option-pricing-model.puml                     (mindmap)
+  assets/article/finance/black-scholes-hedged-portfolio-concept.puml                (concept, in-section)
+  assets/article/finance/black-scholes-derivation-workflow.puml                     (workflow, in-section)
+  assets/article/finance/black-scholes-corporate-liabilities-concept.puml           (concept, in-section)
+  assets/article/finance/black-scholes-moneyness-regimes-workflow.puml            (concept, in-section)

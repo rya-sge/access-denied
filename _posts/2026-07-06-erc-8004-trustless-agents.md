@@ -25,7 +25,7 @@ It is a companion to an earlier [survey of the AI-agent ERC standards](https://r
 
 Two agent-communication protocols already exist. Anthropic's Model Context Protocol (MCP) lets a server list its prompts, resources, and tools. Google's Agent-to-Agent (A2A) protocol handles authentication, skill advertisement through AgentCards, direct messaging, and task orchestration. Neither answers the two questions that matter when agents from different organisations meet: how do I find an agent, and why should I trust it?
 
-[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) addresses discovery and trust with three lightweight registries. Its abstract frames the goal as using the blockchain to discover, choose, and interact with agents across organisational boundaries without a pre-existing relationship. The authorship is worth noting, because it is unusually cross-organisational: Marco De Rossi (MetaMask), Davide Crapis (Ethereum Foundation), Jordan Ellis (Google), and Erik Reppel (Coinbase). 
+[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) addresses discovery and trust with three lightweight registries. Its abstract frames the goal as using the blockchain to discover, choose, and interact with agents across organisational boundaries without a pre-existing relationship. The authorship is made of several different authors: Marco De Rossi (MetaMask), Davide Crapis (Ethereum Foundation), Jordan Ellis (Google), and Erik Reppel (Coinbase). 
 
 The standard is `Draft`, created in August 2025, and it requires [EIP-155](https://eips.ethereum.org/EIPS/eip-155), [EIP-712](https://eips.ethereum.org/EIPS/eip-712), [ERC-721](https://eips.ethereum.org/EIPS/eip-721), and [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271).
 

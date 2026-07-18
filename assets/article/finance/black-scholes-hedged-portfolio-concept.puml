@@ -1,0 +1,25 @@
+@startuml
+title Hedged position - stock long against options short
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #2E8B67
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #F5FBF8
+  BorderColor #2E8B67
+}
+
+package "Hedged position (equity = x - w/w1)" {
+  [1 share long\nvalue x] as STOCK
+  [1/w1 options short\nvalue w each] as OPT
+}
+
+STOCK -down-> [Small stock move\ndx] : +dx
+OPT -down-> [Option move\nw1 * dx] : short side changes\nby ~dx
+[Small stock move\ndx] -right-> [Net stock-price risk = 0] : first-order cancel
+[Option move\nw1 * dx] -right-> [Net stock-price risk = 0]
+[Net stock-price risk = 0] -down-> [Certain return\nmust equal r] : continuous rebalance
+@enduml
