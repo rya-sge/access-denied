@@ -1,0 +1,20 @@
+@startuml
+title How the fair ticket price is found
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF6F0
+skinparam ActivityBorderColor #2E8B67
+skinparam ActivityDiamondBackgroundColor #F5FBF8
+skinparam ActivityDiamondBorderColor #2E8B67
+skinparam ArrowColor #2E8B67
+
+start
+:Someone wants a "buy later" ticket;
+:Stop guessing where the price is heading;
+:Own a bike and sell tickets\nin a careful balanced mix;
+:The mix is now safe\n(gains and losses cancel);
+:A safe mix must grow\nat the plain bank rate;
+:That rule leaves only ONE\nfair price for the ticket;
+:Measure how jumpy the price is\n(jumpier means pricier);
+:Keep nudging the balance\nas the price moves;
+stop
+@enduml

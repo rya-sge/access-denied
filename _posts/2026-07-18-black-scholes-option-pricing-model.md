@@ -190,7 +190,7 @@ w_1(x,t) = N(d_1).
 \end{aligned}
 $$
 
-This is the modern **delta**: the number of shares to hold against one option, or the slope of the value curve. Because $$x w_1 / w$$ is always greater than one, the option is always more volatile than the underlying stock, which is why a hedge of options against stock is needed in the first place.
+This is the modern **delta**: the number of shares to hold against one option, or the slope of the value curve. The factor $$x w_1 / w$$ is always greater than one. This follows from the formula itself: since $$x w_1 = x N(d_1)$$ and $$w = x N(d_1) - c\, e^{r(t-t^*)} N(d_2)$$, their difference is $$x w_1 - w = c\, e^{r(t-t^*)} N(d_2)$$, which is strictly positive because the exercise price, the discount factor, and the probability $$N(d_2)$$ are all positive. So $$x w_1$$ exceeds $$w$$, and the ratio exceeds one. The economic reason is leverage: holding the call is like owning $$N(d_1)$$ shares while having borrowed part of the cost, so the amount actually put in is smaller than the shares it controls, and a given stock move is a larger percentage move on that smaller base. This ratio is the amplification from the stock's return to the option's return, since the dominant random part of the option move is $$\Delta w \approx w_1 \Delta x$$, which in percentage terms reads $$\Delta w / w \approx (x w_1 / w)(\Delta x / x)$$. The option's percentage return is the stock's percentage return magnified by $$x w_1 / w$$, so its volatility is larger by that same factor. The option is therefore always more volatile than the underlying stock, which is why a hedge of options against stock is needed in the first place.
 
 ## An alternative derivation through the CAPM
 
@@ -282,6 +282,9 @@ The volatility $$v^2$$ is the only input not directly observable, and it became 
 | **Compound option** | An option whose underlying is itself an option, the reading of common stock when a firm carries coupon debt rather than pure discount bonds. |
 | **Option writer** | The party who sells (writes) the option and takes the short side, receiving the premium and bearing the obligation to deliver if the holder exercises. |
 | **Capital asset pricing model (CAPM)** | The equilibrium model in which an asset's expected excess return is proportional to its beta, used in the paper as a second route to the same option pricing equation. |
+| **Heat equation** | The diffusion equation $$y_2 = y_{11}$$ of physics, into which a change of variables converts the option pricing equation so that its known Gaussian solution can be borrowed. |
+| **Deep in the money** | The regime where the stock price sits far above the exercise price $$c$$, so exercise is almost certain and the call value approaches the stock price minus a discount bond of face value $$c$$. |
+| **Stochastic calculus** | The calculus of quantities driven by continuous random motion, which expands the option's change with an extra second-order term $$\tfrac{1}{2} w_{11} v^2 x^2 \Delta t$$ because a diffusion's squared move is of order $$\Delta t$$ rather than negligible. |
 
 ## Frequently Asked Questions
 

@@ -1,0 +1,27 @@
+@startuml
+title The balancing trick - own a bike, sell tickets, stay safe
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #2E8B67
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #F5FBF8
+  BorderColor #2E8B67
+}
+
+package "Your balanced mix" {
+  [Own 1 bike\n(good if price rises)] as BIKE
+  [Sold 2 tickets\n(you owe more if price rises)] as TICKETS
+}
+
+BIKE -down-> [Price ticks UP] : you gain a little
+TICKETS -down-> [Price ticks UP] : you lose a little
+[Price ticks UP] -right-> [They cancel\n= almost no change] : safe
+
+BIKE -down-> [Price ticks DOWN] : you lose a little
+TICKETS -down-> [Price ticks DOWN] : you gain a little
+[Price ticks DOWN] -right-> [They cancel\n= almost no change]
+@enduml

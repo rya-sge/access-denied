@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Pricing a\n"buy later" ticket
+** The ticket
+*** Choice, not duty
+*** Fixed strike price
+*** Heads win big,\ntails lose little
+** The old puzzle
+*** Needed a guess\nabout the future
+*** Everyone guessed\ndifferently
+** The balancing trick
+*** Own the bike
+*** Sell tickets
+*** Gains and losses\ncancel
+*** Safe like a\nlevel see-saw
+** The bank rule
+*** Safe mix cannot\nbeat a piggy bank
+*** Must grow at\nbank rate
+*** That fixes the\nfair price
+** The one measurement
+*** How jumpy the\nprice is
+*** Jumpier means\npricier ticket
+** Keep steering
+*** Balance slips
+*** Nudge it often
+** Big surprise
+*** A company is\na ticket too
+*** Owners hold a ticket\non the company
+@endmindmap
