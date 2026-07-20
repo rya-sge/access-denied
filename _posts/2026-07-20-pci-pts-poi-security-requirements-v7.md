@@ -123,7 +123,30 @@ Version 7.0 (May 2025) evolves the standard along the lines that matter as termi
 - **Mandatory access controls.** The operating system must enforce MAC in an enforcing mode.
 - **TLS 1.3.** A device that implements an IP stack must support TLS 1.3 or higher.
 
-## Requirements Checklist
+## Conclusion
+
+The PCI PTS POI v7.0 requirements describe a terminal defined by what it withholds. It withholds the value of a PIN from its own display, withholds cleartext keys and account data from anything outside its secure perimeter, withholds trust from unsigned firmware and unauthenticated third-party code, and withholds its secrets from an attacker who drills, overlays, or eavesdrops on it. The four modules apply this posture from the silicon of the PIN pad out to the IP stack and back to the factory floor.
+
+Read alongside the PCI PTS HSM standard, the POI requirements complete the picture of a payment transaction's cryptographic path: the POI captures and encrypts the PIN at the edge, and the HSM verifies it at the centre, each governed by the same principles of tamper response, key separation, and life-cycle custody applied to a different point in the chain. For anyone building, procuring, or auditing payment acceptance, the standard is a concrete catalogue of the properties a terminal must hold before a cardholder should be asked to type a PIN into it.
+
+![PCI PTS POI v7.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-poi/pci-pts-poi-security-requirements.png)
+
+## Annex — Key Terms
+
+| Term | Definition |
+|------|------------|
+| **POI** | Point of Interaction, the merchant-facing payment terminal (PIN pad, card reader, secure processor) that first handles a PIN and account data. |
+| **PED / EPP** | PIN Entry Device and Encrypting PIN Pad, terminal types that accept and encrypt a cardholder PIN. |
+| **SCR / SCRP** | Secure (encrypting) Card Reader, and Secure Card Reader with PIN, secure components integrated into a larger terminal solution. |
+| **SRED** | Secure Reading and Exchange of Data, the account-data protection function that encrypts card data on entry and never exposes it in cleartext. |
+| **Attack potential** | A Common Criteria score grading attack difficulty by combining time, expertise, target knowledge, opportunity, and equipment. |
+| **Tamper response / zeroization** | Automatic erasure of sensitive data when a device detects physical intrusion, making the data infeasible to recover. |
+| **Key separation** | The rule that each key is usable for one function only, so a PIN key cannot decrypt arbitrary data or act as another key type. |
+| **Open Protocols** | The requirement to declare every public-domain protocol and interface a device exposes so each can be assessed for known vulnerabilities. |
+| **Overlay attack** | Fitting a fraudulent layer over a PIN pad to capture key presses, countered by the integration requirement C1.2. |
+| **Lebanese Loop** | A card-capture attack using a sleeve that traps an inserted card for later retrieval, countered by requirement C2.2. |
+
+## Annex — Requirements Checklist
 
 The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its architecture, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage. Attack-potential thresholds are shown as ≥ combined (≥ exploitation floor).
 
@@ -244,29 +267,6 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | F6 | If it does not, the manufacturer provides the key-loading facility the means to verify authenticity. |
 | ☐ | F7 | Each device has a unique visible identifier (model and hardware version), also retrievable by query. |
 | ☐ | F8 | The vendor maintains a manual recording the full life cycle (production, whereabouts, repair, removal, loss/theft). |
-
-## Conclusion
-
-The PCI PTS POI v7.0 requirements describe a terminal defined by what it withholds. It withholds the value of a PIN from its own display, withholds cleartext keys and account data from anything outside its secure perimeter, withholds trust from unsigned firmware and unauthenticated third-party code, and withholds its secrets from an attacker who drills, overlays, or eavesdrops on it. The four modules apply this posture from the silicon of the PIN pad out to the IP stack and back to the factory floor.
-
-Read alongside the PCI PTS HSM standard, the POI requirements complete the picture of a payment transaction's cryptographic path: the POI captures and encrypts the PIN at the edge, and the HSM verifies it at the centre, each governed by the same principles of tamper response, key separation, and life-cycle custody applied to a different point in the chain. For anyone building, procuring, or auditing payment acceptance, the standard is a concrete catalogue of the properties a terminal must hold before a cardholder should be asked to type a PIN into it.
-
-![PCI PTS POI v7.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-poi/pci-pts-poi-security-requirements.png)
-
-## Annex — Key Terms
-
-| Term | Definition |
-|------|------------|
-| **POI** | Point of Interaction, the merchant-facing payment terminal (PIN pad, card reader, secure processor) that first handles a PIN and account data. |
-| **PED / EPP** | PIN Entry Device and Encrypting PIN Pad, terminal types that accept and encrypt a cardholder PIN. |
-| **SCR / SCRP** | Secure (encrypting) Card Reader, and Secure Card Reader with PIN, secure components integrated into a larger terminal solution. |
-| **SRED** | Secure Reading and Exchange of Data, the account-data protection function that encrypts card data on entry and never exposes it in cleartext. |
-| **Attack potential** | A Common Criteria score grading attack difficulty by combining time, expertise, target knowledge, opportunity, and equipment. |
-| **Tamper response / zeroization** | Automatic erasure of sensitive data when a device detects physical intrusion, making the data infeasible to recover. |
-| **Key separation** | The rule that each key is usable for one function only, so a PIN key cannot decrypt arbitrary data or act as another key type. |
-| **Open Protocols** | The requirement to declare every public-domain protocol and interface a device exposes so each can be assessed for known vulnerabilities. |
-| **Overlay attack** | Fitting a fraudulent layer over a PIN pad to capture key presses, countered by the integration requirement C1.2. |
-| **Lebanese Loop** | A card-capture attack using a sleeve that traps an inserted card for later retrieval, countered by requirement C2.2. |
 
 ## Frequently Asked Questions
 

@@ -131,7 +131,30 @@ In transit the device is shipped in tamper-evident packaging, or carries a secre
 
 Each device carries a unique visible identifier, its model name and hardware version, retrievable by a secure, cryptographically protected query (M7), and the vendor maintains a manual recording the full life cycle of the device's security-related components, including production data, physical whereabouts, repair, removal from operation, and loss or theft (M8).
 
-## Requirements Checklist
+## Conclusion
+
+The PCI PTS HSM v4.0 requirements describe a device defined by what it refuses to do. It refuses to reveal a clear-text key, refuses to use a key for a purpose other than the one assigned, refuses to run firmware it cannot authenticate, and refuses to survive a physical intrusion with its secrets intact. The five modules apply this posture across every stage: physical and logical controls at runtime, dedicated rules for key loading and remote administration, tenant isolation for cloud deployments, and a chain of custody that reaches back to the factory. The v4.0 addition of the cloud module extends the same key-separation and zeroization principles from a single sealed box to shared infrastructure, where the boundary being defended is now between tenants rather than only between the device and the outside world.
+
+For anyone integrating, procuring, or auditing payment cryptography, the standard is useful as a checklist of the properties that matter, and as a reminder that the security of a payment key depends as much on manufacturing, shipping, and multi-tenant isolation as on the algorithm that uses it.
+
+![PCI PTS HSM v4.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-hsm/pci-pts-hsm-security-requirements.png)
+
+## Annex — Key Terms
+
+| Term | Definition |
+|------|------------|
+| **HSM** | Hardware Security Module, a tamper-resistant device that stores cryptographic keys and performs sensitive operations inside a protected boundary. |
+| **PCI PTS** | PIN Transaction Security, the PCI Security Standards Council programme under which payment devices, including HSMs, are evaluated and approved. |
+| **Tamper response / zeroization** | The automatic and immediate erasure of sensitive data when a device detects a physical intrusion, making the data infeasible to recover. |
+| **Attack potential** | A numeric score, inherited from the Common Criteria, that grades the difficulty of an attack by combining time, expertise, target knowledge, opportunity, and equipment. |
+| **Key separation** | The rule that each cryptographic key may be used for exactly one function, so a PIN key cannot decrypt arbitrary data or act as any other key type. |
+| **Key block** | A cryptographically bound, interoperable key-wrapping format (DTR 77 / ANSI X9.143, formerly TR-31) that binds a key to its usage attributes. |
+| **Dual control** | A control requiring two or more authorized operators to act together, so no single person can perform a sensitive operation such as outputting a clear-text key. |
+| **Clear-text key** | A cryptographic key in unencrypted form; the standard forbids exposing such a key outside the protected boundary of the device. |
+| **HSM Solution Consumer** | In the cloud module, a tenant that owns a set of keys and retains sole cryptographic authority over their use on shared infrastructure. |
+| **Perfect forward secrecy** | A property of key agreement, such as Diffie-Hellman, where compromise of long-term keys does not expose previously established session keys. |
+
+## Annex — Requirements Checklist
 
 The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its functionality, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage.
 
@@ -282,29 +305,6 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | M6 | If it does not, the manufacturer provides the deployment facility the means to verify authenticity. |
 | ☐ | M7 | Each device has a unique visible identifier (model and hardware version), also retrievable by secure query. |
 | ☐ | M8 | The vendor maintains a manual recording the full life cycle (production, whereabouts, repair, removal, loss/theft). |
-
-## Conclusion
-
-The PCI PTS HSM v4.0 requirements describe a device defined by what it refuses to do. It refuses to reveal a clear-text key, refuses to use a key for a purpose other than the one assigned, refuses to run firmware it cannot authenticate, and refuses to survive a physical intrusion with its secrets intact. The five modules apply this posture across every stage: physical and logical controls at runtime, dedicated rules for key loading and remote administration, tenant isolation for cloud deployments, and a chain of custody that reaches back to the factory. The v4.0 addition of the cloud module extends the same key-separation and zeroization principles from a single sealed box to shared infrastructure, where the boundary being defended is now between tenants rather than only between the device and the outside world.
-
-For anyone integrating, procuring, or auditing payment cryptography, the standard is useful as a checklist of the properties that matter, and as a reminder that the security of a payment key depends as much on manufacturing, shipping, and multi-tenant isolation as on the algorithm that uses it.
-
-![PCI PTS HSM v4.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-hsm/pci-pts-hsm-security-requirements.png)
-
-## Annex — Key Terms
-
-| Term | Definition |
-|------|------------|
-| **HSM** | Hardware Security Module, a tamper-resistant device that stores cryptographic keys and performs sensitive operations inside a protected boundary. |
-| **PCI PTS** | PIN Transaction Security, the PCI Security Standards Council programme under which payment devices, including HSMs, are evaluated and approved. |
-| **Tamper response / zeroization** | The automatic and immediate erasure of sensitive data when a device detects a physical intrusion, making the data infeasible to recover. |
-| **Attack potential** | A numeric score, inherited from the Common Criteria, that grades the difficulty of an attack by combining time, expertise, target knowledge, opportunity, and equipment. |
-| **Key separation** | The rule that each cryptographic key may be used for exactly one function, so a PIN key cannot decrypt arbitrary data or act as any other key type. |
-| **Key block** | A cryptographically bound, interoperable key-wrapping format (DTR 77 / ANSI X9.143, formerly TR-31) that binds a key to its usage attributes. |
-| **Dual control** | A control requiring two or more authorized operators to act together, so no single person can perform a sensitive operation such as outputting a clear-text key. |
-| **Clear-text key** | A cryptographic key in unencrypted form; the standard forbids exposing such a key outside the protected boundary of the device. |
-| **HSM Solution Consumer** | In the cloud module, a tenant that owns a set of keys and retains sole cryptographic authority over their use on shared infrastructure. |
-| **Perfect forward secrecy** | A property of key agreement, such as Diffie-Hellman, where compromise of long-term keys does not expose previously established session keys. |
 
 ## Frequently Asked Questions
 

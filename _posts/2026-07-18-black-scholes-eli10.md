@@ -66,9 +66,22 @@ Grown-ups call this jumpiness **volatility** (how much a price bounces around ov
 
 ## You have to keep steering
 
-There is a catch to the balancing trick. Remember how you owned one bike and sold two tickets to stay balanced? That perfect balance only works for right now. As the price moves, the balance slips, and the right number of tickets to sell changes a little.
+There is a catch to the balancing trick, and it is worth stopping on because it is easy to miss. Remember how you owned one bike but sold two tickets? Here is a fair worry. If both ticket-holders come back and use their tickets, you must hand over two bikes, but you only own one. You would have to rush out and buy a second bike just to give it away. So how can one bike ever balance two tickets?
 
-It is like riding a bike in a straight line. You do not set the handlebars once and freeze. You make tiny steering corrections all the time to stay on course. Black and Scholes imagined doing the same with the money mix, nudging it constantly so it always stays balanced. In their imaginary perfect world, you correct the balance every single instant, and then the mix is perfectly safe. Real people cannot steer *that* often, so real life is a little messier, but the closer you steer, the safer it gets.
+The answer is that "one bike for two tickets" is only the right mix for *right now*, while the bike sits near 100 coins and nobody yet knows whether the tickets will be used. At that moment each ticket is a coin-flip, so a single ticket only behaves like *half* a bike. Two half-bikes make one whole bike, and that is why one bike cancels two tickets today. Grown-ups even have a name for "how much of a real bike one ticket behaves like." They call it **delta** (a number saying how many bikes a single ticket currently acts like).
+
+As the price moves, that number changes, and you change how many bikes you own to match it. The table shows the idea.
+
+| What is happening | Each ticket behaves like | Bikes you should own (for two tickets) |
+|-------------------|--------------------------|----------------------------------------|
+| Bike near 100, very unsure | about half a bike | 1 bike |
+| Bike climbing, tickets likely to be used | about three-quarters of a bike | about one and a half bikes |
+| Bike high, tickets almost certainly used | almost a whole bike | 2 bikes |
+| Bike low, tickets almost certainly skipped | almost nothing | 0 bikes |
+
+So your worry actually points straight at the answer. If the price climbs and it starts to look like both tickets will be used, you slowly buy that second bike along the way, while it is still cheaper than it will be at the end. By the time the tickets are used you already own the two bikes you need, so you are never caught buying one at the last second. And if the price sinks so the tickets look worthless, you do the opposite and sell your bike back down, because you will not have to hand anything over.
+
+It is like riding a bike in a straight line. You do not set the handlebars once and freeze. You make tiny steering corrections all the time to stay on course. Black and Scholes imagined doing the same with the money mix, nudging it constantly so it always stays balanced. In their imaginary perfect world, you correct the balance every single instant, and then the mix is perfectly safe. Real people cannot steer *that* often, so real life is a little messier, but the closer you steer, the safer it gets. The coins you collected for selling the tickets are what pay for buying those bikes along the way, and if you steer well they turn out to be just enough.
 
 ## A surprise, a company is a kind of ticket too
 
@@ -115,6 +128,10 @@ Grown-ups all over the world buy and sell these tickets, on things like company 
 **Q: What goes wrong if you skip the constant steering?**
 
 If you set the balance once and then stop paying attention, the balance slowly slips out of place as the price moves. Then your mix is no longer safe, and a big price swing can leave you with a real loss or a surprise gain. It is like letting go of your handlebars. For a second you roll straight, but soon you drift off the path. The safety of the trick depends on making lots of small corrections, so skipping them breaks the promise that the mix cannot lose.
+
+**Q: You sold two tickets but own only one bike. If both tickets get used, don't you come up short?**
+
+Good catch, and this is the whole reason the balance is never a set-it-once thing. "One bike for two tickets" is only right at the start, while the bike is near 100 coins and each ticket is still a coin-flip, so each ticket behaves like only half a bike. If the price climbs and it starts to look like both tickets really will be used, you gradually buy that second bike on the way up, while it is still cheaper than the final price. By the time both tickets are used you already own two bikes, one for each, so you never have to scramble at the last moment. If the price falls and the tickets look worthless, you sell your bike back down instead. The coins you were paid for the tickets are what cover the cost of buying bikes as you go.
 
 **Q: Can you give me another example of a "company is a ticket" situation?**
 
