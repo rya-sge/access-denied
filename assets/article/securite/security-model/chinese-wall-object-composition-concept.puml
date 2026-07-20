@@ -1,0 +1,41 @@
+@startuml
+title Composition of objects: conflict classes, company datasets, objects
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam package {
+  BackgroundColor #FBE3E3
+  BorderColor #B54A4A
+}
+
+package "Conflict of interest class: Oil companies" as OIL {
+  package "Dataset: Oil Company A (x_oil, y_a)" as OA {
+    rectangle "object o1" as o1
+    rectangle "object o2" as o2
+  }
+  package "Dataset: Oil Company B (x_oil, y_b)" as OB {
+    rectangle "object o3" as o3
+  }
+}
+
+package "Conflict of interest class: Banks" as BANK {
+  package "Dataset: Bank A (x_bank, y_c)" as BA {
+    rectangle "object o4" as o4
+  }
+}
+
+note bottom of OIL
+  A and B compete:
+  a subject inside A is
+  walled off from B (T2)
+end note
+
+note bottom of BANK
+  Different class:
+  freely accessible
+  regardless of oil access
+end note
+@enduml

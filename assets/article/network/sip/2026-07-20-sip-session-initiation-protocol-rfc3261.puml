@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* SIP\n(RFC 3261)
+** Purpose
+*** Signaling, not media
+*** Locate, negotiate, manage
+*** Five facets\n(location, availability,\ncapabilities, setup, management)
+*** Works with RTP / SDP / RTSP
+** Elements
+*** UA (UAC / UAS)
+*** Proxy (stateful / stateless)
+*** Redirect server
+*** Registrar
+*** B2BUA
+*** Location service
+** Layered model
+*** Syntax & encoding (ABNF)
+*** Transport (UDP/TCP/TLS/SCTP)
+*** Transaction
+*** Transaction user (core)
+** Messages
+*** Methods\n(INVITE ACK BYE\nCANCEL REGISTER OPTIONS)
+*** Responses 1xx-6xx
+*** Headers\n(Via To From Call-ID\nCSeq Contact Max-Forwards)
+** Abstractions
+*** Transaction\n(INVITE vs non-INVITE)
+*** Dialog\n(Call-ID + 2 tags)
+*** Registration & AOR
+** Security
+*** Threats\n(hijacking, impersonation,\ntampering, teardown, DoS)
+*** TLS / IPsec
+*** SIPS URI
+*** HTTP Digest
+*** S/MIME
+@endmindmap

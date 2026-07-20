@@ -1,0 +1,34 @@
+@startuml
+title Simple security rule (A2): read request for object o_r
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FBE3E3
+  DiamondBorderColor #B54A4A
+}
+
+start
+:subject s_u requests read of o_r;
+if (subject possesses any object?) then (no)
+  :first access, unconstrained (A3, A4);
+  :GRANT;
+  stop
+else (yes)
+endif
+if (o_r in same dataset as a possessed object?) then (yes)
+  :inside an existing wall;
+  :GRANT and set N(u, r) = true;
+  stop
+else (no)
+endif
+if (o_r in a different conflict class\nfrom every possessed object?) then (yes)
+  :neutral, no conflict;
+  :GRANT and set N(u, r) = true;
+  stop
+else (no: same class, other dataset)
+  :competitor across the wall;
+  :DENY;
+  stop
+endif
+@enduml

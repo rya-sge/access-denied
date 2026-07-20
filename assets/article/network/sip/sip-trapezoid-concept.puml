@@ -1,0 +1,40 @@
+@startuml
+title SIP Trapezoid and Logical Elements
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam database {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam node {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+
+node "atlanta.com domain" {
+  [Alice's softphone\n(UAC / UAS)] as Alice
+  [atlanta.com\nProxy] as PA
+}
+node "biloxi.com domain" {
+  [biloxi.com\nProxy] as PB
+  [Bob's phone\n(UAS / UAC)] as Bob
+  database "Location\nService" as LS
+}
+
+Alice -down-> PA : INVITE (signaling)
+PA -right-> PB : forwarded INVITE\n(+ own Via)
+PB -down-> Bob : forwarded INVITE
+PB -left-> LS : query current contact
+Bob ..> LS : REGISTER binds\nAOR to device
+
+Alice <==> Bob : RTP media (direct, bypasses proxies)
+
+note bottom of PA
+  Proxies route signaling and add Via;
+  media flows end-to-end over RTP.
+end note
+@enduml

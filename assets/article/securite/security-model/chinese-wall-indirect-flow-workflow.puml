@@ -1,0 +1,33 @@
+@startuml
+title Indirect flow across a shared dataset, blocked by the *-property (A6)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  ActorBackgroundColor #FDEEEE
+  ActorBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+}
+
+actor "User A" as A
+actor "User B" as B
+database "Oil Company A" as OA
+database "Bank A\n(shared, neutral)" as BA
+database "Oil Company B" as OB
+
+A -> OA : read (allowed)
+A -> BA : write Oil A secrets
+note right of BA
+  Without *-property this write
+  is permitted by A2 alone
+end note
+B -> BA : read
+B --> OB : leak reaches
+note over A, OB
+  *-property (A6): A may read Oil A
+  (a different dataset, unsanitized),
+  so the write to Bank A is DENIED.
+  T4: unsanitized info stays in its
+  own dataset; sanitized info flows.
+end note
+@enduml

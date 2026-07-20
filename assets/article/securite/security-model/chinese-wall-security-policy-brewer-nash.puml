@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Chinese Wall\n(Brewer & Nash, 1989)
+** Motivation
+*** Commercial, not military
+*** Market analyst vs competitor
+*** Insider dealing defence
+** Data model
+*** Objects (one corporation)
+*** Company dataset (x)
+*** Conflict of interest class (x)
+*** Axiom A1: dataset => class
+** Access rules
+*** Simple security (A2)\nhistory-based read
+*** Possession matrix N
+*** First access unconstrained
+*** *-property (A6)\nblocks indirect flow
+** Theorems
+*** T1: only same dataset or\ndifferent class
+*** T2: one dataset per class
+*** T3: min L analysts
+*** T4: unsanitized info confined
+** Sanitized data
+*** Distinguished dataset y0
+*** Flows freely
+** Comparisons
+*** Bell-LaPadula: cannot capture\n(no history, not both)
+*** Clark & Wilson: A7, A8\nusers vs processes
+@endmindmap

@@ -1,0 +1,30 @@
+@startuml
+title INVITE Session Establishment and Teardown
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+actor "Alice\n(UAC)" as A
+participant "atlanta.com\nProxy" as PA
+participant "biloxi.com\nProxy" as PB
+actor "Bob\n(UAS)" as B
+
+A -> PA : INVITE
+PA --> A : 100 Trying
+PA -> PB : INVITE
+PB --> PA : 100 Trying
+PB -> B : INVITE
+B --> PB : 180 Ringing
+PB --> PA : 180 Ringing
+PA --> A : 180 Ringing
+B --> PB : 200 OK (SDP)
+PB --> PA : 200 OK
+PA --> A : 200 OK
+A -> B : ACK (direct)
+A <-> B : RTP media session
+B -> A : BYE (direct)
+A --> B : 200 OK
+@enduml

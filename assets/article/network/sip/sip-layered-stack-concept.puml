@@ -1,0 +1,41 @@
+@startuml
+title SIP Layered Protocol Model
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam package {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+
+package "Transaction User (TU) — the core" {
+  [UAC core]
+  [UAS core]
+  [Proxy core]
+}
+package "Transaction layer" {
+  [Client transaction FSM]
+  [Server transaction FSM]
+}
+package "Transport layer" {
+  [UDP / TCP / TLS / SCTP framing]
+}
+package "Syntax and encoding" {
+  [ABNF grammar (text, UTF-8)]
+}
+
+[UAC core] --> [Client transaction FSM]
+[UAS core] --> [Server transaction FSM]
+[Client transaction FSM] --> [UDP / TCP / TLS / SCTP framing]
+[Server transaction FSM] --> [UDP / TCP / TLS / SCTP framing]
+[UDP / TCP / TLS / SCTP framing] --> [ABNF grammar (text, UTF-8)]
+
+note right of [Proxy core]
+  A stateless proxy has
+  no transaction layer and
+  no TU: it just forwards.
+end note
+@enduml
