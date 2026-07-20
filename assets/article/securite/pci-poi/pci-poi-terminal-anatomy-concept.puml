@@ -1,0 +1,42 @@
+@startuml
+title PCI POI Terminal — Components and Trust Boundary
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #FDEEEE
+skinparam componentBorderColor #B54A4A
+skinparam packageBackgroundColor #FCF5F5
+skinparam packageBorderColor #B54A4A
+skinparam rectangleBackgroundColor #FDEEEE
+skinparam rectangleBorderColor #B54A4A
+skinparam ArrowColor #B54A4A
+
+actor Cardholder as ch
+
+package "Tamper-Responsive Secure Perimeter" as sp {
+  component "PIN pad\n(keys not displayed, B3)" as pinpad
+  component "Secure controller\n(PIN & key ops)" as ctrl
+  rectangle "PIN keys 35/15\nAccount keys 26/13 (A6)" as keys
+  component "ICC / contactless\nreader (A13/A10)" as icc
+  component "SRED account-data\nencryption (B23)" as sred
+}
+
+rectangle "Display\n(prompt integrity, A8/B15)" as disp
+rectangle "Third-party apps\n(no cleartext access, B23.1)" as apps
+cloud "Acquirer / network\n(TLS 1.3, D9)" as net
+
+ch --> pinpad : enters PIN
+ch --> icc : inserts / taps card
+pinpad --> ctrl
+icc --> sred
+ctrl --> keys : one key,\none function (B12)
+sred --> keys
+ctrl --> disp : authenticated\nprompts
+apps ..> ctrl : sensitive services\nrequire auth (B5)
+ctrl --> net : encrypted PIN block\n(ISO 9564, B11)
+sred --> net : encrypted account data
+
+note bottom of sp
+  Cleartext PIN and keys never
+  leave the secure perimeter (B13)
+end note
+@enduml

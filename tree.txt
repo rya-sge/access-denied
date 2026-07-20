@@ -94,6 +94,11 @@ _posts/2026-06-28-chinese-remainder-theorem-cryptography.md
   assets/article/cryptographie/crt/crt-ring-isomorphism-concept.puml                                        (concept)
   assets/article/cryptographie/crt/rsa-crt-signature-workflow.puml                                          (workflow)
 
+_posts/2026-07-20-hotp-hmac-one-time-password-rfc4226.md
+  assets/article/cryptographie/hotp/2026-07-20-hotp-hmac-one-time-password-rfc4226.puml                  (mindmap)
+  assets/article/cryptographie/hotp/hotp-generation-pipeline.puml                                        (concept, in-section)
+  assets/article/cryptographie/hotp/hotp-validation-workflow.puml                                        (workflow, in-section)
+
 _posts/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.md
   assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.puml          (mindmap)
   assets/article/cryptographie/lattice/fiat-shamir-aborts-protocol.puml                                 (concept, in-section)
@@ -395,3 +400,15 @@ _posts/2026-07-18-black-scholes-eli10.md
   assets/article/finance/black-scholes-eli10.puml                                    (mindmap)
   assets/article/finance/black-scholes-balancing-concept.puml                       (concept, in-section)
   assets/article/finance/black-scholes-eli10-workflow.puml                          (workflow, in-section)
+
+_posts/2026-07-20-pci-pts-hsm-security-requirements-v4.md
+  assets/article/securite/pci-hsm/pci-pts-hsm-security-requirements.puml            (mindmap)
+  assets/article/securite/pci-hsm/pci-hsm-trust-boundary-concept.puml               (concept, in-section)
+  assets/article/securite/pci-hsm/pci-hsm-lifecycle-workflow.puml                   (workflow, in-section)
+  assets/article/securite/pci-hsm/pci-hsm-cloud-multitenant-concept.puml            (concept, in-section)
+
+_posts/2026-07-20-pci-pts-poi-security-requirements-v7.md
+  assets/article/securite/pci-poi/pci-pts-poi-security-requirements.puml             (mindmap)
+  assets/article/securite/pci-poi/pci-poi-terminal-anatomy-concept.puml              (concept, in-section)
+  assets/article/securite/pci-poi/pci-poi-pin-transaction-workflow.puml              (workflow, in-section)
+  assets/article/securite/pci-poi/pci-poi-attack-surface-concept.puml                (concept, in-section)

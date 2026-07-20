@@ -1,0 +1,40 @@
+@startuml
+title Cloud HSM-as-a-Service — Multi-Tenant Isolation (Module 4)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #FDEEEE
+skinparam componentBorderColor #B54A4A
+skinparam packageBackgroundColor #FCF5F5
+skinparam packageBorderColor #B54A4A
+skinparam rectangleBackgroundColor #FDEEEE
+skinparam rectangleBorderColor #B54A4A
+skinparam ArrowColor #B54A4A
+
+actor "Consumer A\n(key owner)" as ca
+actor "Consumer B\n(key owner)" as cb
+
+package "HSM Virtualization System" as virt {
+  component "Secure channel routing\n(K1, per-consumer)" as route
+}
+
+package "HSM Processing Element\n(attack potential >= 35, I1)" as hpe {
+  rectangle "Keys of A\n(isolated path, I5)" as ka
+  rectangle "Keys of B\n(isolated path, I5)" as kb
+  component "Per-consumer provisioning\nkey, DH / PFS (K4)" as prov
+  component "Storage zeroized before\nreuse across tenants (J6)" as zero
+}
+
+ca --> route : authenticated\napproval (J1/J3)
+cb --> route : authenticated\napproval (J1/J3)
+route --> ka
+route --> kb
+prov ..> ka
+prov ..> kb
+zero ..> ka
+zero ..> kb
+
+note bottom of hpe
+  A tenant cannot import, export, or
+  operate on another tenant's keys
+end note
+@enduml

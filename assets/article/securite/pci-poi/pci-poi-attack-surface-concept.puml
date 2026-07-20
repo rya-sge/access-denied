@@ -1,0 +1,38 @@
+@startuml
+title PCI POI Attack Surface and Countering Requirements
+left to right direction
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #FDEEEE
+skinparam componentBorderColor #B54A4A
+skinparam rectangleBackgroundColor #FCF5F5
+skinparam rectangleBorderColor #B54A4A
+skinparam ArrowColor #B54A4A
+
+rectangle "Physical penetration\n(drills, solvents, seams)" as pen
+rectangle "PIN-disclosing bug\n/ keypad tap" as bug
+rectangle "Overlay on PIN pad" as overlay
+rectangle "Card-capture\n(Lebanese Loop)" as loop
+rectangle "Side channel\n(sound, EM, power, timing)" as side
+rectangle "Prompt manipulation\n(fake PIN request)" as prompt
+rectangle "Wireless eavesdrop\n/ MITM" as wireless
+rectangle "Malicious 3rd-party app" as app
+
+component "Tamper detect &\nzeroize (A1)" as c1
+component "26/13 keypad\nattack potential (A2)" as c2
+component "Overlay resistance\n18/9 (C1.2)" as c3
+component "Card-capture\ndefence (C2.2)" as c4
+component "Emanation limits\n(A5/A7)" as c5
+component "Prompt integrity\n(A8/B15/C2.4)" as c6
+component "Bluetooth/Wi-Fi\nsecurity (D12/D13)" as c7
+component "App isolation\n(B16.1/B23.1)" as c8
+
+pen --> c1
+bug --> c2
+overlay --> c3
+loop --> c4
+side --> c5
+prompt --> c6
+wireless --> c7
+app --> c8
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title PIN Transaction Flow Inside a PCI POI Terminal
+skinparam shadowing false
+skinparam sequenceArrowColor #B54A4A
+skinparam sequenceParticipantBackgroundColor #FDEEEE
+skinparam sequenceParticipantBorderColor #B54A4A
+skinparam sequenceLifeLineBorderColor #B54A4A
+skinparam noteBackgroundColor #FCF5F5
+skinparam noteBorderColor #B54A4A
+
+actor Cardholder as CH
+participant "PIN pad" as PP
+participant "Secure\ncontroller" as SC
+participant "ICC reader" as IC
+participant "Acquirer" as AQ
+
+CH -> PP : enter PIN digits
+note right of PP: display shows only\nnon-significant symbols (B3)
+PP -> SC : key presses (protected path)
+SC -> SC : buffer PIN, clear on\ntimeout / completion (B4)
+alt Online PIN
+  SC -> SC : encrypt PIN block\n(ISO 9564, B11)
+  SC -> AQ : encrypted PIN block (TLS 1.3)
+  note left of AQ: verified by backend HSM
+else Offline PIN
+  SC -> IC : PIN block enciphered to\nICC reader (ISO 9564, B21)
+  IC -> IC : verify PIN against card
+end
+SC -> SC : zeroize sensitive buffers (B4)
+@enduml

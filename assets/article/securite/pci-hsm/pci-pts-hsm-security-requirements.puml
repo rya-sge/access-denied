@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* PCI PTS HSM v4.0
+** Scope
+*** Payment HSMs
+*** PIN, MAC, key mgmt
+*** Manufacturing to deployment
+** Module 1 Core
+*** A Physical
+**** Tamper detect and respond
+**** Attack potential 26 / 35
+*** B Logical
+**** Self-tests
+**** Key separation
+**** Approved algorithms
+**** RNG assessed
+*** C Policy
+** Module 2 Key-loading
+*** No clear-text key exposure
+*** Erase on transfer
+** Module 3 Remote admin
+*** E Dual control init
+*** F MAC ISO 16609
+*** G Key generation
+*** H Digital signature
+** Module 4 Cloud HSMaaS
+*** Multi-tenant isolation
+*** Per-consumer keys
+*** Memory zeroization
+*** Firmware dual-control
+** Module 5 Life cycle
+*** L Manufacturing
+*** M Transit to deployment
+*** Unique device ID
+@endmindmap

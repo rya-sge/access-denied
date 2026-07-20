@@ -1,0 +1,35 @@
+@startuml
+title HOTP server validation with look-ahead window (RFC 4226)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+}
+
+actor User
+participant "Token\n(generator)" as Token
+participant "Server\n(validator)" as Server
+
+User -> Token : request code
+Token -> Token : C_token = C_token + 1
+Token --> User : HOTP(K, C_token)
+User -> Server : submit code z
+
+group throttling check (parameter T)
+  Server -> Server : reject if failed attempts >= T\n(delay or lockout, across sessions)
+end
+
+loop i from C_server to C_server + s - 1
+  Server -> Server : compute HOTP(K, i)
+  alt z == HOTP(K, i)
+    Server -> Server : C_server = i + 1  (resync)
+    Server --> User : authenticated
+  end
+end
+
+alt no match in window
+  Server --> User : rejected
+end
+@enduml

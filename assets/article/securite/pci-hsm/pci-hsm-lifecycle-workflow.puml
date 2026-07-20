@@ -1,0 +1,29 @@
+@startuml
+title PCI HSM Life-Cycle Chain of Trust (Modules L and M)
+skinparam shadowing false
+skinparam activityBackgroundColor #FDEEEE
+skinparam activityBorderColor #B54A4A
+skinparam activityDiamondBackgroundColor #FCF5F5
+skinparam activityDiamondBorderColor #B54A4A
+skinparam ArrowColor #B54A4A
+
+start
+:Design & certification\n(change control, L1);
+:Firmware inspected, free of\nhidden functions (L2);
+:Assembly with certified\nhardware, dual control (L4/L5);
+:Install unique device secret\nunder dual control (L7);
+if (Tamper-evident package\nor self-erasing secret?) then (yes)
+  :Ship under auditable controls (M1/M3);
+else (no)
+  :Account for every device\nat every point in time (M1);
+endif
+:Transfer accountability to\nnext party (M2);
+if (Authenticity of device\nverified at deployment?) then (yes)
+  :Initial key loading\nby acquiring org (M5/M6);
+else (no)
+  :Reject device;
+  stop
+endif
+:Operational use\n(out of PCI HSM scope);
+stop
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+title HOTP generation pipeline (RFC 4226)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+start
+:Shared secret K  +  8-byte counter C;
+:HS = HMAC-SHA-1(K, C)\n(20-byte / 160-bit string);
+:Dynamic Truncation DT(HS);
+:offset = HS[19] & 0x0f\n(0..15);
+:P = HS[offset .. offset+3]\n(4 bytes, big-endian);
+:DBC = P & 0x7fffffff\n(31-bit unsigned);
+:HOTP = DBC mod 10^d\n(d >= 6 digits);
+:Display code, e.g. "872921";
+stop
+@enduml

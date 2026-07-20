@@ -1,0 +1,38 @@
+@startuml
+title PCI HSM Security Boundary — Physical and Logical Protection
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #FDEEEE
+skinparam componentBorderColor #B54A4A
+skinparam packageBackgroundColor #FCF5F5
+skinparam packageBorderColor #B54A4A
+skinparam rectangleBackgroundColor #FDEEEE
+skinparam rectangleBorderColor #B54A4A
+skinparam ArrowColor #B54A4A
+
+package "Tamper-Responsive Boundary" as boundary {
+  rectangle "Sensitive functions\n(PIN, MAC, key ops)" as sf
+  rectangle "Cryptographic keys\n(secret / private)" as keys
+  rectangle "Sensitive buffers\n(cleared after use)" as buf
+  component "Tamper detection\n& zeroization (A1)" as tamper
+  component "Self-tests &\nfirmware auth (B1/B3)" as selftest
+  component "Assessed RNG (B8)" as rng
+}
+
+actor "Operator\n(dual control)" as op
+rectangle "External interface\n(data / control split, B4)" as iface
+cloud "Untrusted host / network" as net
+
+op --> iface
+net --> iface
+iface --> sf : commands only
+sf --> keys : one key,\none function (B12)
+tamper ..> keys : erase on\npenetration
+selftest ..> sf : halt on\nfailure
+rng ..> keys : key generation
+
+note bottom of boundary
+  Clear-text keys and PINs never
+  cross the boundary (B13)
+end note
+@enduml
