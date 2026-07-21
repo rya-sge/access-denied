@@ -1,0 +1,35 @@
+@startuml
+title IPsec / IKE Document Group Interrelationships (RFC 6071, Figure 1)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+
+[Architecture] as ARCH
+[ESP Protocol] as ESP
+[AH Protocol] as AH
+[Encryption\nAlgorithm] as ENC
+[Combined\nAlgorithm] as COMB
+[Integrity-Protection\nAlgorithm] as INTEG
+[IKE Protocol] as IKE
+
+ARCH --> ESP
+ARCH --> AH
+ESP --> ENC
+ESP --> COMB
+ESP --> INTEG
+AH --> INTEG
+IKE --> ESP
+IKE --> AH
+IKE ..> ENC : negotiates
+IKE ..> COMB : negotiates
+IKE ..> INTEG : negotiates
+
+note bottom of IKE
+  IKE negotiates the SAs
+  and keying material used
+  by the protocol groups above.
+end note
+@enduml

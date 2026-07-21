@@ -1,0 +1,33 @@
+@startuml
+title IPsec Processing Databases and the Security Association
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam database {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+}
+
+database "SPD\nSecurity Policy\nDatabase" as SPD
+database "SAD\nSecurity Association\nDatabase" as SAD
+database "PAD\nPeer Authorization\nDatabase\n(IPsec-v3)" as PAD
+
+[Outbound / inbound\npacket] as PKT
+[IKE\n(key management)] as IKE
+
+PKT --> SPD : match selectors
+SPD --> SAD : discard / bypass / protect\n-> find SA
+SAD --> PKT : apply SA\n(SPI, algorithms, keys)
+IKE --> SAD : install negotiated SA
+IKE --> PAD : consult for\npeer authentication
+PAD ..> IKE : authorizes peer
+
+note right of SAD
+  An SA is one-way and named by
+  its SPI; a two-way flow needs a pair.
+  Mode: transport or tunnel.
+end note
+@enduml

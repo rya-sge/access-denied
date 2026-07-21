@@ -1,0 +1,30 @@
+@startuml
+title SIP Trapezoid Message Flow (RFC 3261, Figure 1)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+actor "Alice's\nsoftphone" as A
+participant "atlanta.com\nProxy" as PA
+participant "biloxi.com\nProxy" as PB
+actor "Bob's\nSIP phone" as B
+
+A -> PA : F1  INVITE
+PA --> A : F3  100 Trying
+PA -> PB : F2  INVITE
+PB --> PA : F5  100 Trying
+PB -> B : F4  INVITE
+B --> PB : F6  180 Ringing
+PB --> PA : F7  180 Ringing
+PA --> A : F8  180 Ringing
+B --> PB : F9  200 OK
+PB --> PA : F10 200 OK
+PA --> A : F11 200 OK
+A -> B : F12 ACK
+A <-> B : Media Session (RTP)
+B -> A : F13 BYE
+A --> B : F14 200 OK
+@enduml

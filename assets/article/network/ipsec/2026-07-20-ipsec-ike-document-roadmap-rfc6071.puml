@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* IPsec / IKE\nRoadmap\n(RFC 6071)
+** Purpose
+*** Map dozens of RFCs
+*** Informational,\ndefines nothing
+*** Obsoletes RFC 2411
+*** Tags: S / E / B / I
+** Core concepts
+*** SA (one-way)
+*** SPI
+*** SPD / SAD / PAD
+*** Transport vs tunnel
+** Seven doc groups
+*** Architecture
+*** ESP / AH
+*** Encryption alg
+*** Combined alg
+*** Integ-protection alg
+*** IKE
+** Versions
+*** IPsec-v2 -> v3
+*** IKEv1 -> IKEv2
+*** IKE SA vs IPsec SA\n(CHILD_SA)
+** Extensions
+*** NAT traversal
+*** ESN
+*** PKI4IPsec
+*** Dead peer detection
+*** MOBIKE / remote access
+** Crypto algorithms
+*** IANA value + RFC
+*** Levels MUST..MAY\n(SHOULD+ / MUST-)
+*** DES deprecated
+** Reach beyond IPsec
+*** Outgrowths\n(policy, MIB, IPComp,\nBTNS, KINK, IPSECKEY)
+*** Protocols using IPsec\n(MIP, OSPF, HIP, BGP, SIP)
+*** Protocols adapting IKE\n(EAP, Fibre Channel)
+@endmindmap

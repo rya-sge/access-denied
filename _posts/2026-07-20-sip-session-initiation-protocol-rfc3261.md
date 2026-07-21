@@ -4,7 +4,7 @@ title: "SIP - The Session Initiation Protocol (RFC 3261)"
 date:   2026-07-20
 lang: en
 locale: en-GB
-categories: network security
+categories: network security rfc
 tags: network sip voip signaling rfc3261 telephony proxy registrar
 description: How SIP (RFC 3261) sets up, modifies, and tears down multimedia sessions using a text request/response model, its elements, layered design, transactions, dialogs, and security.
 image: /assets/article/network/sip/2026-07-20-sip-session-initiation-protocol-rfc3261.png
@@ -40,6 +40,10 @@ The canonical example in RFC 3261 is a call from Alice to Bob that traverses two
 Alice calls Bob using his SIP URI, `sip:bob@biloxi.com`, an identifier with the same form as an email address. Her softphone does not know where Bob is, so it sends an `INVITE` request to the proxy that serves her own domain, `atlanta.com`. That proxy returns a `100 (Trying)` response, performs a DNS lookup to find the proxy serving `biloxi.com`, adds its own address in a `Via` header field, and forwards the request. The `biloxi.com` proxy consults a location service to find Bob's current IP address, adds its own `Via`, and forwards the `INVITE` to Bob's phone.
 
 Bob's phone rings and returns `180 (Ringing)`, which flows back through both proxies in reverse, each proxy using the `Via` header to route the response and stripping its own address off the top. When Bob answers, his phone sends `200 (OK)` carrying his SDP media description. Alice's softphone confirms with an `ACK` sent directly to Bob, and the two endpoints then exchange media over RTP, bypassing the proxies entirely. When Bob hangs up, his phone sends a `BYE` directly to Alice, and Alice answers `200 (OK)`. The session is over.
+
+The diagram below traces the whole exchange, with each message labelled `F1` through `F14` as in the specification.
+
+![SIP trapezoid message flow]({{site.url_complet}}/assets/article/network/sip/sip-trapezoid-message-flow.png)
 
 A skeleton `INVITE` from this exchange shows the request line, the mandatory header fields, and the body separator:
 

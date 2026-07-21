@@ -416,6 +416,7 @@ _posts/2026-07-20-pci-pts-poi-security-requirements-v7.md
 _posts/2026-07-20-sip-session-initiation-protocol-rfc3261.md
   assets/article/network/sip/2026-07-20-sip-session-initiation-protocol-rfc3261.puml   (mindmap)
   assets/article/network/sip/sip-trapezoid-concept.puml                                (concept, in-section)
+  assets/article/network/sip/sip-trapezoid-message-flow.puml                           (workflow, in-section)
   assets/article/network/sip/sip-layered-stack-concept.puml                            (concept, in-section)
   assets/article/network/sip/sip-invite-session-workflow.puml                          (workflow, in-section)
 
@@ -424,3 +425,9 @@ _posts/2026-07-20-chinese-wall-security-policy-brewer-nash.md
   assets/article/securite/security-model/chinese-wall-object-composition-concept.puml    (concept, in-section)
   assets/article/securite/security-model/chinese-wall-access-decision-workflow.puml      (workflow, in-section)
   assets/article/securite/security-model/chinese-wall-indirect-flow-workflow.puml        (workflow, in-section)
+
+_posts/2026-07-20-ipsec-ike-document-roadmap-rfc6071.md
+  assets/article/network/ipsec/2026-07-20-ipsec-ike-document-roadmap-rfc6071.puml     (mindmap)
+  assets/article/network/ipsec/ipsec-document-groups-concept.puml                     (concept, in-section)
+  assets/article/network/ipsec/ipsec-databases-concept.puml                           (concept, in-section)
+  assets/article/network/ipsec/ike-negotiation-workflow.puml                          (workflow, in-section)

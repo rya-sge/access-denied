@@ -1,0 +1,25 @@
+@startuml
+title IKEv2 Negotiation: IKE SA then IPsec SA (CHILD_SA)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+  ArrowColor #B54A4A
+}
+participant "Initiator" as I
+participant "Responder" as R
+
+== IKE_SA_INIT (establish the IKE SA) ==
+I -> R : SA proposals, DH key share, nonce
+R --> I : chosen SA, DH key share, nonce
+note over I, R : Shared secret derived; IKE SA now protects further signaling
+
+== IKE_AUTH (authenticate peers + first IPsec SA) ==
+I -> R : identity, AUTH, CHILD_SA proposal, traffic selectors
+R --> I : identity, AUTH, chosen CHILD_SA, traffic selectors
+note over I, R : Peers authenticated (cert / PSK / EAP); IPsec SA (CHILD_SA) established
+
+== Protected data traffic ==
+I <-> R : ESP-protected packets over the IPsec SA
+@enduml

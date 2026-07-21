@@ -4,7 +4,7 @@ title: "HOTP - An HMAC-Based One-Time Password Algorithm (RFC 4226)"
 date:   2026-07-20
 lang: en
 locale: en-GB
-categories: cryptography security
+categories: cryptography security rfc
 tags: cryptography hotp otp hmac two-factor-authentication rfc4226 oath totp
 description: How HOTP (RFC 4226) turns a shared secret and a counter into a 6-digit one-time password using HMAC-SHA-1 and dynamic truncation, with its security analysis, validation rules, and link to TOTP.
 image: /assets/article/cryptographie/hotp/2026-07-20-hotp-hmac-one-time-password-rfc4226.png
