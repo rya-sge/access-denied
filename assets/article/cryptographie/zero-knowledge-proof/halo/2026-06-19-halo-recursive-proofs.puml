@@ -1,0 +1,64 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Halo (ePrint 2019/1021)
+** Motivation
+*** IVC: one proof for a T-step computation
+*** Prior art needed pairing-friendly curves
+*** MNT cycles: 780-bit fields, poor performance
+*** Pairing-based SNARKs need a trusted setup
+
+** Polynomial commitment
+*** Pedersen vector commitment, no trusted setup
+*** Reference string: random G_1...G_d and H
+*** Commit(p; r) = <a, G> + [r]H
+*** Perfectly hiding, additively homomorphic
+
+** Inner product argument
+*** k = log_2(d) rounds of folding
+*** Communication: 2k group elements
+*** Bottleneck: linear MSM G = <s, G>
+*** b = g(x, u_1, ..., u_k) evaluated in O(log d)
+
+** Amortisation
+*** Untrusted helper batches m MSMs into one
+*** Cost O(m log d) total, O(log d) per proof
+*** Soundness comes from the opening argument
+
+** Nested amortisation
+*** Circuit runs partial, log-time verification only
+*** Deferred state (G_old, S_old, u_old) as public input
+*** Linear check paid once by the ultimate verifier
+*** Enables arbitrary recursion depth
+
+** Main argument (Sonic variant)
+*** N multiplication and Q linear constraints
+*** Polynomial encoding r(X,Y), s(X,Y), t(X,Y)
+*** Constant term of t is zero iff circuit satisfied
+*** Batched openings via additive homomorphism
+*** Security: discrete log relation assumption
+
+** Tweedledum / Tweedledee cycle
+*** E_p: y^2 = x^3 + 5 over F_p, order q
+*** E_q: y^2 = x^3 + 5 over F_q, order p
+*** 255-bit primes, not pairing-friendly
+*** 126-bit security after endomorphism correction
+*** gcd(p-1, 5) = 1 enables the Rescue S-box x^5
+*** Endomorphism: 3.5 constraints per challenge bit-pair
+
+** Results
+*** Proof size 3.5 KiB
+*** Recursion threshold below 2^17 multiplication gates
+*** No trusted setup
+*** Security: DLRA plus random oracle for Fiat-Shamir
+@endmindmap

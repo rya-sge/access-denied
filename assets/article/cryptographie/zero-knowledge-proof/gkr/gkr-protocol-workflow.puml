@@ -1,0 +1,45 @@
+@startuml
+title GKR — end-to-end delegation workflow
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Verifier|
+start
+:fix the layered circuit C and the input x;
+:send C and x to the prover;
+
+|Prover|
+:evaluate C on x, keeping every gate value;
+:return the claimed output v_0 = C(x);
+
+|Verifier|
+:form the initial claim V~_0(z_0) = v_0;
+
+|Prover|
+:build the round polynomials g_j for layer 0;
+
+|Verifier|
+repeat
+  :run 2m rounds of sum-check on layer i;
+  :sample fresh challenges after each prover message;
+  :receive the degree-m line polynomial q(t);
+  :check q(0) and q(1) against the two claims;
+  :sample t* and keep the single claim at l(t*);
+repeat while (more layers?) is (yes) not (no)
+
+:evaluate the MLE of x at the surviving point, in O(n);
+if (does it match the surviving claim?) then (yes)
+  :accept the delegated result;
+else (no)
+  :reject;
+endif
+stop
+@enduml

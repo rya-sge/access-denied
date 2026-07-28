@@ -1,0 +1,36 @@
+@startuml
+title Deployment path: handleOps creates the sender via SenderCreator
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+
+participant "Bundler" as B
+participant "EntryPoint" as EP
+participant "SenderCreator" as SC
+participant "Factory" as F
+participant "Sender" as S
+
+B -> EP : handleOps([userOp])
+activate EP
+EP -> EP : _createSenderIfNeeded(initCode)
+alt sender.code already exists
+  EP -> EP : emit IgnoredInitCode, return
+else needs deployment
+  EP -> SC : createSender(initCode)\n{gas: verificationGasLimit}
+  activate SC
+  SC -> SC : require(msg.sender == entryPoint)
+  SC -> F : call factory(initCode[20:])
+  activate F
+  F -> S : CREATE2 deploy
+  F --> SC : return sender address
+  deactivate F
+  SC --> EP : sender
+  deactivate SC
+  EP -> EP : check sender != 0 (AA13)\nsender == mUserOp.sender (AA14)\nsender.code != 0 (AA15)
+  EP -> EP : emit AccountDeployed
+end
+deactivate EP
+@enduml

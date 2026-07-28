@@ -1,0 +1,33 @@
+@startuml
+title The Tweedledum / Tweedledee 2-cycle — why alternating keeps arithmetic native
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+component "Tweedledum\nE_p / F_p : y^2 = x^3 + 5\nbase field F_p, group order q" as DUM
+component "Tweedledee\nE_q / F_q : y^2 = x^3 + 5\nbase field F_q, group order p" as DEE
+
+DUM -down-> DEE : a proof over Tweedledum needs\nF_q arithmetic, which is\nTweedledee's base field
+DEE -up-> DUM : a proof over Tweedledee needs\nF_p arithmetic, which is\nTweedledum's base field
+
+note bottom of DUM
+  odd recursion steps
+end note
+
+note bottom of DEE
+  even recursion steps
+end note
+
+note right of DEE
+  p and q are 255-bit primes
+  no pairing required
+  126-bit security after the
+  order-3 endomorphism correction
+  gcd(p-1, 5) = gcd(q-1, 5) = 1
+  so the Rescue S-box x -> x^5 is a bijection
+end note
+@enduml

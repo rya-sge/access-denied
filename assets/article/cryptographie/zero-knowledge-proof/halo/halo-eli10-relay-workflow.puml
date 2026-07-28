@@ -1,0 +1,36 @@
+@startuml
+title The relay race — the whole story, step by step
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Runner (the prover)|
+start
+repeat
+  :run your leg of the race;
+  :seal your work in an envelope;
+  :play the library game to prove what is inside;
+  :write an IOU for the one slow check;
+  :merge it with the IOU you were handed;
+  :pass the baton, the note and your new stamp forward;
+  :the next runner switches to the partner currency\nso the maths stays cheap;
+repeat while (is there another leg to run?) is (yes) not (no)
+:hand everything to the referee;
+
+|Referee (the final checker)|
+:look at the last stamp only;
+:pay the merged IOU once;
+if (does everything add up?) then (yes)
+  :accept the whole race;
+else (no)
+  :reject;
+endif
+stop
+@enduml

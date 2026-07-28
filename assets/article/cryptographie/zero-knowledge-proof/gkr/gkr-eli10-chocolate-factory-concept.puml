@@ -1,0 +1,42 @@
+@startuml
+title The chocolate factory — how the pieces of the story fit together
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "What the factory is" {
+  component "Raw ingredients\n(the inputs the inspector brought)" as IN
+  component "Machines that add or multiply\n(the gates)" as GATES
+  component "Wiring plan, public to everyone\n(which machine feeds which)" as WIRE
+  component "The finished bar\n(the claimed answer)" as OUT
+}
+
+package "What the inspector uses" {
+  component "The cookie game\n(sum-check)" as GAME
+  component "The smooth surface\n(multilinear extension)" as SURF
+  component "The line trick\n(two questions become one)" as LINE
+}
+
+package "How the game ends" {
+  component "Check the raw ingredients directly" as ANCHOR
+  component "Random noise that cancels out\n(keeping the values secret)" as ZK
+}
+
+IN --> GATES
+WIRE --> GATES
+GATES --> OUT
+OUT --> GAME : the inspector starts here
+SURF --> GAME : lets one question stand for a whole stage
+GAME --> LINE
+LINE --> GAME : next stage up
+LINE --> ANCHOR : after the last stage
+GAME ..> ZK : optional
+@enduml

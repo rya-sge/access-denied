@@ -1,0 +1,57 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Halo, in plain words
+** The problem
+*** Someone did a very long job for you
+*** Checking it yourself takes just as long
+*** And the job keeps growing every day
+
+** The chain of stamps
+*** Each stamp says "my step is right and the last stamp was real"
+*** You only look at the newest stamp
+*** Every stamp is the same small size
+
+** The sealed envelope
+*** Lock a whole formula inside one small fingerprint
+*** Prove things about it without opening it
+*** The lock is built from public numbers, no secret ceremony
+
+** The library game
+*** Ask "left half or right half" over and over
+*** About twenty questions for a million books
+*** One slow step is left at the very end
+
+** The heavy scale
+*** The last check weighs every book on the path
+*** As slow as reading the whole library
+*** This is the step Halo refuses to pay each time
+
+** Passing the IOU
+*** Write a note instead of paying
+*** Merge the new note into the old one
+*** The note never gets bigger
+*** The last person pays once, for everyone
+
+** Two friendly currencies
+*** Tweedledum and Tweedledee accept each other's money
+*** Steps take turns between the two
+*** No exchange fee at any border
+*** Ordinary 255-bit curves, nothing exotic
+
+** Results
+*** Final proof about 3.5 kilobytes
+*** Chain length: as long as you like
+*** No secret setup ceremony to trust
+*** A big quantum computer would break it
+@endmindmap

@@ -1,0 +1,58 @@
+@startuml
+title Division of cryptographic labour in the Zama Protocol
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Client side" {
+  [Plaintext value] as PT
+  [FHE public key\nencryption] as ENC
+  [ZKPoK generation\n(CRS from the KMS)] as ZK
+}
+
+package "Gateway and coprocessors" {
+  [ZKPoK verification] as VER
+  [FHE computation\n(evaluation key)] as FHE
+  [Majority consensus\n+ signed attestation] as SIG
+}
+
+package "Host chain" {
+  [FHE.fromExternal\n/ InputVerifier] as IV
+  [Access Control List] as ACL
+  [Application contract] as APP
+}
+
+package "Key Management Service" {
+  [Threshold MPC\nkey shares] as MPC
+  [Threshold decryption\n+ KMS signatures] as DEC
+}
+
+PT --> ENC
+ENC --> ZK
+ZK --> VER : ciphertext + proof
+VER --> SIG : accepted input
+SIG --> IV : handle + attestation
+IV --> APP : externalEuintXX becomes euintXX
+APP --> ACL : allow / allowThis
+APP --> FHE : symbolic operations
+ACL --> DEC : authorises decryption
+MPC --> DEC
+DEC --> APP : cleartext + signatures\n(checkSignatures)
+
+note right of VER
+  Zero-knowledge is used
+  at this boundary only
+end note
+
+note right of DEC
+  Signatures, not a ZK proof
+end note
+@enduml

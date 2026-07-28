@@ -1,0 +1,28 @@
+@startuml
+title GKR layer-by-layer reduction
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+start
+:V holds the claim V~_0(z_0) = v_0\n[layer 0, the circuit output];
+repeat :run sum-check on f_i over 2m variables\n(wiring predicates x gate-value MLEs);
+  :sum-check ends with two claims\nV~_{i+1}(u) = a and V~_{i+1}(u') = a';
+  :line-restriction trick\ncollapse the two claims into one;
+  :V holds a single claim V~_{i+1}(z_{i+1}) = v_{i+1};
+repeat while (layer i+1 < D ?) is (yes) not (no, layer D reached)
+:V evaluates the MLE of the known input x\ndirectly, in O(n) field operations;
+if (claim matches?) then (yes)
+  :accept;
+else (no)
+  :reject;
+endif
+stop
+@enduml

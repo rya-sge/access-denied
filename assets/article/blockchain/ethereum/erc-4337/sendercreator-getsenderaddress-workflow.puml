@@ -1,0 +1,33 @@
+@startuml
+title getSenderAddress: learn the counterfactual address without deploying
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+
+participant "SDK / dApp" as D
+participant "EntryPoint" as EP
+participant "SenderCreator" as SC
+participant "Factory" as F
+
+D -> EP : eth_call getSenderAddress(initCode)
+activate EP
+EP -> SC : createSender(initCode)
+activate SC
+SC -> SC : require(msg.sender == entryPoint)
+SC -> F : call factory(initCode[20:])
+activate F
+F --> SC : sender address\n(deployment happens in this frame)
+deactivate F
+SC --> EP : sender
+deactivate SC
+EP -->x D : revert SenderAddressResult(sender)
+deactivate EP
+note over D
+  eth_call discards state, and the revert
+  unwinds the factory deployment.
+  Caller decodes sender from the error data.
+end note
+@enduml

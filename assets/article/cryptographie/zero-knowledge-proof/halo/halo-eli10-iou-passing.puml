@@ -1,0 +1,33 @@
+@startuml
+title Passing the IOU — nobody pays the big bill until the very end
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+start
+:dinner 1: do the quick checks;
+:write an IOU for the expensive part;
+:hand the IOU to tomorrow's friend;
+
+repeat
+  :next dinner: do the quick checks for today;
+  :merge today's IOU into yesterday's;
+  :the merged note is still one small note;
+repeat while (another dinner tomorrow?) is (yes) not (no)
+
+:the last friend reads the single merged IOU;
+:pay the expensive bill, once;
+if (does the bill add up?) then (yes)
+  :every dinner was paid for honestly;
+else (no)
+  :something was wrong, reject the whole year;
+endif
+stop
+@enduml

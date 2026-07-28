@@ -1,0 +1,48 @@
+@startuml
+title Halo — how the components fit together
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Commitment layer" {
+  component "Pedersen vector commitment\nno trapdoor, no trusted setup" as PED
+  component "Modified inner product argument\nk = log_2 d folding rounds" as IPA
+  component "Linear-time check G = <s, G>\nthe O(d) bottleneck" as MSM
+}
+
+package "Amortisation layer" {
+  component "Helper amortisation\nm proofs, one opening argument" as HELP
+  component "Nested amortisation\ndeferred state as public input" as NEST
+}
+
+package "Argument layer" {
+  component "Sonic-style circuit argument\nN mult + Q linear constraints" as SONIC
+  component "Batched polynomial openings\nvia additive homomorphism" as BATCH
+  component "Fiat-Shamir with Rescue\nalgebraic hash, S-box x^5" as FS
+}
+
+package "Curve layer" {
+  component "Tweedledum / Tweedledee 2-cycle\n255-bit, not pairing-friendly" as CYCLE
+  component "Order-3 endomorphism\n3.5 constraints per challenge bit-pair" as ENDO
+}
+
+PED --> IPA
+IPA --> MSM
+MSM --> HELP
+HELP --> NEST
+SONIC --> PED
+SONIC --> BATCH
+BATCH --> IPA
+NEST --> FS
+FS --> CYCLE
+CYCLE --> ENDO
+ENDO --> NEST : keeps the circuit under 2^17 gates
+@enduml

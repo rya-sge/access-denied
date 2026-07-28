@@ -1,0 +1,62 @@
+@startuml
+title CTHelpers.getCollectionId — hash to curve, then add
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+  StartColor #4A78B5
+  EndColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+start
+:x1 := uint(keccak256(conditionId . indexSet));
+:odd := bit 255 of x1;
+note right
+  The top bit of the hash chooses
+  which of the two y roots is canonical.
+end note
+
+repeat
+  :x1 := x1 + 1 (mod P);
+  :yy := x1^3 + 3 (mod P);
+  :y1 := yy^((P+1)/4) (mod P);
+repeat while (y1^2 == yy ?) is (no, x1 is not on the curve) not (yes)
+->yes, (x1, y1) is on alt_bn128;
+
+if (parity of y1 matches odd ?) then (no)
+  :y1 := P - y1;
+else (yes)
+endif
+
+if (parentCollectionId == 0 ?) then (yes, root collection)
+else (no, nested collection)
+  :odd := bit 254 of parentCollectionId;
+  :x2 := parentCollectionId with the two top bits cleared;
+  :yy := x2^3 + 3 (mod P);
+  :y2 := yy^((P+1)/4) (mod P);
+  if (y2^2 == yy ?) then (no)
+    #FDEEEE:revert "invalid parent collection ID";
+    kill
+  else (yes)
+  endif
+  :fix parity of y2 from odd;
+  :staticcall precompile 0x06 with (x1, y1, x2, y2);
+  if (call succeeded ?) then (no)
+    #FDEEEE:revert "ecadd failed";
+    kill
+  else (yes)
+  endif
+  :(x1, y1) := decoded sum point;
+endif
+
+:if y1 is odd, set bit 254 of x1;
+:return bytes32(x1);
+stop
+@enduml

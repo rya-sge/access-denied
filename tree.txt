@@ -431,3 +431,45 @@ _posts/2026-07-20-ipsec-ike-document-roadmap-rfc6071.md
   assets/article/network/ipsec/ipsec-document-groups-concept.puml                     (concept, in-section)
   assets/article/network/ipsec/ipsec-databases-concept.puml                           (concept, in-section)
   assets/article/network/ipsec/ike-negotiation-workflow.puml                          (workflow, in-section)
+
+_posts/2026-07-23-sendercreator-entrypoint-erc4337-counterfactual-address.md
+  assets/article/blockchain/ethereum/erc-4337/sendercreator-mindmap.puml                    (mindmap)
+  assets/article/blockchain/ethereum/erc-4337/sendercreator-architecture-concept.puml       (concept, in-section)
+  assets/article/blockchain/ethereum/erc-4337/sendercreator-deploy-workflow.puml            (workflow, in-section)
+  assets/article/blockchain/ethereum/erc-4337/sendercreator-getsenderaddress-workflow.puml  (workflow, in-section)
+
+_posts/2026-07-24-zero-knowledge-proofs-zama-protocol.md
+  assets/article/cryptographie/zero-knowledge-proof/zama/zero-knowledge-proofs-zama-protocol.puml   (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/zama/zama-zk-trust-boundaries-concept.puml      (concept, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/zama/zama-encrypted-input-zkpok-workflow.puml   (workflow, in-section)
+
+_posts/2026-06-19-gkr-protocol.md
+  assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol.puml               (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-protocol-concept.puml                  (concept, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-protocol-workflow.puml                 (workflow, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-sumcheck-rounds-sequence.puml          (sequence, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-layered-circuit.puml                   (component, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-layer-reduction.puml                   (activity, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-line-restriction.puml                  (sequence, in-section)
+
+_posts/2026-06-19-gkr-protocol-explained.md
+  assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol-explained.puml     (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-eli10-chocolate-factory-concept.puml   (concept, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-eli10-inspection-workflow.puml         (workflow, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-eli10-cookie-game-sequence.puml        (sequence, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/gkr/gkr-eli10-factory-inspection-sequence.puml (sequence, in-section)
+
+_posts/2026-06-19-halo-recursive-proofs.md
+  assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs.puml     (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-nested-amortization-concept.puml     (concept, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-ivc-chain-workflow.puml              (workflow, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-helper-amortization.puml             (sequence, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-recursive-step-activity.puml         (activity, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-curve-cycle.puml                     (component, in-section)
+
+_posts/2026-06-19-halo-recursive-proofs-eli10.md
+  assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs-eli10.puml (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-eli10-iou-concept.puml                 (concept, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-eli10-relay-workflow.puml              (workflow, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-eli10-stamp-chain.puml                 (component, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/halo/halo-eli10-iou-passing.puml                 (activity, in-section)

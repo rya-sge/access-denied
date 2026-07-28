@@ -1,0 +1,34 @@
+@startuml
+title Nested amortisation — one recursive step, and the single final check
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Verification circuit at step i|
+start
+:read the deferred state from step i-1\n(G_old, S_old, y_old, u_old) as public input;
+:partially verify the proof pi_i\nall checks except G = <s, G>, in O(log d);
+:apply the amortisation argument\nmerging the new G with the deferred state;
+:output (G_new, S_new, y_new, u_new)\nas public output, same fixed size;
+
+|Verification circuit at step i+1|
+:take that output as its public input;
+:same structure, on the partner curve\nso that all arithmetic stays native;
+
+|Ultimate verifier, outside every circuit|
+:receive the final deferred state;
+:perform the linear-time MSM once:\nG_final = <s_final, G>;
+if (does it match?) then (yes)
+  :accept the whole chain of T steps;
+else (no)
+  :reject;
+endif
+stop
+@enduml

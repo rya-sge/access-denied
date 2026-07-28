@@ -1,0 +1,39 @@
+@startuml
+title Helper amortisation — m linear MSMs collapse into one opening argument
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  NoteBackgroundColor #F3EEFB
+  NoteBorderColor #7A5BB5
+}
+
+participant "m proofs" as PR
+participant "Untrusted helper" as H
+participant "Verifier V" as V
+
+PR -> H : challenges (u_1, ..., u_k) from each of the m proofs
+note right of H
+  each proof would otherwise cost V
+  one O(d) multi-scalar multiplication
+end note
+
+H -> V : the group elements G_1, ..., G_m
+H -> V : opening argument for a random linear\ncombination of the m commitments
+
+note right of V
+  V computes the claimed opening value itself
+  in O(m log d), using the product form
+  g(X, u) = prod_i (u_i + u_i^{-1} X^{2^{i-1}})
+end note
+
+V -> V : check ONE polynomial commitment opening
+note over V #F3EEFB
+  amortised cost per proof: O(log d)
+  instead of O(d)
+  the helper is untrusted: a wrong G_i
+  makes the opening argument fail
+end note
+@enduml

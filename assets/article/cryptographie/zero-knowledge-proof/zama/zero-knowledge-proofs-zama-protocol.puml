@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Zero-knowledge\nin the Zama Protocol
+** Single ZK role
+*** ZKPoK on encrypted inputs
+*** One packed proof per transaction, up to 2048 bits
+*** Generated client-side in a browser or mobile app
+*** Metered as a Gateway operation
+** Proof system
+*** TFHE-rs compact PKE proof
+*** Derived from Libert, eprint 2023/800
+*** ZKV1 close to the paper, ZKV2 by default
+*** CRS produced by the KMS
+*** ZkComputeLoad::Verify keeps proving cheap
+** What the proof asserts
+*** Knowledge of the plaintext
+*** Ciphertext well-formed under the global FHE public key
+*** Bound by metadata: contract, user, ACL, chain id
+*** No statement about balances or business rules
+** Verification path
+*** Client SDK builds ciphertext + proof
+*** Relayer forwards to the Gateway
+*** Coprocessors verify the ZKPoK
+*** Gateway runs majority consensus
+*** Host chain checks EIP-712 coprocessor signatures\nin InputVerifier, not the proof itself
+** Cryptography next door
+*** FHE for computation on ciphertexts
+*** Threshold MPC for key generation and decryption
+*** KMS produces the CRS used by the proofs
+*** Signatures, not ZK, carry decryption results back
+** Limits and roadmap
+*** ZKPoK is the non post-quantum component
+*** Lattice-based replacement announced
+*** ZK-MPC to verify KMS contributions
+*** ZK-FHE to open coprocessing to anyone
+@endmindmap

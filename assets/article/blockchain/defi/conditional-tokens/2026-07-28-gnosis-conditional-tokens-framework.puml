@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Gnosis\nConditional Tokens
+** Motivation
+*** Combinatorial\nprediction markets
+*** Nested markets break\nfungibility
+*** Order of conditions\nmust not matter
+*** Single contract,\ncollateral-agnostic
+** Conditions
+*** oracle + questionId\n+ outcomeSlotCount
+*** conditionId =\nkeccak256 of the three
+*** payoutNumerators[]\n+ payoutDenominator
+*** prepareCondition
+*** reportPayouts\n(sender is the oracle)
+** Outcome collections
+*** Nonempty proper subset\nof outcome slots
+*** Index set = 256-bit\nbitmask
+*** Partition = disjoint\nindex sets
+** Collection IDs
+*** Hash to a point on\nalt_bn128
+*** Try-and-increment\non x
+*** y from x^3 + 3,\nsqrt by (P+1)/4
+*** Compressed to 254 bits\n+ parity flag at bit 254
+*** Combined by ecAdd\n(precompile 0x06)
+*** Elliptic Curve\nMultiset Hash
+** Positions
+*** positionId =\nkeccak256(collateral,\ncollectionId)
+*** Used as the\nERC-1155 token ID
+*** Value = product of\ncollection values
+*** Depth = number of\nconditions
+** Operations
+*** splitPosition\n(burn shallow, mint deep)
+*** mergePositions\n(inverse)
+*** redeemPositions\n(after resolution)
+*** Collateral conservation\ninvariant
+** 2019 audit
+*** Critical: mint-before-burn\nreentrancy
+**** Fixed by burning first
+*** Critical: AdHash\ngeneralized birthday
+**** Replaced by EC\nmultiset hash
+*** Minor: batch mint\ngas savings
+** Deployment
+*** Mainnet\n0xC59b0e4D...
+*** xDai\n0xCeAfDD6b...
+*** Solidity ^0.5.1,\nTruffle, LGPL-3.0
+*** Reused by Omen\nand Polymarket
+@endmindmap

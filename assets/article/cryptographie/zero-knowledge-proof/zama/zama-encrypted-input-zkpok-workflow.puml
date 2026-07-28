@@ -1,0 +1,40 @@
+@startuml
+title Lifecycle of an encrypted input and its ZKPoK
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ActorBackgroundColor #F3EEFB
+  ActorBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+}
+
+actor User
+participant "Relayer SDK\n(browser)" as SDK
+participant "Relayer" as REL
+participant "Gateway\ncontracts" as GW
+participant "Coprocessors" as CP
+participant "Application\ncontract" as APP
+participant "Host chain\ncontracts\n(InputVerifier, ACL)" as HC
+
+User -> SDK : value to submit (e.g. 1000)
+SDK -> SDK : pack all inputs of the call\ninto one ciphertext
+SDK -> SDK : encrypt under the global FHE public key
+SDK -> SDK : build_with_proof_packed(CRS, metadata, Verify)\nmetadata = contract || user || ACL || chainId
+SDK -> REL : bundle = compressedPackedCT + ZKPOK
+REL -> GW : input verification request (fee paid in $ZAMA)
+GW -> CP : verify this encrypted input
+CP -> CP : verify_and_expand against the CRS\nand the same metadata
+CP -> GW : signed result
+GW -> GW : majority consensus over coprocessor answers
+GW --> SDK : handles + EIP-712 coprocessor signatures
+SDK -> APP : transaction(externalEuint64 handle, bytes inputProof)
+APP -> HC : FHE.fromExternal(handle, inputProof)
+HC -> HC : InputVerifier: recover signers,\ncheck threshold and (user, contract, chainId)
+alt attestation valid
+  HC --> APP : euint64 usable in FHE operations
+else invalid or replayed
+  HC --> APP : revert
+end
+@enduml

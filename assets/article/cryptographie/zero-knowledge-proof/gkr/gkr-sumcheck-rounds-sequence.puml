@@ -1,0 +1,37 @@
+@startuml
+title Sum-check protocol — round structure
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  NoteBackgroundColor #F3EEFB
+  NoteBorderColor #7A5BB5
+}
+
+participant "Prover P" as P
+participant "Verifier V" as V
+
+note over V: holds claimed sum H\nand oracle access to g
+
+P -> V : g_1(X_1), univariate, deg <= d
+note right of V : check g_1(0) + g_1(1) = H\ncheck deg(g_1) <= d
+V -> P : challenge r_1, uniform in F
+
+P -> V : g_2(X_2)
+note right of V : check g_2(0) + g_2(1) = g_1(r_1)
+V -> P : challenge r_2, uniform in F
+
+... v - 2 further rounds ...
+
+P -> V : g_v(X_v)
+note right of V : check g_v(0) + g_v(1) = g_{v-1}(r_{v-1})
+V -> P : challenge r_v, uniform in F
+
+note over V #F3EEFB
+  single oracle query
+  verify g_v(r_v) = g(r_1, ..., r_v)
+  accept / reject
+end note
+@enduml

@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* GKR Protocol
+** Foundations
+*** Interactive proofs (IP = PSPACE)
+*** Sum-check protocol
+**** v-variate polynomial g
+**** v rounds, soundness error v*d / |F|
+**** One final oracle query
+*** Multilinear extension (MLE)
+**** Unique multilinear polynomial extending f
+**** Lagrange basis construction
+**** Schwartz-Zippel: one point identifies the table
+
+** GKR core
+*** Layered arithmetic circuits
+**** D layers, 2^m gates per layer
+**** Layer 0 = output, layer D = inputs
+*** Gate value polynomials
+**** V_i: gate values at layer i
+**** V-tilde_i: MLE of V_i
+*** Wiring predicates
+**** A_i, M_i: MLE of gate connectivity
+*** Fundamental recurrence
+**** V-tilde_i(z) = sum over gate pairs in layer i+1
+**** One sum-check instance per layer
+**** Line restriction: 2 claims => 1 claim
+*** Final check: V evaluates the input MLE directly
+
+** Complexity
+*** Prover: O(S log S)
+*** Verifier: O(n + D polylog S)
+*** Communication: O(D log S) field elements
+*** Log-space uniform: verifier O(n polylog n)
+
+** Zero-knowledge variant
+*** Mask each round polynomial with r_j
+*** Constraint r_j(0) + r_j(1) = 0 preserves the sum
+*** Soundness unchanged
+
+** Applications
+*** Theory: #P in IP, NC in IP
+*** Transparent zkSNARKs (Spartan, Hyrax)
+*** GKR-based SNARKs (Libra)
+*** Ingredient in ZK-STARKs
+*** Delegated ML inference, genomic matching
+@endmindmap

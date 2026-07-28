@@ -1,0 +1,33 @@
+@startuml
+title The cookie game — one round at a time
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  NoteBackgroundColor #F3EEFB
+  NoteBorderColor #7A5BB5
+}
+
+participant "Baker\n(the prover)" as B
+participant "You\n(the verifier)" as Y
+
+note over Y: the baker claims\nall the cookies score 6144 in total
+
+B -> Y : left pile scores 2500, right pile scores 3644
+note right of Y : 2500 + 3644 = 6144, so far so good
+Y -> B : my random number is 3.7
+
+B -> Y : the totals for the next split
+note right of Y : they must add up\nto the answer at 3.7
+Y -> B : my next random number is 0.5
+
+... a few more rounds, one per direction of the grid ...
+
+B -> Y : the score of one single cookie
+note over Y #F3EEFB
+  you walk over and taste that one cookie
+  it matches: the whole total was honest
+end note
+@enduml

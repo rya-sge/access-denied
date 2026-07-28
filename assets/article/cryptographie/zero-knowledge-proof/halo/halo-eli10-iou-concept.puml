@@ -1,0 +1,45 @@
+@startuml
+title Halo in plain words — how the pieces of the story fit together
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Locking the work away" {
+  component "Sealed envelope\n(polynomial commitment)" as ENV
+  component "Public lock combination\n(no secret ceremony)" as LOCK
+}
+
+package "Checking it quickly" {
+  component "Library game\n(inner product argument)" as GAME
+  component "Heavy scale at the end\n(the slow linear check)" as SCALE
+}
+
+package "Never paying twice" {
+  component "The IOU\n(deferred state)" as IOU
+  component "Merging IOUs at every step\n(nested amortisation)" as MERGE
+  component "One payment at the very end\n(the final verifier)" as PAY
+}
+
+package "Staying fast at every step" {
+  component "Two friendly currencies\n(Tweedledum and Tweedledee)" as CURR
+  component "Steps take turns between them" as TURN
+}
+
+LOCK --> ENV
+ENV --> GAME
+GAME --> SCALE
+SCALE --> IOU : deferred instead of paid
+IOU --> MERGE
+MERGE --> IOU : still one small note
+MERGE --> PAY
+CURR --> TURN
+TURN --> MERGE : keeps every step cheap
+@enduml

@@ -1,0 +1,62 @@
+@startuml
+title Identifier derivation in the Conditional Tokens Framework
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #4A78B5
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+package "Layer 1 — Condition" {
+  component "oracle\n(address)" as ORACLE
+  component "questionId\n(bytes32)" as QID
+  component "outcomeSlotCount\n(uint)" as OSC
+  component "conditionId\nkeccak256(oracle . questionId . outcomeSlotCount)" as CID
+}
+
+package "Layer 2 — Outcome collection" {
+  component "indexSet\n(256-bit bitmask)" as ISET
+  component "hash-to-curve\nkeccak256(conditionId . indexSet)\n-> point on alt_bn128" as H2C
+  component "collectionId\ncompressed point (254-bit x + parity)" as COLID
+  component "parentCollectionId\n(bytes32, 0 = collateral root)" as PARENT
+  component "ecAdd\nprecompile 0x06" as ECADD
+}
+
+package "Layer 3 — Position" {
+  component "collateralToken\n(ERC-20 address)" as COLL
+  component "positionId\nkeccak256(collateralToken . collectionId)\n= ERC-1155 token ID" as PID
+}
+
+ORACLE --> CID
+QID --> CID
+OSC --> CID
+
+CID --> H2C
+ISET --> H2C
+H2C --> ECADD
+PARENT --> ECADD
+ECADD --> COLID
+
+COLID --> PID
+COLL --> PID
+
+note right of ECADD
+  Point addition is commutative,
+  so (A|B)&(LO) and (LO)&(A|B)
+  yield the same collectionId.
+end note
+
+note bottom of PID
+  payoutNumerators and payoutDenominator
+  are keyed by conditionId, never by positionId.
+end note
+@enduml

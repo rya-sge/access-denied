@@ -1,0 +1,38 @@
+@startuml
+title Halo — incrementally verifiable computation, end to end
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Prover|
+start
+repeat
+  :apply the transition function F to the current state;
+  :commit to the witness polynomials\nwith Pedersen vector commitments;
+  :run the inner product argument\nto open every commitment at the challenge points;
+  :derive all challenges with Fiat-Shamir,\nhashing the transcript with Rescue;
+  :inside the verification circuit:\ntake the previous deferred state as public input;
+  :partially verify the previous proof, in O(log d);
+  :amortise: merge the new G into the deferred state;
+  :emit the updated deferred state as public output;
+  :switch to the partner curve for the next step;
+repeat while (more steps to prove?) is (yes) not (no)
+:publish the final proof, 3.5 KiB,\ncarrying the final deferred state;
+
+|Ultimate verifier|
+:check the final proof, in O(log d);
+:perform the deferred linear MSM exactly once, in O(d);
+if (does the deferred check pass?) then (yes)
+  :accept the entire T-step computation;
+else (no)
+  :reject;
+endif
+stop
+@enduml

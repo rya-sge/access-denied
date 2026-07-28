@@ -1,0 +1,53 @@
+@startuml
+title Layered arithmetic circuit — computation flows down, verification climbs up
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+rectangle "Layer D — inputs (known to V)" as LD {
+  rectangle "x_1" as x1
+  rectangle "x_2" as x2
+  rectangle "x_3" as x3
+  rectangle "x_4" as x4
+}
+
+rectangle "Layer D-1" as LD1 {
+  rectangle "[+]" as g1
+  rectangle "[*]" as g2
+}
+
+rectangle "Layer D-2" as LD2 {
+  rectangle "[*]" as g3
+  rectangle "[+]" as g4
+}
+
+rectangle "Layer 1" as L1 {
+  rectangle "[+]" as g5
+}
+
+rectangle "Layer 0 — output" as L0 {
+  rectangle "[*]" as g6
+}
+
+x1 --> g1
+x2 --> g1
+x3 --> g2
+x4 --> g2
+g1 --> g3
+g2 --> g3
+g1 --> g4
+g2 --> g4
+g3 --> g5
+g4 --> g5
+g5 --> g6
+
+note right of L0
+  claimed output C(x) = v_0
+  verification starts here
+  and reduces toward layer D
+end note
+@enduml

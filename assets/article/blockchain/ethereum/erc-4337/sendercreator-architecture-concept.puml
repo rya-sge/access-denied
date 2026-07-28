@@ -1,0 +1,31 @@
+@startuml
+title SenderCreator as an isolation boundary in ERC-4337
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+actor Bundler as B
+component "EntryPoint\n(holds deposits, trusts msg.sender)" as EP
+component "SenderCreator\n(neutral, no privileges, no funds)" as SC
+component "Account Factory\n(untrusted, user-supplied)" as F
+component "Sender account\n(deployed / EIP-7702 EOA)" as S
+
+B --> EP : handleOps / getSenderAddress
+EP --> SC : createSender()\ninitEip7702Sender()
+SC --> F : call factory(initCallData)\nmsg.sender = SenderCreator
+F --> S : CREATE2 deploys account
+SC ..> S : initEip7702Sender()\ncalls into EOA
+
+note bottom of SC
+  Factory never sees EntryPoint as msg.sender,
+  so a malicious factory cannot abuse
+  EntryPoint authority or balances.
+end note
+@enduml

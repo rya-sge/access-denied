@@ -1,0 +1,49 @@
+@startuml
+title GKR — how the components fit together
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Arithmetisation" {
+  component "Layered arithmetic circuit\nD layers, 2^m gates per layer" as CIRC
+  component "Gate value function V_i\non {0,1}^m" as VI
+  component "Wiring predicates\nadd_i, mult_i on {0,1}^{3m}" as WIRE
+}
+
+package "Algebraic lifting" {
+  component "Multilinear extension\nV~_i on F^m" as MLE
+  component "Wiring predicate MLEs\nadd~_i, mult~_i" as MLEW
+  component "Fundamental recurrence\nV~_i(z) = sum over (w_1, w_2)" as REC
+}
+
+package "Interactive machinery" {
+  component "Sum-check protocol\n2m rounds per layer" as SC
+  component "Line-restriction trick\n2 claims => 1 claim" as LINE
+  component "Schwartz-Zippel bound\nsoundness O(D log S / |F|)" as SZ
+}
+
+package "Anchors" {
+  component "Input MLE evaluation\nO(n), done by V alone" as ANCHOR
+  component "Optional ZK masking\nr_j(0) + r_j(1) = 0" as ZK
+}
+
+CIRC --> VI
+CIRC --> WIRE
+VI --> MLE
+WIRE --> MLEW
+MLE --> REC
+MLEW --> REC
+REC --> SC
+SC --> LINE
+SC --> SZ
+LINE --> ANCHOR
+SC ..> ZK : optional
+@enduml

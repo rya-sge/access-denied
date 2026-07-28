@@ -1,0 +1,29 @@
+@startuml
+title Line-restriction trick — two evaluation claims collapse into one
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  NoteBackgroundColor #F3EEFB
+  NoteBorderColor #7A5BB5
+}
+
+participant "Prover P" as P
+participant "Verifier V" as V
+
+note over V #F3EEFB
+  after sum-check at layer i, V holds
+  V~_{i+1}(u) = a and V~_{i+1}(u') = a'
+end note
+
+V -> V : define the line l(t) with l(0) = u and l(1) = u'
+P -> V : q(t) = V~_{i+1}(l(t)), degree m, sent as m+1 coefficients
+note right of V : check q(0) = a\ncheck q(1) = a'
+V -> P : random t* in F
+note over V #F3EEFB
+  single surviving claim
+  V~_{i+1}(l(t*)) = q(t*)
+end note
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title The factory inspection — stage by stage
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  NoteBackgroundColor #F3EEFB
+  NoteBorderColor #7A5BB5
+}
+
+participant "Inspector\n(the verifier)" as I
+participant "Manager\n(the prover)" as M
+
+I -> M : is this chocolate bar the right one?
+M -> I : yes, and here is what the stage above produced
+note over I, M #F3EEFB: they play the cookie game on that stage
+I -> I : the question shrinks to one machine in the stage above
+I -> I : the line trick turns two questions back into one
+
+I -> M : now prove that one machine
+M -> I : here is what the stage above that produced
+note over I, M #F3EEFB: they play the cookie game again
+
+... one round of the game per stage of the factory ...
+
+note over I #F3EEFB
+  last stage: the raw ingredients
+  the inspector brought them herself,
+  so she checks this one on her own
+  accept / reject
+end note
+@enduml

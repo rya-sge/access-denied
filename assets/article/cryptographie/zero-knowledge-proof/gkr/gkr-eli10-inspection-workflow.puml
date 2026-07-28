@@ -1,0 +1,38 @@
+@startuml
+title The magic audit — the whole inspection, step by step
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Inspector|
+start
+:arrive with the raw ingredients in hand;
+:look at the finished bar the factory hands over;
+
+|Manager|
+:claim the bar is correct;
+:point at the stage that produced it;
+
+|Inspector|
+repeat
+  :play the cookie game on this stage;
+  :pick a fresh random number after every answer;
+  :end up with two questions about the stage above;
+  :use the line trick to keep only one question;
+repeat while (is there another stage above?) is (yes) not (no)
+
+:check the raw ingredients yourself;
+if (does the last answer match?) then (yes)
+  :accept, the whole factory ran honestly;
+else (no)
+  :reject;
+endif
+stop
+@enduml

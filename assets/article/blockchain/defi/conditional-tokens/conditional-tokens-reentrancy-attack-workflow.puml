@@ -1,0 +1,66 @@
+@startuml
+title Audit finding 1 — forging a collection through the mint-before-burn hook (pre-fix code)
+skinparam shadowing false
+skinparam ArrowColor #B54A4A
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  ActorBackgroundColor #FDEEEE
+  ActorBorderColor #B54A4A
+  LifeLineBorderColor #4A78B5
+  GroupBackgroundColor #F7FAFF
+  GroupBorderColor #B54A4A
+}
+skinparam note {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+
+actor "Attacker\ncontract" as A
+participant "ConditionalTokens\n(vulnerable revision)" as CT
+participant "Collateral\nERC-20" as ERC20
+
+note over A
+  Under the old AdHash scheme a collection ID was
+  the truncated sum of the member hashes, so the
+  attacker can solve for a parent ID P such that
+  splitting P lands on an already redeemable ID.
+end note
+
+A -> CT : splitPosition(collateral, P, conditionId, [0b10, 0b01], amount)
+activate CT
+
+CT -> CT : derive target position IDs
+note right of CT #FDEEEE
+  Old ordering: mint the targets first,
+  burn the source afterwards.
+end note
+
+CT -> CT : _mint(targets)
+CT -> A : onERC1155Received(...)
+activate A
+
+group Re-entrant calls, source stake not yet burnt
+  A -> CT : redeemPositions(collateral, P, conditionId, [0b01])
+  CT -> CT : mint stake in position P\n(so the pending burn will succeed)
+  A -> CT : redeemPositions(collateral, 0, conditionId, [0b01])
+  CT -> ERC20 : transfer(attacker, payout)
+  note right of ERC20
+    Collateral leaves the contract for a
+    position that was never backed.
+  end note
+end
+
+A --> CT : return onERC1155Received.selector
+deactivate A
+
+CT -> CT : _burn(position P, amount)\nsucceeds thanks to the re-entrant mint
+CT --> A : PositionSplit
+deactivate CT
+
+note over CT
+  Fix: burn or pull collateral BEFORE minting,
+  and replace AdHash with the elliptic curve
+  multiset hash so parent IDs cannot be forged.
+end note
+@enduml

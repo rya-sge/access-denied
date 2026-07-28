@@ -1,0 +1,56 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* GKR, in plain words
+** The problem
+*** Someone did a huge calculation for you
+*** Redoing it yourself takes just as long
+*** GKR turns checking into a short question game
+
+** Ingredient 1: the cookie game
+*** Baker claims a total score
+*** Each round splits the total in two halves
+*** You pick a random number after the baker answers
+*** Last round: you taste one single cookie
+*** Cheating almost never survives all the rounds
+
+** Ingredient 2: the smooth surface
+*** A table of numbers becomes one smooth formula
+*** Two different tables give two different formulas
+*** Checking one random point checks the whole table
+
+** Ingredient 3: the chocolate factory
+*** Ingredients go in, chocolate bars come out
+*** Each machine adds or multiplies two values
+*** The wiring plan is public, the values are not
+
+** The inspection game
+*** Start at the packaging stage, the output
+*** Play the cookie game at each stage
+*** Line trick: two questions become one
+*** Last stage: the inspector checks the raw materials herself
+
+** Why it is fast
+*** Inspector: a handful of checks per stage
+*** Factory: a little more work than running the line
+*** Messages: a few numbers per stage
+
+** Keeping secrets
+*** Add random noise that cancels out
+*** Total still checks out, single values stay hidden
+
+** Where it is used
+*** Blockchain rollups that prove off-chain work
+*** Proof libraries such as Spartan, Hyrax and Libra
+*** Checking computations run on someone else's machine
+@endmindmap

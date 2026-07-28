@@ -1,0 +1,74 @@
+@startuml
+title ConditionalTokens.splitPosition — validation, burn, then mint
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+  StartColor #4A78B5
+  EndColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+start
+if (partition.length > 1 ?) then (no)
+  #FDEEEE:revert "got empty or singleton partition";
+  kill
+else (yes)
+endif
+
+:outcomeSlotCount := payoutNumerators[conditionId].length;
+if (outcomeSlotCount > 0 ?) then (no)
+  #FDEEEE:revert "condition not prepared yet";
+  kill
+else (yes)
+endif
+
+:fullIndexSet := (1 << outcomeSlotCount) - 1;
+:freeIndexSet := fullIndexSet;
+
+repeat :take next indexSet from partition;
+  if (0 < indexSet < fullIndexSet ?) then (no)
+    #FDEEEE:revert "got invalid index set";
+    kill
+  else (yes)
+  endif
+  if (indexSet & freeIndexSet == indexSet ?) then (no)
+    #FDEEEE:revert "partition not disjoint";
+    kill
+  else (yes)
+  endif
+  :freeIndexSet ^= indexSet;
+  :positionIds[i] := getPositionId(collateral,\ngetCollectionId(parent, conditionId, indexSet));
+repeat while (more elements ?) is (yes) not (no)
+
+partition "Consume the source stake first" {
+  if (freeIndexSet == 0 ?) then (yes, full partition)
+    if (parentCollectionId == 0 ?) then (yes, root)
+      :transferFrom(msg.sender, this, amount)\non the collateral ERC-20;
+    else (no, nested)
+      :burn amount of the parent position;
+    endif
+  else (no, partial partition)
+    :burn amount of the union position\n(fullIndexSet ^ freeIndexSet);
+  endif
+}
+
+partition "Only then create the new stake" {
+  :_batchMint(msg.sender, positionIds, amounts);
+  note right
+    A single onERC1155BatchReceived hook.
+    By this point the source stake is
+    already gone, so re-entering
+    cannot double-spend it.
+  end note
+}
+
+:emit PositionSplit;
+stop
+@enduml

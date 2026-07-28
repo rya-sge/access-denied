@@ -1,0 +1,28 @@
+@startuml
+title The chain of stamps — each one vouches for the one before it
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+component "Stamp 1\n\"step 1 is correct\"" as S1
+component "Stamp 2\n\"step 2 is correct\nand stamp 1 was real\"" as S2
+component "Stamp 3\n\"step 3 is correct\nand stamp 2 was real\"" as S3
+component "...\none stamp per step" as SD
+component "Last stamp\n\"my step is correct\nand the stamp before me was real\"" as ST
+
+S1 -right-> S2
+S2 -right-> S3
+S3 -right-> SD
+SD -right-> ST
+
+note bottom of ST
+  the checker looks at this stamp only
+  if it is genuine, every earlier step was too
+  and it stays the same small size
+  whether the chain has 3 steps or a million
+end note
+@enduml

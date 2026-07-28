@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* SenderCreator
+** Purpose
+*** Neutral relay for initCode
+*** msg.sender to factory is not EntryPoint
+*** Holds no funds, no privileges
+** Functions
+*** createSender(initCode)
+**** 20 bytes factory + calldata
+**** returns sender or address(0)
+*** initEip7702Sender(sender, data)
+**** added in v0.8
+**** inits an EIP-7702 account
+** Used by EntryPoint
+*** handleOps -> _createSenderIfNeeded
+*** getSenderAddress (dry run)
+**** reverts SenderAddressResult
+**** off-chain via eth_call
+** Used by others
+*** Bundlers, SDKs, dApps
+*** Learn counterfactual address
+*** v0.8+: must go through getSenderAddress
+** Version history
+*** v0.6 / v0.7: no access control
+*** v0.8: entryPoint check + 7702
+*** v0.9: NotFromEntryPoint error
+** EIP-7702 caveat
+*** No factory, no CREATE2
+*** getSenderAddress not applicable
+@endmindmap
