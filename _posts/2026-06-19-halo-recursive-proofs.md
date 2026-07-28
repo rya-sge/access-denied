@@ -139,7 +139,7 @@ The verification circuit at step $$i$$ takes as **public inputs** the deferred s
 
 $$
 \begin{aligned}
-(G_\text{old},\ S_\text{old},\ y_\text{old},\ (u_\text{old})_1, \ldots, (u_\text{old})_k)
+\bigl(G_\text{old},\ S_\text{old},\ y_\text{old},\ u_1^{\text{old}}, \ldots, u_k^{\text{old}}\bigr)
 \end{aligned}
 $$
 

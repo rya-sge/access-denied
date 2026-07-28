@@ -360,13 +360,12 @@ The $$j$$-th challenge is a hash of the public parameters $$\sigma$$, the statem
 
 $$
 \begin{aligned}
-\Pr\bigl[\langle P^*, V\rangle(x) = 1\bigr] \geq \varepsilon
-\ \implies\
-\Pr\bigl[(x, w) \in R \ :\ w \leftarrow E^{P^*}(x)\bigr] \geq \varepsilon - \kappa
+&\Pr\bigl[\langle P^\star, V\rangle(x) = 1\bigr] \geq \varepsilon \\
+&\qquad \Longrightarrow \qquad \Pr\bigl[(x, w) \in R, \ \ w \leftarrow E^{P^\star}(x)\bigr] \geq \varepsilon - \kappa
 \end{aligned}
 $$
 
-If a prover convinces the verifier with probability at least $$\varepsilon$$, then an extractor $$E$$ with oracle access to that prover recovers a valid witness with probability at least $$\varepsilon$$ minus the knowledge error $$\kappa$$. This is the formal content of "the prover knows a witness". Note what it does not say: nothing here claims the extractor is efficient enough to run in practice, and it is a thought experiment, never executed.
+Here $$P^\star$$ is any cheating prover, $$\langle P^\star, V\rangle(x)$$ is the verifier's output after interacting with it on statement $$x$$, and $$R$$ is the relation pairing statements with valid witnesses. If that prover convinces the verifier with probability at least $$\varepsilon$$, then an extractor $$E$$ with oracle access to it recovers a valid witness with probability at least $$\varepsilon$$ minus the knowledge error $$\kappa$$. This is the formal content of "the prover knows a witness". Note what it does not say: nothing here claims the extractor is efficient enough to run in practice, and it is a thought experiment, never executed.
 
 ### F15. Relaxed R1CS and the Nova folding step
 
