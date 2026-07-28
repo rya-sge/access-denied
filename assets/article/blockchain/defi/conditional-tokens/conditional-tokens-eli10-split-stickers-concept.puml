@@ -1,0 +1,50 @@
+@startuml
+title One coin in, one sticker for every answer
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #4A78B5
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+component "You\n(1 coin in your pocket)" as YOU
+
+package "The Prize Shop" {
+  component "The money box\n(holds your coin\nuntil the judge speaks)" as BOX
+  component "Sticker printer" as PRINTER
+}
+
+package "Your three stickers" {
+  component "ALICE WINS" as S1
+  component "BOB WINS" as S2
+  component "CAROL WINS" as S3
+}
+
+YOU -down-> BOX : hand over 1 coin
+BOX -right-> PRINTER : coin is safely locked away
+PRINTER -down-> S1
+PRINTER -down-> S2
+PRINTER -down-> S3
+
+note right of S3
+  All three together are always
+  worth exactly 1 coin, because
+  exactly one of them will win.
+  So the shop never runs short.
+end note
+
+note bottom of BOX
+  The shop only opens the box
+  once the judge has announced
+  who actually won.
+end note
+@enduml

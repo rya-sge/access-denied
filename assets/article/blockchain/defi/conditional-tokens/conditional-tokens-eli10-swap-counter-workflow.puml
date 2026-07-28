@@ -1,0 +1,51 @@
+@startuml
+title The counter mistake, and why the order matters
+skinparam shadowing false
+skinparam ArrowColor #B54A4A
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  ActorBackgroundColor #FDEEEE
+  ActorBorderColor #B54A4A
+  LifeLineBorderColor #4A78B5
+  GroupBackgroundColor #F7FAFF
+  GroupBorderColor #B54A4A
+}
+skinparam note {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+
+actor "Sneaky\ncustomer" as A
+participant "Swap counter\n(old shop)" as SWAP
+participant "Cash-in counter" as CASH
+participant "Money box" as BOX
+
+A -> SWAP : "Please swap my sticker\nfor these two new ones"
+activate SWAP
+
+SWAP -> A : hands over the two NEW stickers first
+note right of A #FDEEEE
+  The old sticker is still in
+  the customer's pocket. For a
+  moment they hold both.
+end note
+
+group The customer runs off before the clerk finishes
+  A -> CASH : cashes in one new sticker
+  CASH -> A : gives back a sticker the clerk\nis about to ask for
+  A -> CASH : cashes in the other new sticker
+  CASH -> BOX : opens the box
+  BOX -> A : real money the customer\nnever paid in
+end
+
+A -> SWAP : comes back and hands over the old sticker
+SWAP -> A : "All done, thank you"
+deactivate SWAP
+
+note over SWAP, BOX
+  The new shop takes your old sticker FIRST,
+  and only then prints the new ones. There is
+  no moment where you hold both.
+end note
+@enduml

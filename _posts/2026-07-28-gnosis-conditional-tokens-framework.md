@@ -113,7 +113,7 @@ Whatever remains in `freeIndexSet` after the loop is meaningful in itself. If it
 
 ## Deriving collection identifiers on alt_bn128
 
-This is where the framework departs from a routine hashing scheme. A collection identifier must satisfy two requirements that pull in opposite directions:
+A collection identifier cannot be a plain hash of the collection's data, because it must satisfy two requirements that pull in opposite directions:
 
 - Identifiers for two collections belonging to different conditions must be **combinable** into a single identifier, and the combination must be commutative and associative so that ordering is irrelevant.
 - The combination must be **collision resistant**, so that no attacker can construct a set of collections whose combined identifier equals that of a different set.
@@ -285,7 +285,7 @@ Nothing in the contract lets an account mint stake without consuming backing, an
 
 ## What the 2019 audit found
 
-The [audit report](https://github.com/gnosis/conditional-tokens-contracts/blob/master/docs/audit/AuditReport-ConditionalTokens.md) shipped in the repository lists three issues against commit `a050b6c`, two of them critical, and both criticals had to hold simultaneously for the attack to work.
+The [audit report](https://github.com/gnosis/conditional-tokens-contracts/blob/master/docs/audit/AuditReport-ConditionalTokens.md) shipped in the repository lists three issues against commit `a050b6c`, two of them critical. The two criticals are connected: the exploit path described in the first depends on the identifier weakness described in the second.
 
 ### Forging a collection through the minting hook
 
@@ -332,11 +332,11 @@ The contracts target Solidity `^0.5.1` with a Truffle build, depend on `openzepp
 | xDai | `0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce` |
 | Rinkeby | `0x36bede640D19981A82090519bC1626249984c908` |
 
-The repository deliberately contains no market maker. Pricing and liquidity live in the separate `conditional-tokens-market-makers` project, which supplies an LMSR market maker and a fixed-product market maker operating on positions from this contract. Gnosis's own Omen interface was built on that pair, and Polymarket adopted the same framework for its markets on Polygon, where the ERC-1155 positions are traded through an external order book rather than an automated market maker. The split between the accounting layer described here and the trading layer above it is the reason the same contracts support both designs.
+The repository deliberately contains no market maker. Pricing and liquidity live in the separate `conditional-tokens-market-makers` project, which supplies an LMSR market maker and a fixed-product market maker operating on positions from this contract. Gnosis's own Omen interface was built on that pair, and Polymarket adopted the same framework for its markets on Polygon, where the ERC-1155 positions are traded through an external order book rather than an automated market maker. Keeping pricing logic out of the accounting layer is what lets one set of contracts back both designs.
 
 ## Conclusion
 
-The Conditional Tokens Framework is a narrow contract with a specific claim: that positions contingent on several independent questions should have one identity regardless of how they were assembled. Making that claim hold on-chain required moving identifier derivation from hashing into an elliptic curve group, because the commutativity the design needs and the collision resistance the design needs are only compatible in a setting where the combining operation is hard to invert. The audit history shows how narrow the margin was, with two critical findings that each broke the collateral conservation invariant from a different direction.
+The Conditional Tokens Framework rests on one property: positions contingent on several independent questions should have a single identity regardless of the order in which they were assembled. Holding that property on-chain required moving identifier derivation from hashing into an elliptic curve group, since commutative combination and collision resistance coexist only where the combining operation is hard to invert. The audit found two critical issues, each of which broke the collateral conservation invariant from a different direction, and the shipped code carries both fixes.
 
 The remaining design surface is deliberately left open. Oracle trust, dispute resolution, pricing, and liquidity are all outside the contract, which restricts itself to bookkeeping that is verifiable from the code alone.
 
@@ -415,7 +415,7 @@ They are the three layers of the data model. A condition identifier is `keccak25
 
 **Q: Why can a condition have at most 256 outcome slots?**
 
-Because a subset of slots is represented as an index set, a bitmask stored in a single `uint256`. Bit $j$ of the mask indicates whether slot $j$ belongs to the collection, so 256 bits accommodate exactly 256 slots. The bound is a consequence of the representation rather than an economic choice. The full mask for a 256-slot condition is computed as `(1 << 256) - 1`, which under Solidity 0.5 shift semantics evaluates to `type(uint).max`, the correct all-ones value.
+Because a subset of slots is represented as an index set, a bitmask stored in a single `uint256`. Bit $j$ of the mask indicates whether slot $j$ belongs to the collection, so 256 bits accommodate exactly 256 slots. The bound is a consequence of the representation rather than an economic choice. The full mask for a 256-slot condition is computed as `(1 << 256) - 1`, where the shift evaluates to zero under Solidity 0.5 semantics and the unchecked subtraction wraps to the correct all-ones word.
 
 **Q: Why does the framework hash to an elliptic curve point instead of simply hashing the concatenated collection data?**
 

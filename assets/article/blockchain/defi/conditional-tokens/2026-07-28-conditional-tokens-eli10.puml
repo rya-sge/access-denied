@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* The Prize Shop\n(betting stickers)
+** The question
+*** A judge promises to\nannounce the answer
+*** One box per possible\nanswer
+*** The judge can only\nanswer once
+** Swapping money\nfor stickers
+*** Put in 1 coin,\nget one sticker\nfor every answer
+*** The full set is\nalways worth 1 coin
+*** Hand the full set back,\nget your coin back
+** Cashing in
+*** Wait for the judge
+*** Winning sticker\nbecomes a coin
+*** Losing stickers\nbecome nothing
+** Two questions at once
+*** "Alice wins AND\nit rains"
+*** Build it race-first\nor rain-first
+*** Both routes must land\non the SAME sticker
+** Naming the stickers
+*** Every sticker needs\na serial number
+*** Rule 1: order must\nnot change the name
+*** Rule 2: nobody can\ninvent a fake name
+** The bad first idea
+*** Turn each label into\na big number, then add
+*** Order did not matter\n(good)
+*** But a cheater can hunt\nfor numbers that add up\nto a name they want
+** The fix\n(spots on a curve)
+*** Each label becomes\na spot on a curved line
+*** Spots add together to\nmake another spot
+*** Order still does\nnot matter
+*** Working backwards is\na puzzle nobody\nhas solved
+** The counter mistake
+*** Clerk handed out new\nstickers before taking\nthe old one
+*** Sneaky customer used\nthat gap to cash in twice
+*** Fix: take first,\nhand over after
+** Why it matters
+*** The money box always\nholds enough for\nevery sticker
+*** Real websites use this\nto run prediction markets
+@endmindmap

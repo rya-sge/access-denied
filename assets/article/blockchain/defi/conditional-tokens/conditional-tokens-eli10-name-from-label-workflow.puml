@@ -1,0 +1,51 @@
+@startuml
+title How a label becomes a spot on the curve
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+  StartColor #4A78B5
+  EndColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F7FAFF
+  BorderColor #4A78B5
+}
+
+start
+:Take the label,\nfor example "ALICE WINS";
+:Run it through a scrambler\nto get one huge number;
+
+note right
+  The scrambler always gives the
+  same number for the same label,
+  but you cannot work backwards
+  from the number to the label.
+end note
+
+repeat
+  :Add 1 to the number;
+  :Ask: is there a spot on the\ncurved line at this number?;
+repeat while (Found a spot?) is (no, try the next number) not (yes)
+->yes;
+
+:Pick the top or bottom spot\n(the scrambler decides which);
+#EEF5FF:This spot is the sticker's name;
+
+note right
+  About half of all numbers land on
+  the curve, so this usually takes
+  one or two tries.
+end note
+
+if (Is this sticker built on top\nof another sticker?) then (yes)
+  :Add the two spots together\nusing the curve's adding rule;
+  :The answer is another spot,\nand that is the combined name;
+else (no)
+endif
+
+stop
+@enduml
