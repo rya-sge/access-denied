@@ -221,6 +221,7 @@ Two consequences follow. First, deployment is replaced by initialization: the En
 The properties below are the ones that make a `SenderCreator`-style deployment relay safe rather than merely functional. They are useful when reviewing the EntryPoint or any contract that deploys untrusted factory code on another contract's behalf.
 
 ### Isolation and access control
+
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | Factory `initCode` is called from a dedicated helper, not from the privileged coordinator (EntryPoint), so the factory's `msg.sender` carries no authority. | A malicious factory re-enters privileged functions that trust `msg.sender` and drains deposits or corrupts accounting. |
@@ -228,6 +229,7 @@ The properties below are the ones that make a `SenderCreator`-style deployment r
 | ☐ | The helper holds no deposits, stake, or privileges anywhere in the protocol. | A compromised helper becomes a lever for stealing funds or forging authorization. |
 
 ### Deployment correctness
+
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | The returned sender is checked non-zero (AA13) before it is trusted. | A silently failed factory call is treated as a successful deployment. |
@@ -236,6 +238,7 @@ The properties below are the ones that make a `SenderCreator`-style deployment r
 | ☐ | Deployment runs under an explicit gas ceiling derived from `verificationGasLimit`. | An unbounded factory call enables griefing or gas exhaustion of the bundle. |
 
 ### EIP-7702 handling
+
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | EIP-7702 accounts are initialized, not deployed; the sender is confirmed to be a genuine delegate before `initEip7702Sender` runs. | A non-delegated address is called with attacker calldata, or a factory deployment is attempted on code that already exists. |

@@ -25,6 +25,8 @@ Before anything else, somebody sets up a question. A question needs two things. 
 
 That is the whole setup. A list of answers, and one judge.
 
+> **The grown-up name.** The Prize Shop is a **smart contract**, a program living on a blockchain that anybody can use and nobody can quietly change. The question is a **condition**, each possible answer is an **outcome slot**, and the judge is an **oracle** (the one account allowed to report what happened in the real world). Setting the question up is a function call named `prepareCondition`.
+
 ## How does the shop swap your coin for stickers?
 
 Here is the strange part. If you walk up and hand over one coin, the shop does not give you a sticker that says "Alice wins". It gives you **three** stickers: one saying "Alice wins", one saying "Bob wins", one saying "Carol wins". You get the whole set.
@@ -34,6 +36,8 @@ Here is the strange part. If you walk up and hand over one coin, the shop does n
 Why the whole set? Because of a neat piece of arithmetic. Exactly one of those three stickers is going to be the winner. So the three of them together are always worth exactly one coin, no matter what happens in the race. The shop locks your coin in the money box, and it now holds exactly enough money to pay out whichever sticker wins.
 
 This is the rule that keeps the shop honest. It can never owe more money than it is holding.
+
+> **The grown-up name.** The stickers are **conditional tokens**, and the shop keeps track of them using a standard called **ERC-1155**, which lets one contract look after many different kinds of token at once. Each sticker design is a **position**, and its serial number is literally the token's identity number. Swapping a coin for a full set is called **splitting a position** (`splitPosition`), and handing a full set back for a coin is **merging** (`mergePositions`).
 
 Of course, you did not want all three stickers. You wanted the Alice one. So you find your friend, who thinks Bob will win, and you sell them the "Bob wins" sticker. Somebody else buys the Carol one. Now you are holding only the sticker you believe in, and you have some of your coin back. The price your friend pays you is really their guess about Bob's chances. That is where the betting actually happens: not at the shop, but between people trading stickers.
 
@@ -55,6 +59,8 @@ Now the stickers stop being guesses and become facts:
 
 - A "Bob wins" sticker can be handed in for one coin from the box.
 - An "Alice wins" sticker is now worth nothing. So is a "Carol wins" sticker.
+
+> **The grown-up name.** The judge's announcement is a call to `reportPayouts`, and what they submit is a **payout vector**, one number per answer. Handing a sticker in for money is **redeeming a position** (`redeemPositions`). "Written down once and never changed" is enforced by a single check in the code, which refuses a second announcement for the same question.
 
 There is a slightly cleverer version of this for questions that are not simple win-or-lose. Imagine the question was "how many goals will be scored, somewhere between 0 and 10?" The shop sets up two answers, "low" and "high". If the real result is 9 goals, the judge does not pick just one. The judge says the high sticker is worth nine tenths of a coin and the low sticker is worth one tenth. The two amounts still add up to exactly one coin, so the money box still balances. The idea is the same, only the split is fractional.
 
@@ -99,6 +105,8 @@ It fails rule two, though, and the way it fails is worth understanding. A cheate
 
 Once a cheater finds such a set, they can walk into the shop holding a sticker the shop has never issued, and the shop's own arithmetic will agree that it is real.
 
+> **The grown-up name.** Naming things by adding up scrambled numbers is called **AdHash**. The clever search that breaks it is **Wagner's generalized birthday attack**, and the kind of puzzle it solves is a **subset-sum** problem (find a few numbers from a big pile that add up to a target). In the real system the numbers are not simply added, they are added and then wrapped around to a fixed size, the way a clock wraps from 12 back to 1. That wrapping is part of what makes the search work.
+
 ## How do spots on a curved line fix it?
 
 Here is the clever bit. Instead of giving each label a plain number, the shop gives each label a **spot on a special curved line**.
@@ -108,6 +116,8 @@ Draw a curve on a very large sheet of graph paper. Only certain points sit exact
 There is a rule for adding two spots. You take spot A and spot B, follow the rule, and you land on a third spot, which is also on the curve. It is not ordinary addition, but it behaves like it in the way that counts: **A plus B always lands in the same place as B plus A**. Rule one is satisfied.
 
 And rule two? Working the sum forwards is easy. Working it backwards is not. If somebody hands you a spot and asks "which labels add up to this one?", nobody knows a good way to answer. People have been trying to crack that puzzle for decades, and it is one of the puzzles that a lot of internet security already relies on. It is not proven to be unbreakable, but nobody has broken it.
+
+> **The grown-up name.** That backwards puzzle is called the **discrete logarithm problem**. On a curved line like this one it is the **elliptic curve discrete logarithm problem**, or **ECDLP**. It is the same hard problem behind the padlock icon in your browser and behind the signatures on most cryptocurrency payments. The naming scheme built on top of it has a name too: an **Elliptic Curve Multiset Hash**, which means "turn every item in a set into a curve point, then add the points up". The researchers who published it proved something reassuring. Anyone who could find two different piles of labels landing on the same total could also solve the discrete logarithm problem. So you cannot break the naming scheme without first breaking a puzzle the whole internet is already betting on. The curve the shop actually uses is called **alt_bn128**, and Ethereum has a built-in shortcut for adding spots on it, which is why the adding step is cheap.
 
 That is the swap. The shop gave up plain addition, which was easy to run backwards, for curve addition, which is not.
 
@@ -142,6 +152,8 @@ During that gap they ran over to the cash-in counter. They spent the new sticker
 Notice that this trick only pays off if the cheater can also fake a serial number, which is the earlier weakness. The two problems worked as a team. Fixing either one would have blocked this particular trick, and the shop fixed both, because the fake serial number problem is dangerous by itself as well.
 
 The fix is boring and completely effective. **Take the old sticker first. Print the new ones afterwards.** Now there is no moment where a customer holds both, so there is nothing to exploit during the gap. Real shops of this kind put the same rule everywhere: always collect before you hand out.
+
+> **The grown-up name.** Sneaking back into a program before it has finished its previous job is called **reentrancy**, and it is one of the most famous bug families in blockchain programming. The moment the clerk hands over new stickers is a **callback** (the ERC-1155 standard makes the shop notify the receiver, which is what gives the customer a chance to act). The rule that fixes it is **checks-effects-interactions**: check everything first, update your own books second, and only talk to the outside world last. A real security review found this exact bug in these contracts and rated it critical.
 
 ## Putting it all together
 
