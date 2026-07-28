@@ -1,0 +1,39 @@
+@startuml
+title A reading order through the library
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+start
+:sumcheck.pdf\nread the protocol and its soundness proof;
+:gkrnotes.pdf or l12-gkr.pdf\nsee sum-check drive a real construction;
+note right
+  after these two, the phrase
+  "reduce to a random evaluation"
+  should feel routine
+end note
+
+if (which branch first?) then (pairing-based)
+  :2013-279.pdf Pinocchio\nlearn QAPs and the divisibility test;
+  :2016-260.pdf Groth16\nsee the same idea compressed to 3 elements;
+  :2019-099.pdf Sonic\nuniversal and updatable SRS;
+  :2019-1047.pdf Marlin\nthe AHP + commitment recipe;
+else (transparent)
+  :2017-1066.pdf Bulletproofs\nthe inner product argument;
+  :2018-046.pdf STARK\nAIR, then FRI;
+  :2019-550.pdf Spartan\nsum-check applied to R1CS;
+endif
+
+:2019-1021.pdf Halo\ndefer the linear check and recurse;
+:2021-370.pdf Nova\nfold instead of prove at every step;
+:349.pdf Zerocash\nsee a full system built on top;
+:Goldreich-Krawczyk.pdf\nlearn what cannot be done;
+stop
+@enduml

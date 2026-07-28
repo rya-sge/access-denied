@@ -1,0 +1,67 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* ZK proof systems
+** The one engine
+*** Schwartz-Zippel: d / |F| error
+*** Low-degree extension: table -> polynomial
+*** Every system is a polynomial identity test
+
+** Arithmetisation
+*** R1CS: (Az) o (Bz) = Cz
+**** Spartan, Marlin, Nova
+*** QAP: A(X)B(X) - C(X) = H(X)Z(X)
+**** Pinocchio, Groth16
+*** AIR: trace + transition constraints
+**** STARK
+
+** Information-theoretic core
+*** Sum-check protocol
+**** GKR, Spartan
+*** Interactive oracle proofs (IOP)
+*** Algebraic holographic proofs (AHP)
+**** Marlin's compiler recipe
+
+** Commitment layer
+*** KZG pairing-based, constant size
+**** Sonic, Marlin
+*** Pedersen + inner product argument
+**** Bulletproofs, Halo, Spartan, Nova
+*** Merkle + FRI, hash only
+**** STARK
+
+** Setup spectrum
+*** Per-circuit SRS: Pinocchio, Groth16
+*** Universal and updatable SRS: Sonic, Marlin
+*** Transparent, no setup: STARK, Bulletproofs, Halo, Spartan
+
+** Making it non-interactive
+*** Fiat-Shamir: r = H(transcript)
+*** Random oracle model
+*** Transcript binding is where systems break
+
+** Security notions
+*** Soundness vs knowledge soundness
+*** Extractor defines "knows a witness"
+*** Simulator defines zero knowledge
+*** Goldreich-Krawczyk: composition has limits
+
+** Recursion
+*** Halo: defer the linear check, amortise
+*** Nova: fold two R1CS instances into one
+*** Both give IVC with constant-size proofs
+
+** Application
+*** Zerocash: commitments, nullifiers, Merkle membership
+*** The proof hides origin, destination and amount
+@endmindmap

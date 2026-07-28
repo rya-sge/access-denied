@@ -1,0 +1,46 @@
+@startuml
+title What each security definition actually promises
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Against a cheating prover" {
+  component "Completeness\nan honest prover always convinces" as COMP
+  component "Soundness\na false statement is rejected" as SOUND
+  component "Knowledge soundness\nan extractor recovers a witness\nfrom any convincing prover" as KS
+  component "Extractor E\nrewinds or inspects the prover;\na thought experiment, never run" as EXT
+}
+
+package "Against a cheating verifier" {
+  component "Zero knowledge\nthe transcript reveals nothing\nbeyond the statement's truth" as ZK
+  component "Simulator S\nproduces transcripts without\nany witness at all" as SIM
+  component "Honest-verifier ZK\nonly against a verifier that\nfollows the protocol" as HVZK
+}
+
+package "Limits (Goldreich-Krawczyk 1990)" {
+  component "Plain ZK is not closed\nunder sequential composition" as L1
+  component "Black-box simulation ZK is not\nclosed under parallel execution" as L2
+  component "3-round black-box simulation ZK\nimplies the language is in BPP" as L3
+}
+
+SOUND --> KS : strengthened by
+KS --> EXT : defined by
+ZK --> SIM : defined by
+HVZK --> ZK : weaker variant of
+SIM --> L1
+SIM --> L2
+SIM --> L3
+
+note bottom of KS
+  this, not plain soundness, is what
+  a payment system such as Zerocash needs
+end note
+@enduml

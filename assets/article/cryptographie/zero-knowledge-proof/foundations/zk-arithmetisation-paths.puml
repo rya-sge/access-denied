@@ -1,0 +1,55 @@
+@startuml
+title Three routes from a computation to a polynomial identity
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+component "A program, or an arithmetic circuit" as PROG
+
+package "Route 1 — R1CS" {
+  component "Rank-1 constraint system\n(Az) o (Bz) = Cz" as R1CS
+  component "Encode as a degree-3\nmultivariate polynomial,\nprove with sum-check" as R1CSP
+}
+
+package "Route 2 — QAP" {
+  component "Quadratic arithmetic program\nA(X), B(X), C(X) interpolated\nover the gate points" as QAP
+  component "Divisibility test\nA B - C = H Z" as QAPP
+}
+
+package "Route 3 — AIR" {
+  component "Execution trace, one row per step\nplus transition constraints" as AIR
+  component "Quotient must be low degree,\ntested with FRI" as AIRP
+}
+
+component "One polynomial identity,\nchecked at a random point" as IDENT
+
+PROG --> R1CS
+PROG --> QAP
+PROG --> AIR
+R1CS --> R1CSP
+QAP --> QAPP
+AIR --> AIRP
+R1CSP --> IDENT
+QAPP --> IDENT
+AIRP --> IDENT
+
+note bottom of R1CSP
+  Spartan, Marlin, Nova
+end note
+
+note bottom of QAPP
+  Pinocchio, Groth16
+end note
+
+note bottom of AIRP
+  STARK
+end note
+@enduml

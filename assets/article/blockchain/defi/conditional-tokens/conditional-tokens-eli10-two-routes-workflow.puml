@@ -30,8 +30,8 @@ else (the weather)
   :Keep "ALICE + RAIN";
 endif
 
-#EEF5FF:You are holding a sticker
-that says ALICE + RAIN;
+:You are holding a sticker
+that says ALICE + RAIN;<<#EEF5FF>>
 
 note right
   Both routes end on the very same

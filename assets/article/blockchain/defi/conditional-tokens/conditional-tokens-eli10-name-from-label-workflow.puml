@@ -33,7 +33,7 @@ repeat while (Found a spot?) is (no, try the next number) not (yes)
 ->yes;
 
 :Pick the top or bottom spot\n(the scrambler decides which);
-#EEF5FF:This spot is the sticker's name;
+:This spot is the sticker's name;<<#EEF5FF>>
 
 note right
   About half of all numbers land on

@@ -1,0 +1,59 @@
+@startuml
+title The modular stack — every system in the library is a choice at each layer
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Layer 1 — Arithmetisation" {
+  component "R1CS" as L1A
+  component "QAP" as L1B
+  component "AIR" as L1C
+}
+
+package "Layer 2 — Information-theoretic protocol" {
+  component "Sum-check based IOP" as L2A
+  component "Linear PCP / QAP divisibility" as L2B
+  component "Algebraic holographic proof" as L2C
+  component "Reed-Solomon proximity IOP" as L2D
+}
+
+package "Layer 3 — Commitment scheme" {
+  component "KZG (pairings, trusted setup)" as L3A
+  component "Pedersen + IPA (discrete log)" as L3B
+  component "Merkle + FRI (hash only)" as L3C
+}
+
+package "Layer 4 — Compilation" {
+  component "Fiat-Shamir\nr = H(transcript)" as L4
+}
+
+component "A non-interactive argument\nwith its own size, setup and\nassumption profile" as OUT
+
+L1A --> L2A
+L1A --> L2C
+L1B --> L2B
+L1C --> L2D
+L2A --> L3B
+L2B --> L3A
+L2C --> L3A
+L2C --> L3B
+L2D --> L3C
+L3A --> L4
+L3B --> L4
+L3C --> L4
+L4 --> OUT
+
+note right of L3C
+  the assumption you pick here
+  decides post-quantum security
+  and whether a setup is needed
+end note
+@enduml

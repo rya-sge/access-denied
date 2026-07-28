@@ -17,14 +17,14 @@ skinparam note {
 
 start
 if (partition.length > 1 ?) then (no)
-  #FDEEEE:revert "got empty or singleton partition";
+  :revert "got empty or singleton partition";<<#FDEEEE>>
   kill
 else (yes)
 endif
 
 :outcomeSlotCount := payoutNumerators[conditionId].length;
 if (outcomeSlotCount > 0 ?) then (no)
-  #FDEEEE:revert "condition not prepared yet";
+  :revert "condition not prepared yet";<<#FDEEEE>>
   kill
 else (yes)
 endif
@@ -34,12 +34,12 @@ endif
 
 repeat :take next indexSet from partition;
   if (0 < indexSet < fullIndexSet ?) then (no)
-    #FDEEEE:revert "got invalid index set";
+    :revert "got invalid index set";<<#FDEEEE>>
     kill
   else (yes)
   endif
   if (indexSet & freeIndexSet == indexSet ?) then (no)
-    #FDEEEE:revert "partition not disjoint";
+    :revert "partition not disjoint";<<#FDEEEE>>
     kill
   else (yes)
   endif

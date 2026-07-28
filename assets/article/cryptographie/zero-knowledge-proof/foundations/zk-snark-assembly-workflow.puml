@@ -1,0 +1,35 @@
+@startuml
+title Assembling a modern zkSNARK, following the Marlin recipe
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+  StartColor #7A5BB5
+  EndColor #7A5BB5
+}
+
+|Designer|
+start
+:pick an arithmetisation\n(R1CS, QAP or AIR);
+:design a public-coin information-theoretic protocol\nin which the prover sends oracles to polynomials;
+:prove soundness in the oracle model\nusing Schwartz-Zippel;
+
+|Compiler|
+:choose an extractable polynomial commitment scheme;
+:replace every oracle with a commitment;
+:replace every oracle query with an opening proof;
+:apply Fiat-Shamir, hashing the full transcript\nto derive each verifier challenge;
+
+|Result|
+:a non-interactive argument of knowledge;
+if (does the commitment need a trusted setup?) then (yes)
+  :SRS-based system\nconstant proof size, pairing assumptions;
+else (no)
+  :transparent system\nlarger proofs, weaker assumptions;
+endif
+:add blinding to the committed polynomials\nto obtain zero knowledge;
+stop
+@enduml

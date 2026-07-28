@@ -487,3 +487,12 @@ _posts/2026-07-28-conditional-tokens-eli10.md
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-two-routes-workflow.puml        (workflow, in-section)
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-name-from-label-workflow.puml   (workflow, in-section)
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-swap-counter-workflow.puml      (workflow, in-section)
+
+_posts/2026-07-28-zk-proof-systems-15-concepts-15-formulas.md
+  assets/article/cryptographie/zero-knowledge-proof/foundations/2026-07-28-zk-proof-systems-concepts-formulas.puml (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-security-notions-concept.puml                   (concept, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-snark-assembly-workflow.puml                    (workflow, asset only)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-paper-family-tree.puml                          (component, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-arithmetisation-paths.puml                      (component, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-modular-stack.puml                              (component, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/zk-reading-order.puml                              (activity, in-section)

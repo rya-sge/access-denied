@@ -1,0 +1,61 @@
+@startuml
+title How the papers in the library descend from each other
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Theory (1990 - 2008)" {
+  component "Goldreich-Krawczyk 1990\ncomposition limits of ZK" as GK
+  component "LFKN 1992\nsum-check protocol" as LFKN
+  component "GKR 2008\ndoubly-efficient interactive proofs" as GKR
+}
+
+package "Pairing-based SNARKs (per-circuit setup)" {
+  component "Pinocchio 2013\nQAP arithmetisation" as PIN
+  component "Groth16 2016\n3 group elements" as G16
+}
+
+package "Universal / updatable SRS" {
+  component "Sonic 2019\nlinear universal SRS" as SONIC
+  component "Marlin 2020\nAHP + PCS compiler" as MARLIN
+}
+
+package "Transparent systems (no setup)" {
+  component "Bulletproofs 2018\ninner product argument" as BP
+  component "STARK 2018\nAIR -> FRI" as STARK
+  component "Spartan 2020\nsum-check over R1CS" as SPARTAN
+}
+
+package "Recursion / IVC" {
+  component "Halo 2019\nnested amortisation" as HALO
+  component "Nova 2022\nfolding schemes" as NOVA
+}
+
+package "Application" {
+  component "Zerocash 2014\nanonymous payments" as ZC
+}
+
+LFKN --> GKR
+GKR --> SPARTAN : sum-check reused
+GKR --> STARK : sum-check in constraint composition
+PIN --> G16
+G16 --> ZC : Zcash Sapling
+PIN --> ZC : first deployment
+G16 --> SONIC : universalise the setup
+SONIC --> MARLIN : better efficiency, AHP framing
+SONIC --> HALO : Sonic-style main argument
+BP --> HALO : inner product argument
+BP --> SPARTAN : discrete-log commitment option
+HALO --> NOVA : keep the deferral, drop the PCS
+SPARTAN --> NOVA : compresses the folded instance
+GK ..> HALO : why parallel/recursive ZK needs care
+GK ..> G16 : why 3-round black-box ZK is limited
+@enduml

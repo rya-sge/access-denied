@@ -42,14 +42,14 @@ else (no, nested collection)
   :yy := x2^3 + 3 (mod P);
   :y2 := yy^((P+1)/4) (mod P);
   if (y2^2 == yy ?) then (no)
-    #FDEEEE:revert "invalid parent collection ID";
+    :revert "invalid parent collection ID";<<#FDEEEE>>
     kill
   else (yes)
   endif
   :fix parity of y2 from odd;
   :staticcall precompile 0x06 with (x1, y1, x2, y2);
   if (call succeeded ?) then (no)
-    #FDEEEE:revert "ecadd failed";
+    :revert "ecadd failed";<<#FDEEEE>>
     kill
   else (yes)
   endif
