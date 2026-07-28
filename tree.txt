@@ -496,3 +496,10 @@ _posts/2026-07-28-zk-proof-systems-15-concepts-15-formulas.md
   assets/article/cryptographie/zero-knowledge-proof/foundations/zk-arithmetisation-paths.puml                      (component, in-section)
   assets/article/cryptographie/zero-knowledge-proof/foundations/zk-modular-stack.puml                              (component, in-section)
   assets/article/cryptographie/zero-knowledge-proof/foundations/zk-reading-order.puml                              (activity, in-section)
+
+_posts/2026-07-28-medusa-smart-contract-fuzzer.md
+  assets/article/blockchain/solidity/medusa/2026-07-28-medusa-smart-contract-fuzzer.puml (mindmap)
+  assets/article/blockchain/solidity/medusa/medusa-architecture-concept.puml              (concept, in-section)
+  assets/article/blockchain/solidity/medusa/medusa-fuzzing-lifecycle-workflow.puml        (workflow, in-section)
+  assets/article/blockchain/solidity/medusa/medusa-failure-shrinking-sequence.puml        (sequence, in-section)
+  assets/article/blockchain/solidity/medusa/medusa-project-setup-workflow.puml            (workflow, in-section)

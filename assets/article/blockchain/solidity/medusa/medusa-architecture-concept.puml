@@ -1,0 +1,81 @@
+@startuml
+title Medusa — component architecture
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "cmd (Cobra CLI)" {
+  [init]
+  [fuzz]
+  [corpus clean]
+}
+
+package "compilation" {
+  [crytic-compile adapter]
+  [solc adapter]
+}
+
+package "fuzzing" {
+  [Fuzzer]
+  [FuzzerWorker xN]
+  [CallSequenceGenerator]
+  [ValueGenerator / Mutator]
+  [Corpus]
+  [CoverageMaps]
+  [CorpusPruner]
+  [Assertion provider]
+  [Property provider]
+  [Optimization provider]
+  [Execution tracer]
+}
+
+package "chain" {
+  [TestChain]
+  [Cheatcode contract]
+  [CoverageTracer]
+}
+
+package "external" {
+  [medusa-geth EVM]
+  [Slither]
+  [RPC endpoint]
+}
+
+[fuzz] --> [Fuzzer]
+[init] ..> [Fuzzer] : writes medusa.json
+[corpus clean] --> [Corpus]
+
+[Fuzzer] --> [crytic-compile adapter]
+[Fuzzer] --> [solc adapter]
+[Fuzzer] --> [FuzzerWorker xN]
+[Fuzzer] --> [Corpus]
+[Fuzzer] --> [Assertion provider]
+[Fuzzer] --> [Property provider]
+[Fuzzer] --> [Optimization provider]
+
+[FuzzerWorker xN] --> [CallSequenceGenerator]
+[CallSequenceGenerator] --> [ValueGenerator / Mutator]
+[CallSequenceGenerator] --> [Corpus]
+[FuzzerWorker xN] --> [TestChain]
+[FuzzerWorker xN] --> [Execution tracer]
+
+[Corpus] --> [CoverageMaps]
+[CorpusPruner] --> [Corpus]
+[CoverageTracer] --> [CoverageMaps]
+
+[TestChain] --> [medusa-geth EVM]
+[TestChain] --> [Cheatcode contract]
+[TestChain] --> [CoverageTracer]
+[TestChain] ..> [RPC endpoint] : fork mode
+
+[ValueGenerator / Mutator] <.. [Slither] : mined constants
+
+@enduml

@@ -1,0 +1,60 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* medusa
+** Goal
+*** Validate invariants, not crashes
+*** Function-level properties
+*** System-level properties
+*** Stateful and stateless campaigns
+** Architecture
+*** cmd (Cobra CLI)
+*** fuzzing (workers, corpus, coverage)
+*** chain (TestChain on medusa-geth)
+*** compilation (crytic-compile / solc)
+*** events and hooks (Go API)
+** Fuzzing lifecycle
+*** Deploy targetContracts
+*** Generate call sequence
+*** Execute on TestChain
+*** Update coverage maps
+*** Store coverage-increasing sequences
+*** Reset to base block
+** Coverage guidance
+*** Edge markers (source PC, dest PC)
+*** Recorded on jumps, returns, reverts, entrance
+*** New random sequence (p = 0.3)
+*** Corpus mutation strategies
+**** Corpus head / tail
+**** Splice / interleave
+*** Slither constant mining
+*** Periodic corpus pruning
+** Test providers
+*** Assertion: EVM panic codes
+*** Property: property_ returns bool
+*** Optimization: optimize_ returns int256
+*** Shrinking to minimal sequence
+** Using it on a project
+*** medusa init
+*** targetContracts and testLimit
+*** Wrapper functions with clamping
+*** corpusDirectory for reuse
+*** HTML / LCOV coverage reports
+*** Revert report for harness debugging
+** Advanced features
+*** Cheatcodes at 0x7109...DD12D
+*** Fork mode over RPC
+*** Genesis state from anvil dump
+*** Predeployed contracts
+*** console.log support
+@endmindmap

@@ -1,0 +1,48 @@
+@startuml
+title Medusa — from a failing sequence to a minimal reproduction
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+participant "CallSequence\nGenerator" as Gen
+participant "FuzzerWorker" as W
+participant "TestChain" as C
+participant "Test case\nprovider" as P
+participant "Execution\ntracer" as T
+
+Gen -> W : base sequence (100 calls)
+loop for each call in the sequence
+  W -> C : execute call
+  C --> W : receipt, logs, revert data
+  W -> P : callSequencePostCallTest(sequence)
+  P --> W : no failure
+end
+
+W -> P : callSequencePostCallTest(sequence)
+P --> W : ShrinkCallSequenceRequest\n(+ VerifierFunction)
+
+note over W, P #EEF5FF
+The verifier re-checks that the candidate
+sequence still triggers the same failure.
+end note
+
+loop up to shrinkLimit iterations
+  W -> W : drop reverted calls,\nremove one call,\nshrink an argument
+  W -> C : replay candidate on a fresh chain
+  C --> W : results
+  W -> P : verifier(candidate)
+  P --> W : still failing / no longer failing
+end
+
+W -> C : replay the minimised sequence
+W -> T : attach execution tracer
+T --> W : annotated trace with console.log output
+W -> P : onShrinkResult(minimised sequence)
+P --> W : test marked FAILED
+
+@enduml
