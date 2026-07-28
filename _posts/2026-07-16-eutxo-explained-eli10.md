@@ -4,7 +4,7 @@ title: "Money as a Jar of Coins — How Cardano Tracks Who Owns What, Explained 
 date:   2026-07-16
 lang: en
 locale: en-GB
-categories: blockchain
+categories: blockchain eli10
 tags: cardano eutxo bitcoin blockchain analogy explainer
 description: A simple guide to Cardano's eUTXO model, explained with a jar of real coins, sticky notes, and a referee. Shows how it works and how it is different from Bitcoin, for curious readers of all ages.
 image: /assets/article/blockchain/cardano/eutxo-explained-eli10.png

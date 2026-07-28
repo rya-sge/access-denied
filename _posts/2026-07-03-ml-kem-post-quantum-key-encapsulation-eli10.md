@@ -4,7 +4,7 @@ title: "How Two Computers Agree on a Secret Code That a Quantum Computer Cannot 
 date:   2026-07-03
 lang: en
 locale: en-GB
-categories: cryptography
+categories: cryptography eli10
 tags: cryptography post-quantum lattice ml-kem key-encapsulation analogy explainer
 description: A simple guide to ML-KEM, the new way two computers share a secret code that quantum computers cannot steal, explained with padlocks, locked boxes, and a clever double-check.
 image: /assets/article/cryptographie/lattice/2026-07-03-ml-kem-post-quantum-key-encapsulation-eli10-mindmap.png

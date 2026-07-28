@@ -185,7 +185,9 @@ if(x2 != 0) {
 }
 ```
 
-The `require` on `mulmod(y2, y2, P) == yy` is the load-bearing check. A caller supplies `parentCollectionId` as an arbitrary 32-byte value, and without that check any word could be interpreted as a parent collection. Rejecting x-coordinates that are not on the curve means a valid parent identifier can only be produced by actually running the derivation, which is what makes forging a parent collection infeasible.
+The `require` on `mulmod(y2, y2, P) == yy` rejects any word that is not the compressed form of a real curve point. It is worth being precise about what this check does and does not buy. Roughly half of all 32-byte values happen to encode a point, so passing it is not evidence that the caller derived the identifier legitimately. Its job is to guarantee that what reaches the `ecAdd` precompile is a genuine group element, so that the group structure the collision argument depends on actually applies.
+
+What keeps an attacker out of a position they never backed is the combination of that group structure with the split rules. Stake can only be minted by splitting down from a parent the caller already holds, and that chain bottoms out at the identity when collateral enters the contract. Every reachable collection identifier is therefore a sum of legitimately derived points. Landing on one of them from a different set of collections means finding a discrete logarithm relation among hashed curve points, which is the problem the multiset hash construction rests on.
 
 Point addition is delegated to the precompile at address `0x06`. A parent identifier of `bytes32(0)` is treated as the group identity, which is why splitting from raw collateral passes zeros: adding the identity leaves the child collection identifier unchanged.
 
@@ -305,7 +307,7 @@ The fix was to reorder the operation so the source stake is consumed first, whic
 
 The second finding targets property 3 on its own. Even with the reordering, an identifier scheme where combination is truncated addition of hashes is vulnerable to a generalized birthday attack, which finds sets of values summing to a target far faster than brute force. Any such collision lets an attacker reach a position whose backing was never posted.
 
-Replacing AdHash with the elliptic curve multiset hash removes the algebraic structure the attack relied on. The audit noted the replacement as promising but pending evaluation, and a follow-up review of the multiset hashing proposal plus a January 2020 accumulator audit are both archived in the repository's `docs/audit` directory.
+Replacing AdHash with the elliptic curve multiset hash moves the collision search from a subset-sum problem, which has practical algorithms, to a discrete logarithm relation on alt_bn128, which does not. This finding is dangerous on its own terms: a collision between two legitimately reachable identifiers lets stake built under one set of conditions redeem under another, whatever order the split and mint are performed in. The audit noted the replacement as promising but pending evaluation, and a follow-up review of the multiset hashing proposal plus a January 2020 accumulator audit are both archived in the repository's `docs/audit` directory.
 
 ### Batch minting
 
@@ -366,7 +368,8 @@ The items below are the properties a deployment or a fork of this framework must
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | Collection identifiers are combined by an operation with no exploitable algebraic structure, such as elliptic curve point addition, never by modular addition or XOR of hashes. | A generalized birthday attack forges a collection identifier that redeems against collateral it never posted. |
-| ☐ | A supplied `parentCollectionId` is decompressed and its x-coordinate is verified to satisfy the curve equation before use. | Arbitrary 32-byte words are accepted as parent collections, letting an attacker address positions outside the legitimate derivation. |
+| ☐ | A supplied `parentCollectionId` is decompressed and its x-coordinate is verified to satisfy the curve equation before it reaches the group operation. | Values that are not group elements flow into the point addition, so the collision argument no longer covers the identifier space. |
+| ☐ | Stake can be minted only by splitting down from a position the caller already holds, so every reachable identifier is a sum of legitimately derived points. | An attacker mints into a hand-picked identifier directly, and the on-curve check does not stop them since about half of all words are valid points. |
 | ☐ | The hash-to-curve loop rejects non-residues by squaring the candidate root and comparing, rather than trusting the exponentiation result. | Points that are not on the curve enter the identifier space and break the collision-resistance argument. |
 | ☐ | The parity bit is fixed at a defined position outside the 254-bit x-coordinate and applied consistently in compression and decompression. | Two encodings map to the same point or one point yields two identifiers, splitting balances that should be fungible. |
 | ☐ | The condition identifier binds the oracle address, the question identifier and the outcome slot count together. | Reporting rights or slot counts can be reassigned after preparation, invalidating already-minted positions. |
@@ -431,7 +434,7 @@ It means the supplied partition does not cover every outcome slot of the conditi
 
 **Q: Combining the audit findings, why did the mint-before-burn ordering only become exploitable in the presence of the AdHash collision weakness?**
 
-The reentrancy window alone gives an attacker control during an operation, but not a target worth reaching. To profit, the attacker needs a parent collection whose split produces a position that is already redeemable for collateral the attacker never backed, and constructing such a parent is exactly the collision problem. AdHash made it solvable, because the combined identifier was a modular sum the attacker could work backwards from. With the elliptic curve multiset hash, no such parent can be constructed, so the reentrancy window would have had nothing to exploit. The fixes are independent because either one alone closes the attack, and both were applied.
+The reentrancy window alone gives an attacker control during an operation, but not a target worth reaching. To profit, the attacker needs a parent collection whose split produces a position that is already redeemable for collateral the attacker never backed, and constructing such a parent is exactly the collision problem. AdHash made it solvable, because the combined identifier was a modular sum the attacker could work backwards from. Once identifiers are curve points, no such parent is reachable, so the reentrancy window has nothing to exploit. Either fix alone closes this particular exploit path. They were both applied because the collision weakness is also dangerous by itself: it lets two legitimately built positions collide, which no amount of careful ordering would prevent.
 
 **Q: Why is `getCollectionId` declared `view` on the contract while `getConditionId` and `getPositionId` are `pure`?**
 

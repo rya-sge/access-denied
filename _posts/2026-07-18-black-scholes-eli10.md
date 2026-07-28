@@ -4,7 +4,7 @@ title: "The Black-Scholes Model for Curious Kids — Pricing a Ticket to Buy Lat
 date: 2026-07-18
 lang: en
 locale: en-GB
-categories: finance
+categories: finance eli10
 tags: options black-scholes analogy eli10 finance
 description: A simple guide to the Black-Scholes model - what an option is, why pricing it was a hard puzzle, and how two clever people solved it, explained with everyday analogies for curious readers.
 image: /assets/article/finance/black-scholes-eli10.png

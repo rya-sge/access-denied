@@ -4,7 +4,7 @@ title: "The GKR Protocol — How to Check a Million Calculations Without Doing T
 date:   2026-06-19
 lang: en
 locale: en-GB
-categories: cryptography ZKP
+categories: cryptography ZKP eli10
 tags: zkp interactive-proof gkr sum-check multilinear-extension analogy
 description: An intuitive guide to the GKR protocol through everyday analogies. Learn how a verifier can check a massive computation by asking a few clever questions, without re-running a single step.
 image: /assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol-explained.png

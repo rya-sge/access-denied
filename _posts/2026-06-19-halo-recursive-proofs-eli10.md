@@ -4,7 +4,7 @@ title: "Halo — How to Check an Endless Chain of Work with a Single Glance"
 date:   2026-06-19
 lang: en
 locale: en-GB
-categories: cryptography ZKP
+categories: cryptography ZKP eli10
 tags: zkp recursive-proofs halo analogy
 description: An intuitive guide to Halo, the first system that lets you verify a million steps of computation by checking just one small proof, without trusting any secret setup ceremony.
 image: /assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs-eli10.png

@@ -4,7 +4,7 @@ title: "How Computers Sign Messages That Even a Quantum Computer Cannot Fake —
 date:   2026-07-03
 lang: en
 locale: en-GB
-categories: cryptography
+categories: cryptography eli10
 tags: cryptography post-quantum lattice ml-dsa digital-signature analogy explainer
 description: A simple guide to ML-DSA, the new signature that quantum computers cannot fake, explained with everyday analogies about wax seals, secret paint, and drawings that must stay inside the lines.
 image: /assets/article/cryptographie/lattice/2026-07-03-ml-dsa-post-quantum-signatures-eli10-mindmap.png

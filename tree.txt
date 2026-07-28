@@ -480,3 +480,10 @@ _posts/2026-07-28-gnosis-conditional-tokens-framework.md
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-collection-id-workflow.puml        (workflow, in-section)
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-split-position-workflow.puml       (workflow, in-section)
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-reentrancy-attack-workflow.puml    (workflow, in-section)
+
+_posts/2026-07-28-conditional-tokens-eli10.md
+  assets/article/blockchain/defi/conditional-tokens/2026-07-28-conditional-tokens-eli10.puml                 (mindmap)
+  assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-split-stickers-concept.puml     (concept, in-section)
+  assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-two-routes-workflow.puml        (workflow, in-section)
+  assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-name-from-label-workflow.puml   (workflow, in-section)
+  assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-swap-counter-workflow.puml      (workflow, in-section)
