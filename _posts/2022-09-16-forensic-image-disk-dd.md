@@ -9,7 +9,7 @@ categories: security
 tags: forensic mount dd
 description: Presentation of a list of tools to perform a forensic analysis on a disk image (minfo, fls, mount, photorec, ...).
 isMath: false
-image: 
+image: /assets/article/securite/2022-09-16-forensic-image-disk-dd-mindmap.png
 ---
 
 If you have a disk image file (dd file), here is a presentation of some tools to perform a forensic analysis. You can find more information about this extension here [[WhatIsFileExtension](https://www.whatisfileextension.com/dd/)].
@@ -106,3 +106,9 @@ Reference : [[Sharma 2021]([https://www.tomshardware.com/how-to/recover-deleted-
 3. MOHAN, Shini, 2016. Solution To Mount DD Image In Linux OS. *TechNewsKB*. Online. 8 December 2016. [Accessed 16 September 2022]. Retrieved from: [https://technewskb.com/mount-dd-image-linux-using-terminal-commands/](https://technewskb.com/mount-dd-image-linux-using-terminal-commands/)
 4. SHARMA, Shashank, 2021. How To Recover Deleted Files From Any Drive in Linux. *tom’sHardware*. Online. 21 August 2021. [Accessed 16 September 2022]. Retrieved from: [https://www.tomshardware.com/how-to/recover-deleted-files-from-any-drive-in-linux](https://www.tomshardware.com/how-to/recover-deleted-files-from-any-drive-in-linux)
 5. WHATISFILEEXTENSION, no date. What is DD File Extension? Understanding Forensic DD Image. *WhatIsFileExtension*. Online. [Accessed 16 September 2022]. Retrieved from: [https://www.whatisfileextension.com/dd/](https://www.whatisfileextension.com/dd/)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Disk image forensics mindmap]({{site.url_complet}}/assets/article/securite/2022-09-16-forensic-image-disk-dd-mindmap.png)

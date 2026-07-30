@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain
 tags: aptos move
 description: Aptos Security Checklist
-image:
+image: /assets/article/blockchain/aptos/2025-10-21-aptos-move-security-checklist-mindmap.png
 isMath: 
 
 ---
@@ -99,3 +99,9 @@ This article is a summary of the Aptos Documentation [Move Security Guidelines](
 
 - [Move Security Guidelines](https://aptos.dev/build/smart-contracts/move-security-guidelines)
 - ChatGPT to summarize the documentation
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Aptos Move security checklist mindmap]({{site.url_complet}}/assets/article/blockchain/aptos/2025-10-21-aptos-move-security-checklist-mindmap.png)

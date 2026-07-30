@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* WebSockets\navec express-ws
+** Introduction
+*** Canal bidirectionnel
+*** Persistant, full-duplex
+*** Alternative au polling
+** Fonctionnement
+*** Handshake HTTP\npuis upgrade
+*** Messages échangés\ndans les deux sens
+** Installation
+*** express + express-ws
+** Serveur
+*** Mise en place
+*** Middleware
+*** Définition des routes
+*** Gestion du WebSocket
+** Client
+*** Mise en place
+*** Événements\n(open, message,\nclose, error)
+*** Exemples
+@endmindmap

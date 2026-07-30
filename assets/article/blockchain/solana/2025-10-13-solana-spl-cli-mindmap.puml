@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Solana CLI\n& spl-token
+** Solana concepts
+*** Account model
+*** Types of account
+*** Mint vs token account
+** Global commands
+*** Config & cluster
+*** Keypair management
+** Create a token
+*** spl-token create-token
+*** Create token account
+*** Mint supply
+** Authorities
+*** Mint authority
+*** Freeze authority
+*** Revoking authority
+** Advanced
+*** Token extensions\n(Token-2022)
+*** Transfer & burn
+@endmindmap

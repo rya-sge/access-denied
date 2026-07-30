@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Steakhouse\nFinancial
+** Origin
+*** Core contributors\nto Sky / MakerDAO
+*** Curator & DeFi\nadvisory firm
+** Role
+*** Risk curation
+*** Vault management
+*** Financial reporting
+** Lending protocols
+*** Morpho vaults
+*** Kamino Finance
+** Networks
+*** Ethereum
+*** Katana
+*** Arbitrum
+** Ecosystem work
+*** MakerDAO / SKY
+*** Grove (Sky)
+*** Chronicle Oracle
+*** Lido
+*** ENS reporting
+@endmindmap

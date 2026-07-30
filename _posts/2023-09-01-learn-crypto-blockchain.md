@@ -7,7 +7,7 @@ categories: blockchain
 lang: en
 locale: en-GB
 tags: blockchain mooc course online crypto ethereum
-image: 
+image: /assets/article/blockchain/2023-09-01-learn-crypto-blockchain-mindmap.png
 description: Become a master of Blockchain and Crypto by following these free online courses
 ---
 
@@ -664,3 +664,9 @@ List of resources: [linkedin.com/posts/harendra-shakya_web3-nft-blockchain-activ
 [https://docs.ethernautdao.io/resources/resources](https://docs.ethernautdao.io/resources/resources)
 
 [https://www.web3.university/](https://www.web3.university/)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Free blockchain learning resources mindmap]({{site.url_complet}}/assets/article/blockchain/2023-09-01-learn-crypto-blockchain-mindmap.png)

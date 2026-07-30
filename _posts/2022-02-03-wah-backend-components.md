@@ -2,6 +2,8 @@
 layout: post
 title:  "WAH10 - Back-End Components"
 date:   2022-02-03
+lang: fr
+locale: fr-FR
 categories: security network web
 tags: web backend component lfi rfi hpi hpp smtp wah
 description: Questions & Réponses du chapitre 10 du livre The Web Application Hacker's Handbook

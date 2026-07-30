@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 description: First Fight 38 - Rock Paper Scissors DApp is a fully decentralized implementation of the classic Rock Paper Scissors game on Ethereum.
-image: 
+image: /assets/article/blockchain/audit/2025-05-07-cyfrin-first-fight-38-rock-paper-scissor-mindmap.png
 isMath: false
 ---
 
@@ -449,3 +449,9 @@ This prevents ETH from being sent directly to the contract, making the contract 
 **Option 2: Add a withdrawal mechanism for all contract balance**
 
 Either approach would prevent ETH from being permanently locked in the contract.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![First Fight 38 Rock Paper Scissors mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-05-07-cyfrin-first-fight-38-rock-paper-scissor-mindmap.png)

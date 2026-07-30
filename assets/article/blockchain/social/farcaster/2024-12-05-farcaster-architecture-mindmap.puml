@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Farcaster
+** Overview
+*** Decentralised social\nnetwork on Ethereum
+*** Sufficiently\ndecentralised
+** Split design
+*** Onchain\n(identity, payments)
+*** Offchain\n(messages, data)
+** Contracts
+*** Id Registry
+*** Storage Registry
+*** Key Registry
+** Hubs
+*** Design
+*** Validation
+*** Storage
+*** Replication
+*** Consistency
+** Properties
+*** Users own\ntheir identity
+*** Portable social graph
+@endmindmap

@@ -3,6 +3,8 @@
 layout: post
 title:  "Analyse de programmes avec GCC et GDB"
 date:   2021-05-18 
+lang: fr
+locale: fr-FR
 categories: security
 tags: gcc gdb buffer-overflow shellcode
 description: Compilation avec gcc et commandes de base de GDB

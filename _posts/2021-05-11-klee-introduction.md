@@ -2,6 +2,8 @@
 layout: post
 title:  Introduction à Klee, dynamic symbolic execution engine
 date:   2021-05-11 
+lang: fr
+locale: fr-FR
 categories: security
 tags: klee clang reverse sanitizer concolique analyse
 description: Présentation du logiciel Klee ainsi que ses tutoriels. Klee est un outil permettant de réaliser une analyse concolique. 

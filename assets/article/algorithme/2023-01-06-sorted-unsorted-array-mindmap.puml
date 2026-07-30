@@ -1,0 +1,30 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Sorted vs\nunsorted array
+** Unsorted array
+*** Insert at the end\nO(1)
+*** Linear search O(n)
+*** Remove needs a search
+** Sorted array
+*** Insert keeps order\nO(n)
+*** Binary search\nO(log n)
+*** Ordered traversal\nis free
+** Operations compared
+*** Insert an element
+*** Remove an element
+*** Search an element
+** Conclusion
+*** Read-heavy\n-> sorted
+*** Write-heavy\n-> unsorted
+@endmindmap

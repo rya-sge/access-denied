@@ -2,6 +2,7 @@
 layout: post
 title:  "Le protocole WEP et ses vulnérabilités"
 date:   2022-04-28
+lang: fr
 locale: fr-FR
 categories: security network cryptography
 tags: wep wifi

@@ -7,7 +7,7 @@ locale: en-GB
 lang: en
 categories: security blockchain
 tags: DeFi crypto hack
-image:
+image: /assets/article/blockchain/defi/2022-12-11-hacktober-defi-mindmap.png
 description: This article summarizes the main hacks that took place during the month of October 2022 in the DeFi ecosystem. 
 ---
 
@@ -522,3 +522,9 @@ Reference: [x-explorer](https://mirror.xyz/x-explore.eth/M2BJgQJaj2JK0mAO9OecByj
 EFLeverVault (a mev bot I believe) was exploited for around 750 ETH
 
 Reference: [MevRefund](https://twitter.com/MevRefund/status/1580917351217627136)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![October 2022 DeFi hacks mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2022-12-11-hacktober-defi-mindmap.png)

@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Ethereum\nPectra (2025)
+** Execution layer
+*** EIP-2537\nBLS12-381 precompile
+*** EIP-2935\nHistorical block hashes
+*** EIP-7623\nIncrease calldata cost
+*** EIP-7685\nGeneral purpose requests
+** Account abstraction
+*** EIP-7702\nSet code for EOAs
+** Blobs / scaling
+*** EIP-7691\nBlob throughput increase
+*** EIP-7840\nBlob schedule in config
+** Consensus layer
+*** EIP-7549\nCommittee index out\nof attestation
+** Staking
+*** EIP-6110\nOnchain validator deposits
+*** EIP-7002\nEL triggerable withdrawals
+*** EIP-7251\nRaise MAX_EFFECTIVE_BALANCE
+@endmindmap

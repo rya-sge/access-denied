@@ -2,6 +2,8 @@
 layout: post
 title:  "WPA en bref"
 date:   2021-06-15 
+lang: fr
+locale: fr-FR
 categories: security network
 tags: wpa wifi
 description: Cet article résume les principaux points du protocole WPA, notamment la génération des clés, le contrôle d'intégrité avec MIC et la confidentialité avec TKIP

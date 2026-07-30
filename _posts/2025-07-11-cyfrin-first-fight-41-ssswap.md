@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 description: First Fight 41 - SSSwap is aimed to be a minimalistic AMM on Solana.
-image: 
+image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-41-ssswap-mindmap.png
 isMath: false
 ---
 
@@ -376,3 +376,8 @@ H-05. No Minimum Liquidity Lock in the `liquidity_operations::remove_liquidity` 
     }
 ```
 
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![First Fight 41 SSSwap mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-41-ssswap-mindmap.png)

@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Crypto exchange\nsecurity
+** Role
+*** On-ramp / off-ramp
+*** Trading & custody
+** Threat landscape
+*** Attack vectors
+*** Threat models
+** Attack surface
+*** Hot wallet compromise
+*** Insider threat
+*** Key management failure
+*** Social engineering
+** Industry response
+*** Security practices
+*** Proof of reserves
+*** Cold storage
+** Regulation
+*** Ecosystem developments
+*** Compliance requirements
+** History
+*** Notable hacks\nand failures
+*** Observed patterns
+*** Lessons learned
+@endmindmap

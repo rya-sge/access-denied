@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* SSH
+** Introduction
+*** Shell distant sécurisé
+*** Remplace telnet / rsh
+*** Chiffrement du canal
+** Installation
+*** Client et serveur
+*** Service sshd
+** Connexion
+*** Commande ssh
+*** Authentification\npar mot de passe
+** Cryptographie\nasymétrique
+*** Paire de clés\npublique / privée
+*** Résumé des étapes
+*** Génération\n(ssh-keygen)
+*** Copie de la clé sur\nle serveur distant
+** Configuration
+*** Fichier config
+*** Création d'un alias
+@endmindmap

@@ -1,0 +1,29 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Lire un JSON\navec Node.js
+** Module expérimental\n(import assertions)
+*** Lancement avec\nl'option adéquate
+*** Exemple de code
+*** Erreurs possibles
+** Module fs
+*** Lecture synchrone\n(readFileSync)
+*** Lecture asynchrone\n(readFile)
+*** JSON.parse()
+** Comparaison
+*** Bloquant vs\nnon bloquant
+*** Cas d'usage
+** Remarques
+*** Gestion des erreurs
+*** Chemins relatifs
+@endmindmap

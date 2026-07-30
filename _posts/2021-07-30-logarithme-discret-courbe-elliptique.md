@@ -2,9 +2,12 @@
 layout: post
 title:  "Le Logarithme Discret sur courbe elliptique avec SageMath"
 date:   2021-07-30
+lang: fr
+locale: fr-FR
 categories: cryptography
 tags: courbe-elliptique sage logarithme-discret
 description: Cet article traite du problème du logarithme discret sur une courbe elliptique. Il contient un exemple faisant appel à la librairie python SageMath.
+image: /assets/article/cryptographie/2021-07-30-logarithme-discret-courbe-elliptique-mindmap.png
 isMath: true 
 ---
 
@@ -167,3 +170,9 @@ De nombreuses sources ont été utilisées pour cet article. En voici la liste c
 - [https://high0101.medium.com/redpwnctf-blecc-crypto-b35997c73a5f](https://high0101.medium.com/redpwnctf-blecc-crypto-b35997c73a5f)
 - [c1rcu5_w0lv35 - ctftime.org/team/119580](https://ctftime.org/writeup/29157)
 - [https://github.com/cscosu/ctf-writeups/tree/master/2021/redpwn_ctf/crypto](https://github.com/cscosu/ctf-writeups/tree/master/2021/redpwn_ctf/crypto)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap du logarithme discret sur courbe elliptique]({{site.url_complet}}/assets/article/cryptographie/2021-07-30-logarithme-discret-courbe-elliptique-mindmap.png)

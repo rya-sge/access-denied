@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Disk image\nforensics (dd)
+** Retrieve information
+*** Image metadata
+*** Partition layout
+*** minfo
+** List files
+*** fls (Sleuth Kit)
+*** Deleted entries
+** Mount the image
+*** Loop device
+*** Read-only mount
+*** Offset handling
+** Recover files
+*** PhotoRec
+*** File carving\nby signature
+** Good practice
+*** Work on a copy
+*** Preserve integrity\n(hashes)
+@endmindmap

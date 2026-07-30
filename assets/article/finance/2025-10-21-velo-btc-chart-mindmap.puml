@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Velo BTC\nmarket metrics
+** Futures
+*** 24h volume
+*** Open interest\n(and snapshot)
+*** Funding rate (APR)
+*** BTC price
+*** CVD\n(cumulative volume delta)
+*** Liquidations
+*** 3-month annualised\nbasis
+** Return patterns
+*** Average return\nby hour (UTC)
+*** Average return\nby day (UTC)
+*** Cumulative return\nby session
+** Options
+*** Implied volatility\nterm structure
+** Why it matters
+*** Momentum & participation
+*** Leverage and risk
+*** Market sentiment
+@endmindmap

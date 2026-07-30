@@ -1,0 +1,27 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 40\nWeather Witness
+** Project
+*** Weather-driven NFT
+*** Chainlink automation\n& functions
+** My submissions
+*** High - performUpkeep\nrunnable without\ncheckUpkeep
+*** High - NFT price locked\n(no withdraw function)
+** Invalid submissions
+*** Low - precision loss\non LINK deposit
+** Themes
+*** Automation guard\nconditions
+*** Fund recovery paths
+*** Oracle integration
+@endmindmap

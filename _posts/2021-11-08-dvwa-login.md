@@ -2,6 +2,8 @@
 layout: post
 title:  "DVWA - Challenge Login avec Hydra"
 date:   2021-11-13
+lang: fr
+locale: fr-FR
 last-update: 
 categories: security web
 tags: hydra pentesting login dvwa

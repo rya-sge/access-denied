@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Learning\nblockchain & crypto
+** General concepts
+*** DeFi fundamentals
+*** Beginner cursus
+** Development
+*** Generic platforms
+*** Hands-on courses
+** Ethereum
+*** Patrick Collins
+*** Alchemy University
+*** LearnWeb3 degree
+*** Advanced Solidity\n& gas optimisation
+** Other blockchains
+*** Bitcoin
+*** Cosmos
+*** Solana
+*** Tezos
+** Format
+*** Free online courses
+*** Self-paced
+@endmindmap

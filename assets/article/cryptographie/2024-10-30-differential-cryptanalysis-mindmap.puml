@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Differential\ncryptanalysis
+** Key concepts
+*** Input difference ->\noutput difference
+*** Differential\ncharacteristic
+*** Probability bias
+** Against block ciphers
+*** FEAL
+*** DES\n(S-boxes designed\nto resist it)
+** Against hash functions
+*** IOTA Curl
+*** Collision search
+** Countermeasures
+*** Strong S-boxes
+*** Sufficient rounds
+*** Wide-trail strategy
+** Takeaway
+*** Chosen-plaintext\nattack model
+*** Foundational technique\nin symmetric analysis
+@endmindmap

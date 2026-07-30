@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* OpenZeppelin v5\ndata structures
+** BitMaps
+*** Compact boolean storage
+*** Gas efficient flags
+** EnumerableSet
+*** Unique members
+*** Enumerable + O(1)\nmembership
+** EnumerableMap
+*** Key-value with\nenumeration
+** DoubleEndedQueue
+*** Push / pop both ends
+*** Queue and stack
+** CircularBuffer
+*** Fixed-size history
+*** Overwrites oldest
+** Checkpoints
+*** Value history\nover time
+*** Used for voting power
+** Heap
+*** Priority queue
+*** Ordered extraction
+@endmindmap

@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* AI crawler bots
+** OpenAI
+*** GPTBot
+*** ChatGPT user agents
+** Anthropic
+*** ClaudeBot
+** Google
+*** Google-Extended
+*** Bard / Vertex AI
+** Meta
+*** Meta-ExternalAgent
+*** Meta web crawlers
+** Apple
+*** Applebot
+*** Applebot-Extended
+** Others
+*** Perplexity crawlers
+*** Amazonbot
+** Control
+*** robots.txt directives
+*** Training opt-out vs\nsearch indexing
+@endmindmap

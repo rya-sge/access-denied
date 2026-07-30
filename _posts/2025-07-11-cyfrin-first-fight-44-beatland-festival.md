@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 description: Cyfrin First Fight 44 - Beatland Festival.
-image: 
+image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-44-beatland-festival-mindmap.png
 isMath: false
 ---
 
@@ -716,3 +716,9 @@ function uri(uint256 tokenId) public view override returns (string memory) {
 }
 
 This ensures that URI calls will fail for non-existent items, providing consistent behavior with the rest of the contract and preventing confusion for external integrators.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![First Fight 44 Beatland Festival mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-44-beatland-festival-mindmap.png)

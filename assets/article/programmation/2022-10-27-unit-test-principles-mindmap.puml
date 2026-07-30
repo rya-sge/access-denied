@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Unit testing\nprinciples
+** DRY
+*** Don't Repeat Yourself
+*** Factor out shared\nsetup / helpers
+** KISS
+*** Keep It Simple
+*** One clear assertion\nper behaviour
+*** Readable over clever
+** SRP
+*** Single Responsibility
+*** One reason to fail
+*** Test one unit\nat a time
+** YAGNI
+*** You Aren't Gonna\nNeed It
+*** No speculative tests
+*** Test real behaviour
+** Goal
+*** Fast feedback
+*** Trustworthy suite
+*** Easy maintenance
+@endmindmap

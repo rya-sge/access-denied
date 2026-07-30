@@ -2,6 +2,8 @@
 layout: post
 title:  "WAH11 - Application Logic"
 date:   2022-02-03
+lang: fr
+locale: fr-FR
 categories: security network web
 tags: application logique sql thread wah
 description: Questions & Réponses du chapitre 11, Attacking Application Logic, du livre The Web Application Hacker's Handbook

@@ -2,10 +2,12 @@
 layout: post
 title:  "NodeJS - WebSockets avec Express"
 date:   2021-11-14
+lang: fr
+locale: fr-FR
 last-update: 
 categories: programmation web
 tags: javascript node.js  websockets
-image:
+image: /assets/article/programmation/nodeJS/websocket/2021-11-14-nodejs-express-websocket-mindmap.png
 description: Présentation et implémentation de websockets avec express-ws
 ---
 
@@ -221,3 +223,9 @@ Hello
 - Cours de Technologie Web (TWEB) enseigné à l'HEIG-VD en 2021
 -  [stackoverflow.com - how-to-setup-route-for-websocket-server-in-express](https://stackoverflow.com/questions/22429744/how-to-setup-route-for-websocket-server-in-express)
 - [masteringjs.io/tutorials/express/websockets](https://masteringjs.io/tutorials/express/websockets)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap des WebSockets avec Express]({{site.url_complet}}/assets/article/programmation/nodeJS/websocket/2021-11-14-nodejs-express-websocket-mindmap.png)

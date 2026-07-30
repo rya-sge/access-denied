@@ -2,6 +2,8 @@
 layout: post
 title:  "Le mode opératoire CBC"
 date:   2022-02-27
+lang: fr
+locale: fr-FR
 last-update: 
 categories: cryptography 
 tags: cbc chiffrement-bloc

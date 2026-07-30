@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain ethereum
 tags: solidity ethereum openzeppelin data
 description: This article explores data structures in OpenZeppelin Contracts v5, including EnumerableSet, DoubleEndedQueue, CircularBuffer, Checkpoints, Heap, and MerkleTree.
-image: 
+image: /assets/article/blockchain/solidity/2025-07-29-openzeppelin-data-structure-mindmap.png
 isMath: 
 ---
 
@@ -215,3 +215,9 @@ Whether you're managing whitelists (`EnumerableSet`), tracking history (`Checkpo
 
 - ChatGPT with the input "Write me an article about these different data strucutre available with openzeppelin v5. EnumerableSet DoubleEndedQueue CircularBuffer Checkpoints Heap MerkleTree If possible provide small example"
 - [OpenZeppelin V5 - data structure](https://docs.openzeppelin.com/contracts/5.x/api/utils#data_structures)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![OpenZeppelin v5 data structures mindmap]({{site.url_complet}}/assets/article/blockchain/solidity/2025-07-29-openzeppelin-data-structure-mindmap.png)

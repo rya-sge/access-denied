@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography
 tags: cryptography
 description: Differential cryptanalysis is a method to attack symmetric cryptographic algorithms, such as block ciphers, by analyzing the impact of specific input differences on output differences after several rounds of encryption. 
-image:
+image: /assets/article/cryptographie/2024-10-30-differential-cryptanalysis-mindmap.png
 isMath: true
 ---
 
@@ -194,3 +194,9 @@ While initially effective against early block ciphers like Festel, this attack h
   - [FEAL-4 Linear Cryptanalysis - Prevention](https://crypto.stackexchange.com/questions/40407/feal-4-linear-cryptanalysis-prevention)
   - [Wikipedia - FEAL](https://en.wikipedia.org/wiki/FEAL)
 - ChatGPT with the input "Write me an article about the attack DIFFERENTIAL CRYPTANALYSIS targeting hash function and cryptography algorithm. Give examples."
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Differential cryptanalysis mindmap]({{site.url_complet}}/assets/article/cryptographie/2024-10-30-differential-cryptanalysis-mindmap.png)

@@ -7,7 +7,7 @@ locale: en-GB
 categories: security cryptography
 tags: tls mtls cloud
 description: Mutual TLS (mTLS) is an extension of the standard TLS protocol which requires both the client and server to present and validate certificates, enabling mutual authentication.  
-image: 
+image: /assets/article/reseau/tls/2024-12-16-mtls-overview-mindmap.png
 isMath: false
 ---
 
@@ -149,3 +149,9 @@ mTLS offers significant advantages in terms of security and trust, making it a p
 - [Cloudflare - What is mutual TLS (mTLS)?](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/)
 - [Secure Application Communications with Mutual TLS and Istio](https://istio.io/latest/blog/2023/secure-apps-with-istio/)
 - ChatGPT with the input "Write me an article about mTLS, its advantage and disadvatange compare to a classical TLS architecture", "how can add mtls to kubernates through a service mesh"
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Mutual TLS overview mindmap]({{site.url_complet}}/assets/article/reseau/tls/2024-12-16-mtls-overview-mindmap.png)

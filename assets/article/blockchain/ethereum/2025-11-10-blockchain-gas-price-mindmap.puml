@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Gas price\ndata sources
+** Purpose
+*** Fetch gas price\nand related stats
+*** Compare across chains
+** Per chain
+*** Layer 1 networks
+*** Layer 2 networks
+** Data types
+*** Gas price & stats
+*** Token price
+*** Network notes
+** Typical sources
+*** Block explorers
+*** Token Terminal
+*** Chain analytics\ndashboards
+** Use cases
+*** Cost estimation
+*** Fee monitoring
+*** Chain comparison
+@endmindmap

@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Blockchain\ndowntime
+** Why it matters
+*** Liveness vs safety
+*** User and DeFi impact
+** Common causes
+*** Sequencer failure
+*** Hardware failure
+*** Block finalisation stall
+*** Consensus bug
+*** Emergency hard fork
+** Chains affected
+*** Aptos
+*** Arbitrum
+*** Avalanche
+*** Berachain
+*** Bitcoin
+*** Solana and others
+** Patterns
+*** Centralised components
+*** Client diversity
+*** Recovery procedures
+@endmindmap

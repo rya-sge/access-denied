@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography
 tags: sui walrus move seal KEM DEK
 description: Seal is a framework that allows developers to encrypt data using Identity-Based Encryption (IBE) while enforcing onchain access policies on Sui. 
-image:
+image: /assets/article/cryptographie/2025-09-27-seal-overview-mindmap.png
 isMath: true
 ---
 
@@ -140,3 +140,8 @@ Seal provides a **flexible, generic, and decentralized** approach for encrypting
 - [github.com/MystenLabs/seal](https://github.com/MystenLabs/seal)
 - ChatGPT to summarize the documentation
 
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Seal identity-based encryption mindmap]({{site.url_complet}}/assets/article/cryptographie/2025-09-27-seal-overview-mindmap.png)

@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum ZKP
 tags: steakhouse-finance defi blockchain
 description: Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
-image: 
+image: /assets/article/blockchain/defi/2025-11-06-steakhouse-finance-overview-mindmap.png
 isMath: false
 ---
 
@@ -174,3 +174,9 @@ See [Lido - research](https://research.lido.fi/t/lido-dao-finance-workstream-pro
 ### Blog
 
 - [Steakhouse Financial - The Curious Case of On-Chain Private Credit Repo](https://kitchen.steakhouse.financial/p/the-curious-case-of-on-chain-private)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Steakhouse Financial overview mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2025-11-06-steakhouse-finance-overview-mindmap.png)

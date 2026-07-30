@@ -2,10 +2,12 @@
 layout: post
 title:  "Les wrappers de fonctions en C++ avec std::function"
 date:   2021-08-13
+lang: fr
+locale: fr-FR
 categories: programmation
 tags: c++ wrapper std::function généricité dictionnaire
 description: Cet article introduit l'utilisation des wrappers de fonctions en c++, apparu avec C++11. Le concept sera vu à travers l'implémentation d'un dictionnaire et le wrapper std::function.
-image: 
+image: /assets/article/programmation/2021-08-13-cplusplus-wrapper-fonction-mindmap.png
 ---
 
 Cet article illustre l'utilisation des **wrappers de fonctions** en c++, apparu avec C++11.
@@ -238,3 +240,9 @@ A noter que l'utilisation de *binary_search* et *lower_bound* est conditionné a
 - Cours d'Algorithmes et structures de données 2 enseigné à l'HEIG-VD en 2020.
 - [www.cplusplus.com - std::function](https://www.cplusplus.com/reference/functional/function/)
 - Code disponible sur mon github : [github.com/rya-sge/AD-cplusplus/template](https://github.com/rya-sge/AD-ressources/tree/master/programmation/cplusplus/template)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap des wrappers de fonctions en C++]({{site.url_complet}}/assets/article/programmation/2021-08-13-cplusplus-wrapper-fonction-mindmap.png)

@@ -2,6 +2,8 @@
 layout: post
 title:  "Réaliser un backup sous Linux"
 date:   2021-11-05
+lang: fr
+locale: fr-FR
 last-update: 
 categories: linux
 tags: backup parted

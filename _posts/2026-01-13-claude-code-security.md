@@ -9,7 +9,7 @@ categories: ai security
 tags: claude security ai
 description: technical overview of Claude Code’s security model, including its permission system, sandboxing architecture, identity and access management (IAM), and operational best practices.
 isMath: false
-image: 
+image: /assets/article/securite/2026-01-13-claude-code-security-mindmap.png
 ---
 
 ## Introduction
@@ -240,3 +240,9 @@ While no system is immune to all attacks, Claude Code significantly reduces risk
 - [OWASP Foundation – Command Injection](https://owasp.org/www-community/attacks/Command_Injection)
 - [OWASP Foundation – OWASP Top 10 Web Application Security Risks](https://owasp.org/www-project-top-ten/)
 - [Greshake et al. (2023) – *Not What You’ve Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection*](https://arxiv.org/abs/2302.12173)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Claude Code security model mindmap]({{site.url_complet}}/assets/article/securite/2026-01-13-claude-code-security-mindmap.png)

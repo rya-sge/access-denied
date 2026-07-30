@@ -2,6 +2,7 @@
 layout: post
 title:  "Le mode opératoire ECB"
 date:   2022-04-22
+lang: fr
 locale: fr-FR
 last-update: 
 categories: cryptography 

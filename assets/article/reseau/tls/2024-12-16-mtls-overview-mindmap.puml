@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Mutual TLS\n(mTLS)
+** Principle
+*** Extension of TLS
+*** Both sides present\na certificate
+*** Both sides validate
+** Difference with TLS
+*** TLS: server\nauthenticated only
+*** mTLS: client also\nauthenticated
+** Requirements
+*** Client certificates
+*** Certificate authority
+*** Distribution & rotation
+** Use cases
+*** Service-to-service
+*** Zero-trust networks
+*** Kubernetes workloads
+** Benefits & costs
+*** Strong mutual identity
+*** PKI management burden
+@endmindmap

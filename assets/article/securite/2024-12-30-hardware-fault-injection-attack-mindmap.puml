@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Fault injection\nattacks (FIA)
+** Definition
+*** Target the hardware
+*** Induce faulty behaviour
+** Techniques
+*** Voltage fault\ninjection (VFI)
+*** Clock glitching
+*** Electromagnetic (EMFI)
+*** Laser injection
+** Targets
+*** Smartcards
+*** Secure elements
+*** Embedded devices
+** Consequences
+*** Bypass authentication
+*** Key extraction
+*** Skipped instructions
+** Cryptography case
+*** Perturbing operations
+*** Differential fault\nanalysis
+** Countermeasures
+*** Software approach\n(redundancy, checks)
+*** Hardware approach\n(sensors, shields)
+@endmindmap

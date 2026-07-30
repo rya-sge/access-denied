@@ -7,7 +7,7 @@ locale: en-GB
 categories: security cryptography 
 tags: fault-injection side-channel hardware crypto-wallet
 description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences.
-image: 
+image: /assets/article/securite/2024-12-30-hardware-fault-injection-attack-mindmap.png
 isMath: false
 ---
 
@@ -203,3 +203,9 @@ Understanding the mechanics of fault injection, as well as its potential impacts
 - [Dekra -Fault Injection Attacks](https://www.dekra.com/en/fault-injection-attacks/)
 - Cryptography course (CRY) taught at HEIG-VD in 2023
 - ChatGPT with the input "Write me an article about fault injection attack"
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Hardware fault injection attack mindmap]({{site.url_complet}}/assets/article/securite/2024-12-30-hardware-fault-injection-attack-mindmap.png)

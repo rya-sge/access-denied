@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum
 tags: pectra EIP-2537 EIP-2935 EIP-6110 staking
 description: This article presents the list of EIP included in Ethereum Pectra Upgrade (2025)
-image: 
+image: /assets/article/blockchain/ethereum/2025-05-02-ethereum-pectra-upgrade-mindmap.png
 isMath: false
 ---
 
@@ -98,3 +98,9 @@ Increases the constant `MAX_EFFECTIVE_BALANCE`, while keeping the minimum stakin
 ## Reference
 
 - [Coinbase - The Ultimate Guide to Ethereum's Pectra Upgrade](https://www.coinbase.com/blog/the-ultimate-guide-to-ethereums-pectra-upgrade)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Ethereum Pectra upgrade mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/2025-05-02-ethereum-pectra-upgrade-mindmap.png)

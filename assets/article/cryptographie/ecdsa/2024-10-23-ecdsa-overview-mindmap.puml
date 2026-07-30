@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* ECDSA
+** How it works
+*** Key generation
+*** Signing
+*** Verification
+** Use cases
+*** Digital signatures
+*** ECDSA in blockchain
+*** TLS certificates
+** Security
+*** Nonce (k) generation
+*** Nonce reuse leaks\nthe private key
+*** Curve choice
+** Quantum resistance
+*** Broken by Shor's\nalgorithm
+*** Compared with RSA
+*** Post-quantum migration
+** Practical notes
+*** Malleability
+*** Low-s normalisation
+@endmindmap

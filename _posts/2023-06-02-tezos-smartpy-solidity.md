@@ -7,7 +7,7 @@ locale: en-GB
 lang: en
 categories: blockchain ethereum solidity
 tags: solidity tezos smartpy
-image:
+image: /assets/article/blockchain/tezos/2023-06-02-tezos-smartpy-solidity-mindmap.png
 description: This articles describes a correspondence table between the smart contract languages Solidity (Ethereum) and SmartPy / Python (Tezos).
 isMath: false
 ---
@@ -416,3 +416,8 @@ Here a quick list of the main references
 - Tezos Developers' Handbook: [https://tzapac.notion.site/Tezos-Developers-Handbook-ce244ec152504954a311ce1650d4b8c5](https://tzapac.notion.site/Tezos-Developers-Handbook-ce244ec152504954a311ce1650d4b8c5)
 - How to Create, Test and Deploy Tezos Smart Contracts?: [https://www.leewayhertz.com/tezos-smart-contracts/](https://www.leewayhertz.com/tezos-smart-contracts/)
 
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Solidity vs SmartPy mindmap]({{site.url_complet}}/assets/article/blockchain/tezos/2023-06-02-tezos-smartpy-solidity-mindmap.png)

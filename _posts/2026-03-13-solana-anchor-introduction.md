@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain solana
 tags: solana anchor rust smart-contract testing litesvm mollusk pda cpi
 description: A technical introduction to the Anchor framework for Solana program development. Covers program structure, PDAs, CPIs, custom errors, and testing with LiteSVM and Mollusk.
-image:
+image: /assets/article/blockchain/solana/2026-03-13-solana-anchor-introduction-mindmap.png
 isMath: false
 ---
 
@@ -464,3 +464,9 @@ This makes it practical to track the compute impact of every change to the progr
 - [Anchor PDAs](https://www.anchor-lang.com/docs/basics/pda)
 - [Anchor CPIs](https://www.anchor-lang.com/docs/basics/cpi)
 - [Anchor Custom Errors](https://www.anchor-lang.com/docs/features/errors)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Solana Anchor introduction mindmap]({{site.url_complet}}/assets/article/blockchain/solana/2026-03-13-solana-anchor-introduction-mindmap.png)

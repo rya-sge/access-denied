@@ -7,7 +7,7 @@ locale: en-GB
 lang: en
 categories: programmation
 tags: data-structure array sort
-image:
+image: /assets/article/algorithme/2023-01-06-sorted-unsorted-array-mindmap.png
 description: This article compares a sorted array and its unsorted version to stores data represented by numbers.
 isMath: true
 ---
@@ -163,5 +163,8 @@ It is useful to remove an element because you need to perform research to find t
 
 Still, you must keep the array sorted, making it harder (less efficient) to insert a new element.
 
+## Mindmap
 
+The mindmap below summarizes the article.
 
+![Sorted vs unsorted array mindmap]({{site.url_complet}}/assets/article/algorithme/2023-01-06-sorted-unsorted-array-mindmap.png)

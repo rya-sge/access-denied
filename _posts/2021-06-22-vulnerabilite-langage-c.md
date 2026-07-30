@@ -2,6 +2,8 @@
 layout: post
 title:  "Vulnérabilités avec le langage C"
 date:   2021-06-22
+lang: fr
+locale: fr-FR
 categories: programmation security
 tags: c vulnérabilité strcpy scanf printf malloc sanitizer
 description: Cet article présente une liste de vulnérabilités (CWE 121, CWE 122, etc.) et menaces potentielles avec le langage C afin de sensibiliser les programmeurs.

@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Moniteurs\n(PcoSynchro)
+** Principe
+*** Exclusion mutuelle\nautomatique
+*** Variables de condition
+*** Attendre / Réveiller\nun thread
+** Moniteur de Hoare
+*** Le thread réveillé\ns'exécute immédiatement
+*** Le signaleur cède\nle moniteur
+*** Condition garantie\nau réveil
+** Moniteur de Mesa
+*** Le signaleur garde\nle moniteur
+*** Le réveillé attend\nson tour
+*** Condition à revérifier\n(while, pas if)
+** Réveil
+*** Réveil simple
+*** Réveil multiple\n(tous les threads)
+*** Assurer un ordre\nentre threads
+** PcoSynchro
+*** Header à inclure
+*** Déclaration du moniteur
+*** Résumé des fonctions
+@endmindmap

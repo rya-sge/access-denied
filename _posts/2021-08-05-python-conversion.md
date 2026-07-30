@@ -2,10 +2,12 @@
 layout: post
 title:  "Conversions entre format de données en python(byte, string, int)"
 date:   2021-08-05
+lang: fr
+locale: fr-FR
 categories: programmation
 tags: python
 description: Cet article décrit différentes façons de convertir des données représentées dans des formats différents en python, par exemple des bytes en int
-image:
+image: /assets/article/programmation/python/2021-08-05-python-conversion-mindmap.png
 ---
 
 
@@ -269,3 +271,9 @@ Sources : [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/l
 - [Convertir hexadécimal en octet en Python](https://www.delftstack.com/fr/howto/python/python-convert-hex-to-byte/)
 - [200ok.ch - hexlify() and unhexlify()](https://200ok.ch/posts/2018-12-09_unhexlify.html)
 - [docs.python.org/3/library/binascii.html]( https://docs.python.org/3/library/binascii.html)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap des conversions de données en Python]({{site.url_complet}}/assets/article/programmation/python/2021-08-05-python-conversion-mindmap.png)

@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum 
 tags: gas
 description: Gas price source
-image: 
+image: /assets/article/blockchain/ethereum/2025-11-10-blockchain-gas-price-mindmap.png
 isMath: false
 ---
 
@@ -28,6 +28,8 @@ Here a summary tab with the different resources to fetch gas price and other rel
 | Tezos       | &#x2611; | &#x2612; |                                                              |                                                              |                                                              |
 | zkSync Era  | &#x2612; | &#x2611; | [Token terminal](https://tokenterminal.com/explorer/projects/zksync-era) | [coingecko](https://www.coingecko.com/en/coins/zksync/historical_data) |                                                              |
 
+## Mindmap
 
+The mindmap below summarizes the article.
 
-
+![Blockchain gas price sources mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/2025-11-10-blockchain-gas-price-mindmap.png)

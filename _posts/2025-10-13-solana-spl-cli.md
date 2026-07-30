@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain solana
 tags: solana spl-token token-2022 token
 description: Solana CLI and the spl-token tool allows to create tokens, configure authorities, manage accounts, and use advanced extensions introduced with Token-2022.
-image:
+image: /assets/article/blockchain/solana/2025-10-13-solana-spl-cli-mindmap.png
 isMath: 
 ---
 
@@ -408,3 +408,9 @@ Command Reference
 ## References
 
 - SPL command line - help section
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Solana spl-token CLI mindmap]({{site.url_complet}}/assets/article/blockchain/solana/2025-10-13-solana-spl-cli-mindmap.png)

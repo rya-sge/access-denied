@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 description: First Fight 43 - Order Book.
-image: 
+image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-43-order-book-mindmap.png
 isMath: false
 ---
 
@@ -613,3 +613,9 @@ The standard industry practice to prevent such rounding issues is to increase th
 With this change, the fee calculation becomes significantly more precise. While a price of 33 wei would still result in a zero fee (`(33 * 300) / 10000 = 0`), the threshold for earning a fee is much lower. For a more realistic low-value transaction of **1 USDC (1,000,000 wei)**, the fee would be:
 `(1,000,000 * 300) / 10000 = 30,000 wei` (or 0.03 USDC).
 This ensures that fees are collected fairly and consistently across almost all non-trivial trades, patching the revenue leak.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![First Fight 43 Order Book mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-43-order-book-mindmap.png)

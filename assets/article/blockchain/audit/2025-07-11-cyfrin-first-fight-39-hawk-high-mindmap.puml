@@ -1,0 +1,29 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 39\nHawk High
+** Project
+*** School session\nmanagement
+*** UUPS upgradeable
+** Valid submissions
+*** H-01 Wrong pay-per-teacher\ncalculation
+*** H-02 Broken UUPS\nupgrade logic
+*** M-02 Upgrade allowed\nbefore session ends
+*** M-03 Storage collision\nLevelTwo vs LevelOne
+*** M-04 bursary not updated\nin graduateAndUpgrade
+*** L-02 Principal can add\nhimself as teacher
+** Themes
+*** Upgradeability safety
+*** Storage layout
+*** Access control
+@endmindmap

@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Seal
+** Goal
+*** Encrypt data with IBE
+*** Enforce onchain\naccess policies
+** Identity-Based\nEncryption
+*** Identity as public key
+*** No certificate needed
+** Components
+*** Onchain access policies
+*** Off-chain key servers
+*** User sessions
+** Cryptographic primitives
+*** KEM\n(key encapsulation)
+*** DEM\n(data encapsulation)
+** Trust model
+*** Decentralisation
+*** Security assumptions
+*** Threshold of key servers
+** Use cases
+*** Gated content
+*** Private onchain data
+@endmindmap

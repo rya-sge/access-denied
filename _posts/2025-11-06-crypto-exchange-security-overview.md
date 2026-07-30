@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum security
 tags: wallet hack FTX Mt.Gox QuadrigaCX 
 description: Cryptocurrency exchanges play a pivotal role in the digital asset ecosystem, serving as platforms for on-ramp, trading, storing, and converting cryptocurrencies. As central nodes in a highly valuable and rapidly evolving industry, these exchanges are frequent targets for cyberattacks and financial fraud.
-image: 
+image: /assets/article/blockchain/2025-11-06-crypto-exchange-security-overview-mindmap.png
 isMath: 
 ---
 
@@ -139,3 +139,9 @@ Exchanges face multiple types of threats, including external attacks, insider mi
 - **External threats** include hacking incidents that target hot wallets, phishing campaigns, or denial-of-service attacks.
 - **Internal threats** stem from mismanagement or insider abuse of administrative privileges.
 - **Operational risks** often relate to inadequate key management, insecure APIs, or poorly designed smart contracts.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Crypto exchange security mindmap]({{site.url_complet}}/assets/article/blockchain/2025-11-06-crypto-exchange-security-overview-mindmap.png)

@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ethereum 
 tags: gas
 description: Blockchain downtime overview
-image: 
+image: /assets/article/blockchain/blockchain-downtime-mindmap.png
 isMath: false
 ---
 
@@ -371,7 +371,8 @@ We recently upgraded our congestion control system to improve shared object util
 
 Reference: [Sui Mainnet Outage Resolution - Sui Mainnet Outage Resolution](https://blog.sui.io/sui-mainnet-outage-resolution/), [https://status.sui.io/incidents/f2yz7qzwcc94](https://status.sui.io/incidents/f2yz7qzwcc94)
 
+## Mindmap
 
+The mindmap below summarizes the article.
 
-
-
+![Blockchain downtime overview mindmap]({{site.url_complet}}/assets/article/blockchain/blockchain-downtime-mindmap.png)

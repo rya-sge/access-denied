@@ -2,6 +2,8 @@
 layout: post
 title:  "Android Studio - Design d'une application"
 date:   2021-10-10
+lang: fr
+locale: fr-FR
 categories: programmation
 tags: android design mobile
 description: Cet article présente les quelques astuces de bases pour configurer et modifier le design de son application Android (texte à afficher, multilingue, image, etc.)

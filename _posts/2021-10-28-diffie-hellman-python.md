@@ -2,6 +2,8 @@
 layout: post
 title:  "Diffie-Hellman expliqué en python"
 date:   2021-10-28
+lang: fr
+locale: fr-FR
 last-update: 
 categories: cryptography
 tags: diffie-hellman asymétrique

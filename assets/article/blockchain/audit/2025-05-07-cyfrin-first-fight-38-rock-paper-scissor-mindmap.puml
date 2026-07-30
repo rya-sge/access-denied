@@ -1,0 +1,29 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 38\nRock Paper Scissors
+** Project
+*** Decentralised RPS\ngame on Ethereum
+*** Bet in ETH or token
+** My submissions
+*** High - joinGameWithEth\njoins a token game
+*** Low - winning tokens\nlocked in the contract
+** Invalid submissions
+*** Custom admin system\ninstead of Ownable
+** Missed findings
+*** H-03 DoS via\nETH transfer revert
+*** M-01 Funds from\nreceive() are locked
+** Lessons
+*** Check payment path\nconsistency
+*** Always provide a\nwithdraw path
+@endmindmap

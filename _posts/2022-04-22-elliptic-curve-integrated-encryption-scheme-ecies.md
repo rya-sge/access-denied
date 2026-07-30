@@ -2,6 +2,7 @@
 layout: post
 title:  "Chiffrement hybride sur les courbes elliptiques avec ECIES"
 date:   2022-04-22
+lang: fr
 locale: fr-FR
 last-update: 
 categories: cryptography

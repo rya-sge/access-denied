@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Node.js
+** Présentation
+*** Runtime JavaScript\ncôté serveur
+*** Moteur V8
+*** Écosystème npm
+** Fonctionnement
+*** Mono-thread
+*** Boucle d'événements
+*** Entrées/sorties\nnon bloquantes
+** Commandes de base
+*** node / npm
+*** Installation de modules
+** Modules & fonctionnalités
+*** Chance\n(données aléatoires)
+*** Export de variables
+** Serveurs
+*** HTTP avec Express
+*** HTTP avec le module http
+*** UDP avec dgram
+*** TCP avec Net
+@endmindmap

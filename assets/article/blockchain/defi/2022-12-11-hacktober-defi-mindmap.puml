@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* DeFi hacks\n(October 2022)
+** Contract vulnerabilities
+*** Logic flaws
+*** External libraries
+** Key compromise
+*** Private key theft
+*** Weak key management
+** Market manipulation
+*** Price oracle abuse
+*** Flash-loan driven
+** Social attacks
+*** Scam / rug pull
+*** Phishing
+** Other causes
+*** Implementation bugs
+*** Unknown root cause
+** Lessons
+*** Audit and monitoring
+*** Oracle robustness
+*** Key custody
+@endmindmap

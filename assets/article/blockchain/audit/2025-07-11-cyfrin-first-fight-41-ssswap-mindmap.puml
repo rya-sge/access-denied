@@ -1,0 +1,29 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 41\nSSSwap (Solana)
+** Project
+*** Minimalistic AMM\non Solana
+** My submission
+*** H4 provide_liquidity\ndoes not reload vault
+*** Recommended mitigation
+** Missed submissions
+*** H-01 Incorrect LP token\ncalculation
+*** H-02 No deposit\nslippage protection
+*** H-03 No token decimals\nvalidation
+*** H-05 No minimum\nliquidity lock
+** Themes
+*** Vault state freshness
+*** AMM invariants
+*** Input validation
+@endmindmap

@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity ethereum blockchain
 tags: abiencode encodePacked encodeWithSignature ABI
 description: This article presents the differences between abi.encode, abi.encodePacked, and abi.encodeWithSignature in Solidity. Use cases, examples, and security tips.
-image: 
+image: /assets/article/blockchain/solidity/2025-07-29-solidity-abi-encoding-overview-mindmap.png
 isMath: 
 ---
 
@@ -276,3 +276,9 @@ If you’re building anything with signature verification, unique identifiers, o
 - [Cyfrin - ABI Encode (Solidity Code Example)](https://www.cyfrin.io/glossary/abi-encode-solidity-code-example)
 - [0xScourgedev - Deep Dive into abi.encode: Types, Padding, and Disassembly](https://medium.com/@scourgedev/deep-dive-into-abi-encode-types-padding-and-disassembly-84472f1b4543)
 - [RareSkills - Understanding ABI encoding for function calls](https://rareskills.io/post/abi-encoding)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Solidity ABI encoding mindmap]({{site.url_complet}}/assets/article/blockchain/solidity/2025-07-29-solidity-abi-encoding-overview-mindmap.png)

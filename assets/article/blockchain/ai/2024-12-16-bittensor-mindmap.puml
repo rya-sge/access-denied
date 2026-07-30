@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Bittensor
+** Idea
+*** Incentivised market\nfor digital commodities
+*** Subnet competition
+** Layers
+*** Blockchain (Subtensor)
+*** Bittensor API
+** Personas
+*** Subnet owner
+*** Miner
+*** Validator
+*** Stakeholder
+** Building blocks
+*** Subnet
+*** Neuron
+*** Synapse\n(neuron-to-neuron)
+*** Metagraph
+** Incentive mechanism
+*** Scoring of miners
+*** Validator consensus
+*** Emission of rewards
+@endmindmap

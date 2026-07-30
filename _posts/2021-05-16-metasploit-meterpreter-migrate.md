@@ -2,6 +2,8 @@
 layout: post
 title:  "Metasploit - Elévation de privilège avec migrate"
 date:   2021-05-16 
+lang: fr
+locale: fr-FR
 categories: security
 tags: metasploit meterpreter keylogger migrate
 description: Cet article présente la commande Meterpreter migrate du logiciel  Metasploit. Celle-ci permet à un attaquant d'élever ses privilèges sur la machine après qu'il ait pu obtenir dessus une session meterpreter.

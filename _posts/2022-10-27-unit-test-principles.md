@@ -8,7 +8,7 @@ last-update:
 categories: programmation
 tags: unit test OOP
 description: This article presents some principles to respect when you create unit testing (DRY test, KISS, SRP and Yagni).
-image: 
+image: /assets/article/programmation/2022-10-27-unit-test-principles-mindmap.png
 isMath: false
 ---
 
@@ -71,3 +71,9 @@ TVANFOSSON, 2021. Does YAGNI also apply when writing tests? *Stack Overflow*. On
 WIKIPEDIA, 2022. Dry run (testing). *Wikipedia*. Online. 24 October 2022. [Accessed 25 October 2022]. Retrieved from: [https://en.wikipedia.org/wiki/Dry_run_(testing)](https://en.wikipedia.org/wiki/Dry_run_(testing))
 
 WYNN, Richard, 2021. Single Responsibility Principle (SRP) in 100 seconds. *DEV*. Online. 31 May 2021. [Accessed 25 October 2022]. Retrieved from: [https://dev.to/richardwynn/single-responsibility-principle-srp-in-100-seconds-3b1d](https://dev.to/richardwynn/single-responsibility-principle-srp-in-100-seconds-3b1d)
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Unit testing principles mindmap]({{site.url_complet}}/assets/article/programmation/2022-10-27-unit-test-principles-mindmap.png)

@@ -2,10 +2,12 @@
 layout: post
 title:  "Android Studio - Récupérer le résultat d'une activité"
 date:   2021-11-14
+lang: fr
+locale: fr-FR
 last-update: 
 categories: programmation
 tags: android kotlin activity
-image:
+image: /assets/article/programmation/android/2021-11-14-android-activity-result-mindmap.png
 description: Lancer une nouvelle activité et récupérer son résultat
 ---
 
@@ -89,3 +91,8 @@ if (it.resultCode == Activity.RESULT_OK) {
 - [stackoverflow.com - How to manage startActivityForResult on Android](https://stackoverflow.com/questions/10407159/how-to-manage-startactivityforresult-on-android)
 - [stackoverflow.com - OnActivityResult method is deprecated, what is the alternative?](https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative)
 
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap sur le résultat d'activité Android]({{site.url_complet}}/assets/article/programmation/android/2021-11-14-android-activity-result-mindmap.png)

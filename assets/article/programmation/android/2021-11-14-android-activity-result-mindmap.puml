@@ -1,0 +1,29 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Résultat d'activité\nAndroid
+** Objectif
+*** Lancer une activité
+*** Récupérer son résultat
+** MainActivity\n(appelante)
+*** Lancement de\nl'activité
+*** Enregistrement du\ncallback
+*** Traitement du résultat
+** SecondActivity\n(appelée)
+*** Construction de\nl'Intent de retour
+*** setResult()
+*** finish()
+** Points clés
+*** Codes de résultat\n(OK / CANCELED)
+*** Passage de données\npar Intent
+@endmindmap

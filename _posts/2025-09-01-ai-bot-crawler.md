@@ -7,7 +7,7 @@ locale: en-GB
 categories: 
 tags: ai crawler bot
 description: List of AI crawler bot use for AI training and user actions such as GPTBot, ClaudeBot or Google-Extended
-image: 
+image: /assets/article/web/2025-09-01-ai-bot-crawler-mindmap.png
 isMath: false
 ---
 
@@ -97,3 +97,8 @@ User-agent: Amazonbot
 Disallow: /
 ```
 
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![AI crawler bots mindmap]({{site.url_complet}}/assets/article/web/2025-09-01-ai-bot-crawler-mindmap.png)

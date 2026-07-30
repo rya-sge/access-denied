@@ -2,11 +2,13 @@
 layout: post
 title:  "SSH - accéder à distance à un shell"
 date:   2021-10-14
+lang: fr
+locale: fr-FR
 last-update: 
 categories: linux security
 tags: shell ssh linux
 description: Cet article présente comment accéder à distance à un shell ainsi que la mise en place d'une connexion sécurisée entre un client et un serveur. 
-image: 
+image: /assets/article/linux/2021-10-14-protocole-ssh-mindmap.png
 ---
 
 
@@ -175,3 +177,9 @@ Source : [www.better.dev/how-to-create-an-ssh-shortcut]( https://www.better.dev/
 - SSH shortcut client : 
   - [https://askubuntu.com/questions/754450/shortcuts-to-ssh-clients](https://askubuntu.com/questions/754450/shortcuts-to-ssh-clients)
   - [https://www.better.dev/how-to-create-an-ssh-shortcut](https://www.better.dev/how-to-create-an-ssh-shortcut)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap du protocole SSH]({{site.url_complet}}/assets/article/linux/2021-10-14-protocole-ssh-mindmap.png)

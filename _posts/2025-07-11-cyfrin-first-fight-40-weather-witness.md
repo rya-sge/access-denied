@@ -7,7 +7,7 @@ locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 description: First Fight 40 - Weather Witness.
-image: 
+image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-40-weather-witness-mindmap.png
 isMath: false
 ---
 
@@ -330,3 +330,8 @@ Use an uint96 for the function parameter in requestMintWeather NFT and in the co
     }
 ```
 
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![First Fight 40 Weather Witness mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-40-weather-witness-mindmap.png)

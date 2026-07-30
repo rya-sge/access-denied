@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 44\nBeatland Festival
+** Project
+*** Festival pass NFTs
+*** Performance rewards
+** Actors
+*** Organiser
+*** Attendee
+** Missed submissions
+*** H-01 Pass lending reward\nmultiplication
+*** Unlimited performance\nrewards
+*** buyPass lacks\nreentrancy defence
+*** Max NFT supply\ncan be exceeded
+** Analysis
+*** Root cause
+*** Risk & impact
+*** Proof of concept
+** Themes
+*** Reentrancy guards
+*** Reward accounting
+@endmindmap

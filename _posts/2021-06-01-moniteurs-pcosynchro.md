@@ -2,9 +2,12 @@
 layout: post
 title:  Les moniteurs avec PcoSynchro
 date:   2021-06-01 
+lang: fr
+locale: fr-FR
 categories: programmation
 tags: programmation concurrence pcosynchro hoare mesa 
 description: Cet article présente les moniteurs de Hoare et de Mesa, ainsi que leur utilisation avec la librairie PcoSyncro. Les moniteurs permettent de synchroniser des ressources mises en concurrence entre plusieurs threads qui veulent y accéder.
+image: /assets/article/programmation/2021-06-01-moniteurs-pcosynchro-mindmap.png
 ---
 
 
@@ -252,3 +255,9 @@ if(nbWaiting){
 
 - [gitlab.com/reds-public/pco-synchro](https://gitlab.com/reds-public/pco-synchro)
 - Cours de Programmation concurrente(PCO) enseigné à l'HEIG-VD en 2021
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap des moniteurs de Hoare et Mesa]({{site.url_complet}}/assets/article/programmation/2021-06-01-moniteurs-pcosynchro-mindmap.png)

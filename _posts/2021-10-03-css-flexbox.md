@@ -2,6 +2,8 @@
 layout: post
 title:  "Introduction aux Flexbox"
 date:   2021-10-03
+lang: fr
+locale: fr-FR
 categories: web
 tags: flexbox css 
 description: Cet article présente le concept de flexbox en css. Les flexbox permettent  de gérer le positionnement des éléments sur une page. 

@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Claude Code\nsecurity model
+** Permission architecture
+*** Default least privilege
+*** Tiered permission\nsystem
+*** Explicit user approval
+** Built-in protections
+*** Filesystem protections
+*** Command safety
+*** Prompt fatigue\nmitigation
+** Prompt injection
+*** Untrusted content\nhandling
+*** Defence in depth
+** Sandboxing
+*** Why it matters
+*** Sandbox architecture
+*** Filesystem isolation
+*** Network isolation
+** Identity & access
+*** Authentication
+*** Enterprise controls
+@endmindmap

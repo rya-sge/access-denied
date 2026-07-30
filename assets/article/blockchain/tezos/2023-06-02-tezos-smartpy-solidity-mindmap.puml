@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Solidity vs\nSmartPy (Tezos)
+** Getting started
+*** Contract entry point
+*** Constructor
+** State
+*** Variables & storage
+*** Type system
+** Functions
+*** Visibility
+*** Returning a value
+*** Control flow
+** Security
+*** Access control
+*** Key and signatures
+** Environment
+*** Current timestamp
+*** Other builtins
+** Purpose
+*** Correspondence table\nbetween both languages
+@endmindmap

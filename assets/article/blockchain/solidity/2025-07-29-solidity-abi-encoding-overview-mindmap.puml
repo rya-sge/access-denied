@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Solidity ABI\nencoding
+** abi.encode
+*** Padded to 32 bytes
+*** Unambiguous
+*** Safe for hashing
+** abi.encodePacked
+*** Tightly packed
+*** Shorter output
+*** Hash collision risk\nwith dynamic types
+** abi.encodeWithSignature
+*** Prepends the\nfunction selector
+*** Used for low-level\ncalls
+** Security
+*** Collisions between\nconcatenated strings
+*** Prefer abi.encode\nfor keccak256
+** Tooling
+*** Slither
+*** Aderyn
+@endmindmap

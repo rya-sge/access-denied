@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Solana staking
+** Stake account
+*** Create / initialise
+*** Authorities\n(staker, withdrawer)
+** Delegation
+*** Delegate to a validator
+*** Deactivate
+** Managing stake
+*** Authorize
+*** Set lockup
+*** Withdraw
+** Adjusting stake
+*** Split
+*** Merge
+** Lifecycle
+*** Inactive
+*** Activating\n(warmup)
+*** Active
+*** Deactivating\n(cooldown)
+** Notes
+*** Epoch boundaries
+*** Rewards accrual
+@endmindmap

@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain
 tags: bitcoin btc
 description: BTC chart statistic by Velo
-image:
+image: /assets/article/finance/2025-10-21-velo-btc-chart-mindmap.png
 isMath: 
 ---
 
@@ -207,3 +207,9 @@ A quantitative measure of the *steepness* of the IV term structure curve (differ
   - **Steep positive slope** → market expects more long-term uncertainty or potential big moves later.
   - **Flat or inverted slope** → near-term event risk or calm longer-term outlook.
   - Useful for timing trades — e.g., buying short-term options ahead of volatility spikes.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Velo BTC market metrics mindmap]({{site.url_complet}}/assets/article/finance/2025-10-21-velo-btc-chart-mindmap.png)

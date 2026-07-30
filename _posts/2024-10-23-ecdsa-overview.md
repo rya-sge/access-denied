@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain cryptography
 tags: blockchain wallet ecdsa elliptic-curve
 description: Learn how ECDSA (Elliptic Curve Digital Signature Algorithm) works, its role in digital signatures, and its different use cases, notably in Blockchain.
-image: 
+image: /assets/article/cryptographie/ecdsa/2024-10-23-ecdsa-overview-mindmap.png
 isMath: true
 ---
 
@@ -385,3 +385,9 @@ More details is available in this article ECC: [bill's security - ECC](https://a
 - [research.kudelskisecurity - QUANTUM ATTACK RESOURCE ESTIMATE: USING SHOR’S ALGORITHM TO BREAK RSA VS DH/DSA VS ECC](https://research.kudelskisecurity.com/2021/08/24/quantum-attack-resource-estimate-using-shors-algorithm-to-break-rsa-vs-dh-dsa-vs-ecc/)
 - [Bill Buchanan - ECC questions](https://billatnapier.medium.com/elliptic-curve-cryptography-ecc-questions-9aa67c147c9b)
 - ChatGPT with the input "Write an article explaining ecdsa, Details some use case, notably in blockchain and a topic on its security and known bad implementation (e.g. in the random generation)"
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![ECDSA overview mindmap]({{site.url_complet}}/assets/article/cryptographie/ecdsa/2024-10-23-ecdsa-overview-mindmap.png)

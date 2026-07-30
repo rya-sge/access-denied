@@ -2,6 +2,7 @@
 layout: post
 title:  "Tester la résistance d'un crypto système à un niveau d'attaques"
 date:   2022-04-24
+lang: fr
 locale: fr-FR
 last-update: 
 categories: cryptography 

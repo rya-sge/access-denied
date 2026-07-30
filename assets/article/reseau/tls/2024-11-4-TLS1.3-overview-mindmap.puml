@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* TLS 1.3
+** Why TLS 1.3
+*** History of TLS
+*** Simpler, safer, faster
+** Key features
+*** Faster handshake\n(1-RTT)
+*** 0-RTT resumption
+*** Stronger primitives
+*** Forward secrecy\nby default
+*** Simplified cipher\nsuites
+*** Improved key derivation
+*** Enhanced privacy
+** Security improvements
+*** Legacy ciphers removed
+*** Downgrade protection
+*** Replay protection\nfor 0-RTT
+** Performance
+*** Fewer round trips
+*** Faster page loads
+@endmindmap

@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Regex\nen JavaScript
+** Moteurs
+*** Différentes\nimplémentations
+** Constructions\nprincipales
+*** Métacaractères
+*** Classes de caractères
+*** Groupes et\nalternatives
+** Répétition
+*** Quantificateurs\n(* + ? {n,m})
+*** Gourmand vs paresseux
+** Flags
+*** g (global)
+*** i (insensible à la casse)
+*** m (multiligne)
+** En JavaScript
+*** Littéral /.../ ou\nnew RegExp()
+*** test() / exec()
+*** match() / replace()
+*** Exemples
+@endmindmap

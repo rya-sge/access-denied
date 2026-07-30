@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 43\nOrder Book
+** Project
+*** Onchain order book
+*** Buy / sell orders
+** Findings
+*** High risk findings
+*** Low risk findings
+** Valid submission
+*** H01 No slippage\nprotection in buyOrder
+** Missed submissions
+*** Front-running exposure
+** Mitigations
+*** Slippage parameters
+*** Deadline checks
+*** Commit-reveal /\nprivate mempool
+** Themes
+*** MEV and ordering
+*** Price protection
+@endmindmap

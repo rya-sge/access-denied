@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Conversions\nen Python
+** int <-> bytes
+*** Nativement\n(to_bytes / from_bytes)
+*** Avec la librairie Crypto
+*** Boutisme\n(big / little endian)
+** int <-> string
+*** int() / str()
+** int <-> hexadécimal
+*** hex() / int(x, 16)
+** Chaîne hexa <-> bytes
+*** bytes.fromhex()
+*** .hex()
+** binascii
+*** hexlify / unhexlify
+*** a2b / b2a
+** Cas d'usage
+*** Cryptographie
+*** Manipulation de\ndonnées binaires
+@endmindmap

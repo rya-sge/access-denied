@@ -2,11 +2,13 @@
 layout: post
 title:  "Lecture de fichier JSON avec Node.JS"
 date:   2022-01-01
+lang: fr
+locale: fr-FR
 last-update: 
 categories: programmation
 tags: node.js fs json
 description: Résumé des différentes possibilités pour lire un fichier JSON avec Node.JS.
-image: 
+image: /assets/article/programmation/nodeJS/2022-01-01-nodejs-json-mindmap.png
 ---
 
 
@@ -137,3 +139,9 @@ Cours de Technologie Web (TWEB) enseigné à l’HEIG-VD en 2021-2022
 - [blog.logrocket.com - Reading and writing JSON files in Node.js: A complete tutorial]( https://blog.logrocket.com/reading-writing-json-files-nodejs-complete-tutorial/)
 - [stackabuse.com - Reading and Writing JSON Files with Node.js](https://stackabuse.com/reading-and-writing-json-files-with-node-js/)
 - [www.geeksforgeeks.org - Node.js fs.readFileSync() Method](https://www.geeksforgeeks.org/node-js-fs-readfilesync-method/)
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap sur la lecture de JSON avec Node.js]({{site.url_complet}}/assets/article/programmation/nodeJS/2022-01-01-nodejs-json-mindmap.png)

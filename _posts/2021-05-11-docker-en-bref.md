@@ -2,6 +2,8 @@
 layout: post
 title:  "Docker en bref"
 date:   2021-05-11
+lang: fr
+locale: fr-FR
 last-update: 2021-12-29 
 categories: programmation
 tags: docker virtualisation 

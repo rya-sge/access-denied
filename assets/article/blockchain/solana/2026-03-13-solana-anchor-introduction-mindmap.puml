@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Anchor\n(Solana framework)
+** Program structure
+*** declare_id!
+*** #[program]
+*** #[derive(Accounts)]
+*** #[account]
+*** The IDL file
+** PDAs
+*** Program Derived\nAddresses
+*** Seeds & bump
+*** Definition in an\nAccounts struct
+*** PDA as storage account
+** CPIs
+*** Cross-Program\nInvocation
+*** Basic CPI
+*** CPI with PDA signer
+** Errors
+*** Custom errors
+*** Throwing errors
+** Testing
+*** Anchor test suite
+@endmindmap

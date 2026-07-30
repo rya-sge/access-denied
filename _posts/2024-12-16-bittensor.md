@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain ai
 tags: machine-learning bittensor tao
 description: Bittensor is an open source platform on which you can produce competitive digital commodities. These digital commodities can be machine intelligence, storage space, compute power, protein folding, financial markets prediction, and many more. 
-image: 
+image: /assets/article/blockchain/ai/2024-12-16-bittensor-mindmap.png
 isMath: false
 ---
 
@@ -457,3 +457,9 @@ This Bittensor subnet offers a platform for democratizing the creation of A2A mo
 
 - [Bittensor doc](https://docs.bittensor.com)
 - ChatGPT to summarize some paragraph
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Bittensor architecture mindmap]({{site.url_complet}}/assets/article/blockchain/ai/2024-12-16-bittensor-mindmap.png)

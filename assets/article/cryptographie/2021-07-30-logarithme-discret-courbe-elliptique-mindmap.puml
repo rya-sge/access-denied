@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Logarithme discret\nsur courbe elliptique
+** Courbe elliptique
+*** Définition
+*** Loi de groupe
+*** Ordre du groupe
+** Problème du\nlogarithme discret
+*** Trouver k tel que\nQ = kP
+*** Base de la sécurité\nECC
+** Pohlig-Hellman
+*** Décomposition de l'ordre\nen facteurs premiers
+*** Résolution dans\nchaque sous-groupe
+*** Recombinaison (CRT)
+*** Faiblesse si l'ordre\nest lisse (smooth)
+** Exemple pratique
+*** Présentation du problème
+*** Résolution pas à pas
+*** Code SageMath
+@endmindmap

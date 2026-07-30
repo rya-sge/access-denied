@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Test d'intrusion\n(pentest)
+** Présentation
+*** Simuler une attaque\nréelle
+*** Évaluer la sécurité\nd'un système
+** Pourquoi ?
+*** Identifier les\nvulnérabilités
+*** Vérifier les\ncontre-mesures
+*** Exigences de conformité
+** Types de tests
+*** Boîte noire
+*** Boîte grise
+*** Boîte blanche
+** Guides & méthodologies
+*** OSSTMM
+*** Autres référentiels
+** Limitations
+*** Périmètre du projet
+*** Instantané dans le temps
+*** Autres facteurs\n(temps, budget)
+@endmindmap

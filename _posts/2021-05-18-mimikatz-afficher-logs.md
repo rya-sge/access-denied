@@ -2,6 +2,8 @@
 layout: post
 title:  "Mimikatz - afficher les logs"
 date:   2021-05-18 
+lang: fr
+locale: fr-FR
 categories: security
 tags: mimikatz log 
 Auteur: rya-sge

@@ -2,6 +2,7 @@
 layout: post
 title:  Configurer un reverse proxy avec HTTP Apache
 date:   2021-06-26 
+lang: fr
 locale: fr-FR
 categories: network
 tags: apache proxy load-balancing reverse-proxy

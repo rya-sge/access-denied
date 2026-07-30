@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain defi
 tags: makerDAO liquity stablecoin
 description: Dives deep and explains how Liquity differs from Maker DAO.  
-image: 
+image: /assets/article/blockchain/defi/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity-mindmap.png
 isMath: false
 ---
 
@@ -161,3 +161,9 @@ Liquity uses a recovery mode that temporarily relaxes liquidation conditions whe
 ### Conclusion
 
 While both MakerDAO and Liquity aim to provide stablecoin solutions and DeFi lending, their approaches differ significantly in governance, collateral management, liquidation mechanisms, and system design. Liquity’s emphasis on algorithmic governance, single collateralization, and instantaneous liquidations.
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![MakerDAO vs Liquity mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity-mindmap.png)

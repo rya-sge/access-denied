@@ -2,6 +2,8 @@
 layout: post
 title: Les liens physiques et symboliques avec Linux
 date:   2021-06-15
+lang: fr
+locale: fr-FR
 last-update: 2021-12-10 
 categories: linux
 tags: bash

@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Aptos Move\nsecurity checklist
+** Access control
+*** Signer checks
+*** Capability pattern
+** Function visibility
+*** public vs\npublic(friend)
+*** entry functions
+** Type safety
+*** Generics constraints
+*** Phantom types
+** Resources
+*** Resource management
+*** Unbounded execution
+** Move abilities
+*** copy / drop /\nstore / key
+** Arithmetic
+*** Overflow & underflow
+*** Division rounding
+** Aptos objects
+*** Ownership model
+** Business logic
+*** Invariants
+*** State transitions
+@endmindmap

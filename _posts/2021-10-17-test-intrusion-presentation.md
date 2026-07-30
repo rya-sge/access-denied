@@ -2,10 +2,12 @@
 layout: post
 title:  "Les tests d'intrusion (pentesting)"
 date:   2021-10-17
+lang: fr
+locale: fr-FR
 categories: security
 tags: intrusion pentesting
 description: Cet article introduit le concept de test d'intrusion (pentesting)
-image: 
+image: /assets/article/securite/2021-10-17-test-intrusion-presentation-mindmap.png
 ---
 
 
@@ -127,3 +129,9 @@ Un test d'intrusion ne peut pas trouver toutes les vulnérabilités sur un envir
 ## Source
 
 Cours **Projet d'audit de sécurité technique** enseigné à l'HEIG-VD en 2021
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap sur le test d'intrusion]({{site.url_complet}}/assets/article/securite/2021-10-17-test-intrusion-presentation-mindmap.png)

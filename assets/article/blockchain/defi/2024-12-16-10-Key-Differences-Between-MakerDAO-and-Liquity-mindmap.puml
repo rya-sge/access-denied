@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* MakerDAO\nvs Liquity V1
+** Protocols
+*** MakerDAO (DAI)
+*** Liquity V1 (LUSD)
+** Governance
+*** Active governance\nvs immutable
+** Collateral
+*** Multi-collateral\nvs ETH only
+** Access
+*** Decentralised\nfrontends
+** Economics
+*** Stablecoin redemption
+*** Interest-free loans
+*** Collateralisation ratios
+** Risk management
+*** Liquidation mechanisms
+*** Savings & incentives
+*** Secondary token role
+*** Emergency shutdown\nvs recovery mode
+@endmindmap

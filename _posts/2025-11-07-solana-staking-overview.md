@@ -7,7 +7,7 @@ locale: en-GB
 categories: blockchain solana security
 tags: solana staking
 description: 
-image: 
+image: /assets/article/blockchain/solana/2025-11-07-solana-staking-overview-mindmap.png
 isMath: false
 ---
 
@@ -145,3 +145,9 @@ Here’s a step-by-step example of how a stake account moves through states:
 | **GetMinimumDelegation**                         | Return minimum delegation amount                             | None                                                         | Useful for programs or validation                            |
 
 ## Diagram
+
+## Mindmap
+
+The mindmap below summarizes the article.
+
+![Solana staking overview mindmap]({{site.url_complet}}/assets/article/blockchain/solana/2025-11-07-solana-staking-overview-mindmap.png)

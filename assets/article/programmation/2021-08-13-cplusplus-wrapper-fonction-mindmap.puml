@@ -1,0 +1,30 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Wrappers de fonctions\nen C++ (C++11)
+** Concept
+*** std::function
+*** Passer une fonction\nen paramètre
+*** Lambdas et\nfoncteurs
+** Étape 1\nClasse conteneur
+*** Fonctions publiques
+*** Fonctions privées
+*** Constructeur
+*** Code complet\nde la classe
+** Étape 2\nFonction de test
+*** Avec unordered_set
+*** Avec vector
+** Intérêt
+*** Généricité
+*** Réutilisation du\nmême conteneur
+@endmindmap

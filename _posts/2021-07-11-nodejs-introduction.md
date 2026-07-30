@@ -2,9 +2,12 @@
 layout: post
 title:  "Introduction à Node.JS"
 date:   2021-07-11
+lang: fr
+locale: fr-FR
 categories: network programmation
 tags: node.js javascript serveur backend
 description: Node.JS est un environnement d’exécution (runtime) en Javascript permettant d'exécuter du javascript côté serveur. Il possède un grand nombre de paquets pouvant être installés avec le gestionnaire de package npm.
+image: /assets/article/programmation/nodeJS/2021-07-11-nodejs-introduction-mindmap.png
 ---
 
 ## Introduction
@@ -296,3 +299,9 @@ testImport.MyVariable //Récupérer de la variable
 - Documentation officielle de npm :  [https://docs.npmjs.com/cli/v7/commands/npm-install](https://docs.npmjs.com/cli/v7/commands/npm-install)
 - Laboratoire réalisé dans le cadre du cours de Réseaux(RES) enseigné à l'HEIG-VD : [RES-Labo-Orchestra](https://github.com/rya-sge/Teaching-HEIGVD-RES-2020-Labo-Orchestra)
 - Cours de Réseaux(RES) enseigné à l'HEIG-VD en 2021
+
+## Mindmap
+
+La carte heuristique ci-dessous résume l'article.
+
+![Mindmap d'introduction à Node.js]({{site.url_complet}}/assets/article/programmation/nodeJS/2021-07-11-nodejs-introduction-mindmap.png)

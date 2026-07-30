@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* First Fight 42\nSnowman Merkle Airdrop
+** Project
+*** Merkle-proof airdrop
+*** Snow token & NFT
+** Valid submissions
+*** H1 Unrestricted\nNFT mint
+*** H03 claimSnowman uses\nlive balance
+*** M01 s_hasClaimedSnowman\nnot checked
+*** L-02 EIP-712 typehash\ntypo
+** Invalid submissions
+*** H02 Overpaying fees\nwith buySnow
+** Missed submissions
+*** L-02 Global timer reset\ndenies free claims
+** Themes
+*** Access control on mint
+*** Replay / double claim
+*** Signature typehash
+@endmindmap

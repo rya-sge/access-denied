@@ -2,6 +2,8 @@
 layout: post
 title:  "Le mode opératoire CTR"
 date:   2022-04-22
+lang: fr
+locale: fr-FR
 last-update: 
 categories: cryptography
 tags: cbc chiffrement-bloc

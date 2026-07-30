@@ -2,6 +2,8 @@
 layout: post
 title:  "Fuzzing avec AFL"
 date:   2021-06-05 
+lang: fr
+locale: fr-FR
 categories: security
 tags: fuzzing afl
 description: Présentation de l'outil de Fuzzing AFL (American Fuzzy Lop)
