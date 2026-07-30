@@ -237,7 +237,7 @@ Soroban's state archival model is a meaningful departure from EVM storage semant
 
 For security analysts, the key takeaway is that TTL expiry of a `Persistent` entry does not cause it to return a default value — it causes restoration to its original value before the contract executes. The `#[default]` annotation only applies to genuinely absent keys. Any finding that relies on the default-after-expiry assumption for persistent storage is invalid under the current Stellar protocol.
 
-![stellar-state](../assets/article/blockchain/stellar/stellar-state.png)
+![stellar-state]({{site.url_complet}}/assets/article/blockchain/stellar/stellar-state.png)
 
 ## References
 

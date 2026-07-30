@@ -415,7 +415,7 @@ The key insight is that the Solidity compiler inlines modifier code at every cal
 
 For most application-level contracts with a small number of guarded functions, inline modifiers remain the simpler and more auditable choice. For base contracts and libraries where the same modifier may appear on dozens of inherited functions, the wrapped function pattern provides meaningful bytecode savings with a minor readability cost.
 
-![solidity-modifier](../assets/article/blockchain/ethereum/solidity/solidity-modifier.png)
+![solidity-modifier]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/solidity-modifier.png)
 
 ## Reference
 

@@ -108,7 +108,7 @@ Avertissement :
 
 Chiffrement
 
-![gcm-schema]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement\gcm-schema.PNG)
+![gcm-schema]({{site.url_complet}}/assets/article/cryptographie/mode-chiffrement/gcm-schema.PNG)
 
 Source du schéma : cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
 

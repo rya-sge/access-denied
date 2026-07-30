@@ -2,8 +2,8 @@
 layout: post
 title:  Fiscalité des cryptomonnaies en Suisse
 date:   2024-09-18
-lang: 
-locale: 
+lang: fr
+locale: fr-FR
 categories: blockchain 
 tags: 
 description: Fiscalité des cryptomonnaies en Suisse

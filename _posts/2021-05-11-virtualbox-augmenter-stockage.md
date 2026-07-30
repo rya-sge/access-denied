@@ -2,7 +2,7 @@
 layout: post
 title:  VirtualBox - augmenter l'espace de stockage
 date:   2021-05-11
-last-update: 2021-13-10
+last-update: 2021-10-13
 categories: programmation
 tags: virtualbox virtualisation
 description: Cet article est un tutoriel pour augmenter l'espace de stockage d'une machine virtuelle avec le logiciel de virtualisation VirtualBox. 

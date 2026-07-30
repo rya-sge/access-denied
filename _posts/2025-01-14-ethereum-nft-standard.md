@@ -899,7 +899,7 @@ The process of nesting an NFT into another is functionally identical to sending 
 
 An NFT can be owned by a single other NFT, but can in turn have a number of NFTs that it owns. This proposal establishes the framework for the parent-child relationships of NFTs. A parent token is the one that owns another token. A child token is a token that is owned by another token. A token can be both a parent and child at the same time. Child tokens of a given token can be fully managed by the parent token’s owner, but can be proposed by anyone.
 
-![eip-6059-nestable-tokens](../assets/article/blockchain/ethereum/token/eip-6059-nestable-tokens.png)
+![eip-6059-nestable-tokens]({{site.url_complet}}/assets/article/blockchain/ethereum/token/eip-6059-nestable-tokens.png)
 
 ##### Interface
 

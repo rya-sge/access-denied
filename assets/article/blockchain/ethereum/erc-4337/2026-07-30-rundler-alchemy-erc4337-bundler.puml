@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Rundler\nERC-4337 bundler
+** Pool
+*** prechecks\nfees, limits, funds
+*** ERC-7562 simulation\nJS tracer + debug_traceCall
+*** reputation\nallowlist / blocklist
+*** chain tracker\nreorg cache
+*** sharding\nsender mod num_shards
+*** filters &\nalternative mempools
+** Builder
+*** Assigner\nentrypoint + sender locks
+*** proposer\nfees, gas cap, 2nd sim
+*** state machine\nBuilding Pending Cancelling
+*** signers\nkey, mnemonic, KMS
+*** senders\nraw, conditional,\nFlashbots, Bloxroute
+*** proxies &\naffinity
+** RPC
+*** eth_\nERC-7769
+*** debug_\nspec tests
+*** rundler_\nstatus, gas price, 7702
+*** admin_
+*** permission headers\nX-Rundler-*
+** Gas estimation
+*** PVG\nstatic + dynamic DA
+*** verificationGasLimit\nbinary search
+*** callGasLimit\nSolidity search
+*** EIP-7623\ncalldata floor
+*** state overrides
+** Operations
+*** node / rpc /\npool / builder
+*** chain spec\nnetwork, TOML, env
+*** distributed\ngRPC
+*** poison UO\nisolation
+@endmindmap

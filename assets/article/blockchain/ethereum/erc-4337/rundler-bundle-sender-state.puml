@@ -1,0 +1,41 @@
+@startuml
+title Rundler bundle sender — state machine
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam state {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  FontColor #000000
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+
+[*] --> Building
+
+Building : query the pool, filter by fees,
+Building : gas cap and simulation
+Pending : wait up to
+Pending : max_blocks_to_wait_for_mine
+Cancelling : build a hard or soft
+Cancelling : cancellation operation
+CancelPending : wait for the cancellation
+CancelPending : to mine
+
+Building --> Building : no candidate operations
+Building --> Pending : bundle submitted
+Pending --> Building : mined / dropped / abandoned
+Building --> Cancelling : underpriced for more than\nmax_replacement_underpriced_blocks
+Cancelling --> CancelPending : hard cancellation submitted
+Cancelling --> Building : soft cancellation completed
+CancelPending --> Cancelling : dropped / abandoned
+CancelPending --> Building : mined, or max fee\nincreases exhausted
+
+note right of Building
+  Triggers: a new block, the
+  bundle_max_send_interval timer,
+  or debug_bundler_sendBundleNow
+  in manual mode.
+end note
+@enduml

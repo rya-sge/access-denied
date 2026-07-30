@@ -391,7 +391,7 @@ For regulated financial infrastructure, multi-party business workflows, and any 
 
 The trade-offs are real: no EVM compatibility, a different programming model (Daml), and a smaller ecosystem than Ethereum. For the use cases Canton targets (syndicated lending, trade finance, tokenized securities, cross-institution settlement), those trade-offs are justified by the compliance and privacy properties the architecture provides.
 
-![canton-mindmap](../assets/article/blockchain/canton/canton-mindmap.png)
+![canton-mindmap]({{site.url_complet}}/assets/article/blockchain/canton/canton-mindmap.png)
 
 ---
 

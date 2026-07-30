@@ -99,7 +99,7 @@ Plus d'informations est disponible sur le *github* de *AFL* à l'adresse suivant
 
 Dans le dossier output/crashes, afficher les fichiers ayant généré un crash avec par exemple la commande *cat*. Petites remarques, les noms de fichiers sont plutôt longs.
 
-![result]({{site.url_complet}}\assets\article\outil-securite\afl-fuzzing\result.PNG)
+![result]({{site.url_complet}}/assets/article/outil-securite/afl-fuzzing/result.PNG)
 
 
 
@@ -109,13 +109,13 @@ Il est possible de lancer plusieurs instances d'AFL. Pour cela il faut d'abord l
 
 Ex :
 
-![instances]({{site.url_complet}}\assets\article\outil-securite\afl-fuzzing\instances.png)
+![instances]({{site.url_complet}}/assets/article/outil-securite/afl-fuzzing/instances.png)
 
 
 
 et dans un autre terminal :
 
-![instances2]({{site.url_complet}}\assets\article\outil-securite\afl-fuzzing\instances2.png)
+![instances2]({{site.url_complet}}/assets/article/outil-securite/afl-fuzzing/instances2.png)
 
 Voir cet article pour plus d'informations :
 

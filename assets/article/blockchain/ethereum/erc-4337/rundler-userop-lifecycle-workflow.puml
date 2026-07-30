@@ -1,0 +1,62 @@
+@startuml
+title A user operation's path through Rundler
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+}
+
+|RPC|
+start
+:eth_sendUserOperation(uo, entryPoint, [permissions]);
+:route by entry point address\nto the v0.6 or v0.7+ handler;
+
+|Pool|
+:prechecks — fees, gas caps,\npayer funds, gas-limit efficiency;
+if (precheck passed?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+if (trusted permission set?) then (yes)
+  :skip ERC-7562 simulation;<<#FDEEEE>>
+else (no)
+  :debug_traceCall with the JS tracer;
+  if (validation rules violated?) then (yes)
+    :reject;<<#FDEEEE>>
+    stop
+  else (no)
+  endif
+endif
+
+if (validUntil under 60s\nor validAfter in the future?) then (yes)
+  :reject;<<#FDEEEE>>
+  stop
+else (no)
+endif
+
+:add to the entry point's mempool,\nranked and sharded by sender;
+
+|Builder|
+:worker waits for a new block;
+:Assigner picks an entry point and\nlocks this sender to this worker;
+:proposer filters by required fee\nand bundle gas cap;
+:2nd simulation of each candidate;
+if (still valid?) then (no)
+  :drop from bundle and\nreport removal to the Pool;<<#FDEEEE>>
+else (yes)
+endif
+:validate the whole bundle by eth_call,\nrepeat until it passes;
+:aggregate signatures if any\naggregator is in use;
+:sign with the leased signer;
+:submit via the configured sender;
+
+|Pool|
+:chain tracker sees the\nUserOperationEvent;
+:move the operation into the\nmined cache for reorg replay;
+stop
+@enduml

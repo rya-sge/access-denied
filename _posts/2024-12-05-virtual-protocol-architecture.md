@@ -58,7 +58,7 @@ The Modular Consensus Framework standardizes and facilitates various processes f
 
 Overview from [Virtual Protocol](https://www.virtuals.io/protocol)
 
-![virtual-architecture](../assets/article/blockchain/ai/virtual-protocol/virtual-architecture.png)
+![virtual-architecture]({{site.url_complet}}/assets/article/blockchain/ai/virtual-protocol/virtual-architecture.png)
 
 ### Virtual Agent Composer
 

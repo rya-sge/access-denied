@@ -510,3 +510,10 @@ _posts/2026-07-30-alchemy-smart-wallet-account-abstraction.md
   assets/article/blockchain/ethereum/erc-4337/alchemy-account-variants-concept.puml                     (concept, in-section)
   assets/article/blockchain/ethereum/erc-4337/alchemy-mav2-validation-workflow.puml                     (workflow, in-section)
   assets/article/blockchain/ethereum/erc-4337/alchemy-session-key-sequence.puml                         (sequence, in-section)
+
+_posts/2026-07-30-rundler-alchemy-erc4337-bundler.md
+  assets/article/blockchain/ethereum/erc-4337/2026-07-30-rundler-alchemy-erc4337-bundler.puml (mindmap)
+  assets/article/blockchain/ethereum/erc-4337/rundler-architecture-concept.puml                (concept, in-section)
+  assets/article/blockchain/ethereum/erc-4337/rundler-userop-lifecycle-workflow.puml           (workflow, in-section)
+  assets/article/blockchain/ethereum/erc-4337/rundler-bundle-sender-state.puml                 (state, in-section)
+  assets/article/blockchain/ethereum/erc-4337/rundler-gas-estimation-workflow.puml             (workflow, in-section)

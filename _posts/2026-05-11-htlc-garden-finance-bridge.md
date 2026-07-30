@@ -290,7 +290,7 @@ The Code4rena audit (November–December 2025) identified one medium-severity vu
 
 ## Summary
 
-![garden_finance_mindmap](../assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png)
+![garden_finance_mindmap]({{site.url_complet}}/assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png)
 
 ---
 

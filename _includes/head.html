@@ -4,18 +4,9 @@
   <meta name='viewport' content='width=device-width, initial-scale=1'>
 
 
-  {% unless page.title %}
-  <title>{{ site.title }}</title>
-  {% endunless %}
-  {% unless page.description %}
-  <meta name='description' content="{{ site.description }}">
-  {% endunless %}
-  <!--<meta name='description' content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}
-  {% else %}
-  {
-  {% endif %}">-->
-  <!-- <link rel='canonical' href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
-  -->
+  <!-- title, meta description and rel=canonical are all emitted by the jekyll-seo-tag
+       call further down. Do not add them here: duplicate tags confuse crawlers. -->
+
   <link rel='alternate' type='application/rss+xml' title='{{ site.title }}'
         href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}">
   

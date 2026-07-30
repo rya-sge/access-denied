@@ -11,7 +11,9 @@ image: /assets/article/blockchain/ethereum/erc-4337/2026-07-30-alchemy-smart-wal
 isMath: false
 ---
 
-Most write-ups of account abstraction stop at the standard: a `UserOperation`, a bundler, an `EntryPoint`. ERC-4337 deliberately says nothing about how an account decides *which* key signed, how permissions are scoped, or how a session key gets installed without an extra transaction. Those decisions belong to the account implementation, and they are where the engineering actually lives. Alchemy is one of the few teams that has published every layer of its answer — the account contracts, the bundler, and the API that hides both — so its stack can be read end to end. This article follows that path, from the Solidity that validates a signature to the handful of JSON-RPC methods an application actually calls.
+[ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) defines how a smart account proves to the `EntryPoint` that a `UserOperation` is authorised. It says nothing about how the account decides *which* key signed, how a key's permissions are scoped, or how a session key gets installed without spending a separate transaction. Those questions are left to the account implementation, and answering them is most of the work.
+
+Alchemy has published its answer at every layer — the account contracts, the bundler, and the API that hides both — which makes the stack readable end to end. This article follows that path, from the Solidity that validates a signature to the handful of JSON-RPC methods an application actually calls.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -34,7 +36,7 @@ The intended developer path runs top to bottom: call `wallet_prepareCalls`, sign
 
 ## Modular Account V2
 
-MAv2 is an ERC-4337 account that also implements [ERC-6900](https://eips.ethereum.org/EIPS/eip-6900), the modular-account standard, at version 0.8. Accounts are deployed as ERC-1967 proxies and use ERC-7201 namespaced storage, so the implementation behind a proxy can be replaced without storage collisions.
+MAv2 is an ERC-4337 account that also implements [ERC-6900](https://eips.ethereum.org/EIPS/eip-6900), the modular-account standard, at version 0.8. Accounts are deployed as [ERC-1967](https://eips.ethereum.org/EIPS/eip-1967) proxies and use [ERC-7201](https://eips.ethereum.org/EIPS/eip-7201) namespaced storage, so the implementation behind a proxy can be replaced without storage collisions.
 
 ### The compromise the design makes
 
@@ -46,7 +48,7 @@ A fully modular account has an awkward first transaction. Before it can validate
 uint32 constant FALLBACK_VALIDATION_ID = uint32(0);
 ```
 
-The fallback supports exactly what `SingleSignerValidationModule` supports — secp256k1 ECDSA for an EOA owner, ERC-1271 for a contract owner — without a module install. Modules still work normally; the fallback is a fast path that can be re-pointed at a different signer (`updateFallbackSignerData`) or disabled entirely once other validations exist. Hence "semi-modular": modular by capability, monolithic by default.
+The fallback supports exactly what `SingleSignerValidationModule` supports — secp256k1 ECDSA for an EOA owner, [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271) for a contract owner — without a module install. Modules still work normally; the fallback is a fast path that can be re-pointed at a different signer (`updateFallbackSignerData`) or disabled entirely once other validations exist. Hence "semi-modular": modular by capability, monolithic by default.
 
 The measurable result is that runtime gas for account creation drops below 100 000 — 97 764 by Alchemy's own benchmark, against 180 465 for ZeroDev Kernel v3 and 289 207 for Safe with its 4337 module.
 
@@ -58,7 +60,7 @@ The measurable result is that runtime gas for account creation drops below 100 0
 |----------|-----------------|----------------------|---------|
 | `SemiModularAccountBytecode` (SMA-B) | proxy bytecode, as a Solady `LibClone` immutable arg | **no** | the cheapest new deployment; the default |
 | `SemiModularAccountStorageOnly` (SMA-S) | namespaced storage, set by `initialize()` | yes | upgrading an existing proxy into MAv2 |
-| `SemiModularAccount7702` | defaults to `address(this)` | n/a | an EOA delegating under EIP-7702 |
+| `SemiModularAccount7702` | defaults to `address(this)` | n/a | an EOA delegating under [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) |
 | `ModularAccount` | nowhere — validation lives entirely in modules | yes | maximum modularity |
 
 The distinctions are not stylistic. SMA-B reads its owner out of the proxy's own bytecode, so pointing an arbitrary ERC-1967 proxy at it produces an account with no owner; it is only deployable through `AccountFactory`. And the EIP-7702 variant carries a warning worth repeating in full, because getting it wrong is a total loss:
@@ -103,7 +105,7 @@ Gas-related checks belong in validation hooks rather than execution hooks, and t
 
 **Execution hooks** run in the execution phase, as pre-only, post-only, or a pair. They attach either to a validation function — running whenever that validation is used, which is how per-key permissions work — or to an execution selector, running whenever that function is called regardless of who authorized it. The second form expresses account-wide rules: block transfers of NFTs held in cold storage, apply a resource lock. A pre/post pair can measure state differences, which is what makes an oracle-bounded swap limit expressible.
 
-**Execution functions** let the account expose arbitrary external selectors, forwarded to the installing module, and register the matching ERC-165 interface IDs. A `skipRuntimeValidation` flag exists for view and permissionless functions. The example the documentation gives is a flash-loan callback.
+**Execution functions** let the account expose arbitrary external selectors, forwarded to the installing module, and register the matching [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface IDs. A `skipRuntimeValidation` flag exists for view and permissionless functions. The example the documentation gives is a flash-loan callback.
 
 ## The nonce as a routing field
 
@@ -166,7 +168,7 @@ The three paths differ only in how the validation is chosen:
 | `isValidSignature` (ERC-1271) | the signature itself | `PackedValidationLocator`, 5 or 21 bytes |
 | `executeWithRuntimeValidation` | the authorization blob | `PackedValidationLocator`, 5 or 21 bytes |
 
-There are two encodings of the same union, and mixing them up silently selects the wrong validation. `ValidationLocator` is always 21 bytes and **right-aligned**, options byte last, because it is handled as a `uint168` and hashed in EIP-712. `PackedValidationLocator` is 5 or 21 bytes and **left-aligned**, options byte first, so calldata parsing can branch on the tag before reading the rest.
+There are two encodings of the same union, and mixing them up silently selects the wrong validation. `ValidationLocator` is always 21 bytes and **right-aligned**, options byte last, because it is handled as a `uint168` and hashed in [EIP-712](https://eips.ethereum.org/EIPS/eip-712). `PackedValidationLocator` is 5 or 21 bytes and **left-aligned**, options byte first, so calldata parsing can branch on the tag before reading the rest.
 
 The final segment's contents depend on the module. The fallback validation and `SingleSignerValidationModule` prefix a type byte — `0x00` for an EOA signature, 65 bytes of `r‖s‖v` behind it, `0x01` for an ERC-1271 contract owner. The byte exists so gas estimation does not have to guess which of the two paths will execute; Light Account uses the same trick for the same reason. `WebAuthnValidationModule` instead ABI-encodes a `WebAuthnAuth` struct and verifies a secp256r1 signature over `sha256(authenticatorData ‖ sha256(clientDataJSON))`. It has no runtime path at all: `validateRuntime` reverts `NotAuthorized()`.
 
@@ -197,7 +199,7 @@ A deferred action is a self-call executed **during the validation phase, before 
 
 **Just-in-time session keys.** Installing a session key in a separate owner transaction at sign-in adds a confirmation and a wait to the moment users are least patient, and wastes the gas entirely if the key is never used.
 
-**ERC-20 paymaster approval.** A paymaster that pulls tokens from the account during validation needs an approval; the transaction that grants the approval cannot itself be sponsored by that paymaster. The dependency is circular, and no ordering of separate transactions breaks it.
+**[ERC-20](https://eips.ethereum.org/EIPS/eip-20) paymaster approval.** A paymaster that pulls tokens from the account during validation needs an approval; the transaction that grants the approval cannot itself be sponsored by that paymaster. The dependency is circular, and no ordering of separate transactions breaks it.
 
 The signed structure is small:
 
@@ -284,7 +286,7 @@ Not every application needs modules. Light Account is `SimpleAccount` with the s
 3. ERC-1271 both ways: validating user-operation signatures and exposing `isValidSignature`.
 4. A `SignatureType` prefix byte selecting `ecrecover` or ERC-1271, for accurate gas estimation.
 5. A factory built on Solady's `LibClone.createDeterministicERC1967`.
-6. Factory ownership and EntryPoint staking, addressing the ERC-7562 mempool limits on unstaked entities.
+6. Factory ownership and EntryPoint staking, addressing the [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562) mempool limits on unstaked entities.
 7. Custom errors, and `SimpleAccountInitialized` renamed `LightAccountInitialized`.
 
 `MultiOwnerLightAccount` adds an owner set updated through `updateOwners`, and a `CONTRACT_WITH_ADDR` signature type where the contract owner's address is concatenated into the signature as `type ‖ ownerAddress ‖ signature`.
@@ -424,7 +426,7 @@ Derived from the design constraints described above. Each row is a property an i
 | ☐ | `SemiModularAccountBytecode` is used only for new deployments through `AccountFactory`, never as an upgrade target. | The owner is read from proxy bytecode an arbitrary proxy does not carry, producing an ownerless account. |
 | ☐ | Accounts are deployed behind a proxy, not used directly. | OpenZeppelin's `Initializable` permits reentering the initializer during the constructor, allowing an attacker to install an extra validation. |
 | ☐ | Before upgrading a proxy into MAv2, the `initialized` value at the MAv2 namespaced slot is read. | A proxy that was previously an MAv2 keeps its old ownership configuration, and `initializer` functions will not run. |
-| ☐ | The upgrade target is confirmed to be an ERC-1967 proxy via the ERC-1822 `proxiableUUID` slot. | Upgrading a non-proxy leaves the account unreachable. |
+| ☐ | The upgrade target is confirmed to be an ERC-1967 proxy via the [ERC-1822](https://eips.ethereum.org/EIPS/eip-1822) `proxiableUUID` slot. | Upgrading a non-proxy leaves the account unreachable. |
 
 ### Validation and permissions
 
@@ -535,4 +537,10 @@ What is not free is what you add: each validation hook is an external call with 
 - [ERC-7766: Signature Aggregation for ERC-4337](https://eips.ethereum.org/EIPS/eip-7766)
 - [EIP-7702: Set EOA account code](https://eips.ethereum.org/EIPS/eip-7702)
 - [ERC-1271: Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271)
+- [EIP-712: Typed structured data hashing and signing](https://eips.ethereum.org/EIPS/eip-712)
+- [ERC-1967: Proxy Storage Slots](https://eips.ethereum.org/EIPS/eip-1967)
+- [ERC-1822: Universal Upgradeable Proxy Standard (UUPS)](https://eips.ethereum.org/EIPS/eip-1822)
+- [ERC-7201: Namespaced Storage Layout](https://eips.ethereum.org/EIPS/eip-7201)
+- [ERC-165: Standard Interface Detection](https://eips.ethereum.org/EIPS/eip-165)
+- [ERC-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 - [Claude Code](https://claude.com/product/claude-code)

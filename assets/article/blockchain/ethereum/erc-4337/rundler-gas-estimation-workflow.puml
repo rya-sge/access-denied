@@ -1,0 +1,60 @@
+@startuml
+title eth_estimateUserOperationGas — the three limits Rundler returns
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+}
+
+start
+:apply the optional state override set;
+
+partition "preVerificationGas" {
+  :static part — calldata cost plus the
+  operation's share of shared entry point gas;
+  if (chain posts data elsewhere?) then (yes)
+    :dynamic part — query the L2 precompile
+    for the current DA cost, bundle size 1;<<#EAF6F0>>
+  else (no)
+  endif
+  if (EIP-7623 calldata floor
+  above the minimum gas used?) then (yes)
+    :add the difference to PVG;<<#EAF6F0>>
+  else (no)
+  endif
+}
+
+partition "verificationGasLimit" {
+  :run once at the maximum limit
+  using the gas-measurement helper;
+  if (verification succeeded?) then (no)
+    :reject — it will never succeed;<<#FDEEEE>>
+    stop
+  else (yes)
+  endif
+  :seed the search at gasUsed x 2
+  to absorb the 63/64ths rule;
+  if (paymaster present?) then (yes)
+    :vary maxFeePerGas so the fee cost
+    stays constant and transfers trigger;<<#EAF6F0>>
+  else (no)
+    :estimate with zero fees, then add
+    the cost of one native transfer;<<#EAF6F0>>
+  endif
+  :binary search until the successful and
+  failing bounds are within the allowed error;
+}
+
+partition "callGasLimit" {
+  :override the entry point with a proxy
+  so the search can run in Solidity;
+  :binary search on chain with zero fees;
+}
+
+:return the three limits,
+erring toward over-estimation;
+stop
+@enduml
