@@ -14,10 +14,17 @@
 
 .c-article__image {
   position: relative;
+  overflow: hidden;
   background-color: rgba(220,235,245,0.2);
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
   &:after {
     content: "";
     display: block;
@@ -121,12 +128,20 @@
   }
   .c-recent__image {
     display: block;
+    position: relative;
+    overflow: hidden;
     width: 100%;
     min-height: 180px;
     background-color: rgba(220,235,245,0.2);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
   }
   .c-recent__date {
     color: $gray;

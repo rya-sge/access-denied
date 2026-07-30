@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-{% if page.lang == "en" %}
-<html lang="en">
-{% else %}
-<html lang="fr">
-{% endif %}
+{% comment %}
+  Prefer the post's `locale` (en-GB / fr-FR) over `lang` (en / fr): both are valid
+  BCP 47, but the locale form is more precise for screen readers and search engines.
+  Falls back to `lang`, then to English for pages that declare neither.
+{% endcomment %}
+{% assign page_locale = page.locale | default: page.lang | default: 'en' %}
+<html lang="{{ page_locale }}">
 
 {% include head.html %}
 

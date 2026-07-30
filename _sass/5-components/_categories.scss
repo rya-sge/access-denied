@@ -54,15 +54,25 @@
   max-width: 100%;
   figure {
     position: relative;
+    /* z-index:0 makes this figure a stacking context, so the :before overlay
+       below stays above the <img> but still under the "View all" label, which
+       is a sibling of the figure. */
+    z-index: 0;
     width: 200px;
     max-width: 100%;
     margin-bottom: 20px;
     overflow: hidden;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
     border-radius: 50%;
     box-shadow: inset 0 1px 3px rgba(141, 165, 185, 0.3);
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
     &:after {
       content: "";
       display: block;
@@ -71,6 +81,7 @@
     &:before {
       content: "";
       position: absolute;
+      z-index: 1;
       top: 0;
       bottom: 0;
       left: 0;

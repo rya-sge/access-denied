@@ -3,10 +3,30 @@ description: Blog specialized on Security, Crypto and blockchain.
 baseurl: "/access-denied" # the subpath of your site, e.g. /blog
 url: "https://rya-sge.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 url_complet: "https://rya-sge.github.io/access-denied" #image
-lang: "fr_FR"
+# Consumed by jekyll-seo-tag as the default og:locale, so it must use the
+# language_TERRITORY form. The site is ~82% English (209 EN posts vs 48 FR);
+# per-page overrides come from each post's own `lang:` front matter.
+lang: "en_GB"
+
 # Author
-author-name:    Ryan S. 
+author-name:    Ryan S.
 author-image:   1.jpg
+
+# jekyll-seo-tag reads `author`, `logo` and `social` (it does NOT read the
+# `author-name` / `social-*` keys above, which are only used by the templates).
+# These populate the JSON-LD author/publisher blocks and the social profile links.
+author: Ryan S.
+logo: /assets/1.jpg
+twitter:
+  username: ADCDIII
+  card: summary_large_image
+social:
+  name: Ryan S.
+  links:
+    - https://x.com/ADCDIII
+    - https://github.com/rya-sge
+    - https://www.linkedin.com/in/ryan-sge
+    - https://bsky.app/profile/ad403.bsky.social
 #Source : https://pixabay.com/fr/vectors/pas-d-entrée-signer-attention-909933/
 author-job:     Security engineer | Blockchain Developer
 author-email:    # Add your email for contant form.

@@ -1,0 +1,54 @@
+{% comment %}
+  BreadcrumbList structured data (schema.org / JSON-LD).
+
+  jekyll-seo-tag already emits the BlogPosting node; it does not emit breadcrumbs.
+  This include adds them so search results can show "AccessDenied > blockchain >
+  Article title" instead of a bare URL.
+
+  Pure Liquid on purpose: GitHub Pages builds Jekyll in safe mode, so a plugin
+  is not an option here.
+
+  Only rendered for posts, and only when the post declares a category.
+{% endcomment %}
+{% if page.layout == 'post' %}
+  {% assign crumb_category = page.categories | first %}
+  {% assign site_root = site.url | append: site.baseurl %}
+  {% comment %}
+    Slugify exactly the way _includes/categories.html builds its links, so the
+    breadcrumb URL always matches a real category page (e.g. ISO20022 -> iso20022).
+  {% endcomment %}
+  {% assign crumb_slug = crumb_category | downcase | slugify %}
+  {% assign crumb_url = site_root | append: '/category/' | append: crumb_slug | append: '/' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": {{ site.title | jsonify }},
+      "item": {{ site_root | append: '/' | jsonify }}
+    }{% if crumb_category %},
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ crumb_category | jsonify }},
+      "item": {{ crumb_url | jsonify }}
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ page.title | jsonify }},
+      "item": {{ site_root | append: page.url | jsonify }}
+    }{% else %},
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ page.title | jsonify }},
+      "item": {{ site_root | append: page.url | jsonify }}
+    }{% endif %}
+  ]
+}
+</script>
+{% endif %}
