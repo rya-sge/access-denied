@@ -700,7 +700,7 @@ Backfill both so every post carries `lang: en|fr`, and fix the malformed line (�
 `lang` attributes matter for screen readers and for search-engine language detection **today**, with no
 French site required.
 
-### 8.2 Extract all hardcoded UI strings into `_data/i18n.yml` 🟠 *(2 h)*
+### 8.2 Extract all hardcoded UI strings into `_data/i18n.yml` ✅ *implemented*
 
 Currently English strings are scattered across `index.html`, `_layouts/post.html`,
 `_layouts/category-page.html`, `_includes/header.html`, `_includes/categories.html`, `tags.html` and
@@ -713,35 +713,193 @@ Move them to `_data/i18n.yml` keyed by language and read them via
 **Benefit today:** strings stop being duplicated across 4 files (§5.1), so changing the search
 placeholder is one edit instead of four. **Benefit later:** adding French is one YAML block.
 
-### 8.3 Deduplicate templates before duplicating them per language 🟠 *(1.5 h)*
+> **✅ Done.** `_data/i18n.yml` now holds **23 keys**, with complete `en` and `fr` blocks — verified for
+> key parity and no empty values. Ten templates read from it: `search-box`, `header`, `categories`,
+> `post-card`, `javascripts`, `post`, `home`, `default`, `index.html`, `tags.html`, `404.html`.
+>
+> Every consumer resolves its own `t` with
+> `{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}`. The `default:` fallback is
+> deliberate — a page with a missing or unknown `lang` renders English rather than blank labels.
+>
+> **A subtlety worth knowing:** each Jekyll layout is rendered in its own pass, so a variable assigned in
+> `home.html` is **not** visible in its parent `default.html`. I hit exactly that — the scroll-to-top
+> button rendered an empty `aria-label` until `default.html` resolved `t` itself. Any new layout that
+> uses `t` must assign it locally; a check for that is in the verification below.
+>
+> **Two things deliberately not translated:**
+> - **Proper nouns** (Twitter, GitHub, LinkedIn, Bluesky…) stay hardcoded — they are names, not UI text.
+> - **`404.html`'s front-matter `title:`.** Front matter cannot read `site.data`, so the browser-tab
+>   title stays English. The visible `<h1>` *is* translated. A French 404 needs its own page under
+>   `/fr/`, which is §8.5 territory.
+>
+> **Known limitation — dates.** `date_format` is per-language (`%Y, %b %d` vs `%d %b %Y`), so ordering is
+> right, but **Jekyll always renders month names in English** whatever the format string. A properly
+> localised *"3 février 2026"* needs a month lookup table in `_data/i18n.yml` plus a small Liquid helper.
+> Deliberately deferred: it only becomes visible once French pages actually exist.
+
+### 8.3 Deduplicate templates before duplicating them per language ✅ *done via §5.1–§5.2*
 
 §5.1 and §5.2. Nineteen copy-pasted category pages become **38** the day French exists; four copies of
 the search box become **eight**. Consolidating first means the French version adds front matter, not
 templates. **This is the single change that most reduces future multi-language cost.**
 
-### 8.4 Add a stable `ref:` translation key 🟡 *(30 min, scripted)*
+> **✅ Done as part of §5.** What that actually bought, concretely:
+>
+> | Markup | Before | After | If French is added |
+> |---|---|---|---|
+> | Category page body | 20 copies × ~28 lines | 1 layout + 20× 6-line front matter | +20 front-matter stubs, **0 new markup** |
+> | Search box | 4 copies | 1 include | +0 |
+> | Post card | 2 copies | 1 include | +0 |
+>
+> Combined with §8.2, a French category page is now **six lines with no HTML in it**:
+>
+> ```yaml
+> ---
+> layout: category-list
+> title: cryptographie
+> category: cryptography     # same key — the taxonomy is NOT duplicated
+> permalink: /fr/category/cryptographie/
+> lang: fr
+> ---
+> ```
+>
+> **What is still left to do here.** Deduplication is finished for *listings*, but three templates would
+> still need a language-aware pass when French arrives:
+>
+> 1. **`_layouts/post.html`** — the "You might also enjoy" block uses `site.related_posts`, which is not
+>    language-aware and would mix French and English (see §8.5).
+> 2. **`index.html`** — one paginated index exists; a second one at `/fr/` is the pagination constraint
+>    described in §3.2 of `multi-language.md`.
+> 3. **`tags.html`** — a single global tag page across both languages. Either filter it by `page.lang`
+>    or accept a shared tag index.
+>
+> **Recommendation:** keep `categories` and `tags` values identical across languages (English keys),
+> translating only the *display* label via `_data/i18n.yml`. Translating the keys themselves would
+> fragment the taxonomy and double the number of category pages for no reader benefit.
+
+### 8.4 Add a stable `ref:` translation key 🟡 *(30 min, scripted) — still outstanding*
 
 Add `ref: <slug>` to every post now, derived from the current filename slug and then frozen. It's the
 join key that pairs an article with its translation (`multi-language.md` §5.1). Adding it to 255 posts is
 a scripted one-liner today; retrofitting it *after* translations exist means reconciling two sets of
 files by hand.
 
-### 8.5 Restructure listings to filter by language 🟡 *(2 h)*
+**Why a separate key at all** — the obvious alternatives all break:
 
-Every listing — `index.html:15`, `_layouts/category-page.html`, `_pages/category/*/index.html`,
-`tags.html`, `search.json`, and `site.related_posts` in `_layouts/post.html:71` — iterates `site.posts`
-unconditionally.
+| Candidate join key | Why it fails |
+|---|---|
+| Filename | The French file must have a different name, or it collides in `_posts/` |
+| `title` | Translated by definition, so it cannot match across languages |
+| `permalink` | Differs by design (`/fr/…`), so it cannot match either |
+| Date | Not unique — several posts share a date (e.g. seven on 2025-07-11) |
 
-**This is already a live bug:** French 2021 posts are interleaved with English 2026 posts on the home
-page, in every category listing, and in search results. Adding `| where: "lang", page.lang` fixes the
-current site *and* is exactly the change the French version needs.
+So `ref` has to be its own field, and its one job is to **never change**. It is not a slug, not a title,
+and not a URL — renaming an article or fixing its title must leave `ref` untouched, otherwise the pairing
+silently breaks and the language switcher stops appearing.
 
-### 8.6 Make `js/main.js` path-aware 🟢 *(30 min)*
+**Proposed shape:**
+
+```yaml
+# _posts/2024-11-4-TLS1.3-overview.md
+lang: en
+ref: tls-1-3-overview
+
+# _posts/fr/2024-11-4-tls1.3-presentation.md
+lang: fr
+ref: tls-1-3-overview      # identical — this is what pairs them
+```
+
+**Implementation notes:**
+
+- Derive the initial value from the filename slug **minus the date prefix**, lowercased and slugified,
+  then freeze it. Two posts must never share a `ref` unless they are translations of each other.
+- **Watch for near-duplicate slugs** when generating: the seven `cyfrin-first-fight-*` posts and the four
+  `2022-04-22-*` cipher-mode posts produce similar stems and need a uniqueness assertion in the script.
+- **`2026-07-30-alchemy-smart-wallet-account-abstraction.md`** and the untracked
+  `2026-07-30-rundler-alchemy-erc4337-bundler.md` are closely related but are *different articles* — they
+  must get different `ref` values.
+- Add a build-time guard (§6.2) asserting `ref` is unique per language; a duplicated `ref` would make the
+  `where` lookup in the switcher return the wrong article.
+
+**Effort:** ~30 minutes scripted, of which most is eyeballing the generated values. Do it in the same
+pass as any future front-matter normalisation to avoid touching all 256 posts twice.
+
+### 8.5 Restructure listings to filter by language 🟡 *(2 h) — still outstanding, and a live bug*
+
+Every listing iterates `site.posts` unconditionally, so **French and English articles are interleaved
+everywhere today**. Now that all 256 posts carry an accurate `lang` (§8.1), the fix is mechanical.
+
+**Exact inventory of what needs filtering:**
+
+| Location | Current | Fix | Notes |
+|---|---|---|---|
+| `index.html:16` | `site.posts limit/offset` | `where: "lang", page.lang` | interacts with pagination — see below |
+| `_layouts/category-list.html` | `site.categories[cat]` | `where: "lang", page.lang` | covers all 20 category pages at once |
+| `tags.html` | `site.tags` | filter posts per tag | tag *counts* also need recomputing |
+| `search.json` | `site.posts` | add a `lang` field, or emit one index per language | pairs with `siteConfig.searchJson` (§8.6) |
+| `_layouts/post.html:75` | `site.related_posts` | **replace entirely** | see below |
+| `_includes/categories.html` | `site.categories[category] | size` | per-language counts | tile counts are wrong otherwise |
+
+**Three non-obvious complications:**
+
+1. **`site.related_posts` cannot be filtered.** It is computed by Jekyll (most-recent posts, or LSI if
+   enabled) and there is no `lang` hook. It must be *replaced* with an explicit Liquid expression, e.g.
+   same-language posts sharing a category:
+   ```liquid
+   {% assign related = site.posts | where: "lang", page.lang %}
+   ```
+   then exclude `page.url` and take the first 4. Note the existing widget already skips posts with no
+   image — now moot, since §"mindmaps" gave every post one.
+
+2. **Pagination.** `index.html` uses `paginator.total_pages` for the "Load more" bound while listing via
+   `limit`/`offset`. Filtering by language changes the real post count but **not** `paginator.total_pages`,
+   which `jekyll-paginate` computes from the unfiltered `site.posts`. The counter and the list would
+   disagree, so the `postCount` / `postsCovered` logic must be recomputed from the filtered array —
+   otherwise "Load more" either disappears early or fetches empty pages.
+
+3. **Tag counts.** `tags.html` renders `{{ tag[1] | size }}`. Post-filtering, that must count only
+   same-language posts, or a tag can advertise "12" and then list three.
+
+**Do this even if French never happens.** Every item above is a bug on the current site: a visitor on the
+home page sees 2021 French posts between 2026 English ones, and category tiles count both languages.
+The work is identical whether it is framed as a bug fix or as multi-language groundwork — which is why it
+sits in §8 rather than §1.
+
+**Sequencing:** do §8.4 (`ref`) first if you intend to ship French, since the language switcher and the
+filtered listings are usually written in the same pass.
+
+### 8.6 Make `js/main.js` path-aware ✅ *implemented*
 
 `main.js:17` hardcodes `/access-denied/search.json` and `main.js:62` hardcodes `/access-denied/page/`.
 Both should come from `data-` attributes rendered by Liquid. That kills the hardcoded `baseurl`
 duplication now (it breaks any local preview served at `/`), and later lets the same script pick
 `search-fr.json` and `/fr/page/N` without a second copy.
+
+> **✅ Done**, via a `window.siteConfig` object emitted by `_includes/javascripts.html` rather than
+> `data-` attributes — the script needs several values including nested strings, and one typed object is
+> cleaner than scattering attributes across elements:
+>
+> ```js
+> window.siteConfig = {
+>   baseurl: …, lang: …,
+>   searchJson: …,   // '/search.json'  | relative_url
+>   pagePath: …,     // '/page/'        | relative_url
+>   i18n: { noResults: …, loading: … }
+> };
+> ```
+>
+> `main.js` reads it once at startup with literal fallbacks, so the script still works standalone if the
+> config block is ever missing. **Verified: zero occurrences of `access-denied` remain in `js/`, and
+> `node --check` passes.**
+>
+> Two extra wins beyond the original scope:
+> - The **`Loading...`** and **`No results found`** strings moved into `_data/i18n.yml` too, so the search
+>   UI is fully translatable without touching JavaScript.
+> - The five `<script src>` tags now use `relative_url` instead of `{{site.baseurl}}` string
+>   concatenation, matching how the stylesheet and fonts are referenced since §3.1.
+>
+> **This fixes a real bug today:** `jekyll serve` locally has no `/access-denied` prefix, so search and
+> "Load more" were silently broken in local preview — both now follow whatever `baseurl` is configured.
 
 ---
 
@@ -787,7 +945,7 @@ listings · §8.4 `ref` keys · §8.6 path-aware JS
 | §5 Templates & a11y | ✅ complete except colour contrast |
 | §6 Build & tooling | ⬜ §6.1 CI, §6.2 html-proofer, §6.3 pinned deps, §6.5 analytics outstanding — ~~§6.4 done~~ |
 | §7 Content hygiene | ⬜ outstanding |
-| §8 Multi-language prep | 🟡 §8.3 done via §5.1–§5.2; the rest outstanding |
+| §8 Multi-language prep | 🟡 §8.1 §8.2 §8.3 §8.6 done — **remaining: §8.4 `ref` keys, §8.5 language-filtered listings** |
 
 **Highest-value remaining work: §6.1** (a GitHub Actions build). Nothing currently validates the site
 before it goes live — which is exactly how the §6.4 Liquid failure reached production.

@@ -19,8 +19,9 @@ permalink: /tags/
     {% include search-box.html class="u-full-width" %}
   </div>
 </header>
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <section class="c-blog-tags o-opacity">
-  <h1>Tags in Blog</h1>
+  <h1>{{ t.tags_title }}</h1>
   <ul class="c-tag__list">
   {% for tag in sorted_tags %}
     <li><a href="#{{ tag[0] | cgi_escape }}" class="c-tag">{{ tag[0] }} <span>({{ tag[1] | size }})</span></a></li>

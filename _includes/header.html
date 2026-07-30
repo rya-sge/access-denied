@@ -1,3 +1,4 @@
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <header class="c-header">
   <div class="c-header__box">
     {% include search-box.html %}
@@ -11,13 +12,13 @@
         <li>
           <button type="button" class="c-nav__item is-active" data-target="posts"
                   role="tab" aria-selected="true">
-            <span data-icon='ei-pencil' data-size='s'></span> Posts
+            <span data-icon='ei-pencil' data-size='s'></span> {{ t.nav_posts }}
           </button>
         </li>
         <li>
           <button type="button" class="c-nav__item" data-target="categories"
                   role="tab" aria-selected="false">
-            <span data-icon='ei-star' data-size='s'></span> Categories
+            <span data-icon='ei-star' data-size='s'></span> {{ t.nav_categories }}
           </button>
         </li>
       </ul>

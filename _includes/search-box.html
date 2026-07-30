@@ -9,12 +9,15 @@
 
   Only one search box may exist per page: the id "js-search-input" is what
   js/main.js binds SimpleJekyllSearch to.
+
+  Labels come from _data/i18n.yml, selected by the page's `lang`.
 {% endcomment %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <div class="c-search{% if include.class %} {{ include.class }}{% endif %}">
   <div class="c-search__box">
-    <label for="js-search-input" class="u-screen-reader-text">Search for Blog</label>
+    <label for="js-search-input" class="u-screen-reader-text">{{ t.search_label }}</label>
     <input type="search" id="js-search-input" class="c-search__text" autocomplete="off"
-           placeholder="Type to search...">
+           placeholder="{{ t.search_placeholder }}">
     <div data-icon='ei-search' data-size='s'></div>
   </div>
   <ul id="js-results-container" class="c-search-results-list" aria-live="polite"></ul>

@@ -10,6 +10,7 @@
     * post       (document) - the post to render (required)
     * show_words (bool)     - append the estimated reading time after the date
 {% endcomment %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <article class="c-post">
   {% if include.post.image %}
   <a class="c-post-thumbnail o-opacity" href="{{ include.post.url | prepend: site.baseurl }}">
@@ -28,9 +29,9 @@
       {{ include.post.content | strip_html | truncatewords: 15 }}
       {% endif %}
     </p>
-    <span class="c-post-date">{{ include.post.date | date: '%Y, %b %d' }}&nbsp;&nbsp;&nbsp;—&nbsp;</span>
+    <span class="c-post-date">{{ include.post.date | date: t.date_format }}&nbsp;&nbsp;&nbsp;—&nbsp;</span>
     {% if include.show_words %}
-    <span class="c-post-words">{% capture words %}{{ include.post.content | number_of_words }}{% endcapture %}{% unless words contains "-" %}{{ words | plus: 250 | divided_by: 250 | append: " minute read" }}{% endunless %}</span>
+    <span class="c-post-words">{% capture words %}{{ include.post.content | number_of_words }}{% endcapture %}{% unless words contains "-" %}{{ words | plus: 250 | divided_by: 250 | append: t.read_time_suffix }}{% endunless %}</span>
     {% endif %}
   </div>
 </article> <!-- /.c-post -->

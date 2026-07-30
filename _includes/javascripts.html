@@ -1,21 +1,35 @@
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+{% comment %}
+  Everything js/main.js needs from Jekyll is handed to it here, so that main.js
+  stays a plain static file with no build-time values baked in.
+
+  Before this, main.js hardcoded "/access-denied/search.json" and
+  "/access-denied/page/", which broke any preview served from a different
+  baseurl (e.g. `jekyll serve` at /) and would have needed a second copy of the
+  script to point at a French search index.
+
+  `lang` and the i18n strings are what make the search UI translatable without
+  touching the JS.
+{% endcomment %}
+<script>
+  window.siteConfig = {
+    baseurl:     {{ site.baseurl | default: '' | jsonify }},
+    lang:        {{ page.lang | default: 'en' | jsonify }},
+    searchJson:  {{ '/search.json' | relative_url | jsonify }},
+    pagePath:    {{ '/page/' | relative_url | jsonify }},
+    i18n: {
+      noResults: {{ t.search_no_results | jsonify }},
+      loading:   {{ t.loading | jsonify }}
+    }
+  };
+</script>
+
 <!-- jQuery 3.7.1. Upgraded from 3.3.1 (2018), which is flagged by scanners for
      CVE-2019-11358, CVE-2020-11022 and CVE-2020-11023. Same major version, and
      the APIs used here (fitVids' .wrap() with a closed tag, main.js' $.parseHTML
      + .append() of a jQuery object) are unaffected by the 3.5 htmlPrefilter change. -->
-<script src="{{site.baseurl}}/js/jquery-3.7.1.min.js"></script>
-<script src="{{site.baseurl}}/js/evil-icons.min.js"></script>
-<script src="{{site.baseurl}}/js/jquery.fitvids.js"></script>
-<script src="{{site.baseurl}}/js/simple-jekyll-search.min.js"></script>
-<script src="{{site.baseurl}}/js/main.js"></script>
-
-<!-- matjax -/*<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-        inlineMath: [['$','$']]
-      }
-    });
-  </script>
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-*/
-/javascripts -->
+<script src="{{ '/js/jquery-3.7.1.min.js' | relative_url }}"></script>
+<script src="{{ '/js/evil-icons.min.js' | relative_url }}"></script>
+<script src="{{ '/js/jquery.fitvids.js' | relative_url }}"></script>
+<script src="{{ '/js/simple-jekyll-search.min.js' | relative_url }}"></script>
+<script src="{{ '/js/main.js' | relative_url }}"></script>

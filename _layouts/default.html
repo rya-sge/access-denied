@@ -5,6 +5,11 @@
   Falls back to `lang`, then to English for pages that declare neither.
 {% endcomment %}
 {% assign page_locale = page.locale | default: page.lang | default: 'en' %}
+{% comment %}
+  Each layout is rendered in its own pass, so variables assigned in a child
+  layout (home.html) are not visible here. `t` must be resolved again.
+{% endcomment %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <html lang="{{ page_locale }}">
 
 {% include head.html %}
@@ -19,7 +24,7 @@
   <!-- A <button>, not a <div>: it is an action, so it must be focusable and
        operable with the keyboard. aria-label gives it an accessible name, since
        its only content is a decorative icon. -->
-  <button type="button" class="c-top" aria-label="Scroll to top" title="Scroll To Top">
+  <button type="button" class="c-top" aria-label="{{ t.scroll_top }}" title="{{ t.scroll_top }}">
     <span data-icon='ei-chevron-up' data-size='s'></span>
   </button> <!-- /.c-top -->
   {% include javascripts.html %}

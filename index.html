@@ -10,6 +10,7 @@ layout: home
   {% assign currentPage = 1 %}
 {% endif %}
 
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 {% include header.html %}
 <div class="c-posts o-opacity" data-page="{{ currentPage }}" data-totalPages="{{ paginator.total_pages }}">
   {% for post in site.posts limit:site.paginate offset:offset %}
@@ -22,6 +23,6 @@ layout: home
 {% assign postCount = site.posts | size %}
 {% assign postsCovered = site.paginate | plus:offset %}
 {% if postsCovered < postCount %}
-  <button class="c-load-more c-btn c-btn--middle">Load more posts</button>
+  <button class="c-load-more c-btn c-btn--middle">{{ t.load_more }}</button>
 {% endif %}
 {% include categories.html %}

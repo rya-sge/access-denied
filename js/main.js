@@ -2,6 +2,23 @@ $(document).ready(function () {
 
   'use strict';
 
+  /* =========================================================
+  // Configuration injected by Jekyll (_includes/javascripts.html)
+  //
+  // Paths and UI strings are NOT hardcoded here: they depend on
+  // site.baseurl and on the page language. The fallbacks below only
+  // apply if the script is loaded without the config block.
+  ========================================================= */
+
+  var config = window.siteConfig || {};
+  var paths = {
+    searchJson: config.searchJson || '/search.json',
+    page: config.pagePath || '/page/'
+  };
+  var strings = config.i18n || {};
+  var textNoResults = strings.noResults || 'No results found';
+  var textLoading = strings.loading || 'Loading...';
+
   /* =======================
   // Simple Search Settings
   ======================= */
@@ -14,9 +31,9 @@ $(document).ready(function () {
   SimpleJekyllSearch({
     searchInput: document.getElementById('js-search-input'),
     resultsContainer: document.getElementById('js-results-container'),
-    json: '/access-denied/search.json',
+    json: paths.searchJson,
     searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
-    noResultsText: '<li>No results found</li>'
+    noResultsText: '<li>' + textNoResults + '</li>'
   })
 
   /* =======================
@@ -63,9 +80,9 @@ $(document).ready(function () {
     var nextPage = parseInt($postsContainer.attr('data-page')) + 1;
     var totalPages = parseInt($postsContainer.attr('data-totalPages'));
 
-    $(this).addClass('is-loading').text("Loading...");
+    $(this).addClass('is-loading').text(textLoading);
 
-    $.get('/access-denied/page/' + nextPage, function (data) {
+    $.get(paths.page + nextPage, function (data) {
       var htmlData = $.parseHTML(data);
       var $articles = $(htmlData).find('article');
 

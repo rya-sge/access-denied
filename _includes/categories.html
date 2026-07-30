@@ -1,3 +1,4 @@
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <div class="c-categories" style="display: none;">
   <ul class="c-categories__list u-lists-reset">
     {% capture cats %} {% for cat in site.categories %} {{ cat | first }} {% endfor %} {% endcapture %} {% assign sortedCats
@@ -12,7 +13,7 @@
           <figure>
             <img src="{{ site.baseurl | append: post.image }}" alt="" loading="lazy" decoding="async">
           </figure>
-          <span class="c-categories__more">View all</span>
+          <span class="c-categories__more">{{ t.category_view_all }}</span>
         </div>
         {% else %}
           {% assign empty-figure = 'c-empty-figure' %}
@@ -20,7 +21,7 @@
         {% endfor %}
         <div class="c-categories__container {{empty-figure}}">
           <h2 class="c-categories__header">{{ category }}</h2>
-          <p class="c-categories__count"><span>{{ site.categories[category] | size }}</span> Posts</p>
+          <p class="c-categories__count"><span>{{ site.categories[category] | size }}</span> {{ t.category_posts_count }}</p>
         </div>
       </a>
     </li>

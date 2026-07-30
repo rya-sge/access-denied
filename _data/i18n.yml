@@ -1,0 +1,104 @@
+# ---------------------------------------------------------------------------
+# UI strings, keyed by language.
+#
+# Every piece of interface text that is not article content lives here, so that
+# changing a label is one edit instead of hunting through templates — and so a
+# future French version of the site needs a new YAML block rather than a second
+# copy of every template.
+#
+# Usage in a template or include:
+#
+#   {% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+#   {{ t.load_more }}
+#
+# The `| default:` fallback matters: any page whose `lang` is missing or points
+# at a language that is not defined here still renders English rather than blank.
+#
+# Rules:
+#   * Keys are shared across languages — never add a key to one block only.
+#   * Proper nouns (Twitter, GitHub, LinkedIn, ...) are NOT translated and stay
+#     hardcoded in the templates.
+#   * Strings consumed by JavaScript are passed through window.siteConfig.i18n,
+#     emitted by _includes/javascripts.html. Do not duplicate them in js/main.js.
+# ---------------------------------------------------------------------------
+
+en:
+  # Search
+  search_label: "Search for Blog"
+  search_placeholder: "Type to search..."
+  search_no_results: "No results found"
+
+  # Home / navigation
+  nav_posts: "Posts"
+  nav_categories: "Categories"
+  load_more: "Load more posts"
+  loading: "Loading..."
+  category_view_all: "View all"
+  category_posts_count: "Posts"
+
+  # Post
+  read_time_suffix: " minute read"
+  related_title: "You might also enjoy"
+  contact_intro: "Feel free to contact me on"
+  share_twitter: "Share on Twitter"
+  share_facebook: "Share on Facebook"
+
+  # Sidebar
+  social_title: "Social"
+  contact_button: "Send me"
+  follow_button: "Follow me"
+
+  # Tags page
+  tags_title: "Tags in Blog"
+
+  # 404
+  not_found_title: "Page not found :("
+  not_found_text: "The requested page could not be found."
+  not_found_link: "Back to the blog"
+
+  # Misc
+  scroll_top: "Scroll to top"
+
+  # Date format passed to Liquid's `date` filter. NOTE: Jekyll renders month
+  # names in English whatever this is set to, so a fully localised French date
+  # needs a month lookup table — see site_improvement.md 8.2.
+  date_format: "%Y, %b %d"
+
+fr:
+  # Recherche
+  search_label: "Rechercher sur le blog"
+  search_placeholder: "Rechercher…"
+  search_no_results: "Aucun résultat"
+
+  # Accueil / navigation
+  nav_posts: "Articles"
+  nav_categories: "Catégories"
+  load_more: "Voir plus d'articles"
+  loading: "Chargement…"
+  category_view_all: "Tout voir"
+  category_posts_count: "Articles"
+
+  # Article
+  read_time_suffix: " min de lecture"
+  related_title: "Vous aimerez aussi"
+  contact_intro: "N'hésitez pas à me contacter sur"
+  share_twitter: "Partager sur Twitter"
+  share_facebook: "Partager sur Facebook"
+
+  # Barre latérale
+  social_title: "Réseaux"
+  contact_button: "Écrivez-moi"
+  follow_button: "Suivez-moi"
+
+  # Page des tags
+  tags_title: "Tags du blog"
+
+  # 404
+  not_found_title: "Page introuvable :("
+  not_found_text: "La page demandée n'a pas pu être trouvée."
+  not_found_link: "Retour au blog"
+
+  # Divers
+  scroll_top: "Revenir en haut"
+
+  date_format: "%d %b %Y"
