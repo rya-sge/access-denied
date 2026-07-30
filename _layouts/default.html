@@ -16,7 +16,12 @@
   <div class="o-wrapper">
     {{ content }}
   </div> <!-- /.o-wrapper -->
-  <div class="c-top" data-icon='ei-chevron-up' data-size='s' title="Scroll To Top"></div> <!-- /.c-top -->
+  <!-- A <button>, not a <div>: it is an action, so it must be focusable and
+       operable with the keyboard. aria-label gives it an accessible name, since
+       its only content is a decorative icon. -->
+  <button type="button" class="c-top" aria-label="Scroll to top" title="Scroll To Top">
+    <span data-icon='ei-chevron-up' data-size='s'></span>
+  </button> <!-- /.c-top -->
   {% include javascripts.html %}
   {% if page.isMath %}
   {% include mathJax.html %}

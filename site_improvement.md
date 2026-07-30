@@ -257,9 +257,12 @@ Alt text is actually in good shape: only 17 of 619 images have an empty `![]`.
 
 ---
 
-## 3. Performance
+## 3. Performance — ✅ IMPLEMENTED (2026-07-30), except §3.4
 
-### 3.1 The entire stylesheet is inlined into every page 🔴 *(1 h, biggest single win)*
+§3.1, §3.2, §3.5 done. §3.3 done **partially and deliberately**: jQuery was kept at the author's
+request, and only the version was patched. **§3.4 (image optimisation) was explicitly skipped.**
+
+### 3.1 The entire stylesheet is inlined into every page ✅ *fixed*
 
 `_includes/head.html:35-40`:
 
@@ -294,7 +297,31 @@ Fix: make it a real cacheable stylesheet.
 `sass: style: compressed` is already set in `_config.yml`, so output stays minified. If you want to keep
 first-paint speed, inline only critical CSS and load the rest async — but the plain fix already wins.
 
-### 3.2 KaTeX CSS loaded on every page, apparently unused 🟠 *(10 min)*
+> **✅ Done.** `_includes/main.scss` → `_sass/main.scss` (via `git mv`, so history is preserved), new
+> `assets/css/main.scss` entry point with empty front matter, and `head.html` now links
+> `/assets/css/main.css` via `relative_url`.
+>
+> **Verified by actually compiling it** with Dart Sass using the same load path Jekyll uses: builds
+> clean, and the output contains all the §2.4 `object-fit` rules.
+>
+> **Measured result — the compiled stylesheet is 25.3 KiB compressed:**
+>
+> | | Before | After |
+> |---|---|---|
+> | CSS delivery | inlined into all ~280 pages | one cacheable file |
+> | Total CSS bytes across the site | **≈6.9 MiB** duplicated | **25.3 KiB** downloaded once |
+> | Cacheable | ❌ never | ✅ yes |
+>
+> This also shrinks every `/page/N` fragment that the "Load more" button fetches over AJAX — those were
+> each re-downloading the full stylesheet.
+>
+> No cache-busting query string was added: GitHub Pages serves assets with `Cache-Control: max-age=600`
+> and an ETag, so a stale stylesheet self-corrects within ten minutes. Add `?v=` only if that ever bites.
+>
+> Unrelated nit spotted: `_sass/6-trumps/helpers.scss` is missing the `_` prefix every other partial has.
+> Sass resolves it either way, so it is cosmetic — worth renaming for consistency.
+
+### 3.2 KaTeX CSS loaded on every page, apparently unused ✅ *fixed*
 
 `_includes/head.html:27-29` loads `fonts/katex.min.css` (22 KiB) on **every page**. But math is rendered
 by **MathJax v4 SVG** (`_includes/mathJax.html`), which doesn't use KaTeX stylesheets, and
@@ -304,7 +331,14 @@ Worse, the tag carries `integrity="sha384-…" crossorigin="anonymous"` on a **s
 The `crossorigin` attribute forces a CORS check on your own asset, and if the hash doesn't match the
 local copy the browser silently blocks the stylesheet. Verify it's genuinely unused, then delete it.
 
-### 3.3 jQuery + plugin stack: 180 KiB for very little 🟡 *(3–4 h)*
+> **✅ Done.** Confirmed unused first: the only remaining mentions of "katex" anywhere in the source are
+> the commented-out `#  - jekyll-katex` line in `_config.yml` and a note in `Gemfile`. Math is rendered
+> by MathJax v4 in **SVG** mode, which embeds glyph outlines and needs no font CSS at all.
+>
+> Removed the `<link>` and deleted `fonts/katex.min.css` (22 KiB) — recoverable from git if ever needed.
+> Saves 22 KiB **and one render-blocking request on every page**.
+
+### 3.3 jQuery + plugin stack: 180 KiB for very little ⚖️ *version patched; jQuery kept by request*
 
 | File | Size | What it does |
 |---|---|---|
@@ -327,7 +361,29 @@ and rewrite `main.js` in vanilla JS.
 until JS runs**, so social links and the search icon are blank on first paint. Inline SVG would render
 immediately and cost nothing.
 
-### 3.4 Unoptimised images — 68 MiB of assets 🟡 *(2–3 h, scriptable)*
+> **⚖️ Decision: jQuery stays.** Per explicit instruction, jQuery was **not** removed and `main.js` was
+> **not** rewritten in vanilla JS. fitVids and evil-icons were left untouched as well.
+>
+> **✅ What was done: the security patch only** — jQuery **3.3.1 → 3.7.1**, which keeps jQuery while
+> clearing the three advisories that scanners flag (CVE-2019-11358, CVE-2020-11022, CVE-2020-11023).
+>
+> Compatibility was checked before swapping, since the riskiest change in that range is the jQuery 3.5
+> `htmlPrefilter` fix (self-closing tags for non-void elements are no longer expanded):
+> - `jquery.fitvids.js` calls `.wrap('<div class="fluid-width-video-wrapper"></div>')` — **properly
+>   closed**, so unaffected.
+> - `main.js` calls `$.parseHTML(data)` then `.append($articles)` where `$articles` is a **jQuery object,
+>   not an HTML string** — the prefilter is not involved.
+>
+> The downloaded file was verified against jQuery's **published SRI hash**
+> (`sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=`) — exact match, so the artefact is authentic.
+> The old `js/jquery-3.3.1.min.js` was deleted. Net size change is a **49 KiB saving** (135 → 85.5 KiB),
+> since 3.7.1 dropped IE support.
+>
+> ⚠️ **Untested at runtime** — no local Jekyll build is possible here (§6.3). Smoke-test search,
+> "Load more", the Posts/Categories tabs and video embeds. Revert is one line in
+> `_includes/javascripts.html` plus `git checkout` of the old file.
+
+### 3.4 Unoptimised images — 68 MiB of assets ⏭️ *SKIPPED by request — still outstanding*
 
 17 files exceed 500 KiB; the worst offenders:
 
@@ -343,11 +399,27 @@ worst case for that format. Converting diagrams to **SVG** (draw.io exports it n
 by 90%+ *and* make them sharp on retina. For photos, WebP at quality 80. A one-off `oxipng`/`cwebp` pass
 over the rest is easy and safe.
 
-### 3.5 External font requests 🟢 *(15 min)*
+### 3.5 External font requests ✅ *fixed*
 
 `_includes/head.html:25` still pulls Open Sans from `fonts.googleapis.com` (render-blocking + a
 third-party request, and a GDPR talking point in the EU). Volkhov is already self-hosted in `fonts/` —
 do the same for Open Sans and add `font-display: swap`.
+
+> **✅ Done.** Open Sans is now self-hosted in `fonts/opensans.css` + `fonts/file/*.woff2`, following the
+> exact layout `fonts/volokhov.css` already used. **The site now makes zero third-party requests on page
+> load.**
+>
+> Google served **10 subsets** (cyrillic, greek, hebrew, vietnamese, math, symbols…). Only **latin** and
+> **latin-ext** were kept — together they cover English and French, including the `œ` ligature at
+> U+0152-0153. That is 4 woff2 files, ~163 KiB total, and browsers fetch only the subsets a page
+> actually needs via `unicode-range`.
+>
+> `font-display: swap` is set on all four faces, so text renders immediately in the fallback instead of
+> being invisible while the font loads. Open Sans is Apache-2.0, so self-hosting is permitted; the licence
+> is recorded in the CSS header.
+>
+> The old commented-out Volkhov `googleapis` link was removed at the same time. The only remaining
+> mention of `fonts.googleapis.com` in `head.html` is the explanatory comment.
 
 ---
 
@@ -372,15 +444,25 @@ it. Low priority, but it's free bytes on every page.
 
 ---
 
-## 5. Templates, accessibility & duplication
+## 5. Templates, accessibility & duplication — ✅ IMPLEMENTED (2026-07-30)
 
-### 5.1 Search markup is copy-pasted 4× 🟠 *(30 min)*
+All five items done. The deduplication in §5.1–§5.2 is also the §8.3 multi-language groundwork, so that
+item is now largely complete as a side effect.
+
+### 5.1 Search markup is copy-pasted 4× ✅ *fixed*
 
 The identical search box appears in `_includes/header.html`, `_layouts/post.html:8-16`, `tags.html` and
 `404.html`. Extract `_includes/search-box.html` and include it. This directly reduces the multi-language
 work later (§8.2) — four copies means four places to translate the placeholder.
 
-### 5.2 The 19 category pages are near-identical 🟠 *(1 h)*
+> **✅ Done.** New `_includes/search-box.html`, taking an optional `class` parameter (three of the four
+> call sites need `u-full-width`). Verified: **no file outside the include still contains the raw
+> markup**, and all four call sites now include it.
+>
+> Two small accessibility upgrades came along for free: `type="search"` instead of `type="text"`, and
+> `aria-live="polite"` on the results list so screen readers announce results as they appear.
+
+### 5.2 The 19 category pages are near-identical ✅ *fixed (20 pages)*
 
 `_pages/category/*/index.html` are 19 copies of the same ~28-line template differing only in the category
 name. They exist because `_plugins/category-generator.rb` **never runs on GitHub Pages** (see §6.1).
@@ -398,7 +480,23 @@ permalink: /category/zkp/
 
 This is a prerequisite for the French version, where the alternative is maintaining **38** such files.
 
-### 5.3 Accessibility gaps 🟡 *(2 h)*
+> **✅ Done.** New `_layouts/category-list.html` holds the markup once; all **20** pages are now front
+> matter only — from ~28 lines each down to 6.
+>
+> A `category:` field was added alongside `title:`, because the two are **not** always the same: the
+> ISO 20022 page displays *"ISO 20022"* but must query `site.categories['ISO20022']`. The old
+> `_layouts/category-page.html` used `site.categories[page.title]`, which would have silently returned an
+> empty list for that page. Verified all 20 categories resolve to a page with the correct key.
+>
+> `_layouts/category-page.html` (used only by the safe-mode-disabled plugin) now just chains to
+> `category-list`, so the plugin path and the checked-in pages can no longer drift apart — which is what
+> allowed the missing `oracle` page in §1.2 to go unnoticed.
+>
+> The post-card markup was **also** duplicated between `index.html` and the category pages, so it moved
+> into `_includes/post-card.html` (with an optional `show_words` flag, since only the home page showed
+> reading time). `index.html` dropped from 27 lines of card markup to 3.
+
+### 5.3 Accessibility gaps ✅ *fixed (except contrast, see below)*
 
 - Icons are `<div data-icon>` — not focusable, no accessible name, invisible without JS.
 - The Posts/Categories switcher (`js/main.js:34`) is `<li>` elements with click handlers — **not
@@ -409,15 +507,47 @@ This is a prerequisite for the French version, where the alternative is maintain
 
 `u-screen-reader-text` labels are already used on the search inputs — good, keep that pattern.
 
-### 5.4 Leftover debug markup 🟢 *(1 min)*
+> **✅ Done:**
+> - **Posts/Categories tabs** are now real `<button>`s inside the `<li>`s, with `role="tab"` and
+>   `aria-selected` kept in sync. They were previously unreachable by keyboard entirely. `main.js` now
+>   selects by `data-target` rather than `:last-child`, so behaviour no longer depends on markup order.
+> - **Scroll-to-top** is a `<button>` with `aria-label="Scroll to top"` instead of a `<div>`.
+> - **Social links** — all 9 gained `u-screen-reader-text` names. The screen-reader text is a *sibling*
+>   of the icon, not an attribute on it, because evil-icons **replaces** the `data-icon` node at runtime
+>   and would discard any `aria-*` put there.
+> - **`:focus-visible` outlines** added to both new buttons — making something focusable is pointless if
+>   the focus ring is invisible.
+> - Thumbnail alt text was already handled in §2.4.
+>
+> CSS: `<button>` needs its default `background`/`border`/`font` reset to keep the previous look. The
+> `:first-child` / `:last-child` border-radius rules had to move to `li:first-child .c-nav__item`,
+> because the button is *always* the only child of its `li` and would otherwise have matched both rules
+> and got both roundings. **Verified by compiling the SCSS.**
+>
+> **⚠️ Not done: colour contrast.** Checking `_sass/0-settings/_colors.scss` against WCAG AA needs visual
+> verification I can't do here, and fixing it would change the site's palette — a design decision that
+> should be yours.
+
+### 5.4 Leftover debug markup ✅ *fixed*
 
 `_layouts/post.html:59` renders a literal `<p>Share button</p>` above the share icons. Delete it.
 
-### 5.5 Fragile tags loop 🟢 *(15 min)*
+> **✅ Done** — removed. It was visible on all 255 article pages.
+
+### 5.5 Fragile tags loop ✅ *fixed*
 
 `tags.html:22` iterates `(0..site.tags.size)` with an `{% unless forloop.last %}` guard — an off-by-one
 workaround that will silently drop or duplicate a tag if the collection shape changes. `{% for tag in
 site.tags %}` is clearer and correct.
+
+> **✅ Done.** Both loops now iterate `site.tags | sort`, which yields `[name, posts]` pairs already
+> ordered by name — the `capture`/`split`/index dance and the second range loop are gone. Tag post images
+> also gained `loading="lazy"` and escaped alt text.
+>
+> **Trap hit while doing this**, worth recording: my explanatory comment quoted a Liquid tag, and
+> **Liquid parses tags inside `{% comment %}` blocks too** — so the unclosed quoted tag broke the build
+> exactly like the markdown docs in §6.4. Caught by the tag-balance check before pushing; the comment was
+> reworded to describe the old code in prose instead.
 
 ---
 
@@ -466,7 +596,7 @@ exact production set), **or** move to the Actions build (§6.1) and pin versions
 **commit `Gemfile.lock`** — it is currently git-ignored, which is the opposite of what you want for a
 deployed site.
 
-### 6.4 Repository files are published to the live site 🟠 *(10 min)*
+### 6.4 Repository files are published to the live site ✅ *fixed — and it was breaking the build*
 
 `_config.yml` excludes only `Gemfile`, `Gemfile.lock`, `vendor`, `feedback.md` and `draft`. **Not
 excluded**, and therefore copied verbatim into `_site/` and served publicly:
@@ -502,6 +632,29 @@ exclude:
 ```
 
 Keep `schema/` in the repo (it's the diagram source of truth) — just stop publishing it.
+
+> **🔴 This turned out to be more than cosmetic — it broke the GitHub Pages build.**
+>
+> GitHub Pages force-enables **`jekyll-optional-front-matter`** (visible in the build log:
+> `Requiring: jekyll-optional-front-matter`). That plugin turns **every markdown file without front
+> matter into a rendered page**. And Jekyll runs **Liquid before markdown**, so ```` ``` ```` code fences
+> do **not** protect Liquid tags — a `{% if %}` quoted inside a fenced block is parsed for real.
+>
+> Both of the analysis documents I added quote Liquid, so both became pages and both failed to parse:
+>
+> | File | Problem |
+> |---|---|
+> | `site_improvement.md` | unbalanced `unless` (3 open / 1 close), `if` (3 / 0), `for` (1 / 0) |
+> | `multi-language.md` | unknown tag `{% t %}` (the polyglot translation tag, quoted as an example) |
+>
+> `feedback.md` has the same defect but was already excluded, which is why the build was green before.
+>
+> **✅ Fixed** by applying the `exclude:` list above, with a comment in `_config.yml` explaining the trap
+> so the next internal note that quotes Liquid gets excluded too. Verified: **0 remaining root files are
+> rendered as pages with broken Liquid**, and **2.68 MiB** stops being published.
+>
+> **Lesson worth keeping:** on GitHub Pages, any internal `.md` at the repo root that quotes Liquid must
+> be added to `exclude:` — code fences are not enough.
 
 ### 6.5 No analytics 🟠 *(20 min, and it's a blocker for the FR decision)*
 
@@ -594,10 +747,10 @@ duplication now (it breaks any local preview served at `/`), and later lets the 
 
 ## 9. Recommended order
 
-**Batch 1 — Quick wins** — ✅ **complete except two items**
+**Batch 1 — Quick wins** — ✅ **complete except one item**
 ~~§1.1 broken images~~ · ~~§1.2 oracle 404~~ · ~~§1.3 duplicate title~~ · ~~§1.4 front matter~~ ·
-~~§2.1 sitemap in robots.txt~~ · ~~§2.2 canonical~~ · ~~§2.3 site lang~~ — **remaining:** §5.4 debug
-markup · §6.4 exclude list
+~~§2.1 sitemap in robots.txt~~ · ~~§2.2 canonical~~ · ~~§2.3 site lang~~ · ~~§6.4 exclude list~~
+(promoted here — it was failing the build) — **remaining:** §5.4 debug markup
 
 **All of §2 (SEO) is now done**, including §2.4 real `<img>` tags, §2.5 lazy loading and §2.6 structured
 data, which were originally scheduled for Batch 5.
@@ -609,16 +762,35 @@ data, which were originally scheduled for Batch 5.
 §6.1 GitHub Actions build · §6.3 pin dependencies + commit `Gemfile.lock` · §6.2 html-proofer ·
 §6.5 analytics
 
-**Batch 3 — Performance** *(~1 day, biggest user-visible gain)*
-§3.1 external stylesheet · §3.2 drop KaTeX CSS · §3.5 self-host fonts · §3.4 image optimisation ·
-§3.3 jQuery upgrade or removal
+**Batch 3 — Performance** — ✅ **done except §3.4**
+~~§3.1 external stylesheet~~ · ~~§3.2 drop KaTeX CSS~~ · ~~§3.5 self-host fonts~~ · ~~§3.3 jQuery
+patched to 3.7.1~~ (kept by request) — **remaining:** §3.4 image optimisation (skipped by request)
 
 **Batch 4 — Multi-language groundwork** *(~1 day, pays off twice)*
 §8.1 normalise `lang` · §8.3 deduplicate templates · §8.2 `_data/i18n.yml` · §8.5 language-filtered
 listings · §8.4 `ref` keys · §8.6 path-aware JS
 
-**Batch 5 — Polish** *(as time allows)*
-§2.4 real `<img>` tags · §2.5 lazy loading · §4.2 dark mode · §5.3 accessibility · §7 content hygiene
+**Batch 5 — Polish** — mostly done
+~~§2.4 real `<img>` tags~~ · ~~§2.5 lazy loading~~ · ~~§5.3 accessibility~~ (except colour contrast) —
+**remaining:** §4.2 dark mode · §7 content hygiene · colour contrast
+
+---
+
+## Status summary
+
+| Section | State |
+|---|---|
+| §1 Bugs | ✅ complete |
+| §2 SEO | ✅ complete (§2.1 needs an action in the `rya-sge.github.io` repo) |
+| §3 Performance | ✅ except §3.4 image optimisation (skipped by request) |
+| §4 CSS | ⬜ §4.2 dark mode and §4.3 normalize outstanding |
+| §5 Templates & a11y | ✅ complete except colour contrast |
+| §6 Build & tooling | ⬜ §6.1 CI, §6.2 html-proofer, §6.3 pinned deps, §6.5 analytics outstanding — ~~§6.4 done~~ |
+| §7 Content hygiene | ⬜ outstanding |
+| §8 Multi-language prep | 🟡 §8.3 done via §5.1–§5.2; the rest outstanding |
+
+**Highest-value remaining work: §6.1** (a GitHub Actions build). Nothing currently validates the site
+before it goes live — which is exactly how the §6.4 Liquid failure reached production.
 
 Batches 1 and 2 give the best return per hour. Batch 4 is worth doing **even if the French site never
 happens** — every item in it fixes something on the current site (§8.5 in particular fixes a live

@@ -1,0 +1,21 @@
+{% comment %}
+  Site search box. Previously copy-pasted into four files (_includes/header.html,
+  _layouts/post.html, tags.html, 404.html), which meant four places to edit for
+  any change — and four strings to translate if the site ever goes bilingual.
+
+  Usage:
+    {% include search-box.html %}
+    {% include search-box.html class="u-full-width" %}
+
+  Only one search box may exist per page: the id "js-search-input" is what
+  js/main.js binds SimpleJekyllSearch to.
+{% endcomment %}
+<div class="c-search{% if include.class %} {{ include.class }}{% endif %}">
+  <div class="c-search__box">
+    <label for="js-search-input" class="u-screen-reader-text">Search for Blog</label>
+    <input type="search" id="js-search-input" class="c-search__text" autocomplete="off"
+           placeholder="Type to search...">
+    <div data-icon='ei-search' data-size='s'></div>
+  </div>
+  <ul id="js-results-container" class="c-search-results-list" aria-live="polite"></ul>
+</div>

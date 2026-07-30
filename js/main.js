@@ -31,16 +31,22 @@ $(document).ready(function () {
   // Switching between posts and categories
   ======================================= */
 
-  $('.c-nav__list > .c-nav__item').click(function() {
-    $('.c-nav__list > .c-nav__item').removeClass('is-active');
-    $(this).addClass('is-active');
-    if ($('.c-nav__item:last-child').hasClass('is-active')) {
+  // The tabs are <button data-target="posts|categories"> inside the <li>s, so they
+  // are keyboard-reachable. Selecting by data-target instead of :last-child also
+  // means the behaviour no longer depends on the order of the markup.
+  $('.c-nav__list .c-nav__item').on('click', function () {
+    var showCategories = $(this).data('target') === 'categories';
+
+    $('.c-nav__list .c-nav__item').removeClass('is-active').attr('aria-selected', 'false');
+    $(this).addClass('is-active').attr('aria-selected', 'true');
+
+    if (showCategories) {
       $('.c-posts').css('display', 'none').removeClass('o-opacity');
-      $('.c-load-more').css('display', 'none')
+      $('.c-load-more').css('display', 'none');
       $('.c-categories').css('display', '').addClass('o-opacity');
     } else {
       $('.c-posts').css('display', '').addClass('o-opacity');
-      $('.c-load-more').css('display', '')
+      $('.c-load-more').css('display', '');
       $('.c-categories').css('display', 'none').removeClass('o-opacity');
     }
   });

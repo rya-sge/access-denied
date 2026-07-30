@@ -5,15 +5,7 @@ layout: home
     <div class="c-article__content">
         <header class="c-header u-hide u-no-margin-top">
             <div class="c-header__box">
-                <div class="c-search u-full-width">
-                    <div class="c-search__box">
-                        <label for="js-search-input" class="u-screen-reader-text">Search for Blog</label>
-                        <input type="text" id="js-search-input" class="c-search__text" autocomplete="off"
-                               placeholder="Type to search...">
-                        <div data-icon='ei-search' data-size='s'></div>
-                    </div>
-                    <ul id="js-results-container" class="c-search-results-list"></ul>
-                </div>
+                {% include search-box.html class="u-full-width" %}
             </div>
         </header>
         {% if page.imagePost %}
@@ -62,7 +54,6 @@ layout: home
                 <a href="{{site.baseurl}}/tags#{{tag}}">&#35; {{ tag }}</a>
                 {% endfor %}
             </div>
-            <p>Share button</p>
             <div class="c-article__share">
                 <a href="https://twitter.com/intent/tweet?text={{ page.title | uri_escape }}&url={{ site.url}}{{ site.baseurl }}{{ page.url }}"
                    title="Share

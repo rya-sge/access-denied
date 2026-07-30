@@ -7,7 +7,12 @@
   width: 40px;
   height: 40px;
 	bottom: 20px;
+  padding: 0;
   color: $gray-dark;
+  /* Reset the browser button styling: this is a <button> so it can be focused
+     and activated with the keyboard, but it should still look like a bare icon. */
+  background: none;
+  border: none;
 	cursor: pointer;
 	transition: $global-transition;
 	right: -100px;
@@ -21,5 +26,11 @@
   &:hover {
     color: $gray-dark;
 		opacity: 1;
+  }
+
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid $secondary-color;
+    outline-offset: 2px;
   }
 }

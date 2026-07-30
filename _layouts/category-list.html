@@ -1,0 +1,23 @@
+---
+layout: home
+---
+{% comment %}
+  Shared layout for every category landing page.
+
+  Previously each of the 20 pages under _pages/category/ carried its own ~28-line
+  copy of this markup, differing only in the category name — which is how the
+  `oracle` page came to be missing entirely. They are now front matter only.
+
+  Front matter:
+    * category (string) - the key in site.categories, case-sensitive
+                          (e.g. "ISO20022"). Falls back to `title`.
+    * title    (string) - display name / page title
+{% endcomment %}
+{% assign cat = page.category | default: page.title %}
+{% include header.html %}
+<div class="c-posts o-opacity">
+  {% for post in site.categories[cat] %}
+    {% include post-card.html post=post %}
+  {% endfor %}
+</div>
+{% include categories.html %}

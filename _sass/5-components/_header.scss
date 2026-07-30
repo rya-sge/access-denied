@@ -84,14 +84,22 @@
   .c-nav__list {
     display: flex;
     justify-content: flex-end;
+    li {
+      display: flex;
+    }
     .c-nav__item {
       display: flex;
       align-items: center;
-      float: left;
       padding: 4px 10px;
+      font-family: inherit;
       font-size: 10px;
+      line-height: inherit;
+      color: inherit;
       text-transform: uppercase;
       white-space: nowrap;
+      /* The tabs are <button>s now (they must be keyboard-operable), so the
+         browser's default button background/appearance has to be reset. */
+      background: none;
       border: 1px solid $blue-lighter;
       box-shadow: 0 1px 0px rgba(132, 135, 138, 0.4);
       will-change: transform;
@@ -101,6 +109,10 @@
         color: $dark;
         background-color: $white-color;
       }
+      &:focus-visible {
+        outline: 2px solid $secondary-color;
+        outline-offset: 2px;
+      }
       &.is-active {
         box-shadow: 0 0 0 rgba(132, 135, 138, 0.5);
         transform: translateY(1px);
@@ -109,17 +121,19 @@
           background-color: $background;
         }
       }
-      &:first-child {
-        border-radius: 10px 0 0 10px;
-      }
-      &:last-child {
-        border-radius: 0 10px 10px 0;
-      }
       .icon {
         width: 18px;
         height: 18px;
         margin-right: 3px;
       }
+    }
+    /* Rounded outer corners: keyed off the <li>, because the button is always
+       the only child of its <li> and would otherwise match both rules. */
+    li:first-child .c-nav__item {
+      border-radius: 10px 0 0 10px;
+    }
+    li:last-child .c-nav__item {
+      border-radius: 0 10px 10px 0;
     }
   }
 }
