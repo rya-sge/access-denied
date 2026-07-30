@@ -553,7 +553,7 @@ site.tags %}` is clearer and correct.
 
 ## 6. Build & tooling
 
-### 6.1 No CI — and `_plugins/` is dead code in production 🔴 *(1 h, unlocks a lot)*
+### 6.1 No CI — and `_plugins/` is dead code in production ✅ *implemented — one manual step left for you*
 
 There is **no `.github/` directory**. The site is built by GitHub Pages' classic pipeline, which runs
 Jekyll in **safe mode**, so:
@@ -568,7 +568,28 @@ A ~30-line GitHub Actions workflow (`actions/jekyll-build-pages` + `actions/depl
 three limitations at once. This is the **highest-leverage change in this document** — it's a prerequisite
 for several items here and for the cheaper multi-language options.
 
-### 6.2 No link/image checking 🟠 *(1 h)*
+> **✅ Done** — `.github/workflows/pages.yml`: build on Ruby 3.3 → html-proofer → deploy. Pull requests
+> are built and checked but never deployed. YAML validated.
+>
+> **➡️ ONE MANUAL STEP, and the new pipeline is inert until you do it:**
+> **Settings → Pages → Build and deployment → Source: change "Deploy from a branch" to "GitHub Actions".**
+> Until then the deploy job fails while the classic build keeps serving the site — nothing breaks, the new
+> pipeline simply isn't live.
+>
+> **⚠️ A trap this change created, which I had to fix first.** Building outside safe mode means
+> `_plugins/category-generator.rb` *starts running*. Unmodified, it emits
+> `category/<slug>/index.html` for **every** category — colliding with all 20 checked-in pages under
+> `_pages/category/` and producing "conflicting output file" warnings, one silently overwriting the other.
+> The 20 curated pages would have lost their display titles (`ISO 20022` → `ISO20022`).
+>
+> The plugin now **skips any category whose permalink is already claimed by a checked-in page**, so it
+> becomes a safety net instead of a duplicate: it only fills in a category that has no page — precisely
+> the `oracle` gap from §1.2. Ruby syntax verified with `ruby -c`.
+>
+> Choosing Ruby **3.3, not 3.4**, is deliberate: Jekyll 3.x (pinned by `github-pages` v232) depends on
+> stdlib gems that Ruby 3.4 removed.
+
+### 6.2 No link/image checking ✅ *implemented (non-blocking for now — deliberate)*
 
 §1.1 found 10 broken images that have been live for a while. Add `html-proofer` to the CI build:
 
@@ -580,7 +601,23 @@ Catches broken internal links, missing images and malformed HTML on every push. 
 `--disable-external` (external link checking is flaky), then consider a weekly scheduled run with
 externals enabled — a 5-year-old archive of security articles will have accumulated dead outbound links.
 
-### 6.3 Local development is not reproducible 🟠 *(30 min)*
+> **✅ Done** as a step in the build job, with `--disable-external --allow-hash-href --ignore-empty-alt`.
+>
+> **Deliberately `continue-on-error: true` for now.** This is the first time a 256-post archive has ever
+> been link-checked; a backlog of pre-existing breakage is near-certain, and shipping a config that blocks
+> every deploy on day one would be worse than useless. **Read the first few reports, fix what it finds,
+> then delete that one line** — the comment in the workflow says exactly this. Until you do, it reports
+> but does not gate.
+>
+> Installed via `gem install html-proofer` in the workflow rather than added to the `Gemfile`
+> **on purpose**: html-proofer 5.x pulls a modern Nokogiri that can conflict with the dependency set
+> pinned by `github-pages` v232, and a resolution conflict there would break the *site build* rather than
+> just the check. Keeping it out of the bundle isolates that risk.
+>
+> Worth adding later: a scheduled weekly run **with** external checking, reported separately so flaky
+> third-party links never block a deploy.
+
+### 6.3 Local development is not reproducible ✅ *implemented — needs one `bundle install` from you*
 
 Neither `bundle` nor `jekyll` is installed in this environment, so **the site cannot currently be built
 or previewed locally**. `Gemfile.lock` is git-ignored, and the `Gemfile` pins nothing:
@@ -595,6 +632,27 @@ production can silently diverge. Fix: use `gem "github-pages", group: :jekyll_pl
 exact production set), **or** move to the Actions build (§6.1) and pin versions yourself. Either way,
 **commit `Gemfile.lock`** — it is currently git-ignored, which is the opposite of what you want for a
 deployed site.
+
+> **✅ Done.** The `Gemfile` now pins `gem "github-pages", "~> 232"` — the *exact* version set your build
+> log reports (`github-pages v232 / jekyll v3.10.0`). That deliberately keeps rendering identical to
+> today's production while the pipeline changes underneath it; the Actions build is a change of *builder*,
+> not of *Jekyll version*.
+>
+> `jekyll`, `jekyll-paginate` and `bundler` were removed as separate entries — `github-pages` already
+> pins all four plugins listed in `_config.yml`, and declaring them twice makes the versions fight.
+> Verified: no duplicate gems, and no `_config.yml` plugin is separately pinned.
+>
+> Added `webrick ~> 1.8`: Ruby 3.0 dropped it from stdlib and Jekyll 3.x still needs it for
+> `jekyll serve`. Without it, `bundle exec jekyll serve` fails outright on any modern Ruby — which is
+> likely part of why local previews were not happening.
+>
+> **`Gemfile.lock` is no longer git-ignored**, with a comment in `.gitignore` explaining why (this is a
+> deployed site, not a library). Also added `.jekyll-cache` / `.jekyll-metadata`.
+>
+> **➡️ Your step:** run `bundle install` once and commit the generated `Gemfile.lock`. I could not do it
+> here — neither `bundle` nor `ruby`'s gem environment for this project exists in this sandbox, and
+> hand-writing a lock file would be worse than none. Until it is committed, CI still works
+> (`bundler-cache` resolves fresh) but you lose the reproducibility guarantee that is the whole point.
 
 ### 6.4 Repository files are published to the live site ✅ *fixed — and it was breaking the build*
 
@@ -656,15 +714,25 @@ Keep `schema/` in the repo (it's the diagram source of truth) — just stop publ
 > **Lesson worth keeping:** on GitHub Pages, any internal `.md` at the repo root that quotes Liquid must
 > be added to `exclude:` — code fences are not enough.
 
-### 6.5 No analytics 🟠 *(20 min, and it's a blocker for the FR decision)*
+### 6.5 No analytics ⛔ *DECLINED — do not re-propose*
 
 `google-analytics:` in `_config.yml` is empty and `_includes/analytics.html` doesn't exist, so the
 `{% if site.google-analytics %}` block in `_layouts/default.html:14` never fires.
 
-**There is currently no way to know which articles are read.** That matters well beyond curiosity:
-the French-version roadmap in `multi-language.md` §7 has a "check if anyone reads `/fr/`" decision gate,
-and it cannot be evaluated without traffic data. A privacy-respecting option (GoatCounter, Plausible,
-Umami) fits the blog's stance better than GA and avoids the cookie banner.
+**There is currently no way to know which articles are read.**
+
+> **⛔ Declined by the author (2026-07-30): no analytics of any kind, no user tracking.** This is a
+> settled decision, not an open item — it should not be raised again, including the "privacy-friendly"
+> options (GoatCounter, Plausible, Umami) I originally suggested. They are still tracking.
+>
+> The empty `google-analytics:` key in `_config.yml` and the `{% if site.google-analytics %}` guard in
+> `_layouts/default.html` are therefore **correct as they stand** — the guard never fires and no
+> `_includes/analytics.html` exists. Nothing to do.
+>
+> **Consequence to carry forward:** the French-version roadmap in `multi-language.md` §7 proposed a
+> "check whether anyone reads `/fr/`" decision gate. **That gate is not measurable and must be replaced**
+> — decide on translations from editorial intent (which articles you want to reach a French audience)
+> rather than from traffic data. I have noted this in `multi-language.md` §7 too.
 
 ---
 
@@ -916,9 +984,10 @@ data, which were originally scheduled for Batch 5.
 ⚠️ **One item needs action outside this repository:** the AI-crawler rules and the sitemap submission
 (§2.1) — this repo's `robots.txt` is served from a path crawlers ignore.
 
-**Batch 2 — Foundation** *(~1 day, unlocks everything else)*
-§6.1 GitHub Actions build · §6.3 pin dependencies + commit `Gemfile.lock` · §6.2 html-proofer ·
-§6.5 analytics
+**Batch 2 — Foundation** — ✅ **done**
+~~§6.1 GitHub Actions build~~ · ~~§6.3 pin dependencies~~ · ~~§6.2 html-proofer~~ · ~~§6.4 exclude list~~
+— §6.5 analytics **declined**. Remaining manual steps: flip Pages source to "GitHub Actions", and run
+`bundle install` to commit `Gemfile.lock`.
 
 **Batch 3 — Performance** — ✅ **done except §3.4**
 ~~§3.1 external stylesheet~~ · ~~§3.2 drop KaTeX CSS~~ · ~~§3.5 self-host fonts~~ · ~~§3.3 jQuery
@@ -943,7 +1012,7 @@ listings · §8.4 `ref` keys · §8.6 path-aware JS
 | §3 Performance | ✅ except §3.4 image optimisation (skipped by request) |
 | §4 CSS | ⬜ §4.2 dark mode and §4.3 normalize outstanding |
 | §5 Templates & a11y | ✅ complete except colour contrast |
-| §6 Build & tooling | ⬜ §6.1 CI, §6.2 html-proofer, §6.3 pinned deps, §6.5 analytics outstanding — ~~§6.4 done~~ |
+| §6 Build & tooling | ✅ §6.1–§6.4 done — §6.5 analytics **declined by the author**. Two manual steps left: switch the Pages source to "GitHub Actions", and commit a `Gemfile.lock` |
 | §7 Content hygiene | ⬜ outstanding |
 | §8 Multi-language prep | 🟡 §8.1 §8.2 §8.3 §8.6 done — **remaining: §8.4 `ref` keys, §8.5 language-filtered listings** |
 

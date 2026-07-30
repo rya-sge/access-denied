@@ -3,7 +3,11 @@
 .bundle
 .sass-cache
 _site
-Gemfile.lock
+.jekyll-cache
+.jekyll-metadata
+# Gemfile.lock is deliberately NOT ignored: this repository is a deployed site,
+# not a library, so the exact resolved gem versions must be committed. It is what
+# makes a local preview, CI, and production reproduce the same build.
 .idea
 *.bkp
 *.dtmp

@@ -334,12 +334,29 @@ The French version goes live immediately with real content and zero translation 
 listing bug (§2.3) disappears for everyone.
 
 **Phase 2 — Pilot translation (~15 articles)**
-Pick the highest-traffic English articles. Build the glossary. Translate, review, publish. Then look at
-analytics: *is anyone actually reading `/fr/`?* This is the decision gate.
+Build the glossary, then translate, review and publish a first batch.
+
+> **Revised 2026-07-30.** This phase originally said "pick the highest-traffic articles, then check
+> analytics — that's the decision gate". **The site has no analytics and will not get any** (the author
+> has ruled out user tracking; see `site_improvement.md` §6.5), so that gate does not exist and traffic
+> data cannot inform the pick.
+>
+> **Choose editorially instead** — which is arguably better anyway for a technical blog:
+> - Articles whose subject has a genuinely French-speaking audience: the Swiss crypto-tax article, the
+>   ISO 20022 / finance material, anything regulatory.
+> - Articles you are most often asked about or link to yourself.
+> - Cornerstone explainers (`eli10`, cryptography fundamentals) that pull readers into the rest of the site.
+>
+> Deliberately **avoid** starting with the seven Cyfrin First Flight write-ups or other contest notes:
+> they are narrow, time-bound, and heavy in untranslatable code.
 
 **Phase 3 — Scale, or don't**
-If Phase 2 shows real French traffic, continue by category. If it doesn't, stop — you have lost two days
-of plumbing and gained a properly structured bilingual site, which was worth it anyway.
+Judge the pilot on effort rather than traffic: did producing 15 reviewed French articles cost what you
+expected, and do you want to keep doing it? If yes, continue by category. If no, stop — you have lost two
+days of plumbing and gained a properly structured bilingual site, which was worth it anyway.
+
+Qualitative signals are still available without tracking anyone: search-engine referrals visible in
+Google Search Console (already verified for this site), inbound links, and reader emails or issues.
 
 **Rule going forward:** new articles are written in English and get French only on demand. Do not commit
 to translating every future post; that is the obligation that kills bilingual blogs.

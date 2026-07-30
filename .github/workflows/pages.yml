@@ -1,0 +1,92 @@
+name: Build and deploy site
+
+# Replaces GitHub Pages' classic "build from branch" pipeline.
+#
+# Why: the classic build runs Jekyll in SAFE MODE, which silently ignores
+# _plugins/ and refuses any gem outside GitHub's whitelist. It also validates
+# nothing — a Liquid error ships straight to production (which is exactly how the
+# site_improvement.md / multi-language.md Liquid failure reached the live site).
+#
+# Building here instead gives us:
+#   * _plugins/ actually running (see _plugins/category-generator.rb)
+#   * freedom to add gems outside the Pages whitelist
+#   * a build that FAILS on a Liquid or YAML error instead of deploying it
+#   * html-proofer catching broken internal links and images
+#
+# ⚠️ ONE MANUAL STEP IS REQUIRED, once:
+#     GitHub → repository Settings → Pages → "Build and deployment" → Source
+#     must be changed from "Deploy from a branch" to "GitHub Actions".
+#   Until that is done, the deploy job below fails while the classic build keeps
+#   serving the site. Nothing breaks — the new pipeline simply is not live yet.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-way.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # 3.3 rather than 3.4: Jekyll 3.x (pinned by github-pages v232) relies
+          # on stdlib gems that Ruby 3.4 removed.
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Build site
+        env:
+          JEKYLL_ENV: production
+        # --trace prints a real backtrace instead of a one-line Liquid error.
+        run: bundle exec jekyll build --trace
+
+      - name: Check internal links and images
+        # Not gating deploys yet: this is the first time the archive has ever been
+        # link-checked, so a backlog of pre-existing breakage is likely. Read the
+        # first few reports, fix what it finds, then DELETE this line so a
+        # regression fails the build for real.
+        continue-on-error: true
+        run: |
+          gem install html-proofer --no-document
+          htmlproofer ./_site \
+            --disable-external \
+            --allow-hash-href \
+            --ignore-empty-alt \
+            --no-enforce-https \
+            --ignore-urls "/^\/access-denied\/tags/"
+
+      - name: Upload artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    # Pull requests get built and checked, but never deployed.
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
