@@ -44,8 +44,7 @@ layout: home
           Jekyll in safe mode so a plugin is not an option — a Liquid string
           replace on the rendered HTML is the portable way to do this.
         {% endcomment %}
-        {% assign post_body = page.content | markdownify
-             | replace: '<img src="', '<img loading="lazy" decoding="async" src="' %}
+        {% assign post_body = page.content | markdownify | replace: '<img src="', '<img loading="lazy" decoding="async" src="' %}
         {{ post_body }}
         <div class="c-article__footer u-clearfix">
             <div>

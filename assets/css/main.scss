@@ -1,0 +1,13 @@
+---
+# Empty front matter is required: it tells Jekyll to run this file through the
+# SCSS converter and output assets/css/main.css.
+#
+# The stylesheet used to be inlined into a <style> block in _includes/head.html,
+# which meant every one of the ~280 generated pages carried the whole stylesheet
+# and no browser could ever cache it. Serving it as a real file makes it cacheable
+# once and shared across every page.
+#
+# Minification comes from `sass: style: compressed` in _config.yml.
+---
+
+@import 'main';

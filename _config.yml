@@ -80,9 +80,30 @@ sass:
   style: compressed
 
 # Exclude from processing.
+#
+# IMPORTANT: GitHub Pages force-enables the `jekyll-optional-front-matter`
+# plugin, which turns EVERY markdown file without front matter into a rendered
+# page. Jekyll runs Liquid *before* markdown, so ``` code fences do NOT protect
+# Liquid tags — a `{% if %}` quoted inside a fenced block in an internal note is
+# parsed for real and fails the build with a Liquid exception.
+#
+# => Any internal .md doc that quotes Liquid MUST be listed here.
 exclude:
   - Gemfile
   - Gemfile.lock
   - vendor
-  - feedback.md
   - draft
+  # Internal notes: never meant to be published, and several quote Liquid.
+  - feedback.md
+  - multi-language.md
+  - site_improvement.md
+  - CLAUDE.md
+  - DEPENDENCE.md
+  - polyfills.md
+  - article_list.md
+  - tree.txt
+  - README.md
+  - LICENSE.txt
+  # Diagram sources (~1.8 MB of .drawio / .excalidraw). Kept in the repo as the
+  # source of truth, but there is no reason to publish them.
+  - schema
