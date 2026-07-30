@@ -106,7 +106,7 @@ The "unmodified" variants replay the corpus calls verbatim; the "mutated" varian
 
 ### Coverage and the corpus
 
-Medusa records **edge** coverage rather than instruction coverage. A `CoverageTracer` hooks the EVM's opcode callback, but it does not emit a marker on every instruction. It emits one only when control flow actually branches, which in Medusa's definition means jumps, returns, reverts, and contract entrance.
+Medusa records **edge** coverage rather than instruction coverage. A `CoverageTracer` hooks the EVM, but it does not emit a marker on every instruction. Its opcode callback returns early unless the call frame has just been entered or the previous instruction was a `JUMP` or `JUMPI`, and a separate frame-exit callback records how the frame terminated. The four cases that produce a marker are therefore jumps, contract entrance, returns and reverts.
 
 Each marker is a 64-bit value packing a source in the upper 32 bits and a destination in the lower 32 bits. For a jump, those are the program counters the jump left from and landed on. For a return or a revert, the source is the program counter of the terminating opcode and the destination is a reserved sentinel. For contract entrance, the source is a reserved sentinel and the destination is the first program counter executed in the frame. A `ContractCoverageMap` is a map from marker to hit count, held per code hash and per deployed address inside `CoverageMaps`.
 
@@ -460,23 +460,41 @@ Because the EVM has no equivalent of a crash. A contract cannot dereference a ba
 
 **Q: What determines whether a call sequence is written to the corpus?**
 
-Coverage. A `CoverageTracer` attached to the EVM emits a marker whenever control flow branches, encoding the source and destination program counters of a jump, return, revert or contract entrance. If executing call *i* of a sequence produces a marker that was not previously recorded for that contract, the prefix `sequence[0..i]` is added to the corpus. The corpus is thus a set of sequences each known to have reached something new, not a log of everything attempted. Sequences that add no coverage are discarded, and the `CorpusPruner` periodically re-evaluates stored entries and removes those that later sequences have made redundant.
+Coverage. A `CoverageTracer` attached to the EVM emits a marker whenever control flow branches, encoding the source and destination program counters of a jump, return, revert or contract entrance. If executing call *i* of a sequence produces a marker that was not previously recorded for that contract, the prefix `sequence[0..i]` is added to the corpus.
+
+The corpus is thus a set of sequences each known to have reached something new, not a log of everything attempted. Sequences that add no coverage are discarded, and the `CorpusPruner` periodically re-evaluates stored entries and removes those that later sequences have made redundant.
 
 **Q: What is the difference between an assertion test and a property test, and when would you use each?**
 
-An assertion test is any fuzzer-callable method whose execution raises an enabled EVM panic; the invariant is written inline with `assert()` and the fuzzer controls the method's arguments. It is checked while that call executes, and it suits pre-condition and post-condition reasoning about one function. A property test is a prefixed, argument-free function returning `bool` that is evaluated after *every* transaction in a sequence; the fuzzer controls the call sequence rather than the property's inputs. Use assertions for function-level reasoning with a short sequence, and properties for global rules that must survive arbitrary orderings, with a long sequence. Both providers run concurrently, so a suite normally contains both.
+An assertion test is any fuzzer-callable method whose execution raises an enabled EVM panic; the invariant is written inline with `assert()` and the fuzzer controls the method's arguments. It is checked while that call executes, and it suits pre-condition and post-condition reasoning about one function.
+
+A property test is a prefixed, argument-free function returning `bool` that is evaluated after *every* transaction in a sequence; the fuzzer controls the call sequence rather than the property's inputs.
+
+Use assertions for function-level reasoning with a short sequence, and properties for global rules that must survive arbitrary orderings, with a long sequence. Both providers run concurrently, so a suite normally contains both.
 
 **Q: A campaign completes without failures. What should be checked before concluding the contracts are sound?**
 
-At minimum, three things. Open the HTML coverage report and confirm the fuzzer actually executed the logic of interest; a green campaign over unreached code proves nothing. Enable the revert report and check that the wrappers are not rejecting most generated inputs, which indicates clamping bounds that are too tight. Confirm that each property can in fact fail, by injecting a bug and observing the campaign catch it. Beyond that, check that `callSequenceLength` matches the kind of invariant being tested and that `testLimit` was large enough for coverage to plateau.
+At minimum, three things:
+
+- Open the HTML coverage report and confirm the fuzzer actually executed the logic of interest; a green campaign over unreached code proves nothing.
+- Enable the revert report and check that the wrappers are not rejecting most generated inputs, which indicates clamping bounds that are too tight.
+- Confirm that each property can in fact fail, by injecting a bug and observing the campaign catch it. Beyond that, check that `callSequenceLength` matches the kind of invariant being tested and that `testLimit` was large enough for coverage to plateau.
 
 **Q: Why does the documentation warn that reordering `targetContracts` can invalidate an entire corpus?**
 
-Contracts are deployed in array order from a fixed deployer address, and a contract's address is derived from the deployer address and its nonce. Reordering the array changes the nonce at which each contract is created, so every deployment address shifts. A stored corpus entry records concrete target addresses, so after a reorder those calls reference addresses where the intended contract no longer sits. The same reasoning applies to changing `deployerAddress` or `senderAddresses`. This is what `medusa corpus clean` is for: it replays every stored sequence against a freshly deployed chain and deletes the ones that no longer validate.
+Contracts are deployed in array order from a fixed deployer address, and a contract's address is derived from the deployer address and its nonce. Reordering the array changes the nonce at which each contract is created, so every deployment address shifts. A stored corpus entry records concrete target addresses, so after a reorder those calls reference addresses where the intended contract no longer sits.
+
+The same reasoning applies to changing `deployerAddress` or `senderAddresses`. This is what `medusa corpus clean` is for: it replays every stored sequence against a freshly deployed chain and deletes the ones that no longer validate.
 
 **Q: How do coverage guidance and Slither constant mining work together?**
 
-They attack the same problem from opposite ends. Coverage guidance is a feedback loop: it observes which sequences reached new bytecode and biases future generation toward mutating those sequences, with the weight table favouring corpus prefixes ten to one over argument mutation so that state-building work is preserved. Slither constant mining is a priming step with no feedback: before fuzzing begins, it extracts literals from the target's source so that the value generator can propose them directly. Coverage guidance alone would rarely satisfy an equality check against a magic constant, since the probability of generating a specific 256-bit value at random is negligible; supplying the constant lets the guard be passed once, after which coverage guidance takes over and retains the sequence that passed it. If Slither is unavailable, Medusa falls back to mining constants from each contract's AST.
+They attack the same problem from opposite ends. Coverage guidance is a feedback loop: it observes which sequences reached new bytecode and biases future generation toward mutating those sequences, with the weight table favouring corpus prefixes ten to one over argument mutation so that state-building work is preserved.
+
+Slither constant mining is a priming step with no feedback: before fuzzing begins, it extracts literals from the target's source so that the value generator can propose them directly.
+
+Coverage guidance alone would rarely satisfy an equality check against a magic constant, since the probability of generating a specific 256-bit value at random is negligible; supplying the constant lets the guard be passed once, after which coverage guidance takes over and retains the sequence that passed it.
+
+If Slither is unavailable, Medusa falls back to mining constants from each contract's AST.
 
 ## References
 

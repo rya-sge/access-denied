@@ -1,0 +1,59 @@
+@startuml
+title Modular Account V2 — resolving a UserOperation to a validation function
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #4A78B5
+}
+
+start
+:EntryPoint calls validateUserOp(userOp, hash, missingFunds);
+:read the 192-bit parallel nonce key;
+:split into user key + validation id + options byte;
+
+if (options byte: direct-call bit set?) then (yes)
+  :interpret the 20 bytes as a caller address;<<#EEF5FF>>
+else (no)
+  :interpret the 4 bytes as a validation entity ID;<<#EEF5FF>>
+endif
+
+:derive the ValidationLookupKey\n(mask out isGlobal and hasDeferredAction);
+
+if (deferred action bit set?) then (yes)
+  :parse encodedData and deferredActionSig\nfrom the signature;<<#FDEEEE>>
+  :validate the deferred action through\nthe ERC-1271 path;<<#FDEEEE>>
+  if (authorising validation has hooks?) then (yes)
+    :revert;<<#FDEEEE>>
+    stop
+  else (no)
+  endif
+  :execute the self-call\n(typically installValidation);<<#FDEEEE>>
+else (no)
+endif
+
+:parse the remaining signature as\nsparse calldata segments;
+
+repeat
+  :run validation hook i with its segment;
+  :intersect the returned time range;
+repeat while (more validation hooks?) is (yes)
+->no;
+
+if (entity ID == 0 and fallback enabled?) then (yes)
+  :fallback validation:\nsignature type byte then ecrecover or ERC-1271;<<#EAF6F0>>
+else (no)
+  :call the installed validation module;<<#EAF6F0>>
+endif
+
+if (signature valid?) then (no)
+  :return SIG_VALIDATION_FAILED;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+:return packed validationData\nwith the coalesced time range;
+stop
+@enduml

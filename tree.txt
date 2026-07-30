@@ -503,3 +503,10 @@ _posts/2026-07-28-medusa-smart-contract-fuzzer.md
   assets/article/blockchain/solidity/medusa/medusa-fuzzing-lifecycle-workflow.puml        (workflow, in-section)
   assets/article/blockchain/solidity/medusa/medusa-failure-shrinking-sequence.puml        (sequence, in-section)
   assets/article/blockchain/solidity/medusa/medusa-project-setup-workflow.puml            (workflow, in-section)
+
+_posts/2026-07-30-alchemy-smart-wallet-account-abstraction.md
+  assets/article/blockchain/ethereum/erc-4337/2026-07-30-alchemy-smart-wallet-account-abstraction.puml (mindmap)
+  assets/article/blockchain/ethereum/erc-4337/alchemy-aa-stack-concept.puml                             (concept, in-section)
+  assets/article/blockchain/ethereum/erc-4337/alchemy-account-variants-concept.puml                     (concept, in-section)
+  assets/article/blockchain/ethereum/erc-4337/alchemy-mav2-validation-workflow.puml                     (workflow, in-section)
+  assets/article/blockchain/ethereum/erc-4337/alchemy-session-key-sequence.puml                         (sequence, in-section)

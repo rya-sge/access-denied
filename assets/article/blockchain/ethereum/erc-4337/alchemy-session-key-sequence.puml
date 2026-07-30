@@ -1,0 +1,38 @@
+@startuml
+title Session key flow — two keys, two signatures
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+}
+
+actor "Owner\n(user key)" as Owner
+participant "App" as App
+participant "Session key\n(local secp256k1)" as SK
+participant "Wallet APIs" as API
+participant "Smart account\n(MAv2)" as Acct
+
+App -> SK : generate keypair
+App -> API : wallet_createSession(account, chainId,\nexpirySec, key.publicKey, permissions[])
+API --> App : sessionId + EIP-712 signatureRequest
+App -> Owner : sign the session grant
+Owner --> App : session signature\n(no personal_sign prefix)
+
+note over Owner, SK #EEF5FF
+  The owner signs once. Every call
+  below is signed by the session key.
+end note
+
+App -> API : wallet_prepareCalls(calls,\ncapabilities.permissions = {sessionId, signature},\ncapabilities.paymasterService.policyId)
+API --> App : UserOperation + hash to sign
+App -> SK : sign the hash
+SK --> App : userOp signature
+App -> API : wallet_sendPreparedCalls(payload,\npermissions, signature)
+API -> Acct : bundled as a UserOperation
+Acct -> Acct : install the session key validation\n(deferred action, if not yet installed)
+Acct -> Acct : run permission hooks:\nTimeRange, Allowlist, NativeTokenLimit
+API --> App : call ID
+@enduml

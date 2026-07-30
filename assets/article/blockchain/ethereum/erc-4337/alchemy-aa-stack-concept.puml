@@ -1,0 +1,44 @@
+@startuml
+title Alchemy's account abstraction stack — four layers, one path
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "Application" {
+  [dApp / SDK\n@alchemy/wallet-apis] as App
+}
+
+package "Alchemy cloud" {
+  [Wallet APIs\nwallet_prepareCalls\nwallet_sendPreparedCalls] as WalletApi
+  [Gas Manager\npolicy-based paymaster] as GasMgr
+  [Rundler\nPool + Builder + RPC] as Rundler
+}
+
+package "On-chain" {
+  [EntryPoint\nv0.6 - v0.9] as EP
+  [Modular Account V2\nor Light Account] as Account
+  [Validation &\npermission modules] as Modules
+}
+
+App --> WalletApi : build & submit calls
+WalletApi --> GasMgr : request sponsorship
+WalletApi --> Rundler : eth_sendUserOperation
+Rundler --> EP : handleOps
+EP --> Account : validateUserOp\nthen execute
+Account --> Modules : validation +\nhook calls
+GasMgr ..> EP : paymaster deposit
+
+note right of Account
+  The account chooses which
+  validation runs, using the
+  UserOperation nonce.
+end note
+@enduml

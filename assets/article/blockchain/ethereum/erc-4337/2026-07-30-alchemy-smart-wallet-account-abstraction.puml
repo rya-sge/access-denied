@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Alchemy\naccount abstraction
+** Accounts
+*** Modular Account V2\nERC-4337 + ERC-6900
+**** SMA-Bytecode\nowner in proxy bytecode
+**** SMA-StorageOnly\nupgrade target
+**** SMA-7702\nEOA delegation
+**** ModularAccount\nno fallback
+*** Light Account
+**** single owner
+**** MultiOwner variant
+** Validation
+*** fallback validation\nentity ID 0
+*** SingleSigner\nsecp256k1 / ERC-1271
+*** WebAuthn\nsecp256r1 passkeys
+*** selected by the\nUserOp nonce
+*** direct call\nentity ID 0xFFFFFFFF
+** Permissions
+*** Allowlist\naddress + selector + ERC-20
+*** NativeTokenLimit\ngas-aware
+*** TimeRange
+*** PaymasterGuard
+** Wire formats
+*** nonce\nkey + entityId + options
+*** sparse calldata\nsegments
+*** ReplaySafeHash\nEIP-712
+*** DeferredAction\nnonce, deadline, call
+** Rundler
+*** Pool\nprecheck, simulate, reputation
+*** Builder\nAssigner + state machine
+*** RPC\neth_ debug_ rundler_ admin_
+*** ERC-7766\naggregators
+** Wallet APIs
+*** wallet_requestAccount
+*** wallet_createSession
+*** wallet_prepareCalls
+*** wallet_sendPreparedCalls
+*** Gas Manager\npolicyId
+@endmindmap
