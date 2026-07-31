@@ -1,0 +1,40 @@
+@startwbs
+<style>
+wbsDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+  :depth(2) {
+    BackgroundColor #F7D9D9
+  }
+}
+</style>
+* Goal\nRelease escrowed assets\nto an attacker address
+** Obtain a valid\nthreshold of signatures
+*** Steal keys from signer hosts\n(phishing, lateral movement)\n= Ronin 2022
+*** Backdoor the node binary\nvia the build pipeline\n= Poly Network 2023
+*** Abuse delegated signing\nauthority never revoked\n= Ronin 2022
+*** Capture signer-set governance\nand add attacker keys
+** Corrupt what the\nattestor believes
+*** Poison the RPC nodes the\nattestor reads\n= Kelp DAO 2026
+*** DDoS the honest sources so\nfailover lands on poisoned ones\n= Kelp DAO 2026
+*** Answer honestly to monitoring\nand falsely to the attestor\n= Kelp DAO 2026
+** Make the threshold\ntrivially satisfiable
+*** Uninitialised threshold\ndefaults to zero\n= Ronin 2024
+*** Application requires a single\nverifier, or a default it never read\n= Kelp DAO 2026
+*** Malicious upgrade lowers\nthe required weight
+*** Duplicate signatures from one\nkey counted separately
+** Bypass proof verification
+*** Zero-length Merkle witness\nwith attacker-chosen root\n= Dedaub finding
+*** Replay a valid proof on a\nsecond chain or a second time
+*** Attest to origin state that\nwas never finalised
+** Attack the escrow directly
+*** Upgrade the escrow\nimplementation and drain it
+*** Accounting drift from\nfee-on-transfer or rebasing
+*** Direct donation inflates\nunlockable balance
+@endwbs

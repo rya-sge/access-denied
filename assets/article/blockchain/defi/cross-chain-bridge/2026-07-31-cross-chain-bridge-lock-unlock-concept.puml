@@ -1,0 +1,48 @@
+@startuml
+title Lock/Unlock bridge — where the trust actually sits
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #FDEEEE
+skinparam componentBorderColor #B54A4A
+skinparam packageBackgroundColor #FFFFFF
+skinparam packageBorderColor #B54A4A
+skinparam noteBackgroundColor #FFF6F6
+skinparam noteBorderColor #B54A4A
+skinparam arrowColor #B54A4A
+
+package "Origin chain" {
+  [User] as U
+  [Escrow / LockProxy] as LOCK
+}
+
+package "Off-chain attestation layer" as OFF {
+  [Validator / keeper / operator set] as SIG
+  [Relay chain\n(Poly only)] as RELAY
+}
+
+package "Target chain" {
+  [Gateway / unlock contract] as UNLOCK
+  [Recipient] as R
+}
+
+U --> LOCK : 1. lock assets
+LOCK --> SIG : 2. emit lock event
+SIG --> RELAY : 3. include in relay state
+RELAY --> UNLOCK : 4. signed header + Merkle proof
+SIG --> UNLOCK : 4'. threshold signatures
+UNLOCK --> R : 5. release assets
+
+note right of OFF
+  The verifier on the target chain only
+  checks that enough valid signatures
+  are present.
+
+  Whoever controls the signing set can
+  authorise any unlock, no matter how
+  correct the on-chain code is.
+
+  Ronin 2022: keys stolen
+  Poly 2023 : keys stolen
+  Ronin 2024: threshold set to zero
+end note
+@enduml

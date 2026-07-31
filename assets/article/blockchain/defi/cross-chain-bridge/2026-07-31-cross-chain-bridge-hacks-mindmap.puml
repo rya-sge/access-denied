@@ -1,0 +1,73 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Cross-Chain\nBridge Hacks\n2021-2026
+** Verification logic
+*** Poly Network 2021\n~$600M, returned
+**** Selector collision 0x41973cd9
+**** Keeper list overwritten
+*** Wormhole 2022\n120,000 wETH ~$320M
+**** load_instruction_at unchecked
+**** Forged sysvar account
+**** Exploited 53 min after the fix PR
+*** Nomad 2022\n$156M-$190M
+**** Trusted root set to 0x00
+**** 40+ copycat exploiters
+*** BSC Token Hub 2022\n2M BNB ~$600M
+**** IAVL right attribute ignored
+**** Forged proof, same root hash
+** Trust anchor
+*** Ronin 2022\n~$540M
+**** 5-of-9, spear-phishing
+**** Stale Axie DAO allowlist
+**** 6 days undetected, Lazarus
+*** Harmony Horizon 2022\n~$100M
+**** 2-of-4 multisig
+**** Developer laptop compromised
+**** Failure predicted 12 weeks earlier
+*** Multichain 2023\n~$125M
+**** Sole custody by the CEO
+**** Devices confiscated, no exploit
+** Supply chain
+*** Poly Network 2023\nnotional ~$34B
+**** Trojan in build environment
+**** Consensus keys exfiltrated
+**** Forged relay block header
+left side
+** Deployment
+*** Ronin 2024\n~$12M
+**** initializeV3 skipped
+**** Vote weight threshold = 0
+**** MEV bot, 48 minutes later
+** Origin-chain view
+*** Kelp DAO / LayerZero 2026\n116,500 rsETH ~$292M
+**** 1-of-1 DVN verifier
+**** Two RPC nodes poisoned
+**** Healthy source DDoS'd
+**** Failover, forged attestation
+** Shared causes
+*** Trust anchor, not contract logic
+*** Nominal is not real decentralisation
+*** Build pipeline is protocol code
+*** Signer input is protocol too
+*** Upgrades and disclosures are peak risk
+*** Detection latency drives the loss
+** Defences
+*** Per-transaction value caps
+*** Daily volume limits
+*** Withdrawal delay with challenge
+*** Independent reproducible builds
+*** Quorum that fails closed
+*** Cross-chain reconciliation monitor
+*** Post-upgrade invariant checks
+@endmindmap

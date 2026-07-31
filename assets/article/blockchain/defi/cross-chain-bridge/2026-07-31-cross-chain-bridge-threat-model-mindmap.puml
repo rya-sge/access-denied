@@ -1,0 +1,65 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Cross-Chain Bridge\nThreat Model\n18 threats, 10 critical
+** Scope
+*** Lock/unlock and burn/mint bridges
+*** Escrow, attestor set, gateway
+*** Origin-chain data path
+*** Build pipeline and upgrade path
+*** Verifier configuration
+*** Excludes origin chain consensus
+** Assets
+*** Escrow balance
+*** Signer private keys
+*** Attestor set and threshold config
+*** Node binary integrity
+*** Proxy implementation and init state
+*** Processed message set
+*** Attestor view of origin state
+*** Required verifier count
+*** Pause capability
+** Trust boundaries
+*** TB1 origin chain to attestation
+*** TB2 attestation to target chain
+*** TB3 corporate IT to signer host
+*** TB4 build environment to binary
+*** TB5 admin key to implementation
+left side
+** Critical threats
+*** T-01 signer key theft
+*** T-02 stale delegated authority
+*** T-03 backdoored node binary
+*** T-04 forged attestation
+*** T-05 uninitialised threshold
+*** T-10 detection latency
+*** T-11 misconfiguration in mempool
+*** T-16 poisoned origin-chain view
+*** T-17 single required verifier
+*** T-18 failover onto poisoned sources
+** Countermeasures
+*** Independent failure domains
+*** Hardware key custody
+*** Reproducible verified builds
+*** Two or more required verifiers
+*** Data-source quorum that fails closed
+*** Post-upgrade invariant assertions
+*** Value caps and daily limits
+*** Withdrawal delay with challenge
+*** Cross-chain reconciliation
+** Validation
+*** Every boundary has a control
+*** Every threat has an owner
+*** Refresh on upgrade, config or incident
+*** Register grew when evidence arrived
+@endmindmap

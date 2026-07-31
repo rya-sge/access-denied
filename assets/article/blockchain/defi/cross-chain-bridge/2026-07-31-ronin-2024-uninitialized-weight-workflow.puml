@@ -1,0 +1,43 @@
+@startuml
+title Ronin 2024 — how a skipped initializer emptied the gateway
+skinparam shadowing false
+skinparam activityBackgroundColor #FDEEEE
+skinparam activityBorderColor #B54A4A
+skinparam activityDiamondBackgroundColor #FFF6F6
+skinparam activityDiamondBorderColor #B54A4A
+skinparam arrowColor #B54A4A
+
+start
+:Ronin team upgrades the transparent proxy
+from version 2 to version 4;<<#EEF5FF>>
+:initializeV4 executed;<<#EEF5FF>>
+:initializeV3 NOT executed;<<#FDEEEE>>
+:_totalOperatorWeight keeps its
+default storage value of 0;<<#FDEEEE>>
+
+:MEV bot observes the upgrade
+transaction in the mempool;
+:Attacker contract calls
+submitWithdrawal on MainchainGatewayV3;
+
+:_submitWithdrawal calls
+_computeMinVoteWeight;
+:_getTotalWeight returns _totalWeight = 0;<<#FDEEEE>>
+:_minimumVoteWeight(0) returns 0
+so minimumWeight = 0;<<#FDEEEE>>
+:_locked returns false;
+
+if (weight >= minimumWeight ?) then (0 >= 0, true)
+  :passed = true, no revert;<<#FDEEEE>>
+  :handleAssetOut calls send();
+  :3,996 ETH and 1,998,046 USDC
+  leave the gateway;<<#FDEEEE>>
+else (false)
+  :revert, withdrawal rejected;<<#EAF6F0>>
+  stop
+endif
+
+:Contract paused 38 minutes later,
+SEAL 911 assists, whitehat returns funds;<<#EAF6F0>>
+stop
+@enduml

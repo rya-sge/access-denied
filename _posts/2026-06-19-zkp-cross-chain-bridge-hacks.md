@@ -298,10 +298,12 @@ Aztec Connect routed user DeFi interactions through bridges, batching deposits a
 
 $$
 \begin{aligned}
-\text{user\_output} &= \left\lfloor \frac{\text{total\_input} \times \text{bridge\_output\_a}}{\text{bridge\_output\_b}} \right\rfloor \\
-\text{remainder} &= (\text{total\_input} \times \text{bridge\_output\_a}) \bmod \text{bridge\_output\_b}
+u_{\text{out}} &= \left\lfloor \frac{T \times O_a}{O_b} \right\rfloor \\
+r &= (T \times O_a) \bmod O_b
 \end{aligned}
 $$
+
+where $$T$$ is `total_input`, $$O_a$$ and $$O_b$$ are `bridge_output_a` and `bridge_output_b`, $$u_{\text{out}}$$ is `user_output` and $$r$$ is the remainder.
 
 Two constraint failures in the TurboPlonk circuit combined into a multiple-spend vulnerability:
 
@@ -389,7 +391,7 @@ The disclosed-but-unexploited category represents approximately $1.9$B in at-ris
 
 ## Conclusion
 
-ZK-rollup bridge security depends on the integrity of multiple layers, and each layer has failed in production. The most architecturally novel failures are those where the ZK proof was valid but the system was still exploited: the Aztec Connect June 2026 boundary bypass (the proof did not commit to `numRealTxs`) and the zkSync Era mantissa bug (the proof did not constrain the upper bits of withdrawal amounts). These incidents show that a correct ZK proof is a necessary but insufficient condition for bridge security. The proof must commit to all parameters that govern fund movement on L1.
+ZK-rollup bridge security depends on the integrity of multiple layers, and each layer has failed in production. The most architecturally novel failures are those where the ZK proof was valid but the system was still exploited: the Aztec Connect June 2026 boundary bypass (the proof did not commit to `numRealTxs`) and the zkSync Era RAM permutation bug (the proof did not constrain the upper bits of withdrawal amounts). These incidents show that a correct ZK proof is a necessary but insufficient condition for bridge security. The proof must commit to all parameters that govern fund movement on L1.
 
 The disclosed vulnerabilities demonstrate that production ZK bridge circuits contain exploitable soundness errors, and that bug bounty programs are a functional mechanism for finding them before exploitation. The three circuits that were fixed pre-exploitation (Aztec Connect claim proof, zkSync Era RAM Permutation, zkSync Lite mantissa) covered a combined at-risk value exceeding $1.9$B.
 
@@ -428,8 +430,7 @@ No. Smart contracts on Ethereum are immutable and continue to accept function ca
 - [ZKSwap Exploit — Blockaid](https://www.blockaid.io/blog/how-zkswaps-5m-exploit-couldve-been-prevented-with-onchain-monitoring)
 - [zkSync Era Soundness Bug — ChainLight](https://blog.chainlight.io/uncovering-a-zk-evm-soundness-bug-in-zksync-era-f3bc1b2a66d8)
 - [zkSync Lite Proof Verification Bugfix — Immunefi](https://medium.com/immunefi/zksync-insufficient-proof-verification-bugfix-review-dcd57944d0e2)
-- [Aztec Connect Claim Proof Bug — HackMD](post-mortem/Aztec Connect Claim Proof Bug - HackMD.pdf)
-- [Aztec Multiple-Spend Error Bugfix Review — Immunefi](post-mortem/Aztec Multiple-Spend Error Bugfix Review _ by Immunefi Editor _ Immunefi _ Medium.pdf)
+- Aztec Connect claim proof bug write-up (HackMD) and Aztec multiple-spend bugfix review (Immunefi), September–October 2023
 - [ZKSpace Exploit — ainvest.com](https://www.ainvest.com/news/zkspace-proxy-contract-exploited-4-million-stolen-2507/)
-- [SlowMist Hacked Database — Zone.pdf](slowmist/SlowMist Hacked - SlowMist Zone.pdf)
+- [SlowMist Hacked database](https://hacked.slowmist.io/)
 - [Claude Code](https://claude.com/product/claude-code)

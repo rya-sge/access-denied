@@ -1,0 +1,56 @@
+@startuml
+title Kelp DAO 2026 — how a poisoned RPC view forged a cross-chain message
+skinparam shadowing false
+skinparam activityBackgroundColor #FDEEEE
+skinparam activityBorderColor #B54A4A
+skinparam activityDiamondBackgroundColor #FFF6F6
+skinparam activityDiamondBorderColor #B54A4A
+skinparam arrowColor #B54A4A
+
+start
+:6 March 2026: a LayerZero Labs developer
+is socially engineered, session keys harvested;<<#FDEEEE>>
+:Attacker pivots into the RPC cloud environment;<<#FDEEEE>>
+:Binaries of two internal op-geth nodes swapped,
+running RPC memory patched;<<#FDEEEE>>
+
+note right
+  The implant answers truthfully to
+  every caller except the DVN, so
+  monitoring and indexing see nothing
+end note
+
+:DVN still reads internal AND external
+RPC sources for redundancy;<<#EAF6F0>>
+
+if (Can the attacker reach a quorum\nof poisoned sources?) then (not yet)
+  :DDoS the external RPC provider
+  (10:20 to 11:40 PT);<<#FDEEEE>>
+  :Failover puts the DVN exclusively
+  on the two poisoned nodes;<<#FDEEEE>>
+else (redundancy holds)
+  :Honest source contradicts the fiction,
+  no attestation produced;<<#EAF6F0>>
+  stop
+endif
+
+:LayerZero Labs DVN attests to a burn
+on Unichain that never occurred;<<#FDEEEE>>
+
+if (Second independent DVN required?) then (no, 1-of-1)
+  :Ethereum endpoint accepts inbound nonce 308
+  while Unichain outbound is still 307;<<#FDEEEE>>
+  :116,500 rsETH (~$292M) released
+  from the RSETH_OFTAdapter;<<#FDEEEE>>
+  :89,567 rsETH becomes collateral for
+  82,650 WETH and 821 wstETH on Aave V3;<<#FDEEEE>>
+else (yes, multi-DVN)
+  :Disagreement blocks the message;<<#EAF6F0>>
+  stop
+endif
+
+:17:35 UTC forged release, Kelp pauses
+43,373 rsETH, Aave freezes rsETH at 19:00 UTC;<<#EAF6F0>>
+:Backing restored in five tranches by 26 May;<<#EAF6F0>>
+stop
+@enduml

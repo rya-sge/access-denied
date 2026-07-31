@@ -1,0 +1,101 @@
+@startuml
+title Cross-chain bridge — data flow and trust boundaries
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FFFFFF
+skinparam packageBorderColor #B54A4A
+skinparam noteBackgroundColor #FFF6F6
+skinparam noteBorderColor #B54A4A
+skinparam arrowColor #4A78B5
+skinparam databaseBackgroundColor #EEF5FF
+skinparam databaseBorderColor #4A78B5
+skinparam actorBorderColor #4A78B5
+left to right direction
+
+package "1. Origin chain" as P1 {
+  actor "Bridge user" as USER
+  [Escrow / LockProxy] as LOCK
+  database "Locked balances" as ESC
+}
+
+package "1b. Origin-chain data path" as P1B {
+  [Internal RPC nodes] as RPCI
+  [External RPC provider] as RPCE
+}
+
+package "2. Off-chain attestation layer" as P2 {
+  [Attestor set\nvalidators / keepers / DVNs] as SIG
+  database "Signer private keys" as KEYS
+  [Relay chain\n(optional)] as RELAY
+  [Relayer (permissionless)] as REL
+}
+
+package "3. Target chain" as P3 {
+  [Proxy + implementation] as PROXY
+  [Gateway / verifier] as GW
+  database "Processed message set" as NONCE
+  database "Required verifier set\nand threshold" as CFG
+}
+
+package "Build and release" as P4 {
+  [Source repository] as SRC
+  [Compilation environment] as BUILD
+}
+
+package "Configuration" as P6 {
+  actor "Application delegate" as APP
+}
+
+package "Detection and response" as P5 {
+  [Reconciliation monitor] as MON
+  [Pause / guardian] as PAUSE
+}
+
+USER -[#B54A4A]-> LOCK : lock or burn assets
+LOCK --> ESC : credit escrow
+LOCK --> RPCI : observable state
+LOCK --> RPCE : observable state
+RPCI -[#B54A4A]-> SIG : **TB1** claimed origin state
+RPCE -[#B54A4A]-> SIG : **TB1** claimed origin state
+KEYS --> SIG : sign with
+SIG --> RELAY : commit state
+RELAY --> REL : header + proof
+SIG --> REL : threshold attestations
+REL -[#B54A4A]-> GW : **TB2** withdrawal proof
+CFG --> GW : how many must attest
+GW --> NONCE : check and record
+GW --> USER : release assets
+
+SRC --> BUILD
+BUILD -[#B54A4A]-> SIG : **TB4** node binary
+PROXY -[#B54A4A]-> GW : **TB5** delegates to
+APP -[#B54A4A]-> CFG : **TB2** sets required verifiers
+
+LOCK --> MON
+GW --> MON
+MON --> PAUSE : halt on mismatch
+PAUSE --> GW
+
+note bottom of GW
+  **TB2 is where every attack arrives.**
+  The gateway counts attestations against a
+  threshold and has no independent view of
+  the origin chain.
+  **TB1 is how it is reached without a key.**
+  Poison enough of the data path and the
+  honest attestor signs voluntarily
+  (Kelp DAO 2026).
+  TB3 (corporate IT to attestor host)
+  sits inside package 2.
+end note
+
+note top of RPCE
+  Redundancy here must **fail closed**.
+  A DDoS on the honest source that
+  triggers failover onto a poisoned one
+  turns an availability attack into an
+  integrity attack.
+end note
+@enduml
