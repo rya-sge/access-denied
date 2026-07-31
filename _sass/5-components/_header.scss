@@ -48,7 +48,7 @@
     width: 100%;
     margin: 10px 0 0;
     list-style-type: none;
-    background-color: $white-color;
+    background-color: var(--surface);
     z-index: 1;
     li {
       display: flex;
@@ -56,7 +56,7 @@
       align-items: center;
       margin: 0;
       padding: 20px 25px 0;
-      background-color: $white-color;
+      background-color: var(--surface);
       line-height: 1.4;
       border-left: solid 1px $gray-lighten;
       border-right: solid 1px $gray-lighten;
@@ -107,7 +107,7 @@
       cursor: pointer;
       &:hover {
         color: $dark;
-        background-color: $white-color;
+        background-color: var(--surface);
       }
       &:focus-visible {
         outline: 2px solid $secondary-color;

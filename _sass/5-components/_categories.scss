@@ -25,11 +25,11 @@
   align-items: center;
   padding: 20px 10px;
   border-radius: $global-radius;
-  box-shadow: 5px 5px 25px rgba(46, 61, 73, .15);
-  background-color: $white-color;
+  box-shadow: 5px 5px 25px var(--shadow-soft);
+  background-color: var(--surface);
   transition: $global-transition;
   &:hover {
-    box-shadow: 2px 4px 8px 0px rgba(46, 61, 73, 0.2);
+    box-shadow: 2px 4px 8px 0px var(--shadow-strong);
     .c-categories__img {
       .c-categories__more {
         opacity: 1;

@@ -58,6 +58,7 @@ en:
 
   # Misc
   scroll_top: "Scroll to top"
+  theme_toggle: "Switch between light and dark theme"
 
   # Date format passed to Liquid's `date` filter. NOTE: Jekyll renders month
   # names in English whatever this is set to, so a fully localised French date
@@ -100,5 +101,6 @@ fr:
 
   # Divers
   scroll_top: "Revenir en haut"
+  theme_toggle: "Basculer entre le thème clair et sombre"
 
   date_format: "%d %b %Y"

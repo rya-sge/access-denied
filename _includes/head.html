@@ -23,4 +23,19 @@
   <!--SEO-->
   {% seo %}
   {% include breadcrumbs.html %}
+
+  <!-- Theme bootstrap. This MUST stay inline and MUST stay in <head>: it has to
+       run before the browser paints, otherwise a reader who chose dark mode sees
+       a white flash on every page load.
+       No default is applied — absent a stored choice the site stays light, which
+       is why the OS `prefers-color-scheme` is not consulted here. -->
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) { /* private mode / storage disabled: stay light */ }
+    })();
+  </script>
 </head>

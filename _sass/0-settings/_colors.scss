@@ -2,46 +2,51 @@
 	COLORS
 =============== */
 
+// Brand palette — identical in both themes, so these stay literal values and
+// remain usable by SCSS colour functions such as darken().
 $primary-color: #33aaff;
 $secondary-color: #cfcfdd;
 $alternate-color: #404040;
 $red-color: #ee6c6c;
 $green-color: #55bf55;
+
+// Pure white, for text sitting ON a coloured background (buttons, badges).
+// This must NOT become themeable: white text on the blue gradient stays white
+// in dark mode. Surfaces use var(--surface) instead — see _theme.scss.
 $white-color: #ffffff;
 
-
-$dark: #222222;
 $dark-gray: #333333;
 $darkest: #444444;
 
-$gray: #a0a0a0;
-$gray-dark: #757575;
-$gray-light: #dddddd;
-$gray-lighten: #edeeee;
-$gray-lighter: #cccccc;
-
 $blue: #33aaff;
 $blue-light: #cfcfdd;
-$blue-lighter: #dce4ea;
-$blue-dark: #263959;
 
-// Background Colors
-$background: #fbfbfb;
-$alternate-background: #fafafa;
-
-
-// Body Color
-$text-color: #404040;
-
-
-// Headings
-$heading-font-color: #404040;
-
-
-// Links
+// Links — derived from the brand colour, identical in both themes.
 $link-color: $primary-color;
 $link-color-hover: darken($link-color, 15%);
 
+// ---------------------------------------------------------------------------
+// Themeable variables.
+//
+// These point at the custom properties defined in _theme.scss so that every
+// existing component rule switches theme for free. They can no longer be passed
+// to SCSS colour functions (darken(), rgba(), ...) — use a dedicated custom
+// property for that instead.
+// ---------------------------------------------------------------------------
+$background: var(--bg);
+$alternate-background: var(--alt-bg);
 
-// Border
-$border-color: #f0f0f0;
+$text-color: var(--text);
+$heading-font-color: var(--heading);
+
+$dark: var(--text-strong);
+$gray: var(--text-muted);
+$gray-dark: var(--text-dim);
+$gray-light: var(--line);
+$gray-lighten: var(--divider);
+$gray-lighter: var(--line-soft);
+
+$blue-lighter: var(--border-strong);
+$blue-dark: var(--title);
+
+$border-color: var(--border);

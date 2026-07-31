@@ -9,7 +9,7 @@
 
 .c-wrap-content {
   padding: 20px;
-  background-color: $white-color;
+  background-color: var(--surface);
 }
 
 .c-article__image {
@@ -108,8 +108,8 @@
     border-radius: 10px;
     overflow: hidden;
     text-align: center;
-    background-color: $white-color;
-    box-shadow: 0 1px 1px 0 rgba(31,35,46,0.15);
+    background-color: var(--surface);
+    box-shadow: 0 1px 1px 0 var(--shadow-soft);
     transition: $global-transition;
     h4 {
       margin-bottom: 5px;
@@ -120,7 +120,7 @@
       }
     }
     &:hover {
-      box-shadow: 2px 4px 8px 0px rgba(46,61,73,0.2);
+      box-shadow: 2px 4px 8px 0px var(--shadow-strong);
     }
   }
   .c-recent__footer {

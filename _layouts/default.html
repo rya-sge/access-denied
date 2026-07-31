@@ -21,6 +21,19 @@
   <div class="o-wrapper">
     {{ content }}
   </div> <!-- /.o-wrapper -->
+  <!-- Light/dark switch. Light is the default: the OS `prefers-color-scheme` is
+       deliberately NOT followed, so a visitor only gets dark if they ask for it.
+       aria-pressed reflects the current state for screen readers. -->
+  <button type="button" class="c-theme-toggle" id="js-theme-toggle"
+          aria-label="{{ t.theme_toggle }}" title="{{ t.theme_toggle }}" aria-pressed="false">
+    <svg class="c-theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="c-theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zM4.2 5.6a1 1 0 0 1-.7-.3L2.1 3.9a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1-.7 1.7zm15.4 15.4a1 1 0 0 1-.7-.3l-1.4-1.4a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1-.7 1.7zM3 13H1a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zm20 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zM2.8 21a1 1 0 0 1-.7-1.7l1.4-1.4a1 1 0 0 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-.7.3zM18.2 5.6a1 1 0 0 1-.7-1.7l1.4-1.4a1 1 0 1 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-.7.3z"/>
+    </svg>
+  </button> <!-- /.c-theme-toggle -->
+
   <!-- A <button>, not a <div>: it is an action, so it must be focusable and
        operable with the keyboard. aria-label gives it an accessible name, since
        its only content is a decorative icon. -->

@@ -9,7 +9,8 @@ code {
   word-break: break-all;
   font-family: Courier, monospace;
   font-size: 14px;
-  background-color: #f7f7f7;
+  background-color: var(--code-bg);
+  color: var(--code-text);
 }
 
 p code,

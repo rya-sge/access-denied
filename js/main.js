@@ -20,6 +20,39 @@ $(document).ready(function () {
   var textLoading = strings.loading || 'Loading...';
 
   /* =======================
+  // Light / dark theme
+  //
+  // The theme is already applied by the inline bootstrap in _includes/head.html
+  // (before first paint, to avoid a flash). This only handles the toggle and
+  // persists the choice.
+  //
+  // Light is the default on purpose: no prefers-color-scheme fallback, so a
+  // visitor keeps the white site unless they explicitly ask for dark.
+  ======================= */
+
+  var $themeToggle = $('#js-theme-toggle');
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    $themeToggle.attr('aria-pressed', theme === 'dark' ? 'true' : 'false');
+  }
+
+  // Sync the button state with whatever the bootstrap script decided.
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+
+  $themeToggle.on('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch (e) { /* storage unavailable: the choice just will not persist */ }
+  });
+
+  /* =======================
   // Simple Search Settings
   ======================= */
 

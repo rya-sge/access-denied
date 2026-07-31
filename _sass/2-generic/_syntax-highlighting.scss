@@ -3,10 +3,11 @@
 */
 
 .highlight {
-  background: #f7f7f7;
+  background: var(--code-bg);
+  color: var(--code-text);
 
   .highlighter-rouge & {
-    background: #eef;
+    background: var(--code-alt-bg);
   }
 
   .c     { color: #998; font-style: italic } // Comment
@@ -68,4 +69,46 @@
   .vg    { color: #008080 } // Name.Variable.Global
   .vi    { color: #008080 } // Name.Variable.Instance
   .il    { color: #099 } // Literal.Number.Integer.Long
+}
+
+
+/*
+  Dark theme token colours.
+
+  The palette above is a light (GitHub-ish) theme: strings #d14, numbers #099,
+  keywords #458 and so on are all dark hues chosen for a near-white background,
+  and become unreadable on a dark one. These overrides remap the token groups to
+  a high-contrast dark palette rather than trying to tint the originals.
+  Only the classes actually emitted by Rouge are listed.
+*/
+:root[data-theme="dark"] .highlight {
+  // Comments
+  .c, .cm, .c1, .cs, .cp    { color: #8b949e; }
+  // Keywords and operators
+  .k, .kc, .kd, .kp, .kr, .kt,
+  .o, .ow                   { color: #ff7b72; }
+  // Strings
+  .s, .s1, .s2, .sb, .sc, .sd,
+  .se, .sh, .si, .sx, .sr, .ss { color: #a5d6ff; }
+  // Numbers
+  .m, .mf, .mh, .mi, .mo, .il { color: #79c0ff; }
+  // Functions and exceptions
+  .nf, .ne                  { color: #d2a8ff; }
+  // Classes and namespaces
+  .nc, .nn                  { color: #ffa657; }
+  // Names, attributes, variables, constants, builtins
+  .na, .nv, .no, .nb, .ni,
+  .vc, .vg, .vi, .bp        { color: #79c0ff; }
+  // Tags
+  .nt                       { color: #7ee787; }
+  // Generic / diff
+  .gh, .gu                  { color: #8b949e; }
+  .go, .gp                  { color: #8b949e; }
+  .gi                       { color: #aff5b4; background-color: #033a16; }
+  .gi .x                    { color: #aff5b4; background-color: #04481c; }
+  .gd                       { color: #ffdcd7; background-color: #67060c; }
+  .gd .x                    { color: #ffdcd7; background-color: #8d0a12; }
+  .gr, .gt                  { color: #ffa198; }
+  .err                      { color: #ffa198; background-color: #490202; }
+  .w                        { color: #484f58; }
 }

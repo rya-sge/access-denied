@@ -430,12 +430,55 @@ do the same for Open Sans and add `font-display: swap`.
 The ITCSS layering (`0-settings` → `6-trumps`) is clean and the BEM-ish `c-` / `o-` / `u-` naming is
 consistent. **Don't restructure this.** The problems are in delivery (§3.1), not organisation.
 
-### 4.2 No dark mode 🟡 *(3–4 h)*
+### 4.2 No dark mode ✅ *implemented — light stays the default*
 
-Zero `prefers-color-scheme` rules in `_sass/`. For a technical blog with heavy code blocks, dark mode is
-a frequently-expected feature. Since colours are already centralised in `_sass/0-settings/_colors.scss`,
-converting them to CSS custom properties and adding one `@media (prefers-color-scheme: dark)` block is
-mostly mechanical.
+For a technical blog with heavy code blocks, dark mode is a frequently-expected feature.
+
+> **✅ Implemented, with light as the default by explicit request.**
+>
+> **`prefers-color-scheme` is deliberately NOT honoured.** A visitor whose OS is in dark mode still gets
+> the white site; dark is opt-in only, via the toggle, and the choice is remembered in `localStorage`.
+> The one-line change to make the site follow the OS instead is documented at the top of
+> `_sass/0-settings/_theme.scss` — absent on purpose, not by omission.
+>
+> **How it works.** New `_sass/0-settings/_theme.scss` declares the themeable palette as CSS custom
+> properties on `:root`, with a `:root[data-theme="dark"]` override. `_colors.scss` then redirects the
+> themeable SCSS variables at those properties (`$text-color: var(--text)` and so on), so **existing
+> component rules switch theme without being rewritten**.
+>
+> **Three things that needed care:**
+>
+> 1. **`$white-color` had two jobs.** It was both a *surface* (`background-color`, 10 uses) and *text on
+>    coloured buttons* (`color`, 11 uses). Blanket-redirecting it would have turned white button text
+>    dark-grey on the blue gradient. Only the surface uses became `var(--surface)`; `$white-color` stays
+>    literal `#ffffff` for text-on-colour.
+> 2. **SCSS colour functions cannot take a `var()`.** `darken($text-color, 30%)` in `_tags.scss` would no
+>    longer compile, so it became `var(--text-strong)`. `darken($primary-color, …)` still works because
+>    the brand colour is identical in both themes and stays a literal.
+> 3. **Syntax highlighting is a light theme.** Strings `#d14`, numbers `#099`, keywords `#458` are all
+>    dark hues chosen for a near-white background and would be unreadable on dark. Added a dark token
+>    palette rather than tinting the originals. Tables also had hardcoded `#000000` borders, which would
+>    have vanished against a dark page — now `var(--table-border)`.
+>
+> **No flash of the wrong theme:** an inline script in `<head>` applies the stored choice before first
+> paint. It has to stay inline and in `<head>` — deferring it to `main.js` would show a white flash on
+> every page load for dark-mode readers.
+>
+> **Toggle placement:** a floating button rendered by `_layouts/default.html`, not the header — the header
+> carries `u-hide` on article, tag and 404 pages, so a control there would be invisible on every article.
+> Icons are inline SVG rather than evil-icons, which replaces its nodes at runtime and would leave the
+> button blank until JS loads.
+>
+> **Verified:** SCSS compiles; `node --check` passes; and every text/background pair was checked for
+> contrast — all pass **WCAG AA**, the tightest being muted text at **5.36:1** and code comments at
+> **6.15:1** (4.5 is the threshold).
+>
+> **Two honest caveats.** The toggle is inert with JavaScript disabled (the site still renders fine, in
+> light). And I could not view the result in a browser here, so the palette is verified by contrast maths
+> rather than by eye — worth a look at a code-heavy article and the category tiles before you settle on it.
+>
+> Dark-mode images get a slight `brightness(.92)`, undone on hover, so light-background mindmaps do not
+> glare. Deliberately subtle — technical diagrams should not be recoloured.
 
 ### 4.3 `normalize.scss` is 7.7 KiB of 2012 🟢 *(30 min)*
 
@@ -998,8 +1041,8 @@ patched to 3.7.1~~ (kept by request) — **remaining:** §3.4 image optimisation
 listings · §8.4 `ref` keys · §8.6 path-aware JS
 
 **Batch 5 — Polish** — mostly done
-~~§2.4 real `<img>` tags~~ · ~~§2.5 lazy loading~~ · ~~§5.3 accessibility~~ (except colour contrast) —
-**remaining:** §4.2 dark mode · §7 content hygiene · colour contrast
+~~§2.4 real `<img>` tags~~ · ~~§2.5 lazy loading~~ · ~~§5.3 accessibility~~ · ~~§4.2 dark mode~~ —
+**remaining:** §4.3 normalize trim · §7 content hygiene
 
 ---
 
@@ -1010,7 +1053,7 @@ listings · §8.4 `ref` keys · §8.6 path-aware JS
 | §1 Bugs | ✅ complete |
 | §2 SEO | ✅ complete (§2.1 needs an action in the `rya-sge.github.io` repo) |
 | §3 Performance | ✅ except §3.4 image optimisation (skipped by request) |
-| §4 CSS | ⬜ §4.2 dark mode and §4.3 normalize outstanding |
+| §4 CSS | ✅ §4.2 dark mode done (light default) — ⬜ §4.3 normalize outstanding |
 | §5 Templates & a11y | ✅ complete except colour contrast |
 | §6 Build & tooling | ✅ §6.1–§6.4 done — §6.5 analytics **declined by the author**. Two manual steps left: switch the Pages source to "GitHub Actions", and commit a `Gemfile.lock` |
 | §7 Content hygiene | ⬜ outstanding |

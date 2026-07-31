@@ -13,8 +13,8 @@
   width: 300px;
   padding: 40px 20px 20px;
   text-align: center;
-  box-shadow: 1px 1px 0 rgba(31, 35, 46, 0.15);
-  background-color: $white-color;
+  box-shadow: 1px 1px 0 var(--shadow-soft);
+  background-color: var(--surface);
 }
 
 .c-sidebar-author {

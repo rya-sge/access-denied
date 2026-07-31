@@ -8,7 +8,7 @@
   width: calc(100% - 40px);
   min-height: 100vh;
   padding: 0 20px;
-  background-color: $white-color;
+  background-color: var(--surface);
   z-index: 1;
 }
 

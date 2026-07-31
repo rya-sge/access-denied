@@ -1,0 +1,165 @@
+/* ===============
+	THEME (light / dark)
+=============== */
+
+/*
+  Runtime theming via CSS custom properties.
+
+  SCSS variables are resolved at build time, so they cannot switch theme in the
+  browser. Anything that must change between light and dark is therefore declared
+  here as a custom property, and _colors.scss redirects the corresponding SCSS
+  variable at it — which means existing component rules pick up the theme without
+  being rewritten.
+
+  LIGHT IS THE DEFAULT, deliberately: `prefers-color-scheme` is NOT honoured
+  automatically. A visitor whose OS is in dark mode still gets the light site,
+  and only sees dark if they press the toggle (the floating button defined below,
+  rendered by _layouts/default.html). The choice is stored in localStorage under
+  "theme" and re-applied by the inline script in _includes/head.html before first
+  paint, so a returning reader never gets a flash of the wrong theme.
+
+  To make the site follow the OS instead, add:
+      @media (prefers-color-scheme: dark) { :root:not([data-theme]) { ...dark... } }
+  That is intentionally absent.
+*/
+
+:root {
+  color-scheme: light;
+
+  --bg: #fbfbfb;
+  --alt-bg: #fafafa;
+  --surface: #ffffff;
+
+  --text: #404040;
+  --text-strong: #1a1a1a;
+  --text-muted: #a0a0a0;
+  --text-dim: #757575;
+  --heading: #404040;
+  --title: #263959;
+
+  --border: #f0f0f0;
+  --border-strong: #dce4ea;
+  --divider: #edeeee;
+  --line: #dddddd;
+  --line-soft: #cccccc;
+
+  --shadow-soft: rgba(31, 35, 46, .15);
+  --shadow-strong: rgba(10, 16, 34, .2);
+
+  --code-bg: #f7f7f7;
+  --code-alt-bg: #eeeeff;
+  --code-text: inherit;
+
+  /* Tables use a hard black rule in light mode; that would vanish on dark. */
+  --table-border: #000000;
+}
+
+:root[data-theme="dark"] {
+  /* Tells the browser to render form controls and scrollbars dark too. */
+  color-scheme: dark;
+
+  --bg: #14161a;
+  --alt-bg: #1a1d23;
+  --surface: #1c1f26;
+
+  --text: #c9d1d9;
+  --text-strong: #f0f6fc;
+  --text-muted: #8b949e;
+  --text-dim: #9aa4af;
+  --heading: #e6edf3;
+  --title: #79c0ff;
+
+  --border: #2a2f37;
+  --border-strong: #30363d;
+  --divider: #262b33;
+  --line: #30363d;
+  --line-soft: #444c56;
+
+  --shadow-soft: rgba(0, 0, 0, .45);
+  --shadow-strong: rgba(0, 0, 0, .6);
+
+  --code-bg: #0d1117;
+  --code-alt-bg: #161b22;
+  --code-text: #c9d1d9;
+
+  --table-border: #495057;
+}
+
+/* ---------------------------------------------------------------------------
+   Theme toggle button.
+
+   Lives in _layouts/default.html rather than the header, because the header is
+   given `u-hide` on article, tag and 404 pages — a control placed there would be
+   invisible on every article. Fixed bottom-left so it is reachable everywhere.
+
+   The two icons are inline SVG, not evil-icons: evil-icons replaces its nodes at
+   runtime, so an icon-font approach would leave the button blank until JS runs.
+--------------------------------------------------------------------------- */
+.c-theme-toggle {
+  position: fixed;
+  left: 15px;
+  bottom: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background-color: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  opacity: .65;
+  transition: opacity .2s ease, color .2s ease, background-color .2s ease;
+
+  &:hover {
+    opacity: 1;
+    color: var(--text-strong);
+  }
+
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid $secondary-color;
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: currentColor;
+  }
+
+  /* Show the icon for the theme you would switch TO. */
+  .c-theme-toggle__moon { display: block; }
+  .c-theme-toggle__sun  { display: none; }
+}
+
+:root[data-theme="dark"] .c-theme-toggle {
+  .c-theme-toggle__moon { display: none; }
+  .c-theme-toggle__sun  { display: block; }
+}
+
+@media only screen and (max-width: 480px) {
+  .c-theme-toggle {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/*
+  Diagrams and screenshots are mostly light-background PNGs (the mindmaps in
+  particular). Left at full brightness they glare against a dark page, so they are
+  dimmed very slightly and restored on hover. Deliberately subtle: the point is to
+  take the edge off, not to alter the content of a technical diagram.
+*/
+:root[data-theme="dark"] .c-wrap-content img {
+  filter: brightness(.92);
+  transition: filter .2s ease;
+
+  &:hover {
+    filter: none;
+  }
+}
