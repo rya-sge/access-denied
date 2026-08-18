@@ -1,0 +1,48 @@
+@startuml
+title Zama Protocol — the six key artifacts and where each one lives
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #F3EEFB
+skinparam componentBorderColor #7A5BB5
+skinparam packageBackgroundColor #FCFAFE
+skinparam packageBorderColor #7A5BB5
+skinparam ArrowColor #7A5BB5
+skinparam noteBackgroundColor #F9F6FD
+skinparam noteBorderColor #7A5BB5
+
+package "Generated once per key id by the KMS" as GEN {
+  component "TFHE public key\nencrypts every input,\nfor every user and contract" as PK
+  component "Evaluation key\nbootstrapping and\nkey-switching material" as EK
+  component "Secret key shares\nthreshold-split, never\nreassembled anywhere" as SK #FDEEEE
+  component "ZKPoK CRS\none per bit capacity" as CRS
+}
+
+package "Client, per account" as CLI {
+  component "secp256k1 account key\nsigns transactions and the\ndecryption authorisation" as ACC
+  component "ML-KEM-512 keypair\nseals one decryption\nresult in transit" as MLKEM
+}
+
+package "On-chain" as CHAIN {
+  component "ACL\nwhich address may read\nwhich handle" as ACL
+  component "KMSVerifier\nauthorised signer set\nand threshold" as VER
+}
+
+PK --> CLI : downloaded and cached
+CRS --> CLI : downloaded and cached
+EK --> [Coprocessors] : compute on ciphertexts
+SK --> [KMS nodes] : one share each
+ACC --> ACL : identity the ACL grants to
+MLKEM --> [KMS nodes] : public half travels\nwith the request
+[KMS nodes] --> VER : signer set published on-chain
+
+note right of SK
+  This is the only key that can turn a
+  ciphertext into a plaintext, and no
+  single party ever holds it.
+end note
+
+note right of MLKEM
+  Not the key protecting the balance.
+  It protects the answer on the way back.
+end note
+@enduml

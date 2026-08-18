@@ -1,0 +1,64 @@
+@startuml
+title Per-user key derivation — Zcash Orchard and Aztec
+skinparam shadowing false
+skinparam rectangleBackgroundColor #F3EEFB
+skinparam rectangleBorderColor #7A5BB5
+skinparam packageBackgroundColor #FCFAFE
+skinparam packageBorderColor #7A5BB5
+skinparam ArrowColor #7A5BB5
+skinparam noteBackgroundColor #F9F6FD
+skinparam noteBorderColor #7A5BB5
+
+package "Zcash Orchard" {
+  rectangle "sk\nspending key" as SK
+  rectangle "ask\nspend authorising key" as ASK
+  rectangle "ak\nspend validating key" as AK
+  rectangle "nk\nnullifier deriving key" as NK
+  rectangle "rivk\ncommitment randomness" as RIVK
+  rectangle "fvk = (ak, nk, rivk)\nfull viewing key" as FVK
+  rectangle "ivk + dk\ndetect and decrypt\nincoming notes" as IVK
+  rectangle "ovk\nrecover notes\nyou sent" as OVK
+  rectangle "addr_d\ndiversified addresses" as ADDR
+
+  SK --> ASK
+  SK --> NK
+  SK --> RIVK
+  ASK --> AK
+  AK --> FVK
+  NK --> FVK
+  RIVK --> FVK
+  FVK --> IVK
+  FVK --> OVK
+  IVK --> ADDR
+}
+
+package "Aztec" {
+  rectangle "PXE keystore\n(per account)" as PXE
+  rectangle "nhk_m / Npk_m\nnullifier hiding key" as NHK
+  rectangle "ivsk_m / Ivpk_m\nincoming viewing key" as IVSK
+  rectangle "ovsk_m, tsk_m\ndeclared in the address,\nnot yet used" as UNUSED
+  rectangle "nhk_app = H(nhk_m, contract)\nsiloed per application" as APP
+  rectangle "Signing key\nchosen by the\naccount contract" as SIGN
+  rectangle "address = f(H(Npk_m, Ivpk_m,\nOvpk_m, Tpk_m), partial_address)" as ADDR2
+
+  PXE --> NHK
+  PXE --> IVSK
+  PXE --> UNUSED
+  NHK --> APP
+  NHK --> ADDR2
+  IVSK --> ADDR2
+  UNUSED --> ADDR2
+  SIGN --> ADDR2 : via the account contract
+}
+
+note bottom of ADDR
+  Sharing fvk or ivk discloses history
+  without granting the ability to spend.
+end note
+
+note bottom of ADDR2
+  Protocol keys are committed to inside the
+  address, so they cannot be rotated;
+  the signing key can.
+end note
+@enduml

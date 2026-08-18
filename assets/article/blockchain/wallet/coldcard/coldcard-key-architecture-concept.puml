@@ -1,0 +1,62 @@
+@startuml
+title COLDCARD Mk4/Mk5/Q - where each part of the seed key lives
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FAFCFF
+  BorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #4A78B5
+
+package "Main MCU (STM32L4S5VI)" {
+  component "Bootloader\n(firewall + PCROP)" as BL
+  component "MicroPython\napplication" as MPY
+  component "rom_secrets\npairing secrets\nmcu_hmac_key\nhash_cache_secret" as ROM
+  component "MCU_KEYS\n256 write-once slots\n(replaceable key)" as MK
+}
+
+package "SE1 - Microchip ATECC608" {
+  component "slot 9\nAES-encrypted seed\n(72 bytes)" as SEED
+  component "slot 2\npin_stretch key" as STRETCH
+  component "attempt counter\nmax 13 failures" as CNT
+  component "slot 14\nworld checksum\n-> green LED" as FWSLOT
+}
+
+package "SE2 - Maxim DS28C36B" {
+  component "pages 0-12\ntrick PIN slots\n+ duress seeds" as TRICK
+  component "page 14\nSE2 easy key" as EASY
+  component "page 15\nSE2 hard key\n(ECC unlocked)" as HARD
+}
+
+BL --> ROM : reads pairing secrets
+BL --> MK : picks / clears
+MPY -[#B54A4A]-> BL : callgate only\n(range-checked)
+BL --> STRETCH : HMAC rounds\n(pairing secret auth)
+BL --> CNT : increments on failure
+BL --> TRICK : tests every PIN\nagainst all 14 slots
+BL --> SEED : reads after PIN
+BL --> EASY
+BL --> HARD
+BL --> FWSLOT : writes checksum
+
+note bottom of HARD
+  seed key =
+  HMAC-SHA256(mcu_hmac_key,
+    SE2 easy || SE2 hard || replaceable MCU key)
+  then AES-256-CTR over the SE1 secret
+end note
+
+note right of MK
+  Fast Wipe clears the current
+  replaceable key: the seed becomes
+  undecryptable, with no bus traffic
+end note
+@enduml

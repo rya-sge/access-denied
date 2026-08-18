@@ -1,0 +1,64 @@
+@startuml
+title ngu.random.bytes() - intended pipeline vs. what was linked
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FCFAFF
+  BorderColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam ArrowColor #7A5BB5
+
+package "Intended" {
+  component "seed.py\ngenerate_seed()" as S1
+  component "ngu.random.bytes(32)" as N1
+  component "CHIP_TRNG_32()\n-> rng_get()" as C1
+  component "STM32 RNG peripheral\n(true hardware entropy)" as H1
+  component "my_yasmarang()\nsoftware PRNG" as Y1
+  component "XOR -> 256 bits" as X1
+}
+
+package "As built (before v5.6.0)" {
+  component "seed.py\ngenerate_seed()" as S2
+  component "ngu.random.bytes(32)" as N2
+  component "CHIP_TRNG_32()\n-> rng_get()" as C2
+  component "micropython yasmarang\nseeded: device UID ^ SysTick,\nRTC time, RTC subsecond" as H2
+  component "libngu yasmarang\npad reseeded with 32 bits\nfrom SE1+SE2" as Y2
+  component "XOR -> 256 bits\nof PRNG output" as X2
+}
+
+S1 --> N1
+N1 --> C1
+C1 --> H1
+N1 --> Y1
+H1 --> X1
+Y1 --> X1
+
+S2 --> N2
+N2 --> C2
+C2 --> H2
+N2 --> Y2
+H2 --> X2
+Y2 --> X2
+
+note bottom of X2
+  neither input is unpredictable:
+  entropy collapses to the two seeds,
+  ~32 bits from the secure elements
+  plus the boot-time clock state
+end note
+
+note right of H2
+  the board's own rng.c did not export
+  rng_get(), so the linker took the
+  definition from micropython's
+  ports/stm32/rng.c
+end note
+@enduml

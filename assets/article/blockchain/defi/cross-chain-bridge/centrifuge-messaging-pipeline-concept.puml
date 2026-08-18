@@ -1,0 +1,54 @@
+@startuml
+title Centrifuge messaging pipeline, one direction
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+}
+skinparam ArrowColor #B54A4A
+
+package "Source chain" {
+  component "Hub / Spoke\nprotocol contract" as Src
+  component "MessageDispatcher\nserialize" as Disp
+  component "Gateway\nbatch, price, pay" as GwOut
+  component "GasService\ngas limits" as Gas
+  component "SubsidyManager\nRefundEscrow" as Sub
+  component "MultiAdapter\nfan out to N" as MaOut
+  component "Adapter A\nAxelar" as A1
+  component "Adapter B\nWormhole" as A2
+  component "Adapter C\nLayerZero" as A3
+}
+
+package "Destination chain" {
+  component "Adapter A'" as B1
+  component "Adapter B'" as B2
+  component "Adapter C'" as B3
+  component "MultiAdapter\ncount votes" as MaIn
+  component "Gateway\nsplit, gas check,\nsafe call" as GwIn
+  component "MessageProcessor\ndeserialize, authorize" as Proc
+  component "Hub / Spoke\nhandler" as Dst
+}
+
+Src --> Disp
+Disp --> GwOut
+GwOut --> Gas : estimate
+GwOut --> Sub : pull subsidy
+GwOut --> MaOut
+MaOut --> A1
+MaOut --> A2
+MaOut --> A3
+A1 ..> B1
+A2 ..> B2
+A3 ..> B3
+B1 --> MaIn
+B2 --> MaIn
+B3 --> MaIn
+MaIn --> GwIn : threshold reached
+GwIn --> Proc
+Proc --> Dst
+@enduml

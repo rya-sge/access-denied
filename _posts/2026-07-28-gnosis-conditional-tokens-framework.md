@@ -72,7 +72,7 @@ The oracle submits a vector of numerators $(n_0, \dots, n_{k-1})$ over the $k$ s
 
 $$
 \begin{aligned}
-d = \sum_{j=0}^{k-1} n_j, \qquad d > 0
+d = \sum_{j=0}^{k-1} n_j, \qquad d \gt 0
 \end{aligned}
 $$
 

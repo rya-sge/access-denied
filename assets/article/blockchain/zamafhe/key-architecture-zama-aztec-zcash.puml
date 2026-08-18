@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Keys in\nconfidential\nledgers
+** Zama Protocol
+*** Network FHE public key\none per key id, global
+*** Evaluation key\ncoprocessors compute
+*** Secret key shares\nKMS threshold, never assembled
+*** ZKPoK CRS\nper bit capacity
+*** ML-KEM-512 keypair\nper read, transport only
+*** secp256k1 account key\nauthorise, never decrypt
+** Zcash Orchard
+*** sk spending key
+*** ask then ak\nspend authorisation
+*** nk\nnullifier deriving
+*** fvk = ak, nk, rivk
+*** ivk + dk\ndetect and decrypt incoming
+*** ovk\nrecover own outgoing notes
+** Aztec
+*** nhk_m\nnullifier hiding, app-siloed
+*** ivsk_m\nincoming viewing
+*** ovsk_m, tsk_m\ndeclared, not yet used
+*** Signing key\naccount contract defines it
+*** Keys held by the PXE\nlocal execution and proving
+** What differs
+*** Global key vs per-user key
+*** Committee read vs local read
+*** ACL grant vs viewing key
+*** Permanent vs voluntary disclosure
+*** Lattice vs elliptic-curve\nconfidentiality
+** Blast radius
+*** Threshold breach\nglobal and retroactive
+*** User key loss\none account
+*** App-siloing\nbounds a leak
+*** Integrity failures\nproof soundness vs FHE semantics
+@endmindmap

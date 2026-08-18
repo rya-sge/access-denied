@@ -1,0 +1,53 @@
+@startuml
+title Establishing the protections - factory to field
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #F7FCFA
+  DiamondBorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+
+start
+partition "Every boot" {
+  :startup.S calls firewall_setup()\nbefore entering protected code;
+  if (firewall already enabled?) then (yes)
+    :leave it alone - it cannot be changed\nafter a power-on reset anyway;
+  else (no)
+    if (bag number still blank?) then (yes)
+      :virgin unit: run without the firewall\nso the factory can debug;<<#FFF9E8>>
+    else (no)
+      :configure code segment (bootloader)\nand non-volatile data segment (secrets);
+      :HAL_FIREWALL_EnableFirewall();
+    endif
+  endif
+  :RELEASE builds also check:\nbag set but RDP != 2 -> re-lock;
+}
+
+partition "Factory, once" {
+  :self-test passes;
+  :operator scans the bag barcode;
+  :callgate 19/1 stores the bag number;
+  :callgate 19/102 -> flash_lockdown_hard(RDP level 2);
+  note right
+    WRP1AR write-protects the first
+    14 flash pages; OPTR takes the
+    RDP level. Level 2 is one-way:
+    no JTAG, no built-in DFU, ever
+  end note
+  :set the genuine light, seal the bag;
+}
+
+partition "In the field" {
+  :bootloader verifies firmware signature;
+  :world checksum proved against SE1;
+  if (double-bit ECC error in flash?) then (yes)
+    :NMI, processor stops;<<#FDEEEE>>
+    stop
+  else (no)
+  endif
+  :hand control to MicroPython\n(callgate is the only way back);
+}
+stop
+@enduml

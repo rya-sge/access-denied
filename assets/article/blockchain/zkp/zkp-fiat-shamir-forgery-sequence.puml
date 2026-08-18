@@ -1,0 +1,49 @@
+@startuml
+title Fiat-Shamir binding failure: forging a proof for a false statement
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+  ArrowColor #4A2020
+}
+skinparam note {
+  BackgroundColor #FFF8F8
+  BorderColor #B54A4A
+}
+
+participant "Malicious prover" as P
+participant "Transcript\n(hash function)" as T
+participant "Verifier" as V
+
+group Correct construction
+  P -> T : append A
+  P -> T : append B
+  P -> T : append C
+  T -> P : c = H(A, B, C, statement)
+  note over P
+    c depends on B, so B is fixed
+    before c is known: the prover
+    cannot solve backwards
+  end note
+  P -> V : proof (A, B, C, responses)
+  V -> V : recompute c, check equations
+end
+
+group Binding failure (Frozen Heart)
+  P -> T : append A
+  P -> T : append C
+  note over T #FDEEEE
+    B is never appended
+  end note
+  T -> P : c = H(A, C, statement)
+  P -> P : choose B such that the\nverification equation holds\nfor a false statement
+  P -> V : proof (A, B, C, responses)
+  V -> V : recompute c = H(A, C, statement)
+  V -> V : equations hold, proof accepted
+  note over V #FDEEEE
+    Accepted proof of a claim
+    with no valid witness
+  end note
+end
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+title Reading your own balance — committee round trip versus local trial decryption
+skinparam shadowing false
+skinparam ArrowColor #7A5BB5
+skinparam ParticipantBackgroundColor #F3EEFB
+skinparam ParticipantBorderColor #7A5BB5
+skinparam ActorBackgroundColor #F3EEFB
+skinparam ActorBorderColor #7A5BB5
+skinparam LifelineBorderColor #7A5BB5
+skinparam noteBackgroundColor #F9F6FD
+skinparam noteBorderColor #7A5BB5
+
+actor Alice
+participant "Client" as C
+participant "Chain" as CH
+participant "Relayer" as R
+participant "KMS committee" as K
+
+group Zama Protocol
+  Alice -> C : show my balance
+  C -> CH : confidentialBalanceOf(alice)
+  CH -> C : bytes32 handle
+  C -> C : generate ML-KEM-512 keypair
+  Alice -> C : sign EIP-712 authorisation\n(secp256k1)
+  C -> CH : ACL.persistAllowed(handle, alice)?
+  C -> R : authorised request
+  R -> K : forward
+  K -> K : threshold decryption\n(no node holds the full key)
+  K -> R : result sealed under\nthe ML-KEM public key
+  R -> C : responses + signatures
+  C -> CH : read KMS signer set and threshold
+  C -> C : verify signatures, then open locally
+  C -> Alice : 1000
+  note over C, K #F9F6FD
+    The plaintext exists only after a live
+    interaction with the committee.
+    Offline, the client can obtain nothing.
+  end note
+end
+
+group Zcash and Aztec
+  Alice -> C : show my balance
+  C -> CH : fetch blocks or note stream
+  C -> C : trial-decrypt each output with ivk
+  C -> C : sum the notes not yet nullified
+  C -> Alice : 1000
+  note over C, CH #F9F6FD
+    No third party is contacted and no
+    permission is requested. The cost moves
+    to scanning every candidate output.
+  end note
+end
+@enduml

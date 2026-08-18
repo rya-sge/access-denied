@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Centrifuge V3\nVaults
+** Standards
+*** ERC-4626 base interface
+*** ERC-7540 async requests
+*** ERC-7575 multi-asset shares
+*** ERC-7887 cancellation
+*** ERC-7741 signed operator
+** Vault types
+*** AsyncVault\nasync deposit + redeem
+*** SyncDepositVault\nsync deposit, async redeem
+** Managers
+*** AsyncRequestManager\nspoke state machine
+*** SyncManager\nERC-4626 issuance
+*** BatchRequestManager\nhub epochs
+left side
+** Deposit lifecycle
+*** 1. requestDeposit\nescrow + reserve
+*** 2. approveDeposits\n+ issueShares
+*** 3. notifyDeposit\nsets maxMint
+*** 4. deposit / mint\nclaim shares
+** Custody
+*** PoolEscrow per pool
+*** total vs reserved
+*** WithdrawMode\nTransferOnly / Escrow / Full
+** Pricing
+*** D18 fixed point
+*** pool-per-asset\npool-per-share
+*** ceil pending, floor payout
+** Restrictions
+*** ShareToken transfer hook
+*** ESCROW_HOOK_ID sentinel
+*** maxDeposit returns 0
+@endmindmap

@@ -1,0 +1,49 @@
+@startuml
+title make repro - from a git tag to a byte-for-byte comparison
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FAFCFF
+  DiamondBorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+start
+:checkout the release tag;
+if (submodules at pinned revisions?) then (no)
+  :submods-match fails, stop;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+if (working tree clean?) then (no)
+  :code-committed fails, stop;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+:docker build from dockerfile.build\n(Alpine 3.16.0, pinned arm-none-eabi toolchain);
+:container clones /work/src/.git\ninto a tmpfs checkout;
+:git submodule update --init;
+
+if (published DFU already in ../releases?) then (yes)
+  :use the local copy;
+else (no)
+  :read the filename from signatures.txt;
+  :wget it from coldcard.com/downloads;
+endif
+
+:derive SOURCE_DATE_EPOCH\nfrom the release filename timestamp;
+:make setup, make all\n(file_time.c regenerated only if the version differs);
+:signit sign -> firmware-signed.bin\n(key 1 absent in the container, so key 0 is used);
+
+:signit split published.dfu\n-> check-fw.bin + check-bootrom.bin;
+:signit check on both binaries\n(header fields + ECDSA verdict);
+:hexdump both, replace the 64 signature\nbytes with a fixed marker;
+if (diff empty?) then (yes)
+  :bit-for-bit identical copy;<<#EAF6F0>>
+else (no)
+  :non-reproducible: investigate\ntimestamps, paths, toolchain;<<#FDEEEE>>
+endif
+stop
+@enduml

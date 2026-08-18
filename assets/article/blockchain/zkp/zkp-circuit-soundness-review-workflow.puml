@@ -1,0 +1,62 @@
+@startuml
+title Reviewing a circuit for the "assigned but not constrained" family
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFF8F8
+  DiamondBorderColor #B54A4A
+  ArrowColor #4A2020
+}
+
+start
+:enumerate every signal or witness
+variable produced by the circuit;
+:for each one, locate the constraint
+that pins it to its intended value;
+
+if (a constraint exists?) then (no)
+  :report an under-constrained witness;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+if (bit length of the input constrained?) then (no)
+  :report a mismatching bit length;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+if (output of a sub-circuit checked?) then (no)
+  :report a nondeterministic circuit
+  (missing output check);<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+if (value can wrap past the scalar field order?) then (yes)
+  :report an arithmetic over/underflow;<<#FDEEEE>>
+  stop
+else (no)
+endif
+
+if (declared public input survives compilation?) then (no)
+  :report an unused public input
+  removed by the optimiser;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+:compare the constraint count against
+the count derived from the R1CS or
+PLONKish specification;<<#EAF6F0>>
+
+if (counts match?) then (no)
+  :investigate the difference;<<#FDEEEE>>
+  stop
+else (yes)
+  :inject a deliberate fault and confirm
+  the verifier rejects the proof;<<#EAF6F0>>
+  stop
+endif
+@enduml

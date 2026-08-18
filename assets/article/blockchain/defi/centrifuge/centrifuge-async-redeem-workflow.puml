@@ -1,0 +1,44 @@
+@startuml
+title Asynchronous redemption lifecycle (ERC-7540)
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+}
+
+actor Investor
+participant "AsyncVault" as V
+participant "AsyncRequestManager" as ARM
+participant "PoolEscrow" as E
+participant "BalanceSheet" as BS
+participant "BatchRequestManager\n(hub)" as BRM
+
+== Phase 1 - request ==
+Investor -> V : requestRedeem(shares, controller, owner)
+V -> ARM : requestRedeem(...)
+ARM -> ARM : pendingRedeemRequest += shares
+ARM -> BRM : RedeemRequest message
+ARM -> BS : transferSharesFrom(owner, escrow)
+BS -> E : shares held, reserved(REASON_REDEEM)
+
+== Phase 2 - process (pool manager, hub) ==
+BRM -> BRM : approveRedeems(epoch, shares, pricePoolPerAsset)
+BRM -> BRM : revokeShares(epoch, pricePoolPerShare)
+BRM -> ARM : RevokedShares callback
+ARM -> BS : reserve(assets) + unreserve(shares)
+ARM -> BS : noteWithdraw(assets) then revoke(shares)
+BS -> E : shares burned, assets earmarked
+BRM -> BRM : notifyRedeem(investor, maxClaims)
+BRM -> ARM : FulfilledRedeemRequest callback
+ARM -> ARM : maxWithdraw += assets, redeemPrice updated
+
+== Phase 3 - claim ==
+Investor -> V : withdraw(assets, receiver, controller)
+V -> ARM : withdraw(...)
+ARM -> BS : unreserve(assets) + withdraw(EscrowAndTransfer)
+BS -> E : assets transferred to receiver
+@enduml

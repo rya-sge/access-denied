@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* STM32 memory\nprotection
+** RDP levels
+*** L0 open, debug on
+*** L1 debug blocks\nflash access
+*** L2 permanent,\nno JTAG, no DFU
+*** set at bagging time
+** Write protection
+*** WRP1AR covers\n14 pages
+*** bootloader cannot\nbe erased
+*** survives DFU
+** The firewall
+*** code segment\n+ non-volatile data
+*** violation resets\nthe chip
+*** single call gate
+*** prearm discipline
+** PCROP
+*** exec-only
+*** D-bus blocked even\nfrom inside
+*** documented but\nnot used here
+** OTP area
+*** 128 write-once\n64-bit slots
+*** version high-water
+*** downgrade block
+** Flash ECC
+*** 8 bits per 64
+*** corrects 1, detects 2
+*** NMI on 2-bit error
+*** UV-C attack becomes\na brick
+** Residual
+*** glitching still\npossible
+*** rng_delay jitter
+*** factory mode is\nthe weak window
+@endmindmap

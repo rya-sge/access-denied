@@ -1,0 +1,58 @@
+@startuml
+title Choosing a duress response - what the threat model implies
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFF8F8
+  DiamondBorderColor #B54A4A
+}
+skinparam ArrowColor #B54A4A
+
+start
+:attacker compels you to unlock the device;
+
+if (are wires attached to the board?) then (yes)
+  :assume bus traffic is observed;
+  note right
+    a successful duress login looks
+    different on the bus even though
+    the payload is encrypted
+  end note
+  :prefer a brick or wipe PIN\nover a decoy;<<#FFF1F1>>
+  stop
+else (no)
+endif
+
+if (does the attacker know your XPUB / balance?) then (yes)
+  :a decoy wallet with a small balance\nwill not be believed;
+  if (willing to lose the device?) then (yes)
+    :brick PIN;<<#FFF1F1>>
+    stop
+  else (no)
+    :delta mode - real wallet,\ninvalid signatures;<<#FFF1F1>>
+    stop
+  endif
+else (no)
+endif
+
+if (do you need to appear cooperative?) then (yes)
+  :duress wallet, pre-funded,\nderived via BIP-85;<<#EAF6F0>>
+  stop
+else (no)
+endif
+
+if (can you avoid touching the device at all?) then (yes)
+  :passive trigger: MicroSD 2FA\nwith no enrolled card inserted;<<#EAF6F0>>
+  note right
+    the seed wipes after the correct
+    PIN, with no action from you and
+    nothing shown on screen
+  end note
+  stop
+else (no)
+endif
+
+:wipe PIN, restore later from backup;<<#EAF6F0>>
+stop
+@enduml

@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* RNG entropy\nincident
+** The symptom
+*** seeds ~72 bits\n(Mk4/Mk5/Q)
+*** seeds ~40 bits\n(Mk3 >= 4.0.1)
+*** target 128 bits
+*** regenerate advised
+** The mechanism
+*** MICROPY_HW_ENABLE_RNG = 0
+*** upstream rng.c compiles\nsoftware PRNG
+*** board rng.c lacked\nrng_get()
+*** linker resolved to\nyasmarang
+** The call chain
+*** seed.py generate_seed
+*** ngu.random.bytes
+*** CHIP_TRNG_32 = rng_get
+*** XOR with second\nPRNG
+** Why XOR did not save it
+*** both halves\ndeterministic
+*** libngu pad reseeded\nwith 32 bits
+*** SE entropy truncated\nto 4 bytes
+*** sha256d adds\nno entropy
+** The fix
+*** empty upstream rng.o
+*** board exports rng_get
+*** nm assertion in\nthe build
+*** build fails on\nregression
+** Lessons
+*** check symbols,\nnot files
+*** whitening hides\nfailure
+*** cite the entropy\nbudget
+*** startup self-test\nis not enough
+@endmindmap

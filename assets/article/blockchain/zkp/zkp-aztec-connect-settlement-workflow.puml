@@ -1,0 +1,53 @@
+@startuml
+title Aztec Connect June 2026: settlement loop bound not covered by the proof
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFF8F8
+  DiamondBorderColor #B54A4A
+  ArrowColor #4A2020
+}
+skinparam note {
+  BackgroundColor #FFF8F8
+  BorderColor #B54A4A
+}
+
+start
+:attacker builds a rollup block
+with 32 transaction slots;<<#EAF6F0>>
+:slot 1 = noop, slots 2 to 32 =
+fabricated deposit rows;
+:set numRealTxs = 1 in the calldata;
+note right
+  numRealTxs is read from calldata
+  and is not a public input
+  constrained by the circuit
+end note
+
+fork
+  :circuit hashes all 32 slots
+  with the SHA-256 precompile;<<#EAF6F0>>
+  :zk proof is valid for the
+  full 32-slot block;<<#EAF6F0>>
+fork again
+  :RollupProcessorV3.processRollup()
+  iterates i in [0, numRealTxs);
+  :loop stops after slot 1;
+  :deposit rows in slots 2 to 32
+  are never settled on L1;
+end fork
+
+:proof verifies, block is accepted;
+:L2 balances credited for deposits
+that L1 never processed;
+
+if (attacker withdraws?) then (yes)
+  :submit an honest withdrawal proof
+  against the unbacked L2 balance;
+  :bridge pays out real L1 assets;
+  stop
+else (no)
+  stop
+endif
+@enduml

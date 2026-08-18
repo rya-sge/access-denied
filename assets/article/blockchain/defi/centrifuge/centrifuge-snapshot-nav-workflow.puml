@@ -1,0 +1,38 @@
+@startuml
+title From a spoke balance change to a new share price
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+}
+
+participant "BalanceSheet\n(spoke)" as BS
+participant "HubHandler" as HH
+participant "Hub" as HUB
+participant "Accounting" as AC
+participant "Holdings" as HO
+participant "NAVManager" as NAV
+participant "SimplePriceManager" as SPM
+
+BS -> BS : deposits and withdrawals\naccumulate in queuedAssets
+BS -> BS : issuances and revocations\naccumulate in queuedShares
+BS -> HH : submitQueuedAssets\nnetAmount, isIncrease,\nisSnapshot, nonce
+HH -> HO : increase or decrease\nreturns value in pool units
+HH -> HUB : updateAccountingAmount
+HUB -> AC : unlock, debit, credit, lock
+HH -> HO : setSnapshot(chain, isSnapshot, nonce)
+HO -> HO : require stored nonce == nonce
+alt isSnapshot is false
+  HO -> HO : assets and shares not aligned,\nno hook call
+else isSnapshot is true
+  HO -> NAV : onSync(pool, shareClass, chain)
+  NAV -> AC : read equity, gain, loss, liability
+  NAV -> SPM : onUpdate(netAssetValue)
+  SPM -> SPM : adjust issuance for\ntransferredIn and transferredOut
+  SPM -> HUB : updateSharePrice(NAV / issuance)
+end
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+title Groth16 verification key: honest ceremony vs. shipped defaults
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+  FontColor #4A2020
+}
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFF8F8
+  BorderColor #B54A4A
+}
+
+package "Honest setup" as OK {
+  component "MPC ceremony\n(snarkjs zkey contribute)" as A1
+  component "gamma, delta drawn\nas random scalars" as A2
+  component "Toxic waste destroyed\nby every contributor" as A3
+  component "Verification key\ngamma*G2, delta*G2 unknown DLOG" as A4
+  A1 -down-> A2
+  A2 -down-> A3
+  A3 -down-> A4
+}
+
+package "Veil Cash / FoomCash" as KO {
+  component "Ceremony never run" as B1 #FDEEEE
+  component "gamma = delta = G2 generator\n(placeholder value 1)" as B2 #FDEEEE
+  component "No toxic waste to destroy:\nthe trapdoor is public" as B3 #FDEEEE
+  component "Verification key\nwith known DLOG" as B4 #FDEEEE
+  B1 -down-> B2
+  B2 -down-> B3
+  B3 -down-> B4
+}
+
+note bottom of A4
+  Pairing check binds the proof
+  to a witness the prover must know
+end note
+
+note bottom of B4
+  Pairing check degenerates:
+  any fabricated proof is accepted
+end note
+@enduml

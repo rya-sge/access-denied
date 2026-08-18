@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* COLDCARD\nfirmware
+** Code base
+*** C bootloader\n(fixed at factory)
+*** MicroPython app\n(shared/, 93 modules)
+*** Desktop simulator
+*** Reproducible build\n(make repro)
+** Three secret holders
+*** Main MCU\nSTM32L4S5VI
+**** pairing secrets
+**** mcu_hmac_key
+**** 256 replaceable keys
+*** SE1 ATECC608
+**** encrypted seed
+**** attempt counter (13)
+**** PIN stretching
+**** genuine LED
+*** SE2 DS28C36B
+**** trick PIN slots
+**** duress seeds
+**** half of AES key
+** PIN path
+*** double SHA256\n+ pairing secret
+*** 8 HMAC rounds\ninside SE1
+*** trick PINs checked\nfirst, constant traffic
+*** anti-phishing\ntwo BIP-39 words
+** Duress features
+*** wipe seed
+*** brick device
+*** duress wallet\n(BIP-85)
+*** delta mode
+*** login countdown
+** Code authenticity
+*** secp256k1 header\nsignature
+*** six trusted pubkeys\n(key 0 public)
+*** world checksum\nin SE1
+*** downgrade block\nvia OTP
+** Recovery
+*** staged in PSRAM
+*** microSD fallback
+*** same version only
+** Known limits
+*** temporary seeds\nleave the SE
+*** bus traffic analysis
+*** v5.6.0 entropy hotfix
+@endmindmap

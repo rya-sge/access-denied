@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Firmware\nsupply chain
+** The gap
+*** signature says WHO
+*** not WHAT source
+*** vendor can sign\nanything
+** Determinism
+*** pinned toolchain\n(Alpine image)
+*** SOURCE_DATE_EPOCH
+*** file_time.c\nversion-keyed
+*** submods-match
+*** code-committed
+** Build in a box
+*** docker build
+*** clone from local .git
+*** fetch published DFU
+*** build + sign key 0
+** Comparison
+*** signit split\n(firmware + bootrom)
+*** signit check\n(both signatures)
+*** hexdump diff
+*** 64 sig bytes elided
+** Device side
+*** header signature\nsecp256k1
+*** six trusted keys
+*** world checksum\nin SE1
+*** OTP downgrade\nhigh-water
+** Residual trust
+*** bootloader not\nin repro scope
+*** callgate self-hash\nwith nonce
+*** PGP release\nsignatures
+*** hardware you\ncannot rebuild
+@endmindmap

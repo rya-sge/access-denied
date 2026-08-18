@@ -1,0 +1,42 @@
+@startuml
+title Holding to account wiring and posting directions
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "Per asset, per share class" {
+  component "Holding\nassetAmount\nassetAmountValue\nvaluation\nisLiability" as H
+}
+
+package "Asset holding, four accounts" {
+  component "Asset\ndebit-normal\nper assetId" as ACC_A
+  component "Equity\ncredit-normal\nper chain" as ACC_E
+  component "Gain\ncredit-normal\nper chain" as ACC_G
+  component "Loss\ndebit-normal\nper chain" as ACC_L
+}
+
+package "Liability holding, two accounts" {
+  component "Expense\ndebit-normal\nper assetId" as ACC_X
+  component "Liability\ncredit-normal\nper chain" as ACC_LI
+}
+
+H --> ACC_A : deposit\ndebit asset, credit equity
+H --> ACC_E
+H --> ACC_G : revaluation up\ndebit asset, credit gain
+H --> ACC_L : revaluation down\ndebit loss, credit asset
+H --> ACC_X : liability incurred\ndebit expense, credit liability
+H --> ACC_LI
+
+note bottom of ACC_L #EEF5FF
+  NAV = equity + gain - loss - liability
+  closeGainLoss rolls gain and loss into equity
+end note
+@enduml

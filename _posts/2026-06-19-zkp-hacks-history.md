@@ -71,10 +71,12 @@ The claim proof circuit handled proportional token distribution from DeFi intera
 
 $$
 \begin{aligned}
-\text{user\_output} &= \left\lfloor \frac{\text{total\_input} \times \text{bridge\_output\_a}}{\text{bridge\_output\_b}} \right\rfloor \\
-\text{remainder} &= (\text{total\_input} \times \text{bridge\_output\_a}) \bmod \text{bridge\_output\_b}
+u_{\text{out}} &= \left\lfloor \frac{T \times O_a}{O_b} \right\rfloor \\
+r &= (T \times O_a) \bmod O_b
 \end{aligned}
 $$
+
+where $$T$$ is `total_input`, $$O_a$$ and $$O_b$$ are `bridge_output_a` and `bridge_output_b`, $$u_{\text{out}}$$ is `user_output` and $$r$$ is the remainder.
 
 Because `remainder` was unconstrained, a malicious sequencer could choose any `remainder` value and correspondingly manipulate `user_output` upward, up to `total_input`, without the proof failing. This enabled multiple-spend across shared output tokens.
 
@@ -294,7 +296,7 @@ This is a standard DeFi precision loss error unrelated to the ZK cryptography; t
 
 ## Part III — Disclosed Vulnerabilities (No Exploitation)
 
-### 12. [Solana ZK ElGamal Proof Bug #1](https://solana.com/news/post-mortem-june-25-2025)
+### 12. [Solana ZK ElGamal Proof Bug #1](https://solana.com/news/post-mortem-may-2-2025)
 
 **Date:** April 16–18, 2025 (reported and patched)  
 **Discoverer:** LonelySloth  
@@ -422,10 +424,10 @@ No. Bulletproofs as a cryptographic construction are secure under the discrete l
 
 ## References
 
-- [Aztec Connect Claim Proof Bug — HackMD](post-mortem/Aztec Connect Claim Proof Bug - HackMD.pdf)
-- [Aztec Multiple-Spend Error Bugfix Review — Immunefi](post-mortem/Aztec Multiple-Spend Error Bugfix Review _ by Immunefi Editor _ Immunefi _ Medium.pdf)
+- Aztec Connect claim proof bug write-up (HackMD) and Aztec multiple-spend bugfix review (Immunefi), September–October 2023
 - [zkSync Era Soundness Bug — ChainLight Blog](https://blog.chainlight.io/uncovering-a-zk-evm-soundness-bug-in-zksync-era-f3bc1b2a66d8)
 - [zkSync Lite Proof Verification Bugfix — Immunefi](https://medium.com/immunefi/zksync-insufficient-proof-verification-bugfix-review-dcd57944d0e2)
+- [Solana ZK ElGamal Post-Mortem April 2025](https://solana.com/news/post-mortem-may-2-2025)
 - [Solana ZK ElGamal Post-Mortem June 2025](https://solana.com/news/post-mortem-june-25-2025)
 - [OtterSec zkVM Fiat-Shamir Disclosures](https://osec.io/blog/2026-03-03-zkvms-unfaithful-claims/)
 - [Veil Cash / FoomCash — Rekt News Default Settings](https://rekt.news/default-settings)
@@ -434,5 +436,5 @@ No. Bulletproofs as a cryptographic construction are secure under the discrete l
 - [Aztec Connect Exploit Analysis — SlowMist](https://slowmist.medium.com/analysis-of-the-2-19-million-asset-theft-from-aztec-connect-d867c59b1fc6)
 - [zkLend Exploit — Rekt News](https://rekt.news/zklend-rekt)
 - [dYdX Supply Chain Attack — Socket](https://socket.dev/blog/malicious-dydx-packages-published-to-npm-and-pypi)
-- [SlowMist Hacked Database](slowmist/SlowMist Hacked - SlowMist Zone.pdf)
+- [SlowMist Hacked database](https://hacked.slowmist.io/) — Haven Protocol (December 10, 2024) and HermesVault (May 19, 2026) entries
 - [Claude Code](https://claude.com/product/claude-code)

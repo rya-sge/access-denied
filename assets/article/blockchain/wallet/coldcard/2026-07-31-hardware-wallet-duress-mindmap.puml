@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Designing for\ncoercion
+** The threat
+*** attacker has\nthe device
+*** and can compel\nthe user
+*** may know XPUB\nand balance
+*** may probe\nthe buses
+** Why not secret\nkeystrokes
+*** must be documented
+*** PIN given by phone
+*** cannot force a\nsilent gesture
+*** so: configurable PINs
+** Response types
+*** wipe the seed
+*** brick the device
+*** decoy wallet
+*** delta mode
+*** login countdown
+*** look blank
+** Hiding the response
+*** all slots always\nchecked
+*** hidden flag mask
+*** no bus traffic\non wipe
+*** screen looks normal
+** Passive triggers
+*** MicroSD 2FA\n(absent card wipes)
+*** kill key during\nPIN entry
+*** spending policy\nbypass PIN
+** Honest limits
+*** traffic analysis\nreveals duress login
+*** decoy fails if\nUTXOs known
+*** finite key slots
+*** wrench beats\ncryptography
+@endmindmap

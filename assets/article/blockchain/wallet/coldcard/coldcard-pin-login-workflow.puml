@@ -1,0 +1,70 @@
+@startuml
+title COLDCARD login sequence - from keypad to seed
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FAFCFF
+  DiamondBorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+start
+:user enters PIN prefix\n(2 to 6 digits);
+:bootloader computes\nSHA256(SHA256(pairing || PURPOSE_WORDS || prefix))\nthen 12 HMAC rounds keyed inside SE1;
+:show two BIP-39 anti-phishing words\n(22 bits of the result);
+if (words are the expected pair?) then (no)
+  :abort - possible doppelganger;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+
+:user enters remaining digits;
+:hash full PIN:\nSHA256(SHA256(pairing || PURPOSE_NORMAL || pin))\nthen 8 HMAC rounds inside SE1;
+
+:test the hash against all 14 SE2 trick slots\n(always all of them, constant bus traffic);
+if (trick slot matched?) then (yes)
+  :read tc_flags / tc_arg;
+  :apply the effects named by tc_flags;<<#FDEEEE>>
+  note right
+    TC_WIPE: clear the replaceable MCU key
+    TC_BRICK: roll the SE1 pairing secret
+    TC_WORD_WALLET / TC_XPRV_WALLET:
+      load a duress seed held in SE2
+    TC_FAKE_OUT: report "wrong PIN"
+    TC_DELTA_MODE: rebuild the true PIN
+      from tc_arg, then run hobbled
+    TC_REBOOT: restart, no state change
+  end note
+  :hidden flags masked out\nbefore MicroPython sees the result;
+  stop
+else (no)
+endif
+
+:increment SE1 attempt counter;
+if (PIN correct in SE1?) then (no)
+  if (attempts left?) then (yes)
+    :report failure,\nshow remaining tries;<<#FDEEEE>>
+    stop
+  else (no)
+    :SE1 bricks itself;<<#FDEEEE>>
+    stop
+  endif
+else (yes)
+endif
+
+:ECDH between SE1 and SE2 via the SE joiner keypair;
+:rebuild AES key from\nSE2 easy + SE2 hard + replaceable MCU key\nunder mcu_hmac_key;
+:decrypt the 72-byte secret from SE1;
+:reset attempt counter to 13;
+if (MicroSD 2FA enrolled?) then (yes)
+  if (enrolled card present?) then (no)
+    :fast wipe the seed;<<#FDEEEE>>
+    stop
+  else (yes)
+  endif
+else (no)
+endif
+:decrypt settings, derive BIP-32 root,\nenter the main menu;
+stop
+@enduml

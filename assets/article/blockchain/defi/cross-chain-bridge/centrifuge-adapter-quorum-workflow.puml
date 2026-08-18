@@ -1,0 +1,46 @@
+@startuml
+title MultiAdapter inbound vote accounting
+skinparam shadowing false
+skinparam ArrowColor #B54A4A
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #B54A4A
+}
+
+start
+:adapter calls handle(centrifugeId, payload);
+:poolId = messagePoolId(payload);
+if (adapter registered for (chain, pool)?) then (no)
+  :revert InvalidAdapter;<<#FFFFFF>>
+  stop
+else (yes)
+endif
+
+if (quorum == 1?) then (yes)
+  :forward to Gateway immediately;
+  stop
+else (no)
+endif
+
+:state = inbound[chain][keccak(payload)];
+if (adapter.activeSessionId != state.sessionId?) then (yes)
+  :delete votes, adopt new sessionId;
+else (no)
+endif
+
+:votes[adapter.id - 1] += 1;
+
+if (countPositiveValues(votes, quorum) >= threshold?) then (no)
+  :wait for more adapters;
+  stop
+else (yes)
+endif
+
+:decreaseFirstNValues(votes, quorum, recoveryIndex)
+index < recoveryIndex: always decrement, may go negative
+index >= recoveryIndex: decrement only if positive;
+:forward payload to Gateway;
+stop
+@enduml

@@ -1,0 +1,58 @@
+@startuml
+title Firmware upgrade and power-fail recovery
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+
+participant "Host\n(USB / microSD)" as HOST
+participant "MicroPython\napplication" as MPY
+participant "Bootloader" as BL
+participant "PSRAM\n8 MB volatile" as PS
+participant "SE1\nATECC608" as SE1
+participant "Main flash" as FL
+
+HOST -> MPY : DFU image (up to ~1.5 MB)
+MPY -> PS : stage image
+MPY -> BL : callgate: install firmware\n(main PIN proven)
+BL -> PS : read header
+BL -> BL : verify magic, length,\nhw_compat, pubkey_num
+BL -> BL : secp256k1 signature check\n(one of six trusted keys)
+BL -> BL : reject if timestamp < OTP high-water\n(downgrade protection)
+BL -> BL : compute world checksum\n(new firmware + rest of flash + OTP + serial)
+BL -> SE1 : write world checksum to slot 14
+note right of SE1
+  written **before** any erase:
+  the green LED stays valid
+  across the whole upgrade
+end note
+BL -> FL : erase and program (~15 s)
+BL -> BL : reset
+
+alt normal reboot
+  BL -> FL : double SHA256 + signature check
+  BL -> SE1 : prove world checksum
+  SE1 -> BL : genuine LED green
+else reset during programming (PSRAM survives)
+  BL -> PS : look for staged image
+  BL -> BL : full signature check +\nworld checksum must match SE1
+  BL -> FL : restart programming
+else power loss (PSRAM forgotten)
+  BL -> BL : show "Insert Card"
+  HOST -> BL : microSD with DFU files
+  BL -> BL : for each file: signature +\nworld checksum must match SE1
+  note right of BL
+    only the exact version that was
+    being installed can be restored;
+    no newer or different firmware
+  end note
+  BL -> FL : program
+end
+@enduml

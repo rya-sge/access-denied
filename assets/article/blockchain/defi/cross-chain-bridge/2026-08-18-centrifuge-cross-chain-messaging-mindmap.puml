@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Centrifuge\nCross-Chain Messaging
+** Routing
+*** 26 message types
+*** poolId at byte 1\nis the routing key
+*** Per-pool adapter set
+*** Pool 0 = global set
+** Adapter quorum
+*** MultiAdapter, max 8
+*** quorum, threshold,\nrecoveryIndex
+*** int16 vote array\nallows debt
+*** sessionId invalidates\nold votes
+left side
+** Outbound
+*** Transient batching\nper (chain, pool)
+*** maxBatchGasLimit ceiling
+*** GasService benchmarks
+*** Subsidy + RefundEscrow
+*** Underpaid batch, repay
+** Inbound
+*** Gateway splits batch
+*** gasleft check per message
+*** excessivelySafeCall\nbounded returndata
+*** failedMessages counter
+*** retry, permissionless
+** Recovery and controls
+*** RecoveryAdapter\ninject only
+*** blockOutgoing per pool
+*** Global pause
+*** OnlyFromMainnet\nOnlyFromSource
+@endmindmap

@@ -1,0 +1,44 @@
+@startuml
+title Two state models, two key layouts
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #F3EEFB
+skinparam componentBorderColor #7A5BB5
+skinparam packageBackgroundColor #FCFAFE
+skinparam packageBorderColor #7A5BB5
+skinparam ArrowColor #7A5BB5
+skinparam noteBackgroundColor #F9F6FD
+skinparam noteBorderColor #7A5BB5
+
+package "Shared homomorphic state (Zama)" {
+  component "Contract state\nAlice: ct(a)\nBob:   ct(b)\nall under one public key" as ZS
+  component "Coprocessor\nevaluation key" as ZC
+  component "KMS committee\nsecret key shares" as ZK
+  component "Alice's client\nsecp256k1 + ML-KEM" as ZA
+  ZS --> ZC : compute on both\nwithout reading either
+  ZA --> ZS : encrypted input + ZKPoK
+  ZA --> ZK : authorised read request
+  ZK --> ZA : answer sealed to\nher transport key
+}
+
+package "Per-user notes (Zcash, Aztec)" {
+  component "Commitment tree\ncm(note1), cm(note2), ...\neach note sealed to its owner" as NS
+  component "Alice's client\nkey tree + prover" as NA
+  component "Bob's client\nkey tree + prover" as NB
+  NS --> NA : trial-decrypt with ivk
+  NS --> NB : trial-decrypt with ivk
+  NA --> NS : proof of a valid transition\nover her own notes
+}
+
+note bottom of ZS
+  A transfer touches two owners' values,
+  so both must sit under the same key.
+  Nobody, including Alice, holds that key.
+end note
+
+note bottom of NS
+  Each note is readable by exactly one key tree.
+  No party can compute over Bob's note without
+  Bob producing a proof about it.
+end note
+@enduml

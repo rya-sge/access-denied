@@ -88,6 +88,11 @@ _posts/2026-06-19-zkp-vulnerabilities-eli10.md
 
 _posts/2026-06-19-zkp-vulnerability-taxonomy.md
   assets/article/blockchain/zkp/2026-06-19-zkp-vulnerability-taxonomy-mindmap.puml                          (mindmap)
+  assets/article/blockchain/zkp/zkp-audit-layer-stack-concept.puml                                          (concept, in-section)
+  assets/article/blockchain/zkp/zkp-groth16-broken-setup-concept.puml                                       (concept, in-section)
+  assets/article/blockchain/zkp/zkp-fiat-shamir-forgery-sequence.puml                                       (sequence, in-section)
+  assets/article/blockchain/zkp/zkp-circuit-soundness-review-workflow.puml                                  (workflow, in-section)
+  assets/article/blockchain/zkp/zkp-aztec-connect-settlement-workflow.puml                                  (workflow, in-section)
 
 _posts/2026-06-28-chinese-remainder-theorem-cryptography.md
   assets/article/cryptographie/crt/2026-06-28-chinese-remainder-theorem-cryptography.puml                   (mindmap)
@@ -517,3 +522,70 @@ _posts/2026-07-30-rundler-alchemy-erc4337-bundler.md
   assets/article/blockchain/ethereum/erc-4337/rundler-userop-lifecycle-workflow.puml           (workflow, in-section)
   assets/article/blockchain/ethereum/erc-4337/rundler-bundle-sender-state.puml                 (state, in-section)
   assets/article/blockchain/ethereum/erc-4337/rundler-gas-estimation-workflow.puml             (workflow, in-section)
+
+_posts/2026-07-31-coldcard-firmware-security.md
+  assets/article/blockchain/wallet/coldcard/2026-07-31-coldcard-firmware-security-mindmap.puml (mindmap)
+  assets/article/blockchain/wallet/coldcard/coldcard-key-architecture-concept.puml             (concept, in-section)
+  assets/article/blockchain/wallet/coldcard/coldcard-pin-login-workflow.puml                   (workflow, in-section)
+  assets/article/blockchain/wallet/coldcard/coldcard-firmware-upgrade-sequence.puml            (sequence, in-section)
+
+_posts/2026-07-31-cross-chain-bridge-hacks.md
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-hacks-mindmap.puml                (mindmap)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-lock-unlock-concept.puml          (concept, in-section)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-ronin-2024-uninitialized-weight-workflow.puml        (workflow, in-section)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-kelp-dao-rpc-poisoning-workflow.puml                 (workflow, in-section)
+
+_posts/2026-07-31-cross-chain-bridge-threat-model.md
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-threat-model-mindmap.puml         (mindmap)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-threat-model-dfd.puml             (concept, in-section)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-attack-tree.puml                  (attack tree, in-section)
+
+_posts/2026-07-31-firmware-reproducible-builds-code-signing.md
+  assets/article/blockchain/wallet/coldcard/2026-07-31-firmware-reproducible-builds-mindmap.puml (mindmap)
+  assets/article/blockchain/wallet/coldcard/repro-trust-chain-concept.puml                       (concept, in-section)
+  assets/article/blockchain/wallet/coldcard/repro-build-workflow.puml                            (workflow, in-section)
+
+_posts/2026-07-31-hardware-wallet-duress-coercion-design.md
+  assets/article/blockchain/wallet/coldcard/2026-07-31-hardware-wallet-duress-mindmap.puml       (mindmap)
+  assets/article/blockchain/wallet/coldcard/duress-flag-interpretation-concept.puml              (concept, in-section)
+  assets/article/blockchain/wallet/coldcard/duress-response-selection-workflow.puml              (workflow, in-section)
+
+_posts/2026-07-31-coldcard-rng-entropy-incident.md
+  assets/article/blockchain/wallet/coldcard/2026-07-31-rng-entropy-incident-mindmap.puml         (mindmap)
+  assets/article/blockchain/wallet/coldcard/rng-entropy-pipeline-concept.puml                    (concept, in-section)
+  assets/article/blockchain/wallet/coldcard/rng-symbol-resolution-workflow.puml                  (workflow, in-section)
+
+_posts/2026-07-31-stm32-memory-protection-firmware-security.md
+  assets/article/blockchain/wallet/coldcard/2026-07-31-stm32-memory-protection-mindmap.puml      (mindmap)
+  assets/article/blockchain/wallet/coldcard/stm32-protection-map-concept.puml                    (concept, in-section)
+  assets/article/blockchain/wallet/coldcard/stm32-lockdown-workflow.puml                         (workflow, in-section)
+
+CMTATFHE/metamask/2026-08-01-integrating-zama-fhe-metamask.md   (article NOT in _posts: written into the
+                                                                 CMTATFHE repo at ~/Pictures/dev/CMTATFHE/metamask/,
+                                                                 diagrams stored next to the .md, not under assets/)
+  CMTATFHE/metamask/zama-fhe-metamask-integration.puml                (mindmap)
+  CMTATFHE/metamask/zama-metamask-key-material-concept.puml            (concept, in-section)
+  CMTATFHE/metamask/zama-metamask-encrypted-input-workflow.puml        (workflow, in-section)
+  CMTATFHE/metamask/zama-metamask-user-decryption-workflow.puml        (workflow, in-section)
+  CMTATFHE/metamask/zama-metamask-snap-architecture.puml               (concept, in-section)
+
+_posts/2026-08-18-centrifuge-vaults.md
+  assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-vaults-mindmap.puml    (mindmap)
+  assets/article/blockchain/defi/centrifuge/centrifuge-vault-architecture-concept.puml   (concept, in-section)
+  assets/article/blockchain/defi/centrifuge/centrifuge-async-deposit-workflow.puml       (workflow, in-section)
+  assets/article/blockchain/defi/centrifuge/centrifuge-async-redeem-workflow.puml        (workflow, in-section)
+
+_posts/2026-08-18-centrifuge-cross-chain-messaging.md
+  assets/article/blockchain/defi/cross-chain-bridge/2026-08-18-centrifuge-cross-chain-messaging-mindmap.puml (mindmap)
+  assets/article/blockchain/defi/cross-chain-bridge/centrifuge-messaging-pipeline-concept.puml              (concept, in-section)
+  assets/article/blockchain/defi/cross-chain-bridge/centrifuge-adapter-quorum-workflow.puml                 (workflow, in-section)
+
+_posts/2026-08-18-centrifuge-onchain-accounting.md
+  assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-onchain-accounting-mindmap.puml (mindmap)
+  assets/article/blockchain/defi/centrifuge/centrifuge-chart-of-accounts-concept.puml            (concept, in-section)
+  assets/article/blockchain/defi/centrifuge/centrifuge-snapshot-nav-workflow.puml                (workflow, in-section)
+
+_posts/2026-08-18-centrifuge-hook-vs-erc3643.md
+  assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-hook-vs-erc3643-mindmap.puml   (mindmap)
+  assets/article/blockchain/defi/centrifuge/permissioned-token-enforcement-models-concept.puml   (concept, in-section)
+  assets/article/blockchain/defi/centrifuge/centrifuge-hook-sentinel-workflow.puml               (workflow, in-section)

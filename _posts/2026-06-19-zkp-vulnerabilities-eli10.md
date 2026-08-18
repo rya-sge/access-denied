@@ -206,7 +206,7 @@ There is no such thing as software with a guaranteed zero bugs. However, the cha
 - [FoomCash — Rekt News The Unfinished Proof](https://rekt.news/the-unfinished-proof)
 - [zkSync Lite Proof Verification Bugfix — Immunefi Medium](https://medium.com/immunefi/zksync-insufficient-proof-verification-bugfix-review-dcd57944d0e2)
 - [zkSync Era Soundness Bug — ChainLight Blog](https://blog.chainlight.io/uncovering-a-zk-evm-soundness-bug-in-zksync-era-f3bc1b2a66d8)
-- [Aztec Connect Claim Proof Bug — HackMD post-mortem](post-mortem/Aztec Connect Claim Proof Bug - HackMD.pdf)
+- Aztec Connect claim proof bug write-up (HackMD post-mortem), September 2023
 - [Aztec Connect Bridge Exploit — SlowMist](https://slowmist.medium.com/analysis-of-the-2-19-million-asset-theft-from-aztec-connect-d867c59b1fc6)
 - [ZKSwap Exploit Analysis — Blockaid](https://www.blockaid.io/blog/how-zkswaps-5m-exploit-couldve-been-prevented-with-onchain-monitoring)
 - [OtterSec zkVM Fiat-Shamir Disclosures](https://osec.io/blog/2026-03-03-zkvms-unfaithful-claims/)

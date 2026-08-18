@@ -1,0 +1,41 @@
+@startuml
+title How a hardware RNG call became a software PRNG call
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #FCFAFF
+  DiamondBorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+start
+:board sets MICROPY_HW_ENABLE_RNG = 0\n"this code replaces normal RNG module";
+note right
+  the intent was to disable upstream's
+  RNG module in favour of the board's
+  own, more paranoid, version
+end note
+
+:upstream ports/stm32/rng.c compiles\nthe #else branch: the yasmarang PRNG;
+:that object defines a global rng_get();
+
+:board file COLDCARD_MK4/rng.c defines\nrandom_buffer(), random32(), pyb_rng_get\nbut NOT rng_get();
+
+:libngu is compiled with\nCHIP_TRNG_32() defined as rng_get();
+
+:linker resolves rng_get\nto the only definition available;<<#FDEEEE>>
+
+:ngu.random.bytes() XORs two\nsoftware PRNGs together;<<#FDEEEE>>
+
+:seed.py hashes the result with SHA256d\n"to mitigate any possible bias";
+note right
+  hashing whitens the output: it looks
+  random to every statistical test while
+  carrying the same low entropy
+end note
+
+:generated seed has far fewer than\n128 bits of unpredictability;<<#FDEEEE>>
+
+stop
+@enduml

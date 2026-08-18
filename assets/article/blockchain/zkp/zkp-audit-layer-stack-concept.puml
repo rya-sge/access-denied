@@ -1,0 +1,25 @@
+@startuml
+title Where a ZKP application can fail, layer by layer
+skinparam shadowing false
+skinparam defaultTextAlignment left
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+  FontColor #4A2020
+}
+
+rectangle "**1. Application layer**\n\nContracts, circuits, front-end, configuration\n\n//Failure modes:// malicious inputs, key and nonce\nmanagement, replay, verification bypass,\nL1/L2 parameter binding" as L1 #FDEEEE
+
+rectangle "**2. Prover / verifier layer**\n\nHash and commitment schemes, Fiat-Shamir\ntranscript, Merkle trees, hash-to-curve, randomness\n\n//Failure modes:// Frozen Heart, transcript omissions,\npredictable blinding factors, deprecated hashes" as L2 #FDEEEE
+
+rectangle "**3. Arithmetisation layer**\n\nR1CS, PLONKish, AIR, CCS; constraint generation;\npolynomial implementation\n\n//Failure modes:// assigned but not constrained,\nmismatching bit lengths, untrimmed coefficients" as L3 #FDEEEE
+
+rectangle "**4. Algebra layer**\n\nField arithmetic, elliptic curve groups,\nFFT and MSM acceleration\n\n//Failure modes:// scalar field over/underflow,\nwraparound past the group order" as L4 #FDEEEE
+
+rectangle "**5. Platform layer**\n\nLanguage, runtime, OS, hardware, dependencies\n\n//Failure modes:// compiler optimisation removing\nunconstrained public inputs, RNG weakness,\nSDK supply chain compromise" as L5 #FDEEEE
+
+L1 -down-> L2
+L2 -down-> L3
+L3 -down-> L4
+L4 -down-> L5
+@enduml

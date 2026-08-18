@@ -1,0 +1,51 @@
+@startuml
+title Protection features overlaid on the address space
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #F7FCFA
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam ArrowColor #2E8B67
+
+package "Flash bank (2 MB)" {
+  component "0x0800_0000 (112 KB)\nbootloader code\nWRP + firewall code segment" as BL
+  component "0x0801_c000 (8 KB)\nrom_secrets\nfirewall non-volatile data segment" as SEC
+  component "0x0801_e000 (8 KB)\nMCU_KEYS, 256 write-once slots\nexcluded from world checksum" as MK
+  component "0x0802_0000 (~2 MB)\napplication firmware\nsigned, checksummed" as APP
+  component "0x0818_0000 (512 KB)\nLFS2 settings\nAES-256-CTR at rest" as FS
+}
+
+package "Other regions" {
+  component "0x1FFF_7000 (1 KB)\nOTP: 128 write-once 64-bit slots\nversion high-water marks" as OTP
+  component "0x1FFF_7800 / 0x1FFF_F800\noption bytes: RDP level, WRP" as OB
+  component "0x1FFF_0000 (28 KB)\nsystem ROM (DFU code)" as ROM
+  component "0x2000_0000 (640 KB)\nSRAM, wiped at boot\ntop 8 KB reserved for bootloader" as RAM
+}
+
+BL -[#B54A4A]-> SEC : only firewall-resident\ncode may read
+APP --> BL : callgate only
+OB --> BL : WRP protects
+OB --> APP
+OTP --> APP : downgrade floor
+
+note bottom of MK
+  excluded from the world checksum
+  because it legitimately changes
+  at runtime (each wipe burns a slot)
+end note
+
+note bottom of ROM
+  included in the world checksum:
+  "they say it can't change, but clearly
+  implemented as flash cells"
+end note
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+title Asynchronous deposit lifecycle (ERC-7540)
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+}
+
+actor Investor
+participant "AsyncVault" as V
+participant "AsyncRequestManager" as ARM
+participant "PoolEscrow" as E
+participant "BalanceSheet" as BS
+participant "BatchRequestManager\n(hub)" as BRM
+
+== Phase 1 - request ==
+Investor -> V : requestDeposit(assets, controller, owner)
+V -> ARM : requestDeposit(...)
+ARM -> ARM : pendingDepositRequest += assets
+ARM -> BRM : DepositRequest message
+V -> E : transferFrom(owner, escrow, assets)
+ARM -> BS : reserve(assets, REASON_DEPOSIT)
+BS -> E : reserved += assets
+
+== Phase 2 - process (pool manager, hub) ==
+BRM -> BRM : approveDeposits(epoch, amount, pricePoolPerAsset)
+BRM -> ARM : ApprovedDeposits callback
+ARM -> BS : unreserve + noteDeposit
+BS -> E : total += assets, reserved -= assets
+BRM -> BRM : issueShares(epoch, pricePoolPerShare)
+BRM -> ARM : IssuedShares callback
+ARM -> BS : issue(shares to escrow) + reserve(shares)
+BRM -> BRM : notifyDeposit(investor, maxClaims)
+BRM -> ARM : FulfilledDepositRequest callback
+ARM -> ARM : maxMint += shares, depositPrice updated
+
+== Phase 3 - claim ==
+Investor -> V : mint(shares, receiver)
+V -> ARM : mint(...)
+ARM -> BS : unreserve(shares) + withdraw(TransferOnly)
+BS -> E : shares transferred to receiver
+@enduml

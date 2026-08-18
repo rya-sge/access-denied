@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Permissioned Token\nDesign Models
+** Shared requirement
+*** Only eligible holders
+*** Freeze and unfreeze
+*** Legal override path
+*** Screen issuance\nand redemption too
+** Centrifuge hook
+*** One swappable contract
+*** hookData packed in\nthe balance slot
+*** Operation inferred from\nsentinel addresses
+*** Four shipped policies
+*** authTransferFrom bypasses,\nchecked beforehand
+left side
+** ERC-3643 T-REX
+*** IdentityRegistry\nONCHAINID claims
+*** Compliance modules\nfor global rules
+*** Distinct functions\nper operation
+*** forcedTransfer still\nchecks isVerified
+*** recoveryAddress ties\nold to new identity
+** Contrasts
+*** Storage in-token\nvs external registry
+*** Sentinels vs\nnamed functions
+*** One bit freeze vs\npartial freeze
+*** Native multichain\nvs single chain
+** Review focus
+*** Chokepoint equivalence\non mint and burn
+*** Sentinel collisions
+*** Check-then-move drift
+*** Who holds the\nbypass authority
+@endmindmap

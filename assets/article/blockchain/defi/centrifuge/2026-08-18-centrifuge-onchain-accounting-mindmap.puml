@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Centrifuge Hub\nOnchain Accounting
+** Ledger primitives
+*** Account: totalDebit,\ntotalCredit, isDebitNormal
+*** accountValue signed\nby account nature
+*** Six account types
+*** AccountId derived from\nassetId or chain id
+** Transaction scoping
+*** unlock(poolId) / lock()
+*** transient debited\nand credited
+*** lock reverts if unbalanced
+*** Journal id per pool,\ninterleaving safe
+left side
+** Posting rules
+*** Amount change:\nasset vs equity
+*** Revaluation:\nasset vs gain or loss
+*** Liability mirror:\nexpense vs liability
+*** Sign flip on decrease
+** Multi-chain sync
+*** Spoke queues deltas
+*** nonce enforces order
+*** isSnapshot marks\nassets and shares aligned
+*** Snapshot hook fires\nonly when in sync
+** Derived figures
+*** NAV = equity + gain\n- loss - liability
+*** price = NAV / issuance
+*** closeGainLoss rolls\ninto equity
+*** Transfers adjusted to\navoid double counting
+@endmindmap
