@@ -15,11 +15,11 @@ This document does **not** re-propose anything already marked ✅ in `site_impro
 | 3 | Freshness | ~~`last_modified_at` never set~~ — **✅ implemented 2026-08-19**, backfilled from git on 210 posts | 🔴 High | S |
 | 4 | Structured data | 98 FAQ sections are bold paragraphs, not headings — no anchors, no outline, no TOC entries (`FAQPage` JSON-LD is **not** the answer, see §3.1) | 🟠 Med | M |
 | 5 | Content loss | 3 articles are unpublished (bad filenames), 1 has an invalid filename date. ~~1 duplicate-title stub~~ — **✅ fixed 2026-08-19** | 🟠 Med | S |
-| 6 | Extractability | No answer-first summary, no visible author/updated line, no `<time datetime>` | 🟠 Med | M |
+| 6 | Extractability | No answer-first summary. ~~No visible author/updated line, no `<time datetime>`~~ — **✅ implemented 2026-08-19** | 🟠 Med | M |
 | 7 | Internal linking | ~~`site.related_posts` is "4 most recent"~~ — **✅ implemented 2026-08-19**; 28 posts still have zero in-body internal links | 🟠 Med | M |
 | 8 | Category pages | ~~20 landing pages with no `<h1>`, no description, no intro text~~ — **✅ implemented 2026-08-19** | 🟠 Med | S |
 | 9 | Metadata quality | 126 descriptions exceed the SERP snippet width, 27 are too thin, 2 empty, 3 posts have no category | 🟡 Low | M |
-| 10 | Discovery | No IndexNow, no Bing verification file in the repo, no author/about page | 🟡 Low | S |
+| 10 | Discovery | No IndexNow, no Bing verification file in the repo. ~~No author/about page~~ — **✅ implemented 2026-08-19** | 🟡 Low | S |
 
 **What is already good** (do not touch): `jekyll-seo-tag` + `jekyll-sitemap` + `jekyll-feed` are wired correctly, canonical and `og:` tags are emitted once, `BreadcrumbList` JSON-LD is in place, every post has `title`/`date`/`lang`/`locale`/`description`/`image`, all 711 in-article images resolve and are lazy-loaded, fonts are self-hosted, CSS is an external cacheable file, and the Actions build fails on a Liquid error before it can ship. That baseline is better than most Jekyll blogs.
 
@@ -516,13 +516,27 @@ Rendered as a `<ul>` in a bordered box in `_layouts/post.html`. Add it to `creat
 
 A section that opens with "This means the attacker can…" is unusable as a standalone chunk. First sentence of each `##` section should name its subject explicitly. This is a mechanical review pass, well suited to the `update-article` skill.
 
-### 6.4 Make the entity explicit
+### 6.4 Make the entity explicit — ✅ IMPLEMENTED (2026-08-19)
 
-Answer engines cite *sources*, and a source needs an identity. Currently a post page shows no author byline at all — the author only appears in the sidebar, which is layout chrome that extractors routinely discard. Add:
+Answer engines cite *sources*, and a source needs an identity. Before this change an article page carried **no author at all**: the name appeared only in the sidebar, which is layout chrome that content extractors routinely discard, and nothing on the site tied "Ryan S." to the GitHub, X, LinkedIn or Bluesky profiles that would let an engine resolve it as a person.
 
-- A visible byline in `c-article__header`: author name (linked to an about page) + published date + updated date.
-- An **`/about/` page** — there is none. It should state who the author is, the credentials behind a security/blockchain blog, and link the social profiles already listed in `_config.yml`. Emit `Person` JSON-LD with `sameAs` pointing at the X / GitHub / LinkedIn / Bluesky profiles. This is the standard mechanism by which an engine decides a source is a *someone* rather than an anonymous page, and it is also plain E-E-A-T for Google.
-- Keep `site.author` consistent everywhere (`Ryan S.`); the JSON-LD `author.name` and the visible byline must be the same string.
+**What was implemented.**
+
+1. **An `/about/` page** (`_pages/about.md`), which the site did not have. Written from the author's own profile text rather than invented: security engineer focused on blockchain and smart contract development, what the site covers, the CTF / TryHackMe / Root Me background, the X account used to monitor attacks on the blockchain ecosystem, and LinkedIn as the contact route. It lists the five main personal articles — each resolved to its real URL on this site, not to a guessed one — and the six articles published as part of the author's work for Taurus, linked to taurushq.com. It closes with links into the largest categories and the tags page, so the page is also a hub rather than a dead end.
+
+2. **`ProfilePage` + `Person` JSON-LD** on that page, with `jobTitle`, `knowsAbout`, `mainEntityOfPage`, and a `sameAs` array built from `site.social.links` in `_config.yml` so the profile URLs have one source of truth. `sameAs` is the specific mechanism by which an engine decides that the author of these 254 articles is the same person as that GitHub account and that X handle. `jekyll-seo-tag` emits the author only as a name string inside each `BlogPosting`, which cannot do that.
+
+3. **A visible byline on every article**, in the header next to the dates: `By <a href="/about/" rel="author">Ryan S.</a>`. `rel="author"` plus the link ties each article to the Person entity declared on `/about/`.
+
+4. **The sidebar author name is now a link to `/about/`**, which is present on every page of the site, so the entity page is reachable and crawlable from everywhere rather than being an orphan.
+
+`site.author` and `site.author-name` already held the same string (`Ryan S.`), so the visible byline and the JSON-LD `author.name` agree, which was the consistency requirement in the original finding.
+
+Supporting changes: `byline_by` added to both language blocks in `_data/i18n.yml` ("By" / "Par"), and a `_sass/5-components/_page.scss` component so a prose page rendered through the `home` layout gets the same card treatment as the tags and category pages.
+
+**External links verified.** The six Taurus articles were first listed without links, because inventing a URL on the one page whose job is to establish the author's credibility is the wrong failure to risk. The author supplied them, and all six were checked to return HTTP 200 before being added — outbound links on this page point at real pages, not at plausible ones.
+
+These links matter beyond navigation: an author page that links to bylined work on a company's domain is corroboration an engine can follow, which is precisely what `sameAs` does for the social profiles.
 
 ### 6.5 `llms.txt`
 
@@ -615,7 +629,7 @@ feed:
 7. Promote the 98 FAQ sections' questions from `**Q: …**` to `###` headings, and change the `create-article` convention to match (§3.1). `FAQPage` JSON-LD is explicitly **not** recommended any more.
 8. ~~Replace `site.related_posts` with real tag-overlap related posts~~ — ✅ done 2026-08-19 (§5.1).
 9. Key-takeaways block in `_layouts/post.html` + `create-article`, backfilled on the top articles (§6.1).
-10. `/about/` page with `Person` schema + a visible byline on every article (§6.4).
+10. ~~`/about/` page with `Person` schema + a visible byline on every article~~ — ✅ done 2026-08-19 (§6.4).
 11. `TechArticle` JSON-LD with `keywords` / `articleSection` / `wordCount` (§3.2).
 
 **Tier 3 — worth doing, larger commitment**

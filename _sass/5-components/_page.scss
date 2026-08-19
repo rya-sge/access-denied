@@ -1,0 +1,47 @@
+/* ===============
+	STANDALONE PAGE
+=============== */
+
+// Prose pages that are not articles and not listings — currently /about/.
+// Mirrors the card treatment used by the tags and category pages so a page
+// rendered through the `home` layout does not appear unstyled next to them.
+.c-page {
+  width: 100%;
+  padding: 20px;
+  margin: 20px 0 40px;
+  background-color: var(--surface);
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 18px;
+    text-transform: uppercase;
+    margin: 30px 0 15px;
+    color: $gray-dark;
+  }
+
+  p {
+    margin-bottom: 15px;
+  }
+
+  ul {
+    margin: 0 0 20px;
+    padding-left: 20px;
+
+    li {
+      margin-bottom: 6px;
+    }
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .c-page {
+    padding: 15px;
+
+    h1 {
+      font-size: 27px;
+    }
+  }
+}

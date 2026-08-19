@@ -35,6 +35,17 @@ layout: home
               and is only present when it is newer than the publication date.
             {%- endcomment -%}
             <div class="c-article__date">
+                {%- comment -%}
+                  Visible byline. The author previously appeared only in the
+                  sidebar, which is layout chrome that content extractors drop,
+                  so an article carried no author on the page at all. `rel=author`
+                  and the link to /about/ tie the article to the Person entity
+                  declared there.
+                {%- endcomment -%}
+                <span class="c-article__author">{{ t.byline_by }}
+                  <a href="{{ '/about/' | relative_url }}" rel="author">{{ site.author }}</a>
+                </span>
+                &middot;
                 <time datetime="{{ page.date | date_to_xmlschema }}">
                     {{ page.date | date: t.date_format }}
                 </time>

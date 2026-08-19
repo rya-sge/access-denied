@@ -38,6 +38,7 @@ en:
 
   # Post
   updated_on: "Updated"
+  byline_by: "By"
   toc_title: "Contents"
   series_kicker: "Series"
   series_part: "Part"
@@ -87,6 +88,7 @@ fr:
 
   # Article
   updated_on: "Mis à jour le"
+  byline_by: "Par"
   toc_title: "Sommaire"
   series_kicker: "Série"
   series_part: "Partie"
