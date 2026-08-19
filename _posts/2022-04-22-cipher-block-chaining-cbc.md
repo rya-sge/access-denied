@@ -47,7 +47,7 @@ H) Est-ce qu'il y a des problèmes de sécurité ? (Abr.  Problème de sécurit�
 
 ### 	Chiffrement
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CBC_encryption.svg/900px-CBC_encryption.svg.png)
+![Schéma du chiffrement CBC : chaque bloc de texte clair est combiné par XOR avec le bloc chiffré précédent, le premier avec le vecteur d'initialisation, avant d'être chiffré avec la clé](https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CBC_encryption.svg/900px-CBC_encryption.svg.png)
 
 
 
@@ -55,7 +55,7 @@ H) Est-ce qu'il y a des problèmes de sécurité ? (Abr.  Problème de sécurit�
 
 ### Déchiffrement
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/CBC_decryption.svg/900px-CBC_decryption.svg.png)
+![Schéma du déchiffrement CBC : chaque bloc chiffré est déchiffré avec la clé, puis combiné par XOR avec le bloc chiffré précédent, le premier avec le vecteur d'initialisation](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/CBC_decryption.svg/900px-CBC_decryption.svg.png)
 
 
 

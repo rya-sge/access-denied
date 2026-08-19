@@ -349,11 +349,42 @@ This is not worth a bulk rewrite. Worth doing:
 
 13 posts open with a body-level `# Heading`, while `_layouts/post.html` already renders the title as `<h1 class="c-article__title">`. Two `<h1>`s on a page is not fatal but it muddies the document outline that both Google and every content-extraction library rely on. Demote those 13 to `##`.
 
-### 4.7 Alt text
+### 4.7 Alt text — ✅ IMPLEMENTED (2026-08-19)
 
-711 in-article images, **17 with empty alt**. Small number, quick fix — and worth doing because for a blog whose figures are architecture diagrams, the alt text is often the only description of the diagram that a text-only crawler (or an answer engine) ever sees. Prefer a sentence describing what the diagram *shows* over a repeat of the caption. Note that `html-proofer` currently runs with `--ignore-empty-alt`; once the 17 are fixed, drop that flag so a regression is caught.
+712 in-article images, **17 with empty alt** across 7 posts. All 17 now carry a descriptive sentence.
 
----
+This matters more here than the raw count suggests: the figures on this blog are architecture diagrams, protocol schemas, terminal output and mindmaps, so the alt text is frequently the only description of the figure that a screen reader, a text-only crawler or an answer engine ever gets. A caption repeat would have been worthless — each was written from what the figure actually shows.
+
+The 17, by article:
+
+| Article | Images | Written from |
+|---------|--------|--------------|
+| `2022-04-22-cipher-block-chaining-cbc` | 2 | the CBC encryption/decryption schemas — French alt, matching the article |
+| `2022-04-22-counter-mode-ctr` | 2 | the CTR keystream construction, French alt |
+| `2022-04-22-electronic-codebook-ecb` | 2 | the ECB independent-block schemas, French alt |
+| `2023-06-03-solidity-smart-contracts-doc` | 7 | the Surya `graph` / `ftrace` / `describe` / `inheritance` / `parse` outputs, plus the Solgraph and sol2uml examples |
+| `2024-02-14-solidity-interview-question-rareskills` | 1 | the TWAP formula, read from the image itself |
+| `2025-01-13-chainlink-deco` | 2 | the article's own description of the DECO flow and the proxy/provenance handshake |
+| `2025-10-29-aztec-architecture-overview` | 1 | the mindmap PNG, read and described branch by branch |
+
+Where the image could be fetched it was read before being described, rather than guessed from the filename. Two of the Chainlink images return an error page to a non-browser client, so those two were written from the surrounding prose instead.
+
+**Regression guard.** A CI step now fails the build on any `![](…)` in `_posts/`:
+
+```yaml
+- name: Check every article image has alt text
+  run: |
+    if grep -rnE '!\[[[:space:]]*\]\(' _posts/; then
+      echo "::error::the article images listed above have no alt text"
+      exit 1
+    fi
+```
+
+Note that `html-proofer` keeps `--ignore-empty-alt`, deliberately. An empty alt is the *correct* markup for a decorative image — the category thumbnails in `_includes/categories.html` sit inside a link that already carries the category name, and repeating it would only add noise for a screen reader. The markdown-level check above catches the case that actually matters without forcing a wrong fix on the decorative one.
+
+`create-article` gained an "Alt text is mandatory" section (with the good/bad examples and a 60–200 character target), and `update-article` now requires alt text on any figure it adds or replaces.
+
+**Still open:** 60 images have an alt shorter than 10 characters (`schema`, `result`, `mindmap`). They pass the check but say almost nothing. Worth improving opportunistically, as those articles are next touched, rather than in one pass.
 
 ## 5. Internal linking and site architecture
 
@@ -473,7 +504,7 @@ feed:
 13. IndexNow ping from the deploy workflow (§1.3).
 14. Question-shaped headings and self-contained section openers across the archive (§6.2–6.3).
 15. Series metadata and pillar-page internal linking for the 8 largest categories (§5.2–5.3).
-16. Description-length pass, thin-content decisions, 13 duplicate `<h1>`s, 17 empty alts (§4.4–4.7).
+16. Description-length pass, thin-content decisions, 13 duplicate `<h1>`s (§4.4–4.6). ~~17 empty alts~~ — ✅ done 2026-08-19 (§4.7).
 
 **Deliberately not proposed**: analytics (declined, §6.5 of `site_improvement.md`), image optimisation (skipped by request — though the 72 MB `assets/` tree remains the largest Core Web Vitals liability), and a permalink restructure away from `/:year/:month/:day/:title/` (date-based URLs are mildly unhelpful for evergreen content, but the migration risk outweighs the gain now that redirects would be needed for 254 URLs).
 
@@ -512,7 +543,8 @@ content
   posts with [TOC]                      195
   posts with a body-level H1            13
   posts with tables / code blocks       146 / 144
-  in-article images                     711   (17 with empty alt)
+  in-article images                     712   (0 with empty alt since 2026-08-19;
+                                              60 still have an alt under 10 chars)
   external links                        4 876 (avg ~18/post)
   internal links                        avg 2/post; 28 posts with zero
   distinct tags                         748   (553 used exactly once)

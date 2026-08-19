@@ -41,13 +41,13 @@ Le mode ECB n'utilise pas d'IV et les blocs sont chiffrés de manière indépend
 
 ### Chiffrement
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/ECB_encryption.svg/1920px-ECB_encryption.svg.png)
+![Schéma du chiffrement ECB : chaque bloc de texte clair est chiffré indépendamment avec la même clé, sans aucun chaînage entre les blocs](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/ECB_encryption.svg/1920px-ECB_encryption.svg.png)
 
 Source image : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ### Déchiffrement
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/ECB_decryption.svg/902px-ECB_decryption.svg.png)
+![Schéma du déchiffrement ECB : chaque bloc chiffré est déchiffré indépendamment avec la même clé, sans aucun chaînage entre les blocs](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/ECB_decryption.svg/902px-ECB_decryption.svg.png)
 
 Source : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 

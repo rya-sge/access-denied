@@ -43,13 +43,13 @@ Fonctionnement général :
 
 ### Chiffrement 
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/CTR_encryption_2.svg/902px-CTR_encryption_2.svg.png)
+![Schéma du chiffrement CTR : le nonce concaténé au compteur est chiffré avec la clé pour produire un flux de clé, combiné par XOR avec le bloc de texte clair](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/CTR_encryption_2.svg/902px-CTR_encryption_2.svg.png)
 
 Source image : [wikipedia.org - Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 
 ### Déchiffrement 
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/CTR_decryption_2.svg/902px-CTR_decryption_2.svg.png)
+![Schéma du déchiffrement CTR : le même flux de clé, obtenu en chiffrant le nonce et le compteur, est combiné par XOR avec le bloc de texte chiffré](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/CTR_decryption_2.svg/902px-CTR_decryption_2.svg.png)
 
 Source image : [wikipedia.org - Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
 

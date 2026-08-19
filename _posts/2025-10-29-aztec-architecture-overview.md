@@ -229,7 +229,7 @@ Wallets also manage:
 
 ### Mindmap
 
-![]({{site.url_complet}}/assets/article/blockchain/aztec/aztec-mindmap.png)
+![Mindmap of the Aztec privacy-first Layer 2 covering its architecture, execution model, state model, core components, accounts and keys, wallet architecture, privacy enforcement and developer considerations]({{site.url_complet}}/assets/article/blockchain/aztec/aztec-mindmap.png)
 
 ## References
 

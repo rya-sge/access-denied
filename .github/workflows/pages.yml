@@ -51,6 +51,25 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
+      - name: Check every article image has alt text
+        # `html-proofer` below runs with --ignore-empty-alt, and that stays: an
+        # empty alt is the CORRECT markup for a decorative image (the category
+        # thumbnails in _includes/categories.html sit inside a link that already
+        # carries the category name, so repeating it would only add noise for a
+        # screen reader).
+        #
+        # Article figures are the opposite case. They are architecture diagrams,
+        # protocol schemas and mindmaps, and the alt text is often the only
+        # description of them a text-only crawler or an answer engine ever sees.
+        # So they are checked here instead, at the markdown level, where the
+        # decorative case cannot occur.
+        run: |
+          if grep -rnE '!\[[[:space:]]*\]\(' _posts/; then
+            echo "::error::the article images listed above have no alt text"
+            exit 1
+          fi
+          echo "all article images have alt text"
+
       - name: Build site
         env:
           JEKYLL_ENV: production

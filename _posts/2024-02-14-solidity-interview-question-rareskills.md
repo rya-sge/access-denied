@@ -76,7 +76,7 @@ Ref: [docs.compound.finance/interest-rates/#get-utilization](https://docs.compou
 
 To compute the average price, it will perform a sum up of each price for a certain amount of block and divide it by the number of blocks used. The formula can be summarized thus: 
 
-![](https://static.wixstatic.com/media/935a00_cdd0c97f14834dfdbfb812597b8a34c3~mv2.png)
+![Time-weighted average price formula: the sum of each price multiplied by the time it held, divided by the total elapsed time](https://static.wixstatic.com/media/935a00_cdd0c97f14834dfdbfb812597b8a34c3~mv2.png)
 
 The goal of this oracle is to make more costly a flashhloan attack / price manipulation since a flashloan attack modifies the price of an asset inside the same block.
 
