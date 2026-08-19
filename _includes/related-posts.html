@@ -1,0 +1,139 @@
+{%- comment -%}
+  Related posts, ranked by tag overlap.
+
+  Replaces `site.related_posts`, which does NOT return related posts: without the
+  `classifier-reborn` LSI dependency (never available on GitHub Pages, and not in
+  the Gemfile) Jekyll falls back to "the 10 most recent posts". Every article on
+  the site therefore recommended the same four recent articles — a 2021 Linux
+  note pointed readers at a 2026 Centrifuge article.
+
+  Ranking, best first:
+    tier 2 - shares 2 or more tags with this post
+    tier 1 - shares exactly 1 tag
+    tier 0 - shares no tag, but sits in one of the same categories
+  Within a tier, the most recent post wins.
+
+  Pure Liquid on purpose. A `_plugins/` generator would rank more precisely, but
+  it would also render nothing at all if the site ever falls back to the classic
+  GitHub Pages build, which ignores `_plugins/` (see .github/workflows/pages.yml).
+
+  Two Liquid constraints shape the code below:
+    * there is no `push` filter, so results accumulate as comma-joined strings of
+      URLs and are resolved back to documents with `where` at render time;
+    * `and` / `or` have no precedence and bind right to left, so the tier test is
+      an `elsif` chain of single comparisons rather than one combined expression.
+
+  Cost control: candidates come from the post's own categories rather than from
+  all 254 posts, and tag overlap is one `contains` per tag against a delimited
+  string instead of a nested loop. The commas around both needle and haystack are
+  what stop `eth` from matching `ethereum`.
+
+  Parameters:
+    * limit (int) - how many to show (default 4)
+{%- endcomment -%}
+
+{%- comment -%} `plus: 0` coerces the include parameter to a number, so the
+     comparison against `shown` cannot blow up on a string. {%- endcomment -%}
+{% assign max_related = include.limit | default: 4 | plus: 0 %}
+
+{%- comment -%} Candidate pool: every post sharing at least one category. {%- endcomment -%}
+{% assign pool = '' | split: '' %}
+{% for cat in page.categories %}
+  {% if site.categories[cat] %}
+    {% assign pool = pool | concat: site.categories[cat] %}
+  {% endif %}
+{% endfor %}
+{% if pool.size == 0 %}
+  {%- comment -%} Uncategorised post: fall back to the whole archive. {%- endcomment -%}
+  {% assign pool = site.posts %}
+{% endif %}
+{% assign pool = pool | sort: 'date' | reverse %}
+
+{%- comment -%}
+  One pass over the pool, sorting each candidate into a tier bucket. Three passes
+  (one per tier) would read better but would triple the comparison count, and the
+  pool averages 106 candidates across 254 posts.
+
+  Each bucket is a ",url,url," string: Liquid has no `push` filter, and a
+  delimited string doubles as the de-duplication set (a post sitting in two of
+  this post's categories appears in the pool twice).
+{%- endcomment -%}
+{% assign tier2 = ',' %}
+{% assign tier1 = ',' %}
+{% assign tier0 = ',' %}
+{% assign seen = ',' %}
+{% assign found = 0 %}
+
+{% for candidate in pool %}
+  {% if candidate.url == page.url %}{% continue %}{% endif %}
+  {% capture key %},{{ candidate.url }},{% endcapture %}
+  {% unless seen contains key %}
+    {% assign seen = seen | append: candidate.url | append: ',' %}
+    {% assign found = found | plus: 1 %}
+    {% assign candidate_tags = candidate.tags | join: ',' %}
+    {% capture haystack %},{{ candidate_tags }},{% endcapture %}
+    {% assign shared = 0 %}
+    {% for tag in page.tags %}
+      {% capture needle %},{{ tag }},{% endcapture %}
+      {% if haystack contains needle %}
+        {% assign shared = shared | plus: 1 %}
+      {% endif %}
+    {% endfor %}
+    {% if shared >= 2 %}
+      {% assign tier2 = tier2 | append: candidate.url | append: ',' %}
+    {% elsif shared == 1 %}
+      {% assign tier1 = tier1 | append: candidate.url | append: ',' %}
+    {% else %}
+      {% assign tier0 = tier0 | append: candidate.url | append: ',' %}
+    {% endif %}
+  {% endunless %}
+{% endfor %}
+
+{%- comment -%}
+  Buckets concatenated best-first. The join leaves empty segments (",a,b,,c,");
+  the render loop skips them.
+{%- endcomment -%}
+{% assign picked = tier2 | append: tier1 | append: tier0 %}
+
+{%- comment -%}
+  Nothing to show (a post with no tags and no categories): render nothing at all
+  rather than an empty "You might also enjoy" heading.
+{%- endcomment -%}
+{% if found > 0 %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+<div class="c-recent-post">
+    <h4 class="c-recent__title">{{ t.related_title }}</h4>
+    <div class="c-recent__box">
+        {% assign picked_urls = picked | split: ',' %}
+        {% assign shown = 0 %}
+        {% for url in picked_urls %}
+        {% if shown >= max_related %}{% break %}{% endif %}
+        {% if url != '' %}
+        {% assign rp = pool | where: 'url', url | first %}
+        {% if rp %}
+        {% assign shown = shown | plus: 1 %}
+        {%- comment -%}
+          The card is rendered whether or not the post has an image. The previous
+          version skipped image-less posts entirely, so a related post could be
+          computed and then silently dropped (feedback.md #11).
+        {%- endcomment -%}
+        <div class="c-recent__item">
+            {% if rp.image %}
+            <a class="c-recent__image" href="{{ site.baseurl | append: rp.url }}">
+              <img src="{{ site.baseurl | append: rp.image }}"
+                   alt="{{ rp.title | escape }}" loading="lazy" decoding="async">
+            </a>
+            {% endif %}
+            <div class="c-recent__footer">
+                <h4><a href="{{ site.baseurl | append: rp.url }}">{{ rp.title }}</a></h4>
+                <div class="c-recent__date">
+                    <time datetime="{{ rp.date | date_to_xmlschema }}">{{ rp.date | date: t.date_format }}</time>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div> <!-- /.c-recent-post -->
+{% endif %}

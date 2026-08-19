@@ -16,7 +16,7 @@ This document does **not** re-propose anything already marked ✅ in `site_impro
 | 4 | Structured data | 98 articles have a FAQ section; none emit `FAQPage` JSON-LD | 🔴 High | M |
 | 5 | Content loss | 3 articles are unpublished (bad filenames), 1 is a duplicate-title stub, 1 has an invalid filename date | 🟠 Med | S |
 | 6 | Extractability | No answer-first summary, no visible author/updated line, no `<time datetime>` | 🟠 Med | M |
-| 7 | Internal linking | `site.related_posts` is *not* related — it is "4 most recent"; 28 posts have zero internal links | 🟠 Med | M |
+| 7 | Internal linking | ~~`site.related_posts` is "4 most recent"~~ — **✅ implemented 2026-08-19**; 28 posts still have zero in-body internal links | 🟠 Med | M |
 | 8 | Category pages | 20 landing pages with no title-case, no description, no intro text | 🟠 Med | S |
 | 9 | Metadata quality | 126 descriptions exceed the SERP snippet width, 27 are too thin, 2 empty, 3 posts have no category | 🟡 Low | M |
 | 10 | Discovery | No IndexNow, no Bing verification file in the repo, no author/about page | 🟡 Low | S |
@@ -359,25 +359,31 @@ This is not worth a bulk rewrite. Worth doing:
 
 ## 5. Internal linking and site architecture
 
-### 5.1 "You might also enjoy" is not related — it is recent
+### 5.1 "You might also enjoy" is not related — it is recent — ✅ IMPLEMENTED (2026-08-19)
 
 `_layouts/post.html` iterates `site.related_posts`. Without the `classifier-reborn` LSI dependency (which is not installed, and which GitHub Pages never allowed), **Jekyll's `related_posts` returns the 10 most recent posts**, not related ones. Every article therefore links to the same four recent posts, and a 2021 Linux article recommends a 2026 Centrifuge article.
 
-That wastes the single best internal-linking surface on the site — 254 pages × 4 links. Replace it with tag/category overlap in pure Liquid:
+That wastes the single best internal-linking surface on the site — 254 pages × 4 links.
 
-```liquid
-{% assign candidates = site.posts | where_exp: "p", "p.url != page.url" %}
-{% assign scored = "" | split: "" %}
-{% for p in candidates %}
-  {% assign score = 0 %}
-  {% for tag in page.tags %}{% if p.tags contains tag %}{% assign score = score | plus: 3 %}{% endif %}{% endfor %}
-  {% for cat in page.categories %}{% if p.categories contains cat %}{% assign score = score | plus: 1 %}{% endif %}{% endfor %}
-  {% if score > 2 %}{% assign scored = scored | push: p %}{% endif %}
-{% endfor %}
-{% for post in scored limit: 4 %} … {% endfor %}
-```
+**What was implemented.** The block now lives in `_includes/related-posts.html`, called from `_layouts/post.html` as `{% include related-posts.html limit=4 %}`. Candidates are drawn from the post's own categories and ranked in three tiers, most recent first within each:
 
-With 748 distinct tags this scores well; cap the candidate loop by category first if build time suffers. Sorting by score requires a `sort` on a computed key, which Liquid cannot do directly — if exact ranking matters, do it in a `_plugins/related_posts.rb` generator (the Actions build runs plugins), which is also faster than an O(n²) Liquid loop over 254 posts.
+| Tier | Rule |
+|------|------|
+| 2 | shares **2 or more tags** with this post |
+| 1 | shares **exactly 1 tag** |
+| 0 | shares no tag, but sits in one of the same categories |
+
+Measured against the live archive: **171 of 266 posts fill all four slots from tag matches alone**, 164 have a top pick sharing at least two tags, and no post ends up with an empty block. Restricting candidates to same-category posts rather than scanning all 254 costs almost nothing — only **2 posts** have a strong (≥2 tag) match that lives outside their own categories while being under-filled.
+
+Implementation notes, because Liquid makes this less obvious than it looks:
+
+- **No `push` filter exists.** Results accumulate in `",url,url,"` strings — one per tier — which double as the de-duplication set (a post in two of this post's categories appears in the pool twice). They are concatenated best-first and resolved back to documents with `where: 'url'` at render time.
+- **`and` / `or` have no precedence in Liquid and bind right to left**, so the tier test is an `elsif` chain of single comparisons. A combined `a == 2 and b >= 2 or a == 1 and b == 1` would silently evaluate as something else entirely.
+- **One pass, not three.** Candidates are bucketed in a single loop over the pool (which averages 106 posts), rather than one pass per tier.
+- **Tag matching is one `contains` per tag** against a comma-delimited string instead of a nested loop; the commas wrapping both needle and haystack are what stop `eth` from matching `ethereum`.
+- **Pure Liquid, deliberately.** A `_plugins/` generator would rank more precisely, but it would render nothing at all if the site ever falls back to the classic GitHub Pages build, which ignores `_plugins/`.
+
+Fixed at the same time: the old loop was wrapped in `{% if post.image %}`, so a related post without an image was computed and then silently dropped, leaving a gap in the row (`feedback.md` #11). The card now renders regardless and only the `<img>` is conditional. The date in each card is also a `<time datetime="…">` element.
 
 ### 5.2 28 posts with zero internal links
 
@@ -458,7 +464,7 @@ feed:
 **Tier 2 — high impact, medium effort**
 
 7. `FAQPage` JSON-LD plugin for the 98 FAQ articles (§3.1).
-8. Replace `site.related_posts` with real tag-overlap related posts (§5.1).
+8. ~~Replace `site.related_posts` with real tag-overlap related posts~~ — ✅ done 2026-08-19 (§5.1).
 9. Key-takeaways block in `_layouts/post.html` + `create-article`, backfilled on the top articles (§6.1).
 10. `/about/` page with `Person` schema + a visible byline on every article (§6.4).
 11. `TechArticle` JSON-LD with `keywords` / `articleSection` / `wordCount` (§3.2).
