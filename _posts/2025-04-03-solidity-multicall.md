@@ -2,6 +2,7 @@
 layout: post
 title: "Multicall in Solidity: CALL vs DELEGATECALL Explained"
 date:   2025-04-03
+last_modified_at: 2025-04-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity

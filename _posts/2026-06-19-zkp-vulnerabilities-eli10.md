@@ -2,6 +2,7 @@
 layout: post
 title: "How Zero-Knowledge Proofs Get Hacked — Explained for a 10-Year-Old"
 date: 2026-06-19
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: cryptography security ZKP eli10

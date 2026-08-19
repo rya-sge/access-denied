@@ -2,6 +2,7 @@
 layout: post
 title: "STM32 Memory Protection in Practice - RDP, WRP, Firewall and OTP"
 date:   2026-07-31
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: security programmation

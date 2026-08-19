@@ -2,6 +2,7 @@
 layout: post
 title: Recover your passwords with Hashcat
 date:  2022-11-13
+last_modified_at: 2025-01-16
 locale: en-GB
 lang: en
 categories: security tryhackme

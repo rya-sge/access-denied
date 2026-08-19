@@ -2,6 +2,7 @@
 layout: post
 title: "The GKR Protocol — How to Check a Million Calculations Without Doing Them"
 date:   2026-06-19
+last_modified_at: 2026-07-28
 lang: en
 locale: en-GB
 categories: cryptography ZKP eli10

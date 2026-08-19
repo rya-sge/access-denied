@@ -37,6 +37,7 @@ en:
   category_posts_count: "Posts"
 
   # Post
+  updated_on: "Updated"
   read_time_suffix: " minute read"
   related_title: "You might also enjoy"
   contact_intro: "Feel free to contact me on"
@@ -80,6 +81,7 @@ fr:
   category_posts_count: "Articles"
 
   # Article
+  updated_on: "Mis à jour le"
   read_time_suffix: " min de lecture"
   related_title: "Vous aimerez aussi"
   contact_intro: "N'hésitez pas à me contacter sur"

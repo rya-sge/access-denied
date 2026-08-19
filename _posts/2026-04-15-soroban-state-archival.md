@@ -2,6 +2,7 @@
 layout: post
 title: Soroban State Archival — Storage Semantics and Security Implications
 date: 2026-04-15
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain security

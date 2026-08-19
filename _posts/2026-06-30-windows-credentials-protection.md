@@ -2,6 +2,7 @@
 layout: post
 title: "Windows Credentials Protection - LAPS, WDigest, LSA Protection, Credential Guard and Protected Users"
 date:   2026-06-30
+last_modified_at: 2026-08-19
 lang: en
 locale: en-GB
 categories: security network

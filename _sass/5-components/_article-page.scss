@@ -41,7 +41,10 @@
 }
 
 .c-article__date {
-  span {
+  // `time` as well as `span`: the publication date is now a machine-readable
+  // <time> element (see _layouts/post.html) and would otherwise lose its style.
+  span,
+  time {
     font-size: 13px;
     text-transform: uppercase;
     color: $gray;

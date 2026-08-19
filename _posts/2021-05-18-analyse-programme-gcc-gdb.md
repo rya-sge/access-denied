@@ -3,6 +3,7 @@
 layout: post
 title:  "Analyse de programmes avec GCC et GDB"
 date:   2021-05-18 
+last_modified_at: 2021-10-28
 lang: fr
 locale: fr-FR
 categories: security

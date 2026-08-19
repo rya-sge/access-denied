@@ -2,6 +2,7 @@
 layout: post
 title: Fuzzing Solana Programs with Trident
 date: 2026-03-13
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: solana security blockchain

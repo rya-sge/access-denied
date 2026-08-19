@@ -2,6 +2,7 @@
 layout: post
 title: "Tether USDT smart contract - Overview"
 date: 2025-07-06
+last_modified_at: 2025-07-17
 lang: en
 locale: en-GB
 categories: ethereum defi

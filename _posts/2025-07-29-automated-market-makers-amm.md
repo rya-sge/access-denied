@@ -2,6 +2,7 @@
 layout: post
 title: Automated Market Makers (AMMs) - Overview
 date: 2025-07-29
+last_modified_at: 2025-09-01
 lang: en
 locale: en-GB
 categories: defi blockchain ethereum

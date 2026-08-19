@@ -2,6 +2,7 @@
 layout: post
 title: Insuring Composable DeFi - First-Loss Capital Along the Attack Graph
 date:   2026-07-02
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: blockchain defi security

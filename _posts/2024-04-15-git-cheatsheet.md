@@ -2,6 +2,7 @@
 layout: post
 title:  Most useful commands with git
 date:   2024-04-15
+last_modified_at: 2025-05-02
 lang: en
 locale: en-GB
 categories: programmation

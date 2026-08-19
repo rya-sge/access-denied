@@ -2,6 +2,7 @@
 layout: post
 title: Digital Forensics and Incident Response (DFIR) - Introduction
 date:   2025-01-15
+last_modified_at: 2025-01-22
 lang: en
 locale: en-GB
 categories: security tryhackme

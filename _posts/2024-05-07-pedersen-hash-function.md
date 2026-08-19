@@ -2,6 +2,7 @@
 layout: post
 title: Pedersen Hash Function Overview
 date:   2024-05-07
+last_modified_at: 2025-04-24
 lang: en
 locale: en-GB
 categories: cryptography blockchain

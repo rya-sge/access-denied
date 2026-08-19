@@ -2,6 +2,7 @@
 layout: post
 title:  Introduction to Shamir’s Secret Sharing - How to share a secret
 date:   2024-10-29
+last_modified_at: 2024-11-27
 lang: en
 locale: en-GB
 categories: blockchain cryptography

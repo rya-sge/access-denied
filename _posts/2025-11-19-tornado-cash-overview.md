@@ -4,7 +4,6 @@ title: Tornado Cash Circuits - Overview
 date:   2025-11-19
 locale: en-GB
 lang: en
-last-update: 
 categories: blockchain ZKP solidity
 tags: solidity ethereum smart-contract
 description: Tornado Cash is one of Ethereum’s pioneering privacy protocols build on zk-SNARK and Circom zero-knowledge circuits.

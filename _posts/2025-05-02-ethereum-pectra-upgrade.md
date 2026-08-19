@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Pectra - Overview"
 date:  2025-05-02
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain ethereum

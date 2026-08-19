@@ -2,9 +2,9 @@
 layout: post
 title:  "Tester la résistance d'un crypto système à un niveau d'attaques"
 date:   2022-04-24
+last_modified_at: 2022-04-28
 lang: fr
 locale: fr-FR
-last-update: 
 categories: cryptography 
 tags: ind-cpa ind-caa asymetrique
 description: Cet article aborde les différents tests et jeux auxquels on peut soumettre un crypto système pour vérifier sa robustesse (p.ex. IND-CPA et IND-CAA).

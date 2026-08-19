@@ -2,9 +2,9 @@
 layout: post
 title: Programming proxy contracts with OpenZeppelin | Summary
 date: 2022-10-31
+last_modified_at: 2024-06-10
 locale: en-GB
 lang: en
-last-update: 
 categories: blockchain blockchainBestOf ethereum solidity
 tags: solidity ethereum smart-contract OpenZeppelin
 description: Summary of the most important points to think and check to program proxy contracts on Ethereum, with a focus on the OpenZeppelin library.

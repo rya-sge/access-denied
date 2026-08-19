@@ -2,9 +2,9 @@
 layout: post
 title:  Unit Test Key Principles
 date:   2022-10-27
+last_modified_at: 2026-07-30
 locale: en-GB
 lang: en
-last-update: 
 categories: programmation
 tags: unit test OOP
 description: This article presents some principles to respect when you create unit testing (DRY test, KISS, SRP and Yagni).

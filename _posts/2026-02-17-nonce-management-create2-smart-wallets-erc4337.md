@@ -2,6 +2,7 @@
 layout: post
 title: Nonce Management and CREATE2 in ERC-4337 Smart Wallets
 date:   2026-02-17
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security

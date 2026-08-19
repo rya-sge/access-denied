@@ -2,6 +2,7 @@
 layout: post
 title: "Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem"
 date: 2025-04-23
+last_modified_at: 2025-04-24
 lang: en
 locale: en-GB
 categories: cryptography security

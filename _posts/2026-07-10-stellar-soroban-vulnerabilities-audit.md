@@ -2,6 +2,7 @@
 layout: post
 title: "Three Vulnerabilities from the OpenZeppelin Stellar Contracts Audits"
 date:   2026-07-10
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: blockchain security

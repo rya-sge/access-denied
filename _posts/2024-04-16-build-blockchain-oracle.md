@@ -2,6 +2,7 @@
 layout: post
 title:  How to build a blockchain oracle
 date:   2024-04-16
+last_modified_at: 2025-01-23
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum

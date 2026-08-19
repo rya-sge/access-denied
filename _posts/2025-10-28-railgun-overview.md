@@ -2,6 +2,7 @@
 layout: post
 title: "RAILGUN: Privacy Infrastructure for DeFi"
 date:   2025-10-28
+last_modified_at: 2025-11-06
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP

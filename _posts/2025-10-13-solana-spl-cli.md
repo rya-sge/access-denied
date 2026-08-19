@@ -2,6 +2,7 @@
 layout: post
 title: Solana SPL token - Command
 date:   2025-10-13
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain solana

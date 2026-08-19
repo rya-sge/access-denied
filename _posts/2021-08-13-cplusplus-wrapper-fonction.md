@@ -2,6 +2,7 @@
 layout: post
 title:  "Les wrappers de fonctions en C++ avec std::function"
 date:   2021-08-13
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: programmation

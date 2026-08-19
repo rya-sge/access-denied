@@ -2,6 +2,7 @@
 layout: post
 title:  Solana Programs - Basic Security with Anchor
 date:   2024-08-20
+last_modified_at: 2024-09-18
 lang: en
 locale: en-GB
 categories: blockchain security solana 

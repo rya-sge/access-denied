@@ -2,6 +2,7 @@
 layout: post
 title: Chainlink DECO, zkTLS oracle 
 date:   2025-01-13
+last_modified_at: 2025-01-15
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP

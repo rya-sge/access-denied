@@ -2,6 +2,7 @@
 layout: post
 title: "Solidity Modifier Patterns: Gas, Bytecode Size, and Security Trade-offs"
 date: 2026-02-18
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: solidity security ethereum

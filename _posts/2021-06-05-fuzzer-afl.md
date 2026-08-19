@@ -2,6 +2,7 @@
 layout: post
 title:  "Fuzzing avec AFL"
 date:   2021-06-05 
+last_modified_at: 2021-07-16
 lang: fr
 locale: fr-FR
 categories: security

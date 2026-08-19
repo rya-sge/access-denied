@@ -2,6 +2,7 @@
 layout: post
 title: "Solana Staking - Overview"
 date:   2025-11-09
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain solana security

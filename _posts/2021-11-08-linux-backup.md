@@ -2,9 +2,9 @@
 layout: post
 title:  "Réaliser un backup sous Linux"
 date:   2021-11-05
+last_modified_at: 2022-02-03
 lang: fr
 locale: fr-FR
-last-update: 
 categories: linux
 tags: backup parted
 description: Cet article présente la réalisation d'un backup "fait maison" sous le système d'exploitation Ubuntu 18.04 LTS

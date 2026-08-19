@@ -2,6 +2,7 @@
 layout: post
 title: "Gnosis Conditional Tokens — Combinatorial Prediction Markets on ERC-1155"
 date:   2026-07-28
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity

@@ -2,6 +2,7 @@
 layout: post
 title: Crypto Wallets Explained - Types, Risks, and How to select it
 date:   2024-10-08
+last_modified_at: 2025-03-27
 lang: en
 locale: en-GB
 categories: blockchain cryptography

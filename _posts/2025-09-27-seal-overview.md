@@ -2,6 +2,7 @@
 layout: post
 title: "Seal: Identity-Based Encryption for Onchain Access Control"
 date:   2025-09-27
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain cryptography

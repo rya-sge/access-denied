@@ -2,6 +2,7 @@
 layout: post
 title: Main Concept Behind Zero-Knowledge Proof
 date:   2024-06-17
+last_modified_at: 2024-08-20
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP

@@ -2,9 +2,9 @@
 layout: post
 title: "Security in Claude Code: Architecture, Safeguards, and Best Practices"
 date:   2026-01-13
+last_modified_at: 2026-07-30
 locale: en-GB
 lang: en
-last-update: 
 categories: ai security
 tags: claude security ai
 description: technical overview of Claude Code’s security model, including its permission system, sandboxing architecture, identity and access management (IAM), and operational best practices.

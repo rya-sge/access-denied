@@ -2,9 +2,9 @@
 layout: post
 title: Introduction to Solana and the spl-token command line
 date:   2022-08-06
+last_modified_at: 2025-10-21
 locale: en-GB
 lang: en
-last-update: 
 categories: blockchain solana 
 tags: spl-token airdrop phantom
 description: This article is an introduction to the Solana ecosystem, the Solana Tool Suite and the spl-token command-line utility.

@@ -2,7 +2,7 @@
 layout: post
 title:  "Summary of EIP-4844 Proto-Danksharding"
 date:   2023-09-26
-last-update: 
+last_modified_at: 2024-05-23
 categories: blockchain ethereum
 lang: en
 locale: en-GB

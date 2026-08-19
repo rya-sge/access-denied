@@ -2,6 +2,7 @@
 layout: post
 title:  Introduction to Arbitrum, an Optimistic rollup protocol
 date:   2024-01-31
+last_modified_at: 2024-11-29
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum

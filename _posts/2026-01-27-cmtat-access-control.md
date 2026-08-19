@@ -2,9 +2,9 @@
 layout: post
 title: "Flexible Access Control in smart contracts (CMTAT)"
 date:   2026-01-27
+last_modified_at: 2026-01-29
 locale: en-GB
 lang: en
-last-update: 
 categories: blockchain solidity
 tags: solidity CMTAT RWA access-control RBAC
 description: This article describes how CMTAT implements flexible access control by separating business logic from authorization policy, allowing deployments to choose between RBAC, ownership, OpenZeppelin AccessManager, or custom policies.

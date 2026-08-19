@@ -2,6 +2,7 @@
 layout: post
 title: ERC-20 Implementation Comparison — OpenZeppelin, Solady, and Solarity Solidity Library
 date: 2026-02-13
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain solidity defi

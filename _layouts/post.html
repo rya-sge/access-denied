@@ -26,8 +26,26 @@ layout: home
     <div class="c-wrap-content">
         <header class="c-article__header">
             <h1 class="c-article__title">{{page.title}}</h1>
+            {%- comment -%}
+              Both dates are machine-readable <time> elements: `datePublished`
+              and `dateModified` are what jekyll-seo-tag puts in the JSON-LD, and
+              a crawler that reads only the HTML needs the same two dates in a
+              form it can parse. `last_modified_at` is set from git history (the
+              last commit that changed the article body, title or description),
+              and is only present when it is newer than the publication date.
+            {%- endcomment -%}
             <div class="c-article__date">
-                <span>{{ page.date | date: t.date_format }}</span>
+                <time datetime="{{ page.date | date_to_xmlschema }}">
+                    {{ page.date | date: t.date_format }}
+                </time>
+                {% if page.last_modified_at %}
+                <span class="c-article__updated">
+                    &middot; {{ t.updated_on }}
+                    <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">
+                        {{ page.last_modified_at | date: t.date_format }}
+                    </time>
+                </span>
+                {% endif %}
             </div>
         </header>
         {% include toc.html html=content %}

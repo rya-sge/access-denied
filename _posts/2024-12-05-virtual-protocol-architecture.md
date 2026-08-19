@@ -2,6 +2,7 @@
 layout: post
 title:  Virtual Protocol, create co-ownership AI agents
 date:   2024-12-5
+last_modified_at: 2025-01-16
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi ai

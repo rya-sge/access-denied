@@ -2,6 +2,7 @@
 layout: post
 title:  Influential figures in Crypto and Blockchain
 date:   2024-08-13
+last_modified_at: 2024-09-19
 lang: en
 locale: en-GB
 categories: blockchain

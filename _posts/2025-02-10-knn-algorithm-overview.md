@@ -2,6 +2,7 @@
 layout: post
 title: K-Nearest Neighbor (KNN) Algorithm  - Overview
 date: 2025-02-10
+last_modified_at: 2025-05-02
 lang: en
 locale: en-GB
 categories: ai

@@ -2,6 +2,7 @@
 layout: post
 title: ERC-1271 and ERC-7913 Signature Verification — OpenZeppelin, Solady, Coinbase Smart Wallet, and Solarity Solidity Library
 date: 2026-02-13
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain solidity security

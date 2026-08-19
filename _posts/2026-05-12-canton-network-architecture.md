@@ -2,6 +2,7 @@
 layout: post
 title: Canton Network — Architecture, Privacy Model, and Comparison with Ethereum, Railgun, Zcash, Zama fhEVM, and Besu
 date: 2026-05-12
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain cryptography

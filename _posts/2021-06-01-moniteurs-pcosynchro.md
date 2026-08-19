@@ -2,6 +2,7 @@
 layout: post
 title:  Les moniteurs avec PcoSynchro
 date:   2021-06-01 
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: programmation

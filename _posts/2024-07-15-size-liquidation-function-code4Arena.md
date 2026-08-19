@@ -2,6 +2,7 @@
 layout: post
 title:  Size Code4Arena - Liquidation function
 date:   2024-07-15
+last_modified_at: 2024-12-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi

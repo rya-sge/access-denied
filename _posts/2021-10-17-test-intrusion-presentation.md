@@ -2,6 +2,7 @@
 layout: post
 title:  "Les tests d'intrusion (pentesting)"
 date:   2021-10-17
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: security

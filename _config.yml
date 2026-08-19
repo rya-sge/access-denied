@@ -97,6 +97,8 @@ exclude:
   - feedback.md
   - multi-language.md
   - site_improvement.md
+  - SEO_IMPROVEMENT.md
+  - improvement_31.md
   - CLAUDE.md
   - DEPENDENCE.md
   - polyfills.md

@@ -2,6 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 42 - Snowman Merkle Airdrop"
 date: 2025-07-11
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: solidity blockchain

@@ -2,6 +2,7 @@
 layout: post
 title:  "Mimikatz - afficher les logs"
 date:   2021-05-18 
+last_modified_at: 2021-07-04
 lang: fr
 locale: fr-FR
 categories: security

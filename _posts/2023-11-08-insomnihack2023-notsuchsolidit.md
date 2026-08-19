@@ -2,6 +2,7 @@
 layout: post
 title:  "Insomni Hack 2023 - NotSuchSolidIT challenge"
 date:   2023-11-08
+last_modified_at: 2024-01-31
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity

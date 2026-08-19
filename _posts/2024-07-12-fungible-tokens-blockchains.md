@@ -2,6 +2,7 @@
 layout: post
 title: Fungible Tokens across blockchains
 date:   2024-07-12
+last_modified_at: 2025-01-22
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum defi

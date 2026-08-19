@@ -2,6 +2,7 @@
 layout: post
 title: "How Centrifuge Vaults Work — Asynchronous ERC-7540 Investment on a Hub-and-Spoke Protocol"
 date:   2026-08-18
+last_modified_at: 2026-08-19
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity

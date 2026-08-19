@@ -2,6 +2,7 @@
 layout: post
 title: GNU/Linux Base Security Primitives - Authentication, Permissions, ACLs, Attributes, Capabilities
 date:   2026-06-29
+last_modified_at: 2026-06-30
 lang: en
 locale: en-GB
 categories: linux security

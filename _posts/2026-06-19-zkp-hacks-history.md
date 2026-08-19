@@ -2,6 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proof Hacks — A Documented Record of Exploits and Vulnerabilities (2023–2026)"
 date: 2026-06-19
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: blockchain security defi ZKP

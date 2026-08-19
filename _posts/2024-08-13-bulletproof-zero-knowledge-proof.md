@@ -2,6 +2,7 @@
 layout: post
 title:  Zero Knowledge Proofs with Bulletproof 
 date:   2024-08-13
+last_modified_at: 2024-10-28
 lang: en
 locale: en-GB
 categories: cryptography blockchainBestOf blockchain ZKP

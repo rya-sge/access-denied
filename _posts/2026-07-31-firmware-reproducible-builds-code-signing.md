@@ -2,6 +2,7 @@
 layout: post
 title: "Firmware Supply Chain - Reproducible Builds and Code Signing"
 date:   2026-07-31
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: security blockchain

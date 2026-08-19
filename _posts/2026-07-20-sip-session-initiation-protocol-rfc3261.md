@@ -2,6 +2,7 @@
 layout: post
 title: "SIP - The Session Initiation Protocol (RFC 3261)"
 date:   2026-07-20
+last_modified_at: 2026-07-21
 lang: en
 locale: en-GB
 categories: network security rfc

@@ -2,9 +2,9 @@
 layout: post
 title:  "SSH - accéder à distance à un shell"
 date:   2021-10-14
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
-last-update: 
 categories: linux security
 tags: shell ssh linux
 description: Cet article présente comment accéder à distance à un shell ainsi que la mise en place d'une connexion sécurisée entre un client et un serveur. 

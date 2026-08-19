@@ -2,7 +2,7 @@
 layout: post
 title: 2022 - Hacktober in DeFi
 date: 2022-12-11
-last-update: 
+last_modified_at: 2026-07-30
 locale: en-GB
 lang: en
 categories: security blockchain

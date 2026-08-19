@@ -2,6 +2,7 @@
 layout: post
 title: "Halo — How to Check an Endless Chain of Work with a Single Glance"
 date:   2026-06-19
+last_modified_at: 2026-07-28
 lang: en
 locale: en-GB
 categories: cryptography ZKP eli10

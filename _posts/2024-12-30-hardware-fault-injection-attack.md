@@ -2,6 +2,7 @@
 layout: post
 title: Hardware Security - Understanding Fault Injection Attack
 date:   2024-12-30
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: security cryptography 

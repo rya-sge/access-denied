@@ -2,6 +2,7 @@
 layout: post
 title:  Ethereum Staking - How It Works
 date:   2024-03-28
+last_modified_at: 2025-05-02
 lang: en
 locale: en-GB
 categories: blockchain ethereum cryptography

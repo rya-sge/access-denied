@@ -3,6 +3,7 @@
 layout: post
 title:  "Chiffrement RSA avec SageMath"
 date:   2021-07-27
+last_modified_at: 2024-11-28
 lang: fr
 locale: fr-FR
 categories: cryptography

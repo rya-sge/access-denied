@@ -2,9 +2,9 @@
 layout: post
 title:  "NodeJS - WebSockets avec Express"
 date:   2021-11-14
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
-last-update: 
 categories: programmation web
 tags: javascript node.js  websockets
 image: /assets/article/programmation/nodeJS/websocket/2021-11-14-nodejs-express-websocket-mindmap.png

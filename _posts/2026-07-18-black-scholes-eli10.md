@@ -2,6 +2,7 @@
 layout: post
 title: "The Black-Scholes Model for Curious Kids — Pricing a Ticket to Buy Later"
 date: 2026-07-18
+last_modified_at: 2026-07-20
 lang: en
 locale: en-GB
 categories: finance eli10

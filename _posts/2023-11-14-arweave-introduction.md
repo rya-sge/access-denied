@@ -2,6 +2,7 @@
 layout: post
 title:  Introduction to Arweave, a decentralized storage layer
 date:   2023-11-14
+last_modified_at: 2024-11-29
 lang: en
 locale: en-GB
 categories: blockchain 

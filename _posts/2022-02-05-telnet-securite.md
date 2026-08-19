@@ -2,9 +2,9 @@
 layout: post
 title:  "La sécurité du protocole Telnet"
 date:   2022-02-05
+last_modified_at: 2022-02-07
 lang: fr
 locale: fr-FR
-last-update: 
 categories: security
 tags: telnet pentesting 
 image: /assets/article/pentest/telnet/telnet-cov.PNG

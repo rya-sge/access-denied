@@ -2,6 +2,7 @@
 layout: post
 title: "Medusa — Architecture and Practical Use of a Coverage-Guided Solidity Fuzzer"
 date:   2026-07-28
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security

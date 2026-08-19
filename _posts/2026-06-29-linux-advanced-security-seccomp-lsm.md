@@ -2,6 +2,7 @@
 layout: post
 title: Advanced GNU/Linux Security - SECCOMP and Linux Security Modules (LSM)
 date:   2026-06-29
+last_modified_at: 2026-06-30
 lang: en
 locale: en-GB
 categories: linux security

@@ -2,6 +2,7 @@
 layout: post
 title:  "Android Studio - Design d'une application"
 date:   2021-10-10
+last_modified_at: 2024-08-13
 lang: fr
 locale: fr-FR
 categories: programmation

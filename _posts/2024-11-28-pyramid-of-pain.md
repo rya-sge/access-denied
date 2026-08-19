@@ -2,6 +2,7 @@
 layout: post
 title: The Pyramid of Pain in Cybersecurity
 date:   2024-11-28
+last_modified_at: 2025-01-15
 lang: en
 locale: en-GB
 categories: security tryhackme

@@ -2,6 +2,7 @@
 layout: post
 title: Overview of ECDSA - Elliptic Curve Digital Signature Algorithm
 date:   2024-10-23
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain cryptography

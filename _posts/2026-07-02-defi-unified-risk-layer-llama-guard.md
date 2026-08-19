@@ -2,6 +2,7 @@
 layout: post
 title: The Unified Risk Layer for DeFi - From Price Oracles to Protocol-Owned Risk Oracles
 date:   2026-07-02
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: blockchain defi oracle

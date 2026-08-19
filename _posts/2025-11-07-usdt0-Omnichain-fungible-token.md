@@ -2,6 +2,7 @@
 layout: post
 title: "USD₮0 - Omnichain Fungible Token"
 date:   2025-11-07
+last_modified_at: 2025-11-19
 lang: en
 locale: en-GB
 categories: blockchain ethereum 

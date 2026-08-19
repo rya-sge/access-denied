@@ -2,6 +2,7 @@
 layout: post
 title: "ERC-8004 Trustless Agents - Identity, Reputation and Validation for On-Chain AI Agents"
 date:   2026-07-06
+last_modified_at: 2026-07-18
 lang: en
 locale: en-GB
 categories: ai blockchain ethereum

@@ -2,9 +2,9 @@
 layout: post
 title: "Traditional Futures vs. Perpetual Futures: A Technical Comparison"
 date:   2025-12-29
+last_modified_at: 2026-06-28
 locale: en-GB
 lang: en
-last-update: 
 categories: defi blockchain
 tags: defi futures perpetual derivatives funding-rate trading
 description: A technical comparison of traditional futures and crypto perpetual futures, covering no-arbitrage pricing, mark-to-market settlement, the funding rate mechanism, and liquidation.

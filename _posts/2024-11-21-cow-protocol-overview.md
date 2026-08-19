@@ -2,6 +2,7 @@
 layout: post
 title:  CoW Protocol - Intent & MEV protection
 date:   2024-11-21
+last_modified_at: 2024-12-05
 lang: en
 locale: en-GB
 categories: blockchain defi

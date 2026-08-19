@@ -2,6 +2,7 @@
 layout: post
 title:  RareSkills Solidity Interview Answers - Medium
 date:   2024-02-14
+last_modified_at: 2025-01-15
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum solidity

@@ -2,6 +2,7 @@
 layout: post
 title: "When the Hardware RNG Was Not Called - Anatomy of an Entropy Defect"
 date:   2026-07-31
+last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
 categories: cryptography security blockchain

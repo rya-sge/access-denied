@@ -2,6 +2,7 @@
 layout: post
 title: "ERC Standards for AI Agents - The On-Chain Agent Stack on Ethereum"
 date:   2026-07-06
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: ai blockchain ethereum

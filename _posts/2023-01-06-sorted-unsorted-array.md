@@ -2,7 +2,7 @@
 layout: post
 title: What to choose between sorted and unsorted array
 date: 2023-01-06
-last-update: 
+last_modified_at: 2026-07-30
 locale: en-GB
 lang: en
 categories: programmation

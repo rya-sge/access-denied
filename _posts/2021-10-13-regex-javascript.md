@@ -2,6 +2,7 @@
 layout: post
 title:  "Les regex en Javascript"
 date:   2021-10-13
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: programmation web

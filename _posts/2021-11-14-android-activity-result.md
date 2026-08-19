@@ -2,9 +2,9 @@
 layout: post
 title:  "Android Studio - Récupérer le résultat d'une activité"
 date:   2021-11-14
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
-last-update: 
 categories: programmation
 tags: android kotlin activity
 image: /assets/article/programmation/android/2021-11-14-android-activity-result-mindmap.png

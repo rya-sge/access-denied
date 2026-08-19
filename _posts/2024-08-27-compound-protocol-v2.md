@@ -2,6 +2,7 @@
 layout: post
 title:  Compound V2 Overview
 date:   2024-08-27
+last_modified_at: 2026-02-20
 lang: en
 locale: en-GB
 categories: blockchain defi

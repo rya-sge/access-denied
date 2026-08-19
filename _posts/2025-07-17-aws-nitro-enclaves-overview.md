@@ -2,6 +2,7 @@
 layout: post
 title: "AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data"
 date: 2025-07-17
+last_modified_at: 2025-07-29
 lang: en
 locale: en-GB
 categories: security

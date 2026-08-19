@@ -2,6 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 38 - Rock Paper Scissors"
 date: 2025-05-07
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: solidity blockchain

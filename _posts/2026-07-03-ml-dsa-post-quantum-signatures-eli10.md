@@ -2,6 +2,7 @@
 layout: post
 title: "How Computers Sign Messages That Even a Quantum Computer Cannot Fake — Explained for a 10-Year-Old"
 date:   2026-07-03
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: cryptography eli10

@@ -2,6 +2,7 @@
 layout: post
 title: "Deploying a SEP-41 Fungible Token on Stellar with OpenZeppelin"
 date:   2026-07-09
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: blockchain programmation

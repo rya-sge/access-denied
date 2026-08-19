@@ -2,9 +2,9 @@
 layout: post
 title:  L'analyse de données avec pandas
 date:   2022-03-07
+last_modified_at: 2022-03-09
 lang: fr
 locale: fr-FR
-last-update: 
 categories: programmation ai
 tags: machine-learning panda python
 image: /assets/article/programmation/python/pandas/pandas-head.PNG

@@ -2,6 +2,7 @@
 layout: post
 title:  "Conversions entre format de données en python(byte, string, int)"
 date:   2021-08-05
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: programmation

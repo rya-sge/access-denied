@@ -2,6 +2,7 @@
 layout: post
 title:  Arbre recouvrant de poids minimum (MST / ACM)
 date:   2021-08-22
+last_modified_at: 2025-01-09
 lang: fr
 locale: fr-FR
 categories: programmation

@@ -2,6 +2,7 @@
 layout: post
 title:  Overview, security and applications of Multi-Party Computation (MPC)
 date:   2024-10-21
+last_modified_at: 2024-11-27
 lang: en
 locale: en-GB
 categories: blockchain cryptography

@@ -2,6 +2,7 @@
 layout: post
 title: Mutual TLS (mTLS) - Overview
 date:   2024-12-16
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: security cryptography

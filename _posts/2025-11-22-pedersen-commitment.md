@@ -2,6 +2,7 @@
 layout: post
 title: The Pedersen Commitment - Overview
 date: 2025-11-22
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: cryptography

@@ -2,6 +2,7 @@
 layout: post
 title:  Code4Arena Contest - Renzo Oracle
 date:   2024-05-30
+last_modified_at: 2024-08-12
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi

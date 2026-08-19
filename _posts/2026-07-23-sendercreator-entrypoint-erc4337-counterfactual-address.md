@@ -2,6 +2,7 @@
 layout: post
 title: "SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses"
 date:   2026-07-23
+last_modified_at: 2026-07-28
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security

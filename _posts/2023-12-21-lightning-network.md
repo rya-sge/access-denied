@@ -2,6 +2,7 @@
 layout: post
 title:  "Main Concepts Behind the Lightning Network "
 date:   2023-12-21
+last_modified_at: 2024-06-10
 lang: en
 locale: en-GB
 categories: blockchain 

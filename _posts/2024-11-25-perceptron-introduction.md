@@ -2,6 +2,7 @@
 layout: post
 title: Perceptron - a simple, binary neural network architecture
 date:   2024-11-25
+last_modified_at: 2025-11-14
 lang: en
 locale: en-GB
 categories: ai

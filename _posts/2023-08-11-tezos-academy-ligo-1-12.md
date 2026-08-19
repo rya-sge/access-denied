@@ -2,7 +2,7 @@
 layout: post
 title: Tezos Academy - Overview
 date:   2023-08-11
-last-update: 
+last_modified_at: 2024-11-11
 categories: blockchain
 lang: en
 locale: en-GB

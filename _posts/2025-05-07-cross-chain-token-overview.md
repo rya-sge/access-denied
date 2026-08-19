@@ -2,6 +2,7 @@
 layout: post
 title: Cross-chain tokens Standard (ERC-7281, xERC20) - Overview
 date:  2025-05-07
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum

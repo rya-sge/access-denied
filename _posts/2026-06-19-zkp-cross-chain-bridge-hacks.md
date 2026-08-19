@@ -2,6 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proof Failures in Cross-Chain Bridges — Exploits, Vulnerabilities, and Bug Bounties"
 date: 2026-06-19
+last_modified_at: 2026-07-31
 lang: en
 locale: en-GB
 categories: blockchain security ZKP defi

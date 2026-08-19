@@ -2,7 +2,7 @@
 layout: post
 title:  "Free online courses and MOOC on Crypto and Blockchain"
 date:   2023-09-01
-last-update: 
+last_modified_at: 2026-07-30
 categories: blockchain
 lang: en
 locale: en-GB

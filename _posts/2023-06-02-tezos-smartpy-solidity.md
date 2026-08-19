@@ -2,7 +2,7 @@
 layout: post
 title: Solidity (Ethereum) vs SmartPy (Tezos)
 date: 2023-06-02
-last-update: 
+last_modified_at: 2026-07-30
 locale: en-GB
 lang: en
 categories: blockchain ethereum solidity

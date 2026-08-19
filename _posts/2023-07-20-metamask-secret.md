@@ -2,6 +2,7 @@
 layout: post
 title:  "Deep dive into MetaMask Secrets"
 date:   2023-07-20
+last_modified_at: 2025-01-31
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf cryptography

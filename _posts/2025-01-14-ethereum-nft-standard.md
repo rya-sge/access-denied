@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum NFT Standards: ERC-721, ERC-1155, ERC-6551, and More"
 date:   2025-01-14
+last_modified_at: 2025-04-24
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum

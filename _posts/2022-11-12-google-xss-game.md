@@ -2,7 +2,7 @@
 layout: post
 title: XSS Game - Google
 date: 2022-11-12
-last-update: 
+last_modified_at: 2024-12-05
 locale: en-GB
 lang: en
 categories: security web

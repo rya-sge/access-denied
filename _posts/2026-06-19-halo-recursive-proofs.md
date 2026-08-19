@@ -2,6 +2,7 @@
 layout: post
 title: "Halo — Recursive Proof Composition without a Trusted Setup"
 date:   2026-06-19
+last_modified_at: 2026-07-28
 lang: en
 locale: en-GB
 categories: cryptography ZKP

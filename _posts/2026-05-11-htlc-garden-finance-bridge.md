@@ -2,6 +2,7 @@
 layout: post
 title: "Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge"
 date: 2026-05-11
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain defi security

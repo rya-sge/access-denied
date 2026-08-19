@@ -2,9 +2,9 @@
 layout: post
 title: "Hypergraph and Hypertree - Overview"
 date:   2025-11-25
+last_modified_at: 2026-06-28
 locale: en-GB
 lang: en
-last-update: 
 categories: programmation
 tags: graph hypertreee hypergraph tree
 description: A hypergraph is a generalization of a graph where an edge may connect any number of vertices, not just two.

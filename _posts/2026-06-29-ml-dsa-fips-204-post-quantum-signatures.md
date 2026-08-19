@@ -2,6 +2,7 @@
 layout: post
 title: "ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)"
 date:   2026-06-29
+last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
 categories: cryptography

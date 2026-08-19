@@ -2,9 +2,9 @@
 layout: post
 title:  "Lecture de fichier JSON avec Node.JS"
 date:   2022-01-01
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
-last-update: 
 categories: programmation
 tags: node.js fs json
 description: Résumé des différentes possibilités pour lire un fichier JSON avec Node.JS.

@@ -2,6 +2,7 @@
 layout: post
 title:  Solana Core Concept
 date:   2024-09-19
+last_modified_at: 2024-10-29
 lang: en
 locale: en-GB
 categories: blockchain solana

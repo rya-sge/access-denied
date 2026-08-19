@@ -2,6 +2,7 @@
 layout: post
 title:  "Vulnérabilités avec le langage C"
 date:   2021-06-22
+last_modified_at: 2022-05-05
 lang: fr
 locale: fr-FR
 categories: programmation security

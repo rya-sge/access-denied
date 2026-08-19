@@ -2,6 +2,7 @@
 layout: post
 title: Linux Isolation Primitives - Defense in Depth Beyond the Castle Model
 date:   2026-06-29
+last_modified_at: 2026-06-30
 lang: en
 locale: en-GB
 categories: linux security

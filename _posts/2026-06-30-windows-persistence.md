@@ -2,6 +2,7 @@
 layout: post
 title: "Windows Domain Persistence - Golden Tickets and the Skeleton Key"
 date:   2026-06-30
+last_modified_at: 2026-08-19
 lang: en
 locale: en-GB
 categories: security network

@@ -2,6 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified"
 date:   2026-07-24
+last_modified_at: 2026-07-28
 lang: en
 locale: en-GB
 categories: blockchain cryptography ZKP

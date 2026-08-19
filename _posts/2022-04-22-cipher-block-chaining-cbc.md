@@ -2,9 +2,9 @@
 layout: post
 title:  "Le mode opératoire CBC"
 date:   2022-02-27
+last_modified_at: 2022-05-23
 lang: fr
 locale: fr-FR
-last-update: 
 categories: cryptography 
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode d'opération CBC en analysant également sa sécurité (réutilisation d'IV, répétition de blocs).

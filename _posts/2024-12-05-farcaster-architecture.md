@@ -2,6 +2,7 @@
 layout: post
 title:  Decentralizing Social Platform - Exploring Farcaster’s Architecture
 date:   2024-12-05
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain ethereum

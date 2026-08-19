@@ -2,6 +2,7 @@
 layout: post
 title:  "Le Logarithme Discret sur courbe elliptique avec SageMath"
 date:   2021-07-30
+last_modified_at: 2026-07-30
 lang: fr
 locale: fr-FR
 categories: cryptography

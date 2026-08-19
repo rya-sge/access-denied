@@ -2,6 +2,7 @@
 layout: post
 title: Technical Analysis of the OpenZeppelin ERC-7984 Implementation
 date: 2026-02-24
+last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
 categories: blockchain solidity cryptography

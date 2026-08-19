@@ -2,6 +2,7 @@
 layout: post
 title: Trezor Crypto Wallet – Cryptography and Security
 date:   2024-10-15
+last_modified_at: 2025-10-21
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf cryptography security

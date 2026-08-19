@@ -2,6 +2,7 @@
 layout: post
 title: Rust for Solana - Basic knowledge
 date: 2025-02-10
+last_modified_at: 2025-02-11
 lang: en
 locale: en-GB
 categories: solana

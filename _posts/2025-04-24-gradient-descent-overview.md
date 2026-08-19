@@ -2,6 +2,7 @@
 layout: post
 title: "Gradient Descent in Machine Learning - Overview"
 date: 2025-04-09
+last_modified_at: 2025-05-02
 lang: en
 locale: en-GB
 categories: ai

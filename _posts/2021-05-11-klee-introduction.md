@@ -2,6 +2,7 @@
 layout: post
 title:  Introduction à Klee, dynamic symbolic execution engine
 date:   2021-05-11 
+last_modified_at: 2024-12-05
 lang: fr
 locale: fr-FR
 categories: security

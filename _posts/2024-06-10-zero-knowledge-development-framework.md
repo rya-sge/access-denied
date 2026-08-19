@@ -2,6 +2,7 @@
 layout: post
 title: Overview of Zero-Knowledge development framework
 date:   2024-06-10
+last_modified_at: 2025-05-02
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP

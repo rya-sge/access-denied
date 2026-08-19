@@ -2,9 +2,9 @@
 layout: post
 title: How indicates the solidity version of your smart contract
 date:   2022-10-29
+last_modified_at: 2024-05-30
 locale: en-GB
 lang: en
-last-update: 
 categories: blockchain solidity
 tags: solidity ethereum smart-contract
 description: There are different way to indicate the solidity version of the compiler. This article presents the advantages and disadvantages of each

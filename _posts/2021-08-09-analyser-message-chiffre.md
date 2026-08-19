@@ -2,6 +2,7 @@
 layout: post
 title:  "Analyser un message chiffré [transposition/substitution]"
 date:   2021-08-09
+last_modified_at: 2025-02-10
 lang: fr
 locale: fr-FR
 categories: cryptography

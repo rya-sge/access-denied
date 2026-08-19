@@ -2,9 +2,9 @@
 layout: post
 title:  "Le mode opératoire GCM"
 date:   2022-04-22
+last_modified_at: 2024-06-26
 lang: fr
 locale: fr-FR
-last-update: 
 categories: cryptography 
 tags: cbc chiffrement-bloc
 description: Cet article présente le mode opératoire de chiffrement authentifié GCM avec une analyse sur sa sécurité (confidentialité, intégrité, authenticité et la génération d'IVs).

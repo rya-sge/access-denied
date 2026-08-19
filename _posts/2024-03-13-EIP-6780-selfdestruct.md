@@ -2,6 +2,7 @@
 layout: post
 title:  EIP-6780, selfdestruct, we won't miss you
 date:   2024-03-13
+last_modified_at: 2025-04-03
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum

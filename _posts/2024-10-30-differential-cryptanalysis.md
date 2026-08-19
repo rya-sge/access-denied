@@ -2,6 +2,7 @@
 layout: post
 title: Differential Cryptanalysis - Targeting Hash Functions and Cryptographic Algorithms
 date:   2024-10-30
+last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
 categories: blockchain cryptography
