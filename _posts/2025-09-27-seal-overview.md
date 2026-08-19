@@ -134,7 +134,7 @@ entry fun seal_approve(id: vector<u8>, c: &clock::Clock) {
 
 Seal provides a **flexible, generic, and decentralized** approach for encrypting data with identity-based keys, combining onchain access control with off-chain key management.
 
-# Reference
+## Reference
 
 - [seal.mystenlabs.com](https://seal.mystenlabs.com)
 - [Seal - Design](https://github.com/MystenLabs/seal/blob/main/docs/Design.md)

@@ -11,7 +11,7 @@ description: This article focuses on the different secrets available on Metamask
 image: /assets/article/blockchain/wallet/metamask/MetaMask.png
 ---
 
-# Introduction
+## Introduction
 
 Trusted by millions of users, **MetaMask** is a self-custodial wallet, providing access to blockchain applications and web3. 
 

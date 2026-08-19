@@ -345,9 +345,29 @@ This is not worth a bulk rewrite. Worth doing:
 
 12 posts are under 400 words. For a technical archive this is the tail that drags average quality down in a site-wide quality assessment, and none of them will ever rank. Options per post: expand (several are genuinely useful notes that deserve 800 words), merge into a related article with a redirect, or leave them — but do not let the count grow.
 
-### 4.6 Duplicate `<h1>`
+### 4.6 Duplicate `<h1>` — ✅ IMPLEMENTED (2026-08-19), and the original count was wrong
 
-13 posts open with a body-level `# Heading`, while `_layouts/post.html` already renders the title as `<h1 class="c-article__title">`. Two `<h1>`s on a page is not fatal but it muddies the document outline that both Google and every content-extraction library rely on. Demote those 13 to `##`.
+The first version of this document reported **13 posts** opening with a body-level `# Heading` while `_layouts/post.html` already renders the title as `<h1 class="c-article__title">`. That number came from a regex that did not exclude fenced code blocks, so **9 of the 13 were false positives** — `#` comments inside `bash`, `python` and `yaml` snippets, which are not headings at all:
+
+```bash
+# Generate the key      <- counted as an H1 by the naive scan
+openssl genpkey ...
+```
+
+Re-scanned with fences, indented blocks and front matter excluded, the real figure was **4 published posts**:
+
+| Post | Heading | Fix |
+|------|---------|-----|
+| `2022-10-29-solidity-version` | `# Reference` | → `## Reference` |
+| `2023-06-03-solidity-smart-contracts-doc` | `# Reference` | → `## Reference` |
+| `2023-07-20-metamask-secret` | `# Introduction` (line 2) | → `## Introduction` |
+| `2025-09-27-seal-overview` | `# Reference` | → `## Reference` |
+
+All four were demoted to `##`, which is the level every other section in those posts already uses — no deeper shift was needed, since none of them had subsections hanging off the stray H1. **No published post now has a second `<h1>`.**
+
+Two files still contain a body H1: `permit.md` and `The Main Vulnerabilities When Using ECDSA Signatures in Smart Contracts.md`. Both are unpublished (no front matter, no date prefix — see §4.1), and in both the H1 is currently the only title the document has, so removing it before they get front matter would lose information. Fix it when they are published, not before.
+
+Noted while in there, not fixed: the archive is split between `## References` (124 posts) and `## Reference` (57). Renaming would change the heading anchors, so it is a deliberate decision rather than a cleanup, and it belongs with a TOC/anchor pass rather than here.
 
 ### 4.7 Alt text — ✅ IMPLEMENTED (2026-08-19)
 
@@ -504,7 +524,7 @@ feed:
 13. IndexNow ping from the deploy workflow (§1.3).
 14. Question-shaped headings and self-contained section openers across the archive (§6.2–6.3).
 15. Series metadata and pillar-page internal linking for the 8 largest categories (§5.2–5.3).
-16. Description-length pass, thin-content decisions, 13 duplicate `<h1>`s (§4.4–4.6). ~~17 empty alts~~ — ✅ done 2026-08-19 (§4.7).
+16. Description-length pass and thin-content decisions (§4.4–4.5). ~~13 duplicate `<h1>`s~~ — ✅ done 2026-08-19, and there were 4, not 13 (§4.6). ~~17 empty alts~~ — ✅ done 2026-08-19 (§4.7).
 
 **Deliberately not proposed**: analytics (declined, §6.5 of `site_improvement.md`), image optimisation (skipped by request — though the 72 MB `assets/` tree remains the largest Core Web Vitals liability), and a permalink restructure away from `/:year/:month/:day/:title/` (date-based URLs are mildly unhelpful for evergreen content, but the migration risk outweighs the gain now that redirects would be needed for 254 URLs).
 
@@ -541,7 +561,8 @@ content
   posts under 400 words                 12
   posts with a FAQ section              98
   posts with [TOC]                      195
-  posts with a body-level H1            13
+  posts with a body-level H1            0     (was 4 real + 9 miscounted code
+                                              comments; fixed 2026-08-19)
   posts with tables / code blocks       146 / 144
   in-article images                     712   (0 with empty alt since 2026-08-19;
                                               60 still have an alt under 10 chars)

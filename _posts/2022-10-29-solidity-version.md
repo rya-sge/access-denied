@@ -56,7 +56,7 @@ As indicated in several articles [[Shashank 2022](https://blog.solidityscan.com/
 For libraries, some believe that one can use the floating notation because the code will be used by other smart contracts. This is notably the choice made by OpenZeppelin, see this [[issue](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)] [ConsenSys 2017].
 
 
-# Reference
+## Reference
 
 CONSENSYS, 2017. Should we lock pragma. *GitHub*. Online. 28 December 2017. [Accessed 29 October 2022]. Retrieved from: [https://github.com/ConsenSys/smart-contract-best-practices/issues/125](https://github.com/ConsenSys/smart-contract-best-practices/issues/125)
 
