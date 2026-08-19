@@ -1,0 +1,38 @@
+/* ===============
+	CATEGORY INTRO
+=============== */
+
+// Heading + description block at the top of a category landing page. Before it,
+// those 20 pages had no <h1> at all and no prose — just a grid of cards.
+.c-category-intro {
+  width: 100%;
+  padding: 20px;
+  margin: 20px 0 30px;
+  background-color: var(--surface);
+
+  .c-category-intro__title {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-bottom: 10px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.c-category-intro__count {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: $gray;
+}
+
+@media only screen and (max-width: 480px) {
+  .c-category-intro {
+    padding: 15px;
+    .c-category-intro__title {
+      font-size: 27px;
+    }
+  }
+}

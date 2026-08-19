@@ -13,11 +13,11 @@ This document does **not** re-propose anything already marked ✅ in `site_impro
 | 1 | Hosting | `robots.txt` is served from a path crawlers never read; no custom domain | 🔴 High | M |
 | 2 | Crawler policy | AI **search** bots are allowed only by accident (`User-agent: *`), never by name | 🔴 High | S |
 | 3 | Freshness | ~~`last_modified_at` never set~~ — **✅ implemented 2026-08-19**, backfilled from git on 210 posts | 🔴 High | S |
-| 4 | Structured data | 98 articles have a FAQ section; none emit `FAQPage` JSON-LD | 🔴 High | M |
+| 4 | Structured data | 98 FAQ sections are bold paragraphs, not headings — no anchors, no outline, no TOC entries (`FAQPage` JSON-LD is **not** the answer, see §3.1) | 🟠 Med | M |
 | 5 | Content loss | 3 articles are unpublished (bad filenames), 1 is a duplicate-title stub, 1 has an invalid filename date | 🟠 Med | S |
 | 6 | Extractability | No answer-first summary, no visible author/updated line, no `<time datetime>` | 🟠 Med | M |
 | 7 | Internal linking | ~~`site.related_posts` is "4 most recent"~~ — **✅ implemented 2026-08-19**; 28 posts still have zero in-body internal links | 🟠 Med | M |
-| 8 | Category pages | 20 landing pages with no title-case, no description, no intro text | 🟠 Med | S |
+| 8 | Category pages | ~~20 landing pages with no `<h1>`, no description, no intro text~~ — **✅ implemented 2026-08-19** | 🟠 Med | S |
 | 9 | Metadata quality | 126 descriptions exceed the SERP snippet width, 27 are too thin, 2 empty, 3 posts have no category | 🟡 Low | M |
 | 10 | Discovery | No IndexNow, no Bing verification file in the repo, no author/about page | 🟡 Low | S |
 
@@ -167,74 +167,45 @@ This matters disproportionately for this archive because a large share of it is 
 
 ## 3. Structured data
 
-### 3.1 `FAQPage` on 98 articles — the highest-value schema left
+### 3.1 The 98 FAQ sections — markup, not schema — ⚠️ REVISED (2026-08-19)
 
-98 posts already end with a `## Frequently Asked Questions` section in a rigidly consistent format (`**Q: …**` followed by answer paragraphs) because the `create-article` skill enforces it. That is a ready-made, hand-written Q&A corpus that is currently invisible as structured data.
+98 posts end with a `## Frequently Asked Questions` section in a rigidly consistent format (`**Q: …**` followed by answer paragraphs) because the `create-article` skill enforces it. That is a hand-written Q&A corpus, and the obvious move is to emit `FAQPage` JSON-LD for it. **The first version of this document ranked that as the highest-value schema left. That ranking was wrong, and it is corrected here.**
 
-Two payoffs: Google can surface the questions directly, and — more importantly here — answer engines strongly favour content that is already chunked into question/answer pairs, because it maps onto how they retrieve.
+**Google no longer renders FAQ rich results for a site like this one.** In **August 2023** Google restricted the FAQ rich result to well-known government and health sites, which already put the expandable Q&A accordion out of reach for a personal technical blog; the feature was **deprecated outright in May 2026**. Emitting `FAQPage` today buys no SERP feature whatsoever.
 
-Since the Actions build runs **without safe mode**, a Ruby plugin is the robust route (a Liquid string-parse of `**Q:` would be fragile against bold text inside answers):
+It is not *harmful*: `FAQPage` remains a valid schema.org type, and Google's stated position is that structured data it does not use for a feature is ignored rather than penalised. So markup already in place can stay.
 
-```ruby
-# _plugins/faq_jsonld.rb
-# Emits FAQPage JSON-LD for any post whose body contains a
-# "## Frequently Asked Questions" section in the create-article format:
-#   **Q: <question>**
-#   <one or more answer paragraphs, until the next Q or the next H2>
-#
-# Stored in page.data['faq_jsonld'] and rendered by _includes/faq-schema.html,
-# so a post with no FAQ emits nothing at all.
-module Jekyll
-  class FaqJsonLd < Generator
-    safe true
-    priority :low
+**The remaining argument is AI retrieval, and it is weaker than it is usually presented.** There is no published evidence that `OAI-SearchBot` or `PerplexityBot` weight `FAQPage` JSON-LD. Those pipelines fetch and parse *rendered HTML*; where they read schema.org at all, it is mostly for title, date and author. The claim that answer engines "prefer FAQ schema" is widely repeated in SEO commentary and poorly evidenced. Meanwhile the cost is real: a Ruby generator parsing markdown, stripping links, code fences and MathJax out of answer text, with one malformed answer producing invalid JSON-LD across 98 pages at once.
 
-    HEADING = /^##\s+(?:Frequently Asked Questions|FAQ)\s*$/
-    QUESTION = /^\*\*Q:\s*(.+?)\*\*\s*$/
+**Revised recommendation: optional, low priority.** Emit it only if the generator stays trivial, and treat it as cheap insurance rather than a win. It is no longer a Tier 1 item.
 
-    def generate(site)
-      site.posts.docs.each { |post| build(post) }
-    end
+#### What to do instead — promote the questions to real headings
 
-    private
+The thing that demonstrably works is the *HTML*, and this is where the effort belongs.
 
-    def build(post)
-      body = post.content
-      start = body =~ HEADING
-      return unless start
+Today a question renders as `<p><strong>Q: What exactly is forged in a Golden Ticket…</strong></p>`. That gives it:
 
-      section = body[start..]
-      section = section.split(/^##\s+(?!Frequently|FAQ)/, 2).first
+- no heading element, so it is invisible to the document outline every extractor builds;
+- no `id`, so no anchor — a question cannot be linked to, and Google cannot deep-link a passage to it;
+- no entry in the article TOC (`_includes/toc.html` only collects headings);
+- no clean boundary, so a chunker has to guess where the answer ends.
 
-      pairs = []
-      section.split(QUESTION).drop(1).each_slice(2) do |question, answer|
-        next if answer.nil?
-        text = answer.strip
-        next if text.empty?
-        pairs << { '@type' => 'Question',
-                   'name' => question.strip,
-                   'acceptedAnswer' => { '@type' => 'Answer', 'text' => text } }
-      end
-      return if pairs.empty?
+Promoting each question to an `###` heading fixes all four at once and depends on no vendor honouring any schema type:
 
-      post.data['faq_jsonld'] = {
-        '@context' => 'https://schema.org',
-        '@type' => 'FAQPage',
-        'mainEntity' => pairs
-      }.to_json
-    end
-  end
-end
+```markdown
+### What exactly is forged in a Golden Ticket, and what key makes it possible?
+
+A Golden Ticket is a forged Ticket Granting Ticket (TGT). It is possible because…
 ```
 
-```liquid
-{%- comment -%} _includes/faq-schema.html — add after breadcrumbs.html in head {%- endcomment -%}
-{% if page.faq_jsonld %}
-<script type="application/ld+json">{{ page.faq_jsonld }}</script>
-{% endif %}
-```
+Note that the `Q:` prefix goes away with the bold: as a heading, the question is self-evidently a question. Keep the answer as plain paragraphs — no `A:` prefix.
 
-Caveats to respect: the answer text must be **plain text** (strip markdown links, code fences and math before emitting — a stray `$$` or unescaped quote will invalidate the block), and the JSON-LD must match what the reader sees, or it is spam. Validate a sample with the Rich Results Test before rolling it out to all 98.
+This is two pieces of work:
+
+1. Change the FAQ convention in `create-article` (and `create-article-eli10` / `create-article-talk`, which inherit it) so new articles use `###` headings.
+2. A mechanical pass over the 98 existing FAQ sections. The format is regular enough to script — `^\*\*Q:\s*(.+?)\*\*$` → `### \1` — but the result should be spot-checked, since a handful of answers contain their own bold text.
+
+Worth noting for the TOC: 98 articles gaining 5+ `h3` entries will lengthen it. Check `_includes/toc.html`'s heading-level configuration and cap it at `h2` for the FAQ section if the result is unwieldy.
 
 ### 3.2 Upgrade `BlogPosting` → `TechArticle` where it fits
 
@@ -273,34 +244,61 @@ A modest version, driven entirely by existing front matter, costs one include an
 {% endif %}
 ```
 
-### 3.3 Category pages have no schema and no words
+### 3.3 Category pages have no schema and no words — ✅ IMPLEMENTED (2026-08-19)
 
-The 20 pages under `_pages/category/` are front matter only: `title: zkp`, a `category:` key, a permalink. What renders is a bare grid of cards. Three problems compound:
+The 20 pages under `_pages/category/` were front matter only: `title: zkp`, a `category:` key, a permalink. What rendered was a bare grid of cards. Four problems compounded:
 
-- **No `description`** → `jekyll-seo-tag` falls back to the site description, so 20 pages ship the *same* meta description. Duplicate-snippet territory.
-- **Lowercase display titles** (`zkp`, `iso20022`, `eli10`) — these are the `<h1>`/`<title>` of hub pages for the site's best topics.
-- **No intro prose** → a category hub with 131 links and zero sentences is a thin page to Google and useless to an answer engine, which cannot summarise a list of titles.
+- **No `<h1>` at all.** `_layouts/category-list.html` rendered the search header and went straight to the grid, so the hub pages for the site's best topics had no heading element.
+- **No `description`**, so `jekyll-seo-tag` fell back to the site description and all 20 pages shipped the *same* meta snippet.
+- **Lowercase display titles** — `zkp`, `iso20022`, `eli10`.
+- **No prose**, so a hub with 130 links and zero sentences is thin content to Google and unusable to an answer engine, which cannot summarise a list of titles.
 
-Fix (per page, ~4 lines of front matter + 2 sentences):
+**What was implemented.**
 
-```yaml
----
-layout: category-list
-title: Zero-Knowledge Proofs
-category: ZKP
-permalink: /category/zkp/
-description: Articles on zero-knowledge proof systems — SNARKs, STARKs, recursive proofs, and the vulnerability classes that affect ZK circuits in production.
----
+`_layouts/category-list.html` now renders an intro block and structured data:
 
-Zero-knowledge proofs let one party convince another that a statement is true
-without revealing why. These {{ site.categories.ZKP | size }} articles cover the
-proof systems themselves (Groth16, PLONK, STARKs), the tooling around them, and
-the real-world failures that have hit ZK deployments.
+```liquid
+<section class="c-category-intro">
+  <h1 class="c-category-intro__title">{{ page.title }}</h1>
+  {{ content }}
+  <p class="c-category-intro__count">{{ cat_posts | size }} {{ t.category_posts_count | downcase }}</p>
+</section>
 ```
 
-`_layouts/category-list.html` needs one line to render `{{ content }}` above the grid, plus an `ItemList`/`CollectionPage` JSON-LD block listing the posts in order. Those hubs are the pages most likely to rank for the broad head terms ("zero knowledge proof explained", "ISO 20022 message types") that individual articles are too specific to win.
+The count comes from `site.categories`, so no page hardcodes a number that would go stale on the next post. Below the grid the layout emits **`CollectionPage` + `ItemList`** JSON-LD naming every post on the page in order, with `numberOfItems` and `itemListOrder`. `jekyll-seo-tag` emits neither — it only knows `WebPage` and `BlogPosting`. Every post is listed rather than a top-N slice, because the grid is not paginated and the markup must describe what is actually on the page.
 
----
+All 20 pages were rewritten with a proper display title, a 120-160 character `description`, and two paragraphs of intro prose written from the posts each category actually contains:
+
+| Was | Now | Posts |
+|-----|-----|-------|
+| `ai` | Artificial Intelligence | 14 |
+| `blockchain` | Blockchain | 130 |
+| `blockchainBestOf` | Blockchain — Best Of | 12 |
+| `cryptography` | Cryptography | 60 |
+| `defi` | DeFi | 27 |
+| `eli10` | Explained for a 10-Year-Old | 8 |
+| `ethereum` | Ethereum | 51 |
+| `finance` | Finance | 3 |
+| `ISO 20022` | ISO 20022 | 25 |
+| `linux` | Linux | 8 |
+| `network` | Networks and Protocols | 40 |
+| `oracle` | Oracles | 1 |
+| `programmation` | Programming | 48 |
+| `rfc` | RFC | 3 |
+| `security` | Security | 75 |
+| `solana` | Solana | 9 |
+| `solidity` | Solidity | 41 |
+| `tryhackme` | TryHackMe | 4 |
+| `web` | Web Development and Security | 8 |
+| `zkp` | Zero-Knowledge Proofs | 21 |
+
+Every description is now ≤ 160 characters and unique. Titles avoid `&` (written as "and") — a raw ampersand in front matter ends up escaped inconsistently between the `<h1>` and the meta tags.
+
+Styling lives in a new `_sass/5-components/_category-intro.scss`, imported from `_sass/main.scss`.
+
+The `create-website-category` skill was updated to match: it carried the pre-refactor template (the old inline card markup with `background-image` thumbnails, removed in `site_improvement.md` §2.4) and a canonical key list missing `eli10`, `finance`, `oracle` and `rfc`. It now documents the `category-list` front matter, requires `description` and intro prose, and explains why.
+
+**Still open on these pages:** they have no `lang` front matter, so the UI strings resolve to English even on categories whose posts are largely French (`web` is 7 French posts out of 8). That is a translation question rather than an SEO one, and it belongs with the multi-language work in `multi-language.md`.
 
 ## 4. Content-level fixes
 
@@ -458,12 +456,12 @@ feed:
 2. ~~Migrate `last-update:` → `last_modified_at:`, render published + updated dates with `<time datetime>`~~ — ✅ done 2026-08-19 (§2.1).
 3. Fix the 3 unpublished articles and the 2 malformed filenames (§4.1).
 4. Delete the `ethereum-stacking` stub, add `jekyll-redirect-from` (§4.2).
-5. Add `description:` + title-case titles + a 2-sentence intro to the 20 category pages (§3.3).
+5. ~~Add `description:` + title-case titles + a 2-sentence intro to the 20 category pages~~ — ✅ done 2026-08-19 (§3.3).
 6. Fill in the 3 missing `categories:` and 2 missing `description:` values (§4.3).
 
 **Tier 2 — high impact, medium effort**
 
-7. `FAQPage` JSON-LD plugin for the 98 FAQ articles (§3.1).
+7. Promote the 98 FAQ sections' questions from `**Q: …**` to `###` headings, and change the `create-article` convention to match (§3.1). `FAQPage` JSON-LD is explicitly **not** recommended any more.
 8. ~~Replace `site.related_posts` with real tag-overlap related posts~~ — ✅ done 2026-08-19 (§5.1).
 9. Key-takeaways block in `_layouts/post.html` + `create-article`, backfilled on the top articles (§6.1).
 10. `/about/` page with `Person` schema + a visible byline on every article (§6.4).
@@ -523,6 +521,8 @@ descriptions
 structured data emitted today
   BlogPosting (jekyll-seo-tag)          ✅
   BreadcrumbList (_includes)            ✅
-  FAQPage / TechArticle / ItemList      ❌
+  TechArticle                           ❌
+  CollectionPage / ItemList             ✅ (category pages, since 2026-08-19)
+  FAQPage                               ❌ (deliberate — no longer recommended, §3.1)
   dateModified                          ✅ (since 2026-08-19)
 ```
