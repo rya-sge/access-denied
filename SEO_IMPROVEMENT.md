@@ -14,7 +14,7 @@ This document does **not** re-propose anything already marked ✅ in `site_impro
 | 2 | Crawler policy | AI **search** bots are allowed only by accident (`User-agent: *`), never by name | 🔴 High | S |
 | 3 | Freshness | ~~`last_modified_at` never set~~ — **✅ implemented 2026-08-19**, backfilled from git on 210 posts | 🔴 High | S |
 | 4 | Structured data | 98 FAQ sections are bold paragraphs, not headings — no anchors, no outline, no TOC entries (`FAQPage` JSON-LD is **not** the answer, see §3.1) | 🟠 Med | M |
-| 5 | Content loss | 3 articles are unpublished (bad filenames), 1 is a duplicate-title stub, 1 has an invalid filename date | 🟠 Med | S |
+| 5 | Content loss | 3 articles are unpublished (bad filenames), 1 has an invalid filename date. ~~1 duplicate-title stub~~ — **✅ fixed 2026-08-19** | 🟠 Med | S |
 | 6 | Extractability | No answer-first summary, no visible author/updated line, no `<time datetime>` | 🟠 Med | M |
 | 7 | Internal linking | ~~`site.related_posts` is "4 most recent"~~ — **✅ implemented 2026-08-19**; 28 posts still have zero in-body internal links | 🟠 Med | M |
 | 8 | Category pages | ~~20 landing pages with no `<h1>`, no description, no intro text~~ — **✅ implemented 2026-08-19** | 🟠 Med | S |
@@ -314,18 +314,29 @@ The last two also have no front matter at all. `feedback.md` §1–2 flagged thi
 
 Also: `_posts/2022-20-12-foundry-tutorial-nft.md` has **month 20** in its filename. It builds only because the `date:` in front matter overrides it, but it is a trap for any tool that parses filenames (including the ones in `_plugins/`). Rename to `2022-12-20-…`. And `_posts/2024-11-4-TLS1.3-overview.md` needs its day zero-padded.
 
-### 4.2 Duplicate title / thin stub
+### 4.2 Duplicate title / thin stub — ✅ IMPLEMENTED (2026-08-19)
 
-`_posts/2024-03-28-ethereum-stacking.md` — 34 words, empty description, empty categories, `exclude: yes` — carries **the same `title` as `2024-03-28-ethereum-staking.md`**. `exclude:` only hides it from the home listing; it is still live, still in `sitemap.xml`, still in `search.json`, and still competing with the real article for its own title. This is textbook keyword cannibalisation, made worse by the fact that the stub's only content is a link to the article it competes with.
+`_posts/2024-03-28-ethereum-stacking.md` — 34 words, empty description, empty categories, `exclude: yes` — carried **the same `title` as `2024-03-28-ethereum-staking.md`**. `exclude:` only hid it from the home listing; it was still live, still in `sitemap.xml`, still in `search.json`, and still competing with the real article for its own title, while its entire content was a link to the article it competed with. The slug was a typo (`stacking` for `staking`) that had been papered over with a manual pointer page.
 
-Fix: delete the file and add a redirect instead. Since the Actions build allows gems outside the Pages whitelist, add `jekyll-redirect-from` and put on the real article:
+**What was implemented.** The stub is deleted, and the real article now declares the old URL:
 
 ```yaml
 redirect_from:
   - /2024/03/28/ethereum-stacking/
 ```
 
-That is a proper redirect page with a canonical, rather than a competing document.
+`jekyll-redirect-from` was added to `_config.yml`'s `plugins:` list. No `Gemfile` change: it is a dependency of the pinned `github-pages` gem, so listing it separately would fight the pin (per the Gemfile's own note). The stale row was also dropped from `article_list.md`.
+
+#### Verified against GitHub Pages specifically
+
+The plugin is not merely "probably fine" here — four things were checked, because a project site under a `baseurl` is exactly where redirect plugins tend to go wrong:
+
+1. **It is a supported GitHub Pages plugin.** `https://pages.github.com/versions.json` lists `jekyll-redirect-from: 0.16.0` under `github-pages: 232` — the exact version this repo pins. It therefore runs under the **classic safe-mode build** as well as the Actions build, so the redirect keeps working whichever pipeline is live (the Actions source switch in `.github/workflows/pages.yml` is still a manual step).
+2. **It is `baseurl`-safe.** `RedirectPage#set_paths` builds the target with Jekyll's own `absolute_url` filter, which prepends `site.url` **and** `site.baseurl`. The emitted target is `https://rya-sge.github.io/access-denied/2024/03/28/ethereum-staking/`, not a root-relative path that would 404 on a project site. The `from` path is a `permalink`, so the page is written to `_site/2024/03/28/ethereum-stacking/index.html` and served under `/access-denied/` like everything else.
+3. **It will not re-enter the sitemap.** Generated redirect pages carry `"sitemap" => false` in `RedirectPage::DEFAULT_DATA`, which `jekyll-sitemap` honours. The page also ships `<meta name="robots" content="noindex">` and a `<link rel="canonical">` pointing at the surviving article, so it cannot recreate the duplicate-title problem it was introduced to solve.
+4. **No layout collision.** The plugin injects its own `redirect` layout; this repo has no `_layouts/redirect.html` to shadow it.
+
+**The one honest caveat:** GitHub Pages cannot serve a real HTTP 301 for a project site — there is no server configuration to hook. The generated page is a **client-side redirect**: a zero-delay `<meta http-equiv="refresh">`, a `location=` script, and a canonical link. Google treats a zero-delay meta refresh as a redirect and passes signals through it, so this is the correct and standard solution on GitHub Pages, but it is not a 301. A real 301 only becomes available with a custom domain fronted by a CDN (§1.1).
 
 ### 4.3 Three posts with no category, two with no description
 
@@ -506,7 +517,7 @@ feed:
 1. Add the explicit AI-search-crawler `Allow` block to `robots.txt` (§1.2) and mirror the file to the host root (§1.1).
 2. ~~Migrate `last-update:` → `last_modified_at:`, render published + updated dates with `<time datetime>`~~ — ✅ done 2026-08-19 (§2.1).
 3. Fix the 3 unpublished articles and the 2 malformed filenames (§4.1).
-4. Delete the `ethereum-stacking` stub, add `jekyll-redirect-from` (§4.2).
+4. ~~Delete the `ethereum-stacking` stub, add `jekyll-redirect-from`~~ — ✅ done 2026-08-19 (§4.2).
 5. ~~Add `description:` + title-case titles + a 2-sentence intro to the 20 category pages~~ — ✅ done 2026-08-19 (§3.3).
 6. Fill in the 3 missing `categories:` and 2 missing `description:` values (§4.3).
 

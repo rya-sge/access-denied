@@ -10,6 +10,11 @@ tags: ethereum staking merge
 description: Staking in Ethereum is a key functionality. This article explains the main concepts behind it - BLS signature, slashing, Withdrawal address,...
 image: /assets/article/blockchain/ethereum/ethereum-logo-portrait-purple-purple.png
 isMath: false
+# The article was first published under a misspelled slug ("stacking"). That URL
+# was a separate stub post duplicating this one's title; it is now a generated
+# redirect page pointing here.
+redirect_from:
+  - /2024/03/28/ethereum-stacking/
 ---
 
 ## Introduction

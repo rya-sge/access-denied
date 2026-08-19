@@ -67,6 +67,11 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
+  # Ships with the pinned `github-pages` gem (v232 -> jekyll-redirect-from 0.16.0)
+  # and is on GitHub Pages' supported-plugin list, so it runs under the classic
+  # safe-mode build as well as the Actions build. Used by `redirect_from:` on a
+  # post whose URL changed; see _posts/2024-03-28-ethereum-staking.md.
+  - jekyll-redirect-from
 #  - jekyll-katex
 
 paginate: 7
