@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: First Fight 41 - SSSwap is aimed to be a minimalistic AMM on Solana.
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-41-ssswap-mindmap.png
 isMath: false

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity finance
 tags: centrifuge accounting double-entry nav rwa tokenization hub-spoke bookkeeping valuation
+series: centrifuge
 description: How Centrifuge implements real double-entry accounting in Solidity - debit-normal accounts, balanced journals, cross-chain snapshots, and the NAV and share price derived from them.
 image: /assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-onchain-accounting-mindmap.png
 isMath: true

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: First Fight 39 - Hawk High.
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-39-hawk-high-mindmap.png
 isMath: false

@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 securities sese settlement dvp csd t2s
+series: iso20022
+series_order: 6
 description: How ISO 20022 models securities settlement through the sese business area, from the settlement instruction and its matching, status, and confirmation at a CSD to securities financing, transfers, and the CSDR buy-in advice.
 image: /assets/article/finance/iso20022-securities-settlement-sese.png
 isMath: false

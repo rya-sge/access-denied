@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 bah head routing signature envelope
+series: iso20022
+series_order: 2
 description: What the ISO 20022 Business Application Header (head.001) is and why it matters, covering the routing envelope that accompanies every business message, its fields, its signature, and the head.002 business file header that groups many messages.
 image: /assets/article/finance/iso20022-business-application-header-head.png
 isMath: false

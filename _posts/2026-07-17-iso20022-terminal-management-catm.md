@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 cards catm terminal-management tms certificate
+series: iso20022
+series_order: 20
 description: How ISO 20022 models the management of payment terminals through the catm business area, covering status reporting, management plans, configuration updates, maintenance delegation, and certificate management between a terminal and its management system.
 image: /assets/article/finance/iso20022-terminal-management-catm.png
 isMath: false

@@ -7,6 +7,7 @@ lang: fr
 locale: fr-FR
 categories: security network web
 tags: application logique sql thread wah
+series: wah
 description: Questions & Réponses du chapitre 11, Attacking Application Logic, du livre The Web Application Hacker's Handbook
 image: /assets/article/pentest/wah/wah-cover.PNG
 ---

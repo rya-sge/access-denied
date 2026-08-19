@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: First Fight 38 - Rock Paper Scissors DApp is a fully decentralized implementation of the classic Rock Paper Scissors game on Ethereum.
 image: /assets/article/blockchain/audit/2025-05-07-cyfrin-first-fight-38-rock-paper-scissor-mindmap.png
 isMath: false

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: security blockchain
 tags: firmware security reproducible-build code-signing coldcard
+series: firmware-security
 description: A signed firmware binary proves who built it, not what it was built from. How reproducible builds, deterministic toolchains and on-device signature checks close that gap, using the COLDCARD firmware as a worked example.
 image: /assets/article/blockchain/wallet/coldcard/2026-07-31-firmware-reproducible-builds-mindmap.png
 isMath: false

@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 trade-finance bpo tsmt baseline matching
+series: iso20022
+series_order: 13
 description: How ISO 20022 modelled the Bank Payment Obligation and the Trade Services Utility through the tsmt business area, covering the baseline, data set matching, status management, and reporting that drive a conditional interbank payment obligation.
 image: /assets/article/finance/iso20022-trade-services-management-tsmt.png
 isMath: false

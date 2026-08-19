@@ -1,0 +1,84 @@
+{%- comment -%}
+  Series navigation box, rendered under the article title when the post declares
+  a `series:` key. Nothing renders for a post that does not.
+
+  The series themselves are declared in `_data/series.yml`, which carries the
+  display title and whether the group has a reading order:
+
+    * ordered   - "Part N of M", numbered list, sorted by each post's
+                  `series_order:` front matter.
+    * unordered - "N articles in this series", plain list, newest first. Used
+                  where the articles share a subject but no intended order (four
+                  independent studies of one protocol, write-ups of separate
+                  contests). Numbering those would tell the reader to start at a
+                  place the author never chose.
+
+  Two things this buys beyond navigation: every article in a series links to
+  every sibling, which is the densest topical internal linking on the site, and
+  the CreativeWorkSeries / hasPart block below states the relation explicitly
+  rather than leaving a crawler to infer it from title prefixes.
+{%- endcomment -%}
+
+{% if page.series %}
+{% assign series = site.data.series[page.series] %}
+{% if series %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+{% assign members = site.posts | where: "series", page.series %}
+{% if series.ordered %}
+  {% assign members = members | sort: "series_order" %}
+{% else %}
+  {% assign members = members | sort: "date" | reverse %}
+{% endif %}
+
+{%- comment -%} Position of the current article inside the series. {%- endcomment -%}
+{% assign position = 0 %}
+{% for member in members %}
+  {% if member.url == page.url %}{% assign position = forloop.index %}{% endif %}
+{% endfor %}
+
+<aside class="c-series" aria-label="{{ series.title | escape }}">
+  <p class="c-series__label">
+    <span class="c-series__kicker">{{ t.series_kicker }}</span>
+    <span class="c-series__title">{{ series.title }}</span>
+  </p>
+  <p class="c-series__position">
+    {% if series.ordered %}
+      {{ t.series_part }} {{ position }} {{ t.series_of }} {{ members | size }}
+    {% else %}
+      {{ members | size }} {{ t.series_articles }}
+    {% endif %}
+  </p>
+  {% if series.ordered %}<ol class="c-series__list">{% else %}<ul class="c-series__list c-series__list--plain">{% endif %}
+    {% for member in members %}
+    <li{% if member.url == page.url %} class="is-current" aria-current="true"{% endif %}>
+      {% if member.url == page.url %}
+        <span>{{ member.title }}</span>
+      {% else %}
+        <a href="{{ member.url | prepend: site.baseurl }}">{{ member.title }}</a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  {% if series.ordered %}</ol>{% else %}</ul>{% endif %}
+</aside> <!-- /.c-series -->
+
+{% assign site_root = site.url | append: site.baseurl %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWorkSeries",
+  "name": {{ series.title | jsonify }},
+  "numberOfItems": {{ members | size }},
+  "hasPart": [
+    {% for member in members %}{
+      "@type": "BlogPosting",
+      "@id": {{ site_root | append: member.url | jsonify }},
+      "url": {{ site_root | append: member.url | jsonify }},
+      "headline": {{ member.title | jsonify }}{% if series.ordered %},
+      "position": {{ member.series_order }}{% endif %}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endif %}

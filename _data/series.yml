@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Article series.
+#
+# A post joins one by declaring `series: <key>` in its front matter, and
+# _includes/series-nav.html then renders the whole group at the top of the
+# article and emits the CreativeWorkSeries / hasPart structured data.
+#
+# `ordered: true`  - a reading order exists, so the box says "Part N of M" and
+#                    every member carries a `series_order:` integer.
+# `ordered: false` - the articles cover one subject with no intended order (four
+#                    independent studies of the same protocol, write-ups of
+#                    separate contests). The box lists them without numbering.
+#
+# Claiming an order that the articles do not actually have would be worse than
+# claiming none: it tells a reader to start somewhere the author never chose.
+# ---------------------------------------------------------------------------
+
+windows-sos:
+  title: "Windows and Active Directory Security"
+  ordered: true
+
+linux-sos:
+  title: "GNU/Linux Security Primitives"
+  ordered: true
+
+iso20022:
+  title: "The ISO 20022 Message Sets"
+  ordered: true
+
+rareskills-solidity:
+  title: "RareSkills Solidity Interview Answers"
+  ordered: true
+
+centrifuge:
+  title: "The Centrifuge V3 Protocol"
+  ordered: false
+
+firmware-security:
+  title: "Hardware Wallet and Firmware Security"
+  ordered: false
+
+cyfrin-first-fight:
+  title: "Cyfrin First Fight Write-Ups"
+  ordered: false
+
+wah:
+  title: "Web Application Hacking (WAH)"
+  ordered: false

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: cryptography security blockchain
 tags: rng entropy firmware coldcard security prng
+series: firmware-security
 description: A wallet firmware generated seeds with far less entropy than intended because a linker resolved rng_get() to a software PRNG. How the defect worked, why XOR whitening hid it, and what catches this class of bug.
 image: /assets/article/blockchain/wallet/coldcard/2026-07-31-rng-entropy-incident-mindmap.png
 isMath: false

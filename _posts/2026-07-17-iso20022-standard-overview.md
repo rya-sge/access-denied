@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 messaging payments securities cards standards
+series: iso20022
+series_order: 1
 description: An overview of ISO 20022 as a whole, tying together its methodology, message identifier, and Business Application Header with a map of its business areas across payments, securities, cards, trade finance, FX, regulatory, and reference data.
 image: /assets/article/finance/iso20022-standard-overview.png
 isMath: false

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: First Fight 42 - Snowman Merkle Airdrop.
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-42-snowman-merkle-aidrop-mindmap.png
 isMath: false

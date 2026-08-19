@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 cards casr settlement reporting
+series: iso20022
+series_order: 23
 description: How ISO 20022 models card settlement reporting through the casr business area, a two-message request-and-response pair that reports settlement positions and totals between card parties on the same protected envelope as the transaction messages.
 image: /assets/article/finance/iso20022-settlement-reporting-casr.png
 isMath: false

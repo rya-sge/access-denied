@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: First Fight 43 - Order Book.
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-43-order-book-mindmap.png
 isMath: false

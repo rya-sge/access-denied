@@ -6,6 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain security defi solidity
 tags: BA-bridge cross-chain bridge centrifuge multi-adapter quorum layerzero wormhole axelar ccip messaging
+series: centrifuge
 description: How Centrifuge routes messages between chains - per-pool adapter sets, an n-of-m vote counter that tolerates duplicates, transient batching, gas subsidies, and the recovery paths.
 image: /assets/article/blockchain/defi/cross-chain-bridge/2026-08-18-centrifuge-cross-chain-messaging-mindmap.png
 isMath: true

@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity
 tags: blockchain ethereum solidity centrifuge erc-7540 erc-4626 erc-7575 rwa tokenized-vault
+series: centrifuge
 description: A technical walkthrough of Centrifuge V3 vaults - the ERC-7540 request lifecycle, the pool escrow reservation model, the pricing and rounding rules, and the transfer hook.
 image: /assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-vaults-mindmap.png
 isMath: true

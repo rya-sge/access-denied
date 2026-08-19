@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: security network
 tags: windows authentication smartcard tpm kerberos ntlm windows-hello pkinit
+series: windows-sos
+series_order: 1
 description: How Windows replaces passwords with smartcards, TPM-backed virtual smartcards and Windows Hello for Business, the Kerberos PKINIT flow behind them, and why NTLM and ticket theft still apply.
 image: /assets/article/securite/windows-advanced-authentication/2026-06-30-windows-advanced-authentication.png
 isMath: false

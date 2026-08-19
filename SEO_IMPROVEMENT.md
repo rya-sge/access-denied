@@ -451,11 +451,44 @@ Fixed at the same time: the old loop was wrapped in `{% if post.image %}`, so a 
 
 Cheapest systematic fix: for each of the top 8 categories, designate one **pillar article**, and make every other article in that category link to it once in the opening section. The recent posts already do this well (the Windows persistence article opens with links to the two preceding articles in the series) — it is the 2021–2023 back catalogue that does not.
 
-### 5.3 Series / cluster metadata
+### 5.3 Series / cluster metadata — ✅ IMPLEMENTED (2026-08-19)
 
-Several groups of posts form explicit series. Adding `series: windows-sos` to their front matter and rendering a "Part N of M" navigation box would create dense, semantically meaningful internal links and give answer engines an unambiguous signal that these pages belong together. It also renders well as a `hasPart` / `isPartOf` schema relation.
+**What was implemented.** Eight series covering **53 posts**, declared in a new `_data/series.yml` and rendered by `_includes/series-nav.html` as a box under the article title, above the TOC.
 
----
+| Series | Posts | Ordered | Evidence it is a series |
+|--------|-------|---------|--------------------------|
+| Windows and Active Directory Security | 3 | yes | the persistence article opens "The two previous articles in this series looked at…" and links both |
+| GNU/Linux Security Primitives | 4 | yes | the adversary article opens "The preceding articles built up the twelve base and advanced security primitives…" |
+| The ISO 20022 Message Sets | 25 | yes | the overview article *is* a map of the other 24 and links them in a table |
+| RareSkills Solidity Interview Answers | 3 | yes | Medium → Hard → Advanced is a stated difficulty progression |
+| The Centrifuge V3 Protocol | 4 | no | mutually cross-linked (one article links all three siblings) |
+| Hardware Wallet and Firmware Security | 4 | no | mutually cross-linked, three of four link two siblings each |
+| Cyfrin First Fight Write-Ups | 7 | no | contest numbering 38–44 |
+| Web Application Hacking (WAH) | 3 | no | course numbering WAH10, WAH11, WAH18 |
+
+**Ordered versus unordered is the design decision worth keeping.** Four of the eight groups are articles on one subject with no intended reading order — four independent studies of Centrifuge published the same day, write-ups of seven separate contests. Rendering "Part 1 of 4" over those would tell the reader to start where the author never chose, and would encode a false claim in the `position` field of the structured data. Those render as "4 articles in this series", newest first, with no numbering. `_data/series.yml` carries the flag per series:
+
+```yaml
+linux-sos:
+  title: "GNU/Linux Security Primitives"
+  ordered: true      # members carry series_order: 1..N, box says "Part N of M"
+
+centrifuge:
+  title: "The Centrifuge V3 Protocol"
+  ordered: false     # no order exists, box says "4 articles in this series"
+```
+
+Ordering was taken from the articles themselves, never invented: the two SOS series state their order in prose, and the ISO 20022 order is the one the overview article's own table uses (overview, then the `head` envelope, then the 23 message sets in its listed sequence).
+
+**What it buys.** Every article in a series now links to every sibling, which is the densest topical internal linking on the site — 53 posts × 3 to 25 links each, all within a topic cluster. It also replaces inference with a statement: the include emits a `CreativeWorkSeries` node with a `hasPart` array naming each member (and a `position` for ordered ones), so a crawler no longer has to guess from title prefixes that 25 pages are one work.
+
+Supporting changes: `series_kicker` / `series_part` / `series_of` / `series_articles` added to both language blocks in `_data/i18n.yml`; a `_sass/5-components/_series.scss` component imported from `_sass/main.scss`; the current article renders as plain text rather than a link to itself, with `aria-current="true"`.
+
+`create-article` gained a "Joining an article series" section covering key reuse, the contiguous `1..N` rule for ordered series, the prohibition on `series_order` in unordered ones, and the instruction to default a new series to `ordered: false`.
+
+**Verified:** all 53 posts resolve to a key in `_data/series.yml`, every ordered series has a contiguous `1..N` with no gaps or duplicates, no unordered member carries a stray `series_order`, and no declared series is empty.
+
+**Candidate not implemented:** the four ZKP vulnerability articles of 2026-06-19 (taxonomy, hacks history, cross-chain bridge failures, and the ELI10 version) are clearly one project, but they contain no cross-references and no ordering evidence, so grouping them would have meant inventing the relationship. Worth adding as `ordered: false` if that reading is right — it is a one-line change plus four front-matter keys.
 
 ## 6. Optimising for ChatGPT, Perplexity and Google AI Overviews
 
@@ -534,7 +567,7 @@ feed:
 12. Custom domain migration with `jekyll-redirect-from` (§1.1) — unlocks robots.txt, IndexNow at root, and brand identity in citations.
 13. IndexNow ping from the deploy workflow (§1.3).
 14. Question-shaped headings and self-contained section openers across the archive (§6.2–6.3).
-15. Series metadata and pillar-page internal linking for the 8 largest categories (§5.2–5.3).
+15. Pillar-page internal linking for the 8 largest categories (§5.2). ~~Series metadata~~ — ✅ done 2026-08-19 (§5.3).
 16. Description-length pass and thin-content decisions (§4.4–4.5). ~~13 duplicate `<h1>`s~~ — ✅ done 2026-08-19, and there were 4, not 13 (§4.6). ~~17 empty alts~~ — ✅ done 2026-08-19 (§4.7).
 
 **Deliberately not proposed**: analytics (declined, §6.5 of `site_improvement.md`), image optimisation (skipped by request — though the 72 MB `assets/` tree remains the largest Core Web Vitals liability), and a permalink restructure away from `/:year/:month/:day/:title/` (date-based URLs are mildly unhelpful for evergreen content, but the migration risk outweighs the gain now that redirects would be needed for 254 URLs).

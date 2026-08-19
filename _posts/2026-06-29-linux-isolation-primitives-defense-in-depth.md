@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: linux security
 tags: linux security isolation namespaces cgroups chroot netfilter containers virtualization qubes
+series: linux-sos
+series_order: 3
 description: A technical survey of Linux isolation primitives (mount options, chroot, netfilter, cgroups, namespaces) and how they compose into containers, hypervisors, and Qubes OS as defense in depth.
 image: /assets/article/virtualization/linux-isolation/2026-06-29-linux-isolation-primitives-defense-in-depth.png
 isMath: false

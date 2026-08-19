@@ -7,6 +7,7 @@ lang: fr
 locale: fr-FR
 categories: security network web
 tags: web backend component lfi rfi hpi hpp smtp wah
+series: wah
 description: Questions & Réponses du chapitre 10 du livre The Web Application Hacker's Handbook
 image:  /assets/article/pentest/wah/wah-cover.PNG
 ---

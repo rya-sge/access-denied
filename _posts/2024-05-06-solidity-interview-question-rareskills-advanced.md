@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum solidity
 tags: ethereum solidity interview security gas
+series: rareskills-solidity
+series_order: 3
 description: Solidity Interview Questions - Advanced, answers from the article - Solidity Interview Questions- by RareSkills.
 image: /assets/article/blockchain/ethereum/solidity/solidity_logo.png
 isMath: false

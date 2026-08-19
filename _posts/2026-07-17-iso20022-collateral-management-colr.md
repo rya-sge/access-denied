@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 swift collateral margin csa triparty
+series: iso20022
+series_order: 9
 description: How ISO 20022 models collateral management through the colr business area, from margin call and collateral proposal to substitution, interest, disputes, and triparty processing between two counterparties and their custodian.
 image: /assets/article/finance/iso20022-collateral-management-colr.png
 isMath: true

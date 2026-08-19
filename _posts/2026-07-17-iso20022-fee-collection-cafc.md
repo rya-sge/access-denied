@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 cards cafc fees acquirer issuer
+series: iso20022
+series_order: 22
 description: How ISO 20022 models card fee collection through the cafc business area, a two-message request-and-response pair that collects scheme and service fees between card parties on the same protected envelope as the transaction messages.
 image: /assets/article/finance/iso20022-fee-collection-cafc.png
 isMath: false

@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: security network
 tags: windows credentials laps wdigest lsass credential-guard protected-users active-directory hardening
+series: windows-sos
+series_order: 2
 description: How Windows protects credentials at rest and in memory - password policy, LAPS, logon types, disabling WDigest, LSA Protection (RunAsPPL), Credential Guard (VBS), and the Protected Users group.
 image: /assets/article/securite/windows-credentials-protection/2026-06-30-windows-credentials-protection.png
 isMath: false

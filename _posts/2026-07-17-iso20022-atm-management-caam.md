@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 cards caam atm management key-download
+series: iso20022
+series_order: 19
 description: How ISO 20022 models the management of automated teller machines through the caam business area, covering device control, key download, diagnostics, configuration, reconciliation, and exception handling between an ATM and its manager.
 image: /assets/article/finance/iso20022-atm-management-caam.png
 isMath: false

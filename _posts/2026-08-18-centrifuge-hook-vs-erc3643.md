@@ -6,6 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity security
 tags: rwa erc-3643 t-rex cmtat erc-1404 centrifuge compliance permissioned-token security-token transfer-hook
+series: centrifuge
 description: A comparison of two enforcement architectures for regulated tokens - Centrifuge's single swappable hook with packed eligibility data, and ERC-3643's identity registry plus compliance modules.
 image: /assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-hook-vs-erc3643-mindmap.png
 isMath: false

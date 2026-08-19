@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 foreign-exchange fx fxtr confirmation settlement
+series: iso20022
+series_order: 10
 description: How ISO 20022 models the foreign exchange post-trade process through the fxtr business area, covering trade capture, confirmation and matching, status notification, and net settlement reporting between counterparties and their matching and settlement services.
 image: /assets/article/finance/iso20022-fx-trade-fxtr.png
 isMath: false

@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 cards caaa pos acquirer acceptance
+series: iso20022
+series_order: 15
 description: How ISO 20022 models the merchant-terminal-to-acquirer leg of a card payment through the caaa business area, covering authorisation, completion, cancellation, reconciliation, currency conversion, and batch transfer.
 image: /assets/article/finance/iso20022-acceptor-to-acquirer-caaa.png
 isMath: false

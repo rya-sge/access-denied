@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 payments pacs credit-transfer rtgs cbpr
+series: iso20022
+series_order: 3
 description: How ISO 20022 models interbank payments through the pacs business area, the flagship of the MT-to-MX migration, covering the FIToFI credit transfer, direct debit, payment status, return, and reversal messages that move money between banks.
 image: /assets/article/finance/iso20022-payments-clearing-settlement-pacs.png
 isMath: false

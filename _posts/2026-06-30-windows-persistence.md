@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: security network
 tags: windows active-directory persistence golden-ticket skeleton-key kerberos krbtgt lsass mimikatz
+series: windows-sos
+series_order: 3
 description: How an attacker who already controls a Domain Controller keeps coming back - the Golden Ticket forged from the krbtgt key and the Skeleton Key LSASS backdoor, with detection and mitigation.
 image: /assets/article/securite/windows-persistence/2026-06-30-windows-persistence.png
 isMath: false

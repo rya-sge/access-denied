@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: linux security
 tags: linux security posix permissions acl capabilities suid sgid chattr pam ssh
+series: linux-sos
+series_order: 1
 description: A technical walkthrough of the base GNU/Linux security primitives - login and authentication, POSIX file permissions, ACLs, extended attributes, and capabilities - with their adversary models and trade-offs.
 image: /assets/article/securite/linux-base-security/2026-06-29-linux-base-security-primitives.png
 isMath: false

@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 swift camt cash-management statement payments
+series: iso20022
+series_order: 4
 description: A guided tour of ISO 20022's camt (cash management) business area, from the camt.052/053/054 reporting trio that replaces SWIFT MT940/942/900/910 to payment cancellation, investigations, liquidity, and market-infrastructure query messages.
 image: /assets/article/finance/iso20022-cash-management-camt.png
 isMath: false

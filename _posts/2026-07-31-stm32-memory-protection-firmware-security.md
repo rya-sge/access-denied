@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: security programmation
 tags: stm32 firmware embedded security memory-protection coldcard
+series: firmware-security
 description: What STM32L4 readout protection, write protection, the hardware firewall, PCROP, OTP and flash ECC actually do, how a shipping product combines them, and where each one stops helping.
 image: /assets/article/blockchain/wallet/coldcard/2026-07-31-stm32-memory-protection-mindmap.png
 isMath: false

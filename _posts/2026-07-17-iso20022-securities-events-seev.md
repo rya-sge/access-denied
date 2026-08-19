@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: network programmation ISO20022
 tags: iso20022 securities seev corporate-actions proxy-voting
+series: iso20022
+series_order: 8
 description: A tour of ISO 20022's seev (securities events) business area, covering corporate actions, general meetings and proxy voting, shareholder identification, market claims, and buyer protection across the custody chain.
 image: /assets/article/finance/iso20022-securities-events-seev.png
 isMath: false

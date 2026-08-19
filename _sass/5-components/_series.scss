@@ -1,0 +1,64 @@
+/* ===============
+	SERIES NAV
+=============== */
+
+// Box listing every article of a series, rendered under the title of any post
+// that declares `series:` in its front matter (see _includes/series-nav.html).
+.c-series {
+  padding: 15px 20px;
+  margin: 0 0 25px;
+  background-color: var(--surface);
+  border-left: 3px solid $primary-color;
+}
+
+.c-series__label {
+  margin-bottom: 5px;
+}
+
+.c-series__kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $primary-color;
+  margin-right: 8px;
+}
+
+.c-series__title {
+  font-weight: bold;
+}
+
+.c-series__position {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: $gray;
+  margin-bottom: 10px;
+}
+
+.c-series__list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 15px;
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  // The current article is not a link: it is where the reader already is.
+  .is-current > span {
+    font-weight: bold;
+    color: var(--text-strong);
+  }
+}
+
+.c-series__list--plain {
+  list-style: disc;
+}
+
+@media only screen and (max-width: 480px) {
+  .c-series {
+    padding: 12px 15px;
+  }
+  .c-series__list {
+    font-size: 14px;
+  }
+}

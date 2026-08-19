@@ -7,6 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
+series: cyfrin-first-fight
 description: Cyfrin First Fight 44 - Beatland Festival.
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-44-beatland-festival-mindmap.png
 isMath: false

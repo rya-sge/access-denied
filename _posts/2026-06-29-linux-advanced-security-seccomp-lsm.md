@@ -7,6 +7,8 @@ lang: en
 locale: en-GB
 categories: linux security
 tags: linux security seccomp lsm selinux apparmor mac syscalls bpf
+series: linux-sos
+series_order: 2
 description: How SECCOMP filters system calls and how Linux Security Modules (SELinux, AppArmor, and others) add mandatory access control on top of the base UNIX permission model.
 image: /assets/article/securite/linux-advanced-security/2026-06-29-linux-advanced-security-seccomp-lsm.png
 isMath: false
