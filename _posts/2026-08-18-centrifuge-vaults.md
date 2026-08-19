@@ -316,48 +316,42 @@ The parts most worth attention when integrating or reviewing are the rounding po
 | **D18** | The protocol's 18-decimal fixed-point price type; prices are expressed as pool units per asset unit or pool units per share unit. |
 | **Transfer hook** | The contract a share token consults on every transfer, which infers the protocol operation from the sentinel addresses involved and permits or blocks accordingly. |
 
-## Annex — Security Implementation Checklist
+## Annex — Invariants
 
-The properties below are what separate a correct integration or fork of this vault design from one that leaks value. Each row states a requirement an implementation either meets or fails, and what goes wrong when it does not.
+The properties below are what the deposit and redemption machinery is built to preserve. They are stated as
+invariants rather than as advice, since each one is enforced by a specific mechanism in the code and each is a
+candidate property for an invariant-testing campaign.
 
-### Request and claim accounting
+| Invariant | Enforced by | Breaks if |
+|-----------|-------------|-----------|
+| The sum of investors' pending amounts never exceeds the pool-level pending total. | Ceiling rounding when reducing `userOrder.pending` in `_claimDeposit`. | The reduction is switched to floor, letting rounding dust accumulate into an over-claim. |
+| The sum of shares claimed for an epoch never exceeds the shares issued for it. | Floor rounding on the payment basis used to compute the share payout. | The payout basis is rounded up, so the last claimant of an epoch finds the escrow short. |
+| An escrow's available balance equals `total - reserved` and is never negative. | `availableBalanceOf` returns zero when reserved exceeds total, and `withdraw` requires `total >= reserved`. | An unguarded subtraction underflows and reports a large available balance to pool managers. |
+| A reservation is released only by the reserver that created it, under the same reason code. | The `reservedBy[scId][caller][reason][asset][tokenId]` mapping and the `InsufficientReserve` check. | The deposit flow can release the redemption flow's earmark, freeing assets owed to redeemers. |
+| Shares issued against a fulfilled deposit remain in the pool escrow, reserved, until claimed. | `issue()` mints to `balanceSheet.escrow(poolId)` and is immediately followed by a `reserve` of the same amount. | Issued shares count as pool liquidity and can be deployed before their owners claim them. |
+| A controller has at most one pending deposit and one pending redeem per vault. | `REQUEST_ID` fixed at 0 and single `uint128` pending fields per `(vault, controller)`. | Requests become individually addressable and the aggregate accounting no longer describes them. |
+| No new request is accepted while a cancellation for the same controller is in flight. | The `pendingCancelDepositRequest` and `pendingCancelRedeemRequest` flags and the `CancellationIsPending` check. | Hub and spoke disagree about the pending amount, and the proportional split is computed against the wrong total. |
+| A claim never delivers more shares than it debits from `maxMint`. | `sharesUp` is rounded up and debited while `sharesDown` is rounded down and paid out. | Repeated partial claims extract more than the allocation, at the expense of other claimants in the same escrow. |
+| Only a vault currently linked in the registry can move pool capital. | `_checkIsLinked` at the head of every state-changing entry point in `AsyncRequestManager`. | An unlinked or superseded vault keeps operating after its kill switch was pulled. |
 
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Pending amounts are reduced by the ceiling of the proportional split, while payouts are computed from the floor. | Reversing the rounding lets the sum of individual claims exceed the amount issued, draining the escrow's shared balance. |
-| ☐ | Claiming by share amount (`mint`) debits and pays the same figure; claiming by asset amount (`deposit`) is documented as lossy. | An integration that loops on `deposit` silently burns the investor's claimable balance one wei at a time. |
-| ☐ | A new request is rejected while a cancellation for the same controller and vault is in flight. | Concurrent request and cancellation produce a pending amount the hub and spoke disagree about. |
-| ☐ | Requests that cannot mutate pending (last update behind the current epoch) are queued, not applied. | Editing a pending amount that an approval has already consumed corrupts every other investor's proportional slice. |
-| ☐ | Approved amounts are capped at the recorded pending total and rejected when zero. | An over-approval issues shares against capital that was never deposited. |
+## Annex — Integration Notes
 
-### Custody and escrow
+The behaviours below follow from the asynchronous design and differ from what an ERC-4626 integration usually
+assumes. Each is intentional and documented in the contracts.
 
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Available balance is computed as `total - reserved` and floors at zero rather than underflowing. | An underflow would report a large available balance and let a manager withdraw earmarked capital. |
-| ☐ | Reservations are keyed by reserver and reason code, and released only under the same pair. | The deposit flow could release the redemption flow's earmark, letting redeeming assets be spent. |
-| ☐ | Deposited assets are reserved at request time, before being noted as a holding. | Capital that is still cancellable would count as deployable liquidity. |
-| ☐ | The asset decrease is queued to the hub in the same transaction as the share burn. | A window opens where reported net asset value and share supply disagree, mispricing every conversion in it. |
-| ☐ | Only the balance sheet contract can mint, burn, or move escrow balances, enforced by ward checks. | Any contract able to mint shares directly bypasses the entire accounting pipeline. |
+| Behaviour | What an integrator should do |
+|-----------|------------------------------|
+| `previewDeposit`, `previewMint`, `previewWithdraw` and `previewRedeem` revert. | Treat them as unavailable on async vaults, as ERC-7540 requires. Quote with `convertToShares` and `convertToAssets` instead, and label the result as indicative. |
+| `convertToShares` and `convertToAssets` use the spoke's most recent price, which the contracts note may change between submission and execution. | Never present the result as the price the user will receive. The settlement price is the one the hub supplies at fulfilment. |
+| Claiming by asset amount loses up to one wei of allocation per call. | Claim with `mint(shares, ...)` and `withdraw(assets, ...)` rather than `deposit` and `redeem`, especially in loops. The NatSpec recommends this explicitly. |
+| `maxDeposit`, `maxMint`, `maxWithdraw` and `maxRedeem` return zero when the transfer restriction blocks the user. | Do not read zero as "vault is empty" or as an error. A restricted or frozen investor sees an empty vault through the standard views. |
+| Every request carries `REQUEST_ID = 0`, and repeat requests accumulate into one pending amount. | Do not build a per-request identifier model. Track one aggregate pending deposit and one aggregate pending redeem per controller and vault. |
+| A pending cancellation blocks further requests on that vault until it clears. | Surface cancellation state in the interface, and expect `CancellationIsPending` rather than treating a failed request as a transient error. |
+| On `requestRedeem` the shares leave the holder's balance immediately. | Reflect the reduced balance right away. Note that `withdraw` and `redeem` do not support the usual controller-different-from-caller delegation, because there is no remaining share balance to authorise against. |
+| Delegation has three routes: `setOperator`, an ERC-7741 signature through `authorizeOperator`, and `setEndorsedOperator` for endorsed protocol contracts. | Use `VaultRouter.enable()` for the common case; it registers the router as an endorsed operator in one call. |
+| `totalAssets()` is `convertToAssets(totalSupply)` of the share class, not a balance held by the vault. | Do not expect the vault address to hold assets. Custody is the pool escrow. |
+| `pricePerShare()` and `priceLastUpdated()` exist outside the standards. | Use them for display, and check `priceLastUpdated` before showing a price as current. |
 
-### Pricing
-
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Conversions multiply before dividing, with decimal scaling folded into a single `mulDiv`. | Sequential rounding compounds the error across decimal adjustment and price application. |
-| ☐ | A zero denominator price returns zero or reverts explicitly, never divides. | A division by zero on an uninitialised price bricks the vault's view functions. |
-| ☐ | Synchronous deposits read prices with the staleness check enabled. | Instant issuance at a stale price lets a depositor mint shares below fair value. |
-| ☐ | Asset amounts are clamped to the largest value that converts without exceeding `uint128`. | An overflow deep in a conversion reverts unpredictably, or truncates silently if unchecked. |
-
-### Permissioning
-
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Both sides of a share movement are checked against the transfer hook, including protocol-internal legs. | A restricted investor receives or disposes of shares through a path the hook never inspected. |
-| ☐ | `max*` view functions return zero, rather than reverting, when the restriction check fails. | Aggregators reading a reverting view treat the vault as broken instead of as closed to that user. |
-| ☐ | Every state-changing manager entry point verifies the vault is currently linked. | An unlinked or rogue vault keeps moving pool capital after its kill switch was pulled. |
-| ☐ | Signed operator authorisations are bound to a chain identifier, carry a deadline, and use a nonce that can be invalidated. | A signature is replayed on another chain, or after the signer intended to revoke it. |
-| ☐ | Endorsed-operator registration is restricted to addresses the root contract endorses. | Any contract could register itself as operator for arbitrary users and drain their claims. |
 
 ## Frequently Asked Questions
 

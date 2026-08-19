@@ -13,7 +13,7 @@ isMath: false
 
 The previous article on [Windows advanced authentication]({{site.url_complet}}/windows-advanced-authentication) showed how to replace passwords at the *front door* with hardware-backed keys, and ended on a blunt point: the credentials and tokens those logons produce are still exposed. This article is the defensive counterpart. It covers the controls that protect credentials *after* authentication, both at rest and in memory: password policy, the Local Administrator Password Solution (LAPS), logon types and where secrets get cached, disabling WDigest, LSA Protection, Credential Guard, and account-discipline controls such as the Protected Users group.
 
-> **Source and currency note.** This article is based on the lecture *SOS 2021 - 06 Windows credentials protection* (Jean-Marc Bost, HEIG-VD, May 2021), targeting Windows 10 / Server 2016-era domains. The mechanisms (RunAsPPL, VBS-based Credential Guard, Protected Users, LAPS) are still current, but defaults and packaging have changed: Credential Guard is enabled by default on many newer Windows 11 / Server SKUs, "Windows LAPS" is now built into the OS rather than an add-on, and Microsoft has begun deprecating NTLM. Treat version lists, registry specifics, and "available on" claims as a 2021 snapshot and verify against current Microsoft Learn docs before relying on them.
+> **Source and currency note.** This article is based on the lecture *SOS 2021 - 06 Windows credentials protection* (JMB, HEIG-VD, May 2021), targeting Windows 10 / Server 2016-era domains. The mechanisms (RunAsPPL, VBS-based Credential Guard, Protected Users, LAPS) are still current, but defaults and packaging have changed: Credential Guard is enabled by default on many newer Windows 11 / Server SKUs, "Windows LAPS" is now built into the OS rather than an add-on, and Microsoft has begun deprecating NTLM. Treat version lists, registry specifics, and "available on" claims as a 2021 snapshot and verify against current Microsoft Learn docs before relying on them.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -176,5 +176,5 @@ Because credential protection is defense in depth, not a single feature. Memory 
 - [Microsoft Learn - Protected Users security group](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-protected-users-group)
 - [Microsoft - Mitigating Pass-the-Hash and credential theft (WDigest UseLogonCredential)](https://support.microsoft.com/en-us/topic/microsoft-security-advisory-update-to-improve-credentials-protection-and-management-may-13-2014-93434251-04ac-b7f3-52aa-9f951c14b649)
 - [Microsoft - The evolution of Windows authentication (NTLM deprecation)](https://techcommunity.microsoft.com/blog/windows-itpro-blog/the-evolution-of-windows-authentication/4015650)
-- *SOS 2021 - 06 Windows credentials protection*, Jean-Marc Bost, HEIG-VD, May 2021 (source lecture)
+- *SOS 2021 - 06 Windows credentials protection*, JMB, HEIG-VD, May 2021 (source lecture)
 - [Claude Code](https://claude.com/product/claude-code)

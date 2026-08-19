@@ -13,7 +13,7 @@ isMath: false
 
 The two previous articles in this series looked at hardening authentication ([smartcards, Hello, FIDO2]({{site.url_complet}}/windows-advanced-authentication)) and protecting credentials ([LAPS, Credential Guard, Protected Users]({{site.url_complet}}/windows-credentials-protection)). This one assumes the defender has already lost: the attacker holds a Domain Controller. The question becomes *persistence*, the techniques an intruder uses to guarantee a way back even after the initial hole is closed. Two are specific to Active Directory and rest entirely on how Kerberos and LSASS work: the **Golden Ticket** and the **Skeleton Key**. Both are documented here for defensive and authorized-testing purposes, with detection and mitigation as the goal.
 
-> **Source and currency note.** This article is based on the lecture *SOS 2021 - 05 Windows persistence* (Jean-Marc Bost, HEIG-VD, April 2021), targeting Windows Server 2016-era domains. The underlying mechanics (a stateless KDC trusting any TGT signed with the krbtgt key, an in-memory LSASS patch) are unchanged, but tradecraft and defenses have evolved: modern forged tickets favour **AES** over **RC4** and have variants designed to evade detection (**Diamond** and **Sapphire** tickets), and **Credential Guard** plus **LSA Protection** raise the bar for the LSASS access both techniques need. Treat exact Mimikatz syntax and version specifics as a 2021 snapshot.
+> **Source and currency note.** This article is based on the lecture *SOS 2021 - 05 Windows persistence* (JMB, HEIG-VD, April 2021), targeting Windows Server 2016-era domains. The underlying mechanics (a stateless KDC trusting any TGT signed with the krbtgt key, an in-memory LSASS patch) are unchanged, but tradecraft and defenses have evolved: modern forged tickets favour **AES** over **RC4** and have variants designed to evade detection (**Diamond** and **Sapphire** tickets), and **Credential Guard** plus **LSA Protection** raise the bar for the LSASS access both techniques need. Treat exact Mimikatz syntax and version specifics as a 2021 snapshot.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -139,5 +139,5 @@ No. Both assume the attacker has already fully compromised a Domain Controller w
 - [MITRE ATT&CK T1556.001 - Skeleton Key (Modify Authentication Process)](https://attack.mitre.org/techniques/T1556/001/)
 - [Microsoft Learn - How Credential Guard works](https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/how-it-works)
 - [Microsoft Learn - Configure added LSA protection (RunAsPPL)](https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection)
-- *SOS 2021 - 05 Windows persistence*, Jean-Marc Bost, HEIG-VD, April 2021 (source lecture)
+- *SOS 2021 - 05 Windows persistence*, JMB, HEIG-VD, April 2021 (source lecture)
 - [Claude Code](https://claude.com/product/claude-code)

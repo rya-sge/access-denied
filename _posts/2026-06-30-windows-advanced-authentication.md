@@ -13,7 +13,7 @@ isMath: false
 
 Passwords remain the weakest link in most enterprise authentication systems. Windows offers several mechanisms that replace or strengthen the shared secret with asymmetric keys held in tamper-resistant hardware: physical smartcards, TPM-backed virtual smartcards, and Windows Hello for Business. This article explains how each works, follows the Kerberos PKINIT flow that ties them to a domain logon, and shows why some classic attack surfaces survive regardless of the credential type.
 
-> **Source and currency note.** This article is based on the lecture *SOS 2021 - 07 Windows Advanced Authentication* (Jean-Marc Bost, HEIG-VD, May 2021). The material targets Windows 10 and the domain model of that period. The core mechanics (asymmetric keys, the TPM, Kerberos PKINIT) remain accurate, but the surrounding ecosystem has moved on: FIDO2 security keys and passkeys are now first-class, Windows Hello for Business supports a cloud Kerberos trust model, and Microsoft has begun deprecating NTLM. Sections that reflect post-2021 changes are flagged explicitly.
+> **Source and currency note.** This article is based on the lecture *SOS 2021 - 07 Windows Advanced Authentication* (JMB, HEIG-VD, May 2021). The material targets Windows 10 and the domain model of that period. The core mechanics (asymmetric keys, the TPM, Kerberos PKINIT) remain accurate, but the surrounding ecosystem has moved on: FIDO2 security keys and passkeys are now first-class, Windows Hello for Business supports a cloud Kerberos trust model, and Microsoft has begun deprecating NTLM. Sections that reflect post-2021 changes are flagged explicitly.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -174,5 +174,5 @@ Cryptographically they are nearly the same: both store an asymmetric key on the 
 - [Microsoft Learn - Virtual Smart Card Overview](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/identity-protection/virtual-smart-cards/virtual-smart-card-overview)
 - [Microsoft Learn - Windows Hello for Business](https://learn.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/)
 - [Microsoft - The evolution of Windows authentication (NTLM deprecation)](https://techcommunity.microsoft.com/blog/windows-itpro-blog/the-evolution-of-windows-authentication/4015650)
-- *SOS 2021 - 07 Windows Advanced Authentication*, Jean-Marc Bost, HEIG-VD, May 2021 (source lecture)
+- *SOS 2021 - 07 Windows Advanced Authentication*, JMB, HEIG-VD, May 2021 (source lecture)
 - [Claude Code](https://claude.com/product/claude-code)

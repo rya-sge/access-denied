@@ -373,42 +373,6 @@ The part that is specific to a multi-chain protocol is the snapshot flag. A spok
 | **Snapshot nonce** | A per pool, share class and chain counter that must match on arrival, making the stream of balance-sheet updates ordered. |
 | **Net asset value** | Equity plus gains minus losses and liabilities, computed per chain from account balances and floored at zero. |
 
-## Annex — Security Implementation Checklist
-
-Accounting bugs in this design do not steal funds directly; they misprice shares, which is how value leaves. The items below are the properties that keep the ledger and the figures derived from it trustworthy.
-
-### Ledger integrity
-
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Closing a journal reverts unless debits equal credits. | Unbalanced entries accumulate silently and every derived figure drifts from reality. |
-| ☐ | The pool under edit is held in transient state, not passed per entry. | An entry lands in the wrong pool's books, corrupting two pools at once. |
-| ☐ | Accounts carry running totals and derive their value, rather than storing a mutable net balance. | A single wrong write destroys history that would otherwise allow reconstruction. |
-| ☐ | An account's declared normal balance is fixed at creation and used consistently when reading its value. | Sign errors invert a term of the net asset value calculation. |
-| ☐ | Posting to a non-existent account reverts rather than creating one implicitly. | A typo in a derived account identifier silently opens a parallel set of books. |
-| ☐ | Journal identifiers are stable per pool within a transaction and carry the pool identity. | An off-chain reconstruction groups interleaved entries into the wrong journals. |
-
-### Holdings and valuation
-
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Every holding mutation posts a matching journal entry, including value that arrived before the accounts existed. | Assets appear on the balance sheet that the ledger never recorded, inflating the implied share price. |
-| ☐ | Reclassification between asset and liability is refused while the holding carries value. | The holding's postings split across two account pairs and leave a permanent imbalance. |
-| ☐ | Decreases that would underflow clamp the stored holding while posting the true value, and emit the unclamped figure. | Either a withdrawal path reverts permanently, or the discrepancy becomes unobservable off-chain. |
-| ☐ | Valuation contracts are installed only by the pool manager, and a change is followed by a revaluation. | A stale or hostile quote moves net asset value with no bound in the accounting layer. |
-| ☐ | Revaluation differences of zero perform no posting. | Empty journals inflate gas and clutter the event stream that indexers rely on. |
-
-### Cross-chain consistency
-
-| Check | Security requirement | Failure mode if violated |
-|:---:|------------|------------|
-| ☐ | Balance-sheet updates carry a nonce that must match the stored one, so they apply in order. | A reordered pair of updates leaves holdings at a value that never existed. |
-| ☐ | The share price is recalculated only on updates flagged as a snapshot. | Assets are divided by a stale issuance figure and the price spikes for the duration of the mismatch. |
-| ☐ | The snapshot flag is set only when no share delta and no other asset queue remain outstanding. | A premature snapshot claims consistency that does not hold. |
-| ☐ | Cross-chain share transfers are excluded from the issuance delta on both legs. | Transferring shares between chains changes the global issuance and therefore the price, though nothing was created. |
-| ☐ | Net asset value floors at zero rather than underflowing when liabilities exceed assets. | An insolvent pool reports an enormous positive value from a wrapped subtraction. |
-| ☐ | A share class whose queue never quiesces is monitored, since its price simply stops updating. | The pool prices at a stale value indefinitely with no error raised. |
-
 ## Frequently Asked Questions
 
 **Q: Why store both a debit total and a credit total instead of one net balance?**
