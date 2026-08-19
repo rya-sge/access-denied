@@ -289,7 +289,9 @@ For anyone reviewing a bridge, the practical consequence is that scope determine
 
 ![Cross-chain bridge hacks mindmap]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-hacks-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -310,11 +312,11 @@ For anyone reviewing a bridge, the practical consequence is that scope determine
 | **Fail closed** | A design in which a component refuses to act when its inputs or quorum degrade, rather than continuing on a reduced set. The property LayerZero's RPC redundancy lacked. |
 | **SEAL 911** | A group of security professionals and volunteers offering emergency response to protocols under active exploitation, which assisted Ronin in 2024. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below are derived from the failure modes observed in the ten incidents. They are properties a bridge implementation and its operating procedure either meet or fail, rather than a transcription of any single standard.
 
-### Trust anchor and key custody
+#### Trust anchor and key custody
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -324,7 +326,7 @@ The items below are derived from the failure modes observed in the ten incidents
 | ☐ | No single individual holds unilateral control of operational funds, servers or recovery material. | The protocol stops when that person does, as at Multichain. |
 | ☐ | The signer set and its threshold are reviewed against current TVL, not against the value at launch. | Three keeper EOAs securing a high-TVL bridge concentrate an unbounded loss behind a small signing set. |
 
-### Verifier configuration
+#### Verifier configuration
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -333,7 +335,7 @@ The items below are derived from the failure modes observed in the ten incidents
 | ☐ | Each attestor reads origin chain state from several independent sources and **fails closed** when agreement is unavailable. | Degrading the honest sources forces failover onto the attacker's, which is precisely how LayerZero's redundancy was defeated. |
 | ☐ | Attestors wait for finality appropriate to the origin chain before signing. | A reorganisation removes the commitment while the release stands. |
 
-### Software supply chain
+#### Software supply chain
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -343,7 +345,7 @@ The items below are derived from the failure modes observed in the ten incidents
 | ☐ | Hosts running signing or verification software restrict outbound network egress to known destinations. | Keys or state are exfiltrated to attacker infrastructure on first start. |
 | ☐ | Source repository access is under fine-grained control with an audit trail. | An implant is committed or injected without attribution or detection. |
 
-### Upgrades and deployment
+#### Upgrades and deployment
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -354,7 +356,7 @@ The items below are derived from the failure modes observed in the ten incidents
 | ☐ | A security fix is deployed before its source becomes public, and dependency deprecation notices are treated as disclosures. | The patch itself becomes the exploit tip-off, as in the 53 minutes between Wormhole's pull request and the mint. |
 | ☐ | No implementation reaches mainnet without a third-party audit and invariant or fuzz testing of the authorisation path. | A threshold check that passes on zero weight is never exercised by conventional unit tests. |
 
-### Verification logic
+#### Verification logic
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -366,7 +368,7 @@ The items below are derived from the failure modes observed in the ten incidents
 | ☐ | Signatures are checked for duplicate signers and against the current signer set, with the set change itself governed. | Repeated signatures from one compromised key satisfy a naive count. |
 | ☐ | Every cross-chain message is bound to a chain identifier and a unique, single-use transaction identifier. | A proof valid on one chain or already consumed is replayed on another chain or a second time. |
 
-### Monitoring and loss limitation
+#### Monitoring and loss limitation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

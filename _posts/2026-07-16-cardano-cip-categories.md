@@ -212,7 +212,9 @@ For a working developer, the practical takeaway is to treat the category as a fi
 
 ![Mindmap summarizing the Cardano CIP categories and their notable proposals]({{site.url_complet}}/assets/article/blockchain/cardano/cardano-cip-categories.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

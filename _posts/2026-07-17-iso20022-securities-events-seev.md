@@ -70,7 +70,9 @@ The `seev` business area carries the events in the life of a security across the
 
 ![Mindmap summarising the ISO 20022 seev securities events area]({{site.url_complet}}/assets/article/finance/iso20022-securities-events-seev.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

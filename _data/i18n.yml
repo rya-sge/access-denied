@@ -38,6 +38,7 @@ en:
 
   # Post
   updated_on: "Updated"
+  toc_title: "Contents"
   series_kicker: "Series"
   series_part: "Part"
   series_of: "of"
@@ -86,6 +87,7 @@ fr:
 
   # Article
   updated_on: "Mis à jour le"
+  toc_title: "Sommaire"
   series_kicker: "Série"
   series_part: "Partie"
   series_of: "sur"

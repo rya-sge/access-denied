@@ -69,7 +69,9 @@ The `reda` business area manages the static data that transactions rely on. Its 
 
 ![Mindmap summarising the ISO 20022 reda reference data area]({{site.url_complet}}/assets/article/finance/iso20022-reference-data-reda.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

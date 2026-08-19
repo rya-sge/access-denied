@@ -112,7 +112,9 @@ For developers the model has two practical consequences. Governance-controlled p
 
 ![Mindmap summarizing Cardano Voltaire governance: the three bodies, seven action types, ratification, lifecycle, participation, and developer relevance]({{site.url_complet}}/assets/article/blockchain/cardano/cardano-voltaire-governance-cip-1694.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

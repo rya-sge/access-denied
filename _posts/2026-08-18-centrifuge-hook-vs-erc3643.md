@@ -258,7 +258,9 @@ For a reviewer the practical consequence is that the two models fail differently
 
 ![Permissioned token design models mindmap]({{site.url_complet}}/assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-hook-vs-erc3643-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -273,11 +275,11 @@ For a reviewer the practical consequence is that the two models fail differently
 | **Partial freeze** | Freezing a specific amount of a holder's balance rather than the whole account, supported by ERC-3643 and CMTAT but not by the Centrifuge hooks. |
 | **Endorsed contract** | A protocol contract the Centrifuge root has marked as trusted, which the hooks treat as always eligible and which cannot be frozen. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below apply to a permissioned token of either design. Where a requirement is specific to one model, the row says so.
 
-### Coverage of the chokepoint
+#### Coverage of the chokepoint
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -287,7 +289,7 @@ The items below apply to a permissioned token of either design. Where a requirem
 | ☐ | Zero-address legs are handled explicitly, so issuance and redemption are neither exempted nor bricked by a naive both-parties-must-be-eligible rule. | Either the rule blocks all issuance, or it skips it entirely. |
 | ☐ | The compliance call runs exactly once per operation across any override chain. | Stateful modules double-count, skewing holder caps and position limits. |
 
-### The privileged path
+#### The privileged path
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -297,7 +299,7 @@ The items below apply to a permissioned token of either design. Where a requirem
 | ☐ | Preconditions defined by the standard for the forced path are enforced, such as a verified recipient or a previously frozen source. | Seizure becomes an unconditional transfer primitive. |
 | ☐ | Protocol-owned and endorsed addresses cannot be used as the source of a privileged transfer. | Escrowed pool assets are drained through the enforcement path. |
 
-### Eligibility state
+#### Eligibility state
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

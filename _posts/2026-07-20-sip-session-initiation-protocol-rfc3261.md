@@ -209,7 +209,9 @@ The mindmap below summarizes the article's structure.
 
 ![SIP RFC 3261 mindmap]({{site.url_complet}}/assets/article/network/sip/2026-07-20-sip-session-initiation-protocol-rfc3261.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

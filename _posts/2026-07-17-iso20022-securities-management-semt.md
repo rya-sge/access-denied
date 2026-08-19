@@ -81,7 +81,9 @@ The `semt` business area is the custody world's reporting layer. Its forty-eight
 
 ![Mindmap summarising the ISO 20022 semt securities management area]({{site.url_complet}}/assets/article/finance/iso20022-securities-management-semt.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

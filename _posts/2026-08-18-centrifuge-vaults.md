@@ -303,7 +303,9 @@ The parts most worth attention when integrating or reviewing are the rounding po
 
 ![Centrifuge V3 vaults mindmap]({{site.url_complet}}/assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-vaults-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -318,7 +320,7 @@ The parts most worth attention when integrating or reviewing are the rounding po
 | **D18** | The protocol's 18-decimal fixed-point price type; prices are expressed as pool units per asset unit or pool units per share unit. |
 | **Transfer hook** | The contract a share token consults on every transfer, which infers the protocol operation from the sentinel addresses involved and permits or blocks accordingly. |
 
-## Annex — Invariants
+### Invariants
 
 The properties below are what the deposit and redemption machinery is built to preserve. They are stated as
 invariants rather than as advice, since each one is enforced by a specific mechanism in the code and each is a
@@ -336,7 +338,7 @@ candidate property for an invariant-testing campaign.
 | A claim never delivers more shares than it debits from `maxMint`. | `sharesUp` is rounded up and debited while `sharesDown` is rounded down and paid out. | Repeated partial claims extract more than the allocation, at the expense of other claimants in the same escrow. |
 | Only a vault currently linked in the registry can move pool capital. | `_checkIsLinked` at the head of every state-changing entry point in `AsyncRequestManager`. | An unlinked or superseded vault keeps operating after its kill switch was pulled. |
 
-## Annex — Integration Notes
+### Integration Notes
 
 The behaviours below follow from the asynchronous design and differ from what an ERC-4626 integration usually
 assumes. Each is intentional and documented in the contracts.

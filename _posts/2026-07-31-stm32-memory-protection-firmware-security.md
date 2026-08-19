@@ -335,7 +335,9 @@ level 2 removes the vendor's own recovery options along with the attacker's.
 
 ------
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -352,11 +354,11 @@ level 2 removes the vendor's own recovery options along with the attacker's.
 
 ------
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 For a firmware design relying on MCU memory protection.
 
-### Configuration and ordering
+#### Configuration and ordering
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -366,7 +368,7 @@ For a firmware design relying on MCU memory protection.
 | ☐ | The irreversible RDP transition happens once, at a defined production step, together with recording device identity. | Units ship unlocked, or the lockdown fires unexpectedly in the field. |
 | ☐ | Any development escape hatch is keyed to a provisioning state that ships set. | A debug bypass reaches customers. |
 
-### Integrity measurement
+#### Integrity measurement
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -375,7 +377,7 @@ For a firmware design relying on MCU memory protection.
 | ☐ | Every region excluded from the measurement has a stated reason and changes only through defined operations. | Exclusions accumulate into a place to hide modifications. |
 | ☐ | The measurement's expected value is held outside the processor and cannot be set by it alone. | Modified firmware asserts its own integrity. |
 
-### Rollback and monotonic state
+#### Rollback and monotonic state
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -383,7 +385,7 @@ For a firmware design relying on MCU memory protection.
 | ☐ | The version floor is consulted before a signed image is accepted, not after. | An old signed image is installed and only then rejected. |
 | ☐ | The number of available OTP slots exceeds the expected number of releases. | Anti-rollback silently stops working late in the product's life. |
 
-### Residual risk
+#### Residual risk
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

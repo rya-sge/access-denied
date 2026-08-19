@@ -257,7 +257,9 @@ The trade-off is the security assumption. Halo rests on the discrete log relatio
 
 ![Halo recursive proof composition summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -272,11 +274,11 @@ The trade-off is the security assumption. Halo rests on the discrete log relatio
 | **Deferred state** | The constant-size tuple of group elements and scalars that records an outstanding linear check, passed between recursive steps as a public input. |
 | **Curve cycle** | A pair of elliptic curves $$(E_p, E_q)$$ where each curve's group order equals the other's base field characteristic, so alternating between them keeps all arithmetic native. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The properties below are what separate a secure Halo-style implementation from an insecure one. They apply to the commitment scheme, the recursion, and the Fiat-Shamir transform that makes the whole thing non-interactive.
 
-### Reference string and generators
+#### Reference string and generators
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -284,7 +286,7 @@ The properties below are what separate a secure Halo-style implementation from a
 | ☐ | The hash-to-curve procedure maps to the prime-order subgroup and rejects the identity element. | A generator equal to the identity, or lying outside the prime-order subgroup, silently voids the binding argument for that position. |
 | ☐ | The degree bound $$d$$ is fixed by the reference string, and openings for polynomials of degree $$\geq d$$ are rejected. | An over-degree polynomial escapes the folding structure, so the final scalar check no longer pins down the committed coefficients. |
 
-### Commitment and opening
+#### Commitment and opening
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -293,7 +295,7 @@ The properties below are what separate a secure Halo-style implementation from a
 | ☐ | The final linear check $$G = \langle \mathbf{s}, \mathbf{G} \rangle$$ is performed by the ultimate verifier and never skipped, however deep the recursion. | Skipping it discards the only unconditional anchor: the entire chain of folded claims then rests on prover-supplied values. |
 | ☐ | The scalar $$b$$ is recomputed by the verifier from the product formula, never accepted from the prover. | A prover-supplied $$b$$ decouples the evaluation claim from the challenges, allowing an arbitrary opening value. |
 
-### Fiat-Shamir and challenge derivation
+#### Fiat-Shamir and challenge derivation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -302,7 +304,7 @@ The properties below are what separate a secure Halo-style implementation from a
 | ☐ | The Rescue instance used inside the circuit matches the one used outside it, byte for byte, including padding and domain separation. | A mismatch between the in-circuit and out-of-circuit hash lets a proof verify in one context and not the other, or admits a second valid transcript. |
 | ☐ | The condition $$\gcd(p-1, 5) = 1$$ is verified for the field in use before instantiating the Rescue S-box. | If 5 is not coprime to $$p-1$$, the map $$x \mapsto x^5$$ is not a bijection and the permutation loses the structure its security analysis assumes. |
 
-### Recursion and deferred state
+#### Recursion and deferred state
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

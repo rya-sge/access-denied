@@ -321,7 +321,9 @@ the hard way.
 
 ------
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -338,11 +340,11 @@ the hard way.
 
 ------
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 Derived from this incident, for any device generating long-lived secrets.
 
-### Sourcing entropy
+#### Sourcing entropy
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -352,7 +354,7 @@ Derived from this incident, for any device generating long-lived secrets.
 | ☐ | Entropy from a high-quality source is not truncated below the target security level when seeding a generator. | The generator's state, not the source, becomes the search space. |
 | ☐ | The written entropy budget states how many unpredictable bits enter each generated secret. | Implicit assumptions about entropy go unreviewed for years. |
 
-### Testing and detection
+#### Testing and detection
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -361,7 +363,7 @@ Derived from this incident, for any device generating long-lived secrets.
 | ☐ | Whitening (hashing) is applied only after entropy is established, never as a substitute for it. | Low-entropy output looks indistinguishable from high-entropy output. |
 | ☐ | Startup self-tests cover the generator each consumer actually reaches, not only the one the bootloader uses. | The tested path and the used path differ. |
 
-### Combining sources
+#### Combining sources
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -369,7 +371,7 @@ Derived from this incident, for any device generating long-lived secrets.
 | ☐ | Software PRNGs mixed into a key path are seeded from a source with at least the target entropy. | A constant or clock-derived seed bounds the whole output. |
 | ☐ | Device-unique identifiers are not counted as entropy. | Values printed on the device or exposed over USB are treated as secret. |
 
-### Incident response
+#### Incident response
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

@@ -139,7 +139,9 @@ The mindmap below summarizes the article's structure.
 
 ![IPsec and IKE roadmap mindmap]({{site.url_complet}}/assets/article/network/ipsec/2026-07-20-ipsec-ike-document-roadmap-rfc6071.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

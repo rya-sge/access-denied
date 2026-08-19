@@ -266,7 +266,9 @@ The volatility $$v^2$$ is the only input not directly observable, and it became 
 
 ![Black-Scholes model mindmap]({{site.url_complet}}/assets/article/finance/black-scholes-option-pricing-model.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

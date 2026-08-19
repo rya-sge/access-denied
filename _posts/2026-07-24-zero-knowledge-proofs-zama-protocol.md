@@ -194,7 +194,9 @@ The construction behind it is a compact public-key-encryption proof from TFHE-rs
 
 ![Zero-knowledge proofs in the Zama Protocol]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zama/zero-knowledge-proofs-zama-protocol.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -210,11 +212,11 @@ The construction behind it is a compact public-key-encryption proof from TFHE-rs
 | **Decryption proof** | Byte array of KMS signatures and metadata returned by `publicDecrypt` and checked on-chain by `FHE.checkSignatures`; a threshold-signature attestation rather than a ZK argument. |
 | **inputProof** | The calldata argument passed with an external handle: handle count, signer count, handles and coprocessor signatures, and not the zero-knowledge proof itself. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below are the properties an integration has to meet for the input and decryption paths to hold up. They are written as statements an implementation either satisfies or fails.
 
-### Encrypted inputs and proofs
+#### Encrypted inputs and proofs
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -225,7 +227,7 @@ The items below are the properties an integration has to meet for the input and 
 | ☐ | The encrypted values of a single call stay within the packed-list capacity, 2048 bits in the SDK. | Input construction throws client-side, or the call has to be split into several proofs and several paid verifications. |
 | ☐ | Contract logic does not infer authorisation from the presence of a valid proof. | The proof says nothing about balances or entitlement; treating it as authorisation grants transfers no rule ever checked. |
 
-### Access control and disclosure
+#### Access control and disclosure
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -234,7 +236,7 @@ The items below are the properties an integration has to meet for the input and 
 | ☐ | `FHE.makePubliclyDecryptable` is called only on values the application accepts to publish forever. | The grant cannot be undone for that handle, and any ACL holder can trigger it. |
 | ☐ | Repeated disclosure of a running aggregate is assessed for leakage before being exposed. | Successive published totals reveal each individual delta by subtraction, even though every operation stayed encrypted. |
 
-### Decryption results
+#### Decryption results
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

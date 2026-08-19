@@ -403,7 +403,9 @@ The tool is only as good as the harness. Coverage reports and revert reports exi
 
 ![Medusa mindmap]({{site.url_complet}}/assets/article/blockchain/solidity/medusa/2026-07-28-medusa-smart-contract-fuzzer.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -418,11 +420,11 @@ The tool is only as good as the harness. Coverage reports and revert reports exi
 | **Optimization test** | A prefixed function taking no arguments and returning `int256`, whose maximum observed value the fuzzer tries to raise rather than falsify. |
 | **Stateful fuzzing** | Fuzzing that preserves EVM state across the calls of a sequence, so that later calls can reach code paths unlocked by earlier ones. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 A fuzzing harness fails silently. A campaign that never reaches the code under test, or whose properties can never return `false`, terminates cleanly and reports success. The checklist below covers the harness and configuration properties that separate a campaign providing genuine assurance from one providing only the appearance of it.
 
-### Harness reachability
+#### Harness reachability
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -432,7 +434,7 @@ A fuzzing harness fails silently. A campaign that never reaches the code under t
 | ☐ | `targetContracts` names the harness, and the contracts under test are deployed and reachable from it. | Fuzzing the wrong contract produces a green campaign that exercised none of the target logic. |
 | ☐ | Startup warnings about test functions with invalid signatures are read and resolved. | A `property_` function with the wrong return type is demoted to an ordinary call target and its invariant is never evaluated. |
 
-### Property design
+#### Property design
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -442,7 +444,7 @@ A fuzzing harness fails silently. A campaign that never reaches the code under t
 | ☐ | `senderAddresses` is configured and used when authorisation or per-user accounting matters. | Routing every call through one wrapper collapses the multi-user dimension, hiding access control and cross-account bugs. |
 | ☐ | `panicCodeConfig` is set deliberately for the codebase rather than left at defaults. | Arithmetic overflow, division by zero and out-of-bounds access go unreported when the corresponding flags stay off. |
 
-### Campaign integrity
+#### Campaign integrity
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

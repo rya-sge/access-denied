@@ -62,7 +62,9 @@ None of this moves money, but all of it is a precondition for the transaction me
 
 The `canm` business area manages the network link beneath card transactions. Its four messages form two pairs: one that signs a terminal on and off and keeps the connection alive with echo tests, and one that loads and rotates the cryptographic keys the transaction messages depend on. It is the ISO 20022 successor to ISO 8583's network-management class, and though it carries no financial value itself, it is what makes the value-bearing traffic possible. Read next to the acquirer-to-issuer transaction area whose link it maintains and whose keys it manages, `canm` is the card standard's control plane.
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

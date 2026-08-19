@@ -49,7 +49,6 @@ layout: home
             </div>
         </header>
         {% include series-nav.html %}
-        {% include toc.html html=content %}
         {% comment %}
           Add lazy loading to every in-article image (619 of them across the
           archive). Kramdown cannot emit `loading` itself, and GitHub Pages runs
@@ -57,6 +56,43 @@ layout: home
           replace on the rendered HTML is the portable way to do this.
         {% endcomment %}
         {% assign post_body = page.content | markdownify | replace: '<img src="', '<img loading="lazy" decoding="async" src="' %}
+        {% comment %}
+          Table of contents.
+
+          195 posts carry a `[TOC]` marker on its own line, placed by the author
+          after the introduction. Kramdown has no such syntax (its own is
+          `{:toc}`), so nothing ever consumed the marker: the literal text
+          "[TOC]" was rendered as a paragraph on every one of those pages, while
+          the real table of contents was emitted here, above the whole body.
+
+          Both problems have the same fix. The TOC is captured first, then
+          substituted for the rendered marker, which puts it exactly where the
+          author put it — after the opening paragraphs rather than between the
+          title and the first sentence. That order matters beyond taste: the
+          first thing in the body is what a search engine quotes as a snippet
+          and what an answer engine extracts, and a list of twenty section links
+          is a poor answer to any question.
+
+          Posts with no marker (70 older ones) keep the previous behaviour and
+          get the TOC above the body.
+        {% endcomment %}
+        {% capture toc_html %}<nav class="c-toc" aria-label="{{ t.toc_title }}">
+          <p class="c-toc__title">{{ t.toc_title }}</p>
+          {% include toc.html html=content class="c-toc__list" %}
+        </nav>{% endcapture %}
+        {% if post_body contains '<p>[TOC]</p>' %}
+          {% assign post_body = post_body | replace: '<p>[TOC]</p>', toc_html %}
+        {% elsif post_body contains '[TOC]' %}
+          {%- comment -%}
+            Belt and braces: should kramdown ever wrap the marker differently,
+            substitute the bare string rather than leaving "[TOC]" visible in the
+            article. The branches are exclusive, so the TOC cannot be inserted
+            twice.
+          {%- endcomment -%}
+          {% assign post_body = post_body | replace: '[TOC]', toc_html %}
+        {% else %}
+          {{ toc_html }}
+        {% endif %}
         {{ post_body }}
         <div class="c-article__footer u-clearfix">
             <div>

@@ -1,0 +1,46 @@
+/* ===============
+	TABLE OF CONTENTS
+=============== */
+
+// The TOC used to be an unstyled <ul> emitted between the article title and its
+// first sentence. It is now a labelled <nav> rendered where the article's [TOC]
+// marker sits, which is after the introduction (see _layouts/post.html).
+.c-toc {
+  padding: 15px 20px;
+  margin: 0 0 30px;
+  background-color: var(--surface);
+  border-radius: 6px;
+}
+
+.c-toc__title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $gray;
+  margin-bottom: 8px;
+}
+
+.c-toc__list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 15px;
+
+  li {
+    margin-bottom: 3px;
+  }
+
+  ul {
+    padding-left: 18px;
+    margin-top: 3px;
+    font-size: 14px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .c-toc {
+    padding: 12px 15px;
+  }
+  .c-toc__list {
+    font-size: 14px;
+  }
+}

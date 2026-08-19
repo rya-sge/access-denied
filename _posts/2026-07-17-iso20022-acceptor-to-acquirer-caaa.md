@@ -67,7 +67,9 @@ The `caaa` business area standardises the merchant-terminal-to-acquirer conversa
 
 ![Mindmap summarising the ISO 20022 caaa acceptor-to-acquirer area]({{site.url_complet}}/assets/article/finance/iso20022-acceptor-to-acquirer-caaa.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

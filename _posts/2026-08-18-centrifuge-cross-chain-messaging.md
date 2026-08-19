@@ -319,7 +319,9 @@ Three implementation details do more work than their size suggests. Signed vote 
 
 ![Centrifuge cross-chain messaging mindmap]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/2026-08-18-centrifuge-cross-chain-messaging-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -334,11 +336,11 @@ Three implementation details do more work than their size suggests. Signed vote 
 | **Subsidy** | Native value held in a per-pool `RefundEscrow` that authorised protocol contracts draw on to pay messaging costs on a user's behalf. |
 | **Recovery adapter** | An adapter that cannot send and whose `handle` is authority-gated, used to inject a message directly when a transport is unavailable. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below are the properties an n-of-m cross-chain messaging layer has to hold for its trust assumption to mean what it claims. Each is stated as a requirement, paired with what breaks when it is violated.
 
-### Consensus over transports
+#### Consensus over transports
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -349,7 +351,7 @@ The items below are the properties an n-of-m cross-chain messaging layer has to 
 | ☐ | An adapter must be registered for the exact destination chain and pool whose message it delivers. | An adapter authorised for one pool injects messages on behalf of another. |
 | ☐ | Deployments with a threshold of one are treated as trusted-transport deployments, not verified ones. | A configuration that bypasses the vote path entirely is mistaken for an n-of-m guarantee. |
 
-### Message authenticity and scope
+#### Message authenticity and scope
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -359,7 +361,7 @@ The items below are the properties an n-of-m cross-chain messaging layer has to 
 | ☐ | Every message in a batch is verified to belong to the same pool during the inbound split. | A batch mixes pools, so a routing decision made once is wrong for part of the payload. |
 | ☐ | Adapter wiring for a given chain is one-shot and cannot be silently repointed. | A governance action redirects a live adapter to an attacker-controlled counterpart. |
 
-### Execution and liveness
+#### Execution and liveness
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

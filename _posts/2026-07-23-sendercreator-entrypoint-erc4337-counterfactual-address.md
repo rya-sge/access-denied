@@ -202,7 +202,9 @@ Two consequences follow. First, deployment is replaced by initialization: the En
 
 ![Mindmap summary of the SenderCreator contract, its functions, callers, version history, and EIP-7702 caveat]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/sendercreator-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -217,11 +219,11 @@ Two consequences follow. First, deployment is replaced by initialization: the En
 | **initEip7702Sender** | `SenderCreator` function, added in v0.8, that calls initialization data into an already-delegated EIP-7702 account instead of deploying one. |
 | **NotFromEntryPoint** | The typed error introduced in v0.9 that replaces the v0.8 `AA97` string revert when a caller other than the EntryPoint invokes `SenderCreator`. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The properties below are the ones that make a `SenderCreator`-style deployment relay safe rather than merely functional. They are useful when reviewing the EntryPoint or any contract that deploys untrusted factory code on another contract's behalf.
 
-### Isolation and access control
+#### Isolation and access control
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -229,7 +231,7 @@ The properties below are the ones that make a `SenderCreator`-style deployment r
 | ☐ | The helper records the deploying coordinator as an immutable and rejects any other caller (`msg.sender == entryPoint`). | An arbitrary caller drives `initEip7702Sender` into user accounts, or probes deployments outside the sanctioned path. |
 | ☐ | The helper holds no deposits, stake, or privileges anywhere in the protocol. | A compromised helper becomes a lever for stealing funds or forging authorization. |
 
-### Deployment correctness
+#### Deployment correctness
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -238,7 +240,7 @@ The properties below are the ones that make a `SenderCreator`-style deployment r
 | ☐ | The deployed sender must actually contain code afterward (AA15). | An empty or self-destructing factory passes validation without creating a usable account. |
 | ☐ | Deployment runs under an explicit gas ceiling derived from `verificationGasLimit`. | An unbounded factory call enables griefing or gas exhaustion of the bundle. |
 
-### EIP-7702 handling
+#### EIP-7702 handling
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

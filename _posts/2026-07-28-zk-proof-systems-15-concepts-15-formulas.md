@@ -403,7 +403,9 @@ A practical way to use this: for any paper in the library, answer four questions
 
 ![Zero-knowledge proof systems concepts and formulas summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-07-28-zk-proof-systems-concepts-formulas.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -418,11 +420,11 @@ A practical way to use this: for any paper in the library, answer four questions
 | **Interactive oracle proof (IOP)** | An interactive proof in which prover messages are oracles the verifier queries at a few positions rather than reading in full. |
 | **Folding scheme** | A primitive combining two instances of a relaxed constraint system into a single instance, cheaper than proving and used by Nova for recursion. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The properties below are the recurring places where a correct-on-paper proof system becomes an insecure deployed one. They apply across the constructions in the library, whichever layer choices a given system makes.
 
-### Field, parameters and arithmetisation
+#### Field, parameters and arithmetisation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -430,7 +432,7 @@ The properties below are the recurring places where a correct-on-paper proof sys
 | ☐ | Every constraint the computation relies on is actually present in the constraint system, including range and boolean constraints on witness values. | An under-constrained witness is the most common real-world proof-system bug: the proof verifies for values the program would never produce. |
 | ☐ | Public inputs are bound into the statement the proof commits to, not passed alongside it. | An unbound public input lets a valid proof be replayed against different claimed inputs. |
 
-### Setup and reference string
+#### Setup and reference string
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -438,7 +440,7 @@ The properties below are the recurring places where a correct-on-paper proof sys
 | ☐ | For a transparent system, generators are derived by hash-to-curve from a public seed, with no discrete log relation known among them. | A known relation among generators breaks the binding property of the commitment. |
 | ☐ | The circuit a verification key was generated for is pinned and checked, and keys cannot be reset or replaced by an unprivileged party. | A swapped verification key turns the verifier into a rubber stamp for a circuit of the attacker's choosing. |
 
-### Fiat-Shamir and challenge derivation
+#### Fiat-Shamir and challenge derivation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -446,7 +448,7 @@ The properties below are the recurring places where a correct-on-paper proof sys
 | ☐ | Domain separation distinguishes challenges at different protocol positions, and the hash output is at least twice the target security level in bits. | Cross-position challenge reuse, and collisions cheap enough to reintroduce adaptive attacks. |
 | ☐ | Challenges required to be invertible are checked to be non-zero, with re-derivation rather than a default substitute on failure. | A predictable substituted challenge makes one folding or evaluation round non-binding. |
 
-### Commitments, openings and proof handling
+#### Commitments, openings and proof handling
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -455,7 +457,7 @@ The properties below are the recurring places where a correct-on-paper proof sys
 | ☐ | For FRI-based systems, the number of query repetitions matches the claimed security level for the chosen code rate. | Too few queries let a function far from any low-degree polynomial pass the proximity test. |
 | ☐ | Verification failure aborts; there is no path on which a partially checked proof is accepted. | A single skipped check is usually sufficient to accept arbitrary statements. |
 
-### Zero knowledge and recursion
+#### Zero knowledge and recursion
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

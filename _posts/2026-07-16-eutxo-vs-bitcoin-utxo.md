@@ -148,7 +148,9 @@ The trade-off is deliberate. Cardano gains expressiveness without reading mutabl
 
 ![Mindmap summarizing the eUTXO model against Bitcoin's UTXO model: shared foundation, Bitcoin output, the datum/redeemer/context extensions, and preserved properties]({{site.url_complet}}/assets/article/blockchain/cardano/eutxo-vs-bitcoin-utxo.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

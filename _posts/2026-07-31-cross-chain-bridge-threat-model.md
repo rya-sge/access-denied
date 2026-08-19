@@ -257,7 +257,9 @@ The practical consequence for anyone applying this model is that scope determine
 
 ![Cross-chain bridge threat model mindmap]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-threat-model-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -272,11 +274,11 @@ The practical consequence for anyone applying this model is that scope determine
 | **Challenge window** | A delay between authorisation and release during which a monitor can veto a transaction, converting detection into prevention. |
 | **Residual risk** | The risk that remains after countermeasures are applied, which must be explicitly accepted rather than assumed to be zero. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 Organised by trust boundary, so it can be run directly against the diagram. It complements the control checklist in the [companion article](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-hacks/), which is organised by control family rather than by boundary.
 
-### TB1 — Origin chain to attestation layer
+#### TB1 — Origin chain to attestation layer
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -288,7 +290,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 | ☐ | Escrow accounting uses measured balance deltas, not the requested amount. | Fee-on-transfer or rebasing tokens break the invariant that escrow covers bridged supply. |
 | ☐ | Every lock emits a unique identifier bound to the origin chain. | Releases cannot be reconciled one-to-one against locks. |
 
-### TB2 — Attestation layer to target chain
+#### TB2 — Attestation layer to target chain
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -301,7 +303,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 | ☐ | Proof size and depth are bounded. | Verification becomes a gas exhaustion vector. |
 | ☐ | Each release records the signer set and signatures that authorised it. | Post-incident attribution is impossible from on-chain data. |
 
-### TB3 — Corporate IT to signer host
+#### TB3 — Corporate IT to signer host
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -311,7 +313,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 | ☐ | Use of a delegated or dormant signing path raises an alert. | The delegation is exercised by an attacker with no one watching. |
 | ☐ | Signers in the threshold occupy distinct organisations, networks and administrative domains. | The nominal threshold collapses to one failure domain. |
 
-### TB4 — Build environment to running binary
+#### TB4 — Build environment to running binary
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -321,7 +323,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 | ☐ | Source repository access is under fine-grained control with an audit trail. | An implant is introduced without attribution. |
 | ☐ | Signer hosts restrict outbound network egress to known destinations. | Keys are exfiltrated to attacker infrastructure on first start. |
 
-### TB5 — Upgrade admin to live implementation
+#### TB5 — Upgrade admin to live implementation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -331,7 +333,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 | ☐ | `ProxyAdmin` is behind a multi-signature and a timelock, with the diff published before execution. | A single key is a shorter path to the escrow than the entire signer set. |
 | ☐ | The guardian can pause but not unpause; unpausing requires full governance. | Pause authority becomes a censorship or trap mechanism. |
 
-### Cross-boundary — detection and loss limitation
+#### Cross-boundary — detection and loss limitation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

@@ -124,7 +124,9 @@ The protocol's defining property is that its security rests on economics and a f
 
 ![Mindmap summarizing Ouroboros: the consensus problem, PoW vs PoS, epochs and slots, VRF election, the stake snapshot, chain selection, block-production keys, incentives, and finality]({{site.url_complet}}/assets/article/blockchain/cardano/ouroboros-proof-of-stake.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

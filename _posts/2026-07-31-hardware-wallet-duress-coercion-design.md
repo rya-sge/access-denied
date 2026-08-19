@@ -282,7 +282,9 @@ happen anyway.
 
 ------
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -299,11 +301,11 @@ happen anyway.
 
 ------
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 For anyone designing or reviewing duress features in a device that holds bearer secrets.
 
-### Indistinguishability
+#### Indistinguishability
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -313,7 +315,7 @@ For anyone designing or reviewing duress features in a device that holds bearer 
 | ☐ | Failure counters are suppressed when a decoy login succeeds. | A non-zero failure count after a "successful" login is a tell. |
 | ☐ | Sensitive outcomes are masked before reaching replaceable application code. | Modified or curious application code can report that a wipe or decoy occurred. |
 
-### Trigger design
+#### Trigger design
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -322,7 +324,7 @@ For anyone designing or reviewing duress features in a device that holds bearer 
 | ☐ | Any single-keystroke trigger is chosen so it cannot fire during normal use. | Accidental destruction of the seed by an ordinary keypress. |
 | ☐ | The device can be unlocked remotely by voice or text without losing the duress option. | Defences that require physical presence do not cover the extraction-by-phone case. |
 
-### Decoy integrity
+#### Decoy integrity
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -331,7 +333,7 @@ For anyone designing or reviewing duress features in a device that holds bearer 
 | ☐ | Changing a PIN while logged into a decoy does not reveal the deception. | Probing the PIN-change path distinguishes decoy from real. |
 | ☐ | Degraded modes produce invalid signatures rather than restricted menus. | A restricted interface is noticed; an invalid signature is not, until broadcast. |
 
-### Honest limits
+#### Honest limits
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

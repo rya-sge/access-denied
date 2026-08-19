@@ -532,6 +532,62 @@ Cheap to add, honest about its status: **no major engine consumes `llms.txt` tod
 
 Two things on the page are invisible to a non-JS crawler: MathJax output (214 posts set `isMath`) and the evil-icons SVG sprites. The math case is benign — the raw `$…$` LaTeX stays in the HTML source and is arguably more extractable than rendered MathML. Worth knowing rather than fixing.
 
+### 6.9 One `## Annex` section instead of sibling annex headings — ✅ IMPLEMENTED (2026-08-19)
+
+Raised by the author: the annexes were all `##` headings (`## Annex — Key Terms`, `## Annex — Invariants`, `## Annex — Integration Notes`), so one closing section produced three or four top-level entries in the table of contents and read as several separate annexes.
+
+**What was implemented.** 59 posts restructured to a single `## Annex` with `###` subsections:
+
+```markdown
+## Conclusion
+## Annex
+### Key Terms
+### Invariants
+### Integration Notes
+## Frequently Asked Questions
+## References
+```
+
+Checklist annexes carry their own groupings (`### Module 1, Section A — Physical Security` and similar); those were demoted to `####` so they stay one level below the annex they belong to. 21 annex sections were affected, and no annex previously contained an `h4`, so the shift was collision-free.
+
+**The FAQ is not part of the annex** and did not move: it remains its own `##` section after the annex, followed by `## References`. Verified on all 59.
+
+Distribution before the change: 38 posts had a single annex, 21 had two, 1 had three. The grouping was applied uniformly, including to the single-annex posts — a rule with an exception ("group them, unless there is only one") produces an inconsistent TOC and a convention that is harder to state. Reverting that choice for the 38 single-annex posts is a one-line change to the transform if the flatter form reads better there.
+
+Anchors do change (`#annex--key-terms` becomes `#key-terms`). Nothing in the repository links to the old anchors — checked across `_posts`, `_pages`, `_includes` and `_layouts` — and one outlier was left alone: `2026-01-27-cmtat-access-control` uses `### Annex` as a subsection of a deeper structure, which is a different pattern.
+
+`create-article` now opens its annex section with the required structure and states that the FAQ sits outside the annex; every `## Annex — X` reference in that skill (27 of them) was rewritten to the `###` form, and the checklist grouping guidance moved to `####`.
+
+### 6.8 Table of contents placement — ✅ IMPLEMENTED (2026-08-19)
+
+Raised by the author: the TOC rendered between the article title and its first sentence, so the first thing in the body was a list of twenty-odd section links. Moving it below the introduction is the right call, and for a reason that goes past taste — the opening of the body is exactly what Google quotes as a snippet and what an answer engine extracts as a passage. A link list is a poor answer to any question, and it also pushes the actual opening paragraph below the fold.
+
+Investigating it surfaced a **live bug**, and the diagnosis was confirmed against the deployed site rather than inferred from the templates. Fetching `https://rya-sge.github.io/access-denied/2026/08/18/centrifuge-vaults/` shows:
+
+- `<p>[TOC]</p>` present verbatim in the served HTML, between the intro blockquote and the first `<h2>` — so the literal marker text is on the page;
+- **no** `<ul id="markdown-toc">`, which is what kramdown's own `{:toc}` emits — so the table of contents is not produced by kramdown or by any plugin, but by `_includes/toc.html`, the Liquid include called from `_layouts/post.html`;
+- the TOC `<ul>` at byte 11398 and the article's first paragraph at 14417 — the TOC precedes the introduction.
+ 195 posts carry a line containing exactly `[TOC]`, placed by the author after the introduction. Kramdown has no such syntax — its own is `{:toc}`, and `[TOC]` is a Python-Markdown convention — and nothing in the templates consumed the marker. So on those 195 pages the literal text `[TOC]` was rendered as a paragraph, while `_layouts/post.html` emitted the real table of contents at the top of the body. Both the misplacement and the stray text had the same cause.
+
+**What was implemented.** The TOC is now captured into a variable and substituted for the rendered marker, which places it exactly where the author already put it:
+
+```liquid
+{% capture toc_html %}<nav class="c-toc" aria-label="{{ t.toc_title }}">…</nav>{% endcapture %}
+{% if post_body contains '<p>[TOC]</p>' %}
+  {% assign post_body = post_body | replace: '<p>[TOC]</p>', toc_html %}
+{% elsif post_body contains '[TOC]' %}
+  {% assign post_body = post_body | replace: '[TOC]', toc_html %}
+{% else %}
+  {{ toc_html }}
+{% endif %}
+```
+
+Measured on the archive: **194 of the 195 markers already have prose before them**, so the authored position is the intended one in essentially every case. The 70 posts with no marker keep the previous behaviour and get the TOC above the body — they are mostly short 2021-era notes where it makes little difference. One post (`2023-06-02-tezos-smartpy-solidity`) had its marker inside a blockquote as `> [TOC]`, which would never have matched; it was corrected in the source.
+
+Heading depth is unchanged: the include is still called without `h_min` / `h_max`, so the same headings appear as before. What is new is the wrapper — a labelled `<nav aria-label="Contents">` with a heading, where the TOC was previously a bare unstyled `<ul>` — plus a `_sass/5-components/_toc.scss` component and a `toc_title` string in both language blocks.
+
+`create-article` now documents the marker and its required position.
+
 ### 6.7 Feed
 
 `jekyll-feed` publishes the 10 most recent posts by default. Several aggregators and some AI crawlers use RSS as a discovery channel. Raising it is one line:

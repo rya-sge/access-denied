@@ -144,7 +144,9 @@ The `colr` business area models the full lifecycle of collateral against derivat
 
 ![Mindmap summarising ISO 20022 collateral management with the colr message set]({{site.url_complet}}/assets/article/finance/iso20022-collateral-management-colr.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

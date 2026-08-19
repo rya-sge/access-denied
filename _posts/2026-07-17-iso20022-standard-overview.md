@@ -135,7 +135,9 @@ ISO 20022 is a single standard with many faces. A shared methodology, dictionary
 
 ![Mindmap of the ISO 20022 standard and its business areas]({{site.url_complet}}/assets/article/finance/iso20022-standard-overview.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

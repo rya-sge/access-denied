@@ -129,7 +129,9 @@ The vulnerabilities that remain are specific to the model and are the developer'
 
 ![Mindmap summarizing Cardano contract security: attack classes removed by the eUTXO model, vulnerabilities that remain, defensive patterns, and verification layers]({{site.url_complet}}/assets/article/blockchain/cardano/cardano-smart-contract-security.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

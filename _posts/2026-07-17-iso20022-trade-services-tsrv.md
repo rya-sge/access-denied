@@ -79,7 +79,9 @@ The `tsrv` business area brings bank guarantees and standby letters of credit in
 
 ![Mindmap summarising the ISO 20022 tsrv trade services area]({{site.url_complet}}/assets/article/finance/iso20022-trade-services-tsrv.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

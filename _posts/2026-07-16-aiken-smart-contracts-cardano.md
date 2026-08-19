@@ -252,7 +252,9 @@ Two limits are worth restating. The compiler removes reentrancy, unbounded loops
 
 ![Mindmap summarizing Aiken on Cardano: eUTXO model, language and UPLC target, toolchain, validator handlers, parameters, testing, and deployment artifact]({{site.url_complet}}/assets/article/blockchain/cardano/aiken-smart-contracts-cardano.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

@@ -144,7 +144,9 @@ One honest limitation is worth stating. Halo's security rests on a mathematical 
 
 ![Halo explained in plain words, summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs-eli10.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

@@ -58,7 +58,9 @@ The terminal opens contact with a `catm.001` **StatusReport**, reporting where i
 
 The `catm` business area is the terminal management system's message set. Its eight messages let a TMS manage a fleet of payment terminals remotely: the terminal reports its status, the TMS returns a management plan, pushes configuration, delegates maintenance, and provisions certificates, with a rejection for messages that cannot be applied. It is the point-of-sale counterpart to ATM management and, like it, is kept separate from the transaction traffic it supports. Read next to `caaa`, which carries the terminal's transactions to the acquirer, `catm` is what keeps the terminal itself configured, secured, and maintained.
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

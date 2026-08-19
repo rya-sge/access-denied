@@ -149,7 +149,9 @@ The comparison with Bell-LaPadula sets the model apart. Because the policy requi
 
 ![Mindmap of the Chinese Wall security policy]({{site.url_complet}}/assets/article/securite/security-model/chinese-wall-security-policy-brewer-nash.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

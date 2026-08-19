@@ -341,7 +341,9 @@ The parts still marked incomplete are honest about it. Bundle-size-1 estimation 
 
 ![Mindmap summary of Rundler's architecture, tasks and features]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/2026-07-30-rundler-alchemy-erc4337-bundler.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -356,11 +358,11 @@ The parts still marked incomplete are honest about it. Bundle-size-1 estimation 
 | **KMS key leasing** | Redis-backed locking of AWS KMS signing keys, so multiple Rundler instances sharing a key list never use the same key concurrently and collide on nonces. |
 | **Poison user operation** | An operation that repeatedly causes bundle failures without the cause being attributable; Rundler isolates such operations and retries them alone with exponential backoff. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 Derived from the behaviours described above. Aimed at anyone operating a Rundler deployment or integrating against one.
 
-### RPC exposure
+#### RPC exposure
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -371,7 +373,7 @@ Derived from the behaviours described above. Aimed at anyone operating a Rundler
 | ☐ | The `admin_` namespace is disabled or access-controlled. | `admin_clearState` and `admin_setTracking` alter node behaviour at runtime. |
 | ☐ | A malformed policy header is treated as a hard failure, not a fallback to defaults. | A silently ignored policy header applies permissive defaults to a request meant to be constrained. |
 
-### Simulation integrity
+#### Simulation integrity
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -380,7 +382,7 @@ Derived from the behaviours described above. Aimed at anyone operating a Rundler
 | ☐ | Second simulation and whole-bundle `eth_call` validation are left in place. | The mempool's admission decision is seconds old by bundling time; state may have moved under it. |
 | ☐ | The gas-limit efficiency threshold is not lowered without cause. | Operations reserving far more verification gas than they use crowd out bundle capacity. |
 
-### Signing and funds
+#### Signing and funds
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -389,7 +391,7 @@ Derived from the behaviours described above. Aimed at anyone operating a Rundler
 | ☐ | `fund_below` / `fund_to` are set so sub-keys cannot be drained mid-bundle. | A worker signs a bundle it cannot afford to submit. |
 | ☐ | `max_cancellation_fee_increases` is bounded to a cost the operator accepts. | A cancellation loop escalates fees on an empty transaction against a congested chain. |
 
-### Operational correctness
+#### Operational correctness
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

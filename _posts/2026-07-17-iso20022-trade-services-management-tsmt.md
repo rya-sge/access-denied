@@ -66,7 +66,9 @@ The `tsmt` business area modelled the Bank Payment Obligation and the Trade Serv
 
 ![Mindmap summarising the ISO 20022 tsmt trade services management area]({{site.url_complet}}/assets/article/finance/iso20022-trade-services-management-tsmt.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

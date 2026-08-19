@@ -222,7 +222,9 @@ RFC 4226 specifies HOTP by composing HMAC-SHA-1 with dynamic truncation to conve
 
 ![HOTP RFC 4226 mindmap covering construction, validation, security analysis, and extensions]({{site.url_complet}}/assets/article/cryptographie/hotp/2026-07-20-hotp-hmac-one-time-password-rfc4226.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

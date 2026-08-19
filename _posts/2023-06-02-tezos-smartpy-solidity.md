@@ -22,7 +22,7 @@ This articles describes a correspondence table between the smart contract langua
 
 > Warning: the SmartPy syntax used in this article may be outdated since it was written for the Legacy version of [SmartPy](https://legacy.smartpy.io/) 
 >
-> [TOC]
+[TOC]
 >
 > 
 

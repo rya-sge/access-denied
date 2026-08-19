@@ -72,7 +72,9 @@ The `head` area is small but foundational. The Business Application Header (`hea
 
 ![Mindmap summarising the ISO 20022 Business Application Header]({{site.url_complet}}/assets/article/finance/iso20022-business-application-header-head.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

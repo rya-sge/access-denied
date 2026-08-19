@@ -178,7 +178,9 @@ The `secl` business area is a compact, self-contained illustration of how ISO 20
 
 ![Mindmap summarising ISO 20022 securities clearing with the secl message set]({{site.url_complet}}/assets/article/finance/iso20022-securities-clearing-secl.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

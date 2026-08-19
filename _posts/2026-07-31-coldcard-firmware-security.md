@@ -258,7 +258,9 @@ The documentation is candid about what remains outside the model: bus traffic an
 
 ------
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -275,11 +277,11 @@ The documentation is candid about what remains outside the model: bus traffic an
 
 ------
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 Derived from the mechanisms described above. Each row is a property that separates a secure implementation of this class of device from an insecure one, phrased so it can be checked against code or a design document.
 
-### Secret storage and key separation
+#### Secret storage and key separation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -289,7 +291,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 | ☐ | Values that must never change (chip serial numbers, joining public keys) are captured and re-checked. | Part substitution during an active attack goes undetected. |
 | ☐ | Destruction of the processor's key share is a single local write with no external bus traffic. | An attacker probing the buses can block or interrupt the wipe and retry PINs freely. |
 
-### PIN handling
+#### PIN handling
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -299,7 +301,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 | ☐ | Rate limiting and attempt counting live in code that field firmware cannot replace. | Custom firmware removes the policy while retaining access to the secrets. |
 | ☐ | The anti-phishing response is shown after the prefix and before the remaining digits. | A substituted device collects the full PIN before the user can detect it. |
 
-### Duress and covert response
+#### Duress and covert response
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -308,7 +310,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 | ☐ | Duress wallets are derived deterministically from the real seed. | A decoy wallet not covered by the main backup silently loses the funds placed in it. |
 | ☐ | Signatures produced in a hobbled mode are invalid rather than merely restricted. | An attacker who reaches that mode can move real funds. |
 
-### Firmware authenticity
+#### Firmware authenticity
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -318,7 +320,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 | ☐ | The integrity indicator is controlled by the secure element and cannot be set by the processor alone. | Modified firmware can display a "genuine" state to the user. |
 | ☐ | Unofficially signed images always warn the user, with no way to suppress the warning. | A user cannot distinguish vendor firmware from third-party firmware. |
 
-### Upgrade and recovery
+#### Upgrade and recovery
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -326,7 +328,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 | ☐ | Recovery accepts only an image reproducing the committed integrity value. | Forced recovery becomes a path for installing a different signed version. |
 | ☐ | No user-accessible key sequence enters recovery mode. | The recovery path becomes a routine attack surface rather than a fault handler. |
 
-### Randomness
+#### Randomness
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

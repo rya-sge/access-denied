@@ -88,7 +88,9 @@ The `cain` business area brings the acquirer-to-issuer card conversation into IS
 
 ![Mindmap summarising the ISO 20022 cain acquirer-to-issuer card transaction area]({{site.url_complet}}/assets/article/finance/iso20022-acquirer-issuer-card-cain.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

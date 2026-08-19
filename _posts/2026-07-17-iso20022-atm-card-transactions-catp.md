@@ -95,7 +95,9 @@ The `catp` business area applies ISO 20022 to the point where a customer meets a
 
 ![Mindmap summarising ISO 20022 ATM card transactions with the catp message set]({{site.url_complet}}/assets/article/finance/iso20022-atm-card-transactions-catp.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

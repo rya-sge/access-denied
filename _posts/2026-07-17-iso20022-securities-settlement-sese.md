@@ -76,7 +76,9 @@ The `sese` business area is where a securities trade finally happens. Its core i
 
 ![Mindmap summarising the ISO 20022 sese securities settlement area]({{site.url_complet}}/assets/article/finance/iso20022-securities-settlement-sese.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

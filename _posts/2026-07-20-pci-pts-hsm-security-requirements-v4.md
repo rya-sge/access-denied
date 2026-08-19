@@ -139,7 +139,9 @@ For anyone integrating, procuring, or auditing payment cryptography, the standar
 
 ![PCI PTS HSM v4.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-hsm/pci-pts-hsm-security-requirements.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -154,11 +156,11 @@ For anyone integrating, procuring, or auditing payment cryptography, the standar
 | **HSM Solution Consumer** | In the cloud module, a tenant that owns a set of keys and retains sole cryptographic authority over their use on shared infrastructure. |
 | **Perfect forward secrecy** | A property of key agreement, such as Diffie-Hellman, where compromise of long-term keys does not expose previously established session keys. |
 
-## Annex — Requirements Checklist
+### Requirements Checklist
 
 The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its functionality, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage.
 
-### Module 1, Section A — Physical Security
+#### Module 1, Section A — Physical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -168,7 +170,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | A4 | Determining a secret or private key by penetration requires attack potential ≥ 35 (≥ 15). |
 | ☐ | A5 | Emanations (power, timing) cannot be used to recover PINs, account data, or keys. |
 
-### Module 1, Section B — Logical Security
+#### Module 1, Section B — Logical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -193,13 +195,13 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | B18 | The device can return its unique device ID. |
 | ☐ | B19 | Dual PCI / non-PCI mode devices keep keys separate, signal the active mode, and require dual auth to switch. |
 
-### Module 1, Section C — Policy and Procedures
+#### Module 1, Section C — Policy and Procedures
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
 | ☐ | C1 | A published security policy defines roles and per-role services in a deterministic table; no hidden functionality. |
 
-### Module 2, Section D — Key-Loading Devices
+#### Module 2, Section D — Key-Loading Devices
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -209,14 +211,14 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | D4 | A multi-component device cannot move a key from a higher-security domain to a lower-security one. |
 | ☐ | D5 | Once loaded, functional capabilities cannot change without erasing keys or detectably flagging the change. |
 
-### Module 3, Section E — Remote Administration (Logical)
+#### Module 3, Section E — Remote Administration (Logical)
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
 | ☐ | E1 | The device cannot enter operational service until initialization (keys and material loaded) is complete. |
 | ☐ | E2 | Security-influencing operator functions are permitted only under dual or multiple control. |
 
-### Module 3, Section F — Message Authentication
+#### Module 3, Section F — Message Authentication
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -225,7 +227,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | F3 | Two-key MAC generation or verification follows ISO 16609. |
 | ☐ | F4 | A unidirectional MAC key is used for only one direction (verify received, or generate for transmitted). |
 
-### Module 3, Section G — Key Generation
+#### Module 3, Section G — Key Generation
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -234,14 +236,14 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | G3 | Operator functions such as manual control-data input or moving the device require sensitive states. |
 | ☐ | G4 | Proprietary functions equal a series of approved functions, or are key-separated from standard functions. |
 
-### Module 3, Section H — Digital Signature
+#### Module 3, Section H — Digital Signature
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
 | ☐ | H1 | The key pair is generated inside the device; the private key is exported only under dual control, with controlled use. |
 | ☐ | H2 | The public-key-to-owner binding is determinable for audit (certificates from an authorized CA or equivalent). |
 
-### Module 4, Section I — Cloud Physical Security
+#### Module 4, Section I — Cloud Physical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -251,7 +253,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | I4 | A virtualization system sharing the processing element's execution environment meets its security requirements. |
 | ☐ | I5 | Clear-text keys are processed in execution paths and memory isolated from other consumers and out-of-scope code. |
 
-### Module 4, Section J — Cloud Logical Security
+#### Module 4, Section J — Cloud Logical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -264,7 +266,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | J7 | Each solution provides a verifiable unique ID with hardware and firmware versions; firmware updates are logged. |
 | ☐ | J8 | Firmware is signed under dual control; installing older firmware is prevented unless all keys are erased. |
 
-### Module 4, Section K — Cloud Provisioning and Management
+#### Module 4, Section K — Cloud Provisioning and Management
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -279,7 +281,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | K9 | A public security policy describes services, authentication, and secure deprecation of consumer keys. |
 | ☐ | K10 | A public vulnerability management and disclosure policy is in place. |
 
-### Module 5, Section L — Life Cycle During Manufacturing
+#### Module 5, Section L — Life Cycle During Manufacturing
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -293,7 +295,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | L8 | Development-security measures and documentation protect the integrity of security-related components. |
 | ☐ | L9 | Controls govern the repair process and subsequent inspection and testing. |
 
-### Module 5, Section M — Between Manufacturer and Deployment
+#### Module 5, Section M — Between Manufacturer and Deployment
 
 | Check | # | Requirement |
 |:---:|:---:|------------|

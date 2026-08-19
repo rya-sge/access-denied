@@ -345,7 +345,9 @@ The remaining design surface is deliberately left open. Oracle trust, dispute re
 
 ![Mindmap summarising the Gnosis Conditional Tokens Framework]({{site.url_complet}}/assets/article/blockchain/defi/conditional-tokens/2026-07-28-gnosis-conditional-tokens-framework.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -360,11 +362,11 @@ The remaining design surface is deliberately left open. Oracle trust, dispute re
 | **Position depth** | The number of conditions a position depends on; depth-1 positions redeem to collateral, deeper positions redeem to shallower positions. |
 | **Elliptic curve multiset hash** | An incremental hash that maps each element to a curve point and combines them by point addition, replacing the collision-prone AdHash sum. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below are the properties a deployment or a fork of this framework must satisfy for the collateral conservation invariant to hold. They are derived from the contract's security surface rather than transcribed from a standard.
 
-### Identifier derivation
+#### Identifier derivation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -375,7 +377,7 @@ The items below are the properties a deployment or a fork of this framework must
 | ☐ | The parity bit is fixed at a defined position outside the 254-bit x-coordinate and applied consistently in compression and decompression. | Two encodings map to the same point or one point yields two identifiers, splitting balances that should be fungible. |
 | ☐ | The condition identifier binds the oracle address, the question identifier and the outcome slot count together. | Reporting rights or slot counts can be reassigned after preparation, invalidating already-minted positions. |
 
-### Accounting order and reentrancy
+#### Accounting order and reentrancy
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -384,7 +386,7 @@ The items below are the properties a deployment or a fork of this framework must
 | ☐ | In `redeemPositions`, each position is burnt inside the loop before any payout is minted or transferred. | A hook re-enters and redeems the same stake twice against one balance. |
 | ☐ | Every ERC-1155 receiver hook is reached only after all balance and collateral state has been written. | Any hook observes an inconsistent intermediate state and acts on it. |
 
-### Partition and index set validation
+#### Partition and index set validation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -393,7 +395,7 @@ The items below are the properties a deployment or a fork of this framework must
 | ☐ | Outcome slot count is bounded at 256 so the index set fits one EVM word, and is at least 2. | Bits are silently truncated, or a single-slot condition always pays in full without risk. |
 | ☐ | The condition is confirmed prepared, by a non-zero `payoutNumerators` length, before any split or merge. | Positions are created against a condition that no oracle can ever resolve, permanently locking collateral. |
 
-### Resolution and redemption
+#### Resolution and redemption
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -403,7 +405,7 @@ The items below are the properties a deployment or a fork of this framework must
 | ☐ | Redemption is refused until the condition's denominator is non-zero. | Positions redeem against an unreported payout vector of zeros and stake is destroyed for nothing. |
 | ☐ | Payout arithmetic rounds down and any remainder stays in the contract. | Rounding in the redeemer's favour lets repeated small redemptions withdraw more than the position is worth. |
 
-### Collateral handling
+#### Collateral handling
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

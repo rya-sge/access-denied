@@ -262,7 +262,9 @@ The protocol is an interactive proof rather than an argument of knowledge, and o
 
 ![GKR protocol summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -277,11 +279,11 @@ The protocol is an interactive proof rather than an argument of knowledge, and o
 | **Line-restriction trick** | The step that replaces two evaluation claims about $$\tilde V_{i+1}$$ with a single claim, by restricting the polynomial to the line through the two points and evaluating at a random parameter. |
 | **Delegation** | The setting in which a weak verifier outsources a computation to an untrusted prover and checks the result in time sublinear in the computation's size. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 The items below are the properties an implementation of GKR (or of a sum-check-based proof system built on it) has to satisfy for its soundness and zero-knowledge claims to hold. Each row states the requirement and what breaks when it is violated.
 
-### Field and parameter selection
+#### Field and parameter selection
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -289,7 +291,7 @@ The items below are the properties an implementation of GKR (or of a sum-check-b
 | ☐ | The round polynomial degree bound $$\deg_j(g)$$ is checked against the declared circuit, not taken from the prover's message. | A prover sending a higher-degree polynomial can satisfy the consistency checks while encoding a false sum. |
 | ☐ | The number of variables and layers used by the verifier is fixed by the circuit description, not negotiated per proof. | A prover that shortens the reduction skips layers and never has its intermediate values anchored. |
 
-### Challenge generation
+#### Challenge generation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -297,7 +299,7 @@ The items below are the properties an implementation of GKR (or of a sum-check-b
 | ☐ | Under Fiat-Shamir, the transcript hashed to derive each challenge includes the circuit description, the input, the claimed output, and every prior prover message. | An incomplete transcript permits grinding: the prover replays messages under a challenge it has chosen to its advantage. |
 | ☐ | Challenge derivation uses a hash modelled as a random oracle with output at least twice the target security level in bits. | A short hash output makes challenge collisions findable, which reintroduces the adaptive-prover attack Fiat-Shamir is meant to prevent. |
 
-### Verification logic
+#### Verification logic
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -307,7 +309,7 @@ The items below are the properties an implementation of GKR (or of a sum-check-b
 | ☐ | The wiring predicates are evaluated from the public circuit description held by the verifier, never from prover-supplied values. | A prover that supplies its own wiring proves a different circuit than the one the verifier intended to delegate. |
 | ☐ | Any failed check aborts the protocol; no partial acceptance path exists. | Continuing after a failed round lets an inconsistency be absorbed by later rounds. |
 
-### Zero-knowledge variant
+#### Zero-knowledge variant
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

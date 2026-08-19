@@ -106,7 +106,9 @@ The `camt` business area is cash management in the full sense: not only the stat
 
 ![Mindmap summarising the ISO 20022 cash management area and its camt families]({{site.url_complet}}/assets/article/finance/iso20022-cash-management-camt.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

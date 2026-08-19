@@ -251,7 +251,9 @@ None of this makes cheating impossible, and it is worth being precise about that
 
 ![GKR protocol explained in plain words, summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol-explained.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

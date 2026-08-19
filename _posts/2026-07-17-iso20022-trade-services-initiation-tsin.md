@@ -70,7 +70,9 @@ The `tsin` business area is the corporate-facing entry point to trade finance. I
 
 ![Mindmap summarising the ISO 20022 tsin trade services initiation area]({{site.url_complet}}/assets/article/finance/iso20022-trade-services-initiation-tsin.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

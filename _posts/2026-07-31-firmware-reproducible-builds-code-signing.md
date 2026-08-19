@@ -263,7 +263,9 @@ binaries, and hardware authenticity is a separate problem with separate controls
 
 ------
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -280,11 +282,11 @@ binaries, and hardware authenticity is a separate problem with separate controls
 
 ------
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 For a firmware project intending to be independently verifiable.
 
-### Determinism of the build
+#### Determinism of the build
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -294,7 +296,7 @@ For a firmware project intending to be independently verifiable.
 | ☐ | Clock reads are eliminated or fixed via `SOURCE_DATE_EPOCH` or a version-keyed constant. | The binary differs by build date and can never be reproduced. |
 | ☐ | Absolute paths and hostnames do not reach the output. | The binary depends on where it was built, so only the vendor can reproduce it. |
 
-### Comparison procedure
+#### Comparison procedure
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -303,7 +305,7 @@ For a firmware project intending to be independently verifiable.
 | ☐ | Signatures on both the published and the rebuilt binary are verified, not just their contents. | Content equality without a valid vendor signature proves nothing about origin. |
 | ☐ | The published artefact is fetched by exact filename from a signed manifest. | A substituted "published" binary would be compared against itself. |
 
-### Device-side verification
+#### Device-side verification
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

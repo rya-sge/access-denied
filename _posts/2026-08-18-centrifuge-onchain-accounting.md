@@ -360,7 +360,9 @@ The part that is specific to a multi-chain protocol is the snapshot flag. A spok
 
 ![Centrifuge onchain accounting mindmap]({{site.url_complet}}/assets/article/blockchain/defi/centrifuge/2026-08-18-centrifuge-onchain-accounting-mindmap.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

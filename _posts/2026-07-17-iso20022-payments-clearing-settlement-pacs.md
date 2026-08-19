@@ -69,7 +69,9 @@ The `pacs` business area is the interbank engine of payments. Its ten messages m
 
 ![Mindmap summarising the ISO 20022 pacs payments clearing and settlement area]({{site.url_complet}}/assets/article/finance/iso20022-payments-clearing-settlement-pacs.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

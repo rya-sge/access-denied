@@ -399,7 +399,9 @@ None of these are free, and the repository documentation is unusually direct abo
 
 ![Mindmap summary of Alchemy's smart wallet and account abstraction stack]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/2026-07-30-alchemy-smart-wallet-account-abstraction.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -414,11 +416,11 @@ None of these are free, and the repository documentation is unusually direct abo
 | **Direct-call validation** | A validation installed at entity ID `0xFFFFFFFF` that authorizes a specific caller address to call the account directly, without wrapping the call in `executeWithRuntimeValidation`. |
 | **Rundler** | Alchemy's Rust ERC-4337 bundler, split into Pool, Builder and RPC tasks, supporting EntryPoint v0.6 through v0.9. |
 
-## Annex — Security Implementation Checklist
+### Security Implementation Checklist
 
 Derived from the design constraints described above. Each row is a property an implementation or integration either meets or fails.
 
-### Account deployment and upgrade
+#### Account deployment and upgrade
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -428,7 +430,7 @@ Derived from the design constraints described above. Each row is a property an i
 | ☐ | Before upgrading a proxy into MAv2, the `initialized` value at the MAv2 namespaced slot is read. | A proxy that was previously an MAv2 keeps its old ownership configuration, and `initializer` functions will not run. |
 | ☐ | The upgrade target is confirmed to be an ERC-1967 proxy via the [ERC-1822](https://eips.ethereum.org/EIPS/eip-1822) `proxiableUUID` slot. | Upgrading a non-proxy leaves the account unreachable. |
 
-### Validation and permissions
+#### Validation and permissions
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -440,7 +442,7 @@ Derived from the design constraints described above. Each row is a property an i
 | ☐ | ERC-20 allowances are treated as cumulative over transfers **and** approvals. | A key limited to 100 USDC approves 100 USDC to an address it controls. |
 | ☐ | Token limits are combined with target and selector allowlists. | A spend limit alone does not constrain where the value goes. |
 
-### Signature handling
+#### Signature handling
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -451,7 +453,7 @@ Derived from the design constraints described above. Each row is a property an i
 | ☐ | WebAuthn validations are never relied on for runtime calls. | `validateRuntime` always reverts `NotAuthorized()`. |
 | ☐ | Contract owners of a Light Account avoid `TIMESTAMP`/`NUMBER` and are not ERC-1967 proxies. | ERC-7562 rules reject the operation at the bundler, so it never mines. |
 
-### Deferred actions
+#### Deferred actions
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
@@ -461,14 +463,14 @@ Derived from the design constraints described above. Each row is a property an i
 | ☐ | The authorizing validation carries no validation hooks. | The flow cannot invoke them, so hook-based restrictions are skipped entirely. |
 | ☐ | Unused actions are invalidated with EntryPoint `incrementNonce`. | The signature stays usable until its deadline. |
 
-### Batching and direct calls
+#### Batching and direct calls
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | Self-calls in `executeBatch` are flattened; no `execute`/`executeBatch` nested inside. | Nested self-calls reach account functions past the validation-applicability check. |
 | ☐ | Direct-call validations are scoped to the intended selectors. | The authorized caller reaches more of the account than intended. |
 
-### Bundler operation
+#### Bundler operation
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|

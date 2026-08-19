@@ -68,7 +68,9 @@ The `cafr` business area is a small, focused part of ISO 20022, but it addresses
 
 ![Mindmap summarising the ISO 20022 cafr fraud reporting and disposition area]({{site.url_complet}}/assets/article/finance/iso20022-fraud-reporting-cafr.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

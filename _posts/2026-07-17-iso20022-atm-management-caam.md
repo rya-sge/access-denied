@@ -57,7 +57,9 @@ The machine reports its state to the manager with a `caam.001` **ATMDeviceReport
 
 The `caam` business area is the operator's control plane for automated teller machines. Its sixteen messages let an ATM manager download keys, push and report configuration, run diagnostics, reconcile activity, and handle exceptions on the machines it operates, keeping them provisioned and healthy so that the `catp` transaction traffic can run. It is deliberately separate from the transaction protocol, mirroring the split between control and transactions found throughout the card family. Read next to `catp`, which carries the withdrawals and deposits, `caam` is what keeps the machine behind them working.
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

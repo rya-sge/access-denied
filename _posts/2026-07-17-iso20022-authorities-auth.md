@@ -66,7 +66,9 @@ The `auth` business area is ISO 20022's home for regulatory reporting. Its ninet
 
 ![Mindmap summarising the ISO 20022 auth authorities area]({{site.url_complet}}/assets/article/finance/iso20022-authorities-auth.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|

@@ -131,7 +131,9 @@ Read alongside the PCI PTS HSM standard, the POI requirements complete the pictu
 
 ![PCI PTS POI v7.0 requirements mindmap]({{site.url_complet}}/assets/article/securite/pci-poi/pci-pts-poi-security-requirements.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
@@ -146,11 +148,11 @@ Read alongside the PCI PTS HSM standard, the POI requirements complete the pictu
 | **Overlay attack** | Fitting a fraudulent layer over a PIN pad to capture key presses, countered by the integration requirement C1.2. |
 | **Lebanese Loop** | A card-capture attack using a sleeve that traps an inserted card for later retrieval, countered by requirement C2.2. |
 
-## Annex — Requirements Checklist
+### Requirements Checklist
 
 The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its architecture, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage. Attack-potential thresholds are shown as ≥ combined (≥ exploitation floor).
 
-### Module 1, Section A — Physical Security
+#### Module 1, Section A — Physical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -170,7 +172,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | A14 | The card-insertion opening is in full view of the cardholder; skimming wires are observable. |
 | ☐ | A15 | Modifying the biometric reader's hardware or software requires ≥ 20 (≥ 10). |
 
-### Module 1, Section B — Logical Security
+#### Module 1, Section B — Logical Security
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -207,7 +209,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | B25 | The device deters exhaustive PAN determination. |
 | ☐ | B26 | Secure enablement tokens from the attestation and monitoring system are required for an SCRP to process payments. |
 
-### Module 2, Section C — POS Terminal Integration
+#### Module 2, Section C — POS Terminal Integration
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -219,7 +221,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | C2.4 | The terminal cryptographically enforces correspondence between the display and the PIN-entry operating state (≥ 18, ≥ 9). |
 | ☐ | C2.5 | The terminal has one PIN-acceptance interface; any secondary keyboard is barred from PIN entry. |
 
-### Module 3, Section D — Communications and Interfaces
+#### Module 3, Section D — Communications and Interfaces
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -238,7 +240,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | D13 | Wi-Fi is securely configured with vulnerable protocols disabled (or D14 applies). |
 | ☐ | D14 | Wireless interfaces not meeting D12/D13 are physically and cryptographically isolated. |
 
-### Module 4, Section E — Life Cycle During Manufacturing
+#### Module 4, Section E — Life Cycle During Manufacturing
 
 | Check | # | Requirement |
 |:---:|:---:|------------|
@@ -255,7 +257,7 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 | ☐ | E11 | A vulnerability assessment (analysis, public-domain survey, testing) confirms no exploitable protocol/interface flaws. |
 | ☐ | E12 | Documented vulnerability-disclosure measures distribute vulnerability information and mitigations in a timely way. |
 
-### Module 4, Section F — Between Manufacturer and Deployment
+#### Module 4, Section F — Between Manufacturer and Deployment
 
 | Check | # | Requirement |
 |:---:|:---:|------------|

@@ -83,7 +83,9 @@ The `fxtr` business area applies ISO 20022 to the foreign exchange post-trade pr
 
 ![Mindmap summarising the ISO 20022 fxtr foreign exchange trade area]({{site.url_complet}}/assets/article/finance/iso20022-fx-trade-fxtr.png)
 
-## Annex — Key Terms
+## Annex
+
+### Key Terms
 
 | Term | Definition |
 |------|------------|
