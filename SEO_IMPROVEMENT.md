@@ -246,6 +246,9 @@ A modest version, driven entirely by existing front matter, costs one include an
 
 ### 3.3 Category pages have no schema and no words — ✅ IMPLEMENTED (2026-08-19)
 
+> **Regression, found and fixed 2026-08-20.** The descriptions written in that pass contained an unquoted colon (`description: Zero-knowledge proof systems and their failures: SNARKs and STARKs …`). A plain YAML scalar may not contain `": "`, so the front matter of 18 of the 20 pages failed to parse. Jekyll does not treat that as an error: it warns, then falls back to handling the file as a **static file** — no Liquid, no layout, no permalink — so every affected category page returned **404 in production while the build reported success**. All 20 descriptions are now quoted, and `_config.yml` sets `strict_front_matter: true` so the next occurrence fails the build instead of silently deleting pages. The same warning was added to `create-website-category` and to the front matter contract in `create-article`.
+
+
 The 20 pages under `_pages/category/` were front matter only: `title: zkp`, a `category:` key, a permalink. What rendered was a bare grid of cards. Four problems compounded:
 
 - **No `<h1>` at all.** `_layouts/category-list.html` rendered the search header and went straight to the grid, so the hub pages for the site's best topics had no heading element.

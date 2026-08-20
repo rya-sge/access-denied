@@ -57,6 +57,19 @@ disqus-identifier:
 # Build settings
 markdown: kramdown
 
+# Fail the build on invalid YAML front matter instead of warning and carrying on.
+#
+# Without this, Jekyll logs "YAML Exception" and then treats the file as a STATIC
+# file: no Liquid, no layout, no permalink. The page simply stops existing and
+# nothing fails — which is exactly how all 20 category pages started returning
+# 404 while the build reported success. The cause was one unquoted colon:
+#
+#   description: Zero-knowledge proof systems and their failures: SNARKs and ...
+#
+# A plain YAML scalar may not contain ": ", so the whole front matter block
+# failed to parse. Quote any value containing a colon.
+strict_front_matter: true
+
 
 permalink: /:year/:month/:day/:title/
 
