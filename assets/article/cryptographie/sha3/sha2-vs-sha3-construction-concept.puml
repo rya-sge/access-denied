@@ -1,0 +1,48 @@
+@startuml
+title Merkle-Damgard (SHA-2) against the sponge (SHA-3)
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+
+package "SHA-2 : Merkle-Damgard" {
+  rectangle "IV" as IV
+  rectangle "compress\n(block cipher,\nDavies-Meyer)" as C1 #EDE0FA
+  rectangle "compress" as C2 #EDE0FA
+  rectangle "full final state\nis the digest" as OUT2 #FDEEEE
+  IV --> C1
+  C1 --> C2 : chaining value
+  C2 --> OUT2
+}
+
+package "SHA-3 : sponge" {
+  rectangle "state 0\n1600 bits" as S0
+  rectangle "KECCAK-p\n[1600, 24]" as P1 #EDE0FA
+  rectangle "KECCAK-p\n[1600, 24]" as P2 #EDE0FA
+  rectangle "rate only\nis the digest" as OUT3 #E6F5EC
+  rectangle "capacity\nnever emitted" as CAP #DFCCF5
+  S0 --> P1
+  P1 --> P2 : full 1600-bit state
+  P2 --> OUT3
+  P2 --> CAP : withheld
+}
+
+note bottom of OUT2
+  The digest is the whole state, so an
+  attacker can resume the computation:
+  length extension.
+end note
+
+note bottom of CAP
+  The digest reveals only part of the
+  state, so the computation cannot be
+  resumed.
+end note
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+title Sponge construction of SHAKE128 (b = 1600, r = 1344, c = 256)
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+
+package "Absorbing" {
+  rectangle "M || 1111\nthen pad10*1" as MSG
+  rectangle "P0\n168 bytes" as P0
+  rectangle "P1\n168 bytes" as P1
+  rectangle "Pn-1\n168 bytes" as PN
+}
+
+package "1600-bit state S" {
+  rectangle "rate\nr = 1344 bits\ninput XORed in,\noutput read out" as R #EDE0FA
+  rectangle "capacity\nc = 256 bits\nnever touched by\ninput or output" as C #DFCCF5
+  rectangle "KECCAK-p[1600, 24]" as F #C9B3E8
+}
+
+package "Squeezing" {
+  rectangle "Z0\n168 bytes" as Z0
+  rectangle "Z1\n168 bytes" as Z1
+  rectangle "output\nfirst d bits" as OUT
+}
+
+MSG --> P0
+P0 --> P1
+P1 --> PN
+PN --> R : XOR into rate
+R --> F
+C --> F : capacity carried\nthrough, never emitted
+F --> Z0 : read r bits
+Z0 --> Z1 : permute again\nif d > 1344
+Z1 --> OUT : truncate to d
+
+note bottom of C
+  Security follows from c, not from d:
+  generic attacks cost about 2^(c/2),
+  so c = 256 supports 128-bit security.
+end note
+@enduml

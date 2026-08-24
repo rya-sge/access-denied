@@ -1,0 +1,42 @@
+@startuml
+title SHAKE128(M, d) end-to-end
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+
+start
+:Message M, requested output length d;
+:Append the 4-bit domain suffix 1111\n(distinguishes SHAKE from SHA-3 and cSHAKE);
+:Apply pad10*1 to reach a multiple of\nthe rate, 1344 bits = 168 bytes\n(always adds at least 2 bits);
+note right
+  Byte form for a byte-aligned M:
+  q = 1   -> 0x9F
+  q = 2   -> 0x1F 0x80
+  q > 2   -> 0x1F, zeros, 0x80
+end note
+:Initialise the state S to 1600 zero bits;
+while (blocks left to absorb?) is (yes)
+  :XOR the next 168-byte block into\nthe rate portion of S;
+  :S = KECCAK-p[1600, 24](S);
+endwhile (no)
+:Z = empty;
+:Append the first 168 bytes of S to Z;
+while (len(Z) < d ?) is (yes)
+  :S = KECCAK-p[1600, 24](S);
+  :Append the next 168 bytes of S to Z;
+endwhile (no)
+:Return the first d bits of Z;
+stop
+
+note right
+  d selects how many bits are returned,
+  never which bits they are. This is why
+  a shorter output is a prefix of a longer one.
+end note
+@enduml

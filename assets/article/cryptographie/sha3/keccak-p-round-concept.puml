@@ -1,0 +1,31 @@
+@startuml
+title One round of KECCAK-p[1600, 24], repeated for round index 0 to 23
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+
+start
+:State array A, 5 x 5 x 64 bits\nA[x,y,z] = S[64(5y + x) + z];
+repeat :theta\nXOR each bit with the parity of the\ncolumn at x-1 and the column at x+1\nshifted by one in z  (linear diffusion);
+  :rho\nrotate each of the 25 lanes by a fixed\noffset depending on its (x, y);
+  :pi\npermute lane positions:\nA'[x,y,z] = A[(x + 3y) mod 5, x, z];
+  :chi\nper 5-bit row: a ^= (~b) & c\n(the only non-linear step, degree 2);
+  :iota\nXOR the round constant into lane (0,0),\nbreaking symmetry between rounds;
+repeat while (round index < 24) is (yes)
+->no;
+:Permuted 1600-bit state;
+stop
+
+note right
+  XOR, AND, NOT and rotation only.
+  No lookup tables, no data-dependent
+  branches, so the permutation is
+  constant-time by construction.
+end note
+@enduml

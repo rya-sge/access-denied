@@ -1,0 +1,50 @@
+@startuml
+title The three specification layers of FIPS 202
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor #FBF8FF
+  BorderColor #7A5BB5
+}
+
+package "Layer 3 : the six approved modes" {
+  rectangle "SHA3-224\nc = 448\nsuffix 01" as H224 #EDE0FA
+  rectangle "SHA3-256\nc = 512\nsuffix 01" as H256 #EDE0FA
+  rectangle "SHA3-384\nc = 768\nsuffix 01" as H384 #EDE0FA
+  rectangle "SHA3-512\nc = 1024\nsuffix 01" as H512 #EDE0FA
+  rectangle "SHAKE128\nc = 256\nsuffix 1111" as S128 #DFCCF5
+  rectangle "SHAKE256\nc = 512\nsuffix 1111" as S256 #DFCCF5
+}
+
+package "Layer 2 : intermediate, approved only inside a mode" {
+  rectangle "KECCAK[c]\nsponge over KECCAK-p[1600, 24]\nwith pad10*1 multi-rate padding" as K #C9B3E8
+  rectangle "RawSHAKE128 / RawSHAKE256\nsuffix 11" as RAW
+}
+
+package "Layer 1 : permutations" {
+  rectangle "KECCAK-p[b, nr]\nb in {25, 50, 100, 200, 400, 800, 1600}" as KP
+  rectangle "KECCAK-p[1600, 24]\nalso known as KECCAK-f[1600]\nthe one used by all six modes" as KP1600 #C9B3E8
+}
+
+H224 --> K
+H256 --> K
+H384 --> K
+H512 --> K
+S128 --> RAW
+S256 --> RAW
+RAW --> K
+K --> KP1600
+KP1600 --> KP : instance of
+
+note right of KP1600
+  Approved only within an approved
+  mode. Exposing the bare permutation
+  under a custom construction falls
+  outside FIPS 202.
+end note
+@enduml

@@ -1,0 +1,52 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* SHA-3 Standard\n(FIPS 202, Aug 2015)
+** Why a competition
+*** 2004-2005: MD5, SHA-0, SHA-1 broken
+*** MD5/SHA-1/SHA-2 all Merkle-Damgard
+*** Risk: one break, no fallback
+*** 2007 call, 64 submissions, 51 round 1
+*** 14 round 2, then 5 finalists
+*** Oct 2012: Keccak selected
+*** 2017 SHAttered confirmed SHA-1
+** Three layers
+*** KECCAK-p[b, nr] permutations
+*** KECCAK[c] sponge + pad10*1
+*** Six approved modes
+*** Permutation approved only in a mode
+** Four hash functions
+*** SHA3-224 / 256 / 384 / 512
+*** Suffix 01, first pad byte 0x06
+*** c = 2d, r = 1600 - c
+*** c = 2d set by preimage, not collisions
+*** SHA3-512 near half the speed of SHA3-256
+** Two XOFs
+*** SHAKE128 / SHAKE256
+*** Suffix 1111, byte 0x1F
+*** Approved XOFs, not hash functions
+** vs SHA-2
+*** Sponge vs Merkle-Damgard
+*** No length extension
+*** No 2nd-preimage decay by length
+*** Slower in software, cheaper in hardware
+** Conformance
+*** CAVP validation required
+*** HMAC block size B = rate
+*** 144 / 136 / 104 / 72 bytes
+*** KMAC preferred for keyed use
+** keccak256 is not SHA3-256
+*** Ethereum kept the pre-standard padding
+*** 0x01 vs 0x06 first pad byte
+*** Different digests, same permutation
+@endmindmap

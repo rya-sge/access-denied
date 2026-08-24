@@ -1,0 +1,40 @@
+@startuml
+title Domain separation in FIPS 202: one permutation, six modes
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+
+rectangle "Message M" as M #EDE0FA
+
+rectangle "SHA3-224/256/384/512\nsuffix 01  ->  0x06\nc = 2d" as H
+rectangle "SHAKE128 / SHAKE256\nsuffix 1111  ->  0x1F\nc = 256 / 512" as SH
+rectangle "RawSHAKE128 / 256\nsuffix 11  ->  0x07" as RS
+rectangle "cSHAKE (SP 800-185)\nsuffix 00  ->  0x04" as CS
+rectangle "Original Keccak\n(Ethereum keccak256)\nno suffix  ->  0x01" as KE #FDEEEE
+
+rectangle "pad10*1 to a multiple of the rate" as PAD #EDE0FA
+rectangle "KECCAK-p[1600, 24]\nthe same permutation for every mode" as F #C9B3E8
+
+M --> H
+M --> SH
+M --> RS
+M --> CS
+M --> KE
+H --> PAD
+SH --> PAD
+RS --> PAD
+CS --> PAD
+KE --> PAD
+PAD --> F
+
+note right of KE
+  Not part of FIPS 202. The competition
+  submission appended no suffix, so
+  keccak256 and SHA3-256 return different
+  digests for the same input.
+end note
+@enduml

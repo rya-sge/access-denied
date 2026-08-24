@@ -1,0 +1,40 @@
+@startuml
+title SHA3-256(M) : from message to digest
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowColor #7A5BB5
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+
+start
+:Message M of any bit length;
+:Append the 2-bit domain suffix 01\n(separates SHA-3 from SHAKE and from\noriginal Keccak, which appends nothing);
+:Apply pad10*1 up to a multiple of\nthe rate, 1088 bits = 136 bytes;
+note right
+  First padding byte 0x06,
+  last byte 0x80.
+  A single padding byte is 0x86.
+  Always at least 2 bits added.
+end note
+:Initialise the 1600-bit state to zero\nrate 1088 bits  +  capacity 512 bits;
+while (another 136-byte block?) is (yes)
+  :XOR the block into the rate;
+  :Apply KECCAK-p[1600, 24]\n(24 rounds of theta, rho, pi, chi, iota);
+endwhile (no)
+:Read the first 256 bits of the rate;
+:Digest, 32 bytes;
+stop
+
+note right
+  Only one squeeze is needed:
+  the 256-bit digest fits inside
+  the 1088-bit rate.
+  The 512-bit capacity is never
+  read, which is why length
+  extension does not apply.
+end note
+@enduml

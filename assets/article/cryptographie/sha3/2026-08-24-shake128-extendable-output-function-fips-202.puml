@@ -1,0 +1,55 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* SHAKE128\n(FIPS 202)
+** Sponge construction
+*** r + c = b = 1600 bits
+*** rate r = 1344 (168 bytes)
+*** capacity c = 256 (never exposed)
+*** Absorb: XOR block, permute
+*** Squeeze: read r bits, permute
+*** d selects bits, never changes them
+** KECCAK-p[1600, 24]
+*** State 5 x 5 x 64 (25 lanes)
+*** theta: column parity (linear)
+*** rho: rotate each lane
+*** pi: permute lane positions
+*** chi: a ^= (~b) & c (degree 2)
+*** iota: round constant, lane (0,0)
+*** XOR/AND/NOT/rotate only,\nso constant-time by design
+** Parameters
+*** SHAKE128(M,d) = KECCAK[256](M||1111, d)
+*** Suffix 1111 => byte 0x1F
+*** pad10*1, at least 2 bits
+*** q=1 => 0x9F ; q=2 => 0x1F 0x80
+** Security (Annex A)
+*** Collision min(d/2, 128)
+*** Preimage >= min(d, 128)
+*** No length extension
+*** No length-dependent decay
+** Related outputs (A.2)
+*** Trunc(SHAKE128(M,d+e), d)\nequals SHAKE128(M,d)
+*** Triple DES key example
+*** Approved XOF, not a hash
+*** Fix: bind length into input
+** Domain separation
+*** SHA-3 hashes: 01 (0x06)
+*** RawSHAKE: 11 ; cSHAKE: 00
+*** Ethereum keccak256: none (0x01)
+*** SP 800-185: cSHAKE, KMAC,\nTupleHash, ParallelHash
+** Deployment
+*** ML-KEM: matrix A expansion
+*** ML-DSA: sampling and masks
+*** SLH-DSA: SHAKE parameter sets
+*** Seed => unbounded byte stream
+@endmindmap
