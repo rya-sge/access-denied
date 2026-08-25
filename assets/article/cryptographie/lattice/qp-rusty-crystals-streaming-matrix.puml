@@ -1,0 +1,43 @@
+@startuml
+title Materialised ExpandA versus the streamed product used by the crate
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageBackgroundColor #FBF9FE
+skinparam packageBorderColor #7A5BB5
+skinparam componentBackgroundColor #F3EEFB
+skinparam componentBorderColor #7A5BB5
+skinparam noteBackgroundColor #EAF6F0
+skinparam noteBorderColor #2E8B67
+
+package "Reference shape: expand, then multiply" {
+  component "ExpandA(rho)" as EA
+  component "mat : K x Polyvec<L>\n56 KB resident for ML-DSA-87" as MAT
+  component "matrix_pointwise_montgomery" as MPM
+  EA --> MAT
+  MAT --> MPM
+}
+
+package "qp-rusty-crystals: matrix_pointwise_montgomery_streamed" {
+  component "for i in 0..K, j in 0..L" as LOOP
+  component "a_ij = uniform(rho, (i << 8) + j)\none polynomial, 1 KB" as AIJ
+  component "prod = a_ij x v_j\naccumulate into t_i" as ACC
+  component "a_ij overwritten\non the next iteration" as DROP
+  LOOP --> AIJ
+  AIJ --> ACC
+  ACC --> DROP
+  DROP --> LOOP
+}
+
+note bottom of MPM
+  Peak working set grows
+  with K x L polynomials.
+end note
+
+note bottom of DROP
+  Peak working set is two
+  polynomials (~2 KB).
+  Same accumulation order,
+  so the result is identical
+  bit for bit.
+end note
+@enduml

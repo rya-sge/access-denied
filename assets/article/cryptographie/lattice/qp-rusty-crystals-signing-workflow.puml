@@ -1,0 +1,33 @@
+@startuml
+title signature_var — Fiat-Shamir with aborts as implemented
+skinparam shadowing false
+skinparam activityBackgroundColor #F3EEFB
+skinparam activityBorderColor #7A5BB5
+skinparam activityDiamondBackgroundColor #FBF9FE
+skinparam activityDiamondBorderColor #7A5BB5
+skinparam partitionBorderColor #7A5BB5
+
+start
+:unpack sk into UnpackedSecretKey\n(ZeroizeOnDrop, filled through &mut);<<#F3EEFB>>
+:NTT-transform s1, s2, t0 in place;<<#F3EEFB>>
+:mu = SHAKE256(tr || prefix || M)\nabsorbed as separate slices;<<#F3EEFB>>
+:rho' = SHAKE256(K || rnd || mu)\nrnd = 0^32 when deterministic;<<#F3EEFB>>
+:attempt_nonce = 0;
+
+repeat
+  :assert attempt_nonce <= max_safe_attempt_nonce;<<#FDEEEE>>
+  :y = ExpandMask(rho', L * attempt_nonce + i);<<#F3EEFB>>
+  :w = A(rho) . NTT(y)   [streamed]\n(w1, w0) = Decompose(w);<<#F3EEFB>>
+  :pack w1 into the signature buffer\nc_tilde = SHAKE256(mu || w1Encode)\nc = SampleInBall(c_tilde);<<#F3EEFB>>
+  partition "all four predicates evaluated, no short-circuit" {
+    :cond1 : ||z||inf < gamma1 - beta;<<#EAF6F0>>
+    :cond2 : ||w0 - c.s2||inf < gamma2 - beta;<<#EAF6F0>>
+    :cond3 : ||c.t0||inf < gamma2;<<#EAF6F0>>
+    :cond4 : hint weight <= omega;<<#EAF6F0>>
+  }
+repeat while (cond1 & cond2 & cond3 & cond4 ?) is (false) not (true)
+
+:pack_sig writes z and the hint\nover the w1 scratch region;<<#F3EEFB>>
+:drop wipes y, w0, c.s2, c.t0,\nrho' and the unpacked key;<<#FDEEEE>>
+stop
+@enduml

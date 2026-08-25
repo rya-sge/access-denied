@@ -1,0 +1,57 @@
+@startuml
+title qp-rusty-crystals — layering of the ML-DSA implementation
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageBackgroundColor #FBF9FE
+skinparam packageBorderColor #7A5BB5
+skinparam componentBackgroundColor #F3EEFB
+skinparam componentBorderColor #7A5BB5
+skinparam noteBackgroundColor #F3EEFB
+skinparam noteBorderColor #7A5BB5
+
+package "Public API (per parameter set)" {
+  [ml_dsa_44] as V44
+  [ml_dsa_65] as V65
+  [ml_dsa_87] as V87
+  [frontend.rs\ndefine_ml_dsa! macro\nKeypair / SecretKey / PublicKey] as FE
+}
+
+package "Scheme core (const generic)" {
+  [sign.rs\nkeypair_var / signature_var\nverify_var] as SIGN
+  [packing.rs\npk / sk / sig codecs] as PACK
+}
+
+package "Arithmetic" {
+  [polyvec.rs\nPolyvec<N>] as PV
+  [poly.rs\nsealed Poly] as PY
+  [ntt.rs] as NTT
+  [rounding.rs] as RND
+  [fips202.rs\nKeccakState<R>] as F202
+  [reduce.rs] as RED
+}
+
+[params.rs\nFIPS 204 tables\nconst fn size helpers] as PAR
+
+V44 ..> FE
+V65 ..> FE
+V87 ..> FE
+FE --> SIGN
+SIGN --> PACK
+SIGN --> PV
+PACK --> PY
+PV --> PY
+PY --> NTT
+PY --> RND
+PY --> F202
+NTT --> RED
+RND --> RED
+PAR .. SIGN
+PAR .. PACK
+
+note right of PAR
+  Sizes derived by const fn.
+  Every generic entry point
+  re-checks them with
+  const { assert!(...) }.
+end note
+@enduml

@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions"
-date:   2026-08-25
+date:   2026-08-24
 lang: en
 locale: en-GB
 categories: cryptography
 tags: cryptography sha-3 keccak sponge fips-202 hash sha-2 hash-competition
 description: Why NIST ran a hash competition, what FIPS 202 standardized, how the four SHA3 hash functions differ from SHA-2, and the rules governing their approved use.
-image: /assets/article/cryptographie/sha3/2026-08-25-sha3-standard-fips-202.png
+image: /assets/article/cryptographie/sha3/2026-08-24-sha3-standard-fips-202.png
 isMath: true
 ---
 
@@ -180,7 +180,7 @@ Ethereum's opcode was in fact named `SHA3` for years before being renamed `KECCA
 
 FIPS 202 standardizes a hash family built on a sponge over the `KECCAK-p[1600, 24]` permutation, alongside rather than in place of SHA-2. The four SHA3 hash functions match SHA-2's digest lengths, set their capacity at twice the digest length to reach the preimage resistance a random function of that size would offer, and gain two properties SHA-2 lacks: immunity to length extension, and second preimage resistance that does not decay with message length. The cost is software speed on CPUs that accelerate SHA-256 and not Keccak, which is the main reason SHA-2 remains the default a decade after publication. The standard also draws its approval boundaries narrowly: the permutation is approved only inside an approved mode, and the two SHAKE functions are approved as XOFs and deliberately not as hash functions.
 
-![Mindmap of FIPS 202 covering the competition, the three specification layers, the four hash functions, the SHA-2 contrast, conformance rules and the keccak256 confusion]({{site.url_complet}}/assets/article/cryptographie/sha3/2026-08-25-sha3-standard-fips-202.png)
+![Mindmap of FIPS 202 covering the competition, the three specification layers, the four hash functions, the SHA-2 contrast, conformance rules and the keccak256 confusion]({{site.url_complet}}/assets/article/cryptographie/sha3/2026-08-24-sha3-standard-fips-202.png)
 
 ## Annex
 

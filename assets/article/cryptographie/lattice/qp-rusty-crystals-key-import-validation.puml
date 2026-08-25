@@ -1,0 +1,37 @@
+@startuml
+title public_key_from_secret_var — what a secret key must prove at import
+skinparam shadowing false
+skinparam activityBackgroundColor #F3EEFB
+skinparam activityBorderColor #7A5BB5
+skinparam activityDiamondBackgroundColor #FBF9FE
+skinparam activityDiamondBorderColor #7A5BB5
+
+start
+:unpack_sk -> rho, K, tr, s1, s2, t0\nreturns a canonicality flag;<<#F3EEFB>>
+if (every packed s1 / s2 slot\ndecodes inside [-eta, eta] ?) then (no)
+  :reject before any\nkeygen-scale work;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+:derive_public_components\nt = A(rho) . s1 + s2\n(t1, t0') = Power2Round(t);<<#F3EEFB>>
+:pk = pack_pk(rho, t1);<<#F3EEFB>>
+if (stored t0 equals derived t0' ?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+if (stored tr equals SHAKE256(pk) ?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+if (t1 is non-zero ?) then (no)
+  :reject the degenerate key;<<#FDEEEE>>
+  stop
+endif
+:return pk;<<#EAF6F0>>
+note right
+  The nonce seed K carries no
+  stored commitment, so it is
+  unpacked but cannot be checked.
+end note
+stop
+@enduml

@@ -15,7 +15,7 @@ isMath: true
 
 SHAKE128 takes a message and an output length, and returns exactly that many bits. The length is an argument of the call rather than a property of the function. That is what "extendable-output" means, and it is the source of both the flexibility that makes SHAKE128 useful and the single hazard that a caller has to design around.
 
-This article works through the sponge construction that SHAKE128 is built on, the Keccak permutation underneath it, the specific parameters that distinguish SHAKE128 from the other five functions in the standard, its security strengths, the related-output property described in Annex A.2 of the specification, and the role it now plays inside the post-quantum standards.
+This article works through the sponge construction that SHAKE128 is built on, the Keccak permutation underneath it, the specific parameters that distinguish SHAKE128 from the other five functions in the standard, its security strengths, the related-output property described in Annex A.2 of the specification, and the role it now plays inside the post-quantum standards. It is the second of a pair: [The SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/) covers the standard as a whole, including the competition that produced it, the four SHA3 hash functions and the comparison with SHA-2, while this one stays with the extendable-output half.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -324,6 +324,10 @@ No. HMAC's nested structure exists to defeat length extension, which affects Mer
 - [FIPS 203 — Module-Lattice-Based Key-Encapsulation Mechanism Standard](https://doi.org/10.6028/NIST.FIPS.203)
 - [FIPS 204 — Module-Lattice-Based Digital Signature Standard](https://doi.org/10.6028/NIST.FIPS.204)
 - [FIPS 205 — Stateless Hash-Based Digital Signature Standard](https://doi.org/10.6028/NIST.FIPS.205)
+
+### Related articles
+
+- [The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/)
 
 ### Keccak design documents
 

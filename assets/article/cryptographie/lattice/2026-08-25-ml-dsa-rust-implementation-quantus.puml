@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* ML-DSA in Rust\n(qp-rusty-crystals)
+** Genericity
+*** const generics\n<K, L, ETA, TAU, GAMMA1...>
+*** define_ml_dsa! macro
+*** const { assert!(...) }\nsize consistency
+*** additive Cargo features\n44 / 65 / 87
+** Arithmetic core
+*** q = 2^23 - 2^13 + 1
+*** Montgomery + reduce32
+*** NTT / inverse NTT
+*** sealed Poly type\ndocumented bounds
+*** debug_assert! preconditions
+** Rounding
+*** Power2Round / Decompose
+*** MakeHint / UseHint
+*** fixed-point reciprocals\n1025>>22 and 11275>>24
+*** exhaustive check over [0, q)
+** Hashing
+*** KeccakState<R>\nrate in the type
+*** absorb / squeeze phase tracked
+*** SHAKE128 ExpandA
+*** SHAKE256 ExpandS,\nExpandMask, SampleInBall
+left side
+
+** Memory strategy
+*** streaming A(rho)
+*** no materialised K x L matrix
+*** two-polynomial working set
+*** no_std, zero allocation
+** Secret handling
+*** SensitiveBytes32 / 64
+*** ZeroizeOnDrop everywhere
+*** borrow, never move
+*** painted-stack probes
+** Key import
+*** re-derive pk from sk
+*** check t0, tr, coefficient range
+*** reject degenerate t1 = 0
+*** K seed not verifiable
+** Validation
+*** NIST ACVP vectors
+*** SHAKE256 KATs
+*** compile_fail doctests
+*** dudect timing harness
+@endmindmap

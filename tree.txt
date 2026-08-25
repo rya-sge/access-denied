@@ -597,8 +597,15 @@ _posts/2026-08-24-shake128-extendable-output-function-fips-202.md
   assets/article/cryptographie/sha3/shake128-generation-workflow.puml                              (workflow, in-section)
   assets/article/cryptographie/sha3/shake128-domain-separation-concept.puml                        (concept, asset-only)
 
-_posts/2026-08-25-sha3-standard-fips-202.md
-  assets/article/cryptographie/sha3/2026-08-25-sha3-standard-fips-202.puml                        (mindmap)
+_posts/2026-08-24-sha3-standard-fips-202.md
+  assets/article/cryptographie/sha3/2026-08-24-sha3-standard-fips-202.puml                        (mindmap)
   assets/article/cryptographie/sha3/fips202-layers-concept.puml                                   (concept, in-section)
   assets/article/cryptographie/sha3/sha3-hash-workflow.puml                                       (workflow, in-section)
   assets/article/cryptographie/sha3/sha2-vs-sha3-construction-concept.puml                        (concept, asset-only)
+
+_posts/2026-08-25-ml-dsa-rust-implementation-quantus.md
+  assets/article/cryptographie/lattice/2026-08-25-ml-dsa-rust-implementation-quantus.puml         (mindmap)
+  assets/article/cryptographie/lattice/qp-rusty-crystals-streaming-matrix.puml                    (concept, in-section)
+  assets/article/cryptographie/lattice/qp-rusty-crystals-key-import-validation.puml               (workflow, in-section)
+  assets/article/cryptographie/lattice/qp-rusty-crystals-layering-concept.puml                    (concept, asset-only)
+  assets/article/cryptographie/lattice/qp-rusty-crystals-signing-workflow.puml                    (workflow, asset-only)
