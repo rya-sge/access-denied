@@ -1,0 +1,53 @@
+@startuml
+title Third-party action: what the framework checks before an issuer may seize
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #DCE9FA
+  DiamondBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+start
+:PLB spend carries SpendViaThirdParty;
+:third_party withdraw-0 carries
+ThirdPartyRedeemer { params_idx,
+registry_node_idx, outputs_start_idx };
+:resolve the subject policy's registry node
+by its NFT;
+if (subject policy's third_party_transfer_logic_script\ninvoked in this transaction?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+:pair every PLB input positionally with a
+continuing output from outputs_start_idx;
+repeat :take the next pair;
+  if (input already holds the subject policy?) then (no)
+    :reject, anti-injection;<<#FDEEEE>>
+    stop
+  endif
+  if (address, datum and reference script\nbyte-identical across the pair?) then (no)
+    :reject;<<#FDEEEE>>
+    stop
+  endif
+  if (every non-subject policy byte-identical?) then (no)
+    :reject, anti-contamination;<<#FDEEEE>>
+    stop
+  endif
+  if (output lovelace >= input lovelace?) then (no)
+    :reject, the ratchet forbids draining ADA;<<#FDEEEE>>
+    stop
+  endif
+  :subject amount may rise, fall,
+  or go to zero on this pair;
+repeat while (more pairs?) is (yes)
+->no;
+if (subject total across PLB outputs covers\nall seized inputs plus mint or burn?) then (no)
+  :reject, tokens would escape the PLB;<<#FDEEEE>>
+  stop
+endif
+:accept, tokens redistributed inside the PLB;<<#E7F4EC>>
+stop
+@enduml

@@ -609,3 +609,20 @@ _posts/2026-08-25-ml-dsa-rust-implementation-quantus.md
   assets/article/cryptographie/lattice/qp-rusty-crystals-key-import-validation.puml               (workflow, in-section)
   assets/article/cryptographie/lattice/qp-rusty-crystals-layering-concept.puml                    (concept, asset-only)
   assets/article/cryptographie/lattice/qp-rusty-crystals-signing-workflow.puml                    (workflow, asset-only)
+
+_posts/2026-08-26-fluid-solana-jupiter-lend.md
+  assets/article/blockchain/defi/fluid/2026-08-26-fluid-solana-jupiter-lend-mindmap.puml    (mindmap)
+  assets/article/blockchain/defi/fluid/fluid-solana-two-layer-concept.puml                  (concept, in-section)
+  assets/article/blockchain/defi/fluid/fluid-solana-operate-balance-delta-workflow.puml     (workflow, in-section)
+  assets/article/blockchain/defi/fluid/fluid-solana-tick-branch-concept.puml                (concept, in-section)
+  assets/article/blockchain/defi/fluid/fluid-solana-flashloan-introspection-workflow.puml   (workflow, in-section)
+
+_posts/2026-08-26-cip-113-programmable-tokens-cardano.md
+  assets/article/blockchain/cardano/cip-113-programmable-tokens-cardano.puml    (mindmap)
+  assets/article/blockchain/cardano/cip113-shared-custody-address-concept.puml  (concept, in-section)
+  assets/article/blockchain/cardano/cip113-validator-architecture-concept.puml  (concept, in-section)
+  assets/article/blockchain/cardano/cip113-registry-linked-list-concept.puml    (concept, in-section)
+  assets/article/blockchain/cardano/cip113-transfer-flow-sequence.puml          (sequence, in-section)
+  assets/article/blockchain/cardano/cip113-third-party-action-activity.puml     (activity, in-section)
+  assets/article/blockchain/cardano/cip113-unfracking-workflow.puml             (activity, in-section)
+  assets/article/blockchain/cardano/cip113-token-lifecycle-workflow.puml        (state, asset only)

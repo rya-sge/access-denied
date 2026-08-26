@@ -1,0 +1,69 @@
+@startuml
+title CIP-113 validator set and the single-delegate dispatch rule
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "Custody" {
+  [programmable_logic_base\nspend, once per input] as PLB
+}
+
+package "Delegates (withdraw-0, once per transaction)" {
+  [transfer] as TR
+  [third_party] as TP
+  [unfracking] as UF
+}
+
+package "Registry" {
+  [registry_mint] as RM
+  [registry_spend] as RS
+}
+
+package "Issuance" {
+  [issuance_mint] as IM
+  [issuance_cbor_hex_mint] as ICH
+}
+
+package "Protocol coordination" {
+  [protocol_params_mint] as PP
+  [coordination_spend] as CS
+  [upgrade_multisig] as UM
+}
+
+package "Substandard (pluggable)" #FAFCFF {
+  [transfer logic] as TL
+  [third-party logic] as TPL
+  [unfracking hook] as UFH
+}
+
+PLB --> TR : SpendViaTransfer
+PLB --> TP : SpendViaThirdParty
+PLB --> UF : SpendViaUnfracking
+TR --> RS : reads node
+TP --> RS : reads node
+UF --> RS : reads node
+TR --> TL
+TP --> TPL
+UF --> UFH
+RM --> RS
+IM --> ICH : template bytes
+PP --> CS : one-shot NFT
+CS --> UM : upgrade authority
+
+note right of PLB
+  Reads the live delegate
+  credentials from the
+  coordination datum, then
+  requires exactly one of
+  their withdraw-0s.
+end note
+@enduml

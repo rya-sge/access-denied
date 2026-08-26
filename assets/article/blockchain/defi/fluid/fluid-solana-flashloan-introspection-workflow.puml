@@ -1,0 +1,46 @@
+@startuml
+title Flash loan repayment enforced by instruction introspection
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam DefaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FBFCFE
+  DiamondBorderColor #4A78B5
+}
+
+start
+:flashloan_borrow(amount) is invoked;
+if (amount < MIN_FLASHLOAN_AMOUNT?) then (yes)
+  :FlashloanInvalidParams;<<#FDEEEE>>
+  stop
+endif
+:load_current_index_checked(instruction sysvar);
+if (get_stack_height() > 1?) then (yes)
+  :FlashloanCPICallNotAllowed;<<#FDEEEE>>
+  stop
+endif
+:scan every later instruction in the transaction;
+if (instruction belongs to the flash loan program?) then (yes)
+  if (16 data bytes, payback discriminator,\nsame amount, identical account list?) then (yes)
+    if (a payback was already found?) then (yes)
+      :FlashloanMultiplePaybacksFound;<<#FDEEEE>>
+      stop
+    else (no)
+      :mark payback as found;
+    endif
+  else (no)
+    :FlashloanInvalidInstruction;<<#FDEEEE>>
+    stop
+  endif
+endif
+if (payback found?) then (no)
+  :FlashloanPaybackNotFound;<<#FDEEEE>>
+  stop
+endif
+:set_flashloan_as_active(amount);
+:CPI operate(borrow_amount = +amount) on the liquidity layer;
+:tokens land in the borrower's token account;<<#EAF6F0>>
+stop
+@enduml

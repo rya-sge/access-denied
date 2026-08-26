@@ -1,0 +1,60 @@
+@startuml
+title Jupiter Lend program topology on Solana
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor #FBFCFE
+  BorderColor #4A78B5
+}
+skinparam database {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+skinparam DefaultFontName Helvetica
+
+actor "Wallet / dApp" as user
+actor "Liquidator" as liq
+
+package "Protocol layer" {
+  [Lending\njup3YeL8...] as lending
+  [Vaults\njupr81Yt...] as vaults
+  [Flash loan\njupgfSgf...] as fl
+}
+
+package "Support programs" {
+  [Oracle\njupnw4B6...] as oracle
+  [Lending reward\nrate model] as lrrm
+}
+
+package "Liquidity layer" {
+  [Liquidity\njupeiUmn...] as ll
+  database "TokenReserve PDA\nper mint" as reserve
+  database "Token vault ATA\n(all funds)" as ata
+}
+
+user --> lending
+user --> vaults
+user --> fl
+liq --> vaults
+
+lending ..> ll : CPI operate
+vaults ..> ll : CPI operate
+fl ..> ll : CPI operate
+vaults ..> oracle : CPI get_both_exchange_rate
+lending ..> lrrm : read reward rate
+
+ll --> reserve
+ll --> ata
+
+note right of ll
+  Permissioned. Only whitelisted
+  programs hold a UserSupplyPosition
+  or UserBorrowPosition PDA, and
+  each carries its own limits.
+end note
+@enduml

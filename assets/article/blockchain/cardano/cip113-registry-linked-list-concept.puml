@@ -1,0 +1,32 @@
+@startuml
+title Registry as a sorted linked list, with the two proof shapes
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+rectangle "Origin node\nkey = <empty>\nnext = 0x3a1c..." as O
+rectangle "Node A\nkey = 0x3a1c...\nnext = 0x7f04..." as A
+rectangle "Node B\nkey = 0x7f04...\nnext = 0xff..ff" as B
+rectangle "Sentinel\n0xff..ff (30 bytes)" as S #F2F2F2
+
+O -right-> A
+A -right-> B
+B -right-> S
+
+rectangle "TokenExists { node_idx }\nnode.key == 0x7f04...\nthe policy is registered" as P1 #DCE9FA
+rectangle "TokenDoesNotExist { node_idx }\n0x3a1c... < 0x5b90... < 0x7f04...\nthe policy is an ordinary native asset" as P2 #DCE9FA
+
+P1 .up.> B
+P2 .up.> A
+
+note bottom of P2
+  Sorted order plus completeness
+  make a covering node a proof of
+  absence, so a lookup costs one
+  reference input either way.
+end note
+@enduml

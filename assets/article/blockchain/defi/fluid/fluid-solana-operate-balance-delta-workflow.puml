@@ -1,0 +1,45 @@
+@startuml
+title Deposit path: pre_operate snapshot, transfer, operate reconciliation
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam DefaultFontName Helvetica
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+}
+
+participant "Protocol program\n(Vaults / Lending)" as P
+participant "Liquidity program" as L
+database "TokenReserve PDA" as R
+database "Token vault ATA" as V
+
+P -> L ++ : CPI pre_operate(mint)
+L -> V : balance_of()
+L -> R : interacting_protocol = caller\ninteracting_timestamp = now\ninteracting_balance = balance
+return
+
+P -> V : transfer_spl_tokens(amount)
+note right of V #EEF5FF
+  Tokens are pushed by the caller.
+  The liquidity layer never pulls,
+  because the SVM has no allowance
+  and no reentrant callback.
+end note
+
+P -> L ++ : CPI operate(supply_amount, borrow_amount, ...)
+L -> R : read interacting_* fields
+alt caller or timestamp does not match
+  L -->> P : DepositExpected
+end
+L -> V : balance_of()
+L -> L : net_in = final - interacting_balance
+alt net_in < expected  or  net_in > expected x 1.01
+  L -->> P : TransferAmountOutOfBounds
+end
+L -> R : update positions, utilization,\nborrow rate, exchange prices
+L -> R : reset_interacting_state()
+return (supply_exchange_price, borrow_exchange_price)
+@enduml

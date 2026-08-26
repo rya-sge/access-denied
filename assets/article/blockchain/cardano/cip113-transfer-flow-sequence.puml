@@ -1,0 +1,45 @@
+@startuml
+title Transfer of a programmable token, one transaction
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+  BoxBackgroundColor #FAFCFF
+  BoxBorderColor #4A78B5
+}
+
+participant "Transaction" as TX
+participant "programmable_logic_base\n(per input)" as PLB
+participant "transfer\n(withdraw-0)" as TR
+participant "Registry node\n(reference input)" as REG
+participant "Substandard\ntransfer logic" as TL
+
+TX -> PLB : spend, SpendViaTransfer { params_idx, wdrl_idx }
+PLB -> PLB : read transfer_cred from the coordination datum
+PLB -> PLB : withdrawals[wdrl_idx] == transfer_cred ?
+PLB --> TX : delegate accepted
+
+TX -> TR : withdraw 0, TransferRedeemer { params_idx, proofs }
+TR -> TR : authenticate the params NFT at params_idx
+TR -> TR : every PLB input authorised by its stake credential
+
+loop one proof per distinct policy, ascending
+  TR -> REG : resolve proofs[i]
+  alt TokenExists
+    REG --> TR : node.key == policy
+    TR -> TR : node.transfer_logic_script present in withdrawals
+  else TokenDoesNotExist
+    REG --> TR : node.key < policy < node.next
+    TR -> TR : ordinary native asset, skip
+  end
+end
+
+TR -> TR : programmable value at PLB outputs >= value from PLB inputs
+
+TX -> TL : withdraw 0, substandard redeemer
+TL -> TL : apply the token's own rules
+TL --> TX : approved
+@enduml

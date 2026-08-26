@@ -1,0 +1,52 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* CIP-113\nProgrammable Tokens
+** Custody model
+*** Shared payment credential\n(programmable_logic_base)
+*** Stake credential\nidentifies the owner
+*** Native assets,\nno hard fork
+*** No-escape invariant
+** Validators
+*** programmable_logic_base\n(spend, runs per input)
+*** transfer\n(withdraw-0, hot path)
+*** third_party\n(seize / clawback)
+*** unfracking\n(same-owner restructuring)
+*** registry_mint / registry_spend
+*** issuance_mint
+*** coordination_spend\n+ upgrade_multisig
+** Registry
+*** Sorted linked list of policies
+*** NFT-marked nodes
+*** TokenExists proof
+*** Covering-node\nnon-membership proof
+*** blake2b_224 policy binding
+*** No de-registration
+left side
+** Substandards
+*** Transfer logic
+*** Third-party logic
+*** Unfracking hook\n(unset means forbidden)
+*** Denylist, freeze and seize
+** Admin authority
+*** Freeze is unconditional
+*** Extraction is gated
+*** Per-pair byte identity
+*** Lovelace ratchet
+*** One policy per transaction
+** Integration
+*** Query by full address
+*** Register script stake address
+*** Redeemer indices\n(params, wdrl, node)
+*** Registry node is live config
+@endmindmap

@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Fluid on Solana
+** Deployment
+*** Six Anchor programs
+*** Business Source License 1.1
+*** 12-hour timelock upgrade multisig
+*** Program authority vs init authority
+*** Shipped as Jupiter Lend
+** Liquidity layer
+*** One TokenReserve per mint
+*** operate(supply, borrow) signed amounts
+*** Permissioned, reached only by CPI
+*** Exchange prices at 1e12
+*** Rate curve v1 (one kink) or v2 (two kinks)
+*** Dynamic withdrawal and debt limits
+** SVM adaptations
+*** pre_operate balance snapshot
+*** 1% input excess tolerance
+*** TransferType CLAIM fallback
+*** One PDA per tick and per branch
+*** remaining_accounts_indices layout
+*** Address lookup tables per vault
+*** Decimals normalised to 9
+** Vaults
+*** ratio = 1.0015^tick x 2^48
+*** Tick range -16383 to 16383
+*** Branches and debt factor 35|15
+*** Absorb above liquidation max limit
+*** Position held as an SPL NFT
+** Oracle
+*** Up to four chained sources
+*** Pyth, Chainlink, Redstone
+*** Stake pool, mSOL, single pool, JupLend
+*** Staleness 600 s operate, 7200 s liquidate
+*** Confidence interval capped at 2% operate, 4% liquidate
+** Flash loan
+*** Instruction sysvar introspection
+*** Exact payback discriminator and amount
+*** Stack height must be one
+*** Exactly one payback per borrow
+** Lending
+*** SPL mint carries the shares
+*** deposit, mint, withdraw, redeem
+*** Slippage-bounded variants
+*** Rebalance syncs rewards
+@endmindmap
