@@ -1,0 +1,36 @@
+@startuml
+title Channel half-close, tracked independently per direction
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  FontColor #14342A
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+state "Receive half (istate)" as RX {
+  [*] --> CHAN_INPUT_OPEN
+  CHAN_INPUT_OPEN --> CHAN_INPUT_WAIT_DRAIN : local fd reaches EOF
+  CHAN_INPUT_WAIT_DRAIN --> CHAN_INPUT_WAIT_OCLOSE : buffer drained,\nsend CHANNEL_EOF
+  CHAN_INPUT_WAIT_OCLOSE --> CHAN_INPUT_CLOSED : peer closed
+  CHAN_INPUT_CLOSED --> [*]
+}
+
+state "Transmit half (ostate)" as TX {
+  [*] --> CHAN_OUTPUT_OPEN
+  CHAN_OUTPUT_OPEN --> CHAN_OUTPUT_WAIT_DRAIN : CHANNEL_EOF received
+  CHAN_OUTPUT_WAIT_DRAIN --> CHAN_OUTPUT_WAIT_IEOF : output flushed to fd
+  CHAN_OUTPUT_WAIT_IEOF --> CHAN_OUTPUT_CLOSED : local EOF sent
+  CHAN_OUTPUT_CLOSED --> [*]
+}
+
+note bottom of TX
+  CHANNEL_CLOSE is only sent once
+  both halves reach CLOSED. The channel
+  then becomes SSH_CHANNEL_ZOMBIE until
+  the peer confirms.
+end note
+@enduml

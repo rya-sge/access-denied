@@ -1,0 +1,30 @@
+@startuml
+title Lifecycle of one SSH connection
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #F7FBF9
+  DiamondBorderColor #2E8B67
+}
+
+start
+:exchange version strings;<<#EAF6F0>>
+:negotiate algorithms (KEXINIT);<<#EAF6F0>>
+:run key exchange, derive keys;<<#EAF6F0>>
+:send NEWKEYS, packet.c encrypts from here;<<#EAF6F0>>
+:authenticate the user;<<#EAF6F0>>
+if (authentication succeeded?) then (no)
+  :disconnect;<<#FDEEEE>>
+  stop
+endif
+:enter the connection protocol;<<#EAF6F0>>
+repeat
+  :open a channel (session, direct-tcpip, x11, ...);<<#EAF6F0>>
+  :exchange data under per-channel window;<<#EAF6F0>>
+  :half-close: EOF each direction, then CLOSE;<<#EAF6F0>>
+repeat while (more channels?) is (yes)
+->no;
+:close the transport;<<#EAF6F0>>
+stop
+@enduml

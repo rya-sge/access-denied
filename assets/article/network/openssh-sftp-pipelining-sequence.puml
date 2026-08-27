@@ -1,0 +1,50 @@
+@startuml
+title SFTP download, the request window ramps from 1 to num_requests
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #14342A
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+participant "sftp client\nsftp-client.c" as C
+participant "sftp-server" as S
+
+C -> S : SSH2_FXP_OPEN
+S -> C : SSH2_FXP_HANDLE
+
+note over C
+  max_req = 1
+  buflen = 32768 (-B)
+  ceiling = 64 (-R)
+end note
+
+C -> S : FXP_READ  offset 0
+S -> C : FXP_DATA
+note over C : max_req = 2
+
+C -> S : FXP_READ  offset 32K
+C -> S : FXP_READ  offset 64K
+S -> C : FXP_DATA
+S -> C : FXP_DATA
+note over C : max_req grows by one\nper reply, up to 64
+
+C -> S : FXP_READ x N (in flight)
+S -> C : FXP_DATA x N
+
+note over C, S
+  A short FXP_DATA reply causes the
+  client to re-request the missing tail
+  and shrink buflen to at least
+  MIN_READ_SIZE.
+end note
+
+S -> C : FXP_STATUS (EOF)
+note over C : max_req = 0,\ndrain outstanding replies
+C -> S : SSH2_FXP_CLOSE
+@enduml

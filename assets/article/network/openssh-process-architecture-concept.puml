@@ -1,0 +1,64 @@
+@startuml
+title OpenSSH binaries and where untrusted data is parsed
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+package "Client host" {
+  [ssh\nssh.c] as SSH
+  [ssh-agent\nssh-agent.c] as AGENT
+  [ssh-pkcs11-helper] as P11
+  [ssh-sk-helper] as SK
+  [sftp / scp\nsftp-client.c] as SFTPC
+}
+
+package "Server host" {
+  [sshd\nlistener] as SSHD
+  [sshd-session\nmonitor] as SESS
+  [sshd-auth\nsandboxed] as AUTH
+  [sftp-server] as SFTPS
+}
+
+package "Shared protocol core" {
+  [packet.c\nbinary packet protocol] as PKT
+  [channels.c\nchannel layer] as CH
+  [kex.c\nkey exchange] as KEX
+  [sshbuf\nwire parsing] as BUF
+}
+
+SSH --> PKT
+SSH --> CH
+SSH ..> AGENT : agent socket
+AGENT ..> P11 : PKCS#11 RPC
+AGENT ..> SK : FIDO RPC
+SSH --> SFTPC
+
+SSHD --> SESS : fork + exec
+SESS --> AUTH : fork + exec
+SESS --> SFTPS : subsystem
+AUTH --> PKT
+SESS --> CH
+PKT --> BUF
+KEX --> PKT
+CH --> PKT
+
+note bottom of AUTH
+  Parses network data,
+  chroot + privilege drop + sandbox
+end note
+
+note bottom of SSHD
+  Never parses network data
+end note
+@enduml

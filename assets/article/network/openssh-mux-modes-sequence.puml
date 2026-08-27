@@ -1,0 +1,48 @@
+@startuml
+title ControlMaster, two ways a second ssh reuses the first connection
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #14342A
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+participant "second ssh\n(mux client)" as C
+participant "first ssh\n(mux master)" as M
+participant "sshd\n(server)" as S
+
+C -> M : connect to ControlPath socket
+C -> M : MUX_MSG_HELLO
+M -> C : MUX_MSG_HELLO
+
+group Passthrough mode
+  C -> M : MUX_C_NEW_SESSION
+  M -> S : CHANNEL_OPEN "session"
+  S -> M : CHANNEL_OPEN_CONFIRMATION
+  M -> C : MUX_S_SESSION_OPENED
+  note over C, M
+    stdin, stdout and stderr are passed
+    as file descriptors over the socket.
+    The master relays every byte.
+  end note
+  M -> C : MUX_S_EXIT_MESSAGE
+end
+
+group Proxy mode
+  C -> M : MUX_C_PROXY
+  M -> C : MUX_S_PROXY
+  note over C, M
+    The socket stops speaking the mux
+    protocol. The client now emits SSH
+    connection-protocol messages itself,
+    unencrypted and unpadded.
+  end note
+  C -> M : CHANNEL_OPEN, CHANNEL_DATA, ...
+  M -> S : relayed over the encrypted transport
+end
+@enduml

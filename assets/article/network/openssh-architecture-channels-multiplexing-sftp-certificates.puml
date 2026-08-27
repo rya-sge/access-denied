@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* OpenSSH\narchitecture
+** Channel layer
+*** channels.c, one abstraction
+*** ctypes: session, direct-tcpip,\nforwarded-tcpip, x11,\nauth-agent, streamlocal, tun
+*** istate / ostate half-close
+*** window 2 MiB, packet 32 KiB
+*** nchan.c close state machine
+** Multiplexing
+*** ControlMaster, Unix socket
+*** MUX_C_* / MUX_S_* messages
+*** passthrough vs proxy mode
+*** PROTOCOL.mux
+** SFTP transfer
+*** 64 outstanding requests
+*** 32 KiB buffer
+*** window ramps 1 to 64
+*** scp defaults to SFTP
+** Certificates
+*** sshkey_cert, principals,\nvalidity window
+*** critical options fail closed
+*** extensions fail open
+*** auth-options.c enforcement
+** Revocation
+*** KRL sections
+*** list / range / bitmap
+*** cost model in bits
+** Detached signatures
+*** sshsig.c, SSHSIG preamble
+*** namespace domain separation
+*** ssh-keygen -Y
+@endmindmap

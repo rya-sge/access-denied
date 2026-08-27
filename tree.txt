@@ -626,3 +626,11 @@ _posts/2026-08-26-cip-113-programmable-tokens-cardano.md
   assets/article/blockchain/cardano/cip113-third-party-action-activity.puml     (activity, in-section)
   assets/article/blockchain/cardano/cip113-unfracking-workflow.puml             (activity, in-section)
   assets/article/blockchain/cardano/cip113-token-lifecycle-workflow.puml        (state, asset only)
+
+_posts/2026-08-27-openssh-architecture-channels-multiplexing-sftp-certificates.md
+  assets/article/network/openssh-architecture-channels-multiplexing-sftp-certificates.puml  (mindmap)
+  assets/article/network/openssh-channel-halfclose-state.puml                               (state, in-section)
+  assets/article/network/openssh-mux-modes-sequence.puml                                    (sequence, in-section)
+  assets/article/network/openssh-sftp-pipelining-sequence.puml                              (sequence, in-section)
+  assets/article/network/openssh-process-architecture-concept.puml                          (concept, asset only)
+  assets/article/network/openssh-connection-lifecycle-workflow.puml                         (workflow, asset only)
