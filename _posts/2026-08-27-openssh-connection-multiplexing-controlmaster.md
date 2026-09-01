@@ -12,6 +12,10 @@ image: /assets/article/network/openssh-connection-multiplexing.png
 isMath: false
 ---
 
+OpenSSH is the implementation of the SSH protocol that ships with almost every Unix system, and `ssh` is its client. Each time that client contacts a host it opens a TCP connection, runs a key exchange to derive session keys, and then authenticates the user. That work is repeated in full for every invocation, which is what makes a burst of short commands against the same host feel slow, and what makes a host configured for a password or a hardware token ask again on each one.
+
+Connection multiplexing removes that cost. One `ssh` process keeps its connection open and acts as a master, and later connections to the same destination borrow it rather than building their own, so only the first invocation pays for the handshake.
+
 With `ControlMaster` enabled, a second `ssh` to a host that already has a connection open returns almost immediately. It performs no key exchange and no authentication, which is the whole point of the feature, and the reason is that the second process is not acting as an SSH client at all. It connects to a Unix domain socket and asks the first process to do the work.
 
 That request is a protocol of its own, specified in the `PROTOCOL.mux` file distributed with OpenSSH and implemented in `mux.c`. This article reads both. It covers the socket and its lifetime, the message set, the two modes a multiplexing client can operate in, and the way the whole mechanism is built on the same channel layer that carries ordinary sessions. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.

@@ -12,7 +12,11 @@ image: /assets/article/network/openssh-sshsig.png
 isMath: false
 ---
 
-`sshsig.c` implements something that has nothing to do with establishing a connection. It signs arbitrary data with an ordinary SSH key and emits an armoured blob delimited by `-----BEGIN SSH SIGNATURE-----`. This is the mechanism behind `git config gpg.format ssh`, and the OpenSSH project uses it on its own commits, which is why a `.git_allowed_signers` file sits at the root of the source tree.
+OpenSSH is the implementation of the SSH protocol that ships with almost every Unix system. It provides `ssh` for remote login, `sshd` for the server side, `scp` and `sftp` for file transfer, and `ssh-keygen` for key management. All of that exists to open an authenticated connection to a remote host.
+
+SSHSIG is the part that does not. It is a signature format that lets an ordinary SSH key sign arbitrary data, such as a file, a git commit or a release tarball, with no connection and no remote party involved. Its purpose is to reuse a key that a developer already holds, and already knows how to protect, for the signing work that would otherwise mean setting up PGP. `ssh-keygen -Y sign` produces a signature, `ssh-keygen -Y verify` checks one, and an `allowed_signers` file records which keys are trusted for which identity.
+
+`sshsig.c` implements that format. It emits an armoured blob delimited by `-----BEGIN SSH SIGNATURE-----`, which is the mechanism behind `git config gpg.format ssh`. The OpenSSH project uses it on its own commits, which is why a `.git_allowed_signers` file sits at the root of the source tree.
 
 The format is worth reading for one design decision in particular. A signature carries a mandatory namespace string that is covered by the signature itself, so a signature produced for one purpose cannot be presented as a signature for another. This article covers the blob layout, what is actually signed, how verification enforces the namespace and the hash algorithm, and how `allowed_signers` decides which keys are acceptable. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.
 
