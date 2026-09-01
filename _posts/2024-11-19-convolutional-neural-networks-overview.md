@@ -84,7 +84,7 @@ Made from a diagram available in the following article[An Introduction to Convol
 
 ## Hyperparameters
 
-Hyperparameters in a **Convolutional Neural Network (CNN)** are the parameters that are set before training and are not updated during the training process. They directly influence the accuracy of the model, its learning speed, and its ability to generalize to unseen data.
+Hyperparameters in a **Convolutional Neural Network (CNN)** are the parameters that are set before training and are not updated during the training process. They are crucial because they directly influence the performance of the model, its learning speed, and its ability to generalize to unseen data.
 
 - Learning rate
 - Number of iterations

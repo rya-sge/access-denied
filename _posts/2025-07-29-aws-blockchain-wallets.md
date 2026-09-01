@@ -13,7 +13,7 @@ isMath: false
 
 This article explores how to build wallet solutions using AWS procucts.
 
-AWS Nitro Enclaves enables confidential computing for secure key management in blockchain applications. Learn how **Circle** leverages AWS to support USDC, Programmable Wallets, and global financial services, and how **Fireblocks** uses Nitro Enclaves to strengthen multi-party computation (MPC) wallet infrastructure. 
+AWS Nitro Enclaves enables confidential computing for secure key management in blockchain applications. It covers how **Circle** uses AWS for USDC, Programmable Wallets and its financial services, and how **Fireblocks** uses Nitro Enclaves in its multi-party computation (MPC) wallet infrastructure. 
 
 This article is a summary of the following video [AWS re:Invent 2024 - Blockchain wallets on AWS: Secure, smart, and scalable](https://www.youtube.com/watch?v=hKZtadwZgw8) made with [NoteGPT](https://notegpt.io) and with a few annotation by me.
 
@@ -34,7 +34,7 @@ Developing blockchain wallets demands a secure and scalable architecture. Key co
 - **Monitoring and Logging**: Implementing [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) for operational insights.
   - `CloudWatch` is a service that monitors applications, responds to performance changes, optimizes resource use, and provides insights into operational health.
 
-- **Low Latency Access**: Leveraging AWS cluster placement groups for performance-critical use cases.
+- **Low Latency Access**: Using AWS cluster placement groups for performance-critical use cases.
 
 ---
 
@@ -70,9 +70,9 @@ AWS Nitro Enclaves enhance security and isolation for blockchain applications. T
 
 - **Data Protection**: No external networking or administrator access.
 - **Isolation**: Enclaves are entirely separate from the parent instance.
-- **Ephemeral Storage**: All data exists only in memory, ensuring transient security.
+- **Ephemeral Storage**: All data exists only in memory and disappears with the enclave.
 
-Nitro Enclaves support cryptographic attestation, allowing enclaves to verify their integrity and state. This feature integrates seamlessly with KMS policies, ensuring only trusted applications access sensitive keys.
+Nitro Enclaves support cryptographic attestation, allowing enclaves to verify their integrity and state. This integrates with KMS policies, so only trusted applications access sensitive keys.
 
 ### Implementing Blockchain Wallets on AWS
 
@@ -101,7 +101,7 @@ Circle’s architecture integrates AWS KMS and MPC servers for robust key manage
 
 ## Fireblocks and Nitro Enclaves for Institutional Blockchain Infrastructure
 
-Fireblocks provide blockchain infrastructure and wallet services to institutional clients like Bank of New York Mellon and ANZ. Handling such high transaction volumes requires robust and secure systems, which is where **Nitro Enclaves** and confidential computing come into play.
+Fireblocks provide blockchain infrastructure and wallet services to institutional clients like Bank of New York Mellon and ANZ. Handling those volumes is where **Nitro Enclaves** and confidential computing are used.
 
 ### Details
 
@@ -127,7 +127,7 @@ Reference: [Fireblocks - Support for AWS Nitro Enclaves on Fireblocks](https://w
 1. **Transaction Initialization**: Transactions are created via a web UI or API and processed by the policy engine, which enforces user-defined rules.
 2. **Serialization and Signing**: Protocol-specific serialization converts the transaction into the correct format before signing with private keys.
 
-Critical stages like the policy engine, serialization, and signing are fortified with confidential computing.
+The policy engine, serialization and signing all run inside confidential computing environments.
 
 ### Multiparty Computation (MPC) and Key Security
 
@@ -147,6 +147,6 @@ Critical stages like the policy engine, serialization, and signing are fortified
 
 ### Conclusion
 
-Blockchain wallets are the backbone of decentralized applications, and implementing them securely is critical. 
+A blockchain wallet holds the keys that move funds, so its implementation is where the security of the whole application concentrates. 
 
-The goal of AWS services, particularly Nitro Enclaves, is to provide a framework for developing wallets that are secure, smart, and scalable. 
+The AWS services covered here, Nitro Enclaves in particular, give a framework for building wallets that keep signing keys isolated even from the operator running them. 

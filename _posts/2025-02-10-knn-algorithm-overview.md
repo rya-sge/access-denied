@@ -7,12 +7,12 @@ lang: en
 locale: en-GB
 categories: ai
 tags: K-Nearest-Neighbor KNN machine-learning dimensionality instance-based classification
-description: This article explains the difference between supervised and unsupervised learning in Machine Learning with several examples.
+description: K-Nearest Neighbor (KNN) is a simple, non-parametric algorithm used for classification and regression, predicting from the similarity between data points.
 image: /assets/article/mlg/knn-mindmap.png
 isMath: true
 ---
 
-**K-Nearest Neighbor (KNN)** is a widely used, simple, and effective machine learning algorithm. It is primarily utilized for classification and regression tasks, leveraging the concept of similarity to make predictions. Despite its simplicity, KNN can be powerful when applied to well-suited problems.
+**K-Nearest Neighbor (KNN)** is a simple and widely used machine learning algorithm. It is used mainly for classification and regression, predicting from the similarity between data points. Its simplicity does not prevent it from performing well on the problems that suit it.
 
 > This article comes primarily from ChatGPT with some modifications on my part. I hope to make it more personal in the future
 
@@ -99,7 +99,7 @@ For a given data point, locate the `K` nearest neighbors from the training datas
 
 ### Choosing the Right K Value
 
-Selecting the optimal `K` is crucial for the algorithm's performance:
+The value of `K` drives the performance of the algorithm:
 
 - **Small K:** Captures fine-grained patterns but may overfit and become sensitive to noise.
 - **Large K:** Generalizes better by considering broader patterns but may miss finer details.
@@ -120,13 +120,13 @@ A common practice is to use cross-validation to find the best `K` for a specific
 
 1. **Computationally Expensive:** Storing all training data and computing distances at prediction time can be slow for large datasets.
 2. **Memory Intensive:** Requires storing the entire dataset in memory.
-3. **Sensitive to Scaling:** Feature scaling (e.g., normalization or standardization) is crucial, as distance measures are affected by the scale of data.
+3. **Sensitive to Scaling:** Feature scaling (e.g., normalization or standardization) is crucial, as distance measures are affected by the scale of the data.
 
 ------
 
 ## KNN vs Perceptron, CNN, and Transformer
 
-KNN, Perceptron, Convolutional Neural Networks (CNNs), and Transformers all serve unique purposes in machine learning but differ fundamentally in their mechanisms and applications:
+KNN, Perceptron, Convolutional Neural Networks (CNNs) and Transformers address different tasks and differ in their mechanisms:
 
 ### KNN vs Perceptron
 
@@ -139,7 +139,7 @@ See also my article [Perceptron - a simple, binary neural network architecture](
 ### KNN vs CNN
 
 - **KNN** makes predictions by finding the nearest data points in a feature space.
-- **CNN** is a deep learning model designed specifically for image data, leveraging convolutions to extract spatial features and patterns.
+- **CNN** is a deep learning model designed specifically for image data, using convolutions to extract spatial features and patterns.
 - **Difference:** KNN is simple and general-purpose, while CNN uses multiple layers to hierarchically learn features from complex data like images.
 
 See also my article [Convolutional Neural Networks (CNNs) - Overview](https://rya-sge.github.io/access-denied/2024/11/19/convolutional-neural-networks-overview/)
@@ -185,8 +185,8 @@ The answers come mainly from ChatGPT with some modifications on my part
 ### Computational Complexity of K-NN
 
 - Assuming K-NN examples in the training set, what are the temporal (CPU time) and spatial (memory) complexities of K-NN? Are these complexities good or bad?
-  - **Time complexity:** O(N⋅d)O(N \cdot d)O(N⋅d) (where ddd is the number of features) for each prediction, making it slow for large datasets.
-  - **Space complexity:** O(N)O(N)O(N), as all training examples must be stored.
+  - **Time complexity:** `O(N·d)` per prediction, where `d` is the number of features, which makes it slow on large datasets.
+  - **Space complexity:** `O(N)`, as all training examples must be stored.
   - These complexities are bad because K-NN becomes inefficient with large datasets.
 
 ### Choosing K and Its Impact

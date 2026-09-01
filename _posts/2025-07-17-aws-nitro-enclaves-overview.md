@@ -12,7 +12,7 @@ image: /assets/article/virtualization/amazon/nitro_enclaves_eks.png
 isMath: false
 ---
 
-As organizations increasingly migrate sensitive workloads to the cloud, ensuring data security during processing becomes a mission-critical challenge. 
+Cloud workloads are routinely encrypted at rest and in transit, but data being processed sits in the clear in the memory of the instance handling it. 
 
 **AWS Nitro Enclaves**, a feature of Amazon EC2,  aims to offer highly isolated and secure execution environments. These enclaves provide a trusted runtime for workloads such as cryptographic operations, personally identifiable information (PII) processing, and sensitive machine learning inference.
 
@@ -28,7 +28,7 @@ As organizations increasingly migrate sensitive workloads to the cloud, ensuring
 - **No external network connectivity**
 - **No interactive access (not even for root users)**
 
-The purpose of Nitro Enclaves is to **protect data in use**—a crucial, often overlooked component of cloud data security. By running applications in a trusted and isolated environment, Nitro Enclaves minimize the attack surface and guard against both external threats and insider risks.
+The purpose of Nitro Enclaves is to **protect data in use**, the third state alongside data at rest and data in transit. By running applications in a trusted and isolated environment, Nitro Enclaves reduce the attack surface and guard against both external threats and insider risks.
 
 Reference: [AWS - What is Nitro Enclaves?](https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html)
 

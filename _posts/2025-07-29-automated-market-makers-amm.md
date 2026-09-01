@@ -7,16 +7,16 @@ lang: en
 locale: en-GB
 categories: defi blockchain ethereum
 tags: automated-market-maker amm defi
-description: Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi). This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
+description: Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi). This article covers the most commonly used formulas in AMM design, their benefits, and their limitations.
 image: /assets/article/blockchain/defi/curve/curve-formula.png
 isMath: true
 ---
 
 Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi), enabling to swap crypto assets without intermediaries. 
 
-Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards, making them the backbone of liquidity pools. 
+Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards inside a liquidity pool. 
 
-This article delves into the most commonly used formulas in AMM design, their benefits, and their limitations.
+This article covers the most commonly used formulas in AMM design, their benefits, and their limitations.
 
 
 
@@ -320,7 +320,7 @@ Price slippage: Uniswap invariant (dashed line) vs Stableswap (solid line)
 
 ### Hybrid Models
 
-Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that combine elements of the above models or introduce innovative mechanisms. These include:
+Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that combine elements of the above models or add mechanisms of their own. These include:
 
 - **Dynamic Fees**: Adjusting fees based on market conditions.
 - **Concentrated Liquidity**: Allowing liquidity providers to specify price ranges for their funds (e.g., Uniswap v3).
@@ -356,9 +356,9 @@ Here is a summary of the different formula
 
 ### Conclusion
 
-The choice of formula for an AMM depends on the specific use case and asset characteristics. While the constant product formula remains a foundational approach, innovations like StableSwap and custom weightings are paving the way for more specialized and efficient trading mechanisms. As DeFi evolves, we can expect further experimentation and hybridization of AMM models to cater to diverse needs.
+The choice of formula for an AMM depends on the use case and on the characteristics of the assets. The constant product formula remains the default, while StableSwap and custom weightings target narrower cases, and further hybridization of these models can be expected.
 
-By understanding the nuances of these formulas, developers and users alike can better navigate the dynamic world of decentralized trading.
+Knowing which formula a pool uses tells you where its slippage and its arbitrage exposure come from.
 
 ## References
 

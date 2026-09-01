@@ -12,13 +12,9 @@ image: /assets/article/mlg/supervised-unsupervised-learning.png
 isMath: true
 ---
 
-Machine learning models are transforming how we analyze data, make predictions, and uncover patterns. 
+Supervised and unsupervised learning are the two main families of machine learning algorithms. They differ on one point: whether the training data carries labels.
 
-At the heart of machine learning lie two fundamental approaches: supervised and unsupervised learning. 
-
-Understanding their differences is crucial for selecting the right model for your data. 
-
-Let’s dive into what distinguishes these techniques and explore their applications.
+Which family fits depends on the data you have and on what you want out of it. This article compares the two and gives examples of each.
 
 > This article comes mainly from this video by IBM: [Supervised VS. Unsupervise Learning](https://www.youtube.com/watch?v=W01tIRP_Rqs). Then:
 >
@@ -71,7 +67,7 @@ Output: height
 
 ## What is Unsupervised Learning?
 
-Unsupervised learning operates without labeled data. Instead, it identifies patterns, structures, or relationships within the dataset. The algorithm works autonomously to group or reduce data dimensions, offering insights without explicit human guidance.
+Unsupervised learning operates without labeled data. Instead, it identifies patterns, structures, or relationships within the dataset. The algorithm groups the data or reduces its dimensions without explicit human guidance.
 
 Key tasks in unsupervised learning include:
 
@@ -108,21 +104,21 @@ Made with ChatGPT and [PlantUML](https://www.plantuml.com/plantuml/)
 
 ### The Middle Ground: Semi-Supervised Learning
 
-Sometimes, you might have datasets where only a portion is labeled. This is where **semi-supervised learning** shines. It combines aspects of both supervised and unsupervised learning, making it particularly effective for domains like medical imaging. For instance, a small subset of labeled scans can guide the model to label the remaining images more accurately.
+Sometimes only a portion of a dataset is labeled. That is the case **semi-supervised learning** covers. It combines aspects of both supervised and unsupervised learning, which works well for domains like medical imaging. For instance, a small subset of labeled scans can guide the model to label the remaining images more accurately.
 
 -----
 
-## Final Thoughts
+## Summary
 
 Supervised and unsupervised learning are not mutually exclusive; they address different problems. 
 
 - Supervised learning is ideal for making predictions and ensuring accuracy
-- Unsupervised learning excels at uncovering insights from unlabeled data. 
-- Semi-supervised learning bridges the gap, leveraging the strengths of both approaches.
+- Unsupervised learning finds structure in unlabeled data. 
+- Semi-supervised learning sits between the two: a few labels steer an otherwise unlabeled dataset.
 
-Choosing the right method requires understanding your dataset and the insights you wish to extract. 
+The choice comes down to what your dataset contains and what you want to extract from it. 
 
-As technology evolves, other possibilities exist too, from reinforcement learning to hybrid models. 
+Other families exist as well, from reinforcement learning to hybrid models. 
 
 ----
 

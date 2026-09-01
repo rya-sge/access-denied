@@ -12,7 +12,7 @@ image: /assets/article/mlg/gradient-descent-mindmap.png
 isMath: true
 ---
 
-Gradient descent is one of the most important algorithms in machine learning and optimization. It It is used in supervised learning to minimize errors (`loss function`) and improving performance.
+Gradient descent is one of the most important algorithms in machine learning and optimization. It is used in supervised learning to minimize errors (the `loss function`) and improve performance.
 
 > This article comes primarily from ChatGPT with some modifications on my part. I hope to make it more personal in the future
 
@@ -51,9 +51,9 @@ $$
 $$
 
 
-### Cost Function (holistic view of the model’s performance)
+### Cost Function (average over the whole dataset)
 
-The **cost function** is the **average of the loss function** over the entire dataset. It gives a holistic view of the model’s performance.
+The **cost function** is the **average of the loss function** over the entire dataset. It measures the performance of the model over all the data rather than on one example.
 
 If you have `m` examples:
 $$
