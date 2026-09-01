@@ -117,7 +117,7 @@ When considering Shamir's Secret Sharing as a security measure, we can outline t
 
 ## Shamir’s Secret Sharing in Cryptocurrency Wallets
 
-Cryptocurrency wallets, especially those managing large amounts of assets, face unique security challenges. Cryptocurrency wallets generally store private keys, which are the only means of accessing and transferring digital assets. If a private key is lost or stolen, the associated funds can be permanently lost. This risk has led to the adoption of Shamir’s Secret Sharing for wallet security.
+Cryptocurrency wallets, especially those managing large amounts of assets, concentrate all their security into a single item. They store private keys, which are the only means of accessing and transferring digital assets. If a private key is lost or stolen, the associated funds can be permanently lost. This risk has led to the adoption of Shamir’s Secret Sharing for wallet security.
 
 ### Use Cases in Crypto Wallet Security
 
@@ -130,7 +130,7 @@ Cryptocurrency wallets, especially those managing large amounts of assets, face 
 While Shamir’s Secret Sharing offers substantial security benefits, practical implementation in crypto wallets involves challenges:
 
 - **Storage and Security of Shares**: Each share needs to be stored securely to prevent unauthorized access. A poorly stored share could become a vulnerability.
-- **Threshold Management**: Setting an appropriate threshold is crucial. If the threshold is too high, it may be difficult to gather enough shares if some are lost; if too low, security could be compromised.
+- **Threshold Management**: The threshold has to be chosen carefully. If it is too high, it may be difficult to gather enough shares if some are lost; if too low, security could be compromised.
 - **Handling Corruption or Loss**: While Shamir’s Secret Sharing is resilient, share corruption (e.g., through bit rot in digital storage) can compromise reconstruction. Solutions like error-checking mechanisms and regular integrity checks are recommended.
 
 ### Shamir’s Secret Sharing VS on-chain multi-signature wallets
@@ -194,7 +194,7 @@ Reference: [Ledger - What is Shamir’s Secret Sharing?](https://www.ledger.com/
 
 Shamir’s Secret Sharing provides a method for protecting sensitive information by dividing it among multiple trusted participants. 
 
-Its application in cryptocurrency wallets offers a valuable layer of security for both individual and institutional users, helping to secure private keys and seed phrases in a way that minimizes risks associated with insider threats, data loss, and external attacks.
+Applied to cryptocurrency wallets, it protects private keys and seed phrases for both individual and institutional users, and reduces the risks tied to insider threats, data loss and external attacks.
 
 Although practical challenges exist, careful implementation and management can make Shamir’s Secret Sharing a relevant tool in safeguarding digital assets in the crypto space.
 

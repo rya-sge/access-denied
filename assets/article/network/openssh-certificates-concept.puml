@@ -1,0 +1,52 @@
+@startuml
+title An OpenSSH certificate and what verifies it
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+package "Certificate (signed by the CA)" {
+  [type\nuser or host] as TY
+  [serial] as SER
+  [key_id] as KID
+  [principals] as PR
+  [valid_after\nvalid_before] as VAL
+  [critical options\nrestrict] as CRIT
+  [extensions\ngrant] as EXT
+  [signature_key\nthe CA] as CA
+}
+
+package "Server configuration" {
+  [TrustedUserCAKeys] as TCA
+  [RevokedKeys / KRL] as KRL
+}
+
+package "Enforcement" {
+  [sshkey_cert_check_authority] as CHK
+  [auth-options.c\ncert_option_list] as OPT
+}
+
+CA --> TCA : must be listed
+TY --> CHK
+PR --> CHK
+VAL --> CHK
+CRIT --> OPT : crit = 1, fail closed
+EXT --> OPT : crit = 0, fail open
+SER --> KRL : revoked by serial
+
+note bottom of KRL
+  Enforced only where the
+  current list has arrived,
+  unlike the validity window.
+end note
+@enduml

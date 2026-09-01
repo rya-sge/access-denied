@@ -36,7 +36,7 @@ The Virtual Protocol framework provides tools and libraries for building, managi
 
 **Immutable Contribution Vault** (ICV):
 
-The protocol possesses all validated contributions, represented in the form of **Non-Fungible Tokens (NFTs)**, securely stored within the Immutable Contribution Vault (ICV). This collection of contribution NFTs is a testament to the collaborative efforts and intellectual contributions within the ecosystem.
+The protocol possesses all validated contributions, represented in the form of **Non-Fungible Tokens (NFTs)**, securely stored within the Immutable Contribution Vault (ICV). The collection of contribution NFTs records who contributed what to the ecosystem.
 
 This diagram explains how Modular Consensus Framework works with Protocol and the components within each stack. 
 
@@ -96,7 +96,7 @@ A component dedicated to archiving historical data, decisions, and interactions.
 
 #### Real-Time Value Streaming
 
-Each AI agent is equipped with an ERC 6551 wallet, enabling continuous revenue accrual and seamless distribution back to the owners.
+Each AI agent is equipped with an ERC 6551 wallet, so revenue accrues continuously and is distributed back to the owners.
 
 #### Immutable Contribution Vault
 
@@ -106,11 +106,11 @@ Users can upload custom models and datasets, securely stored in the Immutable Co
 
 ## Decentralized contribution
 
-Decentralized contribution allows external contributors to help drive exponential growth by enhancing the capabilities of AI agents. Contributors can improve various aspects of an agent’s functionality, and successful contributions are minted as NFTs and transferred to the contributor. This serves as proof of contribution and facilitates reward distribution. 
+Decentralized contribution lets external contributors extend the capabilities of AI agents. Contributors can improve various aspects of an agent’s functionality, and successful contributions are minted as NFTs and transferred to the contributor. This serves as proof of contribution and facilitates reward distribution. 
 
 ### Overview
 
-The contribution process is streamlined for contributors to easily submit their models or datasets through our platform. Once submitted, the following actions take place:
+Contributors submit their models or datasets through the platform. Once submitted, the following actions take place:
 
 ![virtual-protocol-decentralized-contribution]({{site.url_complet}}/assets/article/blockchain/ai/virtual-protocol/virtual-protocol-decentralized-contribution.png)
 
@@ -147,7 +147,7 @@ The Cognitive Core is the central component  of a VIRTUAL agent, acts as its "br
 
 #### Large Language Models (LLMs) 
 
-The current LLM leverages on open sourced models. Each Virtual agent personality and central intelligence are being incorporated using the approach below:
+The current LLM is built on open source models. Each Virtual agent personality and central intelligence are being incorporated using the approach below:
 
 - **Personality Development**
 
@@ -184,7 +184,7 @@ Managing and storing extended conversations presents a challenge in terms of mem
 
 #### Unique Identifier
 
-Each user engaging with a Virtual is assigned a unique identifier. This identifier is pivotal for maintaining conversation continuity and user specificity.
+Each user engaging with a Virtual is assigned a unique identifier. This identifier is what keeps conversation continuity and user specificity.
 
 ### Voice Core
 
@@ -262,7 +262,7 @@ The foundational layer is a smart contract wallet, known as ICV, that asserts ow
 
 2. **Second Layer - Individual VIRTUAL agent as ERC-6551 NFTs**:
 
-Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) NFT, which also serves as a unique wallet address. This dual functionality underscores the fusion of identity and transactional capability in the Virtual ecosystem.
+Each VIRTUAL agent is minted and represented as an [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) NFT, which also serves as a unique wallet address. The agent is therefore both an identity and an account able to hold and move assets.
 
 3. **Third Layer - Core Components of VIRTUAL agents**:
 
@@ -274,8 +274,8 @@ Within each Virtual agent, approved contributions are stored in the form of serv
 
 **Key Functions and Benefits of the ICV**
 
-- **Real-Time and Historical Insights**: The ICV elegantly presents the current state of each VIRTUAL agent and traces its historical evolution on-chain. This feature is crucial for both provenance and root cause analysis across every module within the Virtuals ecosystem.
-- **Transparency and Composability**: By open-sourcing the codebase models for VIRTUAL agents, the ICV facilitates transparency and composability, allowing developers and contributors to build upon and integrate with existing VIRTUAL agents seamlessly.
+- **Real-Time and Historical View**: The ICV shows the current state of each VIRTUAL agent and traces its history on-chain. This is what provenance and root cause analysis rely on, across every module of the Virtuals ecosystem.
+- **Transparency and Composability**: By open-sourcing the codebase models for VIRTUAL agents, the ICV facilitates transparency and composability, allowing developers and contributors to build upon and integrate with existing VIRTUAL agents.
 
 ### ERC-6551: Non-fungible Token Bound Accounts
 

@@ -1,0 +1,50 @@
+@startuml
+title What is written, what is signed, and what decides trust
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  AttributeFontColor #14342A
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #14342A
+left to right direction
+
+class "Signed pre-image\n(assembled, never stored)" as PRE {
+  byte[6] MAGIC_PREAMBLE
+  string  namespace
+  string  reserved
+  string  hash_algorithm
+  string  hash_of_message
+}
+
+class "Armoured blob\n(the .sig file)" as BLOB {
+  byte[6] MAGIC_PREAMBLE
+  uint32  SIG_VERSION
+  string  publickey
+  string  namespace
+  string  reserved
+  string  hash_algorithm
+  string  signature
+}
+
+class "Verification inputs" as VER {
+  expected namespace, from -n
+  signer identity, from -I
+  allowed_signers file
+}
+
+PRE --> BLOB : signed, result stored\nin the signature field
+BLOB --> VER : namespace compared by equality\npublickey and identity matched\nagainst allowed_signers
+
+note bottom of BLOB
+  SIG_VERSION and publickey appear
+  only here. They are needed to read
+  the signature, not protected by it.
+  namespace and hash_algorithm appear
+  in both, so neither can be restated.
+end note
+@enduml

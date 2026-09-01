@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* sshsig detached\nsignatures
+** Operations
+*** ssh-keygen -Y sign
+*** -Y verify
+*** -Y check-novalidate
+*** -Y find-principals
+*** -Y match-principals
+** Armoured file
+*** BEGIN SSH SIGNATURE
+*** base64, wrapped at 76
+*** detached only
+** Blob fields
+*** SSHSIG preamble
+*** version, public key
+*** namespace, reserved
+*** hash algorithm
+*** signature
+** Signed pre-image
+*** preamble, namespace,\nreserved, hashalg
+*** hash of the message,\nnot the message
+*** version and key are\nnot signed
+** Namespace
+*** mandatory, never empty
+*** compared by equality
+*** mismatch is\nSIGNATURE_INVALID
+*** git uses "git"
+** Trust
+*** allowed_signers file
+*** principals patterns\nmatched against -I
+*** cert-authority delegation
+*** sha256 or sha512 only
+@endmindmap

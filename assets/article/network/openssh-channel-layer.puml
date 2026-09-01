@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Channel\nlayer
+** One type list
+*** 23 values in channels.h
+*** kinds and lifecycle stages\nshare a namespace
+*** dispatch key for the\nevent loop
+*** LARVAL, DYNAMIC,\nZOMBIE, ABANDONED
+** Wire type strings
+*** RFC 4254: session,\ndirect-tcpip,\nforwarded-tcpip, x11
+*** OpenSSH: streamlocal,\nauth-agent, tun
+*** allocated in ssh.c, mux.c,\nserverloop.c, channels.c
+*** same struct Channel\neverywhere
+** Flow control
+*** credit window per channel
+*** 32 KiB packet,\n2 MiB session window
+*** X11 window is 4 packets
+*** CHAN_INPUT_MAX 16 MiB
+** Half-close
+*** istate and ostate
+*** four states each
+*** WAIT_DRAIN flushes\nbefore EOF
+*** CLOSE only when\nboth halves closed
+*** nchan.c, nchan.ms
+@endmindmap

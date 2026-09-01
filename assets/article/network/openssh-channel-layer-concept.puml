@@ -1,0 +1,59 @@
+@startuml
+title The channel layer as the single abstraction under every feature
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+package "User-visible features" {
+  [remote shell] as SH
+  [-L / -R forwarding] as FWD
+  [-D SOCKS proxy] as SOCKS
+  [X11 forwarding] as X11
+  [agent forwarding] as AG
+  [tun VPN] as TUN
+  [SFTP subsystem] as SFTP
+}
+
+package "channels.c" {
+  [struct Channel] as CH
+  [per-channel window] as WIN
+  [istate / ostate\nhalf-close] as HC
+  [nchan.c\nclose state machine] as NCH
+}
+
+
+package "Transport below" {
+  [packet.c\nbinary packet protocol] as PKT
+}
+
+SH --> CH
+FWD --> CH
+SOCKS --> CH
+X11 --> CH
+AG --> CH
+TUN --> CH
+SFTP --> CH
+
+CH --> WIN
+CH --> HC
+HC --> NCH
+CH --> PKT
+
+note right of CH
+  One object, one event loop.
+  A new feature costs a type
+  string and a dispatch branch,
+  not a subsystem.
+end note
+@enduml

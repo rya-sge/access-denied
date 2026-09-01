@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Connection\nmultiplexing
+** The socket
+*** ControlMaster offers it
+*** ControlPath names it
+*** ControlPersist outlives\nthe first session
+*** expanded per destination
+** Built on channels
+*** MUX_LISTENER
+*** MUX_CLIENT
+*** MUX_PROXY
+*** ctl_chan binds session\nto its client
+** Message set
+*** MUX_MSG_HELLO,\nversion 4
+*** NEW_SESSION,\nNEW_STDIO_FWD
+*** OPEN_FWD / CLOSE_FWD\nLOCAL, REMOTE, DYNAMIC
+*** ALIVE_CHECK, TERMINATE,\nSTOP_LISTENING
+** Passenger mode
+*** passes stdio descriptors
+*** master relays bytes
+*** client stays trivial
+*** must share a host
+** Proxy mode
+*** MUX_C_PROXY switches\nthe socket language
+*** client speaks SSH\nconnection protocol
+*** no descriptor passing
+*** may be relayed to\nanother host
+@endmindmap

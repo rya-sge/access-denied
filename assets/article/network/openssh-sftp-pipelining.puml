@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* SFTP request\npipelining
+** The problem
+*** request and response\nover one channel
+*** one round trip per block
+*** throughput capped by\nlatency, not bandwidth
+** Two constants
+*** COPY_BUFLEN 32768 (-B)
+*** NUM_REQUESTS 64 (-R)
+*** window about 2 MiB
+** Negotiated limits
+*** limits@openssh.com
+*** max read, write,\npacket, handles
+*** clamped per direction
+*** floored at 64 bytes
+*** explicit -B overrides
+** Window ramp
+*** starts at max_req = 1
+*** grows one per reply
+*** collapses to 1 past EOF
+*** upload bounded by\nid minus ackid
+** Imperfect replies
+*** short read re-requested
+*** buflen shrinks toward\nMIN_READ_SIZE 512
+*** empty queue asserted\nat completion
+** scp front end
+*** MODE_SFTP by default
+*** -O selects legacy
+*** no shell glob expansion
+*** crossload skips local disk
+@endmindmap

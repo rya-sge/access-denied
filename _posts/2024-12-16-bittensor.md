@@ -168,7 +168,7 @@ Neurons exchange information by:
 | Synapse   | Synapse is a data object. Subnet validators and subnet miners use Synapse data objects as the main vehicle to exchange information. T |
 | Axon      | Instantiating server                                         |
 | Dentrite  | client network elements                                      |
-| Metagraph | A metagraph is a data structure that contains comprehensive information about current state of the subnet. |
+| Metagraph | A metagraph is a data structure that contains complete information about the current state of the subnet. |
 | Subtensor | A subtensor is a Bittensor object that handles the interactions with the blockchain, whether the chain is local or testchain or mainchain. |
 
 
@@ -238,7 +238,7 @@ See [docs.bittensor.com/learn/bittensor-building-blocks#synapse](https://docs.bi
 
 ### Metagraph
 
->  A metagraph is a data structure that contains comprehensive information about current state of the subnet. 
+>  A metagraph is a data structure that contains complete information about the current state of the subnet. 
 
 When you inspect the metagraph of a subnet, you will find detailed information on all the nodes (neurons) in the subnet. 
 
@@ -269,13 +269,13 @@ Incentive mechanisms are a fundamental part of Bittensor.
 
 - They drive the behaviour of the subnet miners and govern the consensus amongst the subnet validators. 
 - Each subnet has its own incentive mechanism. 
-- Subnet developers should design incentive mechanisms carefully so that these mechanisms comprehensively and explicitly promote all the desired behaviors and penalize undesired behaviors.
+- Subnet developers should design incentive mechanisms carefully, so that they explicitly promote every desired behaviour and penalize the undesired ones.
 
 #### Machine Learning Analogy
 
 In machine learning analogy, incentive mechanisms are effectively loss functions that steer the behaviour of subnet miners towards desirable outcomes. 
 
-**Miner** earnings are dependent on their **loss value**, hence the miners are incentivized to act in ways that minimize such loss value. Furthermore, competition between subnet miners will drive the miners to seek optimal strategies within the given subnet incentive landscape.
+**Miner** earnings are dependent on their **loss value**, hence the miners are incentivized to act in ways that minimize such loss value. Competition between subnet miners also pushes them to look for the best strategy allowed by the subnet's incentive rules.
 
 A subnet incentive mechanism, when running optimally on a subnet, will continuously produce high quality results because the subnet miners and subnet validators are incentivized to do so. 
 
@@ -443,7 +443,7 @@ Validators store price forecasts for the S&P 500 and compare these predictions a
 
 ### Virtuals Protocol's Audio-to-Animation (A2A) Bittensor Subnet
 
-Audio-to-Animation (A2A), also referred to as audio-driven animation, generates visuals that dynamically respond to audio inputs. This technology finds applications across a wide range of domains including gaming AI agents, livestreaming AI idols, virtual companions, metaverses, and more.
+Audio-to-Animation (A2A), also referred to as audio-driven animation, generates visuals that respond to audio inputs. It is used for gaming AI agents, livestreaming AI idols, virtual companions and metaverses, among others.
 
 This Bittensor subnet offers a platform for democratizing the creation of A2A models, gathering the help of the wider ML community in Bittensor to generate the best animated motions and bring life to on-chain AI agents.
 

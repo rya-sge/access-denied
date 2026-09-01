@@ -1,0 +1,42 @@
+@startuml
+title Lifecycle of one key/value item in a Merkle Patricia Forestry
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #FAFCFF
+  DiamondBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+start
+:path = blake2b-256(key), 64 nibbles;
+:walk the trie off-chain along that path;
+
+if (key already present?) then (yes)
+  :collect an inclusion proof;<<#EAF6F0>>
+else (no)
+  :collect a partial proof\n(prove(key, allowMissing = true));<<#EAF6F0>>
+endif
+
+:serialise the steps\nBranch / Fork / Leaf;
+:proof.toCBOR() into the redeemer;
+
+partition "On-chain, inside the validator" {
+  :rebuild the root from the last step upwards;
+  :at every Branch step, recompute the\n16-slot Merkle root from 4 neighbours;
+  :at every Fork or Leaf step, rebuild a\n2-slot sparse Merkle root;
+  if (excluding(key, proof) == datum root?) then (yes)
+    :new_root = including(key, value, proof);<<#EAF6F0>>
+  else (no)
+    :the transaction fails;<<#FDEEEE>>
+    stop
+  endif
+  :check the output datum carries new_root;
+}
+
+:replay the same insert off-chain\nso the two stores agree;
+:every previously issued proof\nis now stale;<<#FDEEEE>>
+stop
+@enduml

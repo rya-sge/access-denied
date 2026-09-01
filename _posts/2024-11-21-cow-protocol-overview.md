@@ -118,15 +118,15 @@ Once the winning solver executes the batch's orders on-chain, users receive thei
 
 - Best price through competition
 
-The competition between solvers in a batch auction ensures that users (including traders, DAOs, smart contracts, and bots) always receive the best prices for their trades.
+The competition between solvers in a batch auction pushes users (traders, DAOs, smart contracts and bots) towards the best available price for their trades.
 
 - Ease for users
 
-Letting solvers do the heavy lifting means users don't have to worry about finding the best liquidity pool, setting the right gas price, or picking the optimal slippage tolerance for their trades. 
+Because solvers handle execution, users do not have to find the best liquidity pool, set the right gas price, or pick a slippage tolerance for their trades. 
 
 - Avoid MEV
 
-Solvers are also experts at avoiding MEV so users can rest assured their orders are protected from MEV bots that exploit their price through frontrunning and sandwich attacks.
+Solvers also specialise in avoiding MEV, so orders are shielded from bots that exploit their price through frontrunning and sandwich attacks.
 
 ----------
 

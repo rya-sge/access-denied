@@ -91,7 +91,7 @@ Both perceptrons and convolutional neural networks (CNNs) are inspired by biolog
    - **Complexity**: While a perceptron is **simple** and interpretable, CNNs are more **complex**, capable of capturing intricate patterns through their hierarchical design.
    - **Applicability**: A perceptron performs **basic linear classification**, whereas CNNs excel in computer vision tasks such as image recognition, object detection, and segmentation.
 
-In summary, while perceptrons laid the groundwork for modern machine learning, CNNs build on that foundation to solve far more complex problems, particularly in the domain of image processing.
+In summary, the perceptron introduced the weights-bias-activation pattern that modern machine learning still uses, and CNNs build on it to solve far harder problems, image processing in particular.
 
 See also my article: [Convolutional Neural Networks (CNNs) - Overview](https://rya-sge.github.io/access-denied/2024/11/19/convolutional-neural-networks-overview/)
 
@@ -99,17 +99,17 @@ See also my article: [Convolutional Neural Networks (CNNs) - Overview](https://r
 
 ## Applications of the Perceptron
 
-Despite its simplicity, the perceptron has applications in tasks requiring linear classification. It is often used as a teaching tool to introduce concepts of supervised learning, gradient descent, and optimization. Additionally, it serves as a stepping stone to understanding advanced models like MLPs and CNNs.
+Despite its simplicity, the perceptron has applications in tasks requiring linear classification. It is often used as a teaching tool to introduce concepts of supervised learning, gradient descent, and optimization. It also introduces the vocabulary reused by MLPs and CNNs.
 
 ------
 
 ## Conclusion
 
-The perceptron is a historic and fundamental model that has influenced the field of machine learning profoundly. 
+The perceptron is a historic model that shaped how later neural networks were designed. 
 
 While its simplicity limits its use in complex tasks, the principles it embodies continue to underpin modern neural network architectures, including CNNs. 
 
-Understanding the perceptron provides a crucial first step in exploring the broader world of artificial intelligence and neural networks.
+The perceptron is a good place to start before moving on to larger neural network architectures.
 
 ------
 

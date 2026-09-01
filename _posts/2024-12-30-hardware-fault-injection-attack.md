@@ -7,14 +7,14 @@ lang: en
 locale: en-GB
 categories: security cryptography 
 tags: fault-injection side-channel hardware crypto-wallet
-description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences.
+description: Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, sometimes with severe consequences.
 image: /assets/article/securite/2024-12-30-hardware-fault-injection-attack-mindmap.png
 isMath: false
 ---
 
-Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, often with catastrophic consequences. 
+Fault injection attack (FIA) is a technique that targets the hardware itself to create unexpected behaviors in systems, sometimes with severe consequences. 
 
-This article delves into fault injection attacks, their mechanisms, targets, and the defenses against them.
+This article covers fault injection attacks, their mechanisms, their targets, and the defenses against them.
 
 > Warning: this article is still in draft state and its content is still mainly taken from several different sources and ChatGPT with a few modifications of my part. Its content should become more personal later.
 
@@ -28,7 +28,7 @@ Fault attacks have been introduced by Boneh, DeMillo and Lipton at Eurocrypt’9
   cryptographic operations and to observe the erroneous result.
 - Perturbation can occur in many different ways  !
 
-Unlike traditional attacks that rely on exploiting software bugs or network vulnerabilities, fault injection seeks to compromise a system by inducing errors, thereby opening the door for malicious activities. 
+Unlike traditional attacks that exploit software bugs or network vulnerabilities, fault injection compromises a system by inducing errors in the hardware itself. 
 
 ### What is a Fault Injection Attack?
 
@@ -106,7 +106,7 @@ The potential consequences of fault injection attacks can be severe, depending o
 
 ## Methods to Prevent Fault Injection Attacks
 
-Given the growing threat of fault injection attacks, researchers and industry leaders have developed several defense mechanisms to protect hardware and systems from such exploits. These include:
+Several defence mechanisms exist to protect hardware and systems from these attacks:
 
 ### Software approach
 
@@ -195,7 +195,7 @@ Fault injection attacks represent a sophisticated threat against hardware device
 
 While the techniques for inducing faults have become more refined, defense mechanisms are also evolving, with hardware and software developers working to mitigate the risks posed by such attacks. 
 
-Understanding the mechanics of fault injection, as well as its potential impacts, is crucial for the ongoing development of secure hardware based-systems. 
+Anyone designing secure hardware-based systems has to account for these techniques and for the damage they can cause. 
 
 -------
 

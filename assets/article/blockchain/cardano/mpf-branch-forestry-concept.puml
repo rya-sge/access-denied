@@ -1,0 +1,42 @@
+@startuml
+title Inside one MPF branch node - proving child 5 costs 4 sibling hashes
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam nodesep 14
+skinparam ranksep 26
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  FontColor #16324F
+}
+skinparam ArrowColor #4A78B5
+
+rectangle "**Branch node hash**\nh( nibbles(prefix) || M )" as BH #4A78B5
+rectangle "**M** = h( a2 || n8 )\nMerkle root over the 16 slots" as M
+rectangle "n8 = subtree over slots 8..15" as N8 #FDEEEE
+rectangle "a2 = h( n4 || a1 )" as A2
+rectangle "n4 = subtree over slots 0..3" as N4 #FDEEEE
+rectangle "a1 = h( a0 || n2 )" as A1
+rectangle "n2 = subtree over slots 6..7" as N2 #FDEEEE
+rectangle "a0 = h( n1 || root )" as A0
+rectangle "n1 = slot 4" as N1 #FDEEEE
+rectangle "**root** = sub-trie under slot 5\nrebuilt from the remaining proof steps" as R #EAF6F0
+
+BH --> M
+M --> A2
+M --> N8
+A2 --> N4
+A2 --> A1
+A1 --> A0
+A1 --> N2
+A0 --> N1
+A0 --> R
+
+note right of N8
+  The four pink nodes are the whole
+  ""neighbors"" field of one ""Branch"" step:
+  4 x 32 = 128 bytes.
+  An Ethereum MPT proof would carry
+  the 15 remaining child hashes instead.
+end note
+@enduml

@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Merkle Patricia\nForestry (Cardano)
+** Structure
+*** Radix-16 Patricia trie
+*** Path = blake2b-256(key)\n64 nibbles, uniform
+*** Two node kinds only:\nBranch and Leaf
+*** Branch = h(nibbles(prefix) || M)
+*** Leaf = h(head || tail || h(value))
+*** Empty trie = 32 zero bytes
+** The forestry idea
+*** 16 children merkleised\ninto a depth-4 binary tree
+*** 4 sibling hashes per level\ninstead of 15
+*** 128 bytes per branch step
+*** Cached null_hash_2 / _4 / _8
+*** Costs CPU and memory,\nbuys proof bytes
+left side
+** Proof format
+*** Branch { skip, neighbors }
+*** Fork { skip, neighbor }
+*** Leaf { skip, key, value }
+*** skip = shared prefix length
+*** Processed left to right
+** Two roots, one proof
+*** including() -> with the item
+*** excluding() -> without it
+*** insert, delete, update, has, miss
+*** Proof binds to one exact root
+** Versus other trees
+*** Binary Merkle: index, no exclusion
+*** Sparse Merkle: 256 deep, binary
+*** Ethereum MPT: ~15 hashes/level
+*** MPF at 10^6 items: ~760 bytes
+@endmindmap

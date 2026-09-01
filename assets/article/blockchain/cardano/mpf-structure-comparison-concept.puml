@@ -1,0 +1,49 @@
+@startuml
+title Four authenticated structures, and what one proof level costs in each
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam package {
+  BackgroundColor #FAFCFF
+  BorderColor #4A78B5
+  FontColor #16324F
+}
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  FontColor #16324F
+}
+
+package "Binary Merkle tree" {
+  rectangle "addressed by **position**\nradix 2" as B1
+  rectangle "1 sibling hash per level\napprox. log2(n) levels" as B2
+  rectangle "no key lookup\nno proof of exclusion" as B3 #FDEEEE
+}
+
+package "Sparse Merkle tree" {
+  rectangle "addressed by **key**\nradix 2, fixed 256-bit path" as S1
+  rectangle "1 sibling hash per level\n256 levels, compressible" as S2
+  rectangle "exclusion is native\nbut the trie is deep" as S3 #EAF6F0
+}
+
+package "Ethereum MPT" {
+  rectangle "addressed by **key**\nradix 16, RLP encoded" as E1
+  rectangle "whole branch node per level\napprox. 15 x 32 bytes" as E2 #FDEEEE
+  rectangle "three node kinds:\nbranch, extension, leaf" as E3
+}
+
+package "Merkle Patricia Forestry" {
+  rectangle "addressed by **hashed key**\nradix 16, 64-nibble path" as F1
+  rectangle "**4 sibling hashes per level**\n128 bytes, approx. log16(n) levels" as F2 #EAF6F0
+  rectangle "two node kinds:\nbranch and leaf" as F3
+}
+
+B1 -[hidden]down- B2
+B2 -[hidden]down- B3
+S1 -[hidden]down- S2
+S2 -[hidden]down- S3
+E1 -[hidden]down- E2
+E2 -[hidden]down- E3
+F1 -[hidden]down- F2
+F2 -[hidden]down- F3
+@enduml

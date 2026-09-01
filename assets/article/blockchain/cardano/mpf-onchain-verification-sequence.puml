@@ -1,0 +1,46 @@
+@startuml
+title Spending a UTXO whose datum carries an MPF root
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+  BoxBackgroundColor #FAFCFF
+  BoxBorderColor #4A78B5
+}
+
+participant "Off-chain trie\n(Node.js, on disk)" as OC
+participant "Transaction builder" as TB
+participant "Validator\n(Aiken)" as V
+participant "mpf library\n(on-chain)" as MPF
+
+OC -> OC : the full key/value store lives here
+TB -> OC : trie.prove(key)
+OC --> TB : Proof, one step per trie level
+TB -> TB : proof.toCBOR() becomes the redeemer
+TB -> V : tx { input datum = old_root,\nredeemer = (key, value, proof) }
+
+V -> MPF : from_root(old_root)
+note right of MPF
+  Only 32 bytes ever cross
+  the chain boundary.
+end note
+
+alt insert
+  MPF -> MPF : expect excluding(key, proof) == old_root
+  MPF -> MPF : new_root = including(key, value, proof)
+else delete
+  MPF -> MPF : expect including(key, value, proof) == old_root
+  MPF -> MPF : new_root = excluding(key, proof)
+else update
+  MPF -> MPF : expect including(key, old_value, proof) == old_root
+  MPF -> MPF : new_root = including(key, new_value, proof)
+end
+
+MPF --> V : MerklePatriciaForestry { new_root }
+V -> V : output datum root == mpf.root(new_root) ?
+V --> TB : validation succeeds
+TB -> OC : replay the same insert off-chain
+@enduml

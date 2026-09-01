@@ -1,0 +1,32 @@
+@startuml
+title Parsing one certificate option bag
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #F7FBF9
+  DiamondBorderColor #2E8B67
+}
+
+start
+repeat
+  :read next option name from the bag;<<#EAF6F0>>
+  if (name recognised?) then (yes)
+    :apply it to the auth options;<<#EAF6F0>>
+    if (trailing data in the option?) then (yes)
+      :error "option corrupt", reject the certificate;<<#FDEEEE>>
+      stop
+    endif
+  else (no)
+    if (bag is critical?) then (yes)
+      :error "critical option not supported",\nreject the certificate;<<#FDEEEE>>
+      stop
+    else (no)
+      :log "extension not supported", skip it;<<#F7FBF9>>
+    endif
+  endif
+repeat while (more options?) is (yes)
+->no;
+:bag accepted;<<#EAF6F0>>
+stop
+@enduml

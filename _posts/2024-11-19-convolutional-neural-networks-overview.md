@@ -18,7 +18,7 @@ They  are relevant to identify features such as edges, textures, and patterns wi
 
 CNNs are structured to recognize spatial hierarchies in data, enabling the network to detect patterns of increasing complexity through successive layers. 
 
-This article provides an overview of the core components of CNNs, essential terminology, and how these components contribute to the capabilities of CNNs.
+This article gives an overview of the core components of CNNs, the terminology around them, and what each component does.
 
 [TOC]
 
@@ -73,7 +73,7 @@ Made from a diagram available in the following article[An Introduction to Convol
 - **Most Common Activation Function**:
   -  ReLU (Rectified Linear Unit) is widely used in CNNs. It replaces all negative values with zero, which helps the network learn faster and more effectively.
   -  softmax activation function to classify inputs appropriately, producing a probability from 0 to 1.
-  -  While convolutional and pooling layers tend to use ReLu functions, FC layers usually leverage a softmax
+  -  While convolutional and pooling layers tend to use ReLu functions, FC layers usually use a softmax
 - **Function**: Without activation functions, CNNs would be limited to linear transformations, greatly reducing their ability to capture complex, non-linear relationships in data.
 
 ### Backpropagation and Loss Function
@@ -84,7 +84,7 @@ Made from a diagram available in the following article[An Introduction to Convol
 
 ## Hyperparameters
 
-Hyperparameters in a **Convolutional Neural Network (CNN)** are the parameters that are set before training and are not updated during the training process. They are crucial because they directly influence the performance of the model, its learning speed, and its ability to generalize to unseen data.
+Hyperparameters in a **Convolutional Neural Network (CNN)** are the parameters that are set before training and are not updated during the training process. They directly influence the accuracy of the model, its learning speed, and its ability to generalize to unseen data.
 
 - Learning rate
 - Number of iterations
@@ -115,7 +115,7 @@ Reference: [unibas - Deep Neural Networks - Hyperparameters](https://dmi.unibas.
 
 ## CNN Architectures and Variants
 
-CNNs have evolved with several specialized architectures that cater to different applications and optimize performance in unique ways. 
+CNNs have evolved into several specialized architectures, each tuned for a different kind of task. 
 
 Some of the most notable CNN architectures include:
 
@@ -136,7 +136,7 @@ see [Understanding Architecture Of Inception Network & Applying It To A Real-Wor
 
 ## Applications of CNNs
 
-CNNs have been transformative across numerous domains. Here are a few significant applications:
+CNNs are used across a wide range of domains:
 
 - **Image Classification**: CNNs excel at categorizing images into predefined classes. Image classification has widespread uses, from object identification to medical diagnosis.
 - **Object Detection**: CNNs detect and localize objects within images, making them essential for applications like self-driving cars, robotics, and surveillance.
@@ -148,7 +148,7 @@ CNNs have been transformative across numerous domains. Here are a few significan
 
 Convolutional Neural Networks (CNNs) allows machine learning to understand and analyze visual data.
 
-By leveraging key components like convolution layers, pooling layers, and fully connected layers, CNNs can be used to learn complex patterns and making accurate predictions in a range of applications. 
+Using convolution layers, pooling layers and fully connected layers, they learn complex patterns and make accurate predictions across a range of applications. 
 
 ## References
 

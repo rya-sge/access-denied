@@ -1,0 +1,49 @@
+@startuml
+title Where the SFTP request window sits
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+package "Client" {
+  [sftp] as SFTP
+  [scp] as SCP
+  [sftp-client.c] as LIB
+  [outstanding request queue\nmax_req .. num_requests] as Q
+  [download_buflen /\nupload_buflen] as BUF
+}
+
+package "Transport" {
+  [one SSH channel\nwith its own window] as CH
+}
+
+package "Server" {
+  [sftp-server.c\nhandler table] as SRV
+  [limits@openssh.com] as LIM
+}
+
+SFTP --> LIB
+SCP --> LIB : default since 9.0
+LIB --> Q
+LIB --> BUF
+Q --> CH
+BUF --> CH
+CH --> SRV
+LIM --> BUF : advertises ceilings
+
+note bottom of Q
+  Keeps the link busy across
+  round trips. Without it,
+  throughput = buflen / RTT.
+end note
+@enduml

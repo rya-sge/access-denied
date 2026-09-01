@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* OpenSSH\ncertificates
+** Structure
+*** user or host type
+*** serial and key_id
+*** principals, max 256
+*** valid_after / valid_before
+*** two option bags
+*** signing CA key
+*** no ASN.1, no chain
+** Validation
+*** type must match the use
+*** half-open validity window
+*** empty principal list\nrejected
+*** wildcard set by caller
+*** operator-readable reasons
+** Critical options
+*** restrict the holder
+*** force-command
+*** source-address
+*** verify-required
+*** unknown means reject
+** Extensions
+*** grant a privilege
+*** permit-pty, permit-agent,\npermit-port-forwarding
+*** no-touch-required
+*** unknown means ignore
+** Revocation
+*** KRL sections
+*** by serial, key id,\nkey blob, fingerprint
+*** list / range / bitmap
+*** cost model in bits
+*** list may be signed
+@endmindmap

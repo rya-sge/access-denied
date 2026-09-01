@@ -46,3 +46,7 @@ cyfrin-first-fight:
 wah:
   title: "Web Application Hacking (WAH)"
   ordered: false
+
+openssh:
+  title: "Reading the OpenSSH Source"
+  ordered: false

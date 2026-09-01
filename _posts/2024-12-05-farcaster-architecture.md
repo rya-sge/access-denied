@@ -25,8 +25,6 @@ It is a public social network similar to Twitter and Reddit. Users can create pr
 
 
 
-So what 
-
 [TOC]
 
 ## Overview

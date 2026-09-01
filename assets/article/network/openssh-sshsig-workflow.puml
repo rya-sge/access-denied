@@ -1,0 +1,46 @@
+@startuml
+title Signing and verifying with sshsig
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #F7FBF9
+  DiamondBorderColor #2E8B67
+}
+
+|Signer|
+start
+:choose a namespace, e.g. "git";<<#EAF6F0>>
+:check hashalg against sha256/sha512;<<#EAF6F0>>
+:hash the message with hash_file;<<#EAF6F0>>
+:build pre-image\npreamble + namespace + reserved\n+ hashalg + H(message);<<#EAF6F0>>
+:sign the pre-image;<<#EAF6F0>>
+:emit armoured blob with version\nand public key alongside;<<#EAF6F0>>
+
+|Verifier|
+:parse and dearmor the blob;<<#EAF6F0>>
+if (version supported?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+if (namespace equals expected?) then (no)
+  :SSH_ERR_SIGNATURE_INVALID;<<#FDEEEE>>
+  stop
+endif
+if (hash algorithm matches?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+:re-hash the message and\ncheck the signature;<<#EAF6F0>>
+if (operation is check-novalidate?) then (yes)
+  :well-formed, trust not decided;<<#F7FBF9>>
+  stop
+endif
+:match signer identity against\nallowed_signers principals;<<#EAF6F0>>
+if (identity authorised?) then (no)
+  :reject;<<#FDEEEE>>
+  stop
+endif
+:accepted;<<#EAF6F0>>
+stop
+@enduml

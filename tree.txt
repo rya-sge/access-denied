@@ -627,10 +627,39 @@ _posts/2026-08-26-cip-113-programmable-tokens-cardano.md
   assets/article/blockchain/cardano/cip113-unfracking-workflow.puml             (activity, in-section)
   assets/article/blockchain/cardano/cip113-token-lifecycle-workflow.puml        (state, asset only)
 
-_posts/2026-08-27-openssh-architecture-channels-multiplexing-sftp-certificates.md
-  assets/article/network/openssh-architecture-channels-multiplexing-sftp-certificates.puml  (mindmap)
-  assets/article/network/openssh-channel-halfclose-state.puml                               (state, in-section)
-  assets/article/network/openssh-mux-modes-sequence.puml                                    (sequence, in-section)
-  assets/article/network/openssh-sftp-pipelining-sequence.puml                              (sequence, in-section)
-  assets/article/network/openssh-process-architecture-concept.puml                          (concept, asset only)
-  assets/article/network/openssh-connection-lifecycle-workflow.puml                         (workflow, asset only)
+_posts/2026-08-27-openssh-channel-layer.md
+  assets/article/network/openssh-channel-layer.puml                             (mindmap)
+  assets/article/network/openssh-channel-layer-concept.puml                     (concept, in-section)
+  assets/article/network/openssh-channel-halfclose-state.puml                   (state, in-section)
+
+_posts/2026-08-27-openssh-connection-multiplexing-controlmaster.md
+  assets/article/network/openssh-connection-multiplexing.puml                   (mindmap)
+  assets/article/network/openssh-connection-multiplexing-concept.puml           (concept, in-section)
+  assets/article/network/openssh-connection-multiplexing-modes-sequence.puml    (sequence, in-section)
+
+_posts/2026-08-27-openssh-sftp-request-pipelining.md
+  assets/article/network/openssh-sftp-pipelining.puml                           (mindmap)
+  assets/article/network/openssh-sftp-pipelining-concept.puml                   (concept, in-section)
+  assets/article/network/openssh-sftp-pipelining-sequence.puml                  (sequence, in-section)
+
+_posts/2026-08-27-openssh-certificates-critical-options-krl.md
+  assets/article/network/openssh-certificates.puml                              (mindmap)
+  assets/article/network/openssh-certificates-concept.puml                      (concept, in-section)
+  assets/article/network/openssh-certificates-options-workflow.puml             (activity, in-section)
+
+_posts/2026-08-27-openssh-sshsig-detached-signatures.md
+  assets/article/network/openssh-sshsig.puml                                    (mindmap)
+  assets/article/network/openssh-sshsig-concept.puml                            (concept, in-section)
+  assets/article/network/openssh-sshsig-workflow.puml                           (activity, in-section)
+
+  Series-level assets shared by the five "Reading the OpenSSH Source" articles
+  (rendered, not embedded in any single article):
+  assets/article/network/openssh-process-architecture-concept.puml              (concept, asset only)
+  assets/article/network/openssh-connection-lifecycle-workflow.puml             (workflow, asset only)
+
+_posts/2026-08-28-merkle-patricia-forestry-cardano.md
+  assets/article/blockchain/cardano/merkle-patricia-forestry-cardano.puml       (mindmap)
+  assets/article/blockchain/cardano/mpf-branch-forestry-concept.puml            (concept, in-section)
+  assets/article/blockchain/cardano/mpf-onchain-verification-sequence.puml      (sequence, in-section)
+  assets/article/blockchain/cardano/mpf-structure-comparison-concept.puml       (concept, asset only)
+  assets/article/blockchain/cardano/mpf-proof-lifecycle-workflow.puml           (workflow, asset only)

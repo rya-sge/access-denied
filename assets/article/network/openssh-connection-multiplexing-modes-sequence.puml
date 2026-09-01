@@ -1,5 +1,5 @@
 @startuml
-title ControlMaster, two ways a second ssh reuses the first connection
+title ControlMaster, passenger mode versus proxy mode
 skinparam shadowing false
 skinparam sequence {
   ParticipantBackgroundColor #EAF6F0
@@ -20,7 +20,7 @@ C -> M : connect to ControlPath socket
 C -> M : MUX_MSG_HELLO
 M -> C : MUX_MSG_HELLO
 
-group Passthrough mode
+group Passenger mode
   C -> M : MUX_C_NEW_SESSION
   M -> S : CHANNEL_OPEN "session"
   S -> M : CHANNEL_OPEN_CONFIRMATION

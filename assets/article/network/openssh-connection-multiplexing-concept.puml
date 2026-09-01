@@ -1,0 +1,46 @@
+@startuml
+title ControlMaster, one authenticated transport serving many clients
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #F7FBF9
+  BorderColor #2E8B67
+}
+
+package "Local host" {
+  [ssh #1\nmux master] as M
+  [ControlPath socket\nSSH_CHANNEL_MUX_LISTENER] as SOCK
+  [ssh #2\npassenger client] as C2
+  [ssh #3\nproxy client] as C3
+  [git / scp / rsync] as APP
+}
+
+package "Remote host" {
+  [sshd] as S
+}
+
+M --> SOCK : listens
+C2 --> SOCK : MUX_C_NEW_SESSION\n+ passed fds
+C3 --> SOCK : MUX_C_PROXY
+APP --> C2 : invokes
+M --> S : one authenticated\nencrypted transport
+
+note bottom of M
+  Key exchange and authentication
+  happen once, when the master
+  starts. Later clients skip both.
+end note
+
+note bottom of C3
+  Speaks SSH connection protocol,
+  so it need not share this host.
+end note
+@enduml
