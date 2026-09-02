@@ -297,3 +297,8 @@ In practice the gap is small for short-dated contracts and widens with maturity 
 - [Bybit — Auto-Deleveraging (ADL) Mechanism](https://www.bybit.com/en/help-center/article/Auto-Deleveraging-ADL)
 - [Binance — What Is Auto-Deleveraging (ADL) and How Does It Work?](https://www.binance.com/en/support/faq/detail/360033525471)
 - [NC State Financial Mathematics — Futures Contract glossary](https://financial.math.ncsu.edu/glossary-f/futures-contract/)
+
+### Related articles
+
+- [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)
+- [The Black-Scholes Model - Pricing Options and Corporate Liabilities]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/)

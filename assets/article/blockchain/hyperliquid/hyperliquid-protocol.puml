@@ -1,0 +1,60 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Hyperliquid
+** HyperBFT
+*** HotStuff variant, delegated PoS
+*** Rounds -> committed blocks
+*** Epoch = 100k rounds (~90 min)
+*** Median 0.2 s end-to-end
+** HyperCore
+*** Perp and spot clearinghouses
+*** CLOB, price-time priority
+*** Intra-block ordering\n(non-book, cancels, GTC/IOC)
+*** Validator oracle every 3 s
+*** Mark price = median of 3 indices
+*** Native multi-sig
+** Risk engine
+*** Cross / isolated / no-cross
+*** Margin tiers, deduction term
+*** Market liquidation at MM
+*** Backstop vault at 2/3 MM
+*** ADL as final solvency rule
+*** Hourly funding, 4%/h cap
+** Account modes
+*** Standard (per-DEX)
+*** Unified account (per-asset)
+*** Portfolio margin
+**** LTV 0.65 HYPE, 0.5 BTC
+**** Borrow/supply, hourly index
+**** Backstop at 0xbbb...b
+left side
+** HyperEVM
+*** Chain ID 999, Cancun no blobs
+*** Dual blocks: 1 s / 3M, 60 s / 30M
+*** EIP-1559, priority fees burned
+*** L1Read precompiles at 0x...800
+*** CoreWriter at 0x333...3
+*** Token system addresses 0x20...
+** HIP standards
+*** HIP-1 token + spot book
+*** HIP-2 Hyperliquidity ladder
+*** HIP-3 builder perps, 500k HYPE
+*** HIP-4 outcome markets
+** Economics
+*** 14d volume fee tiers
+*** Staking discount up to 40%
+*** Assistance fund burns HYPE
+*** Quote assets: 200k HYPE
+*** Aligned quote assets v1/v2
+@endmindmap

@@ -178,3 +178,7 @@ Since the lightning transactions are private, there are no public explorer as fo
 *Make a list of 20 concepts related to the Bitcoin lightning network and provide for each of them a short description. Regroup them in difference topics*
 
 - Cover image: [commons.wikimedia.org/wiki/File:Bitcoin_lightning_logo.svg](https://commons.wikimedia.org/wiki/File:Bitcoin_lightning_logo.svg)
+
+### Related articles
+
+- [Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge]({{site.url_complet}}/2026/05/11/htlc-garden-finance-bridge/)

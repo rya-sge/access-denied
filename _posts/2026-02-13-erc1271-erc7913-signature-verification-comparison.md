@@ -654,3 +654,8 @@ OpenZeppelin is the only library of the four that implements the full ERC-1271 +
 - [Coinbase Smart Wallet ERC1271](https://github.com/coinbase/smart-wallet/blob/main/src/ERC1271.sol)
 - [Coinbase Smart Wallet CoinbaseSmartWallet](https://github.com/coinbase/smart-wallet/blob/main/src/CoinbaseSmartWallet.sol)
 - [Solarity ECDSA256](https://github.com/dl-solarity/solidity-lib/blob/main/contracts/libs/crypto/ECDSA256.sol)
+
+### Related articles
+
+- [Overview of ECDSA - Elliptic Curve Digital Signature Algorithm]({{site.url_complet}}/2024/10/23/ecdsa-overview/)
+- [OpenZeppelin ERC-4337 Account contract Overview]({{site.url_complet}}/2025/12/13/erc4337-oz-account/)

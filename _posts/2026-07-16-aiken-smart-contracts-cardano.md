@@ -313,6 +313,14 @@ Unit tests confirm the checks a validator does perform behave as intended. They 
 - [CIP-30 — Cardano dApp-Wallet Web Bridge](https://cips.cardano.org/cip/CIP-30)
 - [UPLC-CAPE — cross-compiler UPLC benchmarks](https://github.com/IntersectMBO/UPLC-CAPE)
 
+### Related articles
+
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains]({{site.url_complet}}/2026/07/16/cardano-smart-contract-security/)
+- [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)
+- [CIP-113 Programmable Tokens on Cardano]({{site.url_complet}}/2026/08/26/cip-113-programmable-tokens-cardano/)
+- [Merkle Patricia Forestry on Cardano — How It Differs From Other Merkle Trees]({{site.url_complet}}/2026/08/28/merkle-patricia-forestry-cardano/)
+
 ### Tooling used
 
 - [Claude Code](https://claude.com/product/claude-code)

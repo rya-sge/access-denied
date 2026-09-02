@@ -411,3 +411,8 @@ The trade-offs are real: no EVM compatibility, a different programming model (Da
 - [Railgun Protocol](https://railgun.org/)
 - [Hyperledger Besu Documentation](https://besu.hyperledger.org/)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/)
+- [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)

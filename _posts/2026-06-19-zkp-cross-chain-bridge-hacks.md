@@ -435,3 +435,9 @@ No. Smart contracts on Ethereum are immutable and continue to accept function ca
 - [ZKSpace Exploit — ainvest.com](https://www.ainvest.com/news/zkspace-proxy-contract-exploited-4-million-stolen-2507/)
 - [SlowMist Hacked database](https://hacked.slowmist.io/)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Zero-Knowledge Proof Vulnerabilities — A Technical Classification of Soundness, Completeness, and Protocol Failures]({{site.url_complet}}/2026/06/19/zkp-vulnerability-taxonomy/)
+- [Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/)
+- [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)

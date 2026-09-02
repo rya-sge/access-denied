@@ -12,7 +12,7 @@ image: /assets/article/blockchain/defi/garden-finance/garden_finance_mindmap.png
 isMath: true
 ---
 
-Hash Time-Locked Contracts (HTLCs) are one of the foundational primitives of trustless cross-chain protocols. Originally proposed in the context of Bitcoin payment channels and the Lightning Network, they have since become the standard mechanism for atomic swaps between blockchains that share no direct trust relationship. Garden Finance builds on this primitive to create a Bitcoin bridge operating across five chains simultaneously: EVM-compatible networks, Arbitrum, Starknet, Sui, and Solana.
+Hash Time-Locked Contracts (HTLCs) are one of the foundational primitives of trustless cross-chain protocols. Originally proposed in the context of Bitcoin payment channels and the [Lightning Network]({{site.url_complet}}/2023/12/21/lightning-network/), they have since become the standard mechanism for atomic swaps between blockchains that share no direct trust relationship. Garden Finance builds on this primitive to create a Bitcoin bridge operating across five chains simultaneously: EVM-compatible networks, Arbitrum, Starknet, Sui, and Solana.
 
 This article explains HTLCs from first principles, then maps those principles onto Garden Finance's concrete implementation, and concludes with a structured threat model of the protocol.
 
@@ -308,3 +308,9 @@ The Code4rena audit (November–December 2025) identified one medium-severity vu
 - [ERC-1271: Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271)
 - [Code4rena severity classification](https://docs.code4rena.com/awarding/judging-criteria/severity-categorization)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Main Concepts Behind the Lightning Network ]({{site.url_complet}}/2023/12/21/lightning-network/)
+- [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)
+- [Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/)

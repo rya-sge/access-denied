@@ -274,3 +274,7 @@ TOTP (RFC 6238) is HOTP with the counter replaced by a time-derived value: the m
 - [RFC 2119 — Key words for use in RFCs to Indicate Requirement Levels](https://datatracker.ietf.org/doc/html/rfc2119)
 - [Bellare, Canetti, Krawczyk — Keyed Hash Functions and Message Authentication (CRYPTO '96)](https://cseweb.ucsd.edu/~mihir/papers/kmd5.pdf)
 - [Initiative for Open Authentication (OATH)](https://openauthentication.org/)
+
+### Related articles
+
+- [HMAC - Hash-Based Message Authentication Code]({{site.url_complet}}/2024/11/27/hmac/)

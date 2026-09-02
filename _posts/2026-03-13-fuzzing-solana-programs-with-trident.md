@@ -12,7 +12,7 @@ image: /assets/article/blockchain/solana/solana-fuzzing-trident.png
 isMath: false
 ---
 
-Solana programs are complex stateful systems that handle real economic value. Traditional unit and integration tests verify known scenarios, but they cannot exhaustively explore the vast space of possible inputs and instruction sequences. Fuzzing fills this gap by automatically generating unexpected inputs to discover vulnerabilities, panics, and logic errors that manual testing misses. Trident is an open-source, manually guided fuzzing framework built specifically for Anchor-based Solana programs, offering a structured way to fuzz programs written in Rust.
+Solana programs are complex stateful systems that handle real economic value. Traditional unit and integration tests verify known scenarios, but they cannot exhaustively explore the vast space of possible inputs and instruction sequences. Fuzzing fills this gap by automatically generating unexpected inputs to discover vulnerabilities, panics, and logic errors that manual testing misses. Trident is an open-source, manually guided fuzzing framework built specifically for [Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)-based Solana programs, offering a structured way to fuzz programs written in Rust.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and the [Trident](https://github.com/Ackee-Blockchain/trident) documentation.
 
@@ -621,3 +621,8 @@ fn main() {
 - [Anchor Framework](https://www.anchor-lang.com/)
 - [Solana Program Security](https://solana.com/developers/guides/advanced/security-intro)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
+- [Medusa — Architecture and Practical Use of a Coverage-Guided Solidity Fuzzer]({{site.url_complet}}/2026/07/28/medusa-smart-contract-fuzzer/)

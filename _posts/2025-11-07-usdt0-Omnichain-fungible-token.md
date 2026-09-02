@@ -128,3 +128,8 @@ See [docs.usdt0.to - usdt0-deployments](https://docs.usdt0.to/technical-document
 ------
 
 USD₮0 combines **cross-chain interoperability, consistent asset backing, and security** to provide a unified framework for moving USD₮ across multiple blockchains, while maintaining a connection to legacy USDT liquidity through the Legacy Mesh.
+
+## Related articles
+
+- [Cross-chain tokens Standard (ERC-7281, xERC20) - Overview]({{site.url_complet}}/2025/05/07/cross-chain-token-overview/)
+- [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)

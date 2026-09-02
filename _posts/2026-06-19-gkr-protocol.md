@@ -378,3 +378,9 @@ They compose additively. Each of the $$D$$ layer reductions contributes two inde
 ### Lecture notes
 
 - Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. (Chapters 4 and 5 cover sum-check and GKR in depth.)
+
+### Related articles
+
+- [The GKR Protocol — How to Check a Million Calculations Without Doing Them]({{site.url_complet}}/2026/06/19/gkr-protocol-explained/)
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)
+- [Zero-Knowledge Proof Systems — 15 Concepts and 15 Formulas to Read the Foundational Papers]({{site.url_complet}}/2026/07/28/zk-proof-systems-15-concepts-15-formulas/)

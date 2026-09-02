@@ -496,3 +496,8 @@ Neptune is a Rust implementation of the [Poseidon hash function](https://www.pos
 - [docs.zkbob - The Poseidon Hash](https://docs.zkbob.com/implementation/untitled/the-poseidon-hash)
 - [docs.polygon.technology - poseidon-sm/#execution-of-poseidon-actions](https://docs.polygon.technology/zkEVM/architecture/zkprover/hashing-state-machines/poseidon-sm/#execution-of-poseidon-actions)
 - Chatgpt with the following input "Write me a technical article about poseidon hash function. Write a mindmap-plantuml diagram(startuml) to explain this. And another diagram (plantuml) to explain the flow"
+
+### Related articles
+
+- [Pedersen Hash Function Overview]({{site.url_complet}}/2024/05/07/pedersen-hash-function/)
+- [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)

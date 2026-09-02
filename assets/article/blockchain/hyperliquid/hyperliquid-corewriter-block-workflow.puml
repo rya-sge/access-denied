@@ -1,0 +1,44 @@
+@startuml
+title HyperEVM block — ordering of Core interactions
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:L1 block is built;
+if (l1_block_time mod block duration\nselects an EVM block?) then (small block, 1 s / 3M gas)
+  :build small block from the small mempool;
+else (big block, 60 s / 30M gas)
+  :build big block from the big mempool;
+  note right
+    A user opts in with
+    evmUserModify usingBigBlocks
+    on their HyperCore account
+  end note
+endif
+:execute EVM transactions;
+note right
+  L1Read precompiles at 0x...0800+
+  see HyperCore state as of the
+  moment the block is constructed
+end note
+:process EVM to Core transfers\n(ERC-20 Transfer to the token system address);
+:process CoreWriter logs from 0x3333...3333;
+if (sender already exists on HyperCore?) then (yes)
+  if (action is an order or a vault transfer?) then (yes)
+    :enqueue onchain, execute a few seconds later;<<#FFF7E6>>
+  else (no)
+    :execute against HyperCore immediately;
+  endif
+else (no)
+  :action rejected;<<#FDEEEE>>
+endif
+:Core to EVM transfers are queued\nfor the next EVM block;
+stop
+@enduml

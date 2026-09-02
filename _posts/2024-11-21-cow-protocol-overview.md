@@ -175,3 +175,7 @@ CoW Swap works with many popular wallets, including [Rabby](https://rabby.io/), 
 - [CoW 🛠️ How to Add Pre & Post Interactions to your Swaps](https://www.youtube.com/watch?v=6WqU-iL2sds)
 - [Cow Swap: Gasless Transactions, MEV Protection, The BEST Prices & It Goes MOOOOO ](https://www.youtube.com/watch?v=MiB2J6da2CE)
 - [ETHGlobal - EIP-1271 Explained](https://www.youtube.com/watch?v=6zj0_E8JWPQ)
+
+## Related articles
+
+- [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)

@@ -187,9 +187,11 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 ## Reference
 
 - [eprint - Non-Interactive and Information-Theoretic Secure Publicly Verifiable Secret Sharing](https://eprint.iacr.org/2004/201.pdf)
-
 - [RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
-
 - [crypto.stackexchange.com - What is a Pedersen commitment?](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment)
-
 - [https://dl.acm.org/doi/10.5555/646756.705507](https://dl.acm.org/doi/10.5555/646756.705507)
+
+### Related articles
+
+- [Pedersen Hash Function Overview]({{site.url_complet}}/2024/05/07/pedersen-hash-function/)
+- [Zero Knowledge Proofs with Bulletproof]({{site.url_complet}}/2024/08/13/bulletproof-zero-knowledge-proof/)

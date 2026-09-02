@@ -159,3 +159,8 @@ Both draw on the same machinery from different angles. The wallet feature uses t
 - [CIP-95 — Web-Wallet Bridge, Conway era](https://cips.cardano.org/cip/CIP-0095)
 - [CIP-119 — DRep metadata](https://cips.cardano.org/cip/CIP-0119)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)
+- [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)

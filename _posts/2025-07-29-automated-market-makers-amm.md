@@ -365,3 +365,8 @@ Knowing which formula a pool uses tells you where its slippage and its arbitrage
 - [Dmitriy Berenzon - DeFi’s “Zero to One” Innovation](https://medium.com/bollinger-investment-group/constant-function-market-makers-defis-zero-to-one-innovation-968f77022159)
 - [Chainlink - What Are Automated Market Makers (AMMs)?](https://chain.link/education-hub/what-is-an-automated-market-maker-amm)
 - [BTX Capital - A Mathematical View of Automated Market Maker (AMM) Algorithms and Its Future](https://www.btx.capital/post/a-mathematical-view-of-automated-market-maker-amm-algorithms-and-its-future)
+
+### Related articles
+
+- [CoW Protocol - Intent & MEV protection]({{site.url_complet}}/2024/11/21/cow-protocol-overview/)
+- [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)

@@ -268,6 +268,13 @@ This task spans three categories. From Wallets, CIP-0030 (and its Conway-era ext
 - [CIP-0068 — Datum Metadata Standard](https://cips.cardano.org/cip/CIP-68)
 - [CIP-0057 — Plutus Contract Blueprint](https://cips.cardano.org/cip/CIP-57)
 
+### Related articles
+
+- [Cardano On-Chain Governance: The Voltaire Era and CIP-1694]({{site.url_complet}}/2026/07/16/cardano-voltaire-governance-cip-1694/)
+- [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [CIP-113 Programmable Tokens on Cardano]({{site.url_complet}}/2026/08/26/cip-113-programmable-tokens-cardano/)
+
 ### Tooling used
 
 - [Claude Code](https://claude.com/product/claude-code)

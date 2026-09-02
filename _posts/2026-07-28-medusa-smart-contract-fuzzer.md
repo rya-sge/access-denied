@@ -533,3 +533,7 @@ If Slither is unavailable, Medusa falls back to mining constants from each contr
 - [EIP-170 — Contract code size limit](https://eips.ethereum.org/EIPS/eip-170)
 - [Trail of Bits](https://www.trailofbits.com/)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Fuzzing Solana Programs with Trident]({{site.url_complet}}/2026/03/13/fuzzing-solana-programs-with-trident/)

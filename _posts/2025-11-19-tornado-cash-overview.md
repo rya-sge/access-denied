@@ -471,8 +471,13 @@ Here is a summary from the documentation:
 ## Reference
 
 - [Tornado cash github](https://github.com/tornadocash/tornado-core/)
-
 - [Tornado Cash - Circuit](https://github.com/tornadocash/docs/blob/en/circuits/core-deposit-circuit.md)
 - [Tornado Cash Whitepaper](https://berkeley-defi.github.io/assets/material/Tornado%20Cash%20Whitepaper.pdf)
 - [RareSkills - How Tornado Cash Works (Line by Line for Devs)](https://rareskills.io/post/how-does-tornado-cash-work)
 - ChatGPT to summarize the documentation
+
+### Related articles
+
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)
+- [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/)
+- [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)

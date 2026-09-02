@@ -249,3 +249,9 @@ This has no effect on CREATE address prediction (which depends on the EVM nonce)
 - [CREATE2 - EIP-1014](https://eips.ethereum.org/EIPS/eip-1014)
 - [Foundry Book - vm.etch](https://book.getfoundry.sh/cheatcodes/etch)
 - [Foundry Book - vm.getNonce](https://book.getfoundry.sh/cheatcodes/get-nonce)
+
+### Related articles
+
+- [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
+- [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/)
+- [EIP-7702 Smart Wallet Security: Threat Model and Attack Surface Analysis]({{site.url_complet}}/2026/02/17/eip-7702-security-threat-model/)

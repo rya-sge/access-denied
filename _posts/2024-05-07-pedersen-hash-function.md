@@ -478,3 +478,7 @@ This section contains the main references
 - [12. crypto.stackexchange - Pedersen  Hash : when truncating the hash to keep only the X coordinate, is it  possible to compute a collision when the Babyjubjub curve is used?](https://crypto.stackexchange.com/questions/107032/pedersen-hash-when-truncating-the-hash-to-keep-only-the-x-coordinate-is-it-po)
 - [13. What is Jubjub?](https://bitzecbzc.github.io/technology/jubjub/index.html)
 
+### Related articles
+
+- [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/)
+- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash -function-overview/)

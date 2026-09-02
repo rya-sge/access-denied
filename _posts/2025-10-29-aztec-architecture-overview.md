@@ -238,3 +238,8 @@ Wallets also manage:
 - [Aztec Protocol GitHub](https://github.com/AztecProtocol)
 - [Aztec.js SDK Reference](https://docs.aztec.network/dev_docs/aztecjs/)
 - ChatGPT with the input "Write me a technical article on Aztec by using the documentation I provide here. At the end, provide me a summary tab and also a comparison with other privacy system such as moneor, zcash, tornado cash, railgun"
+
+### Related articles
+
+- [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)

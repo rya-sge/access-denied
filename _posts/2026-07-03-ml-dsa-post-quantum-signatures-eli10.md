@@ -157,3 +157,8 @@ Think of a smoothie. You blend one secret fruit into a big cup with lots of othe
 - [ML-DSA, the Module-Lattice Digital Signature Standard (FIPS 204): the full technical version of this article]({{site.url_complet}}/cryptography/2026/06/29/ml-dsa-fips-204-post-quantum-signatures.html)
 - [CRYSTALS-Dilithium, the design ML-DSA is based on](https://pq-crystals.org/dilithium/)
 - [NIST Post-Quantum Cryptography project](https://csrc.nist.gov/projects/post-quantum-cryptography)
+
+### Related articles
+
+- [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)
+- [How Two Computers Agree on a Secret Code That a Quantum Computer Cannot Steal — Explained for a 10-Year-Old]({{site.url_complet}}/2026/07/03/ml-kem-post-quantum-key-encapsulation-eli10/)

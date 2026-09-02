@@ -305,3 +305,7 @@ It lets small devices trust big ones. A phone, or a blockchain smart contract wi
 - Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. (Chapters 4 and 5 are a self-contained treatment.)
 - Xie, T., Zhang, J., Zhang, Y., Papamanthou, C., Song, D.: [*Libra: Succinct Zero-Knowledge Proofs with Optimal Prover Computation*](https://eprint.iacr.org/2019/317). CRYPTO 2019.
 - Setty, S.: [*Spartan: Efficient and general-purpose zkSNARKs without trusted setup*](https://eprint.iacr.org/2019/550). CRYPTO 2020.
+
+### Related articles
+
+- [The GKR Protocol — Delegating Computation with Interactive Proofs]({{site.url_complet}}/2026/06/19/gkr-protocol/)

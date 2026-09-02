@@ -546,3 +546,10 @@ What is not free is what you add: each validation hook is an external call with 
 - [ERC-165: Standard Interface Detection](https://eips.ethereum.org/EIPS/eip-165)
 - [ERC-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Rundler — Inside Alchemy's ERC-4337 Bundler]({{site.url_complet}}/2026/07/30/rundler-alchemy-erc4337-bundler/)
+- [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
+- [EIP-7702: Set Code for EOAs - Overview]({{site.url_complet}}/2025/05/09/eip-7702-overview/)
+- [ERC-1271 and ERC-7913 Signature Verification — OpenZeppelin, Solady, Coinbase Smart Wallet, and Solarity Solidity Library]({{site.url_complet}}/2026/02/13/erc1271-erc7913-signature-verification-comparison/)

@@ -663,3 +663,11 @@ _posts/2026-08-28-merkle-patricia-forestry-cardano.md
   assets/article/blockchain/cardano/mpf-onchain-verification-sequence.puml      (sequence, in-section)
   assets/article/blockchain/cardano/mpf-structure-comparison-concept.puml       (concept, asset only)
   assets/article/blockchain/cardano/mpf-proof-lifecycle-workflow.puml           (workflow, asset only)
+
+_posts/2026-09-02-hyperliquid-protocol-architecture.md
+  assets/article/blockchain/hyperliquid/hyperliquid-protocol.puml                        (mindmap)
+  assets/article/blockchain/hyperliquid/hyperliquid-execution-architecture-concept.puml  (concept, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-order-block-sequence.puml            (sequence, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-liquidation-workflow.puml            (activity, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-corewriter-block-workflow.puml       (workflow, asset only)
+  assets/article/blockchain/hyperliquid/hyperliquid-hip-stack-concept.puml               (concept, asset only)

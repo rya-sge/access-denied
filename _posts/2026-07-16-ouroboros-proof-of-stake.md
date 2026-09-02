@@ -171,3 +171,8 @@ Through the reward formula rather than a hard rule. The formula defines a desira
 - [Ouroboros Genesis](https://eprint.iacr.org/2018/378)
 - [Design of a Reward Sharing Scheme for Stake Pools (Brünjes, Kiayias, Koutsoupias, Stouka)](https://arxiv.org/abs/1807.11218)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Cardano On-Chain Governance: The Voltaire Era and CIP-1694]({{site.url_complet}}/2026/07/16/cardano-voltaire-governance-cip-1694/)

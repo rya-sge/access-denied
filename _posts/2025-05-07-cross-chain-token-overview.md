@@ -303,3 +303,7 @@ ERC-7281 carries Lockbox wrappers, structs, and extensive configuration function
 - [defi-wonderland — crosschainERC20 implementation](https://github.com/defi-wonderland/crosschainERC20)
 - [Optimism Docs — SuperchainERC20](https://docs.optimism.io/interop/superchain-erc20)
 
+### Related articles
+
+- [USD₮0 - Omnichain Fungible Token]({{site.url_complet}}/2025/11/07/usdt0-Omnichain-fungible-token/)
+- [Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/)

@@ -246,3 +246,8 @@ For security analysts, the key takeaway is that TTL expiry of a `Persistent` ent
 - [CAP-0066: Soroban In-Memory Read Resource](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0066.md)
 - [Stellar Docs — Storage How-To Guide](https://developers.stellar.org/docs/build/smart-contracts/getting-started/storing-data)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Deploying a SEP-41 Fungible Token on Stellar with OpenZeppelin]({{site.url_complet}}/2026/07/09/stellar-fungible-token-openzeppelin-sep41/)
+- [Three Vulnerabilities from the OpenZeppelin Stellar Contracts Audits]({{site.url_complet}}/2026/07/10/stellar-soroban-vulnerabilities-audit/)

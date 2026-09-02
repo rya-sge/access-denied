@@ -19,9 +19,9 @@ A deployed validator is immutable, or nearly so, and it usually guards value, wh
 
 ## Two layers of security, and one that is not the contract's
 
-Before the contract-level discussion, one boundary is worth drawing. Network-level threats such as 51%, long-range, and eclipse attacks target consensus, not a validator, and Cardano's Ouroboros protocol defends against those. Everything below is application-level: the security of the validator logic a developer writes.
+Before the contract-level discussion, one boundary is worth drawing. Network-level threats such as 51%, long-range, and eclipse attacks target consensus, not a validator, and [Cardano's Ouroboros protocol]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/) defends against those. Everything below is application-level: the security of the validator logic a developer writes.
 
-Within that scope, the eUTXO model itself removes some attack classes, and the rest fall to the developer. The threat model splits cleanly along that line.
+Within that scope, [the eUTXO model]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/) itself removes some attack classes, and the rest fall to the developer. The threat model splits cleanly along that line.
 
 ## What the eUTXO model removes by design
 
@@ -175,3 +175,9 @@ Because the model's guarantees and unit tests cover different, incomplete parts 
 - [Invariant0 security analysis](https://medium.com/@invariant0)
 - [Mesh (code examples)](https://github.com/MeshJS/mesh)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
+- [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)

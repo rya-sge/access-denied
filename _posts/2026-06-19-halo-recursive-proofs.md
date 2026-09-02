@@ -370,3 +370,10 @@ They remove two independent obstacles, and either one alone leaves the circuit t
 ### Lecture notes
 
 - Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. (Chapters on IVC and recursive composition.)
+
+### Related articles
+
+- [Halo — How to Check an Endless Chain of Work with a Single Glance]({{site.url_complet}}/2026/06/19/halo-recursive-proofs-eli10/)
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)
+- [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/)
+- [Zero Knowledge Proofs with Bulletproof]({{site.url_complet}}/2024/08/13/bulletproof-zero-knowledge-proof/)

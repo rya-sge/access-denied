@@ -15,7 +15,7 @@ A Cardano native asset moves whenever its holder signs for it. That is the point
 
 [CIP-113](https://github.com/cardano-foundation/CIPs/pull/444) closes that gap without changing the ledger. Programmable tokens remain native assets, minted by an ordinary minting policy and tracked by the ledger like any other. What changes is where they live: every programmable token sits at a single shared script address, and the stake credential of the UTxO, rather than its payment credential, records who owns it. Because one payment credential covers every holder, one spending validator runs on every movement, and that validator can consult a registry, invoke the token's own rule set, and refuse.
 
-This article works through the on-chain design as it stands in the Cardano Foundation's Aiken implementation: the custody model and what it costs integrators, the validator set and the withdraw-zero dispatch that keeps it affordable, the sorted-list registry and its two proof shapes, the boundaries of administrative authority, and the restructuring action that keeps a freeze from taking a holder's unrelated assets with it. Where the repository's own documentation has drifted from the code, the code is what is described here, and the drift is flagged.
+This article works through the on-chain design as it stands in the Cardano Foundation's [Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/) implementation: the custody model and what it costs integrators, the validator set and the withdraw-zero dispatch that keeps it affordable, the sorted-list registry and its two proof shapes, the boundaries of administrative authority, and the restructuring action that keeps a freeze from taking a holder's unrelated assets with it. Where the repository's own documentation has drifted from the code, the code is what is described here, and the drift is flagged.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -461,6 +461,14 @@ Only after ruling those out is the substandard's transfer logic, a denylist hit 
 
 - [cardano-foundation/cip113-programmable-tokens-platform](https://github.com/cardano-foundation/cip113-programmable-tokens-platform), the off-chain reference frontend, Java backend, and substandard implementations
 - [input-output-hk/wsc-poc](https://github.com/input-output-hk/wsc-poc), the original Plutarch reference implementation by Phil DiSarro and the IOG team
+
+### Related articles
+
+- [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
+- [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Two Ways to Build a Permissioned Token — Centrifuge's Transfer Hook Against ERC-3643]({{site.url_complet}}/2026/08/18/centrifuge-hook-vs-erc3643/)
+- [Flexible Access Control in smart contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/)
 
 ### Tooling and background
 

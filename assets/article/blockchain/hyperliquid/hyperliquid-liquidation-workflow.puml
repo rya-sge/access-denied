@@ -1,0 +1,46 @@
+@startuml
+title Perp solvency ladder — market liquidation to ADL
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:validators publish oracle prices (~3 s);
+:recompute mark price and account equity;
+if (equity >= maintenance margin?) then (yes)
+  :no action;
+  stop
+else (no)
+  if (position notional > 100k USDC?) then (yes)
+    :send 20% of the position\nas a market order;
+    note right: 30 s cooldown after a\npartial liquidation, then\nthe full size is sent
+  else (no)
+    :send the full position\nas a market order;
+  endif
+  if (equity restored above\nmaintenance margin?) then (yes)
+    :remaining collateral stays\nwith the trader;<<#EEF5FF>>
+    stop
+  else (no)
+    if (equity < 2/3 of maintenance margin?) then (yes)
+      :backstop liquidator takes over\nthe position and its margin;<<#FDEEEE>>
+      note right: HLP liquidator vault, or the\nHIP-3 backstop at 0x400..00 + dex
+    else (no)
+      :keep retrying on the book;
+      stop
+    endif
+  endif
+endif
+if (account value still negative?) then (yes)
+  :rank counterparties by\n(mark / entry) x (notional / equity);<<#FDEEEE>>
+  :auto-deleverage at the previous mark price;<<#FDEEEE>>
+else (no)
+  :done;
+endif
+stop
+@enduml

@@ -439,3 +439,8 @@ No. Bulletproofs as a cryptographic construction are secure under the discrete l
 - [dYdX Supply Chain Attack — Socket](https://socket.dev/blog/malicious-dydx-packages-published-to-npm-and-pypi)
 - [SlowMist Hacked database](https://hacked.slowmist.io/) — Haven Protocol (December 10, 2024) and HermesVault (May 19, 2026) entries
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Zero-Knowledge Proof Vulnerabilities — A Technical Classification of Soundness, Completeness, and Protocol Failures]({{site.url_complet}}/2026/06/19/zkp-vulnerability-taxonomy/)
+- [Zero-Knowledge Proof Failures in Cross-Chain Bridges — Exploits, Vulnerabilities, and Bug Bounties]({{site.url_complet}}/2026/06/19/zkp-cross-chain-bridge-hacks/)

@@ -204,3 +204,8 @@ From [Matter labs - awesome-zero-knowledge-proofs ](https://github.com/matter-la
 - [From Zero (Knowledge) to Bulletproofs](https://github.com/AdamISZ/from0k2bp) - a long and very nice gradual explanation
 - [Dmitry Khovratovich - Bulletproofs](http://sikoba.com/docs/SKOR_DK_Bulletproofs_201905.pdf) - succinct and complete description of the protocol
 - ChatGpt with the input "What is the difference and link between Bulletproof, Bulletproof Commitment Scheme and pedersen commitment ?"
+
+### Related articles
+
+- [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/)
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)

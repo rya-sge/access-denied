@@ -1,0 +1,46 @@
+@startuml
+title Hyperliquid — one consensus, two execution states
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+
+package "HyperBFT consensus" {
+  [Validator set\nstake-weighted, epoch = 100k rounds] as VS
+  [Committed round stream\none total order of actions] as RS
+}
+
+package "HyperCore" {
+  [Perp clearinghouse\nmargin, positions] as PCH
+  [Spot clearinghouse\nbalances, holds] as SCH
+  [Order books\nprice-time priority] as OB
+  [Oracle\nweighted median, 3 s] as ORA
+  [Staking\ndelegation, unstaking queue] as STK
+}
+
+package "HyperEVM" {
+  [Small blocks\n1 s, 3M gas] as SB
+  [Big blocks\n60 s, 30M gas] as BB
+  [L1Read precompiles\n0x...0800+] as PRE
+  [CoreWriter\n0x3333...3333] as CW
+}
+
+VS --> RS : sign rounds
+RS --> PCH
+RS --> OB
+RS --> SB
+RS --> BB
+ORA --> PCH : mark price
+OB <--> PCH : margin checks
+PRE ..> PCH : read state
+PRE ..> OB : read book
+CW ..> RS : enqueue action\n(delayed)
+SCH <--> OB
+STK --> VS : delegated stake
+@enduml

@@ -326,3 +326,8 @@ Merton showed that the value of a live call always exceeds its immediate exercis
 - Stoll, Hans R. "The Relationship Between Put and Call Option Prices." *Journal of Finance* 24 (1969): 802-824.
 - Churchill, R. V. *Fourier Series and Boundary Value Problems*. 2nd ed. New York: McGraw-Hill, 1963.
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Black-Scholes Model for Curious Kids — Pricing a Ticket to Buy Later]({{site.url_complet}}/2026/07/18/black-scholes-eli10/)
+- [Traditional Futures vs. Perpetual Futures: A Technical Comparison]({{site.url_complet}}/2025/12/29/traditional-vs-perpetual-futures/)

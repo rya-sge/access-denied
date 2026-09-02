@@ -511,3 +511,9 @@ The second point is what makes concurrent writers hard under eUTXO. Two parties 
 ### Analyzed source
 
 - [aiken-lang/merkle-patricia-forestry](https://github.com/aiken-lang/merkle-patricia-forestry) — analyzed at commit [`540dfdbf61f8697c548db460dee1beff78cadb19`](https://github.com/aiken-lang/merkle-patricia-forestry/tree/540dfdbf61f8697c548db460dee1beff78cadb19), 2026-08-28. The commit carries no tag; it is after on-chain `v2.1.0` (2025-07-12) and off-chain `v1.3.1` (2025-07-12), the versions whose behaviour this article describes.
+
+### Related articles
+
+- [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Merkle DAGs(IPFS, GIT) - Overview]({{site.url_complet}}/2025/04/09/merkle-dag/)

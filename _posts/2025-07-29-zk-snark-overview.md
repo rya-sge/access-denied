@@ -424,3 +424,10 @@ See my article for more details: [Overview of Zero-Knowledge development framewo
 
 - [zokrates - Introduction](https://zokrates.github.io/introduction.html)
 - [crypto.stanford.edu - Some Recent SNARKs](https://crypto.stanford.edu/~saba/slides/Quals.pdf)
+
+### Related articles
+
+- [Zero Knowledge Proofs with Bulletproof]({{site.url_complet}}/2024/08/13/bulletproof-zero-knowledge-proof/)
+- [Halo — Recursive Proof Composition without a Trusted Setup]({{site.url_complet}}/2026/06/19/halo-recursive-proofs/)
+- [The GKR Protocol — Delegating Computation with Interactive Proofs]({{site.url_complet}}/2026/06/19/gkr-protocol/)
+- [Zero-Knowledge Proof Systems — 15 Concepts and 15 Formulas to Read the Foundational Papers]({{site.url_complet}}/2026/07/28/zk-proof-systems-15-concepts-15-formulas/)

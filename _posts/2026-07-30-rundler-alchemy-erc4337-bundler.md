@@ -13,7 +13,7 @@ isMath: false
 
 A bundler occupies an uncomfortable position in [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337). It spends its own ETH to submit a transaction containing other people's user operations, and it is reimbursed only if those operations validate on-chain. Everything between accepting an operation and being paid for it is the bundler's problem: deciding what to admit, predicting what will still be valid several seconds later, and getting a transaction mined at a price that leaves a margin.
 
-Rundler is Alchemy's answer, written in Rust and running in production behind their Bundler API. This article walks through how it is built — the three tasks it splits into, what the mempool actually checks, how bundles are proposed and submitted, and how it estimates the three gas limits that ERC-4337 makes the client's responsibility.
+Rundler is Alchemy's answer, written in Rust and running in production behind their Bundler API. This article walks through how it is built — the three tasks it splits into, what the mempool actually checks, how bundles are proposed and submitted, and how it estimates the three gas limits that ERC-4337 makes the client's responsibility. The standard itself, and the roles around the bundler, are covered in [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/).
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -469,3 +469,9 @@ Routing happens by the entry point address carried in the request. For methods t
 - [EIP-7702: Set EOA account code](https://eips.ethereum.org/EIPS/eip-7702)
 - [ERC-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [How Alchemy Implements Smart Wallets and Account Abstraction]({{site.url_complet}}/2026/07/30/alchemy-smart-wallet-account-abstraction/)
+- [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
+- [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/)

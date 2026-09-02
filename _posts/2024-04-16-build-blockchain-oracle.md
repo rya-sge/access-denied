@@ -235,3 +235,7 @@ In the case of Chainlink, there are several different nodes maintained by known 
 - [12. stackoverflow - Is Chainlink's price reference data free to consume?](https://ethereum.stackexchange.com/questions/87473/is-chainlinks-price-reference-data-free-to-consume)
 - [14. ethereum stackexchange - Chainlink Stale Data latestRoundData() guide](https://ethereum.stackexchange.com/questions/154261/chainlink-stale-data-latestrounddata-guide)
 - [rareskills.io - How Chainlink Price Feeds Work](https://www.rareskills.io/post/chainlink-price-feed-contract)
+
+### Related articles
+
+- [Integrating Pyth Network Price Feeds — A Security-Focused Guide]({{site.url_complet}}/2026/03/13/pyth-integration-security/)

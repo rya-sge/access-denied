@@ -1,0 +1,52 @@
+@startuml
+title The HIP standards on top of HyperCore
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+
+package "HyperCore primitives" {
+  [Order book engine] as OB
+  [Clearinghouse and margin] as CH
+  [Staking and slashing] as ST
+}
+
+package "HIP-1 — native token" {
+  [Capped-supply token\nname, weiDecimals, szDecimals, maxSupply] as T
+  [Spot book against a quote asset] as SB
+  [Dutch auction, 31 h, floor 500 HYPE] as AU
+}
+
+package "HIP-2 — Hyperliquidity" {
+  [Ladder p_i = round(1.003 x p_i-1)\nrefreshed every 3 s in block logic] as HL
+}
+
+package "HIP-3 — builder perps" {
+  [Deployer stake 500k HYPE\nslashable by validator vote] as D3
+  [Independent DEX\noracle, leverage, settlement] as DX
+  [Backstop liquidator\n0x400..00 + dex_index] as BL
+}
+
+package "HIP-4 — outcome markets" {
+  [Fully collateralised sides\nYes / No, merged book] as OM
+  [split / merge / negate\nquestion-level redemption] as SM
+}
+
+T --> SB
+AU --> T : gas paid in HYPE
+SB --> OB
+HL --> SB : places ALO orders
+D3 --> ST : stake requirement
+DX --> CH
+DX --> OB
+BL --> CH
+OM --> OB
+SM --> OM
+CH --> OB
+@enduml

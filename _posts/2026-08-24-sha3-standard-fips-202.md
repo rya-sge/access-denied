@@ -295,8 +295,10 @@ Where SHA-3 has become established is in new designs with no legacy: the post-qu
 - [Cryptographic Sponge Functions](https://keccak.team/files/CSF-0.1.pdf)
 - [Keccak Team](https://keccak.team/)
 - [SHAttered — The first collision for full SHA-1](https://shattered.io/)
+- [Claude Code](https://claude.com/product/claude-code)
 
 ### Related articles
 
 - [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/)
-- [Claude Code](https://claude.com/product/claude-code)
+- [HMAC - Hash-Based Message Authentication Code]({{site.url_complet}}/2024/11/27/hmac/)
+- [SLH-DSA — The Stateless Hash-Based Signature Standard (FIPS 205)]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/)

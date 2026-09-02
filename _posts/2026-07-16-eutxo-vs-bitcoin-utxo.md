@@ -194,3 +194,10 @@ Because the added visibility stops at the transaction boundary. A Cardano valida
 - [eUTXO handbook (PDF)](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook_for_EC.pdf)
 - [Bitcoin developer guide — transactions](https://developer.bitcoin.org/devguide/transactions.html)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Money as a Jar of Coins — How Cardano Tracks Who Owns What, Explained for a 10-Year-Old]({{site.url_complet}}/2026/07/16/eutxo-explained-eli10/)
+- [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
+- [Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains]({{site.url_complet}}/2026/07/16/cardano-smart-contract-security/)
+- [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)

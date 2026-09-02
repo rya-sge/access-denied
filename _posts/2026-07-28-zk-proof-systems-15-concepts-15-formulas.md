@@ -528,3 +528,10 @@ Yes, and reading it early saves time later. Goldreich and Krawczyk establish tha
 ### Applications
 
 - Ben-Sasson, E., Chiesa, A., Garman, C., Green, M., Miers, I., Tromer, E., Virza, M.: *Zerocash: Decentralized Anonymous Payments from Bitcoin*. IEEE S&P 2014. (`349.pdf`)
+
+### Related articles
+
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)
+- [Halo — Recursive Proof Composition without a Trusted Setup]({{site.url_complet}}/2026/06/19/halo-recursive-proofs/)
+- [The GKR Protocol — Delegating Computation with Interactive Proofs]({{site.url_complet}}/2026/06/19/gkr-protocol/)
+- [Zero Knowledge Proofs with Bulletproof]({{site.url_complet}}/2024/08/13/bulletproof-zero-knowledge-proof/)

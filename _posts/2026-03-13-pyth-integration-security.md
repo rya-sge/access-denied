@@ -456,3 +456,8 @@ Following these principles converts Pyth from a latency risk into a genuine comp
 - [Pyth SVM Error Codes](https://docs.pyth.network/price-feeds/core/error-codes/svm)
 - [pyth-sdk-solidity (GitHub)](https://github.com/pyth-network/pyth-crosschain/tree/main/target_chains/ethereum/sdk/solidity)
 - [pyth-solana-receiver-sdk (GitHub)](https://github.com/pyth-network/pyth-crosschain/tree/main/target_chains/solana/pyth_solana_receiver_sdk)
+
+### Related articles
+
+- [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
+- [How to build a blockchain oracle]({{site.url_complet}}/2024/04/16/build-blockchain-oracle/)

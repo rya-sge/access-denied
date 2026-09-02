@@ -220,3 +220,10 @@ ML-KEM is the post-quantum replacement for Diffie-Hellman key establishment. It 
 - [NIST SP 800-227 — Recommendations for Key-Encapsulation Mechanisms](https://csrc.nist.gov/publications/sp)
 - [NIST Post-Quantum Cryptography Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)
+- [SLH-DSA — The Stateless Hash-Based Signature Standard (FIPS 205)]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/)
+- [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/)
+- [How Two Computers Agree on a Secret Code That a Quantum Computer Cannot Steal — Explained for a 10-Year-Old]({{site.url_complet}}/2026/07/03/ml-kem-post-quantum-key-encapsulation-eli10/)

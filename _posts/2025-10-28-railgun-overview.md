@@ -222,3 +222,9 @@ While earlier privacy systems such as Zcash and Monero focus primarily on shield
 
 - [Railgun - Wiki](https://docs.railgun.org/wiki)
 - ChatGPT with the following input: "Here is the documentation of Railgun. Write me a technical article about it. At the end I want a summary tab. provide me also a summary tab with other confidential system such as Zcash, monero or Tornado cash"
+
+### Related articles
+
+- [Tornado Cash Circuits - Overview]({{site.url_complet}}/2025/11/19/tornado-cash-overview/)
+- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash -function-overview/)
+- [Aztec: A Privacy-First Layer 2 for Ethereum]({{site.url_complet}}/2025/10/29/aztec-architecture-overview/)

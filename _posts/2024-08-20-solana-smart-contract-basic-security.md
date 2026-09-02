@@ -418,3 +418,7 @@ pub struct Example<'info> {
 }
 ```
 
+## Related articles
+
+- [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
+- [Fuzzing Solana Programs with Trident]({{site.url_complet}}/2026/03/13/fuzzing-solana-programs-with-trident/)

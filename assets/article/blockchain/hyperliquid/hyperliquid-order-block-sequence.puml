@@ -1,0 +1,40 @@
+@startuml
+title Order path — from client to committed fill
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam SequenceParticipantBackgroundColor #EEF5FF
+skinparam SequenceParticipantBorderColor #4A78B5
+skinparam SequenceLifeLineBorderColor #4A78B5
+skinparam SequenceBoxBackgroundColor #F7FAFF
+skinparam SequenceBoxBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+actor Client
+participant "API server" as API
+participant "Validator node" as Node
+participant "HyperBFT" as BFT
+participant "Order book" as OB
+participant "Clearinghouse" as CH
+
+Client -> API : signed action (nonce, EIP-712)
+API -> Node : forward
+Node -> BFT : gossip into round
+BFT -> BFT : quorum of 2/3 stake signs
+note right of BFT
+  Actions inside the block are sorted:
+  1. no GTC/IOC order
+  2. cancels
+  3. at least one GTC/IOC
+  proposer order applies within each class
+end note
+BFT -> OB : committed, ordered actions
+OB -> CH : margin check on placement
+CH --> OB : accept or reject
+OB -> OB : match at price-time priority
+OB -> CH : margin check for the resting side\nat each match
+CH -> CH : update positions and balances
+CH --> API : execution response
+API --> Client : committed result (median 0.2 s)
+@enduml

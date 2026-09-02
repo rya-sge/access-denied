@@ -325,10 +325,6 @@ No. HMAC's nested structure exists to defeat length extension, which affects Mer
 - [FIPS 204 — Module-Lattice-Based Digital Signature Standard](https://doi.org/10.6028/NIST.FIPS.204)
 - [FIPS 205 — Stateless Hash-Based Digital Signature Standard](https://doi.org/10.6028/NIST.FIPS.205)
 
-### Related articles
-
-- [The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/)
-
 ### Keccak design documents
 
 - [The Keccak Reference, Version 3.0](https://keccak.team/files/Keccak-reference-3.0.pdf)
@@ -339,3 +335,9 @@ No. HMAC's nested structure exists to defeat length extension, which affects Mer
 ### Tools
 
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/)
+- [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
+- [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)

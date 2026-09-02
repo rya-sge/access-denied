@@ -273,3 +273,8 @@ No. A correct verifier only proves that a submitted proof satisfies the circuit.
 -  [Medium - Solidity Security Best Practices](https://medium.com/@joichiro.sai/solidity-security-best-practices-mastering-the-checks-effects-interactions-pattern-ddfa38b8816d)
 - [docs.circom.io - proving-circuits/](https://docs.circom.io/getting-started/proving-circuits/)
 - ChatGPT to summarize the different resources and articles
+
+### Related articles
+
+- [Zero-Knowledge Proof Vulnerabilities — A Technical Classification of Soundness, Completeness, and Protocol Failures]({{site.url_complet}}/2026/06/19/zkp-vulnerability-taxonomy/)
+- [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)

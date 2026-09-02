@@ -465,9 +465,15 @@ This makes it practical to track the compute impact of every change to the progr
 - [Anchor PDAs](https://www.anchor-lang.com/docs/basics/pda)
 - [Anchor CPIs](https://www.anchor-lang.com/docs/basics/cpi)
 - [Anchor Custom Errors](https://www.anchor-lang.com/docs/features/errors)
-
 ## Mindmap
 
 The mindmap below summarizes the article.
 
 ![Solana Anchor introduction mindmap]({{site.url_complet}}/assets/article/blockchain/solana/2026-03-13-solana-anchor-introduction-mindmap.png)
+
+### Related articles
+
+- [Solana Core Concept]({{site.url_complet}}/2024/09/19/solana-core-concept/)
+- [Rust for Solana - Basic knowledge]({{site.url_complet}}/2025/02/10/rust-solana-programming/)
+- [Solana Programs - Basic Security with Anchor]({{site.url_complet}}/2024/08/20/solana-smart-contract-basic-security/)
+- [Fuzzing Solana Programs with Trident]({{site.url_complet}}/2026/03/13/fuzzing-solana-programs-with-trident/)

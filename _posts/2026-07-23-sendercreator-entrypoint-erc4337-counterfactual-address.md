@@ -282,3 +282,10 @@ Because those accounts have no factory and no `CREATE2` deployment to simulate. 
 - [account-abstraction v0.7.0 SenderCreator.sol](https://github.com/eth-infinitism/account-abstraction/blob/v0.7.0/contracts/core/SenderCreator.sol)
 - [account-abstraction v0.6.0 SenderCreator.sol](https://github.com/eth-infinitism/account-abstraction/blob/v0.6.0/contracts/core/SenderCreator.sol)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
+- [Nonce Management and CREATE2 in ERC-4337 Smart Wallets]({{site.url_complet}}/2026/02/17/nonce-management-create2-smart-wallets-erc4337/)
+- [Rundler — Inside Alchemy's ERC-4337 Bundler]({{site.url_complet}}/2026/07/30/rundler-alchemy-erc4337-bundler/)
+- [EIP-7702: Set Code for EOAs - Overview]({{site.url_complet}}/2025/05/09/eip-7702-overview/)

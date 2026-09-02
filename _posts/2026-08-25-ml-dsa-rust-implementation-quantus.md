@@ -627,3 +627,7 @@ The crate's response is to place secrets in the caller's frame and fill them thr
 ### Analyzed source
 
 - [immunefi-team/audit-comp-quantus-qp-rusty-crystals](https://github.com/immunefi-team/audit-comp-quantus-qp-rusty-crystals) — the audit-competition snapshot of `Quantus-Network/qp-rusty-crystals`, analyzed at commit [`94dfe6e671b29689c66148991630406e983e2457`](https://github.com/immunefi-team/audit-comp-quantus-qp-rusty-crystals/tree/94dfe6e671b29689c66148991630406e983e2457) (crate `qp-rusty-crystals-dilithium` v4.1.0, no tag on this commit), 2026-08-25
+
+### Related articles
+
+- [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/)

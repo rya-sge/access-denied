@@ -213,3 +213,7 @@ There is no such thing as software with a guaranteed zero bugs. However, the cha
 - [OtterSec zkVM Fiat-Shamir Disclosures](https://osec.io/blog/2026-03-03-zkvms-unfaithful-claims/)
 - [Solana ZK ElGamal Post-Mortem June 2025](https://solana.com/news/post-mortem-june-25-2025)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Zero-Knowledge Proof Vulnerabilities — A Technical Classification of Soundness, Completeness, and Protocol Failures]({{site.url_complet}}/2026/06/19/zkp-vulnerability-taxonomy/)

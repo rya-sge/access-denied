@@ -405,3 +405,9 @@ For protocols that interact with EIP-7702 accounts:
 - [OpenZeppelin Contracts — Initializable](https://docs.openzeppelin.com/contracts/5.x/api/proxy#Initializable)
 - [Foundry Book — Cheatcodes](https://book.getfoundry.sh/cheatcodes/)
 - [SmartAccount7702 — Source Repository](https://github.com/smart-wallet-7702)
+
+### Related articles
+
+- [EIP-7702: Set Code for EOAs - Overview]({{site.url_complet}}/2025/05/09/eip-7702-overview/)
+- [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
+- [Nonce Management and CREATE2 in ERC-4337 Smart Wallets]({{site.url_complet}}/2026/02/17/nonce-management-create2-smart-wallets-erc4337/)

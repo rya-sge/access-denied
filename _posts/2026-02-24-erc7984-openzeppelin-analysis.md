@@ -414,3 +414,6 @@ The extension system is well-layered:
 - [Zama FHE Types](https://docs.zama.org/protocol/solidity-guides/smart-contract/types)
 - [ERC-1363 Token and Token Sender](https://eips.ethereum.org/EIPS/eip-1363)
 
+### Related articles
+
+- [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/)

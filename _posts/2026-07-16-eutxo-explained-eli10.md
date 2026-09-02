@@ -126,3 +126,7 @@ Sure. Imagine you have a 20 coin and you buy a book that costs 14. You cannot cu
 - [The Extended UTXO Model (Chakravarty and others, IOHK)](https://iohk.io/en/research/library/papers/the-extended-utxo-model/)
 - [Bitcoin developer guide, transactions](https://developer.bitcoin.org/devguide/transactions.html)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)

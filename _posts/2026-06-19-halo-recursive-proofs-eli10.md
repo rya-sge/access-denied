@@ -197,3 +197,7 @@ Yes, and this is worth being honest about. Halo's security rests on a problem ca
 - Bünz, B., Bootle, J., Boneh, D., Poelstra, A., Wuille, P., Maxwell, G.: [*Bulletproofs: Short Proofs for Confidential Transactions and More*](https://eprint.iacr.org/2017/1066). IEEE S&P 2018. (Where the library game comes from.)
 - Kothapalli, A., Setty, S., Tzialla, I.: [*Nova: Recursive Zero-Knowledge Arguments from Folding Schemes*](https://eprint.iacr.org/2021/370). CRYPTO 2022. (A successor that keeps the same idea with a cheaper per-step trick.)
 - Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022.
+
+### Related articles
+
+- [Halo — Recursive Proof Composition without a Trusted Setup]({{site.url_complet}}/2026/06/19/halo-recursive-proofs/)

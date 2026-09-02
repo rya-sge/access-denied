@@ -335,3 +335,7 @@ Below is the PlantUML representation summarizing these points.
 ![rust-solana-mindmap]({{site.url_complet}}/assets/article/blockchain/solana/rust-solana.png)
 
 This breakdown should help you grasp these essential concepts and their use cases. The PlantUML diagram offers a structured way to visualize these topics.
+
+## Related articles
+
+- [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
