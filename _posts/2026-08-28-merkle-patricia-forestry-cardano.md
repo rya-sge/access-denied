@@ -11,7 +11,9 @@ image: /assets/article/blockchain/cardano/merkle-patricia-forestry-cardano.png
 isMath: true
 ---
 
-A Cardano validator is handed three things and nothing else: the datum attached to the UTXO it is spending, the redeemer supplied by the spender, and the script context describing the transaction. It cannot read arbitrary chain state, and there is no equivalent of the EVM's `SLOAD`. Any application that needs a large key/value registry, a domain name map, a delegator table, an oracled dataset, therefore has to compress that whole store into something a datum can hold, and prove facts about it from data the transaction carries.
+A name service on Cardano has to settle one question inside a validator: does this name map to this address? An account-based chain answers it in a single opcode, because the contract reads its own storage. Cardano has no such opcode. A validator is handed the datum attached to the UTXO it is spending, the redeemer the spender supplied, and the script context describing the transaction, and it is handed nothing else. There is no `SLOAD`, and no way to reach state the transaction did not bring with it.
+
+That constraint reshapes every application built on a large key/value store, whether it holds a registry of names, a delegator table or an oracled dataset. The store cannot sit anywhere the validator can read it. It has to be compressed into something small enough to travel in a datum, and every claim about it has to be provable from the bytes the spender carried in.
 
 Merkle Patricia Forestry (MPF) is the answer that the Aiken ecosystem settled on. The datum holds a 32-byte root hash. The redeemer holds a proof under a kilobyte. From those two values a validator can verify that a key maps to a value, that a key is absent, or that a given insertion or deletion transforms one root into another. The library ships as a pair: an [Aiken](https://aiken-lang.org) package that only ever verifies, and a Node.js package that actually stores the data and produces the proofs.
 
