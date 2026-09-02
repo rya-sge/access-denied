@@ -1,0 +1,48 @@
+@startuml
+title What each HIP gates, prices and polices
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Entry is priced" {
+  [HIP-1: Dutch auction\n31 h, floor 500 HYPE] as A1
+  [HIP-3: 500k HYPE staked\n+ shared Dutch auction\nafter the first 3 assets] as A3
+  [HIP-4: staking requirement\nstacks, deployment is free,\ncapacity is capped per deployer] as A4
+  [Quote asset: 200k HYPE\ncommitted for 3 years] as AQ
+  [Aligned quote asset:\n1M HYPE (v1) or 500k x2 (v2)] as AA
+}
+
+package "Conduct is policed by validator vote" {
+  [HIP-3: irregular market operation\nup to 100 / 50 / 20% by impact] as S3
+  [HIP-4: markets contradicting\ntheir template semanticRestriction] as S4
+  [Quote asset: peg depth failing\nover a 3-day sample window] as SQ
+  [AQAv2: unpaid revenue at the\nsystem interest address, 2%/day] as SA
+}
+
+package "Nothing is gated" {
+  [HIP-2: no deployer role at all.\nThe strategy is block transition\nlogic, with no operator and\nno keeper transactions] as H2
+}
+
+A3 --> S3
+A4 --> S4
+AQ --> SQ
+AA --> SA
+A1 --> H2 : hyperliquidityInit\nis a HIP-1 genesis field
+
+note bottom of S3
+  Slashed stake is BURNED, not
+  distributed to affected users.
+  Users are protected by the
+  deployer's incentive, not by
+  a compensation fund.
+end note
+@enduml

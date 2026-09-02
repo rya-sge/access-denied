@@ -1,0 +1,44 @@
+@startuml
+title HIP-2 — the Hyperliquidity update, run by block transition logic
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:new block committed;
+if (at least 3 s since the last update?) then (no)
+  :leave the ladder untouched;
+  stop
+else (yes)
+endif
+:read the strategy balance;
+note right
+  Price ladder, fixed at deployment:
+  p_0 = startPx
+  p_i = round(1.003 x p_i-1)
+  so consecutive levels sit 0.3% apart
+end note
+:target nFull = floor(balance / orderSz)
+full ask orders, plus one partial
+order of balance mod orderSz;
+:place them as ALO orders
+in the shared spot book;
+note right
+  ALO means post-only, so an
+  order that would cross is
+  rejected rather than taking
+end note
+:for each tranche that filled
+completely, re-place an order of
+orderSz on whichever side has balance;
+:ladder quotes a 0.3% spread again,
+alongside any external market maker
+quoting into the same book;
+stop
+@enduml

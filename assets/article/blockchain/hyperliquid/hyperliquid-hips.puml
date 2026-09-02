@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* HIPs
+** HIP-1 native token
+*** name <= 6 chars, no uniqueness
+*** szDecimals + 5 <= weiDecimals
+*** lot = 10^(weiDec - szDec)
+*** Dutch auction 31 h\nfloor 500 HYPE, start 2x last
+*** 5-step deploy, only step 1 is gas
+*** Fee share ratchets down only
+*** Daily dust sweep at 00:00 UTC
+** HIP-2 Hyperliquidity
+*** No operator, no keeper
+*** p_i = round(1.003 x p_i-1)
+*** Refresh every 3 s in block logic
+*** ALO orders in the shared book
+*** nSeededLevels funds bids
+left side
+** HIP-3 builder perps
+*** 500k HYPE, min 183 days
+*** First 3 assets skip the auction
+*** feeScale 0-300%\n(>100% raises protocol fee)
+*** Growth mode: >=90% cheaper
+*** Cross margin enable is final
+*** Backstop at 0x400..00 + dex
+*** Slashing 100 / 50 / 20%, burned
+** HIP-4 outcome markets
+*** Fully collateralised, no leverage
+*** Yes + No = 1 quote token
+*** Merged book,\nprice-side-time priority
+*** split / merge / negate
+*** Fees only on close or settle
+*** Templates + venue, testnet
+** Common pattern
+*** Permissionless entry
+*** Priced by auction or stake
+*** Policed by validator vote
+*** Slashed stake is burned
+@endmindmap

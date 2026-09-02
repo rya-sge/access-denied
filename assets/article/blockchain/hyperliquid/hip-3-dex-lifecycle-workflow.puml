@@ -1,0 +1,71 @@
+@startuml
+title HIP-3 — the life of a builder-deployed perp DEX
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:stake 500k HYPE;
+:deploy the perp dex
+and pick a collateral asset;
+note right
+  The stake is committed for at
+  least 183 days and stays
+  slashable through the 7-day
+  unstaking queue
+end note
+if (fewer than 3 assets deployed so far?) then (yes)
+  :registerAsset2 with no auction;
+else (no)
+  :win the shared HIP-3 Dutch auction,
+  or spend one of the
+  7 + 0.2 x n reserve deployments;
+endif
+:configure the market
+setOracle, setFundingMultipliers,
+setMarginTableIds, setOpenInterestCaps,
+setDeployerFees (scale 0-300%);
+if (enable cross margin on the asset?) then (yes)
+  :cross margin enabled;<<#FDEEEE>>
+  note right
+    IRREVERSIBLE. Validators review
+    the deployer whenever externalPerpPx
+    moves more than 50% from the
+    start-of-day price
+  end note
+else (no)
+  :isolated or no-cross only;
+endif
+repeat
+  :operate: publish oracle prices
+  every few seconds, keep the book
+  and the margin table sane;
+  if (irregular deployer input?) then (yes)
+    :stake-weighted validator vote;<<#FDEEEE>>
+    :slash up to 100 / 50 / 20% by impact,
+    burned rather than paid to users;<<#FDEEEE>>
+  else (no)
+  endif
+repeat while (market still listed?) is (yes)
+->no;
+:haltTrading settles positions
+to the current mark price;
+note right
+  Reversible, so the same asset
+  can be recycled for the next
+  dated contract without a
+  new auction
+end note
+if (all assets settled and 183 days elapsed?) then (yes)
+  :stake is free to unstake;
+else (no)
+  :stake stays locked;
+endif
+stop
+@enduml

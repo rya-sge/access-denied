@@ -1,0 +1,45 @@
+@startuml
+title HIP-4 — converting between quote tokens and outcome shares
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "A standalone outcome" {
+  [X quote tokens] as Q1
+  [X Yes  +  X No] as YN
+  Q1 -right-> YN : splitOutcome
+  YN -left-> Q1 : mergeOutcome
+}
+
+package "A question: outcomes A, B and the fallback,\nexactly one of which settles Yes" {
+  [X Yes(A) + X Yes(B) + X Yes(fallback)] as ALLY
+  [X quote tokens] as Q2
+  [X No(A)] as NOA
+  [X Yes(B) + X Yes(fallback)] as OTHERY
+  ALLY -right-> Q2 : mergeQuestion
+  NOA -right-> OTHERY : negateOutcome
+}
+
+note bottom of YN
+  Settlement pays settleFraction per Yes share and
+  1 - settleFraction per No share, so the two sides of
+  an outcome always sum to exactly one quote token.
+  Nothing can become undercollateralised, which is why
+  outcome markets have no leverage and no liquidations.
+end note
+
+note bottom of NOA
+  negateOutcome lets a holder who is short one outcome
+  redeem before settlement: "not A" is the same claim as
+  "B or the fallback" once the question is exhaustive.
+end note
+@enduml

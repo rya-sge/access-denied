@@ -671,3 +671,11 @@ _posts/2026-09-02-hyperliquid-protocol-architecture.md
   assets/article/blockchain/hyperliquid/hyperliquid-liquidation-workflow.puml            (activity, in-section)
   assets/article/blockchain/hyperliquid/hyperliquid-corewriter-block-workflow.puml       (workflow, asset only)
   assets/article/blockchain/hyperliquid/hyperliquid-hip-stack-concept.puml               (concept, asset only)
+
+_posts/2026-09-02-hyperliquid-improvement-proposals-hip-1-to-hip-4.md
+  assets/article/blockchain/hyperliquid/hyperliquid-hips.puml                       (mindmap)
+  assets/article/blockchain/hyperliquid/hip-1-deployment-workflow.puml              (activity, in-section)
+  assets/article/blockchain/hyperliquid/hip-2-hyperliquidity-update-workflow.puml   (activity, in-section)
+  assets/article/blockchain/hyperliquid/hip-3-dex-lifecycle-workflow.puml           (activity, in-section)
+  assets/article/blockchain/hyperliquid/hip-4-outcome-algebra-concept.puml          (concept, in-section)
+  assets/article/blockchain/hyperliquid/hip-permissioning-concept.puml              (concept, asset only)

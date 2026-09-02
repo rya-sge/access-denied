@@ -50,3 +50,7 @@ wah:
 openssh:
   title: "Reading the OpenSSH Source"
   ordered: false
+
+hyperliquid:
+  title: "The Hyperliquid Protocol"
+  ordered: false

@@ -6,6 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain defi
 tags: hyperliquid defi perpetual derivatives consensus staking oracle
+series: hyperliquid
 description: How Hyperliquid runs a native order book and an EVM under one HyperBFT consensus, and how its margining, oracles, liquidations and HIP standards work.
 image: /assets/article/blockchain/hyperliquid/hyperliquid-protocol.png
 isMath: true

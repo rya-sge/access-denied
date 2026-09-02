@@ -1,0 +1,49 @@
+@startuml
+title HIP-1 — the five-step spot deployment
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:win the Dutch auction and send
+registerToken2 (name, szDecimals, weiDecimals);<<#FFF7E6>>
+note right
+  ONLY time-sensitive step.
+  Gas is charged here, in HYPE,
+  and is never refunded.
+  31 h linear decay from
+  2x the last clearing price
+  down to a 500 HYPE floor.
+end note
+:userGenesis
+(userAndWei, existingTokenAndWei, blacklistUsers);
+note right: may be sent repeatedly
+:genesis
+(maxSupply checksum, optional noHyperliquidity);
+:registerSpot
+(base index, quote index);
+if (Hyperliquidity wanted?) then (yes)
+  :registerHyperliquidity
+  (startPx, orderSz, nOrders, nSeededLevels);
+else (no, noHyperliquidity was set)
+  :nOrders must be 0;
+endif
+:token trades on its spot book;
+fork
+  :setDeployerTradingFeeShare
+  (may only ever decrease);
+fork again
+  :enableQuoteToken
+  (200k HYPE, irreversible);
+fork again
+  :link an ERC-20 on the HyperEVM
+  and finalize from the EVM side;
+end fork
+stop
+@enduml
