@@ -1,0 +1,58 @@
+@startuml
+title The same long, executed on Hyperliquid and on GMX V2
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam SequenceParticipantBackgroundColor #EEF5FF
+skinparam SequenceParticipantBorderColor #4A78B5
+skinparam SequenceLifeLineBorderColor #4A78B5
+skinparam SequenceBoxBackgroundColor #F7FAFF
+skinparam SequenceBoxBorderColor #4A78B5
+skinparam SequenceGroupBackgroundColor #F7FAFF
+skinparam SequenceGroupBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+actor Trader
+
+box "Hyperliquid" #F7FAFF
+  participant "HyperBFT\n+ HyperCore" as HL
+  participant "Order book" as OB
+  participant "Resting maker" as MK
+end box
+
+box "GMX V2" #F7FAFF
+  participant "Order contract" as GC
+  participant "Keeper" as KP
+  participant "GM pool (LPs)" as LP
+end box
+
+== Hyperliquid: a counterparty has to exist ==
+Trader -> HL : signed IOC buy, size S, limit P
+HL -> OB : committed, sorted into the GTC/IOC class
+OB -> MK : match at price-time priority
+note over OB, MK
+  Price is whatever the resting
+  orders say. Depth beyond P
+  leaves the order unfilled.
+end note
+MK --> Trader : fill at the maker's price
+OB --> Trader : remainder cancelled (IOC)
+
+== GMX V2: the pool is always the counterparty ==
+Trader -> GC : create order request (onchain)
+note right of GC
+  Nothing has executed yet.
+  The request states intent only.
+end note
+KP -> KP : fetch a signed Chainlink\nData Streams price
+KP -> GC : execute with that price
+GC -> LP : open the position against the pool
+note over GC, LP
+  Entry uses the oracle maxPrice for a long.
+  No price impact at entry; impact applies
+  when the position is closed or decreased.
+  Execution is not guaranteed.
+end note
+LP --> Trader : position opened at the oracle price
+@enduml

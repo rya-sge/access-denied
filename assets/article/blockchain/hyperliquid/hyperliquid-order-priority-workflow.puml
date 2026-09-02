@@ -1,0 +1,63 @@
+@startuml
+title How a HyperCore action reaches the book, and in what order
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:signed action arrives in the mempool
+at time arrival_time;
+if (what kind of action?) then (cancel)
+  :f = 0, so effective_time = arrival_time.
+  Cancels are never delayed by anything;<<#EAF6F0>>
+elseif (ALO, post-only) then
+  :treated like a cancel in the mempool:
+  FIFO, no priority effect on ordering;<<#EAF6F0>>
+  :any ALO priority fee instead reorders
+  the queue tail at that price level,
+  among orders placed in the last 400 ms;
+  note right
+    Charged on resting notional at
+    placement, whether or not it fills
+  end note
+else (IOC or GTC)
+  :effective_time = arrival_time + f(priority_fee)
+  with f strictly decreasing, 0-8 bps linear
+  at roughly 45 ms saved per basis point;
+  note right
+    Charged on filled notional.
+    8 bps to 100% only breaks ties
+    inside a 70 ms bucket
+  end note
+endif
+:mempool sorts by effective_time,
+across block boundaries;
+:HyperBFT commits the block;
+:execution sorts the block's actions into classes
+1. no GTC/IOC order  2. cancels  3. GTC/IOC orders;
+note right
+  Proposer order applies only
+  within a class, and the
+  prioritisation spans several blocks
+end note
+:margin check on placement;
+if (order crosses the book?) then (yes)
+  if (resting order is the same address?) then (yes)
+    :cancel the resting order, no fill,
+    no fee, not shown in the trade feed;<<#FFF7E6>>
+  else (no)
+    :match at price-time priority;
+    :margin check on the resting side
+    for every match;
+  endif
+else (no)
+  :rest at its price level;
+endif
+stop
+@enduml

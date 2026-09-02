@@ -1,0 +1,59 @@
+@startuml
+title Where the book lives, and who the counterparty is
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Centralised exchange" {
+  [Matching engine\nprivate process, one operator] as CEX
+  [Book: operator memory\nnot published, not verifiable] as CEXB
+  CEX -down-> CEXB
+  note bottom of CEXB
+    Counterparty: another user
+    Fairness: whatever the
+    operator implements
+  end note
+}
+
+package "Hyperliquid (HyperCore)" {
+  [Matching engine\nrun by every validator] as HL
+  [Book: consensus state\nreplicated and verifiable] as HLB
+  HL -down-> HLB
+  note bottom of HLB
+    Counterparty: another user
+    Fairness: an ordering rule
+    inside the state machine
+  end note
+}
+
+package "dYdX v4" {
+  [Matching\nby the block proposer] as DY
+  [Short-term orders: validator memory\nup to 20 blocks. Only fill amount\nand expiry height reach state] as DYB
+  DY -down-> DYB
+  note bottom of DYB
+    Counterparty: another user
+    The resting book itself is
+    never consensus state
+  end note
+}
+
+package "GMX V2" {
+  [Keeper executes an order request\nat a signed oracle price] as GMX
+  [No book. GM pool holds\nthe other side of every position] as GMXB
+  GMX -down-> GMXB
+  note bottom of GMXB
+    Counterparty: the pool's LPs
+    Price: the oracle, adjusted
+    by imbalance on close
+  end note
+}
+@enduml

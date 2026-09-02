@@ -1,0 +1,40 @@
+@startuml
+title What each venue asks you to trust
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Trusted party" {
+  [CEX operator\nruns the engine, holds the funds,\nsells the colocation] as A
+  [Hyperliquid validators\n> 2/3 of stake honest;\nordering rule is in execution] as B
+  [dYdX v4 validators\n> 2/3 of stake honest;\nresting book is not verifiable\nfrom chain state alone] as C
+  [GMX oracle + keepers\nsigned prices delivered on time;\nLPs bear the traders' PnL] as D
+}
+
+package "Failure that follows" {
+  [Order reordering or a\nfront-run you cannot detect] as FA
+  [A colluding stake majority sets\nthe oracle that liquidates you] as FB
+  [A proposer's view of the book\ncannot be replayed from state] as FC
+  [Stale or gapped oracle prices;\nkeepers that do not execute] as FD
+}
+
+A --> FA
+B --> FB
+C --> FC
+D --> FD
+
+note bottom of FA
+  Every design moves the trust somewhere.
+  None removes it. The useful question is
+  which failure you can observe after the fact.
+end note
+@enduml

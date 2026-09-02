@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Order book
+** Book as consensus state
+*** One book per asset in HyperCore
+*** Price-time priority
+*** Tick: 5 sig figs, <= 6 - szDecimals\n(8 for spot); integers always valid
+*** Lot: rounded to szDecimals
+*** Self-trade = expire maker
+** Two margin checks
+*** On placement
+*** On the resting side\nat every match
+*** Oracle moves between the two
+** Intra-block ordering
+*** 1. no GTC/IOC action
+*** 2. cancels
+*** 3. GTC/IOC actions
+*** Proposer order within a class
+*** Spans several blocks
+left side
+** Latency and fairness
+*** No DMM, no colocation sold
+*** Gossip (read) auction\n2 slots, 3 min, ~25 ms each
+*** IOC priority 0-8 bps,\n~45 ms per bp
+*** ALO priority reorders the\nqueue tail over 400 ms
+*** Cancels always first
+*** Fees burned
+** Rate limits
+*** 1 request per 1 USDC traded
+*** 1000 open orders + 1 / 5M USDC
+*** Congestion: 2x maker share
+** Other designs
+*** CEX: private engine,\noperator-defined fairness
+*** dYdX v4: book in validator\nmemory, only fills onchain
+*** GMX: no book, oracle price,\npool counterparty, keepers
+*** AMM: curve price, no queue
+@endmindmap
