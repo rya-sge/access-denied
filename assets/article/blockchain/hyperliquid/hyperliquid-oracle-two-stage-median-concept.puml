@@ -1,0 +1,68 @@
+@startuml
+title The oracle price is a median of medians
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Stage 1 — inside every validator, every 3 s" {
+  [Binance  w=3] as V1
+  [OKX  w=2] as V2
+  [Bybit  w=2] as V3
+  [Kraken  w=1] as V4
+  [KuCoin  w=1] as V5
+  [Gate.io  w=1] as V6
+  [MEXC  w=1] as V7
+  [Hyperliquid spot  w=1] as V8
+  [Weighted median\nof the included venues] as WM
+  V1 --> WM
+  V2 --> WM
+  V3 --> WM
+  V4 --> WM
+  V5 --> WM
+  V6 --> WM
+  V7 --> WM
+  V8 --> WM
+}
+
+note bottom of WM
+  Inclusion depends on where the asset's
+  spot liquidity actually is. HYPE-style
+  assets exclude external venues until
+  liquidity is sufficient; BTC-style assets
+  exclude Hyperliquid spot.
+end note
+
+package "Stage 2 — across the validator set" {
+  [Validator A submission] as A
+  [Validator B submission] as B
+  [Validator C submission] as C
+  [Stake-weighted median] as SWM
+  A --> SWM
+  B --> SWM
+  C --> SWM
+}
+
+WM --> A : each validator publishes\nits own number onchain
+WM --> B
+WM --> C
+
+[Oracle price used by the clearinghouse] as OUT
+SWM --> OUT
+
+note right of OUT
+  Two medians in series: one venue lying
+  cannot move stage 1, and a minority of
+  validators lying cannot move stage 2.
+  Moving the result needs a majority of
+  stake, not a majority of venues.
+end note
+@enduml

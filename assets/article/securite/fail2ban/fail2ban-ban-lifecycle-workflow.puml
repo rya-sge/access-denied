@@ -1,0 +1,49 @@
+@startuml
+title From a log line to a firewall rule and back
+skinparam shadowing false
+skinparam ArrowColor #B54A4A
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #B54A4A
+}
+
+start
+:backend delivers a new log line;
+:DateDetector splits timestamp from message;
+if (timestamp far from now?) then (yes)
+  :treat as if it happened now\nor ignore during startup;<<#FFF6F6>>
+endif
+if (ignoreregex matches?) then (yes)
+  :discard line;<<#EEF5FF>>
+  stop
+endif
+:apply prefregex, then each failregex;
+if (any failregex matched?) then (no)
+  :discard line;<<#EEF5FF>>
+  stop
+endif
+:extract <HOST> capture\n(ip4, ip6 or dns group);
+if (host is a name and usedns = no?) then (yes)
+  :drop the match;<<#EEF5FF>>
+  stop
+endif
+if (address in ignoreip, ignoreself\nor accepted by ignorecommand?) then (yes)
+  :log "Ignore" and drop;<<#EEF5FF>>
+  stop
+endif
+:FailManager increments the counter\nfor this identifier;
+if (attempts >= maxretry within findtime?) then (no)
+  :wait for more failures;<<#FFF6F6>>
+  stop
+endif
+:create a BanTicket, hand it to the Actions thread;
+:Observer looks up previous bans\nand applies bantime.increment;
+:BanManager records the ticket;
+:each action runs actioncheck then actionban\nthrough /bin/sh;
+:database stores the ban;
+:bantime elapses;
+:actionunban removes the rule;
+stop
+@enduml

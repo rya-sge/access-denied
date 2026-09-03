@@ -181,3 +181,7 @@ The workflow consumes the Pendle AMM price of the token and a parameter registry
 - [Pendle Finance](https://www.pendle.finance)
 - [Chainlink Runtime Environment (CRE) documentation](https://docs.chain.link/cre)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Hyperliquid Oracle - How Validator Medians Become Mark Price, Funding and Liquidation]({{site.url_complet}}/2026/09/02/hyperliquid-oracle-mark-price/)

@@ -1,0 +1,51 @@
+@startuml
+title Mark price — a median over three independent estimates
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Candidate 1 — external spot, corrected for basis" {
+  [Oracle price] as C1A
+  [+ 150 s EMA of\n(Hyperliquid mid - oracle)] as C1B
+  C1A -right-> C1B
+}
+
+package "Candidate 2 — Hyperliquid's own book" {
+  [Median of best bid,\nbest ask, last trade] as C2
+}
+
+package "Candidate 3 — external perp market" {
+  [Weighted median of Binance 3,\nOKX 2, Bybit 2, Gate.io 1, MEXC 1\nperpetual mid prices] as C3
+}
+
+[Median of the candidates] as MED
+C1B --> MED
+C2 --> MED
+C3 --> MED
+
+[Mark price] as MARK
+MED --> MARK
+
+note right of MED
+  If exactly two of the three exist,
+  a 30 s EMA of candidate 2 joins as
+  a fourth input, so the median is
+  never taken over a single source.
+end note
+
+note bottom of MARK
+  Drives margin, liquidation, TP/SL triggering
+  and unrealised PnL. Recomputed whenever
+  validators publish, so roughly every 3 s.
+  Funding does not use it.
+end note
+@enduml

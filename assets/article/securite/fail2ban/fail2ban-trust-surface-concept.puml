@@ -1,0 +1,42 @@
+@startuml
+title Trust boundaries around a Fail2Ban deployment
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+}
+skinparam ArrowColor #B54A4A
+
+package "Untrusted" {
+  [Remote client\nchooses usernames, URLs, headers] as ATK
+}
+
+package "Semi-trusted (attacker-influenced content)" {
+  [Application log line] as LINE
+  [Reverse DNS / whois answers] as DNS
+}
+
+package "Trusted (root-owned)" {
+  [jail.conf, filter.d, action.d] as CFG
+  [fail2ban-server] as SRV
+  [UNIX socket 0600] as SOCK
+  [Firewall ruleset] as FW
+}
+
+ATK --> LINE : injects text into fields\nthe application logs verbatim
+LINE --> SRV : parsed by failregex
+DNS --> SRV : consulted when usedns is yes or warn
+CFG --> SRV : defines every command
+SOCK --> SRV : any writer can set actionban
+SRV --> FW : executes shell commands as root
+
+note bottom of SOCK
+  Socket write access is equivalent
+  to root command execution
+end note
+@enduml

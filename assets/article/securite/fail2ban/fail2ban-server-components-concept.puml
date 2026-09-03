@@ -1,0 +1,59 @@
+@startuml
+title Fail2Ban process architecture and per-jail threads
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #B54A4A
+}
+skinparam database {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+skinparam ArrowColor #B54A4A
+
+package "Administrator side" {
+  [fail2ban-client] as CLI
+  [config/*.conf\njail.local, jail.d/] as CONF
+}
+
+package "fail2ban-server (single process, root)" {
+  [AsyncServer\nUNIX socket 0600] as SOCK
+  [Transmitter\ncommand dispatch] as TRANS
+  [Server\njails registry] as SRV
+
+  package "Jail: sshd" {
+    [Filter thread\nfailregex, ignoreregex] as FILT
+    [FailManager\nfindtime window] as FM
+    [Actions thread\nban queue] as ACT
+    [BanManager\nbantime expiry] as BM
+  }
+
+  [ObserverThread\nbantime.increment] as OBS
+  database "SQLite\nfail2ban.sqlite3" as DB
+}
+
+package "Operating system" {
+  [Log files / journald] as LOGS
+  [netfilter, pf, hosts.deny] as FW
+}
+
+CONF --> CLI
+CLI --> SOCK : pickled command list
+SOCK --> TRANS
+TRANS --> SRV
+SRV --> FILT
+SRV --> ACT
+LOGS --> FILT : lines
+FILT --> FM : FailTicket
+FM --> ACT : threshold reached
+ACT --> BM
+ACT --> FW : /bin/sh actionban
+ACT --> OBS
+OBS --> DB
+FILT --> DB : log position
+@enduml

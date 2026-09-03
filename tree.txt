@@ -686,3 +686,17 @@ _posts/2026-09-02-hyperliquid-order-book-matching-engine.md
   assets/article/blockchain/hyperliquid/hyperliquid-order-priority-workflow.puml   (activity, in-section)
   assets/article/blockchain/hyperliquid/hyperliquid-vs-gmx-execution-sequence.puml (sequence, in-section)
   assets/article/blockchain/hyperliquid/matching-engine-trust-surface-concept.puml (concept, asset only)
+
+_posts/2026-09-02-hyperliquid-oracle-mark-price.md
+  assets/article/blockchain/hyperliquid/hyperliquid-oracle.puml                        (mindmap)
+  assets/article/blockchain/hyperliquid/hyperliquid-oracle-two-stage-median-concept.puml (concept, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-mark-price-concept.puml            (concept, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-oracle-tick-workflow.puml          (activity, in-section)
+  assets/article/blockchain/hyperliquid/hyperliquid-oracle-trust-surface-concept.puml  (concept, asset only)
+
+_posts/2026-09-03-fail2ban-architecture-privilege-model.md
+  assets/article/securite/fail2ban/fail2ban-architecture.puml                     (mindmap)
+  assets/article/securite/fail2ban/fail2ban-server-components-concept.puml        (concept, in-section)
+  assets/article/securite/fail2ban/fail2ban-ban-lifecycle-workflow.puml           (activity, in-section)
+  assets/article/securite/fail2ban/fail2ban-action-substitution-workflow.puml     (activity, in-section)
+  assets/article/securite/fail2ban/fail2ban-trust-surface-concept.puml            (concept, in-section)

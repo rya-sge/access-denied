@@ -1,0 +1,47 @@
+@startuml
+title Oracle failure modes and what bounds each one
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Helvetica
+skinparam PackageBackgroundColor #F7FAFF
+skinparam PackageBorderColor #4A78B5
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam ComponentFontColor #1F3A5F
+skinparam ArrowColor #4A78B5
+skinparam ArrowFontColor #1F3A5F
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+package "Attack or failure" {
+  [Manipulate one spot venue] as F1
+  [Manipulate Hyperliquid's own book] as F2
+  [A minority of validators\npublish a false price] as F3
+  [A stake majority colludes] as F4
+  [An HIP-3 deployer publishes\na wrong or manipulated price] as F5
+  [No external price exists\nfor the asset] as F6
+}
+
+package "What bounds it" {
+  [Weighted median over 8 venues;\none venue is at most weight 3 of 12] as B1
+  [Mark price is a median over three\nindices, only one of which is the book] as B2
+  [Stake-weighted median across\nthe validator set] as B3
+  [Nothing in the oracle. This is the\nbase HyperBFT assumption] as B4
+  [Validator review on any 50% move in\nexternalPerpPx; 500k HYPE slashable\nand burned] as B5
+  [Hyperps: oracle is an 8 h EWMA of own\nmarks, capped at 4x the initial mark] as B6
+}
+
+F1 --> B1
+F2 --> B2
+F3 --> B3
+F4 --> B4
+F5 --> B5
+F6 --> B6
+
+note bottom of B4
+  Every other row is bounded by construction.
+  This one is not, and it is the reason the
+  security of the oracle is the security of
+  the stake distribution.
+end note
+@enduml

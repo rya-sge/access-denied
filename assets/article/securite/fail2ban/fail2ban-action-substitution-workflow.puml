@@ -1,0 +1,31 @@
+@startuml
+title How an action command is assembled before reaching the shell
+skinparam shadowing false
+skinparam ArrowColor #B54A4A
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #B54A4A
+}
+
+start
+:actionban template from the action file\ne.g. "<iptables> -I f2b-<name> 1 -s <ip> -j <blocktype>";
+:replaceTag: static properties from [Init]\nrecursive, cached, family-conditional;
+note right
+  Bounded by MAX_TAG_REPLACE_COUNT
+  to stop self-referencing definitions
+end note
+:replaceDynamicTags: ticket values\n<ip>, <failures>, <matches>, <F-USER>;
+if (value contains a shell metacharacter?) then (yes)
+  :bind it to a shell variable f2bV_<tag>\nand pass it as a positional argument;<<#EEF5FF>>
+else (no)
+  :inline the value in the command text;
+endif
+:buildShellCmd produces\n["f2bV_x=$0 \n <command>", value];
+:Utils.executeCmd runs it with shell=True\nin a new session, timeout 60 s;
+if (exit code 0?) then (no)
+  :run actioncheck, then actionrepair\nand retry once;<<#FFF6F6>>
+endif
+stop
+@enduml

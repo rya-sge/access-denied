@@ -1,0 +1,51 @@
+@startuml
+title What one three-second oracle tick sets in motion
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #F7FAFF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam NoteBackgroundColor #F7FAFF
+skinparam NoteBorderColor #4A78B5
+
+start
+:each validator computes its weighted
+median of the included spot venues;
+:validators publish; the clearinghouse takes
+the stake-weighted median;
+:recompute the mark price as the median
+of its three candidate indices;
+fork
+  :re-evaluate account equity against
+  maintenance margin, and start the
+  liquidation ladder where it fails;<<#FDEEEE>>
+fork again
+  :check trigger orders: TP, SL,
+  stop and take orders fire off mark;
+fork again
+  :restate unrealised PnL on every
+  open position;
+fork again
+  :sample the funding premium from the
+  impact bid and ask against the oracle;
+  note right
+    Sampled every 5 s and averaged over
+    the hour. Payment settles hourly at
+    one eighth of the 8 h rate, on the
+    oracle price rather than the mark
+  end note
+fork again
+  :revalue portfolio-margin collateral
+  at the borrow oracle price, and run a
+  borrow liquidation if a threshold is
+  crossed;<<#FDEEEE>>
+fork again
+  :re-apply the order-entry bands: reject
+  orders priced too far from the oracle,
+  and aggressive orders at an OI cap;<<#FFF7E6>>
+end fork
+:next tick in about 3 seconds;
+stop
+@enduml

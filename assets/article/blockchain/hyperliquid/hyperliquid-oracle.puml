@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Oracle
+** Two-stage median
+*** Per validator: weighted median of\n8 spot venues, weights 3/2/2/1/1/1/1/1
+*** Network: stake-weighted median\nof validator submissions
+*** Published every 3 seconds
+*** Asset-specific inclusion rules
+** Mark price
+*** Median of three indices
+**** Oracle + 150 s EMA of basis
+**** Median of bid, ask, last trade
+**** Weighted median of 5 CEX perp mids
+*** Fourth candidate when only two exist
+*** EMA is a ratio, tau = 2.5 min
+left side
+** Who uses which price
+*** Funding: oracle, for the premium\nand the notional conversion
+*** Margin, liquidation, TP/SL,\nunrealised PnL: mark
+*** Premium: impact prices from the book
+*** Portfolio margin: borrow oracle price
+*** Delisting: 1 h TWAP spot oracle
+*** Order rejection: too far from oracle
+** Assets with no external price
+*** Hyperps: 8 h EWMA of own marks
+*** Oracle capped at 4x initial mark
+*** Mark capped at 3x the 8 h EMA
+*** Premium samples at 1% of normal
+** HIP-3: deployer as oracle
+*** setOracle, oracleUpdater
+*** Funding multiplier, interest rate
+*** externalPerpPx 50% daily review
+*** Slashable, stake burned
+** From the HyperEVM
+*** Read precompile at 0x...0807
+*** Matches Core state at block build
+*** Divide by 10^(6 - szDecimals)
+*** Or third-party feeds on the EVM
+@endmindmap

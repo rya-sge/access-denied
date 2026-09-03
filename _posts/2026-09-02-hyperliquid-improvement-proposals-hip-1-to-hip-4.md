@@ -24,7 +24,12 @@ This article works through the four in order: the token standard and its five-st
 
 ## The shape of the four proposals
 
-The four HIPs sit on the same HyperCore primitives: the order book engine, the clearinghouse, and staking. None of them is a smart contract, and none is upgradeable by its deployer. HIP-1 defines a token and the spot book it trades on. HIP-2 defines a market-making strategy that runs inside block transition logic on a HIP-1 book. HIP-3 lets a bonded deployer stand up an entire perp DEX with its own margining. HIP-4 adds a settled, fully collateralised instrument with no leverage.
+The four HIPs sit on the same HyperCore primitives: the order book engine, the clearinghouse, and staking. None of them is a smart contract, and none is upgradeable by its deployer. Each adds one primitive on top of that engine:
+
+- **HIP-1** defines a token and the spot book it trades on.
+- **HIP-2** defines a market-making strategy that runs inside block transition logic on a HIP-1 book.
+- **HIP-3** lets a bonded deployer stand up an entire perp DEX with its own margining.
+- **HIP-4** adds a settled, fully collateralised instrument with no leverage.
 
 Two of them create a deployer role that carries an ongoing obligation, one creates a deployer role that ends at genesis, and one creates no role at all. That distinction is what the permissioning table at the end of this article turns on.
 
@@ -289,7 +294,7 @@ The one proposal that escapes the pattern is HIP-2, and it escapes by having no 
 
 ## Conclusion
 
-The four HIPs are not versions of one another. HIP-1 is an asset plus a venue, priced by auction and finished at genesis. HIP-2 is a market-making strategy with no operator, no keeper and no admin key, which is why it is the only one with nothing to slash. HIP-3 hands a bonded deployer the whole HyperCore risk engine and polices what they do with it afterwards. HIP-4 adds an instrument whose collateralisation is exact by construction, which is what lets it dispense with leverage and liquidation entirely.
+The four HIPs are not versions of one another. They differ in what a deployer still controls once the market is live, which runs from nothing at all under HIP-2, through a fee share that can only fall under HIP-1, to a bonded party publishing oracle prices under HIP-3 and settling markets under HIP-4.
 
 What connects them is the substitution of a price for an approval, and of a burned bond for a compensation fund. A deployer buys entry at auction or posts stake, operates without asking anyone, and answers to a stake-weighted vote if the operation damages the protocol. For a user or an integrator, the practical reading is that the protections are ex ante: the deployer's incentive not to be slashed, the eligibility standards validators enforce before cross margin is enabled, and the collateralisation arithmetic in HIP-4. There is no rung below those where losses are made whole.
 
@@ -379,7 +384,11 @@ The same principle runs in the other direction and is easier to overlook: inputs
 
 **Q: Which HIPs create an ongoing obligation, and what does a user actually get from the ones that do?**
 
-HIP-3 and HIP-4 create continuous deployer obligations, as do quote-asset and aligned-quote-asset status. HIP-1's deployer role effectively ends at genesis, apart from a fee share that can only decrease. HIP-2 creates no role at all.
+The obligation ends at different points for each:
+
+- **HIP-3 and HIP-4** create continuous deployer obligations, as do quote-asset and aligned-quote-asset status.
+- **HIP-1** effectively ends the deployer's role at genesis, apart from a fee share that can only decrease.
+- **HIP-2** creates no role at all.
 
 What a user gets is narrower than it first appears. The bond is slashable by stake-weighted validator vote, and the slashed stake is **burned**, not distributed to affected users. So the protection is entirely ex ante: it is the deployer's incentive to avoid slashing, plus the eligibility standards validators enforce before an irreversible step such as enabling cross margin. There is no rung below that where losses are made whole.
 

@@ -203,3 +203,7 @@ A container runtime issues `clone` or `unshare` with the new-namespace flags to 
 - [Qubes OS](https://www.qubes-os.org/)
 - [Multics](https://multicians.org/)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [How Fail2Ban Works — Architecture, Privilege Model and Residual Risk]({{site.url_complet}}/2026/09/03/fail2ban-architecture-privilege-model/)

@@ -461,3 +461,4 @@ Following these principles converts Pyth from a latency risk into a genuine comp
 
 - [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
 - [How to build a blockchain oracle]({{site.url_complet}}/2024/04/16/build-blockchain-oracle/)
+- [The Hyperliquid Oracle - How Validator Medians Become Mark Price, Funding and Liquidation]({{site.url_complet}}/2026/09/02/hyperliquid-oracle-mark-price/)

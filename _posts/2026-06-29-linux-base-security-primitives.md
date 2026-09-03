@@ -284,3 +284,7 @@ A SUID-root `tcpdump` runs with the entire root privilege set merely to open raw
 - [acl(5) — man7.org](https://man7.org/linux/man-pages/man7/acl.5.html)
 - [chattr(1) — man7.org](https://man7.org/linux/man-pages/man1/chattr.1.html)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [How Fail2Ban Works — Architecture, Privilege Model and Residual Risk]({{site.url_complet}}/2026/09/03/fail2ban-architecture-privilege-model/)

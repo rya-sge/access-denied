@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Fail2Ban
+** Goal
+*** Rate-limit authentication abuse
+*** Read logs, write firewall rules
+*** Not a replacement for strong auth
+** Architecture
+*** fail2ban-client (config reader)
+*** UNIX socket, pickle protocol
+*** fail2ban-server (one process)
+*** Jail = filter + actions
+*** SQLite database
+*** Observer thread
+** Filter
+*** Backends: polling, pyinotify, systemd
+*** failregex with <HOST> tag
+*** ignoreregex, ignoreip, ignorecommand
+*** DateDetector, findtime window
+*** FailTicket per failure
+** Actions
+*** BanManager holds ban tickets
+*** actionstart / check / ban / unban
+*** CommandAction runs /bin/sh
+*** iptables, nftables, pf, hostsdeny
+*** Reporting: mail, abuseipdb, cloudflare
+** Privilege model
+*** Server runs as root
+*** No privilege separation in code
+*** umask 0077, SocketMode 0600
+*** Socket access equals root
+** Risks
+*** Log injection picks the banned IP
+*** Greedy regex before <HOST>
+*** Regex cost on attacker-controlled lines
+*** Shell metacharacters in tags
+*** Self-lockout and DNS trust
+@endmindmap

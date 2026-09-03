@@ -264,3 +264,7 @@ The logical next step is least privilege applied in depth, then isolating proces
 - [AppArmor](https://apparmor.net/)
 - [TCSEC (Orange Book), DoD 5200.28-STD](https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/dod85.pdf)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [How Fail2Ban Works — Architecture, Privilege Model and Residual Risk]({{site.url_complet}}/2026/09/03/fail2ban-architecture-privilege-model/)
