@@ -37,7 +37,7 @@ Every Rust snippet below was compiled against the library at commit `1e51389`, a
 | `name` | `(env: Env) -> String` |
 | `symbol` | `(env: Env) -> String` |
 
-Three properties of this interface deserve attention because they shape the implementation.
+Three properties of this interface deserve attention because they constrain the implementation.
 
 **Amounts are `i128`, not an unsigned type.** The standard uses a signed 128-bit integer. Negative amounts are therefore representable at the type level and must be rejected at runtime. The OpenZeppelin implementation raises `FungibleTokenError::LessThanZero` (error code 103) for `amount < 0`.
 
@@ -482,7 +482,7 @@ stellar contract deploy \
 
 Constructor arguments are named after the `__constructor` parameters, which is why the parameter names in your Rust source become part of your deployment interface. Renaming `owner` to `admin` is a breaking change to the deploy command.
 
-Invoking follows the same shape, with the function name after the separator:
+Invoking follows the same pattern, with the function name after the separator:
 
 ```bash
 CID=CACDYF3CYMJEJTIVFESQYZTN67GO2R5D5IUABTCUG3HXQSRXCSOROBAN

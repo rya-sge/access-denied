@@ -128,7 +128,7 @@ In practice that means root. A hardened deployment can narrow this (a dedicated 
 
 The consequence is that the control socket is the security boundary, and its only protection is the filesystem.
 
-Two mechanisms enforce that. `Server.start` calls `os.umask(0o077)` before anything else, so the socket file the daemon creates is owner-only. The systemd socket unit declares `SocketMode=0600` explicitly and places the socket under a `RuntimeDirectory`.
+Two mechanisms enforce that. `Server.start` calls `os.umask(0o077)` before anything else, so both the socket file and the directory the daemon creates for it are owner-only; the double fork in `__createDaemon` does not reset the umask, so this survives into daemon mode. The systemd socket unit declares `SocketMode=0600` explicitly and places the socket under a `RuntimeDirectory`. Note that neither is a check Fail2Ban performs: nothing in the server code calls `chmod` on the socket, and the enforcement is the kernel testing the inode's permissions on `connect()`, which is a property of the platform rather than of the daemon.
 
 There is nothing else. The protocol carries no authentication, no capability tokens and no per-command authorization. Anyone who can write to that socket can issue:
 
@@ -136,7 +136,7 @@ There is nothing else. The protocol carries no authentication, no capability tok
 set sshd action iptables-multiport actionban /bin/sh -c 'id > /tmp/pwn'
 ```
 
-and the next ban in that jail executes it as root. Every deployment decision about Fail2Ban reduces to keeping that socket owner-only.
+and the next ban in that jail executes it as root. There is not even a wait involved: `set <jail> banip <ip>` forces a ban on demand, and `set <JAIL> action <ACT> <METHOD> <JSONKWARGS>` is a documented command that the transmitter implements as `getattr(action, actionkey)(**actionvalue)`, so a callable attribute is invoked directly. Every deployment decision about Fail2Ban reduces to keeping that socket owner-only.
 
 The pickle protocol sits behind the same boundary. `asyncserver.py` calls `pickle.loads` on socket data, which is unsafe against untrusted input by construction, and is safe here only because untrusted parties cannot write to the socket. It is a defence-in-depth gap rather than a live vulnerability: an attacker who can send a pickle to that socket can already set `actionban` to a shell command, so deserialization buys them nothing they did not have.
 

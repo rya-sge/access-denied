@@ -16,7 +16,7 @@ A liquidation on Hyperliquid is decided by a price that no trade on Hyperliquid 
 
 Underneath all of them sits a single mechanism: every validator computes a weighted median of external spot venues roughly every three seconds and publishes it onchain, and the clearinghouse takes a stake-weighted median of those submissions. Two medians in series, one over venues and one over validators. Everything else in this article is either built on top of that number or is the special case where no external price exists to build it from.
 
-This article takes that construction apart: how the oracle price is assembled and why the aggregation is shaped the way it is, how the mark price differs from it and why both are needed, what a single three-second tick sets in motion across margin and funding, what happens for assets with no external reference, and where the trust sits once the medians have done their work.
+This article takes that construction apart: how the oracle price is assembled and why the aggregation is built the way it is, how the mark price differs from it and why both are needed, what a single three-second tick sets in motion across margin and funding, what happens for assets with no external reference, and where the trust sits once the medians have done their work.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -69,7 +69,7 @@ This is also where the quanto detail enters. Contracts are USDC-margined but the
 
 Each validator's number is its own opinion, published onchain. The price the clearinghouse uses is the **stake-weighted median** of all of them.
 
-Stacking the two medians is what gives the construction its shape. To move stage one you need to move a weighted majority of eight venues. To move stage two you need to move a stake-weighted majority of validators. Neither a compromised exchange API nor a minority of dishonest validators changes the output, and the price becomes wrong only when a stake majority wants it wrong, which is the same assumption HyperBFT already makes for everything else.
+Stacking the two medians is what sets the cost of moving the price. To move stage one you need to move a weighted majority of eight venues. To move stage two you need to move a stake-weighted majority of validators. Neither a compromised exchange API nor a minority of dishonest validators changes the output, and the price becomes wrong only when a stake majority wants it wrong, which is the same assumption HyperBFT already makes for everything else.
 
 That last point should be stated without softening. The oracle adds no trust assumption beyond the one the chain already has, and it also removes none. There is no fallback that survives a colluding stake majority, because a colluding stake majority is outside the security model by construction.
 
@@ -136,7 +136,7 @@ P = \frac{\max(b - o,\ 0) - \max(o - a,\ 0)}{o}
 \end{aligned}
 $$
 
-Two properties follow from that shape. The premium is **zero whenever the oracle sits between the impact bid and the impact ask**, so a perp trading inside its own spread relative to spot pays nothing. And the prices compared to the oracle are impact prices, meaning the average execution price for a fixed notional (20 000 USDC for BTC and ETH, 6 000 USDC elsewhere) rather than the top of book, so a single one-lot quote cannot manufacture a premium.
+Two properties follow from that formula. The premium is **zero whenever the oracle sits between the impact bid and the impact ask**, so a perp trading inside its own spread relative to spot pays nothing. And the prices compared to the oracle are impact prices, meaning the average execution price for a fixed notional (20 000 USDC for BTC and ETH, 6 000 USDC elsewhere) rather than the top of book, so a single one-lot quote cannot manufacture a premium.
 
 HIP-3 perps use a more responsive variant that gives deployers a wider range of behaviour through the funding multiplier and interest rate:
 
@@ -220,7 +220,7 @@ The practical rule is straightforward. Price a HyperCore asset with the precompi
 
 ## Where the trust sits
 
-Setting the failure modes against what bounds each of them makes the shape of the design clear.
+Setting the failure modes against what bounds each of them shows where the guarantees end and the residual risk begins.
 
 | Failure | What bounds it | Residual risk |
 |---|---|---|

@@ -13,7 +13,7 @@ isMath: true
 
 A name service on Cardano has to settle one question inside a validator: does this name map to this address? An account-based chain answers it in a single opcode, because the contract reads its own storage. Cardano has no such opcode. A validator is handed the datum attached to the UTXO it is spending, the redeemer the spender supplied, and the script context describing the transaction, and it is handed nothing else. There is no `SLOAD`, and no way to reach state the transaction did not bring with it.
 
-That constraint reshapes every application built on a large key/value store, whether it holds a registry of names, a delegator table or an oracled dataset. The store cannot sit anywhere the validator can read it. It has to be compressed into something small enough to travel in a datum, and every claim about it has to be provable from the bytes the spender carried in.
+That constraint applies to every application built on a large key/value store, whether it holds a registry of names, a delegator table or an oracled dataset. The store cannot sit anywhere the validator can read it. It has to be compressed into something small enough to travel in a datum, and every claim about it has to be provable from the bytes the spender carried in.
 
 Merkle Patricia Forestry (MPF) is the answer that the Aiken ecosystem settled on. The datum holds a 32-byte root hash. The redeemer holds a proof under a kilobyte. From those two values a validator can verify that a key maps to a value, that a key is absent, or that a given insertion or deletion transforms one root into another. The library ships as a pair: an [Aiken](https://aiken-lang.org) package that only ever verifies, and a Node.js package that actually stores the data and produces the proofs.
 
@@ -33,7 +33,7 @@ On Cardano the situation inverts. The validator sees the transaction and nothing
 - **Execution units.** A transaction's script budget is capped in both memory and CPU steps. The library's own benchmark table notes that 140K memory units and 100M CPU units are each 1% of the respective maximum, which puts the ceilings at roughly 14M memory units and 10G CPU steps.
 - **Script size.** Every byte of compiled UPLC either sits in the transaction or in a reference script. Including MPF as a dependency adds about 2.5 KB of generated UPLC.
 
-Two consequences follow, and both are visible in the library's shape. First, the structure never exists on-chain: only a root hash crosses the boundary, and the on-chain package deliberately ships no primitive for constructing a trie, not even for debugging. Second, proof bytes are the resource worth optimising, because CPU and memory turn out to be the slack constraints. That is exactly the trade MPF makes.
+Two consequences follow, and the library is built around both. First, the structure never exists on-chain: only a root hash crosses the boundary, and the on-chain package deliberately ships no primitive for constructing a trie, not even for debugging. Second, proof bytes are the resource worth optimising, because CPU and memory turn out to be the slack constraints. That is exactly the trade MPF makes.
 
 ## A short taxonomy of the structures it gets compared with
 
@@ -55,7 +55,7 @@ The cost is depth. A naive proof is 256 sibling hashes, 8 KB. In practice implem
 
 [Ethereum's MPT](https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/) is a radix-16 trie: each level consumes one hex digit (a nibble) of the path, so a branch node has 16 slots. The lineage is the [PATRICIA trie](https://dl.acm.org/doi/10.1145/321479.321481) of 1968, with path compression so that runs of single-child nodes collapse. It uses three node kinds, branch, extension and leaf, all RLP-encoded, and the state trie addresses accounts by `keccak256(address)` rather than by the raw address.
 
-The radix-16 shape is a real gain: depth drops to about $$\log_{16} n$$, five levels for a million entries instead of twenty. The problem is what a proof has to carry at each of those levels. A branch node's hash commits to its RLP encoding, which contains all 16 child references. To recompute the node hash, the verifier needs the whole node, which means the 15 sibling hashes it did not take. That is roughly 480 bytes of hashes plus RLP framing per level, so a five-level proof lands around 2.5 KB. The trie got shallower and each level got 15 times more expensive.
+The radix-16 branching factor is a real gain: depth drops to about $$\log_{16} n$$, five levels for a million entries instead of twenty. The problem is what a proof has to carry at each of those levels. A branch node's hash commits to its RLP encoding, which contains all 16 child references. To recompute the node hash, the verifier needs the whole node, which means the 15 sibling hashes it did not take. That is roughly 480 bytes of hashes plus RLP framing per level, so a five-level proof lands around 2.5 KB. The trie got shallower and each level got 15 times more expensive.
 
 ## What a Merkle Patricia Forestry is
 
@@ -82,7 +82,7 @@ d \approx \log_{16} n = \frac{\log_2 n}{4}
 \end{aligned}
 $$
 
-which is five levels at a million entries and seven at a hundred million. And no adversary can shape keys to deepen the trie, because doing so would require finding BLAKE2b preimages sharing a long prefix. The on-chain side hashes identically, in `including`:
+which is five levels at a million entries and seven at a hundred million. And no adversary can choose keys that deepen the trie, because doing so would require finding BLAKE2b preimages sharing a long prefix. The on-chain side hashes identically, in `including`:
 
 ```aiken
 fn including(key: ByteArray, value: ByteArray, proof: Proof) -> ByteArray {
@@ -391,7 +391,7 @@ Several behaviours will surprise a reader who arrives expecting a hashmap.
 
 Merkle Patricia Forestry is a radix-16 Patricia trie in the Ethereum lineage, with one substitution: a branch node commits to the Merkle root of a depth-4 binary tree over its 16 slots rather than to the slots themselves. That substitution moves the per-level proof cost from fifteen sibling hashes to four, which is what makes a million-entry authenticated map usable inside a 16 KB Cardano transaction.
 
-The rest of the design follows from the eUTXO constraint. Keys are hashed into fixed 64-nibble paths, so depth is logarithmic and cannot be shaped by an adversary. Node kinds are reduced from three to two by folding the compressed prefix into branches and leaves. The on-chain package holds no data and cannot build a trie; it verifies proofs against a 32-byte root and produces a new one. And because `including` and `excluding` walk the same proof to two different roots, insertion, deletion and update are all expressible as a comparison between them.
+The rest of the design follows from the eUTXO constraint. Keys are hashed into fixed 64-nibble paths, so depth is logarithmic and no adversary can deepen one branch at will. Node kinds are reduced from three to two by folding the compressed prefix into branches and leaves. The on-chain package holds no data and cannot build a trie; it verifies proofs against a 32-byte root and produces a new one. And because `including` and `excluding` walk the same proof to two different roots, insertion, deletion and update are all expressible as a comparison between them.
 
 Compared with a compressed sparse Merkle tree the byte counts are similar, and the argument for MPF is fewer proof steps and shallower traversal rather than smaller proofs. Compared with the Ethereum MPT it is derived from, the proof is about four times smaller for the same dataset. What it does not remove is the contention that comes with any single-root structure under eUTXO, where every write invalidates every outstanding proof.
 
@@ -452,7 +452,7 @@ The consequence is the point: proving one child requires the four siblings along
 For two reasons:
 
 - **Uniform depth.** A BLAKE2b-256 digest is 64 nibbles regardless of the key, and its digits are uniformly distributed, so the expected trie depth is about $$\log_{16} n$$ and the structure stays balanced whatever the keys look like.
-- **Resistance to shaping.** With raw keys, an adversary can choose keys sharing long prefixes and deepen one branch of the trie arbitrarily, inflating proofs and execution costs along that path. Doing the same against hashed paths would require finding BLAKE2b preimages with a chosen prefix.
+- **Resistance to adversarial key choice.** With raw keys, an adversary can choose keys sharing long prefixes and deepen one branch of the trie arbitrarily, inflating proofs and execution costs along that path. Doing the same against hashed paths would require finding BLAKE2b preimages with a chosen prefix.
 
 Ethereum's state trie hashes keys for the same reason.
 
@@ -464,7 +464,7 @@ An insert is then just an assertion that the stored root equals the second value
 
 **Q: If a compressed sparse Merkle tree has proofs of roughly the same size, why choose MPF?**
 
-The gain shows up in the shape of the proof rather than its size:
+The gain is in the proof's structure rather than its byte count:
 
 - **Fewer steps to decode.** Five proof steps at a million entries instead of about twenty, and decoding a list of constructors in UPLC has a real per-item cost.
 - **Shallower traversal off-chain.** Five node reads per lookup instead of twenty, which matters when nodes live on disk.
