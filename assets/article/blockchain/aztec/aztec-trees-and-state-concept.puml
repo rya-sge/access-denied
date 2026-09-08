@@ -1,0 +1,49 @@
+@startuml
+title Aztec state — who writes to which tree
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FAFCFF
+skinparam packageBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+package "Writers" {
+  component "PXE\nclient-side\nprivate execution\nand proving" as PXE
+  component "AVM\nsequencer-side\npublic execution" as AVM
+}
+
+package "World state" {
+  component "Note hash tree\nappend-only\nleaf = commitment" as NHT
+  component "Nullifier tree\nindexed Merkle\nnon-membership proofs" as NUL
+  component "Public data tree\nsparse, slot to value" as PDT
+}
+
+component "Archive tree\nblock headers" as ARC
+
+PXE -down-> NHT : note hashes
+PXE -down-> NUL : nullifiers
+AVM -down-> PDT : read and write
+AVM -down-> NHT : notes created in public\nhave visible contents
+
+NHT -down-> ARC
+NUL -down-> ARC
+PDT -down-> ARC
+
+note right of PXE
+  Plaintext notes and viewing keys
+  never leave the client. The node
+  only ever sees commitments,
+  nullifiers and encrypted logs.
+end note
+
+note right of ARC
+  Every slot is siloed by the kernel as
+  H(contract_address, storage_slot), and
+  every note hash as H(contract_address,
+  note_hash), so one contract cannot
+  touch another's state.
+end note
+@enduml

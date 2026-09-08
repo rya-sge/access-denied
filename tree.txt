@@ -700,3 +700,10 @@ _posts/2026-09-03-fail2ban-architecture-privilege-model.md
   assets/article/securite/fail2ban/fail2ban-ban-lifecycle-workflow.puml           (activity, in-section)
   assets/article/securite/fail2ban/fail2ban-action-substitution-workflow.puml     (activity, in-section)
   assets/article/securite/fail2ban/fail2ban-trust-surface-concept.puml            (concept, in-section)
+
+_posts/2026-09-08-how-aztec-works-private-execution-model.md
+  assets/article/blockchain/aztec/2026-09-08-aztec-privacy-protocol-mindmap.puml (mindmap)
+  assets/article/blockchain/aztec/aztec-trees-and-state-concept.puml            (concept, in-section)
+  assets/article/blockchain/aztec/aztec-transaction-lifecycle-sequence.puml     (sequence, in-section)
+  assets/article/blockchain/aztec/aztec-kernel-recursion-workflow.puml          (workflow, in-section)
+  assets/article/blockchain/aztec/confidential-systems-secret-location.puml     (concept, in-section)

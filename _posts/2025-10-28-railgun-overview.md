@@ -228,3 +228,4 @@ While earlier privacy systems such as Zcash and Monero focus primarily on shield
 - [Tornado Cash Circuits - Overview]({{site.url_complet}}/2025/11/19/tornado-cash-overview/)
 - [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash -function-overview/)
 - [Aztec: A Privacy-First Layer 2 for Ethereum]({{site.url_complet}}/2025/10/29/aztec-architecture-overview/)
+- [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)

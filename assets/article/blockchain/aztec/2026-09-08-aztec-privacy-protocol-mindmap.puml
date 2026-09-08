@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Aztec
+** Two execution\nenvironments
+*** PXE\nclient-side, proves\nprivate functions
+*** AVM\nsequencer-side,\npublic functions
+*** Private runs first,\npublic is enqueued
+*** Utility functions\nunconstrained, offchain
+** State model
+*** Notes\nUTXO commitments in\nthe note hash tree
+*** Nullifiers\nspend without\nrevealing the note
+*** Public data tree\nsparse, EVM-like
+*** Slots siloed by\ncontract address
+** Keys
+*** Nullifier keys\nspend, app-siloed
+*** Incoming viewing key\ndecrypt received notes
+*** Signing key\nchosen by the\naccount contract
+*** Reserved slots\novpk, tpk, mspk, fbpk
+** Note delivery
+*** offchain\nno cost, no guarantee
+*** onchain_unconstrained\nDA cost, sender trusted
+*** onchain_constrained\nDA + proving,\nguaranteed
+*** Tagging\nposeidon2(secret, index)
+** Transaction\nlifecycle
+*** Kernel circuits\ninit, inner, reset,\ntail
+*** ~290k gates fixed\n~101k per extra call
+*** Rollup circuits\ntx, block, checkpoint,\nepoch
+*** Epoch proof\nverified on L1
+** Fees
+*** Mana\nDA and L2 dimensions
+*** Fee Juice\nbridged, non-transferable
+*** EIP-1559 style\ncongestion multiplier
+** Portals
+*** L1 to L2 inbox
+*** L2 to L1 outbox
+*** Pull, not push\nkeeps args private
+** What still leaks
+*** enqueue reveals\nmsg_sender
+*** Public call arguments\nare public
+*** Counts of public calls\nand L2 to L1 messages
+*** Node queries reveal\nwhat you read
+@endmindmap

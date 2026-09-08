@@ -2,6 +2,7 @@
 layout: post
 title: "Aztec: A Privacy-First Layer 2 for Ethereum"
 date:   2025-10-29
+last_modified_at: 2026-09-08
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -17,7 +18,9 @@ Ethereum’s transparency provides security and auditability but also makes all 
 
 In addition to scalability features found in other zk-rollups, Aztec introduces a **dedicated virtual machine (the AVM)** designed to handle privacy-preserving computations natively.
 
-> Warning: this article is still in draft state and its content is still mainly taken from the [documentation](https://docs.aztec.network) summarized with the help of ChatGPT. Its content should become more personal later.
+This is the short version. The long one covers the key hierarchy, note delivery and tagging, the kernel circuits and their cost profile, fees, portals, what a transaction still leaks, and a comparison with four other confidential systems: [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/).
+
+> This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
 
@@ -25,7 +28,7 @@ In addition to scalability features found in other zk-rollups, Aztec introduces 
 
 At a high level, Aztec’s architecture comprises several key layers:
 
-- **[Aztec.js](https://docs.aztec.network/dev_docs/aztecjs/)** – SDK for interacting with the network.
+- **[Aztec.js](https://docs.aztec.network/developers/docs/aztec-js)** – SDK for interacting with the network.
 - **PXE (Private Execution Environment)** – Executes private functions client-side.
 - **AVM (Aztec Virtual Machine)** – Executes public functions network-side.
 - **Rollup Sequencer & Prover Network** – Aggregates transactions and produces ZK proofs.
@@ -236,10 +239,10 @@ Wallets also manage:
 - [Aztec Developer Docs](https://docs.aztec.network/)
 - [Noir Language Docs](https://noir-lang.org/)
 - [Aztec Protocol GitHub](https://github.com/AztecProtocol)
-- [Aztec.js SDK Reference](https://docs.aztec.network/dev_docs/aztecjs/)
-- ChatGPT with the input "Write me a technical article on Aztec by using the documentation I provide here. At the end, provide me a summary tab and also a comparison with other privacy system such as moneor, zcash, tornado cash, railgun"
+- [Aztec.js SDK Reference](https://docs.aztec.network/developers/docs/aztec-js)
 
 ### Related articles
 
+- [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)
 - [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)
 - [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)

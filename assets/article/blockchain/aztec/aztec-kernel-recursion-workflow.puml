@@ -1,0 +1,54 @@
+@startuml
+title Private kernel recursion — one iteration per private call
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activityBackgroundColor #EEF5FF
+skinparam activityBorderColor #4A78B5
+skinparam activityDiamondBackgroundColor #EEF5FF
+skinparam activityDiamondBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+start
+:account entrypoint is executed
+in the PXE;
+:private_kernel_init
+validates the call against
+the transaction request;<<#DDE9F8>>
+note right
+  Fixed overhead for init,
+  reset and tail is about
+  290,000 gates.
+end note
+repeat
+  :pop the next call from
+  the private call stack;
+  :execute the private function
+  and prove it;
+  :private_kernel_inner
+  verifies the previous kernel proof
+  and appends the side effects;<<#DDE9F8>>
+  note right
+    About 101,000 gates
+    per extra private call.
+  end note
+repeat while (more private calls?) is (yes)
+->no;
+:private_kernel_reset
+squash transient note and nullifier pairs,
+check read requests;<<#DDE9F8>>
+if (any public calls enqueued?) then (yes)
+  :private_kernel_tail_to_public
+  split revertible and
+  non-revertible side effects;<<#DDE9F8>>
+  :sequencer executes
+  the AVM part;
+else (no)
+  :private_kernel_tail
+  sort side effects,
+  emit rollup format;<<#DDE9F8>>
+endif
+:transaction is gossiped
+to the sequencer;
+stop
+@enduml

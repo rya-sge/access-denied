@@ -1,0 +1,47 @@
+@startuml
+title Aztec transaction lifecycle — private first, then public, then settlement
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam LifelineBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+actor User
+participant "Wallet" as W
+participant "PXE\n(client device)" as PXE
+participant "Aztec node\n/ sequencer" as SEQ
+participant "Prover\nnetwork" as PRV
+participant "Rollup contract\n(Ethereum L1)" as L1
+
+User -> W : transfer 10 tokens privately
+W -> PXE : simulate the entrypoint
+PXE -> SEQ : fetch tagged logs, tree roots
+SEQ --> PXE : encrypted logs and roots
+PXE -> PXE : trial-decrypt, select notes,\nexecute private functions
+note over PXE #F5F9FF
+  Arguments, notes and the call stack
+  stay on the device. The simulation
+  runs kernel-less, so no signature
+  is requested yet.
+end note
+W -> PXE : proveTx with authwits
+PXE -> PXE : run the kernel circuits\ninit, inner, reset, tail
+PXE -> SEQ : proof + note hashes + nullifiers\n+ enqueued public calls
+note over PXE, SEQ #F5F9FF
+  What crosses this line: commitments,
+  nullifiers, encrypted logs, and every
+  public call with its arguments in clear.
+end note
+SEQ -> SEQ : verify the private proof
+SEQ -> SEQ : execute enqueued public calls\nin the AVM, update public state
+SEQ -> L1 : publish the block\n+ data to blobs
+SEQ -> PRV : delegate epoch proving
+PRV -> PRV : rollup circuits\ntx, block, checkpoint, epoch
+PRV -> L1 : submit the epoch proof
+L1 -> L1 : verify, then finalise\nthe state transition
+L1 --> W : settled
+@enduml
