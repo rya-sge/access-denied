@@ -1,0 +1,63 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Circle\nUpgradableMSCA
+** Two generations
+*** v0.7 — plugins,\nPluginManager delegatecall
+*** v0.7 is the deployed one
+*** v0.8 — modules,\nERC-6900 v0.8 aligned
+*** v0.8 not on mainnet yet
+** UpgradableMSCA\n(the thin layer)
+*** ACCOUNT_ID\n"circle.msca.2.0.0"
+*** initializeWithValidation()
+*** DefaultCallbackHandler\n(721 / 1155 / 777)
+*** upgradeToAndCall via\nwrapNativeExecutionFunction
+*** _authorizeUpgrade is empty\nby design
+** BaseMSCA\n(the engine)
+*** validateUserOp / executeUserOp
+*** execute / executeBatch
+*** executeWithRuntimeValidation
+*** install / uninstall\nvalidation and execution
+*** fallback dispatch\nto module selectors
+** Storage
+*** ERC-7201 namespaced slot
+*** "circle.msca.v2.storage",\n256-aligned
+*** executionStorage\nby selector
+*** validationStorage\nby ModuleEntity
+*** supportedInterfaces\nas a counter
+** Validation model
+*** ModuleEntity =\naddress ‖ uint32 entityId
+*** global vs per-selector
+*** signature = entity(24)\n‖ flag(1) ‖ segments
+*** flags: isGlobal,\nisSignature, isUserOp
+*** validation data intersected\nacross hooks
+** Hooks
+*** validation hooks\n(pre-userOp / pre-runtime)
+*** execution hooks,\nvalidation-associated
+*** execution hooks,\nselector-associated
+*** post hooks run in\nreverse order
+** Guard rails
+*** execute may not\ntarget the account
+*** executeBatch self-calls\nonly at top level
+*** RequireUserOperationContext
+*** native / 4337 / IModule\nselectors cannot be installed
+** Factory
+*** CREATE2 on\nkeccak(sender ‖ salt)
+*** module allowlist,\nowner-controlled
+*** Ownable2Step,\nrenounce disabled
+*** staked at the EntryPoint
+** Shipped modules
+*** SingleSignerValidation
+*** WeightedMultisigValidation\n(EOA, 1271, P-256)
+*** ColdStorageAddressBook
+@endmindmap

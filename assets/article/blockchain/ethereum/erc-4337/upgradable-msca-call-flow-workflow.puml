@@ -1,0 +1,40 @@
+@startuml
+title Call order for one execution, as asserted by MSCACallFlow.t.sol
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #F7FAFF
+  DiamondBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+start
+:entry: UserOp, runtime call, or direct call from a module;
+partition "Validation" {
+  :pre-validation hooks, in install order;
+  if (caller is the module that\nprovides the validation?) then (yes)
+    :validation function skipped;<<#FDF3E6>>
+  else (no)
+    :validation function runs;
+  endif
+}
+partition "Pre-execution" {
+  :validation-associated pre-execution hooks,\nin install order;
+  :selector-associated pre-execution hooks,\nin install order;
+  note right
+    A post-only hook contributes
+    nothing on the way in
+  end note
+}
+:the execution function itself;<<#EAF6F0>>
+partition "Post-execution" {
+  :selector-associated post-execution hooks,\nreverse order;
+  :validation-associated post-execution hooks,\nreverse order;
+  note right
+    A pre-only hook contributes
+    nothing on the way out
+  end note
+}
+stop
+@enduml

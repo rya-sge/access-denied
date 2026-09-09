@@ -1,0 +1,41 @@
+@startuml
+title A UserOperation through UpgradableMSCA
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+participant "EntryPoint v0.7" as EP
+participant "Account\n(proxy → UpgradableMSCA)" as A
+participant "Validation hook\nmodules" as VH
+participant "Validation\nmodule" as V
+participant "Execution hook\nmodules" as EH
+participant "Target" as T
+
+group Validation phase
+  EP -> A : validateUserOp(userOp, hash, missingFunds)
+  A -> A : require msg.sender == ENTRY_POINT
+  A -> A : entity = signature[0:24]\nisGlobal = signature[24]
+  A -> A : _checkValidationForCalldata()\nglobal or per-selector, self-call rule
+  A -> VH : preUserOpValidationHook(entityId, userOp, hash)\none calldata segment each
+  VH --> A : validationData
+  A -> V : validateUserOp(entityId, userOp, hash)
+  V --> A : validationData
+  A -> A : intersect time ranges,\nreject an unexpected authorizer
+  A --> EP : packed validationData
+  A -> EP : transfer missingAccountFunds
+end
+
+group Execution phase
+  EP -> A : executeUserOp(userOp, hash)
+  A -> EH : preExecutionHook (validation-associated)
+  A -> A : self-call with callData[4:]
+  A -> EH : preExecutionHook (selector-associated)
+  A -> T : execute / executeBatch / module function
+  T --> A : return data
+  A -> EH : postExecutionHook, reverse order
+end
+@enduml

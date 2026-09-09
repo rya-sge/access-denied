@@ -553,3 +553,5 @@ What is not free is what you add: each validation hook is an external call with 
 - [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
 - [EIP-7702: Set Code for EOAs - Overview]({{site.url_complet}}/2025/05/09/eip-7702-overview/)
 - [ERC-1271 and ERC-7913 Signature Verification — OpenZeppelin, Solady, Coinbase Smart Wallet, and Solarity Solidity Library]({{site.url_complet}}/2026/02/13/erc1271-erc7913-signature-verification-comparison/)
+- [Inside Circle's SponsorPaymaster — How a Verifying Paymaster Is Built]({{site.url_complet}}/2026/09/09/circle-sponsor-paymaster-erc4337/)
+- [Inside Circle's UpgradableMSCA — A Modular Smart Contract Account Under ERC-6900]({{site.url_complet}}/2026/09/09/circle-upgradable-msca-erc6900/)

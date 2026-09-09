@@ -1,0 +1,52 @@
+@startuml
+title _validatePaymasterUserOp — decision path
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+  DiamondBackgroundColor #F7FAFF
+  DiamondBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+start
+:EntryPoint calls
+validatePaymasterUserOp();
+if (paused?) then (yes)
+  :revert EnforcedPause;<<#FDEEEE>>
+  :EntryPoint reports
+  FailedOpWithRevert "AA33 reverted";<<#FDEEEE>>
+  stop
+else (no)
+endif
+if (msg.sender == ENTRY_POINT?) then (no)
+  :revert UnauthorizedCaller;<<#FDEEEE>>
+  stop
+else (yes)
+endif
+:parsePaymasterAndData(userOp.paymasterAndData);
+note right
+  reverts on a blob
+  shorter than 116 bytes
+end note
+:hash = getHash(userOp, verificationGasLimit,
+postOpGasLimit, validUntil, validAfter);
+:hash = toEthSignedMessageHash(hash);
+:(recovered, error) = ECDSA.tryRecover(hash, signature);
+if (error != NoError\nor signer not in the set?) then (yes)
+  :return ("", packValidationData(true, until, after));<<#FDF3E6>>
+  :EntryPoint rejects with
+  FailedOp "AA34 signature error";<<#FDF3E6>>
+  stop
+else (no)
+endif
+:return ("", packValidationData(false, until, after));<<#EAF6F0>>
+if (block.timestamp outside\n[validAfter, validUntil]?) then (yes)
+  :EntryPoint rejects with
+  "AA32 paymaster expired or not due";<<#FDF3E6>>
+  stop
+else (no)
+endif
+:UserOp executes, paymaster deposit is debited;<<#EAF6F0>>
+stop
+@enduml

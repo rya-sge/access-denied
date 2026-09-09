@@ -329,3 +329,4 @@ The signature connection is a second constraint pointing the same way: the AVM h
 - [Nonce Management and CREATE2 in ERC-4337 Smart Wallets]({{site.url_complet}}/2026/02/17/nonce-management-create2-smart-wallets-erc4337/)
 - [OpenZeppelin ERC-4337 Account contract Overview]({{site.url_complet}}/2025/12/13/erc4337-oz-account/)
 - [EIP-7702 Smart Wallet Security: Threat Model and Attack Surface Analysis]({{site.url_complet}}/2026/02/17/eip-7702-security-threat-model/)
+- [Inside Circle's SponsorPaymaster — How a Verifying Paymaster Is Built]({{site.url_complet}}/2026/09/09/circle-sponsor-paymaster-erc4337/)

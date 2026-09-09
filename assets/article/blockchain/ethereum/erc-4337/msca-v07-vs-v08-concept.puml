@@ -1,0 +1,38 @@
+@startuml
+title Circle MSCA v0.7 and v0.8 side by side
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageBackgroundColor #F7FAFF
+skinparam packageBorderColor #4A78B5
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+
+package "v0.7 — ERC-6900 draft, deployed" {
+  component "UpgradableMSCA (v0.7)" as A7
+  component "PluginManager\n(separate contract)" as PM
+  component "Plugin\n+ manifest hash\n+ dependencies" as P7
+  A7 ..> PM : delegatecall to\ninstall / uninstall
+  PM --> P7
+  note bottom of A7
+    FunctionReference = address ‖ uint8
+    validation is per selector only
+    storage slot not 256-aligned
+    circle.msca.v1.storage
+  end note
+}
+
+package "v0.8 — ERC-6900 v0.8, not on mainnet" {
+  component "UpgradableMSCA (v0.8)" as A8
+  component "install logic inside\nBaseMSCA" as IM
+  component "Module\n+ ExecutionManifest\n(no dependencies)" as M8
+  A8 --> IM : internal call
+  IM --> M8
+  note bottom of A8
+    ModuleEntity = address ‖ uint32
+    global or per-selector validation
+    ERC-7201, aligned to 256
+    circle.msca.v2.storage
+  end note
+}
+@enduml

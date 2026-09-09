@@ -1,0 +1,56 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Circle\nSponsorPaymaster
+** Role in ERC-4337
+*** EntryPoint v0.7\n(PackedUserOperation)
+*** Pays the prefund from\nits EntryPoint deposit
+*** Validation phase only
+*** Off-chain policy,\non-chain verification
+** BasePaymaster\n(plumbing)
+*** immutable ENTRY_POINT
+*** _requireFromEntryPoint()
+*** deposit / withdrawTo
+*** addStake / unlockStake\n/ withdrawStake
+*** UUPS + Ownable + Pausable
+*** uint256[50] __gap
+** SponsorPaymaster\n(policy)
+*** EnumerableSet of\nverifying signers
+*** parsePaymasterAndData()
+*** getHash()
+*** _validatePaymasterUserOp()
+*** add / remove / getAllSigners
+** paymasterAndData layout
+*** [0:20] paymaster address
+*** [20:36] verification gas limit
+*** [36:52] postOp gas limit
+*** [52:116] validUntil, validAfter
+*** [116:] ECDSA signature
+** Signed payload
+*** packUpToPaymasterAndData()
+*** both paymaster gas limits
+*** block.chainid
+*** address(this)
+*** validUntil, validAfter
+*** excludes userOp.signature
+** Validation outcome
+*** tryRecover, never reverts
+*** _packValidationData(\nsigFailed, until, after)
+*** EntryPoint maps to\nAA34 / AA32
+*** empty context\nso postOp is skipped
+** Operations
+*** CREATE2 deterministic\naddress across chains
+*** Stake required to read\nown storage (ERC-7562)
+*** Owner can pause,\nupgrade, withdraw
+*** Signer rotation emits\nno event
+@endmindmap

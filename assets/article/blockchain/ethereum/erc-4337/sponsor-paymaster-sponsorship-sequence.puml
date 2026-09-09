@@ -1,0 +1,47 @@
+@startuml
+title Sponsored UserOperation — off-chain signing to on-chain verification
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+
+actor "Wallet / dApp" as W
+participant "Circle sponsorship\nservice (off-chain)" as S
+participant "Verifying signer\n(ECDSA key)" as K
+participant "Bundler" as B
+participant "EntryPoint v0.7" as EP
+participant "SponsorPaymaster\n(proxy)" as PM
+
+W -> S : unsigned PackedUserOperation
+S -> S : policy check\n(quota, subscription, KYC, free tier)
+S -> S : choose paymasterVerificationGasLimit,\npaymasterPostOpGasLimit, validUntil, validAfter
+S -> K : getHash(userOp, gas limits, validUntil, validAfter)
+K --> S : ECDSA signature over\ntoEthSignedMessageHash(hash)
+S --> W : paymasterAndData =\naddress ‖ gasLimits ‖ window ‖ sig
+W -> W : sign the UserOp with the account key
+W -> B : eth_sendUserOperation
+B -> B : simulateValidation, ERC-7562 rules
+B -> EP : handleOps([userOp], beneficiary)
+
+group Validation phase
+  EP -> EP : account.validateUserOp(...)
+  EP -> PM : validatePaymasterUserOp(userOp, userOpHash, maxCost)
+  PM -> PM : whenNotPaused + _requireFromEntryPoint()
+  PM -> PM : parsePaymasterAndData()
+  PM -> PM : getHash() then ECDSA.tryRecover()
+  PM -> PM : verifyingSigners.contains(recovered)
+  PM --> EP : ("", packValidationData(sigFailed, until, after))
+  EP -> EP : reject as AA34 / AA32 if invalid
+end
+
+group Execution phase
+  EP -> EP : account.execute(callData)
+  note right of EP : context is empty,\nso postOp is not called
+  EP -> EP : debit paymaster deposit,\nrefund the unused prefund
+end
+
+EP -> B : pay beneficiary
+@enduml

@@ -1,0 +1,56 @@
+@startuml
+title UpgradableMSCA — proxy, implementation, and module surface
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageBackgroundColor #F7FAFF
+skinparam packageBorderColor #4A78B5
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam databaseBackgroundColor #EAF6F0
+skinparam databaseBorderColor #2E8B67
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+
+component "EntryPoint v0.7\n(singleton)" as EP
+component "UpgradableMSCAFactory\n(Ownable2Step, staked)" as F
+
+package "One user account" {
+  component "ERC1967Proxy\n(the account address)" as PROXY
+  database "ERC-7201 namespace\ncircle.msca.v2.storage" as STORE
+}
+
+package "Shared implementation" {
+  component "UpgradableMSCA\nACCOUNT_ID circle.msca.2.0.0" as IMPL
+  component "BaseMSCA\n(validation, execution, hooks)" as BASE
+  component "DefaultCallbackHandler\nERC-721 / 1155 / 777" as CB
+}
+
+package "Modules (separate contracts)" {
+  component "SingleSignerValidationModule" as M1
+  component "WeightedMultisigValidationModule" as M2
+  component "ColdStorageAddressBookModule" as M3
+}
+
+F ..> IMPL : deploys once,\nin its constructor
+F --> PROXY : CREATE2 with\nkeccak(sender ‖ salt)
+EP --> PROXY : validateUserOp\nexecuteUserOp
+PROXY ..> IMPL : delegatecall
+IMPL --> STORE : reads and writes\nin the account's own storage
+BASE <|-- IMPL
+CB <|-- IMPL
+IMPL --> M1 : validateUserOp / validateRuntime\n/ validateSignature
+IMPL --> M2 : validation + weighted\nsignature checking
+IMPL --> M3 : preUserOpValidationHook\n+ execution functions
+
+note bottom of STORE
+  executionStorage[selector]
+  validationStorage[ModuleEntity]
+  supportedInterfaces[interfaceId]
+end note
+
+note bottom of M3
+  Module state lives in the
+  module, keyed by account
+end note
+@enduml

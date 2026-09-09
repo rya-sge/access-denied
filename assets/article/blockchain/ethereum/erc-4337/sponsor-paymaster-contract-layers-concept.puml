@@ -1,0 +1,55 @@
+@startuml
+title SponsorPaymaster — inheritance and responsibility split
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageBackgroundColor #F7FAFF
+skinparam packageBorderColor #4A78B5
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+
+package "OpenZeppelin upgradeable" {
+  component "Initializable" as INIT
+  component "UUPSUpgradeable" as UUPS
+  component "OwnableUpgradeable" as OWN
+  component "PausableUpgradeable" as PAUS
+}
+
+package "@account-abstraction v0.7" {
+  component "IPaymaster" as IPM
+  component "IEntryPoint\n(singleton)" as IEP
+}
+
+package "buidl-wallet-contracts" {
+  component "BasePaymaster\n(abstract, plumbing)" as BP
+  component "SponsorPaymaster\n(policy)" as SP
+  component "PaymasterUtils\nCalldataUtils" as PU
+}
+
+INIT <|-- BP
+UUPS <|-- BP
+OWN <|-- BP
+PAUS <|-- BP
+IPM <|-- BP
+BP <|-- SP
+SP ..> PU : packUpToPaymasterAndData()
+BP --> IEP : deposit, stake, withdraw
+
+note bottom of BP
+  immutable ENTRY_POINT
+  _requireFromEntryPoint()
+  deposit / withdrawTo
+  addStake / unlockStake / withdrawStake
+  pause / unpause
+  uint256[50] __gap
+end note
+
+note bottom of SP
+  EnumerableSet verifyingSigners (slot 50)
+  parsePaymasterAndData()
+  getHash()
+  _validatePaymasterUserOp()
+end note
+@enduml
