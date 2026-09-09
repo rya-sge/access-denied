@@ -5,7 +5,7 @@ date:   2026-07-31
 last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain cryptography security wallet
 tags: blockchain wallet coldcard bitcoin hardware
 series: firmware-security
 description: How the COLDCARD hardware wallet firmware works - the bootloader/MicroPython split, dual secure elements, PIN key stretching, trick PINs, signed firmware, and reproducible builds.

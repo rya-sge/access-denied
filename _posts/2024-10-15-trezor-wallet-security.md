@@ -5,7 +5,7 @@ date:   2024-10-15
 last_modified_at: 2025-10-21
 lang: en
 locale: en-GB
-categories: blockchain blockchainBestOf cryptography security
+categories: blockchain blockchainBestOf cryptography security wallet
 tags: blockchain wallet trezor hardware
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
 image: /assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png

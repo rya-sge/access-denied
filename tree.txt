@@ -717,3 +717,17 @@ _posts/2026-09-09-mitre-attack-valid-accounts-brute-force.md
   assets/article/securite/mitre-attack/2026-09-09-mitre-valid-accounts-brute-force-mindmap.puml (mindmap)
   assets/article/securite/mitre-attack/credential-access-techniques-concept.puml               (concept, in-section)
   assets/article/securite/mitre-attack/credential-attack-lifecycle-workflow.puml               (workflow, in-section)
+
+_posts/2026-09-09-aztec-native-account-abstraction-vs-erc-4337.md
+  assets/article/blockchain/aztec/2026-09-09-aztec-vs-erc4337-account-abstraction-mindmap.puml (mindmap)
+  assets/article/blockchain/aztec/aa-validation-paths-comparison.puml          (sequence, in-section)
+  assets/article/blockchain/aztec/aztec-authwit-flow-sequence.puml             (sequence, in-section)
+  assets/article/blockchain/aztec/aa-stack-comparison-concept.puml             (concept, asset only)
+  assets/article/blockchain/aztec/aa-account-deployment-workflow.puml          (workflow, asset only)
+
+_posts/2026-09-09-aztec-partial-notes-private-defi-composability.md
+  assets/article/blockchain/aztec/2026-09-09-aztec-partial-notes-mindmap.puml          (mindmap)
+  assets/article/blockchain/aztec/partial-note-two-phase-concept.puml                  (concept, in-section)
+  assets/article/blockchain/aztec/partial-note-amm-swap-sequence.puml                  (sequence, in-section)
+  assets/article/blockchain/aztec/partial-note-payment-endpoint-sequence.puml          (sequence, in-section)
+  assets/article/blockchain/aztec/partial-note-completion-validation-workflow.puml     (workflow, in-section)

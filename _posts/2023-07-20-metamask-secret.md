@@ -5,7 +5,7 @@ date:   2023-07-20
 last_modified_at: 2025-01-31
 lang: en
 locale: en-GB
-categories: blockchain blockchainBestOf cryptography
+categories: blockchain blockchainBestOf cryptography wallet
 tags: crypto wallet blockchain cryptography
 description: This article focuses on the different secrets available on Metamask, one of the most used crypto wallets.
 image: /assets/article/blockchain/wallet/metamask/MetaMask.png

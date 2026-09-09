@@ -1,0 +1,48 @@
+@startuml
+title A note hash built in two phases, in two execution contexts
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FAFCFF
+skinparam packageBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+package "Phase 1 — private execution" {
+  component "owner\nwho gets paid" as OWN
+  component "randomness\nfresh per note,\nblinds the owner" as RND
+  component "partial_commitment:\nH(owner, randomness)" as PC
+  component "validity commitment:\nH(partial_commitment,\ncompleter)" as VC
+  OWN --> PC
+  RND --> PC
+  PC --> VC
+}
+
+package "Phase 2 — public or later private execution" {
+  component "storage_slot" as SLOT
+  component "value\nknown only now:\nthe swap rate, the\naccrued interest" as VAL
+  component "note_hash:\nH(storage_slot,\npartial_commitment, value)" as NH
+  SLOT --> NH
+  VAL --> NH
+}
+
+PC --> NH : carried forward\nas an opaque Field
+VC --> NH : must exist, or\ncompletion reverts
+
+note bottom of VC
+  Written to the nullifier tree, but with its
+  own domain separator: it is not a note
+  nullifier and consumes nothing. The tree
+  is used here only as an append-only set
+  whose entries can be proved to exist.
+end note
+
+note bottom of NH
+  Every Aztec note is hashed this way, even
+  when all fields are known in private. A note
+  created in one step and a note completed in
+  two produce the same hash.
+end note
+@enduml

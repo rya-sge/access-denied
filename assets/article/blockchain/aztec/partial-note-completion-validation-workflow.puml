@@ -1,0 +1,59 @@
+@startuml
+title Completing a partial note — what the token checks, and what it does not
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activityBackgroundColor #EEF5FF
+skinparam activityBorderColor #4A78B5
+skinparam activityDiamondBackgroundColor #EEF5FF
+skinparam activityDiamondBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+start
+:a caller presents a commitment
+and a value;
+:the token sets the completer
+to msg_sender;<<#DDE9F8>>
+if (H(commitment, completer) in the nullifier tree?) then (no)
+  :revert;<<#FDEEEE>>
+  stop
+else (yes)
+  :authorisation accepted;<<#DDE9F8>>
+  note right
+    This is the only authorisation check.
+    The private preimage (owner, randomness)
+    is never re-derived or re-verified here.
+  end note
+endif
+if (which context?) then (public)
+  :emit storage_slot and value
+  in a public log;<<#DDE9F8>>
+  :the amount is visible
+  to everyone;
+else (private)
+  :emit them in a private log
+  tagged by H(commitment);<<#DDE9F8>>
+  :readable by anyone
+  holding the commitment;
+  note right
+    Requires the validity commitment to have
+    settled in an earlier transaction: a partial
+    note cannot be created and completed in the
+    same private transaction.
+  end note
+endif
+:insert note_hash
+H(storage_slot, commitment, value);
+:the validity commitment
+is NOT consumed;<<#FDEEEE>>
+note right
+  So a second completion of the same
+  commitment passes every check. Nothing
+  in the protocol stops it, and the recipient's
+  PXE has already dropped the pending entry,
+  so the second payment is most likely lost.
+end note
+:the recipient's PXE matches the completion
+log and the note becomes spendable;
+stop
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+title A payment endpoint — a name resolves to commitments, never to an address
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam LifelineBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+actor Alice as A
+participant "Token\ncontract" as TOK
+participant "Lookup channel\nfile, ENS record\nor registry" as LOOK
+actor Bob as B
+participant "Relayer\ncontract" as REL
+
+== Ahead of time, by the recipient ==
+A -> TOK : initialize_transfer_commitment(\n  to = alice, completer = relayer)  x N
+TOK -> TOK : partial_i = H(alice, randomness_i)\nwrite H(partial_i, relayer)
+TOK --> A : c1, c2, c3, ...
+A -> LOOK : publish alice.aztec -> [c1, c2, c3]
+note over A, LOOK #F5F9FF
+  Alice's address is inside each hash, blinded
+  by fresh randomness. The list reveals nothing
+  about who owns it.
+end note
+
+== At payment time, by any sender ==
+B -> LOOK : resolve alice.aztec
+LOOK --> B : c2
+B -> B : sign an authwit for the relayer\nto move exactly this amount
+B -> REL : pay_private(token, c2, amount, nonce)
+REL -> TOK : transfer_private_to_commitment(\n  from = bob, c2, amount)
+TOK -> TOK : msg_sender is the relayer,\nso H(c2, relayer) checks out
+TOK -> TOK : debit Bob, complete the note to Alice
+note over REL, TOK #F5F9FF
+  The relayer is the completer, so any sender can
+  pay. Bob is the debited `from`, so the relayer
+  never holds or is pre-funded with his tokens.
+end note
+TOK --> A : Alice's PXE finds the completion log\nfor c2 and removes it from pending
+note over A #F5F9FF
+  Alice did nothing at payment time, and never
+  learned who Bob is. c2 must now be pruned from
+  the list: completing it twice loses the money.
+end note
+@enduml

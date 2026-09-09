@@ -5,7 +5,7 @@ date: 2025-05-30
 last_modified_at: 2025-07-17
 lang: en
 locale: en-GB
-categories: 
+categories: finance blockchain
 tags: CDS credit-default-swap derivative
 description: A Credit Default Swap (CDS) is a financial derivative that functions as a form of insurance against the default of a borrower. 
 image: /assets/article/finance/credit-default-swap-mindmap.png

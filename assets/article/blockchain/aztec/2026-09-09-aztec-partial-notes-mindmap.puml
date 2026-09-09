@@ -1,0 +1,58 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Partial\nnotes
+** The constraint
+*** Private functions cannot\nread current public state
+*** A swap price exists only\nat execution time
+*** A note needs its value\nat creation
+*** Private then public,\nnever back
+** Two-phase\ncommitment
+*** partial = H(owner,\nrandomness)
+*** note_hash = H(slot,\npartial, value)
+*** Private half fixes\nwho gets paid
+*** Public half fixes\nhow much
+*** Every Aztec note uses\nthis format internally
+** The completer
+*** Commitment alone is\njust a Field, copyable
+*** Validity commitment\nH(partial, completer)
+*** Written to the\nnullifier tree
+*** Own domain separator,\nconsumes nothing
+*** Creator fixes payee\nand finaliser
+** Single use
+*** Protocol does not\nenforce it
+*** Reuse links completions\nvia the shared tag
+*** PXE drops the pending\nentry after the first
+*** A second payment is\nmost likely lost
+** Completion\ncontext
+*** complete\npublic, amount visible
+*** complete_from_private\ntag-gated private log
+*** Amount is hidden only\nif the commitment is
+*** Private completion needs\na prior settled tx
+** DeFi use
+*** AMM swap at an\nonchain exchange rate
+*** Interest accrual,\ngas-dependent values
+*** AIP-20 commitment\ntransfers
+*** AIP-4626 vault shares
+** Payment\nendpoints
+*** Name maps to commitments,\nnot to an address
+*** Relayer contract as\nuniversal completer
+*** Authwit lets the relayer\ndebit the sender
+*** Offchain or onchain\nlookup channel
+*** Not a stealth\naddress scheme
+** What leaks
+*** The relayer was called
+*** One completion tag\nper payment
+*** Refill cadence, if\ncreation is visible
+*** Public completion\nreveals the amount
+@endmindmap

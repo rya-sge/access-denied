@@ -1,0 +1,51 @@
+@startuml
+title Getting an account onchain — counterfactual on both sides, for different reasons
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activityBackgroundColor #EEF5FF
+skinparam activityBorderColor #4A78B5
+skinparam activityDiamondBackgroundColor #EEF5FF
+skinparam activityDiamondBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+start
+if (which stack?) then (ERC-4337)
+  :derive the address with CREATE2
+  from the factory, the implementation
+  and the salt;<<#DDE9F8>>
+  :fund the address before
+  any code exists;
+  :first UserOperation carries
+  initCode;<<#DDE9F8>>
+  :SenderCreator deploys the
+  account, then validation runs;
+  note right
+    The factory must be staked at
+    the EntryPoint, or the bundler
+    will not accept the operation.
+  end note
+else (Aztec)
+  :derive the address as
+  hash(public_keys_hash,
+  partial_address);<<#DDE9F8>>
+  :receive notes at the address
+  before any code exists;
+  note right
+    The keys are inside the address,
+    so the address itself is what a
+    sender encrypts to.
+  end note
+  :deploy and initialise, paying
+  through a fee-paying contract
+  if the account holds nothing;<<#DDE9F8>>
+  if (private-only account?) then (yes)
+    :initialisation is enough;
+  else (no)
+    :public deployment
+    is also required;
+  endif
+endif
+:account can send transactions;
+stop
+@enduml

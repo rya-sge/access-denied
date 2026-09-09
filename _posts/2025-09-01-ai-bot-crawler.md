@@ -5,7 +5,7 @@ date:   2025-09-01
 last_modified_at: 2026-07-30
 lang: en
 locale: en-GB
-categories: 
+categories: ai web
 tags: ai crawler bot
 description: List of AI crawler bot use for AI training and user actions such as GPTBot, ClaudeBot or Google-Extended
 image: /assets/article/web/2025-09-01-ai-bot-crawler-mindmap.png

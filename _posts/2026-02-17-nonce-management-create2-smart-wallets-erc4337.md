@@ -5,7 +5,7 @@ date:   2026-02-17
 last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
-categories: blockchain ethereum solidity security
+categories: blockchain ethereum solidity security wallet
 tags: blockchain ethereum solidity erc-4337 eip-7702 smart-wallet nonce create2 account-abstraction
 description: Understanding the dual nonce system in ERC-4337 smart wallets, the differences between CREATE and CREATE2 for contract deployment, and the pitfalls encountered with EIP-7702 delegation.
 image: /assets/article/blockchain/ethereum/erc-4337/smart-wallet-nonce-mindmap.png
@@ -252,6 +252,7 @@ This has no effect on CREATE address prediction (which depends on the EVM nonce)
 
 ### Related articles
 
+- [Native Account Abstraction on Aztec, Compared with ERC-4337]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/)
 - [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
 - [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/)
 - [EIP-7702 Smart Wallet Security: Threat Model and Attack Surface Analysis]({{site.url_complet}}/2026/02/17/eip-7702-security-threat-model/)

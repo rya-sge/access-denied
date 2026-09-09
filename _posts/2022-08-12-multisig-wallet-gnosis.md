@@ -5,7 +5,7 @@ date:   2022-08-12
 last_modified_at: 2022-10-29
 locale: en-GB
 lang: en
-categories: blockchain cryptography
+categories: blockchain cryptography wallet
 tags: solana spl-token airdrop phantom
 description: This tutorial present the different steps to create a multi signature wallet with Gnosis Safe on Ethereum.
 isMath: false

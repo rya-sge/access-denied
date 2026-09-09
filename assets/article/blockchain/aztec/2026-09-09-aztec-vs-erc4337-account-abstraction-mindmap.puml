@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Account\nabstraction
+** Where it sits
+*** ERC-4337\nabove the protocol,\nEOAs still exist
+*** Aztec\nin the protocol,\nno EOAs at all
+*** 4337 needs an\nalt mempool and\nbundlers
+*** Aztec needs neither
+** Validation and DoS
+*** 4337 restricts\nwhat validation may do\nopcodes, storage, gas
+*** Aztec proves validation\nclient-side
+*** Sequencer verifies a\nconstant-size proof
+*** Complex validation\ncosts the network nothing
+** Keys
+*** 4337 rotates\neverything
+*** Aztec signing key\nrotatable, app-defined
+*** Nullifier and viewing\nkeys are fixed\nin the address
+*** Recovery cannot\nrestore note access
+** Addresses
+*** 4337 CREATE2\nfactory + initCode
+*** Aztec hash of\npublic keys and\npartial address
+*** Both counterfactual
+*** Complete address\nneeded to spend
+** Nonces
+*** 4337 semi-abstracted\n192-bit key +\n64-bit sequence
+*** EntryPoint still\nenforces it
+*** Aztec fully abstracted\nno protocol nonce
+*** Sequential, unordered,\ntime-windowed, Merkle
+** Fees
+*** 4337 paymaster\nwith EntryPoint\ndeposit and stake
+*** Aztec fee-paying\ncontract in the\nteardown phase
+*** Fee Juice is\nnon-transferable
+*** Sponsored, private\nand third-party FPC
+** Delegated\nauthorisation
+*** ERC-20 approve\nblanket allowance
+*** Authwit authorises\none exact action
+*** Nullifier makes\nit single-use
+*** Cancel by emitting\nthe nullifier
+*** Does not grant\naccess to note secrets
+@endmindmap

@@ -285,6 +285,7 @@ Because those accounts have no factory and no `CREATE2` deployment to simulate. 
 
 ### Related articles
 
+- [Native Account Abstraction on Aztec, Compared with ERC-4337]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/)
 - [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/)
 - [Nonce Management and CREATE2 in ERC-4337 Smart Wallets]({{site.url_complet}}/2026/02/17/nonce-management-create2-smart-wallets-erc4337/)
 - [Rundler — Inside Alchemy's ERC-4337 Bundler]({{site.url_complet}}/2026/07/30/rundler-alchemy-erc4337-bundler/)

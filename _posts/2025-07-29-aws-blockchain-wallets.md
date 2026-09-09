@@ -4,7 +4,7 @@ title: "Blockchain wallets on AWS with Fireblocks and Circle"
 date: 2025-07-29
 lang: en
 locale: en-GB
-categories: security cryptography
+categories: security cryptography wallet
 tags: amazon enclave nitro secure-environement fireblocks circle wallet
 description: Deep dive into blockchain wallets with Circle and Fireblocks and explore how they use AWS services such as AWS Nitro Enclave
 image: /assets/article/virtualization/amazon/circle-amazon.png

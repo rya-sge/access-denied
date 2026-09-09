@@ -5,7 +5,7 @@ date: 2026-02-17
 last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
-categories: blockchain ethereum security solidity
+categories: blockchain ethereum security solidity wallet
 tags: eip-7702 erc-4337 smart-wallet account-abstraction threat-model security audit
 description: A practical security analysis of EIP-7702 smart wallets covering initialization front-running, access control, signature replay, dual nonce systems, and residual risks inherent to EOA code delegation.
 image: /assets/article/blockchain/ethereum/eip-7702/EIP-7702-threat-model.png

@@ -4,7 +4,7 @@ title: "How Alchemy Implements Smart Wallets and Account Abstraction"
 date:   2026-07-30
 lang: en
 locale: en-GB
-categories: blockchain ethereum solidity
+categories: blockchain ethereum solidity wallet
 tags: blockchain ethereum solidity erc-4337 erc-6900 account-abstraction smart-wallet modular-account session-keys eip-7702 bundler rundler
 description: A walkthrough of Alchemy's ERC-4337 stack — Modular Account V2 and its semi-modular variants, validation selection through the UserOperation nonce, deferred actions, session-key permission modules, the Rundler bundler, and the hosted Wallet APIs.
 image: /assets/article/blockchain/ethereum/erc-4337/2026-07-30-alchemy-smart-wallet-account-abstraction.png

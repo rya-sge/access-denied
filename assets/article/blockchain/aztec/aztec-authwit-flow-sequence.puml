@@ -1,0 +1,55 @@
+@startuml
+title Authwit — authorising one exact action instead of an allowance
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam LifelineBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+actor Alice
+participant "Alice's\naccount contract" as ACC
+participant "PXE\noracle" as PXE
+participant "DeFi\ncontract" as DEFI
+participant "Token\ncontract" as TOK
+participant "Auth\nregistry" as REG
+
+Alice -> PXE : create a witness for\nH(defi, transfer_selector, args)
+note over PXE #F5F9FF
+  inner_hash   = H(caller, selector, args_hash)
+  message_hash = H(consumer, chain_id, version, inner_hash)
+  The chain id and version block cross-chain replay.
+end note
+
+group Private flow
+  Alice -> DEFI : call the action
+  DEFI -> TOK : transfer_in_private(from = alice, ...)
+  TOK -> ACC : static call: is this authorised?
+  ACC -> PXE : request the witness
+  PXE --> ACC : witness
+  ACC --> TOK : yes
+  TOK -> TOK : emit the authwit nullifier,\nthen move the balance
+  note over TOK #F5F9FF
+    The token emits the nullifier, not the account:
+    the account was reached by a static call and
+    cannot write state. One authwit, one use.
+  end note
+end
+
+group Public flow
+  Alice -> REG : set_authorized(message_hash)
+  note over REG #F5F9FF
+    Oracles are unavailable in public, so the
+    approval is stored first. ECDSA is not in the
+    AVM either: verify in private, store here,
+    consume in public.
+  end note
+  Alice -> DEFI : call the action
+  DEFI -> TOK : transfer_in_public(from = alice, ...)
+  TOK -> REG : consume the authorisation
+  REG --> TOK : ok, now spent
+end
+@enduml

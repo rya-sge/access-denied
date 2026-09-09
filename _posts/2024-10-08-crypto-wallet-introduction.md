@@ -5,7 +5,7 @@ date:   2024-10-08
 last_modified_at: 2025-03-27
 lang: en
 locale: en-GB
-categories: blockchain cryptography
+categories: blockchain cryptography wallet
 tags: blockchain wallet trezor ledger metamask
 description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
 image: /assets/article/blockchain/wallet/wallet-introduction/crypto-wallet-category.png

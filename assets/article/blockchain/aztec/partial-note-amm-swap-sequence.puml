@@ -1,0 +1,46 @@
+@startuml
+title A private swap — the note is opened in private and closed at the public price
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam LifelineBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+actor Alice
+participant "PXE\n(private execution)" as PXE
+participant "AMM\ncontract" as AMM
+participant "Token out\ncontract" as T2
+participant "Sequencer\n(public execution)" as PUB
+
+== Private phase, on Alice's device ==
+Alice -> PXE : swap 100 of token1 for token2
+PXE -> AMM : swap_private(...)
+AMM -> T2 : initialize_transfer_commitment(\n  to = alice, completer = amm)
+T2 -> T2 : partial = H(alice, randomness)\nwrite H(partial, amm) to the nullifier tree
+T2 --> AMM : commitment (a Field)
+note over PXE, T2 #F5F9FF
+  The output amount cannot be computed here.
+  The exchange rate is public state, and private
+  execution runs before the sequencer touches
+  the block. Only the payee is fixed.
+end note
+AMM -> AMM : debit Alice's private\ntoken1 balance
+AMM -> PUB : enqueue the public half
+
+== Public phase, on the sequencer ==
+PUB -> AMM : _complete_swap(commitment, amount_in)
+AMM -> AMM : read the reserves,\ncompute amount_out
+AMM -> T2 : transfer_public_to_commitment(\n  commitment, amount_out)
+T2 -> T2 : check H(partial, msg_sender)\nexists, then complete
+T2 -> T2 : note_hash = H(slot, partial, amount_out)\ninserted into the note hash tree
+note over T2, PUB #F5F9FF
+  Public completion emits the value in a public
+  log, so the amount is visible. Alice's identity
+  is not: it stays inside the partial commitment.
+end note
+T2 --> Alice : PXE matches the completion log\nand the note becomes spendable
+@enduml

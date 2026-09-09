@@ -1,0 +1,59 @@
+@startuml
+title Validating a transaction — restricted onchain check versus a client-side proof
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam LifelineBorderColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+actor User
+participant "Client\n/ wallet" as C
+participant "Bundler\nor sequencer" as B
+participant "EntryPoint\nor kernel" as E
+participant "Account\ncontract" as A
+
+group ERC-4337
+  User -> C : sign a UserOperation
+  C -> B : submit to the alt mempool
+  B -> A : simulate validateUserOp
+  note over B, A #F5F9FF
+    The bundler runs the account's own code
+    and must be protected from it: ERC-7562
+    forbids most opcodes, restricts storage
+    access, and caps validation gas.
+  end note
+  B -> E : handleOps(bundle)
+  E -> A : validateUserOp
+  A --> E : validation data
+  E -> A : execute the call
+  note over E #F5F9FF
+    Validation runs onchain, so its cost
+    is paid on Ethereum and scales with
+    how complex the account's rules are.
+  end note
+end
+
+group Aztec
+  User -> C : approve the action
+  C -> A : run the entrypoint locally
+  A -> A : authenticate however\nthe contract defines
+  C -> C : prove the whole execution\nin the kernel circuits
+  note over C #F5F9FF
+    Validation never leaves the device.
+    Verifying 100 signatures costs the
+    user proving time and costs the
+    network nothing.
+  end note
+  C -> B : proof + side effects
+  B -> B : verify a constant-size proof
+  note over B #F5F9FF
+    No restriction on validation logic is
+    needed, because the sequencer never
+    executes it.
+  end note
+end
+@enduml

@@ -5,7 +5,7 @@ date:   2026-07-31
 last_modified_at: 2026-08-18
 lang: en
 locale: en-GB
-categories: blockchain security
+categories: blockchain security wallet
 tags: hardware wallet duress coldcard trezor security
 description: How hardware wallets handle an attacker who has both the device and the user - duress PINs, decoy wallets, delta mode, passive wipe triggers - and where each defence stops working.
 image: /assets/article/blockchain/wallet/coldcard/2026-07-31-hardware-wallet-duress-mindmap.png

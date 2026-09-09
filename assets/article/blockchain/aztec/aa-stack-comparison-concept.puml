@@ -1,0 +1,56 @@
+@startuml
+title Two account-abstraction stacks
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FAFCFF
+skinparam packageBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+skinparam noteBackgroundColor #F5F9FF
+skinparam noteBorderColor #4A78B5
+
+package "ERC-4337 on Ethereum" {
+  component "User\nsigns a UserOperation" as U1
+  component "Alt mempool\nseparate from the\nnormal tx pool" as MP
+  component "Bundler\npacks UserOperations,\nis itself an EOA" as BD
+  component "EntryPoint\nsingleton contract,\nenforces the nonce" as EP
+  component "Account contract\nvalidateUserOp\n+ execute" as AC1
+  component "Paymaster\nstakes and deposits\nat the EntryPoint" as PM
+  component "Protocol\nEOAs still exist and\nstill pay in ETH" as P1
+  U1 --> MP
+  MP --> BD
+  BD --> EP
+  EP --> AC1
+  EP --> PM
+  EP --> P1 : a normal Ethereum\ntransaction, in the end
+}
+
+package "Aztec" {
+  component "User\napproves an action" as U2
+  component "PXE\nruns the entrypoint and\nproves it on the device" as PX
+  component "Account contract\nentrypoint, no protocol\nsignature scheme" as AC2
+  component "Sequencer\nverifies a constant-size\nproof" as SQ
+  component "Fee-paying contract\nsettles in the\nteardown phase" as FPC
+  component "Protocol\nno EOAs; every account\nis a contract" as P2
+  U2 --> PX
+  PX --> AC2
+  AC2 --> PX
+  PX --> SQ
+  SQ --> FPC
+  SQ --> P2
+}
+
+note bottom of P1
+  Abstraction sits above the protocol,
+  so it needs its own mempool, its own
+  relayer role, and a singleton contract
+  to hold the rules together.
+end note
+
+note bottom of P2
+  Abstraction is the protocol, so none
+  of those pieces exist. The cost moves
+  to the user's proving time.
+end note
+@enduml
