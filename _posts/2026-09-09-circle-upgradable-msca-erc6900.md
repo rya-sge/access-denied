@@ -6,7 +6,7 @@ lang: en
 locale: en-GB
 categories: blockchain ethereum solidity wallet
 tags: blockchain ethereum solidity erc-4337 erc-6900 account-abstraction smart-wallet modular-account circle entrypoint
-description: How Circle's UpgradableMSCA implements an ERC-6900 modular account: validation entities, hook ordering, ERC-7201 storage, and the factory that deploys it.
+description: "How Circle's UpgradableMSCA implements an ERC-6900 modular account: validation entities, hook ordering, ERC-7201 storage, and the factory that deploys it."
 image: /assets/article/blockchain/ethereum/erc-4337/2026-09-09-circle-upgradable-msca-mindmap.png
 isMath: false
 ---
