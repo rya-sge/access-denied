@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Credentials\nAcquire & Abuse
+** T1110 Brute Force
+*** Tactic: Credential Access
+*** Online vs offline
+*** .001 Guessing / .002 Cracking
+*** .003 Spraying / .004 Stuffing
+** T1110.001 Password Guessing
+*** No prior knowledge
+*** Common password lists
+*** Many passwords / one account
+*** Risk: account lockout
+** T1110.003 Password Spraying
+*** One common password
+*** Many accounts at once
+*** Avoids lockout
+*** Throttled; SSO / O365
+** T1078 Valid Accounts
+*** Initial Access & Persistence
+*** Priv Esc & Defense Evasion
+*** .001 Default .002 Domain
+*** .003 Local .004 Cloud
+*** Inactive accounts; no malware
+** Defenses
+*** Multi-factor Authentication
+*** Password policies
+*** Account use / lockout policies
+*** Privileged account management
+*** Disable & monitor stale accounts
+@endmindmap

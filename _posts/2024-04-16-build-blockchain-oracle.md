@@ -5,7 +5,7 @@ date:   2024-04-16
 last_modified_at: 2025-01-23
 lang: en
 locale: en-GB
-categories: blockchain blockchainBestOf ethereum
+categories: blockchain blockchainBestOf ethereum oracle
 tags: chainlink oracle blockchain
 description: This article presents the reasoning to build a blockchain oracle providing external information (e.g. price of an asset) to a smart contract. 
 image: /assets/article/blockchain/oracle/chainlink-price-feed.png

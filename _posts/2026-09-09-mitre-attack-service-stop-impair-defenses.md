@@ -236,3 +236,4 @@ No single control covers all three, which is the point of treating them as a cha
 - [The Pyramid of Pain in Cybersecurity]({{site.url_complet}}/2024/11/28/pyramid-of-pain/)
 - [Digital Forensics and Incident Response (DFIR) - Introduction]({{site.url_complet}}/2025/01/15/digital-forensics-incident-response-dfir/)
 - [Windows Domain Persistence - Golden Tickets and the Skeleton Key]({{site.url_complet}}/2026/06/30/windows-persistence/)
+- [Four ATT&CK Techniques for Getting Into Accounts - Valid Accounts, Brute Force, Password Guessing and Password Spraying]({{site.url_complet}}/2026/09/09/mitre-attack-valid-accounts-brute-force/)

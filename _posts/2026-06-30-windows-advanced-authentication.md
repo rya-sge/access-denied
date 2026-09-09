@@ -179,3 +179,7 @@ Cryptographically they are nearly the same: both store an asymmetric key on the 
 - [Microsoft - The evolution of Windows authentication (NTLM deprecation)](https://techcommunity.microsoft.com/blog/windows-itpro-blog/the-evolution-of-windows-authentication/4015650)
 - *SOS 2021 - 07 Windows Advanced Authentication*, JMB, HEIG-VD, May 2021 (source lecture)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Four ATT&CK Techniques for Getting Into Accounts - Valid Accounts, Brute Force, Password Guessing and Password Spraying]({{site.url_complet}}/2026/09/09/mitre-attack-valid-accounts-brute-force/)

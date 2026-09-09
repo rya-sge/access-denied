@@ -712,3 +712,8 @@ _posts/2026-09-09-mitre-attack-service-stop-impair-defenses.md
   assets/article/securite/mitre-attack/2026-09-09-mitre-attack-disruption-evasion-mindmap.puml (mindmap)
   assets/article/securite/mitre-attack/mitre-technique-tactic-mapping-concept.puml             (concept, in-section)
   assets/article/securite/mitre-attack/ransomware-defense-teardown-workflow.puml               (workflow, in-section)
+
+_posts/2026-09-09-mitre-attack-valid-accounts-brute-force.md
+  assets/article/securite/mitre-attack/2026-09-09-mitre-valid-accounts-brute-force-mindmap.puml (mindmap)
+  assets/article/securite/mitre-attack/credential-access-techniques-concept.puml               (concept, in-section)
+  assets/article/securite/mitre-attack/credential-attack-lifecycle-workflow.puml               (workflow, in-section)
