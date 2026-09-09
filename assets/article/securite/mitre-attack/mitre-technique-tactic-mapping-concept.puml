@@ -1,0 +1,34 @@
+@startuml
+title Techniques, tactics and their targets
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam PackageBackgroundColor #FDEEEE
+skinparam PackageBorderColor #B54A4A
+skinparam ComponentBackgroundColor #FFFFFF
+skinparam ComponentBorderColor #B54A4A
+skinparam RectangleBackgroundColor #FBE3E3
+skinparam RectangleBorderColor #B54A4A
+
+package "Defense Evasion" as DE {
+  component "T1562.001\nDisable or Modify Tools" as T1
+  component "T1562.006\nIndicator Blocking" as T6
+}
+
+package "Impact" as IMP {
+  component "T1489\nService Stop" as T89
+}
+
+rectangle "Security tools\n(EDR / AV / IDS)" as TOOLS
+rectangle "Telemetry\n(ETW / Sysmon / SIEM / syslog)" as TELE
+rectangle "Business services\n(Exchange / SQL / ESXi / cloud)" as SVC
+
+T1 --> TOOLS : kill / patch / exclude
+T6 --> TELE  : block / redirect
+T89 --> SVC  : stop / disable
+
+note bottom of IMP
+  Service Stop clears the way for
+  T1485 Data Destruction and
+  T1486 Data Encrypted for Impact
+end note
+@enduml

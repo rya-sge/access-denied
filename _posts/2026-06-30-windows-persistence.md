@@ -144,3 +144,7 @@ No. Both assume the attacker has already fully compromised a Domain Controller w
 - [Microsoft Learn - Configure added LSA protection (RunAsPPL)](https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection)
 - *SOS 2021 - 05 Windows persistence*, JMB, HEIG-VD, April 2021 (source lecture)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Three ATT&CK Techniques Behind the Ransomware Endgame - Service Stop, Disable or Modify Tools, and Indicator Blocking]({{site.url_complet}}/2026/09/09/mitre-attack-service-stop-impair-defenses/)

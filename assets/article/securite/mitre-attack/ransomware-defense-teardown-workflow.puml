@@ -1,0 +1,27 @@
+@startuml
+title Defense teardown before impact
+skinparam shadowing false
+skinparam ActivityBackgroundColor #FDEEEE
+skinparam ActivityBorderColor #B54A4A
+skinparam ActivityDiamondBackgroundColor #FBE3E3
+skinparam ActivityDiamondBorderColor #B54A4A
+skinparam NoteBackgroundColor #FFFFFF
+skinparam NoteBorderColor #B54A4A
+
+start
+:Foothold with administrative rights;
+:Disable or modify security tools;<<#FBE3E3>>
+note right: T1562.001 - kill EDR/AV, add exclusions, load a vulnerable driver (BYOVD)
+:Block indicators and telemetry;<<#FBE3E3>>
+note right: T1562.006 - tamper ETW/Sysmon, redirect Event Log, cut SIEM traffic
+:Stop critical services;<<#FBE3E3>>
+note right: T1489 - halt Exchange, SQL, backup agents, ESXi guests
+if (Data stores now unlocked?) then (yes)
+  :Destroy or encrypt data;
+  note right: T1485 Data Destruction / T1486 Data Encrypted for Impact
+else (no)
+  :Retry service stop / kill processes;
+endif
+:Incident response is blinded and delayed;
+stop
+@enduml

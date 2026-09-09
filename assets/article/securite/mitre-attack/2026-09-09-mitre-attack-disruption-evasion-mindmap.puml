@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* ATT&CK\nDisruption & Evasion
+** T1489 Service Stop
+*** Tactic: Impact
+*** Stop/disable services
+*** Exchange, SQL, ESXi VMs
+*** Cloud: DisableAWSServiceAccess
+*** Enables Data Destruction / Encryption
+** T1562.001 Disable or Modify Tools
+*** Tactic: Defense Evasion
+*** Kill EDR/AV processes
+*** Registry & config tampering
+*** Add EDR exclusions
+*** BYOVD & PPL abuse
+** T1562.006 Indicator Blocking
+*** Tactic: Defense Evasion
+*** Tamper ETW / Sysmon
+*** EventLog registry redirect
+*** Block SIEM traffic
+*** Reconfigure syslog / nxlog
+** Defenses
+*** Tamper-proof EDR
+*** Offline / immutable backups
+*** Remote log forwarding
+*** Least privilege
+*** Network segmentation
+** ATT&CK v19 change
+*** T1562 revoked
+*** Replaced by T1685
+*** New tactic: Defense Impairment
+@endmindmap

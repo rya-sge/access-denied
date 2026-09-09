@@ -2,7 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified"
 date:   2026-07-24
-last_modified_at: 2026-07-28
+last_modified_at: 2026-09-08
 lang: en
 locale: en-GB
 categories: blockchain cryptography ZKP
@@ -30,7 +30,11 @@ The litepaper adds a sentence about that choice which is worth reading twice: "U
 
 A confidential contract receives a ciphertext from an address it does not trust. Two failure modes follow, and neither is caught by the encryption itself.
 
-The first is a malformed ciphertext. The FHE schemes behind the protocol come from the learning-with-errors family, where a ciphertext is a pair carrying a small noise term. Writing the LWE form of a ciphertext under a secret key $$s$$:
+The first is a malformed ciphertext. The FHE schemes behind the protocol come from the learning-with-errors family, so it is worth recalling what that family assumes.
+
+Learning with errors, usually shortened to LWE, is a linear-algebra problem made hard on purpose. Fix a secret vector $$s$$ and publish many pairs $$(a, b)$$, where each $$a$$ is drawn uniformly at random and $$b = \langle a, s \rangle + e$$ for a small random error $$e$$. Drop the errors and recovering $$s$$ is Gaussian elimination on a linear system, a matter of seconds. Keep them and every equation is slightly wrong, no subset of them can be trusted, and the best known algorithms, quantum ones included, need exponential time. That gap is the hardness assumption the lattice-based schemes rest on, and it also explains why a ciphertext carries noise: encryption reuses the same shape, hiding the message inside the linear relation and letting the error mask it.
+
+Writing the LWE form of a ciphertext under a secret key $$s$$:
 
 $$
 \begin{aligned}
@@ -38,7 +42,19 @@ b = \langle a, s \rangle + \Delta m + e \bmod q
 \end{aligned}
 $$
 
-the value $$e$$ is the noise, $$\Delta$$ the scaling factor that separates the message $$m$$ from it, and correctness holds only while the noise stays inside its budget. Nothing about the byte string tells a verifier that the noise was drawn honestly or that the encoded message sits in the declared range. A submitter free to fabricate ciphertexts controls a parameter the rest of the protocol assumes is well behaved, and the network eventually decrypts derived results through the KMS. Requiring a proof of correct encryption at the entry point is the standard answer to that exposure.
+with the ciphertext being the pair $$(a, b)$$:
+
+- $$a$$: the public mask, a vector sampled uniformly at random modulo $$q$$, of the same dimension as the secret key $$s$$.
+- $$b$$: the scalar that closes the pair.
+- $$\langle a, s \rangle$$: the inner product of the mask and the secret key, the term only the key holder can recompute.
+- $$q$$: the ciphertext modulus, the range every coefficient lives in.
+- $$m$$: the plaintext message being encrypted.
+- $$\Delta$$: the scaling factor that lifts $$m$$ into the high-order bits, keeping it clear of the noise.
+- $$e$$: the noise, small relative to $$\Delta$$.
+
+Both $$a$$ and $$b$$ travel in the clear, since it is the secrecy of $$s$$ and the randomness of $$e$$ that hide $$m$$. Decryption recomputes $$b - \langle a, s \rangle = \Delta m + e$$ and rounds the noise away, which only works while the noise stays inside its budget. Homomorphic operations combine ciphertexts and grow that noise, so the budget is consumed as the computation proceeds.
+
+Nothing about the byte string tells a verifier that the noise was drawn honestly or that the encoded message sits in the declared range. A submitter free to fabricate ciphertexts controls a parameter the rest of the protocol assumes is well behaved, and the network eventually decrypts derived results through the KMS. Requiring a proof of correct encryption at the entry point is the standard answer to that exposure.
 
 The second failure mode needs no cryptography to explain. Ciphertexts travel in public calldata. Without a binding between the proof and the party submitting it, anyone could lift another user's encrypted amount out of a past transaction and replay it as their own input. The documentation on [encrypted inputs](https://docs.zama.org/protocol/solidity-guides/smart-contract/inputs) lists exactly this as one of the two purposes of the proof: it verifies "that the user knows the plaintext value of the ciphertext, preventing replay attacks or misuse".
 
