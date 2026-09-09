@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* KZG\nby theme
+** What a commitment promises
+*** Commitment scheme\n//short value fixing a choice//
+*** Binding\n//cannot open to two values//
+*** Hiding\n//reveals nothing until opened//
+*** Polynomial binding\n//one C, one polynomial//
+*** Evaluation binding\n//one C, one value per index//
+** The algebra
+*** Polynomial over a finite field\n//coefficients modulo a prime//
+*** Degree bound\n//largest degree the setup covers//
+*** Polynomial remainder theorem\n//x - i divides f(x) - f(i)//
+*** Quotient polynomial\n//the division result, committed//
+*** Additive homomorphism\n//commitments add like polynomials//
+** Group and pairing machinery
+*** Generator and exponentiation\n//hide a value in an exponent//
+*** Bilinear pairing\n//multiply two hidden exponents//
+*** Symmetric and asymmetric pairings\n//type 1 on paper, type 3 deployed//
+*** Commitment in the exponent\n//C is the polynomial at alpha//
+*** VerifyEval pairing equation\n//the single check a verifier runs//
+** Setup and trust
+*** Structured reference string\n//published powers of the secret//
+*** Powers-of-tau ceremony\n//the secret that must be destroyed//
+*** Post-quantum exposure\n//Shor recovers the secret//
+left side
+** The scheme and its variants
+*** Polynomial commitment scheme\n//commit, then prove evaluations//
+*** Evaluation proof (witness)\n//one element per opened point//
+*** PolyCommitDL\n//computational hiding//
+*** PolyCommitPed\n//unconditional hiding, blinded//
+*** Batch opening\n//many indices, one witness//
+** Hardness assumptions
+*** t-SDH\n//binding rests on it//
+*** t-BSDH\n//batch opening rests on it//
+*** t-polyDH\n//the degree bound rests on it//
+*** Algebraic Group Model\n//where extractability is proved//
+** Use inside a proof system
+*** Extractability\n//the prover knows a polynomial//
+*** Degree bound enforcement\n//the shift trick later work adds//
+*** Compiling a polynomial IOP\n//idealised protocol plus commitment//
+@endmindmap

@@ -494,7 +494,8 @@ _posts/2026-07-28-conditional-tokens-eli10.md
   assets/article/blockchain/defi/conditional-tokens/conditional-tokens-eli10-swap-counter-workflow.puml      (workflow, in-section)
 
 _posts/2026-09-09-kzg-polynomial-commitments-glossary.md
-  assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-mindmap.puml (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-mindmap.puml (mindmap, by level)
+  assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-themes.puml  (mindmap, by theme)
 
 _posts/2026-07-28-zk-proof-systems-15-concepts-15-formulas.md
   assets/article/cryptographie/zero-knowledge-proof/foundations/2026-07-28-zk-proof-systems-concepts-formulas.puml (mindmap)
@@ -698,7 +699,8 @@ _posts/2026-09-02-hyperliquid-oracle-mark-price.md
   assets/article/blockchain/hyperliquid/hyperliquid-oracle-trust-surface-concept.puml  (concept, asset only)
 
 _posts/2026-09-09-hyperliquid-glossary.md
-  assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.puml               (mindmap)
+  assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.puml (mindmap, by level)
+  assets/article/blockchain/hyperliquid/hyperliquid-glossary-themes.puml  (mindmap, by theme)
 
 _posts/2026-09-03-fail2ban-architecture-privilege-model.md
   assets/article/securite/fail2ban/fail2ban-architecture.puml                     (mindmap)

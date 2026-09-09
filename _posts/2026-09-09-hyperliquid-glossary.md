@@ -228,6 +228,10 @@ The advanced level splits into two halves worth learning separately. One is the 
 
 ![Mindmap of Hyperliquid vocabulary, split into beginner, intermediate and advanced terms including HyperCore, oracle price, mark price, liquidation, auto-deleveraging and the four HIPs]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.png)
 
+The same thirty terms sort a second way, by subject rather than by reading order. That cut shows how much of the vocabulary is really one subject: six of the thirty terms describe margin and the account state it governs, and the four HIPs are one deployment idea applied to four instruments.
+
+![Mindmap grouping Hyperliquid vocabulary by theme, with branches for chain and execution, actors and access, the instrument and the book, prices, margin and account state, when a position fails, and deployable primitives]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-glossary-themes.png)
+
 ## Frequently Asked Questions
 
 **Q: What is the difference between the oracle price and the mark price?**

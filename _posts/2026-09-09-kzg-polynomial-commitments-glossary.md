@@ -295,6 +295,10 @@ The intermediate level is the real threshold, and the entry that most often sepa
 
 ![Mindmap of KZG polynomial commitment vocabulary, split into beginner, intermediate and advanced terms including binding, structured reference string, the quotient polynomial, evaluation binding, t-SDH and extractability]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-mindmap.png)
 
+Sorted by reading order the vocabulary is three levels deep. Sorted by subject it is seven clusters, and the second cut shows which entries are one idea split across levels: binding is a beginner term whose two precise forms are intermediate, while the assumptions and the proof-system machinery sit entirely in the advanced level.
+
+![Mindmap grouping KZG vocabulary by theme, with branches for what a commitment promises, the algebra, group and pairing machinery, setup and trust, the scheme and its variants, hardness assumptions and use inside a proof system]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-themes.png)
+
 ## Frequently Asked Questions
 
 **Q: What is the difference between [binding](#binding) and [hiding](#hiding)?**

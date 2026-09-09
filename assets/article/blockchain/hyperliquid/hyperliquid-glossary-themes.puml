@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Hyperliquid\nby theme
+** Chain and execution
+*** HyperBFT\n//consensus over block contents and order//
+*** HyperCore\n//the exchange half of the state//
+*** HyperEVM\n//the general-purpose contract half//
+*** Dual-block architecture\n//two interleaved EVM block types//
+*** Intra-block action ordering\n//the sequence of actions in a block//
+*** L1Read precompiles\n//contracts read HyperCore state//
+*** CoreWriter\n//contracts write to HyperCore//
+** Actors and access
+*** Validator\n//stakes, builds blocks, publishes prices//
+*** Maker and taker\n//the two roles in any trade//
+*** API wallet and the nonce set\n//delegated key, master key stays cold//
+*** Slashing surface\n//staked HYPE burnable by vote//
+** The instrument and the book
+*** Perpetual future (perp)\n//no expiry, no delivery//
+*** Central limit order book (CLOB)\n//resting orders by price then time//
+*** HYPE\n//the chain's native token//
+** Prices
+*** Oracle price\n//validator reference, every few seconds//
+*** Mark price\n//values positions and triggers events//
+*** Funding rate\n//holds the perp near the underlying//
+left side
+** Margin and account state
+*** Clearinghouse\n//owns positions and collateral//
+*** Margin\n//collateral backing a position//
+*** Cross margin and isolated margin\n//shared or ring-fenced collateral//
+*** Maintenance margin\n//floor before liquidation//
+*** Margin tier\n//size bracket setting that floor//
+*** Portfolio margin\n//one collateral pool, many positions//
+** When a position fails
+*** Liquidation\n//forced close below maintenance//
+*** Auto-deleveraging (ADL)\n//last rung once equity goes negative//
+*** HLP (Hyperliquidity Provider)\n//community vault taking the backstop//
+** Deployable primitives
+*** HIP-1 (native token standard)\n//token plus its spot book//
+*** HIP-2 (Hyperliquidity)\n//operator-free market-making ladder//
+*** HIP-3 (builder-deployed perpetuals)\n//permissionless perp DEX//
+*** HIP-4 (outcome market)\n//fully collateralised, bounded range//
+@endmindmap
