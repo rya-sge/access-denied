@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* KZG Polynomial\nCommitments
+** Beginner
+*** Commitment scheme
+*** Binding
+*** Hiding
+*** Polynomial over a finite field
+*** Degree bound
+*** Polynomial commitment scheme
+*** Generator and exponentiation
+*** Bilinear pairing
+*** Structured reference string
+*** Evaluation proof (witness)
+** Intermediate
+*** Commitment in the exponent
+*** Polynomial remainder theorem
+*** Quotient polynomial
+*** VerifyEval pairing equation
+*** PolyCommitDL
+*** PolyCommitPed
+*** Polynomial binding
+*** Evaluation binding
+*** Additive homomorphism
+*** Batch opening
+left side
+** Advanced
+*** t-SDH
+*** t-BSDH
+*** t-polyDH
+*** Trapdoor and ceremony
+*** Degree bound enforcement
+*** Algebraic Group Model
+*** Extractability
+*** Symmetric and asymmetric pairings
+*** Polynomial IOP compiler
+*** Post-quantum exposure
+@endmindmap

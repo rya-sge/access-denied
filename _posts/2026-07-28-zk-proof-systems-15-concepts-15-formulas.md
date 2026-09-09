@@ -531,6 +531,7 @@ Yes, and reading it early saves time later. Goldreich and Krawczyk establish tha
 
 ### Related articles
 
+- [KZG Polynomial Commitments — The Terms and Formulas, From Beginner to Advanced]({{site.url_complet}}/2026/09/09/kzg-polynomial-commitments-glossary/)
 - [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/)
 - [Halo — Recursive Proof Composition without a Trusted Setup]({{site.url_complet}}/2026/06/19/halo-recursive-proofs/)
 - [The GKR Protocol — Delegating Computation with Interactive Proofs]({{site.url_complet}}/2026/06/19/gkr-protocol/)
