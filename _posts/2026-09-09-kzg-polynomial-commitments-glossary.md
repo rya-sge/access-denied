@@ -53,7 +53,7 @@ Working over a finite field rather than the reals is what makes polynomials usab
 
 The maximum degree $$t$$ the scheme is set up to handle. The parameters are generated for a specific $$t$$, and the committer may commit to any $$\phi(x)$$ with $$\deg(\phi) \le t$$.
 
-The bound is not a formality. It is what stops the committer from claiming an arbitrary set of evaluations: a polynomial of degree $$t$$ is pinned down by any $$t+1$$ of its values, so once the degree is capped, the committer has no freedom left after that many openings. The public parameters have size $$O(t)$$, which is the scheme's main storage cost.
+The bound is not a formality. A polynomial of degree $$t$$ is pinned down by any $$t+1$$ of its values, so a committer who has opened that many points has no freedom left over the remaining ones, and a committer who has opened fewer still has some. The paper's hiding definition is stated in exactly these terms, over the evaluations revealed so far. The public parameters have size $$O(t)$$, which is the scheme's main storage cost.
 
 ### Polynomial commitment scheme
 
@@ -69,9 +69,17 @@ Everything below is built from that asymmetry. Exponents can be added and scaled
 
 ### Bilinear pairing
 
-A map $$e : \mathbb G \times \mathbb G \to \mathbb G_T$$ between groups of the same prime order satisfying $$e(g^a, g^b) = e(g,g)^{ab}$$, computable in practice on specially chosen elliptic curves.
+A map that takes two group elements and returns one element of a third group, in a way that makes the hidden exponents multiply:
 
-A pairing supplies exactly the operation ordinary groups lack: it multiplies two hidden exponents and lands the product in a third group. It works once, because $$\mathbb G_T$$ has no pairing of its own. KZG needs precisely one such multiplication, which is why one pairing equation verifies an opening.
+$$
+\begin{aligned}
+e : \mathbb G \times \mathbb G \to \mathbb G_T, \qquad e(g^a,\ g^b) = e(g,g)^{ab}
+\end{aligned}
+$$
+
+Reading the letters: $$e$$ is the pairing itself, $$\mathbb G$$ is the source group and $$\mathbb G_T$$ the target group, $$g$$ is a generator of $$\mathbb G$$, and $$a$$ and $$b$$ are the hidden exponents. Both arguments here come from the same $$\mathbb G$$, which makes this the **symmetric** form; the 2010 paper uses it, and deployed curves use an asymmetric variant with two distinct source groups.
+
+This is the operation ordinary groups lack, and it works once, because $$\mathbb G_T$$ has no pairing of its own. KZG needs exactly one such multiplication, which is why one pairing equation verifies an opening.
 
 ### Structured reference string (SRS)
 
@@ -83,7 +91,7 @@ $$
 \end{aligned}
 $$
 
-for a random secret $$\alpha \in \mathbb Z_p$$. Anyone holding $$\alpha$$ can forge openings, so $$\alpha$$ must be destroyed after generation and is never needed again by the scheme. The contrast is with a transparent setup, where the parameters come from hashing public data and no secret ever exists.
+for a secret $$\alpha$$ drawn at random from the non-zero elements of $$\mathbb Z_p$$. Anyone holding $$\alpha$$ can forge openings, so $$\alpha$$ must be destroyed after generation and is never needed again by the scheme. The contrast is with a transparent setup, where the parameters come from hashing public data and no secret ever exists.
 
 ### Evaluation proof (witness)
 
@@ -105,7 +113,7 @@ C = g^{\phi(\alpha)} = \prod_{j=0}^{\deg(\phi)} \bigl(g^{\alpha^j}\bigr)^{\phi_j
 \end{aligned}
 $$
 
-The committer never learns $$\alpha$$. It only combines the published powers $$g^{\alpha^j}$$ using its own coefficients $$\phi_j$$ as exponents, which is why the right-hand form matters: it is the recipe an honest committer runs. The result is one group element, and the degree bound is enforced implicitly because the string stops at $$g^{\alpha^t}$$.
+The committer never learns $$\alpha$$. It only combines the published powers $$g^{\alpha^j}$$ using its own coefficients $$\phi_j$$ as exponents, which is why the right-hand form matters: it is the recipe an honest committer runs. The result is one group element, and the degree is bounded implicitly because the string stops at $$g^{\alpha^t}$$, an argument that needs its own assumption to be made precise.
 
 ### Polynomial remainder theorem
 
@@ -129,7 +137,7 @@ $$
 \end{aligned}
 $$
 
-The witness is this quotient committed the same way the polynomial itself was. The security argument rests on a conditional: if the claimed value is wrong, the division leaves a non-zero remainder, so $$\psi_i$$ is not a polynomial at all and the committer has nothing to commit to. Its degree is $$\deg(\phi) - 1$$, so an honest committer can always build it from the same public parameters.
+The witness is this quotient committed the same way the polynomial itself was, and its degree is $$\deg(\phi) - 1$$, so an honest committer can always build it from the same public parameters. The intuition for soundness is that a wrong claimed value leaves a non-zero remainder, so the quotient is a rational function rather than a polynomial and cannot be committed from the reference string. The proof itself is a reduction: a committer who produces a passing witness for a wrong value can be turned into a solver for t-SDH.
 
 ### VerifyEval pairing equation
 
@@ -169,7 +177,7 @@ This is binding in its ordinary sense, applied to the whole committed object. It
 
 ### Evaluation binding
 
-The stronger requirement that no efficient adversary can produce two accepting openings of the same commitment at the same index with different values: witnesses $$w_i$$ and $$w_i'$$ both verifying for $$\phi(i) \ne \phi(i)'$$.
+The stronger requirement that no efficient adversary can produce two accepting openings of the same commitment at the same index with different values, that is two triples $$\langle i, v, w\rangle$$ and $$\langle i, v', w'\rangle$$ that both verify with $$v \ne v'$$.
 
 This is the property protocols rely on, since a verifier sees evaluations and never the polynomial. Polynomial binding stops the committer swapping the object; evaluation binding stops it lying about one point of an object it never fully discloses. A scheme can satisfy the first and be useless without the second.
 
@@ -183,7 +191,7 @@ C_{\phi} = C_{\phi_1} \cdot C_{\phi_2}, \qquad w_{\phi,i} = w_{\phi_1,i} \cdot w
 \end{aligned}
 $$
 
-Witnesses combine the same way, so an opening of a sum can be assembled from openings of the parts. This is what lets later protocols take a random linear combination of many committed polynomials and open the combination once instead of opening each one, and it is also how PolyCommitPed is built out of two commitments under different generators.
+An opening of a sum can therefore be assembled from openings of the parts. This is what lets later protocols take a random linear combination of many committed polynomials and open the combination once instead of opening each one, and it is also how PolyCommitPed is built out of two commitments under different generators.
 
 ### Batch opening
 
@@ -211,7 +219,7 @@ $$
 \end{aligned}
 $$
 
-Introduced by Boneh and Boyen, it is the assumption underneath binding for both KZG constructions. It is a q-type assumption, meaning its strength depends on $$t$$ and it grows less conservative as the degree bound rises. Cheon's attack shows the security loss is real, which is why deployed parameters are chosen with the intended $$t$$ in mind.
+Introduced by Boneh and Boyen, it is the assumption underneath binding for both KZG constructions. It is a q-type assumption: its statement is parameterised by $$t$$, and the larger $$t$$ is the more the adversary is given, so a bigger degree bound is a stronger assumption rather than the same one. Cheon's attack turns that into a measurable loss, recovering $$\alpha$$ faster as the published powers extend, which is why deployed parameters are chosen with the intended $$t$$ in mind.
 
 ### t-Bilinear Strong Diffie-Hellman assumption (t-BSDH)
 
@@ -221,9 +229,15 @@ Batch opening needs this variant rather than plain t-SDH, because its verificati
 
 ### t-polynomial Diffie-Hellman assumption (t-polyDH)
 
-The assumption that, from a reference string ending at $$g^{\alpha^t}$$, no efficient adversary can output a pair $$\langle \phi(x), g^{\phi(\alpha)}\rangle$$ with $$\deg(\phi) \gt t$$.
+The assumption that, from a reference string ending at $$g^{\alpha^t}$$, no efficient adversary can output a pair
 
-This is what makes the degree bound meaningful. Without it, the claim that the truncated reference string confines the committer to degree $$t$$ would be an intuition rather than a hypothesis, and the counting argument behind the whole scheme would have no floor. The paper introduces it as a generalisation of the t-DHI assumption.
+$$
+\begin{aligned}
+\bigl\langle \phi(x),\ g^{\phi(\alpha)} \bigr\rangle, \qquad t \lt \deg(\phi) \lt 2^{\kappa}
+\end{aligned}
+$$
+
+for security parameter $$\kappa$$. The upper bound is not decoration: for degrees near the field size the value is computable by other means, since $$\phi(x) = x^{p-1}$$ gives $$g^{\phi(\alpha)} = g$$ for every non-zero $$\alpha$$. This is the assumption that makes the degree bound meaningful, because without it the claim that a truncated reference string confines the committer to degree $$t$$ is an intuition rather than a hypothesis. The paper introduces it as a generalisation of the t-DHI assumption.
 
 ### Trapdoor and the powers-of-tau ceremony
 
@@ -235,7 +249,7 @@ Since a single trusted dealer is a weak assumption, deployments generate the str
 
 Verification checks that an evaluation is consistent with the commitment; it does not check that the committed polynomial has any particular degree. The reference string caps the degree at $$t$$ under t-polyDH, but a protocol that needs a tighter bound $$d \lt t$$ gets no help from the pairing equation.
 
-The standard fix, introduced by later work rather than the 2010 paper, is a shifted commitment: commit to $$x^{t-d}\,\phi(x)$$ as well and check the two are consistent. Only a polynomial of degree at most $$d$$ shifts into the available range. Sonic, Marlin and PLONK all carry some version of this, and a protocol that omits it is usually unsound rather than merely inefficient.
+The standard fix, introduced by later work rather than the 2010 paper, is a shifted commitment: commit to $$x^{t-d}\,\phi(x)$$ as well and check the two are consistent. Only a polynomial of degree at most $$d$$ shifts into the available range. Sonic and Marlin build an explicit degree bound into their commitment scheme this way; systems that instead lean on the reference string's length are sound only when the bound they need is the one the string already gives.
 
 ### Algebraic Group Model (AGM)
 
@@ -251,9 +265,15 @@ Binding says two openings cannot both verify. Extractability says something stro
 
 ### Symmetric and asymmetric pairings
 
-The 2010 paper uses a type-1 pairing $$e : \mathbb G \times \mathbb G \to \mathbb G_T$$, where both inputs come from the same group, and says so purely to simplify presentation. Deployed systems use type-3 pairings $$e : \mathbb G_1 \times \mathbb G_2 \to \mathbb G_T$$ with no efficient map between $$\mathbb G_1$$ and $$\mathbb G_2$$.
+The paper's pairing is **type 1**, or symmetric: one source group used for both arguments. It says it chose that only to simplify presentation, and that the constructions carry over to the other types. Deployed systems use **type 3**, or asymmetric, with two distinct source groups and no efficiently computable map between them:
 
-The reason is that type-1 curves at a useful security level are slow and their parameters have repeatedly been weakened by advances in index-calculus attacks. Reading the paper's equations against a BLS12-381 implementation means splitting each group element into whichever of the two source groups it belongs to, which is why library code shows $$g^{\alpha}$$ in $$\mathbb G_2$$ while the commitment sits in $$\mathbb G_1$$.
+$$
+\begin{aligned}
+e : \mathbb G_1 \times \mathbb G_2 \to \mathbb G_T, \qquad e(g_1^a,\ g_2^b) = e(g_1, g_2)^{ab}
+\end{aligned}
+$$
+
+Type 2 sits between the two, with a homomorphism in one direction only. Type 1 is avoided because its low embedding degree forces a large base field to reach a useful security level, and because such parameters have repeatedly been weakened by advances in discrete-logarithm algorithms. Reading the paper against a BLS12-381 implementation therefore means assigning each element to one of the two groups: library code puts $$g^{\alpha}$$ in $$\mathbb G_2$$ and the commitment in $$\mathbb G_1$$.
 
 ### Compiling a polynomial IOP into a SNARK
 
@@ -265,7 +285,7 @@ The idealised protocol supplies soundness, the commitment supplies the cryptogra
 
 Every security property above rests on discrete logarithms in a pairing group, which Shor's algorithm solves. A sufficiently large quantum computer recovers $$\alpha$$ from the reference string and destroys binding for every commitment ever made under it, retroactively.
 
-This is the structural reason a system that wants post-quantum plausibility does not use KZG. FRI commits through Merkle trees over Reed-Solomon codewords and needs only a collision-resistant hash, at the price of proofs measured in kilobytes; the Bulletproofs inner product argument needs only discrete logarithms and no setup, at the price of logarithmic proofs and linear verification. The choice among the three is a choice among constant proofs, no trusted setup, and quantum resistance, and no scheme currently offers all three.
+That is why a system aiming at post-quantum plausibility does not use KZG. FRI commits through Merkle trees over Reed-Solomon codewords and needs only a collision-resistant hash, at the price of proofs measured in kilobytes; the Bulletproofs inner product argument needs only discrete logarithms and no setup, at the price of logarithmic proofs and linear verification. The choice among the three is a choice among constant proofs, no trusted setup, and quantum resistance, and no deployed scheme offers all three.
 
 ## Conclusion
 
@@ -281,13 +301,13 @@ The intermediate level is the real threshold, and the entry that most often sepa
 
 Binding protects the verifier: once a commitment is published, the committer cannot open it to a different value. Hiding protects the committer: the published commitment leaks nothing about what was committed.
 
-They are independent properties, and each comes in a computational and an unconditional flavour. No scheme is unconditional on both at once, which is exactly the axis separating the paper's two constructions: [PolyCommitDL](#polycommitdl) has computational hiding, [PolyCommitPed](#polycommitped) has unconditional hiding, and both have computational binding.
+They are separate requirements, and each comes in a computational and an unconditional flavour. No scheme is unconditional on both at once, which is exactly the axis separating the paper's two constructions: [PolyCommitDL](#polycommitdl) has computational hiding, [PolyCommitPed](#polycommitped) has unconditional hiding, and both have computational binding.
 
 **Q: Why does an opening need a [quotient polynomial](#quotient-polynomial) rather than just the claimed value?**
 
 Because the claimed value on its own is unverifiable. The verifier holds one group element and cannot evaluate the committed polynomial itself.
 
-The quotient turns the claim into an algebraic fact the verifier can test. By the [polynomial remainder theorem](#polynomial-remainder-theorem), $$\psi_i(x) = (\phi(x) - \phi(i))/(x - i)$$ is a genuine polynomial precisely when $$\phi(i)$$ is the correct value; if the value is wrong, the division leaves a remainder and no such polynomial exists for the committer to commit to. The [VerifyEval pairing equation](#verifyeval-pairing-equation) is the check that this division came out even.
+The quotient turns the claim into an algebraic fact the verifier can test. By the [polynomial remainder theorem](#polynomial-remainder-theorem), $$\psi_i(x) = (\phi(x) - \phi(i))/(x - i)$$ is a genuine polynomial precisely when $$\phi(i)$$ is the correct value; if the value is wrong, the division leaves a remainder and no such polynomial exists. Turning that into a security claim takes the [t-SDH](#t-strong-diffie-hellman-assumption-t-sdh) reduction, which converts a passing witness for a wrong value into a solution to the assumed-hard problem. The [VerifyEval pairing equation](#verifyeval-pairing-equation) is the check that the division came out even.
 
 **Q: What is the difference between [polynomial binding](#polynomial-binding) and [evaluation binding](#evaluation-binding)?**
 
@@ -307,13 +327,29 @@ Two things limit the damage. The ceremony is secure if at least one participant 
 
 It replaces $$k$$ witnesses with one. Opening $$k$$ indices separately costs $$k$$ group elements and $$k$$ verification equations; batching costs one group element plus the interpolating remainder $$r(x)$$, checked in a single equation.
 
-The saving is why the technique matters in proof systems, where a prover typically opens several committed polynomials at the same challenge point. The cost is a different hardness assumption: batch opening rests on [t-BSDH](#t-bilinear-strong-diffie-hellman-assumption-t-bsdh) rather than [t-SDH](#t-strong-diffie-hellman-assumption-t-sdh), because its verification equation compares elements the single-point equation never forms.
+Note which direction it batches: one polynomial opened at many indices. The mirror case, many polynomials opened at one index, is handled instead by [additive homomorphism](#additive-homomorphism), by opening a random linear combination of the commitments. Proof systems use both. The cost of the batch here is a different hardness assumption: batch opening rests on [t-BSDH](#t-bilinear-strong-diffie-hellman-assumption-t-bsdh) rather than [t-SDH](#t-strong-diffie-hellman-assumption-t-sdh), because its verification equation compares elements the single-point equation never forms.
 
-**Q: When would you choose KZG over a hash-based commitment such as FRI?**
+**Q: When would you choose KZG over a hash-based [polynomial commitment scheme](#polynomial-commitment-scheme) such as FRI?**
 
 Choose KZG when proof size and verification cost dominate, and a setup ceremony is acceptable. It gives a constant-size commitment, a constant-size opening, and a verifier whose work does not grow with the [degree bound](#degree-bound), which is why on-chain verification generally uses it.
 
 Choose a hash-based commitment when the setup is unacceptable or [post-quantum exposure](#post-quantum-exposure) matters. It needs no trapdoor and no pairing-friendly curve, at the price of proofs measured in kilobytes rather than bytes. The [compiler that turns a polynomial IOP into a SNARK](#compiling-a-polynomial-iop-into-a-snark) is indifferent to which one is plugged in, so this is a deployment decision rather than a protocol one.
+
+## Notation — the Greek letters used
+
+The formulas use a small, fixed set of Greek symbols. Two rows below name the same object, because the paper and the deployments spell it differently.
+
+| Symbol | Name | What it stands for here |
+|---|---|---|
+| $$\alpha$$ | alpha | The setup secret. The reference string is its successive powers $$g^{\alpha^j}$$, and it is the trapdoor that must be destroyed after generation. |
+| $$\tau$$ | tau | The same secret as $$\alpha$$, under the name most deployments use. This article writes $$\alpha$$ with the paper, but the ceremony that produces the string is universally called powers-of-tau. |
+| $$\phi$$ | phi | The committed polynomial. $$\phi(x)$$ is the polynomial, $$\phi(i)$$ its evaluation at index $$i$$, and $$\phi_j$$ its coefficient of $$x^j$$. |
+| $$\hat\phi$$ | phi-hat | The random blinding polynomial that PolyCommitPed adds against the second generator $$h$$ to make hiding unconditional. |
+| $$\psi$$ | psi | The quotient polynomial that becomes the witness: $$\psi_i$$ when opening one index, $$\psi_B$$ when batching a set $$B$$. |
+| $$\kappa$$ | kappa | The security parameter, which bounds how large a degree the t-polyDH assumption covers. |
+| $$\prod$$ | capital pi | An operator rather than a variable: the product over a range. It builds the commitment from the reference string, and forms the vanishing polynomial $$\prod_{i \in B}(x-i)$$ in batch opening. |
+
+The Latin letters follow the paper as well: $$g$$ and $$h$$ are generators, $$C$$ a commitment, $$w$$ a witness, $$t$$ the degree bound, $$i$$ an index, and $$e$$ the pairing.
 
 ## References
 

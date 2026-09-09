@@ -697,6 +697,9 @@ _posts/2026-09-02-hyperliquid-oracle-mark-price.md
   assets/article/blockchain/hyperliquid/hyperliquid-oracle-tick-workflow.puml          (activity, in-section)
   assets/article/blockchain/hyperliquid/hyperliquid-oracle-trust-surface-concept.puml  (concept, asset only)
 
+_posts/2026-09-09-hyperliquid-glossary.md
+  assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.puml               (mindmap)
+
 _posts/2026-09-03-fail2ban-architecture-privilege-model.md
   assets/article/securite/fail2ban/fail2ban-architecture.puml                     (mindmap)
   assets/article/securite/fail2ban/fail2ban-server-components-concept.puml        (concept, in-section)

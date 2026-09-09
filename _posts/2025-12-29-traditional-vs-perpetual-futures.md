@@ -2,7 +2,7 @@
 layout: post
 title: "Traditional Futures vs. Perpetual Futures: A Technical Comparison"
 date:   2025-12-29
-last_modified_at: 2026-06-28
+last_modified_at: 2026-09-09
 locale: en-GB
 lang: en
 categories: defi blockchain
@@ -303,3 +303,4 @@ In practice the gap is small for short-dated contracts and widens with maturity 
 - [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)
 - [Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/)
 - [The Black-Scholes Model - Pricing Options and Corporate Liabilities]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/)
+- [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/)

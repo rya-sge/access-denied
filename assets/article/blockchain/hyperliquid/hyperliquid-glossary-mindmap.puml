@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Hyperliquid\nvocabulary
+** Beginner
+*** HyperBFT
+*** HyperCore
+*** HyperEVM
+*** HYPE
+*** Validator
+*** Oracle price
+*** CLOB
+*** Maker and taker
+*** Perpetual future
+*** Margin
+** Intermediate
+*** Clearinghouse
+*** Mark price
+*** Funding rate
+*** Cross and isolated margin
+*** Maintenance margin
+*** Liquidation
+*** HLP
+*** Intra-block action ordering
+*** L1Read precompiles
+*** CoreWriter
+left side
+** Advanced
+*** Margin tier
+*** Auto-deleveraging (ADL)
+*** Portfolio margin
+*** Dual-block architecture
+*** API wallet and nonce set
+*** HIP-1 native token
+*** HIP-2 Hyperliquidity
+*** HIP-3 builder perps
+*** HIP-4 outcome market
+*** Slashing surface
+@endmindmap
