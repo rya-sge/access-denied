@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI and proximity proofs\n(part 1: the toolbox)
+** Linear codes
+*** Hamming weight, relative distance
+*** [n, k, l] code, Singleton bound, MDS
+*** Rate rho = k / n
+*** Unique decoding radius mu / 2
+*** List decoding and the Johnson bound
+** Reed-Solomon code
+*** Polynomials of degree < d restricted to L
+*** [n, d, n - d + 1], rate rho = d / n
+*** Unique decoding (1 - rho) / 2
+*** Johnson bound 1 - sqrt(rho)
+*** Open region up to capacity 1 - rho
+** Interactive oracle proofs
+*** IOP: strings sent, cells queried
+*** BCS compiler: Merkle + Fiat-Shamir
+*** Cost driven by verifier queries
+*** IOPP: committed input, delta-soundness
+*** RS-IOPP: is u close to the code?
+left side
+** Poly-IOP to IOP
+*** Polynomial sent as its RS encoding
+*** Proximity test replaces degree check
+*** Quotienting (u - b) / (x - a)
+*** Vanishing and interpolation polynomials
+*** DEEP: out-of-domain sample (r, s)
+*** In-domain points via polynomial division
+** Distance-preserving maps
+*** Batching with powers of r
+*** BCIKS proximity gap theorem
+*** Correlated proximity on a set S
+*** Folding: even / odd split, degree halves
+*** Domain of roots of unity, L squared
+*** Folding never decreases distance
+*** 4-way and 2^w folding via FFT
+@endmindmap

@@ -1,0 +1,37 @@
+@startuml
+title BCS compiler: an IOP becomes a hash-based SNARK
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+
+participant "Prover P(x, w)" as P
+participant "Verifier V(x)" as V
+
+P -> V : Merkle root of string pi_0
+V -> P : challenge alpha_1
+P -> V : Merkle root of string pi_1
+V -> P : challenge alpha_2
+P -> V : ... Merkle root of string pi_k
+note over P, V #F3EEFB
+  Fiat-Shamir: each alpha_i is replaced by a hash
+  of the Merkle roots sent so far, so P runs the
+  whole exchange alone and the proof becomes
+  non-interactive.
+end note
+V -> P : query cell j of pi_i
+P -> V : value pi_i[j] + Merkle authentication path
+V -> V : run the IOP decision algorithm\non the opened cells; accept or reject
+note over V
+  Proof size = k + 1 Merkle roots
+  + one Merkle path per query.
+  Fewer queries means a shorter proof.
+end note
+@enduml

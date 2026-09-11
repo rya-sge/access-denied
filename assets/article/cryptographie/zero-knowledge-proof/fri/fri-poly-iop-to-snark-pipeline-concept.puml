@@ -1,0 +1,38 @@
+@startuml
+title Two routes from a Poly-IOP to a SNARK
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+rectangle "Poly-IOP\n(prover sends bounded-degree polynomials,\nverifier evaluates them at points of F)" as PIOP
+
+rectangle "Interactive proof" as IP1
+rectangle "SNARK" as S1
+
+rectangle "IOP\n(prover sends strings,\nverifier opens cells)" as IOP
+rectangle "SNARK" as S2
+
+PIOP -right-> IP1 : polynomial commitment scheme\n(polynomials -> commitments,\nqueries -> evaluation proofs)
+IP1 -right-> S1 : Fiat-Shamir
+
+PIOP -down-> IOP : Reed-Solomon IOPP\n(polynomial -> RS codeword,\nevaluation -> quotient proximity test)
+IOP -right-> S2 : BCS compiler\n(Merkle commitments + Fiat-Shamir)
+
+note bottom of IOP
+  FRI is one efficient Reed-Solomon IOPP.
+  It is applied to the quotient words that
+  certify the requested evaluations.
+end note
+@enduml

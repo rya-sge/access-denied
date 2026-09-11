@@ -764,3 +764,10 @@ _posts/2026-09-11-aztec-contract-standards-overview.md
   assets/article/blockchain/aztec/aztec-standards-dependency-map-concept.puml                (concept, in-section)
   assets/article/blockchain/aztec/aztec-escrow-lifecycle-sequence.puml                       (sequence, in-section)
   assets/article/blockchain/aztec/aztec-vault-exact-deposit-sequence.puml                    (sequence, in-section)
+
+_posts/2026-09-11-fri-proximity-proofs-part-1-codes-iop-quotienting-folding.md
+  assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-11-fri-proximity-proofs-part-1-mindmap.puml  (mindmap)
+  assets/article/cryptographie/zero-knowledge-proof/fri/fri-poly-iop-to-snark-pipeline-concept.puml          (concept, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/fri/fri-bcs-compiler-sequence.puml                       (sequence, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/fri/fri-deep-quotient-evaluation-sequence.puml           (sequence, in-section)
+  assets/article/cryptographie/zero-knowledge-proof/fri/fri-folding-step-workflow.puml                       (workflow, in-section)

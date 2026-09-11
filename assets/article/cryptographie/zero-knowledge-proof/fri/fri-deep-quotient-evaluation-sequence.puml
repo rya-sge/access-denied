@@ -1,0 +1,34 @@
+@startuml
+title Proving an evaluation of a committed polynomial with quotienting and DEEP
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+
+participant "IOP prover" as P
+participant "IOP verifier" as V
+
+P -> V : oracle pi = f restricted to L\n(honest case: a Reed-Solomon codeword of degree < d)
+V -> P : out-of-domain sample r, drawn from F outside L
+P -> V : s  (claimed f(r))
+note over P, V #F3EEFB
+  DEEP: with delta below the Johnson bound, at most one
+  polynomial in List(pi, d, delta) satisfies f(r) = s
+  with high probability, so the pair (r, s) pins down f.
+end note
+V -> P : evaluation query a_1 (from the Poly-IOP verifier)
+P -> V : b_1  (claimed f(a_1))
+P <-> V : run the RS-IOPP on the virtual oracle\nq_1 = (pi - I) / V for points (a_1, b_1), (r, s)\nagainst the code of degree < d - 2
+V -> V : accept => some f_1 close to pi\nwith f_1(a_1) = b_1 and f_1(r) = s
+V -> P : evaluation query a_2
+P -> V : b_2
+P <-> V : run the RS-IOPP on q_2 built from (a_2, b_2), (r, s)
+V -> V : f_1 and f_2 agree at r => f_1 = f_2 = f\nso f(a_1) = b_1 and f(a_2) = b_2
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+title One folding step: from u on L to u_fold on L squared
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+
+start
+:Input: u from L to F, with L the n-th roots of unity
+(n a power of two, so x in L implies -x in L);
+:Verifier samples a random r in F;
+:For each a in L, read the pair u(a), u(-a);
+:Even part:  u_e(a^2) = (u(a) + u(-a)) / 2;
+:Odd part:   u_o(a^2) = (u(a) - u(-a)) / (2a);
+:u_fold(a^2) = u_e(a^2) + r * u_o(a^2);
+:Output: u_fold from L^2 to F,  |L^2| = n / 2;
+if (u was a codeword of degree < d ?) then (yes)
+  :u_fold is a codeword of degree < d / 2 over L^2
+  (same rate, for every r);<<#F3EEFB>>
+else (no: u is delta-far, delta below the Johnson bound)
+  :u_fold is delta-far from the compressed code
+  with high probability over r;<<#FDEEEE>>
+endif
+stop
+@enduml
