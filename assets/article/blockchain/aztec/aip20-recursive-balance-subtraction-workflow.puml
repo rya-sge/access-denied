@@ -1,0 +1,32 @@
+@startuml
+title AIP-20 _subtract_balance — bounded note consumption with recursion
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam activityBackgroundColor #EEF5FF
+skinparam activityBorderColor #4A78B5
+skinparam activityDiamondBackgroundColor #F7FAFF
+skinparam activityDiamondBorderColor #4A78B5
+
+start
+:Entry call: max_notes = 2
+(INITIAL_TRANSFER_CALL_MAX_NOTES);
+:subtracted = BalanceSet.try_sub(amount, max_notes)
+nullify up to max_notes notes of the account;
+if (subtracted >= amount ?) then (yes)
+  :return change = subtracted - amount;<<#EAF6F0>>
+  :add(change) creates a new note
+for the sender;
+  stop
+else (no)
+  if (subtracted > 0 ?) then (no)
+    :assert fails "Balance too low";<<#FDEEEE>>
+    stop
+  else (yes)
+    :remaining = amount - subtracted;
+    :self-call recurse_subtract_balance_internal(account, remaining)
+max_notes = 8 (RECURSIVE_TRANSFER_CALL_MAX_NOTES);
+    :same decision again on the next batch;
+    stop
+  endif
+endif
+@enduml

@@ -752,3 +752,15 @@ _posts/2026-09-09-circle-upgradable-msca-erc6900.md
   assets/article/blockchain/ethereum/erc-4337/upgradable-msca-userop-sequence.puml           (sequence, in-section)
   assets/article/blockchain/ethereum/erc-4337/upgradable-msca-call-flow-workflow.puml        (activity, in-section)
   assets/article/blockchain/ethereum/erc-4337/msca-v07-vs-v08-concept.puml                   (concept, in-section)
+
+_posts/2026-09-11-aip-20-aztec-token-standard-vs-erc-20-erc-7984.md
+  assets/article/blockchain/aztec/2026-09-11-aip20-vs-erc20-erc7984-mindmap.puml       (mindmap)
+  assets/article/blockchain/aztec/token-standards-balance-models-concept.puml           (concept, in-section)
+  assets/article/blockchain/aztec/aip20-private-transfer-sequence.puml                  (sequence, in-section)
+  assets/article/blockchain/aztec/aip20-recursive-balance-subtraction-workflow.puml     (workflow, in-section)
+
+_posts/2026-09-11-aztec-contract-standards-overview.md
+  assets/article/blockchain/aztec/2026-09-11-aztec-contract-standards-overview-mindmap.puml  (mindmap)
+  assets/article/blockchain/aztec/aztec-standards-dependency-map-concept.puml                (concept, in-section)
+  assets/article/blockchain/aztec/aztec-escrow-lifecycle-sequence.puml                       (sequence, in-section)
+  assets/article/blockchain/aztec/aztec-vault-exact-deposit-sequence.puml                    (sequence, in-section)

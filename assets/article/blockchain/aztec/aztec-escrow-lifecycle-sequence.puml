@@ -1,0 +1,34 @@
+@startuml
+title Escrow standard — create, fund, share and withdraw, all in private execution
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam SequenceLifeLineBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+
+actor "Depositor" as D
+participant "Logic contract\n(owns the escrow)" as L
+participant "Escrow instance\n(salt = Logic address)" as E
+participant "Token (AIP-20)" as T
+actor "Recipient" as R
+
+D -> D : pick secret_key
+D -> L : get_escrow(secret_key)
+L -> L : _get_escrow: derive public keys\nfrom secret_key, compute address\nwith salt = this_address
+L --> D : escrow address
+D -> T : transfer_private_to_private(depositor, escrow, amount, 0)
+note right of T : escrow's note; only a holder of\nthe escrow keys can read or spend it
+D -> L : share_escrow(recipient, escrow, secret_key)
+L -> L : _share_escrow: private log\nEscrowDetails { escrow, secret_key }\ndelivered to recipient
+R -> R : PXE registers the escrow account\nfrom secret_key, discovers its notes
+R -> L : withdraw(escrow, recipient, token, amount)\n(Logic applies its own policy first)
+L -> E : withdraw(token, amount, recipient)
+E -> E : _assert_msg_sender:\nsalt == msg_sender, else "Not Authorized"
+E -> T : transfer_private_to_private(escrow, recipient, amount, 0)
+T --> R : new note for recipient
+note over L, T : No public call, no event, no public state:\nnothing about the escrow is visible on chain.
+@enduml

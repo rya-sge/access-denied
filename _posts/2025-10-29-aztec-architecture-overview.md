@@ -243,6 +243,7 @@ Wallets also manage:
 
 ### Related articles
 
+- [Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-4626 and the Escrow Standard]({{site.url_complet}}/2026/09/11/aztec-contract-standards-overview/)
 - [Partial Notes on Aztec — Deferred Completion and Private DeFi Composability]({{site.url_complet}}/2026/09/09/aztec-partial-notes-private-defi-composability/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)
 - [RAILGUN: Privacy Infrastructure for DeFi]({{site.url_complet}}/2025/10/28/railgun-overview/)

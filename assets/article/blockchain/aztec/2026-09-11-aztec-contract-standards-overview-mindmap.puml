@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Aztec contract standards
+** Shared conventions
+*** Private notes + public balance per account
+*** transfer_<src>_to_<dst>
+*** from + nonce, authwit, no approve
+*** Commitments (partial notes)
+*** PRIVATE_ADDRESS sentinel events
+*** 2 then 8 notes per debit round
+** AIP-20 / ARC-20 fungible token
+*** u128 amounts, public total_supply
+*** mint_to_* / burn_* / minter
+*** Optional ARC-403 hook
+** AIP-721 / ARC-721 NFT
+*** NFTNote { token_id }
+*** nft_exists + public_owners
+*** No hook, no supply
+** ARC-1155 multi-token
+*** MultiTokenNote { token_id, value }
+*** TransferSingle only when id is public
+*** No total_supply, id-bearing hook
+** ARC-403 authorization hook
+*** authorize_private / authorize_public
+*** (from, amount, selector), never to
+*** Mints not hooked
+** AIP-4626 vault
+*** Separate AIP-20 share token
+*** Standard vs exact pattern
+*** vault_offset, VaultDeployer
+*** Known u128 overflow, to leak
+** Escrow standard
+*** Owner = instance salt
+*** withdraw / withdraw_nft, private only
+*** Logic library, key derivation
+** Utilities
+*** GenericProxy forwarders
+*** Dripper faucet (dev only)
+@endmindmap

@@ -1,0 +1,55 @@
+@startuml
+title How the Aztec standards contracts reference one another
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FFFFFF
+skinparam packageBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+
+package "Assets" {
+  component "Token\n(AIP-20 / ARC-20)" as token
+  component "NFT\n(AIP-721 / ARC-721)" as nft
+  component "MultiToken\n(ARC-1155)" as multi
+}
+
+package "Policy" {
+  component "Authorization contract\n(ARC-403)" as auth
+}
+
+package "Vault" {
+  component "Vault\n(AIP-4626)" as vault
+  component "Shares Token\n(AIP-20, minter = vault)" as shares
+  component "VaultDeployer\n(one instance per vault)" as deployer
+}
+
+package "Custody" {
+  component "Logic contract\n(application policy)" as logic
+  component "Escrow\n(owner = salt = Logic)" as escrow
+}
+
+package "Utilities" {
+  component "Dripper\n(dev faucet, minter)" as dripper
+  component "GenericProxy\n(private forwarders)" as proxy
+}
+
+token --> auth : authorize_private /\nauthorize_public\n(from, amount, selector)
+multi --> auth : id-bearing variant
+vault --> token : asset transfers\n(authwit from user)
+vault --> shares : mint_to_* / burn_* /\ninitialize_transfer_commitment
+deployer ..> vault : publish + constructor
+deployer ..> shares : publish + constructor_with_minter
+deployer ..> vault : set_shares_token*
+logic --> escrow : withdraw / withdraw_nft
+escrow --> token : transfer_private_to_private\n(escrow, recipient, amount, 0)
+escrow --> nft : transfer_private_to_private\n(escrow, recipient, token_id, 0)
+dripper --> token : mint_to_public /\nmint_to_private
+proxy ..> token : forward_private_N
+note bottom of auth
+  Not called by NFT or Vault.
+  Never receives "to".
+end note
+@enduml

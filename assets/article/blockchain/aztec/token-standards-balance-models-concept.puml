@@ -1,0 +1,48 @@
+@startuml
+title Where a fungible balance lives in ERC-20, AIP-20 and ERC-7984
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #EEF5FF
+skinparam componentBorderColor #4A78B5
+skinparam packageBackgroundColor #FFFFFF
+skinparam packageBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+skinparam ArrowColor #4A78B5
+
+package "ERC-20 (Ethereum)" {
+  component "mapping(address => uint256)\nbalances" as e20bal
+  component "mapping(owner => spender => uint256)\nallowances" as e20allow
+  note bottom of e20bal
+    Everyone reads amount,
+    sender and recipient.
+    Insufficient balance reverts.
+  end note
+}
+
+package "AIP-20 (Aztec)" {
+  component "Public balances\nMap<AztecAddress, u128>\n(sequencer state)" as a20pub
+  component "Private balances\nOwned<BalanceSet>\nUintNotes in the note hash tree" as a20priv
+  component "Nullifier tree\n(spent notes)" as a20null
+  component "total_supply: u128\n(public)" as a20supply
+  a20priv --> a20null : spending a note\nemits its nullifier
+  a20pub <..> a20priv : transfer_public_to_private\ntransfer_private_to_public\ncommitments
+  note bottom of a20priv
+    Only the owner's PXE holds the
+    note preimages. On chain: a hash
+    and an encrypted log.
+  end note
+}
+
+package "ERC-7984 (FHE EVM)" {
+  component "mapping(address => euint64)\nciphertext handles" as e79bal
+  component "mapping(holder => operator => uint48)\noperator expiry" as e79op
+  component "FHE coprocessor + KMS\n(threshold decryption)" as e79fhe
+  e79bal --> e79fhe : arithmetic on ciphertexts,\nACL-gated decryption
+  note bottom of e79bal
+    Amounts hidden, addresses public.
+    Insufficient balance transfers 0
+    without reverting.
+  end note
+}
+@enduml

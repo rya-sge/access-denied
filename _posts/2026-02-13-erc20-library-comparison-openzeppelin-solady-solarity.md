@@ -519,3 +519,7 @@ The three libraries follow different philosophies: OpenZeppelin favors safety, m
 - [eugenioclrc/erc20-benchmark](https://github.com/eugenioclrc/erc20-benchmark)
 - [Cantina — Solady Security Review](https://cantina.xyz/blog/cantinas-inaugural-project-a-security-review-of-solady)
 - [Optimism — Track Decision: Solady vs OpenZeppelin for SuperchainERC20 (Issue #12573)](https://github.com/ethereum-optimism/optimism/issues/12573)
+
+### Related articles
+
+- [AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/)

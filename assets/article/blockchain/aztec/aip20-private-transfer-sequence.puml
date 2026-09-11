@@ -1,0 +1,37 @@
+@startuml
+title AIP-20 transfer_private_to_private — what happens on the client and what reaches the chain
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam SequenceLifeLineBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+
+actor "Sender wallet\n(PXE, private execution)" as S
+participant "Token contract\n(private circuit)" as T
+participant "ARC-403 auth contract\n(optional)" as A
+participant "Sequencer / L2 state" as L
+actor "Recipient wallet\n(PXE)" as R
+
+S -> T : transfer_private_to_private(from, to, amount, nonce)
+T -> T : authorize_once macro: from == msg_sender\nand nonce == 0, or valid authwit\n(nullifier emitted, single use)
+T -> A : authorize_private(from, amount, selector)
+A --> T : ok or revert
+T -> T : BalanceSet.try_sub(amount, max_notes = 2)\nread up to 2 of from's UintNotes\nprove inclusion, emit their nullifiers
+alt gathered < amount
+  T -> T : recurse_subtract_balance_internal(from, remaining)\n(8 notes per call, until gathered >= amount)
+  note right : gathered == 0 asserts "Balance too low"
+end
+T -> T : add(change) : new UintNote for from\ndelivered as encrypted log
+T -> T : add(amount) : new UintNote for to\ndelivered as encrypted log
+T --> S : proof of private execution
+S -> L : transaction : nullifiers, note hashes,\nencrypted logs, no public call
+L -> L : verify proof, insert note hashes\nand nullifiers, publish logs
+note over L : No Transfer event.\nNo address, no amount in clear.
+R -> L : scan logs by tag
+L --> R : encrypted note for to
+R -> R : decrypt, store note,\nbalance_of_private(to) grows
+@enduml

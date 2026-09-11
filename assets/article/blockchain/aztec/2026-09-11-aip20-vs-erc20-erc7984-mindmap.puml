@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* AIP-20 vs ERC-20 vs ERC-7984
+** Where the balance lives
+*** ERC-20: public uint256 in contract storage
+*** AIP-20: private notes (client side) + public u128
+*** ERC-7984: FHE ciphertext handle (euint64)
+** AIP-20 interface
+*** Two balances per account
+*** transfer_<from-domain>_to_<to-domain>
+*** Commitments (partial notes)
+*** mint_to_* / burn_* / total_supply
+*** name / symbol / decimals
+** Private transfer mechanics
+*** Select notes, nullify, change note
+*** 2 notes first, then 8 per recursion
+*** "Balance too low" reverts
+*** Recipient note delivered as encrypted log
+** Authorization
+*** ERC-20: approve / allowance / transferFrom
+*** AIP-20: from + nonce, authwit, single use
+*** ERC-7984: time-limited operator, any amount
+** Failure and disclosure
+*** ERC-20 and AIP-20 revert
+*** ERC-7984 transfers zero silently
+*** AIP-20 total supply is public
+*** ERC-7984 disclose via decryption proof
+** Compliance hooks
+*** AIP-20: ARC-403 auth contract
+*** ERC-7984: Restricted / Freezable extensions
+*** ERC-20: _update override
+@endmindmap

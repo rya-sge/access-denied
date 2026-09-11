@@ -1,0 +1,34 @@
+@startuml
+title AIP-4626 exact pattern — deposit_private_to_private_exact
+skinparam shadowing false
+skinparam ArrowColor #4A78B5
+skinparam ParticipantBackgroundColor #EEF5FF
+skinparam ParticipantBorderColor #4A78B5
+skinparam ActorBackgroundColor #EEF5FF
+skinparam ActorBorderColor #4A78B5
+skinparam SequenceLifeLineBorderColor #4A78B5
+skinparam noteBackgroundColor #F7FAFF
+skinparam noteBorderColor #4A78B5
+
+actor "User" as U
+participant "Vault (private)" as VP
+participant "Shares Token" as S
+participant "Asset Token" as A
+participant "Vault (public, enqueued)" as VQ
+
+U -> VP : deposit_private_to_private_exact(from, to, assets, min_shares, nonce)
+VP -> VP : authwit check on from
+VP -> S : initialize_transfer_commitment(to, completer = vault)
+S --> VP : commitment (partial note owned by to)
+VP -> A : transfer_private_to_public(from, vault, assets, nonce)
+note right : user's notes spent,\nvault's public balance credited\nin the enqueued call
+VP -> S : mint_to_private(to, min_shares)
+VP -> VQ : enqueue settle_deposit_private_to_private_exact_internal\n(commitment, assets, min_shares)
+== public execution ==
+VQ -> VQ : read total_assets and total_supply,\nsubtract the pre-applied deltas,\nmax_shares = convert_to_shares(assets)
+VQ -> VQ : outstanding = max_shares - min_shares\n(underflow reverts if min_shares too high)
+alt outstanding > 0
+  VQ -> S : mint_to_commitment(commitment, outstanding)
+  note right : shares reach "to" without\nnaming "to" in public
+end
+@enduml
