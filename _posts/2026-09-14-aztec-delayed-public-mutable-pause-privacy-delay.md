@@ -11,7 +11,16 @@ image: /assets/article/blockchain/aztec/2026-09-14-aztec-delayed-public-mutable-
 isMath: false
 ---
 
-A token contract usually carries a small piece of public configuration that every transfer has to consult: a pause flag, a fee rate, an allowlist entry. On Ethereum this is a storage read and nothing more. On [Aztec](https://aztec.network/), the private half of a transfer is proved on the user's device against a block that has already been mined, so the function never sees the chain's present state and cannot know whether the flag flipped since. Aztec.nr offers two ways around this, and neither is free: enqueue a public call that performs the check, which publishes the fact that the token was touched, or store the flag in a `DelayedPublicMutable`, which lets the private function read it but only because every write is postponed by a fixed delay.
+A token contract usually carries a small piece of public configuration that every transfer has to consult: a pause flag, a fee rate, an allowlist entry. 
+
+On Ethereum this is a storage read and nothing more. 
+
+On [Aztec](https://aztec.network/), the private half of a transfer is proved on the user's device against a block that has already been mined, so the function never sees the chain's present state and cannot know whether the flag flipped since. 
+
+Aztec.nr offers two ways around this, and neither is free: 
+
+- Enqueue a public call that performs the check, which publishes the fact that the token was touched;
+- Store the flag in a `DelayedPublicMutable`, which lets the private function read it but only because every write is postponed by a fixed delay.
 
 This article works through the second option with a generic private token and a pause flag as the running example. It explains why the delay is what makes the private read sound, what the delay costs the sender (a shorter window in which the transaction can be included, and a public expiration timestamp that shrinks the privacy set) and why the same delay that protects the read makes the mechanism a poor fit for an emergency pause. The reasoning is not specific to any one token design; it applies to any public value a private function needs to read.
 
@@ -127,7 +136,9 @@ The delay itself is also protected. A public function can lower or raise it with
 
 ### What the read costs in the circuit
 
-The private read is a historical public storage read plus a hash check: the library stores the whole scheduled-change structure behind one hash, so the proof needs a single inclusion path whatever the size of `T`. The Aztec.nr source puts this at roughly 4,000 constraints per variable read. Two flags read in the same function cost two reads, which is why the library recommends packing values that are read together into one `Packable` struct held in a single `DelayedPublicMutable`. The consequence is that they then share one delay, a point that comes back below.
+The private read is a historical public storage read plus a hash check: the library stores the whole scheduled-change structure behind one hash, so the proof needs a single inclusion path whatever the size of `T`. 
+
+The Aztec.nr source puts this at roughly 4,000 constraints per variable read. Two flags read in the same function cost two reads, which is why the library recommends packing values that are read together into one `Packable` struct held in a single `DelayedPublicMutable`. The consequence is that they then share one delay, a point that comes back below.
 
 ## What the delay costs
 
@@ -137,7 +148,15 @@ The read is private, but it is not free of side effects. Two of them fall on the
 
 A transaction that reads no `DelayedPublicMutable` carries the protocol default: its expiration is the anchor block timestamp plus `MAX_TX_LIFETIME`, which is 86,400 seconds, one day. A transaction that reads the pause flag carries `anchor_timestamp + PAUSE_DELAY_SECONDS` instead, or less if a change is pending. The delay is therefore the window in which the sender must prove the transaction, broadcast it and see it included.
 
-That window has to absorb client-side proving, which on a laptop can take tens of seconds to minutes depending on the number of private calls, plus mempool time, plus the sequencer's own scheduling. The library's list of what a short delay breaks is concrete: "large transactions that take long to prove be unfeasible, restrict users with slow proving devices, and force large transaction fees to guarantee fast inclusion". With a 360-second delay, the value used in the Aztec.nr documentation example (five slots of 72 seconds), a transaction that took four minutes to prove on a phone has two minutes left to be picked up. With a six-hour delay the constraint disappears for any realistic device.
+That window has to absorb three things in sequence:
+
+- **Client-side proving.** On a laptop this takes tens of seconds to minutes, depending on the number of private calls.
+- **Mempool time.** The interval between submission and a sequencer picking the transaction up.
+- **The sequencer's own scheduling.** The transaction has to land in a block before the expiration timestamp.
+
+The library's list of what a short delay breaks is concrete: "large transactions that take long to prove be unfeasible, restrict users with slow proving devices, and force large transaction fees to guarantee fast inclusion".
+
+Two values show the range. With a 360-second delay, the value used in the Aztec.nr documentation example (five slots of 72 seconds), a transaction that took four minutes to prove on a phone has two minutes left to be picked up. With a six-hour delay the constraint disappears for any realistic device.
 
 The kernel keeps the minimum across every function in the transaction. A transaction that touches two contracts, one with a 1,000-second delay and one with 10,000, expires after 1,000 seconds. The same mechanism is used by contract upgrades: an upgradeable contract class carries an update delay, and a pending upgrade lowers the expiration of every transaction that calls it to the moment of the upgrade.
 
@@ -171,7 +190,14 @@ Two details make the emergency case worse than the timeline suggests:
 - **The delay cannot be shortened in a hurry.** Decreasing it takes as long as the difference, so an operator who set six hours and wants one hour waits five hours before the shorter delay applies, and then a further hour for the pause. Increasing it is immediate, but that is the wrong direction.
 - **A pending change is public and self-announcing.** From the moment the pause is scheduled, every transaction reading the flag expires at the same public timestamp. Anyone watching the mempool sees the deadline approaching and can front-load transfers before it.
 
-The alternatives are the ones the first option already gave. If the contract needs a pause that bites within a block, the pause has to be checked in public, and the transaction has to accept that its interaction with the contract is visible. A hybrid is common in practice: routine configuration that changes rarely and can tolerate a delay (roles, allowlist entries, the issuer of a regulated token, a fee) lives in `DelayedPublicMutable` and is read privately, while a single kill switch stays in `PublicMutable` and is asserted in an enqueued `#[only_self]` public call. If that public call already exists because the design updates a public counter, the kill switch costs nothing extra in privacy terms.
+The alternatives are the ones the first option already gave. If the contract needs a pause that bites within a block, the pause has to be checked in public, and the transaction has to accept that its interaction with the contract is visible.
+
+A hybrid is common in practice, splitting state by how fast it has to change:
+
+- **Routine configuration** that changes rarely and can tolerate a delay lives in `DelayedPublicMutable` and is read privately. Roles, allowlist entries, the issuer of a regulated token and a fee all fit here.
+- **A single kill switch** stays in `PublicMutable` and is asserted in an enqueued `#[only_self]` public call.
+
+If that public call already exists because the design updates a public counter, the kill switch costs nothing extra in privacy terms.
 
 ## Choosing the delay
 
@@ -193,7 +219,14 @@ A few rules follow from the mechanics rather than from taste:
 
 ## Conclusion
 
-The rule behind every design here is one sentence: a private function may act on public state only for as long as the protocol can guarantee that state has not changed. `PublicMutable` offers no such guarantee, so private functions cannot read it and must enqueue a public call whose existence is visible. `DelayedPublicMutable` manufactures the guarantee by postponing every write, and the private read pays for it with an expiration timestamp equal to the postponement. That timestamp is a bound on how long the sender has to get the transaction included and a public value that clusters transactions by delay, so a delay short enough to be useful for a pause is also short enough to strand slow provers and to single out the contract's users. Configuration that changes rarely belongs in a delayed variable read privately; a switch that must act at once belongs in a public check, with the visibility that entails.
+The rule behind every design here is one sentence: a private function may act on public state only for as long as the protocol can guarantee that state has not changed. The two state variables answer it differently:
+
+- **`PublicMutable`** offers no such guarantee, so private functions cannot read it and must enqueue a public call whose existence is visible.
+- **`DelayedPublicMutable`** manufactures the guarantee by postponing every write, and the private read pays for it with an expiration timestamp equal to the postponement.
+
+That timestamp is two things at once: a bound on how long the sender has to get the transaction included, and a public value that clusters transactions by delay. A delay short enough to be useful for a pause is therefore also short enough to strand slow provers and to single out the contract's users.
+
+Configuration that changes rarely belongs in a delayed variable read privately; a switch that must act at once belongs in a public check, with the visibility that entails.
 
 ![Mindmap of DelayedPublicMutable on Aztec covering the private read problem, the enqueued public check, the delayed variable mechanics, the expiration and privacy-set costs, and delay selection]({{site.url_complet}}/assets/article/blockchain/aztec/2026-09-14-aztec-delayed-public-mutable-mindmap.png)
 

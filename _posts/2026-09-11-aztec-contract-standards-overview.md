@@ -101,7 +101,7 @@ fn authorize_private(from: AztecAddress, amount: u128, selector: Field)  // from
 fn authorize_public(from: AztecAddress, amount: u128, selector: Field)   // from public token functions
 ```
 
-`selector` is the calling token function's own selector, so a policy can treat `transfer_public_to_private` (which reveals `from` and the amount publicly despite calling the private hook) differently from `transfer_private_to_private`. Mints are not hooked; the minter gate already covers them.
+`selector` is the calling token function's own selector, so a policy can tell `transfer_public_to_private` apart from `transfer_private_to_private`; the former calls the private hook but still reveals `from` and the amount publicly. Mints are not hooked; the minter gate already covers them.
 
 The hook never receives `to`. Commitment transfers seal the recipient inside a hash the sender cannot see, so the recipient cannot be supplied consistently, and the standard omits it everywhere rather than pass it sometimes. The documented consequence is that a policy can stop a blocked account from spending but not from receiving. Allowlists, pause switches, transfer caps and sanctions screens fit; recipient-side blocks do not. Reference policies live in a separate `aztec-arc403-extensions` repository.
 
