@@ -1,0 +1,29 @@
+@startuml
+title One fold: half the notebook, half the rule
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+start
+:Rule with 4 numbers:  2 + 3x + 5x^2 + 4x^3
+Notebook with N lines (each spot x has a twin -x);
+:Split into halves
+  even half:  2 + 5y       (y = x^2)
+  odd half:   3 + 4y;
+:Inspector rolls a number, say 10;
+:Blend:  (2 + 5y) + 10 x (3 + 4y) = 32 + 45y;
+:Folded notebook: N / 2 lines (one per y = x^2)
+Folded rule: 2 numbers instead of 4;
+if (Was the old notebook clean?) then (yes)
+  :Folded notebook is clean, for any roll;<<#F3EEFB>>
+else (no, it was far from every rule)
+  :Folded notebook is still far, for almost every roll;<<#FDEEEE>>
+endif
+:Repeat until the notebook is short enough to read in full;
+stop
+@enduml

@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI\ntwelve cards
+** Objects
+*** Low-degree polynomial\n//few coefficients, many evaluations//
+*** Reed-Solomon code\n//polynomial → evaluations; different polynomials rarely agree//
+*** Rate\n//rho = d/n; work below 1 - sqrt(rho)//
+** The property
+*** Proximity\n//close to a polynomial, not necessarily equal to one//
+*** IOP of proximity\n//accept codewords, reject the far, read few entries//
+left side
+** Commitments and challenges
+*** Merkle commitment\n//root = the whole table; path = one entry//
+*** Random challenge\n//r after the commitment, never before//
+*** Folding\n//combine f(x) and f(-x); halve the degree//
+** The protocol
+*** Commit phase\n//commit → challenge → fold, repeat until tiny//
+*** Final polynomial\n//the last layer is sent in the clear//
+*** Query phase\n//one position, checked through every layer, repeated//
+*** FRI\n//fold it down, then spot-check every layer//
+@endmindmap

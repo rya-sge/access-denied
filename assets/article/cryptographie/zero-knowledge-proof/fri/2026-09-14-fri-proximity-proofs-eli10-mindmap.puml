@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI explained simply\n(check a million numbers\nby peeking at twenty)
+** Short rules
+*** A sticky-note rule makes a giant list
+*** Two different rules almost never agree
+** Codes and smudges
+*** Write it longer on purpose (CATCATCAT)
+*** Rate = short length / long length
+*** Valid lists are far from each other
+** The smudge budget
+*** Few smudges: exactly one rule
+*** More smudges: a few candidate rules
+*** Too many: nobody knows (stay out)
+** Sealed notebook game
+*** Seal the notebook, open lines with receipts
+*** Dice rolls from the seals (play alone)
+*** Fewer peeks = shorter letter
+left side
+** Division trick
+*** Subtract the claim, divide by (spot - a)
+*** True claim: shorter rule
+*** False claim: a mess
+** Surprise question
+*** Ask about a far-away spot first
+*** Welds the Storyteller to one rule
+** Blending
+*** Mix many notebooks with one roll
+*** A mess cannot hide in a blend
+** Folding
+*** Even half + roll x odd half
+*** Half the length, half the rule
+*** Smudges survive folding
+@endmindmap

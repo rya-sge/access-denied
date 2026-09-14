@@ -1,0 +1,37 @@
+@startuml
+title The sealed notebook game
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #7A5BB5
+}
+
+participant "Storyteller\n(prover)" as S
+participant "Inspector\n(verifier)" as I
+
+S -> I : seal of notebook 1
+I -> S : dice roll
+S -> I : seal of notebook 2
+I -> S : dice roll
+S -> I : seal of the last notebook
+note over S, I #F3EEFB
+  Trick: the dice rolls can be computed
+  from the seals, so the Storyteller can
+  play alone and mail one letter.
+end note
+I -> S : "open line 4,217 of notebook 1"
+S -> I : the line + a receipt against the seal
+I -> S : "open line 88 of notebook 2"
+S -> I : the line + a receipt
+I -> I : check the opened lines fit together\nsay yes or no
+note over I
+  Every opened line costs one receipt.
+  Fewer peeks means a shorter letter.
+end note
+@enduml

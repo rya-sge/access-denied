@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI Part 1\ntwelve cards
+** Codes and radii
+*** Reed-Solomon code\n//polynomial → evaluations; different polynomials rarely agree//
+*** Rate\n//rho = d/n; every bound is a function of it//
+*** Delta-far\n//far = wrong in more than a delta fraction//
+*** Unique decoding distance\n//below (1-rho)/2, exactly one candidate//
+*** Johnson bound\n//1 - sqrt(rho); few candidates; the proofs stop here//
+** Oracle proofs
+*** Interactive oracle proof (IOP)\n//strings sent, dice rolled, a few cells read//
+*** IOP of proximity (IOPP)\n//accept codewords, reject the far, promise nothing between//
+*** BCS compiler\n//Merkle roots + Fiat-Shamir turn an IOP into a SNARK//
+left side
+** Evaluation proofs
+*** Quotienting\n//(u - b)/(x - a): evaluation claim → proximity claim//
+*** DEEP\n//one random (r, s) outside the domain pins one polynomial//
+** Distance-preserving maps
+*** Proximity gap theorem\n//a far word cannot hide in a random blend//
+*** Folding\n//even + r · odd; half the degree, distance kept//
+@endmindmap

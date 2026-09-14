@@ -1,0 +1,28 @@
+@startuml
+title The division trick: checking one value of the rule
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+  DiamondBackgroundColor #F3EEFB
+  DiamondBorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+start
+:Storyteller claims: "my rule gives 10 at spot 3";
+:Inspector builds a new list from the sealed notebook:
+  new line = (old line - 10) / (spot - 3);
+:Run the closeness check on the new list
+(peek at a few lines, compute them on the fly);
+if (Was the claim true?) then (yes)
+  :New list follows a rule one step shorter
+  (example: 4, 5, 7, 8 = spot + 3);<<#F3EEFB>>
+  :Closeness check passes;
+else (no)
+  :New list is a mess
+  (example: 4.5, 6, 6, 7.5);<<#FDEEEE>>
+  :Closeness check fails;
+endif
+stop
+@enduml

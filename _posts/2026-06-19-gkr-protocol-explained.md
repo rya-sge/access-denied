@@ -308,4 +308,5 @@ It lets small devices trust big ones. A phone, or a blockchain smart contract wi
 
 ### Related articles
 
+- [FRI Explained Like I'm Ten — How to Check a Million Numbers by Peeking at Twenty]({{site.url_complet}}/2026/09/14/fri-proximity-proofs-eli10/)
 - [The GKR Protocol — Delegating Computation with Interactive Proofs]({{site.url_complet}}/2026/06/19/gkr-protocol/)
