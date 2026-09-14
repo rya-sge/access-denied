@@ -771,3 +771,7 @@ _posts/2026-09-11-fri-proximity-proofs-part-1-codes-iop-quotienting-folding.md
   assets/article/cryptographie/zero-knowledge-proof/fri/fri-bcs-compiler-sequence.puml                       (sequence, in-section)
   assets/article/cryptographie/zero-knowledge-proof/fri/fri-deep-quotient-evaluation-sequence.puml           (sequence, in-section)
   assets/article/cryptographie/zero-knowledge-proof/fri/fri-folding-step-workflow.puml                       (workflow, in-section)
+
+_posts/2026-09-11-fri-proximity-proofs-glossary.md
+  assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-11-fri-proximity-proofs-glossary-mindmap.puml  (mindmap, by level)
+  assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-11-fri-proximity-proofs-glossary-themes.puml   (mindmap, by theme)

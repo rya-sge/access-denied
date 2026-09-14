@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI and proximity proofs\nvocabulary
+** Beginner
+*** Finite field
+*** Evaluation domain
+*** Hamming weight
+*** Relative Hamming distance
+*** Linear code
+*** Codeword
+*** Rate
+*** Reed-Solomon code
+*** Prover and verifier
+*** Committed string (oracle access)
+** Intermediate
+*** Minimum distance
+*** Singleton bound and MDS code
+*** Unique decoding distance
+*** List decoding
+*** Johnson bound
+*** Delta-close and delta-far
+*** Interactive oracle proof (IOP)
+*** Soundness, knowledge soundness and succinctness
+*** IOP of proximity (IOPP)
+*** Polynomial IOP (Poly-IOP)
+left side
+** Advanced
+*** BCS compiler
+*** Fiat-Shamir transformation
+*** Reed-Solomon IOPP
+*** Virtual oracle
+*** Quotienting
+*** Vanishing and interpolation polynomials
+*** DEEP (out-of-domain sampling)
+*** Distance-preserving transformation
+*** Proximity gap theorem (BCIKS)
+*** Folding
+@endmindmap

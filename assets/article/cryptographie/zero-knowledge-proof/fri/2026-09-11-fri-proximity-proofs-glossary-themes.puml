@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* FRI and proximity proofs\nby theme
+** Codes and distance
+*** Hamming weight\n//count of non-zero coordinates//
+*** Relative Hamming distance\n//fraction of differing coordinates//
+*** Linear code\n//subspace with parameters n, k, l//
+*** Codeword\n//element of the code, an encoded message//
+*** Minimum distance\n//smallest gap between two codewords//
+*** Singleton bound and MDS code\n//k at most n - l + 1, tight for MDS//
+** Reed-Solomon setting
+*** Finite field\n//integers modulo a prime p//
+*** Evaluation domain\n//the n points where polynomials are evaluated//
+*** Rate\n//message length over codeword length//
+*** Reed-Solomon code\n//evaluation tables of low-degree polynomials//
+** Decoding radii
+*** Unique decoding distance\n//half the minimum distance, one codeword//
+*** List decoding\n//all codewords within radius delta//
+*** Johnson bound\n//1 - sqrt(rho), list provably bounded//
+*** Delta-close and delta-far\n//within delta of the code, or beyond it//
+left side
+** Proof models
+*** Prover and verifier\n//the two parties of a proof system//
+*** Interactive oracle proof (IOP)\n//strings sent, cells read after challenges//
+*** Soundness, knowledge soundness and succinctness\n//what an IOP must guarantee//
+** Commitments and compilation
+*** Committed string (oracle access)\n//fixed string read cell by cell//
+*** BCS compiler\n//Merkle roots plus Fiat-Shamir give a SNARK//
+*** Fiat-Shamir transformation\n//challenges from a hash of the transcript//
+*** Virtual oracle\n//derived string computed from committed cells//
+** Evaluation proofs
+*** Polynomial IOP (Poly-IOP)\n//messages are bounded-degree polynomials//
+*** Quotienting\n//(u - b) / (x - a) tests a claimed value//
+*** Vanishing and interpolation polynomials\n//quotient by several points at once//
+*** DEEP (out-of-domain sampling)\n//random (r, s) pins one polynomial//
+** Proximity testing
+*** IOP of proximity (IOPP)\n//soundness only against delta-far inputs//
+*** Reed-Solomon IOPP\n//is the committed word close to the code//
+*** Distance-preserving transformation\n//far inputs give a far output//
+*** Proximity gap theorem (BCIKS)\n//combinations close for no r or every r//
+*** Folding\n//even and odd split, degree and domain halve//
+@endmindmap
