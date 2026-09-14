@@ -25,7 +25,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Reed-Solomon code
 
-**In plain words:** write down a short formula's answers at many points; that long list is the codeword.
+**In plain words:** A Reed-Solomon code turns a short formula into a long list by writing down the formula's answer at many points.
 
 **Precisely:** The code whose codewords are the values of a polynomial of degree less than $$d$$ at every point of a fixed domain $$L$$ of size $$n$$. Two distinct codewords agree in fewer than $$d$$ positions.
 
@@ -33,7 +33,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Rate
 
-**In plain words:** how much shorter the formula is than the list it produces.
+**In plain words:** The rate compares the length of the formula with the length of the list it produces; a rate of one quarter means the list is four times longer.
 
 **Precisely:** The ratio $$\rho = d/n$$ of message length to codeword length for a [Reed-Solomon code](#reed-solomon-code). Every decoding radius that follows is a function of $$\rho$$ alone.
 
@@ -41,7 +41,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Delta-far
 
-**In plain words:** a list is far from the code when more than a set share of its entries are wrong.
+**In plain words:** A list is delta-far from the code when more than a set share of its entries disagree with every valid list.
 
 **Precisely:** A word is $$\delta$$-far from a code if every codeword differs from it in more than a $$\delta$$ fraction of positions, and $$\delta$$-close if some codeword is within that fraction.
 
@@ -49,7 +49,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Unique decoding distance
 
-**In plain words:** with few enough errors, only one formula could have produced the list.
+**In plain words:** The unique decoding distance is the number of errors a list can contain while only one formula could still have produced it.
 
 **Precisely:** The radius $$\mu/2$$, about $$(1-\rho)/2$$ for Reed-Solomon, within which a word has at most one codeword; two would contradict the minimum distance by the triangle inequality.
 
@@ -57,7 +57,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Johnson bound
 
-**In plain words:** with a few more errors, several formulas could fit, but still only a few; beyond this line nobody knows.
+**In plain words:** The Johnson bound is the larger error level below which only a few formulas can fit a list; past it, nobody knows how many could.
 
 **Precisely:** The radius $$1 - \sqrt\rho$$ below which the number of Reed-Solomon codewords within $$\delta$$ of any word is provably bounded. Between it and $$1 - \rho$$ the list size for structured domains is unknown.
 
@@ -65,7 +65,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Interactive oracle proof (IOP)
 
-**In plain words:** the prover sends long lists, the verifier rolls dice, then reads only a few entries.
+**In plain words:** In an interactive oracle proof, the prover sends long lists, the verifier answers with random numbers, and at the end the verifier reads only a few entries.
 
 **Precisely:** A proof system in which the prover sends strings, the verifier answers with random challenges, and the verifier's decision algorithm reads only a few cells of the strings (oracle access) rather than the strings themselves.
 
@@ -73,7 +73,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### IOP of proximity (IOPP)
 
-**In plain words:** a proof that a sealed list is close to a valid one; lists with many errors are rejected.
+**In plain words:** An IOP of proximity proves that a sealed list is close to a valid one; lists with many errors are rejected and valid lists are always accepted.
 
 **Precisely:** An [IOP](#interactive-oracle-proof-iop) whose instance includes a committed word and whose soundness is required only against words $$\delta$$-far from the relation: codewords are always accepted, [$$\delta$$-far](#delta-far) words rejected with overwhelming probability, and nothing is promised in between.
 
@@ -81,7 +81,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### BCS compiler
 
-**In plain words:** replace each list by a hash fingerprint and the dice by hashes, and the game becomes one short proof.
+**In plain words:** The BCS compiler turns the interactive game into one short proof by replacing each list with a hash fingerprint and each random number with a hash.
 
 **Precisely:** The transformation of an IOP into a hash-based SNARK: strings become Merkle roots, cell reads become Merkle authentication paths, and challenges become hashes of the transcript (Fiat-Shamir). Proof size is driven by the number of cell reads.
 
@@ -89,7 +89,7 @@ Twelve cards, each with a plain-words definition, a precise one, and one thing t
 
 ### Quotienting
 
-**In plain words:** to check one claimed value, subtract it and divide; the result is tidy if the claim is true and a mess otherwise.
+**In plain words:** Quotienting checks one claimed value by subtracting it from every entry and dividing; the result is a tidy list if the claim is true and a mess if it is false.
 
 **Precisely:** Turning the claim "$$f(a) = b$$" about a committed word $$u$$ into a proximity claim: if true, the quotient is a codeword of degree one less; if false for every polynomial near $$u$$, it is $$\delta$$-far.
 
@@ -103,7 +103,7 @@ $$
 
 ### DEEP
 
-**In plain words:** ask for the formula's value at one random far-away point first, so the prover cannot switch formulas later.
+**In plain words:** DEEP makes the verifier ask for the formula's value at one random far-away point first, so the prover can no longer switch between formulas.
 
 **Precisely:** An out-of-domain sample: before any evaluation query the verifier picks a random $$r$$ outside $$L$$, the prover answers $$s = f(r)$$, and every later quotient includes $$(r, s)$$. Below the Johnson bound this binds the prover to one polynomial in the list.
 
@@ -111,7 +111,7 @@ $$
 
 ### Proximity gap theorem
 
-**In plain words:** mix several lists with random weights; if even one is a mess, the mix is a mess too.
+**In plain words:** The proximity gap theorem says that if you mix several lists with random weights and even one of them is a mess, the mix is almost always a mess too.
 
 **Precisely:** For $$\delta$$ below the [Johnson bound](#johnson-bound), the combination $$\sum_j r^j u_j$$ is $$\delta$$-close either for a negligible fraction of $$r$$ or for all $$r$$; in the second case every $$u_j$$ agrees with a codeword on one common set of positions.
 
@@ -119,7 +119,7 @@ $$
 
 ### Folding
 
-**In plain words:** blend each entry with its mirror entry to get a list half as long from a formula half as big.
+**In plain words:** Folding blends each entry of a list with its mirror entry, producing a list half as long that comes from a formula half as big.
 
 **Precisely:** Splitting a word on $$L$$ into even and odd parts and recombining them with a random $$r$$ on the halved domain $$L^2$$; degree bound and domain halve, the rate is unchanged, and below the Johnson bound distance is preserved.
 
@@ -135,18 +135,18 @@ $$
 
 | # | Term | In plain words | One thing to remember |
 |:---:|------|----------------|------------------------|
-| 1 | Reed-Solomon code | write down a short formula's answers at many points; that long list is the codeword | polynomial → evaluations; different polynomials rarely agree |
-| 2 | Rate | how much shorter the formula is than the list it produces | $$\rho = d/n$$; every bound is a function of it |
-| 3 | Delta-far | a list is far from the code when more than a set share of its entries are wrong | far = wrong in more than a $$\delta$$ fraction |
-| 4 | Unique decoding distance | with few enough errors, only one formula could have produced the list | below $$(1-\rho)/2$$, exactly one candidate |
-| 5 | Johnson bound | with a few more errors, several formulas could fit, but still only a few; beyond this line nobody knows | $$1 - \sqrt\rho$$; few candidates; the proofs stop here |
-| 6 | Interactive oracle proof (IOP) | the prover sends long lists, the verifier rolls dice, then reads only a few entries | strings sent, dice rolled, a few cells read |
-| 7 | IOP of proximity (IOPP) | a proof that a sealed list is close to a valid one; lists with many errors are rejected | accept codewords, reject the far, promise nothing between |
-| 8 | BCS compiler | replace each list by a hash fingerprint and the dice by hashes, and the game becomes one short proof | Merkle roots + Fiat-Shamir turn an IOP into a SNARK |
-| 9 | Quotienting | to check one claimed value, subtract it and divide; the result is tidy if the claim is true and a mess otherwise | $$(u - b)/(x - a)$$: evaluation claim → proximity claim |
-| 10 | DEEP | ask for the formula's value at one random far-away point first, so the prover cannot switch formulas later | one random $$(r, s)$$ outside the domain pins one polynomial |
-| 11 | Proximity gap theorem | mix several lists with random weights; if even one is a mess, the mix is a mess too | a far word cannot hide in a random blend |
-| 12 | Folding | blend each entry with its mirror entry to get a list half as long from a formula half as big | even + $$r$$ · odd; half the degree, distance kept |
+| 1 | Reed-Solomon code | A Reed-Solomon code turns a short formula into a long list by writing down the formula's answer at many points. | polynomial → evaluations; different polynomials rarely agree |
+| 2 | Rate | The rate compares the length of the formula with the length of the list it produces; a rate of one quarter means the list is four times longer. | $$\rho = d/n$$; every bound is a function of it |
+| 3 | Delta-far | A list is delta-far from the code when more than a set share of its entries disagree with every valid list. | far = wrong in more than a $$\delta$$ fraction |
+| 4 | Unique decoding distance | The unique decoding distance is the number of errors a list can contain while only one formula could still have produced it. | below $$(1-\rho)/2$$, exactly one candidate |
+| 5 | Johnson bound | The Johnson bound is the larger error level below which only a few formulas can fit a list; past it, nobody knows how many could. | $$1 - \sqrt\rho$$; few candidates; the proofs stop here |
+| 6 | Interactive oracle proof (IOP) | In an interactive oracle proof, the prover sends long lists, the verifier answers with random numbers, and at the end the verifier reads only a few entries. | strings sent, dice rolled, a few cells read |
+| 7 | IOP of proximity (IOPP) | An IOP of proximity proves that a sealed list is close to a valid one; lists with many errors are rejected and valid lists are always accepted. | accept codewords, reject the far, promise nothing between |
+| 8 | BCS compiler | The BCS compiler turns the interactive game into one short proof by replacing each list with a hash fingerprint and each random number with a hash. | Merkle roots + Fiat-Shamir turn an IOP into a SNARK |
+| 9 | Quotienting | Quotienting checks one claimed value by subtracting it from every entry and dividing; the result is a tidy list if the claim is true and a mess if it is false. | $$(u - b)/(x - a)$$: evaluation claim → proximity claim |
+| 10 | DEEP | DEEP makes the verifier ask for the formula's value at one random far-away point first, so the prover can no longer switch between formulas. | one random $$(r, s)$$ outside the domain pins one polynomial |
+| 11 | Proximity gap theorem | The proximity gap theorem says that if you mix several lists with random weights and even one of them is a mess, the mix is almost always a mess too. | a far word cannot hide in a random blend |
+| 12 | Folding | Folding blends each entry of a list with its mirror entry, producing a list half as long that comes from a formula half as big. | even + $$r$$ · odd; half the degree, distance kept |
 
 ## Conclusion
 
