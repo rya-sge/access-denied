@@ -13,7 +13,7 @@ isMath: false
 
 A token contract usually carries a small piece of public configuration that every transfer has to consult: a pause flag, a fee rate, an allowlist entry. 
 
-On Ethereum this is a storage read and nothing more. 
+On Ethereum this is a single storage read. 
 
 On [Aztec](https://aztec.network/), the private half of a transfer is proved on the user's device against a block that has already been mined, so the function never sees the chain's present state and cannot know whether the flag flipped since. 
 

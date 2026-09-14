@@ -253,7 +253,7 @@ ARC-1155. AIP-20 keeps a public `total_supply`, and every private mint or burn e
 
 **Q: What can an outside observer learn from each kind of operation?**
 
-From a private-to-private transfer, mint-to-private on ARC-1155, or an escrow withdrawal: nullifiers and note hashes that cannot be linked to accounts, and nothing else. From a cross-domain transfer: the public party and the amount (or token id), with the private party replaced by the sentinel. From a public-to-public transfer, a public mint or burn, or an AIP-20 private mint's supply update: everything, as on Ethereum. From the vault's `*_public_to_private*` functions: possibly the recipient, through the documented authwit brute-force.
+From a private-to-private transfer, mint-to-private on ARC-1155, or an escrow withdrawal: only nullifiers and note hashes that cannot be linked to accounts. From a cross-domain transfer: the public party and the amount (or token id), with the private party replaced by the sentinel. From a public-to-public transfer, a public mint or burn, or an AIP-20 private mint's supply update: everything, as on Ethereum. From the vault's `*_public_to_private*` functions: possibly the recipient, through the documented authwit brute-force.
 
 ## References
 
