@@ -438,7 +438,7 @@ One fold takes a polynomial of degree less than $$d$$ over a domain of size $$n$
 
 ### Related articles
 
-- [FRI Part 1 in Twelve Cards — The Definitions to Memorise From the Lecture]({{site.url_complet}}/2026/09/14/fri-part-1-flashcards/)
+- [The FRI Toolbox in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-toolbox-flashcards/)
 - [FRI in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-flashcards/)
 - [FRI Explained Like I'm Ten — How to Check a Million Numbers by Peeking at Twenty]({{site.url_complet}}/2026/09/14/fri-proximity-proofs-eli10/)
 - [FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-glossary/)

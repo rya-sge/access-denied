@@ -782,8 +782,14 @@ _posts/2026-09-14-fri-proximity-proofs-eli10.md
   assets/article/cryptographie/zero-knowledge-proof/fri/fri-eli10-division-trick-workflow.puml              (workflow, in-section)
   assets/article/cryptographie/zero-knowledge-proof/fri/fri-eli10-folding-workflow.puml                     (workflow, in-section)
 
-_posts/2026-09-14-fri-part-1-flashcards.md
-  assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-14-fri-part-1-flashcards-mindmap.puml  (mindmap, clustered flashcards)
+_posts/2026-09-14-fri-toolbox-flashcards.md
+  assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-14-fri-toolbox-flashcards-mindmap.puml  (mindmap, clustered flashcards)
 
 _posts/2026-09-14-fri-flashcards.md
   assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-14-fri-flashcards-mindmap.puml         (mindmap, clustered flashcards)
+
+_posts/2026-09-14-aztec-delayed-public-mutable-pause-privacy-delay.md
+  assets/article/blockchain/aztec/2026-09-14-aztec-delayed-public-mutable-mindmap.puml       (mindmap)
+  assets/article/blockchain/aztec/delayed-public-mutable-two-paths-concept.puml               (concept, in-section)
+  assets/article/blockchain/aztec/delayed-public-mutable-private-read-sequence.puml           (sequence, in-section)
+  assets/article/blockchain/aztec/delayed-pause-timeline-workflow.puml                        (activity, in-section)

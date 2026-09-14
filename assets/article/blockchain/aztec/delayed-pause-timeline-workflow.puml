@@ -1,0 +1,39 @@
+@startuml
+title A scheduled pause takes effect one delay later, whatever transfers were proved
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #EEF5FF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+
+start
+:t0: pause role calls pause();
+:schedule_value_change(true)
+timestamp_of_change = t0 + D;
+note right
+  Public. Anyone can read
+  the deadline t0 + D.
+end note
+fork
+  :Transfer proved before t0
+  read paused = false
+  expiration = anchor + D (<= t0 + D);<<#EEF5FF>>
+fork again
+  :Transfer proved after t0
+  read paused = false (pending change)
+  expiration = t0 + D exactly;<<#EEF5FF>>
+end fork
+if (block timestamp < t0 + D ?) then (yes)
+  :Included. Transfers keep settling.;<<#FDEEEE>>
+else (no)
+  :Expired, or read paused = true
+  and failed in simulation.;
+endif
+:t0 + D: first block where the flag is true.
+Pause window = D, for any D.;
+stop
+@enduml

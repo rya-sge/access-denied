@@ -11,7 +11,7 @@ mindmapDiagram {
   }
 }
 </style>
-* FRI Part 1\ntwelve cards
+* The FRI toolbox\ntwelve cards
 ** Codes and radii
 *** Reed-Solomon code\n//polynomial → evaluations; different polynomials rarely agree//
 *** Rate\n//rho = d/n; every bound is a function of it//

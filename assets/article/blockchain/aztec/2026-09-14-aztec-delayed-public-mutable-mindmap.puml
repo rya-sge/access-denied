@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* DelayedPublicMutable\non Aztec
+** The problem
+*** Private functions are proved\nagainst an anchor block
+*** Historical read proves the past,\nnot the present
+*** PublicMutable has no private read
+** Option 1: enqueue a public check
+*** only_self public assert
+*** Exact and immediate
+*** Publishes contract + selector\n(a countable transfer event)
+** Option 2: DelayedPublicMutable
+*** Writes are scheduled: now + delay
+*** Private read = historical read\n+ time horizon
+*** set_expiration_timestamp(horizon)
+*** Delay decrease waits the difference,\nincrease is immediate
+*** ~4k constraints per read,\npack values into one struct
+** What the delay costs
+*** Inclusion window = delay\n(default MAX_TX_LIFETIME = 24 h)
+*** Kernel keeps the minimum\nacross all functions
+*** expiration - anchor is public:\nprivacy-set fingerprint
+*** Pending change = public deadline
+** Unsuitable for emergency pause
+*** Pause lands only at t0 + D
+*** Short D = tight window + unique fingerprint
+*** Long D = hours-long pause window
+*** Hybrid: delayed config,\npublic kill switch
+** Choosing the delay
+*** One delay per contract
+*** Match ecosystem values
+*** Seconds, not blocks
+*** Budget against proving time
+@endmindmap

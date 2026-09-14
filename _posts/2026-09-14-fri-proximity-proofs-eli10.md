@@ -233,7 +233,7 @@ The two halves together are the whole rule, so nothing is thrown away when you s
 
 ### Related articles
 
-- [FRI Part 1 in Twelve Cards — The Definitions to Memorise From the Lecture]({{site.url_complet}}/2026/09/14/fri-part-1-flashcards/)
+- [The FRI Toolbox in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-toolbox-flashcards/)
 - [FRI in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-flashcards/)
 - [FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-part-1-codes-iop-quotienting-folding/)
 - [FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-glossary/)

@@ -307,7 +307,7 @@ Plain proximity would say each $$u_j$$ is individually within $$\delta$$ of some
 
 ### Related articles
 
-- [FRI Part 1 in Twelve Cards — The Definitions to Memorise From the Lecture]({{site.url_complet}}/2026/09/14/fri-part-1-flashcards/)
+- [The FRI Toolbox in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-toolbox-flashcards/)
 - [FRI in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-flashcards/)
 - [FRI Explained Like I'm Ten — How to Check a Million Numbers by Peeking at Twenty]({{site.url_complet}}/2026/09/14/fri-proximity-proofs-eli10/)
 - [FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-part-1-codes-iop-quotienting-folding/)

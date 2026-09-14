@@ -1,0 +1,37 @@
+@startuml
+title Private read of a DelayedPublicMutable and its expiration bound
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+
+actor Admin
+participant "Token (public)\npaused: DelayedPublicMutable" as Pub
+participant "Wallet / PXE\nprivate transfer()" as PXE
+participant "Kernel circuits" as Kernel
+participant "Sequencer / rollup" as Seq
+
+== Earlier: a write is scheduled ==
+Admin -> Pub : pause()
+Pub -> Pub : schedule_value_change(true)\nstore (pre=false, post=true,\n timestamp_of_change = now + DELAY)
+
+== Later: a private transfer ==
+PXE -> PXE : pick anchor block N (already mined)
+PXE -> Pub : historical storage read at block N\n(WithHash: one inclusion proof)
+Pub --> PXE : (pre, post, timestamp_of_change, delay)
+PXE -> PXE : current = value at N's timestamp\nhorizon = timestamp_of_change if pending\n           else anchor_ts + DELAY
+PXE -> Kernel : set_expiration_timestamp(horizon)
+Kernel -> Kernel : keep the minimum over\nall functions in the tx
+PXE -> Seq : broadcast proven tx\n(expiration_timestamp is public)
+alt block timestamp <= expiration
+  Seq -> Seq : include; value read at N\nis still current
+else block timestamp > expiration
+  Seq -> Seq : reject as expired
+end
+@enduml

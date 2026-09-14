@@ -13,7 +13,7 @@ isMath: true
 
 FRI, the Fast Reed-Solomon Interactive Oracle Proof of Proximity, is the low-degree test underneath STARKs and most hash-based SNARKs. It was introduced by Ben-Sasson, Bentov, Horesh and Riabzev in [a 2017 paper](https://eccc.weizmann.ac.il/report/2017/134/), and it is the subject of a two-part [ZK Whiteboard Sessions lecture by Dan Boneh](https://www.youtube.com/watch?v=MBDBrEr2XQg). This deck is for someone who has met the protocol once and wants a mental map that survives a week.
 
-Twelve cards, one thing to remember each, and a revision table at the end. The cards define the pieces and the two phases of the protocol; they do not derive its soundness. The lecture's first half, which builds the coding-theory and oracle-proof toolbox, has its own deck in [FRI Part 1 in Twelve Cards]({{site.url_complet}}/2026/09/14/fri-part-1-flashcards/), and the full thirty-term vocabulary is in [FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-glossary/).
+Twelve cards, each with a plain-words definition, a precise one, and one thing to remember, plus a revision table at the end. The cards define the pieces and the two phases of the protocol; they do not derive its soundness. The lecture's first half, which builds the coding-theory and oracle-proof toolbox, has its own deck in [The FRI Toolbox in Twelve Cards]({{site.url_complet}}/2026/09/14/fri-toolbox-flashcards/), and the full thirty-term vocabulary is in [FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-glossary/).
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -23,49 +23,65 @@ Twelve cards, one thing to remember each, and a revision table at the end. The c
 
 ### Low-degree polynomial
 
-A polynomial whose degree bound $$d$$ is small compared with the size $$n$$ of the domain it is evaluated on, so that its evaluation table is much longer than its coefficient list. FRI is a test for this property.
+**In plain words:** a short formula whose list of answers is much longer than the formula itself.
+
+**Precisely:** A polynomial whose degree bound $$d$$ is small compared with the size $$n$$ of the domain it is evaluated on, so that its evaluation table is much longer than its coefficient list. FRI is a test for this property.
 
 **Remember:** few coefficients, many evaluations
 
 ### Reed-Solomon code
 
-The code whose codewords are the values of a [low-degree polynomial](#low-degree-polynomial) at every point of a fixed domain $$L$$. Two distinct codewords agree in fewer than $$d$$ positions, so different polynomials produce very different tables.
+**In plain words:** write down a short formula's answers at many points; that long list is the codeword.
+
+**Precisely:** The code whose codewords are the values of a [low-degree polynomial](#low-degree-polynomial) at every point of a fixed domain $$L$$. Two distinct codewords agree in fewer than $$d$$ positions, so different polynomials produce very different tables.
 
 **Remember:** polynomial → evaluations; different polynomials rarely agree
 
 ### Rate
 
-The ratio $$\rho = d/n$$ of degree bound to domain size. The unique decoding distance is about $$(1-\rho)/2$$ and the Johnson bound is $$1 - \sqrt\rho$$; FRI's proximity parameter is chosen below the latter.
+**In plain words:** how much shorter the formula is than its list; it sets how many errors the test can tolerate.
+
+**Precisely:** The ratio $$\rho = d/n$$ of degree bound to domain size. The unique decoding distance is about $$(1-\rho)/2$$ and the Johnson bound is $$1 - \sqrt\rho$$; FRI's proximity parameter is chosen below the latter.
 
 **Remember:** $$\rho = d/n$$; work below $$1 - \sqrt\rho$$
 
 ### Proximity
 
-A word is $$\delta$$-close to the [Reed-Solomon code](#reed-solomon-code) if some codeword differs from it in at most a $$\delta$$ fraction of positions, and $$\delta$$-far otherwise. FRI tests closeness, not equality.
+**In plain words:** being close means only a small share of the list is wrong.
+
+**Precisely:** A word is $$\delta$$-close to the [Reed-Solomon code](#reed-solomon-code) if some codeword differs from it in at most a $$\delta$$ fraction of positions, and $$\delta$$-far otherwise. FRI tests closeness, not equality.
 
 **Remember:** close to a polynomial, not necessarily equal to one
 
 ### Merkle commitment
 
-A hash tree over an evaluation table whose root commits the prover to every entry, and whose authentication path opens one entry without revealing the rest. It is how the verifier gets oracle access to a table it never receives.
+**In plain words:** one fingerprint stands for the whole list, and a short receipt proves any single entry belongs to it.
+
+**Precisely:** A hash tree over an evaluation table whose root commits the prover to every entry, and whose authentication path opens one entry without revealing the rest. It is how the verifier gets oracle access to a table it never receives.
 
 **Remember:** root = the whole table; path = one entry
 
 ### IOP of proximity
 
-An interactive protocol in which the prover commits to words, the verifier sends random challenges and reads a few entries, and soundness is required only against words that are [$$\delta$$-far](#proximity): codewords always pass, far words almost never do.
+**In plain words:** a game where the verifier reads a few sealed entries and rejects lists that have many errors.
+
+**Precisely:** An interactive protocol in which the prover commits to words, the verifier sends random challenges and reads a few entries, and soundness is required only against words that are [$$\delta$$-far](#proximity): codewords always pass, far words almost never do.
 
 **Remember:** accept codewords, reject the far, read few entries
 
 ### Random challenge
 
-A field element $$r$$ the verifier sends after the prover has committed, used as the coefficient of the next fold. Chosen in advance, it would let the prover craft a far word that folds into a close one.
+**In plain words:** a random number the verifier picks only after the prover has sealed the list.
+
+**Precisely:** A field element $$r$$ the verifier sends after the prover has committed, used as the coefficient of the next fold. Chosen in advance, it would let the prover craft a far word that folds into a close one.
 
 **Remember:** $$r$$ after the commitment, never before
 
 ### Folding
 
-Combining the values of a word at $$x$$ and $$-x$$ into one value at $$x^2$$, weighted by the [random challenge](#random-challenge), so the degree bound and the domain both halve. A far word folds to a far word with high probability.
+**In plain words:** blend each entry with its mirror entry to get a list half as long from a formula half as big.
+
+**Precisely:** Combining the values of a word at $$x$$ and $$-x$$ into one value at $$x^2$$, weighted by the [random challenge](#random-challenge), so the degree bound and the domain both halve. A far word folds to a far word with high probability.
 
 $$
 \begin{aligned}
@@ -77,44 +93,52 @@ $$
 
 ### Commit phase
 
-The first half of FRI. The prover commits to $$f_0$$, receives $$r_0$$, computes and commits to the [fold](#folding) $$f_1$$, and repeats, each layer on a domain half the size, until the word is small enough to send in the clear.
+**In plain words:** seal the list, get a random number, fold, seal again, until the list is tiny.
+
+**Precisely:** The first half of FRI. The prover commits to $$f_0$$, receives $$r_0$$, computes and commits to the [fold](#folding) $$f_1$$, and repeats, each layer on a domain half the size, until the word is small enough to send in the clear.
 
 **Remember:** commit → challenge → fold, repeat until tiny
 
 ### Final polynomial
 
-The last layer of the [commit phase](#commit-phase), sent as explicit coefficients rather than as a commitment. Its degree bound is $$d / 2^k$$ after $$k$$ folds, often a constant, and the verifier checks it directly.
+**In plain words:** the last tiny formula is sent openly instead of sealed.
+
+**Precisely:** The last layer of the [commit phase](#commit-phase), sent as explicit coefficients rather than as a commitment. Its degree bound is $$d / 2^k$$ after $$k$$ folds, often a constant, and the verifier checks it directly.
 
 **Remember:** the last layer is sent in the clear
 
 ### Query phase
 
-The second half of FRI. The verifier picks a random position $$s$$ in the first domain and, for every layer, opens $$f_i(s)$$ and $$f_i(-s)$$ to check that $$f_{i+1}(s^2)$$ equals their fold, ending at the [final polynomial](#final-polynomial). This is repeated for several independent positions.
+**In plain words:** pick a random spot and check it in every sealed layer, then repeat with new spots.
+
+**Precisely:** The second half of FRI. The verifier picks a random position $$s$$ and, for every layer, opens $$f_i(s)$$ and $$f_i(-s)$$ to check that $$f_{i+1}(s^2)$$ is their fold, down to the [final polynomial](#final-polynomial); repeated for several positions.
 
 **Remember:** one position, checked through every layer, repeated
 
 ### FRI
 
-Fast Reed-Solomon Interactive Oracle Proof of Proximity: an [IOP of proximity](#iop-of-proximity) that proves a committed word is close to a low-degree polynomial by folding it down in a commit phase and then checking random positions across all layers in a query phase.
+**In plain words:** shrink the sealed list by folding, then spot-check the shrinking steps at random spots.
+
+**Precisely:** Fast Reed-Solomon Interactive Oracle Proof of Proximity: an [IOP of proximity](#iop-of-proximity) proving a committed word is close to a low-degree polynomial by folding it down in a commit phase, then checking random positions across all layers in a query phase.
 
 **Remember:** fold it down, then spot-check every layer
 
 ## Flashcard table
 
-| # | Term | One thing to remember |
-|:---:|------|------------------------|
-| 1 | Low-degree polynomial | few coefficients, many evaluations |
-| 2 | Reed-Solomon code | polynomial → evaluations; different polynomials rarely agree |
-| 3 | Rate | $$\rho = d/n$$; work below $$1 - \sqrt\rho$$ |
-| 4 | Proximity | close to a polynomial, not necessarily equal to one |
-| 5 | Merkle commitment | root = the whole table; path = one entry |
-| 6 | IOP of proximity | accept codewords, reject the far, read few entries |
-| 7 | Random challenge | $$r$$ after the commitment, never before |
-| 8 | Folding | combine $$f(x)$$ and $$f(-x)$$; halve the degree |
-| 9 | Commit phase | commit → challenge → fold, repeat until tiny |
-| 10 | Final polynomial | the last layer is sent in the clear |
-| 11 | Query phase | one position, checked through every layer, repeated |
-| 12 | FRI | fold it down, then spot-check every layer |
+| # | Term | In plain words | One thing to remember |
+|:---:|------|----------------|------------------------|
+| 1 | Low-degree polynomial | a short formula whose list of answers is much longer than the formula itself | few coefficients, many evaluations |
+| 2 | Reed-Solomon code | write down a short formula's answers at many points; that long list is the codeword | polynomial → evaluations; different polynomials rarely agree |
+| 3 | Rate | how much shorter the formula is than its list; it sets how many errors the test can tolerate | $$\rho = d/n$$; work below $$1 - \sqrt\rho$$ |
+| 4 | Proximity | being close means only a small share of the list is wrong | close to a polynomial, not necessarily equal to one |
+| 5 | Merkle commitment | one fingerprint stands for the whole list, and a short receipt proves any single entry belongs to it | root = the whole table; path = one entry |
+| 6 | IOP of proximity | a game where the verifier reads a few sealed entries and rejects lists that have many errors | accept codewords, reject the far, read few entries |
+| 7 | Random challenge | a random number the verifier picks only after the prover has sealed the list | $$r$$ after the commitment, never before |
+| 8 | Folding | blend each entry with its mirror entry to get a list half as long from a formula half as big | combine $$f(x)$$ and $$f(-x)$$; halve the degree |
+| 9 | Commit phase | seal the list, get a random number, fold, seal again, until the list is tiny | commit → challenge → fold, repeat until tiny |
+| 10 | Final polynomial | the last tiny formula is sent openly instead of sealed | the last layer is sent in the clear |
+| 11 | Query phase | pick a random spot and check it in every sealed layer, then repeat with new spots | one position, checked through every layer, repeated |
+| 12 | FRI | shrink the sealed list by folding, then spot-check the shrinking steps at random spots | fold it down, then spot-check every layer |
 
 ## Conclusion
 
@@ -159,7 +183,7 @@ Each position opens two entries per layer, each with a Merkle authentication pat
 
 ### Related articles
 
-- [FRI Part 1 in Twelve Cards — The Definitions to Memorise From the Lecture]({{site.url_complet}}/2026/09/14/fri-part-1-flashcards/)
+- [The FRI Toolbox in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/14/fri-toolbox-flashcards/)
 - [FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-glossary/)
 - [FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-part-1-codes-iop-quotienting-folding/)
 - [FRI Explained Like I'm Ten — How to Check a Million Numbers by Peeking at Twenty]({{site.url_complet}}/2026/09/14/fri-proximity-proofs-eli10/)
