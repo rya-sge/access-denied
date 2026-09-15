@@ -404,3 +404,4 @@ ERC-20 has no problem: everything is public and synchronous. ERC-7984 lets the D
 - [Technical Analysis of the OpenZeppelin ERC-7984 Implementation]({{site.url_complet}}/2026/02/24/erc7984-openzeppelin-analysis/)
 - [ERC-20 Implementation Comparison — OpenZeppelin, Solady, and Solarity Solidity Library]({{site.url_complet}}/2026/02/13/erc20-library-comparison-openzeppelin-solady-solarity/)
 - [Reading Public State from a Private Function on Aztec — Why a Pause Flag Comes with a Delay]({{site.url_complet}}/2026/09/14/aztec-delayed-public-mutable-pause-privacy-delay/)
+- [Code Reuse in Aztec Contracts — Modules, Traits and Library Crates Instead of Inheritance]({{site.url_complet}}/2026/09/15/aztec-noir-contract-code-reuse-without-inheritance/)

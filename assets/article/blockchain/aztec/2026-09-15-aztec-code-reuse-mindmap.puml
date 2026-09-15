@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Code reuse in\nAztec contracts
+** Why no inheritance
+*** Noir: structs, traits, generics,\nno "is", no super
+*** The aztec macro reads one\ncontract block, one file
+*** Composition, not extension
+** The contract module owns
+*** Entry points + attributes\n(external, authorize_once, only_self)
+*** storage struct = slot layout
+*** event types (global selector registry)
+*** enqueue_self / internal / emit
+** Library crates
+*** type = "lib", by path or git tag
+*** Module structs implement\nStateVariable<N, Context>
+*** impl per context: public vs private
+*** State variables are values:\npass them as arguments
+** Traits instead of virtual
+*** Screening trait: what a variant decides
+*** One impl per variant\n(FreezeAndLists, FreezeOnly)
+*** Generic chain, monomorphised:\nno dispatch, no cost
+*** contract_library_method\nfor helpers returning state
+** Cost check
+*** Calls inlined like internal helpers
+*** aztec profile gates before/after:\nidentical circuits
+** Contract crates as dependencies
+*** Interface only: Token::at(addr)
+*** Not the code, not the notes
+*** Event selector collision -> stub crate
+*** Nested workspace: build from a copy
+** What stays per contract
+*** Declarations, attributes,\nenqueues, events (~40%)
+*** Events: library returns the values,\ncontract emits and delivers
+*** Selector test across variants
+*** Noir 1.0+: restrictions may lift;\ncomptime macros possible but fragile
+@endmindmap
