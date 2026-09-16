@@ -1,0 +1,33 @@
+@startuml
+title The Process Control Block and what it points to
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam arrow {
+  Color #2E8B67
+}
+
+package "Kernel space (not accessible from the process)" {
+  [PCB of process P\n----\nState: ready, running, blocked, zombie\nPID, parent PID, priority\nSaved execution context: PC, SP, registers, FPU state\nAddress space descriptor\nHeap pointer, stack pointer\nOpen file descriptors\nReferences to child processes\nExit code] as pcb
+  [Page tables\n(MMU configuration)] as mmu
+  [Open file table] as oft
+  [PCBs of the children] as cpcb
+}
+
+package "User space of process P" {
+  [Code, Data, BSS,\nHeap, Stack] as mem
+}
+
+pcb --> mmu : address space
+pcb --> oft : descriptors
+pcb --> cpcb : children
+mmu --> mem : maps
+pcb ..> mem : saved PC and SP\npoint into
+@enduml

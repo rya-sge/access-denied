@@ -1,0 +1,43 @@
+@startuml
+title Context switch from process P0 to process P1
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "Process P0" as p0
+participant "Kernel" as k
+participant "Process P1" as p1
+
+activate p0 #B8E0CC
+p0 -> k : system call, IRQ or timer interrupt
+deactivate p0
+activate k #B8E0CC
+k -> k : kernel work (I/O request, exit(), scheduler tick)
+note right of k
+  a context switch **may** happen here:
+  P0 exits, blocks, or its time slice ends
+end note
+k -> k : 1. save registers, PC, SP,\n   FPU state into PCB0
+k -> k : 2. restore registers, PC, SP,\n   FPU state from PCB1
+k -> k : 3. reconfigure the MMU for\n   P1's address space, sync caches/TLB
+k -> p1 : 4. load P1's PC, return to user mode
+deactivate k
+activate p1 #B8E0CC
+p1 -> p1 : running
+p1 -> k : system call or interrupt
+deactivate p1
+activate k #B8E0CC
+k -> k : same four steps, PCB1 -> PCB0
+k -> p0 : return to user mode
+deactivate k
+activate p0 #B8E0CC
+p0 -> p0 : running again
+deactivate p0
+@enduml

@@ -131,7 +131,7 @@ message_hash = H(consumer, chain_id, version, inner_hash)
 
 The inner hash pins the caller, the function and the exact arguments; the outer hash pins the contract that will verify it, plus the chain id and version, which is what stops a witness being replayed on another chain. Read aloud, a witness says "this specific contract may call this specific function with these specific arguments, on this chain, once".
 
-The two execution contexts need different plumbing:
+The two execution contexts need different code around the check:
 
 - **In private**, the consuming contract makes a *static* call to the account contract asking whether the action is authorised. The account fetches the witness through a PXE oracle and answers. The call is static so that the account cannot re-enter and mutate state mid-verification — which also means the account cannot emit the nullifier, so the consuming contract does it instead.
 - **In public**, oracles do not exist, because the sequencer is running the code. Authorisations are written to a shared **auth registry** first and consumed from it. There is a neat efficiency here: if an authorisation is set and consumed in the same transaction, the two state changes squash.

@@ -54,3 +54,7 @@ openssh:
 hyperliquid:
   title: "The Hyperliquid Protocol"
   ordered: false
+
+sye:
+  title: "Operating Systems (HEIG-VD SYE Lectures)"
+  ordered: true

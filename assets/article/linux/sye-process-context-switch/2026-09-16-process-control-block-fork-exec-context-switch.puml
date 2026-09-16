@@ -1,0 +1,55 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* PCB, process creation\nand context switching
+** Process Control Block
+*** One per process, kernel-only
+*** State, PID, PC, registers, priority
+*** Stack, heap, address space
+*** Open files, children, exit code
+*** Allocated by fork() in the parent
+*** Freed after waitpid() collects the status
+*** Linux: task_struct
+** Process creation
+*** fork()
+**** Full copy of the parent
+**** Returns 0 in the child
+**** Returns the child PID in the parent
+**** Returns -1 on failure (errno)
+*** exec()
+**** Replaces the binary image
+**** Entry point then main()
+**** Library family, execve() is the syscall
+*** exit()
+**** Ends the process
+**** Status stored in the PCB
+*** waitpid()
+**** Blocks until a child ends
+**** Retrieves the status
+**** Frees the PCB (no more zombie)
+*** Launching a program = fork + exec
+** Context switch
+*** Triggers
+**** exit()
+**** Blocking wait (I/O)
+**** Scheduler decision (time slice)
+*** Steps
+**** Save state in outgoing PCB
+**** Restore state from incoming PCB
+**** Reconfigure the MMU
+**** Load the new PC
+*** Hardware involved
+**** Registers, FPU/VFP, coprocessors
+**** MMU, TLB, caches
+*** Cost: keep switches rare
+@endmindmap

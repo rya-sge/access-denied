@@ -1,0 +1,35 @@
+@startuml
+title Launching a program: fork(), exec(), exit() and waitpid()
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "Parent process\n(e.g. a shell)" as parent
+participant "Kernel" as kernel
+participant "Child process" as child
+
+parent -> kernel : fork()
+kernel -> kernel : allocate PCB, copy\nparent's memory context
+kernel --> child : returns 0
+kernel --> parent : returns child PID
+parent -> kernel : waitpid(pid, &status, 0)
+note right of parent
+  parent is blocked
+  until the child ends
+end note
+child -> kernel : execve(path, argv, envp)
+kernel -> kernel : replace the binary image,\nkeep PID and open files
+kernel --> child : jump to entry point, then main(argc, argv)
+child -> child : runs the new program
+child -> kernel : exit(status)
+kernel -> kernel : store status in child's PCB,\nchild becomes a zombie
+kernel --> parent : waitpid() returns, status filled
+kernel -> kernel : free child's PCB
+@enduml

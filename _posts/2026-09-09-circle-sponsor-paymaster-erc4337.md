@@ -15,7 +15,7 @@ A paymaster is the part of ERC-4337 that decides someone else pays. `SponsorPaym
 
 That split is the whole design. The policy question, whether this particular user deserves free gas, is answered off-chain by a service that can look at subscriptions, quotas, credit-card charges, or a free tier. The on-chain contract answers a much narrower question: did one of my trusted keys sign exactly this operation, and is the signature still inside its validity window? Everything in the 200 lines of `SponsorPaymaster.sol` below its licence header exists to make that second question cheap, unambiguous, and impossible to answer "yes" twice for the same operation.
 
-This article reads the contract as it stands at commit `3c47aa94`, walks through the byte layout it parses, the payload it signs, and the failure modes it deliberately does not revert on, then looks at the plumbing it inherits from `BasePaymaster` and at the operational surface an owner is left holding.
+This article reads the contract as it stands at commit `3c47aa94`, walks through the byte layout it parses, the payload it signs, and the failure modes it deliberately does not revert on, then looks at the deposit, stake and ownership functions it inherits from `BasePaymaster` and at the operational surface an owner is left holding.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -206,7 +206,7 @@ The parts that repay attention are the ones that are easy to get wrong elsewhere
 
 The residual risk sits off-chain and in the owner key. A compromised verifying signer drains the deposit up to whatever the validity windows allow, and a compromised owner key does so directly, or replaces the implementation. Neither is a flaw in the contract. Both are the trust this design deliberately places off-chain, in a service and a key rather than in code, and the contract at least makes it obvious where that trust sits.
 
-![Mindmap of Circle's SponsorPaymaster covering its role in ERC-4337, the BasePaymaster plumbing and SponsorPaymaster policy split, the paymasterAndData byte layout, what the signed payload commits to, the validation outcome encoding, and the operational surface]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/2026-09-09-circle-sponsor-paymaster-mindmap.png)
+![Mindmap of Circle's SponsorPaymaster covering its role in ERC-4337, the split between the BasePaymaster inherited functions and the SponsorPaymaster policy, the paymasterAndData byte layout, what the signed payload commits to, the validation outcome encoding, and the operational surface]({{site.url_complet}}/assets/article/blockchain/ethereum/erc-4337/2026-09-09-circle-sponsor-paymaster-mindmap.png)
 
 ## Annex
 

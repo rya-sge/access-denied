@@ -6,6 +6,8 @@ lang: en
 locale: en-GB
 categories: linux programmation
 tags: linux syscalls posix elf process abi arm libc memory-layout operating-system
+series: sye
+series_order: 1
 description: "How a system call crosses from user space to the kernel (svc, syscall number, ABI registers), how compiler and linker build an ELF image, and what a process is."
 image: /assets/article/linux/sye-syscalls-process/2026-09-16-system-calls-binary-image-process.png
 isMath: false

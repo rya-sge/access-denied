@@ -25,7 +25,7 @@ Two facts, one from the language and one from the framework, decide how every Az
 
 **Noir has no inheritance.** It is a Rust-like language: structs, `impl` blocks, traits, generics, modules and crates. There is no `is`, no `super`, no virtual dispatch. Code is shared the way Rust shares it, by calling functions and implementing traits, never by extending a type.
 
-**An Aztec contract is one module in one file.** The `#[aztec]` macro is applied to a `pub contract Name { … }` block. It walks the functions in that block, generates the entry-point plumbing for each `#[external(...)]` function (private context setup, public context setup, the kernel interface), computes the function selectors, builds the `Name::at(address)` interface other contracts use, and emits the artifact. It only looks inside the block. The [contract structure documentation](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/contract_structure) states the limitation and its scope: all `#[external]` functions "must be defined directly inside the `contract` block, that is, in the same file", while "it is possible to define `#[internal]` and helper functions in `mod`s in other files".
+**An Aztec contract is one module in one file.** The `#[aztec]` macro is applied to a `pub contract Name { … }` block. It walks the functions in that block and, for each `#[external(...)]` function, generates the wrapper that makes it callable: the code that builds the `PrivateContext` or `PublicContext` from the call inputs, checks initialization, hashes the arguments and returns the kernel inputs. It then computes the function selectors, builds the `Name::at(address)` interface other contracts use, and emits the artifact. It only looks inside the block. The [contract structure documentation](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/contract_structure) states the limitation and its scope: all `#[external]` functions "must be defined directly inside the `contract` block, that is, in the same file", while "it is possible to define `#[internal]` and helper functions in `mod`s in other files".
 
 Together they rule out the Solidity pattern in both of its forms. You cannot inherit a base token because there is no inheritance, and you cannot import a base token's entry points because the macro would not see them. What remains is composition: the contract block declares its entry points, and everything those entry points *do* can live elsewhere.
 
@@ -270,7 +270,7 @@ Two traps come with contract dependencies, and both surface as confusing errors:
 
 ### Events: emitted by the contract, shaped by the library
 
-Events deserve their own paragraph, because they are the one thing a library can neither declare nor emit, and the reason is mechanical rather than a rule. An `#[event] struct Transfer { from, to, amount }` is turned by the macro into a contract type: it gains an `EventInterface` implementation with a selector derived from the struct's signature, and that selector is entered in the crate-graph-wide registry mentioned above. The struct therefore belongs to the contract that declares it, in the same sense that the storage struct does.
+Events deserve their own paragraph, because they are the one thing a library can neither declare nor emit, and the constraint comes from what the `#[event]` and `#[aztec]` macros generate, not from a style rule. An `#[event] struct Transfer { from, to, amount }` is turned by the macro into a contract type: it gains an `EventInterface` implementation with a selector derived from the struct's signature, and that selector is entered in the crate-graph-wide registry mentioned above. The struct therefore belongs to the contract that declares it, in the same sense that the storage struct does.
 
 Emitting it is a method of the generated `self`, and the two execution contexts differ in what emitting means. In a **public** function, `self.emit(Transfer { … })` writes a public log: plaintext, visible to everyone, the same as a Solidity event, and nothing further to do. In a **private** function, `self.emit(...)` does two things: it pushes a nullifier that is a randomised commitment to the event, so that a third party can later verify the event is authentic without learning its content; and it returns an `EventMessage` that the caller *must* deliver, or the event is lost. Delivery names a recipient and a mode: `deliver_to(to, MessageDelivery::onchain_constrained())` encrypts the event to `to` and proves in the circuit that the ciphertext matches, at a measurable gate cost per delivery; the same message can be delivered again to a second party, such as an auditor.
 
@@ -301,7 +301,7 @@ Two consequences follow. The *policy* of who receives an event and in which mode
 
 After the refactor, each variant still carries, per entry point, the declaration line, its attributes, the `enqueue_self` call and the event emission. On the token above that is roughly forty percent of what the entry points used to be, and all of it is declaration rather than rule. A test that reads each variant's selectors from its compiled interface and asserts the shared set is equal across variants turns "keep the files in step" from a review rule into a check.
 
-Two things could change this. The documentation itself says the single-file restriction is not permanent: "we expect to lift some of these restrictions sometime after the release of Noir 1.0". And Noir's `comptime` metaprogramming, which is how the `#[aztec]` macro generates the plumbing today, could in principle stamp a set of entry points into a contract from a description — the framework already generates `interface()` and `enqueue_self` that way. A project-level macro of that kind is possible now and fragile now, because it would depend on macro internals that have changed with every framework release. Until the language moves, the trait-and-library shape above is the stable one.
+Two things could change this. The documentation itself says the single-file restriction is not permanent: "we expect to lift some of these restrictions sometime after the release of Noir 1.0". And Noir's `comptime` metaprogramming, which is how the `#[aztec]` macro generates its wrappers, selectors and interfaces today, could in principle stamp a set of entry points into a contract from a description — the framework already generates `interface()` and `enqueue_self` that way. A project-level macro of that kind is possible now and fragile now, because it would depend on macro internals that have changed with every framework release. Until the language moves, the trait-and-library shape above is the stable one.
 
 ## Conclusion
 
@@ -316,7 +316,7 @@ Aztec contracts cannot inherit, and every entry point must sit in one contract b
 | Term | Definition |
 |------|------------|
 | **Contract block** | The `pub contract Name { … }` module the `#[aztec]` macro processes; the only place `#[external]` functions, `#[storage]` and `#[event]` types may be declared. |
-| **`#[aztec]` macro** | The comptime macro that turns the contract block into an artifact: entry-point plumbing, selectors, the `Name::at(address)` interface, storage-slot allocation. |
+| **`#[aztec]` macro** | The comptime macro that turns the contract block into an artifact: a callable wrapper per `#[external]` function, the selectors, the `Name::at(address)` interface, storage-slot allocation. |
 | **Library crate** | A Noir crate with `type = "lib"`; holds structs, traits and functions that any contract crate can depend on. The `aztec` framework is one. |
 | **State variable** | A struct implementing `StateVariable<N, Context>`: a context handle plus a storage slot, occupying `N` slots. `PublicMutable`, `Map`, `PrivateSet` and a project's own modules all are. |
 | **Module struct** | A project-defined state variable composing framework ones (a pause switch, a freeze list), held as a field of a contract's storage struct. |
@@ -355,7 +355,7 @@ Aztec contracts cannot inherit, and every entry point must sit in one contract b
 
 **Q: Why can a Noir library not simply export a token's `transfer` entry point?**
 
-Because `#[external]` functions are processed by the `#[aztec]` macro, which reads only the contract block it is applied to. A function in a library is invisible to it: no plumbing is generated, no selector, no entry in the artifact. The library can export the *body* as an ordinary function; the contract must declare the entry point that calls it.
+Because `#[external]` functions are processed by the `#[aztec]` macro, which reads only the contract block it is applied to. A function in a library is invisible to it: no wrapper is generated, so it has no selector and no entry in the artifact. The library can export the *body* as an ordinary function; the contract must declare the entry point that calls it.
 
 **Q: How does a library function get access to the contract's storage?**
 
