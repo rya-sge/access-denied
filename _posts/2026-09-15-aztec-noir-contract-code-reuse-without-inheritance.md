@@ -398,3 +398,4 @@ Because the module's private `impl` does not offer a read on a `PublicMutable`, 
 - [Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-4626 and the Escrow Standard]({{site.url_complet}}/2026/09/11/aztec-contract-standards-overview/)
 - [AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/)
 - [ERC-20 Implementation Comparison — OpenZeppelin, Solady, and Solarity Solidity Library]({{site.url_complet}}/2026/02/13/erc20-library-comparison-openzeppelin-solady-solarity/)
+- [Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps]({{site.url_complet}}/2026/09/16/aztec-packable-storage-packing/)

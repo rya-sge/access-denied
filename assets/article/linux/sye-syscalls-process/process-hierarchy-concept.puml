@@ -1,0 +1,48 @@
+@startuml
+title Process hierarchy: root process, applications, parent/child and threads
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+  BorderStyle dashed
+}
+skinparam arrow {
+  Color #2E8B67
+}
+
+[P0\nroot process] as p0
+
+package "Application A" {
+  [P1] as p1
+}
+
+package "Application B" {
+  [P2\nparent] as p2
+  [P3\nchild] as p3
+  [P4\nchild] as p4
+}
+
+package "Application C (multithreaded)" {
+  component "P5" as p5 {
+    [T0] as t0
+    [T1] as t1
+    [T2] as t2
+    [T3] as t3
+  }
+}
+
+p0 --> p1 : creates
+p0 --> p2 : creates
+p0 --> p5 : creates
+p2 --> p3 : fork
+p2 --> p4 : fork
+note bottom of p5
+  T0..T3 are execution contexts
+  sharing one memory context
+end note
+@enduml

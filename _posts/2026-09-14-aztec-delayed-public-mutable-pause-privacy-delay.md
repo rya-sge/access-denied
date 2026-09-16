@@ -320,3 +320,4 @@ The kernel keeps the minimum, so the transaction expires 1,000 seconds after its
 - [Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-4626 and the Escrow Standard]({{site.url_complet}}/2026/09/11/aztec-contract-standards-overview/)
 - [Aztec: A Privacy-First Layer 2 for Ethereum]({{site.url_complet}}/2025/10/29/aztec-architecture-overview/)
 - [Code Reuse in Aztec Contracts — Modules, Traits and Library Crates Instead of Inheritance]({{site.url_complet}}/2026/09/15/aztec-noir-contract-code-reuse-without-inheritance/)
+- [Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps]({{site.url_complet}}/2026/09/16/aztec-packable-storage-packing/)

@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* System calls, binary images\nand processes
+** System call
+*** C function exposing an OS service
+*** Software interrupt (svc on ARM)
+*** Syscall number in a register
+*** Arguments via registers or stack
+*** Calling convention fixed by the ABI
+*** User-space stub in the libc
+**** glibc, uClibc, bionic, musl
+*** Standard API: POSIX
+*** Higher-level wrappers
+**** fopen(), fread(), pthread_create()
+*** man <section> term
+**** 2 = syscalls, 3 = library
+** Binary image
+*** Source + headers -> compiler -> .o
+*** Linker merges .o and static libraries
+*** Executable format: ELF, PE, ECOFF
+*** Sections: .text .data .bss .debug
+*** Three address kinds
+**** Relative (offset in .o)
+**** Absolute (after loading)
+**** Symbolic (printf, .L2)
+** Process
+*** Execution context
+**** Code, registers (PC, SP)
+*** Memory context
+**** Globals, locals, constants
+*** Logical resources
+**** File descriptors, IPC objects
+*** Hierarchy
+**** Root process, parent, children
+**** Threads share the process
+*** Address space
+**** Code, Data, BSS, Heap, Stack
+**** Stack grows down, heap grows up
+@endmindmap

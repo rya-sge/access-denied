@@ -1,0 +1,52 @@
+@startuml
+title From source files to a loadable binary image
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam arrow {
+  Color #2E8B67
+}
+
+package "Sources" {
+  [main.c] as mainc
+  [printf.c] as printfc
+  [main.h\nprintf.h\nrandom.h] as headers
+}
+
+[Compiler] as cc
+
+package "Object code" {
+  [main.o] as maino
+  [printf.o] as printfo
+  [strlib.o] as strlibo
+}
+
+package "Static libraries" {
+  [libc.a] as libc
+  [libmath.a] as libm
+}
+
+[Linker] as ld
+
+[Binary image (ELF, PE, ECOFF...)\n----\nFile header\n.text   code\n.data   initialised data\n.bss    uninitialised data\n.debug  symbols] as img
+
+mainc --> cc
+printfc --> cc
+headers ..> mainc : included by
+headers ..> printfc : included by
+cc --> maino
+cc --> printfo
+maino --> ld
+printfo --> ld
+strlibo --> ld
+libc --> ld
+libm --> ld
+ld --> img
+@enduml

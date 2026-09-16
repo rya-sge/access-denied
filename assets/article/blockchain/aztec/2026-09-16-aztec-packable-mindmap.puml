@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Packable on Aztec
+** Two encodings
+*** Serialize / Deserialize = ABI,\nintrinsic layout, derive it
+*** Packable = storage and notes,\nonly must round-trip
+*** Same struct, different layouts
+** What N costs
+*** PublicMutable: N slots,\nN SLOAD / SSTORE
+*** DelayedPublicMutable: 2N + 2 slots,\nneeds Eq
+*** Notes: N hash inputs = gates
+*** Calldata: Serialize, not Packable
+** Writing it
+*** Bit widths; total <= 253 bits
+*** Multiply by 2^k and add,\nor mask bits
+*** Unpack low to high:\ncast, subtract, divide
+*** Round-trip test at\nall combinations and maxima
+** Example: two flags + string
+*** Derived N = 3 (one Field per bool)
+*** Packed N = 2: flags as bits,\nFieldCompressedString stays one Field
+*** ABI unchanged: getter still 3 fields
+** Traps the EVM does not have
+*** Circuit arithmetic is not free:\nmeasured +7 gates on a private read
+*** Changing N moves every slot after:\nnotes become unspendable
+*** Schedule with a storage break,\nappend new fields at the end
+** When to pack
+*** Several sub-Field members,\nhot path, notes
+*** Not: all Field-sized, ABI only,\nrare and deployed
+@endmindmap

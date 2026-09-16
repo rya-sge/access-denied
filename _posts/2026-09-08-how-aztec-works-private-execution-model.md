@@ -394,3 +394,4 @@ The cost is the read path and the failure mode. No party holds the key in full, 
 - [Tornado Cash Circuits - Overview]({{site.url_complet}}/2025/11/19/tornado-cash-overview/)
 - [Reading Public State from a Private Function on Aztec — Why a Pause Flag Comes with a Delay]({{site.url_complet}}/2026/09/14/aztec-delayed-public-mutable-pause-privacy-delay/)
 - [Code Reuse in Aztec Contracts — Modules, Traits and Library Crates Instead of Inheritance]({{site.url_complet}}/2026/09/15/aztec-noir-contract-code-reuse-without-inheritance/)
+- [Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps]({{site.url_complet}}/2026/09/16/aztec-packable-storage-packing/)

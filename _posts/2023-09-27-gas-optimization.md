@@ -311,3 +311,7 @@ I made an article to compare these two structures: [Access Denied - What to choo
 8. Estimate gas cost of a transaction: [https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost](https://github.com/ethereum/homestead-guide/blob/master/source/contracts-and-transactions/account-types-gas-and-transactions.rst#example-transaction-cost)
 9. [Hacken - Gas Optimization In Solidity: Strategies For Cost-Effective Smart Contracts](https://hacken.io/discover/solidity-gas-optimization/)
 10. [https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/](https://www.linkedin.com/pulse/optimizing-smart-contract-gas-cost-harold-achiando/)
+
+### Related articles
+
+- [Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps]({{site.url_complet}}/2026/09/16/aztec-packable-storage-packing/)

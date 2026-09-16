@@ -188,3 +188,7 @@ Puis on peut afficher la valeur de la variable locale en récupérant l'adresse 
 - Articles sur les désactivation des protections du compilateur : [https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags]( https://ubuntuplace.info/questions/316138/disable-stack-protection-on-ubuntu-for-buffer-overflow-without-c-compiler-flags)
 - [HACKING] 01. Tuto exploitation d'un Buffer Overflow : [https://www.youtube.com/watch?v=V7Gdc32XRhA](https://www.youtube.com/watch?v=V7Gdc32XRhA)
 - Cours de sécurité logicielle enseigné à l'HEIG-VD en 2021
+
+### Articles liés
+
+- [System Calls, Binary Images and Processes - How a Program Reaches the Kernel]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/)

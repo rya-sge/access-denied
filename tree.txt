@@ -798,3 +798,14 @@ _posts/2026-09-15-aztec-noir-contract-code-reuse-without-inheritance.md
   assets/article/blockchain/aztec/2026-09-15-aztec-code-reuse-mindmap.puml                    (mindmap)
   assets/article/blockchain/aztec/aztec-contract-crate-vs-library-concept.puml                (concept, in-section)
   assets/article/blockchain/aztec/aztec-library-chain-call-sequence.puml                      (sequence, in-section)
+
+_posts/2026-09-16-system-calls-binary-image-process.md
+  assets/article/linux/sye-syscalls-process/2026-09-16-system-calls-binary-image-process.puml      (mindmap)
+  assets/article/linux/sye-syscalls-process/syscall-write-sequence-workflow.puml                   (workflow, in-section)
+  assets/article/linux/sye-syscalls-process/binary-image-toolchain-concept.puml                    (concept, in-section)
+  assets/article/linux/sye-syscalls-process/process-hierarchy-concept.puml                         (concept, in-section)
+
+_posts/2026-09-16-aztec-packable-storage-packing.md
+  assets/article/blockchain/aztec/2026-09-16-aztec-packable-mindmap.puml                      (mindmap)
+  assets/article/blockchain/aztec/aztec-packable-two-encodings-concept.puml                    (concept, in-section)
+  assets/article/blockchain/aztec/aztec-packable-layout-workflow.puml                          (activity, in-section)

@@ -1,0 +1,35 @@
+@startuml
+title Path of write(fd, buf, 10) from user code to the kernel (ARM, SO3 convention)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "User program" as app
+participant "libc stub\nsys_write()" as stub
+participant "CPU\n(mode switch)" as cpu
+participant "Kernel\nsyscall handler" as kern
+participant "Kernel\nwrite implementation" as impl
+
+app -> stub : write(fd, buf, 10)
+note right of stub
+  r7 = 5   (syscall number)
+  r0 = fd
+  r1 = buf
+  r2 = 10
+end note
+stub -> cpu : svc #0
+cpu -> kern : trap, switch to privileged mode
+kern -> kern : read r7, index syscall table
+kern -> impl : sys_write(fd, buf, 10)
+impl --> kern : bytes written
+kern --> cpu : r0 = return value, return from exception
+cpu --> stub : back to user mode
+stub --> app : return value in r0
+@enduml

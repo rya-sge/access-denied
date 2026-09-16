@@ -1,0 +1,50 @@
+@startuml
+title From a derived to a hand-written Packable, and what stays the same
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+skinparam ActivityDiamondBackgroundColor #EEF5FF
+skinparam ActivityDiamondBorderColor #4A78B5
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+
+start
+:Struct with sub-Field members
+{ bool, bool, FieldCompressedString }
+derived Packable: N = 3;
+:1. Bit widths: 1 + 1 bits share a Field,
+   the string is already exactly one Field
+   (total per Field <= 253 bits);
+:2. pack(): flags = default | redeemed << 1
+   [flags as Field, rating field]  -> N = 2;
+:3. unpack(): cast to u64, test each bit,
+   rebuild the string from its Field;
+:4. Round-trip test: all four flag combinations,
+   each flag alone shows disjoint bits;
+if (Is the struct read on a private hot path?) then (yes)
+  :Measure with aztec profile gates
+  before and after;<<#FDEEEE>>
+  note right
+    Measured once: a two-bool
+    pack cost +7 gates on a
+    private DelayedPublicMutable
+    read. Public saving still real.
+  end note
+else (no)
+  :Public write / read only:
+  the saving is N slots, no circuit cost;
+endif
+if (Is a contract already deployed?) then (yes)
+  :Schedule with a storage break:
+  every slot after the struct moves,
+  notes under moved slots are unspendable;<<#FDEEEE>>
+else (no)
+  :Ship it: layout is free to change
+  until the first deployment;
+endif
+:ABI unchanged: setter takes 3 fields,
+getter returns 3 fields, TypeScript untouched;
+stop
+@enduml
