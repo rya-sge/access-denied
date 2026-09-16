@@ -1,0 +1,44 @@
+@startuml
+title Per-process descriptor tables and the kernel's open-file table (lecture example)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam arrow {
+  Color #2E8B67
+}
+
+package "User space" {
+  package "Process Pa" {
+    [fd 0  stdin] as a0
+    [fd 1  stdout] as a1
+    [fd 3] as a3
+  }
+  package "Process Pb, after fd = open(log, O_RDWR) and dup2(fd, 1)" {
+    [fd 0  stdin] as b0
+    [fd 1  stdout] as b1
+    [fd 6  (returned by open)] as b6
+  }
+}
+
+package "Kernel space: open-file table" {
+  [ID 2  console / read / pos] as k2
+  [ID 5  file / RO / offset] as k5
+  [ID 6  console / write / pos] as k6
+  [ID 9  file log / RW / offset] as k9
+}
+
+a0 --> k2
+a1 --> k6
+a3 --> k5
+b0 --> k2
+b1 ..> k6 : before dup2
+b1 --> k9 : after dup2
+b6 --> k9
+@enduml

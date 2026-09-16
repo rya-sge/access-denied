@@ -1,0 +1,38 @@
+@startuml
+title Anonymous pipe shared through fork(): the child writes, the parent reads
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "Parent" as p
+participant "Kernel\n(pipe object)" as k
+participant "Child" as c
+
+p -> k : pipe(pipe_fd)
+k --> p : pipe_fd[0] = read end\npipe_fd[1] = write end
+p -> k : fork()
+k --> c : child starts with copies\nof both descriptors
+note over p, c
+  After fork(), both processes hold both ends.
+  Each closes the end it does not use.
+end note
+c -> k : close(pipe_fd[0])
+p -> k : close(pipe_fd[1])
+p -> k : read(pipe_fd[0], buffer, 80)
+note right of p : blocks: the pipe is empty
+c -> k : write(pipe_fd[1], "Hello, I am your child\\n", 24)
+k --> p : read() returns 24 bytes
+p -> p : printf("I got from the child: %s", buffer)
+c -> k : close(pipe_fd[1])
+c -> k : exit(0)
+p -> k : close(pipe_fd[0])
+p -> k : waitpid(pid, NULL, 0)
+k --> p : child reaped
+@enduml

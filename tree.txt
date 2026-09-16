@@ -821,3 +821,9 @@ _posts/2026-09-16-process-states-threads-posix-pthreads.md
   assets/article/linux/sye-states-threads/process-state-machine-concept.puml                      (state diagram, in-section)
   assets/article/linux/sye-states-threads/thread-memory-pcb-tcb-concept.puml                      (concept, in-section)
   assets/article/linux/sye-states-threads/pthread-create-join-sequence-workflow.puml              (sequence, in-section)
+
+_posts/2026-09-16-file-descriptors-ipc-pipes.md
+  assets/article/linux/sye-ipc-pipes/2026-09-16-file-descriptors-ipc-pipes.puml            (mindmap)
+  assets/article/linux/sye-ipc-pipes/fd-table-open-file-table-concept.puml                 (concept, in-section)
+  assets/article/linux/sye-ipc-pipes/pipe-fork-parent-child-sequence-workflow.puml         (sequence, in-section)
+  assets/article/linux/sye-ipc-pipes/shell-pipeline-ls-more-workflow.puml                  (activity, in-section)

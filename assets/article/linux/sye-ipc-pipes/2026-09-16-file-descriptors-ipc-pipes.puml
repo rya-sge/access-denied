@@ -1,0 +1,56 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* File descriptors,\nIPC and pipes
+** File descriptor
+*** Small integer, unique per process
+*** 0 stdin, 1 stdout, 2 stderr
+*** One descriptor table per process
+*** Points into the kernel's open-file table
+*** Two processes can share one entry
+*** dup2(orig, copy): redirection
+**** copy becomes a synonym of orig
+*** SO3: pcb.fd_array -> open_fds[] -> fops
+*** VFS dispatches to pipe, fat, ...
+** IPC subsystem
+*** Communication and synchronisation
+*** POSIX interfaces
+*** Data exchange
+**** Mapped files, shared memory
+*** Synchronisation
+**** Locks, semaphores, monitors
+**** Signals
+*** Both
+**** Pipes
+**** Network sockets
+** Pipe
+*** Unidirectional byte stream
+*** Destructive read, FIFO order
+*** Limited capacity (about 4 KB in the lecture)
+*** Special file: read() and write()
+*** Two descriptors
+**** fd[0] read end
+**** fd[1] write end
+*** read() on empty pipe blocks
+*** read() returns 0 when writers are gone
+** Named and anonymous pipes
+*** Named: mkfifo() then open()
+**** Visible in the file system
+**** Persistent, unlink() to remove
+*** Anonymous: pipe()
+**** Shared through fork()
+**** Gone when the processes end
+*** Close the unused end
+*** Shell pipeline: pipe, fork, dup2, exec
+**** ls | more
+@endmindmap

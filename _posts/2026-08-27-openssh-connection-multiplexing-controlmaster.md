@@ -253,3 +253,7 @@ This is why forwardings can be added to a running connection. The master already
 ### Analyzed source
 
 - [openssh/openssh-portable](https://github.com/openssh/openssh-portable) — analyzed at commit [`0ef0f5a839831c213f24e3f2ae434765c607fb50`](https://github.com/openssh/openssh-portable/tree/0ef0f5a839831c213f24e3f2ae434765c607fb50), 2026-08-27. The commit carries no release tag and sits after `V_9_7_P1`; `version.h` at this revision declares `OpenSSH_10.5p1`.
+
+### Related articles
+
+- [File Descriptors, the IPC Subsystem and Pipes - Named, Anonymous and Shell Pipelines]({{site.url_complet}}/2026/09/16/file-descriptors-ipc-pipes/)

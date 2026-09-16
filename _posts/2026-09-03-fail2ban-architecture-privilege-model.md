@@ -419,3 +419,4 @@ So a daemon that was down for longer than `findtime` will not count the failures
 - [GNU/Linux Base Security Primitives - Authentication, Permissions, ACLs, Attributes, Capabilities]({{site.url_complet}}/2026/06/29/linux-base-security-primitives/)
 - [Advanced GNU/Linux Security - SECCOMP and Linux Security Modules (LSM)]({{site.url_complet}}/2026/06/29/linux-advanced-security-seccomp-lsm/)
 - [OpenSSH Certificates — Critical Options, Extensions and the KRL Encoding]({{site.url_complet}}/2026/08/27/openssh-certificates-critical-options-krl/)
+- [File Descriptors, the IPC Subsystem and Pipes - Named, Anonymous and Shell Pipelines]({{site.url_complet}}/2026/09/16/file-descriptors-ipc-pipes/)

@@ -1,0 +1,44 @@
+@startuml
+title How a shell builds "ls | more" from pipe(), fork(), dup2() and execve()
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF6F0
+skinparam ActivityBorderColor #2E8B67
+skinparam ActivityDiamondBackgroundColor #EAF6F0
+skinparam ActivityDiamondBorderColor #2E8B67
+skinparam ArrowColor #2E8B67
+skinparam PartitionBorderColor #2E8B67
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+
+start
+:pipe(pipe_fd);
+note right
+  pipe_fd[0] : read end
+  pipe_fd[1] : write end
+end note
+:fork();
+if (return value == 0 ?) then (child: producer)
+  :close(pipe_fd[0]);
+  note right: read end not used here
+  :dup2(pipe_fd[1], 1);
+  note right: stdout now writes into the pipe
+  :execve("/bin/ls", ...);
+  :ls writes its listing to fd 1,
+  which is now the pipe;
+  stop
+else (parent: consumer)
+  :close(pipe_fd[1]);
+  note right
+    write end not used here;
+    otherwise more never sees EOF
+  end note
+  :dup2(pipe_fd[0], 0);
+  note right: stdin now reads from the pipe
+  :execve("/bin/more", ...);
+  :more reads fd 0, which is now the pipe,
+  until read() returns 0;
+  stop
+endif
+@enduml

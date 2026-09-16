@@ -242,11 +242,15 @@ Because the ABI layout is not the contract's to choose. Arguments are encoded by
 
 **Q: A `PublicMutable<bool>` and a `PublicMutable<u64>` sit next to each other in storage. Does the framework pack them like Solidity would?**
 
-No. Each state variable is allocated its own slots from its own `Packable::N`; two neighbouring variables never share a slot. To pack them you put both members in one struct with a hand-written `Packable` and hold that struct in one state variable — which changes the type of the variable, and so the layout.
+No. Each state variable is allocated its own slots from its own `Packable::N`; two neighbouring variables never share a slot. To pack them you put both members in one struct with a hand-written `Packable` and hold that struct in one state variable, which changes the type of the variable, and so the layout.
 
 **Q: Why did hand-packing two `bool`s make a private function *more* expensive?**
 
-Because the struct was read from a `DelayedPublicMutable` in a private function. That read is a historical storage proof against a hash of the whole value, so the second field cost almost nothing, while extracting two bits from one field added a few constraints. Seven gates, in the measured case: negligible, but with the opposite sign to the prediction. The public write of the same struct did save a slot. Measure per context and say which one the claim is about.
+Because the struct was read from a `DelayedPublicMutable` in a private function, and that read does not pay per field. The private read proves one storage slot — the hash of the whole value — and re-hashes the preimage in-circuit to check it; a second field is one more input to a hash the circuit computes anyway, a few gates. Recovering two `bool`s from one packed `Field` costs more than that: a cast to an integer (a range check), two bit masks (bit decomposition) and two comparisons. Net effect in the measured case: **+7 gates** on a 120,000-gate transfer, negligible but with the opposite sign to the prediction. The public write of the same struct did save storage operations. Measure per context and say which one the claim is about.
+
+**Q: How can a `DelayedPublicMutable` read in private cost "almost nothing" per extra field, when a public storage read costs thousands of gates?**
+
+A private function cannot read current public storage; it proves a *historical* read against the anchor block, with a Merkle inclusion path into the public data tree, at roughly 3,500–4,000 gates per slot proven. If a struct were stored as `N` plain slots, a private read would need `N` such proofs. `DelayedPublicMutable` avoids that with `WithHash`: the public write stores the `N` packed fields *plus* a Poseidon2 hash of all of them in one extra slot. The private read then proves the inclusion of **that one slot only**, fetches the `N`-field preimage from an oracle (unconstrained), and re-hashes it in the circuit to assert it matches the proven hash. The cost is therefore one inclusion proof, independent of `N`, plus one hash whose cost grows by a handful of gates per additional field. That is why packing two fields into one saves almost nothing on the private read, and why the unpacking arithmetic can outweigh it. On the public side the same variable is stored as `2N + 2` slots (current and scheduled value, the delay change and the hash), so `N` from 2 to 1 turns six `SSTORE`s into four on every scheduled write: a real saving, in gas, on the sequencer, which the private measurement says nothing about.
 
 **Q: A struct's `N` goes from 3 to 2. What exactly breaks on a deployed contract?**
 
@@ -254,7 +258,17 @@ Every state variable declared after it in the storage struct is now one slot ear
 
 **Q: Two `u128`s in one struct: can they share a `Field`?**
 
-No. 128 + 128 = 256 bits exceeds the 253-bit safe width of a `Field`, whose modulus is just under 2^254; the sum would wrap around. A `u128` and a `u64` (192 bits) can share; the second `u128` needs its own `Field`. `N` for the pair is 2 either way, so there is nothing to gain by trying.
+No. 128 + 128 = 256 bits exceeds the 253-bit safe width of a `Field`, whose modulus is just under 2^254; the sum would wrap around (the next question explains why the limit is not 256). A `u128` and a `u64` (192 bits) can share; the second `u128` needs its own `Field`. `N` for the pair is 2 either way, so there is nothing to gain by trying.
+
+**Q: Why is the safe width 253 bits and not 256? A Solidity word is 256 bits.**
+
+Because a `Field` is not a 256-bit machine word. It is an element of the scalar field of the BN254 curve, the curve Aztec's proving system is built on, so a `Field` value is an integer **modulo a prime** `p ≈ 2^253.58`, and the representable range is `0 … p − 1`. Three things follow:
+
+- **The modulus cannot be 2^256, or any power of two.** The field must be a prime field for the curve arithmetic and the pairings to work, and a prime is never a power of two; `p` is what the BN254 construction produced, not a chosen bit length.
+- **`p` has 254 bits, but not every 254-bit value fits.** `p` lies between 2^253 and 2^254, so a value with 254 significant bits may be at or above `p` and is reduced modulo `p`. Every value below 2^253 is below `p`, which makes 253 bits the largest power-of-two range that is always representable.
+- **Reduction is silent.** Two `u128`s concatenated into one `Field` (256 bits) would store `value − p` for any value at or above `p`, and `unpack` would return different members than were packed. Nothing fails at compile time or at call time; the stored state is quietly wrong.
+
+A Solidity `uint256` really is 256 bits with wrap-around at 2^256, so two 128-bit values do fit in one EVM word. On Aztec the "word" is about 2.4 bits shorter, which is enough to make the same packing unsafe.
 
 **Q: A struct has two `bool`s and one `AztecAddress`. What is the best `N`, and what does the round-trip test need?**
 
