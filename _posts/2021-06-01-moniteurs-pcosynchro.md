@@ -262,3 +262,7 @@ if(nbWaiting){
 La carte heuristique ci-dessous résume l'article.
 
 ![Mindmap des moniteurs de Hoare et Mesa]({{site.url_complet}}/assets/article/programmation/2021-06-01-moniteurs-pcosynchro-mindmap.png)
+
+### Articles liés
+
+- [Process States, Threads and the POSIX Threads Library]({{site.url_complet}}/2026/09/16/process-states-threads-posix-pthreads/)

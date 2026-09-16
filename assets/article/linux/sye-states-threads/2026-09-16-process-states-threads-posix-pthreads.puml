@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Process states\nand threads
+** States and transitions
+*** New -> Ready (created, initialised)
+*** Ready -> Running (elected by the scheduler)
+*** Running -> Ready (preempted)
+*** Running -> Waiting (I/O request, wait)
+*** Waiting -> Ready (I/O done, resource available)
+*** Running -> Zombie (terminated)
+*** One Running process per CPU
+*** Kernel keeps a list per state
+** Thread
+*** One execution context of a process
+*** Every process has at least one (main)
+*** Created from another thread
+*** Own stack, own registers, own PC
+*** Shares code, data, BSS, heap, files
+*** Thread Control Block (TCB)
+**** PC, registers, SP, state, priority
+**** PCB points to its TCBs
+*** Hyper-Threading: hardware threads
+** POSIX threads
+*** IEEE 1003.1c
+*** Creation and termination
+*** Synchronisation
+*** Concurrent access
+*** pthread_create(&tid, attr, start_routine, arg)
+*** void *start_routine(void *)
+*** pthread_join(tid, &retval)
+*** pthread_exit(retval) or return
+** Running threads
+*** printHello example
+*** Two threads incrementing count
+*** Result varies: 200000, 149549, 123001
+*** count++ is load, add, store
+*** Data race, needs synchronisation
+@endmindmap

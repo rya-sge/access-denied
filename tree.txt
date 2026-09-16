@@ -815,3 +815,9 @@ _posts/2026-09-16-process-control-block-fork-exec-context-switch.md
   assets/article/linux/sye-process-context-switch/pcb-structure-concept.puml                                       (concept, in-section)
   assets/article/linux/sye-process-context-switch/fork-exec-wait-exit-sequence-workflow.puml                       (sequence, in-section)
   assets/article/linux/sye-process-context-switch/context-switch-sequence-workflow.puml                            (sequence, in-section)
+
+_posts/2026-09-16-process-states-threads-posix-pthreads.md
+  assets/article/linux/sye-states-threads/2026-09-16-process-states-threads-posix-pthreads.puml   (mindmap)
+  assets/article/linux/sye-states-threads/process-state-machine-concept.puml                      (state diagram, in-section)
+  assets/article/linux/sye-states-threads/thread-memory-pcb-tcb-concept.puml                      (concept, in-section)
+  assets/article/linux/sye-states-threads/pthread-create-join-sequence-workflow.puml              (sequence, in-section)

@@ -1,0 +1,26 @@
+@startuml
+title Process states and transitions
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam arrow {
+  Color #2E8B67
+}
+state New
+state Ready
+state Running
+state Waiting
+state Zombie
+
+[*] --> New : fork()
+New --> Ready : created and initialised\n(ready to be scheduled)
+Ready --> Running : elected by\nthe scheduler
+Running --> Ready : preempted\n(time slice used up)
+Running --> Waiting : suspended\n(I/O request, wait on a resource)
+Waiting --> Ready : woken up\n(I/O done, resource available)
+Running --> Zombie : terminated\n(exit())
+Zombie --> [*] : reaped by\nwaitpid()
+@enduml

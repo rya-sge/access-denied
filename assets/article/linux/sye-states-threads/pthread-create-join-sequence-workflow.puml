@@ -1,0 +1,40 @@
+@startuml
+title Two threads created and joined by the main thread (lecture example)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "T0\nmain thread" as t0
+participant "T1\nprintHello" as t1
+participant "T2\nprintHello" as t2
+
+[-> t0 : main()
+activate t0 #B8E0CC
+t0 -> t1 : pthread_create(&hello_thread1, NULL, printHello, th_name1)
+activate t1 #B8E0CC
+t0 -> t2 : pthread_create(&hello_thread2, NULL, printHello, th_name2)
+activate t2 #B8E0CC
+note over t1, t2
+  T1 and T2 both run
+  for (i = 0; i < 100000; i++) count++;
+  on the same global variable count
+end note
+t0 -> t0 : pthread_join(hello_thread1, NULL)
+note right of t0 : T0 blocks until T1 returns
+t1 --> t0 : return NULL
+deactivate t1
+t0 -> t0 : pthread_join(hello_thread2, NULL)
+note right of t0 : T0 blocks until T2 returns
+t2 --> t0 : return NULL
+deactivate t2
+t0 -> t0 : printf("count = %d\\n", count)
+t0 -> t0 : exit(0)
+deactivate t0
+@enduml

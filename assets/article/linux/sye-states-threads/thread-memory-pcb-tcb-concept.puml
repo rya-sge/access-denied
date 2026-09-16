@@ -1,0 +1,40 @@
+@startuml
+title A multithreaded process: shared memory context, one TCB and one stack per thread
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+skinparam arrow {
+  Color #2E8B67
+}
+
+package "Kernel space" {
+  [PCB of process P1\n----\nState, PID, priority\nThreads (list of TCBs)\nHeap, open files\nChildren, address space\nExit code] as pcb
+  [TCB T0 (main)\n----\nState, ID\nPC, registers\nPriority\nStack pointer] as tcb0
+  [TCB T1\n----\nState, ID\nPC, registers\nPriority\nStack pointer] as tcb1
+  [TCB T2\n----\nState, ID\nPC, registers\nPriority\nStack pointer] as tcb2
+}
+
+package "Address space of P1 (shared by all threads)" {
+  [Stack T0] as s0
+  [Stack T1] as s1
+  [Stack T2] as s2
+  [Shared regions\n----\nHeap\nBSS\nData\nCode (PC of every thread points here)] as shared
+}
+
+pcb --> tcb0
+pcb --> tcb1
+pcb --> tcb2
+tcb0 ..> s0 : SP
+tcb1 ..> s1 : SP
+tcb2 ..> s2 : SP
+s0 -[hidden]- shared
+s1 -[hidden]- shared
+s2 -[hidden]- shared
+@enduml

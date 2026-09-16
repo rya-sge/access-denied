@@ -131,13 +131,28 @@ Solidity packs storage automatically, and packing there is almost always a win. 
 
 ### Packing is not free inside a circuit
 
-In public execution the arithmetic of `pack` and `unpack` is a few AVM opcodes and the saved `SLOAD` dominates. In **private** execution the same arithmetic is constraints in a circuit, and a read of a `DelayedPublicMutable` value already comes with a hash check that makes the extra field nearly free. A measured case makes the point. A two-`bool` flag struct held in a `DelayedPublicMutable` and read on a private transfer path was hand-packed from `N = 2` to `N = 1`, exactly as the sibling struct next to it. The private transfer became **7 gates more expensive**, not cheaper: unpacking two bits from one field cost marginally more than reading one additional field out of the already-hashed value. Seven gates against a 120,000-gate function is nothing either way, and the public-storage saving was real and unmeasured. But the sign of the prediction was wrong, and the change was declined because it also moved storage slots (the second fact below) for no private benefit.
+The same `pack` and `unpack` code is priced differently in the two execution contexts:
+
+- **In public execution** the arithmetic is a few AVM opcodes, and the `SLOAD` it saves dominates. Packing pays.
+- **In private execution** the same arithmetic is constraints in a circuit, paid in the user's proving time. And a read of a `DelayedPublicMutable` value already comes with a hash check over the whole packed value, so the extra field a packing would remove is nearly free to read.
+
+A measured case makes the point:
+
+- A two-`bool` flag struct held in a `DelayedPublicMutable` and read on a private transfer path was hand-packed from `N = 2` to `N = 1`, exactly as the sibling struct next to it already was.
+- The private transfer became **7 gates more expensive**, not cheaper: unpacking two bits from one field cost marginally more than reading one additional field out of the already-hashed value.
+- Seven gates against a 120,000-gate function is nothing either way, and the public-storage saving was real (and unmeasured).
+- The sign of the prediction was still wrong, and the change was declined: it also moved storage slots (the second fact below) for no private benefit.
 
 The rule that follows: **measure per context, and state which one a packing claim is about.** `aztec profile gates` gives the private cost per function; a packing that helps a `PublicMutable` read in a public setter says nothing about a `DelayedPublicMutable` read in a private transfer. A struct that is written rarely in public and never read in private, like the credit events above, is the clean case where packing is pure saving.
 
 ### Changing `N` moves every slot after it
 
-The `#[storage]` macro allocates slots sequentially in declaration order, each state variable taking as many slots as its packed length needs. Changing a struct's `Packable::N` therefore shifts every state variable declared after it. For public state that orphans the values at the old slots. For private state it is worse: the storage slot is an input to every note hash, and the note hash to every nullifier, so **existing notes become unspendable**. There is no storage-layout compatibility tooling and contract upgrades are a low-level protocol feature the macros are not built around, so on a deployed contract a packing change is a redeployment and a holder migration, not a patch.
+The chain from a packing change to a broken deployment has four links:
+
+- **Slots are allocated in declaration order.** The `#[storage]` macro walks the storage struct and gives each state variable as many consecutive slots as its packed length needs. Changing a struct's `Packable::N` therefore shifts every state variable declared after it.
+- **Public state is orphaned.** The values written at the old slots are still there, but the contract now reads and writes different slots; from its point of view the state is gone.
+- **Private state is worse: existing notes become unspendable.** The storage slot is an input to every note hash, and the note hash to every nullifier. A note created under the old slot no longer matches what the contract computes, so it can neither be found nor nullified.
+- **There is no fix in place.** Aztec has no storage-layout compatibility tooling, and contract upgrades are a low-level protocol feature the `#[aztec]` macros are not built around. On a deployed contract a packing change is a redeployment and a holder migration, not a patch.
 
 In the running example the credit-events struct sat *before* the private balance set in the storage struct, so the `N = 3 → 2` change moved the balance slot by one. The change was correct and the saving real, and it still waited a full release: it landed only in a version that was already breaking storage for other reasons and had no deployed instance to migrate. That is the right way to schedule a packing change on a live contract — fold it into a break that is happening anyway, never cause one for it.
 
@@ -149,11 +164,29 @@ Worth it when a struct has several sub-`Field` members (`bool`s, small integers)
 
 Not worth it when every member is already a `Field` or an address (nothing to pack); when the struct only ever crosses the ABI (that is `Serialize`, whose layout is fixed); when the struct is small and rarely touched and the contract is already deployed (the slot move costs more than the slot); and, the Aztec-specific case, when the struct is read on a private hot path and the measurement says the arithmetic costs more than the field it saves.
 
-What the macros do and do not derive is worth keeping at hand, because the framework adds a derive only where the struct's role strictly requires it: `#[event]` derives `Serialize`; `#[note]` **requires** `Packable` and does not add it; `#[storage]` requires `Packable` of every state variable's data type and does not add it; `PublicImmutable` and `DelayedPublicMutable` additionally require `Eq`. A missing derive fails to compile with a clear message; an over-broad one — `Packable` on an event, `Deserialize` on a note that never crosses the boundary — is noise rather than a defect.
+The framework adds a derive only where the struct's role strictly requires it, so what each macro does and does not derive is worth keeping at hand:
+
+| Macro or type | Derives | Requires, without adding it |
+|---|---|---|
+| `#[event]` | `Serialize` | — |
+| `#[note]` | nothing | `Packable` (the macro fails compilation without it) |
+| `#[storage]` | nothing | `Packable` on every state variable's data type |
+| `PublicImmutable<T>`, `DelayedPublicMutable<T>` | nothing | `Packable` and `Eq` (they verify the stored value against a hash) |
+| `PublicMutable<T>` | nothing | `Packable` only |
+
+A missing derive fails to compile with a clear message. An over-broad one (`Packable` on an event, `Deserialize` on a note that never crosses the boundary) is noise rather than a defect.
 
 ## Conclusion
 
-`Packable` is the storage encoding of an Aztec contract, separate from the `Serialize` ABI encoding that must stay intrinsic, and its associated `N` is the number a packing changes: storage slots in public functions, note-hash inputs in private ones. A derived implementation spends one `Field` per member; a hand-written one concatenates sub-`Field` members with powers of two or bit masks, within 253 bits, and is checked by a round-trip test. Two facts separate the technique from its Solidity counterpart, where the compiler packs for free and packing always wins: arithmetic inside a circuit has a cost that can exceed the field it saves, so every claim must be measured in the context it applies to; and a change of `N` moves every slot declared after the struct, which on a deployed contract invalidates notes and forces a migration, so the change is scheduled with a storage break, never as one.
+`Packable` is the storage encoding of an Aztec contract, separate from the `Serialize` ABI encoding that must stay intrinsic. Its associated `N` is the number a packing changes: storage slots in public functions, note-hash inputs in private ones.
+
+- A **derived** implementation spends one `Field` per member.
+- A **hand-written** one concatenates sub-`Field` members with powers of two or bit masks, within 253 bits, and is checked by a round-trip test.
+
+Two facts separate the technique from its Solidity counterpart, where the compiler packs for free and packing always wins:
+
+- **Arithmetic inside a circuit has a cost**, and it can exceed the field it saves; every packing claim is measured in the context it applies to, public gas or private gates.
+- **A change of `N` moves every slot declared after the struct.** On a deployed contract that invalidates notes and forces a migration, so the change is scheduled with a storage break, never as one.
 
 ![Mindmap of Packable on Aztec covering the two encodings, what N costs in public storage and in note hashes, the four steps of a hand-written implementation, the circuit-cost and slot-move traps, and when packing is worth it]({{site.url_complet}}/assets/article/blockchain/aztec/2026-09-16-aztec-packable-mindmap.png)
 
