@@ -8,7 +8,7 @@ categories: linux programmation
 tags: linux syscalls ipc pipes file-descriptor dup2 fifo shell posix operating-system
 series: sye
 series_order: 4
-description: "How per-process descriptor tables point into the kernel's open-file table, what dup2() redirects, what the IPC subsystem offers, and how pipe(), mkfifo(), fork() and exec() build ls | more."
+description: "How descriptor tables point into the kernel open-file table, what dup2() redirects, the IPC families, and how pipe(), fork() and exec() build ls | more."
 image: /assets/article/linux/sye-ipc-pipes/2026-09-16-file-descriptors-ipc-pipes.png
 isMath: false
 ---
@@ -34,7 +34,9 @@ A **file descriptor** is an integer that identifies, uniquely within one process
 
 By convention the first three entries of every process are pre-opened: **0** is standard input, **1** standard output, **2** standard error. `open()` returns the lowest free index, which is why a program that opens one file after start-up gets descriptor 3.
 
-The lecture's figure shows two processes and the kernel table side by side. Process Pa has descriptors 0 and 1 pointing at the console entries for reading and writing, and descriptor 3 pointing at a read-only file. Process Pb has descriptors 0 and 1 pointing at the **same** console entries: two processes can share an open-file entry, and this is how children inherit their parent's terminal. Two facts follow from the split. Descriptor numbers are meaningful only inside a process, since Pa's 3 and Pb's 3 may point anywhere; and a resource can be reached through several descriptors, in one process or in several, all of which see the same open-file entry, including its offset.
+The lecture's figure shows two processes and the kernel table side by side. Process Pa has descriptors 0 and 1 pointing at the console entries for reading and writing, and descriptor 3 pointing at a read-only file. Process Pb has descriptors 0 and 1 pointing at the **same** console entries: two processes can share an open-file entry, and this is how children inherit their parent's terminal. 
+
+Two facts follow from the split. Descriptor numbers are meaningful only inside a process, since Pa's 3 and Pb's 3 may point anywhere; and a resource can be reached through several descriptors, in one process or in several, all of which see the same open-file entry, including its offset.
 
 ![Two per-process descriptor tables pointing into the kernel's open-file table: both processes share the console entries for descriptors 0 and 1, and in process Pb dup2(fd, 1) has moved descriptor 1 from the console entry to the entry of the file log opened as descriptor 6]({{site.url_complet}}/assets/article/linux/sye-ipc-pipes/fd-table-open-file-table-concept.png)
 
@@ -75,7 +77,13 @@ Linux uses the same design with one more level. The per-process table (`files_st
 | **Synchronisation** | Locks, semaphores, monitors; signals |
 | **Both** | Pipes; network sockets |
 
-The first family moves bytes without any notion of ordering or arrival: two processes mapping the same page see each other's writes immediately, and must add their own synchronisation to know when a write is complete. The second family carries no data, or one bit of it: a semaphore says "go", a signal says "something happened". The third family does both in one primitive, because a byte written to a pipe or a socket is both a datum and an event: the reader receives the data, and the act of receiving it (or blocking until it arrives) is the synchronisation. That combination is why pipes and sockets are the most used IPC mechanisms, and why the rest of the lecture is about pipes.
+The three families differ in what crosses the process boundary:
+
+- **Data exchange** moves bytes without any notion of ordering or arrival. Two processes mapping the same page see each other's writes immediately, and must add their own synchronisation to know when a write is complete.
+- **Synchronisation** carries no data, or one bit of it: a semaphore says "go", a signal says "something happened".
+- **Both** does the two in one primitive, because a byte written to a pipe or a socket is both a datum and an event. The reader receives the data, and the act of receiving it, or blocking until it arrives, is the synchronisation.
+
+That combination is why pipes and sockets are the most used IPC mechanisms, and why the rest of the lecture is about pipes.
 
 ## Introduction to pipes
 
@@ -160,7 +168,13 @@ close(fd_pipe);
 unlink(pipeName);
 ```
 
-Three details are worth reading into this code. The writer sends `strlen(str) + 1` bytes so that the terminating NUL crosses the pipe and the reader's `printf("%s")` finds a proper string. The `unlink()` is what the "persistence" bullet requires: without it, `essai.fifo` remains in the directory after both programs exit, and the next run's `mkfifo()` fails with `EEXIST`. And the example runs in either order, because `open()` on a FIFO **blocks** until the other end is opened too: whichever program starts first waits in `open()` for its partner, a rendezvous documented in [`fifo(7)`](https://man7.org/linux/man-pages/man7/fifo.7.html). The second argument the lecture passes to `mkfifo()`, `O_CREAT | 0644`, mixes an `open()` flag into a permission mode: on Linux `O_CREAT` is octal `0100`, which as a mode is the owner-execute bit, so the FIFO is created with mode `0744` rather than `0644`. It is harmless for a FIFO, but the correct form is `mkfifo(pipeName, 0644)`.
+Three details in this code deserve attention:
+
+- **The extra byte.** The writer sends `strlen(str) + 1` bytes so that the terminating NUL crosses the pipe and the reader's `printf("%s")` finds a proper string.
+- **The `unlink()`.** It is what the "persistence" bullet requires: without it, `essai.fifo` remains in the directory after both programs exit, and the next run's `mkfifo()` fails with `EEXIST`.
+- **The start order.** The example runs in either order, because `open()` on a FIFO **blocks** until the other end is opened too: whichever program starts first waits in `open()` for its partner, a rendezvous documented in [`fifo(7)`](https://man7.org/linux/man-pages/man7/fifo.7.html).
+
+The second argument the lecture passes to `mkfifo()`, `O_CREAT | 0644`, mixes an `open()` flag into a permission mode: on Linux `O_CREAT` is octal `0100`, which as a mode is the owner-execute bit, so the FIFO is created with mode `0744` rather than `0644`. It is harmless for a FIFO, but the correct form is `mkfifo(pipeName, 0644)`.
 
 ### Anonymous pipes
 
@@ -200,7 +214,9 @@ exit(0);
 
 ![Sequence of the anonymous pipe example: the parent calls pipe() and fork(), the child closes the read end and writes its message, the parent closes the write end, blocks in read() until the message arrives, prints it, and reaps the child with waitpid()]({{site.url_complet}}/assets/article/linux/sye-ipc-pipes/pipe-fork-parent-child-sequence-workflow.png)
 
-The two `close()` calls at the top of each branch are the part learners skip and should not. After `fork()` there are **four** descriptors on this pipe: two in each process. The child closes the read end it will not use; the parent closes the write end it will not use. If the parent kept `pipe_fd[1]` open, its own `read()` could never return 0 at end of stream, because the kernel would still count one live writer, the parent itself. In this example the parent reads exactly once and does not rely on end-of-file, so the program would still print the message; in any loop that reads "until the pipe is empty", the forgotten `close()` turns into a deadlock. The `waitpid()` at the end reaps the child, as the process-management article required.
+The two `close()` calls at the top of each branch are the part learners skip and should not. After `fork()` there are **four** descriptors on this pipe: two in each process. The child closes the read end it will not use; the parent closes the write end it will not use. If the parent kept `pipe_fd[1]` open, its own `read()` could never return 0 at end of stream, because the kernel would still count one live writer, the parent itself.
+
+In this example the parent reads exactly once and does not rely on end-of-file, so the program would still print the message; in any loop that reads "until the pipe is empty", the forgotten `close()` turns into a deadlock. The `waitpid()` at the end reaps the child, as the process-management article required.
 
 ### A pipe in the shell: ls | more
 
@@ -241,9 +257,15 @@ One simplification separates the slide from a real shell. Here the parent itself
 
 ## Conclusion
 
-A file descriptor is an index into a per-process table whose entries point into the kernel's table of open files. Several descriptors, in one process or several, can point at one entry, which is what `dup2(orig, copy)` exploits: it makes `copy` a synonym of `orig`, redirecting standard output to a file or a pipe without the program's knowledge. `fork()` copies the table and `exec()` keeps it, so redirections are arranged in the child before the new program starts. SO3 implements the model with `fd_array` in the PCB, a global `open_fds` table of reference-counted `struct fd`, and per-type `file_operations` dispatched by the VFS; Linux adds a `struct file` level between the descriptor and the inode.
+A file descriptor is an index into a per-process table whose entries point into the kernel's table of open files. Several descriptors, in one process or several, can point at one entry, which is what `dup2(orig, copy)` exploits: it makes `copy` a synonym of `orig`, redirecting standard output to a file or a pipe without the program's knowledge. `fork()` copies the table and `exec()` keeps it, so redirections are arranged in the child before the new program starts.
 
-The IPC subsystem provides data exchange (mapped files, shared memory), synchronisation (locks, semaphores, monitors, signals) and mechanisms that do both, pipes and sockets. A pipe is a unidirectional kernel buffer with destructive FIFO reads, a bounded capacity that blocks writers when full and readers when empty, and two descriptors, `fd[0]` to read and `fd[1]` to write. A named pipe is created with `mkfifo()`, opened by path, and persists until `unlink()`; an anonymous pipe is created with `pipe()`, shared through `fork()`, and vanishes with its last descriptor. Closing the unused end in each process is what lets the reader see end-of-file. A shell pipeline is a pipe, a fork, a `dup2()` per side and an `exec()` per command.
+SO3 implements the model with `fd_array` in the PCB, a global `open_fds` table of reference-counted `struct fd`, and per-type `file_operations` dispatched by the VFS; Linux adds a `struct file` level between the descriptor and the inode.
+
+The IPC subsystem provides data exchange through mapped files and shared memory, synchronisation through locks, semaphores, monitors and signals, and mechanisms that do both, pipes and sockets.
+
+A pipe is a unidirectional kernel buffer with destructive FIFO reads, a bounded capacity that blocks writers when full and readers when empty, and two descriptors, `fd[0]` to read and `fd[1]` to write. A named pipe is created with `mkfifo()`, opened by path, and persists until `unlink()`; an anonymous pipe is created with `pipe()`, shared through `fork()`, and vanishes with its last descriptor. Closing the unused end in each process is what lets the reader see end-of-file.
+
+A shell pipeline is a pipe, a fork, a `dup2()` per side and an `exec()` per command.
 
 ![Mindmap of the lecture covering file descriptors and dup2(), the SO3 implementation, the IPC subsystem's three families, pipe properties and descriptors, named versus anonymous pipes and the shell pipeline]({{site.url_complet}}/assets/article/linux/sye-ipc-pipes/2026-09-16-file-descriptors-ipc-pipes.png)
 
@@ -280,7 +302,9 @@ The IPC subsystem provides data exchange (mapped files, shared memory), synchron
 
 **Q: Why are two tables needed, one per process and one in the kernel?**
 
-Because the two kinds of information have different scopes. Which resources a process may reach, and under which small integers, is per process; two processes can both have a descriptor 3 pointing at unrelated things. What an open resource is, how it was opened and where the current position sits is a property of the open resource itself, and several processes or several descriptors may share it. Splitting the tables lets a `fork()` copy the small per-process table while both processes keep pointing at the same open files, and lets `dup2()` redirect by rewriting one pointer.
+Because the two kinds of information have different scopes. Which resources a process may reach, and under which small integers, is per process; two processes can both have a descriptor 3 pointing at unrelated things. What an open resource is, how it was opened and where the current position sits is a property of the open resource itself, and several processes or several descriptors may share it.
+
+Splitting the tables lets a `fork()` copy the small per-process table while both processes keep pointing at the same open files, and lets `dup2()` redirect by rewriting one pointer.
 
 **Q: After `fd = open("log", O_RDWR); dup2(fd, 1);`, what does a `printf()` do, and what happened to the terminal?**
 
@@ -302,11 +326,13 @@ A pipe carries bytes, not strings. If only the seven bytes of `"Bonjour"` were s
 
 **Q: In the `ls | more` code, why must the consumer close `pipe_fd[1]` before executing `more`, given that it never writes to the pipe?**
 
-Because `more` stops when `read()` returns 0, and `read()` returns 0 only when every write descriptor on the pipe is closed. The producer's write descriptor closes when `ls` exits. If the consumer still held its inherited copy of `pipe_fd[1]`, that copy would survive the `execve()` into `more`, the kernel would count one live writer, and `more` would block in `read()` forever after `ls` finished. Closing the unused end is not tidiness; it is what makes the pipeline terminate.
+Because `more` stops when `read()` returns 0, and `read()` returns 0 only when every write descriptor on the pipe is closed. The producer's write descriptor closes when `ls` exits. If the consumer still held its inherited copy of `pipe_fd[1]`, that copy would survive the `execve()` into `more`, the kernel would count one live writer, and `more` would block in `read()` forever after `ls` finished. Closing the unused end is what makes the pipeline terminate.
 
 **Q: How do a named and an anonymous pipe differ in who can use them and how long they last?**
 
-An anonymous pipe is reachable only through the descriptors `pipe()` returned, so only the creating process and the descendants that inherit those descriptors can use it, and it disappears when the last descriptor closes. A named pipe has a path, so any process with permission to open that path can use it, related or not, and it remains in the file system after every user has closed it until `unlink()` removes it. The anonymous form suits parent-child and shell pipelines; the named form suits unrelated programs that agree on a name.
+An anonymous pipe is reachable only through the descriptors `pipe()` returned, so only the creating process and the descendants that inherit those descriptors can use it, and it disappears when the last descriptor closes. A named pipe has a path, so any process with permission to open that path can use it, related or not, and it remains in the file system after every user has closed it until `unlink()` removes it.
+
+The anonymous form suits parent-child and shell pipelines; the named form suits unrelated programs that agree on a name.
 
 ## References
 

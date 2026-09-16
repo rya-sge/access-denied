@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Randomness on Aztec
+** One oracle
+*** aztec::oracle::random::random()
+*** oracle attribute aztec_misc_getRandomField
+*** PXE / TXE: Fr.random()
+*** 64 CSPRNG bytes mod r
+*** SEED env = deterministic (tests only)
+** Four framework uses
+*** Note blinding H(owner, r)
+*** Private event commitment
+*** Ephemeral encryption key
+*** Ciphertext padding
+*** + fallback tag, client salts and nonces
+** Three values in a note
+*** r: client, blinds the hash
+*** nonce: protocol, H(first_nullifier, index), unique
+*** nullifier: owner's nsk_app, marks the spend
+** Unconstrained by design
+*** Chooser already knows the preimage
+*** Constraint would protect against nothing
+*** Consistency is what the circuit checks
+*** Bad r weakens privacy, never ownership
+** Limits
+*** No oracle in public functions
+*** No beacon or VRF: privacy, not fairness
+*** Partial note: one draw, one use
+*** Reuse links payments, loses the second
+@endmindmap

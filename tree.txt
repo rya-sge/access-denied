@@ -810,6 +810,11 @@ _posts/2026-09-16-aztec-packable-storage-packing.md
   assets/article/blockchain/aztec/aztec-packable-two-encodings-concept.puml                    (concept, in-section)
   assets/article/blockchain/aztec/aztec-packable-layout-workflow.puml                          (activity, in-section)
 
+_posts/2026-09-17-aztec-randomness-notes-oracle-unconstrained.md
+  assets/article/blockchain/aztec/2026-09-17-aztec-randomness-mindmap.puml                    (mindmap)
+  assets/article/blockchain/aztec/aztec-randomness-oracle-sequence.puml                        (sequence, in-section)
+  assets/article/blockchain/aztec/aztec-note-randomness-nonce-nullifier-concept.puml           (concept, in-section)
+
 _posts/2026-09-16-process-control-block-fork-exec-context-switch.md
   assets/article/linux/sye-process-context-switch/2026-09-16-process-control-block-fork-exec-context-switch.puml   (mindmap)
   assets/article/linux/sye-process-context-switch/pcb-structure-concept.puml                                       (concept, in-section)

@@ -1,0 +1,34 @@
+@startuml
+title Where a random value comes from and where it goes (aztec-nr v5.2.0)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+participant "Contract (Noir circuit)" as C
+participant "aztec-nr\ncreate_note / partial" as L
+participant "Oracle\naztec_misc_getRandomField" as O
+participant "PXE / TXE (host)" as P
+participant "OS CSPRNG" as R
+participant "Recipient" as D
+C -> L : create note for owner
+L -> O : unsafe { random() }
+O -> P : getRandomField()
+P -> R : randomBytes(64)
+R --> P : 512 bits
+P --> O : Fr.random() = bytes mod r
+note right of P
+  SEED set -> deterministic
+  sequence (tests only)
+end note
+O --> L : r  (unconstrained witness)
+L -> L : note_hash = H(slot, H(owner, r), value)
+L -> C : push_note_hash(note_hash)
+L -> D : encrypted message (owner, r, note)\nwith fresh ephemeral key = from_field(random())
+D -> D : recompute hash, find leaf,\nstore note with r
+@enduml

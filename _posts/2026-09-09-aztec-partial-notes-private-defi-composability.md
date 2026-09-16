@@ -47,11 +47,11 @@ The completion phase folds in the fields that were unavailable earlier:
 note_hash = H(storage_slot, partial_commitment, value)
 ```
 
-`randomness` is fresh per note and blinds the owner, so the partial commitment is an opaque `Field` that reveals nothing about who it pays. For a `UintNote` — whose struct holds only a `value`, with `owner`, `randomness` and `storage_slot` supplied to the hash as parameters — the fields divide cleanly:
+`owner` is an `AztecAddress` — the account that will be able to spend the note, the same value a transfer takes as `to`; no key and no amount enter this hash. `randomness` is fresh per note and blinds the owner, so the partial commitment is an opaque `Field` that reveals nothing about who it pays. For a `UintNote` — whose struct holds only a `value`, with `owner`, `randomness` and `storage_slot` supplied to the hash as parameters — the fields divide cleanly:
 
 | Field | Fixed at | Bound how |
 |---|---|---|
-| `owner` | Creation, in private | Inside `partial_commitment = H(owner, randomness)` |
+| `owner` (an `AztecAddress`) | Creation, in private | Inside `partial_commitment = H(owner, randomness)` |
 | `randomness` | Creation, in private | Same commitment; fresh per note |
 | `completer` | Creation, in private | In the validity commitment `H(partial_commitment, completer)`, not in the note hash |
 | `storage_slot` | Completion | Hashed into the final note hash |
@@ -241,6 +241,18 @@ Because private execution runs on the user's device before the sequencer process
 
 The ordering is also one-directional: a private function can enqueue a public call but cannot see its result, since that call runs afterwards. So the amount is unavailable in the only context that can create private state, and the context that knows the amount runs after private execution has finished.
 
+**Q: In `partial_commitment = H(owner, randomness)`, what is `owner` — an address, a private key, an amount?**
+
+An address. The aztec-nr implementation is `poseidon2_hash_with_separator([owner.to_field(), randomness], DOM_SEP__PARTIAL_NOTE_COMMITMENT)` with `owner: AztecAddress` — the recipient's account address, the same field a transfer takes as `to`. It names who will own the completed note: whose PXE discovers it and whose account can spend it.
+
+Not a key: no secret enters the hash. Spending the note later requires the nullifier secret key behind that address, and the spending circuit proves knowledge of it; the commitment only carries the address, which is why a recipient can hand the commitment to a stranger — it lets them pay the address, not act as it. Not an amount either: the amount is `value`, deliberately left out of the partial commitment because it is the field the completer supplies later in `note_hash = H(storage_slot, partial_commitment, value)`. The randomness is there so that nobody can test candidate addresses against the commitment — without it, `H(alice_address)` could be brute-forced from a list of known addresses.
+
+One nuance: `UintNote::partial(owner, context, recipient, completer)` takes an `owner` and a `recipient`. The owner goes into the commitment and can spend; the recipient is only who receives the private message announcing the partial note, and so who discovers it. They are normally the same address, which is why this article uses one word.
+
+**Q: How is `randomness` computed?**
+
+It is not computed from anything; it is drawn fresh. `UintNote::partial` calls `unsafe { random() }`, an oracle: the Noir program asks the host — the PXE, or the TXE in tests — for a field, and the host answers with `Fr.random()`, 64 bytes from the operating system's CSPRNG (`crypto.randomBytes`) reduced modulo the field. Nothing in the circuit constrains it, which the `unsafe` block and the library's own note ("we assume that the oracle is cooperating") make explicit; the only party who could weaken it is the creator, who already knows the whole note preimage. Because it is random rather than derived from a key, the recipient cannot recompute it, which is why the creation step delivers `(owner, randomness, commitment)` to the recipient as a private message — the pending partial note its PXE holds until completion. Ordinary notes get their randomness the same way.
+
 **Q: What stops someone who obtains a commitment from completing it themselves?**
 
 The validity commitment. When the partial note is created, a constrained private execution writes `H(partial_commitment, completer)` to the nullifier tree. At completion the token recomputes that hash using the caller's `msg_sender` as the completer and asserts the result exists in the tree.
@@ -296,6 +308,7 @@ So the amount's privacy is exactly as strong as the commitment's secrecy. Handed
 
 ### Related articles
 
+- [Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never Checks It]({{site.url_complet}}/2026/09/17/aztec-randomness-notes-oracle-unconstrained/)
 - [Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-4626 and the Escrow Standard]({{site.url_complet}}/2026/09/11/aztec-contract-standards-overview/)
 - [AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)
