@@ -153,7 +153,24 @@ The distinction to keep is that Aztec's `random()` is a *privacy* primitive for 
 
 The [AIP-20](https://docs.aztec.network/developers/docs/aztec-nr/standards/aip-20) commitment flow is the one place in the standard where `r` is created by one party and completed by another, and it makes the properties of the previous sections visible.
 
-The recipient calls `initialize_transfer_commitment(to, completer)`. Its device draws `r`, computes `C = H(to, r)`, sends itself the pair `(to, r, C)` as a private message so its PXE registers a *pending* partial note, and pushes a validity commitment `H(C, completer)` to the nullifier tree. The recipient then hands `C` to the payer. The payer's `transfer_private_to_commitment(from, C, amount, nonce)` completes the note: it checks that `H(C, msg_sender)` exists, emits a completion log tagged `H(C)` with `[slot, amount]` in clear, and pushes `H(slot, C, amount)` as a note hash. The payer never learns `r` and never learns `to`; `C` is all it holds.
+The flow has two halves, on two devices.
+
+**Opening, on the recipient's device.** The recipient calls `initialize_transfer_commitment(to, completer)`, and in one private execution it:
+
+- draws `r` from the oracle and computes the commitment `C = H(to, r)`;
+- sends itself `(to, r, C)` as a private message, so that its PXE registers a *pending* partial note keyed by `C`;
+- pushes the validity commitment `H(C, completer)` to the nullifier tree, the public proof that this contract created this partial note for this completer.
+
+The recipient then hands `C` to the payer, by whatever channel it likes.
+
+**Completion, on the payer's device.** The payer calls `transfer_private_to_commitment(from, C, amount, nonce)`, which:
+
+- checks that `H(C, msg_sender)` exists in the nullifier tree, so only the designated completer can pay;
+- spends the payer's notes for `amount`;
+- emits a completion log tagged `H(C)` whose payload is `[slot, amount]` in clear;
+- pushes `H(slot, C, amount)` as the note hash.
+
+The payer never learns `r` and never learns `to`; `C` is all it holds. The recipient's PXE finds the completion log by the tag it can derive from `C`, pairs it with the pending partial note, and now owns a spendable note.
 
 Two consequences follow from `r` being a one-shot, undeliverable value:
 
@@ -202,13 +219,13 @@ Randomness on Aztec is a client-side blinding value, drawn from one unconstraine
 |------|------------|
 | **Oracle** | A Noir call answered by the host process (PXE or TXE) during simulation; its result enters the circuit as an unconstrained witness. |
 | **`random()`** | The aztec-nr oracle `aztec_misc_getRandomField`, the framework's single source of randomness, answered with `Fr.random()`. |
+| **CSPRNG** | A cryptographically secure pseudo-random number generator, one whose output cannot be predicted or distinguished from random without its internal state; the operating system's (`crypto.randomBytes`, Web Crypto) is the source behind every draw here. |
 | **`Fr.random()`** | `@aztec/foundation`'s draw of 64 CSPRNG bytes reduced modulo the BN254 scalar field order, uniform up to a 2^-258 bias. |
 | **Note randomness `r`** | The blinding field mixed into a note hash as `H(owner, r)`, chosen by the note's creator and delivered to the owner in the note message. |
 | **Partial commitment** | `H(owner, r)`, the private half of a note hash; alone it is the commitment a partial-note recipient hands to a payer. |
 | **Note nonce** | `H(first_nullifier_in_tx, note_index)`, a protocol-derived, public value that makes a tree leaf unique; it hides nothing. |
 | **Nullifier** | `H(note_hash_for_nullification, nsk_app)`, published when a note is spent; its unlinkability comes from the owner's secret key, not from `r`. |
 | **Grumpkin** | The elliptic curve embedded in BN254 on which Aztec's account and ephemeral keys live; its points have coordinates in `Fr`, its scalars (secret keys) in `Fq`. |
-| **Ephemeral key pair** | A fresh Grumpkin key pair whose secret is `from_field(random())`, used once for the ECDH shared secret that encrypts a message. |
 | **`SEED`** | The environment variable that switches `@aztec/foundation`'s generator to a deterministic sequence for reproducible tests; never set in production. |
 
 ### Security Implementation Checklist
@@ -309,6 +326,7 @@ The library marks it as a `@todo` for uniformity. The value the code does guard 
 
 ### Related articles
 
+- [Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind It, and What a Quantum Computer Would Break]({{site.url_complet}}/2026/09/17/aztec-ephemeral-keys-ecdh-encryption-post-quantum/)
 - [Partial Notes on Aztec — Deferred Completion and Private DeFi Composability]({{site.url_complet}}/2026/09/09/aztec-partial-notes-private-defi-composability/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)
 - [AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/)

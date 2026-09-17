@@ -1,0 +1,36 @@
+@startuml
+title Two Grumpkin key pairs meet in one shared secret
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor white
+  BorderColor #7A5BB5
+}
+rectangle "Sender (this message only)" as S {
+  component "eph_sk = from_field(random())\neph_pk = eph_sk * G   (positive y)" as E
+}
+rectangle "Recipient (long-term account)" as R {
+  component "address secret = pre_address + ivsk\naddress_point = address secret * G\naddress = address_point.x" as A
+}
+component "S = eph_sk * address_point\n  = address secret * eph_pk" as SS
+component "s_app = Poseidon2(S.x, S.y, contract)\n-> AES-128 key + IV (body), key + IV (header)\n-> field masks" as K
+E --> SS : sender side
+A --> SS : recipient side
+SS --> K
+note bottom of E
+  Public in the log: eph_pk.x only.
+  Discarded after use.
+end note
+note bottom of A
+  Public: the address.
+  Secret: ivsk, in the PXE key store.
+end note
+@enduml

@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Ephemeral keys on Aztec
+** Why a fresh key per message
+*** Sender knows only an address
+*** No linkable sender key in the ciphertext
+*** Nothing durable protects the message
+*** Ephemeral-static Diffie-Hellman
+** Grumpkin, embedded in BN254
+*** y^2 = x^3 - 17 over Fr
+*** Scalars in Fq: EmbeddedCurveScalar {lo, hi}
+*** Native arithmetic inside a circuit
+*** Positive-y convention, x sent alone
+** An address is a public key
+*** address_point = pre_address * G + Ivpk_m
+*** address = address_point.x
+*** address secret = pre_address + ivsk
+** One message, AES-128
+*** S = eph_sk * address_point
+*** s_app = Poseidon2(S, contract)
+*** two key/IV pairs, body + header, CBC
+*** 31-byte packing, masks, eph_pk.x first
+*** random padding to 15 fields, no MAC
+** Handshakes and tags
+*** Non-interactive: 2nd eph key, S' = k * S
+*** Announcement encrypted to the recipient
+*** Interactive: eph key never published
+*** Address-derived / arbitrary: no eph key
+** Post-quantum?
+*** ECDH on Grumpkin: Shor breaks it
+*** Every onchain log carries eph_pk.x
+*** Harvest now, decrypt later
+*** Poseidon2 commitments hold (Grover)
+*** Proof soundness, signatures: broken
+*** Hybrid KEM: bigger log, KEM key in address, in-circuit cost
+@endmindmap

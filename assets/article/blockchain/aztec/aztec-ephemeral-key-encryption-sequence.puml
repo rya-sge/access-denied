@@ -1,0 +1,38 @@
+@startuml
+title Encrypting one note to an address (aztec-nr v5.2.0, AES128::encrypt)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+participant "Sender's private function" as C
+participant "random() oracle" as O
+participant "Grumpkin" as G
+participant "Poseidon2" as P
+participant "AES-128-CBC" as A
+participant "Private log (16 fields)" as L
+participant "Recipient PXE" as R
+C -> O : random()
+O --> C : field
+C -> G : from_field, * G; redraw until y positive
+G --> C : (eph_sk, eph_pk)
+C -> G : address -> address_point (positive root)
+C -> G : S = eph_sk * address_point
+C -> P : s_app = H(S.x, S.y, contract)
+C -> P : 4 subkeys -> (key, iv) body, (key, iv) header
+C -> A : body = CBC(plaintext bytes), header = CBC(len)
+C -> P : masks m_i = H(s_app, i)
+C -> C : pack 31 B/field, add masks,\nprepend eph_pk.x, random pad to 15
+C -> L : [tag | eph_pk.x | masked fields | random pad]
+L -> R : fetched by tag during sync
+R -> G : eph_pk from x (positive root)
+R -> R : oracle: address secret * eph_pk -> s_app
+R -> P : unmask, derive (key, iv) pairs
+R -> A : decrypt header -> length, decrypt body
+R -> R : note preimage; accept only if\nits hash is in the tx's note hash tree
+@enduml
