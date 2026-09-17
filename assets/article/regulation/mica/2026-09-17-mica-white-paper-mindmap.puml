@@ -1,0 +1,59 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF4F4
+    LineColor #2F6F73
+  }
+  :depth(1) {
+    BackgroundColor #2F6F73
+    FontColor white
+  }
+}
+</style>
+* MiCA Title II\nOther crypto-assets
+** Triggers
+*** Offer to the public (Art. 4): offeror
+*** Admission to trading (Art. 5): person seeking admission
+*** Offeror must be a legal person
+*** One white paper for all EU offers and listings
+** Exemptions (Art. 4)
+*** 4(2): white paper waived
+**** < 150 persons per Member State
+**** ≤ EUR 1 000 000 in 12 months
+**** Qualified investors only
+*** 4(3): outside Title II
+**** Offered for free (no data, no fee)
+**** Protocol rewards (mining, staking)
+**** Utility token for a live service
+**** Limited network of merchants
+*** Lost on any listing announcement (4(4))
+** White paper (Art. 6, Annex I)
+*** Ten information blocks, Parts A–I
+*** Climate impact of consensus mechanism
+*** First-page "not approved" statement
+*** Risk statement, no future-value claims
+*** Management-body statement
+*** Summary, languages, machine-readable
+** Marketing (Art. 7)
+*** Identified, consistent, fixed statement
+*** Not before publication of the white paper
+** Notification and publication (Arts 8–9)
+*** Home authority, 20 working days ahead
+*** No prior approval (8(3))
+*** Own classification analysis (8(4))
+*** ESMA register (Art. 109)
+*** EU-wide right to offer (Art. 11)
+** After publication
+*** Results and custody of funds (Art. 10)
+*** Modifications, 7 working days (Art. 12)
+*** Conduct obligations (Art. 14)
+** Holder protection
+*** 14-day retail withdrawal (Art. 13)
+*** Not for tokens already listed
+*** Liability of offeror and board (Art. 15)
+*** No contractual exclusion
+** Transition (Art. 143)
+*** Offers ended before 30 Dec. 2024: exempt
+*** Old listings: white paper by 31 Dec. 2027
+@endmindmap

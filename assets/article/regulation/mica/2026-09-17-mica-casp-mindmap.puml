@@ -1,0 +1,61 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF4F4
+    LineColor #2F6F73
+  }
+  :depth(1) {
+    BackgroundColor #2F6F73
+    FontColor white
+  }
+}
+</style>
+* MiCA Title V\nCrypto-asset service providers
+** Ten services (Art. 3(1)(16))
+*** Custody and administration (keys)
+*** Trading platform
+*** Exchange for funds / for crypto-assets
+*** Execution, placing, reception and transmission
+*** Advice, portfolio management
+*** Transfer services
+** Entry routes (Arts 59–61)
+*** Authorisation as CASP (Art. 63)
+*** Notification by banks, investment firms, CSDs, EMIs, fund managers (Art. 60)
+*** Registered office, effective management, EU director
+*** Reverse solicitation only, lost on any marketing (Art. 61)
+** Authorisation (Arts 62–65)
+*** Application: 15 items, policies per service
+*** 5 + 25 + 40 working days
+*** Withdrawal: unused 12 months, dormant 9 months, AML failures
+*** Passport: home authority forwards in 10 working days
+** Obligations of all CASPs (Arts 66–74)
+*** Honest, fair, professional; risk warnings
+*** Fees and climate impact published
+*** Capital: Class 1 EUR 50 000, Class 2 EUR 125 000, Class 3 EUR 150 000
+*** or 1/4 fixed overheads; CET1 or insurance
+*** Governance, DORA, records 5 years
+*** Client funds to a bank next business day
+*** Complaints, conflicts, outsourcing, wind-down plan
+** Custody (Art. 75)
+*** Agreement, register of positions, custody policy
+*** Quarterly statements, return of assets
+*** Separate on-chain addresses, insolvency-remote
+*** Liability for attributable loss, capped at market value
+*** Sub-custody only with authorised CASPs
+** Trading platform (Art. 76)
+*** Operating rules, suitability of each token
+*** No white paper, no admission
+*** No anonymised tokens
+*** No dealing on own account
+*** Pre- and post-trade transparency
+*** Settlement on ledger within 24 hours
+** Other services (Arts 77–82)
+*** Exchange: firm price, execution at displayed price
+*** Execution: best result, no routing fees
+*** Advice: suitability, independence
+*** Transfer: agreement and security
+** Acquisitions and size (Arts 83–85)
+*** 20 / 30 / 50 % thresholds, 60 working days
+*** Significant CASP: 15 million active users
+@endmindmap

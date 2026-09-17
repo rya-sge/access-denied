@@ -150,3 +150,7 @@ The policy engine, serialization and signing all run inside confidential computi
 A blockchain wallet holds the keys that move funds, so its implementation is where the security of the whole application concentrates. 
 
 The AWS services covered here, Nitro Enclaves in particular, give a framework for building wallets that keep signing keys isolated even from the operator running them. 
+
+## Related articles
+
+- [Becoming a CASP Under MiCA — Authorisation, Capital and Custody Obligations (Title V)]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/)

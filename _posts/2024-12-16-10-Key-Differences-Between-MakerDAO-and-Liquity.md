@@ -168,3 +168,7 @@ While both MakerDAO and Liquity aim to provide stablecoin solutions and DeFi len
 The mindmap below summarizes the article.
 
 ![MakerDAO vs Liquity mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity-mindmap.png)
+
+## Related articles
+
+- [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)

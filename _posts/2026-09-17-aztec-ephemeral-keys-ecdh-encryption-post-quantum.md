@@ -270,6 +270,7 @@ It would also leave discovery tags, proof soundness and account signatures where
 
 ### Related articles
 
+- [Building a Wallet for Aztec — What a MetaMask for a Private Chain Has to Contain]({{site.url_complet}}/2026/09/17/building-an-aztec-wallet-pxe-proving-accounts/)
 - [Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never Checks It]({{site.url_complet}}/2026/09/17/aztec-randomness-notes-oracle-unconstrained/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)
 - [Native Account Abstraction on Aztec, Compared with ERC-4337]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/)

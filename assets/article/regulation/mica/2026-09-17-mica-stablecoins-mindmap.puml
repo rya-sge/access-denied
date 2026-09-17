@@ -1,0 +1,59 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF4F4
+    LineColor #2F6F73
+  }
+  :depth(1) {
+    BackgroundColor #2F6F73
+    FontColor white
+  }
+}
+</style>
+* MiCA Titles III–IV\nStablecoins
+** Two categories
+*** EMT: one official currency, deemed e-money
+*** ART: any other value or basket
+*** Only the issuer may offer (or consent)
+*** Applied since 30 June 2024
+** ART authorisation (Arts 16–26)
+*** EU legal person authorised, or credit institution (Art. 17)
+*** Exempt below EUR 5 000 000 or qualified investors
+*** Application: legal opinion, governance, plans
+*** 25 + 60 + 20 + 25 working days
+*** ECB veto on payment systems, monetary policy
+*** White paper approved with the authorisation
+** Reporting and use limits
+*** Quarterly report above EUR 100 000 000 (Art. 22)
+*** Stop issuing above 1 million tx and EUR 200 million per day (Art. 23)
+** Issuer obligations (Arts 27–35)
+*** Conduct, marketing, monthly disclosure
+*** Governance, complaints, conflicts
+*** Own funds: max(EUR 350 000, 2 % reserve, 1/4 overheads)
+*** Add-ons up to 20 % (40 % in stress)
+** Reserve (Arts 36–40)
+*** Legally and operationally segregated
+*** ≥ 30 % bank deposits per currency
+*** Custody at CASP, bank or investment firm
+*** Investment in highly liquid low-risk instruments
+*** Six-monthly independent audit
+*** Permanent redemption at market value, no fee
+*** No interest (Art. 40)
+** Significant ART (Arts 43–45)
+*** 3 of 7 criteria: 10 M holders, EUR 5 bn, 2.5 M tx/day...
+*** EBA supervision
+*** Own funds 3 %, deposits ≥ 60 %
+*** Liquidity stress tests, open custody
+** Recovery and redemption plans (Arts 46–47)
+*** Liquidity fees, redemption limits, suspension
+*** Orderly redemption with temporary administrator
+** E-money tokens (Arts 48–58)
+*** Credit institution or e-money institution only
+*** Notify 40 working days; white paper 20 working days
+*** Issued and redeemed at par, no fee
+*** No interest (Art. 50)
+*** ≥ 30 % deposits, rest in same-currency liquid assets
+*** Significant EMT: ART reserve regime applies
+*** 80 % home-concentration carve-out for non-euro EU currencies
+@endmindmap

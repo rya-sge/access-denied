@@ -1,0 +1,38 @@
+@startuml
+title Authorisation and passport of a crypto-asset service provider (Articles 62 to 65)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF4F4
+  ParticipantBorderColor #2F6F73
+  LifeLineBorderColor #2F6F73
+  ArrowColor #2F6F73
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+participant "Applicant CASP" as C
+participant "Home competent\nauthority" as NCA
+participant "ESMA register\n(Art. 109)" as ESMA
+participant "Host competent\nauthorities" as Host
+
+C -> NCA : Application (Art. 62): programme of operations,\ncapital, governance, AML, ICT, segregation,\ncomplaints, service policies, continuity
+NCA --> C : Acknowledgement within 5 working days
+NCA -> NCA : Completeness check within 25 working days\n(deadline for missing items)
+NCA --> C : Application complete
+NCA -> NCA : Assessment within 40 working days\n(one suspension of at most 20)
+NCA -> C : Reasoned decision listing the authorised\nservices, notified within 5 working days
+NCA -> ESMA : Authorisation entered in the public register
+note over C, NCA
+  Conditions kept at all times (Art. 59(4));
+  withdrawal if unused 12 months, dormant 9 months,
+  irregular, non-compliant or AML failures (Art. 64)
+end note
+C -> NCA : Cross-border notification (Art. 65): target Member\nStates, services, start date, other activities
+NCA -> Host : Forwarded within 10 working days,\nwith ESMA and EBA
+NCA --> C : Confirmation of the forwarding
+note over C
+  Services may start on receipt of the confirmation,
+  or at the latest 15 calendar days after submission
+end note
+@enduml

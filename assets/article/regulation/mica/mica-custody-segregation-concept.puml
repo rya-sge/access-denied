@@ -1,0 +1,55 @@
+@startuml
+title Segregation and liability of a MiCA custodian (Articles 70 and 75)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam actor {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam database {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+actor "Client A" as A
+actor "Client B" as B
+package "Custodian (CASP)" {
+  database "Register of positions\nper client (Art. 75(2))\nrights and every movement" as Reg
+  component "Custody policy (Art. 75(3))\nfraud, cyber threats, negligence" as Pol
+  component "Own funds or insurance\n(Art. 67), covers Art. 75(8)" as Cap
+}
+package "Distributed ledger" {
+  component "Client addresses\nheld separately from\nthe custodian's own (Art. 75(7))" as ClientAddr
+  component "Custodian's proprietary\naddresses" as OwnAddr
+}
+component "Credit institution or central bank\nclient funds by next business day,\nseparate account (Art. 70(3))" as Bank
+component "Sub-custodian\nauthorised CASP only (Art. 75(9))" as Sub
+component "Insolvency estate\nof the custodian" as Estate
+
+A --> Reg : agreement (Art. 75(1)),\nstatement every 3 months
+B --> Reg
+Reg --> ClientAddr : reconciles
+Pol ..> ClientAddr
+ClientAddr ..> Sub : optional
+A --> Bank : fiat
+Estate ..x ClientAddr : no recourse of creditors\n(legally segregated)
+Estate --> OwnAddr
+Cap --> A : loss from an attributable incident\ncompensated up to market value (Art. 75(8))
+note right of ClientAddr
+  A problem inherent in the ledger
+  the custodian does not control
+  is not attributable to it
+end note
+@enduml

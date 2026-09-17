@@ -1,0 +1,51 @@
+@startuml
+title Sorting a token under MiCA (Articles 2 and 3)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #2F6F73
+}
+start
+if (Digital representation of a value or right,
+transferable and storable via DLT
+or similar technology? (Art. 3(1)(5))) then (no)
+  :Not a crypto-asset,
+  outside MiCA;<<#F6E7E7>>
+  stop
+endif
+if (Financial instrument, deposit, fund,
+securitisation, insurance, pension
+or social-security scheme? (Art. 2(4))) then (yes)
+  :Outside MiCA, existing
+  financial law applies;<<#F6E7E7>>
+  stop
+endif
+if (Unique and not fungible
+with other crypto-assets? (Art. 2(3))) then (yes)
+  :Outside MiCA;<<#F6E7E7>>
+  stop
+endif
+if (Purports to hold a stable value
+by referencing one official currency?) then (yes)
+  :E-money token
+  Title IV (Arts 48–58);<<#B7DBDB>>
+  stop
+endif
+if (Purports to hold a stable value
+by referencing another value, right
+or combination?) then (yes)
+  :Asset-referenced token
+  Title III (Arts 16–47);<<#B7DBDB>>
+  stop
+endif
+:Other crypto-asset
+Title II (Arts 4–15);
+if (Only gives access to a good or service
+supplied by its issuer?) then (yes)
+  :Utility token
+  (Title II exemptions may apply);
+endif
+stop
+@enduml

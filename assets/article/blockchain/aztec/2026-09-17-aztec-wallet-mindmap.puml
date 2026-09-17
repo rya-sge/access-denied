@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Building an Aztec wallet
+** Unlike an Ethereum wallet
+*** Private state lives in the wallet
+*** The wallet proves (WASM, 10-60 s)
+*** Every account is a contract
+*** Fees before the first transaction
+*** A view is a disclosure
+** Components
+*** Keys and accounts: Grumpkin key pairs, address before deployment
+*** PXE: key store, note DB, simulator, hooks
+*** Prover: proveTx, offscreen document
+*** Pipeline: payload, fees, request, simulate, authwits, prove, send
+*** Fees: Fee Juice, FPC, Sponsored FPC
+*** Wallet SDK: discovery, P-256 ECDH, emoji check, capabilities
+*** Approval UI
+** Build order
+*** Keys -> PXE -> deploy -> BaseWallet -> SDK protocol
+*** Senders -> hooks -> backup -> fees -> own node
+** Traps
+*** Seed is not the whole backup
+*** Scan before deployment
+*** authorizeUtilityCall default denies
+*** The node sees your tags
+*** Service worker dies at 5 min
+*** Oracle version, Sponsored FPC not on mainnet
+** Wallets today (Sept 2026)
+*** Azguard: extension, testnet
+*** Obsidion: web, passkeys, Aztec Labs since May 2026
+*** aztec-wallet CLI
+*** EmbeddedWallet, tutorial extension
+@endmindmap

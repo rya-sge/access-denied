@@ -1,0 +1,37 @@
+@startuml
+title Parties and documents around a Title II offer
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam actor {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam database {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+actor "Offeror or person\nseeking admission\n(legal person)" as Off
+actor "Trading platform\noperator (CASP)" as Plat
+actor "Retail holder" as Ret
+actor "Holder" as Hold
+component "Crypto-asset\nwhite paper\n(Art. 6, Annex I)" as WP
+component "Marketing\ncommunications\n(Art. 7)" as MK
+component "Home competent\nauthority" as NCA
+component "Host competent\nauthorities" as Host
+database "ESMA register\n(Art. 109)" as Reg
+
+Off --> WP : draws up, publishes\non its website (Art. 9)
+Off --> MK : after the white paper
+Off --> NCA : notifies ≥ 20 working days\nbefore publication (Art. 8)
+NCA --> Host : within 5 working days
+NCA --> Reg : white paper published\nby the offer start date
+Plat ..> WP : may take over the duties\nby written agreement (Art. 5(3))
+Plat --> Off : no admission without a\npublished white paper (Art. 76(1))
+Ret --> Off : 14-day withdrawal\nin a primary sale (Art. 13)
+Hold --> Off : liability of offeror\nand its board (Art. 15)
+@enduml

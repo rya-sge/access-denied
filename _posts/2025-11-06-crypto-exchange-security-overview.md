@@ -146,3 +146,8 @@ Exchanges face multiple types of threats, including external attacks, insider mi
 The mindmap below summarizes the article.
 
 ![Crypto exchange security mindmap]({{site.url_complet}}/assets/article/blockchain/2025-11-06-crypto-exchange-security-overview-mindmap.png)
+
+## Related articles
+
+- [Becoming a CASP Under MiCA — Authorisation, Capital and Custody Obligations (Title V)]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/)
+- [Market Abuse and Enforcement Under MiCA — Insider Dealing, Manipulation, Penalties and Supervision (Titles VI and VII)]({{site.url_complet}}/2026/09/17/mica-market-abuse-enforcement-supervision/)

@@ -1,0 +1,57 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF4F4
+    LineColor #2F6F73
+  }
+  :depth(1) {
+    BackgroundColor #2F6F73
+    FontColor white
+  }
+}
+</style>
+* MiCA Titles VI–VII\nMarket abuse and enforcement
+** Scope of Title VI (Art. 86)
+*** Crypto-assets admitted (or requested) to trading
+*** Any person, on or off platform
+*** In the Union and in third countries
+** Inside information (Arts 87–88)
+*** Precise, non-public, price-sensitive
+*** Disclosure as soon as possible, 5-year archive
+*** Delay: legitimate interest, not misleading, confidential
+*** ESAP filing from 10 January 2030 (Art. 110a)
+** Prohibitions (Arts 89–91)
+*** Insider dealing, incl. cancelling orders
+*** Insiders include DLT roles: validators, developers
+*** Unlawful disclosure
+*** Manipulation: false signals, artificial price, deception
+*** Spoofing, layering, cornering, undisclosed promotion
+** Detection (Art. 92)
+*** Intermediaries: systems to prevent and detect
+*** Report suspicions, incl. consensus anomalies
+** National authorities (Arts 93–102)
+*** Powers: information, suspension 30 days, prohibition
+*** Inspections, freezing, content removal
+*** Cooperation, classification convergence
+*** Precautionary measures by host authorities
+** Product intervention (Arts 103–105)
+*** ESMA: other crypto-assets
+*** EBA: ARTs and EMTs
+*** National authorities
+** ESMA registers (Arts 109–110)
+*** White papers, issuers, CASPs
+*** Non-compliant entities
+** Penalties (Arts 111–116)
+*** Natural persons ≥ EUR 700 000
+*** Legal persons ≥ EUR 5 M or 3 / 5 / 12.5 % turnover
+*** Market abuse: ≥ EUR 5 M / EUR 15 M or 15 %, 3× profit
+*** Management bans, publication, whistleblowers
+** EBA supervision (Arts 117–138)
+*** Significant ART and EMT issuers
+*** Crypto-asset committee, supervisory colleges
+*** Investigations, on-site inspections
+*** Fines up to 12.5 % / 10 % turnover
+*** Periodic penalties 3 % daily turnover
+*** Court of Justice review, fees, delegation
+@endmindmap

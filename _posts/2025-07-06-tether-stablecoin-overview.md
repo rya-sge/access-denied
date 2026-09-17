@@ -838,3 +838,7 @@ This is a **classic example of a custodial/centralized stablecoin** with:
 
 - USDT mainet contract address: [0xdac17f958d2ee523a2206206994597c13d831ec7](https://etherscan.io/address/0xdac17f958d2ee523a2206206994597c13d831ec7)
 - ChatGPT for the analyse
+
+### Related articles
+
+- [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)

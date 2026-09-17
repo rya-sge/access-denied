@@ -1,0 +1,41 @@
+@startuml
+title The reserve of assets of an asset-referenced token (Articles 35 to 40)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam actor {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+actor "Holders" as H
+package "Issuer" {
+  component "Own funds (Art. 35)\nmax(EUR 350 000, 2 % of reserve,\n1/4 fixed overheads), CET1" as OF
+  component "Recovery plan (Art. 46)\nRedemption plan (Art. 47)" as Plans
+}
+package "Reserve of assets (Art. 36)\nlegally and operationally segregated" {
+  component "Deposits at credit institutions\n≥ 30 % per referenced currency\n(≥ 60 % if significant)" as Dep
+  component "Highly liquid, low-risk\nfinancial instruments (Art. 38)\nprofits and losses borne by issuer" as Inv
+}
+component "Custodians (Art. 37)\nCASP, credit institution\nor investment firm\naccounts per token, no pledge" as Cust
+component "Independent auditor\nevery six months (Art. 36(9))" as Aud
+component "Website (Art. 30)\nmonthly: tokens in circulation,\nreserve value and composition" as Web
+
+H --> OF : permanent right of redemption\nat market value, no fee (Art. 39)
+H <.. OF : no interest, no time-based\nbenefit (Art. 40)
+OF ..> Dep
+OF ..> Inv
+Dep --> Cust
+Inv --> Cust
+Aud --> Dep
+Aud --> Inv
+Aud --> Web : report published
+Plans ..> H : liquidity fees, daily limits,\nsuspension, orderly wind-down
+@enduml

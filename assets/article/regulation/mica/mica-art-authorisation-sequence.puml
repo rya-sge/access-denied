@@ -1,0 +1,37 @@
+@startuml
+title Authorisation of an asset-referenced token issuer (Articles 18 to 21)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF4F4
+  ParticipantBorderColor #2F6F73
+  LifeLineBorderColor #2F6F73
+  ArrowColor #2F6F73
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+participant "Applicant issuer\n(EU legal person)" as Iss
+participant "Home competent\nauthority" as NCA
+participant "EBA and ESMA" as ESA
+participant "ECB or national\ncentral bank" as ECB
+
+Iss -> NCA : Application (Art. 18): LEI, business plan,\nlegal opinion, governance, white paper, plans
+NCA -> Iss : Completeness check within 25 working days
+NCA -> NCA : Assessment within 60 working days\n(one suspension of at most 20 working days)
+NCA -> ESA : Draft decision and application (Art. 20(4))
+NCA -> ECB : Draft decision and application
+ESA --> NCA : Opinion on the classification\nlegal opinion, 20 working days (non-binding)
+ECB --> NCA : Opinion on financial stability, payment\nsystems, monetary policy, 20 working days
+note over NCA, ECB
+  A negative central-bank opinion on payment
+  systems, monetary policy transmission or
+  monetary sovereignty obliges a refusal (Art. 21(4))
+end note
+NCA -> Iss : Reasoned decision within 25 working days\nof the opinions; notified within 5 (Art. 21(1))
+NCA -> ESA : Authorisation communicated to ESMA\nfor the Art. 109 register
+note over Iss
+  Authorisation valid across the Union;
+  the white paper is deemed approved
+end note
+@enduml

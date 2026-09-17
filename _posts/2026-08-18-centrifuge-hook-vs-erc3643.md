@@ -379,3 +379,7 @@ Two secondary factors usually settle borderline cases. If holders should carry i
 ### Analyzed source
 
 - [centrifuge/protocol](https://github.com/centrifuge/protocol) — analyzed at commit [`a1aeae93c94e8a3dbe078f0fefbe9a1a340ffde1`](https://github.com/centrifuge/protocol/tree/a1aeae93c94e8a3dbe078f0fefbe9a1a340ffde1) (no release tag on this commit; it follows the `deploy-testnet-v3.2` tag), 2026-08-18
+
+### Related articles
+
+- [MiCA Explained — Scope, Token Categories and Timeline of Regulation (EU) 2023/1114]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/)

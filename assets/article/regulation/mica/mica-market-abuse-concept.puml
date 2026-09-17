@@ -1,0 +1,44 @@
+@startuml
+title Title VI: from inside information to enforcement
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam actor {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+component "Inside information (Art. 87)\nprecise, non-public,\nprice-sensitive" as II
+package "Duties of issuers" {
+  component "Public disclosure as soon\nas possible (Art. 88)\ndelay on three conditions" as Disc
+}
+package "Prohibitions on any person" {
+  component "Insider dealing (Art. 89)\nuse, cancel or amend orders,\nrecommend or induce" as ID
+  component "Unlawful disclosure (Art. 90)" as UD
+  component "Market manipulation (Art. 91)\nfalse signals, artificial price,\ndeception, undisclosed promotion" as MM
+}
+actor "Issuer, offeror,\nperson seeking admission" as Iss
+actor "Insiders (Art. 89(5))\nofficers, shareholders, employees,\nDLT roles, anyone who ought to know" as Ins
+actor "Any market participant" as Any
+component "CASPs and other persons\nprofessionally arranging or\nexecuting transactions (Art. 92)" as CASP
+component "National competent authority\nArt. 94 powers, Art. 111 penalties" as NCA
+
+Iss --> Disc
+II --> Disc
+II --> ID
+Ins --> ID
+Ins --> UD
+Any --> MM
+CASP --> NCA : suspicious orders and\ntransactions reported without delay
+CASP ..> ID : detect
+CASP ..> MM : detect
+NCA --> Ins : fines ≥ EUR 5 000 000,\n3× profit, bans
+NCA --> Any : fines ≥ EUR 15 000 000\nor 15 % of turnover
+@enduml

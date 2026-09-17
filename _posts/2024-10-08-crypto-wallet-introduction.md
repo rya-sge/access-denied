@@ -278,3 +278,6 @@ Finally, if you want to know if your Bitcoin wallet is truly open-source and sec
   -  "Write me an article about crypto wallet. What they do, their usage, risk, the different type of wallet, and so on."
   - "For the different type of cold wallet, price their pros and cons"
 
+### Related articles
+
+- [Becoming a CASP Under MiCA — Authorisation, Capital and Custody Obligations (Title V)]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/)

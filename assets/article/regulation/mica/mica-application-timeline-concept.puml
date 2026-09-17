@@ -1,0 +1,36 @@
+@startuml
+title Application timeline of MiCA (Articles 143 and 149, Article 110a)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+start
+:29 June 2023
+Entry into force; empowerments for
+delegated acts and technical standards;
+:30 June 2024
+Titles III and IV apply
+(asset-referenced tokens, e-money tokens);<<#B7DBDB>>
+:30 July 2024
+Deadline for pre-existing ART issuers
+to apply for authorisation (Art. 143(4));
+:30 December 2024
+All other titles apply
+(white papers, CASPs, market abuse, supervision);<<#B7DBDB>>
+:30 June 2025
+Commission interim report (Art. 140);
+:1 July 2026
+Latest end of the CASP transitional
+period (Art. 143(3));
+:30 June 2027
+Commission report with possible
+legislative proposal (Art. 140);
+:31 December 2027
+White paper required for crypto-assets
+admitted to trading before 30 Dec. 2024 (Art. 143(2));
+:10 January 2030
+Inside information also submitted
+to ESAP (Art. 110a);
+stop
+@enduml

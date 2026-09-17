@@ -1,0 +1,49 @@
+@startuml
+title Who each title of MiCA addresses
+skinparam shadowing false
+left to right direction
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam actor {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+package "Token regimes" {
+  component "Title II\nOther crypto-assets\nwhite paper, no approval" as T2
+  component "Title III\nAsset-referenced tokens\nauthorisation, reserve, redemption" as T3
+  component "Title IV\nE-money tokens\ncredit institution or EMI, par redemption" as T4
+}
+package "Service regime" {
+  component "Title V\nCrypto-asset service providers\nauthorisation, capital, custody, conduct" as T5
+}
+package "Market and supervision" {
+  component "Title VI\nMarket abuse\ninsider dealing, manipulation" as T6
+  component "Title VII\nCompetent authorities, EBA, ESMA\npowers, registers, penalties" as T7
+}
+
+actor "Offeror /\nperson seeking admission" as Off
+actor "Issuer of ART" as IssA
+actor "Issuer of EMT\n(credit institution or EMI)" as IssE
+actor "CASP" as Casp
+actor "Any person trading\na listed crypto-asset" as Trader
+actor "National competent\nauthority" as NCA
+actor "EBA" as EBA
+actor "ESMA" as ESMA
+
+Off --> T2
+IssA --> T3
+IssE --> T4
+Casp --> T5
+Trader --> T6
+NCA --> T7 : supervises Titles II–VI
+EBA --> T7 : supervises significant\nART and EMT issuers
+ESMA --> T7 : registers, technical\nstandards, intervention
+@enduml

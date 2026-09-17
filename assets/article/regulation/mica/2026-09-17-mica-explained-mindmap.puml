@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF4F4
+    LineColor #2F6F73
+  }
+  :depth(1) {
+    BackgroundColor #2F6F73
+    FontColor white
+  }
+}
+</style>
+* MiCA\nRegulation (EU) 2023/1114
+** Object (Art. 1)
+*** Disclosure: crypto-asset white paper
+*** Authorisation of CASPs, ART and EMT issuers
+*** Protection of holders and clients
+*** Market integrity
+** Scope (Art. 2)
+*** Activities in the Union
+*** Excluded persons: intra-group, central banks, EIB, ESM
+*** Excluded assets
+**** Financial instruments (MiFID II)
+**** Deposits, funds, insurance, pensions
+**** Unique, non-fungible tokens
+** Three categories (Art. 3)
+*** E-money token: one official currency
+*** Asset-referenced token: other value or basket
+*** Other crypto-assets
+**** Utility tokens
+** Actors
+*** Offeror / issuer / person seeking admission
+*** Crypto-asset service provider (10 services)
+*** Retail holder, client
+*** Competent authority, home and host Member State
+*** EBA and ESMA
+** Structure
+*** Title II: white paper
+*** Titles III–IV: stablecoins
+*** Title V: CASPs
+*** Titles VI–VII: market abuse, supervision
+*** Annexes I–VI
+** Timeline
+*** 29 June 2023: entry into force
+*** 30 June 2024: Titles III and IV
+*** 30 December 2024: all other titles
+*** 1 July 2026: end of CASP transition
+*** 31 December 2027: white papers for old listings
+*** 10 January 2030: ESAP
+@endmindmap

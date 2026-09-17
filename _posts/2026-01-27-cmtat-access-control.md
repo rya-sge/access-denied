@@ -509,3 +509,7 @@ This is also particularly relevant for open-source library such as CMTAT to allo
 - [OpenZeppelin AccessManaged](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/manager/AccessManaged.sol)
 - [Composable Security - The Role of Access Control in Solidity Smart Contracts](https://composable-security.com/blog/the-role-of-access-control-in-solidity-smart-contracts/)
 - [Cursor](https://cursor.com/) and [Claude Code](https://claude.com/product/claude-code) to write the first draft of this article and review the content.
+
+### Related articles
+
+- [MiCA Explained — Scope, Token Categories and Timeline of Regulation (EU) 2023/1114]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/)

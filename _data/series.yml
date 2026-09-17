@@ -58,3 +58,7 @@ hyperliquid:
 sye:
   title: "Operating Systems (HEIG-VD SYE Lectures)"
   ordered: true
+
+mica:
+  title: "MiCA — Regulation (EU) 2023/1114 on Markets in Crypto-Assets"
+  ordered: true

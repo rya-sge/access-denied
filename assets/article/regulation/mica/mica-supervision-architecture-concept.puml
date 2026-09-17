@@ -1,0 +1,51 @@
+@startuml
+title Supervision under MiCA (Title VII)
+skinparam shadowing false
+left to right direction
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2F6F73
+}
+skinparam database {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+}
+
+package "European level" {
+  component "ESMA\nregisters (Arts 109–110)\nclassification convergence (Art. 97)\nintervention on other crypto-assets (Art. 103)\ntechnical standards, guidelines" as ESMA
+  component "EBA\ndirect supervision of significant\nART and EMT issuers (Art. 117)\ncrypto-asset committee (Art. 118)\nintervention on ARTs and EMTs (Art. 104)" as EBA
+  component "Supervisory college (Art. 119)\nEBA, home authority, CASP and platform\nauthorities, ECB, central banks, ESMA" as Col
+  component "ECB and national\ncentral banks" as ECB
+}
+package "National level" {
+  component "Home competent authority (Art. 93)\nArt. 94 powers, Art. 111 penalties\nArt. 105 intervention" as Home
+  component "Host competent authority\nprecautionary measures (Art. 102)" as Host
+}
+package "Supervised persons" {
+  component "Offerors and persons\nseeking admission (Title II)" as Off
+  component "Issuers of ARTs\nand EMTs (Titles III–IV)" as Iss
+  component "Issuers of significant\nARTs and EMTs" as SigIss
+  component "CASPs (Title V)" as Casp
+  component "Any person trading\nlisted crypto-assets (Title VI)" as Any
+}
+database "ESMA public registers\nwhite papers, issuers, CASPs,\nnon-compliant entities" as Reg
+
+Home --> Off
+Home --> Iss
+Home --> Casp
+Home --> Any
+Host ..> Home : notifies irregularities
+Home --> ESMA : notifications, authorisations
+ESMA --> Reg
+EBA --> SigIss : investigations, inspections,\nfines up to 12.5 % / 10 %
+EBA --> Col
+Col ..> EBA : non-binding opinions
+ECB ..> Col
+ECB ..> Home : opinion on ART authorisation,\nveto on monetary grounds (Art. 21(4))
+Home ..> SigIss : other activities of\nthe same issuer
+@enduml

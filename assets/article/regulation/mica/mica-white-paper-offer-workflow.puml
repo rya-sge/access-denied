@@ -1,0 +1,56 @@
+@startuml
+title From a token offer to a published white paper (Title II)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF4F4
+  BorderColor #2F6F73
+  DiamondBackgroundColor #FFFFFF
+  DiamondBorderColor #2F6F73
+}
+start
+:Planned offer to the public or
+admission to trading of a crypto-asset
+other than an ART or EMT;
+if (Free, protocol reward, live utility
+token or limited network? (Art. 4(3))) then (yes)
+  if (Listing announced? (Art. 4(4))) then (no)
+    :Outside Title II;<<#B7DBDB>>
+    stop
+  endif
+endif
+if (< 150 persons per Member State,
+≤ EUR 1 000 000 in 12 months,
+or qualified investors only? (Art. 4(2))) then (yes)
+  if (Listing announced? (Art. 4(4))) then (no)
+    :No white paper;
+    :Still a legal person,
+    still Art. 14 conduct;<<#B7DBDB>>
+    stop
+  endif
+endif
+:Draw up the white paper (Art. 6, Annex I)
+ten blocks, warnings, summary,
+management-body statement;
+:Notify the home competent authority
+≥ 20 working days before publication
+with the classification analysis (Art. 8);
+:Authority forwards to host authorities
+and to the ESMA register (Art. 8(6)–(7));
+:Publish on the website before the
+offer or admission starts (Art. 9);
+:Marketing only after publication (Art. 7(2));
+:Offer throughout the Union,
+no further information requirements (Art. 11);<<#B7DBDB>>
+repeat
+  :Offer runs; retail buyers may withdraw
+  within 14 days (Art. 13);
+  if (Significant new factor or
+  material mistake? (Art. 12)) then (yes)
+    :Notify modified white paper
+    ≥ 7 working days before publication;
+    :Publish, time-stamp, keep old versions 10 years;
+  endif
+repeat while (Token still offered or listed?) is (yes)
+->no;
+stop
+@enduml
