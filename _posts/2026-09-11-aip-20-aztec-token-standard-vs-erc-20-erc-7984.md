@@ -2,6 +2,7 @@
 layout: post
 title: "AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984"
 date:   2026-09-11
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -10,6 +11,8 @@ description: "AIP-20 gives each account a private note balance and a public one,
 image: /assets/article/blockchain/aztec/2026-09-11-aip20-vs-erc20-erc7984-mindmap.png
 isMath: false
 ---
+
+Two of the three standards compared here run on chains that hide state by construction. [Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum where a contract has a private side, executed on the user's device inside a zero-knowledge proof over encrypted notes, and a public side executed by a sequencer; a balance can live in either. [Zama](https://www.zama.ai/)'s protocol keeps state encrypted under fully homomorphic encryption, so an EVM contract computes on ciphertexts it never decrypts. Both are described in more detail in [an earlier article]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/).
 
 [ERC-20](https://eips.ethereum.org/EIPS/eip-20) fixed the interface of a fungible token in 2015: one public balance per address, an allowance table, and a `transfer` that either moves the full amount or reverts. Every later token standard has had to decide what to keep from that interface and what to give up, and a privacy-preserving token has to give up the most, because the thing ERC-20 makes public is the thing it exists to hide.
 

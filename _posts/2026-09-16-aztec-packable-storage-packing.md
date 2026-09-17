@@ -2,6 +2,7 @@
 layout: post
 title: "Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps"
 date:   2026-09-16
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -10,6 +11,8 @@ description: "A derived Packable spends one Field per member. Packing two bools 
 image: /assets/article/blockchain/aztec/2026-09-16-aztec-packable-mindmap.png
 isMath: false
 ---
+
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum whose contracts are written in [Noir](https://noir-lang.org/) and compiled, for their private side, into zero-knowledge circuits proved on the user's device; the public side runs on a sequencer with storage slots much like the EVM's. A contract's state therefore has two cost models, one counted in constraints and one in slots, and a storage encoding is measured against both.
 
 A Solidity developer who declares `struct CreditEvents { bool flagDefault; bool flagRedeemed; string rating; }` gets two storage slots without thinking about it: the compiler packs the two `bool`s into one 32-byte word and gives the string its own. The same struct in an Aztec contract written in Noir takes **three** slots, because the framework's default encoding spends one field element per struct member and nothing packs them for you. The tool to get the Solidity layout back is the `Packable` trait, written by hand.
 

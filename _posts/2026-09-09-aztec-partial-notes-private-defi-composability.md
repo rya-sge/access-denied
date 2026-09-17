@@ -2,6 +2,7 @@
 layout: post
 title: "Partial Notes on Aztec — Deferred Completion and Private DeFi Composability"
 date:   2026-09-09
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain defi ZKP
@@ -10,6 +11,8 @@ description: A private function cannot read the price it needs. Partial notes sp
 image: /assets/article/blockchain/aztec/2026-09-09-aztec-partial-notes-mindmap.png
 isMath: false
 ---
+
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum whose contracts run in two halves: a private half executed on the user's device inside a zero-knowledge proof, over encrypted *notes* that only their owner can read, and a public half executed later by a sequencer over state anyone can read. A transaction goes from the private half to the public half and never back, and the [execution model]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/) is what makes the problem below hard.
 
 A private swap on Aztec looks impossible on paper. Creating a note requires knowing its value. The value of a swap output is the exchange rate times the input, and the exchange rate is public state that a private function cannot read: private execution happens on the user's device, before the sequencer touches the block, so the current reserves are not knowable at proving time. Public execution can read them, but by then the private half of the transaction is finished and cannot create anything private.
 

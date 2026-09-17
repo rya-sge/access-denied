@@ -2,6 +2,7 @@
 layout: post
 title: "Code Reuse in Aztec Contracts — Modules, Traits and Library Crates Instead of Inheritance"
 date:   2026-09-15
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -10,6 +11,8 @@ description: "Aztec contracts cannot inherit. What a contract module must own, w
 image: /assets/article/blockchain/aztec/2026-09-15-aztec-code-reuse-mindmap.png
 isMath: false
 ---
+
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum whose contracts are written in [Noir](https://noir-lang.org/), a Rust-like language that compiles to zero-knowledge circuits. A contract's private functions are proved on the user's device and its public functions run on a sequencer, but from the developer's side both sit in one Noir `contract` block, built with the Aztec.nr framework. The constraints of that language and framework, not of the chain, are the subject here.
 
 A Solidity token that needs a pause switch writes `contract MyToken is ERC20, Pausable` and overrides one hook. An Aztec contract written in Noir cannot do that: the language has no inheritance, and the framework requires every entry point of a contract to be declared inside one `contract` block, in one file. The documentation says it plainly: "you cannot take a token contract and extend it to add minting functionality, or reuse it in a liquidity pool". A team that ships several variants of one token, say a full version and a lighter one without transfer lists, seems condemned to three copies of the same file.
 

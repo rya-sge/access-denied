@@ -11,6 +11,8 @@ image: /assets/article/blockchain/aztec/2026-09-17-aztec-randomness-mindmap.png
 isMath: false
 ---
 
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum. A contract there has a private side, executed on the user's device inside a zero-knowledge proof over encrypted *notes* that only their owner can read, and a public side executed by a sequencer; what the chain itself stores of the private side is commitments, hashes of data it never sees. [An earlier article]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/) covers that execution model; this one looks at one ingredient of those commitments.
+
 An Aztec contract publishes hashes, not data. A private balance is a set of note hashes in a Merkle tree; a private event is a commitment in the nullifier tree; a message to a recipient is a ciphertext in a log. Each of those is public, and each is a function of values drawn from small sets: an address that appears in a known list, an amount below a few million units, a storage slot that the contract's layout fixes. A hash of small inputs is not hiding at all, because anyone can enumerate the inputs and compare. What makes the published commitments opaque is a blinding value mixed into every one of them, and that value has to come from somewhere.
 
 On Aztec it comes from exactly one place: an oracle called `random()`, answered by the client software with a field element from the operating system's random number generator. The framework calls it when it creates a note, when it emits a private event, when it generates the ephemeral key that encrypts a message, and when it pads a ciphertext. The client libraries call the same generator for deployment salts, account salts, transaction nonces and bridge secrets. And in none of these places does the zero-knowledge proof check that the value was random. The `unsafe` block around every call is not an oversight; it follows from who knows what.
@@ -67,7 +69,7 @@ Three properties of the value follow from this construction, and every later sec
 
 ## Where the framework spends it
 
-Outside its own tests, aztec-nr calls `random()` from nine places in eight files. They fall into four uses and one fallback, and a further family lives in the TypeScript client.
+Outside its own tests, aztec-nr calls the oracle of the previous section, and only it, from nine places in eight files; every one of them imports `crate::oracle::random::random`, and the framework has no second random function. Eight of the nine fall into four uses and one fallback, listed below; the ninth is an internal handle for an unconstrained scratch array and touches nothing on chain. The TypeScript client draws from the same generator, `Fr.random()`, but directly rather than through the oracle, and that family closes the section.
 
 | Use | Call site (aztec-nr v5.2.0) | What the value does |
 |---|---|---|
@@ -79,7 +81,9 @@ Outside its own tests, aztec-nr calls `random()` from nine places in eight files
 
 The first two are the ones this article is about; the others are worth a sentence each.
 
-**Ephemeral keys.** Each message to a recipient is encrypted with a shared secret derived from a fresh ephemeral key pair and the recipient's public key. The ephemeral secret is `EmbeddedCurveScalar::from_field(random())`, and the framework notes a `@todo`: the randomness is drawn from the BN254 scalar field `Fr` rather than the full domain `Fq` of the Grumpkin scalar, so a small part of the key space is never used. That is a uniformity remark, not a weakness an attacker can use. The library's tests mock the oracle to return `0` and check that the resulting key is rejected ("point at infinity"), which is the one degenerate value the code guards against.
+**Ephemeral keys.** Each message to a recipient is encrypted with a shared secret derived from a fresh ephemeral key pair and the recipient's public key. The key pair lives on **Grumpkin**, the elliptic curve Aztec uses for every account key: nullifier keys, viewing keys, tagging keys and the ephemeral keys of message encryption are all Grumpkin scalars, and the corresponding public keys are Grumpkin points. Grumpkin is the curve *embedded* in BN254, the curve the proofs are made over, and the two are defined so that their fields cross: Grumpkin's points have coordinates in `Fr`, the BN254 scalar field that every Noir `Field` belongs to, while Grumpkin's own scalars, the values a point is multiplied by, live in `Fq`, the BN254 base field. That crossing is what makes elliptic-curve arithmetic cheap inside a circuit: adding two Grumpkin points is native `Field` arithmetic, with no emulation of a foreign field. The price is that a Grumpkin scalar does not fit in a `Field`, since `Fq` is slightly larger than `Fr`; Noir's `EmbeddedCurveScalar` therefore carries it as two 128-bit limbs, `lo` and `hi`.
+
+The ephemeral secret is `EmbeddedCurveScalar::from_field(random())`, and this is where the framework notes a `@todo`: `random()` returns a `Field`, an element of `Fr`, so the scalar it becomes is always below `r` and the values between `r` and `q` are never drawn. The excluded range is `q − r`, about 2^127 keys out of about 2^254, a fraction near 2^-127 of the key space. That is a uniformity remark, not a weakness an attacker can use. The library's tests mock the oracle to return `0` and check that the resulting key is rejected ("point at infinity"), which is the one degenerate value the code guards against.
 
 **Padding.** A ciphertext has a fixed length, and the content fields are masked with Poseidon2-derived values so they look uniformly random. Padding the remainder with zeros would reveal the length of the content; padding it with `random()` makes a two-field message and a ten-field message indistinguishable.
 
@@ -202,8 +206,8 @@ Randomness on Aztec is a client-side blinding value, drawn from one unconstraine
 | **Note randomness `r`** | The blinding field mixed into a note hash as `H(owner, r)`, chosen by the note's creator and delivered to the owner in the note message. |
 | **Partial commitment** | `H(owner, r)`, the private half of a note hash; alone it is the commitment a partial-note recipient hands to a payer. |
 | **Note nonce** | `H(first_nullifier_in_tx, note_index)`, a protocol-derived, public value that makes a tree leaf unique; it hides nothing. |
-| **Unique note hash** | `H(note_nonce, H(contract_address, note_hash))`, the leaf actually inserted in the note hash tree. |
 | **Nullifier** | `H(note_hash_for_nullification, nsk_app)`, published when a note is spent; its unlinkability comes from the owner's secret key, not from `r`. |
+| **Grumpkin** | The elliptic curve embedded in BN254 on which Aztec's account and ephemeral keys live; its points have coordinates in `Fr`, its scalars (secret keys) in `Fq`. |
 | **Ephemeral key pair** | A fresh Grumpkin key pair whose secret is `from_field(random())`, used once for the ECDH shared secret that encrypts a message. |
 | **`SEED`** | The environment variable that switches `@aztec/foundation`'s generator to a deterministic sequence for reproducible tests; never set in production. |
 
@@ -274,9 +278,11 @@ Two consequences follow. The commitment is single-use: a second completion carri
 
 Two levels. Setting the `SEED` environment variable makes the whole `@aztec/foundation` generator deterministic for a run, which the TXE inherits, so every draw in every test follows the same sequence between runs. Inside a single test, `std::test::OracleMock::mock("aztec_misc_getRandomField").returns(v)` makes the next draw return `v`, which is how aztec-nr's own test checks that an ephemeral key of `0` is rejected and how a contract test can assert a note hash against a constant. Neither mechanism belongs anywhere near a production client.
 
-**Q: Is the `Fr` versus `Fq` remark on ephemeral keys a vulnerability?**
+**Q: What is a Grumpkin scalar, and is the `Fr` versus `Fq` remark on ephemeral keys a vulnerability?**
 
-No. The ephemeral secret is `EmbeddedCurveScalar::from_field(random())`, and `random()` returns an element of the BN254 scalar field `Fr`, while a Grumpkin scalar ranges over `Fq`, which is slightly larger. The generated keys therefore skip a small part of the scalar range; the key space is still around 2^254, and no structure in the excluded part helps an attacker.
+Grumpkin is the curve on which all Aztec account keys and ephemeral encryption keys live. It is embedded in BN254, the proving curve, with the fields crossed: Grumpkin points have coordinates in `Fr` (the Noir `Field`), and Grumpkin scalars, the multipliers in `secret × generator`, live in `Fq`, the BN254 base field. A Grumpkin scalar is thus a secret key, and because `Fq` is slightly larger than `Fr` it is stored as two limbs, `EmbeddedCurveScalar { lo, hi }`.
+
+Not a vulnerability. The ephemeral secret is `EmbeddedCurveScalar::from_field(random())`, and `random()` returns an element of `Fr`, so the scalars between `r` and `q` are never drawn. That excluded range is `q − r`, about 2^127 out of about 2^254 keys, a fraction near 2^-127, and no structure in it helps an attacker.
 
 The library marks it as a `@todo` for uniformity. The value the code does guard against is `0`, which yields the point at infinity and an undecryptable message.
 
@@ -292,6 +298,7 @@ The library marks it as a `@todo` for uniformity. The value the code does guard 
 - [Transactions](https://docs.aztec.network/developers/docs/foundational-topics/transactions) — the transaction request `salt` and the first nullifier
 - [Contract creation](https://docs.aztec.network/developers/docs/foundational-topics/contract_creation) — the deployment salt
 - [Note discovery](https://docs.aztec.network/developers/docs/foundational-topics/advanced/storage/note_discovery) — ephemeral keys, tagging secrets and how a recipient finds its notes
+- [Keys](https://docs.aztec.network/developers/docs/foundational-topics/accounts/keys) — all account keys are Grumpkin scalars, public keys Grumpkin points; app-siloed nullifier keys
 - [AIP-20 Fungible Token](https://docs.aztec.network/developers/docs/aztec-nr/standards/aip-20)
 
 ### Analyzed source

@@ -2,6 +2,7 @@
 layout: post
 title: "Reading Public State from a Private Function on Aztec — Why a Pause Flag Comes with a Delay"
 date:   2026-09-14
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -10,6 +11,8 @@ description: A private Aztec function cannot read a public flag. DelayedPublicMu
 image: /assets/article/blockchain/aztec/2026-09-14-aztec-delayed-public-mutable-mindmap.png
 isMath: false
 ---
+
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum. A contract there has private functions, proved on the user's device over encrypted notes, and public functions, executed afterwards by a sequencer over ordinary readable state; the private half of a transaction runs first, without access to the current public state. That ordering is the reason the problem in this article exists.
 
 A token contract usually carries a small piece of public configuration that every transfer has to consult: a pause flag, a fee rate, an allowlist entry. 
 

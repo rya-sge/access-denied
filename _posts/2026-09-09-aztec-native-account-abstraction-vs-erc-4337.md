@@ -2,6 +2,7 @@
 layout: post
 title: "Native Account Abstraction on Aztec, Compared with ERC-4337"
 date:   2026-09-09
+last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -10,6 +11,8 @@ description: Aztec has no EOAs and no protocol signature scheme, so account vali
 image: /assets/article/blockchain/aztec/2026-09-09-aztec-vs-erc4337-account-abstraction-mindmap.png
 isMath: false
 ---
+
+[Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum. Its contracts have a private side, executed on the user's own device inside a zero-knowledge proof over encrypted notes only that user can read, and a public side, executed by a sequencer in a virtual machine close to the EVM; a single transaction crosses from the first to the second. Because the private side runs on the user's device, the account that authorises a transaction is itself a contract the user chose, which is the starting point of this comparison.
 
 [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) abstracts accounts on a chain that still has externally owned accounts underneath. Everything it adds — the alt mempool, the bundler, the singleton EntryPoint, the paymaster — exists to route around a protocol that was not built for programmable accounts, and at the bottom of every bundle there is still an EOA paying for a normal Ethereum transaction in ETH.
 
