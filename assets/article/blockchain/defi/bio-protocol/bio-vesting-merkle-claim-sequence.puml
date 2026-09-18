@@ -1,0 +1,41 @@
+@startuml
+title Merkle-based vesting: claim, then release
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ActorBackgroundColor #EAF6F0
+  ActorBorderColor #2E8B67
+}
+
+actor Beneficiary as B
+participant "TokenVestingMerklePurchasable\n(vToken, non-transferable ERC20)" as V
+participant "Underlying ERC20\n(Token.sol)" as T
+participant "paymentReceiver" as P
+
+== Funding (admin) ==
+V <- T : admin transfers tokens\n(push, no transferFrom)
+note right of V #EAF6F0
+  getWithdrawableAmount()
+  returns balance - vestingSchedulesTotalAmount
+end note
+
+== Claim ==
+B -> V : claimSchedule(proof, start, cliff, duration,\nslice, revokable, amount) + msg.value
+V -> V : leaf = keccak256(bytes.concat(\nkeccak256(abi.encode(msg.sender, ...))))
+V -> V : MerkleProofLib.verify(proof, root, leaf)
+V -> V : require !claimed[leaf]
+V -> V : require msg.value == vTokenCost * amount / 1e18
+V -> P : call{value: msg.value}("")
+V -> V : claimed[leaf] = true\n_createVestingSchedule(...)
+V --> B : emit Transfer(0x0, beneficiary, amount)\n(virtual balance minted)
+
+== Release (any time after cliff) ==
+B -> V : releaseAvailableTokensForHolder(B)
+loop each schedule of B
+  V -> V : releasable = amountTotal * vestedSeconds / duration - released
+  V -> T : safeTransfer(beneficiary, releasable)
+  V --> B : emit Transfer(beneficiary, 0x0, releasable)\n(virtual balance burned)
+end
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+title What a user proves for one private call (documentation figures)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+rectangle "Contract code (what aztec profile gates shows)" as C {
+  component "Account entrypoint\n~22,000" as A
+  component "Your function\n14,000 in the example" as F
+}
+rectangle "Kernel circuits (fixed protocol overhead)" as K {
+  component "private_kernel_init\n~46,000" as I
+  component "private_kernel_inner\n~101,000 per extra call" as N
+  component "private_kernel_reset\n~200,000" as R
+  component "private_kernel_tail\n~44,000" as T
+}
+A --> I : 1st call
+F --> N : 2nd call
+I --> N
+N --> R
+R --> T
+T --> [Total ~427,000 gates]
+@enduml

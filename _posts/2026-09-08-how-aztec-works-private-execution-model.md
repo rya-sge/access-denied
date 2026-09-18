@@ -382,6 +382,7 @@ The cost is the read path and the failure mode. No party holds the key in full, 
 
 ### Related articles
 
+- [Gates on Aztec — What a Private Function Costs, Where the Cost Hides, and Seven Measured Ways to Lower It]({{site.url_complet}}/2026/09/18/aztec-gate-count-optimization-private-functions/)
 - [Building a Wallet for Aztec — What a MetaMask for a Private Chain Has to Contain]({{site.url_complet}}/2026/09/17/building-an-aztec-wallet-pxe-proving-accounts/)
 - [Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind It, and What a Quantum Computer Would Break]({{site.url_complet}}/2026/09/17/aztec-ephemeral-keys-ecdh-encryption-post-quantum/)
 - [Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never Checks It]({{site.url_complet}}/2026/09/17/aztec-randomness-notes-oracle-unconstrained/)

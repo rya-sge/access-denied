@@ -4,7 +4,7 @@ title: "Inside the Zama KMS — Threshold Key Management for FHE, From MPC Proto
 date:   2026-09-18
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain cryptography security zama
 tags: zama fhe fhevm mpc threshold-cryptography privacy security enclave
 description: "How the Zama KMS holds the FHE decryption key as 13 shares, what its gRPC operations do, how a node is built (core, connector, vaults, backups) and deployed in Nitro Enclaves."
 image: /assets/article/blockchain/zamafhe/2026-09-18-zama-kms-mindmap.png

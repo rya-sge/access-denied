@@ -477,3 +477,4 @@ The mindmap below summarizes the article.
 - [Rust for Solana - Basic knowledge]({{site.url_complet}}/2025/02/10/rust-solana-programming/)
 - [Solana Programs - Basic Security with Anchor]({{site.url_complet}}/2024/08/20/solana-smart-contract-basic-security/)
 - [Fuzzing Solana Programs with Trident]({{site.url_complet}}/2026/03/13/fuzzing-solana-programs-with-trident/)
+- [Bio's Voter Stake Registry - Vote-Escrow Governance on Solana with spl-governance]({{site.url_complet}}/2026/09/18/bio-voter-stake-registry-vote-escrow-spl-governance/)

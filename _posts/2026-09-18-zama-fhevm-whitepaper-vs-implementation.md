@@ -4,7 +4,7 @@ title: "The Zama FHEVM Whitepaper — What It Specifies, and What the Code Does 
 date:   2026-09-18
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain cryptography security zama
 tags: zama fhe fhevm mpc zkpok privacy confidential-smart-contract
 description: "A reading of the Zama fhevm whitepaper (v3.1, June 2025) against the zama-ai/fhevm repository, with the changes the implementation has made since the paper was written."
 image: /assets/article/blockchain/zamafhe/2026-09-18-zama-fhevm-whitepaper-mindmap.png

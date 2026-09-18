@@ -367,6 +367,10 @@ This spans several layers. The agent gets an identity from [ERC-8004](https://ei
 - [ethereum/ERCs repository](https://github.com/ethereum/ERCs)
 - [ERCs category - Fellowship of Ethereum Magicians](https://ethereum-magicians.org/c/ercs/57) (unmerged agent proposals are linked individually in the "Proposals not yet merged" table)
 
+### Related articles
+
+- [Bio Protocol Overview - DeSci Launchpad, BIO Token Economy and Open-Source DAO Contracts]({{site.url_complet}}/2026/09/18/bio-protocol-overview/)
+
 ### Tools
 
 - [Claude Code](https://claude.com/product/claude-code)

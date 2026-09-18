@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Gates on Aztec
+** Cost model
+*** Gate = proving work on the user's device
+*** Circuit sized for its worst case
+*** Kernel: ~290k fixed, ~101k per extra private call
+*** Delivery ~20k, tree read 3.5k, delayed read 4k, note slot 3k
+*** aztec profile gates / flamegraph / aztec-wallet profile
+** Seven measured cases
+*** Duplicate read: -1,920 (half the quoted price)
+*** Hoist invariant reads: -5,748 per batch
+*** Note budget 2 + only_self recursion: -42,203
+*** Constrained delivery: +20-24k each, sets batch caps
+*** Screening reads: the cost of a feature, paid once
+*** Packing: slots, not always gates
+*** Library vs internal: byte-identical; constant asserts free
+** Lessons
+*** Measure; estimates miss both ways
+*** Unused budget is paid budget
+*** Side effects cost more than computation
+*** Trade-offs belong to the user
+*** Tests and profile together
+@endmindmap

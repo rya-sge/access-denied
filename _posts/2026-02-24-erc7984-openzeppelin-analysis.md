@@ -5,7 +5,7 @@ date: 2026-02-24
 last_modified_at: 2026-06-28
 lang: en
 locale: en-GB
-categories: blockchain solidity cryptography
+categories: blockchain solidity cryptography zama
 tags: blockchain fhe erc7984 openzeppelin confidential-token zama
 description: A deep technical analysis of the OpenZeppelin ERC-7984 Confidential Fungible Token implementation, covering the core accounting model, FHE-safe arithmetic, ACL access patterns, operator system, and the extension ecosystem.
 image: /assets/article/blockchain/zamafhe/openzeppelin_confidential_token_mindmap.png

@@ -1,0 +1,41 @@
+@startuml
+title From deposit to vote: how the add-in feeds spl-governance
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+  ActorBackgroundColor #EAF6F0
+  ActorBorderColor #2E8B67
+}
+
+actor "Voter authority" as U
+participant "voter-stake-registry" as V
+participant "SPL Token" as T
+participant "spl-governance" as G
+
+== One-time setup ==
+U -> V : create_voter(bumps)
+V -> V : read instructions sysvar\nallow only self or Squads V4 as CPI caller
+V --> U : Voter PDA + VoterWeightRecord PDA
+U -> V : create_deposit_entry(idx, kind, start, periods, clawback)
+
+== Deposit ==
+U -> V : deposit(idx, amount)
+V -> V : resolve_vesting(now)\nmove start_ts past vested periods
+V -> T : transfer(user ATA -> vault ATA)
+V -> V : amount_deposited += amount\namount_initially_locked += amount
+
+== Vote (same transaction) ==
+U -> V : update_voter_weight_record()
+V -> V : sum over deposits:\nbaseline(deposited) + bonus(locked, seconds_left)
+V -> V : record.voter_weight, expiry = slot
+U -> G : cast_vote(proposal, ...)
+G -> G : read VoterWeightRecord\nrequire expiry == current slot
+
+== Withdraw ==
+U -> V : withdraw(idx, amount)
+V -> T : transfer(vault -> destination), signed by Voter PDA
+V -> G : read TokenOwnerRecord\nassert_can_withdraw_governing_tokens()
+V -> V : require amount <= unlocked(now)\namount_deposited -= amount\nrefresh voter_weight_record
+@enduml

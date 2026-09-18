@@ -5,7 +5,7 @@ date:   2026-07-24
 last_modified_at: 2026-09-08
 lang: en
 locale: en-GB
-categories: blockchain cryptography ZKP
+categories: blockchain cryptography ZKP zama
 tags: zama fhe fhevm zero-knowledge zkpok mpc confidential-smart-contract
 description: How the Zama Confidential Blockchain Protocol uses zero-knowledge proofs of knowledge on encrypted inputs, which proof system TFHE-rs relies on, where the proof is verified, and why the calldata inputProof holds signatures rather than the proof.
 image: /assets/article/cryptographie/zero-knowledge-proof/zama/zero-knowledge-proofs-zama-protocol.png

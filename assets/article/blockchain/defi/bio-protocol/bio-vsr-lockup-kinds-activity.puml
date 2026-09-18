@@ -1,0 +1,37 @@
+@startuml
+title Locked vote weight by lockup kind
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #EAF6F0
+  DiamondBorderColor #2E8B67
+}
+
+start
+:Deposit entry with lockup kind, start_ts, end_ts;
+if (lockup expired or max bonus factor == 0 ?) then (yes)
+  :locked weight = 0;
+  stop
+endif
+switch (kind)
+case (None)
+  :locked weight = 0
+tokens withdrawable any time;
+case (Cliff)
+  :remaining = min(end_ts - now, T_sat)
+locked weight = M x remaining / T_sat
+decays linearly to 0 at end_ts;
+case (Constant)
+  :remaining = min(end_ts - start_ts, T_sat)
+locked weight never decays
+must be converted to Cliff to unlock;
+case (Daily / Monthly)
+  :treat as periods_left cliffs
+each holding M / periods_total
+sum their decaying weights
+vested part becomes withdrawable each period;
+endswitch
+:total weight = baseline(deposited) + locked weight;
+stop
+@enduml

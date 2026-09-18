@@ -831,3 +831,7 @@ constructor(...) {
 The mindmap below summarizes the article.
 
 ![First Fight 42 Snowman Merkle Airdrop mindmap]({{site.url_complet}}/assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-42-snowman-merkle-aidrop-mindmap.png)
+
+## Related articles
+
+- [Bio Protocol Overview - DeSci Launchpad, BIO Token Economy and Open-Source DAO Contracts]({{site.url_complet}}/2026/09/18/bio-protocol-overview/)

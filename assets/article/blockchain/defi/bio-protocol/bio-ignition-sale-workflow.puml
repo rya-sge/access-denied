@@ -1,0 +1,41 @@
+@startuml
+title Ignition Sale: from commitment to liquidity
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  DiamondBackgroundColor #EAF6F0
+  DiamondBorderColor #2E8B67
+}
+
+start
+:Project opens a fixed-price sale
+denominated in USDC;
+:User commits USDC (locked until close);
+:User optionally pledges BioXP
+(none pledged = weight of 1);
+:Sale duration elapses;
+if (Total USDC >= raise goal ?) then (no)
+  :Launch fails;
+  :USDC and BioXP claimable back;
+  stop
+else (yes)
+  if (Oversubscribed ?) then (yes)
+    :allocation = min(points / total_points x tokens_for_sale,
+0.5 % x tokens_for_sale);<<#EAF6F0>>
+    :Excess USDC refunded;
+  else (no)
+    :Allocation by USDC committed;
+  endif
+  :Liquidity Engine pairs raised USDC
+with the new token on an AMM;
+  :1 % tax on every swap
+70 % project treasury / 30 % Bio treasury;
+  :Tokens claimable, no vesting for participants;
+  :veBIO stakers receive airdrop
+(20 % at TGE, 80 % linear over 6 months);
+  :Team proceeds unlock when FDV milestones
+are held for 2 weeks (limit-sell orders);
+  stop
+endif
+@enduml

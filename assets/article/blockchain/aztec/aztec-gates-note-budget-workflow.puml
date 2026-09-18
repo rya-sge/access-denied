@@ -1,0 +1,36 @@
+@startuml
+title Spending notes: fixed budget of 16 versus 2 + recursion of 8
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam activityDiamond {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+start
+:debit(amount): try_sub with budget 2
+(~3,050 gates per slot);
+if (notes found cover amount?) then (yes)
+  :create change note;
+  stop
+else (no)
+  if (nothing found at all?) then (yes)
+    :assert "Balance too low";
+    stop
+  else (no)
+    :call_self._recurse_debit(remaining)
+(nested call: +~101k kernel + 30k own);
+    :try_sub with budget 8;
+    if (covered?) then (yes)
+      :return change to the top call;
+      :create change note;
+      stop
+    else (no)
+      :recurse again, 8 more notes;
+      stop
+    endif
+  endif
+endif
+@enduml

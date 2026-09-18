@@ -4,7 +4,7 @@ title: "Running a Zama Coprocessor — Architecture, Services and Operator Setup
 date:   2026-09-18
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain cryptography security zama
 tags: zama fhe fhevm privacy security cloud confidential-smart-contract
 description: "What a Zama coprocessor node is made of, how its six services move work through PostgreSQL and S3, and how an operator deploys one on EKS with the coprocessor-operator charts."
 image: /assets/article/blockchain/zamafhe/2026-09-18-zama-coprocessor-mindmap.png

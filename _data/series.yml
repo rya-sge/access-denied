@@ -62,3 +62,7 @@ sye:
 mica:
   title: "MiCA — Regulation (EU) 2023/1114 on Markets in Crypto-Assets"
   ordered: true
+
+bio-protocol:
+  title: "Bio Protocol (DeSci)"
+  ordered: false

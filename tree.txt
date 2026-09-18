@@ -810,6 +810,11 @@ _posts/2026-09-16-aztec-packable-storage-packing.md
   assets/article/blockchain/aztec/aztec-packable-two-encodings-concept.puml                    (concept, in-section)
   assets/article/blockchain/aztec/aztec-packable-layout-workflow.puml                          (activity, in-section)
 
+_posts/2026-09-18-aztec-gate-count-optimization-private-functions.md
+  assets/article/blockchain/aztec/2026-09-18-aztec-gates-mindmap.puml                          (mindmap)
+  assets/article/blockchain/aztec/aztec-gates-transaction-cost-concept.puml                    (component, in-section)
+  assets/article/blockchain/aztec/aztec-gates-note-budget-workflow.puml                        (activity, in-section)
+
 _posts/2026-09-17-building-an-aztec-wallet-pxe-proving-accounts.md
   assets/article/blockchain/aztec/2026-09-17-aztec-wallet-mindmap.puml                        (mindmap)
   assets/article/blockchain/aztec/aztec-wallet-components-concept.puml                        (component, in-section)
@@ -890,3 +895,15 @@ _posts/2026-09-18-zama-kms-threshold-key-management-architecture-and-operation.m
   assets/article/blockchain/zamafhe/2026-09-18-zama-kms-mindmap.puml                                       (mindmap)
   assets/article/blockchain/zamafhe/zama-kms-node-anatomy-concept.puml                                     (concept, in-section)
   assets/article/blockchain/zamafhe/zama-kms-party-deployment-sequence.puml                                (sequence, in-section)
+
+_posts/2026-09-18-bio-protocol-overview.md
+  assets/article/blockchain/defi/bio-protocol/2026-09-18-bio-protocol-overview-mindmap.puml                 (mindmap)
+  assets/article/blockchain/defi/bio-protocol/bio-protocol-architecture-concept.puml                        (concept, in-section)
+  assets/article/blockchain/defi/bio-protocol/bio-ignition-sale-workflow.puml                               (workflow, in-section)
+  assets/article/blockchain/defi/bio-protocol/bio-vesting-merkle-claim-sequence.puml                        (sequence, in-section)
+
+_posts/2026-09-18-bio-voter-stake-registry-vote-escrow-spl-governance.md
+  assets/article/blockchain/defi/bio-protocol/2026-09-18-bio-voter-stake-registry-mindmap.puml            (mindmap)
+  assets/article/blockchain/defi/bio-protocol/bio-vsr-accounts-concept.puml                              (concept, in-section)
+  assets/article/blockchain/defi/bio-protocol/bio-vsr-vote-sequence.puml                                 (sequence, in-section)
+  assets/article/blockchain/defi/bio-protocol/bio-vsr-lockup-kinds-activity.puml                         (activity, in-section)

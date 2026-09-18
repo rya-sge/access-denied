@@ -422,3 +422,4 @@ pub struct Example<'info> {
 
 - [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
 - [Fuzzing Solana Programs with Trident]({{site.url_complet}}/2026/03/13/fuzzing-solana-programs-with-trident/)
+- [Bio's Voter Stake Registry - Vote-Escrow Governance on Solana with spl-governance]({{site.url_complet}}/2026/09/18/bio-voter-stake-registry-vote-escrow-spl-governance/)

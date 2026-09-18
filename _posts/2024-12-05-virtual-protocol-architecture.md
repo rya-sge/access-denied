@@ -306,3 +306,7 @@ Reference: [eips.ethereum.org/EIPS/eip-6551](https://eips.ethereum.org/EIPS/eip-
 - [0xCygaar Tweet](https://x.com/0xCygaar/status/1864182285278355881?t=LBINpmIuUA8rpnzxS2nNmw&s=35)
 - [Eli5Defi Tweet](https://x.com/eli5_defi/status/1765330652470338018)
 - ChatGPT to summarize some paragraph
+
+### Related articles
+
+- [Bio Protocol Overview - DeSci Launchpad, BIO Token Economy and Open-Source DAO Contracts]({{site.url_complet}}/2026/09/18/bio-protocol-overview/)

@@ -1,0 +1,50 @@
+@startuml
+title Bio Protocol: assets, tokens and contract layers
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #2E8B67
+}
+
+package "Protocol tokens (Ethereum / Base)" as PT {
+  [BIO\nERC20, uncapped] as bio
+  [veBIO\nvote-escrow lock] as vebio
+  [BioXP\npoints, 14-day expiry] as xp
+  [vBIO\nvesting balance] as vbio
+}
+
+package "Bio Protocol V2 launchpad (private code)" as LP {
+  [Ignition Sale\nfixed price, USDC] as sale
+  [Liquidity Engine\nAMM pool + 1 % swap tax] as le
+  [Limit-sell fundraising\nFDV milestones] as lsf
+}
+
+package "Assets launched on Bio" as AS {
+  [BioDAO token] as dao
+  [IP-Token (IPT)] as ipt
+  [BioAgent token] as agent
+}
+
+package "Open-source DAO contracts (Foundry)" as OS {
+  [Token.sol] as tok
+  [TokenVesting*.sol] as vest
+  [MerkleAirdrop.sol] as air
+}
+
+bio -down-> vebio : lock 1 w to 2 y
+vebio -down-> xp : daily accrual
+xp -right-> sale : priority weight
+sale -down-> le : USDC raised pairs\nwith new token
+le -down-> lsf : proceeds unlock\non milestones
+sale -right-> AS : mints and\ndistributes
+AS -up-> xp : stake, 2-week\ncooldown
+vebio -right-> AS : airdrop share,\n6-month unlock
+tok -down-> vest : underlying token
+tok -down-> air : distributed token
+vbio -right-> vest : same\ncode base
+@enduml

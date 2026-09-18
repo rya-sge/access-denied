@@ -1,0 +1,42 @@
+@startuml
+title Voter Stake Registry: accounts around an spl-governance realm
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #2E8B67
+}
+skinparam database {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+
+package "spl-governance" {
+  [Realm] as realm
+  [TokenOwnerRecord\n(per governing token owner)] as tor
+  [Proposal / VoteRecord] as prop
+}
+
+package "voter-stake-registry (add-in)" {
+  [Registrar PDA\nseeds (realm, "registrar", governing mint)\n4 voting mint configs] as reg
+  [Voter PDA\nseeds (registrar, "voter", authority)\n32 deposit entries] as voter
+  [VoterWeightRecord PDA\nseeds (registrar, "voter-weight-record", authority)\nvoter_weight, expiry slot] as vwr
+  database "Vault\nATA(mint, owner = Voter PDA)" as vault
+}
+
+actor "Voter authority\n(wallet or Squads V4 multisig)" as user
+actor "Realm authority" as admin
+
+admin --> reg : create_registrar\nconfigure_voting_mint
+user --> voter : create_voter\ncreate_deposit_entry\ndeposit / withdraw\nreset_lockup
+user --> vwr : update_voter_weight_record
+admin --> voter : grant / clawback
+voter --> vault : SPL transfers signed\nby the Voter PDA
+realm <.. reg : realm, governing mint
+tor <.. voter : assert_can_withdraw\n(no active vote)
+prop <-- vwr : read by cast_vote\nsame transaction
+@enduml

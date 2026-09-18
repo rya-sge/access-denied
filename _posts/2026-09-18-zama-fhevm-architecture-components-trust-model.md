@@ -4,7 +4,7 @@ title: "Zama FHEVM Architecture — Components, Data Flow and What Has to Be Tru
 date:   2026-09-18
 lang: en
 locale: en-GB
-categories: blockchain cryptography security
+categories: blockchain cryptography security zama
 tags: zama fhe fhevm mpc privacy security confidential-smart-contract
 description: "How the Zama Confidential Blockchain Protocol splits work between host contracts, coprocessors, a Gateway rollup and a threshold KMS, and which of them you trust."
 image: /assets/article/blockchain/zamafhe/2026-09-18-zama-fhevm-architecture-mindmap.png

@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Bio Protocol
+** Assets launched
+*** BioDAOs (VitaDAO, HairDAO, CryoDAO...)
+*** IP-Tokens (IPT)
+*** BioAgents (AI scientists)
+** Tokens
+*** BIO (ERC20, 3.32 B initial, uncapped)
+*** vBIO (vesting, non-transferable)
+*** veBIO (vote-escrow, 1 week to 2 years)
+*** BioXP (points, expire after 14 days)
+** V2 Launchpad
+*** Ignition Sale (fixed price, USDC)
+*** Pro-rata allocation by BioXP, 1 % cap
+*** Liquidity Engine (AMM seeding)
+*** Limit-sell fundraising at FDV milestones
+*** 1 % swap tax (70 % project / 30 % Bio)
+** Open-source contracts
+*** Token.sol (roles, gated transfers)
+*** TokenVesting (virtual token)
+*** TokenVestingMerkle(Purchasable)
+*** MerkleAirdrop.sol
+** Security
+*** Pashov (2023, 2024, 2025 x2)
+*** FYEO (2025 x2)
+*** Private launchpad code
+@endmindmap

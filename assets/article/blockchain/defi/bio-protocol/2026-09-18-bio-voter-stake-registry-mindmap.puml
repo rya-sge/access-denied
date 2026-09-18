@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Bio voter-stake-registry
+** spl-governance add-in
+*** Writes VoterWeightRecord, no CPI to governance
+*** Record expires after one slot
+*** update_voter_weight_record before each vote
+** Accounts
+*** Registrar (realm, up to 4 voting mints)
+*** Voter PDA (32 deposit entries)
+*** Vault = ATA owned by the Voter PDA
+*** TokenOwnerRecord checked on withdraw
+** Vote weight
+*** baseline factor x deposited
+*** + lockup bonus x locked x min(t/T_sat, 1)
+*** Factors in 1e-9 units, digit_shift per mint
+** Lockup kinds
+*** None, Daily, Monthly, Cliff, Constant
+*** Strictness never decreases
+*** Up to 200 years, start up to 100 years ahead
+** Grants and clawback
+*** grant by realm, mint or voter authority
+*** clawback of locked tokens only
+*** Ignores active proposals on purpose
+** Bio changes
+*** Squads V4 allowed to create voters via CPI
+*** Anchor 0.31.1, Solana 2.2.1
+*** Pod-safe u8 flags, borsh record wrapper
+@endmindmap
