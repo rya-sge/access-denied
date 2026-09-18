@@ -1,0 +1,43 @@
+@startuml
+title Whitepaper components vs repository (commit ac6ff45)
+top to bottom direction
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+package "Whitepaper v3.1 (June 2025)" as W {
+  component "Host contracts\nACL, executor, verifiers" as w_host
+  component "Coprocessors\ncompute, verify inputs,\nreplicate ACL to the Gateway" as w_cop
+  component "Gateway: GatewayConfig,\nCiphertextCommits, Bridging,\nKeyManagement, InputVerification,\nDecryption" as w_gw
+  component "MultichainACL on the Gateway\nACL copy fed by coprocessors\n<i>removed, commit 803f10487 (Mar 2026)</i>" as w_macl #FDEEEE
+  component "Oracle\nrequestDecryption -> callback\n<i>removed, commit a8b3e6ce1 (Nov 2025)</i>" as w_oracle #FDEEEE
+  component "KMS\n13 parties, t = 4, enclaves" as w_kms
+}
+
+package "Repository (September 2026)" as R {
+  component "Host contracts\nACL + delegateForUserDecryption,\nexecutor, verifiers, HCULimit,\nKMSGeneration, ProtocolConfig" as c_host
+  component "Coprocessors\ncompute, verify inputs,\ncommit digests" as c_cop
+  component "Gateway: GatewayConfig (contexts),\nCiphertextCommits, InputVerification,\nDecryption, KMSGeneration,\nProtocolPayment, PauserSet" as c_gw
+  component "KMS workers\nread each host chain ACL over RPC\n<i>replaces the Gateway ACL copy</i>" as c_kms #EAF6F0
+  component "Any caller\nsubmits cleartext + proof,\ncontract runs checkSignatures\n<i>replaces the oracle</i>" as c_caller #EAF6F0
+  component "Relayer SDK\npublicDecrypt, userDecrypt,\ndelegated user decryption" as c_relayer
+}
+
+w_host -[hidden]down- w_gw
+w_cop -[hidden]down- w_macl
+w_gw -[hidden]down- w_oracle
+w_macl -[hidden]down- w_kms
+c_host -[hidden]down- c_gw
+c_cop -[hidden]down- c_kms
+c_gw -[hidden]down- c_caller
+c_kms -[hidden]down- c_relayer
+W -[hidden]down- R
+@enduml

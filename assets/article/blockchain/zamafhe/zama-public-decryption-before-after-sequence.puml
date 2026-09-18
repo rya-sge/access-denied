@@ -1,0 +1,46 @@
+@startuml
+title Public decryption: whitepaper flow vs implemented flow
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F3F7FD
+  BorderColor #4A78B5
+}
+autonumber
+
+participant "Contract" as C
+participant "Oracle\n(whitepaper only)" as O
+participant "Gateway" as G
+participant "KMS" as K
+actor "User / any caller" as U
+
+== Whitepaper v3.1: oracle-based ==
+C -> C : FHE.requestDecryption(cts, callbackSelector)
+C --> O : DecryptionRequest event
+O -> G : forward request
+G -> G : ACL check on Gateway copy,\nciphertext material added?
+G -> K : decryption event
+K -> G : t + 1 signed plaintexts
+G --> O : result event
+O -> C : callback(requestID, plaintexts, signatures)
+C -> C : FHE.checkSignatures(requestID, signatures)
+
+== Repository: self-relaying ==
+C -> C : FHE.makePubliclyDecryptable(handle)
+U -> G : publicDecrypt(handle) via relayer SDK
+G -> G : ciphertext material added?
+G -> K : decryption event
+K -> K : read host chain ACL:\nhandle publicly decryptable?
+K -> G : t + 1 signed plaintexts
+G --> U : cleartext, ABI encoding,\ndecryption proof
+U -> C : submit(cleartext, proof)
+C -> C : FHE.checkSignatures(handles,\nabiEncodedCleartexts, decryptionProof)
+note over C, U #F3F7FD : No component is obliged to complete the second flow;\nthe contract must be designed for a reveal that may never arrive.
+@enduml

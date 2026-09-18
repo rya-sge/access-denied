@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* fhevm whitepaper v3.1 vs code
+** Four principles
+*** No impact on host chain security
+*** Exact, publicly verifiable results
+*** Solidity and existing tools
+*** Composable, multi-user confidentiality
+** Components and trust
+*** Host contracts (ACL) trusted
+*** Coprocessors: > 1/2 honest, slashable
+*** KMS: > 2/3 honest, 13 parties, t = 4
+*** Gateway: orchestrator, no trust
+*** Oracle and relayer: none, signed messages
+** Solidity library (paper)
+*** ebool, euint, eint, ebytes, eaddress
+*** select for branching
+*** fromExternal + attestation
+*** allow / allowTransient / allowForDecryption
+*** Oracle-based public decryption
+*** User decryption with EIP-712 token
+** Implementation details (paper)
+*** TFHE, programmable bootstrapping
+*** Handles: hash(op, inputs), state independent
+*** Inputs: packed ZKPoK, 1.3 s / 130 ms / 1.8 kB
+*** Commitments: d_req and d_sns
+*** t+1 public, 2t+1 user shares
+*** NIST lifecycle, custodial backup
+** Changes in the repository
+*** Oracle removed: self-relaying decryption
+*** MultichainACL removed: KMS reads host ACL
+*** Types restricted: no eint, no ebytes
+*** Handles mix blockhash, timestamp, chainId
+*** Added: fees, contexts, delegation, pausing
+** Still future
+*** Verifiable FHE
+*** Post-quantum ZKPoK
+*** Verifiable KMS, threshold signatures
+@endmindmap
