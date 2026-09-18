@@ -1,0 +1,44 @@
+@startuml
+title One FHE operation through a coprocessor
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F3F7FD
+  BorderColor #4A78B5
+}
+autonumber
+
+participant "Host chain\n(Executor, ACL)" as H
+participant "host-listener" as HL
+participant "PostgreSQL" as DB
+participant "tfhe-worker" as TW
+participant "sns-worker" as SNS
+participant "S3" as S3
+participant "tx-sender" as TX
+participant "Gateway\nCiphertextCommits" as GW
+participant "KMS" as K
+
+H -> HL : FheAdd event (op, inputs, output handle)
+H -> HL : Allowed(handle, account)
+HL -> DB : INSERT computations, dependence_chain
+HL -> DB : INSERT allowed_handles
+TW -> DB : acquire chain lease\n(inputs present?)
+TW -> TW : FHE.add with TFHE-rs
+TW -> DB : INSERT ciphertexts\nNOTIFY event_ciphertext_computed
+DB -> SNS : notification
+SNS -> SNS : switch-and-squash\n(128-bit form)
+SNS -> S3 : upload regular + squashed
+SNS -> DB : ciphertext_digest\nNOTIFY event_ciphertexts_uploaded
+DB -> TX : notification
+TX -> GW : addCiphertextMaterial(handle, keyId,\ndigest, snsDigest) signed
+GW -> GW : count commitments per digest;\nmajority threshold reached
+GW --> K : material added (on decryption request)
+K -> S3 : download squashed ciphertext
+K -> K : digest == consensus digest?
+note over TW, TX #F3F7FD : Every step is a database row: idempotent inserts,\nleased locks, retries; commitments retry without limit.
+@enduml

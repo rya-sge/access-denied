@@ -310,6 +310,7 @@ The cryptographic ones: $$n = 13$$, $$t = 4$$, 128-bit security, the ZKPoK sizes
 
 ### Related articles
 
+- [Running a Zama Coprocessor — Architecture, Services and Operator Setup]({{site.url_complet}}/2026/09/18/zama-coprocessor-architecture-and-operator-setup/)
 - [Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/)
 - [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/)
 - [Technical Analysis of the OpenZeppelin ERC-7984 Implementation]({{site.url_complet}}/2026/02/24/erc7984-openzeppelin-analysis/)

@@ -1,0 +1,52 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Zama KMS
+** Threshold model
+*** n = 13 parties, t = 4, t < n/3
+*** Maliciously secure, robust MPC
+*** Noah's Ark: noise flooding
+*** 128-bit security, p-fail 2^-128
+*** sk never exists in one place
+** Operations (gRPC)
+*** Preprocessing: hours, Gateway-driven
+*** KeyGen: TFHE key set, shares per party
+*** CrsGen: powers-of-tau for ZKPoK
+*** PublicDecrypt: seconds, signed plaintext
+*** UserDecrypt: signcrypted shares, 2t+1
+*** NewMpcEpoch: resharing, party rotation
+*** Signing schemes: ECDSA, Ed25519, ML-DSA
+** Node anatomy
+*** kms-server: core (50100, localhost) + threshold (50001)
+*** Connector: listener, worker (ACL check), tx sender
+*** Private vault, public Keychain DA, backup vault
+*** Keychain: AWS KMS or custodian shares
+*** Identity: ECDSA key + root signing seed
+*** Boot-time storage verification
+** Networking and enclaves
+*** mTLS, self-signed CA per party, CN checked per message
+*** PrivateLink between parties
+*** Nitro Enclave, 48 CPU / 96 GiB
+*** Attested TLS, PCR allowlist
+** Backup and recovery
+*** Automatic encrypted backups
+*** RestoreFromBackup (AWS KMS)
+*** Custodians, BIP39 seed phrases, quorum
+*** Fixed restore order, recovery mode
+** Deployment of one party
+*** Terraform: EKS, S3, IAM/IRSA, KMS key
+*** kms-core Helm chart, StatefulSet
+*** kms-gen-keys, kms-init (PRSS once)
+*** Key generation via the Gateway
+*** Ports: 50100 never exposed, 50001 peers, 9646 metrics
+@endmindmap

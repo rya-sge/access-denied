@@ -1,0 +1,59 @@
+@startuml
+title One KMS party (threshold mode)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #7A5BB5
+}
+skinparam database {
+  BackgroundColor #F8F5FC
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+package "Gateway (Arbitrum rollup)" {
+  component "Decryption, KMSGeneration\ncontracts" as gw
+}
+package "Host chains" {
+  component "ACL contracts" as acl
+}
+
+package "Party i (own AWS account)" {
+  package "KMS connector (fhevm repo)" {
+    component "GatewayListener" as gl
+    database "connector DB" as cdb
+    component "KmsWorker\nACL check over RPC" as kw
+    component "TransactionSender" as ts
+  }
+  package "Nitro Enclave: kms-server" {
+    component "Core service\ngRPC :50100 (localhost)\nvalidate, sign, package" as core
+    component "Threshold service\n:50001 mTLS\nMPC protocols" as thr
+  }
+  database "Private vault (S3)\nkey shares, PRSS, epochs,\nsigning key + seed" as priv
+  database "Public vault / Keychain DA (S3)\npublic keys, server keys, CRS\nnamed by digest" as pub
+  database "Backup vault (S3)\nBackupCiphertexts" as bak
+  component "Keychain\nAWS KMS root key\nor custodian shares" as kc
+}
+component "12 other parties\n(PrivateLink)" as peers
+
+gw --> gl : events
+gl --> cdb
+cdb --> kw
+kw --> acl : isAllowed?
+kw --> core : gRPC request
+core --> kw : signed result
+kw --> cdb
+cdb --> ts
+ts --> gw : response tx
+core --> thr : run protocol
+thr <--> peers : attested mTLS sessions
+core --> priv
+core --> pub : publish + signed digest
+core --> bak : encrypted backups
+kc --> bak : wraps the backup key
+@enduml

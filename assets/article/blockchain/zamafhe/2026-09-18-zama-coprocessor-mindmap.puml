@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Zama coprocessor
+** Four responsibilities
+*** Compute FHE ops from executor events
+*** Verify and attest encrypted inputs
+*** Commit ciphertext digests to the Gateway
+*** Serve ciphertexts to the KMS from S3
+** Six services around PostgreSQL
+*** host-listener + poller: events to dependence chains
+*** gw-listener: input requests to verify_proofs
+*** tfhe-worker: TFHE-rs evaluation, leased chains
+*** zkproof-worker: ZKPoK check, handles
+*** sns-worker: switch-and-squash, S3, digests
+*** tx-sender: EIP-712 attestation + Gateway txs
+** Data path
+*** Executor event to computations row
+*** Evaluate once inputs exist
+*** Allowed event to squash and upload
+*** addCiphertextMaterial, majority consensus
+*** KMS downloads and checks digest
+** Infrastructure (coprocessor-operator)
+*** EKS, Karpenter pools: 88 CPU FHE nodes
+*** RDS PostgreSQL, ExternalName service
+*** S3 behind Cloudflare hostname
+*** AWS KMS secp256k1 signing key
+*** hub.zama.org images, Grafana Cloud
+** Deployment steps
+*** secrets-bootstrap.sh
+*** DB roles job
+*** operator-check pre-flight hook
+*** One Helm values file per release
+*** Key import to KMS
+** Operating
+*** Cursors, replay, seed-start-block
+*** Slow lane, unlimited commitment retries
+*** Blue-green upgrade with state hashes
+@endmindmap

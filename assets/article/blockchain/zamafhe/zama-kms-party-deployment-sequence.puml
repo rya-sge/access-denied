@@ -1,0 +1,43 @@
+@startuml
+title Deploying one KMS party
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #F3EEFB
+  ParticipantBorderColor #7A5BB5
+  ActorBackgroundColor #F3EEFB
+  ActorBorderColor #7A5BB5
+  LifeLineBorderColor #7A5BB5
+  ArrowColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #F8F5FC
+  BorderColor #7A5BB5
+}
+autonumber
+
+actor "Party operator" as Op
+participant "Terraform\n(terraform-mpc-modules)" as TF
+participant "AWS account\nEKS, S3, IAM, KMS, PrivateLink" as AWS
+participant "Helm\nkms-core chart" as Helm
+participant "kms-server\n(Nitro Enclave)" as KMS
+participant "Other 12 parties" as Peers
+participant "Gateway" as GW
+
+Op -> TF : party ID, tfvars\n(c7a.16xlarge, enclave, attestation SHA)
+TF -> AWS : EKS + enclave node group,\n2 S3 buckets, IRSA roles, KMS root key
+Op -> TF : PrivateLink provider + consumer
+TF -> AWS : VPC endpoint service,\nendpoints to 12 parties
+Op -> Peers : exchange service names,\nTLS certificates (out of band)
+Op -> Helm : values: peersList, PCR allowlist,\nthreshold params, vaults
+Helm -> KMS : StatefulSet, enclave 48 CPU / 96 GiB
+Op -> KMS : kms-gen-keys\n(seed, ECDSA key, TLS cert)
+KMS -> AWS : seed and key to private vault + backup
+Op -> GW : register party\n(signer address, public storage)
+Op -> KMS : kms-init (PRSS, once per party set)
+KMS <-> Peers : PRSS setup over attested mTLS
+GW -> KMS : preprocessing, KeyGen, CrsGen\n(via connector, hours)
+KMS <-> Peers : distributed key generation
+KMS -> AWS : shares to private vault,\npublic keys to Keychain DA
+KMS -> GW : signed digests
+note over KMS, Peers #F8F5FC : Port 50100 stays on localhost; 50001 only between parties;\n9646 only to monitoring.
+@enduml
