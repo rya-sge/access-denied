@@ -1,0 +1,39 @@
+@startuml
+title What has to be trusted
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+rectangle "Authoritative, on-chain\n(audited, upgradeable by owner)" #EEF5FF {
+  rectangle "Host contracts\nExecutor, ACL, InputVerifier, KMSVerifier" as host
+}
+
+rectangle "Honest majority (> 1/2)\nstaked, slashable, recomputable" #F3F7FD {
+  rectangle "Coprocessors\nhold every ciphertext,\nonly the evaluation key" as cop
+}
+
+rectangle "Threshold (at most 1/3 malicious of 13)\nNitro Enclaves, custodial backup" #FDEEEE {
+  rectangle "KMS\nshares of the private key,\ndecrypts on request" as kms
+}
+
+rectangle "Liveness only\n(can delay, cannot read or forge)" #F7F7F7 {
+  rectangle "Gateway rollup" as gw
+  rectangle "Relayer / Oracle" as edge
+}
+
+rectangle "Outside the protocol" #FFFFFF {
+  rectangle "User device\nplaintext + ciphertext coexist" as user
+  rectangle "TFHE scheme\n128-bit, post-quantum" as fhe
+}
+
+user --> host : signed inputs
+host --> cop : events fix what to compute
+cop --> gw : commitments, ACL replica
+gw --> kms : decryption requests
+kms --> edge : signed plaintexts
+edge --> host : callback verified\nby KMSVerifier
+edge --> user : re-encrypted result
+@enduml

@@ -1,0 +1,65 @@
+@startuml
+title Zama protocol components
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #4A78B5
+}
+skinparam actor {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam ArrowColor #4A78B5
+
+actor "User / dApp" as user
+
+package "Host chain (any EVM)" {
+  component "Confidential contract\n(FHEVM Solidity library)" as dapp
+  component "FHEVMExecutor\nsymbolic ops, HCU" as exec
+  component "ACL\nallow / allowTransient /\npublic decryption" as acl
+  component "InputVerifier\nthreshold of\ncoprocessor signatures" as iv
+  component "KMSVerifier\nthreshold of\nKMS signatures" as kv
+}
+
+package "Gateway (Arbitrum rollup)" {
+  component "InputVerification" as gin
+  component "CiphertextCommits\nmajority consensus" as gcc
+  component "Decryption" as gdec
+  component "GatewayConfig\noperators, thresholds" as gcfg
+}
+
+package "Off-chain operators" {
+  component "Coprocessors (x5)\nTFHE-rs, evaluation key\nverify ZKPoK, compute, commit" as cop
+  component "KMS (13 MPC nodes)\nNitro Enclaves\nthreshold decryption" as kms
+}
+
+package "Edge services (untrusted)" {
+  component "Relayer" as relayer
+  component "Oracle" as oracle
+}
+
+user --> relayer : encrypt + ZKPoK\nuser decryption request
+relayer --> gin : register input
+gin <-- cop : signed handles
+relayer --> user : inputProof
+user --> dapp : tx with inputProof
+dapp --> iv : FHE.fromExternal
+dapp --> exec : FHE.add / select ...
+exec --> acl : isAllowed, allowTransient
+dapp --> acl : FHE.allow
+exec ..> cop : operation events
+acl ..> cop : Allowed events
+cop --> gcc : ciphertext digests
+cop --> gcfg : ACL replica
+gdec --> kms : decrypt request
+kms --> gdec : signed plaintext
+gdec --> oracle : public result
+oracle --> dapp : callback
+dapp --> kv : checkSignatures
+gdec --> relayer : re-encrypted result
+@enduml

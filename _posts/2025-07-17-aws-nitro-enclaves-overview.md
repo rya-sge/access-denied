@@ -175,3 +175,7 @@ For workloads that involve confidential data and demand strong security boundari
 
 - [docs.aws.amazon.com - What is Nitro Enclaves?](https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html)
 - ChatGPT to summarize the documentation
+
+### Related articles
+
+- [Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/)

@@ -1,0 +1,63 @@
+@startuml
+title Life of an encrypted value
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  ActorBackgroundColor #EEF5FF
+  ActorBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #F3F7FD
+  BorderColor #4A78B5
+}
+autonumber
+
+actor User
+participant Relayer
+participant "Coprocessors" as Cop
+participant "Gateway" as GW
+participant "Contract" as C
+participant "InputVerifier" as IV
+participant "FHEVMExecutor" as EX
+participant "ACL" as ACL
+participant "KMS" as KMS
+
+== Encrypt ==
+User -> User : encrypt(v, pk) + ZKPoK
+User -> Relayer : ciphertext list + proof
+Relayer -> GW : register input
+GW -> Cop : verification event
+Cop -> Cop : verify ZKPoK, store ciphertext,\nderive handles
+Cop -> GW : EIP-712 signature over\n(handles, user, contract, chainId)
+GW -> Relayer : inputProof = handles + signatures
+Relayer -> User : inputProof
+
+== Compute (symbolic on-chain, real off-chain) ==
+User -> C : call(handle, inputProof)
+C -> IV : FHE.fromExternal
+IV -> IV : chainId, version, threshold of\nregistered signers
+C -> EX : FHE.add(a, b)
+EX -> ACL : isAllowed(a), isAllowed(b)
+EX -> EX : handle = hash(op, a, b, ACL,\nchainId, blockhash, timestamp)
+EX -> ACL : allowTransient(handle, contract)
+EX --> Cop : operation event
+C -> ACL : FHE.allow(handle, holder)
+ACL --> Cop : Allowed event
+Cop -> Cop : evaluate with the evaluation key,\nstore ciphertext under handle
+Cop -> GW : ciphertext digest
+GW -> GW : majority consensus\n-> material added
+
+== Decrypt ==
+User -> Relayer : user decryption(handle, contract,\nephemeral pk, EIP-712 signature)
+Relayer -> GW : request
+GW -> GW : material added?
+GW -> KMS : decrypt request
+KMS -> KMS : check ACL replica,\nthreshold decryption,\nre-encrypt under ephemeral pk
+KMS -> GW : signed result
+GW -> Relayer : re-encrypted plaintext
+Relayer -> User : decrypt locally
+note over C, KMS #F3F7FD : Public decryption follows the same path, with the oracle\nposting the KMS-signed plaintext back to the contract,\nwhich verifies it through KMSVerifier.
+@enduml

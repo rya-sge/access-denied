@@ -868,3 +868,9 @@ _posts/2026-09-17-mica-market-abuse-enforcement-supervision.md
   assets/article/regulation/mica/2026-09-17-mica-market-abuse-mindmap.puml                 (mindmap)
   assets/article/regulation/mica/mica-market-abuse-concept.puml                            (concept, in-section)
   assets/article/regulation/mica/mica-supervision-architecture-concept.puml                (concept, in-section)
+
+_posts/2026-09-18-zama-fhevm-architecture-components-trust-model.md
+  assets/article/blockchain/zamafhe/2026-09-18-zama-fhevm-architecture-mindmap.puml                        (mindmap)
+  assets/article/blockchain/zamafhe/zama-fhevm-components-concept.puml                                     (concept, in-section)
+  assets/article/blockchain/zamafhe/zama-fhevm-encrypt-compute-decrypt-sequence.puml                       (sequence, in-section)
+  assets/article/blockchain/zamafhe/zama-fhevm-trust-model-concept.puml                                    (concept, in-section)

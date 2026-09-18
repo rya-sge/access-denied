@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Zama FHEVM architecture
+** Two ideas
+*** Symbolic execution: chain derives handles, emits events
+*** Threshold decryption: one global key, secret-shared
+** Six components
+*** FHEVM Solidity library
+*** Host contracts: Executor, ACL, InputVerifier, KMSVerifier, HCULimit
+*** Coprocessors (TFHE-rs, evaluation key)
+*** Gateway (Arbitrum rollup, coordination contracts)
+*** KMS (13 MPC nodes, Nitro Enclaves)
+*** Relayer and oracle (untrusted edge)
+** Three keys
+*** Public key: client encrypts
+*** Evaluation key: coprocessors compute
+*** Private key: shared across the KMS
+** Life of a value
+*** Encrypt + ZKPoK on the device
+*** Coprocessor attestation (inputProof)
+*** InputVerifier: threshold of signatures
+*** Executor: handle = hash(op, inputs, block)
+*** Off-chain evaluation + ciphertext commitment
+*** Public or user decryption via Gateway and KMS
+** Access control
+*** Persistent, transient, public decryption
+*** Checked at use and at read
+*** Never revoked; new handle per operation
+*** Replicated to the Gateway, enforced by the KMS
+** Trust model
+*** Host contracts: audited, upgradeable
+*** Coprocessors: honest majority, staking, slashing
+*** Gateway: liveness only
+*** KMS: 2/3 of 13 + enclaves
+*** Correctness attested, not proven (ZK-FHE later)
+@endmindmap

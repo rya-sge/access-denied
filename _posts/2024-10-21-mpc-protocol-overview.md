@@ -268,3 +268,7 @@ The threat models considered in MPC protect against malicious adversaries, collu
   - [Devious Transfer: Breaking Oblivious Transfer-based Threshold ECDSA](https://blog.fordefi.com/devious-transfer-breaking-oblivious-transfer-based-threshold-ecdsa)
   - [Wikipedia - Oblivious transfer ](https://en.wikipedia.org/wiki/Oblivious_transfer), [NPTEL - Lec 37 Oblivious Transfer (OT)](https://www.youtube.com/watch?v=1s-bKKdElAU&list=PLgMDNELGJ1Ca3l-xioOzN86BIZ2a0N8Ds&index=38)
 - ChatGPT with the inputs "Write me an article about MPC, the pros and cons, with also a paragraph to discuss its security, a threat model and its use case", "Complete with some mathematical and technical details"
+
+### Related articles
+
+- [Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/)
