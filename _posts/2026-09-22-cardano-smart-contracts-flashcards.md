@@ -13,7 +13,7 @@ isMath: false
 
 [Cardano](https://cardano.org/) is a proof-of-stake blockchain whose ledger follows the Extended UTXO (eUTXO) model: value sits in discrete outputs rather than in account balances, and a smart contract is not a program that acts but a validator that approves or rejects the transaction trying to spend those outputs. This deck compresses the smart-contract module of the [Cardano developer curriculum](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/overview) and the site's own articles on the model, for a reader who has met the material once and wants the vocabulary to stay put.
 
-Twelve cards, each with a plain-words definition, a precise one and one line to remember, plus a revision table at the end. The cards cover the contract and the piece of ledger architecture it lives in (outputs, script addresses, the two validation phases); they define, they do not derive, and they leave consensus and governance to their own articles. The longer treatments are [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/) for the model, [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/) for the code, and [Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains]({{site.url_complet}}/2026/07/16/cardano-smart-contract-security/) for what goes wrong.
+Twelve cards, each with a plain-words definition, a precise one, one line to remember and a link to the page of the official documentation that defines the term, plus a revision table at the end. The cards cover the contract and the piece of ledger architecture it lives in (outputs, script addresses, the two validation phases); they define, they do not derive, and they leave consensus and governance to their own articles. The longer treatments are [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/) for the model, [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/) for the code, and [Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains]({{site.url_complet}}/2026/07/16/cardano-smart-contract-security/) for what goes wrong.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -29,6 +29,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** created once, spent once, never edited
 
+**Reference:** [Cardano developer portal — How does the UTXO model track ownership?](https://developers.cardano.org/docs/developers/curriculum/fundamentals/core-concepts/eutxo#how-does-the-utxo-model-track-ownership)
+
 ### Datum
 
 **In plain words:** A datum is a piece of data attached to a UTXO when it is created, and it is where a Cardano contract keeps its state.
@@ -36,6 +38,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** Structured data attached to a [UTXO](#utxo) at creation, stored inline in the output or as a hash whose value is revealed at spend time. It is the state a contract keeps, at most one per UTXO it locks.
 
 **Remember:** datum = state, at most one per UTXO
+
+**Reference:** [Cardano developer portal — How does the datum represent state?](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/datum-redeemer-context#how-does-the-datum-represent-state)
 
 ### Redeemer
 
@@ -45,6 +49,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** datum at lock time, redeemer at spend time
 
+**Reference:** [Cardano developer portal — How does the redeemer represent actions?](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/datum-redeemer-context#how-does-the-redeemer-represent-actions)
+
 ### Script context
 
 **In plain words:** The script context is the full transaction handed to the contract to judge: every input and output, who signed, what is minted, and the time window.
@@ -52,6 +58,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** The structure the node passes to a script: a TxInfo with all inputs, reference inputs, outputs, mint, fee, signatories and validity interval, plus the script purpose stating why it runs: spend, mint, withdraw, publish, vote or propose.
 
 **Remember:** the whole transaction, plus why the script runs
+
+**Reference:** [Cardano developer portal — What does the ScriptContext provide?](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/datum-redeemer-context#what-does-the-scriptcontext-provide)
 
 ### Validator
 
@@ -61,6 +69,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** f(datum, redeemer, context) → yes or no
 
+**Reference:** [Cardano developer portal — Smart contracts are validators, not actors](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/overview#smart-contracts-are-validators-not-actors)
+
 ### Script address
 
 **In plain words:** A script address is an address whose rules are a validator: anyone can send coins to it, but only a transaction the validator approves can take them out.
@@ -68,6 +78,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** An address derived from the hash of a [validator](#validator)'s compiled code and a language tag, so the same code under the same Plutus version yields the same address. Sending a UTXO there locks it under that validator.
 
 **Remember:** address = hash of the code; funds locked by rules
+
+**Reference:** [Cardano developer portal — Script addresses and purposes](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/overview#script-addresses-and-purposes)
 
 ### State transition
 
@@ -77,6 +89,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** spend the old datum, create the new one, never edit
 
+**Reference:** [Cardano developer portal — The continuing-output pattern](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/datum-redeemer-context#the-continuing-output-pattern)
+
 ### Minting policy
 
 **In plain words:** A minting policy is a validator that decides when tokens under its name may be created or destroyed; the tokens themselves then move around like ada, with no contract involved.
@@ -84,6 +98,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** A [validator](#validator) run with the mint purpose whenever a transaction mints or burns tokens; its script hash is the policy id. A native token is the pair (policy id, asset name), carried in [UTXO](#utxo) values by the ledger itself.
 
 **Remember:** policy id = script hash; tokens live in UTXO values
+
+**Reference:** [Cardano developer portal — Minting policies](https://developers.cardano.org/docs/developers/curriculum/native-tokens/minting-policies)
 
 ### Deterministic validation
 
@@ -93,6 +109,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** same transaction, same result, cost known in advance
 
+**Reference:** [Cardano developer portal — Why is deterministic validation such a big deal?](https://developers.cardano.org/docs/developers/curriculum/fundamentals/core-concepts/eutxo#why-is-deterministic-validation-such-a-big-deal)
+
 ### Two-phase validation
 
 **In plain words:** Two-phase validation first checks that a transaction is well formed and signed, then runs its contracts; only a contract failing in the second phase costs the sender their collateral.
@@ -100,6 +118,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** Phase 1 checks structure: inputs exist, signatures verify, values balance; a failure costs nothing. Phase 2 runs the scripts within an execution-unit budget priced into the fee; if a script fails, the node consumes the ada-only collateral inputs instead.
 
 **Remember:** phase 1 fails for free; phase 2 failure costs collateral
+
+**Reference:** [Cardano developer portal — How scripts execute](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/overview#how-scripts-execute)
 
 ### Off-chain code
 
@@ -109,6 +129,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 
 **Remember:** off-chain drafts, on-chain judges
 
+**Reference:** [Cardano developer portal — On-chain and off-chain](https://developers.cardano.org/docs/developers/curriculum/smart-contracts/overview#on-chain-and-off-chain)
+
 ### eUTXO model
 
 **In plain words:** The eUTXO model is Cardano's way of holding value and running contracts: coins carry data, and a contract is a rule that decides which transactions may spend them.
@@ -116,6 +138,8 @@ Twelve cards, each with a plain-words definition, a precise one and one line to 
 **Precisely:** The UTXO model extended so that an output carries a [datum](#datum), a spend carries a [redeemer](#redeemer), and a [validator](#validator) judges the whole transaction through the [script context](#script-context). Value moves by consuming and creating outputs, not by updating balances.
 
 **Remember:** coins with data, guarded by predicates, not accounts
+
+**Reference:** [Cardano developer portal — eUTXO](https://developers.cardano.org/docs/developers/curriculum/fundamentals/core-concepts/eutxo)
 
 ## Flashcard table
 
