@@ -201,3 +201,4 @@ Because the added visibility stops at the transaction boundary. A Cardano valida
 - [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
 - [Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains]({{site.url_complet}}/2026/07/16/cardano-smart-contract-security/)
 - [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)
+- [Cardano Smart Contracts in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/22/cardano-smart-contracts-flashcards/)

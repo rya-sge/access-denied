@@ -181,3 +181,4 @@ Because the model's guarantees and unit tests cover different, incomplete parts 
 - [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
 - [Writing Cardano Smart Contracts with Aiken]({{site.url_complet}}/2026/07/16/aiken-smart-contracts-cardano/)
 - [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)
+- [Cardano Smart Contracts in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/22/cardano-smart-contracts-flashcards/)

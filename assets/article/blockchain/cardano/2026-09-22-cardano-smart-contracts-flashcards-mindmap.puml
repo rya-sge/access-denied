@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Cardano smart contracts\ntwelve cards
+** Objects
+*** UTXO\n//created once, spent once, never edited//
+*** Datum\n//datum = state, at most one per UTXO//
+*** Redeemer\n//datum at lock time, redeemer at spend time//
+*** Script context\n//the whole transaction, plus why the script runs//
+** The contract
+*** Validator\n//f(datum, redeemer, context) → yes or no//
+*** Script address\n//address = hash of the code; funds locked by rules//
+*** Minting policy\n//policy id = script hash; tokens live in UTXO values//
+left side
+** Operations
+*** State transition\n//spend the old datum, create the new one, never edit//
+*** Off-chain code\n//off-chain drafts, on-chain judges//
+** The ledger
+*** Deterministic validation\n//same transaction, same result, cost known in advance//
+*** Two-phase validation\n//phase 1 fails for free; phase 2 failure costs collateral//
+*** eUTXO model\n//coins with data, guarded by predicates, not accounts//
+@endmindmap

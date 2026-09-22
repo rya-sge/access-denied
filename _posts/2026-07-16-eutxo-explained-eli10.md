@@ -130,3 +130,4 @@ Sure. Imagine you have a 20 coin and you buy a book that costs 14. You cannot cu
 ### Related articles
 
 - [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
+- [Cardano Smart Contracts in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/22/cardano-smart-contracts-flashcards/)

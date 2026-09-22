@@ -922,3 +922,6 @@ _posts/2026-09-22-bio-launchpad-solana-audit-findings.md
   assets/article/blockchain/defi/bio-protocol/2026-09-22-bio-launchpad-solana-findings-mindmap.puml       (mindmap)
   assets/article/blockchain/defi/bio-protocol/bio-desci-launchpad-accounting-activity.puml               (activity, in-section)
   assets/article/blockchain/defi/bio-protocol/bio-desci-launchpad-refund-race-sequence.puml              (sequence, in-section)
+
+_posts/2026-09-22-cardano-smart-contracts-flashcards.md
+  assets/article/blockchain/cardano/2026-09-22-cardano-smart-contracts-flashcards-mindmap.puml                  (mindmap, clustered flashcards)

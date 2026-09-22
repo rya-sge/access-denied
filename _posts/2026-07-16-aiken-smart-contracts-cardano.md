@@ -320,6 +320,7 @@ Unit tests confirm the checks a validator does perform behave as intended. They 
 - [A Categorized Guide to Cardano Improvement Proposals]({{site.url_complet}}/2026/07/16/cardano-cip-categories/)
 - [CIP-113 Programmable Tokens on Cardano]({{site.url_complet}}/2026/08/26/cip-113-programmable-tokens-cardano/)
 - [Merkle Patricia Forestry on Cardano — How It Differs From Other Merkle Trees]({{site.url_complet}}/2026/08/28/merkle-patricia-forestry-cardano/)
+- [Cardano Smart Contracts in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/09/22/cardano-smart-contracts-flashcards/)
 
 ### Tooling used
 
