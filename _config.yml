@@ -122,6 +122,7 @@ exclude:
   - polyfills.md
   - article_list.md
   - tree.txt
+  - unpublished.txt
   - README.md
   - LICENSE.txt
   # Diagram sources (~1.8 MB of .drawio / .excalidraw). Kept in the repo as the

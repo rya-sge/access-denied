@@ -1,0 +1,32 @@
+Unpublished article registry
+============================
+
+Every article under _posts/ that carries `published: false` is listed here,
+with why it is withheld and what releasing it requires. Jekyll excludes such
+posts from site.posts (home, categories, series box, related posts,
+search.json, feed, sitemap) and does not generate their URL.
+
+An article listed here must have `published: false` in its front matter, and
+every `published: false` post must be listed here; the check in the
+create-article-no-publication skill verifies both directions.
+
+Release = remove `published: false`, add `series:` if intended, add the
+reciprocal links listed under `reciprocal:`, refresh `date:` if the content
+was updated, run the create-article checks, then delete the entry below.
+
+Diagram sources are registered in tree.txt, not here.
+
+Entry format (indented here so it is not read as an entry; real entries
+start in column 0):
+
+    _posts/YYYY-MM-DD-slug.md
+      status:      unpublished (published: false)
+      since:       YYYY-MM-DD
+      reason:      <why it is not published>
+      release:     <condition or date, or "undecided">
+      series:      <intended series key, or none>
+      reciprocal:  <_posts files that should link to it at release, or none>
+      notes:       <anything the releaser must know; "none" if nothing>
+
+Registry
+--------
