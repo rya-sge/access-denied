@@ -510,6 +510,7 @@ No on-chain mechanism produced any of these outcomes. A threat model that assume
 
 - [Cross-Chain Bridge Threat Model](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-threat-model/)
 - [Zero-Knowledge Proof Failures in Cross-Chain Bridges](https://rya-sge.github.io/access-denied/2026/06/19/zkp-cross-chain-bridge-hacks/)
+- [Three Launchpad Bugs from the Bio Protocol EVM Audits - Units, Donations and Partial Claims]({{site.url_complet}}/2026/09/22/bio-launchpad-evm-audit-findings/)
 
 ### Tooling
 

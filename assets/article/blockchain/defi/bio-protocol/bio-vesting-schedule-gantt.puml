@@ -1,0 +1,31 @@
+@startgantt
+<style>
+ganttDiagram {
+  task {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  milestone {
+    BackgroundColor #2E8B67
+    LineColor #2E8B67
+  }
+  timeline {
+    BackgroundColor white
+  }
+}
+</style>
+title BIO vesting schedule (docs, DropsTab, BIOPSY-22; end dates are estimates)
+printscale quarterly
+Project starts 2025-01-01
+[TGE 3 Jan 2025] happens at 2025-01-03
+[Ecosystem incentives 830 M: treasury, no vesting] starts 2025-01-03 and ends 2025-01-10
+[Community auction 664 M: 50 % liquid, 50 % linear 1 y] starts 2025-01-03 and ends 2025-11-14
+[Team 704 M: 1/6 tranche, linear (BIOPSY-22)] starts 2025-11-14 and ends 2026-05-14
+[Team 704 M: remaining 5/6, linear] starts 2025-05-28 and ends 2030-05-28
+[Advisors 139 M: 1 y cliff, then linear to 2030] starts 2026-01-03 and ends 2030-05-28
+[Investors 452 M: 1 y cliff, then linear ~3 y] starts 2026-01-03 and ends 2028-05-28
+[Molecule 166 M: linear ~3 y] starts 2025-01-03 and ends 2028-01-03
+[Molecule fund 166 M: 4 y (docs) / at TGE (DropsTab)] starts 2025-01-03 and ends 2029-01-03
+[Airdrop 199 M: public part liquid, DAO part 1 y cliff, 6 y] starts 2026-01-03 and ends 2030-05-28
+[Data snapshot 18 Sep 2026] happens at 2026-09-18
+@endgantt

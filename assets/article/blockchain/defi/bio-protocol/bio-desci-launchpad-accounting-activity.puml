@@ -1,0 +1,35 @@
+@startuml
+title C-01 and H-01: where sale tokens get stranded in the vault
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FDEEEE
+  DiamondBorderColor #B54A4A
+}
+
+start
+:deposit_token: authority moves sale_supply
+into the stats_token vault;
+:buy_token: each purchase adds to
+user.tokens_purchased and claimed_supply;
+:Sale ends;
+if (claimed_supply < sale_supply ?) then (yes)
+  :claim_token pays
+tokens_purchased / claimed_supply
+x min(sale_supply, claimed_supply);<<#FDEEEE>>
+  :Every buyer receives exactly tokens_purchased;
+  :sale_supply - claimed_supply stays in the vault
+with no instruction able to move it;<<#FDEEEE>>
+else (no)
+  :Vault is fully distributed;
+endif
+if (revenue < min_threshold ?) then (yes)
+  :withdraw_tokens refunds the pay token
+but leaves claimed_supply and the
+purchased tokens untouched;<<#FDEEEE>>
+  :Refunded users' tokens are locked
+in the vault as well;<<#FDEEEE>>
+endif
+stop
+@enduml

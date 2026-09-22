@@ -835,3 +835,4 @@ The mindmap below summarizes the article.
 ## Related articles
 
 - [Bio Protocol Overview - DeSci Launchpad, BIO Token Economy and Open-Source DAO Contracts]({{site.url_complet}}/2026/09/18/bio-protocol-overview/)
+- [Three Launchpad Bugs from the Bio Protocol EVM Audits - Units, Donations and Partial Claims]({{site.url_complet}}/2026/09/22/bio-launchpad-evm-audit-findings/)

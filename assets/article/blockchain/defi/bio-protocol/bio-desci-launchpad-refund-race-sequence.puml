@@ -1,0 +1,42 @@
+@startuml
+title H-02: claim_revenue and withdraw_tokens compete for one vault
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+  ActorBackgroundColor #FDEEEE
+  ActorBorderColor #B54A4A
+}
+
+actor Admin as AD
+actor Buyer as B
+participant "Launchpad program" as P
+participant "stats_pay_token\n(vault PDA)" as V
+
+== Sale ends with revenue < min_threshold ==
+AD -> P : claim_revenue()
+P -> V : transfer(revenue -> admin)
+note right of P #FDEEEE
+  no check that the sale
+  reached its threshold
+end note
+B -> P : withdraw_tokens()
+P -> P : require revenue < min_threshold : ok
+P -> V : transfer(refund_amount -> buyer)
+V --> P : insufficient funds, revert
+note right of B #FDEEEE
+  every refund now fails
+end note
+
+== Same state, other order ==
+B -> P : withdraw_tokens()
+P -> V : transfer(refund_amount -> buyer) : ok
+AD -> P : claim_revenue()
+P -> V : transfer(token_stats.revenue -> admin)
+V --> P : balance < recorded revenue, revert
+note right of AD #FDEEEE
+  admin can never sweep
+  the remaining balance
+end note
+@enduml

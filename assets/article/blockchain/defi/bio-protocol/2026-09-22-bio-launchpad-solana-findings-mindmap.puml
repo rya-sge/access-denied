@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Bio launchpad Solana audits
+** C-01 undersubscription remainder locked
+*** Vault funded with sale_supply
+*** Claims pro-rated on claimed_supply
+*** sale_supply minus claimed_supply never leaves
+*** H-01: refunds do not restore claimed_supply
+** H-02 admin sweep races user refunds
+*** claim_revenue allowed below min_threshold
+*** Refund path needs the same vault balance
+*** Either side can starve the other
+*** M-01: claim and refund both open below threshold
+** FYEO-01 dust denial of service
+*** total_curators is a u16, about 65k slots
+*** minimum contribution 1 base unit
+*** Fill every slot for a few dollars
+** Solana-specific lessons
+*** f64 in money paths
+*** transfer_checked, PDA and ATA authority
+*** LastRestartSlot after a rollback
+** Reports
+*** Pashov 2025 DeSci Launchpad
+*** FYEO 2025 Bio Launchpad v0.1
+@endmindmap

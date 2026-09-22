@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Bio launchpad EVM audits
+** C-01 vestingDuration as timestamp
+*** Curation.claim passes a Unix time as seconds
+*** Vesting contract expects duration in seconds
+*** Lesson: units at every contract seam
+** H-02 one-wei donation DoS
+*** updateFundraiser requires balanceOf == expected
+*** Front-run with 1 wei bricks the launch forever
+*** Lesson: never == on balanceOf, prefer >= and accounting
+** M-01 partial transfer burns the claim
+*** _safeClaimTransfer sends min(amount, balance)
+*** hasClaimed set before transfer, vesting underfunded
+*** Lesson: all-or-nothing claims, no silent clamping
+** Also in the reports
+*** H-01 cap bypass via non-decremented counter
+*** M-01 wrong denominator after unpledge
+*** FYEO V2: initializers, admin sweep, tax bounds
+** Reports
+*** Pashov 2024 FairAuctionVesting
+*** Pashov 2025 Curation and LaunchFactory
+*** FYEO 2025 Launchpad Agent EVM
+@endmindmap

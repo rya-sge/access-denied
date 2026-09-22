@@ -626,3 +626,4 @@ fn main() {
 
 - [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
 - [Medusa — Architecture and Practical Use of a Coverage-Guided Solidity Fuzzer]({{site.url_complet}}/2026/07/28/medusa-smart-contract-fuzzer/)
+- [Three Launchpad Bugs from the Bio Protocol Solana Audits - Stranded Supply, Refund Races and Dust Denial of Service]({{site.url_complet}}/2026/09/22/bio-launchpad-solana-audit-findings/)

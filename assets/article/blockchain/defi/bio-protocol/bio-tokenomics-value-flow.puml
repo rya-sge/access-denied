@@ -1,0 +1,47 @@
+@startuml
+title Where value flows in Bio V2, and where BIO sits
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #2E8B67
+}
+
+package "BIO holders" {
+  [BIO] as bio
+  [veBIO lock\n1 w to 2 y] as ve
+  [BioXP points\n14-day expiry] as xp
+}
+
+package "Launch of a project token" {
+  [Ignition Sale\nUSDC in] as sale
+  [AMM pool\nUSDC + project token] as pool
+  [1 % swap tax] as tax
+}
+
+package "Treasuries" {
+  [Project treasury] as pt
+  [Bio treasury] as bt
+}
+
+package "Supply side" {
+  [Vesting contracts\n0.92 B BIO] as vest
+  [Ecosystem incentives\nbio/acc rewards] as eco
+}
+
+bio --> ve : lock
+ve --> xp : daily accrual
+xp --> sale : priority weight
+ve <-- pool : airdrop share of\nproject token
+sale --> pool : all USDC raised
+pool --> tax : every buy / sell
+tax --> pt : 70 %
+tax --> bt : 30 %
+vest ..> bio : unlocks to team,\ninvestors, advisors
+eco ..> bio : grants to BioDAOs
+bt ..> bio : no documented\nbuyback or burn
+@enduml

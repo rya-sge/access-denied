@@ -347,3 +347,4 @@ In either case the platform's operating rules must refuse admission until a whit
 - [Two Ways to Build a Permissioned Token — Centrifuge's Transfer Hook Against ERC-3643]({{site.url_complet}}/2026/08/18/centrifuge-hook-vs-erc3643/)
 - [CIP-113 Programmable Tokens on Cardano]({{site.url_complet}}/2026/08/26/cip-113-programmable-tokens-cardano/)
 - [Security of Cryptocurrency Exchanges - Overview]({{site.url_complet}}/2025/11/06/crypto-exchange-security-overview/)
+- [BIO Tokenomics - Supply, Unlocks, Demand and Value Capture of Bio Protocol's Token]({{site.url_complet}}/2026/09/18/bio-protocol-tokenomics-analysis/)

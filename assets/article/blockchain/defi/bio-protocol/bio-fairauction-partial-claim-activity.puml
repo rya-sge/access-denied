@@ -1,0 +1,33 @@
+@startuml
+title M-01: how a clamped transfer turns into a lost claim
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+  DiamondBackgroundColor #FDEEEE
+  DiamondBorderColor #B54A4A
+}
+
+start
+:Admin calls emergencyWithdrawBIO()
+BIO balance of the sale becomes 0;
+:User calls claim();
+:hasClaimed = true;
+:(bioAmount, vbioAmount) = getExpectedClaimAmount(user);
+:_safeClaimTransfer(BIO, user, bioAmount);
+if (amount > balance ?) then (yes)
+  :transfer(user, balance) = transfer(user, 0);<<#FDEEEE>>
+else (no)
+  :transfer(user, amount);
+endif
+:_safeClaimTransfer(BIO, vBIO, vbioAmount)
+sends 0 to the vesting contract;<<#FDEEEE>>
+:vBIO.createVestingSchedule(user, ..., vbioAmount);
+note right #FDEEEE
+  schedule recorded for the full amount,
+  vesting contract received nothing
+end note
+:claim() succeeds, emits Claim(user, bioAmount, vbioAmount);
+:User received 0 BIO and cannot claim again;<<#FDEEEE>>
+stop
+@enduml

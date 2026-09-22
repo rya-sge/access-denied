@@ -1,0 +1,41 @@
+@startuml
+title H-02: one wei of bioDaoToken blocks updateFundraiser forever
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+  ActorBackgroundColor #FDEEEE
+  ActorBorderColor #B54A4A
+}
+
+actor Attacker as A
+participant "Fundraiser\ncontract" as F
+participant "bioDaoToken\n(ERC20)" as T
+participant "Curation" as C
+
+== Intended flow ==
+F -> T : transfer(Curation, bioDaoTokenToDistribute)
+F -> C : updateFundraiser()
+C -> T : balanceOf(Curation)
+C -> C : require(balance == bioDaoTokenToDistribute)
+C -> C : isFundraiseSuccessful = true
+note right of C #FDEEEE
+  pledgers can now claim()
+end note
+
+== Attack ==
+A -> T : transfer(Curation, 1 wei)
+note right of A #FDEEEE
+  front-runs, or is sent
+  at any time before finalisation
+end note
+F -> T : transfer(Curation, bioDaoTokenToDistribute)
+F -> C : updateFundraiser()
+C -> T : balanceOf(Curation)
+C -> C : balance == expected + 1 wei\nrevert Curation__BioDAOTokenForVestingNotSent()
+note right of C #FDEEEE
+  no path removes the extra wei;
+  every retry reverts
+end note
+@enduml

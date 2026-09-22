@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* BIO tokenomics (Sept 2026)
+** Supply
+*** 3.32 B fully minted across 4 chains
+*** 2.15 B circulating (CoinGecko), 64.6 %
+*** 0.92 B in vesting contracts on-chain
+*** No protocol inflation, no burn
+** Distribution
+*** Community 56 % (25 % treasury incentives, no vesting)
+*** Team 21.2 %, investors 13.6 %, advisors 4.2 %
+*** Molecule 5 % + Molecule fund 5 %
+** Unlocks
+*** Team: 1/6 released Nov 2025 to May 2026, rest to May 2030
+*** Investors linear to ~2028, Molecule to ~2028
+*** ~0.7 to 1.2 M BIO/day (estimates)
+** Demand
+*** Stake to veBIO for BioXP and launch priority
+*** Airdrops of new tokens to veBIO
+*** Governance (BIO + vBIO today)
+*** Pay for BioAgents, instant BioXP mint
+** Value capture
+*** 1 % swap tax, 30 % to Bio treasury (not in BIO)
+*** Sales settle in USDC
+*** No documented buyback or burn
+** Valuation
+*** MC 57.7 M USD, FDV 89.3 M USD
+*** MC / TVL about 16
+*** No public revenue figure
+@endmindmap
