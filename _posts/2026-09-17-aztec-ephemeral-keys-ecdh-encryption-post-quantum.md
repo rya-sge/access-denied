@@ -269,6 +269,7 @@ It would also leave discovery tags, proof soundness and account signatures where
 - [AztecProtocol/aztec-packages](https://github.com/AztecProtocol/aztec-packages) — analyzed at tag [v5.2.0](https://github.com/AztecProtocol/aztec-packages/tree/v5.2.0), commit [`49a592109ec4f18d79212b43d621891aaf36f7b6`](https://github.com/AztecProtocol/aztec-packages/tree/49a592109ec4f18d79212b43d621891aaf36f7b6), 2026-09-17: `noir-projects/noir-protocol-circuits/crates/types/src/address/aztec_address.nr` (`to_address_point`, address computation), `constants.nr` (`PRIVATE_LOG_SIZE_IN_FIELDS = 16`), `noir-projects/noir-contracts/contracts/standard/handshake_registry_contract/src/main.nr`; the `@aztec/stdlib` (`computeAddressSecret`) and `@aztec/pxe` (`getSharedSecrets`) packages at 5.2.0
 
 ### Related articles
+- [A Test That Could Never Pass — An Aztec End-to-End Failure Three Layers from Its Cause]({{site.url_complet}}/2026/09/23/aztec-e2e-test-failure-three-layers/)
 
 - [Building a Wallet for Aztec — What a MetaMask for a Private Chain Has to Contain]({{site.url_complet}}/2026/09/17/building-an-aztec-wallet-pxe-proving-accounts/)
 - [Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never Checks It]({{site.url_complet}}/2026/09/17/aztec-randomness-notes-oracle-unconstrained/)

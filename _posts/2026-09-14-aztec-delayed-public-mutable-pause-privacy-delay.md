@@ -316,6 +316,7 @@ The kernel keeps the minimum, so the transaction expires 1,000 seconds after its
 - [Claude Code](https://claude.com/product/claude-code)
 
 ### Related articles
+- [A Test That Could Never Pass — An Aztec End-to-End Failure Three Layers from Its Cause]({{site.url_complet}}/2026/09/23/aztec-e2e-test-failure-three-layers/)
 
 - [Gates on Aztec — What a Private Function Costs, Where the Cost Hides, and Seven Measured Ways to Lower It]({{site.url_complet}}/2026/09/18/aztec-gate-count-optimization-private-functions/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)

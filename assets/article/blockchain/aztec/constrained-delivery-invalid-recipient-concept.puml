@@ -1,0 +1,45 @@
+@startuml
+title Delivery mode decides whether an unusable recipient is fatal
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+
+component "recipient address" as Addr
+component "is_valid()\ny² = x³ − 17 solvable at x?" as Valid
+component "tagging secret oracle\n(shared secret derived)" as Oracle
+component "random secret\nundiscoverable tag" as Rand
+component "panic:\nCannot resolve a constrained\ntagging secret" as Panic
+
+Addr --> Valid
+Valid --> Oracle : valid
+Valid --> Rand : invalid,\nunconstrained / offchain
+Valid --> Panic : invalid,\nonchain_constrained
+
+note bottom of Rand
+  Best effort: the send succeeds and
+  the recipient receives nothing it
+  can find. A wrong address stays
+  invisible here.
+end note
+
+note bottom of Panic
+  A proved encryption cannot be served
+  for an address with no curve point,
+  and must not claim the guarantee
+  while emitting an unfindable tag.
+end note
+
+note bottom of Valid
+  About half of all field elements are
+  not x-coordinates of a Grumpkin point.
+  Zero is one of them, and zero is the
+  default of an unset delayed address.
+end note
+@enduml

@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Three layers\nfrom symptom to cause
+** The symptom
+*** "Cannot resolve a constrained\ntagging secret for an invalid recipient"
+*** Framework assertion, not contract
+*** Named none of the three real problems
+** Layer 1\nthe run never started
+*** zod stack overflow at deployment
+*** Self-referential simulation schema
+*** ^4 resolved to 4.5.4
+*** Released 11 days after the framework
+*** Fix: resolutions pin to 4.4.3
+** Layer 2\nthe timeout
+*** sleep = 3,612 s
+*** timeout = 900 s
+*** Could never pass, on any machine
+*** Correct until the delay went 360 s -> 1 h
+*** Fix: derive timeout from the delay
+** Layer 3\nwhy it was loud
+*** Deploy test killed mid-sleep
+*** issuer_address still the default zero
+*** Zero is not a Grumpkin point
+*** Constrained delivery has no fallback
+*** Unconstrained would have failed silently
+** What generalises
+*** A delayed value has a dead window after deployment
+*** Constants in a relationship are written as one
+*** A best-effort path hides what a guaranteed path reports
+*** An unpinned transitive dependency is an unowned decision
+*** A test too slow to run stops reporting
+@endmindmap

@@ -925,3 +925,8 @@ _posts/2026-09-22-bio-launchpad-solana-audit-findings.md
 
 _posts/2026-09-22-cardano-smart-contracts-flashcards.md
   assets/article/blockchain/cardano/2026-09-22-cardano-smart-contracts-flashcards-mindmap.puml                  (mindmap, clustered flashcards)
+
+_posts/2026-09-23-aztec-e2e-test-failure-three-layers.md
+  assets/article/blockchain/aztec/2026-09-23-aztec-e2e-three-layers-mindmap.puml              (mindmap)
+  assets/article/blockchain/aztec/constrained-delivery-invalid-recipient-concept.puml         (concept)
+  assets/article/blockchain/aztec/delayed-issuer-mint-window-workflow.puml                    (workflow)
