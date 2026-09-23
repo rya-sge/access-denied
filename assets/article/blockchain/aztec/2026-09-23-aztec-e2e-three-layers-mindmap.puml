@@ -28,16 +28,17 @@ mindmapDiagram {
 *** Could never pass, on any machine
 *** Correct until the delay went 360 s -> 1 h
 *** Fix: derive timeout from the delay
-** Layer 3\nwhy it was loud
+** Layer 3\nissuer_address still zero
 *** Deploy test killed mid-sleep
 *** issuer_address still the default zero
 *** Zero is not a Grumpkin point
 *** Constrained delivery has no fallback
-*** Unconstrained would have failed silently
+*** Unconstrained would have delivered to nobody
 ** What generalises
 *** A delayed value has a dead window after deployment
 *** Constants in a relationship are written as one
 *** A best-effort path hides what a guaranteed path reports
 *** An unpinned transitive dependency is an unowned decision
 *** A test too slow to run stops reporting
+*** ...and the slowness was avoidable:\nwarp the chain, do not wait for it
 @endmindmap

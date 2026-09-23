@@ -33,9 +33,30 @@ The system under test is a privacy-preserving security token: balances are priva
 
 Three facts about it matter here, and each arrived as a separate, deliberate change:
 
-- **The issuer's address is a `DelayedPublicMutable`.** Every mint, transfer and burn reads it in private, and a value written to such a variable becomes current only after a configured delay. The constructor *schedules* it rather than writing it.
+- **The issuer's address is a `DelayedPublicMutable`.** Every mint, transfer and burn reads it in private, and a value written to such a variable becomes current only after a configured delay. The constructor *schedules* it rather than writing it:
+
+  ```rust
+  // storage
+  issuer_address: DelayedPublicMutable<AztecAddress, CHANGE_ROLES_DELAY_SECONDS, Context>,
+
+  // constructor
+  self.storage.issuer_address.schedule_value_change(admin);
+  ```
+
+  Until the delay elapses, a read returns the type's default. For an `AztecAddress` that default is zero, which matters later.
+
 - **The delay was raised from 360 seconds to one hour.** The old value was an order of magnitude below the framework's own recommendation, and it left a six-minute window in which a transaction had to be proved and included.
-- **The issuer's record of a mint became a constrained delivery.** Previously the issuer received only an offchain copy of each note, which a standard client cannot process at all; the fix was to also emit a `Transfer` event delivered with cryptographic guarantees.
+
+- **The issuer's record of a mint became a constrained delivery.** Previously the issuer received only an offchain copy of each note, which a standard client cannot process at all, so the mint also emits an event:
+
+  ```rust
+  self.emit(Transfer { from: AztecAddress::zero(), to, amount }).deliver_to(
+      issuer,           // read from issuer_address a few lines earlier
+      MessageDelivery::onchain_constrained(),
+  );
+  ```
+
+  An event has no owner and no nullifier, so any recipient's client can process it. `onchain_constrained` is what makes it an unforgeable receipt rather than a claim, and it is the line that turns a zero `issuer` from harmless into fatal.
 
 Each change was reviewed on its own terms. None of them was reviewed against the test suite's constants.
 
@@ -135,7 +156,7 @@ The fix is to derive one from the other, so the relationship is stated rather th
 const LONG_TEST_TIMEOUT = DELAY_MS + 600_000;
 ```
 
-## Layer three: why the failure was loud
+## Layer three: the issuer address was still zero
 
 Here the three changes meet. The deployment test was killed at 900 seconds, in the middle of a sleep that existed precisely so that the scheduled issuer address would become current. It never did. Every subsequent mint read `issuer_address` and got the type's default: the zero address.
 
@@ -151,7 +172,7 @@ So the chain is:
 
 What makes this worth writing down is step 3. Before the auditability change, the issuer received only an *offchain* copy of each note. Offchain delivery is unconstrained, so the same zero address took the `else` branch: a random secret, an undiscoverable tag, and a mint that succeeded while delivering the issuer's copy to nobody.
 
-The change that introduced constrained delivery did not create the bug. It converted a silent, wrong success into a loud, correct failure, and it did so in a code path nobody expected to be exercised, because nobody expected a mint during the first hour after deployment.
+The change that introduced constrained delivery did not create the bug. Before it, the mint completed and the issuer's copy went nowhere; after it, the transaction reverts at simulation with the assertion above. It changed a wrong result into an error, in a code path nobody expected to be exercised, because nobody expected a mint during the first hour after deployment.
 
 ## What generalises
 
@@ -162,11 +183,13 @@ Four points survive the specifics.
 - **A best-effort path hides the bug that a guaranteed path reports.** Unconstrained delivery's fallback is a reasonable design: a malformed recipient should not abort an otherwise valid transaction. The cost is that a wrong address produces no error until something upgrades that delivery to a guaranteed one.
 - **An unpinned transitive dependency is an unowned decision.** Nothing in the project changed between the run that worked and the run that did not; a library eleven days younger than the framework did.
 
-The last one also explains why the failure surfaced now rather than in the change that caused it. The suite had not been run since the delay was raised, because it takes over an hour of wall-clock time, most of it a single `sleep`. A test that is expensive enough to skip is a test that stops reporting.
+The last one also explains why the failure surfaced now rather than in the change that caused it. The suite had not been run since the delay was raised, because it took over an hour of wall-clock time, most of it a single `sleep`. A test that is expensive enough to skip is a test that stops reporting.
+
+And that `sleep` turned out to be unnecessary, which is the sharpest lesson of the four. A local network's L1 is an anvil instance, and the rollup exposes cheat codes that warp it: `RollupCheatCodes.advanceToSlot` moves L1 time and mines, an L2 slot derives from the L1 timestamp, and the clock a private function reads moves with it. One call clears a one-hour delay in seconds. The suite waited an hour not because the clock could not be moved, but because nobody had looked for the method that moves it, and a comment asserting the opposite was copied forward until it read as established fact.
 
 ## Conclusion
 
-The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step. The defect was a test-harness constant that had been correct under a previous configuration, exposed by a delay change, and made fatal by an unrelated auditability change that removed a silent fallback.
+The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step. The defect was a test-harness constant that had been correct under a previous configuration, exposed by a delay change, and made fatal by an unrelated auditability change that replaced a best-effort fallback with a guarantee the address could not meet.
 
 - **The dependency failure was independent** and merely first: an unpinned transitive library, eleven days newer than the framework it serves, broke deployment before any contract logic ran.
 - **The timeout was the defect**, and the only one of the three that was ever wrong.
@@ -187,9 +210,9 @@ The visible error named a cryptographic mechanism: a tagging secret that could n
 | **`DelayedPublicMutable`** | A public state variable whose writes take effect only after a configured delay, which is what makes it readable from a private function. |
 | **Grumpkin** | The elliptic curve Aztec addresses and keys live on, chosen because its arithmetic is native inside the proof system's field. |
 | **Valid address** | An address whose value is the x-coordinate of a real point on Grumpkin; roughly half of all field elements are not, and no shared secret can be derived for those. |
-| **Anchor block** | The historical block a private execution is proved against, and the point from which a transaction's expiry is measured. |
 | **Transitive dependency** | A library a project does not import but receives through one of its dependencies, and whose version the project therefore does not choose unless it pins it. |
 | **`resolutions`** | A package-manager field that forces a version of a package anywhere in the dependency tree, including copies the project never imports directly. |
+| **Cheat codes** | Test-only methods a local network exposes for manipulating chain state, including warping L1 time so that a delay elapses without waiting. |
 
 ### Integration Notes
 
@@ -198,7 +221,7 @@ The visible error named a cryptographic mechanism: a tagging secret that could n
 | A constructor that *schedules* a delayed value leaves it at the type default until the delay elapses. | Treat the first delay after deployment as a window in which value-moving entry points are unavailable, and sequence deployment scripts accordingly. |
 | Constrained delivery to an address that is not a curve point aborts the transaction. | Validate any configurable recipient address before it can reach a constrained delivery, rather than relying on the send to succeed. |
 | Unconstrained and offchain delivery to the same invalid address succeed silently. | Do not infer from a successful send that a recipient received anything; a delivery guarantee exists only in constrained mode. |
-| A test that waits out a real delay cannot be given a fixed timeout. | Derive the timeout from the delay constant, and re-check it whenever the protocol-level delay changes. |
+| A test that waits out a real delay cannot be given a fixed timeout. | Move the chain's clock instead, with the rollup's cheat codes, and keep the wait only as a fallback for real networks; where a wait remains, derive the timeout from the delay constant. |
 | Framework packages declare caret ranges on their own dependencies. | Pin the transitive versions that the framework release was built against, and re-check the pins when upgrading the framework. |
 
 ## Frequently Asked Questions
@@ -227,12 +250,15 @@ Five framework packages declare their dependency on the validation library as `^
 
 **Q: Would running the test suite more often have caught this earlier?**
 
-Yes, and that is the practical lesson. The suite waits out a real delay, so a full run takes over an hour, most of it a single sleep. It was therefore skipped after the delay change, and a test that is expensive enough to skip stops reporting. The structural answer is to keep the fast suite in continuous integration and to run the slow one on a schedule rather than on demand.
+Yes, and that is the practical lesson. The suite waited out a real delay, so a full run took over an hour, most of it a single sleep. It was therefore skipped after the delay change, and a test that is expensive enough to skip stops reporting.
+
+The better answer, though, is to remove the reason it was slow. The wait was avoidable: a local network's L1 is anvil, and warping it through the rollup's cheat codes clears a one-hour delay in seconds, so the suite now runs in minutes. Keeping the fast suite in continuous integration remains worthwhile, but a slow test is worth interrogating before it is scheduled around.
 
 ## References
 
 ### Analyzed source
 
+- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec/) — the token and the test suite described here, analyzed at commit [`cb6111a87f21317c6d3ab226edb80d8b297e4923`](https://github.com/CMTA/private-CMTAT-aztec/tree/cb6111a87f21317c6d3ab226edb80d8b297e4923), 2026-09-23. The quoted storage declaration and constructor are in `contracts/cmtat-aztec/src/main.nr`; the test constants are in `src/test/e2e/index.test.ts`.
 - [AztecProtocol/aztec-nr](https://github.com/AztecProtocol/aztec-nr) — framework sources read at tag [`v5.2.0`](https://github.com/AztecProtocol/aztec-nr/tree/v5.2.0), 2026-09-23. The assertion is in `aztec/src/oracle/resolve_tagging_strategy.nr`; the address validity check is in the protocol-circuit types, `address/aztec_address.nr`.
 
 ### Documentation and libraries
