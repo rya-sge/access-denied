@@ -5,7 +5,7 @@ date:   2026-09-09
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec account-abstraction erc-4337 smart-wallet zkp privacy paymaster
 description: Aztec has no EOAs and no protocol signature scheme, so account validation is proved on the user's device. What that changes against ERC-4337, and what it costs.
 image: /assets/article/blockchain/aztec/2026-09-09-aztec-vs-erc4337-account-abstraction-mindmap.png

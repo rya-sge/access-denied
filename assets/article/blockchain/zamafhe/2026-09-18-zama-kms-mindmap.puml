@@ -16,6 +16,9 @@ mindmapDiagram {
 *** n = 13 parties, t = 4, t < n/3
 *** Maliciously secure, robust MPC
 *** Noah's Ark: noise flooding
+*** Decryption is linear in the key
+*** Each party sends a partial decryption
+*** Parts are combined, shares never are
 *** 128-bit security, p-fail 2^-128
 *** sk never exists in one place
 ** Operations (gRPC)

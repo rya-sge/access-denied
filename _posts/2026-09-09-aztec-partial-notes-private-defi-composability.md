@@ -5,7 +5,7 @@ date:   2026-09-09
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain defi ZKP
+categories: blockchain defi ZKP aztec
 tags: aztec zkp privacy defi smart-contracts
 description: A private function cannot read the price it needs. Partial notes split a note into a private half that fixes the payee and a public half that fixes the amount.
 image: /assets/article/blockchain/aztec/2026-09-09-aztec-partial-notes-mindmap.png

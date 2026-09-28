@@ -4,7 +4,7 @@ title: "Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-462
 date:   2026-09-11
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp privacy token erc20 erc721 erc1155 erc4626 smart-contracts
 description: "Aztec's ERC equivalents share one design: a private note balance and a public balance per account, transfers named by domain, authwits instead of approve."
 image: /assets/article/blockchain/aztec/2026-09-11-aztec-contract-standards-overview-mindmap.png

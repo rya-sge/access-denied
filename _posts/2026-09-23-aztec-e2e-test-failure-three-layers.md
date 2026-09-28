@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "A Test That Could Never Pass — An Aztec End-to-End Failure Three Layers from Its Cause"
+title: "A Test That Could Never Pass — An Aztec Failure, the Explanation That Fitted, and the One That Was True"
 date:   2026-09-23
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec testing debugging noir privacy smart-contracts
-description: "An Aztec test failed on a tagging-secret assertion. The cause was a Jest timeout smaller than the sleep it guarded, and two unrelated changes that made it fatal."
+description: "An Aztec test failed on a tagging-secret assertion. The obvious explanation fitted every symptom and was wrong: the chain had never advanced at all."
 image: /assets/article/blockchain/aztec/2026-09-23-aztec-e2e-three-layers-mindmap.png
 isMath: false
 ---
@@ -21,7 +21,7 @@ Simulation error: Assertion failed: Cannot resolve a constrained tagging secret 
   at messages/delivery/tag.nr:52:37
 ```
 
-Nothing in that message mentions a timeout, a dependency version, or a configuration constant, and all three were involved. The interesting part is not the fix, which is four lines, but the distance between the symptom and the cause, and the fact that two of the three contributing changes were individually correct.
+Nothing in that message mentions a timeout, a dependency version, or a chain that stopped producing blocks, and all three were involved. The interesting part is not the fix, which is a few lines, but that the first explanation fitted every symptom, made a failing test pass when it was applied, and was still not the cause.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -150,52 +150,96 @@ The deployment test performs `await sleep(DELAY_MS)` and runs under `LONG_TEST_T
 
 It was not always wrong. When the delay was 360 seconds, `DELAY_MS` was 372,000 and the 900,000 timeout had more than double the margin it needed. Raising the delay to one hour multiplied one constant by ten and left the other alone. The two had been consistent by coincidence rather than by construction, and nothing connected them.
 
-The fix is to derive one from the other, so the relationship is stated rather than maintained:
+Deriving one from the other states the relationship instead of leaving it to be remembered:
 
 ```ts
 const LONG_TEST_TIMEOUT = DELAY_MS + 600_000;
 ```
 
-## Layer three: the issuer address was still zero
+The deployment test passed after that. The mints still failed, with the same assertion, which is where the interesting part begins: the obvious explanation was available, it fitted every symptom, and it was wrong.
 
-Here the three changes meet. The deployment test was killed at 900 seconds, in the middle of a sleep that existed precisely so that the scheduled issuer address would become current. It never did. Every subsequent mint read `issuer_address` and got the type's default: the zero address.
+## The explanation that fitted and was wrong
 
-Is zero a valid Aztec address? It is the x-coordinate 0, and `y² = −17` has no solution in this field, so no. It is exactly the kind of value the framework's `is_valid()` rejects.
+It reads plausibly. The deployment test is killed at 900 seconds, in the middle of a sleep that exists precisely so the scheduled issuer address becomes current. It never does. Every later mint reads `issuer_address`, gets the type's default, and the default is the zero address.
 
-So the chain is:
+The rest follows mechanically, and this part is correct:
 
-1. the deployment test dies before the delay elapses;
-2. `issuer_address` is still the default zero;
-3. a mint emits a `Transfer` event to the issuer with `onchain_constrained` delivery;
-4. constrained delivery resolves a tagging secret for the recipient;
-5. the recipient is not a curve point, and constrained mode has no fallback, so it panics.
+1. `issuer_address` reads as zero;
+2. a mint emits a `Transfer` event to the issuer with `onchain_constrained` delivery;
+3. constrained delivery resolves a tagging secret for the recipient;
+4. the recipient is not a curve point, constrained mode has no fallback, so it panics.
 
-What makes this worth writing down is step 3. Before the auditability change, the issuer received only an *offchain* copy of each note. Offchain delivery is unconstrained, so the same zero address took the `else` branch: a random secret, an undiscoverable tag, and a mint that succeeded while delivering the issuer's copy to nobody.
+Zero is an invalid address. `is_valid()` asks whether `y² = x³ − 17` has a solution at that x, and at zero it does not; about half of all field elements fail the same test.
 
-The change that introduced constrained delivery did not create the bug. Before it, the mint completed and the issuer's copy went nowhere; after it, the transaction reverts at simulation with the assertion above. It changed a wrong result into an error, in a code path nobody expected to be exercised, because nobody expected a mint during the first hour after deployment.
+But the story has a hole, and the hole is visible in the run that followed the timeout fix. With a timeout large enough to survive the sleep, **the deployment test passed** and the mints failed anyway. It also asserted, on the way through, that the issuer address was set:
+
+```ts
+const { result: onChainIssuer } = await token.methods.public_get_issuer().simulate({ from: issuer });
+expect(onChainIssuer.toString()).toEqual(issuer.toString());
+```
+
+That assertion passed. The issuer address was current. And the next transaction to read it in private still saw zero.
+
+## The actual cause: the chain never moved
+
+Two measurements settled it. First, the chain tip against the wall clock:
+
+```
+wall clock            : 1790172319
+block  42 timestamp   : 1790154805   (now - ts = 17514s)
+block  41 timestamp   : 1790154733
+block  40 timestamp   : 1790154661
+```
+
+The tip was **4.9 hours behind real time**, and the three most recent blocks were 72 seconds apart — one slot — and then nothing. A local network's L1 is an anvil instance whose clock does not track wall time while idle, and no transactions meant no blocks. Sleeping for an hour moved nothing a contract could observe.
+
+Second, what warping does and does not do. Warping L1 through the rollup's cheat codes, then re-reading the tip:
+
+```
+BEFORE: tip=42 ts=1790154805
+AFTER : tip=42 ts=1790154805      chain advanced by 0s
+```
+
+L1 moved; L2 did not. The sequencer builds a block when there is a transaction to put in it, not because time passed. Submitting any transaction after the warp produced one:
+
+```
+before: tip=42 ts=1790154805
+after : tip=43 ts=1790158477       (+3,672s, exactly the 51 slots warped)
+```
+
+That is the whole mechanism, and it explains the contradiction:
+
+- **A public simulation is evaluated at the current time.** `public_get_issuer()` therefore returned the right answer.
+- **A private function is proved against the chain tip.** With no block past `effective_at`, `get_current_value()` still returned the pre-delay default.
+
+The two views of the same variable disagreed, and the test asserted the one that could not fail.
+
+What makes the auditability change part of the story is step 2 above. Before it, the issuer received only an *offchain* copy of each note, and offchain delivery is unconstrained: the same zero address took the `else` branch, got a random secret and an undiscoverable tag, and the mint completed while delivering the issuer's copy to nobody. The change did not create the bug. It replaced a wrong result with an error, in a code path nobody expected to be exercised.
 
 ## What generalises
 
-Four points survive the specifics.
+Five points survive the specifics.
 
-- **A delayed value has a dead window after deployment, and the contract is partly unusable inside it.** If a constructor schedules rather than writes, everything reading that value sees the default until the delay elapses. That is a documented property of the mechanism; what is easy to miss is that it makes some entry points fail outright rather than merely read a stale value.
+- **Waiting is not the same as time passing.** A development chain's clock is not the wall clock. Anvil does not advance while idle, and an L2 block exists only when a transaction is included, so a `sleep` in a test moves nothing a contract can observe. Any test that waits for an on-chain deadline has to move the chain and then check that it moved.
+- **A public view and a private read are two different questions.** A public simulation is evaluated at the current time; a private function is proved against the chain tip. They can disagree about the same variable, and a test that asserts the public one has asserted the easier question.
+- **A delayed value has a dead window after deployment.** If a constructor schedules rather than writes, everything reading that value sees the default until the delay elapses *and* a block exists past that point. What is easy to miss is that some entry points then fail outright rather than read a stale value.
 - **Two constants in a fixed relationship should be written as that relationship.** `LONG_TEST_TIMEOUT = 900_000` was correct for one value of a delay it did not mention. Deriving it costs nothing and removes an invariant from the list of things a human has to remember.
-- **A best-effort path hides the bug that a guaranteed path reports.** Unconstrained delivery's fallback is a reasonable design: a malformed recipient should not abort an otherwise valid transaction. The cost is that a wrong address produces no error until something upgrades that delivery to a guaranteed one.
 - **An unpinned transitive dependency is an unowned decision.** Nothing in the project changed between the run that worked and the run that did not; a library eleven days younger than the framework did.
 
-The last one also explains why the failure surfaced now rather than in the change that caused it. The suite had not been run since the delay was raised, because it took over an hour of wall-clock time, most of it a single `sleep`. A test that is expensive enough to skip is a test that stops reporting.
+Two of these only became visible because the first explanation was tested rather than believed. The timeout was a real defect, it fitted every symptom, and fixing it changed the outcome — the deployment test started passing. It was still not the cause of the failure being investigated, and the evidence that said so was one assertion passing in a test whose later steps failed. A fix that improves the symptoms is the easiest kind of wrong answer to keep.
 
-And that `sleep` turned out to be unnecessary, which is the sharpest lesson of the four. A local network's L1 is an anvil instance, and the rollup exposes cheat codes that warp it: `RollupCheatCodes.advanceToSlot` moves L1 time and mines, an L2 slot derives from the L1 timestamp, and the clock a private function reads moves with it. One call clears a one-hour delay in seconds. The suite waited an hour not because the clock could not be moved, but because nobody had looked for the method that moves it, and a comment asserting the opposite was copied forward until it read as established fact.
+The sleep is gone as well. `RollupCheatCodes.advanceToSlot` warps L1, one transaction produces the L2 block that carries the new timestamp, and a one-hour delay clears in seconds. The suite waited an hour not because the clock could not be moved, but because nobody had looked for the method that moves it, and a comment asserting the opposite was copied forward until it read as established fact.
 
 ## Conclusion
 
-The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step. The defect was a test-harness constant that had been correct under a previous configuration, exposed by a delay change, and made fatal by an unrelated auditability change that replaced a best-effort fallback with a guarantee the address could not meet.
+The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step, and so did the contract. What failed was the test's model of time.
 
 - **The dependency failure was independent** and merely first: an unpinned transitive library, eleven days newer than the framework it serves, broke deployment before any contract logic ran.
-- **The timeout was the defect**, and the only one of the three that was ever wrong.
-- **The delay change and the auditability change were both correct**, and both are what turned a latent inconsistency into a hard failure.
+- **The timeout was a genuine defect** — a test that slept longer than the timeout guarding it could never pass — but fixing it did not fix the mints, and the difference between those two facts is the point of the article.
+- **The cause was that the chain never advanced.** Anvil's clock does not follow wall time, an L2 block needs a transaction, and a private read is anchored to the tip. The issuer address was set in public and unset in private at the same moment.
+- **The auditability change made it visible.** A constrained delivery to the zero address cannot be served, where the earlier unconstrained one silently delivered to nobody.
 
-![Mindmap of an Aztec end-to-end debugging case, covering the tagging-secret symptom, the zod dependency pin, the timeout smaller than its sleep, the delayed issuer address, and the four lessons that generalise]({{site.url_complet}}/assets/article/blockchain/aztec/2026-09-23-aztec-e2e-three-layers-mindmap.png)
+![Mindmap of an Aztec end-to-end debugging case, covering the tagging-secret symptom, the zod dependency pin, the timeout smaller than its sleep, the explanation that fitted but was wrong, the chain that never advanced, and the lessons that generalise]({{site.url_complet}}/assets/article/blockchain/aztec/2026-09-23-aztec-e2e-three-layers-mindmap.png)
 
 ## Annex
 
@@ -221,7 +265,8 @@ The visible error named a cryptographic mechanism: a tagging secret that could n
 | A constructor that *schedules* a delayed value leaves it at the type default until the delay elapses. | Treat the first delay after deployment as a window in which value-moving entry points are unavailable, and sequence deployment scripts accordingly. |
 | Constrained delivery to an address that is not a curve point aborts the transaction. | Validate any configurable recipient address before it can reach a constrained delivery, rather than relying on the send to succeed. |
 | Unconstrained and offchain delivery to the same invalid address succeed silently. | Do not infer from a successful send that a recipient received anything; a delivery guarantee exists only in constrained mode. |
-| A test that waits out a real delay cannot be given a fixed timeout. | Move the chain's clock instead, with the rollup's cheat codes, and keep the wait only as a fallback for real networks; where a wait remains, derive the timeout from the delay constant. |
+| Waiting in wall-clock time does not advance a development chain. | Warp L1 with the rollup's cheat codes, submit one transaction so an L2 block carries the new timestamp, and assert the tip moved before depending on it. |
+| A public view and a private read of the same delayed variable can disagree. | Assert the private path, or the block timestamp, rather than the public getter; the getter is evaluated at the current time and will pass first. |
 | Framework packages declare caret ranges on their own dependencies. | Pin the transitive versions that the framework release was built against, and re-check the pins when upgrading the framework. |
 
 ## Frequently Asked Questions
@@ -244,6 +289,16 @@ No, and it is the reason the problem was found. Before it, the issuer's copy of 
 
 The test slept for the delay plus a small margin, under a hard-coded timeout of 900 seconds. At 360 seconds the sleep was 372 seconds and fitted comfortably. At 3,600 seconds it did not, and no machine or configuration could make it fit. The two constants had a required relationship that was never written down, so changing one of them silently invalidated the other.
 
+Note what this did and did not explain. Fixing it made the deployment test pass, which looked like progress, but the mints kept failing: the sleep had never been advancing the chain in the first place. A change that improves the symptoms is not evidence that it addressed the cause.
+
+**Q: How can a public getter and a private function disagree about the same storage variable?**
+
+They are answering at different times. A public view is a simulation the node evaluates against the current timestamp, so it sees a scheduled value that has become current. A private function is proved against the chain tip, and its reads are evaluated at that block's timestamp.
+
+When no block has been produced since the value became effective, the two diverge: the getter returns the new value and the private read returns the old one. A test that asserts only the public view has asserted the question that cannot fail.
+
+The fix is not to assert harder but to advance the chain: warp the clock, submit one transaction so a block carries the new timestamp, and verify the tip moved before relying on it.
+
 **Q: How could an unpinned dependency break a project whose own code did not change?**
 
 Five framework packages declare their dependency on the validation library as `^4`, which permits any 4.x release. A resolution taken after a newer 4.x appeared installed a version published eleven days after the framework, containing a recursion check that overflows on a self-referential schema the framework uses. Nothing in the project changed; what changed was what `^4` meant on the day the dependencies were resolved.
@@ -252,7 +307,7 @@ Five framework packages declare their dependency on the validation library as `^
 
 Yes, and that is the practical lesson. The suite waited out a real delay, so a full run took over an hour, most of it a single sleep. It was therefore skipped after the delay change, and a test that is expensive enough to skip stops reporting.
 
-The better answer, though, is to remove the reason it was slow. The wait was avoidable: a local network's L1 is anvil, and warping it through the rollup's cheat codes clears a one-hour delay in seconds, so the suite now runs in minutes. Keeping the fast suite in continuous integration remains worthwhile, but a slow test is worth interrogating before it is scheduled around.
+The better answer, though, is to remove the reason it was slow, and in this case the wait was not merely expensive but ineffective. Warping the chain and forcing one block took the suite from 3,698 seconds to 142 seconds, and from eight failures to none in the token suite. Keeping the fast suite in continuous integration remains worthwhile, but a slow test is worth interrogating before it is scheduled around.
 
 ## References
 

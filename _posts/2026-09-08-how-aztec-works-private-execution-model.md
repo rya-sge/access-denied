@@ -4,7 +4,7 @@ title: "How Aztec Works — Private Execution, Notes and Nullifiers, and a Compa
 date:   2026-09-08
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp privacy zcash railgun canton fhe rollup
 description: Aztec runs private functions on the user's device and public ones on the sequencer. Notes, nullifiers, what a transaction still leaks, and four rival designs.
 image: /assets/article/blockchain/aztec/2026-09-08-aztec-privacy-protocol-mindmap.png

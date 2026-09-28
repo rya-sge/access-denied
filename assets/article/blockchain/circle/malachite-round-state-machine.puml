@@ -1,0 +1,20 @@
+@startuml
+title Tendermint round as run by Malachite on Arc (simplified)
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+[*] --> Propose : new height h, round 0
+Propose : proposer builds block via EL\nothers wait timeout_propose\n(3 s + r * 0.5 s)
+Propose --> Prevote : valid proposal received\n-> prevote(block)
+Propose --> Prevote : timeout or invalid\nor timestamp skew -> prevote(nil)
+Prevote : wait for >2/3 prevotes\n(timeout_prevote 1 s + r * 0.5 s)
+Prevote --> Precommit : polka for block -> lock, precommit(block)
+Prevote --> Precommit : polka nil / timeout -> precommit(nil)
+Precommit : wait for >2/3 precommits\n(timeout_precommit 1 s + r * 0.5 s)
+Precommit --> Decide : >2/3 precommits for block
+Precommit --> Propose : no decision -> round r+1,\nnext proposer in rotation
+Decide : commit certificate =\nlist of Ed25519 precommits
+Decide --> [*] : finalize in EL, height h+1
+@enduml

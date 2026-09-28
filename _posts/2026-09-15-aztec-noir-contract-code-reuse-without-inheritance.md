@@ -5,7 +5,7 @@ date:   2026-09-15
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp noir smart-contracts solidity token
 description: "Aztec contracts cannot inherit. What a contract module must own, what a Noir library can hold, and how a trait replaces virtual methods, on a two-variant token."
 image: /assets/article/blockchain/aztec/2026-09-15-aztec-code-reuse-mindmap.png
@@ -381,6 +381,10 @@ A contract dependency gives you a call interface, not code, and it brings that c
 Because the module's private `impl` does not offer a read on a `PublicMutable`, and that is deliberate: a private function is proved against a past block and cannot know the current value. The type system enforces in the library what the protocol would refuse at proving time. The private entry point enqueues the contract's own `#[only_self]` public function, which reads the flag in the public phase, one of the four things that must stay in the contract block.
 
 ## References
+
+### Analyzed source
+
+- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec) — the privacy-preserving CMTAT security token this article's examples come from, analyzed at commit [`f437cbeb15f71cb9e667ea893b594d31cc118678`](https://github.com/CMTA/private-CMTAT-aztec/tree/f437cbeb15f71cb9e667ea893b594d31cc118678), 2026-09-15: `lib/src/modules/` for the module structs held as storage fields, `tokenModule.nr` for the value-moving chains shared by the variants, and the three `contracts/*/src/main.nr` for the entry-point declarations Noir requires in the contract module
 
 - [Aztec.nr — Contract structure and its "Current Limitations"](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/contract_structure)
 - [Aztec.nr — Attributes and macros (`#[external]`, `#[internal]`, `#[only_self]`)](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/functions/attributes)

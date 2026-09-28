@@ -28,17 +28,25 @@ mindmapDiagram {
 *** Could never pass, on any machine
 *** Correct until the delay went 360 s -> 1 h
 *** Fix: derive timeout from the delay
-** Layer 3\nissuer_address still zero
-*** Deploy test killed mid-sleep
-*** issuer_address still the default zero
-*** Zero is not a Grumpkin point
-*** Constrained delivery has no fallback
-*** Unconstrained would have delivered to nobody
+** The fitting wrong answer
+*** Timeout killed the sleep,\nso the issuer stayed zero
+*** Fitted every symptom
+*** Fixing it made the deploy test pass
+*** The mints still failed
+** The actual cause
+*** Anvil's clock does not follow wall time
+*** Tip was 4.9 hours behind
+*** A warp moves L1, not L2
+*** An L2 block needs a transaction
+*** Public view reads "now",\nprivate read reads the tip
+*** Zero is not a Grumpkin point,\nso constrained delivery panics
 ** What generalises
 *** A delayed value has a dead window after deployment
 *** Constants in a relationship are written as one
 *** A best-effort path hides what a guaranteed path reports
 *** An unpinned transitive dependency is an unowned decision
 *** A test too slow to run stops reporting
-*** ...and the slowness was avoidable:\nwarp the chain, do not wait for it
+*** Waiting is not time passing
+*** A fix that improves symptoms\nis not proof of the cause
+*** 3,698s and 8 failures -> 142s and 0
 @endmindmap

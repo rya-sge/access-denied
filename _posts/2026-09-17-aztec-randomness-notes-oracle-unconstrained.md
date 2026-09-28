@@ -4,7 +4,7 @@ title: "Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never
 date:   2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp noir privacy smart-contracts cryptography
 description: "Every random value in an Aztec contract comes from one unconstrained oracle backed by the client's CSPRNG: what it blinds, its limits, and why that is safe."
 image: /assets/article/blockchain/aztec/2026-09-17-aztec-randomness-mindmap.png

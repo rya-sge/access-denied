@@ -5,7 +5,7 @@ date:   2025-10-29
 last_modified_at: 2026-09-08
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: zk aztec circuit
 description: Aztec L2 enables private, composable smart contracts on Ethereum using zero-knowledge proofs and hybrid public/private state.
 image: /assets/article/blockchain/aztec/aztec-mindmap.png

@@ -1,0 +1,29 @@
+@startuml
+title Arc fee routing: current implementation vs. whitepaper target
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam partition {
+  BorderColor #2E8B67
+}
+|Today (arc-node v0.8.x)|
+start
+:Transaction pays gas in native USDC\n(EWMA base fee, 20-20,000 gwei bounds);
+:reward_beneficiary():\nbase fee + priority fee;
+:Credit full amount in USDC\nto proposer's --suggested-fee-recipient;<<#EAF6F0>>
+note right: no burn, no conversion,\nno staker share, no issuance
+|Whitepaper target (post-PoS)|
+:Fee priced in stablecoin,\npaid in USDC, other stables, ARC or future assets;
+:Protocol-level conversion to ARC\n"at block settlement";<<#FFF4E0>>
+note right: price source\nnot specified
+split
+  :Distribution:\nvalidator commission,\nremainder to stakers pro rata;
+split again
+  :Permanent burn\n(ratio set by governance);<<#FDEEEE>>
+end split
+:Plus inflation-funded ARC issuance\n(decaying from ~2-3%);
+stop
+@enduml

@@ -5,7 +5,7 @@ date:   2026-09-11
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp privacy erc20 erc7984 fhe token smart-contracts solidity
 description: "AIP-20 gives each account a private note balance and a public one, swaps approve for authwits and reverts on shortfall. ERC-7984 hides amounts, never reverts."
 image: /assets/article/blockchain/aztec/2026-09-11-aip20-vs-erc20-erc7984-mindmap.png

@@ -33,7 +33,7 @@ Everything else in the architecture exists to connect those two ideas: to get a 
 
 ## The six components
 
-![The six components of the Zama protocol: host contracts and the FHEVM library on the host chain, coprocessors and KMS off-chain, the Gateway rollup between them, and the relayer and oracle at the edge]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-fhevm-components-concept.png)
+![The six components of the Zama protocol: host contracts and the FHEVM library on the host chain, coprocessors and KMS off-chain, the Gateway rollup between them, and the relayer at the edge]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-fhevm-components-concept.png)
 
 ### FHEVM Solidity library
 
@@ -84,9 +84,11 @@ The KMS is a network of thirteen MPC nodes run by independent organisations. At 
 
 Each node runs inside an AWS Nitro Enclave, and the key lifecycle follows [NIST SP 800-57](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final), with rotation done by FHE key switching so that existing ciphertexts stay usable. The KMS is orchestrated by the Gateway and signs every result it returns.
 
-### Relayer and oracle
+### Relayer
 
-Two lightweight services sit at the edge. The *relayer* is an HTTP endpoint that lets a browser or a mobile app register an encrypted input and request a user decryption without sending transactions to the Gateway itself. The *oracle* watches for on-chain public decryption requests, waits for the signed KMS result, and calls the requesting contract back with it. Neither is trusted: a user can run their own relayer or talk to the Gateway directly, and a contract verifies the oracle's callback against the KMS signatures.
+One lightweight service sits at the edge. The *relayer* is an HTTP endpoint that lets a browser or a mobile app register an encrypted input, request a user decryption, or obtain a public decryption result, without sending transactions to the Gateway itself. It is not trusted: a user can run their own relayer or talk to the Gateway directly, and every result it carries is signed by the KMS and verified by whoever receives it.
+
+Earlier versions of the protocol also had an *oracle*, a service that carried public decryption results back to the requesting contract; the protocol documentation still describes it, but it was removed from the library in version 0.9 and the result is now submitted by whoever wants it on-chain.
 
 ## Three keys, three locations
 
@@ -136,8 +138,12 @@ Every coprocessor sees the event, evaluates the operation, and stores the result
 
 Two paths exist. Both start with the Gateway refusing any request for a handle whose ciphertext material has not reached consensus, and both end with a result signed by the KMS.
 
-- **Public decryption** is used when a contract needs the plaintext. The contract marks the handle publicly decryptable, a request goes to `Decryption` on the Gateway, the KMS nodes fetch the ciphertext, run the threshold protocol, and each signs the plaintext. Once the public decryption threshold of responses is reached, the oracle posts the plaintext to the contract, which verifies the signatures through `KMSVerifier`.
+- **Public decryption** is used when a value should become readable by everyone. The contract marks the handle publicly decryptable with `FHE.makePubliclyDecryptable`, and that is the end of its involvement. Any off-chain party then asks the relayer for the plaintext, receives it with the KMS signatures, and submits both back to a function of the contract, which checks them with `FHE.checkSignatures`. Earlier versions of the protocol had an on-chain oracle carry the result back; it was removed in library version 0.9, and no component is now obliged to complete the round trip.
 - **User decryption** is used when only one person should see the value. The user generates an ephemeral key pair, signs its public key with their wallet (EIP-712), and submits the handle, the contract address and the signature. The KMS checks the ACL entry for that user and that contract, decrypts, and re-encrypts the plaintext under the user's ephemeral key. The user decrypts locally; the plaintext never touches a chain, a relayer or the Gateway.
+
+**A user decryption is not a transaction.** This is worth stating plainly, because "submits the handle, the contract address and the signature" reads like an on-chain call and is not one. The holder makes a free `view` call to read the handle, signs an EIP-712 object in their wallet, and sends the request to the relayer over HTTP. No gas is paid, nothing is written on any chain, and a refusal costs nothing and leaves no trace, so a holder with an empty wallet can still read its balance and reads cannot be observed or rate-limited on-chain. The on-chain part happened earlier and on its own: the read permission the contract wrote when the balance changed, which a holder always receives for its own balance.
+
+The two paths are therefore mirror images. A user decryption needs a permission and no transaction; a public decryption needs a transaction first, to mark the handle, and afterwards no permission at all.
 
 ## Access control is the hinge
 
@@ -159,7 +165,7 @@ The host chain's ACL is authoritative, but the enforcement at decryption time ha
 
 ## What has to be trusted
 
-![Trust boundaries of the Zama protocol: on-chain host contracts as the authoritative but upgradeable base, coprocessors under an honest-majority and staking assumption, the Gateway trusted only for liveness, the KMS under a two-thirds threshold inside Nitro Enclaves, and untrusted relayer and oracle]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-fhevm-trust-model-concept.png)
+![Trust boundaries of the Zama protocol: on-chain host contracts as the authoritative but upgradeable base, coprocessors under an honest-majority and staking assumption, the Gateway trusted only for liveness, the KMS under a two-thirds threshold inside Nitro Enclaves, and an untrusted relayer]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-fhevm-trust-model-concept.png)
 
 The protocol is not trustless; it is trust-distributed, with a different assumption for each component. The table states, for each one, what a misbehaving instance could achieve and what the protocol does about it.
 
@@ -169,7 +175,7 @@ The protocol is not trustless; it is trust-distributed, with a different assumpt
 | **Coprocessors** | More than half of them are honest | A minority can only produce a divergent digest that loses the vote; a colluding majority could attest a wrong ciphertext and nobody would detect it from the chain | Redundant execution with commitment consensus on the Gateway; anyone can recompute an operation and compare; operators stake ZAMA and can be slashed through governance; operators are public, named organisations |
 | **Gateway** | None for confidentiality or correctness; availability only | Can delay or drop input attestations and decryption requests | Cannot read, forge or alter a value: every input is signed by coprocessors and every plaintext by the KMS; the rollup is replaceable |
 | **KMS** | At most one third of the 13 nodes are malicious | Below the threshold, nothing; above it, the private key could be reconstructed and every ciphertext in the system read | Threshold MPC with a 2/3 rule and robust output delivery; each node's share lives inside a Nitro Enclave the operator cannot open; enclave attestation of the software version; custodial backup shares held by separate parties |
-| **Relayer and oracle** | None | Can delay a request or refuse to serve it | Results are signed by the KMS and verified by the recipient; anyone can run a replacement |
+| **Relayer** | None | Can delay a request or refuse to serve it | Results are signed by the KMS and verified by the recipient; anyone can run a replacement, or bypass it entirely |
 | **User's device** | The client library and the environment are honest | A compromised client sees the user's own plaintexts | Nothing in the protocol protects against it; it is outside the trust boundary |
 | **The FHE scheme** | TFHE with 128-bit security and a failure probability of 2^-128 per operation | A cryptanalytic break would read every ciphertext | The scheme is lattice-based and considered post-quantum; the proof system on inputs is not, which is the one non-post-quantum piece |
 
@@ -205,7 +211,7 @@ The Zama protocol keeps FHE off the host chain and replaces it with two on-chain
 - **The ACL is checked at use and at read**, is never revoked, and is replicated to the Gateway for the KMS to enforce.
 - **Correctness is attested by majority**, not proven: redundant execution, commitment consensus and slashing, with ZK-FHE as the announced replacement.
 - **Confidentiality is a 2/3-of-13 threshold plus enclaves**, with ZK-MPC as the announced replacement for the hardware assumption.
-- **The Gateway, relayer and oracle are trusted for liveness only.**
+- **The Gateway and the relayer are trusted for liveness only.**
 
 ![Mindmap of the Zama FHEVM architecture covering the two design ideas, the six components, the three keys, the life of a value, access control and the trust model]({{site.url_complet}}/assets/article/blockchain/zamafhe/2026-09-18-zama-fhevm-architecture-mindmap.png)
 
@@ -255,6 +261,12 @@ The Zama protocol keeps FHE off the host chain and replaces it with two on-chain
 
 Nothing homomorphic. `FHEVMExecutor.fheAdd` checks that the caller is allowed on both input handles, checks their types agree, derives the result handle by hashing the operation, the inputs, the ACL address, the chain id, the previous block hash and the timestamp, grants the caller transient access to that handle, charges HCU, and emits an event. The addition itself is performed later by every coprocessor that reads the event.
 
+**Q: If the coprocessors do the arithmetic, why does the Solidity library have `add` and `sub` at all?**
+
+Because the contract decides *which* arithmetic is performed, on which values, under which permissions — it just does not perform it. A confidential token calls `FHE.add` the way a program emits an instruction: the call goes to `Impl.add`, which calls `FHEVMExecutor.fheAdd`, which checks the ACL and the types, derives the result handle, charges HCU and emits the event. The returned `euint64` is `bytes32`: a name for a value that does not exist yet. Every coprocessor reading the event then computes the ciphertext and stores it under that name.
+
+This is what makes the token contract readable as ordinary Solidity. `_update` in OpenZeppelin's `ERC7984` subtracts from one balance and adds to another exactly as an ERC-20 would, and the fact that every one of those operations is a deferred instruction rather than a computation changes nothing in the code — only in when the result exists. Which is also why a contract can never branch on an encrypted value: at the moment the `if` would run, nothing has been computed.
+
 **Q: Why does the `inputProof` in calldata contain signatures rather than the zero-knowledge proof?**
 
 Because verifying the proof on-chain would be far too expensive. The proof is verified off-chain by each coprocessor; what the chain receives is their EIP-712 signatures over the resulting handles, the user address, the contract address and the chain id. `InputVerifier` recovers the signers and requires a threshold of distinct registered coprocessors. The zero-knowledge proof protects the coprocessors from malformed ciphertexts; the signatures protect the chain from unverified ones.
@@ -265,7 +277,7 @@ The KMS, and specifically more than one third of its thirteen nodes, since the t
 
 - A compromised **coprocessor** holds every ciphertext but only the evaluation key, so it can compute but not read.
 - A compromised **Gateway** can delay requests but sees no plaintext.
-- A compromised **relayer or oracle** handles only signed or re-encrypted data.
+- A compromised **relayer** handles only signed or re-encrypted data.
 
 The other way in is the FHE scheme itself, which is a cryptanalytic question rather than an operational one.
 

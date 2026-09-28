@@ -38,9 +38,8 @@ package "Off-chain operators" {
   component "KMS (13 MPC nodes)\nNitro Enclaves\nthreshold decryption" as kms
 }
 
-package "Edge services (untrusted)" {
-  component "Relayer" as relayer
-  component "Oracle" as oracle
+package "Edge service (untrusted)" {
+  component "Relayer\npublicDecrypt, userDecrypt" as relayer
 }
 
 user --> relayer : encrypt + ZKPoK\nuser decryption request
@@ -58,8 +57,9 @@ cop --> gcc : ciphertext digests
 cop --> gcfg : ACL replica
 gdec --> kms : decrypt request
 kms --> gdec : signed plaintext
-gdec --> oracle : public result
-oracle --> dapp : callback
+gdec --> relayer : signed plaintext
+relayer --> user : result + KMS signatures
+user --> dapp : submit(cleartext, proof)
 dapp --> kv : checkSignatures
 gdec --> relayer : re-encrypted result
 @enduml

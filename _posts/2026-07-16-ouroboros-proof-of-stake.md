@@ -176,3 +176,4 @@ Through the reward formula rather than a hard rule. The formula defines a desira
 
 - [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/)
 - [Cardano On-Chain Governance: The Voltaire Era and CIP-1694]({{site.url_complet}}/2026/07/16/cardano-voltaire-governance-cip-1694/)
+- [Malachite Consensus on Arc — How Circle's L1 Finalises a Block, Compared with CometBFT, HotStuff and Gasper]({{site.url_complet}}/2026/09/25/malachite-consensus-arc/)

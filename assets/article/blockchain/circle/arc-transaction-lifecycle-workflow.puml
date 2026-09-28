@@ -1,0 +1,24 @@
+@startuml
+title Arc transaction lifecycle today (arc-node)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+}
+actor User
+participant "RPC node\n(EL, Reth)" as RPC
+participant "Txpool\n(tip-ordered + Denylist)" as POOL
+participant "Proposer\n(round-robin)" as PROP
+participant "Validators\n(Malachite BFT)" as VALS
+participant "EVM handler" as EVM
+User -> RPC : eth_sendRawTransaction (gas in USDC)
+RPC -> POOL : validate, blocklist check
+note right of POOL : pending-tx RPC hidden,\nbundles disabled,\nno encryption
+PROP -> POOL : select txs by tip
+PROP -> VALS : propose block ((h-1+r) mod n)
+VALS -> VALS : prevote / precommit\n(2/3+ voting power)
+VALS -> EVM : decided block executed
+EVM -> PROP : base fee + tip credited\nto fee recipient (USDC)
+EVM --> User : final in one block\n(~0.5 s target)
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+title Threshold decryption: the key is used, never assembled
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor #7A5BB5
+}
+skinparam note {
+  BackgroundColor #F8F5FC
+  BorderColor #7A5BB5
+}
+skinparam ArrowColor #7A5BB5
+
+component "Ciphertext (a, b)\nmask and body\nb = <a,s> + D*m + e" as CT
+
+package "13 KMS parties — each holds one share" {
+  component "Party 1\nshare s1\ncomputes b - <a,s1>\n+ flooding noise" as P1
+  component "Party 2\nshare s2\ncomputes b - <a,s2>\n+ flooding noise" as P2
+  component "...\nup to party 13" as PN
+}
+
+component "Combine the partial decryptions\n(Lagrange, coefficients sum to 1)\nthen round" as CB
+component "Plaintext m" as M
+
+CT --> P1
+CT --> P2
+CT --> PN
+P1 --> CB : partial decryption
+P2 --> CB : partial decryption
+PN --> CB : partial decryption
+
+CB --> M
+
+note right of CB #F8F5FC
+  What is combined are values
+  derived from THIS ciphertext.
+  The shares s1..s13 are never
+  added, sent or reconstructed.
+end note
+
+note bottom of PN #F8F5FC
+  A partial decryption is a linear equation in the share,
+  so each one is masked with large noise before it leaves
+  the party (noise flooding).
+end note
+@enduml

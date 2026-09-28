@@ -5,7 +5,7 @@ date:   2026-09-14
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp privacy smart-contracts token
 description: A private Aztec function cannot read a public flag. DelayedPublicMutable allows it, at the price of a delay that also caps how long the transaction stays valid.
 image: /assets/article/blockchain/aztec/2026-09-14-aztec-delayed-public-mutable-mindmap.png
@@ -306,6 +306,10 @@ Because the guarantee behind every private read is that a value cannot change ea
 The kernel keeps the minimum, so the transaction expires 1,000 seconds after its anchor block. An observer computing `expiration - anchor` sees 1,000 and places the transaction in the privacy set of every contract using that delay. If the 1,000-second contract is the only one with that value, the observer learns that the transaction interacted with it, and learns nothing about the 10,000-second contract.
 
 ## References
+
+### Analyzed source
+
+- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec) — the privacy-preserving CMTAT security token this article's examples come from, analyzed at commit [`0231c2bc5efe4cee1c6355588bfd5a18273d6482`](https://github.com/CMTA/private-CMTAT-aztec/tree/0231c2bc5efe4cee1c6355588bfd5a18273d6482), 2026-09-14: `lib/src/modules/enforcementModule.nr` and `validationModule.nr` for the delayed freeze and list flags and `CHANGE_ROLES_DELAY_SECONDS`, and `contracts/cmtat-aztec/src/main.nr` for the `PublicMutable` pause checked in the enqueued `_transfer`
 
 - [Aztec.nr state variables documentation, DelayedPublicMutable section](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/state_variables#delayedpublicmutable)
 - [Aztec.nr contract upgrades documentation, transaction expiration](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/contract_upgrades#transaction-expiration)

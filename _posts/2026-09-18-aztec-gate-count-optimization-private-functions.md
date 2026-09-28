@@ -4,7 +4,7 @@ title: "Gates on Aztec — What a Private Function Costs, Where the Cost Hides, 
 date:   2026-09-18
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp noir smart-contracts gas privacy
 description: "On Aztec a private function's gate count is proving time on the user's device: kernel overhead, budgets, deliveries, reads, and seven measured optimisations."
 image: /assets/article/blockchain/aztec/2026-09-18-aztec-gates-mindmap.png
@@ -280,7 +280,7 @@ Unconstrained delivery skips the in-circuit encryption and saves about 20,000 ga
 
 - [AztecProtocol/aztec-nr](https://github.com/AztecProtocol/aztec-nr) — analyzed at tag [v5.2.0](https://github.com/AztecProtocol/aztec-nr/tree/v5.2.0), commit [`22e152679f69a2307fdb1b17f60fd4f51a3fd4f5`](https://github.com/AztecProtocol/aztec-nr/tree/22e152679f69a2307fdb1b17f60fd4f51a3fd4f5), 2026-09-18: `balance-set/src/balance_set.nr` (`sub`, `try_sub` and its comment on `max_notes`)
 - [CMTA/aztec-standards](https://github.com/CMTA/aztec-standards) — the AIP-20 `Token` whose note-budget scheme case 3 adopts (`INITIAL_TRANSFER_CALL_MAX_NOTES = 2`, `RECURSIVE_TRANSFER_CALL_MAX_NOTES = 8`), analyzed at commit [`5433e9c7dc34f1b426adfe0ce9e0ae3a688351d9`](https://github.com/CMTA/aztec-standards/tree/5433e9c7dc34f1b426adfe0ce9e0ae3a688351d9), 2026-09-18
-- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec) — the token whose 0.3.0 and 0.4.0 code-quality reviews produced every measurement in this article; the figures are quoted from `doc/audits/tools/v0.3.0/` and `v0.4.0/` at the 0.4.0 development head, 2026-09-18
+- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec) — the token whose 0.3.0 and 0.4.0 code-quality reviews produced every measurement in this article, analyzed at commit [`08c9c0f8470cabe55e3ed68ea73ce4967e6cd7be`](https://github.com/CMTA/private-CMTAT-aztec/tree/08c9c0f8470cabe55e3ed68ea73ce4967e6cd7be), 2026-09-18: the figures are quoted from `doc/audits/tools/v0.3.0/` and `v0.4.0/`
 
 ### Related articles
 

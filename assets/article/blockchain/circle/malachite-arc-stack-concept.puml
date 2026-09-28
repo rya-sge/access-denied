@@ -1,0 +1,28 @@
+@startuml
+title Arc consensus stack: components and trust boundaries
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+package "Validator host" {
+  component "arc-node-consensus\n(Malachite app, fork v0.8.0)" as CL
+  component "arc-consensus-db\n(redb: certificates, blocks,\nevidence) + WAL" as DB
+  component "arc-node-execution\n(Reth v2.2)" as EL
+  component "remote-signer client\n(gRPC)" as RS
+}
+component "arc-remote-signer\n(AWS Nitro Enclave,\nEd25519 key)" as ENC
+component "ProtocolConfig 0x3600..0001\ntimeouts, target block time" as PC
+component "ValidatorRegistry 0x3600..0002\nactive set + voting power" as VR
+cloud "libp2p gossipsub\n/consensus  /proposal_parts  /liveness" as P2P
+node "Follow nodes\n(RPC sync)" as FN
+CL --> EL : Engine API (IPC / JWT HTTP)
+CL --> DB
+CL --> RS
+RS --> ENC : Sign(bytes)
+CL ..> PC : eth_call via EL\nat decided height
+CL ..> VR : eth_call via EL\nat h-1
+CL <--> P2P
+FN ..> CL : fetch certificates\n+ payloads over HTTP/WS
+@enduml

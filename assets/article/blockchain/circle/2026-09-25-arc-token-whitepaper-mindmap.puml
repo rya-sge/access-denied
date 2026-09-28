@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* ARC token whitepaper\n(Circle, May 2026)
+** Arc today
+*** USDC native gas (18 decimals)
+*** Malachite BFT + Reth
+*** Permissioned PoA, round-robin proposer
+*** Fees credited to proposer, no burn
+** Five functions of ARC
+*** Staking and economic security
+*** Platform utility (gas and service discounts)
+*** Fee capture (convert to ARC, split, burn)
+*** Governance of economic parameters
+*** Expanding utility surface
+** Economics
+*** 10 billion initial supply
+*** Decaying inflation from 2-3%
+*** Target: inflation neutrality
+*** 60% ecosystem / 25% Circle / 15% reserve
+left side
+** Governance
+*** Token holders: fees, inflation, burn
+*** Circle: upgrades, incidents, validators, treasury
+*** Authority expands with readiness
+** Gaps with docs and code
+*** "No volatile native token" vs ARC
+*** Base fee not burned today
+*** No price source for fee conversion
+*** Stake-weighted proposer needs consensus change
+*** Encrypted mempool, TEE builder absent
+*** Privacy planned, mainnet private
+@endmindmap

@@ -4,7 +4,7 @@ title: "Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind I
 date:   2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP cryptography
+categories: blockchain ethereum ZKP cryptography aztec
 tags: aztec zkp privacy cryptography elliptic-curve post-quantum smart-contracts
 description: "Every private note on Aztec is encrypted with a one-shot ECDH key on Grumpkin: how it is made, what the ciphertext holds, and why it is not post-quantum."
 image: /assets/article/blockchain/aztec/2026-09-17-aztec-ephemeral-keys-mindmap.png

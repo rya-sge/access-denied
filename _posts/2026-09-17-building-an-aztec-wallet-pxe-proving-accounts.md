@@ -4,7 +4,7 @@ title: "Building a Wallet for Aztec — What a MetaMask for a Private Chain Has 
 date:   2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp privacy wallet account-abstraction smart-wallet cryptography
 description: "An Aztec wallet is a key store, a private-state database, a prover and a dApp gateway in one: components, build order, traps, and the wallets that exist today."
 image: /assets/article/blockchain/aztec/2026-09-17-aztec-wallet-mindmap.png

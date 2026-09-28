@@ -21,7 +21,7 @@ rectangle "Threshold (at most 1/3 malicious of 13)\nNitro Enclaves, custodial ba
 
 rectangle "Liveness only\n(can delay, cannot read or forge)" #F7F7F7 {
   rectangle "Gateway rollup" as gw
-  rectangle "Relayer / Oracle" as edge
+  rectangle "Relayer" as edge
 }
 
 rectangle "Outside the protocol" #FFFFFF {

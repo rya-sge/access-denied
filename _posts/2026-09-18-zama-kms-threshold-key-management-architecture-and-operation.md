@@ -33,6 +33,40 @@ The documentation draws three consequences:
 - **Resilience.** The network keeps working with up to $$t$$ parties offline or hostile.
 - **Auditability.** Every operation is triggered by a transaction on the Gateway, so the audit log is a blockchain and a corrupt party can be identified and penalised.
 
+## How a key can be used without being assembled
+
+The claim that the private key never exists anywhere is the one readers stop at: if no machine holds it, what decrypts? The answer has two halves, and they are different.
+
+**Computation never touches the private key at all.** Adding, comparing or selecting ciphertexts uses the *evaluation* key, which the coprocessors hold and which cannot decrypt anything. A confidential transfer is arithmetic on ciphertexts producing a ciphertext of the correct result, so the KMS is not involved and no balance is learned by anyone. Decryption is needed only when a person wants to read a number.
+
+**Decryption does use the private key, one share at a time**, and that is possible because TFHE decryption is *linear* in the secret key. A ciphertext of a message $$m$$ under a secret key $$s$$ is a pair $$(a, b)$$, a mask and a body, with
+
+$$
+\begin{aligned}
+b = \langle a, s\rangle + \Delta m + e
+\end{aligned}
+$$
+
+and decryption is the rounding of $$(b - \langle a, s\rangle)/\Delta$$. The secret appears in exactly one place, the inner product $$\langle a, s\rangle$$, and an inner product is linear: with Shamir shares $$s_i$$ and their Lagrange coefficients $$\lambda_i$$, which sum to one, each party can evaluate its own term on its own share and the parts add up to the whole,
+
+$$
+\begin{aligned}
+b - \langle a, s\rangle = \sum_i \lambda_i \left( b - \langle a, s_i\rangle \right)
+\end{aligned}
+$$
+
+So party $$i$$ computes $$b - \langle a, s_i\rangle$$ — a **partial decryption** — and publishes it. The combiner interpolates the parts and rounds, obtaining $$m$$. The implementation is that literal: `partial_decrypt128` in `core/threshold-execution` reads the mask and body out of the ciphertext, folds the party's key share against the mask, and returns `b - <a, s>` computed on that share alone.
+
+Two properties follow, and they are the whole design.
+
+**The reconstruction is applied to the partial decryptions, never to the key shares.** What each party publishes is a number derived from *this one ciphertext*. It is useless for any other ciphertext, because the next one has a different mask. No step of the protocol ever combines the $$s_i$$ themselves, which is the precise sense in which the key is used but never assembled.
+
+**The partial decryptions are masked, or they would leak the shares.** Each $$b - \langle a, s_i\rangle$$ is a linear equation in $$s_i$$, and enough of them across enough decryptions would solve for the share. Each party therefore adds large random noise, big enough to drown the information statistically, small enough that the final rounding still recovers $$m$$. This is *noise flooding*, the technique the Noah's Ark paper is named after and the reason the code offers `NoiseFloodSmall` and `NoiseFloodLarge` decryption modes.
+
+Who does the combining differs by request, and that difference is what separates the two decryption kinds: for a public decryption the KMS combines and signs the plaintext, for a user decryption each part is signcrypted under the requester's key and the **user** combines locally, so the value never exists outside that user's machine.
+
+![The path of one decryption: a ciphertext split into its mask and body, thirteen parties each computing one partial decryption from its own key share plus flooding noise, and the parts combined into the plaintext without the shares ever meeting]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-kms-partial-decryption-concept.png)
+
 ## What the KMS does
 
 The gRPC service, `CoreServiceEndpoint`, exposes a small number of operations. Each is a request with a unique 32-byte `RequestId`; long-running ones are started, then polled for their result.

@@ -5,7 +5,7 @@ date:   2026-09-16
 last_modified_at: 2026-09-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum ZKP aztec
 tags: aztec zkp noir smart-contracts gas storage
 description: "A derived Packable spends one Field per member. Packing two bools into one saves a slot or a note-hash input, can cost gates, and moves every slot after it."
 image: /assets/article/blockchain/aztec/2026-09-16-aztec-packable-mindmap.png
@@ -278,6 +278,10 @@ A Solidity `uint256` really is 256 bits with wrap-around at 2^256, so two 128-bi
 `N = 2`: the two flags in one `Field`, the address in the other, since an address is a full `Field` and cannot share. The test enumerates all four flag combinations with a fixed address and asserts `unpack(pack(x)) == x`, plus one case per flag alone to show the two bits are disjoint. With only `bool`s, there is no "maximum value" case to add.
 
 ## References
+
+### Analyzed source
+
+- [CMTA/private-CMTAT-aztec](https://github.com/CMTA/private-CMTAT-aztec) — the privacy-preserving CMTAT security token this article's examples come from, analyzed at commit [`ef65d877f5e9842cf12a0ed47a88931cfc050dc6`](https://github.com/CMTA/private-CMTAT-aztec/tree/ef65d877f5e9842cf12a0ed47a88931cfc050dc6), 2026-09-16: the packed flag types — `FreezableFlag` in `enforcementModule.nr`, `UserFlags` and `SetFlag` in `validationModule.nr`, `DebtIdentifier` and `DebtInstrument` in `extensions/debtModule.nr`
 
 - [Aztec.nr — Data packing and serialization](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/data_packing)
 - [Aztec.nr — State variables](https://docs.aztec.network/developers/docs/aztec-nr/framework-description/state_variables)

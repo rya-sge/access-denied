@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Malachite consensus on Arc
+** Engine
+*** Tendermint-family BFT in Rust
+*** Informal Systems origin, Circle fork v0.8.0
+*** Channel app API, ProposalAndParts
+** Round
+*** Propose / prevote / precommit
+*** >2/3 voting power, one decision per height
+*** Linear timeouts from ProtocolConfig
+*** 500 ms target block time
+** Validators
+*** Permissioned PoA registry
+*** Set read at H-1, effective at H
+*** Round-robin proposer, not weighted
+*** Ed25519, remote Nitro signer
+left side
+** CL / EL coupling
+*** Engine API: FCU, getPayload, newPayload
+*** head = safe = finalized
+*** 128 KiB signed proposal chunks
+*** Timestamp skew gate (30 s)
+** Operations
+*** redb store + WAL, re-propose on restart
+*** P2P value sync and RPC sync
+*** Evidence stored, no slashing
+** Compared with
+*** CometBFT: weighted proposer, H+2 sets
+*** HotStuff / HyperBFT: linear view change
+*** Gasper: fork choice + 2-epoch finality
+*** Ouroboros, TowerBFT: probabilistic
+@endmindmap

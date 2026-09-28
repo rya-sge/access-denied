@@ -1,0 +1,32 @@
+@startuml
+title One Arc height: Malachite (CL) driving Reth (EL) through the Engine API
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+}
+participant "Proposer CL\n(Malachite app)" as PCL
+participant "Proposer EL\n(Reth)" as PEL
+participant "Other validators\nCL" as VCL
+participant "Their EL\n(Reth)" as VEL
+== StartedRound(h, r): proposer = (h-1+r) mod n ==
+PCL -> PEL : forkchoiceUpdated(parent, attributes)
+PEL --> PCL : payloadId
+PCL -> PEL : getPayload(payloadId)
+PEL --> PCL : ExecutionPayloadV3
+PCL -> PEL : newPayload (self-check)
+PCL -> VCL : stream Init | Data (128 KiB) | Fin (Ed25519 sig)
+VCL -> VCL : check proposer, signature,\ntimestamp <= local + 30 s
+VCL -> VEL : newPayload
+VEL --> VCL : VALID / INVALID
+VCL -> VCL : prevote, then precommit\n(>2/3 voting power)
+PCL -> PCL : prevote, precommit
+== Decided(h) ==
+VCL -> VCL : store certificate + block (redb)
+VCL -> VEL : forkchoiceUpdated(head = safe = finalized)
+PCL -> PEL : forkchoiceUpdated(head = safe = finalized)
+== Finalized(h): store evidence, extend certificate ==
+VCL -> VEL : eth_call getActiveValidatorSet() at h\n+ consensusParams()
+VCL -> VCL : pause to 500 ms target, start h+1
+@enduml

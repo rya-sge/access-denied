@@ -1,0 +1,32 @@
+@startuml
+title ARC in the Economic OS: layers and actors (whitepaper model)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam actor {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+rectangle "Applications\nDeFi, payments, wallets, agents" as APP
+rectangle "Developer kits\nEarn, swap, bridge, unified balance" as KIT
+rectangle "Protocol services\nCCTP, Gateway, wallets, StableFX, CPN" as SVC
+rectangle "Assets\nUSDC, EURC, USYC, tokenized assets, ARC" as AST
+rectangle "Arc core\nMalachite BFT + Reth, USDC gas, finality" as CORE
+APP -down-> KIT
+KIT -down-> SVC
+SVC -down-> AST
+AST -down-> CORE
+rectangle "ARC coordination layer\nstaking, fee capture, governance,\nplatform discounts" as ARC #FFF4E0
+ARC .left.> APP
+ARC .left.> SVC
+ARC .left.> CORE
+actor "Token holders\n/ stakers" as TH
+actor "Validators\n(permissioned)" as VAL
+actor "Circle\n(steward)" as CIR
+TH --> ARC : stake, vote on\neconomic parameters
+VAL --> CORE : produce blocks,\nenforce decisions
+CIR --> CORE : upgrades, incidents,\nvalidator membership
+@enduml
