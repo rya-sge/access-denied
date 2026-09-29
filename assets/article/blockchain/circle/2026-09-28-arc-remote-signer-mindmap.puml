@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* arc-remote-signer\nvalidator key security
+** Architecture
+*** Host proxy: SignerService :10340
+*** Nitro Enclave: EnclaveService on vsock :10350
+*** arc-node client over gRPC (tonic)
+** Key protection
+*** Ed25519 key made with crypto/rand in enclave
+*** AES-256-GCM under a KMS data key
+*** Data key released only to attested PCR0
+*** Ciphertext in Secrets Manager
+** Signing path
+*** Blind raw-bytes Sign(message)
+*** No KMS call on the hot path
+*** Plaintext key cached in enclave
+left side
+** What it does not do
+*** No caller authentication, TLS off by default
+*** No height/round/step watermark
+*** No pubkey pinning or signature check in arc-node
+*** Missing secret mints a new key
+*** Host picks APP_ENV (log export)
+** Compared with
+*** CometBFT FilePV: last-sign state
+*** tmkms: HSM + SecretConnection + state file
+*** Horcrux: threshold Ed25519 + Raft watermark
+*** Web3Signer: slashing-protection DB (EIP-3076)
+** Hardening
+*** mTLS or private network only
+*** Double-sign guard in signer or node
+*** PCR0 + PCR8 in KMS policy
+*** Fail closed on missing secret
+@endmindmap

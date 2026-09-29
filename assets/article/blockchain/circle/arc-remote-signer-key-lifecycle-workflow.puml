@@ -1,0 +1,41 @@
+@startuml
+title arc-remote-signer: startup, key generation or load, then signing
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+  LifeLineBorderColor #B54A4A
+}
+participant "arc-node CL" as CL
+participant "Proxy (host)" as PX
+participant "Enclave" as EN
+participant "AWS KMS" as KMS
+participant "Secrets Manager" as SM
+== Startup ==
+PX -> EN : GetAttestation
+EN --> PX : NSM document (PCRs, enclave RSA public key)
+PX -> SM : GetSecretValue(keyId)
+alt secret not found
+  PX -> KMS : GenerateDataKey(AES_256, Recipient=attestation)
+  KMS --> PX : CiphertextBlob + CiphertextForRecipient
+  PX -> EN : GenerateKey(ED25519, CiphertextForRecipient)
+  EN -> EN : unwrap data key with enclave RSA key\ned25519.GenerateKey(crypto/rand)\nAES-256-GCM(dataKey, sk), nil AAD
+  EN --> PX : public key, encrypted sk, nonce
+  PX -> SM : PutSecretValue(gob{blob, ct, nonce})
+else secret exists
+  PX -> KMS : Decrypt(blob, Recipient=attestation)
+  KMS --> PX : CiphertextForRecipient
+  PX -> EN : GetPublicKey(encrypted material)
+  EN --> PX : public key
+end
+== Consensus ==
+CL -> PX : PublicKey()
+PX --> CL : 32-byte key (cached, not compared to a configured key)
+loop every vote, proposal, proposal part
+  CL -> PX : Sign(bytes)
+  PX -> EN : SignMessage(encrypted material, bytes)
+  EN -> EN : cache hit -> ed25519.Sign(sk, bytes)\n(no height/round/step check)
+  EN --> PX : 64-byte signature
+  PX --> CL : signature (length checked only)
+end
+@enduml

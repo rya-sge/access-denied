@@ -1,0 +1,56 @@
+<!--
+Mermaid diagrams, loaded only on pages with `isMermaid: true` in the front matter,
+following the same pattern as mathJax.html.
+
+Why the DOM rewriting: kramdown turns a ```mermaid fence into
+<div class="language-mermaid highlighter-rouge"><div class="highlight"><pre><code>...
+Mermaid expects the source in an element it can find, so each code block is read
+with textContent (which decodes entities and drops any syntax-highlight spans)
+and replaced by a <div class="mermaid"> holding the raw source.
+-->
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  const isDark = () =>
+    document.documentElement.getAttribute('data-theme') === 'dark';
+
+  const blocks = [];
+  document.querySelectorAll('code.language-mermaid, .language-mermaid code').forEach((code) => {
+    const source = code.textContent;
+    const host = code.closest('.language-mermaid') || code.parentElement;
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = source;
+    host.replaceWith(div);
+    blocks.push(div);
+  });
+
+  if (blocks.length) {
+    const render = () => {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: isDark() ? 'dark' : 'default',
+      });
+      // mermaid.run() skips nodes it has already processed, so keep the source
+      // on the element and restore it before each re-render.
+      blocks.forEach((d) => {
+        if (d.dataset.source === undefined) d.dataset.source = d.textContent;
+        else {
+          d.removeAttribute('data-processed');
+          d.textContent = d.dataset.source;
+        }
+      });
+      mermaid.run({ nodes: blocks });
+    };
+
+    render();
+
+    // Re-render when the visitor switches theme, so diagrams follow the page.
+    new MutationObserver(render).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+</script>

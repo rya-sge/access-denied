@@ -1,0 +1,33 @@
+@startuml
+title arc-remote-signer: components and trust boundaries
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+node "Validator host" {
+  component "arc-node-consensus\n(remote-signer client)" as CL
+}
+node "Signer EC2 instance (parent, untrusted for key material)" {
+  component "Proxy: SignerService\n0.0.0.0:10340\nTLS off by default, no client auth\ncaches encrypted key material" as PX
+  node "Nitro Enclave (no network, no disk)" {
+    component "EnclaveService (vsock 10350)\nplaintext Ed25519 key in memory\nNSM attestation doc (no nonce)" as EN
+  }
+}
+cloud "AWS" {
+  component "KMS key\npolicy: RecipientAttestation\nImageSha384 == PCR0" as KMS
+  component "Secrets Manager\ngob{KMS blob, AES-GCM ct, nonce}" as SM
+}
+CL --> PX : Sign(bytes) / PublicKey\n(gRPC, 30 s timeout, 3 retries)
+PX --> EN : SignMessage(alg, encrypted material, bytes)\ninsecure gRPC over vsock
+PX --> KMS : GenerateDataKey / Decrypt\n+ Recipient(attestation doc)
+KMS --> PX : CiphertextForRecipient\n(RSA-OAEP to enclave key)
+PX --> SM : Get / PutSecretValue
+note bottom of PX
+Any process that can reach :10340,
+or any process on the parent that can reach vsock,
+obtains signatures. The enclave protects
+key confidentiality, not key use.
+end note
+@enduml
