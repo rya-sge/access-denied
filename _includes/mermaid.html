@@ -9,8 +9,13 @@ with textContent (which decodes entities and drops any syntax-highlight spans)
 and replaced by a <div class="mermaid"> holding the raw source.
 -->
 
+<!--
+Pinned to the major, so 12.x patches arrive without an edit and 13 never does by surprise.
+Bumped 11 -> 12 on 2026-09-30, after checking that `initialize(config)` and `run({nodes})` -
+the only two APIs used below - are both still present in the 12.0.0 type declarations.
+-->
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.esm.min.mjs';
 
   const isDark = () =>
     document.documentElement.getAttribute('data-theme') === 'dark';

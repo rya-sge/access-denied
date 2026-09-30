@@ -8,6 +8,7 @@ categories: blockchain cryptography security zama
 tags: zama fhe fhevm solidity smart-contract threshold-cryptography key-management eip712
 description: "A line-by-line reading of KMSGeneration.sol: the two-phase key generation ceremony, what 'consensus' means when thirteen KMS nodes sign an EIP-712 digest, contexts and epochs, CRS generation, key migration, aborts, and what the contract deliberately does not verify."
 isMath: true
+isMermaid: true
 ---
 
 The Zama protocol encrypts every value under one global FHE public key, computes on ciphertexts with an evaluation key, and decrypts through thirteen organisations that each hold a share of the private key. Somebody has to decide that a key exists, which one is current, and where its public material can be downloaded — and that decision cannot live in a configuration file, because every contract on every supported chain depends on it.
