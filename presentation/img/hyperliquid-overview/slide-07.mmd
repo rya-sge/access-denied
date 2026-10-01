@@ -1,0 +1,7 @@
+flowchart LR
+    SC["HyperEVM contract"] -->|"read precompiles<br/>0x...0800 and up"| CORE["HyperCore state<br/>positions, balances, prices"]
+    SC -->|"CoreWriter<br/>0x3333...3333"| ACT["HyperCore action<br/>order, transfer, staking"]
+
+    style SC fill:#F0F2F5,stroke:#78909C
+    style CORE fill:#E8F5E9,stroke:#2E7D32
+    style ACT fill:#E8F5E9,stroke:#2E7D32

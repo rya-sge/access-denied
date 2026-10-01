@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph OTHER["Other DEX designs"]
+        direction TB
+        A1["Order book off-chain,<br/>settlement onchain"]
+        A2["AMM pool<br/>instead of a book"]
+    end
+    subgraph HL["Hyperliquid"]
+        direction TB
+        H1["Order book, margin<br/>and liquidation onchain"]
+    end
+    A1 -->|"book moves onchain"| H1
+    A2 -->|"pool replaced by a book"| H1
+
+    style OTHER fill:#F0F2F5,stroke:#78909C
+    style HL fill:#E8F5E9,stroke:#2E7D32
+    style A1 fill:#F0F2F5,stroke:#78909C
+    style A2 fill:#F0F2F5,stroke:#78909C
+    style H1 fill:#E8F5E9,stroke:#2E7D32

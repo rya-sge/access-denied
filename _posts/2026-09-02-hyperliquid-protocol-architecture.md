@@ -2,6 +2,7 @@
 layout: post
 title: "The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics"
 date:   2026-09-02
+last_modified_at: 2026-10-01
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -16,7 +17,7 @@ A decentralised derivatives venue normally keeps its order book off-chain and se
 
 That choice propagates into every part of the design. Block production has to be aware of what an order is, because a naive transaction ordering would let a proposer front-run resting liquidity. Margin has to be re-checked at match time and not only at placement, because oracle prices move between the two. And a smart contract that wants to read the best bid does not call a bridge or an oracle adapter; it calls a precompile that sees HyperCore state as of the moment its own block was built.
 
-This article walks through that architecture from consensus down to the fee schedule: how HyperCore orders actions inside a block, how oracle and mark prices are constructed, what the solvency ladder does between a missed margin call and auto-deleveraging, how the HyperEVM talks to HyperCore in both directions, and what the four HIP standards add on top. It reflects the documentation as of September 2026, which now covers portfolio margin, HIP-4 outcome markets and the migration of USDC away from the Arbitrum bridge.
+This article walks through that architecture from consensus down to the fee schedule: how HyperCore orders actions inside a block, how oracle and mark prices are constructed, what the solvency ladder does between a missed margin call and auto-deleveraging, how the HyperEVM talks to HyperCore in both directions, and what the four HIP standards add on top, before placing the result next to a centralised exchange such as Binance or Coinbase. It reflects the documentation as of September 2026, which now covers portfolio margin, HIP-4 outcome markets and the migration of USDC away from the Arbitrum bridge.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -319,6 +320,29 @@ Reading the design as a whole, the assumptions a user or integrator takes on are
 
 The bug bounty programme classifies findings by impact, with critical issues, meaning significant loss of user funds or a violation of L1 execution invariants, paying up to 1M USDC, network downtime without incorrect state up to 50 000 USDC, and API server performance issues up to 10 000 USDC. Reports go to the Hyper Foundation directly rather than through a platform, and testing against mainnet is prohibited.
 
+## Compared with a centralised exchange
+
+Binance and Coinbase offer the same order-book products as Hyperliquid: spot pairs, perpetuals, price-time priority, maker and taker fees. What differs is who holds the state. On a centralised exchange (CEX) the balances, the book and the liquidation engine are entries in a database the operator controls. On Hyperliquid they are HyperCore state that every validator replicates and that any node can recompute. The [order book article]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/) compares the two at the matching-engine level; the table below stays at the level of a user or an integrator.
+
+| | Binance, Coinbase | Hyperliquid |
+|---|---|---|
+| **Custody** | The exchange holds deposits in its own wallets and credits an internal ledger | Balances are clearinghouse state, moved only by actions signed with the user's key or an approved API wallet |
+| **Account access** | Registration and identity verification (KYC) before trading | No sign-up at protocol level: a key pair is an account. The official front end restricts some jurisdictions in its terms |
+| **Listing** | Decided by the exchange, often after a private negotiation | Spot tokens through the HIP-1 gas auction, perp DEXs through the HIP-3 stake of 500 000 HYPE; validator-operated perps and delistings through validator vote |
+| **Withdrawals** | Processed by the operator, who can delay or pause them | USDC minted and burned natively through CCTP; the legacy Arbitrum bridge settles on a two-thirds validator quorum in three to four minutes |
+| **Fiat** | Card, bank transfer and fiat pairs | None natively; funds arrive as USDC or bridged assets |
+| **Loss absorption** | Insurance fund, ADL, and for Binance the discretionary SAFU fund | Book liquidation, HLP backstop, then ADL enforced by execution, with no discretionary fund |
+| **Solvency evidence** | Periodic proof of reserves (Binance), audited accounts of a listed company (Coinbase) | Every position and balance reconstructable from chain state at any block |
+| **Latency** | Sub-millisecond matching, colocation sold to market makers | Median 0.2 s and 99th percentile 0.9 s end to end for a co-located client; priority sold by public auction |
+| **Programmability** | REST and WebSocket APIs to a closed system | Same style of API, plus HyperEVM contracts that read HyperCore through precompiles and trade through CoreWriter |
+| **Account recovery** | Password reset and customer support | None: a lost key is a lost account; native multi-sig and API wallets limit the exposure of the master key |
+| **Liquidity** | Deepest books on major pairs, wide asset coverage | Competitive on the large perps, thinner on long-tail and HIP-3 markets |
+| **Legal recourse** | A regulated company with licences, terms of service and a jurisdiction | No operator to sue; risk is bounded by the trust assumptions listed above |
+
+Two rows explain most of the trade. Custody and solvency evidence are where Hyperliquid removes trust: a CEX failure such as FTX in 2022 consisted of an operator using customer deposits in a way its users could not see, and that failure has no direct equivalent when balances are consensus state. Liquidity, fiat access and recovery are where it adds work for the user: there is no help desk for a lost key, no card on-ramp, and smaller books outside the main markets.
+
+The trust does not disappear; it moves. A Binance user trusts one company. A Hyperliquid user trusts that more than two thirds of staked HYPE is honest, that the oracle median is not captured, that Circle honours USDC, and that the software executes the published rules. The difference is that each of those assumptions can be named and observed, which is not the case for the internal ledger of a CEX.
+
 ## Conclusion
 
 On Hyperliquid the exchange is the state machine rather than an application running on one. Putting the order book inside consensus is what allows the intra-block ordering rule that puts cancels ahead of aggressive orders, the second margin check on the resting side at match time, and a solvency ladder whose last rung is enforced by execution rather than by an insurance fund's balance. Putting a general-purpose EVM inside the same execution is what removes the bridge between contract logic and order book liquidity, at the cost of a delay on CoreWriter orders and a set of linking caveats that place real verification work on the integrator.
@@ -483,10 +507,13 @@ The cost is borne by traders holding profitable, levered positions in the same a
 - [EIP-1559: Fee market change for London](https://eips.ethereum.org/EIPS/eip-1559)
 - [ERC-4626: Tokenized Vaults](https://eips.ethereum.org/EIPS/eip-4626)
 - [HotStuff: BFT Consensus in the Lens of Blockchain](https://arxiv.org/abs/1803.05069) — the consensus family HyperBFT derives from
+- [Binance Proof of Reserves](https://www.binance.com/en/proof-of-reserves) — the Merkle-tree reserve attestation cited in the CEX comparison
 
 ### Related articles
 
+- [Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/)
 - [Traditional Futures vs. Perpetual Futures: A Technical Comparison]({{site.url_complet}}/2025/12/29/traditional-vs-perpetual-futures/)
 - [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)
 - [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)
 - [Malachite Consensus on Arc — How Circle's L1 Finalises a Block, Compared with CometBFT, HotStuff and Gasper]({{site.url_complet}}/2026/09/25/malachite-consensus-arc/)
+- [HotStuff — Linear and Responsive BFT Consensus, from Basic HotStuff to the Event-Driven Pacemaker]({{site.url_complet}}/2026/10/01/hotstuff-bft-consensus/)

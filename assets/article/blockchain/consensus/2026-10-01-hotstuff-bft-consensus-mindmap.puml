@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* HotStuff BFT Consensus
+** Problem
+*** PBFT view change O(n^3)
+*** Tendermint / Casper wait Δ
+*** Goal: linear + responsive
+** Model
+*** n = 3f + 1, partial synchrony
+*** Threshold signatures k = 2f + 1
+*** Authenticator complexity
+** Basic HotStuff
+*** prepare / pre-commit / commit / decide
+*** safeNode: safety rule OR liveness rule
+*** Lock on precommitQC
+*** O(n) per view
+** Why three phases
+*** Two-phase livelock
+*** f + 1 correct hold prepareQC
+left side
+** Chained HotStuff
+*** One generic phase per view
+*** One-, Two-, Three-Chain
+*** Direct Three-Chain commits
+** Implementation
+*** vheight, b_lock, qc_high
+*** Pacemaker: liveness only
+*** Two-phase variant
+** Framework comparison
+*** DLS: One-Chain
+*** PBFT: Two-Chain + proof
+*** Tendermint / Casper: Two-Chain + Δ
+** Evaluation
+*** ~4K lines C++, vs BFT-SMaRt
+*** Up to 128 replicas
+*** No extra view-change authenticators
+@endmindmap

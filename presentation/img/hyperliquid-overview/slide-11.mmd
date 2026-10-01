@@ -1,0 +1,9 @@
+flowchart LR
+    C1["HyperBFT<br/>consensus"] --> C2["HyperCore<br/>order book in the state"]
+    C2 --> C3["HyperEVM<br/>contracts on the same state"]
+    C3 --> C4["HIP standards<br/>third parties build on top"]
+
+    style C1 fill:#E8EEF9,stroke:#3A5FA0
+    style C2 fill:#E8F5E9,stroke:#2E7D32
+    style C3 fill:#F0F2F5,stroke:#78909C
+    style C4 fill:#F0F2F5,stroke:#78909C

@@ -1,0 +1,13 @@
+flowchart TB
+    VAL["Validators<br/>HyperBFT, staked HYPE"] --> CORE
+    VAL --> EVM
+    subgraph L1["Hyperliquid L1"]
+        direction LR
+        CORE["HyperCore<br/>order books, clearinghouses,<br/>oracle, staking"]
+        EVM["HyperEVM<br/>smart contracts"]
+    end
+
+    style VAL fill:#E8EEF9,stroke:#3A5FA0
+    style L1 fill:#F0F2F5,stroke:#78909C
+    style CORE fill:#E8F5E9,stroke:#2E7D32
+    style EVM fill:#F0F2F5,stroke:#78909C

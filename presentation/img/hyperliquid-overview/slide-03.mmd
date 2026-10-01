@@ -1,0 +1,11 @@
+flowchart LR
+    C["Client<br/>signed order"] --> API["API server<br/>holds the request open"]
+    API --> NODE["Validator node<br/>HyperBFT round"]
+    NODE --> BOOK["Order book<br/>price-time priority"]
+    BOOK --> RES["Fill confirmation<br/>sent back to the client"]
+
+    style C fill:#E8EEF9,stroke:#3A5FA0
+    style API fill:#F0F2F5,stroke:#78909C
+    style NODE fill:#F0F2F5,stroke:#78909C
+    style BOOK fill:#E8F5E9,stroke:#2E7D32
+    style RES fill:#F0F2F5,stroke:#78909C

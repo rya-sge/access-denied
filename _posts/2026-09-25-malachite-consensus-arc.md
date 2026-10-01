@@ -183,7 +183,7 @@ The last difference matters most. Arc is closer to an Ethereum consensus client 
 
 ### Arc against HotStuff
 
-HotStuff (Yin et al., 2019) changes how leaders are replaced. In Tendermint, a new proposer after a failed round must wait for the timeout to be sure it has seen the highest lock. HotStuff adds a phase so that a new leader can move at network speed as soon as it has collected a quorum of messages. This property is called *optimistic responsiveness*. HotStuff also keeps communication linear by relaying votes through the leader as a quorum certificate.
+[HotStuff]({{site.url_complet}}/2026/10/01/hotstuff-bft-consensus/) (Yin et al., 2019) changes how leaders are replaced. In Tendermint, a new proposer after a failed round must wait for the timeout to be sure it has seen the highest lock. HotStuff adds a phase so that a new leader can move at network speed as soon as it has collected a quorum of messages. This property is called *optimistic responsiveness*. HotStuff also keeps communication linear by relaying votes through the leader as a quorum certificate.
 
 Hyperliquid's HyperBFT, [described in an earlier article]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/), is a HotStuff variant with stake-weighted leaders. Arc's roadmap item "three rounds to two" goes the other way, towards fewer voting phases on the happy path.
 
@@ -305,3 +305,4 @@ No. Malachite detects double votes and double proposals, and Arc stores them and
 - [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)
 - [Canton Network — Architecture, Privacy Model, and Comparison with Ethereum, Railgun, Zcash, Zama fhEVM, and Besu]({{site.url_complet}}/2026/05/12/canton-network-architecture/)
 - [Solana Staking - Overview]({{site.url_complet}}/2025/11/07/solana-staking-overview/)
+- [HotStuff — Linear and Responsive BFT Consensus, from Basic HotStuff to the Event-Driven Pacemaker]({{site.url_complet}}/2026/10/01/hotstuff-bft-consensus/)

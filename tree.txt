@@ -947,3 +947,7 @@ _posts/2026-09-25-malachite-consensus-arc.md
 _posts/2026-09-30-aztec-note-encryption-constrained-aes128.md
   assets/article/blockchain/aztec/aztec-note-encryption-constrained.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-hotstuff-bft-consensus.md
+  assets/article/blockchain/consensus/2026-10-01-hotstuff-bft-consensus-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

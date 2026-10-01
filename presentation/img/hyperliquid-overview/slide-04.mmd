@@ -1,0 +1,11 @@
+flowchart LR
+    EXT["8 spot exchanges"] --> ORA["Oracle price<br/>two medians"]
+    ORA --> FUND["Funding<br/>paid hourly"]
+    ORA --> MARK["Mark price<br/>median of 3"]
+    MARK --> LIQ["Margin and<br/>liquidation"]
+
+    style EXT fill:#E8EEF9,stroke:#3A5FA0
+    style ORA fill:#E8F5E9,stroke:#2E7D32
+    style MARK fill:#E8F5E9,stroke:#2E7D32
+    style FUND fill:#F0F2F5,stroke:#78909C
+    style LIQ fill:#F0F2F5,stroke:#78909C

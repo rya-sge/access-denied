@@ -1,0 +1,296 @@
+{
+  "output": "/home/ryan/Downloads/me/access-denied/presentation/hyperliquid-overview.odp",
+  "export": [
+    "pdf",
+    "pptx"
+  ],
+  "theme": {
+    "title_color": "0x1F4E79",
+    "text_color": "0x222222",
+    "font": "Liberation Sans"
+  },
+  "slides": [
+    {
+      "layout": "title",
+      "title": "Hyperliquid in Five Minutes",
+      "subtitle": "An L1 where the order book is part of consensus\nRyan Sauge - v1.0 - 2026-10-01",
+      "notes": "Source: The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics (https://rya-sge.github.io/access-denied/2026/09/02/hyperliquid-protocol-architecture/) and the Hyperliquid documentation. Talk length: about 5 minutes."
+    },
+    {
+      "layout": "image",
+      "title": "What is Hyperliquid",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-01.png",
+      "placement": {
+        "x_cm": 10.6,
+        "y_cm": 5.111734693877551,
+        "width_cm": 16,
+        "height_cm": 8.326530612244898
+      },
+      "bullets": [
+        "A DEX for perpetual futures and spot, on its own chain",
+        "Many DEXs keep the book off-chain, or use an AMM",
+        "Here, order book, margin and liquidations are onchain state",
+        "Question: what if the exchange is the chain itself?"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 8.399999999999999,
+        "height_cm": 11.35
+      },
+      "notes": "(25 s) Most people know Hyperliquid as a perp exchange. The design choice behind it is that the matching engine is not an app deployed on a chain. Every validator runs it."
+    },
+    {
+      "layout": "image",
+      "title": "Architecture: one consensus",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-02.png",
+      "placement": {
+        "x_cm": 14.305882352941175,
+        "y_cm": 4.025,
+        "width_cm": 12.294117647058824,
+        "height_cm": 10.5
+      },
+      "bullets": [
+        "HyperBFT: a block is final with 2/3 of staked HYPE",
+        "HyperCore: order books, clearinghouses, oracle, staking",
+        "HyperEVM: a regular EVM, chain ID 999",
+        "Same consensus, no bridge between the two"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 12.105882352941174,
+        "height_cm": 11.35
+      },
+      "notes": "(30 s) For a co-located client, the median time from sending an order to a committed answer is 0.2 seconds. Mainnet handles about 200 000 orders per second, and the documentation says execution is the bottleneck, not consensus."
+    },
+    {
+      "layout": "image",
+      "title": "The life of an order",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-03.png",
+      "placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 25.2,
+        "height_cm": 3.0214285714285714
+      },
+      "bullets": [
+        "Inside a block, actions run in three groups:",
+        [
+          "Orders that take no liquidity (post-only)",
+          "Cancels",
+          "Orders that take liquidity (GTC, IOC)"
+        ],
+        "Margin is checked at placement and again at each match"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 7.121428571428572,
+        "width_cm": 25.2,
+        "height_cm": 7.828571428571429
+      },
+      "notes": "(35 s) A market maker who cancels and a trader who hits the same quote in the same block: the cancel wins. That removes a form of front-running that a first-come, first-served block allows. Margin is checked when the order is placed, and again for the resting order at each match, because the price may have moved between the two."
+    },
+    {
+      "layout": "image",
+      "title": "Prices: oracle and mark",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-04.png",
+      "placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 25.2,
+        "height_cm": 6.774193548387096
+      },
+      "bullets": [
+        "Oracle: two medians, every ~3 s, used for funding",
+        "Mark: median of 3 indices, used for margin and liquidation"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 10.874193548387096,
+        "width_cm": 25.2,
+        "height_cm": 4.075806451612904
+      },
+      "notes": "(30 s) One consequence: a position can be liquidated with no trade on Hyperliquid at that price, because the mark price also reads external markets. The oracle has its own deck if someone wants the details."
+    },
+    {
+      "layout": "image",
+      "title": "Liquidation: on the order book",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-05.png",
+      "placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 25.2,
+        "height_cm": 6.621428571428571
+      },
+      "bullets": [
+        "Anyone can take the other side of the liquidation orders",
+        "Above 100 000 USDC: 20% at a time, then a 30 s cooldown"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 10.721428571428572,
+        "width_cm": 25.2,
+        "height_cm": 4.228571428571429
+      },
+      "notes": "(20 s) Maintenance margin is half the initial margin at maximum leverage, so between 1.25% and 16.7% depending on the asset. Most liquidations end at this step."
+    },
+    {
+      "layout": "image",
+      "title": "Liquidation: backstop and ADL",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-06.png",
+      "placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 25.2,
+        "height_cm": 6.203571428571428
+      },
+      "bullets": [
+        "Auto-deleveraging (ADL) closes the most profitable, most levered opposite positions first",
+        "A user with no open position never pays for platform losses"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 10.303571428571429,
+        "width_cm": 25.2,
+        "height_cm": 4.646428571428571
+      },
+      "notes": "(20 s) The trader does not get the maintenance margin back at step 2: HLP keeps it so that backstop liquidations are profitable on average."
+    },
+    {
+      "layout": "image",
+      "title": "HyperEVM and HyperCore",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-07.png",
+      "placement": {
+        "x_cm": 10.6,
+        "y_cm": 5.114388145315488,
+        "width_cm": 16,
+        "height_cm": 8.321223709369024
+      },
+      "bullets": [
+        "Read: values match HyperCore when the EVM block was built",
+        "Write: CoreWriter orders are delayed by a few seconds",
+        "Small blocks every second (3M gas)",
+        "Big blocks every minute (30M gas)"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 8.399999999999999,
+        "height_cm": 11.35
+      },
+      "notes": "(30 s) This is how a lending protocol or a vault on the HyperEVM can trade on the order book and price its collateral with the same number the clearinghouse uses."
+    },
+    {
+      "layout": "table",
+      "title": "The HIP standards",
+      "placement": {
+        "height_cm": 8.5
+      },
+      "table": [
+        [
+          "Standard",
+          "What it adds"
+        ],
+        [
+          "HIP-1",
+          "Anyone can deploy a token and its spot market (Dutch auction, 500 HYPE floor)"
+        ],
+        [
+          "HIP-2",
+          "Hyperliquidity: onchain market making, 0.3% spread refreshed every 3 s"
+        ],
+        [
+          "HIP-3",
+          "Anyone can run a perp exchange; the deployer publishes the oracle, 500 000 HYPE staked"
+        ],
+        [
+          "HIP-4",
+          "Fully collateralised outcome markets, no leverage, e.g. prediction markets"
+        ]
+      ],
+      "notes": "(30 s) Green: spot tokens and their liquidity. Blue: new market types, perps and outcomes. HIP-2 attaches to a HIP-1 token at deployment, which is why those two are linked."
+    },
+    {
+      "layout": "image",
+      "title": "Where the fees go",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-09.png",
+      "placement": {
+        "x_cm": 15.35,
+        "y_cm": 4.025,
+        "width_cm": 11.25,
+        "height_cm": 10.5
+      },
+      "bullets": [
+        "Base perp fees: 0.045% taker, 0.015% maker",
+        "Staking HYPE: up to 40% off",
+        "No operator cut; HLP also runs backstop liquidations",
+        "Staking rewards: ~2.37%/year at 400M HYPE staked"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 13.149999999999999,
+        "height_cm": 11.35
+      },
+      "notes": "(25 s) HLP is the vault from slide 6. Anyone can deposit into it, with a four-day lock-up after each deposit."
+    },
+    {
+      "layout": "table",
+      "title": "Limitations",
+      "placement": {
+        "height_cm": 10.5
+      },
+      "table": [
+        [
+          "Limitation (by design)",
+          "What it means for a user"
+        ],
+        [
+          "2/3 of the stake can change any state",
+          "Order book, oracle and votes share one trust assumption"
+        ],
+        [
+          "Validator votes decide offchain questions",
+          "Delistings, HIP-3 slashing, quote assets: judgement by stake"
+        ],
+        [
+          "HIP-3 oracle is one deployer",
+          "Slashed stake is burned; users are not compensated"
+        ],
+        [
+          "HyperEVM token links are not verified",
+          "A linked contract can hold arbitrary code"
+        ],
+        [
+          "No automatic slashing of validators",
+          "Misbehaving validators are jailed by vote"
+        ]
+      ],
+      "notes": "(30 s) None of this is hidden; the documentation states each point. The trust model reduces to how HYPE stake is distributed across validators."
+    },
+    {
+      "layout": "image",
+      "title": "Conclusion",
+      "image": "/home/ryan/Downloads/me/access-denied/presentation/img/hyperliquid-overview/slide-11.png",
+      "placement": {
+        "x_cm": 1.4,
+        "y_cm": 3.6,
+        "width_cm": 25.2,
+        "height_cm": 3.7935483870967737
+      },
+      "bullets": [
+        "On Hyperliquid, the exchange is the chain's state machine",
+        "Cancels before takers, margin checked at each match, fixed liquidation steps",
+        "The cost: one trust assumption, two thirds of the staked HYPE"
+      ],
+      "bullets_placement": {
+        "x_cm": 1.4,
+        "y_cm": 7.893548387096773,
+        "width_cm": 25.2,
+        "height_cm": 7.056451612903226
+      },
+      "notes": "(25 s) Back to the opening question. An exchange that is the chain gets a central-exchange order book with onchain settlement, and puts all its trust in the validator set."
+    }
+  ]
+}

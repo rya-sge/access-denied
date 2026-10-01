@@ -1,0 +1,11 @@
+flowchart LR
+    IN["Equity below 2/3<br/>of maintenance"] --> HLP["Step 2<br/>HLP vault takes<br/>the position"]
+    HLP --> Q2{"Account value<br/>negative?"}
+    Q2 -->|"no"| END["Done"]
+    Q2 -->|"negative"| ADL["Step 3<br/>auto-deleveraging"]
+
+    style IN fill:#F0F2F5,stroke:#78909C
+    style HLP fill:#E8F5E9,stroke:#2E7D32
+    style Q2 fill:#F0F2F5,stroke:#78909C
+    style END fill:#F0F2F5,stroke:#78909C
+    style ADL fill:#FDEEEE,stroke:#B54A4A

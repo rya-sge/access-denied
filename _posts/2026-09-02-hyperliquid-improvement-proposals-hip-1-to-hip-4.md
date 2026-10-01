@@ -2,6 +2,7 @@
 layout: post
 title: "The Hyperliquid Improvement Proposals - HIP-1 to HIP-4"
 date:   2026-09-02
+last_modified_at: 2026-10-01
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -16,7 +17,7 @@ A Hyperliquid Improvement Proposal is not a governance document. Nothing is vote
 
 What the four HIPs share is a way of handling permission. On a centralised venue, listing an asset or opening a market is a decision someone makes about you. On Hyperliquid the decision is priced instead: a Dutch auction for a token ticker, a staked bond for a perp DEX, a per-deployer capacity limit for an outcome venue. Nobody approves the listing, and a deployer who operates a market badly is answerable afterwards to a stake-weighted validator vote that can burn the bond. HIP-2 is the one case with no deployer role to price, because it has no deployer at all.
 
-This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It closes on what the four have in common, which is where the design shows most clearly.
+This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It then answers who can list a token or a market, and closes on what the four have in common, which is where the design shows most clearly.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -268,6 +269,20 @@ Outcomes (HIP-4)   encoding = outcome_id * 10 + side             (side in {0, 1}
 ```
 
 Two traps live here. The spot ID is not the token ID: HYPE on mainnet has token ID 150 and spot ID 107, and both differ again on testnet. And outcome markets, despite sharing most of their implementation with spot, use a third encoding that is neither the spot nor the perp scheme.
+
+## Who can list a token or a market
+
+Read from the side of someone who wants to list, the four HIPs answer one question: who is allowed to add something tradable to Hyperliquid. The short answer is anyone who can pay the entry price, with one exception.
+
+- **A spot token.** Any address can deploy one through HIP-1 by winning the 31-hour gas auction and running the five-step genesis. An asset minted elsewhere follows the same path, through an ERC-20 on the HyperEVM linked to the HIP-1 token. A new pair between two existing tokens has its own auction.
+- **On-book liquidity for that token.** HIP-2 is not a separate listing. It is a genesis field of the HIP-1 deployment, so whoever deploys the token decides whether it starts with a Hyperliquidity ladder.
+- **A perpetual market.** Any address that stakes 500 000 HYPE can run a HIP-3 DEX and list perps on it: three assets without an auction, then further assets through the shared auction or reserve deployments. The deployer chooses the oracle and the contract specification, and answers for them to a validator vote.
+- **An outcome market.** A HIP-4 deployer instantiates a template that validators have already voted on. Deployment costs no gas but is capped per deployer, and at the time of writing the flow is testnet-only.
+- **A quote asset.** Any token can become one by meeting the decimals and fee-share constraints and committing 200 000 HYPE for three years.
+
+The exception is the validator-operated perps, the default markets such as BTC and ETH that are not part of any HIP-3 DEX. No individual deployer can add or remove those; listings and delistings there go through validator vote.
+
+Two consequences matter for a user rather than a deployer. A HIP-1 name has no uniqueness constraint, so a ticker alone does not identify a token, and the token index or system address does. And a HIP-3 market can quote any underlying its deployer can feed an oracle for, which means the quality of a listed perp depends on that deployer and not on a review by the protocol.
 
 ## The common pattern
 

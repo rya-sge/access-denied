@@ -1,0 +1,11 @@
+flowchart LR
+    START["Equity below<br/>maintenance margin"] --> BOOK["Step 1<br/>market orders sent to the book"]
+    BOOK --> Q{"Margin restored?"}
+    Q -->|"restored"| OK["Trader keeps the<br/>remaining collateral"]
+    Q -->|"equity below 2/3<br/>of maintenance"| NEXT["Step 2<br/>next slide"]
+
+    style START fill:#F0F2F5,stroke:#78909C
+    style BOOK fill:#E8F5E9,stroke:#2E7D32
+    style Q fill:#F0F2F5,stroke:#78909C
+    style OK fill:#F0F2F5,stroke:#78909C
+    style NEXT fill:#FDEEEE,stroke:#B54A4A
