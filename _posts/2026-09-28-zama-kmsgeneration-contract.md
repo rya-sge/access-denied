@@ -235,11 +235,11 @@ function _buildConsensusStorageUrls(uint256 contextId, address[] memory consensu
 
 `ActivateKey(keyId, existingKeyId, consensusUrls, keyDigests)` therefore carries, in one event, *what was generated* (digests, per key type) and *where every agreeing node published it*. `getKeyMaterials(keyId)` returns the same pair on demand.
 
-This is the mechanism behind a claim that is often stated without its plumbing: **the public key and the evaluation key are public**. Not "available to coprocessors" — published, at URLs announced on-chain, with digests anchored on-chain, redundantly by each node that took part. Anyone can fetch the evaluation key, fetch the ciphertexts from public storage, re-run an operation and compare the result with what the coprocessors committed to. Without this contract publishing digest and location together, that verifiability would not exist.
+This is the mechanism behind a claim that is often stated without the on-chain record that makes it checkable: **the public key and the evaluation key are public**. Not "available to coprocessors" — published, at URLs announced on-chain, with digests anchored on-chain, redundantly by each node that took part. Anyone can fetch the evaluation key, fetch the ciphertexts from public storage, re-run an operation and compare the result with what the coprocessors committed to. Without this contract publishing digest and location together, that verifiability would not exist.
 
 ## CRS generation
 
-`crsgenRequest(uint256 maxBitLength, ParamsType paramsType)` and `crsgenResponse(uint256 crsId, bytes crsDigest, bytes signature)` are the same machinery in a single phase. The common reference string is what the client-side zero-knowledge proof of ciphertext well-formedness is defined against — the `inputProof` that a confidential token's transfer carries — so the protocol needs an agreed CRS for the same reason it needs an agreed key.
+`crsgenRequest(uint256 maxBitLength, ParamsType paramsType)` and `crsgenResponse(uint256 crsId, bytes crsDigest, bytes signature)` are the same request-and-response pattern, in a single phase. The common reference string is what the client-side zero-knowledge proof of ciphertext well-formedness is defined against — the `inputProof` that a confidential token's transfer carries — so the protocol needs an agreed CRS for the same reason it needs an agreed key.
 
 `maxBitLength` is stored at request time and hashed into the signed struct:
 

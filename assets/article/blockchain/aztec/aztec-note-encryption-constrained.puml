@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Is note encryption\nconstrained on Aztec?
+** The question
+*** AES is byte-oriented,\na poor circuit fit
+*** Aztec pushes much\nto unconstrained oracles
+*** So doubt is reasonable
+** Three delivery modes
+*** offchain()\nno data, no proof
+*** onchain_unconstrained()\nlog, no proof
+*** onchain_constrained()\nlog + proof
+** The answer
+*** Docs: encryption AND tag\nare constrained
+*** Cost line says\n"proving time for encryption"
+*** std::aes128::aes128_encrypt\nis the Noir stdlib
+*** Decryption is an oracle\ntry_aes128_decrypt
+** Where the constraints live
+*** The contract's circuit,\nnot the kernels
+*** profile gates attributes\nthem per function
+*** AES-128 absent\nfrom the AVM
+** Cost and design
+*** ~20,200 gates\nper delivery, measured
+*** Paid in the user's\nproving time
+*** Choice is per recipient,\nnot per contract
+*** Caps batch sizes
+** Found in the source
+*** Invalid address encrypts\nto a random one
+*** Prevents king-of-the-hill
+*** Padding is unconstrained\nrandom, deliberately
+*** Test: who is hurt\nif it is wrong?
+@endmindmap

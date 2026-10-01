@@ -943,3 +943,7 @@ _posts/2026-09-25-malachite-consensus-arc.md
   assets/article/blockchain/circle/malachite-arc-stack-concept.puml                   (concept, component, in-section)
   assets/article/blockchain/circle/malachite-round-state-machine.puml                 (concept, state, in-section)
   assets/article/blockchain/circle/malachite-arc-height-lifecycle-sequence.puml       (workflow, sequence, in-section)
+
+_posts/2026-09-30-aztec-note-encryption-constrained-aes128.md
+  assets/article/blockchain/aztec/aztec-note-encryption-constrained.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
