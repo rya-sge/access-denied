@@ -951,3 +951,11 @@ _posts/2026-09-30-aztec-note-encryption-constrained-aes128.md
 _posts/2026-10-01-hotstuff-bft-consensus.md
   assets/article/blockchain/consensus/2026-10-01-hotstuff-bft-consensus-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-tendermint-bft-consensus.md
+  assets/article/blockchain/consensus/2026-10-01-tendermint-bft-consensus-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-eu-money-market-fund-regulation-2017-1131.md
+  assets/article/regulation/mmf/2026-10-01-eu-money-market-fund-regulation-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

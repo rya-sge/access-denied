@@ -48,7 +48,7 @@ The dependency is Circle's fork of Malachite, pinned in `Cargo.toml` at tag `v0.
 
 ## One round, three votes
 
-Malachite runs the Tendermint round. Each round has one proposer and three phases:
+Malachite runs the [Tendermint round]({{site.url_complet}}/2026/10/01/tendermint-bft-consensus/). Each round has one proposer and three phases:
 
 1. **Propose.** The proposer broadcasts a block. The others wait up to `timeout_propose` for it.
 2. **Prevote.** Each validator prevotes for the block if it received a valid one in time, and prevotes nil otherwise. Seeing more than two thirds of prevotes for the same block, called a *polka*, makes a validator lock on that block.
@@ -306,3 +306,4 @@ No. Malachite detects double votes and double proposals, and Arc stores them and
 - [Canton Network — Architecture, Privacy Model, and Comparison with Ethereum, Railgun, Zcash, Zama fhEVM, and Besu]({{site.url_complet}}/2026/05/12/canton-network-architecture/)
 - [Solana Staking - Overview]({{site.url_complet}}/2025/11/07/solana-staking-overview/)
 - [HotStuff — Linear and Responsive BFT Consensus, from Basic HotStuff to the Event-Driven Pacemaker]({{site.url_complet}}/2026/10/01/hotstuff-bft-consensus/)
+- [Tendermint — BFT Consensus over Gossip, Locks and the validValue Termination Mechanism]({{site.url_complet}}/2026/10/01/tendermint-bft-consensus/)

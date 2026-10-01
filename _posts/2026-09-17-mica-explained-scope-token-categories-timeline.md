@@ -275,3 +275,4 @@ But Article 4(4) removes every Title II exemption where the offeror makes known 
 - [Flexible Access Control in smart contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/)
 - [Tether USDT smart contract - Overview]({{site.url_complet}}/2025/07/06/tether-stablecoin-overview/)
 - [Crypto Wallets Explained - Types, Risks, and How to select it]({{site.url_complet}}/2024/10/08/crypto-wallet-introduction/)
+- [The EU Money Market Fund Regulation (EU) 2017/1131 — Fund Types, Portfolio Rules, Valuation and Liquidity Tools]({{site.url_complet}}/2026/10/01/eu-money-market-fund-regulation-2017-1131/)

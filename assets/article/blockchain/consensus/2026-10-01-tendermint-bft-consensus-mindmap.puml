@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Tendermint BFT Consensus
+** Motivation
+*** WAN, many nodes, mutual distrust
+*** Gossip instead of direct links
+*** No proof piggybacked on proposals
+** Model
+*** Voting power, n > 3f
+*** Partial synchrony, GST, Δ
+*** Gossip communication property
+** Consensus problem
+*** One instance per height
+*** Agreement, Termination, Validity
+*** valid() predicate
+** Round
+*** PROPOSAL carries the block
+*** PREVOTE id(v) or nil
+*** PRECOMMIT after 2f+1 prevotes
+*** Decide on 2f+1 precommits
+left side
+** Safety
+*** Lock on precommit
+*** Lemma 1: quorum intersection
+*** Lemma 2-3: Agreement
+** Termination
+*** validValue / validRound
+*** Re-propose latest possible decision
+*** Timeouts grow > 2Δ
+*** Round skip on f+1
+** Comparison
+*** PBFT: same pattern, no view change
+*** HotStuff: 3 steps, responsive
+*** CometBFT, Malachite
+@endmindmap

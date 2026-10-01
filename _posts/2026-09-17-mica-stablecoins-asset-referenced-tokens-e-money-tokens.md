@@ -364,3 +364,4 @@ The token meets at least three of the Article 43(1) criteria: holders, value, an
 - [USD₮0 - Omnichain Fungible Token]({{site.url_complet}}/2025/11/07/usdt0-Omnichain-fungible-token/)
 - [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/)
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)
+- [The EU Money Market Fund Regulation (EU) 2017/1131 — Fund Types, Portfolio Rules, Valuation and Liquidity Tools]({{site.url_complet}}/2026/10/01/eu-money-market-fund-regulation-2017-1131/)

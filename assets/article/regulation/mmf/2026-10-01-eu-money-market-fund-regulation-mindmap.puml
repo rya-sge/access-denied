@@ -1,0 +1,57 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+  :depth(0) {
+    BackgroundColor #1F5E46
+    FontColor white
+  }
+}
+</style>
+* Money Market Fund Regulation\n(EU) 2017/1131
+** Scope and authorisation
+*** UCITS or AIF in short-term assets
+*** Money market return or capital preservation
+*** Single EU-wide authorisation
+*** Protected MMF designation (Art. 6)
+** Fund types
+*** VNAV (floating NAV, 1 bp)
+*** Public debt CNAV (≥ 99.5 % public debt)
+*** LVNAV (20 bp collar)
+*** Short-term or standard (standard = VNAV only)
+** Eligible assets
+*** MMIs ≤ 397 days
+*** Securitisations and ABCPs
+*** Deposits ≤ 12 months
+*** Hedging-only derivatives
+*** Repos ≤ 7 days, reverse repos
+*** Other MMFs ≤ 5 % / 17.5 %
+*** No short sales, equity, lending, borrowing
+left side
+** Diversification and credit
+*** 5 % per issuer, 15 % per body
+*** 100 % public-debt derogation
+*** 10 % concentration cap
+*** Internal credit assessment
+** Portfolio rules
+*** WAM 60 days / 6 months
+*** WAL 120 days / 12 months
+*** Daily 7.5-10 %, weekly 15-30 %
+*** Stress tests, know your customer
+** Valuation and liquidity tools
+*** Daily mark-to-market
+*** Amortised cost ≤ 75 days, 10 bp
+*** Fees, gates, suspensions (30 % / 10 %)
+*** No external support
+** Transparency and reporting
+*** Weekly investor information
+*** Quarterly report (annual ≤ EUR 100 M)
+*** ESMA central database
+@endmindmap

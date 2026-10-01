@@ -341,10 +341,10 @@ HotStuff trades one additional voting phase for a leader-replacement protocol th
 
 | Term | Definition |
 |------|------------|
-| **Byzantine fault** | A failure in which a replica deviates arbitrarily from the protocol, for instance by lying, sending conflicting messages or staying silent; the protocol tolerates up to f such replicas out of n = 3f + 1. |
+| **Byzantine fault** | A failure in which a replica deviates arbitrarily from the protocol, for instance by lying, sending conflicting messages or staying silent; the protocol tolerates up to f such replicas out of n = 3f + 1, where n is the total number of replicas and f the maximum number of Byzantine ones. |
 | **State machine replication (SMR)** | Technique in which n deterministic replicas execute the same client commands in the same order, so that correct replicas hold the same state and return the same responses. |
 | **Safety and liveness** | Safety means correct replicas never commit conflicting nodes; liveness means new commands are eventually committed. HotStuff guarantees safety at all times and liveness only after GST. |
-| **Quorum** | With n the total number of replicas and f the maximum number of Byzantine replicas tolerated (n = 3f + 1), a quorum is any set of n − f = 2f + 1 replicas; two quorums share at least f + 1 replicas, so at least one correct replica belongs to both. |
+| **Quorum** | Any set of n − f = 2f + 1 replicas; two quorums share at least f + 1 replicas, so at least one correct replica belongs to both. |
 | **Equivocation** | A Byzantine leader sending conflicting proposals for the same view or height to different replicas. |
 | **Partial synchrony** | Network model in which a known delay bound Δ holds only after an unknown Global Stabilization Time (GST); safety must hold always, progress only after GST. |
 | **Global Stabilization Time (GST)** | The unknown moment after which every message between correct replicas arrives within Δ; before it, messages can be delayed arbitrarily, so a decision may never be reached, and after it HotStuff guarantees progress. |
@@ -458,6 +458,7 @@ All three use a Two-Chain commit rule: a replica locks on a One-Chain and commit
 
 ### Related articles
 
+- [Tendermint — BFT Consensus over Gossip, Locks and the validValue Termination Mechanism]({{site.url_complet}}/2026/10/01/tendermint-bft-consensus/)
 - [Malachite Consensus on Arc — How Circle's L1 Finalises a Block, Compared with CometBFT, HotStuff and Gasper]({{site.url_complet}}/2026/09/25/malachite-consensus-arc/)
 - [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)
 - [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)
