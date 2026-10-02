@@ -2,11 +2,13 @@
 Mermaid diagrams, loaded only on pages with `isMermaid: true` in the front matter,
 following the same pattern as mathJax.html.
 
-Why the DOM rewriting: kramdown turns a ```mermaid fence into
-<div class="language-mermaid highlighter-rouge"><div class="highlight"><pre><code>...
-Mermaid expects the source in an element it can find, so each code block is read
-with textContent (which decodes entities and drops any syntax-highlight spans)
-and replaced by a <div class="mermaid"> holding the raw source.
+Why the DOM rewriting: depending on the highlighter configuration, kramdown turns a
+```mermaid fence into either <div class="language-mermaid highlighter-rouge"><div
+class="highlight"><pre><code>... or (as GitHub Pages builds this site) a bare
+<pre><code class="language-mermaid">. Each code block is read with textContent
+(which decodes entities and drops any syntax-highlight spans) and the WHOLE block,
+<pre> included, is replaced by a <div class="mermaid"> holding the raw source.
+Leaving the <pre> in place makes labels inherit `pre { word-break: break-all }`.
 -->
 
 <!--
@@ -23,13 +25,31 @@ the only two APIs used below - are both still present in the 12.0.0 type declara
   const blocks = [];
   document.querySelectorAll('code.language-mermaid, .language-mermaid code').forEach((code) => {
     const source = code.textContent;
-    const host = code.closest('.language-mermaid') || code.parentElement;
+    // Replace the whole block, not just the <code>. GitHub Pages emits a bare
+    // <pre><code class="language-mermaid"> with no wrapper div, so
+    // closest('.language-mermaid') matches the <code> itself; replacing only
+    // that left the diagram inside the <pre>, which inherited
+    // `pre { word-break: break-all }` and split label words mid-word.
+    const pre = code.closest('pre');
+    const host = code.closest('div.language-mermaid')
+      || (pre && pre.closest('div.highlighter-rouge'))
+      || pre
+      || code;
     const div = document.createElement('div');
     div.className = 'mermaid';
     div.textContent = source;
     host.replaceWith(div);
     blocks.push(div);
   });
+
+  // Second line of defence: whatever the diagram ends up nested in, its labels
+  // must wrap only at spaces, as Mermaid sized them.
+  if (blocks.length) {
+    const style = document.createElement('style');
+    style.textContent =
+      '.mermaid, .mermaid * { word-break: normal; overflow-wrap: normal; }';
+    document.head.appendChild(style);
+  }
 
   if (blocks.length) {
     const render = () => {
