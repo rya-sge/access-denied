@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+  :depth(0) {
+    BackgroundColor #1F5E46
+    FontColor white
+  }
+}
+</style>
+* LVNAV Money Market Funds\nunder Stress
+** What an LVNAV may do
+*** Constant dealing price
+*** Private-sector paper
+*** Always short-term (WAM 60, WAL 120)
+*** DLA 10 %, WLA 30 %
+** Two prices every day
+*** Variable NAV, 1 bp rounding
+*** Constant NAV, 0.01 rounding
+*** Amortised cost ≤ 75 days
+*** 10 bp test per asset
+** 20 bp band
+*** Next dealing at variable NAV
+*** Status kept, event reported
+*** First-mover advantage
+left side
+** Article 34 tools
+*** WLA < 30 % and redemptions > 10 %
+*** WLA < 10 %: fee or suspension
+*** Gate 10 %/day, 15 working days
+*** > 15 days in 90: status lost
+*** Threshold effect
+** Stress episodes
+*** March 2020: EUR 85 bn out
+*** USD LVNAVs near the band
+*** Sept 2022 gilt / LDI
+*** No fees, gates or breaks
+** Policy response
+*** FSB 2021, ESRB and ESMA 2022
+*** Commission 2023: no revision
+*** LMT duty from April 2026
+*** COM(2026) 350: 40 % / 20 % benchmarks
+*** US SEC 2023: tie removed
+@endmindmap

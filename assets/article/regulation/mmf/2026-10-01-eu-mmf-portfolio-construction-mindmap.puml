@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+  :depth(0) {
+    BackgroundColor #1F5E46
+    FontColor white
+  }
+}
+</style>
+* Building a Compliant\nEU MMF Portfolio
+** Step 0: fund type
+*** Short-term VNAV
+*** WAM 60, WAL 120
+*** DLA 7.5 %, WLA 15 %
+*** VNAV 10 % / 40 % issuer rule
+** Step 1: eligibility
+*** Seven asset categories
+*** MMIs ≤ 397 days
+*** Deposits on demand ≤ 12 months
+*** Ancillary cash (AMF 10 %)
+** Step 2: credit assessment
+*** Internal, not ratings-driven
+*** DR 2018/990 criteria
+*** Downgrade = material change
+*** Independent from PMs
+left side
+** Steps 3-4: diversification
+*** Group aggregation (17(10))
+*** Combined 15 % per body
+*** Concentration 10 % of issue
+*** Public debt: 17(2) or 17(7)
+*** Fixes: Bank A 16 % -> 14 %
+** Step 5: maturity and liquidity
+*** WAM 52.3, WAL 65.8 days
+*** DLA 27.5 %, WLA 32.5 %
+*** 397-day trade breaks WAM
+** Step 6: repos
+*** Reverse repo 15 % per counterparty
+*** Collateral outside Art. 17
+*** Haircuts for 15(6) assets
+@endmindmap

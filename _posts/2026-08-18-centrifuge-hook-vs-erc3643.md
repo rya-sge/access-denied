@@ -383,3 +383,4 @@ Two secondary factors usually settle borderline cases. If holders should carry i
 ### Related articles
 
 - [MiCA Explained — Scope, Token Categories and Timeline of Regulation (EU) 2023/1114]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/)
+- [Tokenised Money Market Funds in the EU — What Regulation 2017/1131 Requires of an On-Chain Share Class]({{site.url_complet}}/2026/10/01/tokenised-money-market-funds-eu-mmf-regulation/)

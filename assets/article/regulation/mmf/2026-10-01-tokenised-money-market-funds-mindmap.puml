@@ -1,0 +1,56 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+  :depth(0) {
+    BackgroundColor #1F5E46
+    FontColor white
+  }
+}
+</style>
+* Tokenised EU\nMoney Market Funds
+** Applicable regimes
+*** Not MiCA: financial instrument, Art. 2(4)(a)
+*** MiCA "funds" = money (PSD2)
+*** MMFR + UCITS / AIFMD
+*** MiFID II distribution
+*** National register law (French DEEP)
+*** DLT Pilot only for venues
+** Architectures
+*** On-chain legal register (Spiko)
+*** DLT share class (Amundi / CACEIS)
+*** Mirror of TA register (BlackRock / Kinexys)
+** Dealing price (Art. 33)
+*** VNAV at variable NAV
+*** CNAV at constant NAV
+*** LVNAV 20 bp switch
+*** Orders 24/7, settlement at struck NAV
+left side
+** Liquidity tools (Art. 34)
+*** CNAV and LVNAV only
+*** Board decision, reported
+*** Gate 10 % per day, fund-wide
+*** Suspension max 15 working days
+** Holders (Art. 27, 37)
+*** Contracts and pools as one holder
+*** Whitelisting onboarded investors
+*** Holder data for reporting
+** External support (Art. 35)
+*** Sponsor redemption facility
+*** Sponsor-funded price floor
+*** Stable-price wrapper
+** Assets and disclosure
+*** EMT not an eligible asset (Art. 9)
+*** Front end = marketing (Art. 36)
+*** No "stablecoin" framing
+** MiCA reserves
+*** Commission: MMFs as HLFI
+*** EBA opinions Oct 2025 object
+@endmindmap

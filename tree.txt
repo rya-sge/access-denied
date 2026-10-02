@@ -959,3 +959,15 @@ _posts/2026-10-01-tendermint-bft-consensus.md
 _posts/2026-10-01-eu-money-market-fund-regulation-2017-1131.md
   assets/article/regulation/mmf/2026-10-01-eu-money-market-fund-regulation-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-tokenised-money-market-funds-eu-mmf-regulation.md
+  assets/article/regulation/mmf/2026-10-01-tokenised-money-market-funds-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-lvnav-money-market-funds-stress-collar-liquidity-tools.md
+  assets/article/regulation/mmf/2026-10-01-lvnav-money-market-funds-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-01-eu-money-market-fund-portfolio-construction-limits.md
+  assets/article/regulation/mmf/2026-10-01-eu-mmf-portfolio-construction-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

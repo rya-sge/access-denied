@@ -6,6 +6,7 @@ lang: en
 locale: en-GB
 categories: regulation finance
 tags: regulation eu compliance liquidity risk-management money-market-fund
+series: mmfr
 description: "How Regulation (EU) 2017/1131 governs EU money market funds: VNAV, LVNAV and CNAV types, eligible assets, WAM/WAL limits, the 20 bp collar and gates."
 image: /assets/article/regulation/mmf/2026-10-01-eu-money-market-fund-regulation-mindmap.png
 isMath: true
@@ -121,7 +122,7 @@ Article 9(1) lists the only seven asset categories an MMF may hold, each under t
 
 The credit-assessment condition of Article 10(1)(c) does not apply to instruments issued or guaranteed by the Union, a Member State's central authority or central bank, the ECB, the EIB, the ESM or the EFSF (Art. 10(3)). An MMF may also hold ancillary liquid assets under Article 50(2) of the UCITS Directive (Art. 9(3)).
 
-Article 11(4) originally asked the Commission to insert a cross-reference to the criteria for simple, transparent and standardised (STS) securitisations once that framework existed. The [Securitisation Regulation (EU) 2017/2402](https://eur-lex.europa.eu/eli/reg/2017/2402/oj) has since supplied that cross-reference, which brings into play the 20 % aggregate securitisation limit of Article 17(3) discussed below.
+Article 11(4) originally asked the Commission to insert a cross-reference to the criteria for simple, transparent and standardised (STS) securitisations once that framework existed. The Commission did so in Article 1 of [Delegated Regulation (EU) 2018/990](https://eur-lex.europa.eu/eli/reg_del/2018/990/oj), which rewrote Article 11(1)(c) to refer to the STS criteria of the [Securitisation Regulation (EU) 2017/2402](https://eur-lex.europa.eu/eli/reg/2017/2402/oj). That cross-reference brings into play the 20 % aggregate securitisation limit of Article 17(3) discussed below.
 
 ### What an MMF may never do
 
@@ -290,7 +291,7 @@ flowchart TD
 
 The two triggers differ in kind. The first is discretionary: the board may decide to take no action beyond the general duty to correct a breach. The second is mandatory: below 10 % weekly liquidity, a fee or a suspension must be applied. Liquidity fees must reflect the fund's cost of obtaining liquidity, so that remaining investors are not disadvantaged by those who leave.
 
-Article 34(2) adds the backstop. If suspensions total more than 15 days in any 90-day period, the fund loses its CNAV or LVNAV status automatically and must inform every investor in writing. The March 2020 market stress showed the weakness of the first trigger: managers of LVNAV funds approaching 30 % weekly liquidity had an incentive to keep liquidity above that line rather than use it, since crossing it exposed investors to fees or gates. ESMA's 2022 opinion on the review of the Regulation recommended removing that link between liquidity thresholds and the activation of these tools.
+Article 34(2) adds the backstop. If suspensions total more than 15 days in any 90-day period, the fund loses its CNAV or LVNAV status automatically and must inform every investor in writing. The March 2020 market stress showed the weakness of the first trigger: managers of LVNAV funds approaching 30 % weekly liquidity had an incentive to keep liquidity above that line rather than use it, since crossing it exposed investors to fees or gates. ESMA's 2022 opinion on the review of the Regulation recommended removing that link between liquidity thresholds and the activation of these tools. The Commission's 2023 review report did not propose amendments, and its follow-up report of May 2026 (COM(2026) 350) kept the thresholds unchanged while suggesting weekly-liquidity levels of 40 % for stable-NAV funds and 20 % for VNAVs as non-binding supervisory benchmarks.
 
 ## Prohibition of external support (Article 35)
 
@@ -357,7 +358,9 @@ Authorities cooperate with each other, with ESMA, and with the European Systemic
 | 21 January 2018 | Deadline for the Art. 15(7) delegated act and the Art. 37(4) draft reporting ITS |
 | **21 July 2018** | **General date of application** |
 | 21 January 2019 | Deadline for existing UCITS and AIFs to apply for MMF authorisation (Art. 44) |
-| 21 July 2022 | Commission review, including the feasibility of an 80 % EU public debt quota for public debt CNAV MMFs (Art. 46) |
+| 21 July 2022 | Commission review due, including the feasibility of an 80 % EU public debt quota for public debt CNAV MMFs (Art. 46) |
+| 20 July 2023 | Commission review report: no legislative revision proposed |
+| 11 May 2026 | Commission report COM(2026) 350 on MMF liquidity: non-binding weekly-liquidity benchmarks, no change to the Regulation |
 
 ## Conclusion
 
@@ -528,7 +531,7 @@ The manager may take a rating into account but must reach its own conclusion usi
 
 **Q: A tokenised share class of a euro MMF is issued on a public blockchain. Does it fall under MiCA or under the MMF Regulation?**
 
-Under the MMF Regulation. MiCA excludes funds and financial instruments from its scope (Art. 2(4) of Regulation (EU) 2023/1114), and recording units on a distributed ledger does not change the fund's legal nature. The issuer remains a UCITS or AIF authorised as an MMF, and the token holders are subject to the same portfolio rules, NAV calculation, liquidity tools and marketing statements as any other investor in the fund.
+Under the MMF Regulation. Units in a collective investment undertaking are financial instruments under MiFID II (Annex I, Section C(3) of Directive 2014/65/EU), and MiCA does not apply to crypto-assets that qualify as financial instruments (Art. 2(4)(a) of Regulation (EU) 2023/1114). The "funds" exclusion of Art. 2(4)(c) is not the relevant one: in MiCA, "funds" means money as defined in the Payment Services Directive (Art. 3(1)(14)). Recording units on a distributed ledger does not change the fund's legal nature. The issuer remains a UCITS or AIF authorised as an MMF, and the token holders are subject to the same portfolio rules, NAV calculation, liquidity tools and marketing statements as any other investor in the fund.
 
 ## References
 
@@ -539,9 +542,9 @@ Under the MMF Regulation. MiCA excludes funds and financial instruments from its
 - [Directive 2011/61/EU (Alternative Investment Fund Managers Directive)](https://eur-lex.europa.eu/eli/dir/2011/61/oj)
 - [Regulation (EC) No 1060/2009 on credit rating agencies](https://eur-lex.europa.eu/eli/reg/2009/1060/oj), Article 5a on over-reliance on ratings
 - [Regulation (EU) 2017/2402 (Securitisation Regulation)](https://eur-lex.europa.eu/eli/reg/2017/2402/oj), STS criteria referred to by Article 11
-- [Commission Delegated Regulation (EU) 2018/990](https://eur-lex.europa.eu/eli/reg_del/2018/990/oj), supplementing Articles 15 and 22 (reverse repo assets and credit quality assessment)
+- [Commission Delegated Regulation (EU) 2018/990](https://eur-lex.europa.eu/eli/reg_del/2018/990/oj), amending Article 11(1)(c) (STS cross-reference) and supplementing Articles 15 and 22 (reverse repo assets and credit quality assessment)
 - [Commission Implementing Regulation (EU) 2018/708](https://eur-lex.europa.eu/eli/reg_impl/2018/708/oj), reporting template under Article 37(4)
-- [Regulation (EU) 2023/1114 on markets in crypto-assets (MiCA)](https://eur-lex.europa.eu/eli/reg/2023/1114/oj), Article 2(4) exclusion of funds
+- [Regulation (EU) 2023/1114 on markets in crypto-assets (MiCA)](https://eur-lex.europa.eu/eli/reg/2023/1114/oj), Article 2(4)(a) exclusion of financial instruments
 
 ### Related articles
 

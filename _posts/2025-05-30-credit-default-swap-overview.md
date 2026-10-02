@@ -327,3 +327,7 @@ Made with the help of ChatGPT
 - [Wikipedia - Credit default swap](https://en.wikipedia.org/wiki/Credit_default_swap)
 - [CFI - Naked Credit Default Swaps](https://corporatefinanceinstitute.com/resources/derivatives/naked-credit-default-swaps/)
 
+
+### Related articles
+
+- [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/)
