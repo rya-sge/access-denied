@@ -39,6 +39,13 @@ The claim that the private key never exists anywhere is the one readers stop at:
 
 **Computation never touches the private key at all.** Adding, comparing or selecting ciphertexts uses the *evaluation* key, which the coprocessors hold and which cannot decrypt anything. A confidential transfer is arithmetic on ciphertexts producing a ciphertext of the correct result, so the KMS is not involved and no balance is learned by anyone. Decryption is needed only when a person wants to read a number.
 
+**A share is a point, not a piece.** The word invites the wrong picture, of a key cut into thirteen fragments that could be glued back together. What each party holds is one evaluation of a polynomial. The parties jointly construct a polynomial $$f$$ of degree $$t = 4$$ whose constant term is the secret, $$f(0) = s$$, and party $$i$$ ends up holding $$s_i = f(i)$$. Two consequences follow from nothing more than the degree:
+
+- **Any 5 points determine $$f$$**, and therefore $$s$$. That is Lagrange interpolation, and it is where the $$\lambda_i$$ coefficients below come from.
+- **Any 4 points determine nothing.** For every candidate secret there is exactly one degree-4 polynomial passing through those four points and taking that value at zero, so four shares are consistent with every possible key. The guarantee is information-theoretic: it does not weaken against an adversary with more computing power, or a quantum one.
+
+That single parameter is also where the deck-level numbers come from. Four is what the system tolerates and five is what an attacker needs, and they are the same fact stated from either side. The polynomial is never built anywhere during generation either: a distributed key generation produces the points directly, so the constant term $$s$$ has no moment of existence to protect. The implementation works over a residue polynomial ring rather than a prime field, which changes none of the reasoning.
+
 **Decryption does use the private key, one share at a time**, and that is possible because TFHE decryption is *linear* in the secret key. A ciphertext of a message $$m$$ under a secret key $$s$$ is a pair $$(a, b)$$, a mask and a body, with
 
 $$
@@ -182,6 +189,21 @@ Monitoring uses a `ServiceMonitor` on port 9646 and the `kms-health-check` probe
 ## Performance
 
 The benchmarks page reports distributed decryption with 13 parties and the production parameter set, in a LAN setting (one EC2 region). On `c5a.8xlarge` nodes (32 vCPUs), a single `euint64` decryption takes about 96 ms; with 1,024 requests in flight the latency is about 3 s and the throughput about 330 `euint64` per second, or close to 4,800 raw LWE ciphertexts per second for `euint16`. A boolean decrypts in a few milliseconds alone and reaches roughly 700 per second in batches. Key generation and preprocessing are the slow operations, hours rather than seconds, which is why preprocessing runs continuously in the background to keep a cache ahead of demand.
+
+## Post-quantum status
+
+The KMS is the part of the protocol with the least to do here, and the reason is structural rather than fortunate.
+
+**The threshold protocols carry no computational assumption of their own.** The Cryptographic Documentation describes them as resting *"mainly on information theoretic constructions"* and lightweight symmetric primitives, and the broadcast design reflects it: Dolev-Strong was rejected partly because it needs chains of digital signatures, in favour of *"symmetric key encryption, MACs and hash functions"*. Secret sharing, as above, is information-theoretic. Noise flooding is statistical. What protects a value is the lattice problem under the TFHE ciphertext, and the same document states that the only pre-quantum primitive in the protocol sits in the input proofs, which the KMS does not produce.
+
+**Two post-quantum algorithms are already deployed here**, both NIST standards:
+
+- **ML-KEM-512 with AES-256-GCM** protects every share returned by a user decryption. The keypair the SDK generates before a request is an ML-KEM keypair, so the path from the parties back to the one authorised reader is post-quantum end to end.
+- **ML-KEM again in the custodian backup**, where the code explains the dual arrangement in its own words: the RSA-OAEP key lives in AWS KMS and the ML-KEM key in Secret Manager, *"because post quantum algorithms are not supported on AWS KMS at the moment"*.
+
+**And one that is available but unusable on-chain.** The `signing_schemes` list offers ML-DSA at three levels, as noted above, but a contract verifying a decryption result can only call `ecrecover`. The KMS can sign post-quantum; the EVM cannot check it.
+
+A component-by-component treatment, including the input proof and the host chain's signatures, is in [the article on Zama and post-quantum cryptography]({{site.url_complet}}/2026/10/02/zama-post-quantum/).
 
 ## Conclusion
 
