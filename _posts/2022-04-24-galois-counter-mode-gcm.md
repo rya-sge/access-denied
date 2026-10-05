@@ -198,3 +198,7 @@ Sources secondaires :
 - [crypto.stackexchange.com - Leaving authentication data blank less secure for AES GCM?](https://crypto.stackexchange.com/questions/15699/leaving-authentication-data-blank-less-secure-for-aes-gcm)
 - SBAI AZMI, 2017. TLS: Les suites cryptographiques. In : *cert-devoteam* [en ligne]. 29 mai 2017. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://www.cert-devoteam.fr/1166-2/](https://www.cert-devoteam.fr/1166-2/)
 - [MDN CONTRIBUTORS](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams/contributors.txt), 2022. AesGcmParams. In : *MDN* [en ligne]. 29 avril 2022. [Consulté le 2 mai 2022]. Disponible à l’adresse: [https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams](https://developer.mozilla.org/en-US/docs/Web/API/AesGcmParams)
+
+### Related articles
+
+- [The CCM Mode of Operation (NIST SP 800-38C): Counter Mode with CBC-MAC]({{site.url_complet}}/2026/10/05/ccm-mode-nist-sp-800-38c/)

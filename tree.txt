@@ -971,3 +971,7 @@ _posts/2026-10-01-lvnav-money-market-funds-stress-collar-liquidity-tools.md
 _posts/2026-10-01-eu-money-market-fund-portfolio-construction-limits.md
   assets/article/regulation/mmf/2026-10-01-eu-mmf-portfolio-construction-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-05-ccm-mode-nist-sp-800-38c.md
+  assets/article/cryptographie/mode-operation/2026-10-05-ccm-mode-nist-sp-800-38c-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

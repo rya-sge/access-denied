@@ -166,3 +166,7 @@ Le chiffrement par bloc CTR n'est pas adapté au chiffrement de disque dur car :
 - Cours de cryptographie (CRY) enseigné à la HEIG-VD en 2020.
 - Cours de cryptographie appliquée avancée (CAA) enseigné à la HEIG-VD en 2022.
 - Pour les schémas de chiffrement et déchiffrement : [https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
+
+### Related articles
+
+- [The CCM Mode of Operation (NIST SP 800-38C): Counter Mode with CBC-MAC]({{site.url_complet}}/2026/10/05/ccm-mode-nist-sp-800-38c/)

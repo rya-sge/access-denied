@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* CCM mode\nNIST SP 800-38C
+** Inputs
+*** Payload P: encrypted + authenticated
+*** Associated data A: authenticated only
+*** Nonce N: unique per key
+** Primitives
+*** CTR mode (confidentiality)
+*** CBC-MAC, zero IV (authenticity)
+*** One AES key, forward cipher only
+** Formatting function
+*** B0 fixes nonce and payload length
+*** Encoding of (N, A, P) is unique
+*** B0 never equals a counter block
+** Processes
+*** Generation-encryption\nT = CBC-MAC, C = CTR(P) || CTR(T)
+*** Decryption-verification\nreturns P or INVALID
+*** No plaintext before verification
+*** Errors indistinguishable
+left side
+** Appendix A encoding
+*** n + q = 15
+*** t in {4, 6, ..., 16} octets
+*** Flags octet: Adata, t, q
+*** 2 / 6 / 10 octet length of A
+** MAC length (Appendix B)
+*** Tlen >= lg(MaxErrs / Risk)
+*** Below 64 bits only with analysis
+** Security
+*** Nonce reuse leaks P1 xor P2
+*** No replay protection
+*** 2^61 block cipher calls per key
+*** Sequential, length known in advance
+** Deployments
+*** WPA2 CCMP
+*** Bluetooth LE, 802.15.4 (CCM*)
+*** TLS 1.3, IPsec
+@endmindmap

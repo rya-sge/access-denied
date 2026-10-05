@@ -119,3 +119,7 @@ Les stations n'ont pas le droit d'envoyer elle-même des messages en *broadcast*
 - Cours de Sécurité des Réseaux (SRX) enseigné à la HEIG-VD en 2021.
 - [Wikipedia - Wi-Fi Protected Access](https://en.wikipedia.org/wiki/Wi-Fi_Protected_Access)
 - ChatGTP avec l'entrée "Ecris moi un article, en français sur WPA. Parle de la sécurité, cryptographie, etc."
+
+### Related articles
+
+- [The CCM Mode of Operation (NIST SP 800-38C): Counter Mode with CBC-MAC]({{site.url_complet}}/2026/10/05/ccm-mode-nist-sp-800-38c/)
