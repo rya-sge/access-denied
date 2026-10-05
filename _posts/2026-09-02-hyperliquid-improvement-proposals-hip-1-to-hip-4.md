@@ -111,7 +111,7 @@ $$
 
 ![On any block three seconds after the last update, Hyperliquidity targets floor(balance / orderSz) full ALO asks plus one partial, then refills each filled tranche]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hip-2-hyperliquidity-update-workflow.png)
 
-The strategy updates on every block whose timestamp is at least three seconds after the previous update. Each update targets $$\lfloor \text{balance} / \text{orderSz} \rfloor$$ full ask orders plus one partial order of the remainder, and those orders are placed to the extent that ALO orders are not rejected. Every tranche that filled completely since the last update is re-placed at `orderSz` on whichever side has balance, excluding the single partial order.
+The strategy updates on every block whose timestamp is at least three seconds after the previous update. Each update targets $$\lfloor \text{balance} / \text{orderSz} \rfloor$$ full ask orders plus one partial order of the remainder, and those orders are placed to the extent that ALO orders are not rejected. ALO, for **Add Liquidity Only**, is Hyperliquid's post-only time-in-force: the order can only rest on the book as a maker, and if it would match a resting order on arrival it is cancelled instead of executing. Every tranche that filled completely since the last update is re-placed at `orderSz` on whichever side has balance, excluding the single partial order.
 
 Two details follow from the ALO choice. Hyperliquidity never takes, so it never pays a taker fee and never crosses a resting order; and an ALO order that would cross is simply rejected, which is the reason the documentation qualifies the guarantee with "to the extent that ALO orders are not rejected".
 
@@ -324,8 +324,10 @@ What connects them is the substitution of a price for an approval, and of a burn
 | **HIP** | A Hyperliquid Improvement Proposal: a primitive compiled into L1 execution, not a governance document awaiting approval. |
 | **`szDecimals` / `weiDecimals`** | The tradable decimal count and the integer-to-float conversion of a HIP-1 token; the lot size is `10^(weiDecimals - szDecimals)` and `szDecimals + 5 <= weiDecimals` must hold. |
 | **Anchor token** | An existing HIP-1 token whose holders receive a proportional genesis allocation in a new deployment, subject to holding at least 0.0001% of its max supply. |
+| **ALO (Add Liquidity Only)** | Hyperliquid's post-only time-in-force: the order only rests on the book as a maker and is rejected rather than executed if it would cross. The other time-in-force options are GTC (good til canceled) and IOC (immediate or cancel). |
 | **Hyperliquidity** | The HIP-2 strategy: a geometric price ladder of ALO orders refreshed every three seconds by block transition logic, with no operator. |
 | **`nSeededLevels`** | The number of Hyperliquidity levels beginning as bids; each one costs the deployer `px * sz` in USDC and reduces the strategy's genesis token supply. |
+| **Quote asset** | The token a spot book's prices are denominated in and paid with: the second side of a base/quote pair, as USDC is for every new HIP-1 token. Spot USDC is the default; any other token can become a permissionless quote asset by meeting the decimals and fee-share constraints and committing 200 000 HYPE for three years, and can then also serve as a HIP-3 DEX's collateral. |
 | **Perp DEX** | A HIP-3 deployment with its own margining, order books and settings, sharing the HyperCore engine and API but not its collateral pool under standard abstraction. |
 | **Growth mode** | A HIP-3 setting cutting all-in fees, rebates and volume contribution by at least 90%, restricted to markets disjoint from validator-operated perps. |
 | **Outcome** | A HIP-4 market of two tokens whose settlement values sum to exactly one quote token, making it fully collateralised and free of liquidation. |
