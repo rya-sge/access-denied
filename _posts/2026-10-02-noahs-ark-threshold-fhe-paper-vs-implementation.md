@@ -7,6 +7,7 @@ locale: en-GB
 categories: blockchain cryptography security zama
 tags: zama fhe tfhe threshold-cryptography mpc noise-flooding paper-review rust
 description: "Reading eprint 2023/815 against zama-ai/threshold-fhe: the Switch-n-Squash trick, the two-uniform flooding analysis, and six places where the Rust implementation and the paper do not say the same thing."
+image: /assets/article/blockchain/zamafhe/2026-10-02-noahs-ark-mindmap.png
 isMath: true
 isMermaid: true
 ---

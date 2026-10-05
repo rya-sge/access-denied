@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Zama and post-quantum
+** What a quantum computer breaks
+*** Shor: factoring, discrete log, pairings
+*** Grover: quadratic only, halves symmetric keys
+*** Lattice sieving: 2^0.292n classical vs 2^0.265n quantum
+*** NIST 2024: ML-KEM, ML-DSA on Module-LWE
+** Post-quantum today
+*** TFHE: LWE / GLWE, sec = 128
+*** Threshold MPC: information-theoretic, no new assumption
+*** Secret sharing: 4 shares reveal nothing, whatever the adversary
+*** ML-KEM-512 + AES-256-GCM: user decryption shares
+*** ML-KEM again in the custodian backup
+** Not post-quantum
+*** ZKPoK soundness: pairings on BLS12-381
+*** (m, n)-Discrete Log, in ROM and AGM
+*** ECDSA secp256k1: every transaction
+*** EIP-712: coprocessor attestations, KMS results
+*** Locked in by ecrecover and 65-byte layouts
+** The asymmetry that matters
+*** Zero-knowledge IS post-quantum, for all three proofs
+*** Only soundness falls to a quantum adversary
+*** A forged proof yields no plaintext
+*** Harvest now, decrypt later does not apply
+** The replacement
+*** MPC-in-the-Head proof already exists
+*** A few thousand kB against 1.8 kB deployed
+*** A size problem, not a research problem
+*** Litepaper says lattice-based, documentation says MPC-in-the-Head
+** What it means for a token
+*** Issuer and holder: amounts are protected
+*** Auditor: a break forges inputs, reads nothing
+*** Risk committee: the signature layer is the host chain's
+@endmindmap

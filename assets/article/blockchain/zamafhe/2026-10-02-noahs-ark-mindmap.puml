@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Noah's Ark
+** The problem
+*** b = a.s + e + delta.m
+*** Open b - a.[s] and you reveal e
+*** e plus the ciphertext leaks the key
+*** Mask with [E]: too small leaks, too large breaks rounding
+** Why TFHE breaks flooding
+*** BGV / BFV: bootstrap or add levels, 14-24 bits each
+*** TFHE: q = 2^64, post-bootstrap noise around 2^30
+*** The gap is too small, but only by tens of bits
+** Switch-n-Squash
+*** Just a bootstrap, with keys emitting other parameters
+*** (2^64, l) becomes (2^128, L = 4096)
+*** Switches modulus and dimension, squashes noise
+*** No interaction: the online phase stays one round
+*** 241 to 317 ms on an m6i.metal
+** Two contributions
+*** E as a sum of two uniforms: 2^-2.stat
+*** stat = 40 suffices, halving the modulus growth
+*** Simulation-based proof, not Renyi games
+*** So it composes as a black box
+** Two protocols
+*** Protocol 1: PRSS, no offline phase, small n-choose-t
+*** Protocol 2: offline bit generation, large n-choose-t
+*** t < n/3 robust and asynchronous
+*** t < n/2 active-with-abort
+*** Shamir over Galois rings, via ACD+19
+** Paper versus threshold-fhe
+*** Normative reference is the NIST doc, not the paper
+*** Four decryption modes: flooding and bit decomposition
+*** PRSS bound drops the n-choose-t normalisation
+*** One AES block, not two; no pow parameter
+*** Small means 8192 in code, about 100 in the paper
+*** t < n/3 enforced at reconstruction, not at setup
+*** n <= 15 from the degree-4 Galois ring
+** Status
+*** A NIST submission snapshot, not maintained
+*** Production is zama-ai/kms
+*** Q, L match Table 1; l = 928 does not
+@endmindmap

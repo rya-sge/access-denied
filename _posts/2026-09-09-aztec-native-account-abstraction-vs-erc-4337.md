@@ -2,7 +2,7 @@
 layout: post
 title: "Native Account Abstraction on Aztec, Compared with ERC-4337"
 date:   2026-09-09
-last_modified_at: 2026-09-17
+last_modified_at: 2026-10-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -16,7 +16,7 @@ isMath: false
 
 [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) abstracts accounts on a chain that still has externally owned accounts underneath. Everything it adds — the alt mempool, the bundler, the singleton EntryPoint, the paymaster — exists to route around a protocol that was not built for programmable accounts, and at the bottom of every bundle there is still an EOA paying for a normal Ethereum transaction in ETH.
 
-Aztec has no EOAs. Every account is a contract, there is no protocol-level signature scheme at all, and an account's entrypoint decides for itself what counts as authorisation: a Schnorr signature, an ECDSA signature, a passkey, a multisig, a password, or a rule with no signature in it. None of ERC-4337's supporting machinery exists, because none of it is needed.
+Aztec has no EOAs. Every account is a contract, there is no protocol-level signature scheme at all, and an account's entrypoint decides for itself what counts as authorisation: a Schnorr signature, an ECDSA signature, a passkey, a multisig, a password, or a rule with no signature in it. None of ERC-4337's supporting components exist, because none of them are needed.
 
 The comparison is worth making carefully, because the interesting parts are not the obvious ones. Aztec's headline advantage is not that accounts are contracts, which ERC-4337 achieves too. It is that validation is proved on the user's device, so the network never runs it and therefore never has to be defended against it. The headline cost is not proving time either. It is that Aztec accounts have protocol keys baked into the address, and unlike an ERC-4337 account, they cannot be rotated.
 
@@ -31,6 +31,22 @@ ERC-4337 is deliberately an application-layer standard: it required no consensus
 Aztec inverts this. The account contract's entrypoint is where a transaction starts, full stop. There is no separate mempool, no bundler role, no singleton mediating between accounts, and no fallback path for a "plain" transaction because there is no plain transaction to fall back to.
 
 That difference propagates further than it first appears. Every piece of ERC-4337 machinery is a consequence of the abstraction sitting *above* a protocol that does not know about it, and each piece brings its own security surface: the site's articles on [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/) and [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/) cover the factory, paymaster and aggregator staking rules that exist to keep those pieces honest. On Aztec that surface is absent, and a different one takes its place.
+
+## What an account is, and why that settles the question
+
+Ethereum has two kinds of entity and the difference is written into the protocol. An externally owned account is a keypair and nothing else: it can originate a transaction but holds no code. A contract account holds code but cannot originate anything. ERC-4337 exists to give the second kind the privileges of the first, and its EntryPoint, bundler and alternative mempool all follow from that one asymmetry.
+
+Aztec has a single kind. An account **is** a contract instance, and a contract instance is the only thing an address can refer to. There is no keypair-only entity, no `tx.origin` that has to be an EOA, and no protocol-level signature scheme a transaction must satisfy before the account's own code sees it. A wallet is not a contract pretending to be an account; it is the only thing an account ever was.
+
+The representation makes that concrete. An address is derived as `hash(public_keys_hash, partial_address)`, where the partial address commits to the contract class (the code) together with its constructor arguments, and `public_keys_hash` commits to the protocol keys. One value therefore binds three things Ethereum keeps apart: who the account is, which code authorises it, and which keys decrypt and spend its notes.
+
+Three consequences for account abstraction follow, and they explain most of the differences in the rest of this article:
+
+- **There is nothing to abstract over.** Those three components exist to carry a contract account into a transaction lifecycle built for keypairs. With one category of entity there is no second lifecycle to bridge to, which is why native abstraction removes components rather than adding them.
+- **Code and identity are bound at creation.** The address commits to the class the account was created with, so a wallet's authentication logic is part of what its address *is*, not a mutable field inside it. On Ethereum an account's address survives any change of implementation behind a proxy.
+- **Keys and identity are bound too**, which is the expensive half of the same property and the subject of the next section but one. Because the protocol keys sit inside the address, they cannot be rotated without becoming a different account.
+
+The first consequence is the one usually quoted as the advantage, and the third is its price. They are the same design decision seen from two sides.
 
 ## Validation, and the denial-of-service problem
 

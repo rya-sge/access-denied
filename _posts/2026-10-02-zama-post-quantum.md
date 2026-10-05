@@ -7,6 +7,7 @@ locale: en-GB
 categories: blockchain cryptography security zama
 tags: zama fhe post-quantum lattice zkpok tfhe ml-kem cryptography quantum
 description: "Which parts of the Zama protocol resist a quantum adversary and which do not: TFHE and the threshold MPC stand on lattices and information theory, ML-KEM already ships in production, and the gap is one pairing-based proof plus the host chain's signatures."
+image: /assets/article/blockchain/zamafhe/2026-10-02-zama-post-quantum-mindmap.png
 isMath: true
 isMermaid: true
 ---
