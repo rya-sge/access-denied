@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Dijkstra vs Bellman-Ford
+** Shortest-path problem
+*** Single source, all vertices
+*** Shortest-path tree
+*** Negative cycle: distance -inf
+** Relaxation
+*** d(v) > d(u) + w(u,v) => update
+*** Upper-bound property
+*** Path-relaxation property
+** Dijkstra
+*** Greedy, settle by distance
+*** Priority queue
+*** Non-negative weights only
+*** O(E + V log V) Fibonacci heap
+*** Early exit for one target
+** Bellman-Ford
+*** Relax all edges, V - 1 passes
+*** Any real weights
+*** Extra pass detects negative cycle
+*** O(VE)
+*** Hop-limited paths, SPFA
+left side
+** Routing
+*** Link state: OSPF, IS-IS -> Dijkstra
+*** Distance vector: RIP -> Bellman-Ford
+*** Count to infinity
+** Applications
+*** Currency arbitrage (-log rate)
+*** Johnson: Bellman-Ford then Dijkstra
+*** DAG: topological order, O(V + E)
+** Recent results
+*** O(m log^(2/3) n), 2025
+*** Negative weights near-linear, 2022
+@endmindmap

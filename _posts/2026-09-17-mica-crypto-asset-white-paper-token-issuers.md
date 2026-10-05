@@ -204,6 +204,7 @@ Title II replaces licensing with disclosure. An offeror of an ordinary crypto-as
 | **Utility token** | A crypto-asset only intended to provide access to a good or service supplied by its issuer; exempt from Title II when the good or service already exists. |
 | **Limited network** | A set of merchants with contractual arrangements with the offeror within which a token can be spent; offers of such tokens are outside Title II, subject to notification above EUR 1 million. |
 | **Home Member State** | For an offeror established in the Union, the Member State of its registered office; its competent authority receives the white-paper notification. |
+| **ESMA** | The European Securities and Markets Authority, the EU-level supervisor that drafts the technical standards on sustainability indicators and the white-paper templates, issues guidelines under Article 14, and publishes notified white papers in the Article 109 register. |
 | **Retail holder** | A natural person acting outside their trade, business, craft or profession; the beneficiary of the Article 13 right of withdrawal. |
 | **Marketing communication** | Any promotional communication relating to an offer or admission; must be identified as such, be consistent with the white paper and carry the Article 7 statement. |
 

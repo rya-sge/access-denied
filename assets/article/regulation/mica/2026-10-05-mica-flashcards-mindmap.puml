@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* MiCA in eleven cards
+** What is regulated
+*** Crypto-asset\n//value or right + transferable + DLT or similar//
+*** E-money token (EMT)\n//one official currency → EMT, whether or not the peg holds//
+*** Asset-referenced token (ART)\n//stable value, but not one currency → ART//
+*** Utility token\n//access to the issuer's own good or service//
+** Who must do what
+*** Crypto-asset white paper\n//a document, notified not approved, instead of a licence//
+*** Crypto-asset service provider (CASP)\n//ten listed services, professional basis, authorisation required//
+*** Market abuse\n//listed tokens only; insider dealing, leaks, manipulation//
+left side
+** Who supervises
+*** Competent authority\n//national supervisor; ESMA and EBA above it//
+*** Passport\n//one authorisation, notify the home authority, serve the whole Union//
+*** Significant token\n//three of seven criteria → stricter rules, usually EBA//
+** The Regulation
+*** Markets in Crypto-Assets Regulation (MiCA)\n//residual rulebook: what other EU financial law does not cover//
+@endmindmap

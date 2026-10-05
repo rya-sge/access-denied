@@ -118,6 +118,10 @@ flowchart TB
     ET --> C
 ```
 
+The same process at block level shows where each AES call sits. The CBC-MAC chain on top consumes $$B_0$$, then the associated-data blocks, then the payload blocks, and its last output is truncated to $$T$$. Underneath, each counter block is encrypted independently: $$S_1$$ to $$S_m$$ mask the payload, and $$S_0$$ masks $$T$$, which is why the encrypted MAC is appended after the last payload block. Decryption-verification uses the same picture with the roles swapped: the counter part runs first to recover $$P$$ and $$T$$, then the CBC-MAC chain is recomputed and compared with $$T$$.
+
+![CCM encryption at block level: a CBC-MAC chain of AES calls over B0 to Br produces the MAC T, while counter blocks Ctr1 to Ctrm mask the payload and Ctr0 masks T]({{site.url_complet}}/assets/article/cryptographie/mode-operation/ccm-generation-encryption-blocks.png)
+
 The order of the steps is not fixed. Section 6 notes that the counter blocks, and therefore the keystream, can be computed at any time before use, including in advance. What cannot be avoided is that the CBC-MAC chain is sequential, and that it needs $$B_0$$, which contains the length of $$P$$, before it can start.
 
 Counting block cipher calls, one invocation costs $$r + 1$$ calls for the MAC and $$m + 1$$ for the keystream, so roughly two AES calls per 16 octets of payload. That is the price of building authenticated encryption from the block cipher alone.
@@ -324,6 +328,13 @@ These objections motivated EAX, which keeps the same "AES only" property without
 
 ### CCM next to GCM
 
+GCM, specified in SP 800-38D, is the other authenticated-encryption mode NIST approves for AES, and the one most protocols choose when they have the choice (see also [Le mode opératoire GCM]({{site.url_complet}}/2022/04/24/galois-counter-mode-gcm/)). Both modes encrypt with counter mode. They differ in how they authenticate: CCM runs a CBC-MAC with AES itself, while GCM uses GHASH, a polynomial hash over GF($$2^{128}$$) keyed by the subkey $$H = \mathrm{CIPH_K}(0^{128})$$.
+
+That one choice explains most of the rows below:
+
+- **GCM** needs one AES call per block and can process blocks in parallel, but it adds a field multiplier and fails harder on nonce reuse.
+- **CCM** needs nothing beyond an AES encryption core, at the price of a sequential MAC and a length that must be known in advance.
+
 | | CCM (SP 800-38C) | GCM (SP 800-38D) |
 |---|---|---|
 | Block cipher calls per 16-octet block | about 2 | about 1, plus a GHASH multiplication |
@@ -332,6 +343,16 @@ These objections motivated EAX, which keeps the same "AES only" property without
 | Length known in advance | required | not required |
 | Effect of a repeated nonce | confidentiality lost, no known key recovery | confidentiality lost, hash subkey recoverable |
 | Typical deployment | Wi-Fi CCMP, Bluetooth LE, 802.15.4, IoT TLS | TLS, IPsec, SSH, storage |
+
+### Post-quantum considerations
+
+CCM is built only from a symmetric block cipher, so Shor's algorithm, which breaks RSA and elliptic-curve cryptography, does not apply to it. The known generic quantum threat is Grover's algorithm, which searches a key space of size $$2^k$$ in about $$2^{k/2}$$ evaluations. Grover iterations run one after another, and splitting the search over many machines reduces the speedup, so the practical cost is far above a classical $$2^{64}$$ computation even for AES-128. NIST still uses AES-128 key search as the reference for security category 1 of its post-quantum standards.
+
+For data that must stay confidential for decades, AES-256-CCM removes the question: SP 800-38C places no constraint on the key length, RFC 5116 defines `AEAD_AES_256_CCM`, and the NSA's CNSA 2.0 suite requires AES-256.
+
+The MAC length guidance of Appendix B does not change. A forgery attempt is a ciphertext submitted to a receiver that holds the key, one at a time, and Grover cannot speed up queries to a device it does not control. The quantum attacks published against CBC-MAC and GCM ([Kaplan et al., 2016](https://arxiv.org/abs/1602.05973)) assume an attacker who can query the MAC in quantum superposition, which a network protocol does not allow.
+
+In a deployed protocol, the quantum-vulnerable part is how the CCM key is established. TLS 1.3 derives it from an ECDHE exchange that a future quantum computer could break retroactively from recorded traffic, which is why hybrid key exchanges with [ML-KEM (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/) are being deployed. The CCM layer can stay as it is once its key comes from a post-quantum key exchange. WPA2-Personal derives its keys from the passphrase with PBKDF2, which is symmetric too, so its weak point remains passphrase guessing rather than quantum computing.
 
 ### Current status
 
@@ -518,6 +539,7 @@ In CCM the MAC is a CBC-MAC under the AES key itself, and no comparable recovery
 ### Academic papers
 
 - [P. Rogaway and D. Wagner, A Critique of CCM, Cryptology ePrint Archive 2003/070](https://eprint.iacr.org/2003/070)
+- [M. Kaplan, G. Leurent, A. Leverrier and M. Naya-Plasencia, Breaking Symmetric Cryptosystems using Quantum Period Finding, CRYPTO 2016](https://arxiv.org/abs/1602.05973)
 - [J. Jonsson, On the Security of CTR + CBC-MAC, Selected Areas in Cryptography (SAC 2002), LNCS 2595](https://doi.org/10.1007/3-540-36492-7_7)
 
 ### Related articles
@@ -527,6 +549,7 @@ In CCM the MAC is a CBC-MAC under the AES key itself, and no comparable recovery
 - [Le mode opératoire GCM]({{site.url_complet}}/2022/04/24/galois-counter-mode-gcm/)
 - [HMAC - Hash-Based Message Authentication Code]({{site.url_complet}}/2024/11/27/hmac/)
 - [WPA en bref]({{site.url_complet}}/2021/06/15/protocole-wpa/)
+- [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
 
 ### Tooling
 

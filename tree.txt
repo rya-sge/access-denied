@@ -974,4 +974,12 @@ _posts/2026-10-01-eu-money-market-fund-portfolio-construction-limits.md
 
 _posts/2026-10-05-ccm-mode-nist-sp-800-38c.md
   assets/article/cryptographie/mode-operation/2026-10-05-ccm-mode-nist-sp-800-38c-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/cryptographie/mode-operation/ccm-generation-encryption-blocks.dot   (workflow, Graphviz neato -> .png, embedded in the article; render: neato -Tpng -Gdpi=130 <file>.dot -o <file>.png)
+  in-section diagrams: two inline Mermaid diagrams in the article, no .puml
+
+_posts/2026-10-05-dijkstra-vs-bellman-ford.md
+  assets/article/algorithme/shortest-path/2026-10-05-dijkstra-vs-bellman-ford-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-05-mica-flashcards.md
+  assets/article/regulation/mica/2026-10-05-mica-flashcards-mindmap.puml   (mindmap -> .png, cover image)

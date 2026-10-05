@@ -194,6 +194,10 @@ On refait le même processus en choisissant l'arrête (3, 5) de poids 5, poids l
 - Cours de *Graphes et réseaux* (GRE) enseigné à l'HEIG-VD en 2018
 - Cours d'Algorithmes et structures de données 2 (ASD 2) enseigné à l'HEIG-VD en 2020.
 
+**Articles liés**
+
+- [Dijkstra vs Bellman-Ford — Two Ways to Compute Shortest Paths]({{site.url_complet}}/2026/10/05/dijkstra-vs-bellman-ford/) (en anglais ; l'algorithme de Dijkstra a la même structure que celui de Prim)
+
 **Boruvka**
 
 - [boowiki.info - algorithme-boruvka](https://boowiki.info/art/les-algorithmes-sur-les-graphes/l-algorithme-boruvka.html)

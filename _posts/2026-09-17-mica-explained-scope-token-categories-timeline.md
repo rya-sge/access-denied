@@ -271,6 +271,7 @@ But Article 4(4) removes every Title II exemption where the offeror makes known 
 
 ### Related articles
 
+- [MiCA in Eleven Cards — The Definitions to Memorise]({{site.url_complet}}/2026/10/05/mica-flashcards/)
 - [Two Ways to Build a Permissioned Token — Centrifuge's Transfer Hook Against ERC-3643]({{site.url_complet}}/2026/08/18/centrifuge-hook-vs-erc3643/)
 - [Flexible Access Control in smart contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/)
 - [Tether USDT smart contract - Overview]({{site.url_complet}}/2025/07/06/tether-stablecoin-overview/)
