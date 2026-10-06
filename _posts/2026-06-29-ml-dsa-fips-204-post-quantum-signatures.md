@@ -2,7 +2,7 @@
 layout: post
 title: "ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)"
 date:   2026-06-29
-last_modified_at: 2026-07-16
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -274,6 +274,47 @@ $$
 
 where $$\mathsf{OID}$$ is the object identifier of the pre-hash function (for example SHA-256, SHA-512, or SHAKE128) and $$\mathsf{PH}_M$$ is the digest of $$M$$. The leading domain-separator byte guarantees that a pure ML-DSA signature can never be reinterpreted as a HashML-DSA signature or vice versa. To preserve the claimed security level, the pre-hash digest must be drawn from a function offering at least $$\lambda$$ bits of collision resistance, which means a digest of at least $$2\lambda$$ bits. FIPS 204 states that the pure version is generally preferred, with HashML-DSA reserved for the cases that need it.
 
+## Conclusion
+
+ML-DSA recasts the Schnorr signature over module lattices. Its security reduces to MLWE for key recovery and to SelfTargetMSIS for forgery, and it achieves SUF-CMA security against quantum adversaries. 
+
+The signing algorithm follows the Fiat-Shamir with Aborts pattern: it samples a mask, forms a commitment, derives a challenge by hashing, computes a response, and uses rejection sampling to strip the secret-dependent bias before release, retrying until an attempt passes. 
+
+Key compression and the verifier's hint keep the public key small while preserving exact verification. 
+
+The three parameter sets trade size for security category, and the choice between hedged and deterministic signing, together with the pure and pre-hash message formats, lets implementers match the scheme to their platform and threat model. 
+
+The main practical cost relative to elliptic-curve signatures is size: kilobyte-scale keys and signatures in place of the tens of bytes used today.
+
+![ML-DSA FIPS 204 mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Shor's algorithm** | A quantum algorithm that solves factoring and discrete logarithms efficiently, breaking RSA and ECDSA and motivating the move to lattice signatures. |
+| **Learning With Errors (LWE)** | The problem of recovering a secret vector $$\mathbf s$$ from noisy linear equations $$\mathbf A\mathbf s + \mathbf e = \mathbf b$$, where the error $$\mathbf e$$ is small but unknown. |
+| **Short Integer Solution (SIS)** | The problem of finding a non-zero short vector $$\mathbf t$$ with $$\mathbf A\mathbf t = \mathbf 0$$ over $$\mathbb Z_q$$. |
+| **Module-LWE (MLWE)** | LWE over a module of polynomials in $$R_q$$ rather than plain integer vectors; recovering the ML-DSA secret key from the public key is an MLWE instance. |
+| **SelfTargetMSIS** | The non-standard Module-SIS variant on which forgery reduces, where the target is bound to the message through a hash so a forger cannot choose it freely. |
+| **Polynomial ring $$R_q$$** | $$\mathbb Z_q[X]/(X^{256}+1)$$ with $$q = 8380417$$: polynomials of degree below 256 with coefficients modulo $$q$$, in which all ML-DSA arithmetic takes place. |
+| **Number Theoretic Transform (NTT)** | A ring isomorphism from $$R_q$$ to length-256 arrays with entry-wise multiplication, turning each polynomial product into 256 independent products. |
+| **SUF-CMA** | Strong existential unforgeability under chosen-message attack: an adversary that obtains signatures on chosen messages cannot produce any new valid message-signature pair. |
+| **Fiat-Shamir heuristic** | The transformation of an interactive identification protocol into a signature by replacing the verifier's random challenge with a hash of the commitment and the message. |
+| **Fiat-Shamir with Aborts** | The lattice version of that construction, in which the signer may discard an attempt and retry until the response is safe to publish. |
+| **Rejection sampling** | The check that releases the response $$\mathbf z = \mathbf y + c\mathbf s_1$$ only when its coefficients fall in $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$, making it independent of the secret; about 4 to 5 attempts on average. |
+| **Mask $$\mathbf y$$** | The per-attempt random vector that hides $$c\mathbf s_1$$ in the response; reusing it for two different challenges reveals $$\mathbf s_1$$. |
+| **Commitment $$\mathbf w_1$$** | The high bits of $$\mathbf w = \mathbf A\mathbf y$$, hashed with the message representative to produce the challenge. |
+| **Challenge $$c$$** | A small polynomial with exactly $$\tau$$ coefficients equal to $$\pm 1$$, derived from the commitment hash $$\tilde c$$ by $$\mathsf{SampleInBall}$$. |
+| **Key compression** | Dropping the $$d = 13$$ low-order bits of each coefficient of $$\mathbf t$$, so the public key stores $$\mathbf t_1$$ and the private key keeps $$\mathbf t_0$$; an efficiency measure, not a security one. |
+| **Hint $$\mathbf h$$** | Part of the signature, with at most $$\omega$$ non-zero positions, recording where dropping $$\mathbf t_0$$ changes the high bits so the verifier can reconstruct $$\mathbf w_1$$. |
+| **Message representative $$\mu$$** | The 64-byte hash of the public-key hash $$tr$$ and the formatted message, which is what the signature binds to; the verifier recomputes it rather than receiving it. |
+| **Hedged and deterministic signing** | Two variants differing only in $$rnd$$: 32 fresh random bytes (hedged, the default) or zeros (deterministic, easier to attack with faults). |
+| **HashML-DSA** | The pre-hash variant that signs a digest of the message, separated from pure ML-DSA by a leading domain-separator byte of 1 instead of 0. |
+| **NIST security category** | A level defined against a reference primitive: category 2 like a SHA-256 collision, 3 like AES-192 key search, 5 like AES-256 key search. |
+
 ## Frequently Asked Questions
 
 **Q: What lattice problems underpin ML-DSA, and what does each one protect against?**
@@ -299,20 +340,6 @@ The signature contains the commitment hash $$\tilde{c}$$ but not $$\mu$$ itself.
 **Q: Why does the deterministic signing variant carry more risk than the hedged variant if both verify identically?**
 
 Both variants derive the mask from $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu, 64)$$ and produce signatures the same verifier accepts, so interoperability is unaffected. The difference is $$rnd$$: hedged signing uses fresh random bytes, deterministic signing uses zeros. With deterministic signing, every internal value is a fixed function of the key and message, so an attacker who can induce a hardware fault and observe the corrupted output can compare it against the known correct computation, which makes fault attacks and certain side-channel attacks easier. The fresh randomness in the hedged variant breaks that repeatability without weakening the mathematics, which is why FIPS 204 makes it the default and warns against deterministic signing on platforms exposed to physical attacks.
-
-## Conclusion
-
-ML-DSA recasts the Schnorr signature over module lattices. Its security reduces to MLWE for key recovery and to SelfTargetMSIS for forgery, and it achieves SUF-CMA security against quantum adversaries. 
-
-The signing algorithm follows the Fiat-Shamir with Aborts pattern: it samples a mask, forms a commitment, derives a challenge by hashing, computes a response, and uses rejection sampling to strip the secret-dependent bias before release, retrying until an attempt passes. 
-
-Key compression and the verifier's hint keep the public key small while preserving exact verification. 
-
-The three parameter sets trade size for security category, and the choice between hedged and deterministic signing, together with the pure and pre-hash message formats, lets implementers match the scheme to their platform and threat model. 
-
-eThe main practical cost relative to elliptic-curve signatures is size: kilobyte-scale keys and signatures in place of the tens of bytes used today.
-
-![ML-DSA FIPS 204 mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.png)
 
 ## References
 

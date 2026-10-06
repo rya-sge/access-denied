@@ -2,7 +2,7 @@
 layout: post
 title: "Gradient Descent in Machine Learning - Overview"
 date: 2025-04-09
-last_modified_at: 2025-05-02
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: ai
@@ -219,6 +219,31 @@ To deal with these, several enhancements exist, such as:
 
 
 ![gradient-descent-mindmap]({{site.url_complet}}/assets/article/mlg/gradient-descent-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Gradient descent** | An optimization algorithm that finds a minimum of a function by repeatedly moving the parameters in the direction opposite to its gradient. |
+| **Parameters** | The values a model learns, such as the weights of a neural network, written $$\theta$$ and adjusted by each update. |
+| **Loss function** | The error of the model on one training example, for instance the squared difference between the true and the predicted value. |
+| **Cost function** | The average of the loss over the whole training set, written $$J(\theta)$$; gradient descent minimizes it. |
+| **Mean Squared Error (MSE)** | A common regression loss, the square of the difference between the true and the predicted value, averaged over the examples in the cost. |
+| **Gradient** | The vector of partial derivatives of the cost with respect to the parameters, pointing in the direction of steepest increase. |
+| **Learning rate** | The step size $$\alpha$$ of each update; too small makes convergence slow, too large can overshoot the minimum. |
+| **Update rule** | $$\theta \leftarrow \theta - \alpha \cdot \nabla J(\theta)$$: each parameter moves against the gradient by a step proportional to the learning rate. |
+| **Convergence** | The point where further updates no longer reduce the cost significantly, and the iterations stop. |
+| **Batch gradient descent** | The variant computing each update from the entire training set: stable but slow and memory-heavy on large datasets. |
+| **Stochastic gradient descent (SGD)** | The variant updating the parameters after each single example: fast and suited to online learning, but noisy. |
+| **Mini-batch gradient descent** | The variant updating from a small random subset of examples, balancing the two and allowing vectorized, distributed computation. |
+| **Backpropagation** | The procedure that computes the gradient of the loss with respect to every parameter of a neural network, before the gradient descent update. |
+| **Adam** | A gradient-descent-based optimizer that adapts the learning rate for each parameter, used to train transformers. |
+| **Momentum** | An enhancement that adds a fraction of the previous update to the current one, helping the descent through flat regions. |
+| **Convex function** | A function with a single minimum, which is global; gradient descent reaches it with a suitable learning rate. |
+| **Local and global minimum** | A point where the gradient is zero; the global minimum has the lowest cost overall, a local one only within its neighbourhood. |
+| **Saddle point** | A point where the gradient is zero but the cost rises in one direction and falls in another, which can stall gradient descent. |
 
 ## FAQ
 

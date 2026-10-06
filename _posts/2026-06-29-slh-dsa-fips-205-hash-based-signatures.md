@@ -2,7 +2,7 @@
 layout: post
 title: "SLH-DSA — The Stateless Hash-Based Signature Standard (FIPS 205)"
 date:   2026-06-29
-last_modified_at: 2026-06-30
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -195,6 +195,39 @@ The leading byte (0 vs 1) keeps pure and pre-hash signatures from being reinterp
 
 The practical reading: ML-DSA is the default general-purpose post-quantum signature; SLH-DSA is the choice when the threat model demands the weakest possible cryptographic assumption and large signatures are acceptable, for example long-lived roots of trust or firmware signing where verification dominates and signatures are rare.
 
+## Conclusion
+
+SLH-DSA turns a hash function into a stateless signature by layering four constructions: WOTS+ one-time signatures, XMSS Merkle trees, a $d$-layer hypertree reducing everything to one public root, and FORS few-time signatures that sign the message digest. Statelessness comes from pseudorandomly selecting a FORS key over a space large enough that the few collisions occurring within $2^{64}$ signatures are absorbed by FORS's few-time tolerance. The security argument depends only on the hash function, which is its defining advantage and the reason NIST standardized it alongside the lattice-based ML-DSA. The cost is size and signing time: signatures of 8 to 50 KB and slow signing, against a public key of only 32 to 64 bytes. The twelve parameter sets let an implementer pick a hash family, a security category, and a point on the small/fast curve.
+
+![SLH-DSA FIPS 205 mindmap]({{site.url_complet}}/assets/article/cryptographie/hash-based/2026-06-29-slh-dsa-fips-205-hash-based-signatures.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Hash-based signature** | A signature whose security rests only on properties of a hash function, with no number-theoretic or lattice assumption; the idea dates from Lamport and Merkle in 1979. |
+| **Preimage and collision resistance** | The hash properties SLH-DSA relies on: finding an input for a given output, or two inputs with the same output, must be infeasible. |
+| **Grover's algorithm** | The quantum search algorithm that halves the effective preimage security of a hash, compensated in SLH-DSA by the output length $$n$$. |
+| **EUF-CMA** | Existential unforgeability under chosen-message attack, the security goal of SLH-DSA for a key pair that signs at most $$2^{64}$$ messages. |
+| **Stateful and stateless** | A stateful scheme (LMS, XMSS in SP 800-208) must record which one-time keys it has used; SLH-DSA keeps no such state and selects keys pseudorandomly. |
+| **One-time and few-time signature** | A one-time key breaks if it signs two messages; a few-time key tolerates a bounded number of reuses, which is what lets SLH-DSA drop the state. |
+| **WOTS+** | Winternitz One-Time Signature Plus: signs one hash value by revealing intermediate elements of hash chains, one chain per base-$$w$$ digit, with $$w = 16$$ in every FIPS 205 set. |
+| **Hash chain** | A sequence obtained by applying the function $$F$$ repeatedly to a secret value; anyone can move forward along it, but moving backward requires inverting $$F$$. |
+| **WOTS+ checksum** | Extra chains ($$len_2 = 3$$) whose digits decrease when a message digit increases, so an attacker cannot forge by advancing a chain. |
+| **Merkle tree and authentication path** | A binary hash tree whose root commits to all its leaves; the authentication path is the list of sibling nodes needed to recompute the root from one leaf. |
+| **XMSS** | eXtended Merkle Signature Scheme: $$2^{h'}$$ WOTS+ public keys as the leaves of a Merkle tree whose root is a single reusable public key. |
+| **Hypertree** | A stack of $$d$$ layers of XMSS trees in which each tree's root is signed by the layer above, reducing $$2^{h}$$ bottom leaves to one public root $$\mathbf{PK.root}$$. |
+| **FORS** | Forest Of Random Subsets: a few-time signature over $$k$$ Merkle trees of $$2^a$$ leaves that signs the message digest and is itself certified by the hypertree. |
+| **Key seeds** | $$\mathbf{SK.seed}$$ generates every WOTS+ and FORS secret, $$\mathbf{SK.prf}$$ the per-signature randomizer, and the public $$\mathbf{PK.seed}$$ separates hash calls by domain. |
+| **Randomizer $$R$$** | The $$n$$-byte value from $$\mathsf{PRF_{msg}}$$ that is hashed with the message to choose the FORS key and the hypertree leaf, and sent as the first part of the signature. |
+| **Tree and leaf index** | The parts of the message digest that pseudorandomly select the bottom-layer XMSS tree and the leaf within it, replacing the counter of stateful schemes. |
+| **Small and fast parameter sets** | The `s` sets use few tall hypertree layers for shorter signatures and slower signing; the `f` sets use many shallow layers for faster signing and roughly double the signature size. |
+| **Hedged and deterministic signing** | The randomizer input is either fresh random bytes (hedged, the default) or $$\mathbf{PK.seed}$$ (deterministic, reproducible signatures). |
+| **HashSLH-DSA** | The pre-hash variant that signs a digest of the message, separated from pure SLH-DSA by a leading domain-separator byte of 1 instead of 0. |
+| **NIST security category** | A level defined against a reference primitive; $$n = 16, 24, 32$$ bytes give categories 1, 3 and 5, like AES-128, AES-192 and AES-256 key search. |
+
 ## Frequently Asked Questions
 
 **Q: What assumption does SLH-DSA rely on, and why is that attractive?**
@@ -220,12 +253,6 @@ The verifier first checks the signature length matches the parameter set, then r
 **Q: Why is SLH-DSA signing slow and its signatures large compared with ML-DSA, and when does that trade-off pay off?**
 
 Both costs come from the tower of hash trees. A signature must carry a FORS signature plus $d$ XMSS signatures (each a WOTS+ signature and an authentication path), which is thousands of $n$-byte hashes, hence 8–50 KB. Signing must build large Merkle trees from seeds, which is many thousands of hash calls. ML-DSA, by contrast, does a few NTT-based polynomial operations. The trade-off pays off when the application values the minimal-assumption security and the tiny public key over signature size and signing speed, and where signatures are produced rarely but must remain trustworthy for decades, such as firmware or root-certificate signing.
-
-## Conclusion
-
-SLH-DSA turns a hash function into a stateless signature by layering four constructions: WOTS+ one-time signatures, XMSS Merkle trees, a $d$-layer hypertree reducing everything to one public root, and FORS few-time signatures that sign the message digest. Statelessness comes from pseudorandomly selecting a FORS key over a space large enough that the few collisions occurring within $2^{64}$ signatures are absorbed by FORS's few-time tolerance. The security argument depends only on the hash function, which is its defining advantage and the reason NIST standardized it alongside the lattice-based ML-DSA. The cost is size and signing time: signatures of 8 to 50 KB and slow signing, against a public key of only 32 to 64 bytes. The twelve parameter sets let an implementer pick a hash family, a security category, and a point on the small/fast curve.
-
-![SLH-DSA FIPS 205 mindmap]({{site.url_complet}}/assets/article/cryptographie/hash-based/2026-06-29-slh-dsa-fips-205-hash-based-signatures.png)
 
 ## References
 

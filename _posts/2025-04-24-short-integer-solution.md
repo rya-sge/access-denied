@@ -2,7 +2,7 @@
 layout: post
 title: "Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem"
 date: 2025-04-23
-last_modified_at: 2025-04-24
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: cryptography security post-quantum
@@ -148,6 +148,27 @@ The Short Integer Solution (SIS) problem stands as a pillar of lattice-based cry
 Mindmap made with the help of ChatGPT
 
 ![lattice-sis-mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/lattice-sis-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Lattice** | The set of all integer combinations of a basis of vectors, a regular grid of points in $$n$$-dimensional space on which the hard problems below are defined. |
+| **Shortest Vector Problem (SVP)** | Finding the shortest non-zero vector of a lattice; its approximate versions are the worst-case problems lattice cryptography rests on. |
+| **GapSVP and SIVP** | Approximate worst-case lattice problems, with approximation factor $$\gamma$$: deciding the length of the shortest vector within $$\gamma$$, and finding $$n$$ short independent vectors. |
+| **Average-case problem** | A problem that must be hard on randomly chosen instances; an adversary breaks it by solving some random instance, as with CDH, DDH or factoring. |
+| **Worst-case problem** | A problem that must be hard on its hardest instances; breaking it requires solving every instance. |
+| **Worst-case to average-case reduction** | Ajtai's 1996 result that solving random SIS instances would solve worst-case lattice problems, so SIS is hard on average if those are hard in the worst case. |
+| **Short Integer Solution (SIS)** | Given a random matrix $$A$$ over $$\mathbb Z_q$$, finding a non-zero integer vector $$\mathbf x$$ with $$A \cdot \mathbf x \equiv \mathbf 0 \pmod q$$ and $$\lVert \mathbf x \rVert_\infty \leq \beta$$. |
+| **SIS parameters** | The dimensions $$n$$ (the security parameter) and $$m$$ (generally much larger than $$n$$), the modulus $$q$$, typically polynomial in $$n$$, and the norm bound $$\beta$$, much smaller than $$q$$. |
+| **Infinity norm** | The largest absolute value among a vector's coefficients; SIS bounds the solution in this norm, which is what makes it short. |
+| **Learning With Errors (LWE)** | Regev's companion average-case problem, recovering a secret from noisy linear equations, which yields public-key and fully homomorphic encryption. |
+| **One-way function** | A function easy to compute and hard to invert; Ajtai built the first SIS-based family. |
+| **Collision-resistant hash function** | A function for which two inputs with the same output cannot feasibly be found; SIS yields one directly, since a collision gives a short solution. |
+| **Minicrypt** | The class of primitives obtainable from one-way functions (hash functions, signatures, commitments), which is where SIS-based constructions sit. |
+| **Post-quantum cryptography** | Cryptography designed to resist quantum adversaries; SIS and its module variants underlie signatures such as CRYSTALS-Dilithium and Falcon. |
 
 ## Reference
 

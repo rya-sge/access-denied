@@ -2,7 +2,7 @@
 layout: post
 title: K-Nearest Neighbor (KNN) Algorithm  - Overview
 date: 2025-02-10
-last_modified_at: 2025-05-02
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: ai
@@ -151,6 +151,29 @@ See also my article [Convolutional Neural Networks (CNNs) - Overview](https://ry
 - **Difference:** KNN is a simpler, instance-based learning algorithm, while Transformers are highly specialized for sequential data and involve complex deep learning architectures.
 
 See also my article: [Transformers - Attention is All You Need](https://rya-sge.github.io/access-denied/2025/01/13/transformers/)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **K-Nearest Neighbor (KNN)** | A machine learning algorithm that predicts the label or value of a data point from the $$K$$ training points closest to it. |
+| **$$K$$** | The number of neighbors considered; a small $$K$$ follows local patterns and noise, a large $$K$$ smooths the decision boundaries. |
+| **Feature space** | The space in which each data point is a vector of feature values and in which distances between points are measured. |
+| **Distance metric** | The function measuring how close two points are, which determines the neighbors; Euclidean, Manhattan and Minkowski are the usual choices. |
+| **Euclidean distance** | The straight-line distance between two points, the square root of the sum of squared coordinate differences. |
+| **Manhattan distance** | The sum of the absolute differences between the coordinates of two points. |
+| **Minkowski distance** | The generalization with a parameter $$p \geq 1$$: $$p = 1$$ gives the Manhattan distance and $$p = 2$$ the Euclidean one. |
+| **Non-parametric** | Making no assumption about the form of the underlying data distribution. |
+| **Lazy learning** | Deferring all computation to prediction time: no model is built during training, the training data is simply stored. |
+| **Instance-based learning** | Predicting by comparing a new point with stored training examples, as opposed to model-based learning, which builds an explicit model. |
+| **Majority vote and weighted voting** | The classification rule: the most common class among the $$K$$ neighbors wins, optionally weighting closer neighbors more, which also breaks ties. |
+| **KNN regression** | The regression mode, predicting the average or weighted average of the $$K$$ neighbors' values instead of a class. |
+| **Cross-validation** | Evaluating the model on held-out parts of the data to choose $$K$$ or the Minkowski $$p$$ for a given dataset. |
+| **Overfitting** | Fitting the training data, including its noise, too closely; the risk with a very small $$K$$, and certain with $$K = 1$$. |
+| **Feature scaling** | Normalizing or standardizing features so that one with a large range does not dominate the distance. |
+| **Curse of dimensionality** | The loss of contrast between near and far points as the number of features grows, which makes distance-based methods such as KNN less reliable. |
 
 ## FAQ
 
