@@ -2,9 +2,10 @@
 layout: post
 title: "Zama and Post-Quantum Cryptography: Everything Is Lattice-Based Except One Pairing"
 date:   2026-10-02
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
-categories: blockchain cryptography security zama
+categories: blockchain cryptography security zama post-quantum
 tags: zama fhe post-quantum lattice zkpok tfhe ml-kem cryptography quantum
 description: "Which parts of the Zama protocol resist a quantum adversary and which do not: TFHE and the threshold MPC stand on lattices and information theory, ML-KEM already ships in production, and the gap is one pairing-based proof plus the host chain's signatures."
 image: /assets/article/blockchain/zamafhe/2026-10-02-zama-post-quantum-mindmap.png
@@ -14,19 +15,19 @@ isMermaid: true
 
 "Is it quantum-safe?" is a fair question to ask of a token whose premise is that an amount stays confidential for as long as the instrument exists. A bond issued today may still be outstanding in 2041, and the most likely thing to end that confidentiality is a cryptographically relevant quantum computer.
 
-The Zama protocol answers it in one sentence, and the sentence is unusually precise. From the KMS Cryptographic Documentation, §6.3:
+The Zama protocol answers it in one sentence, in §6.3 of the KMS Cryptographic Documentation:
 
 > "The only place where we utilize pre-quantum primitives is in the ZKPoKs of correct FHE encryption which are based on vector commitments. Here we utilize pairings on elliptic curves, which are not post-quantum secure."
 
-One pairing. Everything else in the protocol proper is lattice-based, information-theoretic, or symmetric. There is a second gap underneath, which belongs to Ethereum rather than to Zama and is usually left out of the discussion.
+One pairing. Everything else in the protocol proper is lattice-based, information-theoretic, or symmetric. There is a second gap underneath, which belongs to Ethereum rather than to Zama: the classical signatures that authorise every transaction.
 
-What follows takes each component in turn, names its primitive and its assumption, and says what an adversary would actually gain by breaking it. The distinction that runs through the whole article is between **soundness** and **zero-knowledge**, or more generally between integrity and confidentiality: both gaps sit on the integrity side, which is a different problem from the one people assume when they hear "not post-quantum".
+What follows takes each component in turn, names its primitive and its assumption, and says what an adversary would gain by breaking it. The distinction that runs through the whole article is between **soundness** and **zero-knowledge**, or more generally between integrity and confidentiality: both gaps sit on the integrity side, which is a different problem from the one people assume when they hear "not post-quantum".
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
 
-## What a quantum computer actually breaks
+## What a quantum computer breaks
 
 Two algorithms matter, and they do different damage.
 
@@ -36,7 +37,7 @@ Two algorithms matter, and they do different damage.
 
 Lattice problems sit in neither bucket. The best classical sieving for the shortest-vector problem runs in roughly $$2^{0.292n}$$ and the best known quantum sieving in roughly $$2^{0.265n}$$: a constant-factor improvement in the exponent, not a collapse. Recent resource estimates put a dimension-400 lattice at something like $$10^{13}$$ physical qubits and $$10^{31}$$ years, with essentially no usable quantum speedup at cryptographic dimensions.
 
-That asymmetry is why NIST's standards are lattice-based. In August 2024 it finalised **FIPS 203 (ML-KEM)** and **FIPS 204 (ML-DSA)**, both on Module-LWE, alongside **FIPS 205 (SLH-DSA)** on hash functions alone. The relevance is direct: the problem under ML-KEM is the same family as the problem under Zama's FHE.
+That asymmetry is why NIST's standards are lattice-based. In August 2024 it finalised **[FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) ([ML-KEM]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/))** and **[FIPS 204](https://csrc.nist.gov/pubs/fips/204/final) (ML-DSA)**, both on Module-LWE, alongside **[FIPS 205](https://csrc.nist.gov/pubs/fips/205/final) (SLH-DSA)** on hash functions alone. The relevance is direct: the problem under ML-KEM is the same family as the problem under Zama's FHE.
 
 ## Component 1 — TFHE: the encryption
 
@@ -58,7 +59,7 @@ The design went out of its way to keep it that way. Choosing the broadcast proto
 
 ## Component 3 — ML-KEM, already in production
 
-This is the part that gets left out of the summaries, and it cuts the other way: the protocol already ships NIST post-quantum cryptography, in two places.
+The protocol already ships NIST post-quantum cryptography, in two places.
 
 **User decryption.** When a holder reads their own balance, each KMS party returns its share *signcrypted under the requester's key*, and the requester combines locally. That encryption is hybrid **ML-KEM-512 + AES-256-GCM**, visible in the source:
 
@@ -74,7 +75,7 @@ pub(crate) const ML_KEM_512_SK_LEN:    usize = 1632; // decapsulation key
 
 The keypair a dApp creates with `instance.generateKeypair()` before a user decryption is an ML-KEM-512 keypair. The confidential path from the KMS back to the reader is therefore post-quantum end to end, and `MlKem1024` is marked deprecated, kept only for older relayer SDKs.
 
-**Custodian backup.** The offline custodians who can help rebuild a node's share hold a post-quantum encryption key derived from a BIP39 seed phrase, and the code says why in plain terms:
+**Custodian backup.** The offline custodians who can help rebuild a node's share hold a post-quantum encryption key derived from a BIP39 seed phrase, and the code says why:
 
 ```rust
 // kms/core/service/src/backup/custodian.rs
@@ -86,7 +87,7 @@ The keypair a dApp creates with `instance.generateKeypair()` before a user decry
 /// quantum algorithms are not supported on AWS KMS at the moment.
 ```
 
-That comment is worth reading twice. The reason the backup path carries both an RSA key and an ML-KEM key is not cryptographic conservatism, it is that the cloud HSM does not support post-quantum algorithms yet. It is a concrete picture of what a real migration looks like.
+The backup path carries both an RSA key and an ML-KEM key because AWS KMS, the cloud HSM, does not support post-quantum algorithms yet, not as a hedge against a weakness in ML-KEM. The post-quantum key is stored in AWS Secrets Manager instead, which is what a migration looks like while the infrastructure catches up.
 
 ## Component 4 — the ZKPoK: the one pairing
 
@@ -104,7 +105,7 @@ The deployed proofs derive from Libert's work on vector commitments with proofs 
 
 > "Of course, the (m, n)-Discrete Logarithm problem does not resist quantum algorithms. A quantum adversary would actually be able to generate proofs for false statements and break the soundness of the proof system."
 
-**The asymmetry is the important part**, and it is stated precisely:
+The documentation separates the two properties of these proofs:
 
 > "All types of proof are provide post-quantum zero-knowledge, but the two based on elliptic curves are not post-quantum secure with respect to the soundness property, whereas the latter are."
 
@@ -115,22 +116,22 @@ Two details make the trade-off concrete rather than theoretical:
 - **The post-quantum proof already exists.** It is not a research gap, it is a size problem: a few thousand kilobytes against **1.8 kB** for the deployed proof, which the whitepaper measures at 1.3 s proving in a browser and 130 ms verification for ten `euint64` values. A megabyte-scale proof in calldata is not a deployable artefact today.
 - **The curve itself is below its nominal level.** The documentation notes BLS12-381 is *"believed to provide slightly less than 128 bits of security (between 117 and 120 bits)"*, and points at BLS12-446 to reach 128. That is a classical observation, independent of quantum anything.
 
-One discrepancy worth flagging for anyone comparing sources. The public litepaper says the replacement will be *"a lattice-based ZK scheme that is post-quantum"*. The Cryptographic Documentation's post-quantum construction is **MPC-in-the-Head**, which is built on commitments and information-theoretic arguments rather than lattices. Both are post-quantum; they are not the same design, and the published roadmap and the technical documentation do not currently describe the same replacement.
+The public sources disagree on the replacement. The litepaper says the replacement will be *"a lattice-based ZK scheme that is post-quantum"*. The Cryptographic Documentation's post-quantum construction is **MPC-in-the-Head**, which is built on commitments and information-theoretic arguments rather than lattices. Both are post-quantum; they are not the same design, and the published roadmap and the technical documentation do not currently describe the same replacement.
 
 ## Component 5 — the signatures, which are not Zama's to fix
 
-The broadest exposure is the layer nobody puts on a slide. Nothing in the protocol is reached without classical signatures:
+The widest exposure is in the signatures. Every interaction with the protocol is authorised or attested by a classical signature:
 
 - the transaction calling `confidentialTransfer` is authorised by **ECDSA secp256k1**, like every Ethereum transaction;
-- the attestation on an encrypted input is a set of **EIP-712 ECDSA signatures** from the coprocessors, recovered on-chain by `InputVerifier` with `ECDSA.recover`;
+- the attestation on an encrypted input is a set of **[EIP-712](https://eips.ethereum.org/EIPS/eip-712) ECDSA signatures** from the coprocessors, recovered on-chain by `InputVerifier` with `ECDSA.recover`;
 - a public decryption result returns with **KMS EIP-712 signatures**, checked by `KMSVerifier`;
 - a user decryption request is authenticated by an **EIP-712 signature** from the requester's wallet.
 
 Shor breaks all of it. The whitepaper acknowledges the dependency: the goal is for every component to be post-quantum, *"while this is already the case for our FHE scheme and MPC protocols"*, the underlying blockchains and their signature schemes would have to follow.
 
-And it is structurally locked in, not merely unimplemented. The EVM offers `ecrecover` and nothing else natively, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
+Replacing them is not a configuration change. The EVM offers `ecrecover` and nothing else natively, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
 
-The practical consequence is worth stating plainly. On the day Shor is practical, an attacker who cannot read a single balance can still sign transactions as any address whose public key has been revealed, which on Ethereum means every address that has ever sent a transaction.
+On the day Shor's algorithm is practical, an attacker who cannot read a single balance can still sign transactions as any address whose public key has been revealed, which on Ethereum means every address that has ever sent a transaction.
 
 ```mermaid
 flowchart LR
@@ -170,9 +171,9 @@ Against this protocol it does not, and the reason is now more complete than "the
 - the **proofs**, whose zero-knowledge property is post-quantum even though their soundness is not;
 - the **signcrypted shares** returned by a user decryption, protected by ML-KEM-512.
 
-For an instrument with a fifteen-year life, that is the difference between a confidentiality guarantee and a countdown.
+For an instrument with a fifteen-year life, data recorded today therefore stays confidential against a future quantum computer, for as long as LWE holds.
 
-The honest caveat: *not known to be solvable* is not *proven hard*. Lattice cryptography carries no proof, only an unbroken public record and NIST's judgement after eight years of analysis. A cryptanalytic advance against LWE would be a problem for the whole post-quantum stack, which is a reason for confidence in relative terms and none in absolute ones.
+One caveat: *not known to be solvable* is not *proven hard*. Lattice cryptography carries no proof, only an unbroken public record and NIST's judgement after eight years of analysis. A cryptanalytic advance against LWE would be a problem for the whole post-quantum stack, which is a reason for confidence in relative terms and none in absolute ones.
 
 ## What this means for a confidential security token
 
@@ -180,7 +181,44 @@ Three statements hold today, in the order that answers three different people:
 
 1. **Amounts and balances are protected by post-quantum cryptography**, and recording them, or the proofs beside them, does not help a future adversary. This answers the issuer and the holder.
 2. **The input proof's soundness is not post-quantum.** A break lets an attacker have a ciphertext accepted that they did not create; it does not let them read anything. A post-quantum construction exists in the documentation and is roughly a thousand times larger, which is why it is not deployed. This answers the auditor.
-3. **The signature authorising a transaction is not post-quantum**, it is a property of the host chain rather than of the token, and it is the layer with the broadest blast radius. Anyone depending on long-term unforgeability needs the chain's migration plan, not Zama's. This answers the risk committee, and it is the one most often forgotten.
+3. **The signature authorising a transaction is not post-quantum**, it is a property of the host chain rather than of the token, and it is the layer with the broadest blast radius. Anyone depending on long-term unforgeability needs the chain's migration plan, not Zama's. This answers the risk committee.
+
+## Conclusion
+
+The Zama protocol's confidentiality rests on lattices, information-theoretic secret sharing and symmetric primitives; its two quantum-vulnerable pieces both concern integrity, not the secrecy of amounts.
+
+- **Post-quantum today:** TFHE for balances and amounts, the thirteen-party threshold decryption, and ML-KEM-512 with AES-256-GCM for user decryption and custodian backups.
+- **Not post-quantum, Zama's to fix:** the soundness of the pairing-based input proof. Its zero-knowledge property holds against a quantum adversary, and a post-quantum construction exists but is about a thousand times larger.
+- **Not post-quantum, the host chain's to fix:** the ECDSA and EIP-712 signatures that authorise transactions, attest inputs and certify decryptions.
+
+Harvest-now-decrypt-later does not apply to the data the protocol stores, because ciphertexts, proofs and signcrypted shares are all protected by post-quantum assumptions.
+
+![Mindmap of Zama and post-quantum cryptography covering TFHE, the threshold MPC, ML-KEM in production, the pairing-based ZKPoK and the host chain's signatures]({{site.url_complet}}/assets/article/blockchain/zamafhe/2026-10-02-zama-post-quantum-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Cryptographically relevant quantum computer** | A quantum computer large enough to run Shor's algorithm against deployed key sizes, the event that would end classical public-key security. |
+| **Shor's algorithm** | A quantum algorithm solving factoring and discrete logarithms in polynomial time, which breaks RSA, elliptic-curve signatures and pairing-based assumptions. |
+| **Grover's algorithm** | A quantum algorithm giving a quadratic speedup on unstructured search, which halves the effective security of a symmetric primitive and is answered by doubling the key length. |
+| **LWE / GLWE** | Learning With Errors and its generalisation: the lattice problems under TFHE, the same family as Module-LWE under ML-KEM. |
+| **Module-LWE** | The structured LWE variant under ML-KEM and ML-DSA; a break would affect NIST's post-quantum standards as much as Zama's FHE. |
+| **TFHE** | The lattice-based fully homomorphic encryption scheme Zama uses through TFHE-rs to encrypt balances and amounts, targeting 128-bit computational security. |
+| **Threshold MPC** | The decryption protocol in which thirteen parties each hold a key share and combine partial decryptions, with at most four corruptions tolerated. |
+| **Noise flooding** | The statistical masking each party adds to its partial decryption so that the combined result reveals nothing about the key. |
+| **ML-KEM** | The NIST post-quantum key-encapsulation mechanism of FIPS 203, used here as ML-KEM-512 with AES-256-GCM for user decryption and custodian backups. |
+| **Signcryption** | Signing and encrypting in one operation; how each KMS party returns a share to one designated reader. |
+| **ZKPoK** | The zero-knowledge proof of knowledge attached to an encrypted input, proving that the submitter knows the plaintext and encrypted it correctly. |
+| **Soundness** | The property that a proof cannot be produced for a false statement; the one that is not post-quantum for the deployed proofs. |
+| **Zero-knowledge** | The property that a proof reveals nothing beyond the statement; post-quantum here, including for the pairing-based proofs. |
+| **(m, n)-Discrete Log** | The parameterised assumption under the deployed proof, proven in the random oracle and algebraic group models, and broken by Shor's algorithm. |
+| **BLS12-381** | The pairing-friendly elliptic curve of the deployed proofs, believed to give between 117 and 120 bits of classical security rather than 128. |
+| **MPC-in-the-Head** | A proof technique building a zero-knowledge argument from a simulated multi-party computation; post-quantum, and about a thousand times larger than the deployed proof. |
+| **EIP-712** | The Ethereum standard for signing typed structured data, used with ECDSA by the coprocessors, the KMS and users; not post-quantum. |
+| **Harvest now, decrypt later** | Recording ciphertexts today to decrypt them once a quantum computer exists; ineffective against data protected by lattice or information-theoretic assumptions. |
 
 ## Frequently Asked Questions
 
@@ -208,34 +246,41 @@ Track the host chain's post-quantum plan rather than the protocol's. Account abs
 
 They disagree, so cite both. The litepaper announces a lattice-based replacement; the Cryptographic Documentation presents an MPC-in-the-Head construction. Both are post-quantum, and they are different designs.
 
-## Glossary
+## References
 
-| Term | Meaning |
-|---|---|
-| **LWE / GLWE** | Learning With Errors and its generalisation: the lattice problems under TFHE, the same family as Module-LWE under ML-KEM |
-| **Soundness** | The property that a proof cannot be produced for a false statement. The one that is not post-quantum here |
-| **Zero-knowledge** | The property that a proof reveals nothing beyond the statement. Post-quantum here, including for the pairing-based proofs |
-| **(m, n)-Discrete Log** | The parameterised assumption under the deployed proof, proven in the random oracle and algebraic group models |
-| **MPC-in-the-Head** | A proof technique building a zero-knowledge argument from a simulated multi-party computation; post-quantum, and large |
-| **Signcryption** | Signing and encrypting in one operation; how each KMS party returns a share to one designated reader |
-| **Harvest now, decrypt later** | Recording ciphertexts today to decrypt once a quantum computer exists |
-
-## Sources
+### Analyzed source
 
 Primary documents, read locally:
 
 - *KMS Cryptographic Documentation*, Zama — §4.2 security levels, §4.11.3–4.11.4 the proof systems and their assumptions, §6.3 cryptographic assumptions, §7.6 the quantum status of each proof, §8.6.2 pairing curves
 - *FHEVM whitepaper*, Zama — §4.1 the TFHE scheme, Table 4.2 proof timings and sizes
-- [zama-ai/kms](https://github.com/zama-ai/kms) — `core/service/src/cryptography/hybrid_ml_kem.rs`, `core/service/src/backup/custodian.rs`, `core/service/src/cryptography/signcryption.rs`
-- [zama-ai/fhevm](https://github.com/zama-ai/fhevm) — `host-contracts/contracts/InputVerifier.sol`, `KMSVerifier.sol`
+- [zama-ai/kms](https://github.com/zama-ai/kms) — `core/service/src/cryptography/hybrid_ml_kem.rs`, `core/service/src/backup/custodian.rs`, `core/service/src/cryptography/signcryption.rs`; default branch read around 2026-10-02, exact commit not recorded
+- [zama-ai/fhevm](https://github.com/zama-ai/fhevm) — `host-contracts/contracts/InputVerifier.sol`, `KMSVerifier.sol`; default branch read around 2026-10-02, exact commit not recorded
 
-Public references:
+### Standards
+
+- [FIPS 203 — Module-Lattice-Based Key-Encapsulation Mechanism Standard](https://csrc.nist.gov/pubs/fips/203/final)
+- [FIPS 204 — Module-Lattice-Based Digital Signature Standard](https://csrc.nist.gov/pubs/fips/204/final)
+- [FIPS 205 — Stateless Hash-Based Digital Signature Standard](https://csrc.nist.gov/pubs/fips/205/final)
+- [EIP-712 — Typed structured data hashing and signing](https://eips.ethereum.org/EIPS/eip-712)
+
+### Zama documentation and papers
 
 - [Zama Confidential Blockchain Protocol Litepaper](https://docs.zama.org/protocol/zama-protocol-litepaper)
 - [Zero-knowledge proofs — TFHE-rs documentation](https://docs.zama.org/tfhe-rs/fhe-computation/advanced-features/zk-pok)
 - Benoît Libert, [*Vector Commitments with Proofs of Smallness*](https://eprint.iacr.org/2023/800)
 - Oded Regev, [*On Lattices, Learning with Errors, Random Linear Codes, and Cryptography*](https://cims.nyu.edu/~regev/papers/qcrypto.pdf)
 - [On the practicality of quantum sieving algorithms for the shortest vector problem](https://arxiv.org/pdf/2410.13759)
-- [NIST PQC Standards: FIPS 203, 204, 205](https://www.encryptionconsulting.com/nist-pqc-standards-fips-203-204-205/)
 
-Related: [the protocol's zero-knowledge proofs]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/), [the whitepaper against the implementation]({{site.url_complet}}/2026/09/18/zama-fhevm-whitepaper-vs-implementation/), [the threshold KMS]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/)
+### Related articles
+
+- [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/)
+- [The Zama FHEVM Whitepaper — What It Specifies, and What the Code Does Differently]({{site.url_complet}}/2026/09/18/zama-fhevm-whitepaper-vs-implementation/)
+- [Inside the Zama KMS — Threshold Key Management for FHE, From MPC Protocol to Enclave Deployment]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/)
+- [Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped]({{site.url_complet}}/2026/10/02/noahs-ark-threshold-fhe-paper-vs-implementation/)
+- [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
+- [Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind It, and What a Quantum Computer Would Break]({{site.url_complet}}/2026/09/17/aztec-ephemeral-keys-ecdh-encryption-post-quantum/)
+
+### Tooling
+
+- [Claude Code](https://claude.com/product/claude-code)

@@ -329,6 +329,7 @@ Because the check must distinguish corrupted material from a format change. If t
 - [Running a Zama Coprocessor — Architecture, Services and Operator Setup]({{site.url_complet}}/2026/09/18/zama-coprocessor-architecture-and-operator-setup/)
 - [Overview, security and applications of Multi-Party Computation (MPC)]({{site.url_complet}}/2024/10/21/mpc-protocol-overview/)
 - [AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data]({{site.url_complet}}/2025/07/17/aws-nitro-enclaves-overview/)
+- [Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped]({{site.url_complet}}/2026/10/02/noahs-ark-threshold-fhe-paper-vs-implementation/)
 
 ### Tooling
 

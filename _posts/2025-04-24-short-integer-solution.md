@@ -5,7 +5,7 @@ date: 2025-04-23
 last_modified_at: 2025-04-24
 lang: en
 locale: en-GB
-categories: cryptography security
+categories: cryptography security post-quantum
 tags: ipfs merkle-tree merkle-dag dag graph git
 description: Short integer solution (SIS)is an average-case problems used in lattice-based cryptography constructions. SIS is one of the problems believed to be hard even for quantum computers.
 image: /assets/article/cryptographie/lattice/SIS-average-case.png

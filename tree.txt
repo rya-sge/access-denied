@@ -983,3 +983,15 @@ _posts/2026-10-05-dijkstra-vs-bellman-ford.md
 
 _posts/2026-10-05-mica-flashcards.md
   assets/article/regulation/mica/2026-10-05-mica-flashcards-mindmap.puml   (mindmap -> .png, cover image)
+
+_posts/2026-10-02-noahs-ark-threshold-fhe-paper-vs-implementation.md
+  assets/article/blockchain/zamafhe/2026-10-02-noahs-ark-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-02-zama-post-quantum.md
+  assets/article/blockchain/zamafhe/2026-10-02-zama-post-quantum-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-06-crypto-hacks-september-2026.md
+  assets/article/blockchain/hack/2026-10-06-crypto-hacks-september-2026-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

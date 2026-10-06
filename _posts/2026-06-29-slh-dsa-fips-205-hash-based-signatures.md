@@ -5,7 +5,7 @@ date:   2026-06-29
 last_modified_at: 2026-06-30
 lang: en
 locale: en-GB
-categories: cryptography
+categories: cryptography post-quantum
 tags: cryptography post-quantum hash-based slh-dsa sphincs fips-205 digital-signature
 description: How SLH-DSA (FIPS 205) builds a stateless post-quantum signature from hash functions alone, layering WOTS+, XMSS, a hypertree, and FORS, with the twelve parameter sets and the small/fast trade-off.
 image: /assets/article/cryptographie/hash-based/2026-06-29-slh-dsa-fips-205-hash-based-signatures.png

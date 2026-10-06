@@ -5,7 +5,7 @@ date:   2026-06-29
 last_modified_at: 2026-06-30
 lang: en
 locale: en-GB
-categories: cryptography
+categories: cryptography post-quantum
 tags: cryptography post-quantum lattice ml-kem kyber fips-203 key-encapsulation
 description: How ML-KEM (FIPS 203) builds a post-quantum key-encapsulation mechanism from module lattices, the K-PKE component, the Fujisaki-Okamoto transform with implicit rejection, and the three parameter sets.
 image: /assets/article/cryptographie/lattice/2026-06-29-ml-kem-fips-203-post-quantum-key-encapsulation.png
@@ -223,6 +223,7 @@ ML-KEM is the post-quantum replacement for Diffie-Hellman key establishment. It 
 
 ### Related articles
 
+- [Zama and Post-Quantum Cryptography: Everything Is Lattice-Based Except One Pairing]({{site.url_complet}}/2026/10/02/zama-post-quantum/)
 - [Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind It, and What a Quantum Computer Would Break]({{site.url_complet}}/2026/09/17/aztec-ephemeral-keys-ecdh-encryption-post-quantum/)
 - [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)
 - [SLH-DSA — The Stateless Hash-Based Signature Standard (FIPS 205)]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/)

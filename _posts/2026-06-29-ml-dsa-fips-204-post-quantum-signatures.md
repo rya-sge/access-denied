@@ -5,7 +5,7 @@ date:   2026-06-29
 last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
-categories: cryptography
+categories: cryptography post-quantum
 tags: cryptography post-quantum lattice ml-dsa dilithium fips-204 digital-signature
 description: How ML-DSA (FIPS 204) builds a post-quantum digital signature from module lattices, the Fiat-Shamir with Aborts construction, rejection sampling, and the three NIST parameter sets.
 image: /assets/article/cryptographie/lattice/2026-06-29-ml-dsa-fips-204-post-quantum-signatures.png

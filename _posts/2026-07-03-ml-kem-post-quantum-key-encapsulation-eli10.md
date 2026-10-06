@@ -5,7 +5,7 @@ date:   2026-07-03
 last_modified_at: 2026-07-16
 lang: en
 locale: en-GB
-categories: cryptography eli10
+categories: cryptography eli10 post-quantum
 tags: cryptography post-quantum lattice ml-kem key-encapsulation analogy explainer
 description: A simple guide to ML-KEM, the new way two computers share a secret code that quantum computers cannot steal, explained with padlocks, locked boxes, and a clever double-check.
 image: /assets/article/cryptographie/lattice/2026-07-03-ml-kem-post-quantum-key-encapsulation-eli10-mindmap.png

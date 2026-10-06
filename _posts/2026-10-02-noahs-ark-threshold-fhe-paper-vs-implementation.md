@@ -2,6 +2,7 @@
 layout: post
 title: "Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped"
 date:   2026-10-02
+last_modified_at: 2026-10-06
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -14,7 +15,7 @@ isMermaid: true
 
 Threshold decryption is the reason nobody holds the key that could read a confidential token's balances. The method behind it has a paper, *Noah's Ark: Efficient Threshold-FHE Using Noise Flooding* by Dahl, Demmler, El Kazdadi, Meyre, Orfila, Rotaru, Smart, Tap and Walter ([eprint 2023/815](https://eprint.iacr.org/2023/815), WAHC 2023), and it has a Rust implementation, [`zama-ai/threshold-fhe`](https://github.com/zama-ai/threshold-fhe).
 
-They are not the same thing, and the gap between them is more interesting than either one alone. The paper solves a specific problem elegantly. The repository solves that problem and then keeps going, under a different normative document, with parameters that do not match the paper's table and a masking bound that is not the paper's formula.
+They are not the same thing. The paper solves one specific problem. The repository solves that problem and then keeps going, under a different normative document, with parameters that do not match the paper's table and a masking bound that is not the paper's formula.
 
 This article reads both: the method first, then six places where they diverge, each checked in the PDF and in the source.
 
@@ -38,17 +39,17 @@ Except that opening $$[v]$$ also reveals $$e$$, and $$e$$ together with the ciph
 
 Masking $$e$$ with bound $$|e| < B$$ statistically wants $$E$$ uniform over $$[-2^{\mathsf{stat}}B,\, 2^{\mathsf{stat}}B]$$, which forces $$\Delta > 2^{\mathsf{stat}}B$$ and therefore a large modulus $$q$$. For BGV and BFV that is free: bootstrap, or add two or three levels worth 14–24 bits of gap each, and flooding works untouched.
 
-TFHE is the awkward case, and the paper is blunt about why:
+TFHE is the awkward case, and the paper states why:
 
 > "the only place where noise flooding is in practice a problem is when the FHE parameters are such that the noise gap is tiny, even after a bootstrapping operation is performed. This is exactly the situation in TFHE where one (usually) selects a relatively small q value (for example $$q = 2^{64}$$)."
 
-The small modulus and small LWE dimension force post-bootstrap noise around $$2^{30}$$ just to stay secure, so the gap is too small — **"but only by tens of bits"**. That last clause is the whole paper: the deficit is small enough to engineer around.
+The small modulus and small LWE dimension force post-bootstrap noise around $$2^{30}$$ just to stay secure, so the gap is too small — **"but only by tens of bits"**. The paper's method rests on that clause: the deficit is small enough to engineer around.
 
 ## Two contributions
 
 **The two-uniform analysis.** If $$E$$ is built from *at least two* uniform distributions over the flooding range rather than one, the statistical distance comes out at $$2^{-2\cdot\mathsf{stat}}$$ instead of $$2^{-\mathsf{stat}}$$. So $$\mathsf{stat} \approx 40$$ buys 80 bits, and the modulus growth the naive analysis demands is halved.
 
-The alternative was Rényi divergence, as in [BS23] and [CSS+22], which gives smaller parameters still. The paper rejects it for a reason worth repeating, because it explains why this protocol is usable as a component:
+The alternative was Rényi divergence, as in [BS23] and [CSS+22], which gives smaller parameters still. The paper rejects it because its security games cannot be used inside a larger protocol, which is what Noah's Ark has to support:
 
 > "the general technique of Renyi divergence is hard to apply to security problems which are inherently about distinguishing one distribution from another ... The security games presented in [CSS+22] and [BS23] do not allow such a usage."
 
@@ -94,7 +95,7 @@ Everything above is in the repository. So is a good deal more, and some of it di
 
 ### 1. The paper is not the implementation's specification
 
-This is the one that reframes all the others. The repository's normative reference is **`docs/CryptographicDocumentation.pdf`**, Zama's NIST threshold-cryptography submission, and the source comments say so throughout: *"as described in Fig. 70 of NIST document"*, `//NIST: Level Zero Operation`, *"For now NIST doc doesn't explicitly call this robust_open"*. The paper is cited once, in the README, with a careful hedge:
+This divergence changes how the other five should be read. The repository's normative reference is **`docs/CryptographicDocumentation.pdf`**, Zama's NIST threshold-cryptography submission, and the source comments say so throughout: *"as described in Fig. 70 of NIST document"*, `//NIST: Level Zero Operation`, *"For now NIST doc doesn't explicitly call this robust_open"*. The paper is cited once, in the README, with a careful hedge:
 
 > "The [Noah's ark](https://eprint.iacr.org/2023/815) paper contains the technical details of **some of our protocols**"
 
@@ -214,9 +215,57 @@ And the status note that frames all of it:
 
 **That is the most important sentence for anyone auditing it.** `threshold-fhe` is a NIST submission snapshot, not the production KMS. The code running the thirteen organisations is [`zama-ai/kms`](https://github.com/zama-ai/kms), which imports this lineage but is maintained separately. Findings here do not automatically transfer, in either direction.
 
-Two things in the snapshot are worth knowing for that reason. `DummyPreprocessing` is scattered with `unimplemented!()` and is what the gRPC path constructs when no preprocessing session id is supplied. And `switch_and_squash.rs` carries its own modulus-switch routine, copied from an unmerged `tfhe-rs` branch:
+Two details of the snapshot matter to an auditor for that reason. `DummyPreprocessing` is scattered with `unimplemented!()` and is what the gRPC path constructs when no preprocessing session id is supplied. And `switch_and_squash.rs` carries its own modulus-switch routine, copied from an unmerged `tfhe-rs` branch:
 
 > *"copied from the `noise-gap-exp` branch in tfhe-rs-internal (and added error handling) since this branch will likely not be merged in main."*
+
+## Conclusion
+
+Noah's Ark makes threshold decryption of TFHE ciphertexts possible with noise flooding, which the small TFHE modulus would otherwise rule out. `zama-ai/threshold-fhe` implements that method, but it follows Zama's NIST documentation rather than the paper.
+
+The paper contributes two things:
+
+- **The two-uniform analysis** builds the masking term from at least two uniform distributions, so the statistical distance is $$2^{-2\cdot\mathsf{stat}}$$ and the modulus growth is halved.
+- **Switch-n-Squash** is a bootstrap into $$Q = 2^{128}$$ and $$L = 4096$$ that creates the noise gap flooding needs, without interaction.
+
+The implementation departs from the paper in six places:
+
+- The normative document is `CryptographicDocumentation.pdf`, and the paper is credited with "some of our protocols".
+- Noise flooding sits next to bit decomposition, giving four decryption modes.
+- The PRSS bound drops the $$\binom{n}{t}$$ division and `pow`, which spends noise gap rather than weakening the mask.
+- The PRF uses one AES block, which is enough for the deployed $$2^{110}$$ bound.
+- The non-interactive protocol runs at $$\binom{13}{4} = 715$$ sets, above the paper's informal cutoff of about 100.
+- The $$t \lt n/3$$ robustness condition is checked at reconstruction, and the Galois ring caps a default build at $$n \leq 15$$.
+
+The repository is a NIST submission snapshot. A finding in it applies to the production `zama-ai/kms` only after it has been checked there.
+
+![Mindmap of the Noah's Ark article covering the noise-flooding problem, the two-uniform analysis, Switch-n-Squash, the two protocols, the six divergences and the parameter comparison]({{site.url_complet}}/assets/article/blockchain/zamafhe/2026-10-02-noahs-ark-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **LWE ciphertext** | A pair $$(a, b)$$ with $$b = a \cdot s + e + \Delta \cdot m \bmod q$$, hiding a message $$m$$ under a secret key $$s$$ behind a small noise term $$e$$. |
+| **Secret sharing** | Splitting a value such as the key $$s$$ into shares held by $$n$$ parties, so that $$t$$ of them learn nothing and enough of them can reconstruct it; written $$[s]$$. |
+| **Threshold decryption** | Decrypting a ciphertext jointly from key shares, so that no single party ever holds the secret key. |
+| **Noise gap** | The room between the noise in a ciphertext and the scaling factor $$\Delta$$; rounding returns the right message only while the total noise stays inside it. |
+| **Bootstrapping** | The FHE operation that refreshes a ciphertext and reduces its noise by evaluating decryption homomorphically. |
+| **TFHE** | The FHE scheme Zama uses, with a small modulus such as $$2^{64}$$ and small LWE dimension, which leaves a noise gap too small for direct flooding. |
+| **BGV and BFV** | Two other FHE schemes with large moduli, where flooding works unchanged; in the repository they sit behind an `experimental` feature flag. |
+| **Noise flooding** | Adding a large shared masking term $$E$$ before opening $$e + \Delta m$$, so that the opened value does not reveal $$e$$ and therefore the key. |
+| **Statistical security parameter ($$\mathsf{stat}$$)** | The exponent of the acceptable statistical distance between real and simulated views; about 40 in both the paper and the code (`STATSEC`). |
+| **Two-uniform analysis** | The paper's result that a mask built from at least two uniform distributions reaches statistical distance $$2^{-2\cdot\mathsf{stat}}$$ instead of $$2^{-\mathsf{stat}}$$. |
+| **Rényi divergence** | An alternative analysis that gives smaller parameters, rejected by the paper because its security games cannot be composed into a larger protocol. |
+| **Simulation paradigm** | Proving security by showing a simulator can produce the protocol's view without the secret, which lets the protocol be used as a black box inside another one. |
+| **Switch-n-Squash** | A bootstrap with keys that output parameters $$(L, Q) = (4096, 2^{128})$$, switching modulus and dimension and reducing noise in one non-interactive pass. |
+| **PRSS** | Pseudo-random secret sharing: parties derive shares of a random mask locally from pre-shared PRF keys, one per set of parties, with no interaction. |
+| **Shamir sharing over Galois rings** | Polynomial secret sharing adapted to the non-prime modulus $$2^{64}$$ by embedding party indices into a ring extension, which caps a default build at 15 parties. |
+| **Robust / active-with-abort** | Two security levels: with $$t \lt n/3$$ the honest parties always obtain the output, with $$t \lt n/2$$ a cheating party can only make the protocol abort. |
+| **Bit decomposition** | The alternative to flooding in the repository, which performs the rounding inside generic MPC at the cost of more rounds and preprocessing. |
+| **nSmall / nLarge** | The implementation's names for the two regimes: Protocol 1 with PRSS when $$\binom{n}{t}$$ is small, Protocol 2 with an offline phase when it is large. |
+| **Resharing** | Redistributing key shares to a new epoch so that a share stolen earlier stops being useful; present in the repository, absent from the paper. |
 
 ## Frequently Asked Questions
 
@@ -240,10 +289,26 @@ From the Galois ring. Party indices are embedded as exceptional-set elements, an
 
 They trade differently: flooding is one round and spends noise gap, bit decomposition avoids the gap problem and spends rounds and preprocessing — `1217` triples and `64` bits per ciphertext in the code's own sizing. The default is flooding.
 
-## Sources
+## References
 
-- Dahl, Demmler, El Kazdadi, Meyre, Orfila, Rotaru, Smart, Tap, Walter, [*Noah's Ark: Efficient Threshold-FHE Using Noise Flooding*](https://eprint.iacr.org/2023/815), WAHC 2023
-- [`zama-ai/threshold-fhe`](https://github.com/zama-ai/threshold-fhe) at `c668fdd3`, and its `docs/CryptographicDocumentation.pdf`
-- Abspoel, Cramer, Damgård, Escudero, Yuan, *Efficient Information-Theoretic MPC over* $$\mathbb{Z}/p^k\mathbb{Z}$$ *via Galois Rings*, TCC 2019
+### Analyzed source
+
+- Dahl, Demmler, El Kazdadi, Meyre, Orfila, Rotaru, Smart, Tap, Walter, [*Noah's Ark: Efficient Threshold-FHE Using Noise Flooding*](https://eprint.iacr.org/2023/815), WAHC 2023 (eprint 2023/815, 33 pages)
+- [zama-ai/threshold-fhe](https://github.com/zama-ai/threshold-fhe) — analyzed at commit [`c668fdd32a33270fc3ad2fd92b49267b734463dd`](https://github.com/zama-ai/threshold-fhe/tree/c668fdd32a33270fc3ad2fd92b49267b734463dd), 2025-08-07, including its `docs/CryptographicDocumentation.pdf`
+
+### Papers cited
+
+- Abspoel, Cramer, Damgård, Escudero, Yuan, *Efficient Information-Theoretic MPC over* $$\mathbb Z/p^k\mathbb Z$$ *via Galois Rings*, TCC 2019
 - Damgård & Nielsen, *Scalable and Unconditionally Secure Multiparty Computation*, CRYPTO 2007
-- Related: [the threshold KMS in production]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/), [Zama and post-quantum cryptography]({{site.url_complet}}/2026/10/02/zama-post-quantum/)
+
+### Related articles
+
+- [Inside the Zama KMS — Threshold Key Management for FHE, From MPC Protocol to Enclave Deployment]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/)
+- [The Zama FHEVM Whitepaper — What It Specifies, and What the Code Does Differently]({{site.url_complet}}/2026/09/18/zama-fhevm-whitepaper-vs-implementation/)
+- [Zama and Post-Quantum Cryptography: Everything Is Lattice-Based Except One Pairing]({{site.url_complet}}/2026/10/02/zama-post-quantum/)
+- [Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/)
+- [Overview, security and applications of Multi-Party Computation (MPC)]({{site.url_complet}}/2024/10/21/mpc-protocol-overview/)
+
+### Tooling
+
+- [Claude Code](https://claude.com/product/claude-code)

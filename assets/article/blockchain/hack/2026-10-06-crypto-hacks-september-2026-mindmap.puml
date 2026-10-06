@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks\nSeptember 2026
+** Figures
+*** PeckShield: 55 hacks, $766.49M
+*** CertiK: $772.4M, highest month of 2026
+*** Two incidents = ~92% of losses
+** Infrastructure and keys
+*** Bitget $387.5M (third-party security product)
+*** Duelbits $7M (hot wallet keys)
+*** SingularityNET keyring (Fetch.ai, NuNet, AGIX)
+*** Astroport admin, Dominion multisig
+** Bridges and sidechains
+*** Liquid Network $320M (range-proof cache)
+*** Nomic nBTC, Meter Passport, Symbiosis
+*** Chainflip, Payy, Long Bridge
+*** Cosmos EVM tail (Nesa, KiiChain, TAC)
+** Smart contract bugs
+*** Arbitrary call / allowance abuse
+**** Gnosis Safe $7.73M + MEV front-run
+**** ether.fi AtomicQueue, Bonfire, Nimiq
+*** Oracle manipulation
+**** Nostra $3.5M, Spiral, BeatXswap, Enso
+*** Accounting flaws
+**** Notional uint128 cast, Reddio, DoinGud
+** Governance
+*** Drop treasury proposal $4.4M
+*** Ampleforth proposal (flagged before vote)
+** Users and developers
+*** Permit / Permit2 phishing
+*** Contagious Interview (DPRK job lures)
+*** npm, PyPI, Packagist, GitHub Actions
+*** Fake GIWA bridge
+@endmindmap

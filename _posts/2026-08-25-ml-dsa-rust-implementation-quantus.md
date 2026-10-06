@@ -4,7 +4,7 @@ title: "ML-DSA in Rust — Inside the Quantus qp-rusty-crystals Implementation"
 date:   2026-08-25
 lang: en
 locale: en-GB
-categories: cryptography blockchain
+categories: cryptography blockchain post-quantum
 tags: cryptography post-quantum lattice ml-dsa dilithium fips-204 rust
 description: How the Quantus qp-rusty-crystals crate implements FIPS 204 ML-DSA in no_std Rust, from const-generic parameter sets to streaming matrix expansion.
 image: /assets/article/cryptographie/lattice/2026-08-25-ml-dsa-rust-implementation-quantus.png

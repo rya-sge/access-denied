@@ -315,6 +315,7 @@ The cryptographic ones: $$n = 13$$, $$t = 4$$, 128-bit security, the ZKPoK sizes
 - [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/)
 - [Technical Analysis of the OpenZeppelin ERC-7984 Implementation]({{site.url_complet}}/2026/02/24/erc7984-openzeppelin-analysis/)
 - [Overview, security and applications of Multi-Party Computation (MPC)]({{site.url_complet}}/2024/10/21/mpc-protocol-overview/)
+- [Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped]({{site.url_complet}}/2026/10/02/noahs-ark-threshold-fhe-paper-vs-implementation/)
 
 ### Tooling
 

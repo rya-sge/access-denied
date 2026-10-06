@@ -5,7 +5,7 @@ date:   2024-05-30
 last_modified_at: 2025-03-27
 lang: en
 locale: en-GB
-categories: cryptography blockchain
+categories: cryptography blockchain post-quantum
 tags: hash signature winternitz sha-256
 description: Presentation of Winternitz One-Time Signature (W-OST), a post quantum algorithm which relies on hash function (e.g  SHA-256)
 image: /assets/article/cryptographie/signature/winternitz-cover.png
