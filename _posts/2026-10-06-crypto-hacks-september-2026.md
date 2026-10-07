@@ -12,7 +12,10 @@ isMath: false
 isMermaid: true
 ---
 
-September 2026 was the worst month of the year for crypto theft. PeckShield counted 55 major hacks and ~$766.49M in losses, a rise of about 462% over August's ~$136.3M, and CertiK's dashboard settled at roughly $772.4M, the highest monthly total and the highest incident count of 2026. Two events account for almost all of it: the ~$387.5M drain of Bitget's hot and warm wallets, and the minting of about 4,000 unbacked L-BTC on the Liquid Network sidechain, which removed ~$320M of BTC from its federation reserves before most of it was returned.
+September 2026 was the worst month of the year for crypto theft. PeckShield counted 55 major hacks and ~$766.49M in losses, a rise of about 462% over August's ~$136.3M, and CertiK's dashboard settled at roughly $772.4M, the highest monthly total and the highest incident count of 2026. Two events account for almost all of it:
+
+- **Bitget, ~$387.5M:** the drain of the exchange's hot and warm wallets.
+- **Liquid Network, ~$320M:** the minting of about 4,000 unbacked L-BTC on this Bitcoin sidechain, which removed the equivalent BTC from its federation reserves before most of it was returned.
 
 The remaining fifty or so incidents are smaller and repeat a short list of failure classes: leaked or misused privileged keys, bridges that accept a message they should have rejected, contracts that let any caller spend someone else's allowance, lending markets priced from a spot oracle, and accounting code that counts the same asset twice. This article lists and summarises those incidents, grouped by root cause, using three sources: the [CryptoAlertHack](https://t.me/CryptoAlertHack) Telegram channel, a relay of alerts from SlowMist, PeckShield, CertiK, GoPlus, BlockSec Phalcon, Rekt News and others; the [SlowMist Hacked](https://hacked.slowmist.io/) database, and [Rekt News](https://rekt.news/).
 
