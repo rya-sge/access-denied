@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2018
+** Figures
+*** CipherTrace: ~$950M stolen, ~$725M exit scams
+*** SlowMist: ~$874M, nominal mints excluded
+*** Group-IB: Lazarus ~$571M in 5 attacks (2017-2018)
+** Exchanges
+*** Coincheck ~$534M (NEM hot wallet)
+*** BitGrail ~$170M (double withdrawals)
+*** Zaif, Coinrail, Bithumb, Bancor
+** Token contracts
+*** BEC and SMT overflows (nominal)
+*** EDU transferFrom, SpankChain reentrancy
+*** Fomo3D: airdrop and block stuffing
+** Chains and front ends
+*** 51% attacks: Bitcoin Gold, Verge, ZenCash
+*** MyEtherWallet BGP hijack, BlackWallet DNS
+*** event-stream (Copay), StatCounter (Gate.io)
+** EOS mainnet year
+*** EOSBet, EOS Fomo3D, BetDice rollbacks
+** Not counted
+*** Frauds: BitConnect, Pincoin/iFan, MapleChange
+*** Blockchain.info phishing (multi-year)
+@endmindmap

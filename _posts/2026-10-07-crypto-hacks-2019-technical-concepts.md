@@ -431,6 +431,7 @@ No significant losses were recorded. Auditors and researchers found the serious 
 
 ### Related articles
 
+- [The Technical Concepts Behind the 2018 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2018-technical-concepts/)
 - [Crypto Hacks of 2019 - Binance, Upbit, CoinBene and the EOS Casino Attacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2019/)
 - [The Technical Concepts Behind the 2020 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2020-technical-concepts/)
 - [The Technical Concepts Behind the 2021 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/)

@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2018 hacks
+** Arithmetic
+*** Multiplication overflow (BEC batchTransfer)
+*** Addition overflow and ecrecover (SMT transferProxy)
+*** Unchecked allowance (EDU, BAI)
+** Contract control flow
+*** Reentrancy via a chosen token (SpankChain)
+*** Randomness from block data (Fomo3D airdrop)
+*** extcodesize bypass from a constructor
+*** Block stuffing (Fomo3D round 1)
+** Keys and admin powers
+*** Single-key hot wallets (Coincheck, Zaif)
+*** Owner mint, burn, withdraw (KICKICO, Bancor)
+*** Non-idempotent withdrawals (BitGrail)
+** Consensus
+*** 51% attacks and confirmations (Bitcoin Gold)
+*** Timestamp spoofing (Verge)
+*** Duplicate inputs (CVE-2018-17144)
+** Front ends and supply chain
+*** BGP and DNS hijacks (MyEtherWallet, BlackWallet)
+*** Targeted npm payload (event-stream, Copay)
+*** Third-party script (StatCounter, Gate.io)
+@endmindmap
