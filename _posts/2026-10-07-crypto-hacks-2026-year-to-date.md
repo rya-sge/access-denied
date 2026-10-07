@@ -122,13 +122,13 @@ By category, smart contract bugs are again the most frequent incidents and a sma
 
 | Category | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
-| Key / infrastructure compromise | 42 | $711.4M | 33.4% |
-| Cross-chain bridge / sidechain | 40 | $430.1M | 20.2% |
+| Key / infrastructure compromise | 44 | $726.9M | 34.1% |
+| Cross-chain bridge / sidechain | 39 | $418.3M | 19.6% |
 | Supply chain | 15 | $299.2M | 14.0% |
 | Scam / phishing / social engineering | 18 | $291.0M | 13.7% |
-| Oracle / price manipulation | 33 | $182.5M | 8.6% |
-| Smart contract vulnerability | 117 | $122.6M | 5.8% |
-| Other / unknown | 33 | $58.1M | 2.7% |
+| Oracle / price manipulation | 31 | $181.8M | 8.5% |
+| Smart contract vulnerability | 125 | $128.1M | 6.0% |
+| Other / unknown | 26 | $49.7M | 2.3% |
 | Governance attack | 6 | $35.3M | 1.7% |
 
 The category is derived from the database's attack method first, and from the target and description when the method is generic. SlowMist files KelpDAO as a supply chain attack and Drift as social engineering, which places the two April incidents in different rows although both were operator compromises; read the table as a classification of attack methods, not of victims. The first six entries of October (~$4.8M) are excluded.
@@ -151,7 +151,9 @@ timeline
 
 ### Bitget (~$387.5M, September)
 
-Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC). [Chainalysis](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) attributes the theft to North Korea, which it says takes North Korea's thefts in 2026 above $1B; the funds were spread across four blockchains within three hours. The [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/) covers the incident in detail.
+Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC).
+
+[Chainalysis](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) attributes the theft to North Korea, which it says takes North Korea's thefts in 2026 above $1B, and [Elliptic](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/) rates the link "highly likely" on the strength of on-chain connections to earlier North Korean thefts, including Bybit's laundering addresses; the funds were spread across four blockchains within three hours. The [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/) covers the incident in detail.
 
 ### Liquid Network (~$320M, September)
 
@@ -242,7 +244,7 @@ sequenceDiagram
     X->>X: bridge USDC to Ethereum via CCTP
 ```
 
-Drift's [follow-up](https://x.com/DriftProtocol/status/2040611161121370409) describes a six-month operation. A fake "quant trading firm" built a relationship with the team, met contributors in person and deposited more than $1M; two contributors were then led to open a malicious code repository and a TestFlight app, which gave the attacker the access it needed to obtain the pre-signatures. Drift attributes the operation with medium-high confidence to UNC4736 (AppleJeus), a DPRK group it links to the Radiant hack, while noting that the people met in person were not North Korean.
+Drift's [follow-up](https://x.com/DriftProtocol/status/2040611161121370409) describes a six-month operation. A fake "quant trading firm" built a relationship with the team, met contributors in person and deposited more than $1M; two contributors were then led to open a malicious code repository and a TestFlight app, which gave the attacker the access it needed to obtain the pre-signatures. Drift attributes the operation with medium-high confidence to UNC4736 (AppleJeus), a DPRK group it links to the Radiant hack, while noting that the people met in person were not North Korean. [Elliptic](https://www.elliptic.co/insights/drift-protocol-exploited-for-286-million-in-suspected-dprk-linked-attack/) reached the same conclusion from on-chain behaviour, laundering methods and network-level indicators, and counted Drift as the 18th North Korea-linked incident of 2026.
 
 Press reports describe a Tether-led recovery package of up to about $147.5M.
 
@@ -339,7 +341,7 @@ Official reports changed several figures, as the table shows: Step Finance and O
 - **Losses concentrate in a few events.** Six incidents of $100M or more account for about 70% of the SlowMist total, and two months (April, September) for about two-thirds of PeckShield's.
 - **The largest losses came from operators, not from contract code.** Bitget, KelpDAO, Drift, Step, Resolv, Humanity, AFX and Ostium were all lost through infrastructure, keys or signers.
 - **Minting bugs set the ceiling.** When a verifier accepts a false message or proof (Liquid, KelpDAO's forged message, Verus, Syscoin), the loss is bounded by what can be redeemed, which is why these incidents rank so high.
-- **North Korea is named in the largest cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements, and Chainalysis attributes Bitget to North Korea, putting its 2026 thefts above $1B; PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
+- **North Korea is named in the largest cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements, and Chainalysis and Elliptic both attribute Bitget to North Korea, putting its 2026 thefts above $1B (Elliptic counts more than 51 incidents); PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
 - **Recovery came from chains, coalitions and negotiation.** The Cronos rollback, the Arbitrum Security Council freeze, the DeFi United recovery of rsETH, the Neutron and Cosmos Hub halts, and the Liquid return recovered far more than stablecoin freezes did.
 - **THORChain and Tornado Cash remained the main exits**, used in almost every large case.
 
@@ -461,6 +463,8 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 
 - [Chainalysis: KelpDAO bridge exploit, April 2026](https://www.chainalysis.com/blog/kelpdao-bridge-exploit-april-2026/)
 - [Chainalysis: How AI helped Chainalysis investigators trace the $387 million North Korea stole from Bitget](https://www.chainalysis.com/blog/387m-bitget-theft-2026/)
+- [Elliptic: Drift Protocol exploited for $286 million in suspected DPRK-linked attack](https://www.elliptic.co/insights/drift-protocol-exploited-for-286-million-in-suspected-dprk-linked-attack/)
+- [Elliptic: Bitget attack pushes suspected North Korea crypto heists over $1 billion in 2026](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/)
 - [Chainalysis: How the $320M exploit of Liquid Network went down](https://www.chainalysis.com/blog/320m-exploit-liquid-network/)
 - [The Hacker News: $285M Drift hack traced to six-month operation](https://thehackernews.com/2026/04/285-million-drift-hack-traced-to-six.html)
 - [The Hacker News: $13.74M hack shuts down sanctioned Grinex](https://thehackernews.com/2026/04/1374m-hack-shuts-down-sanctioned-grinex.html)

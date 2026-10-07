@@ -999,3 +999,7 @@ _posts/2026-10-06-crypto-hacks-september-2026.md
 _posts/2026-10-07-crypto-hacks-2026-year-to-date.md
   assets/article/blockchain/hack/2026-10-07-crypto-hacks-2026-year-to-date-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2024.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2024-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

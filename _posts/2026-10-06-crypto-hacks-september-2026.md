@@ -145,7 +145,7 @@ flowchart LR
 
 No private key was stolen. The wallet system signed what its own back end asked it to sign, so key protection, however strong, did not apply. Freezes by Circle and Tether (about $339k) and a halt by NEAR Intents (~$503k) covered roughly 0.22% of the loss.
 
-[Chainalysis' report](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) of 1 October attributes the theft to North Korea and says it takes North Korea's thefts in 2026 above $1B; TRM Labs had found links between the laundering routes and networks used in earlier North Korea-linked thefts. Bitget itself had not confirmed an attribution in the sources used here. Chainalysis also describes how fast the funds moved:
+[Chainalysis' report](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) of 1 October attributes the theft to North Korea and says it takes North Korea's thefts in 2026 above $1B; TRM Labs had found links between the laundering routes and networks used in earlier North Korea-linked thefts, and [Elliptic](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/) assessed the attack on 25 September as "highly likely" to be linked to North Korea: XRP from Bitget connected on-chain to ETH from earlier North Korea-attributed thefts and to addresses that laundered the 2025 Bybit theft. Elliptic counted more than 51 North Korea-linked incidents in 2026 by then. Bitget itself had not confirmed an attribution in the sources used here. Chainalysis also describes how fast the funds moved:
 
 - **Dispersion.** Within three hours, the stolen funds were spread across four blockchains: Ethereum (49.7%), the XRP Ledger (40.8%), Zcash (7.6%) and Tron (1.8%).
 - **Laundering.** Cross-chain liquidity and messaging protocols, instant swaps and laundering services, with XRP converted to Bitcoin through cross-chain liquidity protocols.
@@ -483,6 +483,7 @@ A transfer bug is bounded by the balance the vulnerable contract holds or is app
 ### Threat reports
 
 - [Chainalysis: How AI helped Chainalysis investigators trace the $387 million North Korea stole from Bitget](https://www.chainalysis.com/blog/387m-bitget-theft-2026/)
+- [Elliptic: Bitget attack pushes suspected North Korea crypto heists over $1 billion in 2026](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/)
 - [Chainalysis: How the $320M exploit of Liquid Network went down](https://www.chainalysis.com/blog/320m-exploit-liquid-network/)
 - [The Hacker News: Contagious Interview campaign](https://thehackernews.com/2026/09/contagious-interview-campaign.html)
 - [The Hacker News: Cosmos EVM flaw exploited](https://thehackernews.com/2026/08/cosmos-evm-flaw-exploited-after-cosmos.html)

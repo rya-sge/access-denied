@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2024
+** Figures
+*** Chainalysis, TRM: ~$2.2B stolen
+*** CertiK: ~$2.36B incl. phishing
+*** SlowMist: 410 incidents, ~$2.01B
+*** North Korea: ~$1.34B (Chainalysis)
+** Exchanges (CeFi)
+*** DMM Bitcoin ~$305M (TraderTraitor, FBI)
+*** WazirX ~$235M (multisig signing UI)
+*** BtcTurk, BingX, Indodax, Lykke, Rain, M2
+** Keys and signers
+*** Radiant ~$50M (malware, Safe UI spoofed)
+*** Orbit bridge ~$81M (7 of 10 keys)
+*** PlayDapp, Gala Games (minter keys)
+** DeFi code
+*** Hedgey, Penpie, Sonne, UwU Lend
+*** Thala, Ronin (funds returned)
+*** LI.FI, Seneca (approval drains)
+** People
+*** ~$238M social engineering (DOJ charges)
+*** ~$68M address poisoning (returned)
+*** ~$55M DAI phishing
+@endmindmap
