@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2026\nJanuary to September
+** Figures
+*** PeckShield: 306 hacks, ~$2.08B
+*** CertiK: ~$2.44B incl. phishing
+*** SlowMist: 304 incidents, ~$2.13B
+*** Two spikes: April and September
+** Operators, not code
+*** Bitget ~$387.5M (security appliances)
+*** KelpDAO ~$292M (LayerZero DVN)
+*** Drift ~$285M (multisig signers, durable nonce)
+*** Humanity, Step, Resolv, AFX, Ostium (keys)
+** Verification bugs
+*** Liquid ~$320M (range-proof cache)
+*** Verus x2, Hyperbridge, Saga, Syscoin
+*** Groth16 setup (FOOM, Veil), Bonzo zero BLS signature
+** Legacy and DeFi code
+*** Truebit overflow, Notional V1, DxSale, Aztec Connect
+*** Oracles: Tectonic, YieldBlox, Rhea, Moonwell
+*** Governance: BonkDAO, Neutron
+** Wallets and people
+*** COLDCARD RNG fallback (~$70M to ~$130M)
+*** Hardware-wallet social engineering ~$282M
+*** Wrench attacks, address poisoning, phishing
+@endmindmap

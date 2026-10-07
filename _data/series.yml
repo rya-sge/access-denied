@@ -70,3 +70,7 @@ bio-protocol:
 mmfr:
   title: "The EU Money Market Fund Regulation (EU) 2017/1131"
   ordered: false
+
+crypto-hacks:
+  title: "Crypto Hack Recaps"
+  ordered: false

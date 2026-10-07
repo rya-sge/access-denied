@@ -7,6 +7,7 @@ locale: en-GB
 categories: blockchain security defi
 tags: hack exploit security defi bridge oracle post-mortem phishing supply-chain
 description: "September 2026 lost about $766M to 55 crypto hacks. Bitget (~$387.5M) and Liquid (~$320M) made up 92%; the rest were key leaks, bridge bugs and oracle abuse."
+series: crypto-hacks
 image: /assets/article/blockchain/hack/2026-10-06-crypto-hacks-september-2026-mindmap.png
 isMath: false
 isMermaid: true
