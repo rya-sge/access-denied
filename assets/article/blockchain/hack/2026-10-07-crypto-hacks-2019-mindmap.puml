@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2019
+** Figures
+*** Chainalysis: 11 exchange hacks, ~$283M
+*** CipherTrace: ~$371M thefts, ~$4.1B fraud
+*** SlowMist: 111 incidents, only 9 priced
+** Exchanges
+*** CoinBene ~$105M (denied), Upbit ~$49M
+*** Binance 7,074 BTC (API keys, 2FA codes)
+*** BITPoint, Bithumb, Cryptopia, GateHub
+*** Lazarus: DragonEx, Upbit (2024 attribution)
+** EOS and Tron DApps
+*** Congestion, rollback, fake EOS
+*** Fake notifications, weak random numbers
+** Chains and users
+*** ETC and Vertcoin 51% attacks
+*** NULS, Fusion, VeChain
+*** Electrum, npm supply chain, SIM swaps
+** Not counted
+*** Frauds: PlusToken, WoToken, QuadrigaCX
+*** Accidents: Kraken flash crash, Synthetix oracle
+@endmindmap

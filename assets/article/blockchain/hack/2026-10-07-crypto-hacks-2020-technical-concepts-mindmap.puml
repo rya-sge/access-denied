@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2020 hacks
+** Flash loans and prices
+*** Spot price from one DEX (bZx, February)
+*** Vault share priced from Curve reserves (Harvest)
+*** LP token priced from reserves (Warp)
+** Tokens that do not behave
+*** ERC-777 hooks (Uniswap v1, Lendf.Me)
+*** Fee-on-transfer token and gulp() (Balancer)
+*** Fake tokens in deposits (Akropolis)
+** Accounting mistakes
+*** Self-transfer doubles a balance (bZx, September)
+*** msg.value reused in a loop (Opyn)
+*** Stale memory copy of a struct (Cover)
+** Access control and arbitrary calls
+*** Public helper moving approved tokens (Bancor)
+*** Delegatecall to an approved converter (Pickle)
+** Below the contracts
+*** Hot wallet keys (KuCoin)
+*** 51% reorganisations (Ethereum Classic)
+*** Liquidations at zero bids (MakerDAO)
+@endmindmap

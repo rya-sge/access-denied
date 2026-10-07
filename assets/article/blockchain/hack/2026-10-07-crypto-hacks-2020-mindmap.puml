@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2020
+** Figures
+*** Chainalysis: ~$520M stolen, ~30% DeFi
+*** CipherTrace: ~$1.9B incl. fraud
+*** SlowMist: ~$411M, frauds and accidents excluded
+*** LuBian ~127k BTC: found in 2025, kept apart
+** KuCoin ~$150M to ~$281M
+*** Hot-wallet keys leaked
+*** ~84% recovered, Lazarus (Chainalysis)
+** DeFi summer
+*** First flash-loan attacks (bZx)
+*** ERC-777 reentrancy (Lendf.Me, Uniswap v1)
+*** Share prices from Curve (Harvest, Value DeFi)
+*** Arbitrary calls (Pickle), reward bugs (Cover)
+** Users and chains
+*** SIM swap (~$45M), Electrum phishing
+*** 51% attacks on Ethereum Classic
+** Not counted
+*** Frauds: Wirecard, BitClub, OneCoin, Compounder
+*** Accidents: YFV, Saffron, Maker Black Thursday, YAM
+@endmindmap

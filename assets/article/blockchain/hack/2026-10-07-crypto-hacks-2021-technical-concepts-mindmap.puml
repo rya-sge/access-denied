@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2021 hacks
+** Privileged calls
+*** Selector collision, confused deputy (Poly Network)
+*** Delegatecall into an allowlisted proxy (Furucombo)
+*** Unprotected initialize (Punk, DAO Maker, DODO)
+** Prices and shares
+*** Vault share price inflated by donation (Cream)
+*** Spot reserves in reward minting (PancakeBunny)
+*** Live balances in share math (Spartan, Indexed)
+** Arithmetic and accounting
+*** Constant mismatch in the K check (Uranium)
+*** Index not initialised (Compound Proposal 062)
+*** Rounding at tiny supply (Alpha Homora)
+*** Same token in and out (MonoX)
+*** Shares transferred without checkpoint (Popsicle)
+** Reentrancy through tokens
+*** ERC-777 hooks (Cream / AMP)
+*** Caller-chosen token (Grim, BurgerSwap)
+** Off-chain and keys
+*** Front-end injection (BadgerDAO)
+*** Observer trusting events (THORChain)
+*** ECDSA nonce reuse (Anyswap)
+@endmindmap

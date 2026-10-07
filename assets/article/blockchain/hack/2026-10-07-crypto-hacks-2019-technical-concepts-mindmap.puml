@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2019 hacks
+** Was the deposit real?
+*** XRP partial payments (delivered_amount)
+*** EOS: fake EOS, fake notifications
+*** EOS hard_fail status, Tron fake token ID
+** Randomness and atomicity
+*** Predictable seeds (tapos, block id)
+*** Deferred-transaction congestion
+*** Rollback by assert, blacklist rollback
+** Exchange controls
+*** API keys and 2FA codes (Binance)
+*** Review processes (Bitrue)
+*** Hot-wallet keys (Upbit, BITPoint)
+** Ethereum near-misses
+*** Return data from a call to an EOA (0x v2)
+*** Oracle with too few sources (Synthetix)
+*** ERC-777 reentrancy warning (Uniswap v1)
+** Below the contracts
+*** 51% reorganisations (ETC, Vertcoin)
+*** Signature verification bug (NULS)
+*** Supply chain (npm, Electrum, browser scripts)
+@endmindmap

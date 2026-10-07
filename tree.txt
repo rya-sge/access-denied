@@ -1023,3 +1023,27 @@ _posts/2026-10-07-crypto-hacks-2022.md
 _posts/2026-10-07-crypto-hacks-2022-technical-concepts.md
   assets/article/blockchain/hack/2026-10-07-crypto-hacks-2022-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2021.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2021-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2021-technical-concepts.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2021-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2020.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2020-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2020-technical-concepts.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2020-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2019.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2019-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2019-technical-concepts.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2019-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

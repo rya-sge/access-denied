@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2021
+** Figures
+*** Chainalysis: ~$3.2B stolen, 72% DeFi
+*** Immunefi ~$2.33B hacks, CertiK ~$1.3B DeFi
+*** SlowMist: ~$2.48B, frauds excluded
+*** North Korea: ~$400M in 7 attacks
+** Largest incidents
+*** Poly Network ~$611M (returned)
+*** BitMart, AscendEX, Liquid (hot wallets)
+*** Compound ~$80M to ~$147M (upgrade bug)
+** DeFi's growth year
+*** Cream x3, Alpha Homora, Iron Bank
+*** Flash-loan pricing (PancakeBunny, xToken)
+*** Math and accounting (Uranium, MonoX, Spartan)
+** Keys and supply chain
+*** BadgerDAO ~$120M (front-end injection)
+*** bZx, EasyFi, Vulcan Forged, BXH
+** Frauds and accidents (not counted)
+*** Thodex, Africrypt, AnubisDAO
+*** Meerkat, Snowdog, Squid Game token
+*** Accident: StakeHound ETH lost at Fireblocks (~$75M)
+@endmindmap
