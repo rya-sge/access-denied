@@ -220,6 +220,16 @@ Multichain's bridge used MPC: each vault's key was split into shares held by sev
 | Multichain | MPC shares under one operator | Infrastructure |
 | Level, Exactly, Hundred | Duplicate claims, unvalidated address, empty market | Small logic bugs |
 
+## Data gaps
+
+This section lists what could not be found or verified while writing this article, so that it can be completed later. Each row says what is missing and where to look first.
+
+| Gap | What is missing or unverified | Where to search |
+|-----|-------------------------------|-----------------|
+| Deployed code | Snippets are simplified; none was compared line by line with the deployed contracts. | Etherscan verified sources, protocols' GitHub |
+| Yearn yUSDT sequence | The exact order of the attacker's steps (withdrawal, rebalance, deposit) was summarised from Rekt and should be checked against the transaction. | The exploit transaction, Rekt, CertiK analysis |
+| MEV-Boost | The relay flaw is described from analyses of the indictment; the court's findings were not checked. | US DOJ indictment, Flashbots post-mortem |
+
 ## Conclusion
 
 The 2023 hacks add a set of mechanisms to those of 2024:

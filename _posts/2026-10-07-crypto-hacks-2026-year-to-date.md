@@ -355,6 +355,22 @@ Official reports changed several figures, as the table shows: Step Finance and O
 - **Recovery came from chains, coalitions and negotiation.** The Cronos rollback, the Arbitrum Security Council freeze, the DeFi United recovery of rsETH, the Neutron and Cosmos Hub halts, and the Liquid return recovered far more than stablecoin freezes did.
 - **THORChain and Tornado Cash remained the main exits**, used in almost every large case.
 
+## Data gaps
+
+This section lists what could not be found or verified while writing this article, so that it can be completed later. Each row says what is missing and where to look first.
+
+| Gap | What is missing or unverified | Where to search |
+|-----|-------------------------------|-----------------|
+| Official post-mortems | None found for Wanchain, Grinex, Nostra, Meter, Limit Break, Startale and NuNet; Matcha's SwapNet post-mortem could not be opened for verification. | Project websites and X accounts; meta.matcha.xyz |
+| Truebit, AFX | Truebit published no root cause or loss figure; AFX's vector was still under investigation with Zellic. | Truebit and AFX accounts, Zellic |
+| COLDCARD total | Coinkite gives no loss figure; estimates range from ~$70M (PeckShield) to ~$130M (Rekt). | Coinkite blog, Galaxy Research, TRM Labs, CertiK |
+| PeckShield monthly figures | February's summary was read in an earlier export but is missing from the final one; July is given as ~$210.3M in July's post and ~$270M in August's. | PeckShieldAlert posts of 1 March and 1 August 2026 |
+| CertiK quarterly figure | CertiK's Q1 total (~$501M) exceeds the sum of its January–March posts (~$465.5M). | CertiK Hack3d Q1 2026 report |
+| Telegram export coverage | The export has no messages for 2–4 January and 25–27 April 2026. | The CryptoAlertHack channel itself, or a new export |
+| Press-only claims | LayerZero's public apology and end of 1-of-1 support (The Block) and Drift's Tether-led recovery package (~$147.5M) were seen only in press reports. | LayerZero and Drift official channels |
+| Humanity Protocol dispute | ZachXBT first called the incident "possibly staged", then revised; not covered in the article. | ZachXBT's posts, The Block |
+| Elliptic reports | Found for Bitget and Drift only; none for KelpDAO, Liquid, Resolv, COLDCARD, Humanity or Tectonic. | elliptic.co/insights, Google search |
+
 ## Conclusion
 
 From January to September 2026, trackers counted about 300 hacks and $2.1B to $2.4B in losses, depending on scope.

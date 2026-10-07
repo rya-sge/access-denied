@@ -351,6 +351,16 @@ UwU Lend priced sUSDe with the median of 11 sources, which sounds robust. Accord
 | Polter, UwU Lend | Spot price from reserves, manipulable median | Prices |
 | Address poisoning, DAI phishing | Look-alike addresses, ownership signatures | Users |
 
+## Data gaps
+
+This section lists what could not be found or verified while writing this article, so that it can be completed later. Each row says what is missing and where to look first.
+
+| Gap | What is missing or unverified | Where to search |
+|-----|-------------------------------|-----------------|
+| Deployed code | Snippets are simplified; none was compared line by line with the deployed contracts. | Etherscan verified sources, protocols' GitHub at the exploited version |
+| DMM Bitcoin | The supplier-compromise description relies on the FBI and NPA statements; the FBI page could not be fetched. | fbi.gov, Japan NPA |
+| Radiant | The signing flow is described from press and Rekt; Radiant's own post-mortem URL was not verified. | Radiant's Medium, Mandiant |
+
 ## Conclusion
 
 The 2024 hacks rest on a small set of mechanisms that recur from year to year:

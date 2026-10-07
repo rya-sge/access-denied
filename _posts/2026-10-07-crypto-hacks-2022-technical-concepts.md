@@ -212,6 +212,16 @@ Some of the year's largest thefts involved no cryptography at all. US prosecutor
 | Wintermute (OP) | CREATE address replayed on another chain | Keys and addresses |
 | FTX, Crypto.com | SIM swap, skippable 2FA | Keys and addresses |
 
+## Data gaps
+
+This section lists what could not be found or verified while writing this article, so that it can be completed later. Each row says what is missing and where to look first.
+
+| Gap | What is missing or unverified | Where to search |
+|-----|-------------------------------|-----------------|
+| Deployed code | Snippets are simplified; none was compared line by line with the deployed contracts or programs. | Etherscan, Solana explorers, the protocols' GitHub |
+| BNB Chain proof bug | The description of which IAVL proof field was ignored comes from public analyses, not from the patched code. | BNB Chain's patch commit, the Rekt and samczsun analyses |
+| Audius storage collision | The exact slots involved were summarised; the Audius post-mortem link is dead. | Audius GitHub, Wayback Machine |
+
 ## Conclusion
 
 The 2022 hacks are mostly failures of verification:

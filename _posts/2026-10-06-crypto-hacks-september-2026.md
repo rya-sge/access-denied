@@ -371,6 +371,22 @@ Third-party analyses (SlowMist, Rekt News, CertiK, BlockSec) remain the only tec
 - **Spot prices are still used as oracles**, including in new Uniswap v4 hooks (Spiral) and not only in old code.
 - **Recovery is mostly negotiated.** Liquid's 3,400 BTC came back through a contested "bounty", the rsETH funds through an MEV operator; chain halts on Neutron and the Cosmos Hub secured 64% of the Neutron loss; freezes recovered 0.22% of Bitget's loss. Tornado Cash remained the main exit (Tectonic, Term Labs, Notional, Nomic).
 
+## Data gaps
+
+This section lists what could not be found or verified while writing this article, so that it can be completed later. Each row says what is missing and where to look first.
+
+| Gap | What is missing or unverified | Where to search |
+|-----|-------------------------------|-----------------|
+| Official post-mortems | No written report found for Nostra (a post-mortem was promised), Meter, Limit Break Payment Processor V2, Startale and NuNet; Duelbits gave no root cause. | Each project's website and X account; Magic Eden for Limit Break; Neutron forum for NuNet's parent ecosystem |
+| D'CENT loss and cause | The vendor's report withholds both the root cause and the loss; ~$6.57M is SlowMist's figure only. | D'CENT / IoTrust blog, Korean press, on-chain trackers |
+| Payy root cause | Payy's GitHub advisory describing a verifier flaw is dated June 2026; not confirmed to be the 24 September root cause. | Payy's post-mortem on X, polybase/payy GitHub, CVE-2026-48100 |
+| Symbiosis loss | The ~$775k figure appears only in SlowMist; press reports a ~$336k cash-out. | Symbiosis statements, Rekt, BlockSec |
+| Limit Break loss | PeckShield gives ~$6.6M ($3.4M returned), SlowMist ~$2.8M. | Limit Break, Magic Eden, PeckShield |
+| Bitget timeline | Mandiant dates the intrusion to 24 September, SlowMist (via Rekt) to 31 August. | Mandiant's final report, SlowMist's Bitget analysis |
+| Liquid date | Chainalysis places the exploit on the weekend of 7–8 September; the Liquid Federation's report says 6 September 15:53 UTC. | Liquid Federation, Blockstream assessment, block 4,050,336 |
+| Unknown Gnosis Safe victim | The owner of the Safe drained of ~$7.73M on 15 September is not identified. | Kelp DAO, BlockSec Phalcon, PeckShield |
+| Analytics reports | Chainalysis and Elliptic reports exist only for Bitget and Liquid; none found for the other September incidents. | chainalysis.com/blog, elliptic.co/insights, trmlabs.com blog |
+
 ## Conclusion
 
 September 2026 lost between ~$766M and ~$772M depending on the tracker, the highest monthly total of 2026, and almost all of it in two incidents.
