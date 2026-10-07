@@ -112,7 +112,7 @@ timeline
 
 ### Bitget (~$387.5M), an infrastructure compromise
 
-On 24 September at 18:31 UTC, Bitget's monitoring detected unauthorised transfers from part of its hot and warm wallets. The exchange's [security notice](https://www.bitget.com/support/articles/12560603896024), published three hours later, estimated the funds affected at ~$351.6M, paused withdrawals, stated that the cold wallets were untouched, and said the loss was covered by its User Protection Fund, then holding over $464M. It declined to name the attack vector until the investigation was complete.
+On 24 September at 18:31 UTC, Bitget's monitoring detected unauthorised transfers from part of its hot and warm wallets. The exchange's [security notice](https://www.bitget.com/support/articles/12560603896024), published three hours later, estimated the funds affected at ~$351.6M, paused withdrawals, stated that the cold wallets were untouched, and said the loss was covered by its User Protection Fund. A [post on 25 September](https://x.com/bitget/status/2103321333405036792) specified that the fund holds 5,500 BTC (~$464M at the time) in publicly verifiable addresses, that it would bear the assessed loss of the hot wallet incident, and that Bitget would replenish it. It declined to name the attack vector until the investigation was complete.
 
 Two days later, on 26 September, Bitget [announced](https://x.com/BitgetJP/status/2103698952600355029) that the vulnerability had been identified and remediated, that Mandiant and SlowMist were supporting the investigation, and that no further unauthorised transfer was possible. Trading and deposits had stayed open. Withdrawals reopened by asset:
 
@@ -123,16 +123,23 @@ Two days later, on 26 September, Bitget [announced](https://x.com/BitgetJP/statu
 
 Bitget's [incident explanation](https://www.bitget.com/academy/12560603896113), updated on 3 October, gives about $388M taken from 12 addresses on 11 chains, and [Rekt News](https://rekt.news/bitget-rekt) uses ~$387.5M. The stolen assets spanned Ethereum, the XRP Ledger, BNB Chain, Arbitrum, Optimism, Base, Avalanche, Tron and other networks; about 103 million XRP (around $157.5M) was the largest single position.
 
-According to SlowMist's analysis relayed by Rekt News, the attacker started on 31 August by exploiting a zero-day in an unnamed third-party security product. From there it took database credentials, moved laterally to other security systems and reached the production wallet server. Mandiant confirmed "unauthorized privileged access to third-party security appliances". SlowMist recovered a custom withdrawal tool that forged risk-control parameters and submitted withdrawal requests through the wallet's normal flow.
+Bitget engaged Mandiant on 25 September (UTC+8) and published its [status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf) dated 28 September. Its preliminary findings:
+
+- **Entry.** On 24 September the attacker gained unauthorised privileged access to two of Bitget's third-party security appliances, called A and B in the report.
+- **Persistence.** It deployed a web shell on appliance B and opened a command-and-control (C2) connection.
+- **Lateral movement.** From appliance B it reached Bitget's production wallet job server and deployed malicious packages there, giving it control of the server.
+- **Withdrawals.** On Ethereum, the unauthorised transfers ran alongside legitimate internal wallet operations until about 05:23 UTC+8 (21:23 UTC on 24 September), almost three hours after detection. The stolen assets include XRP, ETH, USDT, USDC, BNB, AVAX, TRX, ZEC and Tether Gold (XAUt).
+
+SlowMist's analysis, relayed by Rekt News, adds detail Mandiant does not give and dates the start earlier. It traces the intrusion to 31 August, through a zero-day in the third-party product used to obtain database credentials, and describes a custom withdrawal tool that forged risk-control parameters and submitted withdrawal requests through the wallet's normal flow. Mandiant's investigation was still ongoing when its report was published.
 
 ```mermaid
 flowchart LR
-    A[Zero-day in third-party<br/>security product] --> B[Database credentials<br/>obtained]
-    B --> C[Lateral movement to<br/>other security systems]
-    C --> D[Production wallet<br/>server reached]
-    D --> E[Custom tool forges<br/>risk-control parameters]
+    A[Third-party security<br/>appliances A and B] --> B[Web shell and C2<br/>on appliance B]
+    B --> C[Lateral movement to the<br/>wallet job server]
+    C --> D[Malicious packages<br/>deployed]
+    D --> E[Forged risk-control<br/>parameters]
     E --> F[Withdrawals signed by the<br/>legitimate wallet system]
-    F --> G[$387.5M out across<br/>8+ chains]
+    F --> G[~$387.5M out across<br/>8+ chains in ~3 hours]
 ```
 
 No private key was stolen. The wallet system signed what its own back end asked it to sign, so key protection, however strong, did not apply. Freezes by Circle and Tether (about $339k) and a halt by NEAR Intents (~$503k) covered roughly 0.22% of the loss.
@@ -312,7 +319,7 @@ The table records, for the main incidents, what the affected project itself publ
 
 | Incident | Official source | What it adds |
 |----------|-----------------|--------------|
-| Bitget | [Security notice](https://www.bitget.com/support/articles/12560603896024), [withdrawal resumption announcement](https://x.com/BitgetJP/status/2103698952600355029), [incident explanation](https://www.bitget.com/academy/12560603896113) | $351.6M, then ~$388M from 12 addresses on 11 chains; third-party security product; keys and cold wallets untouched. |
+| Bitget | [Security notice](https://www.bitget.com/support/articles/12560603896024), [Mandiant status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), [Protection Fund post](https://x.com/bitget/status/2103321333405036792), [withdrawal resumption announcement](https://x.com/BitgetJP/status/2103698952600355029), [incident explanation](https://www.bitget.com/academy/12560603896113) | $351.6M, then ~$388M from 12 addresses on 11 chains; third-party security product; keys and cold wallets untouched. |
 | Liquid Network | [Blockstream assessment](https://blog.blockstream.com/liquid-network-security-incident-assessment/), [status page](https://status.blockstream.com/incidents/b8b719f3-db70-4487-9cff-946e69509228), [Elements v23.3.4](https://github.com/ElementsProject/elements/releases/tag/elements-23.3.4) | Two cache-key bugs; about 4,000 BTC pegged out through SideSwap; 3,400 BTC returned, about 598.5 BTC outstanding; three-stage recovery plan ([incident report](https://x.com/Liquid_BTC/status/2097404704028545175), [release update](https://x.com/Liquid_BTC/status/2097695714310521331) on X). |
 | D'CENT Wallet | [App Wallet incident report](https://store.dcentwallet.com/blogs/post/app-wallet-incident-report) | App Wallet before 8.1.0 only; root cause and loss withheld. |
 | Chainflip | [TRON USDT exploit post-mortem](https://chainflip.io/blog/tron-usdt-exploit-what-happened-and-what-happens-next) | Six unauthorised payouts, 736,442.17 USDT; users to be made whole. |
@@ -343,7 +350,7 @@ Third-party analyses (SlowMist, Rekt News, CertiK, BlockSec) remain the only tec
 
 September 2026 lost between ~$766M and ~$772M depending on the tracker, the highest monthly total of 2026, and almost all of it in two incidents.
 
-- **Bitget (~$387.5M)** was an infrastructure compromise: a zero-day in a third-party security product led to the wallet server, and the withdrawal system signed forged requests. No private key was stolen.
+- **Bitget (~$387.5M)** was an infrastructure compromise: compromised third-party security appliances gave the attacker the wallet job server, and the withdrawal system signed forged requests. No private key was stolen.
 - **Liquid Network (~$320M)** was a software bug in Elements' range-proof cache that minted unbacked L-BTC; 3,400 BTC were returned and the remaining 598.5 BTC is disputed.
 - **Keys and privileged access** account for the next largest group: Duelbits, the SingularityNET keyring, D'CENT and several smaller cases.
 - **Bridges** (Nomic, Meter, Symbiosis, Chainflip, Payy, Long) accepted messages without a matching deposit, and the Cosmos EVM underflow continued to generate post-mortems.
@@ -384,7 +391,7 @@ They use different scopes and price snapshots. PeckShield counts "major hacks" (
 
 **Q: In the Bitget incident, why did secure key storage not prevent the theft?**
 
-The attacker never needed the keys. It exploited a zero-day in a third-party security product, moved to the production wallet server, and used a custom tool that forged risk-control parameters and submitted withdrawals through the normal process. The wallet system then signed transactions it believed were legitimate.
+The attacker never needed the keys. According to Mandiant, it took over two third-party security appliances, moved from one of them to the production wallet job server and deployed malicious packages there; SlowMist adds that it used a custom tool that forged risk-control parameters and submitted withdrawals through the normal process. The wallet system then signed transactions it believed were legitimate.
 
 **Q: How could a cache create money on Liquid Network?**
 
@@ -425,6 +432,8 @@ A transfer bug is bounded by the balance the vulnerable contract holds or is app
 ### Official post-mortems and statements
 
 - [Bitget: Security notice, exchange hot wallets incident, 24 September 2026](https://www.bitget.com/support/articles/12560603896024)
+- [Mandiant: Bitget incident response status report, 28 September 2026 (PDF)](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf)
+- [Bitget: about the Bitget Protection Fund, 25 September 2026 (on X)](https://x.com/bitget/status/2103321333405036792)
 - [Bitget Japan: phased withdrawal resumption, 26 September 2026 (on X)](https://x.com/BitgetJP/status/2103698952600355029)
 - [Bitget: security incident explained, updated 3 October 2026](https://www.bitget.com/academy/12560603896113)
 - [MANTRA Chain: statement on the 20 August 2026 incident (on X)](https://x.com/MANTRA_Chain/status/2093311678205374867)
