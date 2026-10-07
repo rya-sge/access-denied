@@ -151,35 +151,63 @@ timeline
 
 ### Bitget (~$387.5M, September)
 
-Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC). The [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/) covers the incident in detail.
+Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC). [Chainalysis](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) attributes the theft to North Korea, which it says takes North Korea's thefts in 2026 above $1B; the funds were spread across four blockchains within three hours. The [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/) covers the incident in detail.
 
 ### Liquid Network (~$320M, September)
 
-On 6 September, an attacker created about 4,000 L-BTC with no bitcoin behind them on the Liquid sidechain and pegged them out to real BTC. Elements, Liquid's node software, cached range-proof verification results under a key built by concatenating variable-length fields without length prefixes, so two different transactions could share one cache entry. The attackers returned 3,400 BTC as a self-declared "whitehat" and kept about 598.5 BTC, which the Liquid Federation disputes. The fix shipped in Elements v23.3.4.
+On 6 September, an attacker created about 4,000 L-BTC with no bitcoin behind them on the Liquid sidechain and pegged them out to real BTC. Elements, Liquid's node software, cached range-proof verification results under a key built by concatenating variable-length fields without length prefixes, so two different transactions could share one cache entry. The attackers returned 3,400 BTC as a self-declared "whitehat" and kept about 598.5 BTC, which the Liquid Federation disputes; [Chainalysis' analysis](https://www.chainalysis.com/blog/320m-exploit-liquid-network/) reproduces the on-chain messages they used to negotiate. The fix shipped in Elements v23.3.4.
 
 ### KelpDAO (~$292M, April)
 
 On 18 April, an attacker released about 116,500 rsETH from KelpDAO's LayerZero adapter on Ethereum and Arbitrum. Kelp's [statement](https://x.com/KelpDAO/status/2046332070277091807) puts the initial shortfall at 163,200 ETH; LayerZero's [statement](https://x.com/LayerZero_Core/status/2046081551574983137) gives about $290M.
 
-The rsETH path relied on a single decentralised verifier network (DVN), LayerZero Labs' own, in a 1-of-1 configuration. According to LayerZero, the attackers compromised two RPC nodes that this DVN used, replaced their `op-geth` binaries, and launched a denial-of-service attack on the clean RPC nodes so that the DVN failed over to the poisoned ones. The DVN then attested a forged message, and the adapter released the rsETH.
+The rsETH path from Unichain relied on a single decentralised verifier network (DVN), LayerZero Labs' own, in a 1-of-1 configuration. LayerZero's [incident statement](https://layerzero.network/blog/kelpdao-incident-statement) and [Chainalysis' analysis](https://www.chainalysis.com/blog/kelpdao-bridge-exploit-april-2026/) describe the same sequence:
 
-LayerZero's preliminary attribution is "likely DPRK Lazarus / TraderTraitor". The two companies disagree on responsibility: Kelp points to LayerZero's 1-of-1 default, LayerZero to Kelp's choice of configuration. According to The Block, LayerZero later apologised and ended support for 1-of-1 DVN configurations.
+- **Reconnaissance.** The attackers obtained the list of RPC nodes the DVN queried, and gained access to two internal nodes running on separate clusters.
+- **Poisoned nodes.** They replaced the `op-geth` binaries on those nodes. The modified nodes answered the DVN with forged data while returning truthful data to every other client, which kept monitoring blind.
+- **Forced failover.** A simultaneous denial-of-service attack on the external RPC nodes left the DVN with only the two poisoned nodes to query.
+- **Forged attestation.** Those nodes reported blocks in which rsETH had been burned on Unichain, a burn that never happened. With no second DVN required to agree, the attestation was enough, and the adapter on Ethereum and Arbitrum released about 116,500 rsETH.
+
+A second attempt on 40,000 rsETH (~$95M) was blocked.
+
+LayerZero and Chainalysis both attribute the attack to the Lazarus Group, more specifically its TraderTraitor sub-group. The two companies disagree on responsibility: Kelp points to LayerZero's 1-of-1 default; LayerZero writes that it had communicated "best practices around DVN diversification" and that "despite these recommendations, KelpDAO chose to utilize a 1/1 DVN configuration". LayerZero now refuses new 1-of-1 configurations and is asking single-DVN applications to migrate; according to The Block, it later apologised publicly.
 
 The aftermath spread to lending markets:
 
-- **Collateral, not just cash.** The attacker deposited the stolen rsETH in Aave V3, Compound V3 and Euler and borrowed WETH against it, leaving more than $236M of debt; Aave was left with a large bad-debt exposure, and a "DeFi United" effort formed to absorb the shortfall. Both Aave positions were later liquidated.
+- **Collateral, not just cash.** The attacker deposited the stolen rsETH in Aave V3, Compound V3 and Euler and borrowed WETH against it, leaving more than $236M of debt. Aave froze the affected WETH and rsETH reserves and set the WETH loan-to-value to zero while a coalition, DeFi United, organised the recovery described below.
 - **A Layer 2 freeze.** The Arbitrum Security Council froze 30,766 ETH (~$70M) held by the attacker on Arbitrum One, acting, in its words, "with input from law enforcement". Kelp also recovered 40,300 rsETH and blocked a further attempt on 40,000 rsETH; its [recovery update](https://x.com/KelpDAO/status/2047599909692727799) leaves a gap of about 89,500 ETH, of which partners pledged about 43,500 ETH.
+- **Precautionary pauses elsewhere.** Projects using the same bridge stack reacted before the root cause was known. The Morpho Association [paused](https://x.com/Morpho/status/2045760409244725340) the LayerZero bridge for its MORPHO token on Arbitrum the same day, until the cause of the rsETH incident was identified; LayerZero said at the time that all other applications remained safe.
 - **Laundering.** The rest was moved to Bitcoin, about 1,979 BTC, mostly through THORChain, within six days.
 
+The recovery, coordinated by Aave and the DeFi United coalition with Kelp, LayerZero, Compound and several DAOs, took about a month. Aave's posts give the sequence:
+
+- **28 April, plan.** The [technical implementation plan](https://x.com/aave/status/2048958367658332413) found about 107,000 of the 116,500 rsETH in seven attacker addresses with positions on Aave and Compound. It had two goals: restore rsETH's backing at its exchange ratio of 1.07 ETH by depositing ETH into the bridge lockbox, and unwind the attacker's positions through a controlled liquidation, with the rsETH oracle price adjusted temporarily for that purpose. The plan expected to recover about 13,000 ETH on Aave and about 16,776 ETH on Compound "without socializing losses".
+- **1 to 9 May, a court detour.** Plaintiffs holding judgments against North Korea served a restraining notice on Arbitrum DAO to seize the ~$71M of ETH frozen by its Security Council. Aave LLC contested it, and the judge [authorised](https://x.com/aave/status/2052928584667275472) an Arbitrum DAO vote to move the ETH to Aave LLC, with the restraining order following it; Aave borrowed separate funds to cover the gap meanwhile. Arbitrum DAO and Mantle DAO passed proposals to join the recovery.
+- **6 May, liquidation.** The attacker's eight positions on Aave V3 were liquidated and the rsETH sent to a Recovery Guardian; other users, including Umbrella stakers, were not affected.
+- **12 May, supply neutralised.** The liquidated rsETH was [burned on Arbitrum](https://x.com/aave/status/2054307857642971225), and Kelp retired the pending LayerZero packet so that it could not mint rsETH on Ethereum.
+- **13 and 14 May, restart.** The [first tranche](https://x.com/aave/status/2054651122082791528) of rsETH went back into the LayerZero adapter and bridging reopened; rsETH was [unpaused](https://x.com/aave/status/2054989148159873499) on Aave's Ethereum Core, Arbitrum, Base, Linea and Mantle markets, and withdrawals resumed, with the remaining tranches due over two weeks.
+- **17 May, normal operation.** WETH loan-to-value ratios were [restored](https://x.com/aave/status/2056049190841594179) to their pre-incident values on all affected Aave V3 deployments.
+
 ```mermaid
-flowchart LR
-    A[Two DVN RPC nodes<br/>compromised] --> A2[DoS on clean RPCs,<br/>failover to poisoned ones]
-    A2 --> B[Forged cross-chain<br/>message]
-    B --> C[1-of-1 DVN<br/>attests it]
-    C --> D[~116,500 rsETH<br/>released]
-    D --> E[rsETH posted as collateral<br/>on Aave, Compound, Euler]
-    E --> F[WETH borrowed,<br/>bad debt left behind]
-    F --> G[ETH bridged to BTC<br/>via THORChain]
+sequenceDiagram
+    autonumber
+    participant X as Attacker
+    participant N as Internal RPC nodes (poisoned)
+    participant E as External RPC nodes
+    participant D as LayerZero Labs DVN (1-of-1)
+    participant A as rsETH adapter (Ethereum, Arbitrum)
+    participant L as Aave, Compound, Euler
+    X->>N: replace op-geth binaries on two nodes
+    X->>E: denial-of-service attack
+    D->>E: query source chain (Unichain)
+    E--xD: unreachable
+    D->>N: fail over to internal nodes
+    N-->>D: forged blocks: rsETH burned on Unichain
+    D->>A: attest the cross-chain message
+    A->>X: release ~116,500 rsETH
+    X->>L: deposit rsETH as collateral
+    L->>X: lend WETH (over $236M of debt)
+    X->>X: bridge ETH to BTC via THORChain
 ```
 
 The [cross-chain bridge threat model]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/) states the same rule for any bridge: the security of a cross-chain token is the security of its weakest message verifier, and a 1-of-1 configuration has no second opinion.
@@ -194,6 +222,25 @@ The attack ran in four steps, as reconstructed by SlowMist, GoPlus and Beosin:
 - **Signatures.** Signers were led to approve transactions that, thanks to Solana's durable nonces, stayed valid indefinitely and could be submitted later.
 - **Takeover.** On 1 April, the pre-signed transactions gave the attacker admin control of the Drift state account. It listed a worthless token, CVT, as collateral and pushed its oracle price up.
 - **Drain.** CVT deposits were used to withdraw real assets, about $280M in seconds. Over $230M of USDC was then bridged from Solana to Ethereum through Circle's CCTP over several hours without being frozen, which ZachXBT criticised publicly.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant X as Attacker (fake trading firm)
+    participant C as Drift contributors
+    participant S as Security Council multisig (2-of-5, no timelock)
+    participant N as Durable nonce accounts
+    participant P as Drift program
+    X->>C: six months of meetings, $1M+ deposited
+    X->>C: malicious code repository and TestFlight app
+    X->>N: create durable nonce accounts (23 March)
+    C->>S: approve transactions presented as routine
+    S-->>X: pre-signed admin transactions, valid until the nonce advances
+    X->>P: submit them on 1 April: admin control
+    X->>P: list CVT as collateral, raise its oracle price
+    X->>P: deposit CVT, withdraw real assets (~$280M)
+    X->>X: bridge USDC to Ethereum via CCTP
+```
 
 Drift's [follow-up](https://x.com/DriftProtocol/status/2040611161121370409) describes a six-month operation. A fake "quant trading firm" built a relationship with the team, met contributors in person and deposited more than $1M; two contributors were then led to open a malicious code repository and a TestFlight app, which gave the attacker the access it needed to obtain the pre-signatures. Drift attributes the operation with medium-high confidence to UNC4736 (AppleJeus), a DPRK group it links to the Radiant hack, while noting that the people met in person were not North Korean.
 
@@ -264,7 +311,7 @@ The table records, for the year's main incidents, what the affected project publ
 
 | Incident | Official source | What it says |
 |----------|-----------------|--------------|
-| KelpDAO / LayerZero | [Kelp statement](https://x.com/KelpDAO/status/2046332070277091807), [Kelp recovery update](https://x.com/KelpDAO/status/2047599909692727799), [LayerZero statement](https://x.com/LayerZero_Core/status/2046081551574983137), all on X | 163,200 ETH shortfall; poisoned RPC nodes and a 1-of-1 DVN; 40,300 rsETH recovered; DPRK attribution (preliminary); the two disagree on responsibility. |
+| KelpDAO / LayerZero | [Kelp statement](https://x.com/KelpDAO/status/2046332070277091807), [Kelp recovery update](https://x.com/KelpDAO/status/2047599909692727799), [LayerZero statement](https://x.com/LayerZero_Core/status/2046081551574983137), all on X; [LayerZero incident statement](https://layerzero.network/blog/kelpdao-incident-statement), Aave's [recovery plan](https://x.com/aave/status/2048958367658332413) and [updates](https://x.com/aave/status/2052928584667275472) on X | 163,200 ETH shortfall; poisoned RPC nodes and a 1-of-1 DVN; 40,300 rsETH recovered; DPRK attribution (preliminary); the two disagree on responsibility; DeFi United restored rsETH backing by mid-May. |
 | Drift Protocol | [First statement](https://x.com/DriftProtocol/status/2039564441256083878) and [follow-up](https://x.com/DriftProtocol/status/2040611161121370409) on X | Durable-nonce pre-signatures and signers compromised through a six-month social-engineering operation; UNC4736 (DPRK), medium-high confidence. |
 | COLDCARD (Coinkite) | [Mk3 seed-generation warning](https://blog.coinkite.com/coldcard-mk3-seed-generation-warning/), [entropy technical backgrounder](https://blog.coinkite.com/entropy-technical-backgrounder/), [adding to the public record](https://blog.coinkite.com/adding-to-public-record/) | `rng_get()` linked to a software PRNG since firmware 4.0.1; patched firmware; no loss figure. |
 | Step Finance | [Statement on X](https://x.com/StepFinance_/status/2018379876642804213) | Executive devices compromised; ~$40M; ~$4.7M recovered. |
@@ -292,8 +339,8 @@ Official reports changed several figures, as the table shows: Step Finance and O
 - **Losses concentrate in a few events.** Six incidents of $100M or more account for about 70% of the SlowMist total, and two months (April, September) for about two-thirds of PeckShield's.
 - **The largest losses came from operators, not from contract code.** Bitget, KelpDAO, Drift, Step, Resolv, Humanity, AFX and Ostium were all lost through infrastructure, keys or signers.
 - **Minting bugs set the ceiling.** When a verifier accepts a false message or proof (Liquid, KelpDAO's forged message, Verus, Syscoin), the loss is bounded by what can be redeemed, which is why these incidents rank so high.
-- **North Korea is named in the largest DeFi cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements; PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
-- **Recovery came from chains and negotiation.** The Cronos rollback, the Arbitrum Security Council freeze, the Neutron and Cosmos Hub halts, and the Liquid return recovered far more than stablecoin freezes did.
+- **North Korea is named in the largest cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements, and Chainalysis attributes Bitget to North Korea, putting its 2026 thefts above $1B; PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
+- **Recovery came from chains, coalitions and negotiation.** The Cronos rollback, the Arbitrum Security Council freeze, the DeFi United recovery of rsETH, the Neutron and Cosmos Hub halts, and the Liquid return recovered far more than stablecoin freezes did.
 - **THORChain and Tornado Cash remained the main exits**, used in almost every large case.
 
 ## Conclusion
@@ -360,7 +407,7 @@ A transfer bug is limited by the balance a contract holds or is approved to spen
 Recovery came mostly from chain-level actions and negotiation rather than from stablecoin freezes:
 
 - Cronos rolled back 10,961 blocks after Tectonic and recovered ~$111.2M.
-- The Arbitrum Security Council froze 30,766 ETH linked to KelpDAO.
+- The Arbitrum Security Council froze 30,766 ETH linked to KelpDAO, and the DeFi United coalition restored rsETH's backing within a month by liquidating the attacker's Aave and Compound positions.
 - Neutron and the Cosmos Hub halted and recovered about 64% of the Neutron loss.
 - Liquid recovered 3,400 BTC through a contested "bounty"; Verus recovered 75%.
 
@@ -384,6 +431,9 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 
 - [Kelp DAO: rsETH incident statement (on X)](https://x.com/KelpDAO/status/2046332070277091807) and [recovery update (on X)](https://x.com/KelpDAO/status/2047599909692727799)
 - [LayerZero: rsETH incident statement (on X)](https://x.com/LayerZero_Core/status/2046081551574983137)
+- [LayerZero: KelpDAO incident statement](https://layerzero.network/blog/kelpdao-incident-statement)
+- [Morpho: MORPHO OFT bridge on Arbitrum paused, 19 April 2026 (on X)](https://x.com/Morpho/status/2045760409244725340)
+- Aave on X: [DeFi United technical implementation plan, 28 April 2026](https://x.com/aave/status/2048958367658332413), [recovery plan Phase II, 9 May 2026](https://x.com/aave/status/2052928584667275472), [first recovery steps complete, 12 May](https://x.com/aave/status/2054307857642971225), [first rsETH tranche and bridging reopened, 13 May](https://x.com/aave/status/2054651122082791528), [rsETH unpaused, 14 May](https://x.com/aave/status/2054989148159873499), [WETH LTVs restored, 17 May](https://x.com/aave/status/2056049190841594179)
 - [Drift Protocol: incident statement (on X)](https://x.com/DriftProtocol/status/2039564441256083878) and [follow-up (on X)](https://x.com/DriftProtocol/status/2040611161121370409)
 - [Coinkite: COLDCARD Mk3 seed generation warning](https://blog.coinkite.com/coldcard-mk3-seed-generation-warning/), [entropy technical backgrounder](https://blog.coinkite.com/entropy-technical-backgrounder/) and [adding to the public record](https://blog.coinkite.com/adding-to-public-record/)
 - [Step Finance: statement (on X)](https://x.com/StepFinance_/status/2018379876642804213)
@@ -409,6 +459,9 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 
 ### Threat reports
 
+- [Chainalysis: KelpDAO bridge exploit, April 2026](https://www.chainalysis.com/blog/kelpdao-bridge-exploit-april-2026/)
+- [Chainalysis: How AI helped Chainalysis investigators trace the $387 million North Korea stole from Bitget](https://www.chainalysis.com/blog/387m-bitget-theft-2026/)
+- [Chainalysis: How the $320M exploit of Liquid Network went down](https://www.chainalysis.com/blog/320m-exploit-liquid-network/)
 - [The Hacker News: $285M Drift hack traced to six-month operation](https://thehackernews.com/2026/04/285-million-drift-hack-traced-to-six.html)
 - [The Hacker News: $13.74M hack shuts down sanctioned Grinex](https://thehackernews.com/2026/04/1374m-hack-shuts-down-sanctioned-grinex.html)
 - [CertiK: Verus incident analysis](https://www.certik.com/blog/verus-incident-analysis)

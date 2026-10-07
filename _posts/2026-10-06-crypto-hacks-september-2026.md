@@ -145,7 +145,13 @@ flowchart LR
 
 No private key was stolen. The wallet system signed what its own back end asked it to sign, so key protection, however strong, did not apply. Freezes by Circle and Tether (about $339k) and a halt by NEAR Intents (~$503k) covered roughly 0.22% of the loss.
 
-TRM Labs found links between the laundering routes and networks used in earlier North Korea-linked thefts; attribution is not confirmed. According to the later update, private keys were not compromised either; withdrawals fully resumed on 2 October, and the protection fund, drawn on to cover the loss, was replenished to over $300M. The [general threat model of an exchange]({{site.url_complet}}/2025/11/06/crypto-exchange-security-overview/), with its hot/warm/cold separation, assumes the withdrawal path itself is trusted, which is the assumption this attack broke.
+[Chainalysis' report](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) of 1 October attributes the theft to North Korea and says it takes North Korea's thefts in 2026 above $1B; TRM Labs had found links between the laundering routes and networks used in earlier North Korea-linked thefts. Bitget itself had not confirmed an attribution in the sources used here. Chainalysis also describes how fast the funds moved:
+
+- **Dispersion.** Within three hours, the stolen funds were spread across four blockchains: Ethereum (49.7%), the XRP Ledger (40.8%), Zcash (7.6%) and Tron (1.8%).
+- **Laundering.** Cross-chain liquidity and messaging protocols, instant swaps and laundering services, with XRP converted to Bitcoin through cross-chain liquidity protocols.
+- **Tracing.** Automation cut more than 20 hours of manual bridge reconciliation to under 10 minutes, with investigators reviewing the output.
+
+ According to the later update, private keys were not compromised either; withdrawals fully resumed on 2 October, and the protection fund, drawn on to cover the loss, was replenished to over $300M. The [general threat model of an exchange]({{site.url_complet}}/2025/11/06/crypto-exchange-security-overview/), with its hot/warm/cold separation, assumes the withdrawal path itself is trusted, which is the assumption this attack broke.
 
 ### Liquid Network (~$320M), a consensus-level software bug
 
@@ -180,6 +186,8 @@ The attackers consolidated the BTC and left an on-chain message, "we are whiteha
 
 Blockstream refused the claim and called the retention "a crime, not responsible disclosure". The fix shipped on 9 September in [Elements v23.3.4](https://github.com/ElementsProject/elements/releases/tag/elements-23.3.4), which hardens the range-proof cache keys and was reviewed by the Bitcoin Red Team and Alpen Labs among others. The federation's [recovery plan](https://x.com/Liquid_BTC/status/2097695714310521331) has three stages: resume block production with pegs suspended, replay the transactions verified as valid, then resume peg operations once the network state is restored, including a return of funds. The same update warned of fake update sites set up by scammers during the outage.
 
+[Chainalysis' analysis](https://www.chainalysis.com/blog/320m-exploit-liquid-network/) adds the attackers' on-chain messages, written in Bitcoin's `OP_RETURN` field: "The chain is under risk at latest commit. make sure every node is patched." The 3,400 BTC came back in a single transaction once Blockstream confirmed the patch, with the remainder sent as change to an address the attackers controlled. Chainalysis notes that neither side has said whether the roughly 600 BTC kept amounts to a "de facto bounty".
+
 A cache in front of a verifier is part of the verifier. An ambiguous encoding of the cache key, the same problem as hashing `a || b` without a length prefix, turns "this proof was valid for X" into "this proof is valid for anything that encodes like X".
 
 ## Infrastructure and key compromise
@@ -199,7 +207,7 @@ Dedaub's classification of 135 Rekt News incidents from January 2024 to August 2
 
 ## Bridges and sidechains
 
-Besides Liquid, seven bridge-type systems were hit in September. In each case the destination side accepted a message that did not correspond to a real deposit, which is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
+Besides Liquid, seven bridge-type systems were hit in September. Six released value that no real deposit backed, but each through a different flaw, as the last column shows: a double spend, a block-validation bug, misparsed Bitcoin data, a replayed deposit, fabricated RPC events and an invalid proof. The seventh, the fake GIWA bridge, was a scam rather than an exploit. The common outcome is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
 
 | Date | System | Loss (approx. USD) | What the bridge accepted |
 |------|--------|-----:|--------------------------|
@@ -354,7 +362,7 @@ September 2026 lost between ~$766M and ~$772M depending on the tracker, the high
 - **Bitget (~$387.5M)** was an infrastructure compromise: compromised third-party security appliances gave the attacker the wallet job server, and the withdrawal system signed forged requests. No private key was stolen.
 - **Liquid Network (~$320M)** was a software bug in Elements' range-proof cache that minted unbacked L-BTC; 3,400 BTC were returned and the remaining 598.5 BTC is disputed.
 - **Keys and privileged access** account for the next largest group: Duelbits, the SingularityNET keyring, D'CENT and several smaller cases.
-- **Bridges** (Nomic, Meter, Symbiosis, Chainflip, Payy, Long) accepted messages without a matching deposit, and the Cosmos EVM underflow continued to generate post-mortems.
+- **Bridges** (Nomic, Meter, Symbiosis, Chainflip, Payy, Long) released value that no deposit backed, each through a different flaw, and the Cosmos EVM underflow continued to generate post-mortems.
 - **Contract bugs** were individually small and clustered around unbound `from`/`payer` parameters, spot-price oracles and double counting, often in old or dormant code.
 - **Governance and social engineering** completed the month, with a bought vote on Neutron governance proposal 9 that handed eleven Astroport, Drop and Neutron contracts to the attacker (~$6.24M withdrawn, ~$2.23M net), and continued signature phishing.
 
@@ -474,6 +482,8 @@ A transfer bug is bounded by the balance the vulnerable contract holds or is app
 
 ### Threat reports
 
+- [Chainalysis: How AI helped Chainalysis investigators trace the $387 million North Korea stole from Bitget](https://www.chainalysis.com/blog/387m-bitget-theft-2026/)
+- [Chainalysis: How the $320M exploit of Liquid Network went down](https://www.chainalysis.com/blog/320m-exploit-liquid-network/)
 - [The Hacker News: Contagious Interview campaign](https://thehackernews.com/2026/09/contagious-interview-campaign.html)
 - [The Hacker News: Cosmos EVM flaw exploited](https://thehackernews.com/2026/08/cosmos-evm-flaw-exploited-after-cosmos.html)
 - [The Hacker News: US disrupts Xinbi Guarantee](https://thehackernews.com/2026/09/us-disrupts-xinbi-guarantee-scam.html)
