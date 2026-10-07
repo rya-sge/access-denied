@@ -1,0 +1,34 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2023 hacks
+** Lending accounting
+*** Missing health check, self-liquidation (Euler)
+*** Withdrawal ignoring debt (Platypus)
+*** Share price from the wrong asset (Yearn yUSDT)
+** Reentrancy beyond the contract
+*** Compiler-level lock bug (Vyper, Curve pools)
+*** Read-only reentrancy (dForce, Sentiment)
+** AMM mathematics
+*** Tick crossing and rounding (KyberSwap)
+*** Rebalancing without slippage (Jimbos)
+** Oracles
+*** Optimistic oracle read too early (BonqDAO)
+** Infrastructure
+*** MEV-Boost relay revealing blocks
+*** npm library loaded at latest (Ledger)
+*** MPC keys under one operator (Multichain)
+** Small logic bugs
+*** Duplicate claims (Level Finance)
+*** Unvalidated market address (Exactly)
+@endmindmap
