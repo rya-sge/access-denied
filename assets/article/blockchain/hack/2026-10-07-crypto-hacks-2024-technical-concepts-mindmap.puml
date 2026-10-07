@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2024 hacks
+** Signing and keys
+*** Safe execTransaction, EIP-712 hash, DELEGATECALL
+*** Blind signing, spoofed UI (WazirX, Radiant)
+*** Supplier compromise (DMM)
+*** Minter roles, M-of-N thresholds (PlayDapp, Gala, Orbit)
+** Upgrades and initialisation
+*** Uninitialised vote weight (Ronin)
+*** Storage pre-seeded before upgrade (Munchables)
+** Approvals and calls
+*** Arbitrary call spends approvals (LI.FI, Seneca)
+*** Approval to a caller-chosen address (Hedgey)
+*** Callback trust: reentrancy (Penpie), flash-loan initiator (Prisma)
+** Accounting and math
+*** Empty-market donation, rounding (Sonne)
+*** elastic/base rounding (Abracadabra)
+*** Unchecked underflow (Velocore), missing bound (Thala)
+** Prices
+*** Reserve-based spot price (Polter)
+*** Median of manipulable sources (UwU Lend)
+** Users
+*** Address poisoning
+*** Ownership and permit phishing
+@endmindmap

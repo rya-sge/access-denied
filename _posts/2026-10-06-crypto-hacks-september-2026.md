@@ -145,7 +145,14 @@ flowchart LR
 
 No private key was stolen. The wallet system signed what its own back end asked it to sign, so key protection, however strong, did not apply. Freezes by Circle and Tether (about $339k) and a halt by NEAR Intents (~$503k) covered roughly 0.22% of the loss.
 
-[Chainalysis' report](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) of 1 October attributes the theft to North Korea and says it takes North Korea's thefts in 2026 above $1B; TRM Labs had found links between the laundering routes and networks used in earlier North Korea-linked thefts, and [Elliptic](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/) assessed the attack on 25 September as "highly likely" to be linked to North Korea: XRP from Bitget connected on-chain to ETH from earlier North Korea-attributed thefts and to addresses that laundered the 2025 Bybit theft. Elliptic counted more than 51 North Korea-linked incidents in 2026 by then. Bitget itself had not confirmed an attribution in the sources used here. Chainalysis also describes how fast the funds moved:
+Four sources point to North Korea, none of them formally:
+
+- **Chainalysis**, in its [report](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) of 1 October, attributes the theft to North Korea and says it takes North Korea's thefts in 2026 above $1B.
+- **Elliptic** [assessed](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/) the attack on 25 September as "highly likely" linked to North Korea: XRP from Bitget connected on-chain to ETH from earlier North Korea-attributed thefts and to addresses that laundered the 2025 Bybit theft. It counted more than 51 North Korea-linked incidents in 2026 by then.
+- **TRM Labs** found links between the laundering routes and networks used in earlier North Korea-linked thefts.
+- **Bitget's CEO**, Gracy Chen, said in a livestream that the attack "displays the signs of a North Korean operation", [according to Protos](https://protos.com/bitgets-eighth-birthday-ends-with-a-352m-hack/).
+
+Chainalysis also describes how fast the funds moved:
 
 - **Dispersion.** Within three hours, the stolen funds were spread across four blockchains: Ethereum (49.7%), the XRP Ledger (40.8%), Zcash (7.6%) and Tron (1.8%).
 - **Laundering.** Cross-chain liquidity and messaging protocols, instant swaps and laundering services, with XRP converted to Bitcoin through cross-chain liquidity protocols.
@@ -187,6 +194,8 @@ The attackers consolidated the BTC and left an on-chain message, "we are whiteha
 Blockstream refused the claim and called the retention "a crime, not responsible disclosure". The fix shipped on 9 September in [Elements v23.3.4](https://github.com/ElementsProject/elements/releases/tag/elements-23.3.4), which hardens the range-proof cache keys and was reviewed by the Bitcoin Red Team and Alpen Labs among others. The federation's [recovery plan](https://x.com/Liquid_BTC/status/2097695714310521331) has three stages: resume block production with pegs suspended, replay the transactions verified as valid, then resume peg operations once the network state is restored, including a return of funds. The same update warned of fake update sites set up by scammers during the outage.
 
 [Chainalysis' analysis](https://www.chainalysis.com/blog/320m-exploit-liquid-network/) adds the attackers' on-chain messages, written in Bitcoin's `OP_RETURN` field: "The chain is under risk at latest commit. make sure every node is patched." The 3,400 BTC came back in a single transaction once Blockstream confirmed the patch, with the remainder sent as change to an address the attackers controlled. Chainalysis notes that neither side has said whether the roughly 600 BTC kept amounts to a "de facto bounty".
+
+Early reporting by [Protos](https://protos.com/how-4000-btc-walked-out-of-blockstreams-liquid-network/) recorded two observations from the first day: Bitcoin Core contributor Antoine Poinsot noted that Liquid block 4,050,336 "was rejected by @mempool but accepted by @Blockstream", and Jameson Lopp that the public functionary code had not been updated for about two years. The same article's early account of compromised federation keys was contradicted by the federation's own report.
 
 A cache in front of a verifier is part of the verifier. An ambiguous encoding of the cache key, the same problem as hashing `a || b` without a length prefix, turns "this proof was valid for X" into "this proof is valid for anything that encodes like X".
 
@@ -482,6 +491,8 @@ A transfer bug is bounded by the balance the vulnerable contract holds or is app
 
 ### Threat reports
 
+- [Protos: Bitget's eighth birthday ends with a $352M hack](https://protos.com/bitgets-eighth-birthday-ends-with-a-352m-hack/)
+- [Protos: How 4,000 BTC walked out of Blockstream's Liquid Network](https://protos.com/how-4000-btc-walked-out-of-blockstreams-liquid-network/)
 - [Chainalysis: How AI helped Chainalysis investigators trace the $387 million North Korea stole from Bitget](https://www.chainalysis.com/blog/387m-bitget-theft-2026/)
 - [Elliptic: Bitget attack pushes suspected North Korea crypto heists over $1 billion in 2026](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/)
 - [Chainalysis: How the $320M exploit of Liquid Network went down](https://www.chainalysis.com/blog/320m-exploit-liquid-network/)
