@@ -1,0 +1,35 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2022 hacks
+** Bridge message verification
+*** Validator threshold and stale allowlist (Ronin)
+*** Zero root accepted (Nomad)
+*** Proof hash ignoring a field (BNB Chain)
+*** Zero address as ETH (Qubit)
+** Solana account validation
+*** Fake sysvar account (Wormhole)
+*** Unchecked collateral chain (Cashio)
+** Governance and oracles
+*** Flash-loaned voting power (Beanstalk)
+*** Unrealised PnL as collateral (Mango)
+*** Oracle price floor (LUNA, Venus, Blizz)
+** Contract mechanics
+*** Interaction before effects (Fei/Rari)
+*** Proxy storage collision (Audius)
+*** Upgradeable token minted by deployer key (Ankr)
+** Keys and addresses
+*** 32-bit seed vanity keys (Profanity, Wintermute)
+*** CREATE address replay across chains (20M OP)
+*** SIM swap, missing 2FA (FTX, Crypto.com)
+@endmindmap

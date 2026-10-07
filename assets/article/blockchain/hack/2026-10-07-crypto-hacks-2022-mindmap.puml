@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2022
+** Figures
+*** Chainalysis: ~$3.8B, a record at the time
+*** CertiK ~$3.7B, Immunefi ~$3.77B hacks
+*** Bridges: ~$2B (Chainalysis)
+*** North Korea: ~$630M to ~$1.7B
+** Bridges
+*** Ronin ~$625M (5 of 9 keys, Lazarus)
+*** Wormhole ~$326M (forged signature check)
+*** Nomad ~$190M (zero root trusted)
+*** BNB Chain ~$570M minted (forged proof)
+*** Harmony ~$100M (2 of 5 keys)
+** DeFi design
+*** Beanstalk ~$182M (flash-loan governance)
+*** Mango ~$115M (oracle, conviction vacated)
+*** Fei/Rari, Qubit, Cashio
+** Keys and operations
+*** FTX ~$477M (SIM swap, DOJ charges)
+*** Wintermute ~$160M (Profanity vanity key)
+*** Crypto.com, Deribit, Ankr
+** Frauds and collapses (not counted)
+*** Vires Finance, Mining Capital Coin
+*** Terra/Luna, Celsius, FTX collapse
+@endmindmap
