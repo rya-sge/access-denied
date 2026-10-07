@@ -1,0 +1,36 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2023
+** Figures
+*** Chainalysis, TRM: ~$1.7B stolen
+*** CertiK ~$1.84B, Immunefi ~$1.70B hacks
+*** SlowMist: ~$1.84B, frauds excluded
+*** North Korea: ~$600M to ~$1.0B
+** Largest incidents
+*** Mixin ~$200M (cloud database)
+*** Euler ~$197M (returned)
+*** Poloniex, HECO/HTX, Multichain
+** Lazarus' year
+*** Atomic, Alphapo, CoinsPaid (FBI)
+*** Stake.com (FBI), CoinEx
+*** Fake job interviews, hot wallets
+** Code and compilers
+*** Vyper reentrancy lock (Curve pools)
+*** KyberSwap tick rounding
+*** Empty markets (Hundred), read-only reentrancy
+** Frauds (not counted)
+*** JPEX, Solar Techno Alliance, dog-nose Ponzi
+*** CoinDeal, Fintoch, BALD
+*** 127 entries, ~$642M
+@endmindmap

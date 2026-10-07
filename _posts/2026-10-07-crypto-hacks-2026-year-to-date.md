@@ -13,7 +13,7 @@ isMath: false
 isMermaid: true
 ---
 
-From January to September 2026, the crypto industry lost about $2.1B to hacks. PeckShield counted 306 major hacks for about $2.08B, the SlowMist Hacked database lists 304 incidents for about $2.13B, and CertiK, which also counts phishing, reached about $2.44B. The year had two spikes. In April, KelpDAO (about $292M) and Drift (about $285M) were drained within three weeks of each other; in September, Bitget (about $387.5M) and the Liquid Network sidechain (about $320M, most of it returned) did the same.
+From January to September 2026, the crypto industry lost about $2.1B to hacks. PeckShield counted 306 major hacks for about $2.08B, the SlowMist Hacked database lists 303 incidents for about $2.13B (frauds excluded), and CertiK, which also counts phishing, reached about $2.44B. The year had two spikes. In April, KelpDAO (about $292M) and Drift (about $285M) were drained within three weeks of each other; in September, Bitget (about $387.5M) and the Liquid Network sidechain (about $320M, most of it returned) did the same.
 
 The four largest incidents share one trait: none of them was a smart contract bug in the usual sense. Two came from compromised operators (Bitget's security appliances, KelpDAO's single-verifier cross-chain message path), one from multisig signers who were socially engineered (Drift), and one from a verification cache in node software (Liquid). This article summarises the year so far, month by month and by root cause, using the [CryptoAlertHack](https://t.me/CryptoAlertHack) Telegram channel, the [SlowMist Hacked](https://hacked.slowmist.io/) database, [Rekt News](https://rekt.news/) and the projects' own post-mortems. The month of September has its own article, [Crypto Hacks of September 2026]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/), which this one does not repeat in detail.
 
@@ -52,8 +52,8 @@ The table puts the trackers' monthly figures side by side. PeckShield and CertiK
 | June | 40 | ~$75.9M | ~$81.7M | 38 | ~$74.6M | Humanity Protocol |
 | July | 30 | ~$210.3M | ~$187.7M | 34 | ~$224.5M | COLDCARD |
 | August | 50 | ~$136.3M | ~$214.7M | 37 | ~$187.7M | Tectonic |
-| September | 55 | ~$766.5M | ~$772.4M | 50 | ~$762.0M | Bitget |
-| **Total** | **306** | **~$2.08B** | **~$2.44B** | **304** | **~$2.13B** | |
+| September | 55 | ~$766.5M | ~$772.4M | 49 | ~$760.0M | Bitget |
+| **Total** | **306** | **~$2.08B** | **~$2.44B** | **303** | **~$2.13B** | |
 
 Two details explain most of the differences:
 
@@ -103,17 +103,17 @@ Below them, about seventeen incidents sit between $10M and $20M, and 75 between 
 
 ### Statistics from the SlowMist database
 
-The figures below are computed from the 304 entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database dated from January to September (one duplicate row removed). They use the database's own loss figures, before recoveries:
+The figures below are computed from the entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database dated from January to September, after removing one duplicate row and one fraud (the fake GIWA bridge, covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack). They use the database's own loss figures, before recoveries:
 
-- **304 incidents**, of which 271 have a stated loss, for **~$2.13B**.
-- **Median loss: ~$410k.** Six incidents of $100M or more make up about 71% of the total; the 70 incidents below $100k add up to about $3M.
+- **303 incidents**, of which 270 have a stated loss, for **~$2.13B**.
+- **Median loss: ~$407k.** Six incidents of $100M or more make up about 71% of the total; the 70 incidents below $100k add up to about $3M.
 - **Monthly variation.** The database records between 13 incidents (February) and 50 (September) per month, and the monthly loss varies by a factor of about 33.
 
 | Size band | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
-| ≥ $100M | 6 | $1.51B | 70.7% |
+| ≥ $100M | 6 | $1.51B | 70.8% |
 | $10M to $100M | 17 | $310.9M | 14.6% |
-| $1M to $10M | 74 | $271.5M | 12.7% |
+| $1M to $10M | 73 | $269.5M | 12.7% |
 | $100k to $1M | 104 | $38.9M | 1.8% |
 | < $100k | 70 | $3.0M | 0.1% |
 | Not stated | 33 | n/a | n/a |
@@ -122,10 +122,10 @@ By category, smart contract bugs are again the most frequent incidents and a sma
 
 | Category | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
-| Key / infrastructure compromise | 44 | $726.9M | 34.1% |
-| Cross-chain bridge / sidechain | 39 | $418.3M | 19.6% |
-| Supply chain | 15 | $299.2M | 14.0% |
-| Scam / phishing / social engineering | 18 | $291.0M | 13.7% |
+| Key / infrastructure compromise | 44 | $726.9M | 34.2% |
+| Cross-chain bridge / sidechain | 39 | $418.3M | 19.7% |
+| Supply chain | 15 | $299.2M | 14.1% |
+| Phishing / social engineering | 17 | $289.0M | 13.6% |
 | Oracle / price manipulation | 31 | $181.8M | 8.5% |
 | Smart contract vulnerability | 125 | $128.1M | 6.0% |
 | Other / unknown | 26 | $49.7M | 2.3% |
@@ -307,6 +307,16 @@ Token-weighted governance with low turnout was attacked three times. BonkDAO (Ju
 - **Phishing and address poisoning.** Losses of $12.3M (January), $600k (February) and $305k (October) to address poisoning, and a steady stream of `Permit` and approval phishing.
 - **Supply chain.** Compromised browser extensions (MEXC API keys, January), Open VSX and npm packages (GlassWorm, Mini Shai-Hulud), a Holdstation app update (February, 462,000 USDT) and malicious AI-agent skills (OpenClaw) all targeted wallet keys.
 
+## Frauds and scams
+
+Frauds are not hacks: nobody broke into a system, the victims sent their funds to a scheme. They are listed here and **not counted in the hack totals** of this article. The trackers' lists for 2026 contain few of them:
+
+| Date | Scheme | Loss (approx. USD) | What happened |
+|------|--------|--:|---------------|
+| 26 Sep | Fake GIWA bridge | $2M | A fake network imitating Upbit's GIWA L2 collected ~767.65 ETH from about 1,335 addresses. |
+
+Two other losses described above are close to fraud but are counted differently. The ~$282M taken from one person in January was a social-engineering theft of the victim's own wallet, which CertiK counts as phishing. Trove Markets, which [Rekt News](https://rekt.news/trove-of-bs) described as keeping $9.4M raised from investors, is a project-conduct case rather than a hack and is not in the SlowMist totals.
+
 ## Official post-mortems and statements
 
 The table records, for the year's main incidents, what the affected project published itself, as of 7 October 2026. Posts on X are read through a public mirror and labelled as such. Incidents of September are covered in the [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/).
@@ -385,7 +395,7 @@ From January to September 2026, trackers counted about 300 hacks and $2.1B to $2
 
 **Q: How much was stolen in crypto hacks in 2026 so far, and why do the totals differ?**
 
-From January to September, PeckShield counted 306 major hacks and about $2.08B, SlowMist lists 304 incidents and about $2.13B, and CertiK reports about $2.44B. CertiK includes phishing, which adds about $311M in January alone, while PeckShield counts hacks only. Valuation dates and revisions explain the rest.
+From January to September, PeckShield counted 306 major hacks and about $2.08B, SlowMist lists 303 incidents and about $2.13B (frauds excluded), and CertiK reports about $2.44B. CertiK includes phishing, which adds about $311M in January alone, while PeckShield counts hacks only. Valuation dates and revisions explain the rest.
 
 **Q: Which were the largest incidents of the year, and what did they have in common?**
 

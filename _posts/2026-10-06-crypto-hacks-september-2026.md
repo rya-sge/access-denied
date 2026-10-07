@@ -59,16 +59,16 @@ Two incidents represent about 92% of the gross total. Without Bitget and Liquid,
 
 ### Statistics from the SlowMist database
 
-The figures below are computed from the 50 September entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database, after removing one duplicate row (Flamincome is listed twice). They use the database's own loss figures, before returns, and they give a second count, independent of PeckShield's:
+The figures below are computed from the September entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database, after removing one duplicate row (Flamincome is listed twice) and one fraud, the fake GIWA bridge, which is covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack. They use the database's own loss figures, before returns, and they give a second count, independent of PeckShield's:
 
-- **50 incidents**, 47 with a stated loss, for a total of **~$762M**. The same calculation for August gives 37 incidents and ~$188M.
-- **Median loss: ~$180k.** The mean, ~$16.2M, is meaningless here: the two largest incidents make up 92.8% of the total, and the other 48 add up to ~$54.5M.
-- **18 of the 47 priced incidents lost less than $100k.** Most are small DeFi contracts on BNB Chain, Ethereum, Polygon or Base.
+- **49 incidents**, 46 with a stated loss, for a total of **~$760M**. The same calculation for August gives 37 incidents and ~$188M.
+- **Median loss: ~$170k.** The mean, ~$16.5M, is meaningless here: the two largest incidents make up 93.1% of the total, and the other 47 add up to ~$52.5M.
+- **18 of the 46 priced incidents lost less than $100k.** Most are small DeFi contracts on BNB Chain, Ethereum, Polygon or Base.
 
 | Size band | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
-| ≥ $100M | 2 | $707.50M | 92.8% |
-| $1M to $10M | 13 | $49.44M | 6.5% |
+| ≥ $100M | 2 | $707.50M | 93.1% |
+| $1M to $10M | 12 | $47.44M | 6.2% |
 | $100k to $1M | 14 | $4.39M | 0.6% |
 | < $100k | 18 | $709.2k | 0.1% |
 | Not stated | 3 | n/a | n/a |
@@ -77,13 +77,13 @@ Grouping the entries by category gives a different picture by count than by valu
 
 | Category | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
-| Key / infrastructure compromise | 9 | $402.11M | 52.8% |
-| Cross-chain bridge / sidechain | 8 | $328.82M | 43.1% |
+| Key / infrastructure compromise | 9 | $402.11M | 52.9% |
+| Cross-chain bridge / sidechain | 8 | $328.82M | 43.3% |
 | Smart contract vulnerability | 22 | $13.79M | 1.8% |
 | Other / unknown (D'CENT) | 1 | $6.57M | 0.9% |
 | Governance attack | 1 | $4.40M | 0.6% |
 | Oracle / price manipulation | 6 | $4.23M | 0.6% |
-| Scam / phishing / account takeover | 2 | $2.00M | 0.3% |
+| Phishing / account takeover | 1 | not stated | n/a |
 | Supply chain | 1 | $118k | < 0.1% |
 
 The category is derived from the database's attack method first, and from the target and description when the method is generic. Bitget counts as an infrastructure compromise and Liquid as a sidechain bug. The database also files the Neutron governance attack as two rows, Drop (governance, ~$4.4M) and Astroport (administrator privileges, ~$4.9M, counted under key / infrastructure); the official post-mortem puts the whole attack at ~$6.24M withdrawn and ~$2.23M net, so these tables overstate it by about $3M. The loss is concentrated in time as well: the week of 22 to 28 September (Bitget, Duelbits, Astroport, Drop, Payy, Meter, Limit Break) accounts for 54% of the month's total.
@@ -216,7 +216,7 @@ Dedaub's classification of 135 Rekt News incidents from January 2024 to August 2
 
 ## Bridges and sidechains
 
-Besides Liquid, seven bridge-type systems were hit in September. Six released value that no real deposit backed, but each through a different flaw, as the last column shows: a double spend, a block-validation bug, misparsed Bitcoin data, a replayed deposit, fabricated RPC events and an invalid proof. The seventh, the fake GIWA bridge, was a scam rather than an exploit. The common outcome is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
+Besides Liquid, six bridge-type systems were hit in September. Each released value that no real deposit backed, but through a different flaw, as the last column shows: a double spend, a block-validation bug, misparsed Bitcoin data, a replayed deposit, fabricated RPC events and an invalid proof. The common outcome is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
 
 | Date | System | Loss (approx. USD) | What the bridge accepted |
 |------|--------|-----:|--------------------------|
@@ -226,7 +226,6 @@ Besides Liquid, seven bridge-type systems were hit in September. Six released va
 | 14 Sep | Long bridge (Robinhood Chain vault) | $118k | A third-party RPC fed the keeper fabricated Arc withdrawal events; 46.79 WETH was released. |
 | 24 Sep | Meter Passport | $2.3M | Over 1B unbacked wrapped MTRG minted on BNB Chain and partly sold on PancakeSwap; MTRG fell 74%. Meter, as quoted in the press, attributes it to a block-validation vulnerability on Meter mainnet; no written post-mortem was found. |
 | 24 Sep | Payy Network rollup | $1.83M (Payy: ~$1.92M) | The Ethereum bridge was emptied of USDC. BlockSec Phalcon observed burns with all-zero `burn_hash` values passing `verifyRollup`. Payy's post-mortem on X rules out a compromised key: its Noir/Barretenberg verifier accepted an invalid burn proof. |
-| 26 Sep | Fake GIWA bridge | $2M | Not an exploit: scammers deployed a fake GIWA L2 network, and about 1,335 addresses bridged ~767.65 ETH to it. |
 
 The Long bridge case shows that a bridge's trust boundary includes its data providers: the keeper was honest, but it read events from an RPC endpoint that lied. The Payy case, a proof verifier accepting an invalid proof, adds to the list of [zero-knowledge proof failures in bridges]({{site.url_complet}}/2026/06/19/zkp-cross-chain-bridge-hacks/).
 
@@ -330,6 +329,14 @@ Alerts relayed by the channel in September also covered threats that target peop
 - **Package and extension supply chain.** MemTensor's npm and PyPI packages were compromised to steal developer secrets; two GitHub Actions from May's "Mini Shai-Hulud" campaign were re-enabled with their malicious tags; 13 Packagist packages served an iOS exploit chain that steals wallet seeds; Elastic described the "Kremlin" Chrome/Edge banking extension.
 - **Commodity stealers.** Lunex (abusing an AMD driver), Psychedelic Stealer (fake Cloudflare CAPTCHA, ClickFix) and a fake LastPass installer using a Microsoft-signed driver all target browser credentials and wallet files.
 - **Scams and enforcement.** The founder of Nano Labs had their X account hijacked to promote a fake token; copycat tokens appeared on day one of the Arc chain launch; US authorities disrupted the Xinbi Guarantee marketplace and froze ~$52.8M.
+
+## Frauds and scams
+
+Some entries in the trackers' lists are frauds rather than hacks: nobody broke into a system, the victims sent their funds to a scheme. They are listed here for completeness and are **not counted in the hack totals** of this article.
+
+| Date | Scheme | Loss (approx. USD) | What happened |
+|------|--------|--:|---------------|
+| 26 Sep | Fake GIWA bridge | $2M | Scammers deployed a fake network imitating GIWA, an L2 announced by Upbit, and about 1,335 addresses bridged ~767.65 ETH to it. GIWA [stated](https://x.com/GIWA_by_Upbit/status/2104108336228843590) that it has no mainnet running. |
 
 ## Official post-mortems and statements
 
