@@ -1055,3 +1055,11 @@ _posts/2026-10-07-crypto-hacks-2018.md
 _posts/2026-10-07-crypto-hacks-2018-technical-concepts.md
   assets/article/blockchain/hack/2026-10-07-crypto-hacks-2018-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2017.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2017-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-07-crypto-hacks-2017-technical-concepts.md
+  assets/article/blockchain/hack/2026-10-07-crypto-hacks-2017-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

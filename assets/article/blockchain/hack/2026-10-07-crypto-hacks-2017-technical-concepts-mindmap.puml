@@ -1,0 +1,32 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Technical concepts\nbehind the 2017 hacks
+** Proxies and libraries
+*** Fallback forwarding every call (Parity)
+*** Initialiser callable again (Parity, July)
+*** Uninitialised library self-destructed (Parity, November)
+** Contract code
+*** blockhash older than 256 blocks (SmartBillions)
+*** One-character typos (HackerGold =+)
+** ICO and wallet front ends
+*** Address swapped on the sale page (CoinDash)
+*** Email, DNS and hosting takeovers (Enigma, EtherDelta)
+*** Key-stealing wallet sites (mybtgwallet)
+** Custody and issuers
+*** Spear phishing and VPN (NiceHash)
+*** Issuer freeze through a new client (Tether)
+** Protocol bugs
+*** Inflation through a race (Stellar)
+*** Proof check typo (Zcoin)
+@endmindmap

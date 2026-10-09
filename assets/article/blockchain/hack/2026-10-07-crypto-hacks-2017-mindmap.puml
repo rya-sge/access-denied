@@ -1,0 +1,31 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Crypto hacks 2017
+** Figures
+*** CipherTrace: ~$266M stolen from exchanges
+*** EY: ~10% of ICO funds lost or stolen
+*** Chainalysis: ~$225M lost to Ethereum scams (Aug)
+** Exchanges and services
+*** NiceHash ~$64M (spear phishing, VPN)
+*** Tether ~$31M (treasury wallet)
+*** Korea: Yapizon, Coinis, YouBit, Bithumb
+** Ethereum
+*** Parity July ~$31M (re-initialised wallets)
+*** CoinDash, Enigma: ICO sites hijacked
+*** EtherDelta, Classic Ether Wallet: DNS
+** Not counted
+*** Accident: Parity freeze, 513,774 ETH
+*** Enforcement: BTC-e seized
+*** Frauds: Control-Finance, PlexCoin, Confido
+@endmindmap

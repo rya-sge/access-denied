@@ -387,6 +387,7 @@ Overflow is unlikely in Solidity 0.8 code outside `unchecked` blocks. Every othe
 
 ### Related articles
 
+- [The Technical Concepts Behind the 2017 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2017-technical-concepts/)
 - [Crypto Hacks of 2018 - Coincheck, BitGrail and the Year of Exchange Breaches]({{site.url_complet}}/2026/10/07/crypto-hacks-2018/)
 - [The Technical Concepts Behind the 2019 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2019-technical-concepts/)
 - [The Technical Concepts Behind the 2020 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2020-technical-concepts/)

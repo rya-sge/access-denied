@@ -2,6 +2,7 @@
 layout: post
 title: "Crypto Hacks of September 2026 - Bitget, Liquid Network and 50 Smaller Incidents"
 date:   2026-10-06
+last_modified_at: 2026-10-09
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -216,7 +217,7 @@ Dedaub's classification of 135 Rekt News incidents from January 2024 to August 2
 
 ## Bridges and sidechains
 
-Besides Liquid, six bridge-type systems were hit in September. Each released value that no real deposit backed, but through a different flaw, as the last column shows: a double spend, a block-validation bug, misparsed Bitcoin data, a replayed deposit, fabricated RPC events and an invalid proof. The common outcome is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
+Besides Liquid, six cross-chain systems were hit in September. Each paid out value that no real deposit backed, but through a different flaw, as the last column shows: a double spend, a block-validation bug, misparsed Bitcoin data, a replayed deposit, fabricated RPC events and an invalid proof. The common outcome is the failure class described in the article on [cross-chain bridge hacks]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/).
 
 | Date | System | Loss (approx. USD) | What the bridge accepted |
 |------|--------|-----:|--------------------------|
@@ -226,6 +227,17 @@ Besides Liquid, six bridge-type systems were hit in September. Each released val
 | 14 Sep | Long bridge (Robinhood Chain vault) | $118k | A third-party RPC fed the keeper fabricated Arc withdrawal events; 46.79 WETH was released. |
 | 24 Sep | Meter Passport | $2.3M | Over 1B unbacked wrapped MTRG minted on BNB Chain and partly sold on PancakeSwap; MTRG fell 74%. Meter, as quoted in the press, attributes it to a block-validation vulnerability on Meter mainnet; no written post-mortem was found. |
 | 24 Sep | Payy Network rollup | $1.83M (Payy: ~$1.92M) | The Ethereum bridge was emptied of USDC. BlockSec Phalcon observed burns with all-zero `burn_hash` values passing `verifyRollup`. Payy's post-mortem on X rules out a compromised key: its Noir/Barretenberg verifier accepted an invalid burn proof. |
+
+The shared outcome does not mean six bridge-contract bugs. The flaws sat in different layers, and in two cases the bridge was only the exit:
+
+| System | What it is | Where the flaw was | Bug in the bridge itself? |
+|--------|-----------|--------------------|---------------------------|
+| Nomic nBTC | A Bitcoin bridge | Its forwarding logic to Osmosis did not bind the signer to the packet sender | Yes |
+| Chainflip | A validator-run cross-chain swap protocol | Its deposit handling processed one TRON deposit twice, once as a failed swap | Yes, in deposit handling |
+| Symbiosis | A cross-chain swap protocol (BridgeV2) | Parsing of Bitcoin transaction data, with negative fee settings | Probably; no technical report was published |
+| Long | A bridge vault on Robinhood Chain | A third-party RPC endpoint fed the keeper fabricated events | Partly: the logic was sound, but the keeper trusted a single data source |
+| Payy | A rollup whose Ethereum bridge was emptied | The zero-knowledge proof verifier accepted an invalid burn proof | No: the flaw was in proof verification; the bridge was the exit |
+| Meter Passport | Meter's bridge | A block-validation vulnerability on Meter's own chain, according to Meter as quoted in the press | No, if Meter's account is right: the bridge minted on the strength of an invalid block |
 
 The Long bridge case shows that a bridge's trust boundary includes its data providers: the keeper was honest, but it read events from an RPC endpoint that lied. The Payy case, a proof verifier accepting an invalid proof, adds to the list of [zero-knowledge proof failures in bridges]({{site.url_complet}}/2026/06/19/zkp-cross-chain-bridge-hacks/).
 
@@ -394,7 +406,7 @@ September 2026 lost between ~$766M and ~$772M depending on the tracker, the high
 - **Bitget (~$387.5M)** was an infrastructure compromise: compromised third-party security appliances gave the attacker the wallet job server, and the withdrawal system signed forged requests. No private key was stolen.
 - **Liquid Network (~$320M)** was a software bug in Elements' range-proof cache that minted unbacked L-BTC; 3,400 BTC were returned and the remaining 598.5 BTC is disputed.
 - **Keys and privileged access** account for the next largest group: Duelbits, the SingularityNET keyring, D'CENT and several smaller cases.
-- **Bridges** (Nomic, Meter, Symbiosis, Chainflip, Payy, Long) released value that no deposit backed, each through a different flaw, and the Cosmos EVM underflow continued to generate post-mortems.
+- **Cross-chain systems** (Nomic, Meter, Symbiosis, Chainflip, Payy, Long) paid out value that no deposit backed, through flaws in different layers: bridge logic for Nomic and Chainflip, a proof verifier for Payy, the chain itself for Meter; the Cosmos EVM underflow continued to generate post-mortems.
 - **Contract bugs** were individually small and clustered around unbound `from`/`payer` parameters, spot-price oracles and double counting, often in old or dormant code.
 - **Governance and social engineering** completed the month, with a bought vote on Neutron governance proposal 9 that handed eleven Astroport, Drop and Neutron contracts to the attacker (~$6.24M withdrawn, ~$2.23M net), and continued signature phishing.
 
