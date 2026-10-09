@@ -90,6 +90,7 @@ Grouping the entries by category gives a different picture by count than by valu
 The category is derived from the database's attack method first, and from the target and description when the method is generic. Bitget counts as an infrastructure compromise and Liquid as a sidechain bug. The database also files the Neutron governance attack as two rows, Drop (governance, ~$4.4M) and Astroport (administrator privileges, ~$4.9M, counted under key / infrastructure); the official post-mortem puts the whole attack at ~$6.24M withdrawn and ~$2.23M net, so these tables overstate it by about $3M. The loss is concentrated in time as well: the week of 22 to 28 September (Bitget, Duelbits, Astroport, Drop, Payy, Meter, Limit Break) accounts for 54% of the month's total.
 
 ```mermaid
+%%{init: {"themeVariables": {"pie1": "#56B4E9", "pie2": "#E69F00", "pie3": "#009E73", "cScale1": "#56B4E9", "cScale2": "#E69F00", "cScale3": "#009E73", "pieSectionTextColor": "#000000"}}}%%
 pie showData
     title Gross losses of the September 2026 top ten (USD million, PeckShield)
     "Bitget" : 387
