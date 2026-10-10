@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Morpho Vault V2
+** Architecture
+*** Immutable ERC-4626 vault
+*** Idle assets + adapters
+*** Adapters report realAssets
+*** Registries restrict adapters
+** Roles
+*** Owner: appoints
+*** Curator: configures
+*** Allocators: move funds
+*** Sentinels: reduce risk
+** Timelocks
+*** submit, then anyone executes
+*** Per-selector delay
+*** Decrease costs its own delay
+*** abdicate = permanent
+** Ids and caps
+*** Adapter, collateral, market ids
+*** Absolute cap
+*** Relative cap vs firstTotalAssets
+*** Checked on allocate only
+left side
+** Accounting
+*** Once per transaction
+*** Gains capped by maxRate
+*** Losses immediate
+*** Performance fee <= 50%
+*** Management fee <= 5%/year
+** Exits
+*** withdraw: idle, then liquidity adapter
+*** forceDeallocate: penalty <= 2%
+*** In-kind redemption via flash loan
+** Gates
+*** receive / send shares
+*** receive / send assets
+** Losses
+*** Bad debt lowers realAssets
+*** burnShares (timelocked)
+*** Reverting adapter blocks accrual
+@endmindmap

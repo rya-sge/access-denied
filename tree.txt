@@ -1069,3 +1069,9 @@ _posts/2026-10-10-morpho-vault-v2-risk-monitoring.md
   assets/article/blockchain/defi/morpho/morpho-vault-v2-risk-layers-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/morpho/morpho-vault-v2-loss-timeline-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-morpho-vault-v2-architecture.md
+  assets/article/blockchain/defi/morpho/2026-10-10-morpho-vault-v2-architecture-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-in-kind-redemption-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

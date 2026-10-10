@@ -1,0 +1,24 @@
+@startuml
+title Morpho Vault V2 - in-kind redemption with forceDeallocate
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+}
+participant Depositor as U
+participant "Flash lender" as F
+participant "Blue market" as M
+participant "Adapter" as A
+participant "VaultV2" as V
+U -> F : flash-borrow X
+U -> M : supply X (own account)
+U -> V : forceDeallocate(adapter, market, X, U)
+V -> A : deallocate(X)
+A -> M : withdraw X
+A --> V : X back to idle
+V -> V : burn U's shares worth X * penalty\n(assets stay in vault)
+U -> V : withdraw(X)
+V --> U : X
+U -> F : repay X
+note over U, M : U now holds X of supply in the market
+@enduml

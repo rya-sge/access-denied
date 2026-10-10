@@ -10,6 +10,7 @@ description: "Where a Morpho Vault V2 depositor's loss comes from, which on-chai
 image: /assets/article/blockchain/defi/morpho/2026-10-10-morpho-vault-v2-risk-monitoring-mindmap.png
 isMath: true
 isMermaid: true
+series: morpho
 ---
 
 [Morpho](https://morpho.org/) is a lending protocol on Ethereum built in two layers. Morpho Blue holds isolated lending markets, each defined by one loan token, one collateral token, one oracle, one interest-rate model and one liquidation threshold. A Morpho Vault V2 is an [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) vault that takes deposits in one asset and allocates them across such markets through adapters, under rules set by a curator.
