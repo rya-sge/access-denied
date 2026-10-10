@@ -1,0 +1,26 @@
+@startuml
+title Allocating a Vault V2 into a Vault V1 through MorphoVaultV1Adapter
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+}
+actor Allocator
+participant VaultV2 as V
+participant MorphoVaultV1Adapter as AD
+participant "Vault V1" as V1
+participant "Morpho Blue" as B
+Allocator -> V : allocate(adapter, "", assets)
+V -> V : accrueInterest()\nsum of realAssets()
+V -> AD : transfer(assets)
+V -> AD : allocate("", assets, selector, sender)
+AD -> V1 : deposit(assets, adapter)
+V1 -> B : supply along the supply queue
+note right of V1 : reverts AllCapsReached\nif caps are full
+V1 --> AD : V1 shares
+AD -> V1 : previewRedeem(balance)
+AD --> V : ([adapterId], newAllocation - oldAllocation)
+V -> V : allocation[adapterId] += change
+V -> V : check absolute and relative caps
+@enduml

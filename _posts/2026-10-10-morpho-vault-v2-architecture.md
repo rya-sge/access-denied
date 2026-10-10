@@ -13,7 +13,7 @@ isMermaid: true
 series: morpho
 ---
 
-[Morpho](https://morpho.org/) is a lending protocol on Ethereum and other EVM chains. Its base layer, Morpho Blue, is a set of isolated and immutable lending markets; its vaults sit on top and let a depositor lend to several markets at once without choosing them. Vault V2 is the second generation of those vaults, and its main change is that a vault no longer talks to Morpho Blue directly but through pluggable contracts called adapters.
+[Morpho](https://morpho.org/) is a lending protocol on Ethereum and other EVM chains. Its base layer, [Morpho Blue]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/), is a set of isolated and immutable lending markets; its vaults sit on top and let a depositor lend to several markets at once without choosing them. Vault V2 is the second generation of those vaults, and its main change is that a vault no longer talks to Morpho Blue directly but through pluggable contracts called adapters.
 
 This article explains how a Vault V2 is built: the contracts involved, the four roles and what each one may do, the timelock system that protects depositors from configuration changes, the cap system expressed over abstract identifiers, the share accounting with its rate limit and fees, and the exit paths, including the in-kind redemption performed with `forceDeallocate`. Every statement is taken from the `morpho-org/vault-v2` source at the commit pinned in the references. A companion article, [Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/), starts from the same code and looks at it from the depositor's side: where losses come from and which on-chain signals reveal them.
 
@@ -23,7 +23,7 @@ This article explains how a Vault V2 is built: the contracts involved, the four 
 
 ## From MetaMorpho to Vault V2
 
-The first generation of Morpho vaults, MetaMorpho (now called Morpho Vaults V1), supplies a single asset to a list of Morpho Blue markets, ordered by a supply queue and a withdraw queue, with one cap per market. Its design is tied to Blue: a vault can only hold Blue supply positions.
+The first generation of Morpho vaults, MetaMorpho (now called Morpho Vaults V1), supplies a single asset to a list of Morpho Blue markets, ordered by a supply queue and a withdraw queue, with one cap per market. Its design is tied to Blue: a vault can only hold Blue supply positions. [How Morpho Vault V1 (MetaMorpho) Works, and What Vault V2 Changes]({{site.url_complet}}/2026/10/10/morpho-vault-v1-metamorpho/) describes it in detail.
 
 Vault V2 keeps the idea of a curated, non-custodial [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) vault and generalises the rest:
 
@@ -77,7 +77,7 @@ interface IAdapter {
 }
 ```
 
-`allocate` and `deallocate` move funds in and out of the target protocol and return two things: the list of **ids** the position belongs to, and the **change** in the value of the position. `realAssets` returns the current value of everything the adapter holds. The vault never inspects the target protocol; it trusts the adapter's report. This is why the choice of adapters is a curator decision, behind a timelock, and why a registry can restrict it further.
+`allocate` and `deallocate` move funds in and out of the target protocol and return two things: the list of **ids** the position belongs to, and the **change** in the value of the position. `realAssets` returns the current value of everything the adapter holds. The vault never inspects the target protocol; it trusts the adapter's report. This is why the choice of adapters is a curator decision, behind a timelock, and why a registry can restrict it further. The rules an adapter must follow, the three adapters in the repository and the Vault V1 adapter's caveats are covered in [Morpho Vault V2 Adapters - How a Vault Allocates, and Why It Wraps a Vault V1]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/).
 
 ## Roles
 

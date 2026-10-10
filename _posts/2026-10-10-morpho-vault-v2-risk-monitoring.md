@@ -13,7 +13,7 @@ isMermaid: true
 series: morpho
 ---
 
-[Morpho](https://morpho.org/) is a lending protocol on Ethereum built in two layers. Morpho Blue holds isolated lending markets, each defined by one loan token, one collateral token, one oracle, one interest-rate model and one liquidation threshold. A Morpho Vault V2 is an [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) vault that takes deposits in one asset and allocates them across such markets through adapters, under rules set by a curator.
+[Morpho](https://morpho.org/) is a lending protocol on Ethereum built in two layers. [Morpho Blue]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/) holds isolated lending markets, each defined by one loan token, one collateral token, one oracle, one interest-rate model and one liquidation threshold. A Morpho Vault V2 is an [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) vault that takes deposits in one asset and allocates them across such markets through adapters, under rules set by a curator.
 
 A depositor in a Vault V2 therefore lends to every market the vault holds, and also accepts the vault's governance: who may move the money, how fast the rules can change, and what an exit can pay. This article lists the signals a depositor needs to monitor, explains where each one comes from in the contracts, and reports what a block-by-block watcher built for this purpose showed on a real vault, Sentora RLUSD Main, on 10 October 2026.
 

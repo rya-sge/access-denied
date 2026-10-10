@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Morpho Blue
+** Markets
+*** Loan, collateral, oracle, IRM, LLTV
+*** Id = keccak256(params)
+*** Permissionless, immutable
+*** Isolated accounting
+** Owner
+*** Enable IRMs and LLTVs
+*** Fee <= 25% of interest
+*** No pause, no upgrade
+** Shares and interest
+*** Supply and borrow shares
+*** 1e6 virtual shares, 1 virtual asset
+*** Rounding favours protocol
+*** Lazy accrual, Taylor series
+left side
+** Health and liquidation
+*** Debt <= collateral x price x LLTV
+*** LIF = min(1.15, 1/(1 - 0.3(1 - LLTV)))
+*** No close factor
+** Bad debt
+*** Written off when collateral = 0
+*** Shared by market suppliers
+*** Oracle drop < LLTV x LIF
+** Developer features
+*** Callbacks before transferFrom
+*** Free flash loans
+*** Authorizations, EIP-712
+@endmindmap

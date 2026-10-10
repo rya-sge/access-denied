@@ -1,0 +1,38 @@
+@startuml
+title Morpho Vault V2 - adapter layer
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BorderColor #4A78B5
+}
+actor Depositor
+actor Curator
+actor Allocator
+component "VaultV2\nidle assets, caps per id,\nallocation per id" as V
+component "Adapter registry\n(optional, append-only)" as R
+package "Adapters (trusted)" {
+  component "MorphoMarketV1AdapterV2\nids: adapter, collateral, market" as A1
+  component "MorphoVaultV1Adapter\nid: adapter" as A2
+  component "MidnightAdapter (WIP)" as A3
+}
+component "Morpho Blue markets" as B
+component "Vault V1 (MetaMorpho)\nV1.0 or V1.1" as M
+component "Midnight markets" as MN
+Depositor --> V : deposit / withdraw
+Curator --> V : addAdapter, caps\n(timelocked)
+Allocator --> V : allocate / deallocate
+V ..> R : isInRegistry
+V --> A1 : allocate / deallocate
+V --> A2
+V --> A3
+A1 --> B
+A2 --> M
+M --> B
+A3 --> MN
+A1 ..> V : ids, change, realAssets
+A2 ..> V : ids, change, realAssets
+@enduml

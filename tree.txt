@@ -1075,3 +1075,21 @@ _posts/2026-10-10-morpho-vault-v2-architecture.md
   assets/article/blockchain/defi/morpho/morpho-vault-v2-architecture-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/morpho/morpho-vault-v2-in-kind-redemption-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-morpho-vault-v1-metamorpho.md
+  assets/article/blockchain/defi/morpho/2026-10-10-morpho-vault-v1-metamorpho-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-vault-v1-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-vault-v1-market-lifecycle-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-morpho-blue-lending-markets.md
+  assets/article/blockchain/defi/morpho/2026-10-10-morpho-blue-lending-markets-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-blue-singleton-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-blue-liquidation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-morpho-vault-v2-adapters.md
+  assets/article/blockchain/defi/morpho/2026-10-10-morpho-vault-v2-adapters-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-adapter-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-v1-adapter-allocation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

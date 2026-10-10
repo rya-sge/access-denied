@@ -1,0 +1,52 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Morpho Vault V1 (MetaMorpho)
+** Versions
+*** v1.0: MetaMorpho
+*** v1.1: MetaMorphoV1_1
+*** Immutable, one factory each
+** Roles
+*** Owner: fee, curator, allocators
+*** Curator: supply caps
+*** Allocators: queues, reallocate
+*** Guardian: revoke only
+** Timelock
+*** One value, 1 day to 2 weeks
+*** Cap increase, forced removal
+*** Timelock decrease, guardian change
+*** Anyone accepts after delay
+** Markets
+*** submitCap / acceptCap
+*** Max 30 markets
+*** Normal or forced removal
+*** Idle market convention
+left side
+** Queues
+*** Supply queue: deposits up to caps
+*** Withdraw queue: liquidity, totalAssets
+*** reallocate: withdrawn = supplied
+** Accounting
+*** Sum of Blue supply
+*** Performance fee <= 50%
+*** Real max* functions
+** Bad debt
+*** v1.0: share price drops
+*** v1.1: lostAssets, price unchanged
+*** v1.1: last holders bear the loss
+** Vault V2 changes
+*** Adapters, id-based caps
+*** Per-function timelocks, abdicate
+*** Sentinels, gates, maxRate
+*** In-kind redemption
+@endmindmap

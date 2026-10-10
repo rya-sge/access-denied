@@ -1,0 +1,23 @@
+@startuml
+title Morpho Blue - liquidate(market, borrower, seizedAssets or repaidShares)
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+start
+:Accrue interest on the market;
+:Read oracle price;
+if (Position healthy?) then (yes)
+  :revert HEALTHY_POSITION;<<#FDEEEE>>
+  stop
+endif
+:LIF = min(1.15, 1 / (1 - 0.3 x (1 - LLTV)));
+:Seized collateral = repaid debt x LIF / price;
+:Reduce borrower's debt and collateral;
+if (Borrower collateral = 0 and debt left?) then (yes)
+  :Write off remaining debt\nfrom total borrow AND total supply\n(suppliers absorb bad debt);<<#FDEEEE>>
+endif
+:Send collateral to liquidator;
+:Optional onMorphoLiquidate callback;
+:Pull repaid loan tokens from liquidator;
+stop
+@enduml

@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Morpho Vault V2 adapters
+** Interface
+*** allocate(data, assets, selector, sender)
+*** deallocate(...)
+*** realAssets()
+*** returns ids + change
+** Specification
+*** only the vault calls
+*** correct, unique ids
+*** approval after deallocate
+*** no re-entrancy
+*** realAssets never reverts
+** Vault side
+*** transfer, call, check caps
+*** change = new - old allocation
+*** total = idle + sum realAssets
+*** gains capped by maxRate
+** Adapters
+*** MorphoMarketV1AdapterV2
+**** Blue markets, 3 ids
+*** MorphoVaultV1Adapter
+**** one V1 vault, 1 id
+*** MidnightAdapter (WIP)
+left side
+** Control
+*** curator: add, remove, caps (timelocked)
+*** allocator: allocate, liquidity adapter
+*** sentinel: deallocate, decrease caps
+*** anyone: forceDeallocate (max 2 %)
+*** registry (append-only)
+** Vault V1 through an adapter
+*** code: metamorpho, metamorpho-v1.1
+*** why: reuse, migrate, V2 tools
+*** realAssets = previewRedeem
+*** caveats
+**** V1.1 hides losses (lostAssets)
+**** one opaque id
+**** inflation, re-entrant IRM
+**** reverting market blocks V2
+@endmindmap

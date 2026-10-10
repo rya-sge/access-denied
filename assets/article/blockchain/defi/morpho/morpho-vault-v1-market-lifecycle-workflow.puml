@@ -1,0 +1,22 @@
+@startuml
+title Morpho Vault V1 - enabling and removing a market
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+start
+:Curator: submitCap(market, higher cap);
+:Wait for the timelock (guardian may revoke);
+:Anyone: acceptCap(market)\nmarket appended to withdraw queue;
+:Allocator: add market to supply queue;
+:Market receives deposits and reallocations;
+:Curator: lower cap to 0 (immediate);
+if (Supply can be withdrawn?) then (yes)
+  :Allocator: reallocate supply out;
+  :Allocator: updateWithdrawQueue without the market;
+else (no: reverts or illiquid)
+  :Curator: submitMarketRemoval;
+  :Wait for the timelock;
+  :Allocator: updateWithdrawQueue without the market\nremaining supply written off;<<#FDEEEE>>
+endif
+stop
+@enduml
