@@ -1,0 +1,21 @@
+@startuml
+title From an underwater borrower to a lower share price
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+}
+participant Oracle
+participant "Blue market" as B
+participant "Vault V2" as V
+participant "Informed depositor" as E
+participant Liquidator as L
+Oracle -> B : collateral price falls
+note over B, V : borrower underwater, nothing recorded
+E -> V : withdraw at the pre-loss price
+L -> B : liquidate, collateral short of the debt
+B -> B : bad debt written off
+note over V : totalAssets() < _totalAssets
+V -> V : next entry point calls accrueInterest
+note over V : remaining holders carry the loss
+@enduml

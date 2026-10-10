@@ -1,0 +1,32 @@
+@startuml
+title Morpho Vault V2: where a depositor's risk sits
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+actor Depositor
+rectangle "Vault V2\n_totalAssets, totalAssets()\nfees, gates, caps, timelocks" as V
+rectangle "Idle balance\n(plain withdrawal)" as I
+rectangle "MorphoMarketV1AdapterV2\nrealAssets(), supplyShares(id)" as A
+rectangle "Liquidity market\n(liquidityData)" as LM
+rectangle "Other Blue markets\n(forceDeallocate only)" as OM
+rectangle "Oracle per market" as O
+rectangle "Borrowers\n(liquidated on the oracle price)" as B
+rectangle "Curator (timelocked)\nAllocator (immediate)\nSentinel (risk-reducing)" as R
+Depositor --> V : shares
+V --> I
+V --> A : allocate / deallocate
+A --> LM
+A --> OM
+LM --> B
+OM --> B
+O --> LM
+O --> OM
+R ..> V : configures
+@enduml

@@ -181,3 +181,7 @@ See [Lido - research](https://research.lido.fi/t/lido-dao-finance-workstream-pro
 The mindmap below summarizes the article.
 
 ![Steakhouse Financial overview mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2025-11-06-steakhouse-finance-overview-mindmap.png)
+
+## Related articles
+
+- [Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/)

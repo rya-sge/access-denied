@@ -1063,3 +1063,9 @@ _posts/2026-10-07-crypto-hacks-2017.md
 _posts/2026-10-07-crypto-hacks-2017-technical-concepts.md
   assets/article/blockchain/hack/2026-10-07-crypto-hacks-2017-technical-concepts-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-morpho-vault-v2-risk-monitoring.md
+  assets/article/blockchain/defi/morpho/2026-10-10-morpho-vault-v2-risk-monitoring-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-risk-layers-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-vault-v2-loss-timeline-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

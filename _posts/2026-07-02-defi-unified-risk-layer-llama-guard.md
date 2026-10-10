@@ -185,3 +185,4 @@ The workflow consumes the Pendle AMM price of the token and a parameter registry
 ### Related articles
 
 - [The Hyperliquid Oracle - How Validator Medians Become Mark Price, Funding and Liquidation]({{site.url_complet}}/2026/09/02/hyperliquid-oracle-mark-price/)
+- [Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/)

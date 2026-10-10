@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Monitoring a Morpho Vault V2
+** Structure
+*** Vault, adapters, Blue markets
+*** Owner, curator, allocator, sentinel
+*** Caps per adapter, collateral, market
+** Sources of loss
+*** Bad debt in a held market
+*** Window before the Blue write-off
+*** Exit limited to idle + liquidity market
+*** Concentration
+*** Governance: timelocks, gates, fees
+** Signals
+*** Liquidate with badDebtAssets
+*** totalAssets() below _totalAssets
+*** Submit / Accept / Revoke decoded
+*** Allocate / Deallocate shares
+*** Utilisation, oracle moves, gates
+*** Not covered: underwater borrowers, mempool
+** Watcher
+*** eth_getLogs on vault, adapters, market ids
+*** One batch of view calls per block range
+*** Rules, alerts, cursor saved last
+*** Cross-checks: second RPC, API vs chain
+** Sentora RLUSD Main, 10 Oct 2026
+*** 458.1M RLUSD, 51.3% in kBTC market
+*** Plain exit 39.1M, +46.5M via forceDeallocate
+*** 3-day timelocks on caps and adapters
+*** Exit gates abdicated
+@endmindmap
