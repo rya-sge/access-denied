@@ -1,0 +1,40 @@
+@startuml
+title Monte Carlo risk model: inputs, loss function and outputs
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BorderColor #2E8B67
+}
+package "Inputs per dependency layer" {
+  [Yearly frequency p] as P
+  [Severity Beta(a, b)] as S
+  [Dependence: links, common shock] as Dep
+}
+package "Position" {
+  [Collateral, debt, LLTV, incentive] as Pos
+  [Oracle behaviour] as Orc
+}
+[Seeded random generator] as RNG
+[Loss function\n(liquidation, limited liability)] as LF
+package "Outputs" {
+  [Loss distribution] as Dist
+  [Expected loss, VaR, CVaR] as M
+  [Attribution per layer] as Attr
+  [Decision: stay / reduce / exit\nbreakeven p*] as Dec
+}
+RNG --> P
+RNG --> S
+P --> LF
+S --> LF
+Dep --> LF
+Pos --> LF
+Orc --> LF
+LF --> Dist
+Dist --> M
+Dist --> Attr
+M --> Dec
+@enduml

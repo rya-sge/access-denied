@@ -1,0 +1,26 @@
+@startuml
+title One Monte Carlo run over N paths
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Convert yearly frequencies to horizon probabilities;
+:Seed the random generator;
+repeat
+  :Draw for each layer: did it fail? (Bernoulli);
+  :Draw its severity (Beta);
+  :Apply shocks to true value and oracle value;
+  if (oracle value x LLTV < debt?) then (yes)
+    :Liquidation: collateral seized with the bonus;
+  else (no)
+    :Equity = max(0, value - debt);
+  endif
+  :Record the loss of the path;
+repeat while (fewer than N paths?) is (yes)
+:Sort the N losses;
+:Read expected loss, VaR and CVaR at 99 %;
+:Compare with carry, exit cost and breakeven p*;
+stop
+@enduml

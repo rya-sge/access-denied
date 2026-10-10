@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Monte Carlo for DeFi risk
+** The method
+*** Average of a function of random inputs
+*** Law of large numbers
+*** Error falls as 1/sqrt(N)
+*** Seeded pseudo-random generator
+*** Inverse transform sampling
+** Modelling a position
+*** One event per dependency layer
+*** Yearly frequency to horizon probability
+*** Beta-distributed severity
+*** Loss function: liquidation and limited liability
+*** Oracle value vs true value
+** Risk measures
+*** Expected loss
+*** P(loss), P(liquidation)
+*** VaR and CVaR at 99 %
+*** Attribution per layer
+left side
+** Decision
+*** Carry vs expected loss vs exit cost
+*** Tail budget on CVaR
+*** Breakeven probability p*
+** Refinements
+*** Dependence: links, common shock, copulas
+*** Variance reduction for rare events
+*** Nested simulation over uncertain inputs
+** Limits
+*** Inputs decide the output
+*** Missing loss channels
+*** Cascades and market impact
+*** Single horizon hides timing
+@endmindmap

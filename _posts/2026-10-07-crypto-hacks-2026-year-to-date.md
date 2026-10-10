@@ -2,6 +2,7 @@
 layout: post
 title: "Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget"
 date:   2026-10-07
+last_modified_at: 2026-10-10
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -141,7 +142,7 @@ timeline
     March : sillytuna (~$24M, individual) : Resolv (~$25M) : Kraken user (~$18.2M, individual)
     April : Drift (~$285M) : Hyperbridge : Rhea (~$18.4M) : KelpDAO (~$292M)
     May : THORChain (~$10.7M) : Verus bridge (~$11.6M) : Superfortune (~$15.2M)
-    June : Humanity Protocol (~$36.4M) : Aztec Connect (~$2.3M)
+    June : Humanity Protocol (~$36.4M) : Aztec Connect (~$2.3M) : Taiko bridge (~$1.75M)
     July : BonkDAO (~$19.3M) : Ostium (~$23.75M) : AFX (~$24.15M) : COLDCARD (~$70M+)
     August : Cosmos EVM chains : Term Labs (~$8.5M) : Tectonic (~$120.4M gross)
     September : Liquid (~$320M) : Neutron (~$6.24M) : Bitget (~$387.5M)
@@ -273,6 +274,7 @@ The second class mints value instead of moving it: a verifier accepts something 
 | 18 May, 23 Jul | Verus-Ethereum bridge | $11.6M (75% returned) and $7.5M | Two different gaps in cross-chain import validation |
 | 7 to 8 Jun | Syscoin bridge | $10M (Rekt: $8.56M; SYS returned on 10 Jun) | The relay path accepted a transaction proof it should have rejected, creating about 5 billion unbacked SYS |
 | June | Aztec Connect, Aztec bridge | ~$4M combined | Proof and settlement layer processed different transaction sets |
+| 21 to 22 Jun | Taiko bridge | ~$1.75M (users made whole) | Forged proofs from rogue SGX provers: the enclave signing key had been committed to Taiko's public repository, and attestation accepted debug-mode enclaves |
 | 11 Jul | Bonzo Lend (Hedera) | $9.05M | A zero BLS signature `[0,0]` passed the oracle's pairing check |
 | 21 Jul | Wanchain Cardano-BNB bridge | $10M (SlowMist; ~$13M per PeckShield) | A forged message minted 203M NIGHT |
 | 20 to 25 Aug | Six Cosmos EVM chains (MANTRA, TAC, KiiChain…) | $5.72M (Cosmos Labs) | An unchecked underflow in `SubBalance` reached through vesting delegation |
@@ -341,6 +343,7 @@ The table records, for the year's main incidents, what the affected project publ
 | THORChain | [Exploit report](https://blog.thorchain.org/thorchain-exploit-report-1) | GG20 key-share leak by a newly churned node; recovery left to governance. |
 | YieldBlox (Blend V2) | [Script3 statements on X](https://x.com/script3official/status/2026013344453501130) | Contained to one community pool; about 48M XLM quarantined by validators; depositors compensated. |
 | Syscoin bridge | [Preliminary post-mortem](https://x.com/syscoin/status/2063749418365665413) and [update](https://x.com/syscoin/status/2064616775829102889) on X | Relay accepted a wrong proof; the SYS was returned on 10 June. |
+| Taiko | [Post-mortem](https://paragraph.com/@taiko-labs/taiko-security-incident-a-postmortem-and-next-steps) | Enclave signing key committed to the public repository and debug-mode enclaves accepted by attestation; ~$1.75M taken, more than $11M held back by withdrawal limits; users made whole and the bridge reopened on 2 July. |
 | Wanchain, Grinex | none found | No official write-up located; Chainalysis suggests Grinex's "cyberattack" looks more like insider fraud or an exit scam. |
 | Hardware-wallet victim (January) | [ZachXBT's report](https://t.me/investigations/302) | Not a protocol; no victim statement. |
 
@@ -370,6 +373,7 @@ This section lists what could not be found or verified while writing this articl
 | Press-only claims | LayerZero's public apology and end of 1-of-1 support (The Block) and Drift's Tether-led recovery package (~$147.5M) were seen only in press reports. | LayerZero and Drift official channels |
 | Humanity Protocol dispute | ZachXBT first called the incident "possibly staged", then revised; not covered in the article. | ZachXBT's posts, The Block |
 | Elliptic reports | Found for Bitget and Drift only; none for KelpDAO, Liquid, Resolv, COLDCARD, Humanity or Tectonic. | elliptic.co/insights, Google search |
+| Taiko key exposure | The post-mortem says the enclave signing key was committed to the public repository but not when, nor whether it came in through a pull request. | Commit history of `docker/enclave-key.pem` in Taiko's raiko repository |
 
 ## Conclusion
 
@@ -467,6 +471,7 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 - [Step Finance: statement (on X)](https://x.com/StepFinance_/status/2018379876642804213)
 - [Humanity Protocol: statement (on X)](https://x.com/Humanityprot/status/2064167144120877127) and [recovery plan (on X)](https://x.com/Humanityprot/status/2066825020530127313)
 - [Resolv: post-mortem (on X)](https://x.com/ResolvLabs/status/2040480752643580252)
+- [Taiko Labs: Taiko security incident, a postmortem and next steps](https://paragraph.com/@taiko-labs/taiko-security-incident-a-postmortem-and-next-steps)
 - [Ostium: statement (on X)](https://x.com/Ostium/status/2078640436688941194)
 - [THORChain: exploit report](https://blog.thorchain.org/thorchain-exploit-report-1)
 - [Triple-A: official statement regarding recent wallet activity](https://triple-a.io/newsroom/official-statement-regarding-recent-wallet-activity)

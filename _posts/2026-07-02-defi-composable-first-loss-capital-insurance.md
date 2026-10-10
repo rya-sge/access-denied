@@ -131,3 +131,7 @@ Each path through the graph, together with its attached coverage, behaves like a
 - [Original talk (YouTube)](https://www.youtube.com/watch?v=BgNGjJgTw2E)
 - [Aave protocol](https://aave.com)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)

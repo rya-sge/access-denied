@@ -1093,3 +1093,9 @@ _posts/2026-10-10-morpho-vault-v2-adapters.md
   assets/article/blockchain/defi/morpho/morpho-vault-v2-adapter-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/morpho/morpho-vault-v2-v1-adapter-allocation-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-10-monte-carlo-defi-risk-analysis.md
+  assets/article/blockchain/defi/monte-carlo/2026-10-10-monte-carlo-defi-risk-analysis-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/monte-carlo/monte-carlo-risk-model-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/monte-carlo/monte-carlo-simulation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
