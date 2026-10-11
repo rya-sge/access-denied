@@ -1,0 +1,38 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Pricing yield collateral on Morpho
+** Shared setting
+*** One immutable oracle per market
+*** LIF 4.38 % at 86 % LLTV, 2.62 % at 91.5 %
+*** MorphoChainlinkOracleV2, no USDC/USD quote
+** Huma PST
+*** PayFi receipt, 7-day revolving loans
+*** Chainlink exchange rate (redemption value)
+*** CCIP burn-and-mint to Ethereum
+*** Blind to defaults, runs, bridge mints
+*** Fails late: bad debt for lenders
+** Ojo PT feed
+*** min(Pendle 15-min TWAP, linear discount)
+*** Ceiling, no floor
+*** Staleness check always passes
+*** Fails early: false liquidations
+** 25 Aug 2026 PT-reUSD
+*** YT buys push TWAP down 277 bps
+*** 33 liquidations, about 36.1M repaid
+*** 2.62 % bonus paid by borrowers, no bad debt
+** What to watch
+*** Issuer buffer, queue, DEX discount
+*** Bridge mints and admins
+*** Oracle floor, window, borrow gap
+@endmindmap

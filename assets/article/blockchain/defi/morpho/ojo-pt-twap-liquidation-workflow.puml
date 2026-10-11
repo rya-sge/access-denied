@@ -1,0 +1,21 @@
+@startuml
+title PT-reUSD, 25 August 2026: a downward TWAP push through a min() oracle
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+}
+participant "Trader wallet" as A
+participant "Pendle PT/SY pool" as P
+participant "OjoPTFeed (min)" as O
+participant "Morpho markets" as M
+participant "Liquidator" as L
+A -> P : 11 SY->YT swaps, 320,000 SY (04:28-04:37 UTC)
+P -> O : implied rate up, PT TWAP down
+note over O : linear branch about 0.982\nTWAP falls below and wins
+O -> M : 0.9710 -> 0.9660 at the last buy
+L -> M : first liquidation 12 s later
+O -> M : 0.9441 at 04:51 as old observations roll out
+L -> M : 33 liquidations, 19 borrowers, about 36.1M repaid
+A -> P : sells YT back (04:51-05:39 UTC)
+@enduml

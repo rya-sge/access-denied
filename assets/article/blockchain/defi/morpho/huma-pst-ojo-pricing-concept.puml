@@ -1,0 +1,28 @@
+@startuml
+title Two oracle designs feeding one Morpho Blue health check
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+package "PST/USDC market" {
+  [Huma pool (Solana)\nloan book + liquid buffer] as H
+  [Chainlink feed\nPST-USDC Exchange Rate] as CL
+  [CCIP burn-and-mint\nEthereum PST] as CC
+}
+package "PT/USDC market" {
+  [Pendle PT/SY AMM\n15-min TWAP] as PM
+  [Linear discount model] as LD
+  [OjoPTFeed\nmin(TWAP, linear)] as OJ
+}
+[MorphoChainlinkOracleV2] as MO
+[Morpho Blue\nhealth check, liquidation] as MB
+H --> CL : reported redemption value
+H ..> CC : supply on Ethereum
+CL --> MO
+PM --> OJ
+LD --> OJ
+OJ --> MO
+MO --> MB : price()
+@enduml
