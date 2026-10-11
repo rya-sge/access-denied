@@ -1,0 +1,30 @@
+@startuml
+title Dependencies of a confidential depositor in a Morpho vault
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+actor "Confidential depositor" as D
+component "cAsset wrapper\n(ERC-7984)" as CA
+component "Deposit batcher" as DB
+component "Redeem batcher" as RB
+component "cShare wrapper\n(pool of shares)" as CS
+component "Morpho Vault V2" as V
+component "Lending markets\n(collateral, oracles)" as M
+component "Zama decryption\n(KMS, coprocessors)" as K
+component "Wrapper registry\n(can pause)" as R
+D --> CA
+CA --> DB
+DB --> V
+V --> CS
+CS --> RB
+V --> M : losses come from here
+CA ..> K : decrypted by
+CS ..> K : decrypted by
+DB ..> K
+RB ..> K
+CA ..> R
+CS ..> R
+@enduml

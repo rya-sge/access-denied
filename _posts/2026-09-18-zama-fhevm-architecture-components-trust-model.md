@@ -344,6 +344,7 @@ Verifiability here is the ability to detect and prove misbehaviour after the fac
 - [Overview, security and applications of Multi-Party Computation (MPC)]({{site.url_complet}}/2024/10/21/mpc-protocol-overview/)
 - [AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data]({{site.url_complet}}/2025/07/17/aws-nitro-enclaves-overview/)
 - [Introduction to Arbitrum, an Optimistic rollup protocol]({{site.url_complet}}/2024/01/31/arbitrum-introduction/)
+- [Risk of a Zama Confidential Morpho Vault - Losses, Exits, Contagion and What Can Be Watched]({{site.url_complet}}/2026/10/11/zama-confidential-morpho-vault-risk/)
 
 ### Tooling
 

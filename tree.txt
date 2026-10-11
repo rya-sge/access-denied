@@ -1111,3 +1111,9 @@ _posts/2026-10-11-oracle-kinds-pricing-lending-position-incident.md
   assets/article/blockchain/oracle/oracle-kinds-incident-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/oracle/oracle-incident-pricing-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-11-zama-confidential-morpho-vault-risk.md
+  assets/article/blockchain/defi/morpho/2026-10-11-zama-confidential-morpho-vault-risk-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/zama-confidential-vault-dependencies-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/zama-confidential-vault-exit-race-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Risk of a Zama\nconfidential Morpho vault
+** Structure
+*** cAsset and cShare (ERC-7984)
+*** Deposit and redeem batchers, daily
+*** Zama decryption (KMS)
+** Losses
+*** Bad debt lowers the share price
+*** Confidential shares lose pro rata
+** Holders
+*** cShare is a pool, not one holder
+*** Skip it as representative depositor
+*** Not a fast holder in a run
+** Exits
+*** Batch: up to a day, no slippage bound
+*** Instant: minutes, amount public
+*** Neither beats a NAV markdown by batch
+left side
+** Contagion
+*** Through markets: computed as usual
+*** Through Zama: common-mode
+*** A freeze costs time, not value
+** Probabilities
+*** No history for the Zama layer
+*** Breakeven p* frames the decision
+** Monitoring
+*** Daily redeem total is public
+*** Instant exits, canceled batches
+*** Pauses, upgrades, owner changes
+@endmindmap

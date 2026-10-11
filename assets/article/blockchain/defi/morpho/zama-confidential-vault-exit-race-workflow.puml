@@ -1,0 +1,24 @@
+@startuml
+title A confidential depositor's exit against a collateral markdown
+skinparam shadowing false
+start
+:Bad news about a collateral;<<#F3EEFB>>
+if (Market priced by an issuer NAV?) then (yes)
+  :Markdown lands in one transaction;<<#FDEEEE>>
+  if (Exit chosen?) then (batch)
+    :Settles at the next dispatch, after the markdown;<<#FDEEEE>>
+    :Bears the loss pro rata;
+  else (instant)
+    :Unwrap cShare, one decryption;<<#F3EEFB>>
+    :Redeem from free liquidity, amount public;
+  endif
+else (no)
+  :Price moves over time;<<#F3EEFB>>
+  :Compare next dispatch time with the expected move;
+endif
+if (Zama decryption halted?) then (yes)
+  :Neither exit completes until it resumes;<<#FDEEEE>>
+else (no)
+endif
+stop
+@enduml
