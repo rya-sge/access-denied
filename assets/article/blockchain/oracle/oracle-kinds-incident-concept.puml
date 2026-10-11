@@ -1,0 +1,37 @@
+@startuml
+title Oracle kinds and the shocks they pass on
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+package "Price-tracking" {
+  [Push feed\n(heartbeat, deviation)] as PF
+  [Pool TWAP\n(window)] as TW
+}
+package "Constant-price" {
+  [Exchange rate\nissuer loss at once] as ER
+  [Published value\nissuer loss at next round] as PB
+  [Linear discount\nnever moves] as LD
+  [Fixed value\nnever moves] as FX
+}
+package "Composite" {
+  [Product of feeds] as PR
+  [min(TWAP, schedule)] as MN
+  [Meta-oracle\nprimary / backup] as MO
+}
+[Market depeg or pool sale] as MK
+[Issuer records a loss] as IS
+MK --> PF
+MK --> TW
+IS --> ER
+IS --> PB
+PR ..> PF : any input moves it
+MN ..> TW : lower of the two
+MO ..> PB : live source until switch
+@enduml

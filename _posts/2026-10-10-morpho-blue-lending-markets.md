@@ -423,6 +423,7 @@ A position opened at the LLTV becomes impossible to liquidate fully, without lea
 
 ### Related articles
 
+- [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
 - [Compound V2 Overview]({{site.url_complet}}/2024/08/27/compound-protocol-v2/)
 - [Vault Curator - Steak House Finance]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/)
 - [Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/)

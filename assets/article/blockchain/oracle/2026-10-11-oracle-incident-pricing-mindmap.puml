@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Pricing a lending position\nduring an incident
+** Two prices
+*** Oracle price: the only one the contract reads
+*** Market price: what the collateral sells for
+*** Liquidatable when q × Po × LLTV < D
+** Price-tracking oracles
+*** Push feeds: heartbeat, deviation threshold
+*** Pendle TWAP: the move must hold the window
+** Constant-price oracles
+*** Exchange rate: issuer loss at once
+*** Published: issuer loss at the next round
+*** Linear discount: never
+*** Fixed: never
+** Composite oracles
+*** Product: any input
+*** Minimum of TWAP and schedule
+*** Meta-oracle: primary, then backup after a timelock
+left side
+** Oracle that moves
+*** Liquidations at the oracle price
+*** Bad debt = D − Vo / LIF
+** Oracle that keeps reading
+*** Nobody liquidated
+*** Hidden shortfall on the lenders
+*** Drain past d* = 1 − LLTV / (1 + c)
+** PT collateral
+*** Price (1 + y)^-T
+*** Sensitivity grows with time to maturity
+*** Pool sale measured from quotes
+** Decision
+*** Stay loses L, leaving costs C
+*** Breakeven p* = C / L
+*** Conditional distribution of the size
+@endmindmap

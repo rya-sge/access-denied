@@ -1105,3 +1105,9 @@ _posts/2026-10-11-huma-pst-ojo-pt-oracle-morpho-collateral-pricing.md
   assets/article/blockchain/defi/morpho/huma-pst-ojo-pricing-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/morpho/ojo-pt-twap-liquidation-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-11-oracle-kinds-pricing-lending-position-incident.md
+  assets/article/blockchain/oracle/2026-10-11-oracle-incident-pricing-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/oracle/oracle-kinds-incident-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/oracle/oracle-incident-pricing-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

@@ -1,0 +1,32 @@
+@startuml
+title Pricing a position once the incident is known
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Incident given: token T marked down by f;
+:Classify each oracle pricing T
+(structure, round history, name);
+if (Oracle kind moves on this incident?) then (yes)
+  :Oracle reads f low
+(at once, next round, or after the window);
+  :Liquidate positions with q × Po × LLTV < D;
+  :Bad debt = max(0, D − Vo / LIF);
+else (no)
+  :Nobody liquidated;
+  :Hidden shortfall at the market price;
+  if (Discount above d*?) then (yes)
+    :Drain: free liquidity borrowed,
+part of it bad debt;
+  endif
+endif
+:Loss of staying L, cost of leaving C;
+if (L > C?) then (yes)
+  :EXIT;
+else (no)
+  :STAY, breakeven p* = C / L;
+endif
+stop
+@enduml
