@@ -1,0 +1,38 @@
+@startuml
+title Charrette workflow: from idea to merge
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+start
+:Entry: idea, board, module or roadmap slot;
+:write-plan: open plan in aiview;
+repeat
+  :interview one decision;
+  :write the section it settles;
+repeat while (open decision?) is (yes)
+:ask mode, cut slices, draw tracker;
+:settle the mandate;
+if (person approves?) then (yes)
+  :write-slice: one document per slice;
+else (no)
+  :revise the plan;
+  stop
+endif
+repeat
+  :orchestrate-plan: brief a subagent;
+  :execute-slice: shape code, do slice;
+  :orchestrator re-runs the check;
+  :merge subagent merges branch;
+  if (verify on?) then (yes)
+    :verify-<app> pass, act on verdict;
+  endif
+  :tick step in tracker;
+repeat while (slices left?) is (yes)
+:close: state node, roadmap redraw;
+:validate-delivery with the person (recommended);
+:pr-review;
+:merge;
+stop
+@enduml

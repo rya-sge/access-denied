@@ -1,0 +1,25 @@
+@startuml
+title Where USDe's backing sits and what absorbs a loss
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+component "sUSDe\n(staked claim)" as S
+component "USDe" as U
+component "Off-exchange settlement\n(Copper, Ceffu)" as C
+component "Liquid stablecoins\n79.5 %" as L
+component "Binance margin\n13.4 %" as B
+component "OKX, Bybit, Deribit, CDE\n7.1 %" as O
+component "Short perpetuals\n(hedges)" as H
+component "Reserve fund\n62.1M USD" as R
+S --> U : claim on
+U --> L
+U --> C : backing held by
+C --> B : delegated as margin
+C --> O : delegated as margin
+B --> H
+O --> H
+R ..> U : absorbs a loss first
+@enduml

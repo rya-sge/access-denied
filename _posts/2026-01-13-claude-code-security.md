@@ -241,6 +241,10 @@ While no system is immune to all attacks, Claude Code significantly reduces risk
 - [OWASP Foundation – OWASP Top 10 Web Application Security Risks](https://owasp.org/www-project-top-ten/)
 - [Greshake et al. (2023) – *Not What You’ve Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection*](https://arxiv.org/abs/2302.12173)
 
+### Related articles
+
+- [How Charrette Works: Architecture of an Agent Skill Collection That Plans Before It Codes]({{site.url_complet}}/2026/10/13/charrette-agent-skills-architecture/)
+
 ## Mindmap
 
 The mindmap below summarizes the article.

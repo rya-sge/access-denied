@@ -304,3 +304,4 @@ In practice the gap is small for short-dated contracts and widens with maturity 
 - [Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/)
 - [The Black-Scholes Model - Pricing Options and Corporate Liabilities]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/)
 - [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/)
+- [Risk of Ethena's USDe and sUSDe - Backing Venues, Depeg Priors and a Leveraged PT Position]({{site.url_complet}}/2026/10/11/ethena-usde-risk-backing-venues-leveraged-positions/)

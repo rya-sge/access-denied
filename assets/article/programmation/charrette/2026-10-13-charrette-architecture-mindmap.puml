@@ -1,0 +1,55 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Charrette
+** Design premises
+*** Settle before building
+*** Diagrams as shared context
+*** Documents outside the repository
+*** Small increments
+** Skills
+*** One folder, SKILL.md + references/
+*** Description = trigger only
+*** One owner per protocol
+*** Groups: project, architecture, ui,\nplan, execute, verify, workbench, review
+** The loop
+*** Entry: idea, board, module, roadmap slot
+*** write-plan -> write-slice
+*** execute-plan -> pr-review -> merge
+*** roadmap above: iterations and slots
+** Plan document
+*** Design: why, before/after, modules, flows
+*** Decisions table (D1...)
+*** Slices, mandate, interview log
+** Tracker
+*** Glyphs: todo, running, done, paused, dropped
+*** State node: branch, next, blocked
+*** Mandate line
+*** mermaid-check, tracker check
+** Execution
+*** execute-plan keeps the plan
+*** orchestrate-plan dispatches
+*** execute-slice does one slice
+*** Mandate: mode, pace, PRs, tests, verify
+*** swarm board for parallel slices
+** Verification
+*** verify-<app> skill (agent)
+*** validate-delivery (person)
+** aiview
+*** CLI, Node server, React UI
+*** SQLite index in the data home
+*** Markdown, Mermaid, mockups, PDF
+** Releases
+*** Version bump in both manifests
+*** Committed dist/ and dist-cli/
+@endmindmap

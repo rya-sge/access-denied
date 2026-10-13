@@ -1,0 +1,21 @@
+@startuml
+title Replaying the PT-reUSD liquidations from on-chain state
+skinparam shadowing false
+skinparam ActivityBackgroundColor #FDEEEE
+skinparam ActivityBorderColor #B54A4A
+start
+:Read state at block 25,829,808\n(archive RPC, 60 blocks before);
+:Borrowers from the markets' Borrow events;
+:Positions, totals, oracle price;
+fork
+  :Shock A: lowest observed oracle price\n(−2.45 % USDC, −2.76 % USDT);
+fork again
+  :Shock B: rebuild the Pendle pool\nsell 5,428,403 PT: −2.36 %;
+fork again
+  :Shock C: cascade of resold PT\nto the 96 % cap: −2.46 %;
+end fork
+:Liquidation test C × P × LLTV < D;
+:Compare with the 33 Liquidate events;
+:13 / 13 and 7 / 7, same borrowers, no bad debt;
+stop
+@enduml

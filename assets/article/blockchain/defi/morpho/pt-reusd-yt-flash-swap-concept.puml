@@ -1,0 +1,17 @@
+@startuml
+title Buying YT on Pendle sells PT into the pool
+skinparam shadowing false
+skinparam ParticipantBackgroundColor #FDEEEE
+skinparam ParticipantBorderColor #B54A4A
+participant "Buyer" as U
+participant "Pendle router" as R
+participant "PT/SY pool" as P
+participant "YT contract" as Y
+U -> R: swapExactSyForYt(320,000 SY in total)
+R -> P: swap: request SY out, PT owed
+P -> R: SY sent first (flash swap)
+R -> Y: mintPY(buyer SY + pool SY)
+Y -> U: YT
+Y -> P: PT (repays ptOwed)
+note over P: pool holds more PT, less SY\nimplied APY up, PT price down
+@enduml

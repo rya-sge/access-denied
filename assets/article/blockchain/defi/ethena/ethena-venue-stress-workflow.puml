@@ -1,0 +1,23 @@
+@startuml
+title A venue failure, from the lost margin to a leveraged PT-sUSDe position
+skinparam shadowing false
+start
+:Venue fails;<<#EAF6F0>>
+if (Settlement arrangement holds?) then (yes)
+  :Loss limited to unsettled PnL (one daily cycle);<<#EAF6F0>>
+  :Hedge reopened on another exchange;
+  stop
+else (no, stress case)
+  :lost = delegated margin x share lost;<<#FDEEEE>>
+  :reserve fund absorbs up to 62.1M;
+  :markdown = (lost - absorbed) / total backing;<<#FDEEEE>>
+  :USDe and sUSDe marked down, no recovery;
+  if (Oracle follows the market now?) then (yes)
+    :Liquidation if markdown > 5.16 %;<<#FDEEEE>>
+  else (meta-oracle)
+    :Loss in value, no liquidation for 16 h;
+    :Oracle switches, then liquidation;<<#FDEEEE>>
+  endif
+  stop
+endif
+@enduml

@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Risk of Ethena's\nUSDe and sUSDe
+** Backing
+*** Delta-neutral: assets + short perps
+*** 79.5 % liquid stablecoins
+*** 13.4 % margin at Binance
+*** Reserve fund 62.1M (1.30 %)
+** Probabilities
+*** Depeg 12 %/yr, mean 8.2 %
+*** Exploit 1.33 %/yr, base rate
+*** Depeg drives the expected loss
+** Path to a PT loop
+*** Liquidated by a 5.16 % fall
+*** Meta-oracle: 16 h delay
+*** Loss of backing: every oracle sees it
+left side
+** Venue failure
+*** By design: unsettled PnL only
+*** Stress: 50 % of Binance margin
+*** Markdown 5.39 %, no recovery
+** Negative funding
+*** -10 %/yr on 975M hedged
+*** Reserve lasts about 232 days
+** Contagion
+*** Sibling sUSDe markets
+*** USDe and sUSDe together
+*** Thin Pendle pool, 61 % of category
+** Uncertain
+*** Split by custodian
+*** Lost hedges, cooldown
+@endmindmap

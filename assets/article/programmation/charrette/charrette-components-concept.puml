@@ -1,0 +1,39 @@
+@startuml
+title Charrette components and where they live
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #F3EEFB
+  BorderColor #7A5BB5
+}
+skinparam package {
+  BorderColor #7A5BB5
+}
+package "Checkout or plugin cache (versioned)" {
+  [Skills (SKILL.md + references)] as SK
+  [aiview CLI] as CLI
+  [aiview UI (dist/)] as UI
+  [swarm CLI / server / UI] as SW
+}
+package "Data home ($HOME/charrette_appdata)" {
+  database "aiview.sqlite" as DB
+  [docs/<project>/ plans, boards, mockups] as DOCS
+  database "swarm store" as ST
+}
+package "Project repository" {
+  [AGENTS.md, README, architecture docs] as AG
+  [Code] as CODE
+}
+[aiview server :4321] as SRV
+actor Person
+SK --> CLI : agent runs
+CLI --> DB
+CLI --> DOCS
+SRV --> DB
+SRV --> DOCS
+SRV --> UI : serves
+SW --> ST
+SK ..> AG : write-conventions,\ntechnical-writing
+SK ..> CODE : execute-slice
+Person --> SRV : reads, live reload
+@enduml

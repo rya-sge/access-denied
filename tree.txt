@@ -1117,3 +1117,21 @@ _posts/2026-10-11-zama-confidential-morpho-vault-risk.md
   assets/article/blockchain/defi/morpho/zama-confidential-vault-dependencies-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/morpho/zama-confidential-vault-exit-race-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-11-ethena-usde-risk-backing-venues-leveraged-positions.md
+  assets/article/blockchain/defi/ethena/2026-10-11-ethena-usde-risk-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/ethena/ethena-usde-backing-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/ethena/ethena-venue-stress-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-11-pt-reusd-morpho-liquidations-pendle-twap-replay.md
+  assets/article/blockchain/defi/morpho/2026-10-11-pt-reusd-liquidations-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/pt-reusd-yt-flash-swap-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/pt-reusd-backtest-replay-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-13-charrette-agent-skills-architecture.md
+  assets/article/programmation/charrette/2026-10-13-charrette-architecture-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/charrette/charrette-components-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/charrette/charrette-plan-execution-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

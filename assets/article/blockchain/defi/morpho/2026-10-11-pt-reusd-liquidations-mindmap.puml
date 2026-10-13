@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* PT-reUSD liquidations\n25 August 2026
+** Setting
+*** Two Morpho markets, USDC and USDT
+*** LLTV 91.5 %, LIF 1.02617
+*** Ojo feed: min(TWAP 900 s, linear)
+** Trigger
+*** 320,000 SY buys 9.5M YT
+*** Flash swap returns PT to the pool
+*** Implied APY 10.58 % to 20.37 %
+** TWAP lag
+*** −0.51 % at the last purchase
+*** −2.76 % fourteen minutes later
+*** Linear branch never binds
+left side
+** Liquidations
+*** 20 positions, 33 events
+*** 36.1M repaid, 945,796 bonus
+*** No bad debt: borrowers pay
+** Replay
+*** State 60 blocks before
+*** Same 13 and 7 positions
+*** From the sale alone: −2.36 %
+*** Squeeze: 309,320 PT accepted
+** Lessons
+*** Borrow below the LLTV
+*** Floor or deviation check
+*** Watch implied APY and pool depth
+@endmindmap
