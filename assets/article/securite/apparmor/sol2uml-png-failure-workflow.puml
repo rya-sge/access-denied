@@ -1,0 +1,22 @@
+@startuml
+title sol2uml PNG export on Ubuntu 23.10+ with Puppeteer's bundled Chrome
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #FDEEEE
+  ParticipantBorderColor #B54A4A
+}
+participant sol2uml
+participant Puppeteer
+participant "Chrome\n(<U+007E>/.cache/puppeteer)" as C
+participant "Kernel + AppArmor" as K
+sol2uml -> sol2uml : parse Solidity, layout SVG (viz.js)
+sol2uml -> Puppeteer : convert SVG to PNG
+Puppeteer -> C : launch headless
+C -> K : create user namespace
+K --> C : allowed, moved to unprivileged_userns
+C -> K : use CAP_SYS_ADMIN in namespace
+K --> C : DENIED (sys_admin)
+C --> Puppeteer : FATAL No usable sandbox!
+Puppeteer --> sol2uml : Failed to launch the browser process
+note over sol2uml : Failed to convert PNG file\n(-f dot + Graphviz, -f svg, or a profiled\nChrome via PUPPETEER_EXECUTABLE_PATH avoid it)
+@enduml

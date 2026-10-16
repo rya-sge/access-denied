@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Stellar Classic assets
+** Model
+*** CODE:ISSUER identity
+*** Trustline per holder
+*** Issuer cannot hold its own asset
+*** int64, 7 decimals
+** Issuer controls
+*** AUTH_REQUIRED
+*** AUTH_REVOCABLE (freeze)
+*** AUTH_CLAWBACK_ENABLED
+*** AUTH_IMMUTABLE
+*** Lock issuer to cap supply
+** Built-in features
+*** SDEX order book and AMM
+*** Path payments
+*** Claimable balances
+*** Sponsored reserves
+** Mapping to Ethereum
+*** ERC-20: no allowance on Classic
+*** ERC-7943: no partial freeze
+*** forcedTransfer = clawback + mint
+** Next steps
+*** SEP-8 approval server
+*** SAC with contract admin
+*** SEP-41 custom token
+**** OpenZeppelin RWA module
+@endmindmap

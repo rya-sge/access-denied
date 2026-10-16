@@ -2,7 +2,7 @@
 layout: post
 title: "Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget"
 date:   2026-10-07
-last_modified_at: 2026-10-10
+last_modified_at: 2026-10-14
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -152,7 +152,7 @@ timeline
 
 ### Bitget (~$387.5M, September)
 
-Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC).
+Bitget's hot and warm wallets were drained on 24 September. According to [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), the attacker gained privileged access to two third-party security appliances, installed a web shell and a command-and-control connection on one of them, moved to the production wallet job server and deployed malicious packages there. SlowMist's [investigation progress report](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf) finds earlier activity, from 31 August, through a zero-day in one of the two products, and a custom withdrawal tool that forged risk-control parameters. The wallet system then signed the withdrawals itself; no private key was stolen. Bitget covered the loss from its Protection Fund (5,500 BTC).
 
 [Chainalysis](https://www.chainalysis.com/blog/387m-bitget-theft-2026/) attributes the theft to North Korea, which it says takes North Korea's thefts in 2026 above $1B, and [Elliptic](https://www.elliptic.co/insights/bitget-attack-pushes-suspected-north-korea-crypto-heists-over-1-billion-in-2026/) rates the link "highly likely" on the strength of on-chain connections to earlier North Korean thefts, including Bybit's laundering addresses; the funds were spread across four blockchains within three hours. The [September article]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/) covers the incident in detail.
 
@@ -476,6 +476,7 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 - [THORChain: exploit report](https://blog.thorchain.org/thorchain-exploit-report-1)
 - [Triple-A: official statement regarding recent wallet activity](https://triple-a.io/newsroom/official-statement-regarding-recent-wallet-activity)
 - [Mandiant: Bitget incident response status report, 28 September 2026 (PDF)](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf)
+- [SlowMist: Investigation Progress Report - Bitget, as of 29 September 2026 (PDF)](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf)
 - [Liquid Federation: incident report, 8 September 2026 (on X)](https://x.com/Liquid_BTC/status/2097404704028545175)
 - [Cosmos Labs: Cosmos EVM GHSA-7g4w-cg88-2cq2 post-mortem](https://github.com/cosmos/security/blob/main/communications/cosmos_evm_GHSA-7g4w-cg88-2cq2_post_mortem.md)
 - [Solva: Neutron governance attack, final post-mortem (on X)](https://x.com/crypto_crew/status/2104924316357841306)

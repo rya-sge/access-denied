@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* AppArmor, user namespaces\nand sol2uml
+** sol2uml
+*** Solidity to UML class diagram
+*** dot -> svg (viz.js) -> png
+*** PNG via Puppeteer headless Chrome
+** AppArmor
+*** Linux Security Module (MAC)
+*** Path-based profiles
+*** Enforce / complain / unconfined
+*** /etc/apparmor.d, apparmor_parser
+** Ubuntu userns restriction
+*** 23.10 opt-in, 24.04 default
+*** userns rule in profile
+*** Unconfined -> unprivileged_userns
+*** All capabilities denied
+*** Qualys bypasses (2025)
+left side
+** Failure chain
+*** Chrome in <U+007E>/.cache, no profile
+*** CAP_SYS_ADMIN denied
+*** No usable sandbox!
+*** Failed to convert PNG file
+** Remediations
+*** PUPPETEER_EXECUTABLE_PATH\n(system Chrome)
+*** sol2uml -f dot + Graphviz dot
+*** SVG output
+*** Profile for Puppeteer Chrome\n(user-writable path)
+*** sysctl off (system-wide)
+@endmindmap

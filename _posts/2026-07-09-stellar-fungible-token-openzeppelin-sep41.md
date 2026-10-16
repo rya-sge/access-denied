@@ -635,4 +635,5 @@ Path 3: issue a classic asset, then call `set_admin` on its Stellar Asset Contra
 ### Related reading
 
 - [Soroban State Archival — Storage Semantics and Security Implications]({{site.url_complet}}/2026/04/15/soroban-state-archival/)
+- [Stellar Classic Assets — How They Work, and How They Map to ERC-20 and ERC-7943]({{site.url_complet}}/2026/10/15/stellar-classic-assets-erc20-erc7943/)
 - [Claude Code](https://claude.com/product/claude-code)

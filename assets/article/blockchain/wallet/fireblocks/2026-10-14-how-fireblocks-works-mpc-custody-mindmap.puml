@@ -1,0 +1,59 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Fireblocks custody
+** MPC protocols
+*** MPC-CMP / CGGMP
+**** presigning, 1 online round
+**** proactive refresh
+**** identifiable aborts
+*** MPC-BAM (2-party)
+*** mpc-lib (open source, NCC audit)
+** Key share placement
+*** 2 Fireblocks cloud co-signers (SGX)
+*** 1 customer share
+**** mobile Secure Enclave / TEE
+**** API Co-Signer
+** Hardware isolation
+*** Intel SGX
+*** AWS Nitro Enclaves
+**** KMS + attestation (PCR8)
+*** GCP Confidential Space
+** Governance
+*** Transaction Authorization Policy
+*** Admin Quorum
+*** Callback Handler
+** HSM: Key Link
+*** Thales Luna
+*** Securosys Primus
+*** customer server decides
+** Recovery
+*** offline RSA key
+*** recovery kit + passphrase
+left side
+** Vulnerabilities
+*** legacy GG18 (2021, patched)
+*** BitForge (found in others)
+*** TSSHOCK, Alpha-Rays
+*** no known MPC-bug theft
+** Customer incidents
+*** StakeHound: lost key backup (availability)
+*** Fortress Trust: vendor breach, capped by policy
+*** Deribit, Phemex, WazirX: moved after hack
+** Safe multisig comparison
+*** Bybit: fake UI, blind signing
+*** WazirX, Radiant
+*** Bitget 2026: forged risk-control, own signer
+*** BigONE 2025: trusted backend
+*** key: independent tx verification
+@endmindmap

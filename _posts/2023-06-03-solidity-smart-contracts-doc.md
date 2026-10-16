@@ -287,3 +287,7 @@ It includes the tool Surya too.
 - [bkrem - Awesome Solidity](https://github.com/bkrem/awesome-solidity?tab=readme-ov-file#audits)
 - [Consensys Diligence Tools](https://consensys.io/diligence/tools/)
 - [Cyfrin - 8 Industry-leading Smart Contract Security Auditing Tools](https://www.cyfrin.io/blog/industry-leading-smart-contract-auditing-and-security-tools)
+
+### Related articles
+
+- [AppArmor on Ubuntu, User Namespace Restrictions, and Why sol2uml Cannot Export a PNG]({{site.url_complet}}/2026/10/15/apparmor-ubuntu-user-namespaces-sol2uml/)

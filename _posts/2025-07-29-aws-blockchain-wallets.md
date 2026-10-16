@@ -154,3 +154,4 @@ The AWS services covered here, Nitro Enclaves in particular, give a framework fo
 ## Related articles
 
 - [Becoming a CASP Under MiCA — Authorisation, Capital and Custody Obligations (Title V)]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/)
+- [How Fireblocks Works - MPC Custody, Enclaves, HSMs and Lessons from Real Hacks]({{site.url_complet}}/2026/10/14/how-fireblocks-works-mpc-custody/)

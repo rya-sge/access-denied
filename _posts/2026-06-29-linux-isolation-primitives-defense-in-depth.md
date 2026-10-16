@@ -209,3 +209,4 @@ A container runtime issues `clone` or `unshare` with the new-namespace flags to 
 - [How Fail2Ban Works — Architecture, Privilege Model and Residual Risk]({{site.url_complet}}/2026/09/03/fail2ban-architecture-privilege-model/)
 - [System Calls, Binary Images and Processes - How a Program Reaches the Kernel]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/)
 - [The Process Control Block, fork/exec/waitpid/exit and the Context Switch]({{site.url_complet}}/2026/09/16/process-control-block-fork-exec-context-switch/)
+- [AppArmor on Ubuntu, User Namespace Restrictions, and Why sol2uml Cannot Export a PNG]({{site.url_complet}}/2026/10/15/apparmor-ubuntu-user-namespaces-sol2uml/)

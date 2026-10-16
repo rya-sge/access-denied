@@ -1,0 +1,22 @@
+@startuml
+title Issuing a regulated Stellar Classic asset
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+start
+:Create issuing and distribution accounts;
+:Issuer SetOptions: AUTH_REQUIRED, AUTH_REVOCABLE, AUTH_CLAWBACK_ENABLED;
+:Issuer SetOptions: home_domain, publish stellar.toml;
+:Distribution and holder accounts ChangeTrust: open trustlines CODE:ISSUER;
+:Issuer SetTrustLineFlags: AUTHORIZED_FLAG on each trustline;
+:Issuer Payment to distribution account (mint);
+:Distribution account pays holders;
+if (Supply must be capped?) then (yes)
+  :Set issuer master weight to 0 (account locked);
+else (no)
+endif
+:Optional: deploy the SAC for Soroban access;
+stop
+@enduml

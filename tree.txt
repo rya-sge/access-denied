@@ -1135,3 +1135,19 @@ _posts/2026-10-13-charrette-agent-skills-architecture.md
   assets/article/programmation/charrette/charrette-components-concept.puml   (concept -> .png, asset only)
   assets/article/programmation/charrette/charrette-plan-execution-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-14-how-fireblocks-works-mpc-custody.md
+  assets/article/blockchain/wallet/fireblocks/2026-10-14-how-fireblocks-works-mpc-custody-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-15-apparmor-ubuntu-user-namespaces-sol2uml.md
+  assets/article/securite/apparmor/2026-10-15-apparmor-ubuntu-userns-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/securite/apparmor/apparmor-userns-transition-concept.puml   (concept -> .png, asset only)
+  assets/article/securite/apparmor/sol2uml-png-failure-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-15-stellar-classic-assets-erc20-erc7943.md
+  assets/article/blockchain/stellar/2026-10-15-stellar-classic-assets-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/stellar/stellar-classic-asset-model-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/stellar/stellar-classic-issuance-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

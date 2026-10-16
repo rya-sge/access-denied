@@ -1,0 +1,21 @@
+@startuml
+title Ubuntu user namespace restriction (kernel.apparmor_restrict_unprivileged_userns = 1)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #FDEEEE
+  BorderColor #B54A4A
+}
+rectangle "Process creates a user namespace" as P
+rectangle "Profile with userns rule\n(e.g. chrome -> /opt/google/chrome/chrome)" as A
+rectangle "Holds CAP_SYS_ADMIN on the host\n(root)" as R
+rectangle "Unconfined, no CAP_SYS_ADMIN\n(e.g. <U+007E>/.cache/puppeteer/.../chrome)" as U
+rectangle "Namespace with full capabilities inside" as OK
+rectangle "Moved to profile unprivileged_userns:\nnamespace created, every capability denied" as DENY
+P --> A
+P --> R
+P --> U
+A --> OK
+R --> OK
+U --> DENY
+@enduml

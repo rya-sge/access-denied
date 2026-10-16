@@ -2,7 +2,7 @@
 layout: post
 title: "Crypto Hacks of September 2026 - Bitget, Liquid Network and 50 Smaller Incidents"
 date:   2026-10-06
-last_modified_at: 2026-10-09
+last_modified_at: 2026-10-14
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -133,11 +133,20 @@ Bitget engaged Mandiant on 25 September (UTC+8) and published its [status report
 - **Lateral movement.** From appliance B it reached Bitget's production wallet job server and deployed malicious packages there, giving it control of the server.
 - **Withdrawals.** On Ethereum, the unauthorised transfers ran alongside legitimate internal wallet operations until about 05:23 UTC+8 (21:23 UTC on 24 September), almost three hours after detection. The stolen assets include XRP, ETH, USDT, USDC, BNB, AVAX, TRX, ZEC and Tether Gold (XAUt).
 
-SlowMist's analysis, relayed by Rekt News, adds detail Mandiant does not give and dates the start earlier. It traces the intrusion to 31 August, through a zero-day in the third-party product used to obtain database credentials, and describes a custom withdrawal tool that forged risk-control parameters and submitted withdrawal requests through the wallet's normal flow. Mandiant's investigation was still ongoing when its report was published.
+SlowMist, invited by Bitget on 25 September, published its own [investigation progress report](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf) with findings as of 29 September. It names the two appliances Product A and Product B, gives times in UTC+8 (converted to UTC below), and dates the first malicious activity three weeks before the theft:
+
+- **31 August, Product A.** A service on one of Product A's nodes was hit through a zero-day vulnerability. The attacker ran a hidden script under the service process, read the environment variable holding the database password and connected to the database. The same hidden-script activity appears on two other nodes on 23 and 25 September, so the environment was already compromised before any asset moved.
+- **24 September, 16:07 UTC, Product B.** The attacker logged into Product B's management platform with an internal employee's identity, made three attempts to inject system commands into its task parameters, then used the platform's web execution endpoint to change the server configuration, write a communication relay file and upload malicious program files in batches. This appears to correspond to the web shell and C2 connection Mandiant found on appliance B.
+- **17:49 UTC, the withdrawal tool.** SlowMist recovered, from files the attacker had deleted, a withdrawal tool written for Bitget's wallet system: it forged risk-control parameters, built withdrawal requests and called the withdrawal process itself. The host log shows it started stealing at 17:49 UTC.
+- **18:31:00 to 21:23:11 UTC, the transfers.** The first verified on-chain transfer sent 93 TRX to the attacker's address, followed eleven seconds later by 0.84 ETH on Ethereum. The transfers lasted 2 hours 52 minutes across several chains; the start matches the time Bitget's monitoring raised the alert, and the end matches Mandiant's 05:23 UTC+8.
+- **After 21:22 UTC, failed BTC attempts.** The attacker also edited withdrawal records directly in the wallet database and launched withdrawal tasks on the local host. Two fabricated BTC withdrawal orders entered processing and returned errors; the attacker then read logs, queried order status and tried again.
+
+Both investigations were still ongoing when these reports were published. SlowMist had not yet established how the attacker moved between the systems involved.
 
 ```mermaid
 flowchart LR
-    A[Third-party security<br/>appliances A and B] --> B[Web shell and C2<br/>on appliance B]
+    Z[31 Aug: zero-day on Product A,<br/>database password read] --> A
+    A[24 Sep: Product B platform<br/>accessed with an employee identity] --> B[Command injection, relay file<br/>and malicious programs on B]
     B --> C[Lateral movement to the<br/>wallet job server]
     C --> D[Malicious packages<br/>deployed]
     D --> E[Forged risk-control<br/>parameters]
@@ -357,7 +366,7 @@ The table records, for the main incidents, what the affected project itself publ
 
 | Incident | Official source | What it adds |
 |----------|-----------------|--------------|
-| Bitget | [Security notice](https://www.bitget.com/support/articles/12560603896024), [Mandiant status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), [Protection Fund post](https://x.com/bitget/status/2103321333405036792), [withdrawal resumption announcement](https://x.com/BitgetJP/status/2103698952600355029), [incident explanation](https://www.bitget.com/academy/12560603896113) | $351.6M, then ~$388M from 12 addresses on 11 chains; third-party security product; keys and cold wallets untouched. |
+| Bitget | [Security notice](https://www.bitget.com/support/articles/12560603896024), [Mandiant status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf), [SlowMist investigation progress report](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf), [Protection Fund post](https://x.com/bitget/status/2103321333405036792), [withdrawal resumption announcement](https://x.com/BitgetJP/status/2103698952600355029), [incident explanation](https://www.bitget.com/academy/12560603896113) | $351.6M, then ~$388M from 12 addresses on 11 chains; third-party security product; keys and cold wallets untouched. |
 | Liquid Network | [Blockstream assessment](https://blog.blockstream.com/liquid-network-security-incident-assessment/), [status page](https://status.blockstream.com/incidents/b8b719f3-db70-4487-9cff-946e69509228), [Elements v23.3.4](https://github.com/ElementsProject/elements/releases/tag/elements-23.3.4) | Two cache-key bugs; about 4,000 BTC pegged out through SideSwap; 3,400 BTC returned, about 598.5 BTC outstanding; three-stage recovery plan ([incident report](https://x.com/Liquid_BTC/status/2097404704028545175), [release update](https://x.com/Liquid_BTC/status/2097695714310521331) on X). |
 | D'CENT Wallet | [App Wallet incident report](https://store.dcentwallet.com/blogs/post/app-wallet-incident-report) | App Wallet before 8.1.0 only; root cause and loss withheld. |
 | Chainflip | [TRON USDT exploit post-mortem](https://chainflip.io/blog/tron-usdt-exploit-what-happened-and-what-happens-next) | Six unauthorised payouts, 736,442.17 USDT; users to be made whole. |
@@ -395,7 +404,7 @@ This section lists what could not be found or verified while writing this articl
 | Payy root cause | Payy's GitHub advisory describing a verifier flaw is dated June 2026; not confirmed to be the 24 September root cause. | Payy's post-mortem on X, polybase/payy GitHub, CVE-2026-48100 |
 | Symbiosis loss | The ~$775k figure appears only in SlowMist; press reports a ~$336k cash-out. | Symbiosis statements, Rekt, BlockSec |
 | Limit Break loss | PeckShield gives ~$6.6M ($3.4M returned), SlowMist ~$2.8M. | Limit Break, Magic Eden, PeckShield |
-| Bitget timeline | Mandiant dates the intrusion to 24 September, SlowMist (via Rekt) to 31 August. | Mandiant's final report, SlowMist's Bitget analysis |
+| Bitget timeline | Mandiant dates the intrusion to 24 September; SlowMist's progress report finds activity on Product A from 31 August. SlowMist had not yet established how the attacker moved between the systems. | Mandiant's final report, SlowMist's final report |
 | Liquid date | Chainalysis places the exploit on the weekend of 7–8 September; the Liquid Federation's report says 6 September 15:53 UTC. | Liquid Federation, Blockstream assessment, block 4,050,336 |
 | Unknown Gnosis Safe victim | The owner of the Safe drained of ~$7.73M on 15 September is not identified. | Kelp DAO, BlockSec Phalcon, PeckShield |
 | Analytics reports | Chainalysis and Elliptic reports exist only for Bitget and Liquid; none found for the other September incidents. | chainalysis.com/blog, elliptic.co/insights, trmlabs.com blog |
@@ -445,7 +454,7 @@ They use different scopes and price snapshots. PeckShield counts "major hacks" (
 
 **Q: In the Bitget incident, why did secure key storage not prevent the theft?**
 
-The attacker never needed the keys. According to Mandiant, it took over two third-party security appliances, moved from one of them to the production wallet job server and deployed malicious packages there; SlowMist adds that it used a custom tool that forged risk-control parameters and submitted withdrawals through the normal process. The wallet system then signed transactions it believed were legitimate.
+The attacker never needed the keys. According to Mandiant, it took over two third-party security appliances, moved from one of them to the production wallet job server and deployed malicious packages there; SlowMist's investigation report adds that the attacker entered appliance B with an internal employee's identity and ran a custom tool that forged risk-control parameters and submitted withdrawals through the normal process. The wallet system then signed transactions it believed were legitimate.
 
 **Q: How could a cache create money on Liquid Network?**
 
@@ -487,6 +496,7 @@ A transfer bug is bounded by the balance the vulnerable contract holds or is app
 
 - [Bitget: Security notice, exchange hot wallets incident, 24 September 2026](https://www.bitget.com/support/articles/12560603896024)
 - [Mandiant: Bitget incident response status report, 28 September 2026 (PDF)](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf)
+- [SlowMist: Investigation Progress Report - Bitget, as of 29 September 2026 (PDF)](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf)
 - [Bitget: about the Bitget Protection Fund, 25 September 2026 (on X)](https://x.com/bitget/status/2103321333405036792)
 - [Bitget Japan: phased withdrawal resumption, 26 September 2026 (on X)](https://x.com/BitgetJP/status/2103698952600355029)
 - [Bitget: security incident explained, updated 3 October 2026](https://www.bitget.com/academy/12560603896113)

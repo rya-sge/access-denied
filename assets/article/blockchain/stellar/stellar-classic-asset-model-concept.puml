@@ -1,0 +1,24 @@
+@startuml
+title Stellar Classic asset model
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+rectangle "Issuing account (G...)\nflags: AUTH_REQUIRED, AUTH_REVOCABLE,\nAUTH_CLAWBACK_ENABLED, AUTH_IMMUTABLE\nhome_domain -> stellar.toml" as ISS
+rectangle "Distribution account\nTrustline CODE:ISSUER\nbalance, limit, flags" as DIST
+rectangle "Holder account\nTrustline CODE:ISSUER\nAUTHORIZED / MAINTAIN_LIABILITIES\nTRUSTLINE_CLAWBACK_ENABLED" as HOLD
+rectangle "Stellar Asset Contract (SAC)\nSEP-41 + admin functions\ncontract balances in contract data" as SAC
+rectangle "SDEX order book\nand AMM pools" as DEX
+ISS --> DIST : Payment = mint
+DIST --> HOLD : Payment / PathPayment
+HOLD --> ISS : Payment to issuer = burn
+ISS ..> HOLD : SetTrustLineFlags / Clawback
+SAC ..> HOLD : reads and writes the same trustline
+HOLD --> DEX : offers, pool deposits
+@enduml
