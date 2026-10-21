@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Polaris
+** Bonding curve
+*** p = alpha * s^beta, 0 < beta < 1
+*** Reserve = 1/(1+beta) of market cap
+*** Scale-free price response
+*** Spot price and rising floor price
+** Fee Router
+*** Burn revenue at the floor
+*** Rebuy pETH at spot
+*** Distribute through pETH flows
+** pETH split
+*** fpETH: floor component
+*** vpETH: market premium
+** Reserve Loans
+*** Borrow ETH against fpETH
+*** Up to 100% of floor, no liquidation
+*** Fee = share of floor growth
+left side
+** pAsset markets
+*** USDp, GOLDp, MCR 115%
+*** Adaptive Peg Defense
+*** Peg Stability and Protocol Safety rates
+*** Earn Pool, then redistribution
+*** Defensive (<110%) and Recovery (<100%)
+** Oracles
+*** Medianizer, up to 3 feeds
+*** Only for pAsset reference prices
+** POLAR
+*** One-way pETH conversion, Dutch auction
+*** sPOLAR: 2 weeks to 4 years, NFT
+*** Bounded stewardship
+@endmindmap

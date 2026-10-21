@@ -1,0 +1,28 @@
+@startuml
+title Polaris - components around the pETH bonding curve
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+component "Bonding curve\n(pETH, ETH reserve)" as BC
+component "Fee Router" as FR
+component "Splitter\n(fpETH / vpETH)" as SP
+component "Reserve Loans manager" as RL
+component "pAsset market\n(USDp, GOLDp)" as MKT
+component "Earn Pool" as EP
+component "Medianizer" as MED
+component "POLAR / sPOLAR" as POL
+BC --> FR : swap fees (pETH)
+FR --> BC : floorSellAndBurn + buy
+BC --> SP : split / merge pETH
+SP --> RL : fpETH collateral
+RL --> BC : borrow ETH from reserve
+RL --> FR : loan fees
+MKT --> BC : pETH collateral
+MED --> MKT : ETH/USD, XAU/USD
+MKT --> EP : minter interest, liquidations
+MKT --> POL : minter interest share
+POL --> FR : conversion value
+@enduml

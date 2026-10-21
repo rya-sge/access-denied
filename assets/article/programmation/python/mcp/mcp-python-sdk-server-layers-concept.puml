@@ -1,0 +1,21 @@
+@startuml
+title MCP Python SDK v2 - server layers
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ComponentBackgroundColor #EAF6F0
+skinparam ComponentBorderColor #2E8B67
+component "Transport\n(stdio / SSE / Streamable HTTP)" as T
+component "JSONRPCDispatcher\n(ids, tasks, cancel, progress)" as D
+component "ServerRunner\n(versions, initialize, init gate)" as R
+component "Middleware\n(OTel, RequestStateBoundary)" as M
+component "Server (low level)\n(method -> handler)" as S
+component "MCPServer\n(Tool/Resource/PromptManager)" as H
+component "mcp-types\n(models, per-version validators)" as Y
+T --> D : SessionMessage
+D --> R : method, params
+R --> M
+M --> S
+S --> H : on_* handlers
+R ..> Y
+H ..> Y
+@enduml

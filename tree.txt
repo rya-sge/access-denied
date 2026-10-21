@@ -1151,3 +1151,15 @@ _posts/2026-10-15-stellar-classic-assets-erc20-erc7943.md
   assets/article/blockchain/stellar/stellar-classic-asset-model-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/stellar/stellar-classic-issuance-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-19-mcp-python-sdk-server-architecture-security.md
+  assets/article/programmation/python/mcp/2026-10-19-mcp-python-sdk-server-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/python/mcp/mcp-python-sdk-server-layers-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/python/mcp/mcp-python-sdk-tool-call-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-21-polaris-peth-bonding-curve-passets.md
+  assets/article/blockchain/defi/polaris/2026-10-21-polaris-peth-bonding-curve-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/polaris/polaris-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/polaris/polaris-fee-router-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

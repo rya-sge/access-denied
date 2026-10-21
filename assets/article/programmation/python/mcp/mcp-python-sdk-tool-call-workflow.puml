@@ -1,0 +1,30 @@
+@startuml
+title tools/call through the MCP Python SDK server
+skinparam shadowing false
+skinparam ParticipantBackgroundColor #EAF6F0
+skinparam ParticipantBorderColor #2E8B67
+participant Client
+participant Transport
+participant Dispatcher
+participant Runner
+participant "Server registry" as S
+participant "MCPServer / Tool" as H
+Client -> Transport : tools/call
+Transport -> Dispatcher : SessionMessage
+Dispatcher -> Runner : on_request (own task)
+Runner -> Runner : version check, init gate,\nparams model_validate
+Runner -> S : get_request_handler
+S -> H : _handle_call_tool
+H -> H : validate args (Pydantic)\nrun function\nconvert result
+alt success
+  H --> Runner : CallToolResult
+else ToolError / ValidationError
+  H --> Runner : is_error=True, message
+else unexpected exception
+  H --> Runner : is_error=True, generic message
+else MCPError
+  H --> Runner : JSON-RPC error
+end
+Runner --> Dispatcher : serialised result
+Dispatcher --> Client : response
+@enduml

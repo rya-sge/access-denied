@@ -1,0 +1,24 @@
+@startuml
+title Polaris - Fee Router processing of pETH revenue
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+participant "Fee sources\n(swaps, loans, conversions)" as SRC
+participant "Fee Router" as FR
+participant "Bonding curve" as BC
+participant "pETH flow recipients" as REC
+SRC -> FR : pETH fees
+FR -> BC : floorSellAndBurn(fees)
+note right of BC : floorSupply += fees\nfloor price rises, spot unchanged
+BC --> FR : ETH = R(Sf + fees) - R(Sf)
+FR -> BC : buy(pETH) with released ETH (no fee)
+note right of BC : virtualSupply grows\nspot price rises
+BC --> FR : newly minted pETH
+FR -> REC : distribute pETH
+@enduml

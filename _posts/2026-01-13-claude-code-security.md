@@ -184,7 +184,7 @@ Claude Code supports **Model Context Protocol (MCP)** servers, which extend agen
 - Permissions can be scoped per MCP tool
 - Anthropic does not audit third-party MCP servers
 
-Best practice is to use internally developed or well-audited MCP providers.
+Best practice is to use internally developed or well-audited MCP providers. The server side of that trust relationship is covered in [How the MCP Python SDK Server Works: Architecture, Request Lifecycle and Security]({{site.url_complet}}/2026/10/19/mcp-python-sdk-server-architecture-security/).
 
 ------
 
@@ -244,6 +244,7 @@ While no system is immune to all attacks, Claude Code significantly reduces risk
 ### Related articles
 
 - [How Charrette Works: Architecture of an Agent Skill Collection That Plans Before It Codes]({{site.url_complet}}/2026/10/13/charrette-agent-skills-architecture/)
+- [How the MCP Python SDK Server Works: Architecture, Request Lifecycle and Security]({{site.url_complet}}/2026/10/19/mcp-python-sdk-server-architecture-security/)
 
 ## Mindmap
 

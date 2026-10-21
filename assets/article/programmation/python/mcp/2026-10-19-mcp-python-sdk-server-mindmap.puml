@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* MCP Python SDK server (v2)
+** Layers
+*** Transport
+*** JSONRPCDispatcher
+*** ServerRunner + middleware
+*** Low-level Server registry
+*** MCPServer managers
+** Primitives
+*** Tools: schema from type hints
+*** Resources: RFC 6570 templates
+*** Prompts and completions
+*** Structured output
+** Lifecycle
+*** Handshake era: initialize
+*** Modern era 2026-07-28: _meta envelope
+*** Multi-round-trip requests
+*** Context and lifespan
+** Transports
+*** stdio
+*** SSE (legacy)
+*** Streamable HTTP
+**** stateful / stateless / modern
+** Security
+*** DNS rebinding protection (localhost default)
+*** 4 MiB body limit
+*** Sessions: cap, idle expiry, principal binding
+*** OAuth 2.1 resource server
+**** TokenVerifier, scopes, RFC 9728
+**** validate_token_resource (RFC 8707)
+*** Argument validation, generic crash errors
+*** ResourceSecurity + safe_join
+*** Sealed requestState
+*** Left to the host: prompt injection, tool poisoning
+@endmindmap
