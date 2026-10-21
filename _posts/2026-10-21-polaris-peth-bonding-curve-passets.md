@@ -20,6 +20,18 @@ This article explains the system from two sources. The first is the public docum
 
 [TOC]
 
+## What you need to know first
+
+The article assumes familiarity with DeFi and Ethereum, and uses the following more specific mechanisms without re-deriving them.
+
+- **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/) vaults. Below a minimum collateral ratio the position can be liquidated, and a system can also track the ratio of all collateral to all debt to restrict operations under stress, which is what Polaris's Defensive and Recovery modes do.
+- **Peg arbitrage, stability pool and redistribution.** [Liquity](https://www.liquity.org/) keeps its stablecoin near one dollar by letting anyone redeem it for collateral at face value, and liquidates without auctions: a pool of stablecoin depositors absorbs bad debt first, and leftover debt is shared among all other positions. Polaris keeps both liquidation stages and applies peg arbitrage on both sides of the peg.
+- **Marginal price and price impact.** When price depends on the quantity traded, as in an [automated market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/), the quoted price applies only to an infinitesimal trade, and a real trade pays the average over the range it moves through. On a bonding curve that cost is the area under the price curve, which is why integrals appear below.
+- **Splitting a token into components.** [Pendle](https://www.pendle.finance/) splits a yield-bearing token into principal and yield parts that trade separately and recombine into the original. Polaris splits pETH into floor and premium and relies on the same split-and-merge arbitrage.
+- **Vote-escrowed staking.** A holder locks tokens for a chosen period, often up to four years, in exchange for voting power and revenue that depend on the lock length, a model popularised by Curve's veCRV. sPOLAR follows it, with each position held as a transferable NFT.
+- **Fixed-point arithmetic and fractional powers.** Solidity has no floating point, so fractions are integers scaled by $$10^{18}$$ and every rounding decides whether the user or the protocol keeps the dust. A power such as $$s^{\beta}$$ with fractional $$\beta$$ is computed as $$2^{\beta \cdot \log_2 s}$$ by libraries such as [PRBMath](https://github.com/PaulRBerg/prb-math) and [ABDK](https://github.com/abdk-consulting/abdk-libraries-solidity), which the Polaris prototype compares.
+- **Invariant testing.** In Foundry, the fuzzer calls a handler contract in random sequences and checks after every call that the `invariant_*` functions still hold. The prototype uses it to show that the curve's reserve accounting never drifts.
+
 ## The architecture at a glance
 
 Polaris has three layers, all of them denominated in or backed by pETH.
@@ -57,7 +69,9 @@ The documentation describes the core contracts as immutable, with no admin role 
 
 ### A power-law price
 
-The prototype contract `BaseBondingCurve.sol` defines the curve in a single comment: `p = A * s^B`. Writing $$\alpha$$ for `A` and $$\beta$$ for `B`, the marginal price of pETH at supply $$s$$ and the ETH reserve needed to reach that supply are:
+A bonding curve is a contract that is the market for its own token. There is no order book and no liquidity provider: the contract mints a token when someone pays the reserve asset in, burns it when someone hands it back, and quotes a price that depends only on how many tokens exist. For Polaris the token is pETH and the reserve asset is ETH.
+
+The prototype contract `BaseBondingCurve.sol` gives the price rule in a single comment: `p = A * s^B`. Writing $$\alpha$$ for `A` and $$\beta$$ for `B`, the curve is defined by two functions of the supply $$s$$:
 
 $$
 \begin{aligned}
@@ -66,9 +80,29 @@ R(s) &= \int_0^{s} \alpha \, x^{\beta} \, dx = \frac{\alpha \, s^{\beta + 1}}{\b
 \end{aligned}
 $$
 
-The constructor enforces `params.beta > 0` and `params.beta < DECIMAL_PRECISION`, so $$\beta$$ is strictly between 0 and 1 in 18-decimal fixed point. The curve is therefore concave: price rises with supply, but more slowly as supply grows. $$\alpha$$ is stored in a mutable slot because `init()` can set it once. $$\beta$$ is `immutable`.
+The symbols mean the following:
 
-The contract never evaluates the integral. It keeps the reserve on the curve through a "reserve ratio" identity, implemented in `_getReserveRatioLeftFormula` and `_getBalanceFromReserveRatio`:
+- **$$s$$** is the supply coordinate on the curve. In the code it is `virtualSupply()`, which, as the floor section below explains, is the circulating pETH plus the pETH already burnt at the floor.
+- **$$p(s)$$** is the *marginal* price: the ETH cost of one more infinitesimally small unit of pETH at supply $$s$$. It is the spot price returned by `currentPrice()`.
+- **$$\alpha$$** is a scale factor. Doubling it doubles every price and every reserve amount without changing the shape of the curve. The constructor caps it (`MAX_ALPHA`), and `init()` can set it once if it was not set at deployment.
+- **$$\beta$$** is the exponent and sets how fast the price grows with supply. It is `immutable`, and the constructor enforces `params.beta > 0` and `params.beta < DECIMAL_PRECISION`, so in 18-decimal fixed point $$\beta$$ is strictly between 0 and 1.
+- **$$R(s)$$** is the ETH the curve must hold when the supply is $$s$$, which is the variable `virtualBalance`.
+
+The reserve is an integral because each unit of pETH was bought at the marginal price in force when it was minted. Adding up the price of every unit from 0 to $$s$$ is the area under the price curve, and for a power function that area has the closed form above. The same reasoning prices any trade: moving from supply $$s_1$$ to $$s_2$$ costs (or, for a sale, pays) the area between the two points, $$R(s_2) - R(s_1)$$.
+
+The bound on $$\beta$$ decides how the price grows. With $$\beta = 0$$ the price would be the constant $$\alpha$$ and the curve would be a fixed-rate wrapper of ETH. With $$\beta = 1$$ it would be a straight line, the price rising by the same amount for every unit minted. With $$\beta$$ between the two, the curve is concave: price rises with supply, but each additional unit raises it by less than the previous one, so large supplies see a smaller price impact per pETH. Holding the reserve at a constant share of the token's market value, as shown below, makes this the same family of curves as Bancor's constant-reserve-ratio design.
+
+A worked example with the parameters of the repository's tests, $$\alpha = 2$$ and $$\beta = 0.5$$ (so $$p(s) = 2\sqrt{s}$$ and $$R(s) = \frac{4}{3} s^{1.5}$$), fees ignored:
+
+| Supply $$s$$ | Spot price $$p(s)$$ | Reserve $$R(s)$$ |
+|---|---|---|
+| 100 | 20 | 1,333.33 |
+| 121 | 22 | 1,774.67 |
+| 144 | 24 | 2,304.00 |
+
+A buyer who takes the supply from 100 to 121 receives 21 pETH and pays $$R(121) - R(100) = 441.33$$ ETH, an average of about 21.02 ETH per pETH. That average lies between the spot price before the trade (20) and after it (22), which is the price impact of the trade. A seller who returns the same 21 pETH moves the curve back to 100 and receives the same 441.33 ETH, so a round trip without fees costs nothing. The next 23 pETH, from 121 to 144, cost 529.33 ETH and raise the price by another 2 ETH: in this example the price rises by 2 for every step of the square root of the supply, which is the concavity at work.
+
+The contract never evaluates the integral. It keeps the reserve on the curve through a "reserve ratio" identity, obtained by multiplying the expression for $$R$$ by $$\beta + 1$$, and implemented in `_getReserveRatioLeftFormula` and `_getBalanceFromReserveRatio`:
 
 $$
 \begin{aligned}
@@ -76,7 +110,13 @@ $$
 \end{aligned}
 $$
 
-A buy of $$\Delta$$ pETH computes the new reserve from the new supply and charges the difference. A sell does the reverse. The invariant test `invariant_ReserveRatio` asserts that `reserveRatioDeviation()` is exactly zero after every handler call.
+Each trading function uses this identity in one direction or the other:
+
+- **Buy a given amount of pETH** (`getBuyAmount`): compute the new supply $$s + \Delta$$, derive the reserve it requires, and charge the difference with the current `virtualBalance`. The division by $$\beta + 1$$ is rounded up, so rounding favours the curve.
+- **Sell a given amount of pETH** (`getSellAmount`): compute the reserve at $$s - \Delta$$ and pay out the difference.
+- **Spend a given amount of ETH** (`getBuyBcTokenAmountFromReserve`): invert the identity to find the supply that a reserve $$R$$ supports, $$s = \left(\frac{(\beta + 1) R}{\alpha}\right)^{\frac{1}{\beta + 1}}$$, then recompute the reserve from that supply and return any rounding leftover.
+
+The invariant test `invariant_ReserveRatio` asserts that `reserveRatioDeviation()`, the difference between the two sides of the identity, is exactly zero after every handler call.
 
 ### Why the curve is called scale-free
 
@@ -170,7 +210,7 @@ The split is reversible at any time, so one fpETH plus one vpETH should trade cl
 | Floor up, premium down | 0.82 ETH | 0.23 ETH | 1.05 ETH |
 | Floor up, premium up | 0.85 ETH | 0.40 ETH | 1.25 ETH |
 
-fpETH is the low-volatility side: an ETH-denominated asset whose yield is the growth of the floor, not validator rewards or borrower interest. vpETH carries the premium, and the documentation suggests it can be used to hedge. A minter who shorts vpETH keeps the pETH collateral and the floor growth while removing exposure to the premium, leaving only the ETH/USD exposure, which can be hedged elsewhere. The comparison the documentation draws is with [Pendle](https://www.pendle.finance/). Pendle splits a yield-bearing asset into fixed and variable yield, whereas Polaris splits its asset into floor and premium.
+fpETH is the low-volatility side: an ETH-denominated asset whose yield is the growth of the floor, not validator rewards or borrower interest. vpETH carries the premium, and the documentation suggests it can be used to hedge. A minter who shorts vpETH keeps the pETH collateral and the floor growth while removing exposure to the premium, leaving only the ETH/USD exposure, which can be hedged elsewhere. The comparison the documentation draws is with Pendle. Pendle splits a yield-bearing asset into fixed and variable yield, whereas Polaris splits its asset into floor and premium.
 
 Secondary-market prices of the two halves need not equal the curve's current floor and premium. fpETH may trade above the floor if buyers pay in advance for future floor growth, and below it only to the extent that the Reserve Loan route described next does not arbitrage the discount away.
 
@@ -221,7 +261,7 @@ Because interest is paid in the pAsset while minters also receive pETH-denominat
 
 ### Liquidations, Earn Pools and redistribution
 
-Liquidations stay inside the protocol, with no external auction. Readers who know [Liquity](https://www.liquity.org/) will recognise the two-stage structure of its Stability Pool and redistribution:
+Liquidations stay inside the protocol, with no external auction. Readers who know Liquity will recognise the two-stage structure of its Stability Pool and redistribution:
 
 1. **Earn Pool first.** Depositors of the pAsset supply the funds that cancel a liquidated position's debt, and the pool receives the position's pETH collateral. Since liquidation happens above 100% collateralization, the pETH received normally exceeds the pAssets burnt. Depositors earn a protocol-defined minimum share of minter interest plus these liquidation gains. Each deposit is a transferable NFT, and auto-compounding [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) wrappers are left to third parties.
 2. **Redistribution second.** If the pool cannot absorb the whole position, the remaining debt and collateral are spread proportionally across the other open positions in that market.
@@ -382,6 +422,23 @@ The market is in Recovery Mode, so the redemption pays 90% of face value in pETH
 **Q: Why is POLAR conversion one-way, and what does it do to pETH?**
 
 If POLAR could be converted back into pETH, part of the value of each conversion would have to be held in reserve to honour that exit. With a one-way conversion, the burnt pETH releases ETH from the curve, part of it may be rebated to the converter, and the rest is routed through the Fee Router into the floor. Each conversion therefore reduces pETH supply, raises the floor for remaining holders and increases POLAR supply, without a perpetual emission schedule.
+
+## Gaps
+
+The sources leave the following points open. They should be checked, or the article updated, once the production contracts and parameters are published.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The `bonding-curve` repository is a math-library prototype, not the deployed protocol. | All code-level statements (state variables, `floorSellAndBurn`, flat fee) may differ in production. | The production Polaris contracts and their deployment addresses, once published. |
+| Production values of $$\alpha$$ and $$\beta$$ are not given. | The floor-to-spot ratio and the price elasticity depend on them; the article uses the test value $$\beta = 0.5$$. | Mainnet deployment parameters or a Polaris parameter page. |
+| The spike-and-decay swap-fee and peg-fee formulas are only described in prose. | The cost of a trade and the size of revenue routed to the floor depend on them. | The fee contract source or a formal specification. |
+| The Reserve Loan fee curve (share of floor growth as a function of utilization) is not specified. | Borrowers cannot compute their cost, and the docs example assumes 1%. | The Reserve Loans manager contract. |
+| How Adaptive Peg Defense splits debt, collateral and fees across positions is not specified. | It determines how a minter's position changes without their action. | The pAsset market accounting code. |
+| The Peg Stability Rate and Protocol Safety Rate update functions are not specified. | Effective minting cost and market behaviour under stress depend on them. | The interest-rate contracts. |
+| The prototype's `redeemFpToken` transfers reserve without updating `virtualBalance` or `floorBalance`, and no test exercises it. | It would break the reserve-balance invariant if used as written. | The production splitter and its interaction with the curve. |
+| Oracle feeds, staleness thresholds, POLAR allocation, Earn Pool minimum share and sPOLAR revenue split are announced for later. | Oracle risk, token supply and yield distribution cannot be assessed without them. | Polaris announcements and the docs at mainnet launch. |
+| No audit report appeared in either source. | Security claims rely on the docs alone. | Polaris audit reports, if published. |
+| Several statements come from general knowledge or inference rather than the sources: the Bancor and Liquity comparisons, the description of veCRV, and the Fee Router's net supply reduction. | They are stated in the article as background or derivation. | Bancor's whitepaper, Liquity's documentation, Curve's documentation, and the Fee Router code. |
 
 ## References
 
