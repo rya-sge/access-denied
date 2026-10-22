@@ -379,6 +379,72 @@ Stewardship is limited to a fixed list of parameters:
 
 This limit does not remove governance risk, and the documentation's risk page says so: the choice of flow recipients, rate splits and oracle feeds still shapes yields and liquidity across the system.
 
+## Risks
+
+The documentation has a [risk page](https://docs.polaris.finance/risks) that lists smart-contract, market, peg, oracle, Earn Pool, stewardship and execution risks. This section covers the same ground with the details from the code and the testnet, and adds the risks that follow from the design itself. Points marked *derived* are this article's analysis rather than statements from the sources; on-chain observations are from the Sepolia testnet on 22 October 2026.
+
+### Smart contracts and transparency
+
+- **No published source for the deployed contracts.** As of 22 October 2026 the testnet contracts are not verified on Etherscan or Sourcify, the core repositories are not public, and neither source contains an audit report. A user cannot yet check that the deployed code matches the documentation.
+- **Immutability cuts both ways.** The documentation states that the core contracts cannot be upgraded or paused. On the protective side, nobody can upgrade them to a malicious or buggy new version, swap the logic behind users' positions, or change the rules after a user has deposited, which removes the upgrade and admin-key risk that many DeFi protocols carry. On the other side, a bug in the curve, the market accounting or the Reserve Loans contract could not be fixed in place: the fix would be a new deployment and a migration.
+- **Unusual accounting.** Adaptive Peg Defense and redistribution change every position's debt and collateral through shared accumulators, the Fee Router burns and rebuys on the same curve, and Reserve Loans charge every borrower on each interaction. Shared-accumulator code of this kind is where rounding and ordering bugs have appeared in comparable CDP systems (*derived*).
+
+### External dependencies and oracles
+
+- **Oracles for the pAssets.** pETH has no oracle, but every pAsset market needs at least ETH/USD, and GOLDp needs XAU/USD as well. A wrong, stale or manipulated feed misprices collateral, which triggers or blocks liquidations and redemptions.
+- **Fallback to the last valid price.** When no feed is valid, the Medianizer keeps returning the last valid price. That keeps the market running, but during a fast move the price used can be stale for as long as the feeds are down. The testnet XAU/USD Medianizer exposes a `MAX_STALENESS_THRESHOLD()` of 7 days, an upper bound on the configurable staleness rather than the setting itself, which was not read.
+- **Which feeds are used is not yet known.** The launch feeds were still to be announced, so the oracle risk cannot be assessed provider by provider.
+- **Ethereum and WETH.** The reserve is wrapped ETH (WETH on the testnet), and the protocol inherits Ethereum's risks: congestion that delays liquidations and arbitrage, MEV around peg operations and Fee Router rebuys, and censorship by some block builders.
+
+### Depeg
+
+- **USDp and GOLDp depend on arbitrage.** The peg holds only while arbitrageurs find it profitable to buy at peg above the target and redeem at peg below it. Gas costs, peg fees, thin secondary liquidity or slow oracles widen the band in which the price can drift.
+- **The above-peg defence is switched off under stress.** In Defensive Mode, buying at peg is restricted, so a pAsset trading above its target in a stressed market loses its main supply-side correction (*derived* from the Defensive Mode rules).
+- **The below-peg defence weakens in Recovery Mode.** Below 100% backing, redemptions pay in proportion to the backing, so a market backed at 90% redeems at 90% of face value. A pAsset in that state can trade below its peg with no arbitrage pulling it back to 1.
+- **pETH is not pegged to ETH.** pETH trades at its spot price, above a floor. If demand for pETH falls, the spot price can fall as far as the floor, which on the testnet was 39.4% below the spot price. A holder who bought at the spot price carries that premium risk in ETH terms, before any ETH/USD move.
+
+### Collateral quality and reflexivity
+
+- **Two layers of volatility.** A USDp position's collateral is worth (pETH price in ETH) × (ETH price in USD). A fall in ETH and a fall in the pETH premium compound, so the 115% minimum ratio covers a combined move, not an ETH move alone (*derived*).
+- **Possible feedback loop.** Liquidations hand pETH to Earn Pool depositors, who may sell it on the curve. Selling lowers the spot price, which lowers the collateral value of the remaining positions and can trigger more liquidations. Whether this loop exists depends on whether markets value pETH at its spot price or at its floor, which neither source states (*derived*; listed under Gaps).
+- **Manipulating the spot price is expensive at the testnet's β.** With $$\beta = 0.15$$, raising the spot price by 10% requires the curve's reserve to grow by a factor of $$1.1^{1.15 / 0.15} \approx 2.08$$, that is more than doubling it. On the testnet that would mean adding about 971,700 WETH to a reserve of about 902,600. A flatter curve makes short-lived price manipulation through the curve costly (*derived*).
+- **Yield depends on activity.** The floor grows only when fees, Reserve Loan charges and conversions feed the Fee Router. If activity stops, the floor stops rising, fpETH's yield goes to zero, and the premium that vpETH holders own depends only on expectations.
+
+### Reserve liquidity
+
+- **Lent ETH is not available to sellers.** Reserve Loans lend ETH out of the same reserve that pays pETH sellers. Neither source says what happens if many holders sell while a large share of the reserve is lent out, for example whether sales are limited until loans are repaid (*derived*; listed under Gaps).
+- **Leverage built on the floor.** Borrowing 100% of the floor value and buying more pETH or fpETH with it (looping) multiplies exposure to the premium and to the floor-growth rate. The loan itself cannot be liquidated, but the position built with the borrowed ETH can lose value.
+
+### Centralisation and governance
+
+- **Bounded, not absent.** Stewardship cannot change the curve, the collateral or the liquidation logic, but it does choose oracle feeds, flow recipients and their weights, interest-rate splits and conversion parameters. Those choices decide where the protocol's revenue goes and which prices the markets trust.
+- **Who holds stewardship power.** sPOLAR voting power follows staked POLAR, and the allocation of the initial 100 million POLAR between treasury, community, team and investors was not yet published. A concentrated allocation would concentrate stewardship.
+- **Owners on the testnet.** On 22 October 2026 the testnet's bonding curve, markets and Fee Router answered none of the usual owner, pause or admin getters. Several peripheral contracts did: the Earn Pool contracts (`stabilityPool`), the position and Reserve Loan NFTs, and the vote-escrow contracts return an `owner()` or `dao()` equal to [`0x11df…79D4`](https://sepolia.etherscan.io/address/0x11dfDAcb5A362e5C6fF35fA1538ed87b66c179D4), an upgradeable proxy that answers like an Aragon OSx DAO (`protocolVersion()` 1.4.0). The vote-escrow contract also defines `PAUSER_ROLE` and `SWEEPER_ROLE`. What these owners can do, and who controls the DAO, could not be determined without the source.
+- **Off-chain components.** The documentation, the testnet application and the list of contract addresses are served by the team. Users who rely on them for addresses or transaction data depend on those front ends being correct.
+
+### Liquidations and loss sharing
+
+- **Earn Pool depositors take the first loss.** If collateral falls fast or liquidations are late, the pETH received can be worth less than the pAssets burnt.
+- **Every position can absorb bad debt.** When the Earn Pool cannot cover a liquidation, the remainder is redistributed to all positions, including collateral-only positions that never borrowed. Their reward for supporting the market (peg fees, Protocol Safety Rate) comes with this exposure.
+- **Peg operations change positions without consent.** Adaptive Peg Defense resizes every position on each peg buy or redemption, so a minter's ratio and exposure change between their own transactions.
+
+### Regulatory
+
+- **A stablecoin with no issuer.** USDp is minted by immutable contracts with no company behind the issuance. How regulations such as MiCA, covered in [Stablecoins Under MiCA]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/), apply to a fully decentralised issuer, and to the front ends and integrators that distribute it, is not settled and may restrict access in some jurisdictions.
+
+### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|---|---|---|---|
+| Code | Unverified, unaudited (in the sources), immutable contracts | No admin key on the core: the logic cannot be upgraded to a malicious or buggy version | Bugs cannot be patched; code cannot yet be reviewed |
+| Oracle | ETH/USD and XAU/USD for pAssets | Medianizer with up to three feeds, timelocked replacement | Stale last-valid price; launch feeds unknown |
+| pAsset depeg | Arbitrage on both sides of the peg | Peg buys, redemptions, Peg Stability Rate | Peg buys restricted under stress; pro-rata redemptions below 100% |
+| pETH premium | Demand for pETH above its floor | Floor that only rises | Spot can fall to the floor (39.4% below spot on the testnet) |
+| Reflexive liquidations | pETH both collateral and liquidation proceeds | Low β makes the spot price hard to move | Valuation basis of pETH collateral not documented |
+| Reserve liquidity | Reserve Loans lend the reserve | Utilization-based fee | Behaviour of sells at high utilization not documented |
+| Governance | Stewardship of feeds, flows, splits | Hard limits on what stewards can change | Token allocation unknown; testnet periphery owned by a DAO proxy |
+| Loss sharing | Earn Pool, redistribution, Adaptive Peg Defense | Liquidation gains and fees compensate | Collateral-only positions can receive bad debt |
+
 ## Comparison with Liquity V2 (BOLD)
 
 The pAsset markets borrow the most from Liquity, and the closest current design is [Liquity V2]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/), whose stablecoin is BOLD. Both have an immutable core, mint a dollar against ETH-based collateral, and liquidate through a stability pool before redistributing leftover debt to the other positions. The Liquity V2 values below come from `contracts/src/Dependencies/Constants.sol` of its repository. Where the two differ is in what backs the debt, how the interest rate is set, who is redeemed against, and what happens under stress.
@@ -415,6 +481,7 @@ Polaris builds a stablecoin and synthetic-asset system on one collateral, pETH, 
 - **The floor** supports two primitives that a conventional collateral cannot: fpETH, an ETH-denominated asset whose yield is floor growth, and Reserve Loans, which lend up to 100% of that floor with no liquidation.
 - **pAsset markets** follow a Liquity-like design (Earn Pool, then redistribution) and add two-sided peg arbitrage whose debt is spread over existing positions, a self-adjusting Peg Stability Rate, a leverage-based Protocol Safety Rate, and per-market Defensive and Recovery modes.
 - **Governance** is limited to flows, splits, conversion parameters and oracle feeds. External prices enter only through a three-feed Medianizer.
+- **The main risks** are unverified and unaudited immutable code, oracle feeds for the pAssets, a peg defence that weakens under stress, a pETH premium that can fall to the floor, an undocumented collateral valuation basis that decides whether liquidations can feed on themselves, and stewardship powers whose holders are not yet known.
 - **Compared with Liquity V2**, Polaris has one collateral and several debt assets, a protocol-set rather than borrower-set interest rate, redemptions spread over all positions rather than the lowest-rate ones, and a Recovery Mode instead of a permanent branch shutdown.
 
 The protocol was in public testnet on Sepolia when the documentation was read, and several production parameters, including the swap-fee schedule and the launch oracles, were not published. The testnet contracts, read on 22 October 2026, give $$\beta = 0.15$$ and liquidation penalties of 5% and 15%, but their source is not verified and mainnet values may differ.
@@ -527,6 +594,8 @@ The sources leave the following points open. They should be checked, or the arti
 | The Peg Stability Rate and Protocol Safety Rate update functions are not specified. | Effective minting cost and market behaviour under stress depend on them. | The interest-rate contracts. |
 | The prototype's `redeemFpToken` transfers reserve without updating `virtualBalance` or `floorBalance`, and no test exercises it. | It would break the reserve-balance invariant if used as written. | The production splitter and its interaction with the curve. |
 | Oracle feeds, staleness thresholds, POLAR allocation, Earn Pool minimum share and sPOLAR revenue split are announced for later. | Oracle risk, token supply and yield distribution cannot be assessed without them. | Polaris announcements and the docs at mainnet launch. |
+| Whether pAsset markets value pETH collateral at the spot or the floor price, and what happens to pETH sales when much of the reserve is lent through Reserve Loans, are not documented. | Both decide whether the liquidation feedback loop and the reserve-liquidity risk described under Risks exist. | The market `priceFeed` contracts and the Reserve Loans manager. |
+| Testnet peripheral contracts (Earn Pools, position and loan NFTs, vote escrow) have an owner or `dao` that answers like an Aragon OSx DAO proxy at `0x11df…79D4`; its powers and controllers were not determined. | It bears on the centralisation risk and on the claim that no administrator can move user funds. | The DAO's plugins and permissions, and the source of the owned contracts. |
 | No audit report appeared in either source. | Security claims rely on the docs alone. | Polaris audit reports, if published. |
 | Liquidation penalties and gas compensation are known only from the testnet (5%, 15%, 0.0375 on 22 October 2026), the denomination of the gas compensation is not determined, and whether pETH collateral is valued at the spot or the floor price is not given. | Both are needed to compare liquidation incentives and collateral ratios with Liquity V2. | The market contracts' `priceFeed` logic and the mainnet values. |
 | The testnet `RECOVERY_MODE_RATIO()` getter reverts on the market contracts, and the Medianizer's actual staleness threshold was not read (only its maximum, `MAX_STALENESS_THRESHOLD() = 7 days`, and a `TIMELOCK_DURATION()` of 1 hour on the gold oracle). | The Recovery Mode trigger and oracle fallback timing are taken from the documentation only. | The contract holding the Recovery Mode ratio and the Medianizer's per-feed configuration. |

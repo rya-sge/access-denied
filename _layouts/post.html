@@ -65,8 +65,13 @@ layout: home
           archive). Kramdown cannot emit `loading` itself, and GitHub Pages runs
           Jekyll in safe mode so a plugin is not an option — a Liquid string
           replace on the rendered HTML is the portable way to do this.
+
+          `content` is already the post's converted HTML. It must not go through
+          `markdownify` again: a second kramdown pass treats the backslash of a
+          display formula's `\[` as an escape and drops it, which left a literal
+          "[" and "]" around every display formula on the site.
         {% endcomment %}
-        {% assign post_body = page.content | markdownify | replace: '<img src="', '<img loading="lazy" decoding="async" src="' %}
+        {% assign post_body = content | replace: '<img src="', '<img loading="lazy" decoding="async" src="' %}
         {% comment %}
           Table of contents.
 
