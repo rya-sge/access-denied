@@ -2,6 +2,7 @@
 layout: post
 title: "How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets"
 date:   2026-10-21
+last_modified_at: 2026-10-22
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -14,7 +15,7 @@ isMermaid: true
 
 [Polaris](https://polaris.finance/) is a pre-mainnet DeFi protocol on Ethereum that issues stablecoins and synthetic assets against a single collateral, pETH. pETH is not wrapped ETH. Its price comes from a bonding curve that holds ETH, and the curve gives it a floor price, measured in ETH, that protocol rules only allow to rise. Every other component of Polaris is built on that floor: the dollar USDp, the gold token GOLDp, a loan that cannot be liquidated, and a token split that separates the floor from the premium above it.
 
-This article explains the system from two sources. The first is the public documentation repository, read at a commit of October 2026. The second is the `bonding-curve` repository, a Foundry project that implements the power-law curve and compares two fixed-point math libraries. The second source is a prototype rather than the deployed protocol, so the article gives the curve's mathematics from the code and the rest of the architecture from the documentation, and it says which source each claim comes from.
+This article explains the system from three sources. The first is the public documentation repository, read at a commit of October 2026. The second is the `bonding-curve` repository, a Foundry project that implements the power-law curve and compares two fixed-point math libraries; it is a prototype rather than the deployed protocol. The third is the Polaris public testnet on Sepolia, whose contracts are deployed but not source-verified, and whose parameters were read on-chain on 22 October 2026. The article gives the curve's mathematics from the code, the rest of the architecture from the documentation, and testnet values where the contracts expose them, and it says which source each claim comes from.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -128,7 +129,7 @@ p \propto R^{\frac{\beta}{\beta + 1}} \quad \Longrightarrow \quad \frac{dp}{p} =
 \end{aligned}
 $$
 
-A deposit that grows the reserve by 1% moves the price by the same percentage at 1,000 ETH of reserve as at 1,000,000 ETH. That is the property the documentation calls a *scale-free design*: the price response of pETH depends on relative flows, not on absolute size. With $$\beta = 0.5$$, the value used in the repository's tests, a 1% increase in reserve raises the price by about 0.33%. The production value of $$\beta$$ is not given in either source.
+A deposit that grows the reserve by 1% moves the price by the same percentage at 1,000 ETH of reserve as at 1,000,000 ETH. That is the property the documentation calls a *scale-free design*: the price response of pETH depends on relative flows, not on absolute size. With $$\beta = 0.5$$, the value used in the repository's tests, a 1% increase in reserve raises the price by about 0.33%. The curve deployed on the Polaris testnet uses a much flatter $$\beta = 0.15$$ (read on 22 October 2026, see below), for which the same 1% increase raises the price by about 0.13%. The mainnet value is not published.
 
 ### The floor, from the code
 
@@ -158,6 +159,24 @@ The second ratio explains the documentation's table on $$\beta$$. For a given po
 `buy()` and `sell()` change `virtualBalance` and the real supply, but neither touches `floorSupply`. The floor moves only through `floorSellAndBurn()`, which is restricted to the Fee Router by `_requireOnlyFeeRouter()`. It burns $$\Delta$$ pETH, adds $$\Delta$$ to `floorSupply`, and sends the Fee Router the reserve between the old and the new floor points, $$R(S_f + \Delta) - R(S_f)$$. There is no function that decreases `floorSupply`, and since $$\beta \gt 0$$ the floor price can only increase. This is the code-level basis for the documentation's statement that "the pETH floor can only rise; it cannot fall".
 
 The burn leaves $$S_v$$ unchanged, so it raises the floor without changing the spot price. Two `require` statements bound it: the new floor supply cannot exceed the virtual supply, and `init()` requires a non-zero floor from the start so that `pow` is never evaluated at zero.
+
+### The curve deployed on the testnet
+
+The Polaris public testnet runs on Sepolia. Its web application (`testnet.polaris.finance`) lists the deployed contract addresses, and the pETH curve is at [`0x07ea…705e`](https://sepolia.etherscan.io/address/0x07ea2ff889e6228cded329a09f66e370f12c705e). Its source is not verified on Etherscan or Sourcify, but it still answers the prototype's public getters, so its state can be read directly. The values below were read on **22 October 2026**, at Sepolia block 11,969,272. They are **testnet values**, which can change at any time and need not match the mainnet deployment.
+
+| Getter | Testnet value (22 October 2026) |
+|---|---|
+| `B()`, the exponent $$\beta$$ | 0.15 |
+| `A()`, the scale $$\alpha$$ | ≈ 0.4513 |
+| `currentPrice()`, spot price | ≈ 3.0495 WETH per pETH |
+| `floorPrice()`, floor price | ≈ 1.8479 WETH per pETH |
+| `virtualSupply()` / `floorSupply()` | ≈ 340,386 / ≈ 12,068 pETH |
+| `virtualBalance()` / `floorBalance()` | ≈ 902,630 / ≈ 19,392 WETH |
+| `reserveToken()` | Sepolia WETH |
+
+These numbers are consistent with the formulas of the previous subsections. The floor-to-spot ratio predicted by $$\left(\frac{S_f}{S_v}\right)^{\beta}$$ is $$\left(\frac{12{,}068}{340{,}386}\right)^{0.15} \approx 0.606$$, and the ratio of the two prices returned by the contract is $$\frac{1.8479}{3.0495} \approx 0.606$$. The reserve-ratio identity also holds to within rounding: $$(\beta + 1) \cdot R(S_v)$$ and $$\alpha \, S_v^{\beta + 1}$$ both come to about 1,038,024. With $$\beta = 0.15$$, the curve holds $$\frac{1}{1.15} \approx 87\%$$ of pETH's market value in reserve, against 67% for the $$\beta = 0.5$$ of the tests.
+
+The deployed curve differs from the prototype in at least one respect: `FEE_PERCENTAGE()` reverts, and the application's interface instead calls functions named `buyFee`, `buyFeeParams` and `buyFeeState`. That is consistent with the documentation's dynamic, spike-and-decay swap fee.
 
 ### Swap fees and the math libraries
 
@@ -266,6 +285,8 @@ Liquidations stay inside the protocol, with no external auction. Readers who kno
 1. **Earn Pool first.** Depositors of the pAsset supply the funds that cancel a liquidated position's debt, and the pool receives the position's pETH collateral. Since liquidation happens above 100% collateralization, the pETH received normally exceeds the pAssets burnt. Depositors earn a protocol-defined minimum share of minter interest plus these liquidation gains. Each deposit is a transferable NFT, and auto-compounding [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) wrappers are left to third parties.
 2. **Redistribution second.** If the pool cannot absorb the whole position, the remaining debt and collateral are spread proportionally across the other open positions in that market.
 
+The documentation gives no liquidation penalty, but the testnet market contracts expose them. On 22 October 2026 both testnet markets (the dollar market at [`0xbdc1…6aa1`](https://sepolia.etherscan.io/address/0xbdc1fe97e787ae7f653ffbccd74ec49814fe6aa1) and the gold market at [`0x18f6…fe41`](https://sepolia.etherscan.io/address/0x18f652c41a5d30b4b49a9962800b34a6f1abfe41)) returned `LIQUIDATION_PENALTY_SP() = 5%`, `LIQUIDATION_PENALTY_REDISTRIBUTION() = 15%` and `fixedGasComp() = 0.0375` (18-decimal units, denomination not determined). They also returned `MCR() = 115%`, `DEFENSIVE_MODE_RATIO() = 110%` and `DEFENSIVE_MODE_MCR() = 150%`, which match the documentation. On the testnet the two pAssets are named pUSD and pGOLD rather than USDp and GOLDp.
+
 ### Defensive Mode and Recovery Mode
 
 Each market has two stress states, triggered by its own reserve-to-debt ratio and independent of the other markets and of the bonding curve.
@@ -321,6 +342,33 @@ Stewardship is limited to a fixed list of parameters:
 
 This limit does not remove governance risk, and the documentation's risk page says so: the choice of flow recipients, rate splits and oracle feeds still shapes yields and liquidity across the system.
 
+## Comparison with Liquity V2 (BOLD)
+
+The pAsset markets borrow the most from Liquity, and the closest current design is [Liquity V2](https://github.com/liquity/bold), whose stablecoin is BOLD. Both have an immutable core, mint a dollar against ETH-based collateral, and liquidate through a stability pool before redistributing leftover debt to the other positions. The Liquity V2 values below come from `contracts/src/Dependencies/Constants.sol` of its repository. Where the two differ is in what backs the debt, how the interest rate is set, who is redeemed against, and what happens under stress.
+
+| | Liquity V2 (BOLD) | Polaris (USDp, GOLDp) |
+|---|---|---|
+| Collateral | WETH, wstETH and rETH, one branch of contracts per collateral, all minting the same BOLD | One collateral, pETH, priced by the bonding curve; one market per pAsset |
+| Debt assets | BOLD only | USDp, GOLDp and any pAsset with an oracle; new markets are permissionless |
+| Minimum collateral ratio | 110% (WETH), 120% (wstETH, rETH) | 115% for USDp and GOLDp |
+| Minimum position | 2,000 BOLD of debt | None stated; collateral-only positions with no debt are allowed |
+| Interest rate | Chosen by each borrower, 0.5% to 250% a year; a 7-day upfront fee on opening, borrowing more, and on rate changes within 7 days | Peg Stability Rate set by net minting and redemption activity, minimum 0.05%, plus the Protocol Safety Rate transferring from high to low leverage |
+| Where interest goes | 75% to the branch's Stability Pool, 25% to LQTY-governed initiatives | A protocol-defined minimum to the Earn Pool, a share to sPOLAR, the rest to approved recipients |
+| Below the peg | Redemption at face value minus a fee of 0.5% plus a decaying base rate, against troves with the **lowest interest rate** first | Redemption at peg for pETH, spread across **all** positions of the market by Adaptive Peg Defense |
+| Above the peg | No minting at peg; a soft ceiling, as borrowers lower their rates when BOLD trades high | Anyone can buy newly minted pAssets at peg, the debt being spread across existing positions |
+| Liquidation | Stability Pool then redistribution; penalties of 5% (pool) and 10% or 20% (redistribution), plus gas compensation | Earn Pool then redistribution; on the testnet (22 October 2026), penalties of 5% (pool) and 15% (redistribution) and a fixed gas compensation of 0.0375, the same figure as Liquity V2's 0.0375 WETH |
+| Market-wide stress | Below the critical ratio (150% or 160%), operations must raise the branch's total ratio; below the shutdown ratio (110% or 120%) or on oracle failure, the branch shuts down permanently and urgent redemptions pay a 2% bonus | Defensive Mode below 110%, Recovery Mode below 100% with pro-rata redemptions; the market keeps running and can return to normal |
+| Oracle failure | Branch shutdown, using the last good price | Medianizer falls back to the last valid price; stewards replace the failed feed |
+| Yield on the collateral itself | Staking yield of wstETH or rETH accrues to the borrower | pETH floor growth and pETH flows accrue to holders and minters |
+| Positions | Troves are NFTs; delegation of rate setting and batch managers | Not described as NFTs; Earn Pool deposits and sPOLAR are NFTs |
+| Governance | LQTY staked with voting power growing with time, directing the 25% of interest | sPOLAR locked 2 weeks to 4 years, steering flows and a bounded parameter list |
+
+Three differences matter most for a user:
+
+- **Who carries a redemption.** In Liquity V2 the borrower chooses an interest rate knowing that the lowest rates are redeemed first, so the rate is also a price for redemption risk. In Polaris every position takes a pro-rata share of each redemption and of each peg buy, so no position is singled out, but no position can avoid them either.
+- **How the rate is set.** Liquity V2 leaves the rate to a market of individual borrowers. Polaris sets one rate per market from aggregate minting and redemption flows, and adds a separate transfer from leveraged to conservative positions.
+- **What happens below full backing.** Liquity V2 ends a failing branch with an irreversible shutdown. Polaris keeps the market open in Recovery Mode, pays redemptions in proportion to the remaining backing, and lets the ratio recover.
+
 ## Conclusion
 
 Polaris builds a stablecoin and synthetic-asset system on one collateral, pETH, whose price and floor come from a power-law bonding curve rather than from an oracle.
@@ -330,8 +378,9 @@ Polaris builds a stablecoin and synthetic-asset system on one collateral, pETH, 
 - **The floor** supports two primitives that a conventional collateral cannot: fpETH, an ETH-denominated asset whose yield is floor growth, and Reserve Loans, which lend up to 100% of that floor with no liquidation.
 - **pAsset markets** follow a Liquity-like design (Earn Pool, then redistribution) and add two-sided peg arbitrage whose debt is spread over existing positions, a self-adjusting Peg Stability Rate, a leverage-based Protocol Safety Rate, and per-market Defensive and Recovery modes.
 - **Governance** is limited to flows, splits, conversion parameters and oracle feeds. External prices enter only through a three-feed Medianizer.
+- **Compared with Liquity V2**, Polaris has one collateral and several debt assets, a protocol-set rather than borrower-set interest rate, redemptions spread over all positions rather than the lowest-rate ones, and a Recovery Mode instead of a permanent branch shutdown.
 
-The protocol was in public testnet on Sepolia when the documentation was read, and several production parameters, including $$\beta$$, the swap-fee schedule and the launch oracles, were not published in either source.
+The protocol was in public testnet on Sepolia when the documentation was read, and several production parameters, including the swap-fee schedule and the launch oracles, were not published. The testnet contracts, read on 22 October 2026, give $$\beta = 0.15$$ and liquidation penalties of 5% and 15%, but their source is not verified and mainnet values may differ.
 
 ![Mindmap of Polaris covering the pETH bonding curve and floor, the Fee Router, the fpETH/vpETH split, Reserve Loans, pAsset markets with Earn Pools and stress modes, oracles, and POLAR stewardship]({{site.url_complet}}/assets/article/blockchain/defi/polaris/2026-10-21-polaris-peth-bonding-curve-mindmap.png)
 
@@ -419,6 +468,10 @@ The most likely cause is Adaptive Peg Defense. If USDp traded above one dollar, 
 
 The market is in Recovery Mode, so the redemption pays 90% of face value in pETH, and every redeemer takes the same cut, so there is no gain in redeeming first. Redistribution of liquidations is also disabled, and a liquidation only proceeds if it keeps or raises the 90% ratio. The bonding curve is unaffected, and the market returns towards normal as the ETH price recovers, minters add collateral or repay, and liquidations and the Protocol Safety Rate improve the ratio.
 
+**Q: A borrower wants to avoid being redeemed against. How does that differ between Liquity V2 and Polaris?**
+
+In Liquity V2, redemptions hit troves in order of interest rate, lowest first, so a borrower lowers their redemption risk by paying a higher rate than other borrowers. The 7-day upfront fee on rate changes stops them from raising the rate only when a redemption is about to happen. In Polaris, Adaptive Peg Defense spreads every redemption across all positions of the market, so a minter cannot avoid it by any choice of rate or collateral ratio. In return, the minter receives a share of the redemption fees.
+
 **Q: Why is POLAR conversion one-way, and what does it do to pETH?**
 
 If POLAR could be converted back into pETH, part of the value of each conversion would have to be held in reserve to honour that exit. With a one-way conversion, the burnt pETH releases ETH from the curve, part of it may be rebated to the converter, and the rest is routed through the Fee Router into the floor. Each conversion therefore reduces pETH supply, raises the floor for remaining holders and increases POLAR supply, without a perpetual emission schedule.
@@ -429,8 +482,8 @@ The sources leave the following points open. They should be checked, or the arti
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The `bonding-curve` repository is a math-library prototype, not the deployed protocol. | All code-level statements (state variables, `floorSellAndBurn`, flat fee) may differ in production. | The production Polaris contracts and their deployment addresses, once published. |
-| Production values of $$\alpha$$ and $$\beta$$ are not given. | The floor-to-spot ratio and the price elasticity depend on them; the article uses the test value $$\beta = 0.5$$. | Mainnet deployment parameters or a Polaris parameter page. |
+| The `bonding-curve` repository is a math-library prototype, and the testnet contracts on Sepolia are deployed but not source-verified on Etherscan or Sourcify (checked 22 October 2026). | Code-level statements (state variables, `floorSellAndBurn`) are confirmed only through the getters the testnet curve still answers; the rest may differ in production. | Verified or published source of the testnet and mainnet contracts. |
+| Only testnet values of $$\alpha$$ and $$\beta$$ are known ($$\beta = 0.15$$, $$\alpha \approx 0.4513$$, read 22 October 2026). | The floor-to-spot ratio and the price elasticity depend on them, and $$\beta$$ is `immutable`, so the mainnet value is fixed at deployment. | The mainnet curve's `A()` and `B()` once deployed. |
 | The spike-and-decay swap-fee and peg-fee formulas are only described in prose. | The cost of a trade and the size of revenue routed to the floor depend on them. | The fee contract source or a formal specification. |
 | The Reserve Loan fee curve (share of floor growth as a function of utilization) is not specified. | Borrowers cannot compute their cost, and the docs example assumes 1%. | The Reserve Loans manager contract. |
 | How Adaptive Peg Defense splits debt, collateral and fees across positions is not specified. | It determines how a minter's position changes without their action. | The pAsset market accounting code. |
@@ -438,6 +491,8 @@ The sources leave the following points open. They should be checked, or the arti
 | The prototype's `redeemFpToken` transfers reserve without updating `virtualBalance` or `floorBalance`, and no test exercises it. | It would break the reserve-balance invariant if used as written. | The production splitter and its interaction with the curve. |
 | Oracle feeds, staleness thresholds, POLAR allocation, Earn Pool minimum share and sPOLAR revenue split are announced for later. | Oracle risk, token supply and yield distribution cannot be assessed without them. | Polaris announcements and the docs at mainnet launch. |
 | No audit report appeared in either source. | Security claims rely on the docs alone. | Polaris audit reports, if published. |
+| Liquidation penalties and gas compensation are known only from the testnet (5%, 15%, 0.0375 on 22 October 2026), the denomination of the gas compensation is not determined, and whether pETH collateral is valued at the spot or the floor price is not given. | Both are needed to compare liquidation incentives and collateral ratios with Liquity V2. | The market contracts' `priceFeed` logic and the mainnet values. |
+| The testnet `RECOVERY_MODE_RATIO()` getter reverts on the market contracts, and the Medianizer's actual staleness threshold was not read (only its maximum, `MAX_STALENESS_THRESHOLD() = 7 days`, and a `TIMELOCK_DURATION()` of 1 hour on the gold oracle). | The Recovery Mode trigger and oracle fallback timing are taken from the documentation only. | The contract holding the Recovery Mode ratio and the Medianizer's per-feed configuration. |
 | Several statements come from general knowledge or inference rather than the sources: the Bancor and Liquity comparisons, the description of veCRV, and the Fee Router's net supply reduction. | They are stated in the article as background or derivation. | Bancor's whitepaper, Liquity's documentation, Curve's documentation, and the Fee Router code. |
 
 ## References
@@ -446,6 +501,8 @@ The sources leave the following points open. They should be checked, or the arti
 
 - [Polaris-Finance/polaris-docs](https://github.com/Polaris-Finance/polaris-docs) — analyzed at commit [`651688826fc9c58f39191fd4f1c0f50b4e6f126a`](https://github.com/Polaris-Finance/polaris-docs/tree/651688826fc9c58f39191fd4f1c0f50b4e6f126a), 2026-10-21
 - [Polaris-Finance/bonding-curve](https://github.com/Polaris-Finance/bonding-curve) — analyzed at commit [`2312169a0882071a41822440fa99493ba379218d`](https://github.com/Polaris-Finance/bonding-curve/tree/2312169a0882071a41822440fa99493ba379218d), 2026-10-21
+- Polaris public testnet contracts on Sepolia, addresses taken from the `testnet.polaris.finance` application bundle, source not verified; state read with `eth_call` on 2026-10-22 at block 11,969,272: bonding curve [`0x07ea2ff889e6228cded329a09f66e370f12c705e`](https://sepolia.etherscan.io/address/0x07ea2ff889e6228cded329a09f66e370f12c705e), Fee Router [`0x133e695512bf7b11ad5f7c2739971e99ea5b0965`](https://sepolia.etherscan.io/address/0x133e695512bf7b11ad5f7c2739971e99ea5b0965), dollar market [`0xbdc1fe97e787ae7f653ffbccd74ec49814fe6aa1`](https://sepolia.etherscan.io/address/0xbdc1fe97e787ae7f653ffbccd74ec49814fe6aa1), gold market [`0x18f652c41a5d30b4b49a9962800b34a6f1abfe41`](https://sepolia.etherscan.io/address/0x18f652c41a5d30b4b49a9962800b34a6f1abfe41), Reserve Loans manager [`0xcaa0757808a96f9f4ee76c04256536d6c17e6e27`](https://sepolia.etherscan.io/address/0xcaa0757808a96f9f4ee76c04256536d6c17e6e27), XAU/USD Medianizer [`0x331ed8031be714d2b43df97f31542d89dc5df50e`](https://sepolia.etherscan.io/address/0x331ed8031be714d2b43df97f31542d89dc5df50e)
+- [liquity/bold](https://github.com/liquity/bold) (Liquity V2), used for the comparison, at commit [`d262669ef3c4d37bf0544df3bb2624c07b8a5ee0`](https://github.com/liquity/bold/tree/d262669ef3c4d37bf0544df3bb2624c07b8a5ee0), 2026-10-22
 
 ### Polaris documentation
 
