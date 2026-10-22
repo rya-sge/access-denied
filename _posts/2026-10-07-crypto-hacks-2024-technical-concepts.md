@@ -295,7 +295,7 @@ Since Solidity 0.8, overflow reverts, except inside `unchecked` blocks, which de
 
 ```solidity
 unchecked {
-    uint256 factor = 1e18 - ((1e18 - k) * effectiveFee1e9) / 1e9;   // underflows if effectiveFee1e9 > 1e9
+    uint256 factor = 1e18 - ((1e18 - k) * effectiveFee1e9) / 1e9;   // can only underflow if effectiveFee1e9 > 1e9 (fee above 100%)
 }
 ```
 

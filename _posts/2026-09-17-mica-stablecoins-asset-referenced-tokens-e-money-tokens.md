@@ -333,12 +333,14 @@ Article 20(5) makes all the opinions non-binding in principle, but Article 21(4)
 
 Under Article 23 the issuer must stop issuing the token and, within 40 working days, submit a plan to bring both figures back below the thresholds. The competent authority may require modifications, such as a minimum denomination, and permits issuance to resume only when it has evidence that use is below the thresholds. The article is the operational form of the "monetary sovereignty" concern: it caps the extent to which a private token can replace the currency in everyday payments within a currency area.
 
-**Q: Combining the significance and capital rules: an e-money institution issues a euro EMT with 12 million holders and EUR 6 billion outstanding. What changes for it?**
+**Q: Combining the significance and capital rules: an e-money institution issues a euro EMT with 12 million holders, EUR 6 billion outstanding, and on average 3 million transactions worth EUR 600 million a day. What changes for it?**
 
-The token meets at least three of the Article 43(1) criteria: holders, value, and almost certainly transaction volume. EBA therefore classifies it as significant under Article 56 and supervision of the issuer moves to EBA under Article 117, since the carve-out of Article 56(7) applies only to non-euro currencies. Under Article 58 the issuer must now:
+The token meets three of the Article 43(1) criteria: more than 10 million holders, more than EUR 5 billion in value, and more than 2.5 million transactions and EUR 500 million a day. Two would not be enough, since classification requires at least three.
+
+EBA therefore classifies it as significant under Article 56 and supervision of the issuer moves to EBA under Article 117, since the carve-out of Article 56(7) applies only to non-euro currencies. Under Article 58 the issuer must now:
 
 - hold a **reserve of assets** under Articles 36 to 38 instead of safeguarding funds under the E-Money Directive, with at least 60 % of the euro amount in bank deposits (Article 45(7)(b));
-- hold **own funds of 3 %** of the average reserve instead of the Directive's capital rule;
+- hold **own funds of 3 %** of the average reserve instead of the Directive's capital rule, which is EUR 180 million if the reserve averages EUR 6 billion;
 - adopt a **liquidity management policy** with stress testing;
 - allow **custody by CASPs outside its group** on fair terms;
 - mandate the **six-monthly reserve audit** from the date of the classification decision.
