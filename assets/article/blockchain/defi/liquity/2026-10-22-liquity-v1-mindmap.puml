@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Liquity V1
+** Troves and fees
+*** ETH collateral, LUSD debt
+*** MCR 110%, min debt 2,000 LUSD
+*** One-off borrowing fee 0.5%-5%
+*** 200 LUSD liquidation reserve
+** Stability Pool
+*** LUSD absorbs liquidated debt
+*** Product-sum P and S, scales, epochs
+*** Withdrawals blocked below 110%
+** Redistribution
+*** Uncovered debt to all troves
+*** Corrected stakes
+*** Order-preserving
+** Redemptions
+*** LUSD for ETH at face value
+*** Lowest ICR first
+*** baseRate, 12h half-life
+** Recovery Mode
+*** TCR below 150%
+*** Liquidate ICR below TCR, capped 1.1x
+*** Borrowing restricted, fee 0
+** Price feed
+*** Chainlink primary
+*** Tellor fallback
+*** lastGoodPrice, no shutdown
+** LQTY
+*** Fee-sharing staking
+*** 32M issuance to SP
+*** Front-end kickbacks
+** Forks and legacy
+*** Prisma zap exploit
+*** V2 governance stakes into V1
+@endmindmap

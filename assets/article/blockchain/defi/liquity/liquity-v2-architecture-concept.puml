@@ -1,0 +1,37 @@
+@startuml
+title Liquity V2 registry and branches
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+component CollateralRegistry
+component BoldToken
+component "Governance (InterestRouter)" as GOV
+package "Branch (WETH / wstETH / rETH)" {
+  component AddressesRegistry
+  component BorrowerOperations
+  component TroveManager
+  component TroveNFT
+  component StabilityPool
+  component SortedTroves
+  component ActivePool
+  component PriceFeed
+}
+package Periphery {
+  component Zappers
+  component HintHelpers
+  component RedemptionHelper
+}
+CollateralRegistry --> TroveManager : route redemptions by unbacked debt
+BorrowerOperations --> TroveManager
+TroveManager --> TroveNFT
+TroveManager --> SortedTroves : order by rate
+TroveManager --> StabilityPool : offset
+TroveManager --> PriceFeed : price / redemption price
+ActivePool --> StabilityPool : 75% interest
+ActivePool --> GOV : 25% interest
+ActivePool --> BoldToken : mint interest
+Zappers --> BorrowerOperations : manager role
+@enduml

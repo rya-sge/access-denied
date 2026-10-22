@@ -103,6 +103,10 @@ A worked example with the parameters of the repository's tests, $$\alpha = 2$$ a
 
 A buyer who takes the supply from 100 to 121 receives 21 pETH and pays $$R(121) - R(100) = 441.33$$ ETH, an average of about 21.02 ETH per pETH. That average lies between the spot price before the trade (20) and after it (22), which is the price impact of the trade. A seller who returns the same 21 pETH moves the curve back to 100 and receives the same 441.33 ETH, so a round trip without fees costs nothing. The next 23 pETH, from 121 to 144, cost 529.33 ETH and raise the price by another 2 ETH: in this example the price rises by 2 for every step of the square root of the supply, which is the concavity at work.
 
+![Left, the price curve p(s) = 2√s with the reserve R(100) shaded as the area under the curve and a 21-pETH buy from supply 100 to 121 costing 441.33 ETH; right, the curves for β = 1, 0.5 and the testnet value 0.15]({{site.url_complet}}/assets/article/blockchain/defi/polaris/polaris-power-law-curve.svg)
+
+The left panel shows the worked example: the shaded area up to $$s = 100$$ is the reserve, and the band between 100 and 121 is what the buyer pays. The right panel shows why $$\beta$$ matters: the closer it is to 0, the flatter the curve, and the testnet value of 0.15 (read on 22 October 2026) gives a much flatter curve than the prototype's 0.5.
+
 The contract never evaluates the integral. It keeps the reserve on the curve through a "reserve ratio" identity, obtained by multiplying the expression for $$R$$ by $$\beta + 1$$, and implemented in `_getReserveRatioLeftFormula` and `_getBalanceFromReserveRatio`:
 
 $$
@@ -244,6 +248,10 @@ There is no interest rate. The cost has two parts:
 
 The documentation's example: 1 fpETH with a floor of 1 ETH, 1 ETH borrowed, 0.9995 ETH received. When the floor reaches 1.2 ETH and the utilization-based share is 1%, the borrower can access 0.198 ETH of the 0.2 ETH gain and 0.002 ETH goes to the protocol.
 
+![Left, the fpETH floor value rising in steps from 1 to 1.2 ETH above a flat 1 ETH loan debt, the gap being the floor growth; right, the floor value at opening (1 ETH, all debt) and later (1.2 ETH split into 1.0 debt, 0.198 to the borrower and a 0.002 fee)]({{site.url_complet}}/assets/article/blockchain/defi/polaris/polaris-reserve-loan.svg)
+
+The left panel shows why there is no liquidation: the collateral's floor value and the debt are both in ETH, the first can only rise and the second is fixed, so the ETH/USD price never enters the comparison. The right panel shows where the documentation's example ends up: the debt is still covered by the original floor value, and the growth above it is split between the borrower and the fee.
+
 Fees are collected from *every* open loan whenever *any* loan is opened, increased, repaid or closed, and they are sent to the Fee Router. A borrower therefore pays accrued fees without touching their own position, and revenue depends on loan activity continuing. Reserve Loans also put a bound on fpETH's market price, since fpETH bought below the floor can be deposited and borrowed against at the full floor value.
 
 ## pAsset markets
@@ -264,6 +272,10 @@ Both sides of the peg are defended by arbitrage at the target price:
 | Below target | Buy on the market, redeem at peg for pETH | Contracts | Downsized: debt and collateral removed, fees spread across positions |
 
 Where Polaris differs from most collateralized-debt systems is in who carries the new debt. A peg buyer does not open a position. The minted supply, the pETH paid for it and the peg-arbitrage fee are distributed across the market's existing positions, both minting and collateral-only, according to the protocol's accounting. Redemptions apply the same distribution in reverse. A minter's debt and collateral can therefore change without any action on their part, and the fee they receive is the compensation for it.
+
+![Left, a pAsset's market price oscillating around its 1.00 target, with the above-peg zone where arbitrageurs buy at peg and sell and the below-peg zone where they buy and redeem at peg; right, illustrative market totals showing a 50,000 peg buy lowering the collateral ratio from 170% to 166.7% and a 50,000 redemption raising it to 173.7%]({{site.url_complet}}/assets/article/blockchain/defi/polaris/polaris-adaptive-peg-defense.svg)
+
+The right panel draws a consequence of the mechanism with illustrative numbers. Take a market with 1.7 million of collateral and 1 million of debt, a 170% ratio. A peg buy adds debt and collateral of equal value (fees aside), so 50,000 of it brings the market to 1.75 million against 1.05 million, about 166.7%. A redemption of 50,000 removes equal value from both and lifts the ratio to about 173.7%. Peg buys therefore move a market towards 100% backing and redemptions away from it, which is consistent with Defensive Mode restricting peg buys, as described below. The documentation does not say how that change is split between individual positions, so the figure shows market totals only.
 
 ### Two interest rates
 
@@ -344,7 +356,7 @@ This limit does not remove governance risk, and the documentation's risk page sa
 
 ## Comparison with Liquity V2 (BOLD)
 
-The pAsset markets borrow the most from Liquity, and the closest current design is [Liquity V2](https://github.com/liquity/bold), whose stablecoin is BOLD. Both have an immutable core, mint a dollar against ETH-based collateral, and liquidate through a stability pool before redistributing leftover debt to the other positions. The Liquity V2 values below come from `contracts/src/Dependencies/Constants.sol` of its repository. Where the two differ is in what backs the debt, how the interest rate is set, who is redeemed against, and what happens under stress.
+The pAsset markets borrow the most from Liquity, and the closest current design is [Liquity V2]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/), whose stablecoin is BOLD. Both have an immutable core, mint a dollar against ETH-based collateral, and liquidate through a stability pool before redistributing leftover debt to the other positions. The Liquity V2 values below come from `contracts/src/Dependencies/Constants.sol` of its repository. Where the two differ is in what backs the debt, how the interest rate is set, who is redeemed against, and what happens under stress.
 
 | | Liquity V2 (BOLD) | Polaris (USDp, GOLDp) |
 |---|---|---|
@@ -493,7 +505,7 @@ The sources leave the following points open. They should be checked, or the arti
 | No audit report appeared in either source. | Security claims rely on the docs alone. | Polaris audit reports, if published. |
 | Liquidation penalties and gas compensation are known only from the testnet (5%, 15%, 0.0375 on 22 October 2026), the denomination of the gas compensation is not determined, and whether pETH collateral is valued at the spot or the floor price is not given. | Both are needed to compare liquidation incentives and collateral ratios with Liquity V2. | The market contracts' `priceFeed` logic and the mainnet values. |
 | The testnet `RECOVERY_MODE_RATIO()` getter reverts on the market contracts, and the Medianizer's actual staleness threshold was not read (only its maximum, `MAX_STALENESS_THRESHOLD() = 7 days`, and a `TIMELOCK_DURATION()` of 1 hour on the gold oracle). | The Recovery Mode trigger and oracle fallback timing are taken from the documentation only. | The contract holding the Recovery Mode ratio and the Medianizer's per-feed configuration. |
-| Several statements come from general knowledge or inference rather than the sources: the Bancor and Liquity comparisons, the description of veCRV, and the Fee Router's net supply reduction. | They are stated in the article as background or derivation. | Bancor's whitepaper, Liquity's documentation, Curve's documentation, and the Fee Router code. |
+| Several statements come from general knowledge or inference rather than the sources: the Bancor comparison, the description of veCRV, and the Fee Router's net supply reduction. The Liquity V2 column was checked against `liquity/bold`; the Liquity V1 background in the prerequisites was not. | They are stated in the article as background or derivation. | Bancor's whitepaper, Curve's documentation, the Fee Router code, and the site's Liquity V1 article for the V1 mechanisms. |
 
 ## References
 
@@ -524,6 +536,8 @@ The sources leave the following points open. They should be checked, or the arti
 
 ### Related articles
 
+- [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
+- [How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/)
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)
 - [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/)
 - [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)

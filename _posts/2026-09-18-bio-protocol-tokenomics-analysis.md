@@ -342,3 +342,4 @@ Holders of `BIO` and `vBIO`, by proposal vote. Because `vBIO` counts unreleased 
 - [Virtual Protocol, create co-ownership AI agents]({{site.url_complet}}/2024/12/05/virtual-protocol-architecture/)
 - [Issuing a Token Under MiCA — The Crypto-Asset White Paper and Its Exemptions (Title II)]({{site.url_complet}}/2026/09/17/mica-crypto-asset-white-paper-token-issuers/)
 - [The ARC Token Whitepaper — Circle's Coordination Asset Read Against the Arc Node]({{site.url_complet}}/2026/09/25/arc-token-whitepaper-circle/)
+- [How DefiLlama Works - Data Model, Free and Pro API, and Adapters]({{site.url_complet}}/2026/10/22/defillama-architecture-api-adapters/)

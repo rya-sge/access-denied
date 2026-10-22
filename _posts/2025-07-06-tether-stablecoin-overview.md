@@ -842,3 +842,4 @@ This is a **classic example of a custodial/centralized stablecoin** with:
 ### Related articles
 
 - [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)
+- [How DefiLlama Works - Data Model, Free and Pro API, and Adapters]({{site.url_complet}}/2026/10/22/defillama-architecture-api-adapters/)

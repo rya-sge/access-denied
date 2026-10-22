@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Liquity V2 (BOLD)
+** Branches
+*** WETH, wstETH, rETH
+*** MCR 110/120, CCR 150/160, SCR 110/120
+*** CollateralRegistry routes redemptions
+** Interest
+*** Borrower sets 0.5%-250%
+*** 75% to SP, 25% to governance
+*** 7-day upfront and premature fees
+** Redemptions
+*** Split by unbacked debt
+*** Lowest rate first, debt in front
+*** baseRate, 6h half-life
+*** Zombie troves below 2,000 BOLD
+** Liquidations
+*** SP offset 5% penalty
+*** Redistribution 10%/20% cap
+*** No Recovery Mode, CCR limits
+*** SP rework: no epochs, P 1e36
+** Delegation
+*** Add and remove managers
+*** Interest delegates
+*** Batches, shares, BCR 10%
+*** Share-ratio cap, kickFromBatch
+** Oracles and shutdown
+*** Redemption price: worse of two
+*** Oracle failure shuts branch down
+*** Urgent redemptions, 2% bonus
+** Governance
+*** LQTY voting power t*M - S
+*** Weekly epochs, veto-only last day
+*** Initiatives and bribes
+** Audits and whitepaper
+*** First launch Jan 2025, redeploy May 2025
+*** Batch, zombie, zapper findings
+*** Code departs from whitepaper rev. 0.3
+@endmindmap

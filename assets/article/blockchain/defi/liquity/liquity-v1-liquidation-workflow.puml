@@ -1,0 +1,30 @@
+@startuml
+title Liquity V1 liquidation decision
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Trove selected;
+if (TCR < 150% ?) then (Recovery Mode)
+  if (ICR <= 100% ?) then (yes)
+    :Redistribute all debt and ETH;
+  elseif (ICR < 110% ?) then (yes)
+    :Offset with SP, redistribute remainder;
+  elseif (ICR < TCR and SP covers debt ?) then (yes)
+    :Offset; SP gets ETH worth 1.1 x debt;
+    :Surplus to CollSurplusPool;
+  else (no)
+    :Skip;
+  endif
+else (Normal Mode)
+  if (ICR < 110% ?) then (yes)
+    :Offset with SP, redistribute remainder;
+  else (no)
+    :Skip;
+  endif
+endif
+:Liquidator gets 200 LUSD + 0.5% ETH;
+stop
+@enduml

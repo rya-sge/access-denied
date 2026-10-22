@@ -1,0 +1,37 @@
+@startuml
+title Liquity V1 core contracts
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+actor Borrower
+actor Depositor
+actor Redeemer
+component BorrowerOperations
+component TroveManager
+component StabilityPool
+component SortedTroves
+component PriceFeed
+component ActivePool
+component DefaultPool
+component CollSurplusPool
+component LUSDToken
+component LQTYStaking
+component CommunityIssuance
+Borrower --> BorrowerOperations : open / adjust / close
+Redeemer --> TroveManager : redeemCollateral
+Depositor --> StabilityPool : provideToSP / withdrawFromSP
+BorrowerOperations --> TroveManager
+BorrowerOperations --> ActivePool : ETH, debt
+TroveManager --> SortedTroves : order by NICR
+TroveManager --> StabilityPool : offset
+TroveManager --> DefaultPool : redistribution
+TroveManager --> CollSurplusPool : surplus
+TroveManager --> PriceFeed : Chainlink / Tellor
+BorrowerOperations --> LUSDToken : mint
+TroveManager --> LQTYStaking : redemption fee (ETH)
+BorrowerOperations --> LQTYStaking : borrowing fee (LUSD)
+CommunityIssuance --> StabilityPool : LQTY rewards
+@enduml

@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* DefiLlama
+** Architecture
+*** Adapters return token balances
+*** coins.llama.fi prices them
+*** API hosts and website serve them
+*** On-chain data, review by PR
+** Data
+*** TVL buckets
+**** tvl, staking, pool2
+**** borrowed, doublecounted
+*** Fees income statement
+**** fees, supply side
+**** revenue, holders revenue
+*** Prices, stablecoins, yields
+*** Volumes, open interest
+*** Hacks, unlocks, raises, bridges
+left side
+** Free API
+*** api.llama.fi
+*** coins.llama.fi
+*** stablecoins.llama.fi
+*** yields.llama.fi
+*** 402 = Pro-only endpoint
+** Pro API
+*** pro-api.llama.fi/KEY/...
+*** Key in the path
+*** Unlocks, bridges, derivatives
+*** Dimensions and statements (beta)
+** Adapters
+*** TVL: DefiLlama-Adapters
+**** sumTokens2, helpers, registries
+**** node test.js
+*** Dimensions: fees, dexs, OI
+**** version 2, pullHourly, labels
+*** Yields: pools and APY
+*** Stablecoins: minted, unreleased
+@endmindmap

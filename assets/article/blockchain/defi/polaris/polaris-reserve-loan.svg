@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="470" viewBox="0 0 980 470" font-family="DejaVu Sans, Helvetica, Arial, sans-serif">
+<rect width="980" height="470" fill="#FFFFFF"/>
+<line x1="90" y1="380.0" x2="590" y2="380.0" stroke="#DDDDDD"/>
+<text x="82.0" y="384.0" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0.9</text>
+<line x1="90" y1="297.5" x2="590" y2="297.5" stroke="#DDDDDD"/>
+<text x="82.0" y="301.5" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1</text>
+<line x1="90" y1="215.0" x2="590" y2="215.0" stroke="#DDDDDD"/>
+<text x="82.0" y="219.0" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1.1</text>
+<line x1="90" y1="132.5" x2="590" y2="132.5" stroke="#DDDDDD"/>
+<text x="82.0" y="136.5" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1.2</text>
+<line x1="90" y1="50.0" x2="590" y2="50.0" stroke="#DDDDDD"/>
+<text x="82.0" y="54.0" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1.3</text>
+<line x1="90" y1="380" x2="590" y2="380" stroke="#222222"/>
+<line x1="90" y1="50" x2="90" y2="380" stroke="#222222"/>
+<text transform="translate(46,215.0) rotate(-90)" font-size="12" text-anchor="middle" fill="#222222">value in ETH</text>
+<text x="340.0" y="36.0" font-size="14" text-anchor="middle" font-weight="bold" fill="#222222">Collateral floor value and debt, both in ETH</text>
+<path d="M90.0,297.5 L90.0,297.5 L150.0,297.5 L150.0,281.0 L205.0,281.0 L205.0,256.2 L245.0,256.2 L245.0,239.7 L310.0,239.7 L310.0,215.0 L370.0,215.0 L370.0,198.5 L415.0,198.5 L415.0,173.8 L475.0,173.8 L475.0,157.3 L530.0,157.3 L530.0,132.5 L590.0,132.5 L590.0,297.5 L90.0,297.5 Z" fill="#009E73" fill-opacity="0.25"/>
+<path d="M90.0,297.5 L90.0,297.5 L150.0,297.5 L150.0,281.0 L205.0,281.0 L205.0,256.2 L245.0,256.2 L245.0,239.7 L310.0,239.7 L310.0,215.0 L370.0,215.0 L370.0,198.5 L415.0,198.5 L415.0,173.8 L475.0,173.8 L475.0,157.3 L530.0,157.3 L530.0,132.5 L590.0,132.5" fill="none" stroke="#009E73" stroke-width="2.5"/>
+<line x1="90.0" y1="297.5" x2="590.0" y2="297.5" stroke="#0072B2" stroke-width="2.5" stroke-dasharray="8,5"/>
+<text x="585.0" y="122.5" font-size="12" text-anchor="end" font-weight="bold" fill="#009E73">fpETH floor value (only rises)</text>
+<text x="585.0" y="317.5" font-size="12" text-anchor="end" font-weight="bold" fill="#0072B2">loan debt: 1 ETH (received 0.9995 after the 0.05% fee)</text>
+<text x="440.0" y="256.2" font-size="12" text-anchor="middle" font-weight="normal" fill="#222222">floor growth while the loan is open</text>
+<text x="440.0" y="270.3" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555">(the fee is a share of this area)</text>
+<text x="90.0" y="399.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#222222">open</text>
+<text x="590.0" y="399.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#222222">later</text>
+<text x="340.0" y="420.0" font-size="12" text-anchor="middle" font-weight="normal" fill="#222222">time</text>
+<text x="96.0" y="66.0" font-size="11" text-anchor="start" font-weight="normal" fill="#555555">The ETH/USD price appears nowhere: the debt can never exceed the collateral.</text>
+<line x1="720" y1="380.0" x2="940" y2="380.0" stroke="#DDDDDD"/>
+<text x="712.0" y="384.0" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0</text>
+<line x1="720" y1="329.2" x2="940" y2="329.2" stroke="#DDDDDD"/>
+<text x="712.0" y="333.2" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0.2</text>
+<line x1="720" y1="278.5" x2="940" y2="278.5" stroke="#DDDDDD"/>
+<text x="712.0" y="282.5" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0.4</text>
+<line x1="720" y1="227.7" x2="940" y2="227.7" stroke="#DDDDDD"/>
+<text x="712.0" y="231.7" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0.6</text>
+<line x1="720" y1="176.9" x2="940" y2="176.9" stroke="#DDDDDD"/>
+<text x="712.0" y="180.9" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">0.8</text>
+<line x1="720" y1="126.2" x2="940" y2="126.2" stroke="#DDDDDD"/>
+<text x="712.0" y="130.2" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1</text>
+<line x1="720" y1="75.4" x2="940" y2="75.4" stroke="#DDDDDD"/>
+<text x="712.0" y="79.4" font-size="11" text-anchor="end" font-weight="normal" fill="#222222">1.2</text>
+<line x1="720" y1="380" x2="940" y2="380" stroke="#222222"/>
+<line x1="720" y1="50" x2="720" y2="380" stroke="#222222"/>
+<text transform="translate(676,215.0) rotate(-90)" font-size="12" text-anchor="middle" fill="#222222">value in ETH</text>
+<text x="830.0" y="36.0" font-size="14" text-anchor="middle" font-weight="bold" fill="#222222">Where the floor value goes</text>
+<rect x="744.0" y="126.2" width="62" height="253.8" fill="#0072B2" fill-opacity="0.8" stroke="#FFFFFF"/>
+<text x="775.0" y="257.1" font-size="12" text-anchor="middle" font-weight="bold" fill="#FFFFFF">debt 1.0</text>
+<text x="775.0" y="399.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#222222">open</text>
+<text x="775.0" y="118.2" font-size="11" text-anchor="middle" font-weight="bold" fill="#222222">floor 1</text>
+<rect x="849.0" y="126.2" width="62" height="253.8" fill="#0072B2" fill-opacity="0.8" stroke="#FFFFFF"/>
+<text x="880.0" y="257.1" font-size="12" text-anchor="middle" font-weight="bold" fill="#FFFFFF">debt 1.0</text>
+<rect x="849.0" y="75.9" width="62" height="50.3" fill="#009E73" fill-opacity="0.8" stroke="#FFFFFF"/>
+<text x="880.0" y="105.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#FFFFFF">0.198</text>
+<rect x="849.0" y="75.4" width="62" height="0.5" fill="#D55E00" fill-opacity="0.8" stroke="#FFFFFF"/>
+<text x="880.0" y="399.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#222222">later</text>
+<text x="880.0" y="67.4" font-size="11" text-anchor="middle" font-weight="bold" fill="#222222">floor 1.2</text>
+<text x="880.0" y="120.2" font-size="10" text-anchor="middle" font-weight="bold" fill="#FFFFFF">borrower</text>
+<text x="880.0" y="53.4" font-size="11" text-anchor="middle" font-weight="bold" fill="#D55E00">0.002 fee (1%)</text>
+<text x="490.0" y="458.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555">Numbers from the Polaris documentation's example; the floor's step pattern is illustrative.</text>
+</svg>

@@ -1,0 +1,33 @@
+@startuml
+title Choosing the DefiLlama endpoint and host
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Identify the data family;
+if (Prices or blocks?) then (yes)
+  :https://coins.llama.fi;
+elseif (Stablecoins?) then (yes)
+  :https://stablecoins.llama.fi;
+elseif (Yield pools?) then (yes)
+  :https://yields.llama.fi;
+else (TVL, volume, fees, OI)
+  :https://api.llama.fi;
+endif
+:Send the request;
+if (HTTP status) then (200)
+  :Use the data;
+elseif () then (402)
+  :Pro-only endpoint;
+  if (API key available?) then (yes)
+    :https://pro-api.llama.fi/KEY/<prefix>/<path>;
+  else (no)
+    :Look for a free alternative;
+  endif
+else (404)
+  :Check host and slug;
+endif
+stop
+@enduml

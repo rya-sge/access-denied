@@ -219,7 +219,7 @@ The repository README lists the issues the team considered and accepted:
 - **Hints at the ends of the sorted list** can make `adjustTrove` run out of gas.
 - **Front-running.** Depositors can withdraw from the Stability Pool ahead of a price drop, or deposit just before a profitable liquidation. Attackers can front-run redemptions and inserts with new troves to raise the gas they cost.
 
-Before launch, V1 was audited by Trail of Bits (core contracts, LQTY lockups, LP staking, proxy contracts) and Coinspect; the reports are linked from the [V1 documentation](https://docs.liquity.org/). An audit-time finding reproduced in public collections shows a trove updated to a zero ICR being removed from `SortedTroves` while `TroveManager` still records it.
+Before launch, Trail of Bits audited the core contracts, the LQTY lockups, the LP staking contract and the proxy contracts, and Coinspect audited the system as well. The reports are linked from the [V1 documentation](https://docs.liquity.org/). An audit-time finding reproduced in public collections shows a trove updated to a zero ICR being removed from `SortedTroves` while `TroveManager` still records it.
 
 Because the code is open and the design proven, V1 has been forked many times, often for other collateral types. The most expensive fork incident is [Prisma Finance](https://hackmd.io/@PrismaRisk/PostMortem0328) in March 2024: a migration helper that users had approved as a delegate accepted a flash-loan callback from anyone, and read the victim's account from the attacker's data. The [technical concepts behind the 2024 hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) covers that callback bug in detail. The flaw was in the periphery, not in the V1 core, but it shows where forks add risk: new collateral types, new zap contracts, and new oracle wiring.
 
@@ -310,7 +310,9 @@ Redistributed debt and collateral are allocated in proportion to each trove's co
 
 **Q: What made Prisma Finance exploitable, and does V1 itself share the flaw?**
 
-Prisma was a V1 fork for liquid staking tokens. Its `MigrateTroveZap` accepted an ERC-3156 flash-loan callback while checking only that the lender called it, then read the account to migrate from the callback data. Users had made the zap a delegate in `BorrowerOperations`, so an attacker could close and reopen their troves with less collateral. V1 has no delegate system and no zap with that callback, so the core does not share the flaw. Forks that add periphery contracts must check the loan initiator and the account.
+Prisma was a V1 fork for liquid staking tokens. Its `MigrateTroveZap` accepted an ERC-3156 flash-loan callback while checking only that the lender called it, then read the account to migrate from the callback data. Users had made the zap a delegate in `BorrowerOperations`, so an attacker could close and reopen their troves with less collateral.
+
+V1 has no delegate system and no zap with that callback, so the core does not share the flaw. Forks that add periphery contracts must check both the loan initiator and the account.
 
 ## Gaps
 

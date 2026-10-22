@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2024 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-10-22
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -257,7 +258,7 @@ function onFlashLoan(address initiator, address, uint256 amount, uint256 fee, by
 }
 ```
 
-Prisma's migration zap checked the lender but not the initiator. Anyone could ask the debt token to flash-lend to the zap with crafted `data` naming a victim who had delegated to the zap; the zap then closed the victim's trove and reopened it with less collateral, and the attacker kept the difference ([Prisma post-mortem](https://hackmd.io/@PrismaRisk/PostMortem0328)).
+Prisma, a fork of [Liquity V1]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/) for liquid staking tokens, added a migration zap that checked the lender but not the initiator. Anyone could ask the debt token to flash-lend to the zap with crafted `data` naming a victim who had delegated to the zap; the zap then closed the victim's trove and reopened it with less collateral, and the attacker kept the difference ([Prisma post-mortem](https://hackmd.io/@PrismaRisk/PostMortem0328)).
 
 ## Accounting and rounding
 
@@ -497,6 +498,7 @@ An upgrade review checks the storage layout and values, calls the initialiser, a
 
 ### Related articles
 
+- [How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/)
 - [Compound V2 Overview]({{site.url_complet}}/2024/08/27/compound-protocol-v2/)
 - [Programming proxy contracts with OpenZeppelin | Summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/)
 - [Multicall in Solidity: CALL vs DELEGATECALL Explained]({{site.url_complet}}/2025/04/03/solidity-multicall/)

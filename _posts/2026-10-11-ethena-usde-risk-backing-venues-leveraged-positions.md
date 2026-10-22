@@ -294,3 +294,4 @@ When the incident is likely enough that the loss it saves outweighs the cost of 
 - [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)
 - [Risk of a Zama Confidential Morpho Vault - Losses, Exits, Contagion and What Can Be Watched]({{site.url_complet}}/2026/10/11/zama-confidential-morpho-vault-risk/)
 - [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)
+- [How DefiLlama Works - Data Model, Free and Pro API, and Adapters]({{site.url_complet}}/2026/10/22/defillama-architecture-api-adapters/)

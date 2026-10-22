@@ -1,0 +1,26 @@
+@startuml
+title Liquity V2 redemption
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+}
+actor Redeemer
+participant CollateralRegistry as CR
+participant "TroveManager (branch b)" as TM
+participant PriceFeed as PF
+Redeemer -> CR : redeemCollateral(M, maxIterations, maxFee)
+CR -> CR : decay baseRate, add M / supply
+loop each branch
+  CR -> TM : getUnbackedPortionPriceAndRedeemability()
+  TM -> PF : fetchPrice()
+end
+CR -> CR : M_b = M x U_b / sum U
+loop each redeemable branch
+  CR -> TM : redeemCollateral(M_b, fee)
+  TM -> TM : lastZombieTroveId first, then lowest rate
+  TM -> TM : take M_b x (1 - fee) / p of collateral
+  TM -> TM : trove below 2,000 BOLD becomes zombie
+end
+CR -> Redeemer : collateral; BOLD burned
+@enduml

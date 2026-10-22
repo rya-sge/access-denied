@@ -2,12 +2,12 @@
 layout: post
 title: 10 Key Differences Between MakerDAO and Liquity
 date:   2024-12-16
-last_modified_at: 2026-07-30
+last_modified_at: 2026-10-22
 lang: en
 locale: en-GB
 categories: blockchain defi
 tags: makerDAO liquity stablecoin
-description: Dives deep and explains how Liquity differs from Maker DAO.  
+description: How Liquity V1 differs from MakerDAO on governance, collateral, redemptions, interest, liquidations and shutdown, with notes on what Liquity V2 changed.
 image: /assets/article/blockchain/defi/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity-mindmap.png
 isMath: false
 ---
@@ -19,6 +19,8 @@ Since the video is rather old, it is possible that some information is no longer
 - A transcript has been generated with [NoteGPT](https://notegpt.io)
 - A more formal article has been made with ChatGPT from this transcript
 - Finally, I have perform a few addition and personal notes.
+
+> **Update (October 2026).** The comparison below describes Liquity V1. Liquity V2, launched in 2025 with the BOLD stablecoin, changes several of these points (interest, collateral, governance, Recovery Mode). Each section now ends with a short *Liquity V2* note where it differs. The two versions are described in detail in [How Liquity V1 Works]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/) and [How Liquity V2 Works]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/).
 
 Here’s an exploration of the 10 key differences between MakerDAO and Liquity.
 
@@ -65,7 +67,9 @@ MakerDAO operates on a human governance model, where key parameters like `intere
 - In 2020, a protocol team uses a flashloan to pass one of their proposal, see [MakerDAO issues warning after a flash loan is used to pass a governance vote](https://www.theblock.co/post/82721/makerdao-issues-warning-after-a-flash-loan-is-used-to-pass-a-governance-vote).
 - Sky Money, the new version of MakerDao uses a specific smart contract `ds-chief`to prevent MKR locked for voting from being used in the same block as the deposit.  See [developers.sky.money - governance-flash-loan-attacks](https://developers.sky.money/security/security-measures/security-mechanisms#governance-flash-loan-attacks)
 
-In contrast, Liquity employs a fully algorithmic governance system. Parameters like `fees` adjust automatically based on external inputs without human intervention. This ensures a more efficient and tamper-resistant governance structure, reducing risks associated with manual adjustments.
+In contrast, Liquity V1 has no governance at all. Its parameters (minimum collateral ratio, fee floors, liquidation reserve) are constants in immutable contracts with no admin key. The only values that move are the borrowing and redemption fees, which follow a formula driven by redemption volume and time, without any vote.
+
+*Liquity V2:* a limited governance exists. LQTY stakers vote each week on how 25% of the interest paid by borrowers is distributed to liquidity initiatives. They cannot change any protocol parameter, since the core contracts remain immutable.
 
 ------
 
@@ -75,7 +79,7 @@ MakerDAO supports a multi-collateral system, allowing various ERC-20 tokens as c
 
 Liquity V1 adopts a single-collateral approach, accepting only Ether (ETH) as collateral. This choice aligns with its belief in Ether as the most trustless, risk-free asset on the Ethereum network. By focusing on Ether, Liquity minimizes complexity and potential vulnerabilities.
 
-Liquity V2 with its new stablecoin BOLD will also allow leading liquid staking tokens (LSTs) –Lido wrapped staked ETH and Rocket Pool staked ETH– as collateral in addition to Ether. See [Liquity V2 Whitepaper](https://liquity.gitbook.io/v2-whitepaper)
+*Liquity V2:* the BOLD stablecoin also accepts two liquid staking tokens (LSTs), Lido's wstETH and Rocket Pool's rETH, in addition to Ether. Each collateral has its own branch of contracts, Stability Pool and parameters, so a problem with one LST does not mix collateral across branches. See the [Liquity V2 Whitepaper](https://liquity.gitbook.io/v2-whitepaper) and [How Liquity V2 Works]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/).
 
 ### 3. Decentralized Frontends
 
@@ -101,6 +105,8 @@ Liquity offers loans without recurring interest. Borrowers only pay a `one-time`
 
 MakerDAO applies a `stability fee`, which functions as an interest rate, accruing over time. This recurring cost can be a significant consideration for long-term borrowers.
 
+*Liquity V2:* loans are no longer interest-free. Each borrower chooses their own annual rate, between 0.5% and 250%, and can change it. Redemptions take collateral from the troves with the lowest rates first, so the rate also sets how exposed a borrower is to redemptions. The rate is set by the market of borrowers, not by governance as with Maker's stability fee.
+
 See [Maker DAO archive - stability-fee](https://rya-sge.github.io/maker-dao-community-archive/faqs/stability-fee/)
 
 ------
@@ -110,6 +116,8 @@ See [Maker DAO archive - stability-fee](https://rya-sge.github.io/maker-dao-comm
 MakerDAO’s minimum collateralization ratio for Ether is either 130% or 150%, depending on the specific parameters. Higher ratios provide a buffer but limit capital efficiency.
 
 Liquity’s system (V1) requires only a 110% minimum collateralization ratio, enabled by its innovative liquidation mechanism. This lower requirement increases capital efficiency while maintaining system stability. See [Liquity CR](https://www.liquity.org/features/collaterization-ratio)
+
+*Liquity V2:* the minimum is 110% for ETH and 120% for wstETH and rETH.
 
 ------
 
@@ -126,6 +134,8 @@ Liquity employs instantaneous liquidations. A stability pool pre-funds the repay
 MakerDAO offers the `DAI Savings Rate (DSR)`, allowing users to earn interest on their DAI holdings. However, the rate is determined by human governance and is currently set at 0%.
 
 Liquity does not have a direct savings feature but offers two alternative mechanisms: the Stability Pool and LQTY staking. The Stability Pool allows users to deposit LUSD and earn liquidation gains in Ether. Additionally, LQTY token holders can stake their tokens to earn a share of system fees, providing multiple avenues for rewards.
+
+*Liquity V2:* the Stability Pool of each collateral branch receives 75% of the interest paid by that branch's borrowers, in addition to liquidation gains. It works as a savings product whose yield comes from borrowers rather than from a governance-set rate such as the DSR.
 
 ------
 
@@ -155,7 +165,9 @@ What happens during an Emergency Shutdown?
 
 See [Maker DAO archive - Emergency Shutdown](https://rya-sge.github.io/maker-dao-community-archive/scd-faqs/emergency-shutdown/#what-is-an-emergency-shutdown)
 
-Liquity uses a recovery mode that temporarily relaxes liquidation conditions when the total collateralization ratio drops below 150%. This mode allows the system to stabilize and return to normal operation without shutting down, ensuring continuous functionality.
+Liquity V1 uses a Recovery Mode when the total collateralization ratio drops below 150%. In that mode, a trove whose ratio is below the system's total ratio can be liquidated if the Stability Pool covers its whole debt (the borrower keeps collateral above 110% of the debt), and new borrowing must keep the system ratio from falling. The system returns to normal operation when the ratio recovers, without shutting down.
+
+*Liquity V2:* Recovery Mode is removed, so a trove above the minimum ratio is never liquidated. Each collateral branch has a critical ratio (150% or 160%) below which borrowing that lowers the system ratio is refused, and a shutdown ratio (110% or 120%). Below the shutdown ratio, or if the branch's oracle fails, the branch shuts down permanently and fee-free "urgent" redemptions with a 2% bonus clear its debt. This is closer to Maker's emergency shutdown, but it applies to one collateral at a time rather than to the whole system.
 
 ------
 
@@ -171,5 +183,7 @@ The mindmap below summarizes the article.
 
 ## Related articles
 
+- [How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/)
+- [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
 - [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)
 - [How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets]({{site.url_complet}}/2026/10/21/polaris-peth-bonding-curve-passets/)

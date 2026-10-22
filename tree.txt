@@ -1162,4 +1162,25 @@ _posts/2026-10-21-polaris-peth-bonding-curve-passets.md
   assets/article/blockchain/defi/polaris/2026-10-21-polaris-peth-bonding-curve-mindmap.puml   (mindmap -> .png, cover image)
   assets/article/blockchain/defi/polaris/polaris-architecture-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/polaris/polaris-fee-router-workflow.puml   (workflow -> .png, asset only)
+  assets/article/blockchain/defi/polaris/polaris-power-law-curve.py   (in-section figure -> .svg, embedded in "A power-law price"; plain Python, no dependency)
+  assets/article/blockchain/defi/polaris/polaris-reserve-loan.py   (in-section figure -> .svg, embedded in "Reserve Loans"; plain Python, no dependency)
+  assets/article/blockchain/defi/polaris/polaris-adaptive-peg-defense.py   (in-section figure -> .svg, embedded in "Adaptive Peg Defense"; plain Python, no dependency)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-22-liquity-v1-lusd-troves-stability-pool.md
+  assets/article/blockchain/defi/liquity/2026-10-22-liquity-v1-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/liquity/liquity-v1-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/liquity/liquity-v1-liquidation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-22-liquity-v2-bold-user-set-interest-rates.md
+  assets/article/blockchain/defi/liquity/2026-10-22-liquity-v2-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/liquity/liquity-v2-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/liquity/liquity-v2-redemption-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-22-defillama-architecture-api-adapters.md
+  assets/article/blockchain/defi/defillama/2026-10-22-defillama-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/defillama/defillama-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/defillama/defillama-api-request-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml

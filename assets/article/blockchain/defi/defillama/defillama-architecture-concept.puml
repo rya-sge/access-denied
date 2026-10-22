@@ -1,0 +1,42 @@
+@startuml
+title DefiLlama - repositories and services
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam database {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+cloud "Chains (RPC, logs, subgraphs)" as chains
+component "@defillama/sdk\nChainApi, multicall, getLogs" as sdk
+package "Adapter repositories" {
+  component "DefiLlama-Adapters\nTVL buckets" as tvl
+  component "dimension-adapters\nfees, volume, OI" as dim
+  component "yield-server\nAPY pools" as yld
+  component "peggedassets-server\nstablecoin supply" as stb
+}
+component "coins.llama.fi\nprice service" as coins
+package "Free API" {
+  component "api.llama.fi" as api
+  component "stablecoins.llama.fi" as sapi
+  component "yields.llama.fi" as yapi
+}
+component "pro-api.llama.fi/{KEY}" as pro
+component "@defillama/api\nTypeScript client" as client
+chains --> sdk
+sdk --> tvl
+sdk --> dim
+sdk --> yld
+sdk --> stb
+tvl --> coins : token balances
+dim --> coins : token balances
+coins --> api : USD values
+stb --> sapi
+yld --> yapi
+api ..> pro : same data, /api prefix
+client --> api
+client --> pro
+@enduml
