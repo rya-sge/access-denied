@@ -101,7 +101,18 @@ A worked example with the parameters of the repository's tests, $$\alpha = 2$$ a
 | 121 | 22 | 1,774.67 |
 | 144 | 24 | 2,304.00 |
 
-A buyer who takes the supply from 100 to 121 receives 21 pETH and pays $$R(121) - R(100) = 441.33$$ ETH, an average of about 21.02 ETH per pETH. That average lies between the spot price before the trade (20) and after it (22), which is the price impact of the trade. A seller who returns the same 21 pETH moves the curve back to 100 and receives the same 441.33 ETH, so a round trip without fees costs nothing. The next 23 pETH, from 121 to 144, cost 529.33 ETH and raise the price by another 2 ETH: in this example the price rises by 2 for every step of the square root of the supply, which is the concavity at work.
+A buyer who takes the supply from 100 to 121 receives 21 pETH and pays $$R(121) - R(100) = 441.33$$ ETH. The price is not fixed during the trade: the first unit is minted at about 20 ETH and the last at about 22 ETH, so the buyer pays an average of about 21.02 ETH per pETH. The gap between the spot price quoted before the trade (20) and this average is the price impact; a larger trade moves further along the curve and pays a higher average.
+
+A seller who returns the same 21 pETH moves the supply back from 121 to 100 and receives the same 441.33 ETH, because the price depends only on supply and the sale covers the same stretch of curve. Without fees, a round trip therefore costs nothing.
+
+Raising the price from 22 to 24 then takes 23 pETH, two more than the 21 that raised it from 20 to 22. Each further increase of the price needs a larger amount of pETH, which is what makes the curve concave:
+
+| Supply $$s$$ | $$\sqrt{s}$$ | Price $$2\sqrt{s}$$ | pETH added | Cost in ETH | Price gain |
+|---|---|---|---|---|---|
+| 100 | 10 | 20 | | | |
+| 121 | 11 | 22 | 21 | 441.33 | +2 |
+| 144 | 12 | 24 | 23 | 529.33 | +2 |
+| 169 | 13 | 26 | 25 | 625.33 | +2 |
 
 ![Left, the price curve p(s) = 2√s with the reserve R(100) shaded as the area under the curve and a 21-pETH buy from supply 100 to 121 costing 441.33 ETH; right, the curves for β = 1, 0.5 and the testnet value 0.15]({{site.url_complet}}/assets/article/blockchain/defi/polaris/polaris-power-law-curve.svg)
 
@@ -122,6 +133,17 @@ Each trading function uses this identity in one direction or the other:
 - **Spend a given amount of ETH** (`getBuyBcTokenAmountFromReserve`): invert the identity to find the supply that a reserve $$R$$ supports, $$s = \left(\frac{(\beta + 1) R}{\alpha}\right)^{\frac{1}{\beta + 1}}$$, then recompute the reserve from that supply and return any rounding leftover.
 
 The invariant test `invariant_ReserveRatio` asserts that `reserveRatioDeviation()`, the difference between the two sides of the identity, is exactly zero after every handler call.
+
+#### The power-law price in short
+
+- **The curve is the market.** pETH is minted when ETH comes in and burnt when it goes out, with no order book and no liquidity provider.
+- **The price depends only on the supply**, through $$p(s) = \alpha \, s^{\beta}$$. $$\alpha$$ scales every price, $$\beta$$ sets how fast the price rises.
+- **$$\beta$$ is between 0 and 1**, so the price rises with supply but each extra pETH raises it less than the previous one.
+- **The reserve is the area under the price curve.** It is the sum of what every pETH in existence was paid, $$R(s)$$.
+- **A trade pays the area between its start and end supply.** Its average price lies between the spot price before and after the trade; the difference is the price impact.
+- **Buying and then selling the same amount returns the same ETH**, fees aside, because both cover the same stretch of curve.
+- **The contract never integrates.** It enforces $$(\beta + 1) \cdot R = s \cdot p(s)$$ after every trade, and its tests require that identity to hold exactly.
+- **The testnet curve is flatter than the prototype's**: $$\beta = 0.15$$ on Sepolia (read on 22 October 2026) against 0.5 in the tests.
 
 ### Why the curve is called scale-free
 
