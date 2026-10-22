@@ -210,6 +210,8 @@ This file is maintained as the lookup table for the `update-article` skill: when
 | `Blockchain downtime.md` | Blockchain e | blockchain ethereum | Blockchain downtime overview |
 | `The Main Vulnerabilities When Using ECDSA Signatures in Smart Contracts.md` | The Main Vulnerabilities When Using ECDSA Signatures in Smart Contracts | security blockchain | ECDSA signature pitfalls in smart contracts (malleability, replay, unauthorized access) and best practices (no front matter; raw markdown). |
 | `permit.md` | Understanding Permit in Solidity: Use Case, Implementation, Variants, Risks, and Security | blockchain ethereum solidity | EIP-2612 Permit: off-chain signature approvals, variants, risks, and secure implementation (no front matter; raw markdown). |
+| `2026-10-21-polaris-peth-bonding-curve-passets.md` | How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets | blockchain defi ethereum | Polaris from its docs and bonding-curve code: pETH and its rising floor, fpETH/vpETH, non-liquidatable Reserve Loans, USDp markets and POLAR. |
+| `2026-10-22-power-law-curves.md` | Power-Law Curves - Scale Invariance, Log-Log Lines, Bonding Curves and Heavy Tails | finance defi | What a power law y = a·x^k is, why it has no preferred scale, how to read it on log-log axes, and where it appears in DeFi pricing curves and fat tails. |
 
 ---
 

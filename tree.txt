@@ -1184,3 +1184,10 @@ _posts/2026-10-22-defillama-architecture-api-adapters.md
   assets/article/blockchain/defi/defillama/defillama-architecture-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/defillama/defillama-api-request-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-22-power-law-curves.md
+  assets/article/finance/power-law/2026-10-22-power-law-curves-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/finance/power-law/power-law-family-concept.puml   (concept -> .png, asset only)
+  assets/article/finance/power-law/power-law-fitting-workflow.puml   (workflow -> .png, asset only)
+  assets/article/finance/power-law/power-law-linear-vs-loglog.py   (in-section figure -> .svg, embedded in "Definition"; plain Python, no dependency)
+  in-section diagrams: inline Mermaid in the article, no .puml

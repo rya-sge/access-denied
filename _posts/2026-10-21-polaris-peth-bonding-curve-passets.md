@@ -27,6 +27,7 @@ The article assumes familiarity with DeFi and Ethereum, and uses the following m
 
 - **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/) vaults. Below a minimum collateral ratio the position can be liquidated, and a system can also track the ratio of all collateral to all debt to restrict operations under stress, which is what Polaris's Defensive and Recovery modes do.
 - **Peg arbitrage, stability pool and redistribution.** [Liquity](https://www.liquity.org/) keeps its stablecoin near one dollar by letting anyone redeem it for collateral at face value, and liquidates without auctions: a pool of stablecoin depositors absorbs bad debt first, and leftover debt is shared among all other positions. Polaris keeps both liquidation stages and applies peg arbitrage on both sides of the peg.
+- **Power law.** A function of the form $$y = a \cdot x^{k}$$, where the variable is raised to a fixed exponent. Multiplying $$x$$ by any factor $$c$$ multiplies $$y$$ by $$c^{k}$$ wherever the curve starts, so a power law has no preferred scale. The pETH price is a power law of the supply with exponent $$\beta$$; [a separate article]({{site.url_complet}}/2026/10/22/power-law-curves/) covers power-law curves in detail.
 - **Marginal price and price impact.** When price depends on the quantity traded, as in an [automated market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/), the quoted price applies only to an infinitesimal trade, and a real trade pays the average over the range it moves through. On a bonding curve that cost is the area under the price curve, which is why integrals appear below.
 - **Splitting a token into components.** [Pendle](https://www.pendle.finance/) splits a yield-bearing token into principal and yield parts that trade separately and recombine into the original. Polaris splits pETH into floor and premium and relies on the same split-and-merge arbitrage.
 - **Vote-escrowed staking.** A holder locks tokens for a chosen period, often up to four years, in exchange for voting power and revenue that depend on the lock length, a model popularised by Curve's veCRV. sPOLAR follows it, with each position held as a transferable NFT.
@@ -89,7 +90,7 @@ The symbols mean the following:
 - **$$\beta$$** is the exponent and sets how fast the price grows with supply. It is `immutable`, and the constructor enforces `params.beta > 0` and `params.beta < DECIMAL_PRECISION`, so in 18-decimal fixed point $$\beta$$ is strictly between 0 and 1.
 - **$$R(s)$$** is the ETH the curve must hold when the supply is $$s$$, which is the variable `virtualBalance`.
 
-The reserve is an integral because each unit of pETH was bought at the marginal price in force when it was minted. Adding up the price of every unit from 0 to $$s$$ is the area under the price curve, and for a power function that area has the closed form above. The same reasoning prices any trade: moving from supply $$s_1$$ to $$s_2$$ costs (or, for a sale, pays) the area between the two points, $$R(s_2) - R(s_1)$$.
+The reserve is an integral because each unit of pETH was bought at the marginal price in force when it was minted. Adding up the price of every unit from 0 to $$s$$ is the area under the price curve, and for a power function that area has the closed form above. That is the practical reason for choosing a power law: integrating $$x^{\beta}$$ gives another power, $$\frac{x^{\beta + 1}}{\beta + 1}$$, so the reserve is a single formula the contract can evaluate without summing anything. The same reasoning prices any trade: moving from supply $$s_1$$ to $$s_2$$ costs (or, for a sale, pays) the area between the two points, $$R(s_2) - R(s_1)$$.
 
 The bound on $$\beta$$ decides how the price grows. With $$\beta = 0$$ the price would be the constant $$\alpha$$ and the curve would be a fixed-rate wrapper of ETH. With $$\beta = 1$$ it would be a straight line, the price rising by the same amount for every unit minted. With $$\beta$$ between the two, the curve is concave: price rises with supply, but each additional unit raises it by less than the previous one, so large supplies see a smaller price impact per pETH. Holding the reserve at a constant share of the token's market value, as shown below, makes this the same family of curves as Bancor's constant-reserve-ratio design.
 
@@ -154,6 +155,8 @@ $$
 p \propto R^{\frac{\beta}{\beta + 1}} \quad \Longrightarrow \quad \frac{dp}{p} = \frac{\beta}{\beta + 1} \cdot \frac{dR}{R}
 \end{aligned}
 $$
+
+This is the power-law property seen from the reserve side. On the price side, doubling the supply always multiplies the price by $$2^{\beta}$$: about 1.41 (+41%) with $$\beta = 0.5$$, and about 1.11 (+11%) with the testnet's $$\beta = 0.15$$, whether the supply goes from 10 to 20 or from one million to two million.
 
 A deposit that grows the reserve by 1% moves the price by the same percentage at 1,000 ETH of reserve as at 1,000,000 ETH. That is the property the documentation calls a *scale-free design*: the price response of pETH depends on relative flows, not on absolute size. With $$\beta = 0.5$$, the value used in the repository's tests, a 1% increase in reserve raises the price by about 0.33%. The curve deployed on the Polaris testnet uses a much flatter $$\beta = 0.15$$ (read on 22 October 2026, see below), for which the same 1% increase raises the price by about 0.13%. The mainnet value is not published.
 
@@ -558,6 +561,7 @@ The sources leave the following points open. They should be checked, or the arti
 
 ### Related articles
 
+- [Power-Law Curves - Scale Invariance, Log-Log Lines, Bonding Curves and Heavy Tails]({{site.url_complet}}/2026/10/22/power-law-curves/)
 - [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
 - [How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/)
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)

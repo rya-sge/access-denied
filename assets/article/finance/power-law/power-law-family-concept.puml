@@ -1,0 +1,20 @@
+@startuml
+title Power laws y = a * x^k - one formula, several familiar cases
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+component "y = a * x^k" as PL
+component "k < 0\ninverse law\nconstant product AMM (k = -1)" as NEG
+component "0 < k < 1\nconcave\nbonding curves (Polaris beta)" as CONC
+component "k = 1\nlinear" as LIN
+component "k > 1\nconvex\narea (k = 2), volume (k = 3)" as CONV
+component "Pareto tail\nP(X > x) ~ x^(-alpha)" as PAR
+PL --> NEG
+PL --> CONC
+PL --> LIN
+PL --> CONV
+NEG --> PAR : survival function\nof a distribution
+@enduml

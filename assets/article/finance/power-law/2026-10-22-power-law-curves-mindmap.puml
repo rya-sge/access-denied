@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Power-law curves
+** Definition
+*** y = a * x^k
+*** k sets the shape, a the scale
+*** k < 0, 0 < k < 1, k = 1, k > 1
+** Scale invariance
+*** f(cx) = c^k * f(x)
+*** Constant elasticity = k
+*** Doubling x multiplies y by 2^k
+** Log-log plot
+*** Straight line of slope k
+*** k from two points
+** Versus other curves
+*** Linear: special case k = 1
+*** Exponential overtakes any power
+left side
+** Calculus
+*** Integral of x^k is x^(k+1)/(k+1)
+*** k = -1 gives a logarithm
+** In DeFi and finance
+*** Bonding curves: p = alpha * s^beta
+*** Constant product: y = K / x
+*** Weighted pools: y ~ x^(-w1/w2)
+*** Square-root price impact (empirical)
+** Distributions
+*** Pareto tail P(X > x) ~ x^(-alpha)
+*** 80/20 rule: alpha ~ 1.16
+*** Fit by maximum likelihood, not by a log-log line
+@endmindmap
