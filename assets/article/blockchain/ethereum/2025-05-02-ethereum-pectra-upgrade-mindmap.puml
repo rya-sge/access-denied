@@ -11,21 +11,26 @@ mindmapDiagram {
   }
 }
 </style>
-* Ethereum\nPectra (2025)
-** Execution layer
-*** EIP-2537\nBLS12-381 precompile
-*** EIP-2935\nHistorical block hashes
-*** EIP-7623\nIncrease calldata cost
-*** EIP-7685\nGeneral purpose requests
-** Account abstraction
-*** EIP-7702\nSet code for EOAs
-** Blobs / scaling
-*** EIP-7691\nBlob throughput increase
-*** EIP-7840\nBlob schedule in config
-** Consensus layer
-*** EIP-7549\nCommittee index out\nof attestation
-** Staking
-*** EIP-6110\nOnchain validator deposits
-*** EIP-7002\nEL triggerable withdrawals
-*** EIP-7251\nRaise MAX_EFFECTIVE_BALANCE
+* Ethereum Pectra\n(mainnet 2025-05-07)
+** Accounts
+*** EIP-7702: EOA delegates to code
+*** Tx type 0x04, 0xef0100 || address
+*** 25,000 gas per authorization
+** Staking (EIP-7685 requests)
+*** EIP-6110: deposits on chain (~13 min)
+*** EIP-7002: exits from withdrawal address
+*** EIP-7251: up to 2,048 ETH, consolidation
+*** EIP-7549: aggregation across committees
+left side
+** Capacity
+*** EIP-7691: blobs 6 target / 9 max
+*** EIP-7623: calldata floor 10 / 40 gas per byte
+*** EIP-7840: blob schedule in config
+** EVM
+*** EIP-2537: BLS12-381 precompiles 0x0b-0x11
+*** EIP-2935: 8,191 block hashes in state
+** Impact
+*** EOA may have code
+*** Data-heavy txs cost more
+*** Contracts can trigger exits
 @endmindmap

@@ -124,7 +124,7 @@ The gas changes that affect contract developers:
 | First write to a slot | 22,100 (was zero) or 5,000 (was non-zero), cold | 12,100 execution gas in both cases (2,100 cold access + 10,000 write) | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) |
 | Cold account access | 2,600 | 3,000 | EIP-8038 |
 | Transaction base cost | 21,000 | 12,000, plus 3,000 for the called account and 6,000 when value is sent | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) |
-| Calldata floor | 10 gas per token | 16 gas per token | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) |
+| Calldata floor | 10 gas per token (40 per non-zero byte, 10 per zero byte) | 64 gas per byte, zero or not (every byte counts as 4 tokens, 16 gas per token) | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) |
 | What the 16,777,216 cap applies to | all gas | execution gas only | EIP-8037 |
 | Block accounting | gas after refunds | execution and state gas counted separately, before refunds | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) |
 
@@ -254,7 +254,7 @@ The gas of an Ethereum transaction is the sum of an intrinsic cost, the cost of 
 | **`gasUsed`** | The gas a transaction actually consumed, recorded in its receipt after refunds and the calldata floor. |
 | **Intrinsic gas** | The gas charged before execution: a base cost, calldata, contract creation and access list entries. |
 | **Calldata token** | The unit used to price calldata: one per zero byte, four per non-zero byte. |
-| **Calldata floor** | The minimum gas a transaction pays per calldata token since EIP-7623, 10 per token under Fusaka and 16 under Glamsterdam. |
+| **Calldata floor** | The minimum gas a transaction pays per calldata token since EIP-7623, 10 per token under Fusaka; under Glamsterdam, 64 per byte, every byte counting as 4 tokens at 16 gas. |
 | **Cold / warm access** | The first access to an account or slot in a transaction (cold) costs more than later accesses to the same item (warm). |
 | **Refund** | Gas returned for clearing storage, capped at one fifth of the gas used since EIP-3529. |
 | **Base fee** | The protocol-set price per gas unit, burned, which moves by at most 12.5 % per block toward a target of half the block gas limit. |
@@ -357,6 +357,7 @@ The following points were not settled by the sources used for this article:
 
 ### Related articles
 
+- [Ethereum Upgrade Glamsterdam - Overview]({{site.url_complet}}/2026/10/23/ethereum-glamsterdam-upgrade-overview/)
 - [Ethereum: A Gas Story]({{site.url_complet}}/2026/10/23/ethereum-a-gas-story/)
 - [Ethereum Upgrade Pectra - Overview]({{site.url_complet}}/2025/05/02/ethereum-pectra-upgrade/)
 - [Blockchain gas price]({{site.url_complet}}/2025/11/10/blockchain-gas-price/)

@@ -1202,3 +1202,19 @@ _posts/2026-10-23-ethereum-a-gas-story.md
   assets/article/blockchain/ethereum/gas/2026-10-23-ethereum-a-gas-story-mindmap.puml   (mindmap -> .png, cover image)
   assets/article/blockchain/ethereum/gas/ethereum-block-gas-limit-history.py   (in-section figure -> .svg, embedded in "2015: Frontier and the first price list"; matplotlib, create-plot)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-fusaka-upgrade-overview.md
+  assets/article/blockchain/ethereum/fusaka/2026-10-23-ethereum-fusaka-upgrade-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-glamsterdam-upgrade-overview.md
+  assets/article/blockchain/ethereum/glamsterdam/2026-10-23-ethereum-glamsterdam-upgrade-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-2300-gas-stipend.md
+  assets/article/blockchain/ethereum/gas/2026-10-23-ethereum-2300-gas-stipend-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2025-05-02-ethereum-pectra-upgrade.md
+  assets/article/blockchain/ethereum/2025-05-02-ethereum-pectra-upgrade-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

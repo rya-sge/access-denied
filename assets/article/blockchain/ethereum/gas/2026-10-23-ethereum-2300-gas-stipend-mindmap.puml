@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* 2,300 gas stipend
+** In the EVM
+*** CALL_STIPEND = 2300 since Frontier
+*** Added only when value > 0
+*** Added after the 63/64 cap
+*** Paid in CALL_VALUE (9,000)
+** In Solidity
+*** transfer: 2,300, reverts
+*** send: 2,300, returns false
+*** call: all gas, returns false
+*** transfer/send deprecated in 0.8.31
+** Measured receivers
+*** Event only: 1,469, fits everywhere
+*** One SLOAD: 281 / 881 / 2,181
+*** SLOAD + event: 2,317 after Istanbul
+*** SSTORE: always fails
+*** TSTORE: 138, fits (Cancun+)
+left side
+** Breakages by fork
+*** Constantinople: EIP-1283 withdrawn
+*** Istanbul: EIP-2200 sentry, SLOAD 800
+*** Berlin: cold reads 2,100
+*** Cancun: transient storage fits
+*** Pectra: EIP-7702 accounts run code
+** Glamsterdam
+*** CALL_VALUE = 11,300
+*** Cold account 3,000
+*** EIP-7708 transfer logs
+** Alternatives
+*** call + checks-effects-interactions
+*** Reentrancy guard (transient)
+*** Pull payments
+*** PAY opcode (EIP-5920, draft)
+@endmindmap

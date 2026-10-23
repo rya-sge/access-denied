@@ -147,7 +147,7 @@ Glamsterdam (Amsterdam on the execution layer, meta-EIP [EIP-7773](https://eips.
 - **State gas** ([EIP-8037](https://eips.ethereum.org/EIPS/eip-8037)) charges the creation of new state per byte, at 1,530 gas per byte: 97,920 for a new storage slot (64 bytes) and 183,600 for a new account (120 bytes). It is counted apart from the 16,777,216 cap, which now applies to execution gas only. The part of a transaction's gas limit above the cap becomes a reservoir from which state gas is paid.
 - **State access** ([EIP-8038](https://eips.ethereum.org/EIPS/eip-8038)) separates accessing a slot from creating it: any first write to a slot costs 2,100 for the cold access plus 10,000, and a cold account access rises from 2,600 to 3,000.
 - **Intrinsic cost** ([EIP-2780](https://eips.ethereum.org/EIPS/eip-2780)) breaks the 21,000 base cost into its parts: 12,000 for the transaction, 3,000 for the called account and 6,000 when ETH is sent. A plain ETH transfer still costs 21,000.
-- **Data and access lists** become more expensive: the calldata floor rises from 10 to 16 gas per token ([EIP-7976](https://eips.ethereum.org/EIPS/eip-7976)), and access lists are charged for their data footprint as well, so that they cannot be used to bypass that floor ([EIP-7981](https://eips.ethereum.org/EIPS/eip-7981)).
+- **Data and access lists** become more expensive: the calldata floor rises to 64 gas per byte, every byte now counting as 4 tokens at 16 gas, zero bytes included ([EIP-7976](https://eips.ethereum.org/EIPS/eip-7976)), and access lists are charged for their data footprint as well, so that they cannot be used to bypass that floor ([EIP-7981](https://eips.ethereum.org/EIPS/eip-7981)).
 - **Block accounting** counts gas before refunds ([EIP-7778](https://eips.ethereum.org/EIPS/eip-7778)), so a refund no longer frees room in the block, and counts execution gas and state gas separately, each against the block gas limit.
 
 The 20,000 gas charged since Frontier for a new storage slot thus becomes 12,100 of execution gas and 97,920 of state gas. Creating state, which stays on every node forever, is now priced for the storage it occupies rather than for the time it takes. The companion article measures the effect on a batch mint on Sepolia: 117,597 gas per new holder instead of 29,593, and up to 849 new holders in one transaction instead of 565, because only the execution part counts against the cap.
@@ -253,7 +253,7 @@ The following points were not settled by the sources used for this article:
 
 | Gap | Why it matters | What to read or verify |
 |---|---|---|
-| The Glamsterdam gas EIPs were in Last Call status on 2026-10-23. | The constants of the Glamsterdam section (1,530 per byte, 12,000 base cost, 16 per token floor) may change before mainnet. | The EIP texts and `forks/amsterdam/` in execution-specs at the time of reading. |
+| The Glamsterdam gas EIPs were in Last Call status on 2026-10-23. | The constants of the Glamsterdam section (1,530 per byte, 12,000 base cost, 64 gas per byte calldata floor) may change before mainnet. | The EIP texts and `forks/amsterdam/` in execution-specs at the time of reading. |
 | The account of the 2016 Shanghai attacks comes from the EIP-150 and EIP-2929 texts and the paper they cite, not from a post-mortem. | Details such as the exact attack transactions and dates are not given here. | Ethereum Foundation blog posts of September and October 2016 on the DoS attacks. |
 | The discovery of the EIP-1283 reentrancy issue is described from the EIP-2200 rationale; who found it and when is general knowledge. | The article does not name the finder or the date the upgrade was postponed. | The ChainSecurity disclosure of January 2019 and the Ethereum Foundation postponement announcement. |
 | The block gas limit curve is built from about 45 sampled blocks, not from every block. | Short-lived changes between two samples are not visible in the figure. | A full series of block headers, or Etherscan's gas limit chart. |
@@ -333,6 +333,7 @@ The following points were not settled by the sources used for this article:
 
 ### Related articles
 
+- [The 2,300 Gas Stipend in Ethereum - Origin, Breakages and Alternatives]({{site.url_complet}}/2026/10/23/ethereum-2300-gas-stipend/)
 - [Ethereum Gas — How Transaction Cost and the Per-Transaction Limit Are Computed (Fusaka and Glamsterdam)]({{site.url_complet}}/2026/10/23/ethereum-gas-cost-transaction-limit-fusaka-glamsterdam/)
 - [Ethereum Upgrade Pectra - Overview]({{site.url_complet}}/2025/05/02/ethereum-pectra-upgrade/)
 - [Summary of EIP-4844 Proto-Danksharding]({{site.url_complet}}/2023/09/26/EIP-4844-Proto-Danksharding/)

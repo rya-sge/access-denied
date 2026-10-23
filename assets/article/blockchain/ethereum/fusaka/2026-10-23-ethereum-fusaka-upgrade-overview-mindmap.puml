@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Fusaka (Fulu + Osaka)\nmainnet 2025-12-03
+** Data availability
+*** EIP-7594 PeerDAS
+*** 128 columns, custody 4 (8+ validators)
+*** Sample 8 columns per slot
+*** Senders compute cell proofs
+*** Max 6 blobs per transaction
+** Blob capacity and fees
+*** EIP-7892 BPO forks
+*** 6/9 -> 10/15 -> 14/21 blobs
+*** EIP-7918 reserve price
+** Execution limits
+*** EIP-7825 cap 16,777,216 gas per tx
+*** EIP-7934 block size 8 MiB RLP
+*** EIP-7935 default 60M gas limit
+left side
+** EVM and precompiles
+*** EIP-7939 CLZ (5 gas)
+*** EIP-7823 MODEXP inputs <= 1,024 bytes
+*** EIP-7883 MODEXP repricing
+*** EIP-7951 P256VERIFY (6,900 gas)
+** Consensus
+*** EIP-7917 proposer lookahead
+** Node operations
+*** EIP-7642 eth/69
+*** EIP-7910 eth_config
+@endmindmap

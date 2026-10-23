@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Glamsterdam
+** Status
+*** Gloas + Amsterdam
+*** Sepolia 2026-10-06, mainnet not set
+*** 17 EIPs in Last Call
+** Block production
+*** EIP-7732 enshrined PBS
+*** Builders bid, PTC of 512
+*** EIP-8282 builder deposit / exit
+** Block validation
+*** EIP-7928 block-level access lists
+*** Parallel IO and execution
+*** Networking: eth/70-72, snap/2
+left side
+** Gas
+*** EIP-8037 state gas 1,530 / byte
+*** EIP-8038 access and write costs
+*** EIP-2780 intrinsic 12,000 + parts
+*** EIP-7778, 7976, 7981
+** EVM
+*** EIP-7954 contracts 64 KiB
+*** EIP-8024 DUPN / SWAPN / EXCHANGE
+*** EIP-7843 SLOTNUM
+*** EIP-7708 ETH transfer logs
+*** EIP-8246, EIP-7997
+** Consensus
+*** EIP-8061 faster exits
+*** EIP-8045 slashed not proposers
+*** EIP-7688 stable proofs
+@endmindmap

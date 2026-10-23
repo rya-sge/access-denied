@@ -78,3 +78,7 @@ crypto-hacks:
 morpho:
   title: "The Morpho Protocol"
   ordered: false
+
+ethereum-upgrades:
+  title: "Ethereum Network Upgrades"
+  ordered: false
