@@ -100,6 +100,10 @@ Increases the constant `MAX_EFFECTIVE_BALANCE`, while keeping the minimum stakin
 
 - [Coinbase - The Ultimate Guide to Ethereum's Pectra Upgrade](https://www.coinbase.com/blog/the-ultimate-guide-to-ethereums-pectra-upgrade)
 
+### Related articles
+
+- [Ethereum Gas — How Transaction Cost and the Per-Transaction Limit Are Computed (Fusaka and Glamsterdam)]({{site.url_complet}}/2026/10/23/ethereum-gas-cost-transaction-limit-fusaka-glamsterdam/)
+
 ## Mindmap
 
 The mindmap below summarizes the article.

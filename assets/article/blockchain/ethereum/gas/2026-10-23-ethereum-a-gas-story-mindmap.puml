@@ -1,0 +1,42 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Ethereum: a gas story
+** 2015 Frontier
+*** One price list, first-price auction
+*** SLOAD 50, new slot 20,000
+*** Gas limit 5,000 then 3,141,592
+** 2016 Shanghai attacks
+*** Cheap state reads, gas limit cut to 500,000
+*** EIP-150: repricing, 63/64 rule
+*** EIP-160, EIP-161, EIP-170
+** 2017-2019
+*** REVERT returns unused gas
+*** EIP-1283 withdrawn (Petersburg)
+*** Istanbul: SLOAD 800, calldata 16
+*** EIP-2200: net metering + 2,300 guard
+left side
+** 2021 Berlin and London
+*** Cold / warm access, access lists
+*** EIP-1559: base fee burned, target
+*** EIP-3529: refunds cut, gas tokens end
+** 2022-2024
+*** Merge: validators set the limit
+*** EIP-4844: blob gas market
+*** Transient storage (EIP-1153)
+** 2025-2026
+*** Gas limit 30M to 60M
+*** EIP-7623 calldata floor
+*** EIP-7825: cap 16,777,216 per tx
+*** Glamsterdam: state gas per byte
+@endmindmap

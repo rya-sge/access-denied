@@ -1,0 +1,40 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Ethereum gas
+** How gas is computed
+*** Intrinsic: base, calldata, access list
+*** Execution: opcodes, storage, logs
+*** Refunds (max 1/5) and calldata floor
+*** Fee = gasUsed x (base fee + tip)
+** Limits on one transaction
+*** Sender's gas limit
+*** Cap 16,777,216 (EIP-7825)
+*** Block gas limit (60M default)
+*** Block size and mempool size
+left side
+** Fusaka vs Glamsterdam
+*** New slot: 20,000 vs 97,920 state gas
+*** Slot write: 22,100 / 5,000 vs 12,100
+*** Cap on all gas vs execution gas only
+*** State gas reservoir above the cap
+** Measuring gas
+*** Receipt on anvil / Hardhat
+*** eth_simulateV1 + state overrides
+*** Binary search for the maximum
+*** Gas price from Etherscan
+** Example: batch mint
+*** Mainnet: 565 new / 1,339 existing
+*** Sepolia: 849 with ~99.9M gas limit
+*** Sepolia: 142 with a 2^24 gas limit
+@endmindmap
