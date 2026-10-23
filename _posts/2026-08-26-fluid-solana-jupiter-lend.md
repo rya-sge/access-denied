@@ -341,86 +341,6 @@ Beyond the three authorities, every program except the flash loan one keeps an o
 
 The code is not open source. It ships under the [Business Source License 1.1](https://mariadb.com/bsl11/) with a change date of 2029-07-24, after which it converts to the open source licence named in the file. Two sets of math helpers are carved out as Apache 2.0 because they derive from other projects: the casting and safe-arithmetic files from Drift, and the `u256` routines from Orca's Whirlpools. The `NOTICE` also credits the SPL token-lending program as modified source, without naming specific files.
 
-## Risks
-
-The protocol's own disclosure is short. The repository README has a "Security" section that points to the audit reports in [Jupiter's documentation repository](https://github.com/jup-ag/docs/tree/main/static/files/audits), gives two disclosure addresses (security@fluid.io and security@jup.ag), and describes the three authorities covered in the governance section above. No dedicated risk page turned up in the sources read for this article. What follows adds what the code and the mainnet deployment show. The on-chain facts come from read-only JSON-RPC calls to the public mainnet endpoint on 22 October 2026, between slots 460053497 and 460054186.
-
-### Smart contracts and transparency
-
-- **The source is readable, but it is not open source and is not tied to the deployed binary.** The code is public under the BSL 1.1 described above. The ProgramData accounts show that five of the six programs were redeployed after the commit this article analyses (dated 26 August 2026): liquidity, lending and the reward rate model at slots 453953579, 453954884 and 453954509 (6 October 2026, 41 days later), vaults and oracle at slots 449989995 and 449989861 (24 September 2026, 29 days later). Only the flash loan program (slot 430476301, 3 July 2026) predates it. Whether the deployed bytecode matches any public commit was not checked.
-- **Audits exist; their scope against the deployed code is unknown.** Jupiter's audit folder holds fifteen files whose names start with `lend-`: OtterSec (two), Offside (liquidity, oracle and flash loan, vault), MixBytes (vault), Zenith, Code4rena, two Certora formal-verification reports, and five whose names contain `amm`, which may concern another component. They were not read for this article, so which commit each one covers is open.
-- **Every program is upgradeable, and one authority upgrades all six.** Each program account is owned by `BPFLoaderUpgradeab1e11111111111111111111111`, and each ProgramData account names `4MsgBB5VPoTrUSp5XnfbViV386C1UnsTdifLBw33ZMSJ` as upgrade authority; none has been made immutable. The upside is that a bug can be patched without migrating positions, which the redeployments above show is used. The other side is that whoever controls that authority can replace the logic of the program that holds every deposited token, and a single approval can rewrite all six programs at once.
-- **The upgrade authority is a [Squads](https://squads.so/) v4 vault behind a 4-of-6 multisig with a 12-hour timelock.** `4MsgBB5…` is off the ed25519 curve (a PDA, with no private key) and is a data-less System account. The liquidity upgrade at slot 453953579 was executed by the Squads v4 program (`SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf`, instruction `VaultTransactionExecute`) on behalf of multisig `J3mJ3wz6xkVUk3T8qHnuAYNxsRH3ixHsryYNZAU2vG8P`. Decoding that account at slot 460054156 gives a threshold of 4, six members all holding every permission, a `time_lock` of 43200 seconds (12 hours, matching the README), and the default config authority, so membership changes go through the same 4-of-6 vote and delay.
-- **Two authorities are compiled in.** `GOVERNANCE_MS` and `PROTOCOL_INIT_AUTH` are constants, so replacing either key after a compromise needs an upgrade and its 12-hour wait.
-- **The new mechanisms carry the most implementation risk.** The `interacting_*` handshake, the caller-supplied `remaining_accounts`, the instruction introspection of flash loans and the tick, branch and debt-factor bookkeeping are each small checks guarding large balances (*derived*). `close_position` is not exported, so position rent is locked at the analysed revision.
-
-### External dependencies
-
-- **Oracles.** The oracle program accepts seven source types. Pyth, Chainlink and Redstone are timestamped feeds; user operations reject a price older than 600 seconds or a confidence interval wider than 2%, liquidation accepts 7200 seconds and 4%. Liquidation can therefore act on a price twelve times older than the one a borrow would accept, the trade-off discussed in [Pricing a Lending Position During an Incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/), and the Pyth integration pitfalls are covered in [Integrating Pyth Network Price Feeds]({{site.url_complet}}/2026/03/13/pyth-integration-security/). Which sources each live vault uses was not read.
-- **Exchange-rate sources.** `StakePool`, `MsolPool` and `SinglePool` read the stake pool account itself; `StakePool` returns `total_lamports / pool_token_supply`, fails with `StakePoolNotRefreshed` when the pool has not been updated for the current epoch within its first hour, and rejects a pool whose fees exceed a ceiling. `JupLend` prices a jlToken from Jupiter Lend's own exchange price. These sources depend on the stake pool programs and on the lending program rather than on a market.
-- **Jupiter.** The application at jup.ag, the SDK that builds the versioned transactions, and the lookup tables set by `update_lookup_table` are the usual path to the programs. If the front end or the lookup tables become unavailable, the programs still run, but a user has to build vault transactions by hand (*derived*).
-- **Solana itself.** Every liquidation is a large versioned transaction that competes for block space and compute units, so under congestion it depends on priority fees and leader inclusion (*derived*). Solana mainnet has also halted block production several times since 2020; during a halt no price is updated and no position can be liquidated or withdrawn, and positions are repriced in one step when blocks resume (*derived*).
-- **Token programs.** A mint's freeze authority or a Token-2022 transfer hook can block a transfer; the `CLAIM` path protects the user's side, but a freeze on the liquidity program's own token vault would lock that reserve for every protocol using it (*derived*).
-- **Bridged assets and LSTs.** A bridged token is worth what its bridge redeems, and an LST what its stake pool holds; the listed reserves and their issuers were not checked for this article.
-
-### Depeg
-
-- **LSTs are priced at redemption value, not at market.** Because `StakePool` returns the pool's lamports per token, a secondary-market discount on an LST does not move the oracle price. Borrowers looping an LST against SOL are not liquidated by a temporary discount, which avoids a cascade; the cost is that a liquidator who needs to sell the seized LST at once gets the market price, so the penalty has to cover the gap or liquidation stalls (*derived*). A real loss in the pool (slashing, a pool exploit) lowers `total_lamports` and is passed through.
-- **jlTokens follow the reserve's exchange price.** The lending program refuses to run if the liquidity exchange price moves backwards, so a jlToken's price never falls; a shortfall in the reserve shows up as missing liquidity, not as a lower share price (*derived*).
-- **Stablecoins.** Whether each stablecoin market prices the token through its own USD feed or treats it as equal to another asset was not read; in the second case a depeg would not show in the oracle price.
-
-### Collateral and market risk
-
-- **The shared reserve spreads one vault's loss.** Every vault and the lending program draw on one reserve per mint. A vault whose bad debt is never repaid still owes its borrow position on the liquidity program, so the missing tokens are missing for every supplier of that mint, including jlToken holders who never used that vault (*derived*). The per-protocol `max_debt_ceiling` caps how much one vault can owe, which bounds this exposure.
-- **Reflexive loops.** Looping an asset against itself or a near copy (an LST against SOL, a jlToken as collateral for the same underlying) multiplies exposure to one rate. For Pyth-priced volatile collateral, liquidators selling seized collateral on Solana venues push the market prices those feeds aggregate (*derived*).
-- **Liquidation on a stale price.** With a two-hour tolerance a liquidation can run on a price far from the market. Liquidators act only when it pays, so a stale price that overstates collateral delays liquidation while the shortfall grows (*derived*).
-- **Absorption limit.** `update_core_settings` keeps `liquidation_max_limit + liquidation_penalty` at or below 99.7%; positions beyond `liquidation_max_limit` are absorbed into vault-level totals instead of being liquidated tick by tick.
-
-### Liquidity
-
-- **Utilization.** Suppliers cannot withdraw what is lent out. `max_utilization` stops a borrow, but not a withdrawal, from pushing utilization past the cap, and at full utilization exits wait for repayments or liquidations while the rate curve rises.
-- **Withdrawal limits are per protocol, not per user.** The expanding withdrawal limit applies to the lending program's position as a whole, so all jlToken holders share one schedule; a large holder who withdraws first uses the window and the rest wait for it to expand (*derived*). The same mechanism is what bounds a drain by a buggy protocol.
-- **Pauses.** A guardian can pause supply or borrow per mint for class 0 protocols (class 1, "established protocols", cannot be paused by guardians). An auth can set the liquidity program's status to locked with `change_status`, and the `ProtocolLockdown` constraint sits on the `PreOperate`, `Operate` and `Claim` contexts, so a lockdown stops withdrawals and claims as well as deposits.
-- **Exit during an upgrade window.** The 12-hour timelock gives depositors time to leave before a malicious upgrade lands, but only within what utilization and withdrawal limits allow during those 12 hours (*derived*).
-
-### Centralisation and governance
-
-The three authorities were read on chain. Each is a System-owned, data-less, off-curve address, and the multisig behind it was found from a `VaultTransactionExecute` it signed.
-
-| Authority | Address | Squads v4 multisig | Threshold | Members (full permissions) | Timelock | Read at slot |
-|-----------|---------|--------------------|-----------|----------------------------|----------|--------------|
-| Upgrade | `4MsgBB5VPoTrUSp5XnfbViV386C1UnsTdifLBw33ZMSJ` | `J3mJ3wz6xkVUk3T8qHnuAYNxsRH3ixHsryYNZAU2vG8P` | 4 | 6 (6) | 43200 s (12 h) | 460054156 |
-| Program (`GOVERNANCE_MS`) | `HqPrpa4ESBDnRHRWaiYtjv4xe93wvCS9NNZtDwR89cVa` | `5Y93cxqp8rGtjDhxGkehewfhFdxLkrCfPDWookCGeASF` | 4 | 9 (7) | 21600 s (6 h) | 460054171 |
-| Init (`PROTOCOL_INIT_AUTH`) | `3H8C6yYTXUcN9RRRDmcLDt3e4aZLYRRX4x2HbEjTqQAA` | `B9fGPEBP1M4SvQgtG7egVrdL5N9zBxrFpdtZevTkhQ6o` | 3 | 7 (5) | none | 460054186 |
-
-- **The program authority changes the economics on a six-hour delay.** It sets rate curves, LTV, limits and per-vault oracles (`update_oracle`), and was seen at slot 460047004 executing an `UpdateRateDataV1` on the liquidity program. Two of its nine members, and two of the init multisig's seven, hold only permission value 1, which in Squads v4 is the right to propose, not to vote.
-- **The same keys sit on both sides.** Five of the six upgrade members are also full members of the program multisig (*derived* from the addresses). The README says Jupiter and Fluid signers share control; which key belongs to which team cannot be read on chain.
-- **The init authority acts without delay.** A 3-of-7 vote with no timelock can create reserves, markets and vaults, though not reconfigure them.
-- **Guardians and auths.** Guardian pauses and `change_status` go through auth and guardian lists that were not read; their members and any delay are open.
-- **Off-chain parts.** The designated rebalancer of the lending program, the liquidator set, Jupiter's front end and SDK, and the lookup tables are operated off chain.
-
-### Loss sharing
-
-- **No first-loss buffer found.** A search of the programs for an insurance fund or a bad-debt reserve found none. Debt above `liquidation_max_limit` moves into `absorbed_debt_amount` with its collateral; if that collateral is worth less than the debt, nothing in the code covers the difference.
-- **Suppliers absorb it, in order of exit.** Since exchange prices never fall, an unrecovered shortfall is not shared pro rata through the price; the reserve simply holds fewer tokens than it owes, and the last suppliers to withdraw are the ones left short (*derived*). Revenue collected with `collect_revenue` could be used to refill a reserve, but that would be a governance decision, not a mechanism.
-
-### Regulatory
-
-- **None found in the code.** The programs have no KYC or allow-list for end users. Admin control by identifiable teams bears on whether a service counts as fully decentralised under the EU framework described in [MiCA explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/), a question this article does not settle (*derived*).
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-|------|---------------------|-------------------------------|--------------|
-| Malicious or faulty upgrade | All six programs share one upgrade authority | Squads v4 4-of-6 multisig, 12-hour timelock | Signers' identities unknown; exits limited during the window |
-| Deployed code differs from reviewed code | Five programs redeployed after the analysed commit | Public source and fifteen audit files | No verified-build match checked |
-| Stale or wrong price | Pyth, Chainlink, Redstone and pool-rate sources | Age and confidence checks, stricter for user operations | Liquidation accepts a two-hour-old price |
-| LST market depeg | Pool redemption rate used as price | No liquidation cascade on a market discount | Liquidators sell at market; penalty must cover the gap |
-| Bad debt in one vault | Shared reserve per mint | Per-protocol debt ceilings, absorb path | No insurance; last suppliers out take the loss |
-| Locked withdrawals | High utilization, per-protocol withdrawal limits, pauses | Rate curve, expansion schedule, claim accounts | Lockdown blocks withdrawals and claims |
-| Governance changes | Program authority sets rates, limits, oracles | 4-of-9 multisig, 6-hour timelock | Guardian and auth lists not read |
-| Chain halt or congestion | Solana block production and fees | None in the programs | Positions repriced in one step after a halt |
-
 ## Conclusion
 
 The port keeps Fluid's economic design intact and rebuilds its plumbing. The shared reserve, the tick-based liquidation with branches and debt factors, the dual rate curves and the per-protocol expanding limits all carry over with the same constants. What changed is everything that depended on EVM execution semantics: the pull-based deposit became a snapshot-and-compare handshake, the reentrant flash loan callback became instruction introspection, the storage mapping became a set of PDAs the caller must name in advance, and the unconditional token transfer gained a claim fallback for the case where a destination account will not accept it.
@@ -475,6 +395,86 @@ For a reviewer, the parts that carry the most new risk are the ones with no EVM 
 | Liquidation reads a price that may be up to two hours old. | Do not assume the liquidation price matches a live market quote; size liquidations against the returned `col_per_unit_debt`. |
 | Positions cannot be closed at the analysed revision. | Budget for the rent of every position account created; it is not currently reclaimable. |
 | `close_claim_account` has an empty body. | Rent recovery comes from Anchor's `close = user` constraint, and the account context also requires the claim balance to be zero. |
+
+### Risks
+
+The protocol's own disclosure is short. The repository README has a "Security" section that points to the audit reports in [Jupiter's documentation repository](https://github.com/jup-ag/docs/tree/main/static/files/audits), gives two disclosure addresses (security@fluid.io and security@jup.ag), and describes the three authorities covered in the governance section above. No dedicated risk page turned up in the sources read for this article. What follows adds what the code and the mainnet deployment show. The on-chain facts come from read-only JSON-RPC calls to the public mainnet endpoint on 22 October 2026, between slots 460053497 and 460054186.
+
+#### Smart contracts and transparency
+
+- **The source is readable, but it is not open source and is not tied to the deployed binary.** The code is public under the BSL 1.1 described above. The ProgramData accounts show that five of the six programs were redeployed after the commit this article analyses (dated 26 August 2026): liquidity, lending and the reward rate model at slots 453953579, 453954884 and 453954509 (6 October 2026, 41 days later), vaults and oracle at slots 449989995 and 449989861 (24 September 2026, 29 days later). Only the flash loan program (slot 430476301, 3 July 2026) predates it. Whether the deployed bytecode matches any public commit was not checked.
+- **Audits exist; their scope against the deployed code is unknown.** Jupiter's audit folder holds fifteen files whose names start with `lend-`: OtterSec (two), Offside (liquidity, oracle and flash loan, vault), MixBytes (vault), Zenith, Code4rena, two Certora formal-verification reports, and five whose names contain `amm`, which may concern another component. They were not read for this article, so which commit each one covers is open.
+- **Every program is upgradeable, and one authority upgrades all six.** Each program account is owned by `BPFLoaderUpgradeab1e11111111111111111111111`, and each ProgramData account names `4MsgBB5VPoTrUSp5XnfbViV386C1UnsTdifLBw33ZMSJ` as upgrade authority; none has been made immutable. The upside is that a bug can be patched without migrating positions, which the redeployments above show is used. The other side is that whoever controls that authority can replace the logic of the program that holds every deposited token, and a single approval can rewrite all six programs at once.
+- **The upgrade authority is a [Squads](https://squads.so/) v4 vault behind a 4-of-6 multisig with a 12-hour timelock.** `4MsgBB5…` is off the ed25519 curve (a PDA, with no private key) and is a data-less System account. The liquidity upgrade at slot 453953579 was executed by the Squads v4 program (`SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf`, instruction `VaultTransactionExecute`) on behalf of multisig `J3mJ3wz6xkVUk3T8qHnuAYNxsRH3ixHsryYNZAU2vG8P`. Decoding that account at slot 460054156 gives a threshold of 4, six members all holding every permission, a `time_lock` of 43200 seconds (12 hours, matching the README), and the default config authority, so membership changes go through the same 4-of-6 vote and delay.
+- **Two authorities are compiled in.** `GOVERNANCE_MS` and `PROTOCOL_INIT_AUTH` are constants, so replacing either key after a compromise needs an upgrade and its 12-hour wait.
+- **The new mechanisms carry the most implementation risk.** The `interacting_*` handshake, the caller-supplied `remaining_accounts`, the instruction introspection of flash loans and the tick, branch and debt-factor bookkeeping are each small checks guarding large balances (*derived*). `close_position` is not exported, so position rent is locked at the analysed revision.
+
+#### External dependencies
+
+- **Oracles.** The oracle program accepts seven source types. Pyth, Chainlink and Redstone are timestamped feeds; user operations reject a price older than 600 seconds or a confidence interval wider than 2%, liquidation accepts 7200 seconds and 4%. Liquidation can therefore act on a price twelve times older than the one a borrow would accept, the trade-off discussed in [Pricing a Lending Position During an Incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/), and the Pyth integration pitfalls are covered in [Integrating Pyth Network Price Feeds]({{site.url_complet}}/2026/03/13/pyth-integration-security/). Which sources each live vault uses was not read.
+- **Exchange-rate sources.** `StakePool`, `MsolPool` and `SinglePool` read the stake pool account itself; `StakePool` returns `total_lamports / pool_token_supply`, fails with `StakePoolNotRefreshed` when the pool has not been updated for the current epoch within its first hour, and rejects a pool whose fees exceed a ceiling. `JupLend` prices a jlToken from Jupiter Lend's own exchange price. These sources depend on the stake pool programs and on the lending program rather than on a market.
+- **Jupiter.** The application at jup.ag, the SDK that builds the versioned transactions, and the lookup tables set by `update_lookup_table` are the usual path to the programs. If the front end or the lookup tables become unavailable, the programs still run, but a user has to build vault transactions by hand (*derived*).
+- **Solana itself.** Every liquidation is a large versioned transaction that competes for block space and compute units, so under congestion it depends on priority fees and leader inclusion (*derived*). Solana mainnet has also halted block production several times since 2020; during a halt no price is updated and no position can be liquidated or withdrawn, and positions are repriced in one step when blocks resume (*derived*).
+- **Token programs.** A mint's freeze authority or a Token-2022 transfer hook can block a transfer; the `CLAIM` path protects the user's side, but a freeze on the liquidity program's own token vault would lock that reserve for every protocol using it (*derived*).
+- **Bridged assets and LSTs.** A bridged token is worth what its bridge redeems, and an LST what its stake pool holds; the listed reserves and their issuers were not checked for this article.
+
+#### Depeg
+
+- **LSTs are priced at redemption value, not at market.** Because `StakePool` returns the pool's lamports per token, a secondary-market discount on an LST does not move the oracle price. Borrowers looping an LST against SOL are not liquidated by a temporary discount, which avoids a cascade; the cost is that a liquidator who needs to sell the seized LST at once gets the market price, so the penalty has to cover the gap or liquidation stalls (*derived*). A real loss in the pool (slashing, a pool exploit) lowers `total_lamports` and is passed through.
+- **jlTokens follow the reserve's exchange price.** The lending program refuses to run if the liquidity exchange price moves backwards, so a jlToken's price never falls; a shortfall in the reserve shows up as missing liquidity, not as a lower share price (*derived*).
+- **Stablecoins.** Whether each stablecoin market prices the token through its own USD feed or treats it as equal to another asset was not read; in the second case a depeg would not show in the oracle price.
+
+#### Collateral and market risk
+
+- **The shared reserve spreads one vault's loss.** Every vault and the lending program draw on one reserve per mint. A vault whose bad debt is never repaid still owes its borrow position on the liquidity program, so the missing tokens are missing for every supplier of that mint, including jlToken holders who never used that vault (*derived*). The per-protocol `max_debt_ceiling` caps how much one vault can owe, which bounds this exposure.
+- **Reflexive loops.** Looping an asset against itself or a near copy (an LST against SOL, a jlToken as collateral for the same underlying) multiplies exposure to one rate. For Pyth-priced volatile collateral, liquidators selling seized collateral on Solana venues push the market prices those feeds aggregate (*derived*).
+- **Liquidation on a stale price.** With a two-hour tolerance a liquidation can run on a price far from the market. Liquidators act only when it pays, so a stale price that overstates collateral delays liquidation while the shortfall grows (*derived*).
+- **Absorption limit.** `update_core_settings` keeps `liquidation_max_limit + liquidation_penalty` at or below 99.7%; positions beyond `liquidation_max_limit` are absorbed into vault-level totals instead of being liquidated tick by tick.
+
+#### Liquidity
+
+- **Utilization.** Suppliers cannot withdraw what is lent out. `max_utilization` stops a borrow, but not a withdrawal, from pushing utilization past the cap, and at full utilization exits wait for repayments or liquidations while the rate curve rises.
+- **Withdrawal limits are per protocol, not per user.** The expanding withdrawal limit applies to the lending program's position as a whole, so all jlToken holders share one schedule; a large holder who withdraws first uses the window and the rest wait for it to expand (*derived*). The same mechanism is what bounds a drain by a buggy protocol.
+- **Pauses.** A guardian can pause supply or borrow per mint for class 0 protocols (class 1, "established protocols", cannot be paused by guardians). An auth can set the liquidity program's status to locked with `change_status`, and the `ProtocolLockdown` constraint sits on the `PreOperate`, `Operate` and `Claim` contexts, so a lockdown stops withdrawals and claims as well as deposits.
+- **Exit during an upgrade window.** The 12-hour timelock gives depositors time to leave before a malicious upgrade lands, but only within what utilization and withdrawal limits allow during those 12 hours (*derived*).
+
+#### Centralisation and governance
+
+The three authorities were read on chain. Each is a System-owned, data-less, off-curve address, and the multisig behind it was found from a `VaultTransactionExecute` it signed.
+
+| Authority | Address | Squads v4 multisig | Threshold | Members (full permissions) | Timelock | Read at slot |
+|-----------|---------|--------------------|-----------|----------------------------|----------|--------------|
+| Upgrade | `4MsgBB5VPoTrUSp5XnfbViV386C1UnsTdifLBw33ZMSJ` | `J3mJ3wz6xkVUk3T8qHnuAYNxsRH3ixHsryYNZAU2vG8P` | 4 | 6 (6) | 43200 s (12 h) | 460054156 |
+| Program (`GOVERNANCE_MS`) | `HqPrpa4ESBDnRHRWaiYtjv4xe93wvCS9NNZtDwR89cVa` | `5Y93cxqp8rGtjDhxGkehewfhFdxLkrCfPDWookCGeASF` | 4 | 9 (7) | 21600 s (6 h) | 460054171 |
+| Init (`PROTOCOL_INIT_AUTH`) | `3H8C6yYTXUcN9RRRDmcLDt3e4aZLYRRX4x2HbEjTqQAA` | `B9fGPEBP1M4SvQgtG7egVrdL5N9zBxrFpdtZevTkhQ6o` | 3 | 7 (5) | none | 460054186 |
+
+- **The program authority changes the economics on a six-hour delay.** It sets rate curves, LTV, limits and per-vault oracles (`update_oracle`), and was seen at slot 460047004 executing an `UpdateRateDataV1` on the liquidity program. Two of its nine members, and two of the init multisig's seven, hold only permission value 1, which in Squads v4 is the right to propose, not to vote.
+- **The same keys sit on both sides.** Five of the six upgrade members are also full members of the program multisig (*derived* from the addresses). The README says Jupiter and Fluid signers share control; which key belongs to which team cannot be read on chain.
+- **The init authority acts without delay.** A 3-of-7 vote with no timelock can create reserves, markets and vaults, though not reconfigure them.
+- **Guardians and auths.** Guardian pauses and `change_status` go through auth and guardian lists that were not read; their members and any delay are open.
+- **Off-chain parts.** The designated rebalancer of the lending program, the liquidator set, Jupiter's front end and SDK, and the lookup tables are operated off chain.
+
+#### Loss sharing
+
+- **No first-loss buffer found.** A search of the programs for an insurance fund or a bad-debt reserve found none. Debt above `liquidation_max_limit` moves into `absorbed_debt_amount` with its collateral; if that collateral is worth less than the debt, nothing in the code covers the difference.
+- **Suppliers absorb it, in order of exit.** Since exchange prices never fall, an unrecovered shortfall is not shared pro rata through the price; the reserve simply holds fewer tokens than it owes, and the last suppliers to withdraw are the ones left short (*derived*). Revenue collected with `collect_revenue` could be used to refill a reserve, but that would be a governance decision, not a mechanism.
+
+#### Regulatory
+
+- **None found in the code.** The programs have no KYC or allow-list for end users. Admin control by identifiable teams bears on whether a service counts as fully decentralised under the EU framework described in [MiCA explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/), a question this article does not settle (*derived*).
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|------|---------------------|-------------------------------|--------------|
+| Malicious or faulty upgrade | All six programs share one upgrade authority | Squads v4 4-of-6 multisig, 12-hour timelock | Signers' identities unknown; exits limited during the window |
+| Deployed code differs from reviewed code | Five programs redeployed after the analysed commit | Public source and fifteen audit files | No verified-build match checked |
+| Stale or wrong price | Pyth, Chainlink, Redstone and pool-rate sources | Age and confidence checks, stricter for user operations | Liquidation accepts a two-hour-old price |
+| LST market depeg | Pool redemption rate used as price | No liquidation cascade on a market discount | Liquidators sell at market; penalty must cover the gap |
+| Bad debt in one vault | Shared reserve per mint | Per-protocol debt ceilings, absorb path | No insurance; last suppliers out take the loss |
+| Locked withdrawals | High utilization, per-protocol withdrawal limits, pauses | Rate curve, expansion schedule, claim accounts | Lockdown blocks withdrawals and claims |
+| Governance changes | Program authority sets rates, limits, oracles | 4-of-9 multisig, 6-hour timelock | Guardian and auth lists not read |
+| Chain halt or congestion | Solana block production and fees | None in the programs | Positions repriced in one step after a halt |
 
 ## Frequently Asked Questions
 

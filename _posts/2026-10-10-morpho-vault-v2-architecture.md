@@ -321,100 +321,6 @@ Two mechanisms on the adapter side are relevant:
 
 What a depositor can do about these risks, and which events reveal them early, is the subject of the [companion monitoring article]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/).
 
-## Risks
-
-Morpho's own risk disclosure for Vault V2 is the repository [README](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/README.md), the warnings in the source, and the [audit reports](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e/audits) stored next to the code. The README states that all contracts are immutable, that relative caps can be exceeded after withdrawals, that the `max*` functions return zero, and that the non-custodial guarantee holds only "if the right timelocks are not zero". This section adds what the code and one deployed vault show, and stays at the level of a summary: which on-chain signals reveal each risk, and a watcher built on them, are the subject of [Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/).
-
-The configuration figures below come from Sentora RLUSD Main (`0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf`), the vault the monitoring article observed, read on Ethereum mainnet on 22 October 2026 at block 26,248,478. They describe one vault at one block. Every Vault V2 has its own roles, timelocks and adapters, and must be read on its own.
-
-### Smart contracts and transparency
-
-- **The core cannot be upgraded, in either direction.** `VaultV2` has no proxy (see [From MetaMorpho to Vault V2](#from-metamorpho-to-vault-v2)). The observed vault is verified on Etherscan as `VaultV2` (Solidity 0.8.28), was created on 4 March 2026 at block 24,587,448 by a contract verified as `VaultV2Factory` (`0xA1D94F746dEfa1928926b84fB2596c06926C0405`), and that factory's `isVaultV2` returns true for it. A bug found in the vault cannot be patched: the remedy is for depositors to leave and for the curator to open a new vault. In return, nobody can replace the logic with a malicious or faulty version, and the ceilings described above (50 % performance fee, 5 % a year management fee, 2 % force-deallocation penalty, 200 % a year `maxRate`) and the timelock mechanics cannot change under a depositor.
-- **The configuration is what moves.** Which adapters hold the funds, how much each id may receive, the fees, the gates and the timelocks are state written by the roles. For a depositor, the upgrade question of an upgradeable protocol becomes a governance question here, covered under [Centralisation and governance](#centralisation-and-governance) below (*derived*).
-- **Audits and formal verification.** The repository's `audits` folder holds reports by Spearbit (several rounds), Zellic, a public competition, Blackthorn and ChainSecurity for the vault, and Blackthorn, Certora and Spearbit for the market adapter; a `certora` folder holds formal-verification specifications. This article did not compare the deployed bytecode with the pinned commit, which is later than the vault's creation (see [Gaps](#gaps)).
-- **Accounting that integrators misread.** The `max*` functions returning zero, `totalSupply` without pending fee shares, stale allocations and caps checked only on allocation are listed in the [Integration Notes](#integration-notes). They are traps for code built on top of the vault rather than flaws in its own accounting.
-
-### External dependencies
-
-- **Adapters are trusted for value.** The vault takes each adapter's `realAssets()` at face value ([Architecture](#architecture)), so a faulty adapter misprices every share, and an adapter whose `realAssets()` reverts stops every deposit, withdrawal, allocation and `forceDeallocate`, since the latter ends with a `withdraw` that accrues first ([Losses](#losses)). On the observed vault, `setAdapterRegistry` is abdicated with a registry verified as `RegistryList` (`0x3696c5eAe4a7Ffd04Ea163564571E9CD8Ed9364e`), whose four sub-registries are verified as `MorphoMarketV1Registry`, `MorphoMarketV1RegistryV2` and two `MorphoVaultV1Registry` contracts. `RegistryList` cannot remove a sub-registry, but its owner can add one; at the observed block that owner was a Safe 1.3.0 with a threshold of 6 out of 10 owners, so the families of adapters this vault may ever adopt are decided by that Safe and not by the curator alone.
-- **Underlying markets and their oracles.** The vault reads no price itself. Every price enters through the Morpho Blue markets the adapter supplies to (ten market ids on the observed adapter `0x3C6EAB22cFc03fc32AD1bf836f2F886A5015DFFF`), each with its own oracle and liquidation threshold. [The PT-reUSD Liquidations on Morpho]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/) shows such an oracle at work: a 320,000 SY trade moved a TWAP-based PT feed and liquidated 36.1M of loans. That incident left no bad debt; the same mechanism on collateral that liquidators cannot absorb would leave some with the markets' suppliers, among them any vault holding them (*derived*).
-- **A MetaMorpho vault held through `MorphoVaultV1Adapter`.** The vault then inherits that vault's curator, timelocks and markets, and the monitoring article notes that Vault V1.1 does not realise bad debt. [Morpho Vault V2 Adapters]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/) covers the caveats of that adapter.
-- **Wrappers built on top.** A product that wraps a Vault V2 adds its own dependencies. [Risk of a Zama Confidential Morpho Vault]({{site.url_complet}}/2026/10/11/zama-confidential-morpho-vault-risk/) analyses one: the vault underneath is unchanged, but exits now also depend on the decryption service.
-- **The base chain.** The in-kind exit needs a flash loan of the asset and a transaction included in time. When a borrower in a held market is underwater, the order in which exits and the liquidation land on Ethereum decides who carries the loss (*derived*, from the window described in the monitoring article). The availability of flash liquidity for the vault's asset was not checked (see [Gaps](#gaps)).
-
-### Depeg
-
-- **A share has no peg.** The share price follows total assets, and losses pass through at the next accrual ([Total assets and the max rate](#total-assets-and-the-max-rate)). Nothing in the vault holds a share at a fixed value of its asset.
-- **The vault's asset.** Every amount is in the vault's single asset, RLUSD for the observed vault, and nothing in the contracts converts or hedges it. A depeg of the asset is carried in full by depositors who measure their position in another unit. RLUSD's backing and redemption terms are outside the sources of this article (see [Gaps](#gaps)).
-- **Pegged collateral in the held markets.** A depeg of a collateral token (a synthetic dollar, a liquid staking token, a PT) becomes bad debt when the fall outruns liquidations. With the Morpho Blue liquidation incentive factor, a position liquidated exactly at its LLTV still covers its debt plus the incentive only while the collateral falls by less than $$d$$ (*derived*; the formula comes from Morpho's documentation, see [Gaps](#gaps)):
-
-$$
-\begin{aligned}
-\text{LIF} &= \min\left(1.15,\; \frac{1}{0.3 \cdot \text{LLTV} + 0.7}\right) \\
-d &= 1 - \text{LLTV} \cdot \text{LIF}
-\end{aligned}
-$$
-
-For the 91.5 % LLTV of the USDe / RLUSD market the monitoring article observed, LIF is about 1.0262 and $$d$$ about 6.1 %. A collateral that gaps down by more than that between two blocks leaves bad debt even if liquidators act at once.
-
-### Collateral and market risk
-
-- **Concentration is a curator choice.** The collateral id lets a cap limit one collateral across every market that accepts it ([Ids and caps](#ids-and-caps)), but a cap set high limits nothing. On 10 October the monitoring article found 51.3 % of the observed vault in a single kBTC market.
-- **Reflexive loops sit in the markets.** Liquidations sell collateral into the venues that set the oracle price, which can push the price further and trigger more liquidations, as in the PT-reUSD case above. The vault supplies the loan side, so it is exposed only to what liquidations fail to cover, but that is exactly where a loop ends (*derived*).
-- **Caps are soft after allocation.** Interest, donations and withdrawals move allocations above their caps without a revert ([Ids and caps](#ids-and-caps)), so a cap is a limit on new money rather than on current exposure.
-
-### Liquidity
-
-- **A plain withdrawal pays from idle assets and the liquidity adapter only** ([Deposits and withdrawals](#deposits-and-withdrawals)). At the observed block the vault had no liquidity adapter and held 36.08M RLUSD idle out of 478.11M, 7.55 % of total assets; any further exit had to go through `forceDeallocate`.
-- **The forced exit is bounded by the markets.** `forceDeallocate` only withdraws what a market has not lent out, and an in-kind redemption leaves the depositor with a supply position that is as illiquid as the market (*derived*). Its penalty on the observed adapter was 0.01 % (`1e14` in WAD), below the 2 % ceiling.
-- **Instant allocator settings.** An allocator can change or unset the liquidity adapter without delay ([Roles](#roles)), which can make `withdraw` revert; it cannot block `forceDeallocate`.
-- **Gates on the exit path.** Three of the four gates can trap funds ([Gates](#gates)). On the observed vault all four gates were unset and the setters of the three exit-related gates were abdicated, so no gate can ever block an exit there. The `sendAssetsGate` setter, which restricts entry only, was neither abdicated nor timelocked.
-- **The race before a write-off.** Depositors who exit while a borrower is underwater but not yet liquidated leave the loss to those who stay (ChainSecurity finding CS-MORPHO-VLT2-001, described in the monitoring article). Liquidity therefore favours the depositor who watches.
-
-### Centralisation and governance
-
-The roles of the observed vault, read with `owner()`, `curator()`, `isSentinel` and `isAllocator` at block 26,248,478. Sentinels and allocators were listed from every `SetIsSentinel` and `SetIsAllocator` event since the vault's creation, then confirmed one by one; the Safes were read with `getThreshold()`, `getOwners()`, `getModulesPaginated` and the guard storage slot.
-
-| Role | Address | What it is |
-|------|---------|------------|
-| Owner | `0xe8C9C99EcaD0686A14A00d8521c572281E938008` | Safe 1.4.1, threshold 1 of 1 (owner `0x295Df6B70f4Ed2bE704Bd802a4D805fE700Bd7E9`, an EOA), no module, no guard |
-| Curator | `0x9e396dE3312D373b87F9BD8763fb48184b42aac0` | Safe 1.4.1, threshold 1 of 1 (owner `0x992592e073AA9b98daeD79eE05C4Af832e1D0ABE`, an EOA), no module, no guard; also a sentinel and an allocator |
-| Sentinel and allocator | `0x13DE0cEE0B83562CBfD46682e10FfA4E3c5090e1` | The vault's deployer, an EOA carrying an [EIP-7702]({{site.url_complet}}/2025/05/09/eip-7702-overview/) delegation |
-| Sentinel | `0x74D1672d0b90F6E7c322dEc9D5396fF6ACE61618` | An EOA |
-| Allocator | `0xC4Ba4e822C420452fe2BAB93211208D3CcBd79D3` | An EOA |
-
-- **Owner powers are instant.** `setOwner`, `setCurator` and `setIsSentinel` have no timelock. The owner can replace the curator in one transaction; the new curator still goes through the timelocks, and a change submitted by the former curator stays executable, because `executableAt` is keyed by the calldata and not by who submitted it (*derived*, from `submit` and `timelocked`). Both the owner and the curator are [Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/) accounts with one signer, so a single key controls each role and the multisig adds no second approval.
-- **What is timelocked on the observed vault.** Three days (259,200 s): `addAdapter`, `increaseAbsoluteCap`, `increaseRelativeCap`, and `burnShares` on the adapter. Seven days (604,800 s): `removeAdapter`, `increaseTimelock` and `abdicate`. Lowering any of these timelocks takes as long as the timelock itself ([Timelocks and abdication](#timelocks-and-abdication)).
-- **What is instant on the observed vault.** Timelock zero, so a submission can be executed in the same block: `setIsAllocator`, `setPerformanceFee`, `setManagementFee`, both fee recipients, `setForceDeallocatePenalty` and `setSendAssetsGate`. Instant by design: cap decreases and `revoke` (curator and sentinels), `deallocate` (allocators and sentinels), `allocate` within the caps, `setLiquidityAdapterAndData` and `setMaxRate` (allocators), and the owner functions. Abdicated: `setAdapterRegistry` and the three exit-related gate setters.
-- **The non-custodial guarantee covers adapters and caps here, not fees.** A curator key could, without notice, raise the management fee from 0 to 5 % a year, about 23.9M RLUSD a year or 65.5K a day on 478.11M of assets, raise the performance fee from 10 % to 50 %, or raise the force-deallocation penalty from 0.01 % to 2 %, which turns the cost of a forced exit of 1M RLUSD from 100 into 20,000 (*derived*). It could not add an adapter or raise a cap without three days of notice, nor block an exit with a gate.
-- **Off-chain operators.** Allocation decisions, the choice of markets and the response to an incident are taken off-chain by whoever holds the allocator and curator keys. Morpho's API and front end report warnings on vaults, but they are a service, not part of the contracts.
-
-### Loss sharing
-
-- **No first-loss layer.** A loss is spread over all holders in proportion to their shares ([Losses](#losses)). There is no insurance fund, no junior tranche and no priority between depositors.
-- **Depositors take losses without having borrowed.** Every depositor is a supplier to the markets the curator and allocators chose, and the adapter's `burnShares` realises a loss on a curator decision after its timelock (three days on the observed adapter).
-- **The `maxRate` buffer exists only when it is used.** Undistributed gains absorb a later loss only if `maxRate` is set below the real rate. On the observed vault it was 63,419,583,967 per second in WAD, which is 200 % a year, the ceiling, so no buffer builds up by design (*derived*).
-- **What the remaining holders receive.** Force-deallocation penalties stay in the vault as a donation to those who remain, and the management fee is charged whether the vault gains or loses ([Fees](#fees)).
-- **Pooled holders.** A wrapper that holds the vault for many users, such as the Zama confidential vault linked above, passes the loss on to its own users as a pool.
-
-### Regulatory
-
-- **The vault contract.** None found that the vault's design raises by itself: it has no issuer and needs no identity check unless a gate is set. Gates can turn a vault into a permissioned one ([Gates](#gates)); on the observed vault the share and exit gates can no longer be set, while the entry gate still can.
-- **The asset.** A vault denominated in a regulated stablecoin carries that stablecoin's regulatory position. Whether and how RLUSD is classified, for example as an e-money token in the sense of [Stablecoins Under MiCA]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/), is outside the sources of this article (see [Gaps](#gaps)).
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-|------|---------------------|-------------------------------|--------------|
-| Contract bug | Immutable `VaultV2` and adapters | Several audits, formal-verification specs, no upgrade path | A bug cannot be patched; deployed bytecode not compared with the pinned commit |
-| Adapter misreporting or reverting | `realAssets()` trusted at face value | Registry restricts adapter families; adding one is timelocked | One reverting adapter halts the vault; the registry owner can add families |
-| Oracle or collateral failure | Each held Blue market's oracle and LLTV | Collateral caps across markets | Bad debt when collateral gaps beyond about 6.1 % at 91.5 % LLTV |
-| Asset depeg | The vault's single asset | None | Carried in full by depositors |
-| Illiquidity | Idle balance and liquidity adapter only | `forceDeallocate` and in-kind redemption, penalty capped at 2 % | Bounded by unborrowed market liquidity; race before a write-off |
-| Governance change | Owner, curator, allocators, sentinels | Per-selector timelocks, abdication, sentinels can revoke | Owner and curator are one-signer Safes; fees and penalty have no timelock on the observed vault |
-| Loss allocation | Pro rata over shares | `maxRate` buffer if used, penalties donated to remaining holders | No first-loss layer; observed `maxRate` at its ceiling |
-| Regulatory | Gates and the asset's status | Optional permissioning through gates | Asset classification outside the sources |
-
 ## Conclusion
 
 Morpho Vault V2 is an immutable ERC-4626 vault that delegates every interaction with a lending protocol to adapters, and constrains what its operators can do through caps, timelocks and gates.
@@ -480,6 +386,100 @@ Morpho Vault V2 is an immutable ERC-4626 vault that delegates every interaction 
 | A loss reduces the share price immediately at the next interaction, and the management fee is taken even during losses. | Do not assume the share price is monotonic; protect against price drops with explicit checks around deposits and redemptions. |
 | A gate that reverts can block every interaction, including fee minting. | Check gate addresses and their behaviour before integrating, and treat a change of gate as a significant event. |
 | Vault shares should not be loanable. | Do not list Vault V2 shares on lending markets where they can be borrowed and shorted ahead of a known loss. |
+
+### Risks
+
+Morpho's own risk disclosure for Vault V2 is the repository [README](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/README.md), the warnings in the source, and the [audit reports](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e/audits) stored next to the code. The README states that all contracts are immutable, that relative caps can be exceeded after withdrawals, that the `max*` functions return zero, and that the non-custodial guarantee holds only "if the right timelocks are not zero". This section adds what the code and one deployed vault show, and stays at the level of a summary: which on-chain signals reveal each risk, and a watcher built on them, are the subject of [Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/).
+
+The configuration figures below come from Sentora RLUSD Main (`0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf`), the vault the monitoring article observed, read on Ethereum mainnet on 22 October 2026 at block 26,248,478. They describe one vault at one block. Every Vault V2 has its own roles, timelocks and adapters, and must be read on its own.
+
+#### Smart contracts and transparency
+
+- **The core cannot be upgraded, in either direction.** `VaultV2` has no proxy (see [From MetaMorpho to Vault V2](#from-metamorpho-to-vault-v2)). The observed vault is verified on Etherscan as `VaultV2` (Solidity 0.8.28), was created on 4 March 2026 at block 24,587,448 by a contract verified as `VaultV2Factory` (`0xA1D94F746dEfa1928926b84fB2596c06926C0405`), and that factory's `isVaultV2` returns true for it. A bug found in the vault cannot be patched: the remedy is for depositors to leave and for the curator to open a new vault. In return, nobody can replace the logic with a malicious or faulty version, and the ceilings described above (50 % performance fee, 5 % a year management fee, 2 % force-deallocation penalty, 200 % a year `maxRate`) and the timelock mechanics cannot change under a depositor.
+- **The configuration is what moves.** Which adapters hold the funds, how much each id may receive, the fees, the gates and the timelocks are state written by the roles. For a depositor, the upgrade question of an upgradeable protocol becomes a governance question here, covered under [Centralisation and governance](#centralisation-and-governance) below (*derived*).
+- **Audits and formal verification.** The repository's `audits` folder holds reports by Spearbit (several rounds), Zellic, a public competition, Blackthorn and ChainSecurity for the vault, and Blackthorn, Certora and Spearbit for the market adapter; a `certora` folder holds formal-verification specifications. This article did not compare the deployed bytecode with the pinned commit, which is later than the vault's creation (see [Gaps](#gaps)).
+- **Accounting that integrators misread.** The `max*` functions returning zero, `totalSupply` without pending fee shares, stale allocations and caps checked only on allocation are listed in the [Integration Notes](#integration-notes). They are traps for code built on top of the vault rather than flaws in its own accounting.
+
+#### External dependencies
+
+- **Adapters are trusted for value.** The vault takes each adapter's `realAssets()` at face value ([Architecture](#architecture)), so a faulty adapter misprices every share, and an adapter whose `realAssets()` reverts stops every deposit, withdrawal, allocation and `forceDeallocate`, since the latter ends with a `withdraw` that accrues first ([Losses](#losses)). On the observed vault, `setAdapterRegistry` is abdicated with a registry verified as `RegistryList` (`0x3696c5eAe4a7Ffd04Ea163564571E9CD8Ed9364e`), whose four sub-registries are verified as `MorphoMarketV1Registry`, `MorphoMarketV1RegistryV2` and two `MorphoVaultV1Registry` contracts. `RegistryList` cannot remove a sub-registry, but its owner can add one; at the observed block that owner was a Safe 1.3.0 with a threshold of 6 out of 10 owners, so the families of adapters this vault may ever adopt are decided by that Safe and not by the curator alone.
+- **Underlying markets and their oracles.** The vault reads no price itself. Every price enters through the Morpho Blue markets the adapter supplies to (ten market ids on the observed adapter `0x3C6EAB22cFc03fc32AD1bf836f2F886A5015DFFF`), each with its own oracle and liquidation threshold. [The PT-reUSD Liquidations on Morpho]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/) shows such an oracle at work: a 320,000 SY trade moved a TWAP-based PT feed and liquidated 36.1M of loans. That incident left no bad debt; the same mechanism on collateral that liquidators cannot absorb would leave some with the markets' suppliers, among them any vault holding them (*derived*).
+- **A MetaMorpho vault held through `MorphoVaultV1Adapter`.** The vault then inherits that vault's curator, timelocks and markets, and the monitoring article notes that Vault V1.1 does not realise bad debt. [Morpho Vault V2 Adapters]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/) covers the caveats of that adapter.
+- **Wrappers built on top.** A product that wraps a Vault V2 adds its own dependencies. [Risk of a Zama Confidential Morpho Vault]({{site.url_complet}}/2026/10/11/zama-confidential-morpho-vault-risk/) analyses one: the vault underneath is unchanged, but exits now also depend on the decryption service.
+- **The base chain.** The in-kind exit needs a flash loan of the asset and a transaction included in time. When a borrower in a held market is underwater, the order in which exits and the liquidation land on Ethereum decides who carries the loss (*derived*, from the window described in the monitoring article). The availability of flash liquidity for the vault's asset was not checked (see [Gaps](#gaps)).
+
+#### Depeg
+
+- **A share has no peg.** The share price follows total assets, and losses pass through at the next accrual ([Total assets and the max rate](#total-assets-and-the-max-rate)). Nothing in the vault holds a share at a fixed value of its asset.
+- **The vault's asset.** Every amount is in the vault's single asset, RLUSD for the observed vault, and nothing in the contracts converts or hedges it. A depeg of the asset is carried in full by depositors who measure their position in another unit. RLUSD's backing and redemption terms are outside the sources of this article (see [Gaps](#gaps)).
+- **Pegged collateral in the held markets.** A depeg of a collateral token (a synthetic dollar, a liquid staking token, a PT) becomes bad debt when the fall outruns liquidations. With the Morpho Blue liquidation incentive factor, a position liquidated exactly at its LLTV still covers its debt plus the incentive only while the collateral falls by less than $$d$$ (*derived*; the formula comes from Morpho's documentation, see [Gaps](#gaps)):
+
+$$
+\begin{aligned}
+\text{LIF} &= \min\left(1.15,\; \frac{1}{0.3 \cdot \text{LLTV} + 0.7}\right) \\
+d &= 1 - \text{LLTV} \cdot \text{LIF}
+\end{aligned}
+$$
+
+For the 91.5 % LLTV of the USDe / RLUSD market the monitoring article observed, LIF is about 1.0262 and $$d$$ about 6.1 %. A collateral that gaps down by more than that between two blocks leaves bad debt even if liquidators act at once.
+
+#### Collateral and market risk
+
+- **Concentration is a curator choice.** The collateral id lets a cap limit one collateral across every market that accepts it ([Ids and caps](#ids-and-caps)), but a cap set high limits nothing. On 10 October the monitoring article found 51.3 % of the observed vault in a single kBTC market.
+- **Reflexive loops sit in the markets.** Liquidations sell collateral into the venues that set the oracle price, which can push the price further and trigger more liquidations, as in the PT-reUSD case above. The vault supplies the loan side, so it is exposed only to what liquidations fail to cover, but that is exactly where a loop ends (*derived*).
+- **Caps are soft after allocation.** Interest, donations and withdrawals move allocations above their caps without a revert ([Ids and caps](#ids-and-caps)), so a cap is a limit on new money rather than on current exposure.
+
+#### Liquidity
+
+- **A plain withdrawal pays from idle assets and the liquidity adapter only** ([Deposits and withdrawals](#deposits-and-withdrawals)). At the observed block the vault had no liquidity adapter and held 36.08M RLUSD idle out of 478.11M, 7.55 % of total assets; any further exit had to go through `forceDeallocate`.
+- **The forced exit is bounded by the markets.** `forceDeallocate` only withdraws what a market has not lent out, and an in-kind redemption leaves the depositor with a supply position that is as illiquid as the market (*derived*). Its penalty on the observed adapter was 0.01 % (`1e14` in WAD), below the 2 % ceiling.
+- **Instant allocator settings.** An allocator can change or unset the liquidity adapter without delay ([Roles](#roles)), which can make `withdraw` revert; it cannot block `forceDeallocate`.
+- **Gates on the exit path.** Three of the four gates can trap funds ([Gates](#gates)). On the observed vault all four gates were unset and the setters of the three exit-related gates were abdicated, so no gate can ever block an exit there. The `sendAssetsGate` setter, which restricts entry only, was neither abdicated nor timelocked.
+- **The race before a write-off.** Depositors who exit while a borrower is underwater but not yet liquidated leave the loss to those who stay (ChainSecurity finding CS-MORPHO-VLT2-001, described in the monitoring article). Liquidity therefore favours the depositor who watches.
+
+#### Centralisation and governance
+
+The roles of the observed vault, read with `owner()`, `curator()`, `isSentinel` and `isAllocator` at block 26,248,478. Sentinels and allocators were listed from every `SetIsSentinel` and `SetIsAllocator` event since the vault's creation, then confirmed one by one; the Safes were read with `getThreshold()`, `getOwners()`, `getModulesPaginated` and the guard storage slot.
+
+| Role | Address | What it is |
+|------|---------|------------|
+| Owner | `0xe8C9C99EcaD0686A14A00d8521c572281E938008` | Safe 1.4.1, threshold 1 of 1 (owner `0x295Df6B70f4Ed2bE704Bd802a4D805fE700Bd7E9`, an EOA), no module, no guard |
+| Curator | `0x9e396dE3312D373b87F9BD8763fb48184b42aac0` | Safe 1.4.1, threshold 1 of 1 (owner `0x992592e073AA9b98daeD79eE05C4Af832e1D0ABE`, an EOA), no module, no guard; also a sentinel and an allocator |
+| Sentinel and allocator | `0x13DE0cEE0B83562CBfD46682e10FfA4E3c5090e1` | The vault's deployer, an EOA carrying an [EIP-7702]({{site.url_complet}}/2025/05/09/eip-7702-overview/) delegation |
+| Sentinel | `0x74D1672d0b90F6E7c322dEc9D5396fF6ACE61618` | An EOA |
+| Allocator | `0xC4Ba4e822C420452fe2BAB93211208D3CcBd79D3` | An EOA |
+
+- **Owner powers are instant.** `setOwner`, `setCurator` and `setIsSentinel` have no timelock. The owner can replace the curator in one transaction; the new curator still goes through the timelocks, and a change submitted by the former curator stays executable, because `executableAt` is keyed by the calldata and not by who submitted it (*derived*, from `submit` and `timelocked`). Both the owner and the curator are [Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/) accounts with one signer, so a single key controls each role and the multisig adds no second approval.
+- **What is timelocked on the observed vault.** Three days (259,200 s): `addAdapter`, `increaseAbsoluteCap`, `increaseRelativeCap`, and `burnShares` on the adapter. Seven days (604,800 s): `removeAdapter`, `increaseTimelock` and `abdicate`. Lowering any of these timelocks takes as long as the timelock itself ([Timelocks and abdication](#timelocks-and-abdication)).
+- **What is instant on the observed vault.** Timelock zero, so a submission can be executed in the same block: `setIsAllocator`, `setPerformanceFee`, `setManagementFee`, both fee recipients, `setForceDeallocatePenalty` and `setSendAssetsGate`. Instant by design: cap decreases and `revoke` (curator and sentinels), `deallocate` (allocators and sentinels), `allocate` within the caps, `setLiquidityAdapterAndData` and `setMaxRate` (allocators), and the owner functions. Abdicated: `setAdapterRegistry` and the three exit-related gate setters.
+- **The non-custodial guarantee covers adapters and caps here, not fees.** A curator key could, without notice, raise the management fee from 0 to 5 % a year, about 23.9M RLUSD a year or 65.5K a day on 478.11M of assets, raise the performance fee from 10 % to 50 %, or raise the force-deallocation penalty from 0.01 % to 2 %, which turns the cost of a forced exit of 1M RLUSD from 100 into 20,000 (*derived*). It could not add an adapter or raise a cap without three days of notice, nor block an exit with a gate.
+- **Off-chain operators.** Allocation decisions, the choice of markets and the response to an incident are taken off-chain by whoever holds the allocator and curator keys. Morpho's API and front end report warnings on vaults, but they are a service, not part of the contracts.
+
+#### Loss sharing
+
+- **No first-loss layer.** A loss is spread over all holders in proportion to their shares ([Losses](#losses)). There is no insurance fund, no junior tranche and no priority between depositors.
+- **Depositors take losses without having borrowed.** Every depositor is a supplier to the markets the curator and allocators chose, and the adapter's `burnShares` realises a loss on a curator decision after its timelock (three days on the observed adapter).
+- **The `maxRate` buffer exists only when it is used.** Undistributed gains absorb a later loss only if `maxRate` is set below the real rate. On the observed vault it was 63,419,583,967 per second in WAD, which is 200 % a year, the ceiling, so no buffer builds up by design (*derived*).
+- **What the remaining holders receive.** Force-deallocation penalties stay in the vault as a donation to those who remain, and the management fee is charged whether the vault gains or loses ([Fees](#fees)).
+- **Pooled holders.** A wrapper that holds the vault for many users, such as the Zama confidential vault linked above, passes the loss on to its own users as a pool.
+
+#### Regulatory
+
+- **The vault contract.** None found that the vault's design raises by itself: it has no issuer and needs no identity check unless a gate is set. Gates can turn a vault into a permissioned one ([Gates](#gates)); on the observed vault the share and exit gates can no longer be set, while the entry gate still can.
+- **The asset.** A vault denominated in a regulated stablecoin carries that stablecoin's regulatory position. Whether and how RLUSD is classified, for example as an e-money token in the sense of [Stablecoins Under MiCA]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/), is outside the sources of this article (see [Gaps](#gaps)).
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|------|---------------------|-------------------------------|--------------|
+| Contract bug | Immutable `VaultV2` and adapters | Several audits, formal-verification specs, no upgrade path | A bug cannot be patched; deployed bytecode not compared with the pinned commit |
+| Adapter misreporting or reverting | `realAssets()` trusted at face value | Registry restricts adapter families; adding one is timelocked | One reverting adapter halts the vault; the registry owner can add families |
+| Oracle or collateral failure | Each held Blue market's oracle and LLTV | Collateral caps across markets | Bad debt when collateral gaps beyond about 6.1 % at 91.5 % LLTV |
+| Asset depeg | The vault's single asset | None | Carried in full by depositors |
+| Illiquidity | Idle balance and liquidity adapter only | `forceDeallocate` and in-kind redemption, penalty capped at 2 % | Bounded by unborrowed market liquidity; race before a write-off |
+| Governance change | Owner, curator, allocators, sentinels | Per-selector timelocks, abdication, sentinels can revoke | Owner and curator are one-signer Safes; fees and penalty have no timelock on the observed vault |
+| Loss allocation | Pro rata over shares | `maxRate` buffer if used, penalties donated to remaining holders | No first-loss layer; observed `maxRate` at its ceiling |
+| Regulatory | Gates and the asset's status | Optional permissioning through gates | Asset classification outside the sources |
 
 ## Frequently Asked Questions
 

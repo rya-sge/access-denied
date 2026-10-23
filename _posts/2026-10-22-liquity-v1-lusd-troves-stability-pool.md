@@ -223,80 +223,6 @@ Before launch, Trail of Bits audited the core contracts, the LQTY lockups, the L
 
 Because the code is open and the design proven, V1 has been forked many times, often for other collateral types. The most expensive fork incident is [Prisma Finance](https://hackmd.io/@PrismaRisk/PostMortem0328) in March 2024: a migration helper that users had approved as a delegate accepted a flash-loan callback from anyone, and read the victim's account from the attacker's data. The [technical concepts behind the 2024 hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) covers that callback bug in detail. The flaw was in the periphery, not in the V1 core, but it shows where forks add risk: new collateral types, new zap contracts, and new oracle wiring.
 
-## Risks
-
-Liquity's own disclosure is spread over three places: the Known Issues section of the `liquity/dev` README (summarised in the previous section), the audit matrix and "Risk assertions" posts on the [technical resources page](https://docs.liquity.org/documentation/resources), and a FAQ entry stating that "a hack or a bug that results in losses for the users can never be fully excluded". A bug bounty runs on Hats Finance, with a maximum pool of 250,000 USD according to the docs. The points below add what the deployed contracts and the design show. All on-chain values were read on 22 October 2026 at Ethereum block 26,248,459, with the addresses from the docs and the `lib-ethers` mainnet deployment file. Points marked (*derived*) come from this article's reasoning, not from a Liquity source.
-
-### Smart contracts and transparency
-
-- **Immutable and ownerless on-chain.** `owner()` returns the zero address on `TroveManager`, `BorrowerOperations`, `StabilityPool`, `SortedTroves`, `ActivePool`, `PriceFeed`, `LQTYStaking` and `CommunityIssuance`. `LUSDToken` has no `owner()` at all (the call reverts and the source has no ownership logic), and none of the core contracts has a `paused()` function. Etherscan shows the sources verified (Solidity 0.6.11) and none of them is a proxy.
-- **No upgrade risk.** Because no one holds an admin key, no one can swap the logic for a malicious or buggy version, change a parameter or freeze funds. The upgrade and admin-key risks that proxy-based protocols carry do not exist here, and the rules a borrower accepted at opening are the rules that apply at closing (*derived*).
-- **A bug cannot be patched.** The other side of immutability is that a flaw found today stays in the deployed code. The only remedy is for users to leave and for a new deployment to be adopted, which is what V2 is (*derived*).
-- **Audit coverage has a seam.** The docs' audit matrix lists Trail of Bits (January 2021, all core contracts *except the PriceFeed*, commit `f0df3ef`), Coinspect (March 2021, core and LQTY lockups, `dd7f59b9`), a second Trail of Bits report (March 2021, `8cec3fd` and `dce38b7`) and a Trail of Bits review of the proxy contracts. The mainnet deployment file records commit `5174ecd`, which is none of these.
-- **The accounting is error-prone by nature.** The product-sum scheme with scales and epochs and the corrected stakes (see The Stability Pool and liquidations above) are where the known issues and the zero-ICR audit finding sit. The liquity-v1 notes record that small rounding errors in this arithmetic caused real bugs in forks.
-
-### External dependencies
-
-- **Chainlink is administered by a multisig V1 cannot leave.** The ETH/USD feed V1 reads is a proxy whose `owner()` is a Gnosis Safe (version 1.1.1) with a threshold of 4 out of 9 owners. That Safe can point the proxy to another aggregator, while V1 has no way to change its oracle address.
-- **The feed was healthy at the read.** `PriceFeed.status()` returned 0 (`chainlinkWorking`), and `lastGoodPrice` was 2,397.90 USD, equal to the Chainlink answer, which was 26.2 minutes old. The Tellor value read through `TellorCaller` was 2,404.02 USD, 1.86 hours old and 0.255% above Chainlink.
-- **A frozen price is still served.** When both oracles fail, V1 keeps returning `lastGoodPrice` (see The price feed above). If that price stays above the market, borrowers can mint LUSD against overvalued ETH and liquidations are delayed until the debt is undercollateralized; if it stays below, redeemers take ETH from borrowers at a discount and healthy troves can be liquidated (*derived*). The [article on pricing a lending position during an incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/) discusses who bears that gap.
-- **Base chain and ordering.** Liquidations depend on permissionless keepers whose transactions must be included in time, and the README's front-running issues (Stability Pool withdrawals ahead of a price update, redemptions ahead of an oracle update, griefing inserts) all rely on transaction ordering. The 200 LUSD reserve and the 0.5% of collateral pay for liquidation gas, but congestion still delays them (*derived*).
-- **No wrapped collateral, but bridged LUSD.** The collateral is native ETH, so there is no WETH, LST or bridge risk on the collateral side. The docs list LUSD addresses on Optimism, Arbitrum, zkSync Era, Polygon zkEVM and Starknet: those tokens cannot be redeemed on their chain and are worth what their bridge holds on mainnet (*derived*).
-
-### Depeg
-
-- **The floor is redemption minus the fee.** At the read, the stored `baseRate` was 0.1318%, so a small redemption paid about 0.6318% (less after decay, more for a large one) and the arbitrage floor was about 0.9937 USD before gas (*derived*). The floor weakens after large redemptions, because the fee rises with each one up to a 100% cap, and it disappears when the TCR falls below 110%, because `redeemCollateral` then reverts (`_requireTCRoverMCR`).
-- **The redeemer carries price risk.** Redemptions pay ETH at the oracle price, so when the market moves faster than Chainlink, the arbitrage that holds the floor is less reliable in the moments it matters (*derived*).
-- **The ceiling is soft.** Above about 1.10 USD, minting at 110% and selling is profitable, but nothing forces it, and new borrowing is limited in Recovery Mode. The Chainlink LUSD/USD feed listed in the docs read 1.0047 USD, updated 8.8 hours before the block.
-
-### Collateral and market risk
-
-- **ETH is the only collateral.** Every trove falls with the same asset, so a crash hits all of them at once. At the read, the system held 71,297.76 ETH (170.96 million USD at `lastGoodPrice`) against 25,685,263.41 LUSD of debt, a TCR of 665.6%, confirmed by `TroveManager.getTCR`.
-- **Distance to stress.** With that TCR, ETH would have to fall 77.5% for the system to enter Recovery Mode. The riskiest trove had an ICR of 571.7%, so it would fall to 110% after an ETH drop of 80.8% (*derived*, ignoring changes to the troves in between).
-- **Reflexive loop.** Stability Pool depositors receive ETH at liquidation and may sell it, which pushes down the price that values the remaining troves. Redistribution then lowers the ratio of every other trove, and the README lists the resulting cascade as a known issue (*derived* for the selling part).
-- **Few, large positions.** `getTroveOwnersCount()` returned 68 troves. With that few positions, one large trove can move the TCR, the Stability Pool and the redemption order on its own (*derived*; the debt distribution was not read).
-- **No price is computed by the protocol.** V1 does not derive any price from its own state or from a DEX, so manipulation cost is that of the Chainlink and Tellor feeds.
-
-### Liquidity
-
-- **Borrowers need LUSD to leave.** Closing a trove requires the full debt minus the 200 LUSD reserve in LUSD. LUSD supply was 25,685,263.41, equal to the system debt, so a borrower who does not hold LUSD depends on market liquidity to buy it back (*derived*; DEX depth was not read).
-- **Stability Pool exits can be blocked.** `withdrawFromSP` reverts while any trove is below 110%, so a depositor cannot exit while a liquidation is pending, and the deposit may come back partly as ETH.
-- **Redemptions compete with no one else.** There is no shared reserve: redemptions draw on troves' collateral, and surplus collateral waits in the `CollSurplusPool` until its owner claims it.
-
-### Centralisation and governance
-
-- **No admin, no governance, none found on-chain.** Every core contract's owner is the zero address (see above), there is no pause, and LQTY has nothing to vote on in V1. V2 governance deposits LQTY into `LQTYStaking`, but that gives it no control over V1.
-- **Front ends are off-chain and third-party.** Liquity AG did not run a front end, and the frontend registry lists 58 operators, last updated in August 2023. A front end can go offline, censor or present a malicious transaction, and its kickback rate is fixed once at registration (`_requireFrontEndNotRegistered`). The contracts stay callable directly (*derived*).
-- **Keepers and hint servers.** Liquidations and redemptions are run by bots, and hints come from off-chain reads, so the system's speed depends on actors no one is obliged to run (*derived*).
-
-### Loss sharing
-
-- **Stability Pool depositors take the first loss.** A liquidation below 100% ICR, after a flash crash or an oracle failure, gives them less ETH than the LUSD burned (see the FAQ below). At the read, the pool held 6,586,958.39 LUSD, 25.64% of the system debt.
-- **Then every borrower.** Debt the pool cannot cover is redistributed to all active troves (see Redistribution above), including borrowers who never took a risky position.
-- **Healthy borrowers in Recovery Mode.** A trove between 110% and the TCR can be liquidated if the pool covers it, and its owner loses collateral worth up to 10% of the debt even though their own ratio was above the minimum (see Recovery Mode above).
-- **Redeemed borrowers lose exposure.** A redemption takes ETH at the oracle price from the lowest-ratio troves first. The borrower keeps the value but loses ETH exposure they chose to hold, at a price that may lag the market (*derived* for the lag).
-- **A shrinking reward buffer.** `CommunityIssuance` had issued 31,317,548.01 LQTY, 97.87% of the 32 million, and held 1,153,309.41 LQTY. Depositors are paid almost only in liquidation gains now, which weakens the incentive to keep the first-loss buffer large (*derived*).
-- **LUSD holders last.** If the TCR falls below 100%, there is no insurance fund or other backstop, and LUSD is undercollateralized (*derived*).
-
-### Regulatory
-
-- **An issuer-less stablecoin.** LUSD references the US dollar but has no issuer, no reserve and no fiat redemption. Under MiCA, classification follows what a token purports to do, so a token pegged to one official currency is an e-money token in principle ([MiCA scope and categories]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/)). The issuer obligations in [MiCA's stablecoin titles]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/) assume a legal person, and Article 142 leaves DeFi to a Commission report. Whether an immutable protocol such as V1 is in scope, and what that means for EU front ends and exchanges offering LUSD, is not settled by the sources here (*derived*).
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-|---|---|---|---|
-| Immutability: unpatchable bug, no upgrade | Immutable, ownerless contracts | No admin can upgrade the logic or change the rules, which removes upgrade and admin-key risk; three audits, a bug bounty, simple fixed rules | A bug stays in place with no fix path; deployed commit differs from audited ones |
-| Oracle failure or capture | Chainlink proxy under a 4-of-9 multisig; Tellor fallback | 4-hour timeout, 50% deviation guard, 5% agreement rule | Frozen `lastGoodPrice` used indefinitely |
-| Depeg below 1 USD | Selling pressure on LUSD | Redemptions at face value minus a fee | Floor gone when TCR is below 110%; fee up to 100% |
-| ETH crash | Single collateral | 110% MCR, Stability Pool, Recovery Mode | Cascades through redistribution and ETH selling |
-| Stability Pool losses | Liquidations below 100% ICR | Withdrawals blocked while a trove is below 110% | Front-running a price update; pool covers 25.64% of debt |
-| Redistribution | Pool smaller than liquidated debt | Order-preserving accumulators | Every borrower can be pushed toward 110% |
-| Redemption against a borrower | Lowest-ICR-first order | No value loss at the oracle price | Loss of ETH exposure; oracle lag |
-| Off-chain components | Third-party front ends and keepers | Direct contract calls remain possible | Availability depends on volunteers |
-| Fewer depositor rewards | 97.87% of LQTY issued | ETH liquidation gains | Weaker incentive to fund the pool |
-| Regulatory status | Issuer-less USD stablecoin | No issuer or admin to regulate | Treatment of front ends and exchanges unsettled |
-
 ## From V1 to V2
 
 V1 works, but its design has two costs that V2 addresses:
@@ -355,6 +281,80 @@ Liquity V1 issues LUSD against ETH at a 110% minimum ratio, with no interest and
 | The Stability Pool is never emptied by an offset. | `MIN_LUSD_IN_SP` | The product P reaches zero and every deposit is lost to rounding. |
 | Pending redistribution rewards are applied before a trove is read or changed. | `_applyPendingRewards` at the start of each operation | An entry point reads stale debt or collateral. |
 | Total LUSD supply equals total system debt. | Mint and burn only by protocol contracts | A fork adds a mint path not matched by debt. |
+
+### Risks
+
+Liquity's own disclosure is spread over three places: the Known Issues section of the `liquity/dev` README (summarised in [Known issues, audits and forks](#known-issues-audits-and-forks)), the audit matrix and "Risk assertions" posts on the [technical resources page](https://docs.liquity.org/documentation/resources), and a FAQ entry stating that "a hack or a bug that results in losses for the users can never be fully excluded". A bug bounty runs on Hats Finance, with a maximum pool of 250,000 USD according to the docs. The points below add what the deployed contracts and the design show. All on-chain values were read on 22 October 2026 at Ethereum block 26,248,459, with the addresses from the docs and the `lib-ethers` mainnet deployment file. Points marked (*derived*) come from this article's reasoning, not from a Liquity source.
+
+#### Smart contracts and transparency
+
+- **Immutable and ownerless on-chain.** `owner()` returns the zero address on `TroveManager`, `BorrowerOperations`, `StabilityPool`, `SortedTroves`, `ActivePool`, `PriceFeed`, `LQTYStaking` and `CommunityIssuance`. `LUSDToken` has no `owner()` at all (the call reverts and the source has no ownership logic), and none of the core contracts has a `paused()` function. Etherscan shows the sources verified (Solidity 0.6.11) and none of them is a proxy.
+- **No upgrade risk.** Because no one holds an admin key, no one can swap the logic for a malicious or buggy version, change a parameter or freeze funds. The upgrade and admin-key risks that proxy-based protocols carry do not exist here, and the rules a borrower accepted at opening are the rules that apply at closing (*derived*).
+- **A bug cannot be patched.** The other side of immutability is that a flaw found today stays in the deployed code. The only remedy is for users to leave and for a new deployment to be adopted, which is what V2 is (*derived*).
+- **Audit coverage has a seam.** The docs' audit matrix lists Trail of Bits (January 2021, all core contracts *except the PriceFeed*, commit `f0df3ef`), Coinspect (March 2021, core and LQTY lockups, `dd7f59b9`), a second Trail of Bits report (March 2021, `8cec3fd` and `dce38b7`) and a Trail of Bits review of the proxy contracts. The mainnet deployment file records commit `5174ecd`, which is none of these.
+- **The accounting is error-prone by nature.** The product-sum scheme with scales and epochs and the corrected stakes (see The Stability Pool and liquidations above) are where the known issues and the zero-ICR audit finding sit. The liquity-v1 notes record that small rounding errors in this arithmetic caused real bugs in forks.
+
+#### External dependencies
+
+- **Chainlink is administered by a multisig V1 cannot leave.** The ETH/USD feed V1 reads is a proxy whose `owner()` is a Gnosis Safe (version 1.1.1) with a threshold of 4 out of 9 owners. That Safe can point the proxy to another aggregator, while V1 has no way to change its oracle address.
+- **The feed was healthy at the read.** `PriceFeed.status()` returned 0 (`chainlinkWorking`), and `lastGoodPrice` was 2,397.90 USD, equal to the Chainlink answer, which was 26.2 minutes old. The Tellor value read through `TellorCaller` was 2,404.02 USD, 1.86 hours old and 0.255% above Chainlink.
+- **A frozen price is still served.** When both oracles fail, V1 keeps returning `lastGoodPrice` (see The price feed above). If that price stays above the market, borrowers can mint LUSD against overvalued ETH and liquidations are delayed until the debt is undercollateralized; if it stays below, redeemers take ETH from borrowers at a discount and healthy troves can be liquidated (*derived*). The [article on pricing a lending position during an incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/) discusses who bears that gap.
+- **Base chain and ordering.** Liquidations depend on permissionless keepers whose transactions must be included in time, and the README's front-running issues (Stability Pool withdrawals ahead of a price update, redemptions ahead of an oracle update, griefing inserts) all rely on transaction ordering. The 200 LUSD reserve and the 0.5% of collateral pay for liquidation gas, but congestion still delays them (*derived*).
+- **No wrapped collateral, but bridged LUSD.** The collateral is native ETH, so there is no WETH, LST or bridge risk on the collateral side. The docs list LUSD addresses on Optimism, Arbitrum, zkSync Era, Polygon zkEVM and Starknet: those tokens cannot be redeemed on their chain and are worth what their bridge holds on mainnet (*derived*).
+
+#### Depeg
+
+- **The floor is redemption minus the fee.** At the read, the stored `baseRate` was 0.1318%, so a small redemption paid about 0.6318% (less after decay, more for a large one) and the arbitrage floor was about 0.9937 USD before gas (*derived*). The floor weakens after large redemptions, because the fee rises with each one up to a 100% cap, and it disappears when the TCR falls below 110%, because `redeemCollateral` then reverts (`_requireTCRoverMCR`).
+- **The redeemer carries price risk.** Redemptions pay ETH at the oracle price, so when the market moves faster than Chainlink, the arbitrage that holds the floor is less reliable in the moments it matters (*derived*).
+- **The ceiling is soft.** Above about 1.10 USD, minting at 110% and selling is profitable, but nothing forces it, and new borrowing is limited in Recovery Mode. The Chainlink LUSD/USD feed listed in the docs read 1.0047 USD, updated 8.8 hours before the block.
+
+#### Collateral and market risk
+
+- **ETH is the only collateral.** Every trove falls with the same asset, so a crash hits all of them at once. At the read, the system held 71,297.76 ETH (170.96 million USD at `lastGoodPrice`) against 25,685,263.41 LUSD of debt, a TCR of 665.6%, confirmed by `TroveManager.getTCR`.
+- **Distance to stress.** With that TCR, ETH would have to fall 77.5% for the system to enter Recovery Mode. The riskiest trove had an ICR of 571.7%, so it would fall to 110% after an ETH drop of 80.8% (*derived*, ignoring changes to the troves in between).
+- **Reflexive loop.** Stability Pool depositors receive ETH at liquidation and may sell it, which pushes down the price that values the remaining troves. Redistribution then lowers the ratio of every other trove, and the README lists the resulting cascade as a known issue (*derived* for the selling part).
+- **Few, large positions.** `getTroveOwnersCount()` returned 68 troves. With that few positions, one large trove can move the TCR, the Stability Pool and the redemption order on its own (*derived*; the debt distribution was not read).
+- **No price is computed by the protocol.** V1 does not derive any price from its own state or from a DEX, so manipulation cost is that of the Chainlink and Tellor feeds.
+
+#### Liquidity
+
+- **Borrowers need LUSD to leave.** Closing a trove requires the full debt minus the 200 LUSD reserve in LUSD. LUSD supply was 25,685,263.41, equal to the system debt, so a borrower who does not hold LUSD depends on market liquidity to buy it back (*derived*; DEX depth was not read).
+- **Stability Pool exits can be blocked.** `withdrawFromSP` reverts while any trove is below 110%, so a depositor cannot exit while a liquidation is pending, and the deposit may come back partly as ETH.
+- **Redemptions compete with no one else.** There is no shared reserve: redemptions draw on troves' collateral, and surplus collateral waits in the `CollSurplusPool` until its owner claims it.
+
+#### Centralisation and governance
+
+- **No admin, no governance, none found on-chain.** Every core contract's owner is the zero address (see above), there is no pause, and LQTY has nothing to vote on in V1. V2 governance deposits LQTY into `LQTYStaking`, but that gives it no control over V1.
+- **Front ends are off-chain and third-party.** Liquity AG did not run a front end, and the frontend registry lists 58 operators, last updated in August 2023. A front end can go offline, censor or present a malicious transaction, and its kickback rate is fixed once at registration (`_requireFrontEndNotRegistered`). The contracts stay callable directly (*derived*).
+- **Keepers and hint servers.** Liquidations and redemptions are run by bots, and hints come from off-chain reads, so the system's speed depends on actors no one is obliged to run (*derived*).
+
+#### Loss sharing
+
+- **Stability Pool depositors take the first loss.** A liquidation below 100% ICR, after a flash crash or an oracle failure, gives them less ETH than the LUSD burned (see the FAQ below). At the read, the pool held 6,586,958.39 LUSD, 25.64% of the system debt.
+- **Then every borrower.** Debt the pool cannot cover is redistributed to all active troves (see Redistribution above), including borrowers who never took a risky position.
+- **Healthy borrowers in Recovery Mode.** A trove between 110% and the TCR can be liquidated if the pool covers it, and its owner loses collateral worth up to 10% of the debt even though their own ratio was above the minimum (see Recovery Mode above).
+- **Redeemed borrowers lose exposure.** A redemption takes ETH at the oracle price from the lowest-ratio troves first. The borrower keeps the value but loses ETH exposure they chose to hold, at a price that may lag the market (*derived* for the lag).
+- **A shrinking reward buffer.** `CommunityIssuance` had issued 31,317,548.01 LQTY, 97.87% of the 32 million, and held 1,153,309.41 LQTY. Depositors are paid almost only in liquidation gains now, which weakens the incentive to keep the first-loss buffer large (*derived*).
+- **LUSD holders last.** If the TCR falls below 100%, there is no insurance fund or other backstop, and LUSD is undercollateralized (*derived*).
+
+#### Regulatory
+
+- **An issuer-less stablecoin.** LUSD references the US dollar but has no issuer, no reserve and no fiat redemption. Under MiCA, classification follows what a token purports to do, so a token pegged to one official currency is an e-money token in principle ([MiCA scope and categories]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/)). The issuer obligations in [MiCA's stablecoin titles]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/) assume a legal person, and Article 142 leaves DeFi to a Commission report. Whether an immutable protocol such as V1 is in scope, and what that means for EU front ends and exchanges offering LUSD, is not settled by the sources here (*derived*).
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|---|---|---|---|
+| Immutability: unpatchable bug, no upgrade | Immutable, ownerless contracts | No admin can upgrade the logic or change the rules, which removes upgrade and admin-key risk; three audits, a bug bounty, simple fixed rules | A bug stays in place with no fix path; deployed commit differs from audited ones |
+| Oracle failure or capture | Chainlink proxy under a 4-of-9 multisig; Tellor fallback | 4-hour timeout, 50% deviation guard, 5% agreement rule | Frozen `lastGoodPrice` used indefinitely |
+| Depeg below 1 USD | Selling pressure on LUSD | Redemptions at face value minus a fee | Floor gone when TCR is below 110%; fee up to 100% |
+| ETH crash | Single collateral | 110% MCR, Stability Pool, Recovery Mode | Cascades through redistribution and ETH selling |
+| Stability Pool losses | Liquidations below 100% ICR | Withdrawals blocked while a trove is below 110% | Front-running a price update; pool covers 25.64% of debt |
+| Redistribution | Pool smaller than liquidated debt | Order-preserving accumulators | Every borrower can be pushed toward 110% |
+| Redemption against a borrower | Lowest-ICR-first order | No value loss at the oracle price | Loss of ETH exposure; oracle lag |
+| Off-chain components | Third-party front ends and keepers | Direct contract calls remain possible | Availability depends on volunteers |
+| Fewer depositor rewards | 97.87% of LQTY issued | ETH liquidation gains | Weaker incentive to fund the pool |
+| Regulatory status | Issuer-less USD stablecoin | No issuer or admin to regulate | Treatment of front ends and exchanges unsettled |
 
 ## Frequently Asked Questions
 

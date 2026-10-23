@@ -2,6 +2,7 @@
 layout: post
 title: "How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown"
 date:   2026-10-22
+last_modified_at: 2026-10-23
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -270,6 +271,54 @@ The 25% of interest that does not go to the Stability Pools funds liquidity for 
 
 Governance received six audits, which found two Criticals and fifteen Highs between them. Most came from the first representation of voting power as an *average stake timestamp*, whose rounding made allocate-then-deallocate a non-zero operation and let a flash-loan stake shift what a deallocation subtracted. The current code stores each allocation's exact amount and offset and resets all allocations before each new one. One finding was accepted rather than fixed: vetoes can still be removed after the voting cutoff, which works like a late vote (ChainSecurity CS-V2Gov-012).
 
+## Where the yield comes from
+
+Liquity V2 has no token emissions and no external yield source. Every return in the system is paid by another participant: mostly by borrowers, through the interest rate they choose themselves. The mechanisms are spread over the earlier sections; this one gathers who pays, who receives, and in which asset. The source references are to `ActivePool.sol` and `TroveManager.sol` at the analysed commit.
+
+### Who pays
+
+- **Borrowers** pay the annual interest rate they set (0.5% to 250%). It accrues continuously and is minted as new BOLD whenever the branch is touched.
+- **Borrowers again, through upfront fees.** Opening a trove, borrowing more, changing the rate within 7 days of the last change, and joining a batch each cost 7 days of the branch's average interest. The fee is added to the trove's debt and minted together with the accrued interest (`_mintAggInterest(_upfrontFee)` in `ActivePool`), so it is split exactly like interest.
+- **Troves in a batch** pay the batch manager's annual management fee, at most 10%, which can only be lowered after registration.
+- **Redeemers** pay the redemption fee, 0.5% plus the decaying base rate, as a cut of the collateral they would otherwise receive.
+- **Liquidated borrowers** lose collateral worth their debt plus a penalty: 5% when the Stability Pool absorbs the debt, 10% (WETH) or 20% (wstETH, rETH) when it is redistributed. Anything above that is returned to them through the collateral surplus pool.
+- **A shut-down branch** pays urgent redeemers a 2% collateral bonus out of its remaining collateral.
+
+### Who receives, and in what
+
+| Position | Yield | Paid in | Comes from |
+|---|---|---|---|
+| Stability Pool depositor | 75% of the branch's interest and upfront fees (`SP_YIELD_SPLIT`), plus liquidation gains | BOLD, and the branch's collateral | Borrowers of that branch, liquidated borrowers |
+| Governance initiatives (DEX pools, gauges, bribe contracts) | The remaining 25%, minted to the `InterestRouter` (the `Governance` contract) and allocated by LQTY votes each 7-day epoch | BOLD | Borrowers of all branches |
+| LQTY voter | No direct share of V2 interest; bribes paid by initiatives, and the Liquity V1 staking fees their staked LQTY keeps earning | BOLD and a bribe token; V1 ETH and LUSD | Initiatives competing for votes; V1 activity |
+| Redeemed borrower | The redemption fee stays in their own trove as collateral (`RedemptionFeePaidToTrove`), a partial compensation for being redeemed | Collateral | Redeemers |
+| Batch manager | The management fee of every trove in the batch, minted to the batch's address | BOLD | Troves in the batch |
+| Liquidator | 0.0375 WETH per trove, plus 0.5% (at most 2 units) of the collateral offset by the Stability Pool | WETH and collateral | Liquidated borrowers |
+| Other troves of the branch | The penalty share of a redistributed liquidation, together with its debt | Collateral | Liquidated borrowers |
+| Borrower on the wstETH or rETH branch | The staking yield of the collateral itself, through the token's rising exchange rate | Collateral value | Ethereum validators, outside Liquity |
+| BOLD held outside the pool or a funded pool | Nothing: BOLD does not accrue interest by itself | Not applicable | Not applicable |
+
+```mermaid
+flowchart LR
+  B[Borrowers] -->|interest and upfront fees, minted as BOLD| AP[ActivePool]
+  AP -->|75%| SP[Stability Pool of the branch]
+  AP -->|25%| GOV[Governance contract]
+  GOV -->|LQTY votes, per epoch| INI[Initiatives: DEX pools, gauges, bribes]
+  INI -->|bribes| V[LQTY voters]
+  BT[Troves in a batch] -->|management fee| BM[Batch manager]
+  RD[Redeemers] -->|redemption fee in collateral| RT[Redeemed troves]
+  LQ[Liquidated borrowers] -->|collateral above debt| SP
+  LQ -->|gas compensation| LIQ[Liquidators]
+  LQ -->|redistribution penalty| OT[Other troves of the branch]
+```
+
+### What the yield depends on
+
+- **Borrowing demand and the rates borrowers choose.** The only large, recurring source is interest. Rates are set by the borrowers themselves, so the yield follows demand for BOLD loans and the redemption pressure that pushes borrowers to raise their rates.
+- **How much BOLD sits in the pool.** The pool receives 75% of a branch's interest but holds only part of its debt, so its yield is a multiple of the branch's average rate: $$0.75 \times \frac{\text{debt}}{\text{pool}}$$. With the pool sizes read on 22 October 2026 (see Risks), that multiple was about 1.19 on the WETH branch, 1.68 on wstETH and 0.65 on rETH, where the pool held more BOLD than the branch owed.
+- **Liquidation gains come in bursts.** They arrive only when collateral prices fall far enough to liquidate troves, and they are paid in collateral that may keep falling.
+- **Some flows are transfers, not revenue.** The redemption fee moves value from the redeemer to the redeemed borrower, and a redistribution moves it from the liquidated borrower to the other troves. Only interest and upfront fees are paid into the system as a whole.
+
 ## Deployment history and audits
 
 V2 has been deployed twice:
@@ -288,97 +337,6 @@ The public reports are listed in the documentation: two core audits and a review
 - **Redemption inputs.** The redemption price leaking into other checks, and unbacked debt that includes debt redemptions cannot reach.
 - **Shutdown as a terminal state.** The last trove could not be closed, a division by `totalStakes` could reach zero, and guards were missing on sibling entry points.
 - **Zappers.** Flash-loan callbacks that checked only the lender (the class of bug behind the Prisma exploit on a V1 fork), and leftovers stuck when the core repaid less than requested.
-
-## Risks
-
-Liquity publishes its own risk disclosure: the [known issues and mitigations](https://github.com/liquity/bold?tab=readme-ov-file#known-issues-and-mitigations) section of the `bold` README describes 26 issues, from oracle front-running to bad debt after a shutdown, and says for each one whether a fix was made. Its guidance for forks adds the two assumptions the whole design rests on: "economically and technically sound collateral" and "robust price oracles". This section starts from that list and adds what the deployed contracts and their state show. On-chain values were read on 22 October 2026 at Ethereum block 26,248,463 (13:30 UTC), from the addresses in `api.liquity.org/addresses/relaunch.json`. Points marked *derived* are this article's analysis rather than statements from the sources.
-
-The state of the three branches at that block:
-
-| Branch | Collateral | Price (USD) | Debt (BOLD) | Stability Pool (BOLD) | TCR | Pool / debt |
-|---|---|---|---|---|---|---|
-| WETH | 10,583.5 WETH | 2,397.90 | 12,955,850 | 8,164,064 | 195.9% | 63.0% |
-| wstETH | 17,857.7 wstETH | 2,991.05 | 21,457,943 | 9,593,885 | 248.9% | 44.7% |
-| rETH | 5,652.4 rETH | 2,815.75 | 4,101,110 | 4,723,335 | 388.1% | 115.2% |
-
-Collateral and debt come from `getEntireBranchColl()` and `getEntireBranchDebt()` on each `TroveManager`, deposits from `getTotalBoldDeposits()` on each `StabilityPool`, and the price from a simulated call (`eth_call`) to each feed's `fetchPrice()`, which reported no oracle failure on any branch. The TCR is collateral times price divided by debt. The branches carry 38.51 million BOLD of debt in total, against a `totalSupply()` of 38,514,160 BOLD, and the three pools hold 58.4% of that supply. No branch was shut down: `shutdownTime()` returned 0 on every `TroveManager` and `hasBeenShutDown()` returned false on every `BorrowerOperations`.
-
-### Smart contracts and transparency
-
-- **Verified, immutable, without owners.** The `BoldToken`, the `CollateralRegistry`, the `Governance` contract, the three `TroveManager`s, the three price feeds and the WETH `StabilityPool` are verified on Etherscan (Solidity 0.8.24) and none is a proxy. `owner()` returns the zero address on the `BoldToken`, the three `AddressesRegistry` contracts and `Governance`, which each give up ownership once their wiring call has run (`setCollateralRegistry`, `setAddresses`, `registerInitialInitiatives`). The `CollateralRegistry` and the three price feeds have no `owner()` function at all; the feeds lost theirs in V7.
-- **Immutability cuts both ways.** No one holds an admin key, so no one can upgrade the logic to a malicious or buggy version, change a parameter or freeze funds, which removes the upgrade and admin-key risk that many DeFi protocols carry. The rules a borrower accepted when opening a trove are the rules that apply for the life of the deployment (*derived* from the owner reads above). The counterpart is that a bug can only be fixed by deploying a new system, as the next point shows.
-- **A fix means a new system.** A bug cannot be patched in place. The Stability Pool fix of March 2025 therefore shipped as a new deployment, and V7 was deployed again in May (see [Deployment history and audits](#deployment-history-and-audits)). Each deployment has its own troves and its own BOLD token, so moving to it is up to each user. The V4 contracts are still on-chain: at the read block none of their branches was shut down, and their BOLD token (`0xb01d…ab98`) had a supply of 201,388, almost all of it (199,751 BOLD) debt on the old wstETH branch. The sources do not say how holders of the first deployment were migrated (listed under Gaps).
-- **Accounting that is easy to get wrong.** Batch shares, the zombie state and the Stability Pool's product-sum are where the audits found their serious bugs (see [Deployment history and audits](#deployment-history-and-audits)). Several limits are accepted rather than fixed: aggregate debt that differs slightly from the sum of trove debts (Known Issue 6), pool rounding (7), an overflow bound near 1e23 BOLD in the pool (15), and stakes that could round to zero after about a thousand redistributions of 10% of a branch's debt (22).
-- **Zappers act on users' troves.** The zappers set themselves as add manager, remove manager and receiver on the troves they open, so a bug in a zapper can move collateral or debt of every trove opened through it. The flash-loan callback bug of this kind found before launch (CS-BOLD-002) is the class of bug behind the Prisma exploit (about $11$M, March 2024) on a V1 fork. The same applies to friendly forks that reuse the code: a fork built on V4 or earlier lacks the V5 to V7 fixes (*derived*).
-
-### External dependencies
-
-- **Three Chainlink feeds and two issuer rates.** The branches depend on Chainlink ETH/USD, STETH/USD and RETH/ETH, and on the canonical rates returned by `stEthPerToken()` on wstETH and `getExchangeRate()` on rETH. The deployed staleness thresholds, read from `ethUsdOracle()`, `stEthUsdOracle()` and `rEthEthOracle()`, are 24 hours for ETH/USD and STETH/USD and 48 hours for RETH/ETH, as in the README. Until a feed passes that threshold, the system keeps using its last answer, which can allow redemptions at a wrong price, borrowing with too little collateral, or liquidation of healthy troves (Known Issue 5).
-- **An oracle failure is terminal.** Any failure shuts the branch down for good, and with no owner on the feeds nobody can point the branch at a replacement. The README considers a feed that Chainlink stops maintaining the most likely cause. The shut-down branch is then priced at a frozen `lastGoodPrice`, which can make urgent redemptions unprofitable and leave debt in place if the market price is lower (Known Issue 4; see [Branch shutdown and urgent redemptions](#branch-shutdown-and-urgent-redemptions)).
-- **LST contracts outside Liquity's control.** The canonical rates are set by the Lido and Rocket Pool systems. The README notes that most LST exchange rates are "controlled by an oracle-like scheme", so a wrong or manipulated rate on either side would flow straight into the branch's price. How those rates are governed is not covered by the sources (listed under Gaps).
-- **Ethereum and MEV.** Liquidations, redemptions and Stability Pool deposits compete in the mempool, and the README expects many liquidations to go through private order flow. Several known issues depend on mempool visibility: oracle front-running (1), just-in-time pool deposits (16), and depositors or borrowers stepping out ahead of a loss-making liquidation (24, 25). Congestion that delays liquidations leaves more debt for the pools to absorb at a lower price (*derived*).
-
-### Depeg
-
-- **BOLD has a hard floor and a soft ceiling.** Below 1 USD, a redeemer receives 1 USD of collateral per BOLD minus the fee. At the read block `baseRate()` on the `CollateralRegistry` was 0.291%, so the fee was 0.791% and the floor about 0.992 USD before gas (*derived*). Above 1 USD there is no mint-at-par arbitrage: the whitepaper relies on borrowers lowering their rates, which makes borrowing cheaper, so BOLD can trade above its peg for as long as rates take to adjust.
-- **The floor weakens when redemptions stop.** Branches below their SCR and shut-down branches are excluded from routing. After a shutdown that leaves bad debt, part of the BOLD supply can never be redeemed, and the README warns this could cause a bank run and "break the BOLD peg" (Known Issue 9).
-- **The LST branches carry an LST depeg.** The wstETH borrowing price is STETH/USD times the canonical rate, so a stETH discount on the market lowers it directly. The rETH price takes the lower of the market and canonical prices, so either a market discount or a cut in the canonical rate (a slashing loss, for example) lowers it. The README states that downward manipulation is not protected against and that its impact should stay within the branch: liquidations and, at worst, shutdown (Known Issue 8).
-- **WETH has no peg of its own.** WETH is a fixed 1:1 wrapper of ETH, so the WETH branch has no depeg risk beyond the ETH price itself.
-
-### Collateral and market risk
-
-Treating each branch as a whole and leaving liquidations aside, the price fall that takes a branch from its TCR down to a threshold is:
-
-$$
-\begin{aligned}
-\text{fall to threshold} = 1 - \frac{\text{threshold}}{\text{TCR}}
-\end{aligned}
-$$
-
-- **Buffers at the read block.** The formula gives 23.4% (WETH), 35.7% (wstETH) and 58.8% (rETH) to the CCR, and 43.8%, 51.8% and 69.1% to the SCR (*derived*). Individual troves near the MCR are liquidated long before that, and the WETH and wstETH branches would hold less collateral than debt after falls of 48.9% and 59.8%.
-- **One market under three branches.** All three collaterals are priced in ETH, so a fall in ETH hits every branch at once. Branches isolate a failure of one LST, not the ETH price (*derived*). The wstETH branch carries 55.7% of all debt and has the lowest pool coverage, 44.7%.
-- **Reflexive selling.** Pool depositors receive the liquidated collateral and may sell it. For an LST that trades in a few DEX pools, those sales lower the market price the feed reads, which can trigger the next round of liquidations (*derived*). When pools are empty, redistribution can drag healthy troves below the MCR in a cascade (Known Issue 23), although V2 no longer pays collateral compensation on redistributed troves, which makes such cascades less profitable to trigger.
-- **Redemption risk for low-rate borrowers.** A borrower with little debt in front loses collateral to redemptions at the oracle price; the fee stays in the trove, but the README notes that a redemption can still cause a short-term loss. Debt in front can change at any moment because others adjust their debt and rates, and troves at the same rate are redeemed last-in, first-out, so a batch manager can re-insert its batch for free just before a redemption (Known Issue 26). The 7-day fees make dodging a redemption costly but do not remove the risk.
-- **Manipulation of the prices the protocol computes.** The protocol computes no market price itself, only the redemption fee and the routing split. Routing can be steered with flash-loaned pool deposits on the branches a redeemer wants to avoid, which extracts no value from the system (Known Issue 2). At the read block the rETH pool held more BOLD than the branch's debt, so rETH had no unbacked debt and every redemption went 28.8% to WETH and 71.2% to wstETH (*derived* from the routing formula).
-
-### Liquidity
-
-- **Borrowers need BOLD to leave.** Closing a trove requires repaying its full debt in BOLD, bought on the market if needed. The last trove of a branch cannot be closed unless the branch is shut down.
-- **Stability Pool deposits can always be withdrawn.** The code has no V1-style check that blocks withdrawals while undercollateralized troves exist (see [Whitepaper versus implementation](#whitepaper-versus-implementation)). Depositors can always get out, but those who stay take a larger share of a loss-making liquidation (Known Issue 24).
-- **Holders exit by selling or redeeming.** Redemption is open to anyone, but the README calls it complex and MEV-competitive and advises leaving it to bots, warning that manual redemptions can lose funds. A holder who is not a bot relies on DEX liquidity, which the 25% interest share is meant to fund; its depth was not measured here (listed under Gaps).
-
-### Centralisation and governance
-
-- **No admin power over the core.** The owner reads above show no key that can change the core contracts. `Governance` has no owner either, and its only power is the split of the 25% interest share between initiatives. The mainnet contract returns `REGISTRATION_FEE()` = 100 BOLD and `VOTING_THRESHOLD_FACTOR()` = 2%, and its other immutables (0.01% registration threshold, unregistration after 4 epochs, `MIN_CLAIM` and `MIN_ACCRUAL` of 0, 7-day epochs with a 6-day voting cutoff, first epoch on 8 May 2025) also match the deploy script.
-- **Voting power follows LQTY and bribes.** Anyone can register an initiative for 100 BOLD, and `BribeInitiative` lets third parties pay voters, so the incentive budget goes where LQTY holders and bribers send it. Vetoes can still be removed after the voting cutoff (CS-V2Gov-012, accepted). How LQTY voting power is distributed was not read (listed under Gaps).
-- **The bad-debt remedy depends on governance.** The only way the README offers to fill a hole left by a shutdown is for LQTY voters to direct interest to a BOLD burn (Known Issue 9). Nothing in the contracts forces that vote.
-- **Delegates are trusted by the borrowers who choose them.** A remove manager can withdraw collateral and borrow, sending the funds to its receiver. A batch manager can charge premature-adjustment fees that push a trove below the MCR after a price fall, and the README says batch managers "should be considered trusted actors" (Known Issue 11). Managers stay attached to the trove NFT on transfer (see [Delegation and batches](#delegation-and-batches)).
-- **Off-chain parts.** Users access the protocol through front ends that third parties host, and an automated rate manager such as `bold-ir-management` runs on the Internet Computer. Redemptions and liquidations depend on bots. None of these can change the contracts, but a user who signs what a front end prepares depends on it (*derived*).
-
-### Loss sharing
-
-- **The Stability Pool takes the first loss, per branch.** Depositors burn BOLD and receive collateral worth up to the debt plus 5%, which is a loss only when the trove's collateral is worth less than its debt. Just-in-time deposits can take most of a profitable liquidation from long-term depositors (Known Issue 16), and withdrawals ahead of a loss leave it to those who stay (24). At least 1 BOLD (`MIN_BOLD_IN_SP`) always stays in each pool.
-- **Borrowers of the same branch take the second loss.** What the pool cannot cover is redistributed to the active troves of the branch, borrowers who did not choose to absorb liquidations. The 10% or 20% penalty makes this a gain while the liquidated trove is above 100%, but it lowers every recipient's ratio, and a borrower can close ahead of a loss-making redistribution and leave it to the others (Known Issue 25).
-- **Bad debt after a shutdown is nobody's in particular.** No mechanism socializes it automatically. It stays as BOLD that no collateral backs, so every BOLD holder carries it until governance burns enough interest (Known Issue 9). Below 102% ICR, the 2% urgent-redemption bonus makes a trove worse (Known Issue 14).
-
-### Regulatory
-
-- **A stablecoin with no issuer.** BOLD is minted by immutable contracts, and no company issues it. MiCA classifies a token by what it purports to do, so a token that references the US dollar falls under the e-money token rules, which reserve the offer to the public and admission to trading to the issuer or persons it authorises (see [MiCA Explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/) and [Stablecoins Under MiCA]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)). How that applies to BOLD, and to the front ends and exchanges that make it available in the EU, is not settled in the sources, and it could restrict access in some jurisdictions (listed under Gaps).
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-|---|---|---|---|
-| Code | Immutable contracts with complex batch, zombie and pool accounting | Audits by ChainSecurity, Dedaub, Coinspect and Recon, a Cantina competition, Certora verification; verified source; no admin key, which removes upgrade and admin-key risk: the logic cannot be swapped for a malicious or buggy version, parameters cannot change and funds cannot be frozen | Bugs cannot be patched in place; a fix needs a redeployment and user migration |
-| Oracle | Chainlink ETH/USD, STETH/USD, RETH/ETH and two canonical rates | Staleness thresholds (24 h, 48 h), worst-price rule for redemptions, minimum of market and canonical for rETH | Any failure shuts the branch for good at a frozen price; stale prices are used until the threshold |
-| BOLD depeg | Redemption arbitrage below 1 USD, rate changes above | Redemptions at face value minus a 0.5% floor fee, routing to the least covered branches | Soft ceiling; unredeemable BOLD after a shutdown with bad debt |
-| LST depeg | wstETH and rETH market discounts, slashing, canonical-rate errors | Separate branches with 120% MCR and 20% redistribution penalty | Downward manipulation not protected; 55.7% of debt sits on the wstETH branch |
-| ETH market | All collateral priced in ETH | TCR buffers of 23.4% to 58.8% before the CCR at the read block | A large ETH fall hits all branches at once; reflexive selling of LST collateral |
-| Redemption | Rate order within each branch | Upfront and premature-adjustment fees, debt-in-front tools | Low-rate borrowers lose collateral; debt in front can change before a redemption |
-| Liquidity | Repayment in BOLD, MEV-competitive redemptions | No lock on pool withdrawals; 25% of interest for DEX liquidity | Non-bot holders depend on DEX depth; pool stayers carry loss-evading exits |
-| Governance and delegation | LQTY votes and bribes, managers chosen by borrowers | Governance limited to the 25% interest split; delegation is opt-in | Bad-debt repair needs a vote; batch and remove managers are trusted |
-| Loss sharing | Pool first, then redistribution, then BOLD holders | 5% and 10% or 20% penalties, `MIN_BOLD_IN_SP` | Bad debt after shutdown is not socialized by any mechanism |
-| Regulatory | Dollar stablecoin without an issuer | None in the design | Treatment under MiCA of offering and listing BOLD is open |
 
 ## Whitepaper versus implementation
 
@@ -430,6 +388,7 @@ Liquity V2 keeps V1's immutable, auction-free design and adds a market for inter
 - **Stress is handled per branch.** Below the CCR, borrowing that lowers the TCR is refused. Below the SCR or on oracle failure, the branch shuts down for good, and urgent redemptions with a 2% bonus clear its debt.
 - **Most of the complexity is in batches and zombies.** The audits found their most serious bugs in debt-share rounding and in the below-minimum-debt state, and the fixes (the share-ratio cap, `kickFromBatch`, the zombie pointer) are not in the whitepaper.
 - **The whitepaper is a design document, not a specification.** Stability Pool withdrawals, borrowing below the CCR, redistribution penalties and liquidator compensation all work differently in the deployed code.
+- **All yield is paid by borrowers**, mostly through the rate each one chooses: 75% of the interest goes to the branch's Stability Pool and 25% to initiatives chosen by LQTY votes, while redemption fees stay with the redeemed troves and liquidation gains go to the pool, liquidators and other troves.
 - **The main risks sit around the immutable core.** An oracle or LST failure shuts a branch down for good at a frozen price, bad debt left by a shutdown is cleared by no mechanism, only by a governance vote to burn interest, and low-rate borrowers are redeemed first. On 22 October 2026 all three branches were far above their SCR, and the wstETH branch held 55.7% of the debt with the lowest Stability Pool coverage, 44.7%.
 
 ![Mindmap of Liquity V2 covering branches and parameters, interest and upfront fees, redemption routing and zombie troves, liquidations and the Stability Pool, batches, price feeds and shutdown, governance, audits, and differences from the whitepaper]({{site.url_complet}}/assets/article/blockchain/defi/liquity/2026-10-22-liquity-v2-mindmap.png)
@@ -471,6 +430,97 @@ Liquity V2 keeps V1's immutable, auction-free design and adds a market for inter
 | A shut-down branch never resumes borrowing or interest accrual. | `shutdownTime` checks in BorrowerOperations and TroveManager | A sibling entry point lacks the shutdown guard. |
 | Each Stability Pool keeps at least 1 BOLD. | `MIN_BOLD_IN_SP` in the offset and withdrawal paths | The pool is emptied and the product `P` collapses. |
 | The rate changes that move a trove in the redemption order pay the premature-adjustment fee inside the cooldown. | Fee checks in rate change, batch join and batch rate change | A new path changes the rate without checking the trove's own timestamp. |
+
+### Risks
+
+Liquity publishes its own risk disclosure: the [known issues and mitigations](https://github.com/liquity/bold?tab=readme-ov-file#known-issues-and-mitigations) section of the `bold` README describes 26 issues, from oracle front-running to bad debt after a shutdown, and says for each one whether a fix was made. Its guidance for forks adds the two assumptions the whole design rests on: "economically and technically sound collateral" and "robust price oracles". This section starts from that list and adds what the deployed contracts and their state show. On-chain values were read on 22 October 2026 at Ethereum block 26,248,463 (13:30 UTC), from the addresses in `api.liquity.org/addresses/relaunch.json`. Points marked *derived* are this article's analysis rather than statements from the sources.
+
+The state of the three branches at that block:
+
+| Branch | Collateral | Price (USD) | Debt (BOLD) | Stability Pool (BOLD) | TCR | Pool / debt |
+|---|---|---|---|---|---|---|
+| WETH | 10,583.5 WETH | 2,397.90 | 12,955,850 | 8,164,064 | 195.9% | 63.0% |
+| wstETH | 17,857.7 wstETH | 2,991.05 | 21,457,943 | 9,593,885 | 248.9% | 44.7% |
+| rETH | 5,652.4 rETH | 2,815.75 | 4,101,110 | 4,723,335 | 388.1% | 115.2% |
+
+Collateral and debt come from `getEntireBranchColl()` and `getEntireBranchDebt()` on each `TroveManager`, deposits from `getTotalBoldDeposits()` on each `StabilityPool`, and the price from a simulated call (`eth_call`) to each feed's `fetchPrice()`, which reported no oracle failure on any branch. The TCR is collateral times price divided by debt. The branches carry 38.51 million BOLD of debt in total, against a `totalSupply()` of 38,514,160 BOLD, and the three pools hold 58.4% of that supply. No branch was shut down: `shutdownTime()` returned 0 on every `TroveManager` and `hasBeenShutDown()` returned false on every `BorrowerOperations`.
+
+#### Smart contracts and transparency
+
+- **Verified, immutable, without owners.** The `BoldToken`, the `CollateralRegistry`, the `Governance` contract, the three `TroveManager`s, the three price feeds and the WETH `StabilityPool` are verified on Etherscan (Solidity 0.8.24) and none is a proxy. `owner()` returns the zero address on the `BoldToken`, the three `AddressesRegistry` contracts and `Governance`, which each give up ownership once their wiring call has run (`setCollateralRegistry`, `setAddresses`, `registerInitialInitiatives`). The `CollateralRegistry` and the three price feeds have no `owner()` function at all; the feeds lost theirs in V7.
+- **Immutability cuts both ways.** No one holds an admin key, so no one can upgrade the logic to a malicious or buggy version, change a parameter or freeze funds, which removes the upgrade and admin-key risk that many DeFi protocols carry. The rules a borrower accepted when opening a trove are the rules that apply for the life of the deployment (*derived* from the owner reads above). The counterpart is that a bug can only be fixed by deploying a new system, as the next point shows.
+- **A fix means a new system.** A bug cannot be patched in place. The Stability Pool fix of March 2025 therefore shipped as a new deployment, and V7 was deployed again in May (see [Deployment history and audits](#deployment-history-and-audits)). Each deployment has its own troves and its own BOLD token, so moving to it is up to each user. The V4 contracts are still on-chain: at the read block none of their branches was shut down, and their BOLD token (`0xb01d…ab98`) had a supply of 201,388, almost all of it (199,751 BOLD) debt on the old wstETH branch. The sources do not say how holders of the first deployment were migrated (listed under Gaps).
+- **Accounting that is easy to get wrong.** Batch shares, the zombie state and the Stability Pool's product-sum are where the audits found their serious bugs (see [Deployment history and audits](#deployment-history-and-audits)). Several limits are accepted rather than fixed: aggregate debt that differs slightly from the sum of trove debts (Known Issue 6), pool rounding (7), an overflow bound near 1e23 BOLD in the pool (15), and stakes that could round to zero after about a thousand redistributions of 10% of a branch's debt (22).
+- **Zappers act on users' troves.** The zappers set themselves as add manager, remove manager and receiver on the troves they open, so a bug in a zapper can move collateral or debt of every trove opened through it. The flash-loan callback bug of this kind found before launch (CS-BOLD-002) is the class of bug behind the Prisma exploit (about $11$M, March 2024) on a V1 fork. The same applies to friendly forks that reuse the code: a fork built on V4 or earlier lacks the V5 to V7 fixes (*derived*).
+
+#### External dependencies
+
+- **Three Chainlink feeds and two issuer rates.** The branches depend on Chainlink ETH/USD, STETH/USD and RETH/ETH, and on the canonical rates returned by `stEthPerToken()` on wstETH and `getExchangeRate()` on rETH. The deployed staleness thresholds, read from `ethUsdOracle()`, `stEthUsdOracle()` and `rEthEthOracle()`, are 24 hours for ETH/USD and STETH/USD and 48 hours for RETH/ETH, as in the README. Until a feed passes that threshold, the system keeps using its last answer, which can allow redemptions at a wrong price, borrowing with too little collateral, or liquidation of healthy troves (Known Issue 5).
+- **An oracle failure is terminal.** Any failure shuts the branch down for good, and with no owner on the feeds nobody can point the branch at a replacement. The README considers a feed that Chainlink stops maintaining the most likely cause. The shut-down branch is then priced at a frozen `lastGoodPrice`, which can make urgent redemptions unprofitable and leave debt in place if the market price is lower (Known Issue 4; see [Branch shutdown and urgent redemptions](#branch-shutdown-and-urgent-redemptions)).
+- **LST contracts outside Liquity's control.** The canonical rates are set by the Lido and Rocket Pool systems. The README notes that most LST exchange rates are "controlled by an oracle-like scheme", so a wrong or manipulated rate on either side would flow straight into the branch's price. How those rates are governed is not covered by the sources (listed under Gaps).
+- **Ethereum and MEV.** Liquidations, redemptions and Stability Pool deposits compete in the mempool, and the README expects many liquidations to go through private order flow. Several known issues depend on mempool visibility: oracle front-running (1), just-in-time pool deposits (16), and depositors or borrowers stepping out ahead of a loss-making liquidation (24, 25). Congestion that delays liquidations leaves more debt for the pools to absorb at a lower price (*derived*).
+
+#### Depeg
+
+- **BOLD has a hard floor and a soft ceiling.** Below 1 USD, a redeemer receives 1 USD of collateral per BOLD minus the fee. At the read block `baseRate()` on the `CollateralRegistry` was 0.291%, so the fee was 0.791% and the floor about 0.992 USD before gas (*derived*). Above 1 USD there is no mint-at-par arbitrage: the whitepaper relies on borrowers lowering their rates, which makes borrowing cheaper, so BOLD can trade above its peg for as long as rates take to adjust.
+- **The floor weakens when redemptions stop.** Branches below their SCR and shut-down branches are excluded from routing. After a shutdown that leaves bad debt, part of the BOLD supply can never be redeemed, and the README warns this could cause a bank run and "break the BOLD peg" (Known Issue 9).
+- **The LST branches carry an LST depeg.** The wstETH borrowing price is STETH/USD times the canonical rate, so a stETH discount on the market lowers it directly. The rETH price takes the lower of the market and canonical prices, so either a market discount or a cut in the canonical rate (a slashing loss, for example) lowers it. The README states that downward manipulation is not protected against and that its impact should stay within the branch: liquidations and, at worst, shutdown (Known Issue 8).
+- **WETH has no peg of its own.** WETH is a fixed 1:1 wrapper of ETH, so the WETH branch has no depeg risk beyond the ETH price itself.
+
+#### Collateral and market risk
+
+Treating each branch as a whole and leaving liquidations aside, the price fall that takes a branch from its TCR down to a threshold is:
+
+$$
+\begin{aligned}
+\text{fall to threshold} = 1 - \frac{\text{threshold}}{\text{TCR}}
+\end{aligned}
+$$
+
+- **Buffers at the read block.** The formula gives 23.4% (WETH), 35.7% (wstETH) and 58.8% (rETH) to the CCR, and 43.8%, 51.8% and 69.1% to the SCR (*derived*). Individual troves near the MCR are liquidated long before that, and the WETH and wstETH branches would hold less collateral than debt after falls of 48.9% and 59.8%.
+- **One market under three branches.** All three collaterals are priced in ETH, so a fall in ETH hits every branch at once. Branches isolate a failure of one LST, not the ETH price (*derived*). The wstETH branch carries 55.7% of all debt and has the lowest pool coverage, 44.7%.
+- **Reflexive selling.** Pool depositors receive the liquidated collateral and may sell it. For an LST that trades in a few DEX pools, those sales lower the market price the feed reads, which can trigger the next round of liquidations (*derived*). When pools are empty, redistribution can drag healthy troves below the MCR in a cascade (Known Issue 23), although V2 no longer pays collateral compensation on redistributed troves, which makes such cascades less profitable to trigger.
+- **Redemption risk for low-rate borrowers.** A borrower with little debt in front loses collateral to redemptions at the oracle price; the fee stays in the trove, but the README notes that a redemption can still cause a short-term loss. Debt in front can change at any moment because others adjust their debt and rates, and troves at the same rate are redeemed last-in, first-out, so a batch manager can re-insert its batch for free just before a redemption (Known Issue 26). The 7-day fees make dodging a redemption costly but do not remove the risk.
+- **Manipulation of the prices the protocol computes.** The protocol computes no market price itself, only the redemption fee and the routing split. Routing can be steered with flash-loaned pool deposits on the branches a redeemer wants to avoid, which extracts no value from the system (Known Issue 2). At the read block the rETH pool held more BOLD than the branch's debt, so rETH had no unbacked debt and every redemption went 28.8% to WETH and 71.2% to wstETH (*derived* from the routing formula).
+
+#### Liquidity
+
+- **Borrowers need BOLD to leave.** Closing a trove requires repaying its full debt in BOLD, bought on the market if needed. The last trove of a branch cannot be closed unless the branch is shut down.
+- **Stability Pool deposits can always be withdrawn.** The code has no V1-style check that blocks withdrawals while undercollateralized troves exist (see [Whitepaper versus implementation](#whitepaper-versus-implementation)). Depositors can always get out, but those who stay take a larger share of a loss-making liquidation (Known Issue 24).
+- **Holders exit by selling or redeeming.** Redemption is open to anyone, but the README calls it complex and MEV-competitive and advises leaving it to bots, warning that manual redemptions can lose funds. A holder who is not a bot relies on DEX liquidity, which the 25% interest share is meant to fund; its depth was not measured here (listed under Gaps).
+
+#### Centralisation and governance
+
+- **No admin power over the core.** The owner reads above show no key that can change the core contracts. `Governance` has no owner either, and its only power is the split of the 25% interest share between initiatives. The mainnet contract returns `REGISTRATION_FEE()` = 100 BOLD and `VOTING_THRESHOLD_FACTOR()` = 2%, and its other immutables (0.01% registration threshold, unregistration after 4 epochs, `MIN_CLAIM` and `MIN_ACCRUAL` of 0, 7-day epochs with a 6-day voting cutoff, first epoch on 8 May 2025) also match the deploy script.
+- **Voting power follows LQTY and bribes.** Anyone can register an initiative for 100 BOLD, and `BribeInitiative` lets third parties pay voters, so the incentive budget goes where LQTY holders and bribers send it. Vetoes can still be removed after the voting cutoff (CS-V2Gov-012, accepted). How LQTY voting power is distributed was not read (listed under Gaps).
+- **The bad-debt remedy depends on governance.** The only way the README offers to fill a hole left by a shutdown is for LQTY voters to direct interest to a BOLD burn (Known Issue 9). Nothing in the contracts forces that vote.
+- **Delegates are trusted by the borrowers who choose them.** A remove manager can withdraw collateral and borrow, sending the funds to its receiver. A batch manager can charge premature-adjustment fees that push a trove below the MCR after a price fall, and the README says batch managers "should be considered trusted actors" (Known Issue 11). Managers stay attached to the trove NFT on transfer (see [Delegation and batches](#delegation-and-batches)).
+- **Off-chain parts.** Users access the protocol through front ends that third parties host, and an automated rate manager such as `bold-ir-management` runs on the Internet Computer. Redemptions and liquidations depend on bots. None of these can change the contracts, but a user who signs what a front end prepares depends on it (*derived*).
+
+#### Loss sharing
+
+- **The Stability Pool takes the first loss, per branch.** Depositors burn BOLD and receive collateral worth up to the debt plus 5%, which is a loss only when the trove's collateral is worth less than its debt. Just-in-time deposits can take most of a profitable liquidation from long-term depositors (Known Issue 16), and withdrawals ahead of a loss leave it to those who stay (24). At least 1 BOLD (`MIN_BOLD_IN_SP`) always stays in each pool.
+- **Borrowers of the same branch take the second loss.** What the pool cannot cover is redistributed to the active troves of the branch, borrowers who did not choose to absorb liquidations. The 10% or 20% penalty makes this a gain while the liquidated trove is above 100%, but it lowers every recipient's ratio, and a borrower can close ahead of a loss-making redistribution and leave it to the others (Known Issue 25).
+- **Bad debt after a shutdown is nobody's in particular.** No mechanism socializes it automatically. It stays as BOLD that no collateral backs, so every BOLD holder carries it until governance burns enough interest (Known Issue 9). Below 102% ICR, the 2% urgent-redemption bonus makes a trove worse (Known Issue 14).
+
+#### Regulatory
+
+- **A stablecoin with no issuer.** BOLD is minted by immutable contracts, and no company issues it. MiCA classifies a token by what it purports to do, so a token that references the US dollar falls under the e-money token rules, which reserve the offer to the public and admission to trading to the issuer or persons it authorises (see [MiCA Explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/) and [Stablecoins Under MiCA]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)). How that applies to BOLD, and to the front ends and exchanges that make it available in the EU, is not settled in the sources, and it could restrict access in some jurisdictions (listed under Gaps).
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|---|---|---|---|
+| Code | Immutable contracts with complex batch, zombie and pool accounting | Audits by ChainSecurity, Dedaub, Coinspect and Recon, a Cantina competition, Certora verification; verified source; no admin key, which removes upgrade and admin-key risk: the logic cannot be swapped for a malicious or buggy version, parameters cannot change and funds cannot be frozen | Bugs cannot be patched in place; a fix needs a redeployment and user migration |
+| Oracle | Chainlink ETH/USD, STETH/USD, RETH/ETH and two canonical rates | Staleness thresholds (24 h, 48 h), worst-price rule for redemptions, minimum of market and canonical for rETH | Any failure shuts the branch for good at a frozen price; stale prices are used until the threshold |
+| BOLD depeg | Redemption arbitrage below 1 USD, rate changes above | Redemptions at face value minus a 0.5% floor fee, routing to the least covered branches | Soft ceiling; unredeemable BOLD after a shutdown with bad debt |
+| LST depeg | wstETH and rETH market discounts, slashing, canonical-rate errors | Separate branches with 120% MCR and 20% redistribution penalty | Downward manipulation not protected; 55.7% of debt sits on the wstETH branch |
+| ETH market | All collateral priced in ETH | TCR buffers of 23.4% to 58.8% before the CCR at the read block | A large ETH fall hits all branches at once; reflexive selling of LST collateral |
+| Redemption | Rate order within each branch | Upfront and premature-adjustment fees, debt-in-front tools | Low-rate borrowers lose collateral; debt in front can change before a redemption |
+| Liquidity | Repayment in BOLD, MEV-competitive redemptions | No lock on pool withdrawals; 25% of interest for DEX liquidity | Non-bot holders depend on DEX depth; pool stayers carry loss-evading exits |
+| Governance and delegation | LQTY votes and bribes, managers chosen by borrowers | Governance limited to the 25% interest split; delegation is opt-in | Bad-debt repair needs a vote; batch and remove managers are trusted |
+| Loss sharing | Pool first, then redistribution, then BOLD holders | 5% and 10% or 20% penalties, `MIN_BOLD_IN_SP` | Bad debt after shutdown is not socialized by any mechanism |
+| Regulatory | Dollar stablecoin without an issuer | None in the design | Treatment under MiCA of offering and listing BOLD is open |
 
 ## Frequently Asked Questions
 

@@ -245,83 +245,6 @@ The renaming has a side effect the source comments acknowledge: the [EIP-712](ht
 
 Blue markets can carry external reward programs, and rewards earned by the vault's supply are paid to the vault's address. MetaMorpho has no logic to distribute them. Instead, the owner sets a `skimRecipient`, and anyone can call `skim(token)` to send the vault's entire balance of that token to it. The README recommends using a Universal Rewards Distributor as the recipient, from which the vault's managers publish a Merkle root of what each depositor can claim. Since the vault never holds its own asset between transactions, skimming does not touch depositors' funds.
 
-## Risks
-
-A MetaMorpho depositor carries the risks of every Blue market the vault supplies to, plus the risks of the vault's own governance. Morpho's own disclosure for Vault V1 is the "Emergency" section of the [v1.0](https://github.com/morpho-org/metamorpho/tree/ded84e59668155b34d3c24906c4f7461c12828af) and [v1.1](https://github.com/morpho-org/metamorpho-v1.1/tree/3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7) READMEs, which describes what to do when a market becomes unsafe, when its funds are lost, and when the curator or an allocator acts against the vault's strategy, together with the audit reports in each repository's `audits/` folder. This section adds what the code and two deployed vaults show. On-chain values were read on Ethereum mainnet at block 26,248,480 (22 October 2026, 13:33 UTC) on two vaults the site already links from its [Steakhouse article]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/): Steakhouse USDC (`0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB`) and Steakhouse USDT (`0xbEef047a543E45807105E51A8BBEFCc5950fcfBa`). The comparison with Vault V2 in the next section shows which of these risks V2 changes.
-
-### Smart contracts and transparency
-
-- **Immutable, on both sides.** The factory deploys each vault without a proxy (see [Names and versions](#names-and-versions)), and Etherscan shows Steakhouse USDC's source verified as `MetaMorpho`, compiled with Solidity 0.8.21. A bug in a deployed vault cannot be patched by anyone, Morpho included: a fix means a new vault and depositors moving their funds to it. In exchange, nobody can replace the logic with a malicious or faulty version, and the limits written in the code (a fee of at most 50 %, a timelock between 1 day and 2 weeks, the guardian's veto) cannot change under a depositor.
-- **Audits and verification.** The v1.0 folder holds a Cantina managed review (14 November 2023), an OpenZeppelin review of the periphery (16 November 2023) and a Cantina competition (5 January 2024); the v1.1 folder adds a Cantina review of the v1.0 to v1.1 diff (23 September 2024), an OpenZeppelin review (10 January 2025) and a Cantina managed review (20 February 2025). The v1.0 README states that formal verification was done with Certora. Which commit each report covered, and whether it matches the bytecode of a given vault, was not checked here.
-- **The version is fixed per vault.** Both Steakhouse vaults return `true` from `isMetaMorpho` on the v1.0 factory (`0xA9c3D3a366466Fa809d1Ae982Fb2c46E5fC41101`) and `false` on the v1.1 factory (`0x1897A8997241C1cD4bD0698647e4EB7213535c24`), and `lostAssets()` reverts on both: they are v1.0 vaults, which realise bad debt in the share price. The two versions share a name but not the loss rule, so a depositor has to check the factory of each vault.
-- **Accounting that one market can stop.** `totalAssets()` calls Blue for every market in the withdraw queue, so a single reverting market halts deposits and withdrawals until a forced removal passes the timelock (see [Market lifecycle](#market-lifecycle)). For an 18-decimal asset the virtual-share offset is zero, which leaves a new vault open to the inflation attack unless the deployer seeds it ([Share conversion](#share-conversion)); the two Steakhouse vaults hold 6-decimal stablecoins, so their offset is 12.
-
-### External dependencies
-
-- **Morpho Blue.** All of the vault's assets sit in Blue markets. Blue is immutable, and its owner, a Safe at `0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa` with a threshold of 6 of its 10 owners, can only enable interest-rate models and LLTVs and set a per-market fee of up to 25 % of borrower interest, which lowers what suppliers, and so the vault, earn. It cannot move funds. Blue's own mechanisms and their limits are covered in the Morpho Blue article linked in the introduction.
-- **The oracle of each market.** The vault has no oracle of its own; each market's oracle decides when borrowers are liquidated and whether bad debt appears, and it is fixed when the market is created. A curator who raises a market's cap accepts that oracle on the depositors' behalf. How each oracle kind passes a price shock on, and who bears the gap, is the subject of [Pricing a Lending Position During an Incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/).
-- **The chain and liquidators.** Bad debt falls on suppliers when liquidations come too late, so a vault depends on third-party liquidators acting on Ethereum during congestion or a fast price move (*derived*). The vault itself runs no keeper.
-- **Rewards.** Forwarding rewards needs a skim recipient and an off-chain Merkle root (see [Rewards](#rewards)). Both Steakhouse vaults return the zero address from `skimRecipient()`, and `skim` reverts with `ZeroAddress` in that case, so any reward token sent to them stays in the vault until the owner sets a recipient.
-
-### Depeg
-
-- **The loan asset.** The vault counts in units of its asset, so if USDC or USDT loses its peg, a depositor's position falls in dollar terms one for one and nothing in the vault hedges it (*derived*). Both stablecoins are issued by companies that can freeze addresses; the effect of a freeze on Blue or on a vault was not checked here.
-- **Collateral pegs.** Markets that accept stablecoins, liquid-staking tokens or principal tokens as collateral often price them with an exchange-rate or fixed-price oracle. If the collateral depegs while the oracle keeps reading the peg, liquidations do not start and the shortfall becomes bad debt for the market's suppliers, including the vault (*derived*, following the oracle article linked above).
-
-### Collateral and market risk
-
-- **Limits are per market, not per collateral.** A cap limits one market, and two markets with the same collateral and different oracles or LLTVs have separate caps (see [What Vault V2 changes](#what-vault-v2-changes)). Allocators can move funds to any enabled market up to its cap, so a depositor's worst-case exposure is the sum of the caps, not the current allocation (*derived*). Interest and donations can also push a position above its cap.
-- **Reflexive loops.** Liquidations sell seized collateral, which can push down the price its oracle reads and make further positions liquidatable; markets used for leverage loops, where borrowers buy more collateral with the loan asset, compound this (*derived*). [The PT-reUSD liquidations]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/) show a case where a trade moved a TWAP oracle and liquidated 36.1M of USDC and USDT debt in two markets, without bad debt.
-
-### Liquidity
-
-- **An exit depends on Blue utilisation.** Withdrawals pull liquidity along the withdraw queue and revert with `NotEnoughLiquidity` when its markets are fully borrowed (see [Deposits, withdrawals and reallocation](#deposits-withdrawals-and-reallocation)). V1 has no in-kind exit, so a depositor waits for repayments, new supply or an allocator.
-- **Other lenders draw on the same pool.** Other vaults and direct suppliers in the same Blue markets withdraw from the same liquidity, first come, first served (*derived*). An idle market only protects exits if the allocators keep funds in it.
-- **One reverting market blocks every exit.** Because `totalAssets()` reverts with it, withdrawals stop until a forced removal has waited out the timelock. On both Steakhouse vaults `timelock()` returns 604,800 seconds, so the minimum outage in that case is 7 days.
-
-### Centralisation and governance
-
-The vault is immutable, but its roles are not, and each role is an address that can be a single key or a multisig. On the two Steakhouse vaults, nothing was pending at the block read (`pendingGuardian()` and `pendingTimelock()` return zero):
-
-| Getter | Steakhouse USDC | Steakhouse USDT | What the address is |
-|--------|-----------------|-----------------|---------------------|
-| `owner()` | `0x0A0e559bc3b0950a7e448F0d4894db195b9cf8DD` | Same | Safe 1.4.1, threshold 5 of 10 owners |
-| `curator()` | `0x827e86072B06674a077f592A531dcE4590aDeCdB` | Same | Safe 1.4.1, threshold 3 of 9 owners |
-| `guardian()` | `0xaa0500198B4425DfC4E272FbE42C8E64E21fc03d` | `0xaeC761545Fd135db6d04D27C92BCB3951668c67F` | Aragon OSx `DAO` (protocol version 1.3.0) behind an ERC-1967 UUPS proxy |
-| `feeRecipient()` | `0x255c7705e8BB334DfCae438197f7C4297988085a` | Same | Safe 1.4.1, threshold 2 of 4 owners |
-| `timelock()` | 604,800 s (7 days) | Same | |
-| `fee()` | 5 % | Same | |
-| `totalAssets()` | 66.18M USDC | 77.63M USDT | |
-
-- **What the owner can do at once.** The owner sets the curator, the allocators, the fee (up to 50 %), the fee recipient and the skim recipient without delay (see [Roles](#roles)). Five of the ten owner signers could raise the fee from 5 % to 50 % in one transaction, which takes the depositor's share of interest from 95 % to 50 %, a 47.4 % cut in net yield; the fee applies only to interest, never to principal.
-- **What waits for the timelock.** New markets and higher caps, forced removals, a lower timelock and a new guardian wait 7 days on these vaults. A compromised owner could appoint its own curator and allocators at once, submit a cap for a market whose oracle it controls, and move funds there once the 7 days have passed (*derived*; the README's "curator takeover" case describes the same path). Depositors have those 7 days to exit, and the guardian can revoke the pending cap; the owner cannot remove the guardian quickly, because replacing it is itself timelocked and the guardian can revoke that too.
-- **The guardian is upgradeable.** Unlike the vault, each guardian is an Aragon OSx DAO behind an upgradeable proxy, so its logic and its members can change. Who can execute through it (its plugins, members and voting thresholds) was not determined from the chain here.
-- **Allocators and off-chain work.** Allocators were not enumerated for these vaults. They cannot exceed caps or touch markets that are not enabled, but they can concentrate funds in one enabled market. The choice of markets, the risk analysis behind the caps and the rewards Merkle root are off-chain work by the curator and owner, outside anything the contract checks.
-
-### Loss sharing
-
-- **Depositors take the first loss.** The vault has no insurance fund, reserve or junior tranche: bad debt in any enabled market, or a forced removal, falls on the vault's shareholders, and the fee recipient's shares lose in the same proportion. Who bears it depends on the version (see [Bad debt: v1.0 realises it, v1.1 does not](#bad-debt-v10-realises-it-v11-does-not)): pro rata at once in v1.0, as on both Steakhouse vaults, and by the depositors who stay in v1.1.
-- **Losses from markets added after a deposit.** A depositor never borrows, yet can lose on a market enabled after they deposited, once the timelock has passed. Watching `SubmitCap` events and exiting within the timelock is the only defence, and it needs liquidity. Ways to cover such losses from outside the vault are discussed in [Insuring Composable DeFi]({{site.url_complet}}/2026/07/02/defi-composable-first-loss-capital-insurance/).
-
-### Regulatory
-
-- **The curator's status.** The vault has no issuer and cannot be changed, but a curator is an identifiable party that chooses where depositors' assets go and is paid a performance fee for it. Whether that falls under "portfolio management on crypto-assets", one of the services that [requires authorisation as a CASP under MiCA]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/), is not settled, and [MiCA's Article 142]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/) leaves decentralised lending to a later report (*derived*). No other concrete regulatory question was found.
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-|------|---------------------|-------------------------------|--------------|
-| Contract bug | Immutable vault code | Audits, Certora verification; logic cannot be swapped | A bug cannot be patched; depositors must migrate |
-| Wrong loss rule assumed | v1.0 and v1.1 share a name | `isMetaMorpho` on each factory | Depositors must check which factory deployed the vault |
-| Market bad debt | Oracles and collateral of enabled markets | Per-market caps, timelocked cap increases | No aggregate limit per collateral; losses fall on depositors |
-| Reflexive liquidations | Collateral sold into the price its oracle reads | Isolated markets limit the spread | Exposure to loop-heavy markets up to the caps |
-| Exit blocked | Fully borrowed markets, or one reverting market | Queues, idle market, forced removal | No in-kind exit; at least the timelock (7 days on Steakhouse) when a market reverts |
-| Owner abuse or key loss | Immediate owner powers | Two-step ownership, multisig owners on Steakhouse | Fee up to 50 %, curator and allocators change at once |
-| Malicious market added | Curator or owner submitting caps | Timelock and guardian veto | Depends on the guardian acting, and on depositors exiting in time |
-| Guardian changes | Upgradeable Aragon DAO as guardian on Steakhouse | Guardian can only cancel | Its members and thresholds were not determined |
-| Loan asset depeg or freeze | USDC, USDT issuers | None in the vault | Full exposure in dollar terms |
-| Regulatory | Curator chooses allocations for a fee | None | Status under MiCA not settled |
-
 ## What Vault V2 changes
 
 Vault V2 keeps the purpose of MetaMorpho, a curated and non-custodial ERC-4626 vault, and changes almost every mechanism. The table compares MetaMorpho v1.1 with Vault V2 at the commits pinned in the references.
@@ -418,6 +341,83 @@ MetaMorpho is an immutable ERC-4626 vault that supplies one asset to at most 30 
 | The owner can change the fee and appoint allocators without delay. | Monitor `SetFee`, `SetIsAllocator` and `SetCurator` events; the timelock does not cover them. |
 | v1.1 builds its EIP-712 domain from an empty name. | Sign permits for v1.1 vaults with the domain the contract uses, not the vault's displayed name. |
 | A vault cannot be upgraded from v1.0 to v1.1. | Check the factory that deployed a vault (`isMetaMorpho` on each factory) to know which version and which bad-debt behaviour applies. |
+
+### Risks
+
+A MetaMorpho depositor carries the risks of every Blue market the vault supplies to, plus the risks of the vault's own governance. Morpho's own disclosure for Vault V1 is the "Emergency" section of the [v1.0](https://github.com/morpho-org/metamorpho/tree/ded84e59668155b34d3c24906c4f7461c12828af) and [v1.1](https://github.com/morpho-org/metamorpho-v1.1/tree/3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7) READMEs, which describes what to do when a market becomes unsafe, when its funds are lost, and when the curator or an allocator acts against the vault's strategy, together with the audit reports in each repository's `audits/` folder. This section adds what the code and two deployed vaults show. On-chain values were read on Ethereum mainnet at block 26,248,480 (22 October 2026, 13:33 UTC) on two vaults the site already links from its [Steakhouse article]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/): Steakhouse USDC (`0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB`) and Steakhouse USDT (`0xbEef047a543E45807105E51A8BBEFCc5950fcfBa`). The comparison in [What Vault V2 changes](#what-vault-v2-changes) shows which of these risks V2 changes.
+
+#### Smart contracts and transparency
+
+- **Immutable, on both sides.** The factory deploys each vault without a proxy (see [Names and versions](#names-and-versions)), and Etherscan shows Steakhouse USDC's source verified as `MetaMorpho`, compiled with Solidity 0.8.21. A bug in a deployed vault cannot be patched by anyone, Morpho included: a fix means a new vault and depositors moving their funds to it. In exchange, nobody can replace the logic with a malicious or faulty version, and the limits written in the code (a fee of at most 50 %, a timelock between 1 day and 2 weeks, the guardian's veto) cannot change under a depositor.
+- **Audits and verification.** The v1.0 folder holds a Cantina managed review (14 November 2023), an OpenZeppelin review of the periphery (16 November 2023) and a Cantina competition (5 January 2024); the v1.1 folder adds a Cantina review of the v1.0 to v1.1 diff (23 September 2024), an OpenZeppelin review (10 January 2025) and a Cantina managed review (20 February 2025). The v1.0 README states that formal verification was done with Certora. Which commit each report covered, and whether it matches the bytecode of a given vault, was not checked here.
+- **The version is fixed per vault.** Both Steakhouse vaults return `true` from `isMetaMorpho` on the v1.0 factory (`0xA9c3D3a366466Fa809d1Ae982Fb2c46E5fC41101`) and `false` on the v1.1 factory (`0x1897A8997241C1cD4bD0698647e4EB7213535c24`), and `lostAssets()` reverts on both: they are v1.0 vaults, which realise bad debt in the share price. The two versions share a name but not the loss rule, so a depositor has to check the factory of each vault.
+- **Accounting that one market can stop.** `totalAssets()` calls Blue for every market in the withdraw queue, so a single reverting market halts deposits and withdrawals until a forced removal passes the timelock (see [Market lifecycle](#market-lifecycle)). For an 18-decimal asset the virtual-share offset is zero, which leaves a new vault open to the inflation attack unless the deployer seeds it ([Share conversion](#share-conversion)); the two Steakhouse vaults hold 6-decimal stablecoins, so their offset is 12.
+
+#### External dependencies
+
+- **Morpho Blue.** All of the vault's assets sit in Blue markets. Blue is immutable, and its owner, a Safe at `0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa` with a threshold of 6 of its 10 owners, can only enable interest-rate models and LLTVs and set a per-market fee of up to 25 % of borrower interest, which lowers what suppliers, and so the vault, earn. It cannot move funds. Blue's own mechanisms and their limits are covered in the Morpho Blue article linked in the introduction.
+- **The oracle of each market.** The vault has no oracle of its own; each market's oracle decides when borrowers are liquidated and whether bad debt appears, and it is fixed when the market is created. A curator who raises a market's cap accepts that oracle on the depositors' behalf. How each oracle kind passes a price shock on, and who bears the gap, is the subject of [Pricing a Lending Position During an Incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/).
+- **The chain and liquidators.** Bad debt falls on suppliers when liquidations come too late, so a vault depends on third-party liquidators acting on Ethereum during congestion or a fast price move (*derived*). The vault itself runs no keeper.
+- **Rewards.** Forwarding rewards needs a skim recipient and an off-chain Merkle root (see [Rewards](#rewards)). Both Steakhouse vaults return the zero address from `skimRecipient()`, and `skim` reverts with `ZeroAddress` in that case, so any reward token sent to them stays in the vault until the owner sets a recipient.
+
+#### Depeg
+
+- **The loan asset.** The vault counts in units of its asset, so if USDC or USDT loses its peg, a depositor's position falls in dollar terms one for one and nothing in the vault hedges it (*derived*). Both stablecoins are issued by companies that can freeze addresses; the effect of a freeze on Blue or on a vault was not checked here.
+- **Collateral pegs.** Markets that accept stablecoins, liquid-staking tokens or principal tokens as collateral often price them with an exchange-rate or fixed-price oracle. If the collateral depegs while the oracle keeps reading the peg, liquidations do not start and the shortfall becomes bad debt for the market's suppliers, including the vault (*derived*, following the oracle article linked above).
+
+#### Collateral and market risk
+
+- **Limits are per market, not per collateral.** A cap limits one market, and two markets with the same collateral and different oracles or LLTVs have separate caps (see [What Vault V2 changes](#what-vault-v2-changes)). Allocators can move funds to any enabled market up to its cap, so a depositor's worst-case exposure is the sum of the caps, not the current allocation (*derived*). Interest and donations can also push a position above its cap.
+- **Reflexive loops.** Liquidations sell seized collateral, which can push down the price its oracle reads and make further positions liquidatable; markets used for leverage loops, where borrowers buy more collateral with the loan asset, compound this (*derived*). [The PT-reUSD liquidations]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/) show a case where a trade moved a TWAP oracle and liquidated 36.1M of USDC and USDT debt in two markets, without bad debt.
+
+#### Liquidity
+
+- **An exit depends on Blue utilisation.** Withdrawals pull liquidity along the withdraw queue and revert with `NotEnoughLiquidity` when its markets are fully borrowed (see [Deposits, withdrawals and reallocation](#deposits-withdrawals-and-reallocation)). V1 has no in-kind exit, so a depositor waits for repayments, new supply or an allocator.
+- **Other lenders draw on the same pool.** Other vaults and direct suppliers in the same Blue markets withdraw from the same liquidity, first come, first served (*derived*). An idle market only protects exits if the allocators keep funds in it.
+- **One reverting market blocks every exit.** Because `totalAssets()` reverts with it, withdrawals stop until a forced removal has waited out the timelock. On both Steakhouse vaults `timelock()` returns 604,800 seconds, so the minimum outage in that case is 7 days.
+
+#### Centralisation and governance
+
+The vault is immutable, but its roles are not, and each role is an address that can be a single key or a multisig. On the two Steakhouse vaults, nothing was pending at the block read (`pendingGuardian()` and `pendingTimelock()` return zero):
+
+| Getter | Steakhouse USDC | Steakhouse USDT | What the address is |
+|--------|-----------------|-----------------|---------------------|
+| `owner()` | `0x0A0e559bc3b0950a7e448F0d4894db195b9cf8DD` | Same | Safe 1.4.1, threshold 5 of 10 owners |
+| `curator()` | `0x827e86072B06674a077f592A531dcE4590aDeCdB` | Same | Safe 1.4.1, threshold 3 of 9 owners |
+| `guardian()` | `0xaa0500198B4425DfC4E272FbE42C8E64E21fc03d` | `0xaeC761545Fd135db6d04D27C92BCB3951668c67F` | Aragon OSx `DAO` (protocol version 1.3.0) behind an ERC-1967 UUPS proxy |
+| `feeRecipient()` | `0x255c7705e8BB334DfCae438197f7C4297988085a` | Same | Safe 1.4.1, threshold 2 of 4 owners |
+| `timelock()` | 604,800 s (7 days) | Same | |
+| `fee()` | 5 % | Same | |
+| `totalAssets()` | 66.18M USDC | 77.63M USDT | |
+
+- **What the owner can do at once.** The owner sets the curator, the allocators, the fee (up to 50 %), the fee recipient and the skim recipient without delay (see [Roles](#roles)). Five of the ten owner signers could raise the fee from 5 % to 50 % in one transaction, which takes the depositor's share of interest from 95 % to 50 %, a 47.4 % cut in net yield; the fee applies only to interest, never to principal.
+- **What waits for the timelock.** New markets and higher caps, forced removals, a lower timelock and a new guardian wait 7 days on these vaults. A compromised owner could appoint its own curator and allocators at once, submit a cap for a market whose oracle it controls, and move funds there once the 7 days have passed (*derived*; the README's "curator takeover" case describes the same path). Depositors have those 7 days to exit, and the guardian can revoke the pending cap; the owner cannot remove the guardian quickly, because replacing it is itself timelocked and the guardian can revoke that too.
+- **The guardian is upgradeable.** Unlike the vault, each guardian is an Aragon OSx DAO behind an upgradeable proxy, so its logic and its members can change. Who can execute through it (its plugins, members and voting thresholds) was not determined from the chain here.
+- **Allocators and off-chain work.** Allocators were not enumerated for these vaults. They cannot exceed caps or touch markets that are not enabled, but they can concentrate funds in one enabled market. The choice of markets, the risk analysis behind the caps and the rewards Merkle root are off-chain work by the curator and owner, outside anything the contract checks.
+
+#### Loss sharing
+
+- **Depositors take the first loss.** The vault has no insurance fund, reserve or junior tranche: bad debt in any enabled market, or a forced removal, falls on the vault's shareholders, and the fee recipient's shares lose in the same proportion. Who bears it depends on the version (see [Bad debt: v1.0 realises it, v1.1 does not](#bad-debt-v10-realises-it-v11-does-not)): pro rata at once in v1.0, as on both Steakhouse vaults, and by the depositors who stay in v1.1.
+- **Losses from markets added after a deposit.** A depositor never borrows, yet can lose on a market enabled after they deposited, once the timelock has passed. Watching `SubmitCap` events and exiting within the timelock is the only defence, and it needs liquidity. Ways to cover such losses from outside the vault are discussed in [Insuring Composable DeFi]({{site.url_complet}}/2026/07/02/defi-composable-first-loss-capital-insurance/).
+
+#### Regulatory
+
+- **The curator's status.** The vault has no issuer and cannot be changed, but a curator is an identifiable party that chooses where depositors' assets go and is paid a performance fee for it. Whether that falls under "portfolio management on crypto-assets", one of the services that [requires authorisation as a CASP under MiCA]({{site.url_complet}}/2026/09/17/mica-casp-authorisation-capital-custody/), is not settled, and [MiCA's Article 142]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/) leaves decentralised lending to a later report (*derived*). No other concrete regulatory question was found.
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|------|---------------------|-------------------------------|--------------|
+| Contract bug | Immutable vault code | Audits, Certora verification; logic cannot be swapped | A bug cannot be patched; depositors must migrate |
+| Wrong loss rule assumed | v1.0 and v1.1 share a name | `isMetaMorpho` on each factory | Depositors must check which factory deployed the vault |
+| Market bad debt | Oracles and collateral of enabled markets | Per-market caps, timelocked cap increases | No aggregate limit per collateral; losses fall on depositors |
+| Reflexive liquidations | Collateral sold into the price its oracle reads | Isolated markets limit the spread | Exposure to loop-heavy markets up to the caps |
+| Exit blocked | Fully borrowed markets, or one reverting market | Queues, idle market, forced removal | No in-kind exit; at least the timelock (7 days on Steakhouse) when a market reverts |
+| Owner abuse or key loss | Immediate owner powers | Two-step ownership, multisig owners on Steakhouse | Fee up to 50 %, curator and allocators change at once |
+| Malicious market added | Curator or owner submitting caps | Timelock and guardian veto | Depends on the guardian acting, and on depositors exiting in time |
+| Guardian changes | Upgradeable Aragon DAO as guardian on Steakhouse | Guardian can only cancel | Its members and thresholds were not determined |
+| Loan asset depeg or freeze | USDC, USDT issuers | None in the vault | Full exposure in dollar terms |
+| Regulatory | Curator chooses allocations for a fee | None | Status under MiCA not settled |
 
 ## Frequently Asked Questions
 

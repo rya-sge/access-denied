@@ -128,8 +128,6 @@ Compound V2 includes formal verification specifications powered by [Certora](htt
 - If a borrower falls below their collateralization ratio (CR), their position is liquidated to pay back their debt.
 - The debt can be liquidated by a **keeper**. The keeper receives in return a bonus.
 
-
-
 ### Collateralization ratios and factors
 
 - The CR is calculated via a collateral factor (CF)
@@ -165,13 +163,11 @@ Example 2:
 
 - The total supply balance is now $500, with 80% being ETH and 20% being DAI. The required CR is
 
-
 $$
   \begin{aligned}[b]
   100/(0.8*60 + 0.2 * 90) = 151\%
   \end{aligned}
 $$
-
 
 ------
 
@@ -218,8 +214,6 @@ function utilizationRate(uint cash, uint borrows, uint reserves) public pure ret
     }
 ```
 
-
-
 #### Example
 
 For example: given that reserves are 0,
@@ -240,7 +234,6 @@ $$
 
 Note: the denominator `cash + borrows - reserves = 900 + 100 - 0 = 1000` represents the total amount the protocol owes to suppliers (effective total supply), not the current available cash.
 
-
 ### Borrow rate formula
 
 - It is an increasing linear function with a y-intercept known as the *base rate* that represents the borrow rate at 0% borrow demand and a *slope* representing the rate of change of the rates
@@ -250,8 +243,6 @@ Note: the denominator `cash + borrows - reserves = 900 + 100 - 0 = 1000` represe
   - kink is the utilization point at which the jump multiplier is applied
 
 - These formulas can be used to reduce the cost of borrowing up to the *kink* and then increase the cost of borrowing after the *kink* to incentivize a minimum level of liquidity.
-
-
 
 - Formula
 
@@ -295,9 +286,6 @@ $$
 \end{aligned}
 $$
 
-
-
-
 #### Code
 
 See [compound-finance - JumpRateModel.sol#L79](https://github.com/compound-finance/compound-protocol/blob/a3214f67b73310d547e00fc578e8355911c9d376/contracts/JumpRateModel.sol#L79)
@@ -323,8 +311,6 @@ See [compound-finance - JumpRateModel.sol#L79](https://github.com/compound-finan
     }
 ```
 
-
-
 ### Supply interest formula
 
 #### High level formula
@@ -345,8 +331,6 @@ $$
 
 - In an extreme price movement, many positions may become undercollateralized in that they have insufficient funds to repay the suppliers. In the event of such a scenario, the suppliers would be repaid using the assets in the reserve pool
 
-
-
 #### Implementation
 
 ##### Explanation
@@ -359,7 +343,6 @@ $$
 Base = 10^{18}
 \end{aligned}
 $$
-
 
 So the real implementation is:
 $$
@@ -414,8 +397,6 @@ The portion of interest that has been **set aside for the protocol**, not availa
     }
 ```
 
-
-
 #### Example 1
 
 In the DAI market, 100 million is supplied and 50 millions is borrowed.
@@ -452,8 +433,6 @@ $$
 \end{aligned}
 $$
 
-
-
 #### Example 2
 
 - The borrow rate is not a marginal rate, it is a rate for all borrowers
@@ -478,8 +457,6 @@ $$
 | Reserve .1 x 3m            | = .3m            |
 | Distributions to suppliers | = 2.7 m          |
 
-
-
 - 6% of borrow interest of 50 million is equal to 3 million of borrow payment
 - Distributing 3 millions of payments to 100 millions of suppliers implies a 3% interest rate to all suppliers.
 - With 10% diverted to the reserve (300,000), then there is only 2.7 millions of payments to the suppliers
@@ -502,8 +479,6 @@ $$
 0.9 * 0.13 = 11.7\%
 \end{aligned}
 $$
-
-
 
 ### Advantage of Compound
 
@@ -680,76 +655,6 @@ From [github.com/compound-finance - CToken.sol#L721](https://github.com/compound
 (rest of the functions available on Compound GitHub)
 ```
 
-
-
-------
-
-## Risks
-
-This section lists what can go wrong for a supplier or a borrower in Compound V2. It starts from what Compound publishes (the [V2 documentation](https://docs.compound.finance/v2/), its governance proposals and the incidents covered on this site), then adds what the deployed contracts show. The on-chain values below were read on 22 October 2026 at Ethereum block 26,248,478. Points that come from this article's own reasoning rather than from a source are marked (*derived*).
-
-One fact frames the rest: at that block, the two markets checked, cUSDC and cETH, had minting and borrowing paused by the Comptroller (`mintGuardianPaused` and `borrowGuardianPaused` both `true`) and a reserve factor of 100% (`reserveFactorMantissa()` = 1e18). With the supply rate formula of the [Supply interest formula](#supply-interest-formula) section, a reserve factor of 100% means suppliers in these markets earn no interest: all interest paid by the remaining borrowers goes to the reserves (*derived*). V2 is being wound down in favour of Compound III; the other 18 listed markets were not checked.
-
-### Smart contracts and transparency
-
-- **Verified, audited, formally specified.** The Unitroller, the Comptroller implementation, cETH, cUSDC, the price oracle and the governance contracts all have verified source on Etherscan. The repository includes Certora specifications (see [Formal Verification](#formal-verification)), and Compound's documentation lists external audits of V2; which audits covered which version of the Comptroller was not checked for this article (see [Gaps](#gaps)).
-- **Upgradeable Comptroller, both sides.** The Comptroller sits behind the `Unitroller` proxy (`0x3d98…Cd3B`), whose `comptrollerImplementation()` pointed to `0xBafE…B526` (a contract named `Comptroller`). Upgradeability let Compound fix bugs and add features such as COMP distribution and borrow caps without migrating users. It also means whoever holds `admin()` can replace the whole risk engine, including `redeemAllowed`, so the statement in the [Governance](#governance) section that governance "cannot prevent users from withdrawing" holds only as long as no upgrade changes that logic (*derived*).
-- **cTokens are partly fixed.** cETH (`CEther`) and cUSDC (`CErc20`) are not proxies, so their own code cannot be swapped, but their `admin()` (the Timelock) can still change their Comptroller, interest-rate model and reserve factor. Later markets use the `CErc20Delegator` pattern, whose implementation the admin can replace.
-- **Upgrades can carry bugs.** Proposal 062 (September 2021) upgraded the Comptroller with a boundary error in COMP distribution that paid out about $80$M of COMP at first, up to $147$M by Rekt's tally, and the fix had to go through the same vote and timelock ([Crypto hacks 2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021/), [technical concepts]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/)). The safeguard against a malicious upgrade also slowed the repair.
-- **Empty-market rounding.** The cToken exchange rate divides the market's assets by the cToken supply, and forks of V2 lost funds when a newly listed market had almost no supply (Hundred Finance in 2023, Sonne Finance in 2024; see [Crypto hacks 2024: technical concepts]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/)). Compound's own markets are large and mature, so this applies mainly to forks and to any new listing (*derived*).
-
-### External dependencies
-
-- **Price oracle.** The Comptroller's `oracle()` returned `0x8CF4…55d9`, a contract named `PriceOracle` that maps each cToken to a [Chainlink](https://chain.link/) feed or to a fixed price. cUSDC reads the USDC / USD feed and cETH the ETH / USD feed. Its `getUnderlyingPrice` ignores the feed's `updatedAt`, so a stale price is accepted as current, and only a zero or negative answer is rejected. Every borrow limit and liquidation in all markets depends on this one contract (*derived* from the source).
-- **History of oracle events.** On 26 November 2020, a brief DAI price spike on Coinbase Pro, reported by the oracle Compound used then, caused about $89$M of liquidations ([Crypto hacks 2020]({{site.url_complet}}/2026/10/07/crypto-hacks-2020/)). How a lending market passes such price moves on to positions is covered in [Oracle kinds, pricing and lending positions]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/).
-- **Underlying tokens.** Each market inherits the risks of its token: USDC and USDT issuers can freeze addresses, including a cToken contract, and a token with transfer hooks can re-enter (a pattern that hit Compound forks such as Cream; see the 2021 technical concepts article above).
-- **Chain.** Liquidations are first-come transactions on Ethereum; during congestion they can be delayed, and liquidators compete through MEV. Interest accrues per block, so the rates assume roughly 12-second blocks (*derived*).
-
-### Depeg
-
-- **Stablecoin markets.** Compound does not hold any peg itself. Because the oracle reads a market feed for USDC rather than a fixed 1 dollar, a depeg of a stablecoin used as collateral lowers borrowing power and can trigger liquidations, while a depeg of a borrowed stablecoin lowers the debt's value (*derived*).
-- **cToken exchange rate.** A cToken is not pegged; its exchange rate is `(cash + totalBorrows - totalReserves) / totalSupply` and normally only grows. Bad debt stays inside `totalBorrows`, so the exchange rate does not fall when a loan becomes uncollectable: the shortfall appears only when the last suppliers try to redeem (*derived*). Protocols that accept cTokens as collateral (see [cTokens can be traded](#ctokens-can-be-traded)) price them at that rate.
-
-### Collateral and market risk
-
-- **Pooled risk.** As the [Difference between V2 and V3](#difference-between-v2-and-v3) section says, one market's bad asset or bad price affects every market, since collateral in any market backs borrows in all others.
-- **How far a price can fall.** cETH had a collateral factor of 82.5% (`markets(cETH)` = 8.25e17) and the liquidation incentive was 1.08 (`liquidationIncentiveMantissa()`). A position borrowed to the limit is liquidatable as soon as ETH moves against it, and its collateral is worth less than its debt after a fall of 1 - 0.825 = 17.5%; liquidating the whole debt stops being profitable at a fall of 1 - 0.825 × 1.08 = 10.9% (*derived*). The close factor of 50% (`closeFactorMantissa()` = 5e17) means each liquidation repays at most half the debt.
-- **Reflexive loops.** Liquidators who seize collateral usually sell it, which pushes down the price the oracle reports and can make more positions liquidatable. Users who borrow and resupply the same asset (the [CR as a reserve multiplier](#cr-as-a-reserve-multiplier) section) amplify this (*derived*).
-
-### Liquidity
-
-- **Utilisation caps withdrawals.** A supplier can only redeem what is in the market's cash. At the block read, cUSDC had 2,980,377.91 USDC of cash against 4,681,014.56 USDC of borrows and 181,280.60 USDC of reserves, a utilisation of 4,681,014.56 / (2,980,377.91 + 4,681,014.56 - 181,280.60) = 62.58%; only 39.84% of the 7,480,111.88 USDC owed to suppliers could leave at once. cETH had 21,443.79 ETH of cash and 151.22 ETH of borrows, a utilisation of 0.70%.
-- **No new supply to refill cash.** With minting paused, cash only grows through repayments and liquidations. The [Kink](#example-4----kink) mechanism raises the borrow rate to push borrowers to repay, but a borrower who accepts the rate keeps the funds (*derived*). At 100% utilisation, no supplier can withdraw until someone repays.
-
-### Centralisation and governance
-
-- **Who controls the upgrade.** The Unitroller's `admin()`, the cTokens' `admin()` and the GovernorBravo's `admin()` all returned the Timelock `0x6d90…3925`, with `delay()` = 172,800 seconds (2 days) and a grace period of 14 days. The Timelock's own `admin()` was no longer GovernorBravo (`0xc0Da…6529`, still deployed with 393 proposals) but `0x309a…c8C0`, a `TransparentUpgradeableProxy` pointing to a contract named `CompoundGovernor` built on OpenZeppelin Governor, whose ProxyAdmin is owned by the Timelock.
-- **Thresholds.** On `CompoundGovernor`, a proposal needs 25,000 COMP of delegated votes (`proposalThreshold()`), 0.25% of the 10,000,000 COMP supply, and 400,000 COMP of votes in favour for quorum (4%). The voting delay is 13,140 blocks and the voting period 19,710 blocks; at 12 seconds per block that is about 1 day 20 hours and 2 days 18 hours, so a proposal needs at least about 6 days 13 hours from submission to execution including the timelock (*derived*). These are the same values as the GovernorAlpha quorum in the [Governance parameters](#governance-parameters) section.
-- **A multisig with direct power.** `pauseGuardian()`, `borrowCapGuardian()`, `whitelistGuardian()` and `proposalGuardian()` all returned `0xbbf3…012c`, a Safe with a threshold of 5 of 9 owners. In the Comptroller it can pause but only the admin can unpause. It is also `owner()` of the price oracle, and the oracle's `updateConfigPriceFeed` and `updateConfigFixedPrice` are `onlyOwner` with no timelock, so five signers can change the price of any market without a vote (*derived* from the source).
-- **Voting power and capture.** Voting power follows COMP delegation, so a holder or coalition with 400,000 COMP of votes in favour, more than the opposition, can pass any proposal, including a Comptroller upgrade or a transfer of reserves. In July 2024 a group known as Humpy or the "Golden Boys" passed a proposal to move about 499,000 COMP from the treasury to a vault they controlled, and the episode ended in a negotiated agreement rather than a technical block. This summary relies on general knowledge, not on a source read for this article (see [Gaps](#gaps)).
-
-### Loss sharing
-
-- **No insurance layer.** Compound V2 has no stability pool or insurance fund that absorbs bad debt by rule. Reserves (181,280.60 USDC in cUSDC at the block read) can be used, but only if governance votes to do so (*derived*).
-- **Losses fall on the last suppliers.** Bad debt stays in `totalBorrows` and is not written off, so suppliers who redeem early receive full value and those who redeem last find the cash missing. With pooled risk, suppliers of a market who never borrowed can absorb losses created by a bad asset in another market (*derived*).
-
-### Regulatory
-
-- **None specific found.** Compound V2 has no issuer, no KYC and is governed by token holders, and the design does not raise a specific question beyond the general treatment of decentralised lending, discussed in [MiCA explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/). Front ends and the reserve's use are where an authority would most likely look (*derived*).
-
-### Summary
-
-| Risk | Where it comes from | What the design does about it | What remains |
-| --- | --- | --- | --- |
-| Logic replaced by governance | Unitroller proxy, Timelock as admin | 2-day timelock, 400,000 COMP quorum | A captured vote can change withdrawal rules |
-| Buggy upgrade | Proposal 062 type error | Certora specs, audits, review | Fix needs the same path of about 6.5 days |
-| Oracle failure or stale price | One Chainlink-based oracle for all markets | Rejects zero or negative prices | No staleness check, owner multisig can reset feeds |
-| Pooled collateral | Any market backs all borrows | Per-asset collateral factors, borrow caps | One bad asset or price hits every market |
-| Liquidity | Cash only, mint paused | Kink raises borrow rates | cUSDC: 39.84% of supply withdrawable at once |
-| Bad debt | Insolvent positions stay in borrows | Liquidation incentive of 8%, close factor 50% | Losses fall on the last redeemers |
-| Multisig power | 5-of-9 Safe as guardian and oracle owner | Guardian cannot unpause | Can change prices with no vote |
-| Regulatory | Issuer-less lending | None | None specific found |
-
 ------
 
 ## Comparison with Traditional Finance
@@ -801,8 +706,6 @@ From August 26, 2024
 
 ![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-dashboard-view.png)
 
-
-
 ![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-tether.png)
 
 - Collateral factor is 0% meaning this is not possible to use tether as a collateral
@@ -812,13 +715,79 @@ From August 26, 2024
 
 - The CR is high (82.5%) indicated that Ether is considered as a safe asset
 
-
-
 ![alt text]({{site.url_complet}}/assets/article/blockchain/defi/compound/compound-yearn.png)
 
-
-
 - The CR is pretty low, only 20% meaning that this asset is considered as more volatile
+
+## Annex
+
+### Risks
+
+This section lists what can go wrong for a supplier or a borrower in Compound V2. It starts from what Compound publishes (the [V2 documentation](https://docs.compound.finance/v2/), its governance proposals and the incidents covered on this site), then adds what the deployed contracts show. The on-chain values below were read on 22 October 2026 at Ethereum block 26,248,478. Points that come from this article's own reasoning rather than from a source are marked (*derived*).
+
+One fact frames the rest: at that block, the two markets checked, cUSDC and cETH, had minting and borrowing paused by the Comptroller (`mintGuardianPaused` and `borrowGuardianPaused` both `true`) and a reserve factor of 100% (`reserveFactorMantissa()` = 1e18). With the supply rate formula of the [Supply interest formula](#supply-interest-formula) section, a reserve factor of 100% means suppliers in these markets earn no interest: all interest paid by the remaining borrowers goes to the reserves (*derived*). V2 is being wound down in favour of Compound III; the other 18 listed markets were not checked.
+
+#### Smart contracts and transparency
+
+- **Verified, audited, formally specified.** The Unitroller, the Comptroller implementation, cETH, cUSDC, the price oracle and the governance contracts all have verified source on Etherscan. The repository includes Certora specifications (see [Formal Verification](#formal-verification)), and Compound's documentation lists external audits of V2; which audits covered which version of the Comptroller was not checked for this article (see [Gaps](#gaps)).
+- **Upgradeable Comptroller, both sides.** The Comptroller sits behind the `Unitroller` proxy (`0x3d98…Cd3B`), whose `comptrollerImplementation()` pointed to `0xBafE…B526` (a contract named `Comptroller`). Upgradeability let Compound fix bugs and add features such as COMP distribution and borrow caps without migrating users. It also means whoever holds `admin()` can replace the whole risk engine, including `redeemAllowed`, so the statement in the [Governance](#governance) section that governance "cannot prevent users from withdrawing" holds only as long as no upgrade changes that logic (*derived*).
+- **cTokens are partly fixed.** cETH (`CEther`) and cUSDC (`CErc20`) are not proxies, so their own code cannot be swapped, but their `admin()` (the Timelock) can still change their Comptroller, interest-rate model and reserve factor. Later markets use the `CErc20Delegator` pattern, whose implementation the admin can replace.
+- **Upgrades can carry bugs.** Proposal 062 (September 2021) upgraded the Comptroller with a boundary error in COMP distribution that paid out about $80$M of COMP at first, up to $147$M by Rekt's tally, and the fix had to go through the same vote and timelock ([Crypto hacks 2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021/), [technical concepts]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/)). The safeguard against a malicious upgrade also slowed the repair.
+- **Empty-market rounding.** The cToken exchange rate divides the market's assets by the cToken supply, and forks of V2 lost funds when a newly listed market had almost no supply (Hundred Finance in 2023, Sonne Finance in 2024; see [Crypto hacks 2024: technical concepts]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/)). Compound's own markets are large and mature, so this applies mainly to forks and to any new listing (*derived*).
+
+#### External dependencies
+
+- **Price oracle.** The Comptroller's `oracle()` returned `0x8CF4…55d9`, a contract named `PriceOracle` that maps each cToken to a [Chainlink](https://chain.link/) feed or to a fixed price. cUSDC reads the USDC / USD feed and cETH the ETH / USD feed. Its `getUnderlyingPrice` ignores the feed's `updatedAt`, so a stale price is accepted as current, and only a zero or negative answer is rejected. Every borrow limit and liquidation in all markets depends on this one contract (*derived* from the source).
+- **History of oracle events.** On 26 November 2020, a brief DAI price spike on Coinbase Pro, reported by the oracle Compound used then, caused about $89$M of liquidations ([Crypto hacks 2020]({{site.url_complet}}/2026/10/07/crypto-hacks-2020/)). How a lending market passes such price moves on to positions is covered in [Oracle kinds, pricing and lending positions]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/).
+- **Underlying tokens.** Each market inherits the risks of its token: USDC and USDT issuers can freeze addresses, including a cToken contract, and a token with transfer hooks can re-enter (a pattern that hit Compound forks such as Cream; see the 2021 technical concepts article above).
+- **Chain.** Liquidations are first-come transactions on Ethereum; during congestion they can be delayed, and liquidators compete through MEV. Interest accrues per block, so the rates assume roughly 12-second blocks (*derived*).
+
+#### Depeg
+
+- **Stablecoin markets.** Compound does not hold any peg itself. Because the oracle reads a market feed for USDC rather than a fixed 1 dollar, a depeg of a stablecoin used as collateral lowers borrowing power and can trigger liquidations, while a depeg of a borrowed stablecoin lowers the debt's value (*derived*).
+- **cToken exchange rate.** A cToken is not pegged; its exchange rate is `(cash + totalBorrows - totalReserves) / totalSupply` and normally only grows. Bad debt stays inside `totalBorrows`, so the exchange rate does not fall when a loan becomes uncollectable: the shortfall appears only when the last suppliers try to redeem (*derived*). Protocols that accept cTokens as collateral (see [cTokens can be traded](#ctokens-can-be-traded)) price them at that rate.
+
+#### Collateral and market risk
+
+- **Pooled risk.** As the [Difference between V2 and V3](#difference-between-v2-and-v3) section says, one market's bad asset or bad price affects every market, since collateral in any market backs borrows in all others.
+- **How far a price can fall.** cETH had a collateral factor of 82.5% (`markets(cETH)` = 8.25e17) and the liquidation incentive was 1.08 (`liquidationIncentiveMantissa()`). A position borrowed to the limit is liquidatable as soon as ETH moves against it, and its collateral is worth less than its debt after a fall of 1 - 0.825 = 17.5%; liquidating the whole debt stops being profitable at a fall of 1 - 0.825 × 1.08 = 10.9% (*derived*). The close factor of 50% (`closeFactorMantissa()` = 5e17) means each liquidation repays at most half the debt.
+- **Reflexive loops.** Liquidators who seize collateral usually sell it, which pushes down the price the oracle reports and can make more positions liquidatable. Users who borrow and resupply the same asset (the [CR as a reserve multiplier](#cr-as-a-reserve-multiplier) section) amplify this (*derived*).
+
+#### Liquidity
+
+- **Utilisation caps withdrawals.** A supplier can only redeem what is in the market's cash. At the block read, cUSDC had 2,980,377.91 USDC of cash against 4,681,014.56 USDC of borrows and 181,280.60 USDC of reserves, a utilisation of 4,681,014.56 / (2,980,377.91 + 4,681,014.56 - 181,280.60) = 62.58%; only 39.84% of the 7,480,111.88 USDC owed to suppliers could leave at once. cETH had 21,443.79 ETH of cash and 151.22 ETH of borrows, a utilisation of 0.70%.
+- **No new supply to refill cash.** With minting paused, cash only grows through repayments and liquidations. The [Kink](#example-4----kink) mechanism raises the borrow rate to push borrowers to repay, but a borrower who accepts the rate keeps the funds (*derived*). At 100% utilisation, no supplier can withdraw until someone repays.
+
+#### Centralisation and governance
+
+- **Who controls the upgrade.** The Unitroller's `admin()`, the cTokens' `admin()` and the GovernorBravo's `admin()` all returned the Timelock `0x6d90…3925`, with `delay()` = 172,800 seconds (2 days) and a grace period of 14 days. The Timelock's own `admin()` was no longer GovernorBravo (`0xc0Da…6529`, still deployed with 393 proposals) but `0x309a…c8C0`, a `TransparentUpgradeableProxy` pointing to a contract named `CompoundGovernor` built on OpenZeppelin Governor, whose ProxyAdmin is owned by the Timelock.
+- **Thresholds.** On `CompoundGovernor`, a proposal needs 25,000 COMP of delegated votes (`proposalThreshold()`), 0.25% of the 10,000,000 COMP supply, and 400,000 COMP of votes in favour for quorum (4%). The voting delay is 13,140 blocks and the voting period 19,710 blocks; at 12 seconds per block that is about 1 day 20 hours and 2 days 18 hours, so a proposal needs at least about 6 days 13 hours from submission to execution including the timelock (*derived*). These are the same values as the GovernorAlpha quorum in the [Governance parameters](#governance-parameters) section.
+- **A multisig with direct power.** `pauseGuardian()`, `borrowCapGuardian()`, `whitelistGuardian()` and `proposalGuardian()` all returned `0xbbf3…012c`, a Safe with a threshold of 5 of 9 owners. In the Comptroller it can pause but only the admin can unpause. It is also `owner()` of the price oracle, and the oracle's `updateConfigPriceFeed` and `updateConfigFixedPrice` are `onlyOwner` with no timelock, so five signers can change the price of any market without a vote (*derived* from the source).
+- **Voting power and capture.** Voting power follows COMP delegation, so a holder or coalition with 400,000 COMP of votes in favour, more than the opposition, can pass any proposal, including a Comptroller upgrade or a transfer of reserves. In July 2024 a group known as Humpy or the "Golden Boys" passed a proposal to move about 499,000 COMP from the treasury to a vault they controlled, and the episode ended in a negotiated agreement rather than a technical block. This summary relies on general knowledge, not on a source read for this article (see [Gaps](#gaps)).
+
+#### Loss sharing
+
+- **No insurance layer.** Compound V2 has no stability pool or insurance fund that absorbs bad debt by rule. Reserves (181,280.60 USDC in cUSDC at the block read) can be used, but only if governance votes to do so (*derived*).
+- **Losses fall on the last suppliers.** Bad debt stays in `totalBorrows` and is not written off, so suppliers who redeem early receive full value and those who redeem last find the cash missing. With pooled risk, suppliers of a market who never borrowed can absorb losses created by a bad asset in another market (*derived*).
+
+#### Regulatory
+
+- **None specific found.** Compound V2 has no issuer, no KYC and is governed by token holders, and the design does not raise a specific question beyond the general treatment of decentralised lending, discussed in [MiCA explained]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/). Front ends and the reserve's use are where an authority would most likely look (*derived*).
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+| --- | --- | --- | --- |
+| Logic replaced by governance | Unitroller proxy, Timelock as admin | 2-day timelock, 400,000 COMP quorum | A captured vote can change withdrawal rules |
+| Buggy upgrade | Proposal 062 type error | Certora specs, audits, review | Fix needs the same path of about 6.5 days |
+| Oracle failure or stale price | One Chainlink-based oracle for all markets | Rejects zero or negative prices | No staleness check, owner multisig can reset feeds |
+| Pooled collateral | Any market backs all borrows | Per-asset collateral factors, borrow caps | One bad asset or price hits every market |
+| Liquidity | Cash only, mint paused | Kink raises borrow rates | cUSDC: 39.84% of supply withdrawable at once |
+| Bad debt | Insolvent positions stay in borrows | Liquidation incentive of 8%, close factor 50% | Losses fall on the last redeemers |
+| Multisig power | 5-of-9 Safe as guardian and oracle owner | Guardian cannot unpause | Can change prices with no vote |
+| Regulatory | Issuer-less lending | None | None specific found |
+
+------
 
 ## Gaps
 
