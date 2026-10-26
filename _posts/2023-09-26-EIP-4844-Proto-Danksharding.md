@@ -161,3 +161,7 @@ They would use a proof of equivalence protocol, using the point evaluation preco
 4. [https://twitter.com/protolambda/status/1495538286332624898](https://twitter.com/protolambda/status/1495538286332624898)
 5. [https://eips.ethereum.org/EIPS/eip-4844](https://eips.ethereum.org/EIPS/eip-4844)
 6. [https://ethereum.org/en/roadmap/danksharding/](https://ethereum.org/en/roadmap/danksharding/)
+
+### Related articles
+
+- [Ethereum Upgrade Dencun - Overview]({{site.url_complet}}/2026/10/23/ethereum-dencun-upgrade-overview/)

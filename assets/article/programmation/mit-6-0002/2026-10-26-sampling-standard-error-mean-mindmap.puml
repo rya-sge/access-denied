@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Sampling and\nstandard error\n(MIT 6.0002, lecture 8)
+** Probability sampling
+*** Nonzero inclusion probability
+*** Simple random sampling
+*** Stratified sampling
+*** Convenience samples are biased
+** Temperature example
+*** 21 US cities, 1961-2015
+*** ~422k daily highs, sigma ~9.44 C
+*** 1,000 samples of n = 100
+*** SD of means 0.94, then 0.66 at n = 200
+** Standard error of the mean
+*** SE = sigma / sqrt(n)
+*** Larger n, not more samples
+*** Error bars and overlap rule
+** Estimating sigma
+*** Sample SD as a proxy
+*** Bessel n - 1 vs numpy ddof=0
+*** Tails and kurtosis need larger n
+** Population size
+*** Irrelevant when N >> n
+*** Finite population correction
+** One-sample procedure
+*** Choose n, draw one sample
+*** Mean and sample SD
+*** SE estimate, mean +/- 1.96 SE
+*** Check: about 5 % misses
+@endmindmap

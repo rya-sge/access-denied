@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Random walks\n(MIT 6.0002, Lecture 5)
+** Why they matter
+*** Brownian motion, diffusion
+*** Stock prices (random walk hypothesis)
+*** Simulation as a way to understand
+** Abstractions
+*** Location (immutable, move returns new)
+*** Drunk base class
+**** UsualDrunk: 4 unit steps
+**** MasochistDrunk: north 1.1, south 0.9
+*** Field: dict drunk -> location
+**** OddField: wormholes
+** Simulation structure
+*** walk: one walk of n steps
+*** simWalks: many trials
+*** drunkTest: report mean, max, min
+left side
+** Sanity check
+*** 0 steps -> 0, 1 step -> 1
+*** Bug: numTrials passed for numSteps
+*** Every run was a 100-step walk
+** Results
+*** Unbiased: E[d^2] = n, mean ~ 0.886 sqrt(n)
+*** Biased: drift 0.05 per step, distance ~ 0.05 n
+*** Crossover near n = 400
+** Plotting
+*** pylab.plot, styles, legend
+*** Today: matplotlib.pyplot + numpy
+** Lessons
+*** Simple version first, then elaborate
+*** Check simulation against analysis
+@endmindmap

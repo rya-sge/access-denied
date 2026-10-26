@@ -275,3 +275,7 @@ Reference: [Figment - What The Pectra And Fusaka Ethereum Upgrades Mean For Inst
   - [ethereum.org - withdrawal-key](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/#withdrawal-key)
 - [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography)
 - [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
+
+### Related articles
+
+- [Ethereum Upgrade Shapella (Shanghai and Capella) - Overview]({{site.url_complet}}/2026/10/23/ethereum-shapella-upgrade-overview/)

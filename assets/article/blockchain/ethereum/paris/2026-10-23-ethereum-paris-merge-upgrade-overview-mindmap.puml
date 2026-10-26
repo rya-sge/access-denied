@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* The Merge\n(Paris + Bellatrix, 2022-09-15)
+** Trigger
+*** Bellatrix at epoch 144,896
+*** TTD 58,750,000,000,000,000,000,000
+*** First PoS block 15,537,394
+** EIP-3675
+*** difficulty 0, nonce 0, no ommers
+*** No block reward (was 2 ETH)
+*** Fork choice and gossip to the CL
+** EIP-4399 PREVRANDAO
+*** DIFFICULTY (0x44) returns RANDAO mix
+*** 1 bit of bias per proposer per slot
+left side
+** Bellatrix
+*** Execution payload in beacon block
+*** Stricter inactivity and slashing
+*** Optimistic sync
+** Two clients
+*** Execution + consensus client
+*** Engine API with JWT
+** Impact
+*** block.difficulty = randomness
+*** 12 s slots, finality
+*** Validators get priority fees
+*** No withdrawals until Shapella
+@endmindmap

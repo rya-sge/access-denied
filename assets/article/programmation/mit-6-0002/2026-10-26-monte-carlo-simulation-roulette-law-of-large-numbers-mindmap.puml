@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Monte Carlo simulation\nMIT 6.0002 lecture 6
+** History
+*** Ulam and solitaire (1946)
+*** von Neumann, ENIAC runs (1948)
+*** Name from Metropolis, paper in 1949
+** Inferential statistics
+*** Population and random sample
+*** Confidence grows with sample size
+*** Confidence falls with variance
+** Roulette test bench
+*** Fair wheel: 36 pockets, return 0
+*** European: 37 pockets, return -1/37
+*** American: 38 pockets, return -2/38
+** Laws and fallacies
+*** Law of large numbers (Bernoulli)
+*** Gambler's fallacy (Monte Carlo, 1913)
+*** Regression to the mean (Galton)
+** Measuring spread
+*** Variance and standard deviation
+*** Read relative to the mean
+*** Per-spin sigma about 5.8
+** Empirical rule
+*** 68 / 95 / 99.7 %
+*** 1.96 sigma for 95 %
+*** Assumes unbiased, normal errors
+*** Interval shrinks as 1 / sqrt(n)
+left side
+** Next steps
+*** CLT and standard error (lecture 7)
+*** Applied use: DeFi risk analysis
+@endmindmap

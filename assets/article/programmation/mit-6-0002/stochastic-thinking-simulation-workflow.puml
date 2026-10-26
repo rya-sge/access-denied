@@ -1,0 +1,28 @@
+@startuml
+title Lecture 4: estimating a probability by simulation (runSim, birthdayProb)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+start
+:random.seed(0)\n(only while debugging);
+:hits = 0;
+repeat :run one trial\n(roll 5 dice / draw N birthdays);
+  if (trial has the property?\n(11111, or max(birthdays) >= k)) then (yes)
+    :hits += 1;
+  else (no)
+  endif
+repeat while (more trials?) is (yes) not (no)
+:estimate = hits / numTrials;
+:compare with the closed form, if one exists;
+if (event rare and hits small?) then (yes)
+  :raise numTrials\n(1,000 -> 1,000,000);<<#FDF3E1>>
+  detach
+else (no)
+  :report it as a sample probability;
+endif
+:repeat with other seeds\nbefore trusting the result;
+stop
+@enduml

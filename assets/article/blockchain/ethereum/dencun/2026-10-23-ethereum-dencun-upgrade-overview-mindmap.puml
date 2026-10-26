@@ -1,0 +1,37 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Ethereum Dencun\n(mainnet 2024-03-13)
+** Blobs (EIP-4844)
+*** Tx type 0x03, 128 KiB per blob
+*** KZG commitment, versioned hash
+*** Blob gas: target 3, max 6, min 1 wei
+*** Kept 4,096 epochs (~18 days)
+*** Point evaluation precompile 0x0a
+** EVM (Cancun)
+*** EIP-1153: TSTORE / TLOAD, 100 gas
+*** EIP-5656: MCOPY
+*** EIP-6780: SELFDESTRUCT restricted
+*** EIP-7516: BLOBBASEFEE
+*** EIP-4788: beacon roots, 8,191 entries
+left side
+** Consensus (Deneb)
+*** EIP-7044: exits valid across upgrades
+*** EIP-7045: longer attestation window
+*** EIP-7514: max 8 activations per epoch
+** Impact
+*** Rollups move data to blobs
+*** Metamorphic contracts end
+*** Cheap reentrancy locks
+*** Nodes store blob sidecars
+@endmindmap

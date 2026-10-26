@@ -1,0 +1,46 @@
+@startuml
+title Lecture 3 search loops: DFS (recursive) and BFS (queue of paths)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+partition "DFS(graph, start, end, path, shortest)" {
+  start
+  :path = path + [start];
+  if (start == end?) then (yes)
+    :return path;
+    stop
+  else (no)
+  endif
+  while (next child of start?) is (yes)
+    if (child in path?) then (yes)
+      :skip (would create a cycle);
+    else (no)
+      if (shortest is None or len(path) < len(shortest)?) then (yes)
+        :newPath = DFS(graph, child, end, path, shortest);
+        if (newPath is not None?) then (yes)
+          :shortest = newPath;
+        endif
+      endif
+    endif
+  endwhile (no)
+  :return shortest;
+  stop
+}
+partition "BFS(graph, start, end)" {
+  start
+  :queue = a list holding one path, (start);
+  while (queue not empty?) is (yes)
+    :path = queue.pop(0)  (oldest first);
+    if (last node of path == end?) then (yes)
+      :return path (fewest edges);
+      stop
+    endif
+    :for each child not in path,\nappend path + [child] to queue;
+  endwhile (empty)
+  :return None;
+  stop
+}
+@enduml

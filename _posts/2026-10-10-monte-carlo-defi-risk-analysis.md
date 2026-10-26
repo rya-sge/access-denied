@@ -2,6 +2,7 @@
 layout: post
 title: "Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision"
 date:   2026-10-10
+last_modified_at: 2026-10-26
 lang: en
 locale: en-GB
 categories: defi finance blockchain
@@ -37,7 +38,7 @@ Combining these analytically means convolving several mixed distributions throug
 
 ### Estimating an expectation by sampling
 
-The method was named and published by [Metropolis and Ulam in 1949](https://doi.org/10.1080/01621459.1949.10483310), after its use in neutron-transport calculations at Los Alamos. Its core is one observation. If $$L = f(X)$$ is the loss produced by random inputs $$X$$, its expectation can be approximated by drawing $$N$$ independent samples $$x_1, \dots, x_N$$ of $$X$$ and averaging:
+The method was developed at Los Alamos in 1946 and 1947 by Stanislaw Ulam and John von Neumann for neutron-transport calculations; Nicholas Metropolis suggested the name, after the Monte Carlo casino, and the first published description is the [1949 paper by Metropolis and Ulam](https://doi.org/10.1080/01621459.1949.10483310). The foundations (the law of large numbers, the empirical rule and a simulation that can be checked against an exact answer) are developed on a roulette example in [Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/). The core of the method is one observation. If $$L = f(X)$$ is the loss produced by random inputs $$X$$, its expectation can be approximated by drawing $$N$$ independent samples $$x_1, \dots, x_N$$ of $$X$$ and averaging:
 
 $$
 \begin{aligned}
@@ -51,7 +52,7 @@ The same sample gives far more than the mean. Sorting the $$N$$ losses gives an 
 
 ### How accurate the estimate is
 
-By the **central limit theorem**, the error of $$\hat\mu_N$$ is approximately normal with standard deviation $$\sigma / \sqrt N$$, where $$\sigma$$ is the standard deviation of $$L$$. With $$\hat\sigma$$ the sample standard deviation, a 95 % confidence interval is:
+By the **central limit theorem**, the error of $$\hat\mu_N$$ is approximately normal with standard deviation $$\sigma / \sqrt N$$, where $$\sigma$$ is the standard deviation of $$L$$. With $$\hat\sigma$$ the sample standard deviation, computed with the $$N - 1$$ divisor (Bessel's correction), a 95 % confidence interval is:
 
 $$
 \begin{aligned}
@@ -59,14 +60,28 @@ $$
 \end{aligned}
 $$
 
+"95 %" describes the procedure, not one interval: if the simulation were repeated with fresh random draws, about 95 % of the intervals built this way would contain the model's true expected loss. A single interval either contains it or does not. The derivation of this interval, and its conditions, are covered in [Confidence Intervals and the Central Limit Theorem - MIT 6.0002 Lecture 7 in Python]({{site.url_complet}}/2026/10/26/confidence-intervals-central-limit-theorem/).
+
 Two consequences follow:
 
 - **The error shrinks as $$1/\sqrt N$$.** Ten times more precision costs a hundred times more samples.
-- **The error does not depend on the number of inputs.** A model with six risk layers converges at the same rate as a model with one, which is why simulation scales where numerical integration does not.
+- **The convergence rate does not depend on the number of inputs.** A model with six risk layers converges at the same $$1/\sqrt N$$ rate as a model with one, which is why simulation scales where numerical integration does not. The constant in front of the rate, $$\sigma$$, does depend on the model, and adding risk layers usually increases it.
+
+The normal approximation behind the interval needs two conditions that a rare-event loss model can strain:
+
+- **A finite variance.** Losses here are bounded by the position's equity, so the condition holds; a model with unbounded, heavy-tailed losses would need more care.
+- **Enough non-zero losses.** The approximation is driven by the paths where something happens, not by $$N$$ itself. If incidents occur in 2 % of 20,000 paths, the mean rests on about 400 non-zero losses and the interval is reliable. If they occur in 0.1 % of paths, it rests on about 20, the sampling distribution of the mean is still skewed, and a symmetric $$\pm 1.96$$ interval understates the upside uncertainty. More paths, importance sampling or a bootstrap interval are the remedies.
 
 ### Pseudo-random numbers and seeds
 
 A computer draws from a **pseudo-random number generator**: a deterministic algorithm that produces a sequence statistically indistinguishable from uniform draws on $$[0, 1)$$. Given the same **seed**, it produces the same sequence. Risk tools fix the seed for two reasons: a report can be reproduced exactly, and two runs of a model that differ in one parameter use the same random draws, so the difference in their outputs comes from the parameter and not from sampling noise. Modern libraries such as [NumPy's `Generator`](https://numpy.org/doc/stable/reference/random/generator.html) provide seeded generators with long periods and good statistical properties.
+
+### Checking the simulation itself
+
+A confidence interval says how far the estimate is from what the *program* computes, not whether the program computes what was intended. Two checks catch most errors before any number is reported:
+
+- **Run a case with a known answer.** Switch every layer off but one, use a severity with a closed-form mean, and compare the simulated expected loss with the exact value $$p_h \cdot \mathbb E[\text{severity}] \cdot$$ exposure for a position far from its threshold. A bug in the sampling or in the loss function shows up as a gap larger than the confidence interval.
+- **Rerun with several independent seeds.** A fixed seed makes a result reproducible, not stable. Running the model under, say, ten different seeds and checking that the estimates fall within the stated sampling error of one another catches a result that depends on a few lucky paths, which matters most for tail measures.
 
 ### Turning uniform draws into the right distribution
 
@@ -151,11 +166,13 @@ Formally:
 $$
 \begin{aligned}
 V_q &= \inf \{ \ell : \mathbb P(L \le \ell) \ge q \} \\
-C_q &= \mathbb E[L \mid L \ge V_q]
+C_q &= \frac{1}{1-q} \int_q^1 V_u \, du
 \end{aligned}
 $$
 
-CVaR, also called expected shortfall, is preferred over VaR for tail risk because it is a coherent risk measure in the sense of Artzner et al.: in particular it is subadditive, so splitting a book into parts never makes its tail look smaller than the sum of the parts' tails. VaR does not have that property.
+CVaR, also called expected shortfall, is preferred over VaR for tail risk because, defined this way, it is a coherent risk measure in the sense of Artzner et al.: in particular it is subadditive, so merging two books never makes the tail of the merged book larger than the sum of their tails. VaR does not have that property.
+
+The definition matters for this kind of model. The simpler form $$\mathbb E[L \mid L \ge V_q]$$, the tail conditional expectation, coincides with $$C_q$$ when the loss distribution is continuous, but it is not subadditive in general when the distribution has atoms. A rare-incident loss distribution has a large atom at zero, and when $$V_q = 0$$ the conditional form averages over every path, including all the zero-loss ones. The averaging-of-quantiles form above, from [Acerbi and Tasche](https://doi.org/10.1016/S0378-4266%2802%2900283-2) and Rockafellar and Uryasev, is the one that stays coherent. On a sample it is what the table already describes: the average of the worst $$N(1-q)$$ losses, here the worst 200 of 20,000.
 
 ### Choosing the confidence level
 
@@ -212,7 +229,7 @@ With $$N = 20{,}000$$, an event with $$p = 1\,\%$$ is estimated within about 7 %
 
 - **Importance sampling** draws rare events more often than they occur and reweights each path by the ratio of the true probability to the sampling probability, so the estimate stays unbiased while the tail gets many more samples.
 - **Stratified sampling** splits the input space into strata and samples each one in proportion, which removes the variance due to uneven coverage.
-- **Antithetic variates** pair each draw $$U$$ with $$1 - U$$, so errors in opposite directions cancel.
+- **Antithetic variates** pair each draw $$U$$ with $$1 - U$$, so errors in opposite directions cancel. The guarantee holds when the loss is monotone in the draw; a loss with thresholds, such as a liquidation that switches on in the middle of the range, can make the pair positively correlated, and the variance can then increase rather than fall.
 - **Common random numbers**, the seeded generator mentioned earlier, make comparisons between two variants of a model far more precise than their separate errors suggest.
 - **Quasi-Monte Carlo** replaces random draws with low-discrepancy sequences that cover the space more evenly; it converges faster for smooth integrands, less so for the thresholds of a liquidation model.
 
@@ -267,8 +284,8 @@ Monte Carlo simulation estimates the loss distribution of a position by drawing 
 | **Limited liability** | The rule that a borrower's loss stops at their equity; any shortfall beyond it becomes the lenders' bad debt. |
 | **Bad debt** | Debt that the remaining collateral can no longer cover, borne by the lenders of the market. |
 | **Value at Risk (VaR)** | The loss exceeded with probability $$1-q$$ over the horizon, the $$q$$-quantile of the loss distribution. |
-| **Conditional Value at Risk (CVaR)** | The average loss in the worst $$1-q$$ fraction of outcomes; also called expected shortfall. |
-| **Coherent risk measure** | A risk measure satisfying monotonicity, translation invariance, positive homogeneity and subadditivity; CVaR is one, VaR is not. |
+| **Conditional Value at Risk (CVaR)** | The average loss in the worst $$1-q$$ fraction of outcomes, defined as the average of the VaR over levels above $$q$$; also called expected shortfall. |
+| **Coherent risk measure** | A risk measure satisfying monotonicity, translation invariance, positive homogeneity and subadditivity; CVaR defined as an average of quantiles is one, VaR is not. |
 | **Carry** | What staying in a position earns over the horizon, such as the collateral's yield minus the interest on the debt. |
 | **Breakeven probability** | The probability of a scenario above which exiting costs less than staying, equal to exit cost plus carry divided by the scenario's loss. |
 | **Copula** | A function that joins marginal distributions into a joint distribution with a chosen dependence structure. |
@@ -323,11 +340,23 @@ No. The confidence interval measures only the sampling error: how far the estima
 
 If the yearly probabilities were estimated from a biased history, or the loss function ignores a channel such as rate risk, the estimate converges precisely to the wrong value. Nested simulation over the uncertain inputs, and sensitivity runs, are the tools for that second kind of error.
 
+## Gaps
+
+The following points were not settled by the sources of this article and are worth checking before relying on it.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The Gauntlet methodology page URL was not re-checked when the article was revised. | The DeFi-practice reference may have moved or changed content. | Open the Gauntlet link in the References and confirm it still describes their VaR methodology. |
+| The arXiv identifier 2609.00911 for the DeFi loss-frequency paper was not verified. | The frequencies discussion points readers to it as a data source. | Check the arXiv abstract page for the identifier, title and author. |
+| The 1946-1947 dates and the attribution of the name to Metropolis come from historical accounts, not from the 1949 paper. | The history paragraph states them as fact. | N. Metropolis, "The Beginning of the Monte Carlo Method", *Los Alamos Science*, Special Issue 15, 1987. |
+| The 400 versus 20 non-zero-loss threshold for a reliable normal interval is a rule of thumb, not a derived bound. | The advice on when to trust $$\pm 1.96$$ depends on it. | Glasserman (2003), chapter on output analysis, or a bootstrap comparison on the actual model. |
+
 ## References
 
 ### Method
 
 - N. Metropolis and S. Ulam, ["The Monte Carlo Method"](https://doi.org/10.1080/01621459.1949.10483310), *Journal of the American Statistical Association* 44(247), 1949.
+- N. Metropolis, "The Beginning of the Monte Carlo Method", *Los Alamos Science*, Special Issue 15, 1987.
 - Art B. Owen, [*Monte Carlo theory, methods and examples*](https://artowen.su.domains/mc/), book draft, Stanford University.
 - Paul Glasserman, *Monte Carlo Methods in Financial Engineering*, Springer, 2003.
 - [NumPy random `Generator` documentation](https://numpy.org/doc/stable/reference/random/generator.html).
@@ -336,6 +365,7 @@ If the yearly probabilities were estimated from a biased history, or the loss fu
 
 - P. Artzner, F. Delbaen, J.-M. Eber and D. Heath, ["Coherent Measures of Risk"](https://doi.org/10.1111/1467-9965.00068), *Mathematical Finance* 9(3), 1999.
 - R. T. Rockafellar and S. Uryasev, "Optimization of Conditional Value-at-Risk", *Journal of Risk* 2(3), 2000.
+- C. Acerbi and D. Tasche, ["On the coherence of expected shortfall"](https://doi.org/10.1016/S0378-4266%2802%2900283-2), *Journal of Banking & Finance* 26(7), 2002.
 - A. J. McNeil, R. Frey and P. Embrechts, *Quantitative Risk Management: Concepts, Techniques and Tools*, Princeton University Press, revised edition 2015.
 
 ### DeFi risk practice
@@ -351,3 +381,5 @@ If the yearly probabilities were estimated from a biased history, or the loss fu
 - [The Unified Risk Layer for DeFi - From Price Oracles to Protocol-Owned Risk Oracles]({{site.url_complet}}/2026/07/02/defi-unified-risk-layer-llama-guard/)
 - [Insuring Composable DeFi - First-Loss Capital Along the Attack Graph]({{site.url_complet}}/2026/07/02/defi-composable-first-loss-capital-insurance/)
 - [The Black-Scholes Model - Pricing Options and Corporate Liabilities]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/)
+- [Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/)
+- [Confidence Intervals and the Central Limit Theorem - MIT 6.0002 Lecture 7 in Python]({{site.url_complet}}/2026/10/26/confidence-intervals-central-limit-theorem/)

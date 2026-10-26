@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Graph-theoretic models\n(MIT 6.0002, lecture 3)
+** Why graphs
+*** Routes, rail, roads
+*** Computer, financial, social networks
+*** Königsberg bridges (Euler, 1736)
+*** Abstraction: keep only connections
+** Vocabulary
+*** Nodes / vertices
+*** Edges / arcs
+*** Directed graph (digraph)
+*** Weighted edges
+*** Tree: one path between two nodes
+** Representation
+*** Adjacency matrix: O(V²) space, O(1) edge test
+*** Adjacency list: O(V+E) space, fast neighbours
+*** Node, Edge, Digraph, Graph classes
+*** Graph subclasses Digraph (substitution)
+** Shortest path
+*** Fewest edges
+*** Minimum total weight
+** Depth-first search
+*** Recursive, backtracking
+*** Cycle avoidance: node not in path
+*** Explores all simple paths (exponential)
+** Breadth-first search
+*** FIFO queue of paths
+*** First path found has fewest edges
+*** O(V+E) with a visited set
+** Weighted shortest path
+*** BFS answer can cost more
+*** Weighted DFS with pruning
+*** Priority queue: Dijkstra
+@endmindmap

@@ -1,0 +1,21 @@
+@startuml
+title Estimating a population mean from a single random sample
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Estimate how heavy-tailed or skewed\nthe population is (pilot data, domain knowledge);
+:Choose sample size n\n(larger for skewed / heavy-tailed data);
+:Draw ONE independent random sample\n(random.sample, not a contiguous slice);
+:Compute sample mean x and sample SD s;
+:Estimate SE = s / sqrt(n);
+if (n small?) then (yes)
+  :Use Student t quantile instead of 1.96\nand Bessel's n - 1 in s;<<#FFFFFF>>
+else (no)
+endif
+:Report x +/- 1.96 (or t) SE as the 95 % confidence interval;
+:Validate by simulation if possible:\nabout 5 % of intervals should miss mu;
+stop
+@enduml

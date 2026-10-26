@@ -1,0 +1,38 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Shapella\n(mainnet 2023-04-12)
+** Activation
+*** Shanghai (EL) + Capella (CL)
+*** First fork by timestamp (EIP-6953)
+*** Epoch 194,048, block 17,034,870
+** Capella: withdrawals
+*** Sweep: 16,384 validators max
+*** 16 withdrawals per payload
+*** Full after exit, partial above 32 ETH
+*** BLSToExecutionChange 0x00 -> 0x01
+*** Historical summaries
+left side
+** EIP-4895
+*** System-level operation
+*** No gas, no code execution
+*** After all transactions
+** EVM
+*** EIP-3855 PUSH0 (2 gas)
+*** EIP-3860 initcode 49,152 bytes, 2 gas/word
+*** EIP-3651 warm COINBASE
+*** EIP-6049 SELFDESTRUCT deprecated
+** Impact
+*** Contracts credited without receive()
+*** PUSH0 bytecode fails on chains without it
+@endmindmap

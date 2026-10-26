@@ -1,0 +1,45 @@
+@startuml
+title Random walk simulation: the three abstractions of MIT 6.0002 Lecture 5
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+hide circle
+class Location <<immutable>> {
+  x : float
+  y : float
+  move(dx, dy) : Location
+  distFrom(other) : float
+}
+class Drunk <<base class>> {
+  name : str
+}
+class UsualDrunk {
+  takeStep() : one of (0,1) (0,-1) (1,0) (-1,0)
+}
+class MasochistDrunk {
+  takeStep() : one of (0,1.1) (0,-0.9) (1,0) (-1,0)
+}
+class Field <<mutable>> {
+  drunks : dict[Drunk, Location]
+  addDrunk(drunk, loc)
+  getLoc(drunk) : Location
+  moveDrunk(drunk)
+}
+class OddField {
+  wormholes : dict[(x, y), Location]
+  moveDrunk(drunk)
+}
+Drunk <|-- UsualDrunk
+Drunk <|-- MasochistDrunk
+Field <|-- OddField
+Field "1" o-- "*" Drunk : keys
+Field "1" o-- "*" Location : values
+note right of OddField
+  calls Field.moveDrunk, then
+  teleports if the new (x, y)
+  is a wormhole entrance
+end note
+@enduml

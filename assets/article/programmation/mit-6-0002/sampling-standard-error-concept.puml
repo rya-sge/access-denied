@@ -1,0 +1,31 @@
+@startuml
+title Population, samples and the sampling distribution of the mean
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+rectangle "Population (N ~ 422,000 daily highs)\nmean mu ~ 16.3 C, SD sigma ~ 9.44 C" as P
+rectangle "Sample 1 (n values)\nmean x1, SD s1" as S1
+rectangle "Sample 2 (n values)\nmean x2, SD s2" as S2
+rectangle "Sample k (n values)\nmean xk, SD sk" as Sk
+rectangle "Sampling distribution of the mean\ncentre ~ mu, SD = SE = sigma / sqrt(n)\napproximately normal (CLT)" as D
+rectangle "One-sample estimate\nSE_hat = s / sqrt(n)\n95 % CI = x +/- 1.96 SE_hat" as E
+P --> S1 : random.sample
+P --> S2 : random.sample
+P --> Sk : random.sample
+S1 --> D
+S2 --> D
+Sk --> D
+S1 --> E : in practice only one sample exists
+D ..> E : theory says what SE is
+note right of D
+  more samples: same SD of means
+  larger n: SD shrinks as 1/sqrt(n)
+end note
+@enduml

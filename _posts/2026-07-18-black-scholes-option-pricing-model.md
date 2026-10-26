@@ -331,3 +331,4 @@ Merton showed that the value of a live call always exceeds its immediate exercis
 
 - [The Black-Scholes Model for Curious Kids — Pricing a Ticket to Buy Later]({{site.url_complet}}/2026/07/18/black-scholes-eli10/)
 - [Traditional Futures vs. Perpetual Futures: A Technical Comparison]({{site.url_complet}}/2025/12/29/traditional-vs-perpetual-futures/)
+- [Random Walks in Python - Simulating the Drunkard's Walk and the Square-Root Law]({{site.url_complet}}/2026/10/26/random-walks-simulation-python/)

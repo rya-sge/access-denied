@@ -312,3 +312,7 @@ Therefore, the security risk posed by this sensible operation makes it better to
 - [EIP-6789](https://eips.ethereum.org/EIPS/eip-6780) ([ethereum-magicians](https://ethereum-magicians.org/t/eip-6780-deactivate-selfdestruct-except-where-it-occurs-in-the-same-transaction-in-which-a-contract-was-created/13539))
 - [Parity multig sig wallet bug](https://www.parity.io/blog/a-postmortem-on-the-parity-multi-sig-library-self-destruct/)
 - [research paper - Why Do Smart Contracts Self-Destruct?](https://soarsmu.github.io/papers/2021/tosem216.pdf)
+
+### Related articles
+
+- [Ethereum Upgrade Dencun - Overview]({{site.url_complet}}/2026/10/23/ethereum-dencun-upgrade-overview/)

@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Confidence intervals\nMIT 6.0002 lecture 7
+** Probability density functions
+*** y-values are densities, not probabilities
+*** probability = area under the curve
+*** density = derivative of the CDF
+** Normal distribution
+*** random.gauss(mu, sigma)
+*** PDF formula in code
+*** empirical rule checked with scipy.integrate.quad
+**** 68.27 % / 95.00 % / 99.73 %
+** Central limit theorem
+*** sample means approximately normal
+*** mean of means close to population mean
+*** variance of means = variance / n
+*** conditions: i.i.d., finite variance
+*** continuous dice and roulette demos
+left side
+** Monte Carlo estimation of pi
+*** circle inscribed in a square
+*** pi = 4 x fraction inside
+*** double needles until std is small
+*** about 431,000 needles for std 0.0025
+** What a 95 % interval means
+*** coverage of the procedure
+*** standard error = std / sqrt(trials)
+*** not a probability about pi
+** Valid is not true
+*** bug 4 -> 2 gives a tight interval around pi/2
+*** statistics measure reproducibility
+*** sanity check the model
+@endmindmap

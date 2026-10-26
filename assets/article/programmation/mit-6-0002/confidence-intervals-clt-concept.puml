@@ -1,0 +1,33 @@
+@startuml
+title From one random draw to a confidence interval (MIT 6.0002, lecture 7)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+
+rectangle "Population\nany distribution with mean mu\nand finite variance sigma^2\n(uniform die, roulette, needle hit/miss)" as P
+rectangle "Sample of size n\nX1 ... Xn, independent,\nsame distribution" as S
+rectangle "Sample mean\nXbar = (X1 + ... + Xn) / n" as M
+rectangle "Central limit theorem\nXbar approx. Normal(mu, sigma^2 / n)\nfor large n" as C
+rectangle "Empirical rule\n68.27 % within 1 SE\n95.00 % within 1.96 SE\n99.73 % within 3 SE" as E
+rectangle "95 % confidence interval\nXbar +/- 1.96 s / sqrt(n)" as CI
+rectangle "Simulation model\n(code that generates the X_i)" as SIM
+
+SIM --> P : defines
+P --> S : draw
+S --> M : average
+M --> C : distribution of
+C --> E : licenses
+E --> CI : gives
+note right of CI
+  Covers E[Xbar] in about 95 % of repetitions.
+  E[Xbar] equals the real quantity
+  only if the model is right.
+end note
+@enduml

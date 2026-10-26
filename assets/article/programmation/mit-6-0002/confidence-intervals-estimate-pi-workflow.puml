@@ -1,0 +1,38 @@
+@startuml
+title Estimating pi to a target precision (estPi, MIT 6.0002 lecture 7)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+
+start
+:precision = 0.005, numTrials = 100
+numNeedles = 1000;
+repeat
+  :run numTrials trials;
+  note right
+    each trial throws numNeedles points
+    uniformly in the unit square and returns
+    4 x (points with x^2 + y^2 <= 1) / numNeedles
+  end note
+  :curEst = mean of the trial estimates
+  sDev = std of the trial estimates;
+  :numNeedles = 2 x numNeedles;
+repeat while (sDev >= precision / 2 ?) is (yes)
+-> no;
+:report curEst +/- 1.96 x sDev;<<#FFFFFF>>
+:sanity check against an independent bound
+(Archimedes: 223/71 < pi < 22/7);
+if (estimate inside the bound?) then (yes)
+  :accept the estimate;
+else (no)
+  :the model or the code is wrong
+  (e.g. factor 2 instead of 4);<<#FDEEEE>>
+endif
+stop
+@enduml

@@ -412,6 +412,7 @@ Yes, in two cases. When paths are limited to at most $$k$$ edges, $$k$$ passes o
 
 - [Arbre recouvrant de poids minimum (MST / ACM)]({{site.url_complet}}/2021/08/22/arbre-recouvrant-poids-minimum/)
 - [Hypergraph and Hypertree - Overview]({{site.url_complet}}/2025/11/25/hypergraph-hypertree/)
+- [Graph-Theoretic Models — Depth-First and Breadth-First Search (MIT 6.0002, Lecture 3)]({{site.url_complet}}/2026/10/26/graph-theoretic-models-dfs-bfs/)
 
 ### Tooling
 

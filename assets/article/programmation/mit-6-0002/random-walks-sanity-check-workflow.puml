@@ -1,0 +1,32 @@
+@startuml
+title Building and checking the random walk simulation
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+start
+:Define Location, Drunk, Field;
+:walk(f, d, numSteps): one walk;
+:simWalks(numSteps, numTrials, dClass): many walks;
+:drunkTest(walkLengths, numTrials, dClass): report mean, max, min;
+:Run on 10, 100, 1000, 10000 steps;
+:Mean about 8.6 to 9.2 for every length;<<#FDEEEE>>
+:Sanity check on 0, 1, 2 steps;
+if (mean = 0 for 0 steps and 1 for 1 step?) then (no)
+  :Read the code: walk() received numTrials instead of numSteps;<<#FDEEEE>>
+  :Fix and re-run the sanity check;
+else (yes)
+endif
+:Results grow with n;
+:Elaborate one change at a time;
+fork
+  :New drunk: MasochistDrunk;
+fork again
+  :New field: OddField with wormholes;
+end fork
+:Plot distance trends, end locations, one traced walk;
+:Compare with analysis: sqrt(n) and 0.05 n;
+stop
+@enduml

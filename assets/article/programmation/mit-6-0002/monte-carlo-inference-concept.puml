@@ -1,0 +1,28 @@
+@startuml
+title Monte Carlo estimation as inferential statistics (MIT 6.0002 lecture 6)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+rectangle "Population\nall possible outcomes\n(every possible sequence of spins)" as P
+rectangle "Random sample\nN simulated trials\n(proper subset, drawn at random)" as S
+rectangle "Statistics of the sample\nmean and standard deviation" as T
+rectangle "Inference about the population\nestimate +/- 1.96 x std\nwith 95 % confidence" as I
+P --> S : draw at random\n(seeded generator)
+S --> T : compute
+T --> I : empirical rule
+note right of S
+  Key fact: a random sample tends to
+  exhibit the properties of the population
+end note
+note right of I
+  Valid if the estimation error has mean 0
+  and is normally distributed
+end note
+@enduml

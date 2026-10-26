@@ -1,0 +1,32 @@
+@startuml
+title Lecture 4: from nondeterminism to estimating a probability
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+
+rectangle "Views of the world" {
+  rectangle "Newtonian determinism\nevery effect has a cause" as newton
+  rectangle "Causal nondeterminism\n(Copenhagen doctrine)" as causal
+  rectangle "Predictive nondeterminism\nincomplete knowledge" as predictive
+}
+rectangle "Stochastic process\nnext state = f(previous states, random element)" as process
+rectangle "Probability by counting\nP = favourable / possible\n(equally likely outcomes)" as counting
+rectangle "Three rules\n0 <= P <= 1\nP(not A) = 1 - P(A)\nP(A and B) = P(A) P(B) if independent" as rules
+rectangle "Closed form\n1/6^5, birthday formula" as exact
+rectangle "Simulation\nsample probability = hits / trials" as sim
+rectangle "Pseudo-random generator\ndeterministic, started from a seed" as prng
+
+newton -down-> predictive : "either way, we\ncannot predict"
+causal -down-> predictive
+predictive -down-> process : "model it as"
+process -down-> counting
+counting -right-> rules
+rules -down-> exact : "tractable"
+rules -down-> sim : "intractable or\nassumptions change"
+prng -left-> sim : "supplies the draws"
+exact .. sim : "compare: sample vs actual"
+@enduml

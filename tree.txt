@@ -1218,3 +1218,48 @@ _posts/2026-10-23-ethereum-2300-gas-stipend.md
 _posts/2025-05-02-ethereum-pectra-upgrade.md
   assets/article/blockchain/ethereum/2025-05-02-ethereum-pectra-upgrade-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-dencun-upgrade-overview.md
+  assets/article/blockchain/ethereum/dencun/2026-10-23-ethereum-dencun-upgrade-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-shapella-upgrade-overview.md
+  assets/article/blockchain/ethereum/shapella/2026-10-23-ethereum-shapella-upgrade-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-23-ethereum-paris-merge-upgrade-overview.md
+  assets/article/blockchain/ethereum/paris/2026-10-23-ethereum-paris-merge-upgrade-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+_posts/2026-10-23-ethereum-a-gas-story.md (additional in-section figures)
+  assets/article/blockchain/ethereum/gas/ethereum-london-base-fee-first-blocks.py   (in-section figure -> .svg, embedded in "2021: Berlin and London"; matplotlib, create-plot)
+  assets/article/blockchain/ethereum/gas/ethereum-eip7623-calldata-floor.py   (in-section figure -> .svg, embedded in "2025: Pectra, the gas limit increases and Fusaka"; matplotlib, create-plot)
+  assets/article/blockchain/ethereum/gas/ethereum-storage-slot-cost-forks.py   (in-section figure -> .svg, embedded in "2026: Glamsterdam and two dimensions of gas"; matplotlib, create-plot)
+_posts/2026-10-26-graph-theoretic-models-dfs-bfs.md
+  assets/article/programmation/mit-6-0002/2026-10-26-graph-theoretic-models-dfs-bfs-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/graph-models-class-hierarchy-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/graph-models-dfs-bfs-workflow.puml   (workflow -> .png, asset only)
+_posts/2026-10-26-stochastic-thinking-probability-simulation.md
+  assets/article/programmation/mit-6-0002/2026-10-26-stochastic-thinking-probability-simulation-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/stochastic-thinking-probability-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/stochastic-thinking-simulation-workflow.puml   (workflow -> .png, asset only)
+  assets/article/programmation/mit-6-0002/stochastic-thinking-birthday-curves.py   (in-section figure -> .svg, embedded in "The birthday problem"; matplotlib, create-plot)
+_posts/2026-10-26-random-walks-simulation-python.md
+  assets/article/programmation/mit-6-0002/2026-10-26-random-walks-simulation-python-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/random-walks-classes-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/random-walks-sanity-check-workflow.puml   (workflow -> .png, asset only)
+  assets/article/programmation/mit-6-0002/random-walks-mean-distance.py   (in-section figure -> .svg; matplotlib, create-plot)
+_posts/2026-10-26-monte-carlo-simulation-roulette-law-of-large-numbers.md
+  assets/article/programmation/mit-6-0002/2026-10-26-monte-carlo-simulation-roulette-law-of-large-numbers-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/monte-carlo-inference-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/monte-carlo-roulette-empirical-rule-workflow.puml   (workflow -> .png, asset only)
+  assets/article/programmation/mit-6-0002/monte-carlo-roulette-convergence.py   (in-section figure -> .svg, embedded in "The law of large numbers"; matplotlib, create-plot)
+_posts/2026-10-26-confidence-intervals-central-limit-theorem.md
+  assets/article/programmation/mit-6-0002/2026-10-26-confidence-intervals-central-limit-theorem-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/confidence-intervals-clt-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/confidence-intervals-estimate-pi-workflow.puml   (workflow -> .png, asset only)
+  assets/article/programmation/mit-6-0002/confidence-intervals-normal-and-clt.py   (in-section figure -> .svg; matplotlib, create-plot)
+_posts/2026-10-26-sampling-standard-error-mean.md
+  assets/article/programmation/mit-6-0002/2026-10-26-sampling-standard-error-mean-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/mit-6-0002/sampling-standard-error-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/mit-6-0002/sampling-standard-error-workflow.puml   (workflow -> .png, asset only)
+  assets/article/programmation/mit-6-0002/sampling-standard-error-vs-sample-size.py   (in-section figure -> .svg, embedded in "The standard error of the mean"; matplotlib, create-plot)

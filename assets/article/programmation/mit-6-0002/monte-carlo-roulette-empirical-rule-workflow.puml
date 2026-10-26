@@ -1,0 +1,32 @@
+@startuml
+title Applying the empirical rule to a roulette simulation (MIT 6.0002 lecture 6)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+start
+:choose a game (Fair, European, American)
+and a trial size numSpins;
+repeat
+  :play one trial: numSpins spins,
+  bet 1 on pocket 2 every spin;
+  :record the mean return per spin of the trial;
+repeat while (fewer than 20 trials?) is (yes)
+-> no;
+:mean, std = getMeanAndStd(trial returns);
+:report mean +/- 1.96 x std
+"with 95 % confidence";<<#FFFFFF>>
+note right
+  1.96 x std is the spread of one trial's return.
+  The uncertainty of the mean of 20 trials is
+  smaller by sqrt(20): the standard error, lecture 7.
+end note
+:increase numSpins (1,000 -> 100,000 -> 1,000,000)
+and observe the interval shrink as 1 / sqrt(numSpins);
+stop
+@enduml

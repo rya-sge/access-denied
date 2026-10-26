@@ -82,3 +82,7 @@ morpho:
 ethereum-upgrades:
   title: "Ethereum Network Upgrades"
   ordered: false
+
+mit-6-0002:
+  title: "MIT 6.0002 — Computational Thinking and Data Science"
+  ordered: true

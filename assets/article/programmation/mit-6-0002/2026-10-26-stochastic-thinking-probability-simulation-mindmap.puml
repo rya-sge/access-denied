@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Stochastic thinking\n(MIT 6.0002, lecture 4)
+** Determinism debate
+*** Newtonian mechanics: every effect has a cause
+*** Copenhagen doctrine: causal nondeterminism
+*** Predictive nondeterminism: we lack the knowledge
+*** Hidden coins: answer fixed, still unknown
+** Stochastic processes
+*** Next state = previous states + random element
+*** Underdetermined vs stochastic specification
+*** random.choice: uniform draw
+** Probability by counting
+*** Favourable / possible outcomes
+*** 11111 in 5 rolls: 1/7776
+*** Complement: P(A) = 1 - P(not A)
+*** Product rule needs independence
+*** Patriots vs Broncos: 22/64 becomes ~1
+** Simulation
+*** Outer loop of trials, inner trial, count, divide
+*** Sample vs actual probability
+*** Rare events need many trials
+*** 1000 trials -> 0.0, 10^6 trials -> 0.000128
+** Birthday problem
+*** Pigeonhole: 367 people -> 1
+*** Closed form for two sharing
+*** Three sharing: 0.644 at N = 100
+*** Non-uniform dates: 0.749, code change only
+** Pseudo-random numbers
+*** Deterministic generator + seed
+*** random.seed(0) for reproducible runs
+*** Debug with several seeds
+*** Not for secrets: use secrets / os.urandom
+left side
+** Models
+*** Descriptive, not prescriptive
+*** "All models are wrong, but some are useful"
+*** Successive refinement, what-if questions
+@endmindmap

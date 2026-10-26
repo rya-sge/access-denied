@@ -62,9 +62,9 @@ Two numbers of that table appear again and again later. Reading state was cheap 
 
 The fee was a first-price auction: each transaction carried a `gasPrice`, miners included the highest bids, and every included transaction paid its own bid. The block gas limit was voted by miners, each block allowed to move it by at most 1/1024 of the previous value. The genesis block had a gas limit of 5,000, too low for a single transaction (21,000 gas); miners raised it to 21,003 by block 46,147 on 2015-08-07, when the first transactions appeared, and to 3,141,592 within a week.
 
-![Block gas limit of Ethereum mainnet on a logarithmic scale from 2015 to 2026: 5,000 at genesis, 3,141,592 in August 2015, a drop to 500,000 during the October 2016 attacks, 8M in 2018, 30M with London in 2021, 36M and 45M in 2025, then 60M, with the 16.8M per-transaction cap of Fusaka drawn below it]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-block-gas-limit-history.svg)
+![Mainnet block gas limit 2015 to 2026 on a log scale, from 5,000 at genesis through a 500,000 dip in 2016 to 60M, above the 16.8M per-transaction cap of Fusaka]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-block-gas-limit-history.svg)
 
-The figure plots the gas limit of mainnet blocks sampled for this article. Its two sharp movements are the October 2016 drop, when miners cut the limit to resist an attack, and the August 2021 doubling, when London introduced a gas target equal to half the limit.
+The figure plots the gas limit of mainnet blocks sampled for this article as a solid blue line, one dot per sampled block. The dashed orange line is a different limit: the gas cap of a single transaction, 16,777,216, which exists only since Fusaka (December 2025) and stays below the block limit. Its two sharp movements are the October 2016 drop, when miners cut the limit to resist an attack, and the August 2021 doubling, when London introduced a gas target equal to half the limit.
 
 ## 2016: Homestead and the Shanghai attacks
 
@@ -107,6 +107,10 @@ The Istanbul changes show the second pattern of the story: a repricing that is c
 
 The headers of the first London blocks show the mechanism at work. Block 12,965,000 had a base fee of 1 gwei and used 30,025,257 gas of its 30,029,122 limit, twice the target; two blocks later the base fee was 1.265 gwei, close to 1 × 1.125².
 
+![First 60 London blocks: full blocks at twice the 15M target, and a base fee rising from 1 gwei to 31.4 gwei]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-london-base-fee-first-blocks.svg)
+
+The upper panel shows the gas used by each block against the target, the lower panel the base fee of the same blocks. For the first 25 blocks after the fork, every block was full, so the base fee rose by about 12.5 % per block, from 1 gwei to 19 gwei. Once blocks started to fall below the target, the base fee stopped rising and moved between about 23 and 31 gwei.
+
 London also changed refunds. Since Frontier, clearing a slot refunded 15,000 gas, up to half of the gas used. Users had turned this into a gas battery: *GasToken* contracts filled storage when gas was cheap and cleared it when gas was expensive, collecting refunds that paid for other work.
 
 [EIP-3529](https://eips.ethereum.org/EIPS/eip-3529) lowered the refund for clearing a slot to 4,800, capped the total refund at one fifth of the gas used, and removed the `SELFDESTRUCT` refund. Its rationale states that gas tokens would become valueless.
@@ -121,6 +125,20 @@ London also changed refunds. Since Frontier, clearing a slot refunded 15,000 gas
 
 **Dencun** (Cancun on the execution layer, 2024-03-13) opened a second gas market. [EIP-4844](https://eips.ethereum.org/EIPS/eip-4844) introduced *blobs*: 128 KiB data attachments that the EVM cannot read, kept by nodes for about 18 days, priced in a separate *blob gas* with its own base fee and its own target (3 blobs per block, at most 6). Rollups moved their data from calldata to blobs, and the execution gas market and the data market have been priced separately since. The same upgrade added transient storage ([EIP-1153](https://eips.ethereum.org/EIPS/eip-1153)): `TSTORE` and `TLOAD`, 100 gas each, for values that only need to live during one transaction, such as reentrancy locks that previously cost a full storage write. It also added `MCOPY` ([EIP-5656](https://eips.ethereum.org/EIPS/eip-5656)), the `BLOBBASEFEE` opcode ([EIP-7516](https://eips.ethereum.org/EIPS/eip-7516)), and restricted `SELFDESTRUCT` to contracts created in the same transaction ([EIP-6780](https://eips.ethereum.org/EIPS/eip-6780)).
 
+Since Dencun, a blob transaction pays in two markets at once, each with its own base fee, target and burn:
+
+```mermaid
+flowchart LR
+    T["Blob transaction<br/>(type 0x03)"] --> E["Execution part: calldata and EVM code<br/>pays gasUsed × (base fee + tip)"]
+    T --> B["Blobs: 128 KiB each, not readable by the EVM<br/>pays 131,072 blob gas per blob × blob base fee"]
+    E --> EM["Execution gas market<br/>target: half the block gas limit"]
+    B --> BM["Blob gas market<br/>target 3 blobs, maximum 6 per block"]
+    EM --> F1["Base fee burned,<br/>tip to the block proposer"]
+    BM --> F2["Blob base fee burned"]
+```
+
+A rollup posting its data in blobs therefore no longer competes with users of the EVM for the same gas: a block full of blobs leaves the execution base fee unchanged, and a busy EVM leaves the blob base fee unchanged.
+
 The block gas limit stayed at 30M from London to the end of 2024.
 
 ## 2025: Pectra, the gas limit increases and Fusaka
@@ -128,6 +146,10 @@ The block gas limit stayed at 30M from London to the end of 2024.
 The block gas limit rose three times in 2025, as validators changed the value their clients were configured to target: 36M in February, 45M by September, about 60M by the end of November. The samples show 36,000,000 on 2025-02-08, 45,000,000 on 2025-09-05 and 59,940,950 on 2025-11-28.
 
 **Pectra** (Prague on the execution layer, 2025-05-07) made calldata-heavy transactions pay a floor ([EIP-7623](https://eips.ethereum.org/EIPS/eip-7623)). A transaction now pays at least 21,000 + 10 gas per calldata token (one token per zero byte, four per non-zero byte), which makes data that the EVM does not use more expensive than in a blob and bounds the size of a block filled with calldata. Pectra also raised the blob target and maximum to 6 and 9 ([EIP-7691](https://eips.ethereum.org/EIPS/eip-7691)), priced the delegations of externally owned accounts ([EIP-7702](https://eips.ethereum.org/EIPS/eip-7702), 25,000 per authorization, 12,500 refunded when the account already exists) and added BLS12-381 precompiles ([EIP-2537](https://eips.ethereum.org/EIPS/eip-2537)).
+
+![Gas against calldata size: 16 gas per non-zero byte before Pectra, 40 gas per byte since Pectra above 2,083 bytes]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-eip7623-calldata-floor.svg)
+
+The figure takes a transaction with 50,000 gas of execution and growing calldata. Below 2,083 non-zero bytes, the floor is lower than what the transaction already pays, and nothing changes. Above it, the transaction pays the floor of 40 gas per non-zero byte instead of 16, so a transaction that mostly carries data pays two and a half times more for it.
 
 **Fusaka** (Osaka on the execution layer, 2025-12-03) capped the gas of a single transaction at 2²⁴ = 16,777,216 ([EIP-7825](https://eips.ethereum.org/EIPS/eip-7825)). Until then, a transaction could use the whole block, so each increase of the block gas limit also raised the worst case of a single transaction. With the cap, the block limit can keep rising while the largest transaction stays bounded; on a 60M block, at least three maximum-size transactions fit. Fusaka also:
 
@@ -151,6 +173,10 @@ Glamsterdam (Amsterdam on the execution layer, meta-EIP [EIP-7773](https://eips.
 - **Block accounting** counts gas before refunds ([EIP-7778](https://eips.ethereum.org/EIPS/eip-7778)), so a refund no longer frees room in the block, and counts execution gas and state gas separately, each against the block gas limit.
 
 The 20,000 gas charged since Frontier for a new storage slot thus becomes 12,100 of execution gas and 97,920 of state gas. Creating state, which stays on every node forever, is now priced for the storage it occupies rather than for the time it takes. The companion article measures the effect on a batch mint on Sepolia: 117,597 gas per new holder instead of 29,593, and up to 849 new holders in one transaction instead of 565, because only the execution part counts against the cap.
+
+![First write to a storage slot by fork: a new slot costs 20,000, then 22,100, then 110,020 with 97,920 state gas; an existing one 5,000, 5,000, 12,100]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-storage-slot-cost-forks.svg)
+
+The left panel shows the cost of creating a slot, the right panel the cost of updating one, at the first write in a transaction. The state gas, hatched, appears only under Glamsterdam, and only when a slot is created: creating state becomes about five times more expensive, while updating existing state goes from 5,000 to 12,100.
 
 ## What the story shows
 
@@ -333,6 +359,7 @@ The following points were not settled by the sources used for this article:
 
 ### Related articles
 
+- [Ethereum Upgrade Paris (The Merge) - Overview]({{site.url_complet}}/2026/10/23/ethereum-paris-merge-upgrade-overview/)
 - [The 2,300 Gas Stipend in Ethereum - Origin, Breakages and Alternatives]({{site.url_complet}}/2026/10/23/ethereum-2300-gas-stipend/)
 - [Ethereum Gas — How Transaction Cost and the Per-Transaction Limit Are Computed (Fusaka and Glamsterdam)]({{site.url_complet}}/2026/10/23/ethereum-gas-cost-transaction-limit-fusaka-glamsterdam/)
 - [Ethereum Upgrade Pectra - Overview]({{site.url_complet}}/2025/05/02/ethereum-pectra-upgrade/)

@@ -1,0 +1,53 @@
+@startuml
+title Lecture 3 graph classes and the adjacency-list representation
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+  ArrowColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+class Node {
+  - name : str
+  + getName() : str
+}
+class Edge {
+  - src : Node
+  - dest : Node
+  + getSource() : Node
+  + getDestination() : Node
+}
+class Digraph {
+  - edges : dict[Node, list[Node]]
+  + addNode(node)
+  + addEdge(edge)
+  + childrenOf(node) : list[Node]
+  + hasNode(node) : bool
+  + getNode(name) : Node
+}
+class Graph {
+  + addEdge(edge)
+}
+Edge --> "2" Node : src, dest
+Digraph o-- "*" Node : keys of edges
+Digraph ..> Edge : consumes
+Graph --|> Digraph
+note right of Graph
+  addEdge adds src->dest
+  and dest->src, so an undirected
+  edge is two directed ones
+end note
+note bottom of Digraph
+  Adjacency list:
+  Boston -> [Providence, New York]
+  Providence -> [Boston, New York]
+  New York -> [Chicago]
+  Chicago -> [Denver, Phoenix]
+  Denver -> [Phoenix, New York]
+  Phoenix -> []
+  Los Angeles -> [Boston]
+end note
+@enduml
