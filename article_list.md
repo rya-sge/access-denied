@@ -4,7 +4,7 @@ Index of all articles under `_posts/`. One row per article: filename (the slug u
 
 This file is maintained as the lookup table for the `update-article` skill: when asked to update an article, match the request against the **Title** / **Description** / **Filename** columns here to identify the target `_posts/<filename>` before editing.
 
-**Total: 212 articles.** Regenerate with the scanner described at the bottom of this file after adding or renaming posts.
+**Total: 221 articles.** Regenerate with the scanner described at the bottom of this file after adding or renaming posts.
 
 | Filename | Title | Categories | Description |
 |----------|-------|------------|-------------|
@@ -226,6 +226,9 @@ This file is maintained as the lookup table for the `update-article` skill: when
 | `2026-10-26-monte-carlo-simulation-roulette-law-of-large-numbers.md` | Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule | programmation | Monte Carlo simulation with roulette: exact returns of 0, -1/37 and -2/38, the law of large numbers, and 95 % confidence intervals from the empirical rule. |
 | `2026-10-26-confidence-intervals-central-limit-theorem.md` | Confidence Intervals and the Central Limit Theorem - MIT 6.0002 Lecture 7 in Python | programmation | Normal densities, the empirical rule checked by integration, the central limit theorem, a Monte Carlo estimate of pi, and what a 95 % interval means. |
 | `2026-10-26-sampling-standard-error-mean.md` | Sampling and Standard Error - Estimating a Population Mean from One Random Sample | programmation | How one random sample gives a confidence interval for a population mean, using the standard error σ/√n, the sample SD as a proxy, and MIT 6.0002 code. |
+| `2026-10-26-hyperliquid-hip-flashcards.md` | Hyperliquid HIP-1 to HIP-4 in Twelve Cards — The Definitions to Memorise | blockchain defi | Twelve flashcards for Hyperliquid HIP-1 to HIP-4: native tokens, Hyperliquidity, builder-deployed perp DEXs, slashing and outcome markets, with a revision table. |
+| `2026-10-26-hyperliquid-hip-risks-market-quality.md` | Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality | blockchain defi | What users lose when a HIP-1 to HIP-4 market fails on Hyperliquid, how to judge a market before trading it, and worked examples for each proposal. |
+| `2026-10-26-hyperliquid-hip-developer-reference.md` | Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration | blockchain defi | Request payloads, info queries, asset-ID lookups, error cases, testnet steps and checklists for deploying and integrating Hyperliquid HIP-1 to HIP-4. |
 
 ---
 

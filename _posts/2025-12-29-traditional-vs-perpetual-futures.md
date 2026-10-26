@@ -305,3 +305,4 @@ In practice the gap is small for short-dated contracts and widens with maturity 
 - [The Black-Scholes Model - Pricing Options and Corporate Liabilities]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/)
 - [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/)
 - [Risk of Ethena's USDe and sUSDe - Backing Venues, Depeg Priors and a Leveraged PT Position]({{site.url_complet}}/2026/10/11/ethena-usde-risk-backing-venues-leveraged-positions/)
+- [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/)

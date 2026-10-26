@@ -375,6 +375,7 @@ If the vault's liquidity is mostly in that market, the queue to withdraw matters
 - [The Unified Risk Layer for DeFi - From Price Oracles to Protocol-Owned Risk Oracles]({{site.url_complet}}/2026/07/02/defi-unified-risk-layer-llama-guard/)
 - [Risk of Ethena's USDe and sUSDe - Backing Venues, Depeg Priors and a Leveraged PT Position]({{site.url_complet}}/2026/10/11/ethena-usde-risk-backing-venues-leveraged-positions/)
 - [The PT-reUSD Liquidations on Morpho - How a 320,000 SY Trade Liquidated 36M, Replayed from On-Chain State]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/)
+- [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/)
 
 ### Tooling
 

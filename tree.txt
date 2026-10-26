@@ -684,6 +684,12 @@ _posts/2026-09-02-hyperliquid-improvement-proposals-hip-1-to-hip-4.md
   assets/article/blockchain/hyperliquid/hip-4-outcome-algebra-concept.puml          (concept, in-section)
   assets/article/blockchain/hyperliquid/hip-permissioning-concept.puml              (concept, asset only)
 
+_posts/2026-10-26-hyperliquid-hip-risks-market-quality.md
+  assets/article/blockchain/hyperliquid/hyperliquid-hip-risks-market-quality.puml   (mindmap -> .png, cover image)
+
+_posts/2026-10-26-hyperliquid-hip-developer-reference.md
+  assets/article/blockchain/hyperliquid/hyperliquid-hip-developer-reference.puml    (mindmap -> .png, cover image)
+
 _posts/2026-09-02-hyperliquid-order-book-matching-engine.md
   assets/article/blockchain/hyperliquid/hyperliquid-order-book.puml                (mindmap)
   assets/article/blockchain/hyperliquid/order-book-venue-models-concept.puml       (concept, in-section)

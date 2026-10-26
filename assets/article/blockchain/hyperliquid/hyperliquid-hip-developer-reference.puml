@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF7EE
+    LineColor #3E8A4F
+  }
+  :depth(1) {
+    BackgroundColor #3E8A4F
+    FontColor white
+  }
+}
+</style>
+* Building on Hyperliquid HIPs
+** Prerequisites
+*** Activated, funded account
+*** Stake: none / 500k HYPE / outcome stake
+*** Standard abstraction for HIP-4
+** Signing
+*** L1 actions, msgpack field order
+*** Sorted tuples, no trailing zeros
+*** Lowercase addresses
+** HIP-1 and HIP-2
+*** spotDeployState first
+*** Five steps, maxSupply checksum
+*** Spot index for the ladder
+*** tokenDetails to verify
+left side
+** HIP-3
+*** registerAsset2 with schema
+*** maxGas 0 = reserve deployment
+*** setOracle every 3 s, 1% clamp
+*** OI caps, fees, haltTrading
+** HIP-4 (testnet)
+*** Venue and templates
+*** Deploy from template
+*** settleOutcome must match
+*** userOutcome operations
+** Integration
+*** Resolve asset IDs at runtime
+*** Error cases
+*** Testnet procedure
+*** Checklists
+@endmindmap

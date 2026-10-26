@@ -373,3 +373,4 @@ Knowing which formula a pool uses tells you where its slippage and its arbitrage
 - [Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/)
 - [How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets]({{site.url_complet}}/2026/10/21/polaris-peth-bonding-curve-passets/)
 - [Power-Law Curves - Scale Invariance, Log-Log Lines, Bonding Curves and Heavy Tails]({{site.url_complet}}/2026/10/22/power-law-curves/)
+- [The Hyperliquid Improvement Proposals - HIP-1 to HIP-4]({{site.url_complet}}/2026/09/02/hyperliquid-improvement-proposals-hip-1-to-hip-4/)

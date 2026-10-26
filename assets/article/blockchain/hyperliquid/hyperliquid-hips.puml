@@ -35,6 +35,7 @@ left side
 *** Cross margin enable is final
 *** Backstop at 0x400..00 + dex
 *** Slashing 100 / 50 / 20%, burned
+*** HIP-3* allow-list venues, testnet
 ** HIP-4 outcome markets
 *** Fully collateralised, no leverage
 *** Yes + No = 1 quote token
@@ -47,4 +48,8 @@ left side
 *** Priced by auction or stake
 *** Policed by validator vote
 *** Slashed stake is burned
+** Status (verified 2026-10-26)
+*** HIP-1, HIP-2, HIP-3 on mainnet
+*** HIP-4 deployers and HIP-3* on testnet
+*** Parameters change without versioning
 @endmindmap

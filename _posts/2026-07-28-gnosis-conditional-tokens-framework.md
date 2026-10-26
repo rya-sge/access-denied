@@ -468,3 +468,7 @@ Because combining a child collection with a parent requires elliptic curve point
 
 - [OpenZeppelin Contracts (Solidity) 2.3.0](https://github.com/OpenZeppelin/openzeppelin-contracts/tree/v2.3.0)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [The Hyperliquid Improvement Proposals - HIP-1 to HIP-4]({{site.url_complet}}/2026/09/02/hyperliquid-improvement-proposals-hip-1-to-hip-4/)

@@ -225,3 +225,5 @@ A [HIP-3](#builder-deployed-perp-dex-hip-3) deployer defines its own markets, or
 - [The Hyperliquid Improvement Proposals - HIP-1 to HIP-4]({{site.url_complet}}/2026/09/02/hyperliquid-improvement-proposals-hip-1-to-hip-4/)
 - [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/)
 - [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)
+- [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/)
+- [Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration]({{site.url_complet}}/2026/10/26/hyperliquid-hip-developer-reference/)

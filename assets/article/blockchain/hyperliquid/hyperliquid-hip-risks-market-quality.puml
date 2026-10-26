@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FFF4E8
+    LineColor #B5652A
+  }
+  :depth(1) {
+    BackgroundColor #B5652A
+    FontColor white
+  }
+}
+</style>
+* Hyperliquid HIPs in practice
+** Risk matrix
+*** Who controls each failure
+*** Who bears the loss
+*** Slashed stake is burned
+** Worked examples
+*** HIP-1: auction, genesis checksum, holders
+*** HIP-2: one-sided ladder, stale levels
+*** HIP-3: 1% clamp, liquidation in ~20 s
+*** HIP-4: interpolated settlement, question arbitrage
+left side
+** Market quality
+*** Depth, spread, impact prices
+*** OI against caps, funding
+*** Oracle vs mark vs external
+*** Exit risk and deployer checks
+** Validator discretion
+*** Irregular vs regular inputs
+*** Subjective harm out of scope
+*** No appeal procedure
+*** JELLY: intervention outside slashing
+** Risks by proposal
+*** HIP-1 supply, bridges, tickers
+*** HIP-3 incentives, ADL, HIP-3*
+*** HIP-4 resolution, timing, disputes
+@endmindmap

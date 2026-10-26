@@ -2,7 +2,7 @@
 layout: post
 title: "The Hyperliquid Improvement Proposals - HIP-1 to HIP-4"
 date:   2026-09-02
-last_modified_at: 2026-10-01
+last_modified_at: 2026-10-26
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -17,7 +17,9 @@ A Hyperliquid Improvement Proposal is not a governance document. Nothing is vote
 
 What the four HIPs share is a way of handling permission. On a centralised venue, listing an asset or opening a market is a decision someone makes about you. On Hyperliquid the decision is priced instead: a Dutch auction for a token ticker, a staked bond for a perp DEX, a per-deployer capacity limit for an outcome venue. Nobody approves the listing, and a deployer who operates a market badly is answerable afterwards to a stake-weighted validator vote that can burn the bond. HIP-2 is the one case with no deployer role to price, because it has no deployer at all.
 
-This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It then answers who can list a token or a market, and closes on what the four have in common, which is where the design shows most clearly.
+This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It then answers who can list a token or a market, compares each HIP with the design it replaces, records which parts are live on mainnet and which are still on testnet, and closes on what the four have in common, which is where the design shows most clearly.
+
+This article describes how the four proposals work. Two companion articles take the next steps: [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/) covers what users lose when a market fails and how to judge a market before trading it, with worked examples for each HIP, and [Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration]({{site.url_complet}}/2026/10/26/hyperliquid-hip-developer-reference/) gives the request payloads, info queries, error cases and checklists.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -65,7 +67,19 @@ The frontend checks published alongside the standard narrow the ranges further f
 
 Deployment gas is priced by a Dutch auction lasting 31 hours, in which the price decreases **linearly** from an initial value down to a floor of 500 HYPE. The initial value is twice the previous clearing price, or the 500 HYPE floor itself if the last auction failed to complete. Gas is paid in HYPE.
 
-Deployment is a five-action sequence: `registerToken2`, then `userGenesis` (repeatable, and able to blacklist addresses), then `genesis` with a `maxSupply` checksum that verifies every `userGenesis` call landed, then `registerSpot` naming the base and quote indices, then `registerHyperliquidity`.
+### Deployment steps at a glance
+
+Deployment is a sequence of five `spotDeploy` actions sent in a fixed order, each signed by the deployer. The table summarises what each one fixes and what can still change afterwards.
+
+| # | Action | What it does | Main fields | Repeatable | Notes |
+|:---:|--------|--------------|-------------|:---:|-------|
+| 1 | `registerToken2` | Pays the auction gas and creates the token, which receives its token index. | `spec.name`, `spec.szDecimals`, `spec.weiDecimals`, `maxGas`, optional `fullName` | No | The only time-sensitive and gas-charged step. Name and decimals are final from here. |
+| 2 | `userGenesis` | Credits genesis balances to addresses and to holders of existing anchor tokens. | `userAndWei`, `existingTokenAndWei`, optional `blacklistUsers` | Yes | Split large distributions across several calls; `blacklistUsers` sets or clears a blacklist flag per address. |
+| 3 | `genesis` | Closes the genesis and fixes the supply. | `maxSupply`, optional `noHyperliquidity` | No | `maxSupply` acts as a checksum: it must match what the earlier calls and the Hyperliquidity allocation add up to. |
+| 4 | `registerSpot` | Creates the spot pair, base against quote. | `tokens: [base, quote]` | No | For a new token the quote is spot USDC. The same action, under its own auction, adds a pair between two existing tokens. |
+| 5 | `registerHyperliquidity` | Starts the HIP-2 ladder on the new pair, or confirms there is none. | `spot`, `startPx`, `orderSz`, `nOrders`, optional `nSeededLevels` | No | `spot` is the spot index, not the token index. With `noHyperliquidity`, `nOrders` must be 0. |
+
+Optional actions can follow at any time after step 1: `setDeployerTradingFeeShare` (downward only), `setTokenAnnotation` (at most once a day), `setDeployerLabel` (once per deployer), the quote-token actions `enableQuoteToken`, `enableAlignedQuoteToken` and their `disable` counterparts, and, in the [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) though not in the deployment documentation, a freeze privilege (`enableFreezePrivilege`, `freezeUser`, `revokeFreezePrivilege`) that lets the deployer stop an address from trading, sending or receiving the token. The Hyperliquidity inventory is itself a `userGenesis` balance, credited to the address `0xffff…ffff` in the SDK's example, and `maxSupply` is given in wei. The developer reference gives a request body for each step.
 
 The property that catches deployers is that only the **first** step is time-sensitive and gas-charged. Once `registerToken2` lands, the ticker and the decimals are locked in and the HYPE is spent, with no time limit on the remaining four. The documentation's own warning is unusually direct: a deployment can end up stuck, for instance with incompatible Hyperliquidity and supply values, and **gas is not refunded** for a stuck deployment. Rehearsing the exact deployment on testnet is the documented mitigation, not a suggestion.
 
@@ -125,7 +139,7 @@ HIP-3 is the largest of the four by surface area. It lets anyone who posts the b
 
 ### What the deployer owns
 
-The deployer is responsible for market definition, which means the oracle definition and the contract specifications, and for market operation, which means publishing oracle prices, setting leverage limits, and settling the market when needed. The action set reflects that: `registerAsset2`, `setOracle`, `setFundingMultipliers`, `setFundingInterestRates`, `setMarginTableIds`, `setOpenInterestCaps`, `setMarginModes`, `setDeployerFees`, `setFeeRecipient`, `setSubDeployers`, `setPerpAnnotation`, `haltTrading` and `disableDex`.
+The deployer is responsible for market definition, which means the oracle definition and the contract specifications, and for market operation, which means publishing oracle prices, setting leverage limits, and settling the market when needed. The action set reflects that: `registerAsset2`, `setOracle`, `setFundingMultipliers`, `setFundingInterestRates`, `setFundingClamps`, `insertMarginTable`, `setMarginTableIds`, `setOpenInterestCaps`, `setMarginModes`, `setDeployerFees`, `setFeeRecipient`, `setSubDeployers`, `setPerpAnnotation`, `haltTrading` and `disableDex`.
 
 `haltTrading` does more than its name suggests. It cancels every order and settles all positions to the current mark price, and the same action reverses to resume trading. That makes it a general recycling mechanism: a deployer can list a dated contract, settle it at expiry, and relist the next one on the same asset slot without returning to the deployment auction.
 
@@ -133,15 +147,26 @@ The deployer is responsible for market definition, which means the oracle defini
 
 ![The life of a HIP-3 DEX: stake 500k HYPE, list three assets without an auction, configure and optionally enable cross margin irreversibly, then operate under validator review]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hip-3-dex-lifecycle-workflow.png)
 
-Mainnet requires **500 000 staked HYPE**, maintained for a minimum of 183 days after the DEX is deployed, with anything above the current requirement free to unstake. The requirement is expected to fall as the infrastructure matures. One qualifying deployer gets one perp DEX for now, with shared-stake multi-DEX deployment named as a future upgrade.
+Mainnet requires **500 000 staked HYPE**. The requirement is expected to fall as the infrastructure matures. One qualifying deployer gets one perp DEX for now, with shared-stake multi-DEX deployment named as a future upgrade.
 
-Listing follows a two-tier rule. The **first three assets** in any DEX skip the auction entirely. Additional assets go through a Dutch auction with the same hyperparameters as the HIP-1 auction, shared across every perp DEX rather than per-DEX. Deployers also accumulate $$7 + 0.2 n$$ reserve deployments, where $$n$$ is their number of auction deployments, usable at the current auction price but bypassing the auction timer — the mechanism for listing something time-sensitive without waiting.
+The documentation states four separate conditions on that stake, and they are easier to reason about apart than compressed into one rule:
+
+| Condition | What it says | Source section |
+|-----------|--------------|----------------|
+| **Amount** | The deployer must hold the current requirement, 500 000 HYPE; anything staked above the most recent requirement can be unstaked at any time. | HIP-3 spec, item 1 |
+| **Minimum duration** | The requirement is maintained for at least 183 days after the DEX is deployed. | HIP-3 spec, item 1 |
+| **Release** | Once all of the DEX's assets are settled, the required stake is free to be unstaked. | HIP-3, Settlement |
+| **Tail exposure** | Stake whose withdrawal has been initiated stays slashable throughout the 7-day unstaking queue. | HIP-3, Slashing |
+
+The documentation does not say how the release rule and the 183-day minimum combine when every asset is settled before day 183. Reading the minimum as a floor that the release rule does not shorten is the cautious interpretation, and the one a deployer should plan around until the documentation says otherwise.
+
+Listing follows a two-tier rule. The **first three assets** in any DEX skip the auction entirely. Additional assets go through a Dutch auction with the same hyperparameters as the HIP-1 auction, shared across every perp DEX rather than per-DEX. Deployers also accumulate $$7 + 0.2 n$$ reserve deployments, where $$n$$ is their number of auction deployments, usable at the current auction price but bypassing the auction timer, which is the mechanism for listing something time-sensitive without waiting.
 
 Any quote asset can serve as the DEX's collateral. If a quote asset loses its status by validator vote, perp DEXs collateralised by it are disabled; a deployer-initiated disabling is not contagious in the same way. HIP-3 deployers are not themselves slashed over quote-asset failures, since quote token deployers post their own separate stake.
 
 ### Fees
 
-The deployer sets a fee `scale` between 0% and 300%, or 0% to 100% under growth mode. Taking a base user fee of one unit and non-aligned collateral, the split behaves as follows:
+The deployer sets a fee `scale` between 0% and 300%, or 0% to 100% under growth mode. On mainnet the deployer fee setting can change at most once every 30 days. Taking a base user fee of one unit and non-aligned collateral, the split behaves as follows:
 
 | `growthMode` | `feeScale` | To protocol | To deployer |
 |:---:|:---:|:---:|:---:|
@@ -167,6 +192,12 @@ Enabling cross margin on a HIP-3 asset is **irreversible**. Because a user in cr
 ### The backstop liquidator
 
 Each HIP-3 DEX has a fully onchain strategy at `0x400..00 + {dex_index}` that takes over backstop-liquidatable positions from that DEX. It accepts only assets where cross margin is enabled, which makes those assets materially less likely to reach auto-deleveraging during a volatility event. The strategy is an independent user and itself falls back to ADL, so the DEX's solvency guarantee holds mathematically rather than depending on the strategy's balance.
+
+### HIP-3\* venues (testnet only)
+
+The deployer documentation now describes a variant called **HIP-3\***, selected once at DEX creation with `isStar: true` in the DEX schema and available on testnet only. It adds an **allow-list**: the deployer approves the users who may trade on the venue. It also adds **proxied user actions**: the deployer, or a sub-deployer holding the matching grant, can cancel an approved user's orders, restrict the user to reduce-only trading, place reduce-only orders on their behalf, and move collateral from the user's account to another account on the same venue with `sendAsset`.
+
+On a HIP-3\* venue the deployer submits only a spot oracle price; the external perp price is taken from the main DEX asset of the same name, and the mark price is computed onchain as a median of three inputs. This removes some oracle discretion and adds account-level discretion in its place, which changes the user's trust assumption considerably. The [risks article]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/) treats it as a separate row of its risk matrix.
 
 ### Open interest caps
 
@@ -290,7 +321,7 @@ Setting the four side by side, the design that repeats is clearer than any indiv
 
 | | Entry is gated by | Ongoing obligation | Slashable for | Deployer role after launch |
 |---|---|---|---|---|
-| **HIP-1** | Dutch auction, 31 h, floor 500 HYPE | None | Nothing | Fee share only, and it can only decrease |
+| **HIP-1** | Dutch auction, 31 h, floor 500 HYPE | None | Nothing | Fee share, which can only decrease, and a freeze privilege if enabled (SDK) |
 | **HIP-2** | Nothing; it is a HIP-1 genesis field | None | Nothing | **None at all** |
 | **HIP-3** | 500 000 HYPE for ≥183 days, plus a shared auction after the first three assets | Publish oracle prices, operate the market | Irregular inputs: up to 100% / 50% / 20% by impact | Continuous |
 | **HIP-4** | Staking requirement that stacks; free deployment with per-deployer capacity caps | Settle outcomes correctly | Markets contradicting their template's `semanticRestriction` | Continuous |
@@ -307,11 +338,45 @@ Three observations follow.
 
 The one proposal that escapes the pattern is HIP-2, and it escapes by having no operator to bond or slash. That is the design in its simplest form, and it is available only because the strategy is simple enough to express as block transition logic. Everything a deployer might get wrong in HIP-1, HIP-3 or HIP-4 is something HIP-2 has no room to get wrong.
 
+## How each HIP compares with the design it replaces
+
+Each HIP replaces a design that already exists elsewhere, and the trade-off is easier to see against that alternative than in isolation.
+
+| HIP | Usual alternative | What the HIP gains | What it gives up |
+|-----|-------------------|--------------------|------------------|
+| **HIP-1** | An ERC-20 contract plus a separate listing on a DEX or CEX | Token and venue arrive in one deployment; supply logic is protocol code, so there is no contract to audit for hidden mint or fee-on-transfer paths | No custom logic at all: no hooks, no vesting or pause in the token itself; the ticker is not unique |
+| **HIP-2** | A constant-product AMM pool, such as Uniswap v2 | No operator, no keeper and no separate pool; other makers quote inside the ladder on the same book | A coarse, fixed ladder with no price feed; the strategy cannot rebalance and is exposed to informed flow at every level |
+| **HIP-3** | A listing decided by an exchange or by governance, as for Hyperliquid's own validator-operated perps | Anyone with the bond can list any underlying they can feed an oracle for, and choose margining and fees | Market quality rests on one deployer; slashing burns stake and compensates nobody |
+| **HIP-4** | A prediction market on a general-purpose chain (Polymarket on the [Gnosis Conditional Tokens framework]({{site.url_complet}}/2026/07/28/gnosis-conditional-tokens-framework/)), or margined options | Full collateralisation with no liquidation, a native order book, and composition with portfolio margin | Validator-approved templates only; settlement is a deployer action, with no built-in dispute window like an optimistic oracle |
+
+Two of these comparisons are developed in other articles. The HIP-2 trade-off against constant-function pools follows from the pricing curves covered in [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/), and the order-book side is in [Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/). For HIP-4, the Gnosis article shows the split, merge and redemption algebra that HIP-4 reproduces natively, and where an external resolution oracle sits in that design.
+
+## Current status and version history
+
+Several numbers in this article are protocol parameters rather than fixed rules, and the documentation changes without versioned releases. The table below records what was checked against the live documentation and when.
+
+| HIP | Last verified | Network status | Fixed by design | Can change (parameter or upgrade) | Specification and API |
+|-----|---------------|----------------|-----------------|-----------------------------------|-----------------------|
+| HIP-1 | 2026-10-26 | Mainnet | Capped supply, one-way fee-share ratchet, five-step order | Auction duration (31 h) and floor (500 HYPE), dust thresholds, frontend decimal ranges | [Spec](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-1-native-token-standard), [API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets) |
+| HIP-2 | 2026-10-26 | Mainnet, USDC pairs only | No operator, ALO-only orders | Ladder step (0.3%), refresh interval (3 s), quote assets supported | [Spec](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-2-hyperliquidity) |
+| HIP-3 | 2026-10-26 | Mainnet; HIP-3\* venues testnet only | Burned (not redistributed) slashing, irreversible cross-margin switch | Stake (500 000 HYPE, expected to fall), 183-day minimum, fee ranges, OI size cap (1B), one DEX per deployer | [Spec](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-3-builder-deployed-perpetuals), [API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions) |
+| HIP-4 | 2026-10-26 | Protocol-run recurring markets on mainnet; deployer flow testnet only; multi-outcome questions not in the first mainnet release | Yes and No sum to one quote token; split and merge as the only issuance | Per-deployer caps (10 active, 50 per day on testnet), fees (zero during testing), fee-scale range | [Spec](https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-4-outcome-markets), [API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions) |
+
+The documentation carries no changelog, so the changes it records are visible only through renamed actions and notes about legacy behaviour:
+
+- **HIP-1.** `registerToken2` replaced an earlier registration action. Tokens deployed before the deployer fee share existed get a one-time upward move from zero, after which the downward-only ratchet applies.
+- **HIP-3.** `registerAsset2` takes a `marginMode` (`strictIsolated`, `noCross` or `normal`) where `registerAsset` took a boolean `onlyIsolated`. `setFundingClamps` and `insertMarginTable` have joined the action set. Deployer fee changes are rate-limited to one per 30 days on mainnet. HIP-3\* has been added on testnet.
+- **HIP-4.** `settleQuestion` is discontinued in favour of `settleQuestion2`, which settles every remaining outcome of a question in one action.
+
+This article's own revisions: first published on 2026-09-02, revised on 2026-10-01, and on 2026-10-26 checked against the live documentation, with the deployment-step table, the stake conditions, HIP-3\*, the comparison table and this section added. The same day, the HIP-1 genesis details (Hyperliquidity address, `maxSupply` in wei) and the freeze privilege were added from the official Python SDK at commit `2fdb18f`.
+
 ## Conclusion
 
-The four HIPs are not versions of one another. They differ in what a deployer still controls once the market is live, which runs from nothing at all under HIP-2, through a fee share that can only fall under HIP-1, to a bonded party publishing oracle prices under HIP-3 and settling markets under HIP-4.
+The four HIPs are not versions of one another. They differ in what a deployer still controls once the market is live, which runs from nothing at all under HIP-2, through a fee share that can only fall (plus an optional freeze privilege) under HIP-1, to a bonded party publishing oracle prices under HIP-3 and settling markets under HIP-4.
 
 What connects them is the substitution of a price for an approval, and of a burned bond for a compensation fund. A deployer buys entry at auction or posts stake, operates without asking anyone, and answers to a stake-weighted vote if the operation damages the protocol. For a user or an integrator, the practical reading is that the protections are ex ante: the deployer's incentive not to be slashed, the eligibility standards validators enforce before cross margin is enabled, and the collateralisation arithmetic in HIP-4. There is no rung below those where losses are made whole.
+
+What that means in practice, for a trader judging a market or a builder deploying one, is the subject of the two companion articles on [risks and market quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/) and on [deployment and integration]({{site.url_complet}}/2026/10/26/hyperliquid-hip-developer-reference/).
 
 ![Mindmap of the four Hyperliquid Improvement Proposals covering HIP-1 native tokens, HIP-2 Hyperliquidity, HIP-3 builder-deployed perps, HIP-4 outcome markets and the permissioning pattern they share]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-hips.png)
 
@@ -406,7 +471,7 @@ The same principle runs in the other direction and is easier to overlook: inputs
 The obligation ends at different points for each:
 
 - **HIP-3 and HIP-4** create continuous deployer obligations, as do quote-asset and aligned-quote-asset status.
-- **HIP-1** effectively ends the deployer's role at genesis, apart from a fee share that can only decrease.
+- **HIP-1** effectively ends the deployer's role at genesis, apart from a fee share that can only decrease and, when the deployer enabled it, a freeze privilege over holders.
 - **HIP-2** creates no role at all.
 
 What a user gets is narrower than it first appears. The bond is slashable by stake-weighted validator vote, and the slashed stake is **burned**, not distributed to affected users. So the protection is entirely ex ante: it is the deployer's incentive to avoid slashing, plus the eligibility standards validators enforce before an irreversible step such as enabling cross margin. There is no rung below that where losses are made whole.
@@ -416,6 +481,10 @@ What a user gets is narrower than it first appears. The bond is slashable by sta
 The difference is whether there is anything for a human to get wrong at run time. Hyperliquidity's entire behaviour is fixed by five parameters at deployment and executed thereafter by block transition logic: no one publishes a price, no one adjusts a leverage limit, no one settles anything. There is no operator, so there is nothing to bond.
 
 A HIP-3 deployer, by contrast, publishes the oracle prices that drive margining and liquidation on their DEX, sets margin tables and OI caps, and settles markets. Every one of those is a continuous opportunity to damage users or the protocol, and the bond is what makes that opportunity expensive. The general rule the pair illustrates is that Hyperliquid bonds discretion, not deployment: where a primitive can be expressed as execution logic it is, and where it needs a human in the loop, that human posts stake.
+
+**Q: A HIP-3 deployer settles every asset of their DEX 90 days after deployment. Can they unstake the 500 000 HYPE?**
+
+The documentation gives two rules that point in different directions. The spec says the requirement is maintained for a minimum of 183 days after deployment; the settlement section says that once all assets are settled, the required stake is free to be unstaked. It does not say which one wins before day 183. The cautious reading treats 183 days as a floor. Whatever the answer, any stake whose withdrawal starts remains slashable for the 7 days of the unstaking queue, so conduct in the final days of the DEX is still covered.
 
 ## References
 
@@ -436,6 +505,7 @@ A HIP-3 deployer, by contrast, publishes the oracle prices that drive margining 
 - [Exchange endpoint](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint) — `splitOutcome`, `mergeOutcome`, `mergeQuestion` and `negateOutcome` semantics
 - [Asset IDs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/asset-ids) — the perp, HIP-3, spot and outcome encodings
 - [Interacting with HyperCore](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/interacting-with-hypercore) — the CoreWriter action table, including `Outcome operation`
+- [hyperliquid-python-sdk](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) — official Python SDK (commit `2fdb18f`, 2026-06-04); `examples/spot_deploy.py` shows the Hyperliquidity genesis address, `maxSupply` in wei and the freeze privilege
 
 ### Supporting mechanics
 
@@ -450,7 +520,16 @@ A HIP-3 deployer, by contrast, publishes the oracle prices that drive margining 
 
 - [ERC-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20) — the HyperEVM side of a linked HIP-1 token
 
+### Other designs
+
+- [Uniswap v2 Core whitepaper](https://app.uniswap.org/whitepaper.pdf) — the constant-product pool HIP-2 is compared with
+- [Polymarket documentation](https://docs.polymarket.com/) — a prediction market built on conditional tokens with external resolution
+
 ### Related articles
 
+- [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/)
+- [Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration]({{site.url_complet}}/2026/10/26/hyperliquid-hip-developer-reference/)
+- [Gnosis Conditional Tokens — Combinatorial Prediction Markets on ERC-1155]({{site.url_complet}}/2026/07/28/gnosis-conditional-tokens-framework/)
+- [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)
 - [Hyperliquid HIP-1 to HIP-4 in Twelve Cards — The Definitions to Memorise]({{site.url_complet}}/2026/10/26/hyperliquid-hip-flashcards/)
 - [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/)
