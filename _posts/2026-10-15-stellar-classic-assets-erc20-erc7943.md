@@ -236,6 +236,8 @@ The Stellar Asset Contract has an admin, by default the issuer, that can call `m
 
 This option changes **who may exercise the issuer controls and under which conditions**. It does not change what a transfer between two holders checks: those still follow the Classic trustline rules. It is the right step when the requirement is governance over minting and enforcement, not new transfer rules.
 
+Changing the SAC admin does not change the issuer, and it does not take the issuer's Classic powers away. The issuer is part of the asset's identity (`CODE:ISSUER`), and the issuing account can still mint with a `Payment`, change trustline flags with `SetTrustLineFlags` and claw back with the `Clawback` operation, none of which goes through the SAC. A Soroban contract also cannot be a signer of a Classic account, whose signers can only be ed25519 keys, pre-authorized transaction hashes, hash-x preimages and signed payloads. To put the asset fully under the admin contract, the issuer first calls `set_admin` to hand the SAC to the contract, then locks the issuing account (master key weight zero, no other signers). From then on, `mint`, `clawback` and `set_authorized` are only reachable through the contract. The cost is the issuer actions the SAC does not expose, such as setting a trustline to `AUTHORIZED_TO_MAINTAIN_LIABILITIES`, since `set_authorized` only switches authorization on or off. Without the lock, the issuer key and the admin contract both hold minting and enforcement power.
+
 ### SEP-41: a custom Soroban token
 
 When the requirement is per-transfer logic on-chain (partial freeze, transfer rules, identity checks, compliance modules), the asset has to be a contract. [SEP-41](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0041.md) defines the token interface such a contract exposes, so that wallets and other contracts can use it like any SAC:
@@ -352,6 +354,8 @@ Holding a Classic asset is opt-in. The recipient must first create a trustline w
 
 It mints the full supply to a distribution account, then sets the issuing account's master key weight to zero and removes all other signers. After that, no transaction can be signed for the issuer, so nothing more can be minted. The same lock also removes every issuer control: no authorization changes, no freeze and no clawback. A regulated asset therefore cannot use it.
 
+The lock fixes the supply only while the issuer is still the SAC admin. If the SAC admin was moved to another account or contract before the lock, that admin can still call `mint`, `clawback` and `set_authorized` through the SAC.
+
 **Q: Which ERC-7943 functions can a Classic asset reproduce, and which can it not?**
 
 It can reproduce:
@@ -370,6 +374,21 @@ A Classic asset with SEP-8. Both rules depend on the transfer (the amount, the d
 A contract admin on the SAC controls the privileged functions only: `mint`, `clawback`, `set_authorized` and `set_admin`. It can add roles, limits or delays to those actions, but a transfer between two holders still follows the Classic trustline rules.
 
 A SEP-41 token is a separate contract with its own balances. Its `transfer` can run any logic, which is what partial freezes and compliance modules require. In exchange, it is no longer a Classic asset, so it loses the native DEX and path payments.
+
+**Q: Is it possible to wrap a Stellar Classic token into a Soroban smart contract?**
+
+Yes, and in most cases no wrapper is needed. Every Classic asset can be exposed to Soroban through its Stellar Asset Contract, which anyone can deploy at a deterministic address (for example with `stellar contract asset deploy --asset CODE:ISSUER`). The SAC is not a wrapper: it reads and writes the same trustline balance, so the asset stays on the SDEX and in path payments while contracts use it through the SEP-41 interface.
+
+A true wrapper is still possible when the token needs logic the SAC does not have. It is a SEP-41 contract that takes deposits of the Classic asset through the SAC and mints its own token 1:1, then burns that token and returns the underlying on withdrawal. The contract address holds the underlying in a contract balance, so it needs no trustline. Two points remain:
+
+- **Issuer controls still apply to the underlying.** If the issuer has `AUTH_REQUIRED_FLAG` set, it must authorize the wrapper's balance with `set_authorized`, and with clawback enabled it can claw back from the wrapper contract or deauthorize it, which would freeze every wrapped holder at once.
+- **The wrapped token is a Soroban token.** It has the SEP-41 trade-offs listed above: no SDEX or path payments, contract-specific wallet support, code to audit and storage subject to state archival.
+
+**Q: Can the issuer of a Classic asset be changed?**
+
+No. The issuer is part of the asset's identity (`CODE:ISSUER`), and the SAC address is derived from it, so another issuer means another asset, with new trustlines and another SAC. Moving to a new issuer requires issuing a new asset and migrating holders, for example through a swap or a clawback followed by a reissue.
+
+What can change is who controls the issuing account. With `SetOptions`, the issuer can add signers and thresholds (a Classic multisig), rotate keys by adding a new signer and setting the old master key weight to zero, or lock the account entirely. A Soroban contract cannot be one of those signers. Setting a contract as SAC admin and then locking the issuer is the way to place every privileged action (`mint`, `clawback`, `set_authorized`) under contract control.
 
 **Q: Where does the ERC-20 allowance model exist on Stellar?**
 

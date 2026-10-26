@@ -1,0 +1,33 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Hyperliquid HIPs in twelve cards
+** Execution layer
+*** HyperCore\n//the exchange is the state machine//
+*** Add Liquidity Only (ALO)\n//rest as maker or be rejected//
+** Spot tokens and liquidity
+*** HIP-1 token\n//capped supply, native book, identify by index not ticker//
+*** Deployment Dutch auction\n//31 hours, falling price, 500 HYPE floor, paid once//
+*** Hyperliquidity (HIP-2)\n//0.3% ladder, every 3 seconds, no operator, shared book//
+** Builder perpetuals
+*** Builder-deployed perp DEX (HIP-3)\n//500k HYPE stake, deployer runs oracle and risk//
+*** Deployer slashing\n//irregular input → validator vote → stake burned, not refunded//
+left side
+** Outcome markets
+*** Outcome (HIP-4)\n//Yes + No = 1 quote token, no leverage//
+*** Split and merge\n//1 quote token ⇄ 1 Yes + 1 No//
+*** Question\n//No on one = Yes on all the others//
+*** Outcome template\n//validators approve the pattern, deployers fill the blanks//
+** The proposals
+*** Hyperliquid Improvement Proposal (HIP)\n//1 token, 2 liquidity, 3 perps, 4 outcomes//
+@endmindmap

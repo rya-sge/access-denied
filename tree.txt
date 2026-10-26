@@ -702,6 +702,9 @@ _posts/2026-09-09-hyperliquid-glossary.md
   assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.puml (mindmap, by level)
   assets/article/blockchain/hyperliquid/hyperliquid-glossary-themes.puml  (mindmap, by theme)
 
+_posts/2026-10-26-hyperliquid-hip-flashcards.md
+  assets/article/blockchain/hyperliquid/hyperliquid-hip-flashcards-mindmap.puml (mindmap -> .png, cover image)
+
 _posts/2026-09-03-fail2ban-architecture-privilege-model.md
   assets/article/securite/fail2ban/fail2ban-architecture.puml                     (mindmap)
   assets/article/securite/fail2ban/fail2ban-server-components-concept.puml        (concept, in-section)
