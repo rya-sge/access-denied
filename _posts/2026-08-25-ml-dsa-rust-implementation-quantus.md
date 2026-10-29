@@ -631,3 +631,4 @@ The crate's response is to place secrets in the caller's frame and fill them thr
 ### Related articles
 
 - [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/)
+- [Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-blockchains/)

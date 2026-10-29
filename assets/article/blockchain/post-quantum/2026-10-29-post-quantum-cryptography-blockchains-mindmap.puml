@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Post-quantum cryptography on blockchains
+** What breaks
+*** Account signatures (ECDSA, EdDSA)
+*** Validator signatures (BLS, Ed25519)
+*** Pairing-based proofs
+*** Hashes and proof-of-work survive
+*** Long vs short exposure
+** Migration patterns
+*** 1. New post-quantum account or output
+*** 2. ZK proof of seed knowledge
+*** 3. Sunset legacy signatures
+** Bitcoin
+*** BIP-360 P2MR (draft)
+*** BIP-361 legacy sunset (draft)
+*** SHRINCS hash-based signature
+** Ethereum
+*** EF post-quantum team (2026)
+*** leanSig hash-based consensus
+*** EIP-8051 ML-DSA, EIP-8052 Falcon
+left side
+** Other chains
+*** Solana: Falcon, Winternitz vault
+*** Cardano: research framework
+*** Aptos: AIP-137 SLH-DSA
+*** Sui: ZK seed proof
+*** XRP Ledger: ML-DSA on AlphaNet
+*** Algorand: Falcon state proofs live
+** Privacy and permissioned
+*** Zama: TFHE lattice, pairing proof not PQ
+*** Aztec: roadmap to 2030
+*** Canton: no published plan
+** Post-quantum native
+*** QRL: XMSS since 2018, ML-DSA-87 in 2.0
+*** Quantus: ML-DSA mainnet 2026
+@endmindmap

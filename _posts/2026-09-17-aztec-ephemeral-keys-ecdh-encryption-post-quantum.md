@@ -278,3 +278,4 @@ It would also leave discovery tags, proof soundness and account signatures where
 - [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
 - [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)
 - [Chiffrement hybride sur les courbes elliptiques avec ECIES]({{site.url_complet}}/2022/04/22/elliptic-curve-integrated-encryption-scheme-ecies/)
+- [Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-blockchains/)

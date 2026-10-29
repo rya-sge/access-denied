@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Post-quantum cryptography in 2026
+** Quantum threat
+*** Shor breaks RSA, ECC, pairings
+*** Grover halves symmetric security
+*** RSA-2048 under 1M noisy qubits (2025)
+*** ECDLP-256 under 500k physical qubits (2026)
+*** Harvest now, decrypt later
+** NIST standards
+*** FIPS 203 ML-KEM (KEM)
+*** FIPS 204 ML-DSA (lattice signature)
+*** FIPS 205 SLH-DSA (hash-based)
+*** FIPS 206 FN-DSA / Falcon (draft)
+*** HQC backup KEM (planned FIPS 207)
+*** SP 800-208 LMS / XMSS
+** Hybrid TLS
+*** X25519MLKEM768
+*** RFC 10024 (August 2026)
+*** Authentication still classical
+left side
+** Deployments
+*** Chrome 131, Apple OS 26
+*** Cloudflare: most human traffic
+*** OpenSSL 3.5, OpenSSH 10
+*** Signal PQXDH and SPQR, iMessage PQ3
+*** AWS KMS ML-DSA, Windows CNG
+** Open problems
+*** Signature size (10x to 270x Ed25519)
+*** No post-quantum WebPKI certificates
+*** Merkle Tree Certificates experiment
+*** Deadlines 2030 / 2035 (NIST IR 8547 draft)
+** Blockchains
+*** See companion article
+@endmindmap

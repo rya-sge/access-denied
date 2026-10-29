@@ -280,6 +280,7 @@ Primary documents, read locally:
 - [Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped]({{site.url_complet}}/2026/10/02/noahs-ark-threshold-fhe-paper-vs-implementation/)
 - [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
 - [Ephemeral Keys on Aztec — Encrypting to an Address, the Curve Behind It, and What a Quantum Computer Would Break]({{site.url_complet}}/2026/09/17/aztec-ephemeral-keys-ecdh-encryption-post-quantum/)
+- [Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-blockchains/)
 
 ### Tooling
 

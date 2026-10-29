@@ -1272,3 +1272,11 @@ _posts/2026-10-26-sampling-standard-error-mean.md
   assets/article/programmation/mit-6-0002/sampling-standard-error-concept.puml   (concept -> .png, asset only)
   assets/article/programmation/mit-6-0002/sampling-standard-error-workflow.puml   (workflow -> .png, asset only)
   assets/article/programmation/mit-6-0002/sampling-standard-error-vs-sample-size.py   (in-section figure -> .svg, embedded in "The standard error of the mean"; matplotlib, create-plot)
+
+_posts/2026-10-29-post-quantum-cryptography-algorithms-overview.md
+  assets/article/cryptographie/post-quantum/2026-10-29-post-quantum-cryptography-algorithms-overview-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-29-post-quantum-cryptography-blockchains.md
+  assets/article/blockchain/post-quantum/2026-10-29-post-quantum-cryptography-blockchains-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article, no .puml

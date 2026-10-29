@@ -359,3 +359,4 @@ Both variants derive the mask from $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu
 - [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/)
 - [How Computers Sign Messages That Even a Quantum Computer Cannot Fake — Explained for a 10-Year-Old]({{site.url_complet}}/2026/07/03/ml-dsa-post-quantum-signatures-eli10/)
 - [Overview of ECDSA - Elliptic Curve Digital Signature Algorithm]({{site.url_complet}}/2024/10/23/ecdsa-overview/)
+- [Post-Quantum Cryptography in 2026 — The Algorithms, What They Do and Who Deploys Them]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-algorithms-overview/)
