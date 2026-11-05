@@ -2,7 +2,7 @@
 layout: post
 title: "Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision"
 date:   2026-10-10
-last_modified_at: 2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: defi finance blockchain
@@ -38,7 +38,11 @@ Combining these analytically means convolving several mixed distributions throug
 
 ### Estimating an expectation by sampling
 
-The method was developed at Los Alamos in 1946 and 1947 by Stanislaw Ulam and John von Neumann for neutron-transport calculations; Nicholas Metropolis suggested the name, after the Monte Carlo casino, and the first published description is the [1949 paper by Metropolis and Ulam](https://doi.org/10.1080/01621459.1949.10483310). The foundations (the law of large numbers, the empirical rule and a simulation that can be checked against an exact answer) are developed on a roulette example in [Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/). The core of the method is one observation. If $$L = f(X)$$ is the loss produced by random inputs $$X$$, its expectation can be approximated by drawing $$N$$ independent samples $$x_1, \dots, x_N$$ of $$X$$ and averaging:
+The method was developed at Los Alamos in 1946 and 1947 by Stanislaw Ulam and John von Neumann for neutron-transport calculations; Nicholas Metropolis suggested the name, after the Monte Carlo casino, and the first published description is the [1949 paper by Metropolis and Ulam](https://doi.org/10.1080/01621459.1949.10483310).
+
+The foundations are developed on a roulette example in [Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/): the law of large numbers, the empirical rule and a simulation that can be checked against an exact answer.
+
+The core of the method is one observation. If $$L = f(X)$$ is the loss produced by random inputs $$X$$, its expectation can be approximated by drawing $$N$$ independent samples $$x_1, \dots, x_N$$ of $$X$$ and averaging:
 
 $$
 \begin{aligned}
@@ -127,7 +131,7 @@ The loss is the equity before the shock minus the equity after it. The distincti
 
 ### One simulated path
 
-A worked path makes the mechanics concrete. Take collateral worth 1,000,000 USD, a debt of 850,000 USD, a liquidation loan-to-value of 91.5 % and an incentive factor of 1.03. In this path, the issuer depegs by 10 % and the oracle follows the market:
+Take collateral worth 1,000,000 USD, a debt of 850,000 USD, a liquidation loan-to-value of 91.5 % and an incentive factor of 1.03. In this path, the issuer depegs by 10 % and the oracle follows the market:
 
 1. The oracle value falls to 900,000. Since $$900{,}000 \times 0.915 = 823{,}500 \lt 850{,}000$$, the position is liquidated.
 2. The liquidator seizes $$850{,}000 \times 1.03 / 900{,}000 \approx 97.3\,\%$$ of the collateral.

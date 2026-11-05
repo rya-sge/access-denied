@@ -2,6 +2,7 @@
 layout: post
 title: "How DefiLlama Works - Data Model, Free and Pro API, and Adapters"
 date:   2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -26,7 +27,7 @@ This article reads the code of the main DefiLlama repositories to explain how th
 
 The article relies on a few DeFi accounting and on-chain data concepts:
 
-- **Total value locked (TVL).** The USD value of the assets held by a protocol's contracts at a given time. It is a balance-sheet measure (what is deposited), not a flow measure (what is traded or earned).
+- **Total value locked (TVL).** The USD value of the assets held by a protocol's contracts at a given time. It is a balance-sheet measure of what is deposited, not a flow measure of what is traded or earned.
 - **Double counting.** When protocol B deposits its users' assets into protocol A, the same tokens appear in both protocols' balances. Summing TVL across protocols then counts them twice, so aggregators flag such protocols and exclude them from totals.
 - **Event logs.** EVM contracts emit indexed events (`Swap`, `Transfer`, `Deposit`) stored in transaction receipts. Reading the logs over a time window is the usual way to measure a flow, such as volume or fees, without running an indexer.
 - **Multicall.** A helper contract that bundles many read-only calls into one RPC request. Adapters that read balances of hundreds of contracts depend on it to stay within RPC rate limits.
@@ -213,7 +214,18 @@ right   https://pro-api.llama.fi/KEY/api/overview/derivatives
 
 The free endpoints are also served through the Pro host, with a prefix that depends on the free host: `/api/…` for `api.llama.fi` paths, `/coins/…`, `/stablecoins/…` and `/yields/…` for the others. A Pro user calls them there for the higher rate limit.
 
-The Pro-only endpoints cover token holdings across protocols (`/api/tokenProtocols/{symbol}`), inflows and outflows (`/api/inflows/{protocol}/{timestamp}`), token unlocks (`/api/emissions`), categories, forks, oracles, hacks, raises and treasuries, borrow rates (`/yields/poolsBorrow`), perpetual funding rates (`/yields/perps`), derivatives volume, bridges, ETFs, digital-asset treasuries, real-world assets, and a beta "dimensions" API (`/api/v2/metrics/{metric}` and `/api/v2/chart/{metric}/…`) that breaks any flow metric down by chain, protocol, version or fee label. A beta financial-statement endpoint returns a protocol's income statement by year, quarter and month.
+The Pro-only endpoints cover:
+
+- token holdings across protocols (`/api/tokenProtocols/{symbol}`);
+- inflows and outflows (`/api/inflows/{protocol}/{timestamp}`);
+- token unlocks (`/api/emissions`);
+- categories, forks, oracles, hacks, raises and treasuries;
+- borrow rates (`/yields/poolsBorrow`);
+- perpetual funding rates (`/yields/perps`);
+- derivatives volume, bridges, ETFs, digital-asset treasuries and real-world assets;
+- a beta "dimensions" API (`/api/v2/metrics/{metric}` and `/api/v2/chart/{metric}/…`) that breaks any flow metric down by chain, protocol, version or fee label.
+
+A beta financial-statement endpoint returns a protocol's income statement by year, quarter and month.
 
 `https://pro-api.llama.fi/usage/{KEY}` returns the remaining credits. It is the one endpoint where the key comes last.
 

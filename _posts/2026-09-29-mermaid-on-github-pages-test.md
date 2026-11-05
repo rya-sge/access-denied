@@ -2,6 +2,7 @@
 layout: post
 title: "Mermaid Diagrams on GitHub Pages — A Rendering Test"
 date:   2026-09-29
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -71,7 +72,7 @@ Three details matter, and each one comes from a difference between Mermaid's exp
 
 ## The cost, and when to pay it
 
-Loading a diagram library on a page that has no diagram is waste, which is why the script is gated on a front-matter flag rather than added to every page. The Mermaid ESM bundle is not small, and it is fetched from a CDN, so a reader without JavaScript, or behind a CDN block, sees the fence as source text. That is the honest failure mode for this approach: the page stays readable, the diagram does not appear.
+Loading a diagram library on a page that has no diagram is waste, which is why the script is gated on a front-matter flag rather than added to every page. The Mermaid ESM bundle is not small, and it is fetched from a CDN, so a reader without JavaScript, or behind a CDN block, sees the fence as source text. In that case the page stays readable and the diagram does not appear.
 
 An alternative avoids the runtime entirely: render the diagrams to SVG at build time with the Mermaid CLI and commit the images. It costs a build step and the diagrams stop being editable in the Markdown, and in exchange nothing is fetched at page load and the result renders everywhere, including in RSS readers.
 

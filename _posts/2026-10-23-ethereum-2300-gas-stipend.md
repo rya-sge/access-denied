@@ -2,6 +2,7 @@
 layout: post
 title: "The 2,300 Gas Stipend in Ethereum - Origin, Breakages and Alternatives"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -138,7 +139,7 @@ Transient storage ([EIP-1153](https://eips.ethereum.org/EIPS/eip-1153)) added `T
 
 [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) lets an externally owned account delegate to contract code. A payment to such an account runs the delegated code's `receive` function with the stipend, like a payment to a contract. Measured on anvil with Osaka rules:
 
-- An account delegated to the counter receiver rejected `transfer` (the sender reverted) and `send` (it returned `false`), and accepted `call`.
+- An account delegated to the counter receiver accepted `call` and rejected the other two: with `transfer` the sender reverted, and with `send` it returned `false`.
 - An account delegated to the event-only receiver accepted all three.
 
 Code that pays users with `transfer` on the grounds that users are EOAs fails for every user whose wallet delegates to code that does more than 2,300 gas of work on receipt.

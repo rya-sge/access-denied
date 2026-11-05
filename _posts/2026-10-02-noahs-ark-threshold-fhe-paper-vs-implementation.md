@@ -2,7 +2,7 @@
 layout: post
 title: "Noah's Ark: Threshold FHE by Noise Flooding, and What Zama Actually Shipped"
 date:   2026-10-02
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -87,7 +87,7 @@ The paper measures it at 241–317 ms on an AWS `m6i.metal`, depending on the pa
 
 In Protocol 1 the two-uniform trick is free: two PRSS contributions already are a sum of two uniforms. In Protocol 2 it is explicit, $$[E] = \left(-2^B + \sum [b_i]2^i\right) + \left(-2^B + \sum [b_i']2^i\right)$$.
 
-Sharing is Shamir over **Galois rings**, via [ACD+19], rather than replicated sharing — because replicated share sizes grow with $$\binom{n}{t}$$, and because the natural modulus $$2^{64}$$ is not a prime, so Shamir needs the ring machinery to work at all.
+Sharing is Shamir over **Galois rings**, via [ACD+19], rather than replicated sharing — because replicated share sizes grow with $$\binom{n}{t}$$, and because the natural modulus $$2^{64}$$ is not a prime, so Shamir needs Galois rings to work at all.
 
 ## Six divergences
 
@@ -95,7 +95,7 @@ Everything above is in the repository. So is a good deal more, and some of it di
 
 ### 1. The paper is not the implementation's specification
 
-This divergence changes how the other five should be read. The repository's normative reference is **`docs/CryptographicDocumentation.pdf`**, Zama's NIST threshold-cryptography submission, and the source comments say so throughout: *"as described in Fig. 70 of NIST document"*, `//NIST: Level Zero Operation`, *"For now NIST doc doesn't explicitly call this robust_open"*. The paper is cited once, in the README, with a careful hedge:
+The repository's normative reference is **`docs/CryptographicDocumentation.pdf`**, Zama's NIST threshold-cryptography submission, and the source comments say so throughout: *"as described in Fig. 70 of NIST document"*, `//NIST: Level Zero Operation`, *"For now NIST doc doesn't explicitly call this robust_open"*. The paper is cited once, in the README, with a careful hedge:
 
 > "The [Noah's ark](https://eprint.iacr.org/2023/815) paper contains the technical details of **some of our protocols**"
 
@@ -283,7 +283,7 @@ Because the cutoff was always informal, and the cost is a one-off: `PRSS.Init()`
 
 **Q: Where does the $$n \leq 15$$ limit come from?**
 
-From the Galois ring. Party indices are embedded as exceptional-set elements, and a degree-4 extension has $$2^4 = 16$$ of them. Building with `all_extension_degrees` raises it. Nothing in the paper mentions this; it is an artefact of the [ACD+19] machinery the implementation chose.
+From the Galois ring. Party indices are embedded as exceptional-set elements, and a degree-4 extension has $$2^4 = 16$$ of them. Building with `all_extension_degrees` raises it. Nothing in the paper mentions this; it is an artefact of the [ACD+19] Galois ring sharing the implementation chose.
 
 **Q: Is bit decomposition better than noise flooding?**
 

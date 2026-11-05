@@ -2,6 +2,7 @@
 layout: post
 title: "Aztec Contract Standards — AIP-20, AIP-721, ARC-1155, ARC-403, AIP-4626 and the Escrow Standard"
 date:   2026-09-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -15,7 +16,7 @@ Ethereum has ERC-20, ERC-721, ERC-1155 and ERC-4626, and a wallet, an exchange o
 
 The standards that fill that role are maintained by Wonderland in the `defi-wonderland/aztec-standards` repository and mirrored in the Aztec developer documentation. They are numbered after their Ethereum counterparts where one exists: AIP-20 (fungible token), AIP-721 (NFT), AIP-4626 (tokenized vault), with the newer ARC-1155 multi-token and the ARC-403 authorization hook, plus an Escrow standard with no ERC equivalent and two utilities. The repository mixes two prefixes, AIP for the older documents and ARC for the newer ones; they name the same family, and this article uses whichever spelling the repository does for each standard.
 
-This article is the map. It reads every contract in the repository at one pinned commit, explains the conventions all of them share, then walks through each standard by what it adds and what it deliberately leaves out. A companion article covers [AIP-20 alone in depth and against ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/); this one stays at the level of the family.
+This article reads every contract in the repository at one pinned commit, explains the conventions all of them share, then walks through each standard by what it adds and what it deliberately leaves out. A companion article covers [AIP-20 alone in depth and against ERC-20 and ERC-7984]({{site.url_complet}}/2026/09/11/aip-20-aztec-token-standard-vs-erc-20-erc-7984/); this one stays at the level of the family.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -43,7 +44,9 @@ The standards are consistent enough that learning one teaches most of the others
 
 ### Two balances per account
 
-Every asset contract keeps a *private* balance and a *public* balance for each account. The public one is ordinary sequencer state, a `Map<AztecAddress, PublicMutable<u128>>` for tokens or a `Map<Field, PublicMutable<AztecAddress>>` of owners for NFTs, and behaves like an EVM mapping. The private one is a set of *notes*, small structs whose hash sits in the chain's note hash tree and whose plaintext only the owner's PXE (the private execution environment on the user's device) holds. Spending a note emits its nullifier; nobody else can tell which note was spent or by whom. The [protocol article]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/) on this site covers the machinery; here it is enough that a private balance is a bag of notes and a public balance is an integer.
+Every asset contract keeps a *private* balance and a *public* balance for each account. The public one is ordinary sequencer state, a `Map<AztecAddress, PublicMutable<u128>>` for tokens or a `Map<Field, PublicMutable<AztecAddress>>` of owners for NFTs, and behaves like an EVM mapping.
+
+The private one is a set of *notes*, small structs whose hash sits in the chain's note hash tree and whose plaintext only the owner's PXE (the private execution environment on the user's device) holds. Spending a note emits its nullifier; nobody else can tell which note was spent or by whom. The [protocol article]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/) on this site covers the machinery; here it is enough that a private balance is a bag of notes and a public balance is an integer.
 
 Each standard defines its own note type: `UintNote { owner, randomness, value: u128 }` for AIP-20, `NFTNote { token_id }` for AIP-721, `MultiTokenNote { token_id, value }` for ARC-1155. All three support *partial notes* (below).
 
@@ -60,7 +63,9 @@ Aztec executes private functions before public ones and a private function canno
 
 ### `from` plus `nonce` instead of `approve`
 
-No standard has `approve`, `allowance` or `transferFrom`. Every spending function takes a `from` and a `nonce` and carries the `#[authorize_once("from", "_nonce")]` macro. When `from` is the caller, the nonce must be zero and no further check runs. When it is not, the macro demands an *authentication witness* (authwit): a signature by `from`'s account contract over the exact call, including the nonce, verified inside the proof for private functions and read from an on-chain registry for public ones, and nullified so it works once. The [account-abstraction article]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/) covers the witness format; for the standards, the consequences are that authorisation is per call rather than per amount, and that a single call can authorise only one `from`.
+No standard has `approve`, `allowance` or `transferFrom`. Every spending function takes a `from` and a `nonce` and carries the `#[authorize_once("from", "_nonce")]` macro. When `from` is the caller, the nonce must be zero and no further check runs. When it is not, the macro demands an *authentication witness* (authwit): a signature by `from`'s account contract over the exact call, including the nonce, verified inside the proof for private functions and read from an on-chain registry for public ones, and nullified so it works once.
+
+The [account-abstraction article]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/) covers the witness format; for the standards, the consequences are that authorisation is per call rather than per amount, and that a single call can authorise only one `from`.
 
 ### Commitments, for a recipient fixed before the amount
 
@@ -88,7 +93,7 @@ minter: PublicImmutable<AztecAddress, Context>,
 auth_contract: PublicImmutable<AztecAddress, Context>,
 ```
 
-It has two supply models chosen at construction: `constructor_with_initial_supply` mints everything publicly to one address and leaves `minter` unset, so minting is permanently disabled; `constructor_with_minter` names a single immutable minter (a bridge, a vault, a faucet) that can call `mint_to_public`, `mint_to_private` and `mint_to_commitment`.
+It has two supply models chosen at construction: `constructor_with_initial_supply` mints everything publicly to one address and leaves `minter` unset, so minting is permanently disabled; `constructor_with_minter` names a single immutable minter, such as a bridge, a vault or a faucet, that can call `mint_to_public`, `mint_to_private` and `mint_to_commitment`.
 
 And `total_supply` is public. Every private mint or burn enqueues a public supply update and emits `Transfer(0x0, PRIVATE_ADDRESS, amount)`, so the *amount* of a private mint is visible even though the recipient is not. This is the one place where the family's privacy differs by standard: ARC-1155 has no `total_supply` and leaks nothing on a private mint.
 
@@ -148,7 +153,16 @@ The interesting design problem is that the exchange rate is public state, and a 
 
 The ordering inside the private half is itself a security decision: the asset transfer happens before the share mint, a comment in the source noting it "neutralizes ARC-403 reentrancy", since the asset token may call an external hook.
 
-Conversion uses a virtual-shares offset, `shares = assets · (total_supply + vault_offset) / (total_assets + 1)`, the OpenZeppelin defence against inflation attacks on an empty vault; choosing the offset is left to the deployer. The README is candid about the standard's status: the multiplication can overflow `u128` for large inputs (an open TODO), `max_*` and `preview_*` are advisory and see only public share balances, assets sent to the vault's *private* balance are unrecoverable because the vault has no keys, and several `*_public_to_private*` functions can leak the `to` address because every other argument is public and the authwit hash can be brute-forced over candidate recipients. The section is headed "not yet production-ready".
+Conversion uses a virtual-shares offset, `shares = assets · (total_supply + vault_offset) / (total_assets + 1)`, the OpenZeppelin defence against inflation attacks on an empty vault; choosing the offset is left to the deployer.
+
+The README is candid about the standard's status:
+
+- The multiplication can overflow `u128` for large inputs (an open TODO).
+- `max_*` and `preview_*` are advisory and see only public share balances.
+- Assets sent to the vault's *private* balance are unrecoverable because the vault has no keys.
+- Several `*_public_to_private*` functions can leak the `to` address because every other argument is public and the authwit hash can be brute-forced over candidate recipients.
+
+The section is headed "not yet production-ready".
 
 Deployment needs a `VaultDeployer`: a disposable contract, one instance per vault, whose private initializer derives both addresses, publishes both instances, enqueues both constructors and links them with `set_shares_token`. A reusable public factory is not possible yet because instance publication is a private-only operation.
 
@@ -182,7 +196,16 @@ Reading the repository as a whole, some absences are as informative as the conte
 
 ## Conclusion
 
-The Aztec standards are a single design applied five times. Each asset gives every account a private note balance and a public balance, names its transfers by the domains they cross, authorises third-party spending with a per-call authwit carried in `from` and `nonce`, uses partial-note commitments when a recipient must be fixed before an amount, and emits ERC-shaped events with a `PRIVATE_ADDRESS` sentinel on the public side only. AIP-20 sets the pattern and keeps a public total supply; AIP-721 swaps balances for ownership maps and drops the hook; ARC-1155 folds many ids into one note set and drops total supply so that private mints leak nothing; ARC-403 externalises policy into a contract that sees the spender, the amount and the function but never the recipient; AIP-4626 splits vault and share token and offers a standard and an exact pattern for private legs, with several documented limits; the Escrow standard gives a contract keys and a salt-encoded owner so that a policy contract can hold private funds without any public footprint.
+The Aztec standards are a single design applied five times. Each asset gives every account a private note balance and a public balance, names its transfers by the domains they cross, authorises third-party spending with a per-call authwit carried in `from` and `nonce`, uses partial-note commitments when a recipient must be fixed before an amount, and emits ERC-shaped events with a `PRIVATE_ADDRESS` sentinel on the public side only.
+
+Standard by standard:
+
+- **AIP-20** sets the pattern and keeps a public total supply.
+- **AIP-721** swaps balances for ownership maps and drops the hook.
+- **ARC-1155** folds many ids into one note set and drops total supply so that private mints leak nothing.
+- **ARC-403** externalises policy into a contract that sees the spender, the amount and the function but never the recipient.
+- **AIP-4626** splits vault and share token and offers a standard and an exact pattern for private legs, with several documented limits.
+- **The Escrow standard** gives a contract keys and a salt-encoded owner so that a policy contract can hold private funds without any public footprint.
 
 For an integrator, the practical summary is that the family is consistent enough that the conventions transfer between contracts, and that the places where privacy is weaker than it looks are documented in the READMEs rather than hidden: the public supply in AIP-20, the public side of every cross-domain move, the `to` leak in some vault functions, and the vault's open overflow issue.
 
@@ -245,7 +268,9 @@ Two ways. In the standard pattern the caller supplies both `assets` and `shares`
 
 **Q: Why does an Escrow need keys, and how does it know its owner without storage?**
 
-A contract can only read a note with the incoming-viewing key and spend it with the nullifier key, so a contract that holds private balances must have a key set; the escrow derives its keys from a single secret key that the Logic contract shares with participants through a private log. The owner is the address encoded in the contract instance's salt, which is part of the address derivation, so it is immutable and needs no storage; the escrow's only check is that `msg_sender` equals that salt.
+A contract can only read a note with the incoming-viewing key and spend it with the nullifier key, so a contract that holds private balances must have a key set; the escrow derives its keys from a single secret key that the Logic contract shares with participants through a private log.
+
+The owner is the address encoded in the contract instance's salt, which is part of the address derivation, so it is immutable and needs no storage; the escrow's only check is that `msg_sender` equals that salt.
 
 **Q: An application wants to hide the amounts of private mints. Which token standard should it use and why?**
 
@@ -253,7 +278,10 @@ ARC-1155. AIP-20 keeps a public `total_supply`, and every private mint or burn e
 
 **Q: What can an outside observer learn from each kind of operation?**
 
-From a private-to-private transfer, mint-to-private on ARC-1155, or an escrow withdrawal: only nullifiers and note hashes that cannot be linked to accounts. From a cross-domain transfer: the public party and the amount (or token id), with the private party replaced by the sentinel. From a public-to-public transfer, a public mint or burn, or an AIP-20 private mint's supply update: everything, as on Ethereum. From the vault's `*_public_to_private*` functions: possibly the recipient, through the documented authwit brute-force.
+- From a private-to-private transfer, mint-to-private on ARC-1155, or an escrow withdrawal: only nullifiers and note hashes that cannot be linked to accounts.
+- From a cross-domain transfer: the public party and the amount (or token id), with the private party replaced by the sentinel.
+- From a public-to-public transfer, a public mint or burn, or an AIP-20 private mint's supply update: everything, as on Ethereum.
+- From the vault's `*_public_to_private*` functions: possibly the recipient, through the documented authwit brute-force.
 
 ## References
 

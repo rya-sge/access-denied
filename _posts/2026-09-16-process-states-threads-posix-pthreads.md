@@ -2,6 +2,7 @@
 layout: post
 title: "Process States, Threads and the POSIX Threads Library"
 date:   2026-09-16
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: linux programmation
@@ -50,7 +51,7 @@ Each arrow in the state diagram corresponds to one of the events discussed in th
 - **Waiting → Ready.** The event the process was waiting for occurs: the I/O completes, the resource is released, the child exits. The kernel **wakes** the process by moving it back to the ready queue. It does not run immediately; it competes with the other ready processes.
 - **Running → Zombie.** The process calls `exit()`, or returns from `main()`, or is killed. Its status is stored in its PCB and its parent is notified.
 
-Two transitions are absent from the diagram, and their absence says as much as the arrows. A process never goes from Waiting straight to Running: being woken only makes it eligible, and the scheduler still has to pick it. And a process never goes from Ready to Waiting: only a running process can issue the request that blocks it.
+Two transitions are absent from the diagram. A process never goes from Waiting straight to Running: being woken only makes it eligible, and the scheduler still has to pick it. And a process never goes from Ready to Waiting: only a running process can issue the request that blocks it.
 
 ### One list per state
 
@@ -163,7 +164,7 @@ The function returns `0` on success and an error number on failure. Unlike most 
 int pthread_join(pthread_t thread, void **retval);
 ```
 
-The calling thread blocks until `thread` terminates, and the value that thread returned is stored through `retval` if it is not `NULL`. Joining also releases the terminated thread's resources, exactly as `waitpid()` releases a zombie's PCB; a thread that is never joined (and was not created detached) keeps its TCB and stack allocated until the process exits.
+The calling thread blocks until `thread` terminates, and the value that thread returned is stored through `retval` if it is not `NULL`. Joining also releases the terminated thread's resources, exactly as `waitpid()` releases a zombie's PCB; a thread that is never joined and was not created detached keeps its TCB and stack allocated until the process exits.
 
 A thread terminates in one of two ways. It can **return from its start routine**, which the lecture notes is the normal case when there is no particular value to hand back; the return value of the function becomes the value delivered by `pthread_join()`. Or it can call [`pthread_exit()`](https://man7.org/linux/man-pages/man3/pthread_exit.3.html) from any depth of its call stack:
 

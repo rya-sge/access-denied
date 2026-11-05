@@ -2,6 +2,7 @@
 layout: post
 title: "The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions"
 date:   2026-08-24
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography
@@ -15,7 +16,7 @@ isMath: true
 
 SHA-3 is not a replacement for SHA-2, and it was not standardized because SHA-2 was failing. Both families remain approved, both are recommended, and [FIPS 180-4](https://doi.org/10.6028/NIST.FIPS.180-4) was never withdrawn. What SHA-3 provides is a second family built on different principles, so that a break in one leaves the other standing.
 
-This article covers why NIST ran the competition, what the standard actually specifies, how the four SHA3 hash functions compare with their SHA-2 counterparts, and the conformance rules governing what an implementation may and may not claim. The extendable-output half of the standard is treated separately in [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/), which goes into the sponge construction and the XOF-specific hazards in more depth.
+This article covers why NIST ran the competition, what the standard specifies, how the four SHA3 hash functions compare with their SHA-2 counterparts, and the conformance rules governing what an implementation may and may not claim. The extendable-output half of the standard is treated separately in [SHAKE128 — The Extendable-Output Function of the SHA-3 Standard]({{site.url_complet}}/2026/08/24/shake128-extendable-output-function-fips-202/), which goes into the sponge construction and the XOF-specific hazards in more depth.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -23,9 +24,9 @@ This article covers why NIST ran the competition, what the standard actually spe
 
 ## Why NIST Ran a Hash Competition
 
-Between 2004 and 2005 the cryptanalytic ground under the deployed hash functions shifted. Xiaoyun Wang and co-authors published practical collisions for MD5, collisions for SHA-0, and a collision attack on SHA-1 requiring roughly $$2^{69}$$ operations rather than the $$2^{80}$$ a 160-bit output should demand. MD5 and SHA-1 were the two hash functions the internet actually ran on.
+Between 2004 and 2005 the cryptanalytic ground under the deployed hash functions shifted. Xiaoyun Wang and co-authors published practical collisions for MD5, collisions for SHA-0, and a collision attack on SHA-1 requiring roughly $$2^{69}$$ operations rather than the $$2^{80}$$ a 160-bit output should demand. MD5 and SHA-1 were the two hash functions the internet ran on.
 
-The immediate concern was not SHA-2, which resisted those techniques and still does. The concern was structural. MD5, SHA-1 and SHA-2 are all **Merkle-Damgård** constructions, iterating a compression function over message blocks, and SHA-2 inherits a good deal of design DNA from SHA-1. An advance that generalized from SHA-1 to SHA-2 was not obviously impossible, and had it arrived, every approved hash function would have fallen at once. There was no second option to migrate to.
+The immediate concern was not SHA-2, which resisted those techniques and still does. The concern was the shared construction: MD5, SHA-1 and SHA-2 are all **Merkle-Damgård** constructions, iterating a compression function over message blocks, and SHA-2 inherits a good deal of design DNA from SHA-1. An advance that generalized from SHA-1 to SHA-2 was not obviously impossible, and had it arrived, every approved hash function would have fallen at once. There was no second option to migrate to.
 
 NIST announced the SHA-3 competition in November 2007 on that reasoning. It received 64 submissions, of which 51 met the requirements for the first round; 14 advanced to the second; five became finalists, namely BLAKE, Grøstl, JH, Keccak and Skein. On 2 October 2012 NIST selected **Keccak**, designed by Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche. Daemen was already a co-designer of Rijndael, which had become AES through the same kind of open process.
 
@@ -117,7 +118,7 @@ SHA3-512("") = a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a6
 SHA3-256("abc") = 3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532
 ```
 
-Note the direction of the capacity trade. SHA3-512 withholds 1024 of the 1600 state bits, so only 72 bytes of message are absorbed per invocation of the permutation, against 136 for SHA3-256. **SHA3-512 is therefore close to twice as slow as SHA3-256**, which inverts the intuition carried over from SHA-2, where SHA-512 is often the faster of the two on 64-bit hardware because it processes larger blocks with the same number of rounds.
+SHA3-512 withholds 1024 of the 1600 state bits, so only 72 bytes of message are absorbed per invocation of the permutation, against 136 for SHA3-256. **SHA3-512 is therefore close to twice as slow as SHA3-256**, which inverts the intuition carried over from SHA-2, where SHA-512 is often the faster of the two on 64-bit hardware because it processes larger blocks with the same number of rounds.
 
 ## The Sponge and the Permutation, Briefly
 
@@ -153,7 +154,7 @@ FIPS 202 draws several lines that matter to anyone claiming compliance.
 - **SHAKE128 and SHAKE256 are approved XOFs but are not approved as hash functions.** Their approved uses are left to NIST Special Publications, and the reason for the distinction is the related-output property described in Annex A.2 of the standard.
 - **`KECCAK-p[1600, 24]` is approved only inside an approved mode**, as are `KECCAK[c]` and the RawSHAKE functions.
 - **Conformance is tested through the Cryptographic Algorithm Validation Program.** Only validated implementations comply.
-- **An implementation may restrict** the message bit lengths and XOF output lengths it supports, at the cost of interoperability. It may also replace any procedure in the standard with a mathematically equivalent one, which is what permits the lane-oriented implementations everyone actually writes.
+- **An implementation may restrict** the message bit lengths and XOF output lengths it supports, at the cost of interoperability. It may also replace any procedure in the standard with a mathematically equivalent one, which is what permits the lane-oriented implementations everyone writes.
 
 For HMAC, the input block size $$B$$ is the rate in bytes, which is not the value a developer carrying habits over from SHA-2 would guess:
 
@@ -178,7 +179,9 @@ Ethereum's opcode was in fact named `SHA3` for years before being renamed `KECCA
 
 ## Conclusion
 
-FIPS 202 standardizes a hash family built on a sponge over the `KECCAK-p[1600, 24]` permutation, alongside rather than in place of SHA-2. The four SHA3 hash functions match SHA-2's digest lengths, set their capacity at twice the digest length to reach the preimage resistance a random function of that size would offer, and gain two properties SHA-2 lacks: immunity to length extension, and second preimage resistance that does not decay with message length. The cost is software speed on CPUs that accelerate SHA-256 and not Keccak, which is the main reason SHA-2 remains the default a decade after publication. The standard also draws its approval boundaries narrowly: the permutation is approved only inside an approved mode, and the two SHAKE functions are approved as XOFs and deliberately not as hash functions.
+FIPS 202 standardizes a hash family built on a sponge over the `KECCAK-p[1600, 24]` permutation, alongside rather than in place of SHA-2. The four SHA3 hash functions match SHA-2's digest lengths, set their capacity at twice the digest length to reach the preimage resistance a random function of that size would offer, and gain two properties SHA-2 lacks: immunity to length extension, and second preimage resistance that does not decay with message length.
+
+The cost is software speed on CPUs that accelerate SHA-256 and not Keccak, which is the main reason SHA-2 remains the default a decade after publication. The standard also draws its approval boundaries narrowly: the permutation is approved only inside an approved mode, and the two SHAKE functions are approved as XOFs and deliberately not as hash functions.
 
 ![Mindmap of FIPS 202 covering the competition, the three specification layers, the four hash functions, the SHA-2 contrast, conformance rules and the keccak256 confusion]({{site.url_complet}}/assets/article/cryptographie/sha3/2026-08-24-sha3-standard-fips-202.png)
 
@@ -206,7 +209,7 @@ FIPS 202 standardizes a hash family built on a sponge over the `KECCAK-p[1600, 2
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | A SHA3 function is chosen where a fixed-length digest is required, not a truncated SHAKE output. | SHAKE is not approved as a hash function, and its outputs at different lengths are prefixes of one another. |
-| ☐ | The digest length is chosen for the collision resistance actually needed, at $$d/2$$ bits. | SHA3-224 provides 112-bit collision resistance, below the 128-bit floor most current policy requires. |
+| ☐ | The digest length is chosen for the collision resistance needed, at $$d/2$$ bits. | SHA3-224 provides 112-bit collision resistance, below the 128-bit floor most current policy requires. |
 | ☐ | `KECCAK-p[1600, 24]` is used only inside an approved mode, never as a bare primitive under a custom construction. | The result falls outside FIPS 202 and carries none of the standard's analysis or validation. |
 | ☐ | Claims of conformance rest on CAVP validation, not on passing a handful of self-selected vectors. | An implementation correct on short inputs can still fail on multi-block or boundary-length messages. |
 
@@ -273,7 +276,11 @@ The two therefore produce completely different digests for the same input, and n
 
 **Q: Why has SHA-3 adoption been slow?**
 
-Three reasons compound. SHA-2 is not broken, so there is no forcing event of the kind that moved deployments off MD5 and SHA-1. SHA-3 is generally slower in software on general-purpose CPUs, and the SHA-256 instructions now present on mainstream x86 and ARM parts widen that gap, since no equivalent acceleration for Keccak is as widely available. And migrating a hash function means touching protocols, certificates and stored digests across a whole system for a benefit that is contingent on a future attack.
+Three reasons compound.
+
+- SHA-2 is not broken, so there is no forcing event of the kind that moved deployments off MD5 and SHA-1.
+- SHA-3 is generally slower in software on general-purpose CPUs, and the SHA-256 instructions now present on mainstream x86 and ARM parts widen that gap, since no equivalent acceleration for Keccak is as widely available.
+- Migrating a hash function means touching protocols, certificates and stored digests across a whole system for a benefit that is contingent on a future attack.
 
 Where SHA-3 has become established is in new designs with no legacy: the post-quantum standards ML-KEM, ML-DSA and SLH-DSA all build on SHAKE, and hardware implementations benefit from Keccak's compact, parallel structure.
 

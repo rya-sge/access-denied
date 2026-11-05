@@ -2,7 +2,7 @@
 layout: post
 title: "How Morpho Vault V2 Works - Adapters, Caps, Timelocks and In-Kind Redemption"
 date:   2026-10-10
-last_modified_at: 2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -78,7 +78,9 @@ interface IAdapter {
 }
 ```
 
-`allocate` and `deallocate` move funds in and out of the target protocol and return two things: the list of **ids** the position belongs to, and the **change** in the value of the position. `realAssets` returns the current value of everything the adapter holds. The vault never inspects the target protocol; it trusts the adapter's report. This is why the choice of adapters is a curator decision, behind a timelock, and why a registry can restrict it further. The rules an adapter must follow, the three adapters in the repository and the Vault V1 adapter's caveats are covered in [Morpho Vault V2 Adapters - How a Vault Allocates, and Why It Wraps a Vault V1]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/).
+`allocate` and `deallocate` move funds in and out of the target protocol and return two things: the list of **ids** the position belongs to, and the **change** in the value of the position. `realAssets` returns the current value of everything the adapter holds.
+
+The vault never inspects the target protocol; it trusts the adapter's report. This is why the choice of adapters is a curator decision, behind a timelock, and why a registry can restrict it further. The rules an adapter must follow, the three adapters in the repository and the Vault V1 adapter's caveats are covered in [Morpho Vault V2 Adapters - How a Vault Allocates, and Why It Wraps a Vault V1]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/).
 
 ## Roles
 
@@ -395,7 +397,7 @@ The configuration figures below come from Sentora RLUSD Main (`0x6dC58a0FdfC8D69
 
 #### Smart contracts and transparency
 
-- **The core cannot be upgraded, in either direction.** `VaultV2` has no proxy (see [From MetaMorpho to Vault V2](#from-metamorpho-to-vault-v2)). The observed vault is verified on Etherscan as `VaultV2` (Solidity 0.8.28), was created on 4 March 2026 at block 24,587,448 by a contract verified as `VaultV2Factory` (`0xA1D94F746dEfa1928926b84fB2596c06926C0405`), and that factory's `isVaultV2` returns true for it. A bug found in the vault cannot be patched: the remedy is for depositors to leave and for the curator to open a new vault. In return, nobody can replace the logic with a malicious or faulty version, and the ceilings described above (50 % performance fee, 5 % a year management fee, 2 % force-deallocation penalty, 200 % a year `maxRate`) and the timelock mechanics cannot change under a depositor.
+- **The core cannot be upgraded, in either direction.** `VaultV2` has no proxy (see [From MetaMorpho to Vault V2](#from-metamorpho-to-vault-v2)). The observed vault is verified on Etherscan as `VaultV2` (Solidity 0.8.28), was created on 4 March 2026 at block 24,587,448 by a contract verified as `VaultV2Factory` (`0xA1D94F746dEfa1928926b84fB2596c06926C0405`), and that factory's `isVaultV2` returns true for it. A bug found in the vault cannot be patched: the remedy is for depositors to leave and for the curator to open a new vault. In return, nobody can replace the logic with a malicious or faulty version, and neither the ceilings described above nor the timelock mechanics can change under a depositor. Those ceilings are a 50 % performance fee, a 5 % a year management fee, a 2 % force-deallocation penalty and a 200 % a year `maxRate`.
 - **The configuration is what moves.** Which adapters hold the funds, how much each id may receive, the fees, the gates and the timelocks are state written by the roles. For a depositor, the upgrade question of an upgradeable protocol becomes a governance question here, covered under [Centralisation and governance](#centralisation-and-governance) below (*derived*).
 - **Audits and formal verification.** The repository's `audits` folder holds reports by Spearbit (several rounds), Zellic, a public competition, Blackthorn and ChainSecurity for the vault, and Blackthorn, Certora and Spearbit for the market adapter; a `certora` folder holds formal-verification specifications. This article did not compare the deployed bytecode with the pinned commit, which is later than the vault's creation (see [Gaps](#gaps)).
 - **Accounting that integrators misread.** The `max*` functions returning zero, `totalSupply` without pending fee shares, stale allocations and caps checked only on allocation are listed in the [Integration Notes](#integration-notes). They are traps for code built on top of the vault rather than flaws in its own accounting.
@@ -485,11 +487,15 @@ The roles of the observed vault, read with `owner()`, `curator()`, `isSentinel` 
 
 **Q: What does an adapter return to the vault, and why does the vault need both values?**
 
-On `allocate` and `deallocate`, an adapter returns a list of ids and the signed change in the value of the position. The vault adds the change to the allocation of each id, then checks the caps of each id. The ids say which risk factors the position belongs to, and the change says by how much the exposure to each of them moved. Separately, `realAssets()` gives the total value the adapter holds, which the vault uses to compute interest and losses.
+On `allocate` and `deallocate`, an adapter returns a list of ids and the signed change in the value of the position. The vault adds the change to the allocation of each id, then checks the caps of each id. The ids say which risk factors the position belongs to, and the change says by how much the exposure to each of them moved.
+
+Separately, `realAssets()` gives the total value the adapter holds, which the vault uses to compute interest and losses.
 
 **Q: Why is the relative cap measured against `firstTotalAssets` rather than the current total assets?**
 
-If it were measured against the live total, an allocator could flash-borrow a large amount, deposit it, allocate a large position against the inflated total, then withdraw and repay within the same transaction, leaving an allocation far above the intended fraction. `firstTotalAssets` is fixed at the first accrual of the transaction, so a deposit made later in the same transaction does not raise the base. The source notes that this makes the check conservative: a large deposit routed through the liquidity adapter can revert even when it would be within the cap afterwards.
+If it were measured against the live total, an allocator could flash-borrow a large amount, deposit it, allocate a large position against the inflated total, then withdraw and repay within the same transaction, leaving an allocation far above the intended fraction. `firstTotalAssets` is fixed at the first accrual of the transaction, so a deposit made later in the same transaction does not raise the base.
+
+The source notes that this makes the check conservative: a large deposit routed through the liquidity adapter can revert even when it would be within the cap afterwards.
 
 **Q: A curator has set a seven-day timelock on `addAdapter`. How long does it take to add an adapter, and how long to reduce that timelock to one day?**
 
@@ -497,7 +503,11 @@ Adding an adapter takes seven days from the `submit` call. Reducing the timelock
 
 **Q: Real interest across the markets is 8 % per year but the vault reports 5 %. What could explain it, and what happens to the difference?**
 
-The most likely explanation is a `maxRate` set at 5 % per year. `accrueInterest` takes the minimum of the real assets and the stored total grown at `maxRate`, so the excess is not distributed and stays in the vault as unaccounted value. It is distributed later, at most at `maxRate`, when real growth falls below the cap, and it acts as a buffer: a later loss smaller than the buffer reduces real assets without lowering them below the distributed total. The performance fee is computed on the distributed 5 %, not the real 8 %, and the management fee, taken on total assets, also reduces the net rate.
+The most likely explanation is a `maxRate` set at 5 % per year. `accrueInterest` takes the minimum of the real assets and the stored total grown at `maxRate`, so the excess is not distributed and stays in the vault as unaccounted value.
+
+It is distributed later, at most at `maxRate`, when real growth falls below the cap, and it acts as a buffer: a later loss smaller than the buffer reduces real assets without lowering them below the distributed total.
+
+The performance fee is computed on the distributed 5 %, not the real 8 %, and the management fee, taken on total assets, also reduces the net rate.
 
 **Q: A vault's only liquid market has no liquidity left and allocators are not acting. How can a depositor exit, and what does it cost?**
 
@@ -515,7 +525,9 @@ ERC-4626 allows `max*` functions to underestimate, and returning zero is the ext
 
 **Q: Which roles can reduce risk in an emergency, and which actions are available to them immediately?**
 
-Both the curator and the sentinels can act without delay. They can decrease absolute and relative caps, which stops new allocations to a market or collateral, and revoke any pending curator change. Sentinels can also call `deallocate` to pull funds from an adapter to idle. Allocators can deallocate too, and can set the liquidity adapter, but they cannot change caps. None of these roles can add risk without a timelock.
+Both the curator and the sentinels can act without delay. They can decrease absolute and relative caps, which stops new allocations to a market or collateral, and revoke any pending curator change. Sentinels can also call `deallocate` to pull funds from an adapter to idle.
+
+Allocators can deallocate too, and can set the liquidity adapter, but they cannot change caps. None of these roles can add risk without a timelock.
 
 ## Gaps
 

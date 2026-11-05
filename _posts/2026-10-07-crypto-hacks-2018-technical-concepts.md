@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2018 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security solidity
@@ -79,7 +80,7 @@ flowchart LR
     E --> F["_from debited by 0"]
 ```
 
-The fixes are the ones that became standard: SafeMath on every operation in pre-0.8 code, checked arithmetic by default since Solidity 0.8, and `unchecked` blocks only where an overflow is provably impossible. Overflow also hit EOS that year (EOS Fomo3D lost 60,686 EOS when its pot went negative) and Tron (Tronwin, 2M TRX in December): the bug is a language default, not an Ethereum problem.
+The fixes are the ones that became standard: SafeMath on every operation in pre-0.8 code, checked arithmetic by default since Solidity 0.8, and `unchecked` blocks only where an overflow is provably impossible. Overflow also hit EOS that year, where EOS Fomo3D lost 60,686 EOS when its pot went negative, and Tron (Tronwin, 2M TRX in December): the bug is a language default, not an Ethereum problem.
 
 ### A missing allowance check (EDU, BAI)
 

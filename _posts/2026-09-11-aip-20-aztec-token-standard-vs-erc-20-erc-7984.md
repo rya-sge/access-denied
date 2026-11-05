@@ -2,7 +2,7 @@
 layout: post
 title: "AIP-20, the Aztec Token Standard, Compared with ERC-20 and ERC-7984"
 date:   2026-09-11
-last_modified_at: 2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -62,7 +62,9 @@ Three details are worth reading off this struct before looking at any function.
 - **Name and symbol are `FieldCompressedString`**, a string of at most 31 bytes packed into one field. The constructors take `str<31>`. An ERC-20 name longer than 31 characters cannot be represented.
 - **`total_supply` is public** and lives next to the private balances. This is a deliberate design choice with a privacy cost discussed below.
 
-`private_balances` is an `Owned<BalanceSet>`. `BalanceSet` is a set of `UintNote`s keyed by owner, with `add(amount)` (create a note) and `try_sub(amount, max_notes)` (consume up to `max_notes` notes and return their sum). `Owned` is the per-owner container for private state, the private counterpart of `Map`, reached with `.at(owner)`. Reading the notes it holds requires their preimages, and only the owner's PXE (the private execution environment on the user's device) has them, which is why `balance_of_private` is a `#[utility]` function rather than a view: it runs unconstrained inside that PXE over the notes it stores. Another contract cannot call it from constrained code, and there is no equivalent of `balanceOf(other)` for private balances at all.
+`private_balances` is an `Owned<BalanceSet>`. `BalanceSet` is a set of `UintNote`s keyed by owner. Its `add(amount)` creates a note, and `try_sub(amount, max_notes)` consumes up to `max_notes` notes and returns their sum. `Owned` is the per-owner container for private state, the private counterpart of `Map`, reached with `.at(owner)`.
+
+Reading the notes it holds requires their preimages, and only the owner's PXE (the private execution environment on the user's device) has them, which is why `balance_of_private` is a `#[utility]` function rather than a view: it runs unconstrained inside that PXE over the notes it stores. Another contract cannot call it from constrained code, and there is no equivalent of `balanceOf(other)` for private balances at all.
 
 The metadata getters are `name()`, `symbol()` and `decimals()`. The RFC lists them as `get_name`, `get_symbol` and `get_decimals`; the implementation dropped the prefix, and the ERC-20 spelling is what ships.
 
@@ -161,7 +163,7 @@ ERC-20's `approve`/`allowance`/`transferFrom` triple is absent. Every spending f
 - If `from == msg_sender`, the account is spending its own tokens; `nonce` **must be zero** and no further check runs.
 - Otherwise the macro demands an *authentication witness* (authwit): a signature by `from`'s account contract over the hash of the exact call (`caller`, function selector, arguments including `nonce`), scoped to this token contract, chain and version. In private context the witness is fetched from the user's PXE and verified inside the proof; in public context it is read from an on-chain authwit registry that `from` populated in advance. Either way a nullifier is emitted so the witness is consumed exactly once.
 
-The difference from an allowance is not cosmetic. An ERC-20 approval is a standing *amount* that any call from the spender can draw against until it is exhausted or revoked, which is why "infinite approval" drains happen. An authwit authorises one *call* with fixed arguments: this spender, this amount, this recipient, this nonce. Repeating the same action needs a new nonce and a new witness. There is no allowance table to read, so `allowance(owner, spender)` has no equivalent, and there is no `Approval` event. The [account-abstraction article]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/) covers how the account contract validates the witness; from the token's point of view the macro is the whole story.
+An ERC-20 approval is a standing *amount* that any call from the spender can draw against until it is exhausted or revoked, which is why "infinite approval" drains happen. An authwit authorises one *call* with fixed arguments: this spender, this amount, this recipient, this nonce. Repeating the same action needs a new nonce and a new witness. There is no allowance table to read, so `allowance(owner, spender)` has no equivalent, and there is no `Approval` event. The [account-abstraction article]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/) covers how the account contract validates the witness; from the token's point of view the macro is the whole story.
 
 One limit: the macro authorises exactly one `from`. A batch that debits several holders in one call cannot be expressed through it.
 
@@ -282,7 +284,9 @@ ERC-20 compliance is a code-level override. ERC-7984's extensions add restrictio
 
 ## Conclusion
 
-AIP-20 is an ERC-20 whose single balance has been split along the private/public seam of the Aztec execution model, and whose one `transfer` has been split into a function per pair of domains. The private side is a note set, so a debit selects and nullifies notes and returns change, bounded at 2 then 8 notes per round; the public side is an ordinary `u128` map with an ERC-20-style event. Authorisation drops `approve` for single-use authwits carried by a `from` plus `nonce` pair, commitments (partial notes) cover the case where the recipient is fixed before the amount is, and ARC-403 lets a policy contract veto spends without seeing recipients. Total supply stays public, which means mint and burn amounts are public even when their owners are not.
+AIP-20 is an ERC-20 whose single balance has been split along the private/public seam of the Aztec execution model, and whose one `transfer` has been split into a function per pair of domains. The private side is a note set, so a debit selects and nullifies notes and returns change, bounded at 2 then 8 notes per round; the public side is an ordinary `u128` map with an ERC-20-style event.
+
+Authorisation drops `approve` for single-use authwits carried by a `from` plus `nonce` pair, commitments (partial notes) cover the case where the recipient is fixed before the amount is, and ARC-403 lets a policy contract veto spends without seeing recipients. Total supply stays public, which means mint and burn amounts are public even when their owners are not.
 
 ERC-7984 keeps one balance and one call signature and encrypts the amounts, at the cost of an operator model with no amount bound, a transfer that cannot revert on shortfall, and a transaction graph that stays fully visible. The two standards are not competing implementations of one idea; they hide different things, fail differently, and put the trust in different places: a client-side proof on one side, a coprocessor and a decryption committee on the other. Which one fits depends on whether the requirement is hidden counterparties or hidden amounts, and on whether the integrator can live with asynchronous reconciliation or with client-side proving.
 
@@ -355,7 +359,9 @@ Because each Aztec account has a private balance and a public balance, and a tra
 
 **Q: What does the `nonce` parameter do, and why must it be zero when I spend my own tokens?**
 
-The nonce exists for the authwit path. When `from` differs from the caller, the token requires a witness signed by `from`'s account contract over the exact call, and the nonce is part of the signed message so that the same action can be authorised more than once with distinct witnesses. When `from` is the caller, no witness is involved, and the macro requires the nonce to be zero, which keeps the two cases distinct and turns a stray non-zero nonce into a visible error instead of an ignored parameter.
+The nonce exists for the authwit path. When `from` differs from the caller, the token requires a witness signed by `from`'s account contract over the exact call, and the nonce is part of the signed message so that the same action can be authorised more than once with distinct witnesses.
+
+When `from` is the caller, no witness is involved, and the macro requires the nonce to be zero, which keeps the two cases distinct and turns a stray non-zero nonce into a visible error instead of an ignored parameter.
 
 **Q: What happens if a private transfer needs more notes than the cap allows?**
 
@@ -367,15 +373,21 @@ Only the recipient is. `mint_to_private` creates the recipient's note in private
 
 **Q: In what sense does ERC-7984 "not revert" on an insufficient balance, and why?**
 
-An FHE contract cannot branch on an encrypted comparison, so it cannot execute `require(balance >= amount)`. Instead `_update` computes an encrypted boolean and selects either `amount` or zero as the transferred value. The transaction succeeds, the event fires with a handle, and the return value is the handle of what was moved. Only a party with decryption rights can tell whether the transfer did anything. AIP-20, whose private functions run on the client with plaintext notes, asserts the balance inside the proof and fails outright.
+An FHE contract cannot branch on an encrypted comparison, so it cannot execute `require(balance >= amount)`. Instead `_update` computes an encrypted boolean and selects either `amount` or zero as the transferred value. The transaction succeeds, the event fires with a handle, and the return value is the handle of what was moved. Only a party with decryption rights can tell whether the transfer did anything.
+
+AIP-20, whose private functions run on the client with plaintext notes, asserts the balance inside the proof and fails outright.
 
 **Q: How do the three standards let a smart contract spend a user's tokens, and what is the risk in each?**
 
-ERC-20 uses an amount allowance: the user approves a spender for an amount, and the risk is a standing (often unlimited) approval that survives long after the interaction. ERC-7984 uses a time-limited operator with no amount bound, because the contract cannot compare against a ciphertext; the risk is that the operator can take the whole balance until expiry. AIP-20 uses an authwit: a single-use signature over one exact call, nullified on consumption; the risk moves to the wallet, which must produce a witness and nonce per action, and the model cannot express a batch that debits several holders.
+- **ERC-20** uses an amount allowance: the user approves a spender for an amount, and the risk is a standing (often unlimited) approval that survives long after the interaction.
+- **ERC-7984** uses a time-limited operator with no amount bound, because the contract cannot compare against a ciphertext; the risk is that the operator can take the whole balance until expiry.
+- **AIP-20** uses an authwit: a single-use signature over one exact call, nullified on consumption; the risk moves to the wallet, which must produce a witness and nonce per action, and the model cannot express a batch that debits several holders.
 
 **Q: A DEX wants to pay a user an amount computed from public reserves. How does each standard handle it?**
 
-ERC-20 has no problem: everything is public and synchronous. ERC-7984 lets the DEX transfer the encrypted output and, with the `AndCall` variants, notifies a recipient contract through a callback; the recipient can react but cannot learn the amount without decryption. AIP-20 uses a commitment: the user initialises a partial note naming themselves as owner in private execution, the DEX completes it with the amount in public execution via `transfer_public_to_commitment` or `mint_to_commitment`, and the result is a private note for the user whose amount was decided after the private phase ended.
+- **ERC-20** has no problem: everything is public and synchronous.
+- **ERC-7984** lets the DEX transfer the encrypted output and, with the `AndCall` variants, notifies a recipient contract through a callback; the recipient can react but cannot learn the amount without decryption.
+- **AIP-20** uses a commitment: the user initialises a partial note naming themselves as owner in private execution, the DEX completes it with the amount in public execution via `transfer_public_to_commitment` or `mint_to_commitment`, and the result is a private note for the user whose amount was decided after the private phase ended.
 
 ## References
 

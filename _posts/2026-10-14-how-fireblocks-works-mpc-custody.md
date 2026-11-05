@@ -2,7 +2,7 @@
 layout: post
 title: "How Fireblocks Works - MPC Custody, Enclaves, HSMs and Lessons from Real Hacks"
 date:   2026-10-14
-last_modified_at: 2026-10-30
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security wallet cryptography
@@ -55,7 +55,11 @@ In the default configuration the signing key is split across three co-signers: t
 
 A **Hosted MPC** variant moves all three shares to the customer: a primary co-signer (mobile or API co-signer) plus customer-run SGX "guard" co-signers.
 
-The customer cannot split its own share into a k-of-n among its staff. The customer side can hold several shares, but they sit side by side and are not combined: according to the [Fireblocks mobile app documentation](https://support.fireblocks.io/hc/en-us/articles/8744575638044-About-the-Fireblocks-mobile-app), every user with the Owner, Admin or Signer role generates a key share of their own in the [secure enclave or TEE of their phone](https://support.fireblocks.io/hc/en-us/articles/9205187986844-Security-aspects-Signing-with-the-Fireblocks-mobile-app), and the Owner approves each new share. Approvers, Editors and Viewers hold no share. Requiring several people on the customer side is a policy setting, not a cryptographic one: a TAP rule names the approvers and their number, and the policy engine releases the request to the co-signers only once they have approved. Hosted MPC is the only option where the customer holds every share needed to sign, and it gets there by replacing Fireblocks' two shares, not by splitting the customer's.
+The customer cannot split its own share into a k-of-n among its staff. The customer side can hold several shares, but they sit side by side and are not combined: according to the [Fireblocks mobile app documentation](https://support.fireblocks.io/hc/en-us/articles/8744575638044-About-the-Fireblocks-mobile-app), every user with the Owner, Admin or Signer role generates a key share of their own in the [secure enclave or TEE of their phone](https://support.fireblocks.io/hc/en-us/articles/9205187986844-Security-aspects-Signing-with-the-Fireblocks-mobile-app), and the Owner approves each new share. Approvers, Editors and Viewers hold no share.
+
+Requiring several people on the customer side is a policy setting, not a cryptographic one: a TAP rule names the approvers and their number, and the policy engine releases the request to the co-signers only once they have approved.
+
+Hosted MPC is the only option where the customer holds every share needed to sign, and it gets there by replacing Fireblocks' two shares, not by splitting the customer's.
 
 ```mermaid
 flowchart LR
@@ -148,7 +152,7 @@ MPC removes the single key, but each share is still a secret on a computer. Fire
 3. The data key is stored in S3, encrypted under a customer-managed KMS key (CMK).
 4. The CMK's key policy only releases the key to an enclave whose attestation document shows the expected measurements; **PCR8** binds it to an image signed by Fireblocks.
 
-The parent EC2 instance therefore only ever sees ciphertext. An attacker with root on the instance, or an AWS operator without the ability to forge an attestation, cannot read the share. The trust base still includes AWS (the Nitro hypervisor and the KMS attestation check) and Fireblocks (whoever signs the image). The [AWS re:Invent session summarised here]({{site.url_complet}}/2025/07/29/aws-blockchain-wallets/) shows the same design from the AWS side.
+The parent EC2 instance therefore only ever sees ciphertext. An attacker with root on the instance, or an AWS operator without the ability to forge an attestation, cannot read the share. The trust base still includes AWS, through the Nitro hypervisor and the KMS attestation check, and Fireblocks, through whoever signs the image. The [AWS re:Invent session summarised here]({{site.url_complet}}/2025/07/29/aws-blockchain-wallets/) shows the same design from the AWS side.
 
 ### Mobile signers
 
@@ -164,7 +168,7 @@ The flow is:
 - The agent forwards each request to a **Customer Server** that the customer builds, which calls the HSM or KMS (on-premises or cloud, hot or cold).
 - Two key types exist: **validation keys**, approved once by the Admin Quorum, and **signing keys**, which must carry a certificate from a validation key plus a proof of ownership.
 
-Two HSM vendors publish Key Link integration guides: [Thales Luna](https://thalesdocs.com/gphsm/integrations/guides/fireblocks/index.html) (secp256k1 ECDSA on Luna 7.x firmware, Ed25519 from firmware 7.8.9, RSA-2048 validation keys) and [Securosys Primus](https://docs.securosys.com/fireblocks/overview). The design is vendor-agnostic, so any HSM or KMS that supports the curve can sit behind the Customer Server, but those are the only documented integrations found for this article.
+Two HSM vendors publish Key Link integration guides: [Thales Luna](https://thalesdocs.com/gphsm/integrations/guides/fireblocks/index.html) and [Securosys Primus](https://docs.securosys.com/fireblocks/overview). The Thales guide covers secp256k1 ECDSA on Luna 7.x firmware, Ed25519 from firmware 7.8.9 and RSA-2048 validation keys. The design is vendor-agnostic, so any HSM or KMS that supports the curve can sit behind the Customer Server, but those are the only documented integrations found for this article.
 
 The security model changes accordingly. With Key Link, the key is a single key protected by the HSM's tamper resistance and access control (see the [PCI PTS HSM article]({{site.url_complet}}/2026/07/20/pci-pts-hsm-security-requirements-v4/) for what an HSM certification checks), and the customer's Customer Server becomes the component that decides what the HSM signs. The protection against a forged request is the customer's own code, not the MPC quorum.
 
@@ -205,7 +209,11 @@ Other teams found comparable bugs: **Alpha-Rays** ([ePrint 2021/1621](https://ep
 | WazirX, Jul 2024 | 235M USD | Remediation: Fireblocks integrated in January 2026 | Safe multisig with Liminal (see below) |
 | Bitget, Sep 2026 | 351.6 to 387.5M USD | Bitget had announced a Fireblocks Off Exchange integration for institutional clients in June 2026 ([TechFlow](https://www.techflowpost.com/en-US/newsletter/125690)); neither [Mandiant's status report](https://img.bgstatic.com/multiLang/events/MFR26-1029_Status_Update_Bitget_0930.pdf) nor [SlowMist's progress report](https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/incident-response/SlowMist%20Investigation%20Progress%20Report%20-%20Bitget_en-us.pdf) mentions Fireblocks, and the stolen hot-wallet funds were signed by Bitget's own wallet system | Third-party security appliances compromised (zero-day on one product from 31 August, an employee identity on the other, per SlowMist), wallet job server taken over, custom tool forging risk-control parameters (see below) |
 
-Fortress Trust is the most instructive case. The attacker never touched a key share; they obtained legitimate access through a vendor and issued transactions the workspace accepted. MPC did nothing against that, and the TAP amount limit is what capped the loss. No public incident was found in which a Fireblocks key share, enclave or cloud co-signer was compromised. StakeHound is the closest case, and it is a loss of availability, not a theft: validator key shares generated by Fireblocks outside its platform could no longer be decrypted, and responsibility is disputed in court. Bitget is listed for its operational lessons; the public reports tie the theft to its own wallet back end, not to its Fireblocks integration. Operationally, third-party trackers report short service disruptions (for example delayed finalisation for about two hours in February 2026), not breaches.
+Fortress Trust is the most instructive case. The attacker never touched a key share; they obtained legitimate access through a vendor and issued transactions the workspace accepted. MPC did nothing against that, and the TAP amount limit is what capped the loss.
+
+No public incident was found in which a Fireblocks key share, enclave or cloud co-signer was compromised. StakeHound is the closest case, and it is a loss of availability, not a theft: validator key shares generated by Fireblocks outside its platform could no longer be decrypted, and responsibility is disputed in court.
+
+Bitget is listed for its operational lessons; the public reports tie the theft to its own wallet back end, not to its Fireblocks integration. Operationally, third-party trackers report short service disruptions (for example delayed finalisation for about two hours in February 2026), not breaches.
 
 ## Comparison with Safe multisig hacks
 
@@ -270,7 +278,7 @@ Mapped onto the controls described above, the attack did not need to break any k
 
 ### Robustness compared
 
-The table below compares the schemes on the failure modes that actually caused losses. It is a qualitative reading of the documented designs and incidents, not a benchmark.
+The table below compares the schemes on the failure modes that caused losses. It is a qualitative reading of the documented designs and incidents, not a benchmark.
 
 | Failure mode | Safe multisig (default use) | Fireblocks MPC | HSM-only custody (incl. Key Link) | In-house signing service |
 |--------------|-----------------------------|----------------|-----------------------------------|--------------------------|
@@ -286,9 +294,11 @@ Three observations follow from the incidents.
 
 - **The signature scheme was rarely the weak point.** Bybit, WazirX and Radiant all used a sound multisig with hardware wallets, and the keys were never extracted. The attack replaced *what* was signed. MPC removes the key-theft class but does not solve this one by itself.
 - **The decisive control is independent verification at the signer.** Fireblocks' answer is that the policy engine, running in enclaves on Fireblocks' side, checks destination and amount against rules that an attacker on the customer's front end cannot change without the admin quorum. That defence holds only as long as the rules are restrictive (whitelisted destinations, low limits on hot vaults). A workspace with a permissive `ALLOW` rule is close to a blind signer.
-- **The same failure hits non-multisig systems.** Bitget lost up to 387.5 million USD in September 2026 when attackers, entering through two compromised third-party security appliances (one through a zero-day, the other with an employee's identity), took over the wallet job server and forged the risk-control parameters; Bitget's own wallet system then signed the transfers (see [Bitget, September 2026](#bitget-september-2026), based on the Mandiant and SlowMist reports). BigONE (July 2025) failed the same way. The problem is a signer that trusts the host telling it what to sign, whatever the key scheme.
+- **The same failure hits non-multisig systems.** Bitget lost up to 387.5 million USD in September 2026. Attackers entered through two compromised third-party security appliances, one through a zero-day and the other with an employee's identity. They took over the wallet job server and forged the risk-control parameters, and Bitget's own wallet system then signed the transfers. The section [Bitget, September 2026](#bitget-september-2026) gives the account, based on the Mandiant and SlowMist reports. BigONE (July 2025) failed the same way. The problem is a signer that trusts the host telling it what to sign, whatever the key scheme.
 
-There is also a cost on the Fireblocks side of the ledger. A Safe's signer set and threshold can be read by anyone on-chain; a Fireblocks wallet is an ordinary address, and the customer must trust Fireblocks' SGX deployment, its image signing and its policy engine. The Bybit theft itself started with the compromise of a wallet vendor's developer, and Fireblocks is a wallet vendor whose cloud co-signers take part in every signature. Taylor Monahan's remark after Bybit, that adding security products can make "your attack surface LARGER" ([Blockworks](https://www.blockworks.com/news/security-firms-react-to-bybit-hack)), applies to any vendor in the signing path, Fireblocks included. Its [own post on Bybit](https://www.fireblocks.com/blog/bybit-attack-security-flaws-fireblocks-nation-state-resilient-solutions) argues that its design would have prevented the attack, but that claim has not been independently tested.
+There is also a cost on the Fireblocks side of the ledger. A Safe's signer set and threshold can be read by anyone on-chain; a Fireblocks wallet is an ordinary address, and the customer must trust Fireblocks' SGX deployment, its image signing and its policy engine.
+
+The Bybit theft itself started with the compromise of a wallet vendor's developer, and Fireblocks is a wallet vendor whose cloud co-signers take part in every signature. Taylor Monahan's remark after Bybit, that adding security products can make "your attack surface LARGER" ([Blockworks](https://www.blockworks.com/news/security-firms-react-to-bybit-hack)), applies to any vendor in the signing path, Fireblocks included. Its [own post on Bybit](https://www.fireblocks.com/blog/bybit-attack-security-flaws-fireblocks-nation-state-resilient-solutions) argues that its design would have prevented the attack, but that claim has not been independently tested.
 
 ## Conclusion
 
@@ -382,7 +392,9 @@ These controls exist but are configured by the customer, and Fireblocks' claim t
 
 **Q: Would Fireblocks have prevented the Bitget theft?**
 
-Probably not prevented, but it could have capped it. Bitget's hot wallets were run by its own wallet system, not by Fireblocks (its Fireblocks integration covers Off Exchange for institutional clients), so this is a counterfactual. The attacker controlled the back end that creates withdrawals. In a Fireblocks setup, that back end is the API initiator, and the API Co-Signer runs in the customer's own infrastructure, so an attacker in that infrastructure could have submitted requests that Fireblocks would see as coming from a legitimate API user. The enclave would keep the key share out of reach, but the attacker did not need it at Bitget either.
+Probably not prevented, but it could have capped it. Bitget's hot wallets were run by its own wallet system, not by Fireblocks (its Fireblocks integration covers Off Exchange for institutional clients), so this is a counterfactual.
+
+The attacker controlled the back end that creates withdrawals. In a Fireblocks setup, that back end is the API initiator, and the API Co-Signer runs in the customer's own infrastructure, so an attacker in that infrastructure could have submitted requests that Fireblocks would see as coming from a legitimate API user. The enclave would keep the key share unavailable to the attacker, who did not need it at Bitget either.
 
 What changes is where the last check runs:
 

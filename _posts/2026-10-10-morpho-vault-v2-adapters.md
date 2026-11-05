@@ -2,6 +2,7 @@
 layout: post
 title: "Morpho Vault V2 Adapters - How a Vault Allocates, and Why It Wraps a Vault V1"
 date:   2026-10-10
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -459,7 +460,11 @@ V1.0 is in `morpho-org/metamorpho` (`src/MetaMorpho.sol`), and V1.1 in `morpho-o
 
 **Q: Why would a curator allocate a V2 vault into a V1 vault rather than directly into Blue markets?**
 
-To reuse an existing V1 vault's liquidity and curation, to migrate from V1 to V2 gradually, or to give depositors V2's tools (id-based caps, sentinels, in-kind redemption, gates) while the funds stay where they are. The cost is that the V2 vault sees the V1 position as a single id and cannot cap the markets inside it.
+- To reuse an existing V1 vault's liquidity and curation.
+- To migrate from V1 to V2 gradually.
+- To give depositors V2's tools while the funds stay where they are: id-based caps, sentinels, in-kind redemption and gates.
+
+The cost is that the V2 vault sees the V1 position as a single id and cannot cap the markets inside it.
 
 ---
 

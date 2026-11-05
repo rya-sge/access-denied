@@ -2,6 +2,7 @@
 layout: post
 title: "BIO Tokenomics - Supply, Unlocks, Demand and Value Capture of Bio Protocol's Token"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi finance
@@ -29,7 +30,7 @@ All market data was collected on **18 September 2026 between 14:10 and 14:20 UTC
 - **Aggregators**: CoinGecko for price, market cap, circulating supply and volume; DefiLlama's API for the protocol TVL; DropsTab and Tokenomist for unlock tracking.
 - **Reporting** on governance decisions, chiefly the BIOPSY-22 vote that rescheduled the team unlock.
 
-DefiLlama's token and unlock pages could not be fetched directly and its emissions endpoint is paid, so unlock figures come from DropsTab and Tokenomist, cross-checked against the documentation and the on-chain vesting balances. DefiLlama does not track fees or revenue for Bio Protocol, which matters for the valuation section.
+DefiLlama's token and unlock pages could not be fetched directly and its emissions endpoint is paid, so unlock figures come from DropsTab and Tokenomist, cross-checked against the documentation and the on-chain vesting balances. DefiLlama does not track fees or revenue for Bio Protocol.
 
 ## Tokenomics snapshot
 
@@ -133,11 +134,11 @@ DropsTab reports the next daily unlock at **722,657 BIO**, about 19,400 USD or 0
 
 At the 18 September 2026 price, 278 M to 320 M `BIO` per year is **7.5 M to 8.6 M USD** of new supply, or **13 % to 15 % of the circulating supply**. Against the 13.8 M USD daily volume, the daily unlock of roughly 760,000 to 880,000 `BIO` is about 0.15 % of a day's trading. The unlock is therefore small relative to liquidity on any given day and material relative to float over a year. No single cliff remains: all buckets are now in linear release, so there is no scheduled one-day supply event ahead.
 
-Two discrepancies to keep in mind. DropsTab's category totals use a 3.2 B base rather than 3.32 B, so its absolute figures run about 3.6 % low. And the Molecule Ecosystem Fund is shown as fully unlocked by DropsTab while the documentation says four-year vesting; the on-chain vesting balance of 909 M cannot settle it because the master contract aggregates all buckets.
+DropsTab's category totals use a 3.2 B base rather than 3.32 B, so its absolute figures run about 3.6 % low. And the Molecule Ecosystem Fund is shown as fully unlocked by DropsTab while the documentation says four-year vesting; the on-chain vesting balance of 909 M cannot settle it because the master contract aggregates all buckets.
 
 ## Demand
 
-The documentation lists five uses of `BIO`. Each is assessed for whether it creates a reason to hold rather than to hold briefly:
+The documentation lists five uses of `BIO`:
 
 - **Staking for `veBIO` and BioXP.** Locking `BIO` for 1 week to 2 years mints a decaying `veBIO` balance (`weeks_remaining / 104` per token) that accrues **BioXP** daily. BioXP is the priority weight in oversubscribed Ignition Sales and expires after 14 days. This is the strongest demand driver in the design: a launch participant who wants allocation priority needs a `veBIO` position that is continuously maintained. On-chain, **115.4 M `BIO`** are in the two `veBIO` contracts, 5.4 % of circulating supply. Public reporting at an unspecified later date cited "over 125 M" staked, after Ethereum staking opened in August 2025 had quadrupled the amount locked, so the locked amount has since been flat to slightly down.
 - **Airdrops to `veBIO` holders.** Every token launched through an Ignition Sale airdrops a share of its supply to stakers pro rata, with 20 % redeemable at TGE and 80 % over six months. The reward is denominated in the new project's token, not in `BIO`.

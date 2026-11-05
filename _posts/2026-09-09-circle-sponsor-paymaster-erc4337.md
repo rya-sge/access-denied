@@ -2,6 +2,7 @@
 layout: post
 title: "Inside Circle's SponsorPaymaster — How a Verifying Paymaster Is Built"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity wallet
@@ -11,7 +12,7 @@ image: /assets/article/blockchain/ethereum/erc-4337/2026-09-09-circle-sponsor-pa
 isMath: false
 ---
 
-A paymaster is the part of ERC-4337 that decides someone else pays. `SponsorPaymaster`, in Circle's `buidl-wallet-contracts` repository, is the contract behind the gasless experience of Circle's programmable wallets: the end user signs an operation, Circle's backend agrees to fund it, and the on-chain contract does nothing more than check that the agreement is genuine.
+A paymaster is the part of ERC-4337 that decides someone else pays. `SponsorPaymaster`, in Circle's `buidl-wallet-contracts` repository, is the contract behind the gasless experience of Circle's programmable wallets: the end user signs an operation, Circle's backend agrees to fund it, and the on-chain contract only checks that the agreement is genuine.
 
 That split is the whole design. The policy question, whether this particular user deserves free gas, is answered off-chain by a service that can look at subscriptions, quotas, credit-card charges, or a free tier. The on-chain contract answers a much narrower question: did one of my trusted keys sign exactly this operation, and is the signature still inside its validity window? Everything in the 200 lines of `SponsorPaymaster.sol` below its licence header exists to make that second question cheap, unambiguous, and impossible to answer "yes" twice for the same operation.
 
@@ -70,11 +71,11 @@ The first three fields belong to the EntryPoint: it slices the address to route 
 
 The time window is `abi.encode`d rather than packed, so two `uint48` values occupy 64 bytes rather than 12. It costs 52 bytes of calldata per operation, and it makes the offsets trivially readable, which is the trade the contract accepts.
 
-One consequence of using calldata slices: a `paymasterAndData` shorter than 116 bytes makes the slice expression revert. The EntryPoint wraps that as `FailedOpWithRevert` with reason `"AA33 reverted"`, and the bundler drops the operation. Malformed input fails loudly rather than silently recovering a garbage signer.
+One consequence of using calldata slices: a `paymasterAndData` shorter than 116 bytes makes the slice expression revert. The EntryPoint wraps that as `FailedOpWithRevert` with reason `"AA33 reverted"`, and the bundler drops the operation. Malformed input reverts rather than recovering a garbage signer.
 
 ## What the signature commits to
 
-`getHash` is the heart of the contract, and the interesting part is the list of things it covers:
+`getHash` sets what the signature covers:
 
 ```solidity
 return keccak256(
@@ -148,13 +149,13 @@ Trusted signers live in an `EnumerableSet.AddressSet`, which the deployed byteco
 
 A set rather than a single address is what makes key rotation possible without downtime: add the new signer, wait for signatures from the old one to fall outside their validity windows, remove the old signer. The legacy version of this contract, still visible in the ABI of the Hardhat deployments under `deployments/`, had a single `verifyingSigner` address and a `setVerifyingSigner` setter, where rotation meant a window in which one of the two keys was not accepted.
 
-The set lookup has a consequence that is easy to miss. `verifyingSigners.contains(recovered)` reads the paymaster's **own** storage during the validation phase, and [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562), the validation-rules companion to ERC-4337, only permits an entity to touch its own storage slots during validation if that entity is **staked** with the EntryPoint. An unstaked deployment would have its operations rejected by conforming bundlers before they ever reached the chain. `BasePaymaster.addStake` exists for precisely this reason, and the repository's README makes calling it a mandatory post-deployment step.
+`verifyingSigners.contains(recovered)` reads the paymaster's **own** storage during the validation phase, and [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562), the validation-rules companion to ERC-4337, only permits an entity to touch its own storage slots during validation if that entity is **staked** with the EntryPoint. An unstaked deployment would have its operations rejected by conforming bundlers before they ever reached the chain. `BasePaymaster.addStake` exists for precisely this reason, and the repository's README makes calling it a mandatory post-deployment step.
 
 ## `postOp` is never called
 
 Both validation branches return an empty `context`. In EntryPoint v0.7, the post-execution path only calls `postOp` when the context returned by validation is non-empty, so this paymaster's `postOp` hook is dead code on the happy path, and `BasePaymaster._postOp` is an empty body accordingly.
 
-Nothing is lost by it. A paymaster only needs `postOp` when it has to settle something after the fact, which is what an ERC-20 paymaster does when it pulls tokens at the measured gas cost. The repository clearly anticipated that: `PaymasterUtils` declares a `ChargeMode` enum with `GAS_ONLY`, `FREE`, `FEE_ONLY` and `FEE_AND_GAS`, and carries a long comment working through a Chainlink `ETH/USDC` conversion down to token subunits. None of it is referenced by `SponsorPaymaster`, which implements the `FREE` path alone. The scaffolding for the charging modes is present; the contract that would use it is not in this repository.
+Nothing is lost by it. A paymaster only needs `postOp` when it has to settle something after the fact, which is what an ERC-20 paymaster does when it pulls tokens at the measured gas cost. The repository clearly anticipated that: `PaymasterUtils` declares a `ChargeMode` enum with `GAS_ONLY`, `FREE`, `FEE_ONLY` and `FEE_AND_GAS`, and carries a long comment working through a Chainlink `ETH/USDC` conversion down to token subunits. None of it is referenced by `SponsorPaymaster`, which implements the `FREE` path alone. The enum and the conversion comment are present; the contract that would use them is not in this repository.
 
 Skipping `postOp` also removes a class of failure. A reverting `postOp` forces the EntryPoint to undo the execution and call the hook a second time in `postOpReverted` mode, and a paymaster that never returns a context never enters that path.
 
@@ -180,7 +181,7 @@ The owner holds a wide set of powers, and the pause modifier covers more functio
 
 The one function that stays open is the upgrade path: `_authorizeUpgrade` carries `onlyOwner` and no pause check.
 
-The contract emits no events of its own. Adding or removing a verifying signer, the single most security-relevant state change available, produces no log. Monitoring signer rotation means reading `getAllSigners()` on a schedule or decoding calldata, and the same applies to reconstructing the history of the set after the fact.
+The contract emits no events of its own. Adding or removing a verifying signer, the single most security-relevant state change available, produces no log. Monitoring signer rotation, or reconstructing the history of the set after the fact, means reading `getAllSigners()` on a schedule or decoding calldata.
 
 Ownership is a single address, and it can upgrade the implementation, replace the signer set, pause the contract, and withdraw the entire deposit. A multisig or a timelock in that role is doing most of the security work.
 
@@ -202,7 +203,12 @@ Deployment leaves the contract non-functional on purpose. The proxy is initialis
 
 `SponsorPaymaster` is a small contract because it delegates the hard part. The question of who deserves free gas is a business question with no on-chain answer, so the design pushes it entirely to an off-chain service and keeps only the cryptographic residue: an ECDSA check against a rotatable signer set, a validity window, and a hash whose contents fix the operation, the chain, the paymaster and the account nonce.
 
-The parts that repay attention are the ones that are easy to get wrong elsewhere. Returning `SIG_VALIDATION_FAILED` instead of reverting keeps the paymaster in good standing with bundlers. Covering both paymaster gas limits in the signed payload closes the gap a bundler could otherwise use to bill a larger validation budget than the service agreed to. Returning an empty context removes the `postOp` path and its `postOpReverted` re-entry entirely. And reading the signer set during validation is what makes staking a hard requirement rather than an optional reputation boost.
+The parts that repay attention are the ones that are easy to get wrong elsewhere:
+
+- Returning `SIG_VALIDATION_FAILED` instead of reverting keeps the paymaster in good standing with bundlers.
+- Covering both paymaster gas limits in the signed payload closes the gap a bundler could otherwise use to bill a larger validation budget than the service agreed to.
+- Returning an empty context removes the `postOp` path and its `postOpReverted` re-entry entirely.
+- Reading the signer set during validation is what makes staking a hard requirement rather than an optional reputation boost.
 
 The residual risk sits off-chain and in the owner key. A compromised verifying signer drains the deposit up to whatever the validity windows allow, and a compromised owner key does so directly, or replaces the implementation. Neither is a flaw in the contract. Both are the trust this design deliberately places off-chain, in a service and a key rather than in code, and the contract at least makes it obvious where that trust sits.
 
@@ -255,7 +261,9 @@ The residual risk sits off-chain and in the owner key. A compromised verifying s
 
 **Q: Why does the paymaster return a packed failure value on a bad signature instead of reverting?**
 
-ERC-4337 draws a sharp line between a validation that says "no" and a validation that malfunctions. A returned `validationData` with the signature-failure bit set is the protocol's normal way to decline, and the EntryPoint converts it into `FailedOp(opIndex, "AA34 signature error")`. A revert is treated as an unexpected condition and counts against the paymaster's reputation with bundlers, which can lead to throttling or a ban from the alt-mempool. Since a verifying paymaster will legitimately see stale, expired and forged signatures as part of normal operation, reverting on each one would be self-harming.
+ERC-4337 draws a sharp line between a validation that says "no" and a validation that malfunctions. A returned `validationData` with the signature-failure bit set is the protocol's normal way to decline, and the EntryPoint converts it into `FailedOp(opIndex, "AA34 signature error")`. A revert is treated as an unexpected condition and counts against the paymaster's reputation with bundlers, which can lead to throttling or a ban from the alt-mempool.
+
+Since a verifying paymaster will legitimately see stale, expired and forged signatures as part of normal operation, reverting on each one would be self-harming.
 
 **Q: What does `getHash` deliberately leave out, and why is each omission safe?**
 
@@ -267,19 +275,27 @@ Three things:
 
 **Q: Why does this contract need to be staked, when its deposit is what pays for gas?**
 
-Deposit and stake answer different questions. The deposit is the money the EntryPoint debits for gas. The stake is collateral that ERC-7562 requires before an entity may read its **own** storage during the validation phase, because such an entity can invalidate many pending operations at once with a single state change and a bundler needs something to slash against. `_validatePaymasterUserOp` calls `verifyingSigners.contains(recovered)`, a read of the paymaster's own storage, so a conforming bundler will reject its operations if it is unstaked. Funding without staking produces a paymaster that looks solvent and is never used.
+Deposit and stake answer different questions. The deposit is the money the EntryPoint debits for gas. The stake is collateral that ERC-7562 requires before an entity may read its **own** storage during the validation phase, because such an entity can invalidate many pending operations at once with a single state change and a bundler needs something to slash against.
+
+`_validatePaymasterUserOp` calls `verifyingSigners.contains(recovered)`, a read of the paymaster's own storage, so a conforming bundler will reject its operations if it is unstaked. Funding without staking produces a paymaster that looks solvent and is never used.
 
 **Q: What can an attacker do with a stolen sponsorship signature?**
 
-Almost nothing. The signature binds the sender, the nonce, the call data hash, the gas fields, the chain id and the paymaster address. Submitting it from another account fails; submitting it on another chain fails; submitting it a second time fails once the nonce is consumed. The realistic use is front-running the legitimate submission with the identical operation, which executes exactly what the sponsor already agreed to pay for. This is why the contract can afford to put the signature in public calldata.
+Almost nothing. The signature binds the sender, the nonce, the call data hash, the gas fields, the chain id and the paymaster address. Submitting it from another account fails; submitting it on another chain fails; submitting it a second time fails once the nonce is consumed.
+
+The realistic use is front-running the legitimate submission with the identical operation, which executes exactly what the sponsor already agreed to pay for. This is why the contract can afford to put the signature in public calldata.
 
 **Q: Why is `postOp` never called, and what would have to change for it to be?**
 
-Both validation branches return an empty `context`, and EntryPoint v0.7 only invokes `postOp` when the context is non-empty. For pure sponsorship there is nothing to settle afterwards, so returning empty is both correct and cheaper. It would change for a charging paymaster: an ERC-20 variant has to measure the actual gas cost and pull the equivalent in tokens, which can only happen after execution. The repository already carries the scaffolding for that in `PaymasterUtils`, whose `ChargeMode` enum and Chainlink price-feed comment describe a token-charging design that `SponsorPaymaster` does not implement.
+Both validation branches return an empty `context`, and EntryPoint v0.7 only invokes `postOp` when the context is non-empty. For pure sponsorship there is nothing to settle afterwards, so returning empty is both correct and cheaper.
+
+It would change for a charging paymaster: an ERC-20 variant has to measure the actual gas cost and pull the equivalent in tokens, which can only happen after execution. In the repository, `PaymasterUtils` already carries a `ChargeMode` enum and a Chainlink price-feed comment that describe a token-charging design `SponsorPaymaster` does not implement.
 
 **Q: Combining two parts of the design, why is the choice of an `EnumerableSet` over a single signer address both an availability improvement and an extra staking obligation?**
 
-The set makes key rotation continuous. With a single `verifyingSigner`, replacing the key invalidates every signature already issued under the old one, so there is a gap in which sponsorship is broken; the legacy version of this contract worked that way. A set lets the owner add the new key, keep signing with the old one until outstanding windows expire, then remove it, with no interruption. The cost is that the lookup is a read of the paymaster's own storage during validation, which is exactly the access ERC-7562 gates behind a stake. A design that carried the authorised signer in the implementation as an immutable would avoid the storage read, and would give up rotation entirely.
+The set makes key rotation continuous. With a single `verifyingSigner`, replacing the key invalidates every signature already issued under the old one, so there is a gap in which sponsorship is broken; the legacy version of this contract worked that way. A set lets the owner add the new key, keep signing with the old one until outstanding windows expire, then remove it, with no interruption.
+
+The cost is that the lookup is a read of the paymaster's own storage during validation, which is exactly the access ERC-7562 gates behind a stake. A design that carried the authorised signer in the implementation as an immutable would avoid the storage read, and would give up rotation entirely.
 
 **Q: If the paymaster is paused during an incident, what can and cannot the owner still do?**
 

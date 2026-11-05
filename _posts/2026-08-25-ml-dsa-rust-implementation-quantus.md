@@ -2,6 +2,7 @@
 layout: post
 title: "ML-DSA in Rust — Inside the Quantus qp-rusty-crystals Implementation"
 date:   2026-08-25
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography blockchain post-quantum
@@ -15,7 +16,7 @@ isMath: true
 
 This article reads one such implementation: `qp-rusty-crystals-dilithium`, the pure-Rust ML-DSA crate used by [Quantus Network](https://www.quantus.com), a Substrate-based Layer 1 that replaces elliptic-curve signatures with lattice-based ones throughout. The crate is `#![no_std]`, contains no `unsafe`, and supports all three FIPS 204 parameter sets from a single code path. The source was read at the revision pinned in the references, which is the snapshot published for the project's Immunefi audit competition.
 
-The focus here is deliberately narrow. Rather than restating what ML-DSA is (a previous article, [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/), covers the construction, the hard problems, and the rejection-sampling paradigm), this one looks at the engineering decisions that turn that specification into a crate: const-generic monomorphization, a sealed polynomial type with a documented bounds contract, a sponge that carries its rate in the type system, streamed matrix expansion, and a secret-handling discipline built around borrowing rather than moving.
+A previous article, [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/), covers the construction, the hard problems, and the rejection-sampling paradigm. This one looks at the engineering decisions that turn that specification into a crate: const-generic monomorphization, a sealed polynomial type with a documented bounds contract, a sponge that carries its rate in the type system, streamed matrix expansion, and a secret-handling discipline built around borrowing rather than moving.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -159,7 +160,7 @@ pub struct Poly {
 
 `Poly::from_coeffs` is the validated door for untrusted data. It accepts $(-q, q)$, which is inside the domain of every public routine in the module, so a polynomial built there can be handed to any of them. The unpack functions produce bounded coefficients by construction. `coeffs_mut` is the deliberate escape hatch for advanced integrations, and it moves the obligation to the caller in its own documentation.
 
-Routines whose domain is narrower than $(-q, q)$ are not public at all. `shiftl` requires $|c| < 2^{31-d}$, so it is `pub(crate)`, and the module docs pin that with a `compile_fail` doctest showing that boundary-validated data cannot reach it. Every precondition is additionally checked with `debug_assert!`, which costs nothing in release and fails loudly in tests:
+Routines whose domain is narrower than $(-q, q)$ are not public at all. `shiftl` requires $|c| < 2^{31-d}$, so it is `pub(crate)`, and the module docs pin that with a `compile_fail` doctest showing that boundary-validated data cannot reach it. Every precondition is additionally checked with `debug_assert!`, which costs nothing in release and panics in tests:
 
 ```rust
 pub fn invntt_tomont(a: &mut Poly) {
@@ -235,9 +236,9 @@ pub type Shake128State = KeccakState<SHAKE128_RATE>;
 pub type Shake256State = KeccakState<SHAKE256_RATE>;
 ```
 
-A state built by SHAKE128 operations cannot reach a SHAKE256 function, and the module documents that with a `compile_fail` doctest. The absorb-to-squeeze transition is tracked at runtime in `squeezing` and checked with `debug_assert!`, so absorbing into a finalised state panics in tests and stays deterministic in release.
+A state built by SHAKE128 operations cannot be passed to a SHAKE256 function, and the module documents that with a `compile_fail` doctest. The absorb-to-squeeze transition is tracked at runtime in `squeezing` and checked with `debug_assert!`, so absorbing into a finalised state panics in tests and stays deterministic in release.
 
-The fields are private, and that is load-bearing rather than stylistic. The squeeze loop relies on `pos <= R` to make progress; a state restored from untrusted bytes with `pos > R` would emit zero bytes per iteration and spin forever. A defensive `>=` guard remains as a backstop:
+The fields are private, which protects the squeeze loop. It relies on `pos <= R` to make progress; a state restored from untrusted bytes with `pos > R` would emit zero bytes per iteration and spin forever. A defensive `>=` guard remains as a backstop:
 
 ```rust
 		// `>=` (rather than `==`) is a defensive guard: a well-formed state always
@@ -316,7 +317,7 @@ pub fn matrix_pointwise_montgomery_streamed<const K: usize, const L: usize>(
 
 Peak extra working memory is two polynomials, roughly 2 KB. The accumulation order is unchanged, so the result is identical bit for bit to the materialised version, and only stack usage differs. The trade is recomputation: signing regenerates the whole matrix on every rejection-sampling attempt, and ML-DSA-87 averages 3.85 attempts.
 
-The commitment to that decision shows up outside the crate. A `stack-check.sh` script builds for `thumbv7em-none-eabihf` with per-function stack-size emission and reports the frame of every ML-DSA entry point, specifically so that a change re-introducing a materialised matrix is caught before it reaches hardware.
+A `stack-check.sh` script outside the crate builds for `thumbv7em-none-eabihf` with per-function stack-size emission and reports the frame of every ML-DSA entry point, specifically so that a change re-introducing a materialised matrix is caught before it reaches hardware.
 
 ## The Signing Loop as Implemented
 
@@ -384,7 +385,7 @@ Mask reuse in ML-DSA is the analogue of ECDSA nonce reuse: two signatures under 
 	let max_safe_attempt_nonce: u16 = (u16::MAX - (L as u16 - 1)) / (L as u16);
 ```
 
-The helper it protects is `pub(crate)`, and its documentation states the requirement, so an external caller cannot reach it with an unchecked nonce.
+The helper it protects is `pub(crate)`, and its documentation states the requirement, so an external caller cannot call it with an unchecked nonce.
 
 ## Verification
 
@@ -414,7 +415,7 @@ Both `sign` and `verify` cap the message at 64 MiB and the context string at the
 
 ## Handling Secret Material
 
-A move in Rust is a copy, and the source of that copy is dead but never dropped, so `ZeroizeOnDrop` cannot reach it. The crate builds its whole secret-handling discipline around that fact, and the resulting style is unusual enough to be worth showing.
+A move in Rust is a copy, and the source of that copy is dead but never dropped, so `ZeroizeOnDrop` never runs on it. The crate builds its whole secret-handling discipline around that fact.
 
 Sensitive byte strings live in wrappers that consume their input:
 
@@ -585,7 +586,12 @@ Its only input is the challenge seed $\tilde c = H(\mu, w_1)$, and no secret-key
 
 **Q: What can secret-key import validate, what can it not, and why does the gap matter?**
 
-It validates four things: that every packed $\mathbf s_1$ and $\mathbf s_2$ coefficient decodes inside $[-\eta, \eta]$, that the stored $\mathbf t_0$ matches the low bits re-derived from $\mathbf A \mathbf s_1 + \mathbf s_2$, that the stored $tr$ equals $\mathsf{SHAKE256}(pk)$, and that the derived $\mathbf t_1$ is non-zero.
+It validates four things:
+
+- Every packed $\mathbf s_1$ and $\mathbf s_2$ coefficient decodes inside $[-\eta, \eta]$.
+- The stored $\mathbf t_0$ matches the low bits re-derived from $\mathbf A \mathbf s_1 + \mathbf s_2$.
+- The stored $tr$ equals $\mathsf{SHAKE256}(pk)$.
+- The derived $\mathbf t_1$ is non-zero.
 
 It cannot validate the nonce seed $K$. $K$ is independent entropy squeezed from the key-generation seed, the seed is not stored, and under FIPS 204 every 32-byte value is a valid $K$, so no stored field commits to it.
 

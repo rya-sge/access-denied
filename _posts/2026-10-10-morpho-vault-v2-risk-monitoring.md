@@ -2,6 +2,7 @@
 layout: post
 title: "Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch"
 date:   2026-10-10
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -54,7 +55,7 @@ Caps are set per identifier. For each market, the market adapter registers three
 
 A Blue market liquidates a borrower when the oracle price of the collateral, times the liquidation threshold (LLTV), falls below the debt. If the collateral is worth less than the debt by the time the liquidation runs, the shortfall is bad debt, and Blue writes it off against the market's suppliers. The vault is one of those suppliers, so its loss is the bad debt times its share of the market's supply.
 
-This is not theoretical. In March 2026, the unbacked minting of Resolv's USR stablecoin left bad debt in Morpho, Euler and Fluid markets that accepted USR as collateral, as described in [the review of 2026's hacks on this site]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/). What decides the size of such a loss is in each market's parameters: the collateral's own soundness, how the oracle prices it, the LLTV, and the liquidity available to liquidators.
+In March 2026, the unbacked minting of Resolv's USR stablecoin left bad debt in Morpho, Euler and Fluid markets that accepted USR as collateral, as described in [the review of 2026's hacks on this site]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/). What decides the size of such a loss is in each market's parameters: the collateral's own soundness, how the oracle prices it, the LLTV, and the liquidity available to liquidators.
 
 ### When a loss reaches the share price
 
@@ -298,7 +299,7 @@ Its value is the timelock of the function being changed. With a timelock of zero
 
 **Q: How is a depositor's share of a bad debt in one market computed?**
 
-Multiply the bad debt by the vault's share of the market's supply (the adapter's supply shares over the market's total supply shares), then by the depositor's share of the vault (their vault shares over the vault's total supply). For example, 100 of bad debt in a market where the vault holds 60% of the supply, for a depositor with 20% of the vault, costs that depositor 12.
+Multiply the bad debt by the vault's share of the market's supply, which is the adapter's supply shares over the market's total supply shares. Then multiply by the depositor's share of the vault, which is their vault shares over the vault's total supply. For example, 100 of bad debt in a market where the vault holds 60% of the supply, for a depositor with 20% of the vault, costs that depositor 12.
 
 **Q: Why does the watcher filter Blue events by topic rather than by address alone?**
 

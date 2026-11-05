@@ -2,6 +2,7 @@
 layout: post
 title: "Randomness on Aztec — One Oracle, Four Uses, and Why the Circuit Never Checks It"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -33,7 +34,7 @@ Aztec has that gap too, and this article returns to it at the end. But the rando
 - the **value** is a `u128`, but a real balance is a number of units that a search can cover in seconds;
 - the **storage slot** is a constant of the contract's layout.
 
-An observer with the token's source, the note hash tree and a list of deployed accounts could compute `H(slot, owner, value)` for every `(owner, value)` pair and learn every balance on the chain. The remedy is the standard one from commitment schemes: add a field `r` drawn uniformly from the whole scalar field, so that the preimage space has 2^254 members per guess and enumeration is hopeless. Every public artefact of a private operation on Aztec carries such an `r`. The rest of the article is about where it comes from and where it goes.
+An observer with the token's source, the note hash tree and a list of deployed accounts could compute `H(slot, owner, value)` for every `(owner, value)` pair and learn every balance on the chain. The remedy is the standard one from commitment schemes: add a field `r` drawn uniformly from the whole scalar field, so that the preimage space has 2^254 members per guess and enumeration is hopeless. Every public artefact of a private operation on Aztec carries such an `r`.
 
 ## One oracle, traced to the bytes
 
@@ -78,8 +79,6 @@ Outside its own tests, aztec-nr calls the oracle of the previous section, and on
 | **Ephemeral encryption keys** | `keys/ephemeral.nr` `generate_ephemeral_key_pair` | Becomes the ephemeral secret scalar of the ECDH exchange that encrypts a note or event message to its recipient |
 | **Ciphertext padding** | `messages/encryption/aes128.nr` | Fills the unused fields of a fixed-length ciphertext so that padding is indistinguishable from masked content |
 | **Undiscoverable tag fallback** | `messages/delivery/tag_derivation.nr`, `oracle/resolve_tagging_strategy.nr` | When an unconstrained message is addressed to an invalid recipient, a random tagging secret produces a tag nobody can find, instead of aborting the send |
-
-The first two are the ones this article is about; the others are worth a sentence each.
 
 **Ephemeral keys.** Each message to a recipient is encrypted with a shared secret derived from a fresh ephemeral key pair and the recipient's public key. The key pair lives on **Grumpkin**, the elliptic curve Aztec uses for every account key: nullifier keys, viewing keys, tagging keys and the ephemeral keys of message encryption are all Grumpkin scalars, and the corresponding public keys are Grumpkin points. Grumpkin is the curve *embedded* in BN254, the curve the proofs are made over, and the two are defined so that their fields cross: Grumpkin's points have coordinates in `Fr`, the BN254 scalar field that every Noir `Field` belongs to, while Grumpkin's own scalars, the values a point is multiplied by, live in `Fq`, the BN254 base field. That crossing is what makes elliptic-curve arithmetic cheap inside a circuit: adding two Grumpkin points is native `Field` arithmetic, with no emulation of a foreign field. The price is that a Grumpkin scalar does not fit in a `Field`, since `Fq` is slightly larger than `Fr`; Noir's `EmbeddedCurveScalar` therefore carries it as two 128-bit limbs, `lo` and `hi`.
 
@@ -133,7 +132,7 @@ What *is* constrained is **consistency**. The circuit computes the note hash fro
 Two situations sit outside the argument and are worth naming:
 
 - **A contract as note creator.** When a contract computes a note for a user, the "sender" is the contract's code executing on the caller's device, and the caller controls the oracle. A DeFi protocol that returns a note to a counterparty is, in the framework's trust model, the counterparty's own execution choosing `r` for a note it will own; the party whose privacy `r` protects and the party who chose it are again the same, or in a relationship where the chooser already knows the preimage.
-- **A recipient who did not choose.** For a partial note, the recipient chooses `r` (it calls `initialize_transfer_commitment` and its device draws the value) and the sender only learns `H(owner, r)`. The trust runs the other way, and the sender's privacy is not what `r` protects, so nothing changes.
+- **A recipient who did not choose.** For a partial note, the recipient chooses `r`: it calls `initialize_transfer_commitment` and its device draws the value. The sender only learns `H(owner, r)`. The trust runs the other way, and the sender's privacy is not what `r` protects, so nothing changes.
 
 The framework's own docstring on `random()` names the alternative for applications where an unconstrained draw is not acceptable: pseudo-random values derived by hashing values outside the user's control, such as block hashes, or secrets. That is a different tool for a different need, the one the next section is about.
 
@@ -143,7 +142,7 @@ Public functions run in the AVM on the sequencer, and the Aztec docs are direct 
 
 Nor does the protocol offer, at 5.2.0, a randomness beacon or a VRF a public function could read. A public function that needs an unpredictable value has the options the EVM has, minus `prevrandao`:
 
-- **receive it from a private function**, which drew it from the caller's oracle and passes it as an argument of the enqueued public call; the value is then the caller's choice, which is acceptable when the caller is the party the unpredictability protects (a commitment the caller will later open) and not when it is the party being drawn against (a lottery entrant choosing its own draw);
+- **receive it from a private function**, which drew it from the caller's oracle and passes it as an argument of the enqueued public call; the value is then the caller's choice, which is acceptable when the caller is the party the unpredictability protects, as with a commitment the caller will later open, and not when it is the party being drawn against, as with a lottery entrant choosing its own draw;
 - **commit-reveal across transactions**, where several parties commit to hidden values and the public function combines the reveals;
 - **an external oracle contract**, none of which is part of the protocol.
 
@@ -177,13 +176,13 @@ Two consequences follow from `r` being a one-shot, undeliverable value:
 - **The commitment is single-use.** The completion log's tag is `H(C)`; a second payment into the same `C` carries the same tag, which publicly links the two payments as going to one recipient, and the recipient's PXE, having matched the first completion and removed the pending entry, does not discover the second. The Aztec docs' *Single-use semantics* section states both effects, and the library's docstring on `UintNote::partial` gives the privacy half: "Each partial note should only be used once, since otherwise multiple notes would be linked together and known to belong to the same owner." A recipient who expects several payments creates several partial notes, each with its own draw.
 - **Losing the pending message loses the note.** Because `r` is random rather than derived from the recipient's keys, a recipient whose PXE state is lost cannot reconstruct `(to, r)` from `C`, even though the note is provably its own. The value exists in exactly one place until completion.
 
-A comparison with the ordinary transfer closes the loop: in `transfer_private_to_private` the *sender* draws `r` and delivers it; in the commitment flow the *recipient* draws it and keeps it. In both cases the party that draws is the party whose privacy the draw protects or a party that already knows the preimage, which is the condition under which leaving `r` unconstrained is safe.
+In `transfer_private_to_private` the *sender* draws `r` and delivers it; in the commitment flow the *recipient* draws it and keeps it. In both cases the party that draws is the party whose privacy the draw protects or a party that already knows the preimage, which is the condition under which leaving `r` unconstrained is safe.
 
 ## Testing with and without randomness
 
 Two facilities exist for tests that need to control the value.
 
-The TXE behind `aztec test` answers `getRandomField` with the same `Fr.random()` as the PXE, so tests see fresh values by default, and two runs never produce the same note hashes. Setting `SEED` makes the whole `@aztec/foundation` generator deterministic for a run, which is how reproducible test transcripts are obtained; it is the same switch that must never reach production.
+The TXE behind `aztec test` answers `getRandomField` with the same `Fr.random()` as the PXE, so tests see fresh values by default, and two runs never produce the same note hashes. Setting `SEED` makes the whole `@aztec/foundation` generator deterministic for a run, which is how reproducible test transcripts are obtained; it is the same switch that must never be set in production.
 
 Inside Noir, `std::test::OracleMock` intercepts a named oracle. The library's own test for ephemeral keys is the model:
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Partial Notes on Aztec — Deferred Completion and Private DeFi Composability"
 date:   2026-09-09
-last_modified_at: 2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ZKP aztec
@@ -62,7 +62,7 @@ note_hash = H(storage_slot, partial_commitment, value)
 
 The creator fixes who gets paid and who may finalise; the completer fixes how much. Funds flow from the completing side to the owner the creator chose.
 
-**A detail that is easy to miss and worth stating: every Aztec note is hashed this way, even when nothing is deferred.** A note created in one step with all fields known still computes a partial commitment first and then completes it immediately. That is what makes the two paths indistinguishable — a note assembled in two phases and a note assembled in one produce the same hash and behave identically thereafter. Partial notes are not a special case bolted onto the note format; the note format was designed around them.
+**Every Aztec note is hashed this way, even when nothing is deferred.** A note created in one step with all fields known still computes a partial commitment first and then completes it immediately. That is what makes the two paths indistinguishable — a note assembled in two phases and a note assembled in one produce the same hash and behave identically thereafter. Partial notes are not a special case bolted onto the note format; the note format was designed around them.
 
 ## The completer, and why a commitment is not a capability
 
@@ -104,7 +104,7 @@ Treat a partial note as a one-shot object. An endpoint that accepts many payment
 - **`complete`**, in a public function — AIP-20's `transfer_public_to_commitment`. The storage slot and value go into a public log tagged by the commitment. Anyone watching the chain learns the amount.
 - **`complete_from_private`**, in a private function — AIP-20's `transfer_private_to_commitment`. The same data goes into a private log with the same tag. The payload is plaintext, but only a party who can derive the tag can find it, and the tag derives from the commitment.
 
-The second point has a consequence worth being explicit about, because it is a privacy property that depends on operational discipline rather than on cryptography: **in private completion the amount is hidden only for as long as the commitment is.** If the commitment is published in an onchain registry, anyone can derive the tag and read the amount out of the private log. If it is handed only to prospective senders, the amount stays hidden from everyone else.
+The privacy of the second path depends on operational discipline rather than on cryptography: **in private completion the amount is hidden only for as long as the commitment is.** If the commitment is published in an onchain registry, anyone can derive the tag and read the amount out of the private log. If it is handed only to prospective senders, the amount stays hidden from everyone else.
 
 One protocol constraint bounds what is buildable: `complete_from_private` requires the validity commitment to have settled in a *prior* transaction. A partial note cannot be created and completed in the same private transaction. Public completion has no such restriction, which is why the swap flow below creates in private and completes in public within one transaction.
 
@@ -122,7 +122,7 @@ The same structure appears wherever the value arrives late. [AIP-4626](https://d
 
 ## The payment-endpoint case
 
-The second family of uses is unrelated to deferred pricing, and it is the more interesting one. Here the partial note is not waiting for a value: it is an **offer to be paid**, published in advance.
+The second family of uses is unrelated to deferred pricing. Here the partial note is not waiting for a value: it is an **offer to be paid**, published in advance.
 
 The problem it solves is that a stable address is a correlation handle. If `alice.aztec` resolves to an Aztec address, every sender and every observer of the registry can link payments to the same identifier even when the notes themselves are private, and two senders can collude to confirm they paid the same person.
 
@@ -141,7 +141,7 @@ Four pieces make it work:
 
 The completer choice decides who can pay. Two options matter, and only one scales:
 
-- **Completer set to a specific sender.** The recipient creates one note per known sender, and that sender completes it with their own funds, acting as both `from` and `msg_sender`. This needs no new contracts but requires knowing every sender's address in advance, which suits subscriptions and recurring invoices and nothing else.
+- **Completer set to a specific sender.** The recipient creates one note per known sender, and that sender completes it with their own funds, acting as both `from` and `msg_sender`. This needs no new contracts but requires knowing every sender's address in advance, which suits only subscriptions and recurring invoices.
 - **Completer set to a relayer contract.** The recipient names a known relayer whose only job is to forward a payment into the token's completion function. Any sender can invoke it, the token sees the relayer as `msg_sender` so the validity check passes, and the sender is debited as the authorised `from`. Because the relayer needs no per-name logic, one global relayer contract could serve every endpoint on the network.
 
 The relayer path depends on the authwit mechanism: since the token sees the relayer rather than the sender as its immediate caller, the sender signs an authentication witness authorising the relayer to call `transfer_private_to_commitment` with those exact arguments. The [account abstraction article]({{site.url_complet}}/2026/09/09/aztec-native-account-abstraction-vs-erc-4337/) covers how authwits are scoped and consumed. The relayer never holds or is pre-funded with the sender's tokens, because completion debits `from` directly.
@@ -156,9 +156,14 @@ The documented recommendation for "name resolves to an unlinkable endpoint, reci
 
 The pattern hides the recipient's address from senders, the link between any two payments to the same name provided each consumes a different commitment, and, under private completion where the commitment is not public, the amount.
 
-It leaks that the relayer contract was invoked, one completion tag per payment (which confirms a completion happened without revealing the recipient), whatever the lookup channel itself exposes, and the refill cadence if the transactions creating fresh notes are visible.
+It leaks:
 
-**It is also not a stealth-address scheme, and the distinction is worth keeping straight.** A stealth-address scheme lets a recipient publish one meta-address and stay passive forever, with each sender deriving a fresh one-time address non-interactively. Partial-note endpoints require the recipient to create, publish and keep refilling a finite supply of slots. If senders drain the list faster than it is refilled, the lookup returns nothing and payments fail. What is bought in exchange is an explicit, recipient-controlled supply of payment slots with a cryptographically enforced completer.
+- That the relayer contract was invoked.
+- One completion tag per payment, which confirms a completion happened without revealing the recipient.
+- Whatever the lookup channel itself exposes.
+- The refill cadence, if the transactions creating fresh notes are visible.
+
+**It is also not a stealth-address scheme.** A stealth-address scheme lets a recipient publish one meta-address and stay passive forever, with each sender deriving a fresh one-time address non-interactively. Partial-note endpoints require the recipient to create, publish and keep refilling a finite supply of slots. If senders drain the list faster than it is refilled, the lookup returns nothing and payments fail. What is bought in exchange is an explicit, recipient-controlled supply of payment slots with a cryptographically enforced completer.
 
 ## Limitations and current status
 
@@ -248,13 +253,19 @@ The ordering is also one-directional: a private function can enqueue a public ca
 
 An address. The aztec-nr implementation is `poseidon2_hash_with_separator([owner.to_field(), randomness], DOM_SEP__PARTIAL_NOTE_COMMITMENT)` with `owner: AztecAddress` — the recipient's account address, the same field a transfer takes as `to`. It names who will own the completed note: whose PXE discovers it and whose account can spend it.
 
-Not a key: no secret enters the hash. Spending the note later requires the nullifier secret key behind that address, and the spending circuit proves knowledge of it; the commitment only carries the address, which is why a recipient can hand the commitment to a stranger — it lets them pay the address, not act as it. Not an amount either: the amount is `value`, deliberately left out of the partial commitment because it is the field the completer supplies later in `note_hash = H(storage_slot, partial_commitment, value)`. The randomness is there so that nobody can test candidate addresses against the commitment — without it, `H(alice_address)` could be brute-forced from a list of known addresses.
+Not a key: no secret enters the hash. Spending the note later requires the nullifier secret key behind that address, and the spending circuit proves knowledge of it; the commitment only carries the address, which is why a recipient can hand the commitment to a stranger — it lets them pay the address, not act as it.
+
+Not an amount either: the amount is `value`, deliberately left out of the partial commitment because it is the field the completer supplies later in `note_hash = H(storage_slot, partial_commitment, value)`. The randomness is there so that nobody can test candidate addresses against the commitment — without it, `H(alice_address)` could be brute-forced from a list of known addresses.
 
 One nuance: `UintNote::partial(owner, context, recipient, completer)` takes an `owner` and a `recipient`. The owner goes into the commitment and can spend; the recipient is only who receives the private message announcing the partial note, and so who discovers it. They are normally the same address, which is why this article uses one word.
 
 **Q: How is `randomness` computed?**
 
-It is not computed from anything; it is drawn fresh. `UintNote::partial` calls `unsafe { random() }`, an oracle: the Noir program asks the host — the PXE, or the TXE in tests — for a field, and the host answers with `Fr.random()`, 64 bytes from the operating system's CSPRNG (`crypto.randomBytes`) reduced modulo the field. Nothing in the circuit constrains it, which the `unsafe` block and the library's own note ("we assume that the oracle is cooperating") make explicit; the only party who could weaken it is the creator, who already knows the whole note preimage. Because it is random rather than derived from a key, the recipient cannot recompute it, which is why the creation step delivers `(owner, randomness, commitment)` to the recipient as a private message — the pending partial note its PXE holds until completion. Ordinary notes get their randomness the same way.
+It is not computed from anything; it is drawn fresh. `UintNote::partial` calls `unsafe { random() }`, an oracle: the Noir program asks the host — the PXE, or the TXE in tests — for a field, and the host answers with `Fr.random()`, 64 bytes from the operating system's CSPRNG (`crypto.randomBytes`) reduced modulo the field.
+
+Nothing in the circuit constrains it, which the `unsafe` block and the library's own note ("we assume that the oracle is cooperating") make explicit; the only party who could weaken it is the creator, who already knows the whole note preimage.
+
+Because it is random rather than derived from a key, the recipient cannot recompute it, which is why the creation step delivers `(owner, randomness, commitment)` to the recipient as a private message — the pending partial note its PXE holds until completion. Ordinary notes get their randomness the same way.
 
 **Q: What stops someone who obtains a commitment from completing it themselves?**
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL"
 date:   2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation finance
@@ -42,7 +43,7 @@ The VNAV-only derogation in the last row matters below: a VNAV may hold up to 10
 
 ### The closed list
 
-Article 9(1) allows seven categories of assets and nothing else: money market instruments, eligible securitisations and ABCPs, deposits with credit institutions, financial derivative instruments, repurchase agreements, reverse repurchase agreements, and units of other MMFs. A fund may also hold ancillary liquid assets under Article 50(2) of the UCITS Directive (Art. 9(3)). Article 9(2) excludes short sales, any exposure to equities or commodities, securities lending and borrowing, any encumbrance of assets, and borrowing or lending cash.
+Article 9(1) allows only seven categories of assets: money market instruments, eligible securitisations and ABCPs, deposits with credit institutions, financial derivative instruments, repurchase agreements, reverse repurchase agreements, and units of other MMFs. A fund may also hold ancillary liquid assets under Article 50(2) of the UCITS Directive (Art. 9(3)). Article 9(2) excludes short sales, any exposure to equities or commodities, securities lending and borrowing, any encumbrance of assets, and borrowing or lending cash.
 
 Each category has its own conditions, which the overview article lists in full. The ones the example portfolio relies on are:
 
@@ -148,7 +149,12 @@ $$
 \end{aligned}
 $$
 
-The other checks pass. The deposit with Bank A (8 %) and with Bank B (7 %) are below 10 %; the ABCP is 4 % of assets and well within both the 5 % issuer limit and the 20 % aggregate; the units of MMF K are 2 %; the reverse repo with Bank R is 10 % against a 15 % counterparty limit, and its collateral, French government bills, is exempt from the 15 % collateral-issuer cap because it is public debt of the kind listed in Article 17(7).
+The other checks pass:
+
+- The deposits with Bank A at 8 % and Bank B at 7 % are below 10 %.
+- The ABCP is 4 % of assets and well within both the 5 % issuer limit and the 20 % aggregate.
+- The units of MMF K are 2 %.
+- The reverse repo with Bank R is 10 % against a 15 % counterparty limit, and its collateral, French government bills, is exempt from the 15 % collateral-issuer cap because it is public debt of the kind listed in Article 17(7).
 
 The German and French bills, at 10 % each, need a basis above the 5 % issuer limit. The fund has two options. It can apply for the Article 17(7) derogation, which requires the competent authority's authorisation, at least six different issues per issuer, at most 30 % in one issue, and disclosure in the fund rules and prospectus. Or it can rely on the VNAV rule of Article 17(2), as it does here, since the 28 % aggregate leaves room. The AMF grants the Article 17(7) derogation together with the MMF authorisation itself, through the compliance table of the application form.
 
@@ -245,7 +251,7 @@ The fund may also borrow cash through a repo, but only as a temporary liquidity 
 
 ## Step 7: the portfolio in context
 
-The portfolio rules do not operate alone. Three other obligations feed back into how the manager constructs it:
+Three other obligations feed back into how the manager constructs it:
 
 - **Know your customer (Art. 27).** The liquidity floors are minima; the manager must size the actual buffer to its own investor base, considering investor type, holding size and the correlation between investors. A fund whose largest investor exceeds the daily liquidity requirement must also look at that investor's cash-need patterns and risk aversion.
 - **Stress testing (Art. 28).** The portfolio is tested at least "bi-annually" against shocks to liquidity, credit, rates, redemptions and spreads, using ESMA's reference parameters. A vulnerability leads to an action plan approved by the board and sent to the competent authority.

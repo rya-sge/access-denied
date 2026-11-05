@@ -2,6 +2,7 @@
 layout: post
 title: "OpenSSH Detached Signatures — sshsig, Namespaces and ssh-keygen -Y"
 date:   2026-08-27
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: network security linux
@@ -18,7 +19,7 @@ SSHSIG is the part that does not. It is a signature format that lets an ordinary
 
 `sshsig.c` implements that format. It emits an armoured blob delimited by `-----BEGIN SSH SIGNATURE-----`, which is the mechanism behind `git config gpg.format ssh`. The OpenSSH project uses it on its own commits, which is why a `.git_allowed_signers` file sits at the root of the source tree.
 
-The format is worth reading for one design decision in particular. A signature carries a mandatory namespace string that is covered by the signature itself, so a signature produced for one purpose cannot be presented as a signature for another. This article covers the blob layout, what is actually signed, how verification enforces the namespace and the hash algorithm, and how `allowed_signers` decides which keys are acceptable. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.
+A signature carries a mandatory namespace string that is covered by the signature itself, so a signature produced for one purpose cannot be presented as a signature for another. This article covers the blob layout, what is actually signed, how verification enforces the namespace and the hash algorithm, and how `allowed_signers` decides which keys are acceptable. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -34,7 +35,7 @@ Everything is reached through `ssh-keygen -Y`, and the subcommands are dispatche
 - `find-principals` looks up which identities in an `allowed_signers` file correspond to the key that made a signature.
 - `match-principals` resolves an identity against the patterns in an `allowed_signers` file.
 
-The separation between `verify` and `check-novalidate` is the useful one. The first answers whether an authorised party signed this, the second answers only whether the signature is mathematically valid, which are different questions and are frequently confused in signature tooling.
+`verify` answers whether an authorised party signed this, `check-novalidate` answers only whether the signature is mathematically valid, which are different questions and are frequently confused in signature tooling.
 
 ![Component diagram of the sshsig format showing the armoured blob fields, the separately constructed signed pre-image, and the allowed_signers file consulted at verification]({{site.url_complet}}/assets/article/network/openssh-sshsig-concept.png)
 
@@ -65,7 +66,7 @@ if ((r = sshbuf_put(tosign, MAGIC_PREAMBLE, MAGIC_PREAMBLE_LEN)) != 0 ||
     (r = sshbuf_put_stringb(tosign, h_message)) != 0) {
 ```
 
-Comparing the two is instructive. The version and the public key appear in the file but not in the signed data, because they are needed to interpret the signature rather than protected by it. The namespace and the hash algorithm appear in both, so neither can be reinterpreted after the fact. And the final field is `h_message`, a hash of the content, not the content itself.
+The version and the public key appear in the file but not in the signed data, because they are needed to interpret the signature rather than protected by it. The namespace and the hash algorithm appear in both, so neither can be reinterpreted after the fact. And the final field is `h_message`, a hash of the content, not the content itself.
 
 That last point makes the scheme two-level. The file is hashed once by `hash_file`, and the signature covers a short structure containing that hash, which is what keeps signing a large file inexpensive and allows a signature to be checked without re-reading the original in memory.
 
@@ -102,7 +103,7 @@ The hash algorithm is checked immediately afterwards in the same manner, closing
 
 This is domain separation implemented as a required API parameter rather than as advice. Because the caller cannot sign without naming a namespace, and cannot verify without stating the namespace it expects, an application that adopts sshsig is isolated from every other user of the same key by construction. Git signs with the namespace `git`, so a Git commit signature is not a valid file signature and the reverse is equally false.
 
-The general form of the problem is worth stating plainly, because it is not specific to SSH. A key used for two purposes without domain separation lets a signature gathered under one purpose be replayed under the other, and whether that matters depends entirely on what the two purposes authorise. Placing the purpose inside the signed data and checking it on the way out removes the question.
+The problem is not specific to SSH. A key used for two purposes without domain separation lets a signature gathered under one purpose be replayed under the other, and whether that matters depends entirely on what the two purposes authorise. Placing the purpose inside the signed data and checking it on the way out removes the question.
 
 ## Deciding whose signature counts
 
@@ -128,7 +129,7 @@ Two things transfer to work unrelated to SSH. A signature format should carry it
 |------|------------|
 | **Detached signature** | A signature stored separately from the data it covers, which is the only form sshsig currently supports. |
 | **Armoured format** | The base64 encoding delimited by `-----BEGIN SSH SIGNATURE-----` and its matching footer, which a signature file must begin and end with. |
-| **Signed pre-image** | The structure actually passed to the signing operation, containing the preamble, namespace, reserved field, hash algorithm and message hash. |
+| **Signed pre-image** | The structure passed to the signing operation, containing the preamble, namespace, reserved field, hash algorithm and message hash. |
 | **Namespace** | The mandatory interpretation domain carried in the signature and compared for equality at verification, which may not be empty. |
 | **Cross-protocol attack** | Presenting a signature made for one interpretation domain as though it were made for another, which the namespace exists to prevent. |
 | **`allowed_signers`** | The file mapping identity patterns to keys, which decides whose signatures are acceptable. |

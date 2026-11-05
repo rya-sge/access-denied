@@ -2,6 +2,7 @@
 layout: post
 title: "FRI Explained Like I'm Ten — How to Check a Million Numbers by Peeking at Twenty"
 date:   2026-09-14
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography ZKP eli10
@@ -29,13 +30,15 @@ Rules like this have a special property. Two *different* short rules almost neve
 
 Why does anyone care? Because computers can turn almost any calculation into "here is a list that should follow a short rule." If you can check that cheaply, you can check the calculation cheaply. The Storyteller (the friend with the notebook) does all the hard work. The Inspector (you) just wants to be sure she did it right, without redoing it.
 
-> **The grown-up name.** A "short rule" is a **polynomial of low degree** (a formula built from adding and multiplying the spot number, with only a few numbers on the sticky note). The Storyteller is the **prover** and the Inspector is the **verifier**. The fact that two different low-degree polynomials agree in only a few spots comes from a rule you may meet later: a polynomial with $$d$$ numbers on its note has fewer than $$d$$ spots where it equals zero.
+> **The grown-up name.** A "short rule" is a **polynomial of low degree**: a formula built from adding and multiplying the spot number, with only a few numbers on the sticky note. The Storyteller is the **prover** and the Inspector is the **verifier**. The fact that two different low-degree polynomials agree in only a few spots comes from a rule you may meet later: a polynomial with $$d$$ numbers on its note has fewer than $$d$$ spots where it equals zero.
 
 ## Why does writing things twice help?
 
 Suppose you want to send your friend the word CAT, but the letter might get rained on. If you write CAT once and the C smudges, she reads "?AT" and cannot tell CAT from BAT or HAT. If you write it three times, CATCATCAT, one smudge is no problem. She can still see what you meant.
 
-Writing something longer than it needs to be, on purpose, so that smudges can be spotted and fixed, is a very old idea. The long version is called a codeword. The rule that stretches short things into long things is called a code. How much longer? If a three-letter word becomes nine letters, we say the rate is one third. A smaller rate means more stretching, which means more protection but more paper.
+Writing something longer than it needs to be, on purpose, so that smudges can be spotted and fixed, is a very old idea. The long version is called a codeword. The rule that stretches short things into long things is called a code.
+
+How much longer? If a three-letter word becomes nine letters, we say the rate is one third. A smaller rate means more stretching, which means more protection but more paper.
 
 Our secret rules do the same thing. The sticky note is the short message. The giant list of numbers, computed at thousands of spots, is the long version. And because two different rules almost never agree, two different lists produced this way disagree in nearly every spot. That is what makes smudges easy to notice: a valid list is very far from every other valid list.
 
@@ -86,21 +89,24 @@ Why not just stay in the first zone, where life is simplest? Because the further
 
 Now for the game itself. The Storyteller does not hand over the whole notebook. That would defeat the point. Instead, she seals it.
 
-Here is how sealing works. She takes every page, and from all the pages she makes one short fingerprint, a bit like a wax seal that depends on every letter inside. She gives the Inspector only the seal. Later, when the Inspector asks "what is on line 4,217?", the Storyteller shows that one line together with a small receipt proving the line belongs to the sealed notebook. Changing even one digit after sealing would break the receipt.
+She takes every page, and from all the pages she makes one short fingerprint, a bit like a wax seal that depends on every letter inside. She gives the Inspector only the seal. Later, when the Inspector asks "what is on line 4,217?", the Storyteller shows that one line together with a small receipt proving the line belongs to the sealed notebook. Changing even one digit after sealing would break the receipt.
 
 The game then goes back and forth. The Storyteller seals a notebook. The Inspector rolls dice and sends the result. The Storyteller seals another notebook based on the dice. This repeats a few times. At the end, the Inspector asks to open a handful of lines from each sealed notebook, checks that they fit together, and says yes or no.
 
 ![The sealed notebook game as a back-and-forth: the Storyteller sends a seal, the Inspector sends a dice roll, and at the end the Inspector opens a few lines and receives receipts]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/fri/fri-eli10-sealed-notebook-sequence.png)
 
-Two details make this practical. First, the dice rolls can be replaced by a trick. Instead of the Inspector rolling, the Storyteller computes the "roll" from the seals she has already sent, using a scrambling recipe that nobody can steer. That way she can play the whole game alone, write down everything, and mail the result as a single letter. Second, the cost of the letter is mostly the receipts. Every line the Inspector opens needs one receipt. So the whole design pushes towards opening as few lines as possible.
+Two details make this practical:
 
-> **The grown-up name.** The back-and-forth with sealed notebooks and line-by-line peeks is an **interactive oracle proof**, or **IOP**. The seal is a **Merkle root** and the receipt is a **Merkle proof** (both built from a hash function, a scrambler that turns any input into a short fingerprint). Replacing the dice with a hash of the seals is the **Fiat-Shamir transformation**. Doing both at once is called the **BCS compiler**, and the single letter that comes out is a **SNARK**.
+- **The dice rolls can be replaced by a trick.** Instead of the Inspector rolling, the Storyteller computes the "roll" from the seals she has already sent, using a scrambling recipe that nobody can steer. That way she can play the whole game alone, write down everything, and mail the result as a single letter.
+- **The cost of the letter is mostly the receipts.** Every line the Inspector opens needs one receipt. So the whole design pushes towards opening as few lines as possible.
+
+> **The grown-up name.** The back-and-forth with sealed notebooks and line-by-line peeks is an **interactive oracle proof**, or **IOP**. The seal is a **Merkle root** and the receipt is a **Merkle proof**, both built from a hash function, a scrambler that turns any input into a short fingerprint. Replacing the dice with a hash of the seals is the **Fiat-Shamir transformation**. Doing both at once is called the **BCS compiler**, and the single letter that comes out is a **SNARK**.
 
 ## How do you check one value with a division trick?
 
 The Inspector often needs more than "the notebook follows some rule." She needs to know what the rule says at a particular spot, one that is not even in the notebook. For example: "your rule, at spot 3, gives 10. True?"
 
-Here is a clever trick. Take every number in the notebook, subtract 10, and divide by (that spot minus 3). If the claim was true, this new list follows a rule that is *one step shorter* than the old one. If the claim was false, the new list is a mess that follows no short rule at all. So the Inspector just runs the same closeness check on the new list.
+Take every number in the notebook, subtract 10, and divide by (that spot minus 3). If the claim was true, this new list follows a rule that is *one step shorter* than the old one. If the claim was false, the new list is a mess that follows no short rule at all. So the Inspector just runs the same closeness check on the new list.
 
 Let us try it with the rule "spot times itself, plus one." Its values at spots 1, 2, 4 and 5 are 2, 5, 17 and 26. The Storyteller claims the rule gives 10 at spot 3, which is correct.
 
@@ -128,7 +134,7 @@ The new list is 4.5, 6, 6, 7.5. No "spot plus something" rule fits those. The li
 
 One more nice thing: the Inspector never needs the new list written down. Whenever she wants to peek at line 4,217 of the new list, she peeks at line 4,217 of the sealed notebook and does the subtraction and division herself.
 
-> **The grown-up name.** This is **quotienting**: the new list is $$(u(x) - b) / (x - a)$$ where $$a$$ is the spot asked about and $$b$$ is the claimed value. Checking several spots at once uses a **vanishing polynomial** (zero at all the asked spots) and an **interpolation polynomial** (hitting all the claimed values). A list that is computed on the fly from a sealed one, rather than sealed itself, is a **virtual oracle**.
+> **The grown-up name.** This is **quotienting**: the new list is $$(u(x) - b) / (x - a)$$ where $$a$$ is the spot asked about and $$b$$ is the claimed value. Checking several spots at once uses a **vanishing polynomial**, which is zero at all the asked spots, and an **interpolation polynomial**, which hits all the claimed values. A list that is computed on the fly from a sealed one, rather than sealed itself, is a **virtual oracle**.
 
 ## Why ask a surprise question first?
 
@@ -138,7 +144,7 @@ The fix is simple. Before asking any real questions, the Inspector picks a rando
 
 Why does that close the loophole? Because two different short rules almost never agree at a random spot. If the Storyteller answered the surprise with rule A's value, she cannot later switch to rule B, because rule B gives a different value at the surprise spot, and the division trick would turn that into mess. One surprise question welds her to a single rule.
 
-> **The grown-up name.** The surprise question is an **out-of-domain sample**, and the technique is called **DEEP**, short for Domain Extension for Eliminating Pretenders. It works because the number of candidate rules is small (that is the Johnson bound again) and the field of possible spots is huge, so the chance two candidates collide at a random spot is tiny, about the odds of guessing which grain of sand on a beach someone is thinking of.
+> **The grown-up name.** The surprise question is an **out-of-domain sample**, and the technique is called **DEEP**, short for Domain Extension for Eliminating Pretenders. It works because the number of candidate rules is small (the Johnson bound again) and the field of possible spots is huge, so the chance two candidates collide at a random spot is tiny, about the odds of guessing which grain of sand on a beach someone is thinking of.
 
 ## Can you check many notebooks with one dice roll?
 
@@ -146,7 +152,9 @@ Sometimes the Storyteller has ten notebooks, and the Inspector wants to know tha
 
 Instead, the Inspector rolls a number, say 7. The Storyteller builds one blended notebook: line 1 of the blend is line 1 of notebook one, plus 7 times line 1 of notebook two, plus 49 times line 1 of notebook three, and so on. Then they play the game once, on the blend.
 
-If all ten notebooks follow short rules, the blend follows a short rule too, whatever number was rolled. That part is easy. The surprising part is the other direction. If even one of the ten notebooks is a mess, the blend is a mess for almost every roll. A mess cannot hide inside a blend. Proving that took mathematicians until 2020, and it holds as long as we stay in the second zone of the smudge ruler.
+If all ten notebooks follow short rules, the blend follows a short rule too, whatever number was rolled. That part is easy.
+
+The surprising part is the other direction. If even one of the ten notebooks is a mess, the blend is a mess for almost every roll. A mess cannot hide inside a blend. Proving that took mathematicians until 2020, and it holds as long as we stay in the second zone of the smudge ruler.
 
 > **The grown-up name.** The blend is a **random linear combination**, and this is **batching**. The theorem that says a mess cannot hide is the **proximity gap theorem**. It also says something extra: all ten notebooks are clean on the *same* set of lines, which is called **correlated agreement**.
 
@@ -154,7 +162,7 @@ If all ten notebooks follow short rules, the blend follows a short rule too, wha
 
 This is the step that gives FRI its name and its speed. The idea is to turn a long notebook that follows a rule with, say, eight numbers on its note into a notebook *half as long* that follows a rule with *four* numbers on its note. Then do it again. And again. After a few folds the notebook is so short the Inspector can just read the whole thing.
 
-Here is how one fold works. Take a rule like "2 + 3x + 5x² + 4x³". Split it into two halves: the pieces where x is raised to an even power, and the pieces where it is raised to an odd power.
+Take a rule like "2 + 3x + 5x² + 4x³". Split it into two halves: the pieces where x is raised to an even power, and the pieces where it is raised to an odd power.
 
 ```
 even half:  2 + 5x²    ->  think of it as  2 + 5y     (with y = x²)
@@ -173,7 +181,7 @@ The important question is whether folding could accidentally turn a messy notebo
 
 ![Activity diagram of one fold: split the rule into even and odd halves, blend them with a rolled number, and get a notebook half as long that follows a rule half as complex]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/fri/fri-eli10-folding-workflow.png)
 
-> **The grown-up name.** This is **folding**. The spots are chosen as **roots of unity** (a set where every spot $$x$$ has a partner $$-x$$, and squaring maps both to the same new spot). The even and odd halves are written $$f_e$$ and $$f_o$$, and the fold is $$f_e + r \cdot f_o$$ for the rolled number $$r$$. The guarantee that smudges survive folding is the **distance-preservation lemma**, and it is what FRI repeats round after round.
+> **The grown-up name.** This is **folding**. The spots are chosen as **roots of unity**: a set where every spot $$x$$ has a partner $$-x$$, and squaring maps both to the same new spot. The even and odd halves are written $$f_e$$ and $$f_o$$, and the fold is $$f_e + r \cdot f_o$$ for the rolled number $$r$$. The guarantee that smudges survive folding is the **distance-preservation lemma**, and it is what FRI repeats round after round.
 
 ## Putting it all together
 
@@ -192,7 +200,15 @@ This article covers steps 1 to 4 and the idea behind step 5. The exact rules of 
 
 ## Summary
 
-FRI is a way to check that a huge list of numbers follows one short rule by peeking at only a few entries. It works because two different short rules almost never agree, so a list that is even slightly wrong stands out once you look at enough of it. The Inspector cannot catch a single smudge, so she settles for catching lists that are far from every rule, and that turns out to be enough. Sealed notebooks make the peeks trustworthy. A division trick turns "is this value right?" into "is this list clean?" A surprise question stops the Storyteller from switching rules. Blending checks many lists at once. And folding shrinks the list by half each round until it is small enough to read.
+FRI is a way to check that a huge list of numbers follows one short rule by peeking at only a few entries. It works because two different short rules almost never agree, so a list that is even slightly wrong stands out once you look at enough of it. The Inspector cannot catch a single smudge, so she settles for catching lists that are far from every rule, and that turns out to be enough.
+
+The parts of the game:
+
+- Sealed notebooks make the peeks trustworthy.
+- A division trick turns "is this value right?" into "is this list clean?"
+- A surprise question stops the Storyteller from switching rules.
+- Blending checks many lists at once.
+- Folding shrinks the list by half each round until it is small enough to read.
 
 ![Mindmap of FRI explained simply, covering short rules, codes and smudges, the smudge budget, the sealed notebook game, the division trick, the surprise question, blending and folding]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-14-fri-proximity-proofs-eli10-mindmap.png)
 
@@ -200,15 +216,21 @@ FRI is a way to check that a huge list of numbers follows one short rule by peek
 
 **Q: But why not just send the sticky note with the rule on it? Then the Inspector could check everything herself.**
 
-Sometimes she could, and then no game is needed. But in the real use of FRI, the "rule" is the whole record of a big calculation, and the notebook is a stretched-out version of that record. The sticky note itself can be as big as the calculation. The point is that the Inspector wants to spend far less effort than the Storyteller did. Peeking at a few lines of a sealed notebook costs her almost nothing. Reading the whole rule would cost as much as redoing the work.
+Sometimes she could, and then no game is needed. But in the real use of FRI, the "rule" is the whole record of a big calculation, and the notebook is a stretched-out version of that record. The sticky note itself can be as big as the calculation.
+
+The point is that the Inspector wants to spend far less effort than the Storyteller did. Peeking at a few lines of a sealed notebook costs her almost nothing. Reading the whole rule would cost as much as redoing the work.
 
 **Q: What if the Storyteller is wrong in exactly one spot? Does she get away with it?**
 
-Yes, probably. Twenty random peeks will almost never land on one bad line out of a million. That is why the Inspector only promises to catch notebooks that are far from every rule. In real systems this is fine, because a notebook that is close to a valid one still pins down the same single rule, and it is the rule that matters, not the individual lines. In real systems this is more complex, but the core idea is the same.
+Yes, probably. Twenty random peeks will almost never land on one bad line out of a million. That is why the Inspector only promises to catch notebooks that are far from every rule.
+
+In real systems this is fine, because a notebook that is close to a valid one still pins down the same single rule, and it is the rule that matters, not the individual lines. In real systems this is more complex, but the core idea is the same.
 
 **Q: How does this help in real life?**
 
-Think of a small phone that wants to be sure a giant computer did a calculation correctly, without redoing it. Or a blockchain (a shared ledger that thousands of computers keep in sync) that wants to accept thousands of transactions at once but only has room to check a tiny proof. FRI-based proofs are used for exactly that. The big computer plays the Storyteller, does the work, and mails a short letter. Everyone else plays the Inspector and checks the letter in a blink.
+Think of a small phone that wants to be sure a giant computer did a calculation correctly, without redoing it. Or a blockchain (a shared ledger that thousands of computers keep in sync) that wants to accept thousands of transactions at once but only has room to check a tiny proof. FRI-based proofs are used for exactly that.
+
+The big computer plays the Storyteller, does the work, and mails a short letter. Everyone else plays the Inspector and checks the letter in a blink.
 
 **Q: What goes wrong if you skip the surprise question?**
 
@@ -216,11 +238,15 @@ Then a sneaky Storyteller with a smudged notebook can answer different questions
 
 **Q: Can you give me another example of "two short rules almost never agree"?**
 
-Think of straight lines drawn on graph paper. Two different straight lines can cross at most once. Two different curves that bend once (like a smile) can cross at most twice. In general, two different rules with a few numbers on their notes can meet only a few times, and then they part forever. So if you check a random spot and both rules give the same answer, you were incredibly unlucky, or they are secretly the same rule.
+Think of straight lines drawn on graph paper. Two different straight lines can cross at most once. Two different curves that bend once (like a smile) can cross at most twice. In general, two different rules with a few numbers on their notes can meet only a few times, and then they part forever.
+
+So if you check a random spot and both rules give the same answer, you were incredibly unlucky, or they are secretly the same rule.
 
 **Q: Why does folding not lose information?**
 
-The two halves together are the whole rule, so nothing is thrown away when you split. Blending them with a random number does mix them, but because the Inspector chose the number after the Storyteller sealed the notebook, the Storyteller could not arrange for a mess to cancel out. That is why the folded notebook is still a mess if the original was. And each fold is checked: the Inspector opens a few pairs of twin lines in the old notebook and confirms the blend was done honestly.
+The two halves together are the whole rule, so nothing is thrown away when you split. Blending them with a random number does mix them, but because the Inspector chose the number after the Storyteller sealed the notebook, the Storyteller could not arrange for a mess to cancel out. That is why the folded notebook is still a mess if the original was.
+
+Each fold is also checked: the Inspector opens a few pairs of twin lines in the old notebook and confirms the blend was done honestly.
 
 ## References
 

@@ -2,6 +2,7 @@
 layout: post
 title: "KZG Polynomial Commitments — The Terms and Formulas, From Beginner to Advanced"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -53,7 +54,7 @@ Working over a finite field rather than the reals is what makes polynomials usab
 
 The maximum degree $$t$$ the scheme is set up to handle. The parameters are generated for a specific $$t$$, and the committer may commit to any $$\phi(x)$$ with $$\deg(\phi) \le t$$.
 
-The bound is not a formality. A polynomial of degree $$t$$ is pinned down by any $$t+1$$ of its values, so a committer who has opened that many points has no freedom left over the remaining ones, and a committer who has opened fewer still has some. The paper's hiding definition is stated in exactly these terms, over the evaluations revealed so far. The public parameters have size $$O(t)$$, which is the scheme's main storage cost.
+A polynomial of degree $$t$$ is pinned down by any $$t+1$$ of its values, so a committer who has opened that many points has no freedom left over the remaining ones, and a committer who has opened fewer still has some. The paper's hiding definition is stated in exactly these terms, over the evaluations revealed so far. The public parameters have size $$O(t)$$, which is the scheme's main storage cost.
 
 ### Polynomial commitment scheme
 
@@ -149,7 +150,7 @@ e(C,\ g) \;\overset{?}{=}\; e\bigl(w_i,\ g^{\alpha}/g^{i}\bigr) \cdot e(g,g)^{\p
 \end{aligned}
 $$
 
-Reading it in the exponent makes it obvious. The right-hand side is $$e(g,g)^{\psi_i(\alpha)(\alpha - i) + \phi(i)}$$, and the remainder theorem says that exponent is exactly $$\phi(\alpha)$$, which is the left-hand side. The verifier needs only $$g^{\alpha}$$ from the reference string, so verification cost does not grow with $$t$$.
+The right-hand side is $$e(g,g)^{\psi_i(\alpha)(\alpha - i) + \phi(i)}$$, and the remainder theorem says that exponent is exactly $$\phi(\alpha)$$, which is the left-hand side. The verifier needs only $$g^{\alpha}$$ from the reference string, so verification cost does not grow with $$t$$.
 
 ### PolyCommitDL
 
@@ -167,7 +168,7 @@ C = g^{\phi(\alpha)} h^{\hat\phi(\alpha)}
 \end{aligned}
 $$
 
-The trade is the standard one. Hiding becomes unconditional, so an attacker with unlimited computing power still learns nothing about unopened evaluations, while binding stays computational under t-SDH. The cost is a reference string of $$2t+2$$ elements instead of $$t+1$$, and a witness that carries a second exponentiation.
+Hiding becomes unconditional, so an attacker with unlimited computing power still learns nothing about unopened evaluations, while binding stays computational under t-SDH. The cost is a reference string of $$2t+2$$ elements instead of $$t+1$$, and a witness that carries a second exponentiation.
 
 ### Polynomial binding
 
@@ -291,11 +292,13 @@ That is why a system aiming at post-quantum plausibility does not use KZG. FRI c
 
 The vocabulary has one load-bearing idea and a lot of consequences. The polynomial remainder theorem is what makes an evaluation checkable at all, and everything in the intermediate level is that fact expressed in a group: the quotient becomes the witness, the division becomes a pairing equation, and the degree bound becomes the length of the reference string. A reader who can rederive the verification equation from the remainder theorem has the construction.
 
-The intermediate level is the real threshold, and the entry that most often separates a working understanding from a partial one is evaluation binding, because it is the property protocols use and the one polynomial binding does not imply. The advanced level is where the caveats live: the degree bound the pairing check does not enforce, the extractability that binding does not give, and the trapdoor whose destruction the whole scheme assumes. Next, read the KZG section of Marlin or PLONK, where these terms appear in their working form, and compare it against the FRI construction to see which of the properties above are consequences of pairings rather than of commitment schemes in general.
+The intermediate level is the real threshold, and the entry that most often separates a working understanding from a partial one is evaluation binding, because it is the property protocols use and the one polynomial binding does not imply. The advanced level is where the caveats live: the degree bound the pairing check does not enforce, the extractability that binding does not give, and the trapdoor whose destruction the whole scheme assumes.
+
+Next, read the KZG section of Marlin or PLONK, where these terms appear in their working form, and compare it against the FRI construction to see which of the properties above are consequences of pairings rather than of commitment schemes in general.
 
 ![Mindmap of KZG polynomial commitment vocabulary, split into beginner, intermediate and advanced terms including binding, structured reference string, the quotient polynomial, evaluation binding, t-SDH and extractability]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-mindmap.png)
 
-Sorted by reading order the vocabulary is three levels deep. Sorted by subject it is seven clusters, and the second cut shows which entries are one idea split across levels: binding is a beginner term whose two precise forms are intermediate, while the assumptions and the proof-system machinery sit entirely in the advanced level.
+Sorted by reading order the vocabulary is three levels deep. Sorted by subject it is seven clusters, and the second cut shows which entries are one idea split across levels: binding is a beginner term whose two precise forms are intermediate, while the assumptions and the proof-system entries sit entirely in the advanced level.
 
 ![Mindmap grouping KZG vocabulary by theme, with branches for what a commitment promises, the algebra, group and pairing machinery, setup and trust, the scheme and its variants, hardness assumptions and use inside a proof system]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-09-09-kzg-polynomial-commitments-themes.png)
 
@@ -311,7 +314,9 @@ They are separate requirements, and each comes in a computational and an uncondi
 
 Because the claimed value on its own is unverifiable. The verifier holds one group element and cannot evaluate the committed polynomial itself.
 
-The quotient turns the claim into an algebraic fact the verifier can test. By the [polynomial remainder theorem](#polynomial-remainder-theorem), $$\psi_i(x) = (\phi(x) - \phi(i))/(x - i)$$ is a genuine polynomial precisely when $$\phi(i)$$ is the correct value; if the value is wrong, the division leaves a remainder and no such polynomial exists. Turning that into a security claim takes the [t-SDH](#t-strong-diffie-hellman-assumption-t-sdh) reduction, which converts a passing witness for a wrong value into a solution to the assumed-hard problem. The [VerifyEval pairing equation](#verifyeval-pairing-equation) is the check that the division came out even.
+The quotient turns the claim into an algebraic fact the verifier can test. By the [polynomial remainder theorem](#polynomial-remainder-theorem), $$\psi_i(x) = (\phi(x) - \phi(i))/(x - i)$$ is a genuine polynomial precisely when $$\phi(i)$$ is the correct value; if the value is wrong, the division leaves a remainder and no such polynomial exists.
+
+Turning that into a security claim takes the [t-SDH](#t-strong-diffie-hellman-assumption-t-sdh) reduction, which converts a passing witness for a wrong value into a solution to the assumed-hard problem. The [VerifyEval pairing equation](#verifyeval-pairing-equation) is the check that the division came out even.
 
 **Q: What is the difference between [polynomial binding](#polynomial-binding) and [evaluation binding](#evaluation-binding)?**
 

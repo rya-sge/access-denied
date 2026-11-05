@@ -2,6 +2,7 @@
 layout: post
 title: "FRI and Proximity Proofs — The Vocabulary, From Beginner to Advanced"
 date:   2026-09-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -15,7 +16,7 @@ FRI is the proximity test at the bottom of every STARK and of most hash-based SN
 
 Those words are the obstacle. Each carries a precise meaning borrowed from coding theory or from the theory of interactive proofs, and the papers reuse them without restating them. This article is a term list rather than a walkthrough: thirty terms split into three levels, each entry standalone, each with the formula or the fact that makes it concrete. Read it in order, or open it at whichever word stopped you.
 
-The terms are those used in the first half of a two-part [ZK Whiteboard Sessions lecture by Dan Boneh](https://www.youtube.com/watch?v=MBDBrEr2XQg) on FRI, and in its companion article on this site, [FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-part-1-codes-iop-quotienting-folding/), which walks through the constructions. This one defines the vocabulary; it does not build the protocol.
+The terms are those used in the first half of a two-part [ZK Whiteboard Sessions lecture by Dan Boneh](https://www.youtube.com/watch?v=MBDBrEr2XQg) on FRI, and in its companion article on this site, [FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding]({{site.url_complet}}/2026/09/11/fri-proximity-proofs-part-1-codes-iop-quotienting-folding/), which walks through the constructions.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -153,7 +154,7 @@ The IOP is an information-theoretic model: it has no hash functions or hardness 
 
 ### Soundness, knowledge soundness and succinctness
 
-Three requirements on an [IOP](#interactive-oracle-proof-iop), alongside completeness (an honest prover on a true statement is always accepted). Soundness: for any prover $$P^\star$$ and any instance with no witness, the verifier accepts with probability at most $$2^{-128}$$. Knowledge soundness: a prover that convinces the verifier must know a witness. Succinctness: the verifier runs in time far below the cost of checking the relation directly.
+Three requirements on an [IOP](#interactive-oracle-proof-iop), alongside completeness, which means that an honest prover on a true statement is always accepted. Soundness: for any prover $$P^\star$$ and any instance with no witness, the verifier accepts with probability at most $$2^{-128}$$. Knowledge soundness: a prover that convinces the verifier must know a witness. Succinctness: the verifier runs in time far below the cost of checking the relation directly.
 
 Succinctness is what rules out the trivial protocol of sending the witness, and it is why the verifier can afford only a handful of cell reads. The variant of soundness used for proximity proofs is relaxed; see [IOP of proximity](#iop-of-proximity-iopp).
 
@@ -265,7 +266,9 @@ The Hamming weight is a property of one vector: the count of its non-zero coordi
 
 **Q: Why is the [Johnson bound](#johnson-bound) rather than the [unique decoding distance](#unique-decoding-distance) the limit everyone quotes?**
 
-Below the unique decoding distance a word has at most one nearby codeword, which is the simplest situation but also the most restrictive: at rate $$1/4$$ it stops at $$3/8$$. Below the Johnson bound, $$1/2$$ at that rate, the number of nearby codewords is no longer one but is still provably bounded, and a bounded list is enough for every argument in the FRI toolbox, from the DEEP union bound to the proximity gap theorem. Above the Johnson bound nothing is proven for structured domains, so it is the largest radius with a guarantee.
+Below the unique decoding distance a word has at most one nearby codeword, which is the simplest situation but also the most restrictive: at rate $$1/4$$ it stops at $$3/8$$. Below the Johnson bound, $$1/2$$ at that rate, the number of nearby codewords is no longer one but is still provably bounded, and a bounded list is enough for every argument in the FRI toolbox, from the DEEP union bound to the proximity gap theorem.
+
+Above the Johnson bound nothing is proven for structured domains, so it is the largest radius with a guarantee.
 
 **Q: How does an [IOP of proximity](#iop-of-proximity-iopp) differ from an ordinary [IOP](#interactive-oracle-proof-iop)?**
 
@@ -277,11 +280,15 @@ It saves a commitment: a derived string such as a [quotient](#quotienting) or a 
 
 **Q: Why does [quotienting](#quotienting) need [DEEP](#deep-out-of-domain-sampling) once the proximity parameter exceeds the unique decoding distance?**
 
-Quotienting proves that some polynomial in $$\mathrm{List}(u, d, \delta)$$ takes the claimed value at the query point. Below the unique decoding distance the list has one member, so that polynomial is the committed one. Above it, the list may hold several, and each query could be answered from a different member, so the prover is not bound to a single polynomial. DEEP's out-of-domain pair $$(r, s)$$, included in every quotient, singles out one list member with high probability because two distinct low-degree polynomials rarely agree at a random point.
+Quotienting proves that some polynomial in $$\mathrm{List}(u, d, \delta)$$ takes the claimed value at the query point. Below the unique decoding distance the list has one member, so that polynomial is the committed one. Above it, the list may hold several, and each query could be answered from a different member, so the prover is not bound to a single polynomial.
+
+DEEP's out-of-domain pair $$(r, s)$$, included in every quotient, singles out one list member with high probability because two distinct low-degree polynomials rarely agree at a random point.
 
 **Q: Which property of a [Reed-Solomon code](#reed-solomon-code) makes [folding](#folding) preserve the rate, and why does that matter for the [Johnson bound](#johnson-bound)?**
 
-A fold halves the degree bound, from $$d$$ to $$d/2$$, because the even and odd parts each hold half the coefficients, and it halves the domain, from $$L$$ to $$L^2$$, because squaring on a group of roots of unity is two-to-one. The rate $$\rho = d/n$$ is therefore unchanged. Since the Johnson bound is $$1 - \sqrt\rho$$, a proximity parameter chosen below it for the original code stays below it for every folded code, so the distance-preservation guarantee applies at every round.
+A fold halves the degree bound, from $$d$$ to $$d/2$$, because the even and odd parts each hold half the coefficients, and it halves the domain, from $$L$$ to $$L^2$$, because squaring on a group of roots of unity is two-to-one. The rate $$\rho = d/n$$ is therefore unchanged.
+
+Since the Johnson bound is $$1 - \sqrt\rho$$, a proximity parameter chosen below it for the original code stays below it for every folded code, so the distance-preservation guarantee applies at every round.
 
 **Q: What does "correlated" add to the [proximity gap theorem](#proximity-gap-theorem-bciks)?**
 

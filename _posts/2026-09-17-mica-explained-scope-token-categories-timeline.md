@@ -2,6 +2,7 @@
 layout: post
 title: "MiCA Explained — Scope, Token Categories and Timeline of Regulation (EU) 2023/1114"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation blockchain
@@ -52,7 +53,7 @@ Article 2(2) lists six categories of person to which the Regulation does not app
 
 ### Assets outside the scope
 
-Two further paragraphs exclude assets rather than persons, and they matter more in practice.
+Two further paragraphs exclude assets rather than persons.
 
 Article 2(3) excludes crypto-assets that are **unique and not fungible with other crypto-assets**. This is the NFT carve-out. The text does not use the term, and the exclusion is narrower than the label suggests: a token is out of scope only if it is unique in fact, so a large series of near-identical tokens, or a fractionalised interest in one asset, does not qualify simply because it is minted under a non-fungible standard.
 
@@ -106,7 +107,7 @@ The ten crypto-asset services in Article 3(1)(16) are: custody and administratio
 
 ## How the text is organised
 
-The Regulation has nine titles and six annexes. Reading it is easier once the mapping between title and audience is clear, because the same obligation (a white paper, a conflicts-of-interest policy, a complaints procedure) reappears in three titles with variations for each category of token.
+The Regulation has nine titles and six annexes. Reading it is easier once the mapping between title and audience is clear, because the same obligation, such as a white paper, a conflicts-of-interest policy or a complaints procedure, reappears in three titles with variations for each category of token.
 
 | Title | Articles | Subject | Covered in |
 |---|---|---|---|
@@ -228,11 +229,13 @@ MiCA is written as a set of conditions and obligations; the rows below transcrib
 
 **Q: Does MiCA apply to a token issued on a private, permissioned ledger?**
 
-Yes, if the token meets the definition in Article 3(1)(5). The definition requires only that the value or right be transferable and storable electronically using distributed ledger technology "or similar technology". Neither the openness of the ledger nor the consensus mechanism is a criterion. What removes a token from the scope is its legal nature (a financial instrument, a deposit, a fund) or its uniqueness, not the ledger it runs on.
+Yes, if the token meets the definition in Article 3(1)(5). The definition requires only that the value or right be transferable and storable electronically using distributed ledger technology "or similar technology". Neither the openness of the ledger nor the consensus mechanism is a criterion. What removes a token from the scope is its legal nature, as with a financial instrument, a deposit or a fund, or its uniqueness, not the ledger it runs on.
 
 **Q: A token references the euro but is stabilised by an algorithm and over-collateralised crypto-assets rather than a bank reserve. Is it an EMT or an ART?**
 
-It is an e-money token. Article 3(1)(7) defines an EMT by what the token *purports* to do, namely maintain a stable value by referencing one official currency, and says nothing about the mechanism. The stabilisation method is irrelevant to the classification, though it is highly relevant to whether the issuer can meet Title IV, which requires issuance at par against funds received and redemption at par at any time. An ART is defined by exclusion from the EMT category, so a single-currency reference can never be an ART.
+It is an e-money token. Article 3(1)(7) defines an EMT by what the token *purports* to do, namely maintain a stable value by referencing one official currency, and says nothing about the mechanism.
+
+The stabilisation method is irrelevant to the classification, though it is highly relevant to whether the issuer can meet Title IV, which requires issuance at par against funds received and redemption at par at any time. An ART is defined by exclusion from the EMT category, so a single-currency reference can never be an ART.
 
 **Q: Why does the Regulation regulate the offeror rather than the issuer for ordinary crypto-assets, but the issuer for stablecoins?**
 
@@ -246,7 +249,10 @@ Titles III and IV, covering asset-referenced tokens and e-money tokens, applied 
 
 **Q: A firm was providing custody of crypto-assets in a Member State under a national registration before December 2024. Does it need a MiCA authorisation on 30 December 2024?**
 
-Not immediately. Article 143(3) allows a CASP that provided its services in accordance with applicable law before 30 December 2024 to continue until 1 July 2026 or until its MiCA application is granted or refused, whichever comes first. Two qualifications apply. Member States could shorten or waive that period if they judged their previous regime less strict than MiCA, and several did; the firm must check its own Member State's choice. And the transitional right covers continuation of existing services only; it does not give a passport to other Member States, which requires a MiCA authorisation and the notification under Article 65.
+Not immediately. Article 143(3) allows a CASP that provided its services in accordance with applicable law before 30 December 2024 to continue until 1 July 2026 or until its MiCA application is granted or refused, whichever comes first. Two qualifications apply:
+
+- Member States could shorten or waive that period if they judged their previous regime less strict than MiCA, and several did; the firm must check its own Member State's choice.
+- The transitional right covers continuation of existing services only; it does not give a passport to other Member States, which requires a MiCA authorisation and the notification under Article 65.
 
 **Q: Combining the scope rules and the taxonomy: a company sells tokens that give discounted access to its cloud storage service, which is live today, and it also lists them on an EU exchange. Which title applies, and does it need a white paper?**
 

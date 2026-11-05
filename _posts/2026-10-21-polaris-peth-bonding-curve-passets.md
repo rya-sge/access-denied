@@ -2,7 +2,7 @@
 layout: post
 title: "How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets"
 date:   2026-10-21
-last_modified_at: 2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -92,9 +92,13 @@ The symbols mean the following:
 - **$$\beta$$** is the exponent and sets how fast the price grows with supply. It is `immutable`, and the constructor enforces `params.beta > 0` and `params.beta < DECIMAL_PRECISION`, so in 18-decimal fixed point $$\beta$$ is strictly between 0 and 1.
 - **$$R(s)$$** is the ETH the curve must hold when the supply is $$s$$, which is the variable `virtualBalance`.
 
-The reserve is an integral because each unit of pETH was bought at the marginal price in force when it was minted. Adding up the price of every unit from 0 to $$s$$ is the area under the price curve, and for a power function that area has the closed form above. That is the practical reason for choosing a power law: integrating $$x^{\beta}$$ gives another power, $$\frac{x^{\beta + 1}}{\beta + 1}$$, so the reserve is a single formula the contract can evaluate without summing anything. The same reasoning prices any trade: moving from supply $$s_1$$ to $$s_2$$ costs (or, for a sale, pays) the area between the two points, $$R(s_2) - R(s_1)$$.
+The reserve is an integral because each unit of pETH was bought at the marginal price in force when it was minted. Adding up the price of every unit from 0 to $$s$$ is the area under the price curve, and for a power function that area has the closed form above. That is the practical reason for choosing a power law: integrating $$x^{\beta}$$ gives another power, $$\frac{x^{\beta + 1}}{\beta + 1}$$, so the reserve is a single formula the contract can evaluate without summing anything.
 
-The bound on $$\beta$$ decides how the price grows. With $$\beta = 0$$ the price would be the constant $$\alpha$$ and the curve would be a fixed-rate wrapper of ETH. With $$\beta = 1$$ it would be a straight line, the price rising by the same amount for every unit minted. With $$\beta$$ between the two, the curve is concave: price rises with supply, but each additional unit raises it by less than the previous one, so large supplies see a smaller price impact per pETH. Holding the reserve at a constant share of the token's market value, as shown below, makes this the same family of curves as Bancor's constant-reserve-ratio design.
+The same reasoning prices any trade: moving from supply $$s_1$$ to $$s_2$$ costs (or, for a sale, pays) the area between the two points, $$R(s_2) - R(s_1)$$.
+
+The bound on $$\beta$$ decides how the price grows. With $$\beta = 0$$ the price would be the constant $$\alpha$$ and the curve would be a fixed-rate wrapper of ETH. With $$\beta = 1$$ it would be a straight line, the price rising by the same amount for every unit minted. With $$\beta$$ between the two, the curve is concave: price rises with supply, but each additional unit raises it by less than the previous one, so large supplies see a smaller price impact per pETH.
+
+Holding the reserve at a constant share of the token's market value, as shown below, makes this the same family of curves as Bancor's constant-reserve-ratio design.
 
 A worked example with the parameters of the repository's tests, $$\alpha = 2$$ and $$\beta = 0.5$$ (so $$p(s) = 2\sqrt{s}$$ and $$R(s) = \frac{4}{3} s^{1.5}$$), fees ignored:
 
@@ -205,7 +209,9 @@ The Polaris public testnet runs on Sepolia. Its web application (`testnet.polari
 | `virtualBalance()` / `floorBalance()` | ≈ 902,630 / ≈ 19,392 WETH |
 | `reserveToken()` | Sepolia WETH |
 
-These numbers are consistent with the formulas of the previous subsections. The floor-to-spot ratio predicted by $$\left(\frac{S_f}{S_v}\right)^{\beta}$$ is $$\left(\frac{12{,}068}{340{,}386}\right)^{0.15} \approx 0.606$$, and the ratio of the two prices returned by the contract is $$\frac{1.8479}{3.0495} \approx 0.606$$. The reserve-ratio identity also holds: the contract's own `reserveRatioDeviation()` returned 0 at that block. Recomputing both sides with exact arithmetic gives $$(\beta + 1) \cdot R(S_v) \approx 1{,}038{,}024.43$$ and $$\alpha \, S_v^{\beta + 1} \approx 1{,}038{,}023.57$$, a gap of about 0.86 WETH, or 0.00008%. That gap is the approximation error of the contract's fixed-point `pow`. The contract's own check reports zero because `virtualBalance` is itself computed with that same `pow`. With $$\beta = 0.15$$, the curve holds $$\frac{1}{1.15} \approx 87\%$$ of pETH's market value in reserve, against 67% for the $$\beta = 0.5$$ of the tests.
+These numbers are consistent with the formulas of the previous subsections. The floor-to-spot ratio predicted by $$\left(\frac{S_f}{S_v}\right)^{\beta}$$ is $$\left(\frac{12{,}068}{340{,}386}\right)^{0.15} \approx 0.606$$, and the ratio of the two prices returned by the contract is $$\frac{1.8479}{3.0495} \approx 0.606$$.
+
+The reserve-ratio identity also holds: the contract's own `reserveRatioDeviation()` returned 0 at that block. Recomputing both sides with exact arithmetic gives $$(\beta + 1) \cdot R(S_v) \approx 1{,}038{,}024.43$$ and $$\alpha \, S_v^{\beta + 1} \approx 1{,}038{,}023.57$$, a gap of about 0.86 WETH, or 0.00008%. That gap is the approximation error of the contract's fixed-point `pow`. The contract's own check reports zero because `virtualBalance` is itself computed with that same `pow`. With $$\beta = 0.15$$, the curve holds $$\frac{1}{1.15} \approx 87\%$$ of pETH's market value in reserve, against 67% for the $$\beta = 0.5$$ of the tests.
 
 The deployed curve differs from the prototype in at least one respect: `FEE_PERCENTAGE()` reverts, and the application's interface instead calls functions named `buyFee`, `buyFeeParams` and `buyFeeState`. That is consistent with the documentation's dynamic, spike-and-decay swap fee.
 
@@ -302,7 +308,9 @@ Where Polaris differs from most collateralized-debt systems is in who carries th
 
 ![Left, a pAsset's market price oscillating around its 1.00 target, with the above-peg zone where arbitrageurs buy at peg and sell and the below-peg zone where they buy and redeem at peg; right, illustrative market totals showing a 50,000 peg buy lowering the collateral ratio from 170% to 166.7% and a 50,000 redemption raising it to 173.7%]({{site.url_complet}}/assets/article/blockchain/defi/polaris/polaris-adaptive-peg-defense.svg)
 
-The right panel draws a consequence of the mechanism with illustrative numbers. Take a market with 1.7 million of collateral and 1 million of debt, a 170% ratio. A peg buy adds debt and collateral of equal value (fees aside), so 50,000 of it brings the market to 1.75 million against 1.05 million, about 166.7%. A redemption of 50,000 removes equal value from both and lifts the ratio to about 173.7%. Peg buys therefore move a market towards 100% backing and redemptions away from it, which is consistent with Defensive Mode restricting peg buys, as described below. The documentation does not say how that change is split between individual positions, so the figure shows market totals only.
+The right panel draws a consequence of the mechanism with illustrative numbers. Take a market with 1.7 million of collateral and 1 million of debt, a 170% ratio. A peg buy adds debt and collateral of equal value (fees aside), so 50,000 of it brings the market to 1.75 million against 1.05 million, about 166.7%. A redemption of 50,000 removes equal value from both and lifts the ratio to about 173.7%.
+
+Peg buys therefore move a market towards 100% backing and redemptions away from it, which is consistent with Defensive Mode restricting peg buys, as described below. The documentation does not say how that change is split between individual positions, so the figure shows market totals only.
 
 ### Two interest rates
 
@@ -324,7 +332,7 @@ Liquidations stay inside the protocol, with no external auction. Readers who kno
 1. **Earn Pool first.** Depositors of the pAsset supply the funds that cancel a liquidated position's debt, and the pool receives the position's pETH collateral. Since liquidation happens above 100% collateralization, the pETH received normally exceeds the pAssets burnt. Depositors earn a protocol-defined minimum share of minter interest plus these liquidation gains. Each deposit is a transferable NFT, and auto-compounding [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) wrappers are left to third parties.
 2. **Redistribution second.** If the pool cannot absorb the whole position, the remaining debt and collateral are spread proportionally across the other open positions in that market.
 
-The documentation gives no liquidation penalty, but the testnet market contracts expose them. On 22 October 2026 both testnet markets (the dollar market at [`0xbdc1…6aa1`](https://sepolia.etherscan.io/address/0xbdc1fe97e787ae7f653ffbccd74ec49814fe6aa1) and the gold market at [`0x18f6…fe41`](https://sepolia.etherscan.io/address/0x18f652c41a5d30b4b49a9962800b34a6f1abfe41)) returned `LIQUIDATION_PENALTY_SP() = 5%`, `LIQUIDATION_PENALTY_REDISTRIBUTION() = 15%` and `fixedGasComp() = 0.0375` (18-decimal units, denomination not determined). They also returned `MCR() = 115%`, `DEFENSIVE_MODE_RATIO() = 110%` and `DEFENSIVE_MODE_MCR() = 150%`, which match the documentation. On the testnet the two pAssets are named pUSD and pGOLD rather than USDp and GOLDp.
+The documentation gives no liquidation penalty, but the testnet market contracts expose them. On 22 October 2026 both testnet markets, the dollar market at [`0xbdc1…6aa1`](https://sepolia.etherscan.io/address/0xbdc1fe97e787ae7f653ffbccd74ec49814fe6aa1) and the gold market at [`0x18f6…fe41`](https://sepolia.etherscan.io/address/0x18f652c41a5d30b4b49a9962800b34a6f1abfe41), returned `LIQUIDATION_PENALTY_SP() = 5%`, `LIQUIDATION_PENALTY_REDISTRIBUTION() = 15%` and `fixedGasComp() = 0.0375` (18-decimal units, denomination not determined). They also returned `MCR() = 115%`, `DEFENSIVE_MODE_RATIO() = 110%` and `DEFENSIVE_MODE_MCR() = 150%`, which match the documentation. On the testnet the two pAssets are named pUSD and pGOLD rather than USDp and GOLDp.
 
 ### Defensive Mode and Recovery Mode
 
@@ -383,7 +391,7 @@ This limit does not remove governance risk, and the documentation's risk page sa
 
 ## Where the yield comes from
 
-Polaris describes its yield as *protocol-native*: it does not come from validator rewards, lending to an external market or off-chain assets such as Treasury bills. Every return in the system is paid by another participant for something they do inside the protocol. The yield is spread over the earlier sections; this one gathers who pays, who receives, and in which asset.
+Polaris describes its yield as *protocol-native*: it does not come from validator rewards, lending to an external market or off-chain assets such as Treasury bills. Every return in the system is paid by another participant for something they do inside the protocol.
 
 ### Who pays
 
@@ -432,7 +440,7 @@ flowchart LR
 - **Activity, not time.** Every source above is a fee on a transaction or interest on a loan. If trading, borrowing and minting stop, the floor stops rising and fpETH earns nothing. There is no emission schedule to fill the gap, by design.
 - **Two denominations.** Floor growth and pETH flows are in ETH terms, while minter interest and Earn Pool yield are in the pAsset. A minter's net rate therefore moves with ETH/USD, which is why the documentation says it can be low or even negative.
 - **Some yield is a transfer, not revenue.** The Protocol Safety Rate and peg fees move value between positions of the same market; they do not add value to the system as a whole. Only fees paid in from outside a market (swap fees, loan fees, conversions, minter interest) grow the total.
-- **The reserve itself earns nothing.** The curve holds WETH, not a staking token, so the reserve gives up the staking yield an LST would earn. pETH yield has to exceed that opportunity cost to be worth holding instead of staked ETH (*derived*; the testnet reserve token is WETH).
+- **The reserve itself earns nothing.** The curve holds WETH, not a staking token, so the reserve gives up the staking yield an LST would earn. pETH yield has to exceed that opportunity cost to be worth holding instead of staked ETH (*derived*). The testnet reserve token is WETH.
 
 ## Comparison with Liquity V2 (BOLD)
 
@@ -600,7 +608,9 @@ The documentation has a [risk page](https://docs.polaris.finance/risks) that lis
 
 **Q: What is the difference between the spot price and the floor price of pETH?**
 
-The spot price is the marginal price of pETH at the curve's current virtual supply $$S_v$$: it is what the next buyer pays and it rises or falls with buys and sells. The floor price is the marginal price at the floor supply $$S_f$$, which is what the last pETH would receive if every holder sold. Buys and sells change only $$S_v$$, so they move the spot price. Only the Fee Router's burns move $$S_f$$, and only upward, so the floor never falls.
+The spot price is the marginal price of pETH at the curve's current virtual supply $$S_v$$: it is what the next buyer pays and it rises or falls with buys and sells. The floor price is the marginal price at the floor supply $$S_f$$, which is what the last pETH would receive if every holder sold.
+
+Buys and sells change only $$S_v$$, so they move the spot price. Only the Fee Router's burns move $$S_f$$, and only upward, so the floor never falls.
 
 **Q: Why does the documentation call the bonding curve scale-free?**
 
@@ -618,19 +628,27 @@ Because the ETH was released near the floor price and spent near the spot price,
 
 **Q: Why can a Reserve Loan lend 100% of the collateral value without liquidations, when Aave or Morpho cannot?**
 
-In a conventional loan the collateral and debt are in different assets, so a price move can push the debt above the collateral value, and the lender needs a buffer and a liquidation mechanism. A Reserve Loan uses fpETH, whose value is the pETH floor in ETH, and lends ETH from the same reserve that backs that floor. Collateral and debt are in the same unit, and the floor cannot fall, so no price move can make the position undercollateralized. The borrower pays with a utilization-based share of future floor growth instead of interest.
+In a conventional loan the collateral and debt are in different assets, so a price move can push the debt above the collateral value, and the lender needs a buffer and a liquidation mechanism.
+
+A Reserve Loan uses fpETH, whose value is the pETH floor in ETH, and lends ETH from the same reserve that backs that floor. Collateral and debt are in the same unit, and the floor cannot fall, so no price move can make the position undercollateralized. The borrower pays with a utilization-based share of future floor growth instead of interest.
 
 **Q: A USDp minter has done nothing for a week, yet their debt has increased. What happened?**
 
-The most likely cause is Adaptive Peg Defense. If USDp traded above one dollar, arbitrageurs bought newly minted USDp at peg with pETH. That new debt, the pETH paid and the peg fee were spread across all existing positions, so each position's debt and collateral grew together and its fee balance increased. Accrued Peg Stability Rate interest also adds to debt over time. A redistribution after a liquidation the Earn Pool could not fully absorb would have the same visible effect.
+The most likely cause is Adaptive Peg Defense. If USDp traded above one dollar, arbitrageurs bought newly minted USDp at peg with pETH. That new debt, the pETH paid and the peg fee were spread across all existing positions, so each position's debt and collateral grew together and its fee balance increased.
+
+Accrued Peg Stability Rate interest also adds to debt over time. A redistribution after a liquidation the Earn Pool could not fully absorb would have the same visible effect.
 
 **Q: What changes for a USDp holder who wants to redeem when the market's reserve-to-debt ratio is 90%?**
 
-The market is in Recovery Mode, so the redemption pays 90% of face value in pETH, and every redeemer takes the same cut, so there is no gain in redeeming first. Redistribution of liquidations is also disabled, and a liquidation only proceeds if it keeps or raises the 90% ratio. The bonding curve is unaffected, and the market returns towards normal as the ETH price recovers, minters add collateral or repay, and liquidations and the Protocol Safety Rate improve the ratio.
+The market is in Recovery Mode, so the redemption pays 90% of face value in pETH, and every redeemer takes the same cut, so there is no gain in redeeming first. Redistribution of liquidations is also disabled, and a liquidation only proceeds if it keeps or raises the 90% ratio.
+
+The bonding curve is unaffected, and the market returns towards normal as the ETH price recovers, minters add collateral or repay, and liquidations and the Protocol Safety Rate improve the ratio.
 
 **Q: A borrower wants to avoid being redeemed against. How does that differ between Liquity V2 and Polaris?**
 
-In Liquity V2, redemptions hit troves in order of interest rate, lowest first, so a borrower lowers their redemption risk by paying a higher rate than other borrowers. The 7-day upfront fee on rate changes stops them from raising the rate only when a redemption is about to happen. In Polaris, Adaptive Peg Defense spreads every redemption across all positions of the market, so a minter cannot avoid it by any choice of rate or collateral ratio. In return, the minter receives a share of the redemption fees.
+In Liquity V2, redemptions hit troves in order of interest rate, lowest first, so a borrower lowers their redemption risk by paying a higher rate than other borrowers. The 7-day upfront fee on rate changes stops them from raising the rate only when a redemption is about to happen.
+
+In Polaris, Adaptive Peg Defense spreads every redemption across all positions of the market, so a minter cannot avoid it by any choice of rate or collateral ratio. In return, the minter receives a share of the redemption fees.
 
 **Q: Why is POLAR conversion one-way, and what does it do to pETH?**
 

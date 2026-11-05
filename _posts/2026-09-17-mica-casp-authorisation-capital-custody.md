@@ -2,6 +2,7 @@
 layout: post
 title: "Becoming a CASP Under MiCA — Authorisation, Capital and Custody Obligations (Title V)"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation blockchain security
@@ -166,7 +167,7 @@ The custody article is the most detailed of the chapter and the one with the mos
 - **Liability.** The custodian is liable to clients for the loss of crypto-assets or of the means of access "as a result of an incident that is attributable to them", **capped at the market value at the time of the loss**. Incidents not attributable to the custodian are those it shows occurred independently of its service or operations, "such as a problem inherent in the operation of the distributed ledger that the crypto-asset service provider does not control" (Article 75(8)).
 - **Sub-custody.** A custodian that uses another custodian may only use one authorised under Article 59, and must tell its clients (Article 75(9)).
 
-The segregation paragraph is the one that dictates how a custodian is built. Holding client assets and proprietary assets in the same on-chain address is not permitted; an omnibus client address is, provided the register of positions reconciles it to each client. The liability paragraph means that a key-management failure, an insider theft or a compromised signing server is the custodian's loss up to the market value of what was taken, while a consensus failure or a reorganisation of the underlying chain is not.
+Holding client assets and proprietary assets in the same on-chain address is not permitted; an omnibus client address is, provided the register of positions reconciles it to each client. The liability paragraph means that a key-management failure, an insider theft or a compromised signing server is the custodian's loss up to the market value of what was taken, while a consensus failure or a reorganisation of the underlying chain is not.
 
 ![MiCA custodian model: client assets on separate on-chain addresses reconciled to a per-client register, insolvency-remote from the custodian, with attributable losses compensated up to market value]({{site.url_complet}}/assets/article/regulation/mica/mica-custody-segregation-concept.png)
 
@@ -340,7 +341,9 @@ Title V is a licensing regime with ongoing obligations. The rows below transcrib
 
 **Q: Does a non-custodial wallet application need a CASP authorisation?**
 
-Not for the wallet itself. Custody and administration is defined in Article 3(1)(17) as safekeeping or controlling crypto-assets or the means of access to them on behalf of clients, and a provider that never holds keys or key shares capable of moving the assets does not control the means of access. The analysis changes if the provider holds a share of a multi-party key sufficient to sign, can freeze or recover assets, or executes transfers on the user's behalf, which would be custody or transfer services. Article 4(5) also exempts custody and transfer of tokens whose offer is outside Title II, unless the token is listed or otherwise offered.
+Not for the wallet itself. Custody and administration is defined in Article 3(1)(17) as safekeeping or controlling crypto-assets or the means of access to them on behalf of clients, and a provider that never holds keys or key shares capable of moving the assets does not control the means of access.
+
+The analysis changes if the provider holds a share of a multi-party key sufficient to sign, can freeze or recover assets, or executes transfers on the user's behalf, which would be custody or transfer services. Article 4(5) also exempts custody and transfer of tokens whose offer is outside Title II, unless the token is listed or otherwise offered.
 
 **Q: How much capital does an exchange that also holds client assets need?**
 
@@ -354,7 +357,9 @@ In practice the custodian cannot pool client and proprietary assets in one addre
 
 **Q: A custodian loses client assets because a validator set on the underlying chain finalised a malicious fork. Is the custodian liable?**
 
-Under Article 75(8) the custodian is liable for loss resulting from an incident attributable to it, capped at the market value of the crypto-asset at the time of the loss. An incident is not attributable where the custodian demonstrates that it occurred independently of its service and operations, and the article gives as its example "a problem inherent in the operation of the distributed ledger that the crypto-asset service provider does not control". A consensus failure of the chain is that example. A compromise of the custodian's signing infrastructure, by contrast, is attributable, and the insurance policy used under Article 67 must cover that liability.
+Under Article 75(8) the custodian is liable for loss resulting from an incident attributable to it, capped at the market value of the crypto-asset at the time of the loss. An incident is not attributable where the custodian demonstrates that it occurred independently of its service and operations, and the article gives as its example "a problem inherent in the operation of the distributed ledger that the crypto-asset service provider does not control".
+
+A consensus failure of the chain is that example. A compromise of the custodian's signing infrastructure, by contrast, is attributable, and the insurance policy used under Article 67 must cover that liability.
 
 **Q: Can a trading platform run a market-making desk on its own venue?**
 

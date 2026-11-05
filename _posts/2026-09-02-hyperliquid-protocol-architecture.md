@@ -2,7 +2,7 @@
 layout: post
 title: "The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics"
 date:   2026-09-02
-last_modified_at: 2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -182,7 +182,9 @@ Suppliers earn the same rate on idle balances, less the 10% the protocol retains
 
 The motivating trade is the cash-and-carry. Holding 1 BTC spot and shorting 1 BTC-USDC perp at 10x, the trader pays interest only on the initial margin while earning funding on the full notional, and spot and perp PnL offset each other for margin purposes. If BTC rallies from 100k to 150k, portfolio margin borrows 50k USDC against the appreciated spot leg rather than liquidating the short. The hedged price range is considerably wider than for the same trade collateralised by USDC alone, which is what the mode is for.
 
-Liquidation under portfolio margin generalises cross margin across the whole account, triggering when the portfolio margin ratio exceeds 0.95, with all notionals converted to USDC at the borrow oracle price. Positions are taken over by a backstop liquidator at system address `0xbbb...b`, in full below the full-liquidation threshold and in 20% increments between the partial and full thresholds, stopping as soon as the account is healthy. There is no market-liquidation phase as there is for perps, because spot books have less consistent depth; the liquidator instead unwinds collateral into the debt asset on a TWAP with a ten-minute half-life. Two behaviours should be understood before enabling it: sub-accounts are margined separately, and the order in which perp positions and spot borrows are liquidated depends on the order of oracle updates, so it is not deterministic.
+Liquidation under portfolio margin generalises cross margin across the whole account, triggering when the portfolio margin ratio exceeds 0.95, with all notionals converted to USDC at the borrow oracle price. Positions are taken over by a backstop liquidator at system address `0xbbb...b`, in full below the full-liquidation threshold and in 20% increments between the partial and full thresholds, stopping as soon as the account is healthy.
+
+There is no market-liquidation phase as there is for perps, because spot books have less consistent depth; the liquidator instead unwinds collateral into the debt asset on a TWAP with a ten-minute half-life. Two behaviours should be understood before enabling it: sub-accounts are margined separately, and the order in which perp positions and spot borrows are liquidated depends on the order of oracle updates, so it is not deterministic.
 
 ## HyperEVM
 
@@ -204,7 +206,13 @@ Returned prices are integers. Dividing by $$10^{6 - \text{szDecimals}}$$ gives a
 
 The CoreWriter system contract at `0x3333333333333333333333333333333333333333` burns about 25 000 gas and emits a log that HyperCore processes as an action, for a realistic total near 47 000 gas. The payload is a byte string: byte 1 is the encoding version, currently 1; bytes 2 to 4 are a big-endian action ID; the remainder is the raw ABI encoding of the action's Solidity types.
 
-The action set is broad enough to build a real application. Limit orders and both cancel variants cover trading; vault transfers, staking deposits and withdrawals, token delegation, spot sends, asset sends and USD class transfers cover treasury movement; `Add API wallet`, `Approve builder fee` and `Set abstraction` cover account configuration; `Finalize EVM Contract` completes a Core-to-EVM token link; and the newer `Borrow lend operation` and `Outcome operation` reach portfolio-margin supply/withdraw and HIP-4 split, merge and negate respectively.
+The action set is broad enough to build a real application:
+
+- Limit orders and both cancel variants cover trading.
+- Vault transfers, staking deposits and withdrawals, token delegation, spot sends, asset sends and USD class transfers cover treasury movement.
+- `Add API wallet`, `Approve builder fee` and `Set abstraction` cover account configuration.
+- `Finalize EVM Contract` completes a Core-to-EVM token link.
+- The newer `Borrow lend operation` and `Outcome operation` reach portfolio-margin supply/withdraw and HIP-4 split, merge and negate respectively.
 
 One constraint shapes every design that uses it: order actions and vault transfers sent through CoreWriter are delayed onchain by a few seconds, so the HyperEVM cannot be used to bypass the L1 mempool for a latency advantage. Such actions appear twice in the L1 explorer, once when enqueued and once when executed. Since a user already waits for a small-block confirmation, the delay is invisible in practice but fatal to a strategy that assumed otherwise.
 
@@ -216,7 +224,7 @@ Once a Core token and an EVM contract are linked, a Core-to-EVM transfer is a `s
 
 The linking flow is deliberately two-sided. The deployer sends a spot deploy action naming the EVM address, and the EVM side then proves intent either by sending an action with the nonce that deployed the contract, or, for contract-deployed contracts, by storing a finalizer address in the first storage slot or at `keccak256("HyperCore deployer")`.
 
-The caveats section of that page is unusually blunt, and it lands on the integrator rather than the protocol. Nothing verifies that the system address holds sufficient supply, and nothing verifies that the linked contract is a valid ERC-20. The linked contract can carry arbitrary bytecode, and there is no guarantee about what its `transfer` does. If the EVM contract has extra wei decimals, any log value that is not a round multiple has the remainder burned, bounded by one wei. Fungibility between Core spot and EVM spot is a property of a specific deployment, not of the protocol.
+The documentation's caveats fall on the integrator rather than the protocol. Nothing verifies that the system address holds sufficient supply, and nothing verifies that the linked contract is a valid ERC-20. The linked contract can carry arbitrary bytecode, and there is no guarantee about what its `transfer` does. If the EVM contract has extra wei decimals, any log value that is not a round multiple has the remainder burned, bounded by one wei. Fungibility between Core spot and EVM spot is a property of a specific deployment, not of the protocol.
 
 Ordering inside a block that produces an EVM block is fixed: the L1 block is built, then the EVM block, then EVM-to-Core transfers, then CoreWriter actions. Core-to-EVM transfers wait for the next EVM block. The consequence that catches integrators is that an account performing a CoreWriter action must already exist on HyperCore before the EVM block is built; initialising it with an EVM-to-Core transfer in the same block still leaves the CoreWriter action rejected.
 
@@ -248,7 +256,9 @@ HIP-3 lets anyone deploy a perp DEX with its own margining, order books and sett
 
 The economic bond is 500 000 staked HYPE, held for at least 183 days after deployment. The first three assets in a DEX skip the auction; further assets go through a Dutch auction shared across all perp DEXs, with each deployer also receiving $$7 + 0.2 n$$ reserve deployments usable at the current auction price without waiting for the timer. Deployers configure a fee share between 0% and 300%, where a share above 100% also raises the protocol fee to match.
 
-Slashing is the enforcement mechanism, decided by stake-weighted validator vote, and the guidelines are explicit that it is technical rather than moral: it does not distinguish a deployer who deviated from a good spec, one who faithfully followed a bad spec, and one whose keys were stolen. The rough scale is up to 100% for irregular inputs causing invalid state transitions or prolonged downtime, up to 50% for brief downtime, and up to 20% for network degradation. Slashed stake is burned rather than distributed to affected users, on the reasoning that paying out victims would misalign incentives between users and deployers. Any team running an LST on top of a HIP-3 deployer inherits this risk and needs to say so to its depositors.
+Slashing is the enforcement mechanism, decided by stake-weighted validator vote, and the guidelines are explicit that it is technical rather than moral: it does not distinguish a deployer who deviated from a good spec, one who faithfully followed a bad spec, and one whose keys were stolen. The rough scale is up to 100% for irregular inputs causing invalid state transitions or prolonged downtime, up to 50% for brief downtime, and up to 20% for network degradation.
+
+Slashed stake is burned rather than distributed to affected users, on the reasoning that paying out victims would misalign incentives between users and deployers. Any team running an LST on top of a HIP-3 deployer inherits this risk and needs to say so to its depositors.
 
 Cross margin on a HIP-3 asset is irreversible once enabled, and validators enforce eligibility standards on it: observable liquidity, a reliable external oracle, and resistance to manipulation. Each time an asset's `externalPerpPx` moves more than 50% from the start-of-day price, validators review whether the deployer should be slashed, and any asset where such moves are expected more than once a month is ineligible.
 
@@ -270,7 +280,9 @@ Any token can become a spot quote asset permissionlessly, subject to `weiDecimal
 
 Alignment is an opt-in revenue-share arrangement layered on quote-asset status. Under AQAv1, a deployer stakes 800 000 HYPE beyond the quote-asset requirement, for 1M total, and routes 50% of the AQA rate to the protocol, where the rate is a stake-weighted median of validator-reported values. In exchange the asset gets 20% lower taker fees, 50% larger maker rebates, and 20% more volume contribution toward fee tiers. Offchain conditions, enforced by validator quorum rather than by execution, require 1:1 backing by cash and short-term treasuries, par redemption, native minting on the HyperEVM as the source chain, and a deployer that takes no rate-linked compensation for conversions.
 
-AQAv2 drops the exclusivity requirement and roughly doubles the share, with deployers passing about 90% of cost-adjusted reserve yield on their Hyperliquid supply. It splits the role into a *treasury deployer* and a *technical deployer*, each staking 500 000 HYPE, each requiring six months' notice before ceasing operation, and both slashable. Minted supply is held 9:1 between the treasury address and the technical deployer's linked EVM contract. Revenue accrues over 30-day intervals and is swept to the Assistance Fund eight days after each interval closes; an insufficient balance at the system interest address `0x50...00 + {token_index}` makes the treasury deployer's stake slashable at 2% per day. A future upgrade will make AQAv2 a requirement for quote assets listed against HIP-4 and validator-operated perp markets.
+AQAv2 drops the exclusivity requirement and roughly doubles the share, with deployers passing about 90% of cost-adjusted reserve yield on their Hyperliquid supply. It splits the role into a *treasury deployer* and a *technical deployer*, each staking 500 000 HYPE, each requiring six months' notice before ceasing operation, and both slashable. Minted supply is held 9:1 between the treasury address and the technical deployer's linked EVM contract.
+
+Revenue accrues over 30-day intervals and is swept to the Assistance Fund eight days after each interval closes; an insufficient balance at the system interest address `0x50...00 + {token_index}` makes the treasury deployer's stake slashable at 2% per day. A future upgrade will make AQAv2 a requirement for quote assets listed against HIP-4 and validator-operated perp markets.
 
 ### Fees
 
@@ -282,7 +294,9 @@ W = V_p + 2\,V_s
 \end{aligned}
 $$
 
-One tier applies across perps, HIP-3 perps and spot. The base perp rate is 0.045% taker and 0.015% maker, falling to 0.024% taker at the top tier; spot starts at 0.070% and 0.040%. Staking HYPE layers a discount on top, from 5% above 10 HYPE to 40% above 500 000. Spot pairs between two quote assets pay 80% less. Growth mode for a HIP-3 perp cuts all-in fees, rebates and volume contribution by at least 90%, conditional on a deployer fee scale between 0 and 10 and on the market being disjoint from validator-operated perps, which rules out crypto perps, crypto indices, and duplicates of existing markets such as a gold perp competing with PAXG-USDC.
+One tier applies across perps, HIP-3 perps and spot. The base perp rate is 0.045% taker and 0.015% maker, falling to 0.024% taker at the top tier; spot starts at 0.070% and 0.040%. Staking HYPE layers a discount on top, from 5% above 10 HYPE to 40% above 500 000. Spot pairs between two quote assets pay 80% less.
+
+Growth mode for a HIP-3 perp cuts all-in fees, rebates and volume contribution by at least 90%, conditional on a deployer fee scale between 0 and 10 and on the market being disjoint from validator-operated perps, which rules out crypto perps, crypto indices, and duplicates of existing markets such as a gold perp competing with PAXG-USDC.
 
 The destination of those fees is not an operator. There is no clearance fee on liquidations, and the profit stream from backstop liquidation accrues to HLP rather than to the operator or to privileged market makers. Protocol fees flow to HLP, to deployers, and to the Assistance Fund at `0xfefefefefefefefefefefefefefefefefefefefe`, which converts them to HYPE as part of L1 execution and burns the result, removing it from circulating and total supply.
 
@@ -306,7 +320,9 @@ That leaves three distinct slashing surfaces to keep separate when reasoning abo
 
 USDC is now natively minted on the Hyperliquid L1 through Circle's CCTP, with Circle's contracts deployed on the HyperEVM and audited independently. The original Arbitrum bridge is deprecated and holds less than 10% of HyperCore's USDC supply.
 
-The legacy bridge is still instructive, because its design states the protocol's trust model in the most explicit terms available. Deposits are credited once validators holding more than two thirds of stake have signed them. Withdrawals are deducted from the L1 balance immediately, then signed by validators as separate transactions; at a two-thirds quorum an Arbitrum transaction can request the withdrawal. A dispute period follows, during which cold-wallet signatures from two thirds of the stake-weighted validator set can lock the bridge against a withdrawal that does not match L1 state, and unlocking requires the same cold-wallet quorum. Finalisation then distributes USDC to destinations. The user pays no Arbitrum gas: a 1 USDC withdrawal fee on Hyperliquid covers the validators' costs, and funds arrive in three to four minutes. The minimum deposit is 5 USDC, and anything below it is lost. The bridge and its relationship to L1 staking were audited by Zellic in two reports.
+The legacy bridge is still instructive, because its design states the protocol's trust model in the most explicit terms available. Deposits are credited once validators holding more than two thirds of stake have signed them. Withdrawals are deducted from the L1 balance immediately, then signed by validators as separate transactions; at a two-thirds quorum an Arbitrum transaction can request the withdrawal. A dispute period follows, during which cold-wallet signatures from two thirds of the stake-weighted validator set can lock the bridge against a withdrawal that does not match L1 state, and unlocking requires the same cold-wallet quorum. Finalisation then distributes USDC to destinations.
+
+The user pays no Arbitrum gas: a 1 USDC withdrawal fee on Hyperliquid covers the validators' costs, and funds arrive in three to four minutes. The minimum deposit is 5 USDC, and anything below it is lost. The bridge and its relationship to L1 staking were audited by Zellic in two reports.
 
 ## Trust assumptions and known risk surfaces
 
@@ -347,7 +363,7 @@ The trust does not disappear; it moves. A Binance user trusts one company. A Hyp
 
 On Hyperliquid the exchange is the state machine rather than an application running on one. Putting the order book inside consensus is what allows the intra-block ordering rule that puts cancels ahead of aggressive orders, the second margin check on the resting side at match time, and a solvency ladder whose last rung is enforced by execution rather than by an insurance fund's balance. Putting a general-purpose EVM inside the same execution is what removes the bridge between contract logic and order book liquidity, at the cost of a delay on CoreWriter orders and a set of linking caveats that place real verification work on the integrator.
 
-The recent additions extend the same pattern in both directions. Portfolio margin folds spot balances, borrowing and perp positions into one margin computation, which widens the range over which a carry trade stays hedged while introducing a non-deterministic liquidation ordering. HIP-4 adds a settled, fully collateralised primitive with no liquidation at all. And the trust surface has consolidated onto validator votes: quote-asset quality, HIP-3 market operation and aligned-stablecoin revenue are all enforced by stake-weighted vote against conditions that are partly observed off-chain, with slashed stake burned rather than paid to affected users.
+Portfolio margin folds spot balances, borrowing and perp positions into one margin computation, which widens the range over which a carry trade stays hedged while introducing a non-deterministic liquidation ordering. HIP-4 adds a settled, fully collateralised primitive with no liquidation at all. And the trust surface has consolidated onto validator votes: quote-asset quality, HIP-3 market operation and aligned-stablecoin revenue are all enforced by stake-weighted vote against conditions that are partly observed off-chain, with slashed stake burned rather than paid to affected users.
 
 ![Mindmap of Hyperliquid covering HyperBFT consensus, HyperCore, the risk engine, account abstraction modes, the HyperEVM, the four HIP standards and the fee economics]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-protocol.png)
 
@@ -434,7 +450,7 @@ Without portfolio margin, the perp leg is collateralised by USDC alone. A rally 
 
 With portfolio margin, spot and perp PnL offset each other in one margin computation, and a shortfall is met by borrowing automatically against the spot BTC up to its balance times its borrow oracle price times its 0.5 LTV. A rally from 100k to 150k borrows 50k USDC against the appreciated collateral instead of liquidating.
 
-The trade-offs are real: borrowing accrues interest at $$0.05 + 4.75\max(0, u - 0.8)$$ APY on stablecoins, the account is capped at $25$M of value and by global and per-user borrow limits, and the position becomes liquidatable when the portfolio margin ratio passes 0.95 with no market-liquidation phase to soften it.
+The trade-offs: borrowing accrues interest at $$0.05 + 4.75\max(0, u - 0.8)$$ APY on stablecoins, the account is capped at $25$M of value and by global and per-user borrow limits, and the position becomes liquidatable when the portfolio margin ratio passes 0.95 with no market-liquidation phase to soften it.
 
 **Q: How does the intra-block ordering rule change what a market maker can be hit by?**
 

@@ -2,7 +2,7 @@
 layout: post
 title: "How Centrifuge Vaults Work — Asynchronous ERC-7540 Investment on a Hub-and-Spoke Protocol"
 date:   2026-08-18
-last_modified_at: 2026-08-19
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity
@@ -27,7 +27,7 @@ Vaults live on the spoke side. They never decide anything. A vault validates the
 
 ![Centrifuge V3 vault architecture]({{site.url_complet}}/assets/article/blockchain/defi/centrifuge/centrifuge-vault-architecture-concept.png)
 
-In practice, **the vault contract holds no assets and computes no authoritative price**. Assets live in a per-pool escrow, and the price an investor actually receives is set on the hub after the request was made, not when it was made.
+In practice, **the vault contract holds no assets and computes no authoritative price**. Assets live in a per-pool escrow, and the price an investor receives is set on the hub after the request was made, not when it was made.
 
 ## The standards a Centrifuge vault implements
 
@@ -89,7 +89,12 @@ function requestDeposit(uint256 assets, address controller, address owner) publi
 
 Note the ordering: the manager is called first, the token transfer happens last. `globalEscrow()` is a legacy name kept for ABI compatibility with vaults deployed before v3.1.0; it resolves to the pool-specific `PoolEscrow` and reverts unless the caller is a linked vault.
 
-Inside the manager, four things happen. The vault is checked to be linked to the registry. The investor is checked against the share token's transfer restriction, using `address(0)` as source, which is the sentinel for issuance. The pending amount is incremented, but only if no cancellation is already in flight. Finally a `DepositRequest` message is serialised and dispatched to the hub, and the assets are reserved in the escrow under the reason code `REASON_DEPOSIT`.
+Inside the manager, four things happen:
+
+1. The vault is checked to be linked to the registry.
+2. The investor is checked against the share token's transfer restriction, using `address(0)` as source, which is the sentinel for issuance.
+3. The pending amount is incremented, but only if no cancellation is already in flight.
+4. A `DepositRequest` message is serialised and dispatched to the hub, and the assets are reserved in the escrow under the reason code `REASON_DEPOSIT`.
 
 That last step matters. The reservation is recorded before the assets are noted as a holding, so a pool manager cannot treat freshly requested capital as available liquidity, and a cancellation can return it untouched.
 
@@ -181,7 +186,7 @@ function deposit(uint256 assets, address receiver) external returns (uint256 sha
 }
 ```
 
-The comment is worth reading twice. Accounting is updated before the token moves, so that a token with a transfer callback cannot re-enter the manager and observe a half-updated state.
+Accounting is updated before the token moves, so that a token with a transfer callback cannot re-enter the manager and observe a half-updated state.
 
 Two mechanisms bound what synchronous deposits can do.
 
@@ -259,7 +264,14 @@ function detectTransferRestriction(address from, address to, uint256 value) publ
 }
 ```
 
-The protocol ships four hooks: `FullRestrictions` (memberlist plus freezing on both sides), `RedemptionRestrictions` (membership required only to redeem), `FreelyTransferable`, and `FreezeOnly`. A pool can install its own.
+The protocol ships four hooks:
+
+- `FullRestrictions`: memberlist plus freezing on both sides.
+- `RedemptionRestrictions`: membership required only to redeem.
+- `FreelyTransferable`.
+- `FreezeOnly`.
+
+A pool can install its own.
 
 The hook has no separate callback per protocol operation. Each operation is instead encoded as a transfer between recognisable addresses, which the hook reads off the `from` and `to` arguments:
 
@@ -322,7 +334,7 @@ The parts most worth attention when integrating or reviewing are the rounding po
 
 ### Invariants
 
-The properties below are what the deposit and redemption machinery is built to preserve. They are stated as
+The properties below are what the deposit and redemption flows are built to preserve. They are stated as
 invariants rather than as advice, since each one is enforced by a specific mechanism in the code and each is a
 candidate property for an invariant-testing campaign.
 
@@ -363,7 +375,7 @@ assumes. Each is intentional and documented in the contracts.
 
 Because there is no answer it could return that would be true. The number of shares a deposit earns depends on `pricePoolPerShare`, which the pool manager supplies on the hub when the epoch containing that request is issued, potentially days after the request was made. ERC-7540 makes this explicit and requires the four preview functions to revert on asynchronous flows rather than return a figure that integrations would treat as a quote.
 
-**Q: What is actually stored on a per-investor basis, and where?**
+**Q: What is stored on a per-investor basis, and where?**
 
 Two contracts hold complementary halves of the state:
 
@@ -388,7 +400,18 @@ Second, price staleness. `SyncManager` reads both `pricePoolPerShare` and `price
 
 **Q: How would a reviewer confirm that a custom transfer hook cannot be bypassed by the protocol's own operations?**
 
-Enumerate the sentinel pairs and check each one. The hook infers the operation from the `from` and `to` addresses: issuance is `address(0)` to the investor, deposit fulfilment is `address(0)` to the pool escrow, the deposit claim is escrow to investor, a redeem request is investor to `ESCROW_HOOK_ID`, redemption fulfilment is the balance sheet to `address(0)`, and a cross-chain transfer targets `address(uint160(chainId))`. A hook that only implements a memberlist check on ordinary transfers and treats every sentinel case as automatically permitted has effectively opened a path from the escrow to any address the protocol will pay out to. The corresponding positive check is that `checkTransferRestriction` is consulted on both legs of every movement, including the internal ones, which is what `AsyncRequestManager._canTransfer` is doing at each request and claim boundary.
+Enumerate the sentinel pairs and check each one. The hook infers the operation from the `from` and `to` addresses:
+
+- Issuance is `address(0)` to the investor.
+- Deposit fulfilment is `address(0)` to the pool escrow.
+- The deposit claim is escrow to investor.
+- A redeem request is investor to `ESCROW_HOOK_ID`.
+- Redemption fulfilment is the balance sheet to `address(0)`.
+- A cross-chain transfer targets `address(uint160(chainId))`.
+
+A hook that only implements a memberlist check on ordinary transfers and treats every sentinel case as automatically permitted has effectively opened a path from the escrow to any address the protocol will pay out to.
+
+The corresponding positive check is that `checkTransferRestriction` is consulted on both legs of every movement, including the internal ones, which is what `AsyncRequestManager._canTransfer` is doing at each request and claim boundary.
 
 ## References
 

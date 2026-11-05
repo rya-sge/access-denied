@@ -2,6 +2,7 @@
 layout: post
 title: "Hyperliquid's Onchain Order Book - Matching, Ordering, and How It Differs from a CEX and from GMX"
 date:   2026-09-02
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -33,8 +34,6 @@ On Hyperliquid, HyperCore state includes one order book per asset. Placing, modi
 On [dYdX v4](https://docs.dydx.xyz/), short-term orders live in validator memory for up to twenty blocks, and only the fill amount and expiry block height are committed to state. Long-term and conditional orders are stateful and do reach the chain. Matching happens off-chain, and the proposer includes the resulting matches in its block. The design achieves lower latency and free order placement, at the cost that the resting book itself is not something you can derive from chain state.
 
 On [GMX](https://docs.gmx.io/docs/trading/v2/) there is no book to place anywhere. A trader creates an order request onchain, a keeper executes it against a signed oracle price, and the counterparty is a GM pool rather than another trader.
-
-The rest of this article treats Hyperliquid's design as the subject and the others as points of comparison.
 
 ## The matching engine
 
@@ -70,9 +69,9 @@ Hyperliquid's mempool and consensus logic are **semantically aware** of which ac
 
 Proposer order applies only *within* a class, and a `modify` is classified by the new order it places. Each L1 block also contains only a few consensus bundles, and within each bundle ALO orders and cancels execute before other transactions.
 
-The documentation is explicit about both the purpose and the scope of the rule. It exists to protect makers against toxic flow, so that end users see tight spreads and deep liquidity during volatility, and the prioritisation of cancels and ALO orders over IOC and GTC orders sent at the same time **spans several blocks** rather than applying only inside one.
+According to the documentation, the rule exists to protect makers against toxic flow, so that end users see tight spreads and deep liquidity during volatility, and the prioritisation of cancels and ALO orders over IOC and GTC orders sent at the same time **spans several blocks** rather than applying only inside one.
 
-For a market maker this changes the shape of the risk. On a venue with plain first-come-first-served ordering, the exposure of a stale quote is bounded by how quickly your cancel reaches the sequencer relative to a taker's order, which is a race you win by spending money on infrastructure. Here the exposure is bounded by the protocol's own ordering rule, and no amount of priority fee buys the taker a place ahead of the cancel.
+On a venue with plain first-come-first-served ordering, the exposure of a market maker's stale quote is bounded by how quickly your cancel reaches the sequencer relative to a taker's order, which is a race you win by spending money on infrastructure. Here the exposure is bounded by the protocol's own ordering rule, and no amount of priority fee buys the taker a place ahead of the cancel.
 
 ## Latency when there is no colocation to sell
 
@@ -117,7 +116,7 @@ where $$f$$ is strictly decreasing in the priority rate and **zero for prioritis
 - **Cancels are never overtaken.** All cancels are prioritised before all immediately executable orders, at any priority rate. A taker cannot pay to get ahead of a maker's cancel.
 - **Above 8 bps, money stops buying time.** Everything from 8 bps to 100% has identical time preference in the mempool. Within a 70 ms bucket, IOC orders at or above 8 bps that the proposer would execute are sorted in decreasing order of fee, so the upper range breaks ties among near-simultaneous orders rather than moving an order forward in time.
 
-**ALO priority** does something different, and confusing the two is easy. It has no effect on mempool ordering at all: ALO orders are processed FIFO as transactions, with end-to-end latency similar to cancels. What the fee buys is **queue position at a price level**, on a 400 ms timescale. The tail of the queue at each level, consisting of orders placed within the past 400 ms, is sorted in decreasing order of priority rate, so any slot is open to bidding for a window of that duration. The fee is deducted when the order is placed, whether or not it ever fills.
+**ALO priority** has no effect on mempool ordering at all: ALO orders are processed FIFO as transactions, with end-to-end latency similar to cancels. What the fee buys is **queue position at a price level**, on a 400 ms timescale. The tail of the queue at each level, consisting of orders placed within the past 400 ms, is sorted in decreasing order of priority rate, so any slot is open to bidding for a window of that duration. The fee is deducted when the order is placed, whether or not it ever fills.
 
 The window is continuous rather than bucketed, which produces an ordering that looks wrong until the rule is applied carefully. Take a level that opens empty. Order `A` lands with no priority fee at time `t'`. Order `B` lands at `t' + 399 ms` with priority `p`, so `B` sorts ahead of `A`. Order `C` lands at `t' + 401 ms` with a higher priority `p' > p`, but `A` has now been resting for the full window and its position is locked, so the queue reads `B > A > C` despite `C` paying the most.
 
@@ -145,7 +144,7 @@ Read together, these say something the fee schedule alone does not: block space 
 | **Custody** | The operator holds the funds | The clearinghouse is protocol state |
 | **Failure you cannot observe** | Reordering, a favoured counterparty, a paused withdrawal | A colluding stake majority setting the oracle |
 
-The last row is where the two designs really part. A CEX asks a trader to trust an operator whose queue, whose reordering and whose favours are all invisible from outside. Hyperliquid asks the trader to trust that more than two thirds of staked HYPE is honest, and hands over the transaction log for everything downstream of that one assumption.
+The two designs differ most in the last row, the failure you cannot observe. A CEX asks a trader to trust an operator whose queue, whose reordering and whose favours are all invisible from outside. Hyperliquid asks the trader to trust that more than two thirds of staked HYPE is honest, and hands over the transaction log for everything downstream of that one assumption.
 
 ## How other DeFi designs differ
 
@@ -153,7 +152,7 @@ The last row is where the two designs really part. A CEX asks a trader to trust 
 
 dYdX v4 keeps a real limit order book with real makers, but deliberately keeps most of it out of consensus. Short-term orders sit in validator memory for up to twenty blocks; only the fill amount and the expiry block height are written to state. Long-term and conditional orders are stateful and are committed. Validators gossip orders to each other, the proposer matches, and the matches go into the next block.
 
-The gain is real: placing and cancelling short-term orders costs no gas and takes no block space, and latency is closer to a centralised venue's. What is given up is the property Hyperliquid keeps, namely that the resting book is derivable from chain state. Two nodes can hold different views of the book without either being provably wrong, and a fill can be verified after the fact while the queue it came from cannot be replayed.
+Placing and cancelling short-term orders costs no gas and takes no block space, and latency is closer to a centralised venue's. What is given up is the property Hyperliquid keeps, namely that the resting book is derivable from chain state. Two nodes can hold different views of the book without either being provably wrong, and a fill can be verified after the fact while the queue it came from cannot be replayed.
 
 Hyperliquid pays for that property with block space and with an end-to-end latency it openly describes as not comparable with a centralised engine's.
 
@@ -191,7 +190,7 @@ Four consequences distinguish this from a book:
 
 ### Constant-function AMMs
 
-A [constant-function market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/) sits further from an order book still. Price is a function of reserves, liquidity is passive, and there is neither a queue nor a resting quote to cancel. The closest thing Hyperliquid has to it is HIP-2 Hyperliquidity, and the difference is instructive: Hyperliquidity is an onchain strategy that posts discrete post-only orders **into the shared book**, so an active market maker can quote inside its ladder and improve the market without liquidity having to migrate anywhere.
+A [constant-function market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/) sits further from an order book still. Price is a function of reserves, liquidity is passive, and there is neither a queue nor a resting quote to cancel. The closest thing Hyperliquid has to it is HIP-2 Hyperliquidity, an onchain strategy that posts discrete post-only orders **into the shared book**, so an active market maker can quote inside its ladder and improve the market without liquidity having to migrate anywhere.
 
 ## What each design costs
 
@@ -209,7 +208,7 @@ A [constant-function market maker]({{site.url_complet}}/2025/07/29/automated-mar
 
 Hyperliquid's matching engine is conventional in its core: price-time priority, ticks and lots, post-only and IOC semantics that a CEX market maker would recognise. What changes is that the engine runs inside consensus, which forces the protocol to answer questions a centralised venue answers privately. It answers them by writing an ordering rule into execution that places cancels ahead of aggressive orders, by checking margin again on the resting side at every match, and by replacing the colocation market with two Dutch auctions whose proceeds are burned and whose winners are queryable.
 
-The comparison sharpens what that costs. dYdX v4 buys latency and free order placement by keeping the resting book out of consensus, which means a fill can be verified but the queue it came from cannot. GMX removes the book entirely: there is no queue, no cancel and no maker, the pool takes the other side of every position, and the entire pricing surface reduces to an oracle price a keeper delivers. Each design relocates trust rather than removing it, and the question that separates them is not which is most decentralised but which failure a user can still observe after it happens.
+dYdX v4 buys latency and free order placement by keeping the resting book out of consensus, which means a fill can be verified but the queue it came from cannot. GMX removes the book entirely: there is no queue, no cancel and no maker, the pool takes the other side of every position, and the entire pricing surface reduces to an oracle price a keeper delivers. Each design relocates trust rather than removing it, and the question that separates them is not which is most decentralised but which failure a user can still observe after it happens.
 
 ![Mindmap of Hyperliquid's order book covering consensus state, the two margin checks, intra-block ordering, priority auctions, rate limits and the CEX, dYdX v4 and GMX comparisons]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-order-book.png)
 
@@ -287,7 +286,13 @@ The auctions are also public: current gossip priority winners are queryable thro
 
 Because ALO priority reorders only the *tail* of the queue at a level, defined as orders placed within the past 400 ms, and an order older than that window has locked in its position.
 
-Take an empty level. Order `A` lands with no fee at `t'`. Order `B` lands at `t' + 399 ms` with priority `p`, so it sorts ahead of `A`, both still being inside the window. Order `C` lands at `t' + 401 ms` with `p' > p`, but `A` is now outside the window and immovable, and `B` already sits in front of `A`. The queue reads `B > A > C`.
+Take an empty level:
+
+1. Order `A` lands with no fee at `t'`.
+2. Order `B` lands at `t' + 399 ms` with priority `p`, so it sorts ahead of `A`, both still being inside the window.
+3. Order `C` lands at `t' + 401 ms` with `p' > p`, but `A` is now outside the window and immovable, and `B` already sits in front of `A`.
+
+The queue reads `B > A > C`.
 
 The window is continuous rather than bucketed: each new order compares against the tail of orders less than 400 ms old at the moment it is placed.
 
@@ -304,7 +309,7 @@ The corollary is that the whole vocabulary of queue competition, meaning priorit
 
 **Q: GMX charges 0.04% or 0.06% depending on the trade. Is that a maker-taker schedule?**
 
-No, and the distinction matters. A maker-taker schedule prices *aggression*: whether you removed liquidity from a book or added it.
+No. A maker-taker schedule prices *aggression*: whether you removed liquidity from a book or added it.
 
 GMX has no book to add to, so it prices *balance* instead. A position fee of 0.04% applies when the trade reduces the absolute gap between long and short open interest, and 0.06% when it widens that gap. The same principle drives the rest of the pool's economics: funding flows between longs and shorts according to open-interest imbalance, the borrowing fee is paid only by the larger side, and price impact on closing is computed from the change in imbalance.
 

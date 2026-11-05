@@ -2,6 +2,7 @@
 layout: post
 title: "Two Ways to Build a Permissioned Token — Centrifuge's Transfer Hook Against ERC-3643"
 date:   2026-08-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity security
@@ -33,7 +34,7 @@ That last item is the one that most often fails in practice. A compliance check 
 
 ## Model A: ERC-3643
 
-T-REX splits the decision in two, and the split is conceptual rather than merely structural.
+T-REX splits the decision in two.
 
 `IdentityRegistry.isVerified(address)` answers who may hold. It resolves an address to an ONCHAINID identity contract, checks the claims on that identity against the topics the token requires, and checks those claims were signed by a trusted issuer. `Compliance.canTransfer(from, to, amount)` answers whether this particular movement is permitted under the rules of the offering: holder caps, per-country limits, maximum position sizes.
 
@@ -160,7 +161,7 @@ A pool installs one per share token and can replace it through a governance mess
 | Recovery of a lost wallet | Protocol-level token recovery through governance | `recoveryAddress` rebinding to the same identity |
 | Multi-chain | Built in, with chain identifiers as sentinel targets | Out of scope for the standard |
 
-The rows are not a scorecard. They describe two answers to the question of how much the compliance layer should know.
+The rows describe two answers to the question of how much the compliance layer should know.
 
 The Centrifuge hook knows about one token's holders and the protocol's own operations. It cannot express "no more than 500 holders, at most 50 from any one country" because it has no aggregate state. The ERC-3643 compliance contract exists precisely to hold that aggregate state, and pays for it with external calls, notification hooks that must fire exactly once, and counters that can desynchronise.
 
@@ -252,7 +253,9 @@ A pool that needs both can put the aggregate rules in a custom hook, since the i
 
 ## Conclusion
 
-Both designs place a mandatory check on the path that changes balances, and both provide a privileged path around it for legal enforcement. They differ in where the knowledge sits. ERC-3643 keeps identity in a registry that outlives any one token and keeps offering rules in a compliance contract that can hold aggregate state, at the cost of external calls and notification hooks that must be kept consistent. Centrifuge keeps a holder's expiry and freeze bit in the same storage slot as their balance and hands both to a single hook that infers the protocol operation from the addresses involved, which is compact and complete across mint and burn, but limited to per-holder rules.
+Both designs place a mandatory check on the path that changes balances, and both provide a privileged path around it for legal enforcement. They differ in where the knowledge sits.
+
+ERC-3643 keeps identity in a registry that outlives any one token and keeps offering rules in a compliance contract that can hold aggregate state, at the cost of external calls and notification hooks that must be kept consistent. Centrifuge keeps a holder's expiry and freeze bit in the same storage slot as their balance and hands both to a single hook that infers the protocol operation from the addresses involved, which is compact and complete across mint and burn, but limited to per-holder rules.
 
 For a reviewer the practical consequence is that the two models fail differently. The registry model fails at its seams, where a hook is not called or a counter drifts. The hook model fails at its conventions, where a sentinel is misread or a privileged move is made without the check that was supposed to precede it.
 
@@ -352,7 +355,12 @@ Whether the rules are about individual holders or about the holder set as a whol
 
 Per-holder rules, meaning eligibility with an expiry plus freezing, are exactly what the hook model expresses, and it will be cheaper per transfer, simpler to audit, and easier to replace when the rules change. Aggregate rules, meaning caps on the number of holders, per-country limits, or maximum position sizes, need state that spans holders, which the shipped hooks have nowhere to keep.
 
-Two secondary factors usually settle borderline cases. If holders should carry identity that other issuers also recognise, the ONCHAINID model provides a network effect a per-token memberlist cannot. If the token must exist on several chains, the hook model already has the vocabulary for it. A team that needs aggregate rules and picks the hook model will end up writing a custom hook that keeps aggregate state, at which point they have rebuilt a compliance module with a different interface, and should compare the two honestly before committing.
+Two secondary factors usually settle borderline cases:
+
+- If holders should carry identity that other issuers also recognise, the ONCHAINID model provides a network effect a per-token memberlist cannot.
+- If the token must exist on several chains, the hook model already has the vocabulary for it.
+
+A team that needs aggregate rules and picks the hook model will end up writing a custom hook that keeps aggregate state, at which point they have rebuilt a compliance module with a different interface, and should compare the two honestly before committing.
 
 ## References
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Centrifuge Cross-Chain Messaging — Per-Pool Adapter Quorums, Batching and Failure Recovery"
 date:   2026-08-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -12,7 +13,7 @@ image: /assets/article/blockchain/defi/cross-chain-bridge/2026-08-18-centrifuge-
 isMath: true
 ---
 
-Two earlier articles on this site examined cross-chain bridges from the outside: [ten incidents grouped into five failure classes](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-hacks/), and [a STRIDE threat model](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-threat-model/) of the assets and trust boundaries involved. This one goes the other way and reads a production implementation in detail. Centrifuge does not operate a bridge; it operates a protocol whose pools span several chains, and it treats the transport layer as replaceable. Messages travel over Axelar, Wormhole, LayerZero and Chainlink CCIP simultaneously, and a message is only executed once enough of them independently deliver it. This article follows a message end to end and examines the vote accounting, the batching and payment machinery, and what happens when any part of it fails.
+Two earlier articles on this site examined cross-chain bridges from the outside: [ten incidents grouped into five failure classes](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-hacks/), and [a STRIDE threat model](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-threat-model/) of the assets and trust boundaries involved. This one goes the other way and reads a production implementation in detail. Centrifuge does not operate a bridge; it operates a protocol whose pools span several chains, and it treats the transport layer as replaceable. Messages travel over Axelar, Wormhole, LayerZero and Chainlink CCIP simultaneously, and a message is only executed once enough of them independently deliver it. This article follows a message end to end and examines the vote accounting, the batching, the payment routes, and what happens when any part of it fails.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -118,7 +119,7 @@ function decreaseFirstNValues(int16[8] storage arr, uint8 numValues, uint8 numVa
 
 Execution consumes one vote from every adapter in the quorum, not only from those that voted. An adapter below `recoveryIndex` is decremented unconditionally and goes negative, which records a debt: when its delivery finally arrives, the increment settles that debt rather than counting toward a fresh execution. Without it, a threshold of two out of three would execute on the first two deliveries and then execute a second time when the third arrived alongside a later duplicate.
 
-Adapters at or above `recoveryIndex` are exempt, since the loop skips them when their count is not positive. A recovery adapter that stays idle accumulates no debt, so its vote remains available for the moment it is actually needed. A normal transport and a recovery transport are distinguished by nothing more than that `continue`.
+Adapters at or above `recoveryIndex` are exempt, since the loop skips them when their count is not positive. A recovery adapter that stays idle accumulates no debt, so its vote remains available for the moment it is needed. A normal transport and a recovery transport differ only by that `continue`.
 
 ### Reconfiguration invalidates history
 
@@ -134,7 +135,7 @@ if (adapter.activeSessionId != state.sessionId) {
 
 Partial votes collected under an old adapter set are discarded on first contact rather than being migrated. Removing a compromised adapter therefore also removes any half-finished consensus it participated in, which matters because ids are positional and a reused index would otherwise inherit the departed adapter's votes.
 
-One optimisation is worth flagging when reviewing a deployment: a quorum of exactly one bypasses the vote machinery entirely and forwards straight to the gateway. Single-adapter configurations get no independent confirmation at all, which is a deployment choice rather than a protocol property.
+One optimisation is worth flagging when reviewing a deployment: a quorum of exactly one bypasses the vote counter entirely and forwards straight to the gateway. Single-adapter configurations get no independent confirmation at all, which is a deployment choice rather than a protocol property.
 
 ## Batching in transient storage
 
@@ -191,7 +192,7 @@ G_{\text{overall}} = \left(G_{\text{process}} + G_{\text{base}}\right) \cdot \fr
 \end{aligned}
 $$
 
-The cube is deliberate. EIP-150 forwards at most 63/64 of remaining gas per call, and the inbound path crosses three call boundaries (executor to adapter, adapter to `MultiAdapter`, `MultiAdapter` to `Gateway`), so the reserve has to survive three applications of that rule. `BASE_COST` of 75,000 covers the gateway and multi-adapter work itself, and `PROCESS_FAIL_MESSAGE_GAS` of 35,000 is held back so a failing message still has enough gas to record its own failure.
+The cube is deliberate. EIP-150 forwards at most 63/64 of remaining gas per call, and the inbound path crosses three call boundaries: executor to adapter, adapter to `MultiAdapter`, and `MultiAdapter` to `Gateway`. The reserve therefore has to survive three applications of that rule. `BASE_COST` of 75,000 covers the gateway and multi-adapter work itself, and `PROCESS_FAIL_MESSAGE_GAS` of 35,000 is held back so a failing message still has enough gas to record its own failure.
 
 Three payment routes exist.
 
@@ -309,7 +310,7 @@ Mapping the mechanisms onto the failure classes from the earlier articles gives 
 | Malicious handler return data | `excessivelySafeCall` with a 128-byte copy cap | None material at this layer |
 | Runaway or unwanted traffic | Per-pool `blockOutgoing`, global pause, per-chain batch gas ceiling | Governance latency |
 
-The honest reading is that the trust assumption has been moved rather than eliminated. A message is as safe as the assumption that `threshold` of the configured transports do not fail together, and each of those transports has its own validator set with its own history. What the design does buy is that the assumption is explicit, configurable per pool, and revocable without redeploying anything.
+The trust assumption has been moved rather than eliminated. A message is as safe as the assumption that `threshold` of the configured transports do not fail together, and each of those transports has its own validator set with its own history. What the design does buy is that the assumption is explicit, configurable per pool, and revocable without redeploying anything.
 
 ## Conclusion
 
@@ -338,7 +339,7 @@ Three implementation details do more work than their size suggests. Signed vote 
 
 ### Security Implementation Checklist
 
-The items below are the properties an n-of-m cross-chain messaging layer has to hold for its trust assumption to mean what it claims. Each is stated as a requirement, paired with what breaks when it is violated.
+The items below are the properties an n-of-m cross-chain messaging layer has to hold for its trust assumption to mean what it claims.
 
 #### Consensus over transports
 
@@ -368,7 +369,7 @@ The items below are the properties an n-of-m cross-chain messaging layer has to 
 | ☐ | Handler execution is isolated so one failing message does not revert the whole batch. | A single malformed message blocks every message queued behind it, indefinitely. |
 | ☐ | Return data from the handler is copied under a fixed cap. | A handler returning very large return data forces an out-of-gas in the caller. |
 | ☐ | Remaining gas is checked against the message's requirement before each execution, with a reserve held back for recording failure. | A message runs out of gas mid-execution and its failure is never recorded, so it cannot be retried. |
-| ☐ | Retry is limited to messages that actually failed, tracked by a counter that decrements once per successful retry. | Arbitrary messages can be replayed, or a failed message can be executed more times than it was delivered. |
+| ☐ | Retry is limited to messages that failed, tracked by a counter that decrements once per successful retry. | Arbitrary messages can be replayed, or a failed message can be executed more times than it was delivered. |
 | ☐ | Batch gas totals are capped against the destination chain's capacity at build time. | An oversized batch is paid for and dispatched but can never be executed on arrival. |
 | ☐ | A recovery path exists that can inject a message without any transport, and it can never emit one. | A transport outage permanently strands a pool, or the recovery path becomes a second unmonitored sender. |
 
@@ -376,13 +377,15 @@ The items below are the properties an n-of-m cross-chain messaging layer has to 
 
 **Q: Why are the vote counters signed integers rather than unsigned counts?**
 
-Because an execution consumes a vote from every adapter in the quorum, including those that have not delivered yet. Those adapters go to minus one, recording that their eventual delivery is already accounted for. When it arrives, the increment brings them back to zero rather than to one, so it cannot contribute to a second execution. With unsigned counters the protocol would either have to skip absent adapters, which lets a late delivery combine with a duplicate payload to execute twice, or track delivery separately at a higher storage cost.
+Because an execution consumes a vote from every adapter in the quorum, including those that have not delivered yet. Those adapters go to minus one, recording that their eventual delivery is already accounted for. When it arrives, the increment brings them back to zero rather than to one, so it cannot contribute to a second execution.
+
+With unsigned counters the protocol would either have to skip absent adapters, which lets a late delivery combine with a duplicate payload to execute twice, or track delivery separately at a higher storage cost.
 
 **Q: What exactly does `recoveryIndex` change about an adapter's behaviour?**
 
 Only whether it is decremented when it has not voted. The decrement loop skips any index at or above `recoveryIndex` whose count is not positive, so a recovery adapter never accumulates debt while idle.
 
-The consequence is operational rather than cryptographic. A standby transport can sit unused across many messages and still have a usable vote the moment it is needed, whereas a primary adapter that has been offline for ten messages carries a debt of ten and would have to deliver eleven times before contributing again.
+A standby transport can sit unused across many messages and still have a usable vote the moment it is needed, whereas a primary adapter that has been offline for ten messages carries a debt of ten and would have to deliver eleven times before contributing again.
 
 **Q: A message arrives, the threshold is met, but the handler reverts. What is the state afterwards, and who can fix it?**
 

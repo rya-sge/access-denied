@@ -2,6 +2,7 @@
 layout: post
 title: "Inside Circle's UpgradableMSCA — A Modular Smart Contract Account Under ERC-6900"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity wallet
@@ -23,7 +24,7 @@ This article reads the contracts at commit `3c47aa94`. It covers what `Upgradabl
 
 ## Two generations live in the repository
 
-Before reading any code, one fact settles which version matters. The repository holds two independent implementations under `src/msca/6900/`:
+The repository holds two independent implementations under `src/msca/6900/`:
 
 - **`v0.7`** targets the earlier ERC-6900 draft, where extensions are called **plugins**, installation is delegated to a separate `PluginManager` contract, and a plugin declares a manifest hash plus dependencies on other plugins. This is the generation deployed on chain: every script under `script/` imports from `v0.7`, and `script/000_ContractAddress.sol` carries a live `PLUGIN_MANAGER_ADDRESS`.
 - **`v0.8`** targets ERC-6900 v0.8, where extensions are **modules**, installation logic moved inside the account, dependencies are gone, and validation gained a global mode. Its own README states plainly that the contracts "are not deployed on any mainnets yet".
@@ -37,7 +38,7 @@ The concrete contract is deliberately thin. It contributes five things.
 - **An account identifier.** `ACCOUNT_ID = "circle.msca.2.0.0"`, returned by `accountId()`, following the ERC-6900 `vendor.account.semver` convention.
 - **One-shot initialisation.** `initializeWithValidation` installs the first validation function and is guarded by `walletStorageInitializer`, a fork of OpenZeppelin's `Initializable` that keeps its flags in the account's namespaced storage rather than at slot 0.
 - **Token callbacks.** It inherits `DefaultCallbackHandler`, so the account answers `onERC721Received`, `onERC1155Received`, `onERC1155BatchReceived` and `tokensReceived` without any module installed, and folds those interface ids into `supportsInterface`.
-- **UUPS upgradeability.** It overrides `upgradeToAndCall` to run it through the account's own permission machinery.
+- **UUPS upgradeability.** It overrides `upgradeToAndCall` to run it through the account's own permission check.
 - **An empty upgrade authorisation.**
 
 That last one deserves its own line, because it looks alarming and is not:
@@ -104,7 +105,7 @@ Every user operation names its validation function in the first bytes of the sig
 Byte 24 is the global-validation flag, and it selects between the two ways a validation function can be permitted for a given selector:
 
 - **Global validation** (`flag == 1`) applies to every native execution function and to any module execution function whose manifest set `allowGlobalValidation`. It is the "this key can drive the whole account" mode, and it requires the `isGlobal` flag on the installed validation.
-- **Per-selector validation** (`flag == 0`) applies only to the selectors explicitly listed for that `ModuleEntity` at install time. It is the session-key mode: a validation that may call `transfer` and nothing else.
+- **Per-selector validation** (`flag == 0`) applies only to the selectors explicitly listed for that `ModuleEntity` at install time. It is the session-key mode: a validation that may call only `transfer`.
 
 `_checkValidationForSelector` resolves the two, and a third mode, `EITHER`, is used internally for direct calls. The `ValidationFlags` byte carries three independent bits, `isGlobal`, `isSignatureValidation` and `isUserOpValidation`, so a validation authorised to sign ERC-1271 messages is not automatically authorised to drive user operations.
 
@@ -194,7 +195,7 @@ Four properties follow from that expression.
 
 The factory also keeps an owner-controlled `isModuleAllowed` allowlist, checked against the validation module and against the first 20 bytes of every hook blob, with the contract's comment stating the reason: "We only support fully audited modules during account creation for security reasons." Modules outside the allowlist can still be installed later through `installValidation`, once the account exists and its own validation governs the change.
 
-Two operational details round it out. The factory carries `addStake`, `unlockStake` and `withdrawStake`, and it needs them: deployment happens inside the validation phase, `_getAddressWithValidation` reads the factory's own `isModuleAllowed` mapping there, and [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562) only lets an entity touch its own storage during validation if it is staked. The contract's NatSpec states the requirement directly. And `renounceOwnership` is overridden to revert with `Unsupported`, so the allowlist cannot be frozen by an accidental renounce.
+The factory carries `addStake`, `unlockStake` and `withdrawStake`, and it needs them: deployment happens inside the validation phase, `_getAddressWithValidation` reads the factory's own `isModuleAllowed` mapping there, and [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562) only lets an entity touch its own storage during validation if it is staked. The contract's NatSpec states the requirement directly. And `renounceOwnership` is overridden to revert with `Unsupported`, so the allowlist cannot be frozen by an accidental renounce.
 
 ## The modules Circle ships
 
@@ -225,7 +226,12 @@ Manifest hashes and plugin dependencies also disappeared. In v0.7 a plugin decla
 
 `UpgradableMSCA` is short because the interesting decisions are made one level down and one level out. `BaseMSCA` decides how a validation function is named, how it is matched to a selector, and how hooks wrap the call. The modules decide what a signature means. The account contract itself contributes an identifier, a one-shot initialiser, token callbacks, and an upgrade path whose authorisation it deliberately declines to hard-code.
 
-The parts worth studying are the ones the standard leaves room to get wrong. Copying the post-hook list before running any pre-hook closes the window in which a pre-hook could change which post-hooks fire. Banning `execute` self-calls and flattening `executeBatch` self-calls closes the route from a narrow session key to full account control. Intersecting hook time ranges, and converting an empty window into a failure, keeps a set of independently-written hooks from combining into a permission none of them granted. And putting the account's whole state behind an ERC-7201 namespace is what makes replacing the implementation a routine operation rather than a migration.
+The parts worth studying are the ones the standard leaves room to get wrong:
+
+- Copying the post-hook list before running any pre-hook closes the window in which a pre-hook could change which post-hooks fire.
+- Banning `execute` self-calls and flattening `executeBatch` self-calls closes the route from a narrow session key to full account control.
+- Intersecting hook time ranges, and converting an empty window into a failure, keeps a set of independently-written hooks from combining into a permission none of them granted.
+- Putting the account's whole state behind an ERC-7201 namespace is what makes replacing the implementation a routine operation rather than a migration.
 
 Two things are worth keeping in view when reading this code as a user rather than an author. The v0.8 tree is not deployed; the accounts holding funds today run the v0.7 plugin design. And the flexibility that makes the account durable is also its risk surface, since a module installed with global validation can drive every native function, including the upgrade.
 
@@ -279,7 +285,9 @@ Two things are worth keeping in view when reading this code as a user rather tha
 
 **Q: Why is `_authorizeUpgrade` empty, and what stops an arbitrary address from upgrading the account?**
 
-The `wrapNativeExecutionFunction` modifier on `upgradeToAndCall` does. It calls `_checkCallPermission`, which lets through the EntryPoint and the account itself, and requires everyone else to satisfy a direct-call validation registered for their address. A call from the EntryPoint has already been through `validateUserOp`, where the signature named a validation function that had to be permitted for the `upgradeToAndCall` selector, either globally or per-selector. Leaving `_authorizeUpgrade` empty avoids a second, redundant, hard-coded check and puts the policy where the rest of the account's policy lives.
+The `wrapNativeExecutionFunction` modifier on `upgradeToAndCall` does. It calls `_checkCallPermission`, which lets through the EntryPoint and the account itself, and requires everyone else to satisfy a direct-call validation registered for their address. A call from the EntryPoint has already been through `validateUserOp`, where the signature named a validation function that had to be permitted for the `upgradeToAndCall` selector, either globally or per-selector.
+
+Leaving `_authorizeUpgrade` empty avoids a second, redundant, hard-coded check and puts the policy where the rest of the account's policy lives.
 
 **Q: What is the difference between a validation hook and a validation-associated execution hook?**
 
@@ -291,11 +299,19 @@ Both attach to a `ModuleEntity` rather than to a selector, so both follow the ke
 
 **Q: An account is configured with a session key permitted only to call `transfer`. Why can it not escalate through `executeBatch`?**
 
-Three checks compose. First, `_checkValidationForCalldata` verifies the outer selector, `executeBatch`, is permitted for that validation. Second, for each inner call whose target is the account itself, the inner selector is re-checked against the *same* validation function, so an inner `installValidation` fails unless the session key was explicitly granted it. Third, an inner `execute` or `executeBatch` is rejected outright, so the key cannot add a level of nesting to hide the selector from the second check. A key that may only call `transfer` therefore ends up with `transfer` as the only self-call selector it can reach.
+Three checks compose:
+
+1. `_checkValidationForCalldata` verifies the outer selector, `executeBatch`, is permitted for that validation.
+2. For each inner call whose target is the account itself, the inner selector is re-checked against the *same* validation function, so an inner `installValidation` fails unless the session key was explicitly granted it.
+3. An inner `execute` or `executeBatch` is rejected outright, so the key cannot add a level of nesting to hide the selector from the second check.
+
+A key that may only call `transfer` therefore ends up with `transfer` as the only self-call selector it can reach.
 
 **Q: Why does the multisig module let the last signer set the gas fields, and how does the account know which digest was signed?**
 
-Collecting several signatures takes time, and the gas fields of a user operation are part of what a signature covers, so fees moving between the first and last signature would invalidate the earlier ones. The module resolves it by having the first *k−1* signers sign a minimal operation with only `sender`, `nonce`, `initCode` and `callData` populated, leaving the rest at default values, and having the final signer sign the complete object. The two digests are distinguished by the signature type byte: a signature over the actual, fully-populated operation has 32 added to its `v` value, and the module subtracts 32 back before recovering.
+Collecting several signatures takes time, and the gas fields of a user operation are part of what a signature covers, so fees moving between the first and last signature would invalidate the earlier ones. The module resolves it by having the first *k−1* signers sign a minimal operation with only `sender`, `nonce`, `initCode` and `callData` populated, leaving the rest at default values, and having the final signer sign the complete object.
+
+The two digests are distinguished by the signature type byte: a signature over the actual, fully-populated operation has 32 added to its `v` value, and the module subtracts 32 back before recovering.
 
 **Q: What stops a module from corrupting the account's storage?**
 
@@ -309,7 +325,9 @@ Redeploying the factory creates a *new* `ACCOUNT_IMPLEMENTATION` in its construc
 
 **Q: If an account's validation is uninstalled but the transaction succeeds, can its hooks still be active?**
 
-Yes, and this is the case worth checking. `_uninstallValidation` zeroes the validation flags and removes the registered selectors unconditionally, but it only touches the hooks when `hookUninstallData` is non-empty, and then it requires exactly one entry per validation hook plus one per execution hook. Calling it with an empty array leaves both hook lists in `validationStorage` for that `ModuleEntity`. The validation itself is unusable, since its flags are cleared, but reinstalling the same module and entity id later would find the old hooks still attached.
+Yes, and this is the case worth checking. `_uninstallValidation` zeroes the validation flags and removes the registered selectors unconditionally, but it only touches the hooks when `hookUninstallData` is non-empty, and then it requires exactly one entry per validation hook plus one per execution hook. Calling it with an empty array leaves both hook lists in `validationStorage` for that `ModuleEntity`.
+
+The validation itself is unusable, since its flags are cleared, but reinstalling the same module and entity id later would find the old hooks still attached.
 
 ## References
 

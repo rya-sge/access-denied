@@ -2,6 +2,7 @@
 layout: post
 title: "System Calls, Binary Images and Processes - How a Program Reaches the Kernel"
 date:   2026-09-16
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: linux programmation
@@ -13,7 +14,7 @@ image: /assets/article/linux/sye-syscalls-process/2026-09-16-system-calls-binary
 isMath: false
 ---
 
-A user program never touches a disk, a network card or another process's memory directly. Every one of those operations goes through a **system call**: a controlled entry point into the kernel, triggered by a software interrupt, with the request number and the arguments placed in registers according to a convention the platform's ABI fixes once and for all. Above that thin interface sits the libc, and above the libc the higher-level functions most code actually calls, so that `fopen()` ends up as an `open` system call without the programmer ever writing an `svc` instruction.
+A user program never touches a disk, a network card or another process's memory directly. Every one of those operations goes through a **system call**: a controlled entry point into the kernel, triggered by a software interrupt, with the request number and the arguments placed in registers according to a convention the platform's ABI fixes once and for all. Above that thin interface sits the libc, and above the libc the higher-level functions most code calls, so that `fopen()` ends up as an `open` system call without the programmer ever writing an `svc` instruction.
 
 The program issuing that call is itself the product of a toolchain. A compiler turns each source file into an object file that only knows relative and symbolic addresses; a linker merges those object files with static libraries into an executable image (ELF on Linux, PE on Windows) laid out in sections; and the operating system loads that image into memory, resolves the addresses into absolute ones, and wraps the result in a **process**: an execution context, a memory context and a set of logical resources such as file descriptors.
 
@@ -45,7 +46,7 @@ On ARM that instruction is `svc` (*supervisor call*, formerly spelled `swi`). Th
     1048:   mov     pc, lr
 ```
 
-Three things happen in those eight instructions. The **system call number** (5, which is `write` in this build of SO3) is loaded into `r7`. A per-process variable is cleared through `sl` (most likely the error indicator that the kernel will set on failure). Then `svc 0` traps into the kernel; when the handler returns, the saved registers are restored and the stub returns to its caller with the kernel's result in `r0`. The arguments `fd`, `buf` and `count` are not visible in the listing because the C calling convention already placed them in `r0`, `r1` and `r2` before the stub was entered, and the stub simply leaves them there.
+Three things happen in those eight instructions. The **system call number**, 5 for `write` in this build of SO3, is loaded into `r7`. A per-process variable, most likely the error indicator that the kernel will set on failure, is cleared through `sl`. Then `svc 0` traps into the kernel; when the handler returns, the saved registers are restored and the stub returns to its caller with the kernel's result in `r0`. The arguments `fd`, `buf` and `count` are not visible in the listing because the C calling convention already placed them in `r0`, `r1` and `r2` before the stub was entered, and the stub simply leaves them there.
 
 ### Examples of system calls
 
@@ -59,7 +60,7 @@ The lecture reproduces a comparison of UNIX and Win32 calls that summarises what
 | File systems and rights | `mount`, `umount`, `chmod` | (none) | Mounting is not exposed to Win32 programs; permissions go through the NT security API |
 | Signals and time | `kill`, `time` | `GetLocalTime` | Win32 has no signal mechanism comparable to `kill` |
 
-Two entries have aged. NTFS has supported hard links since Windows 2000 (`CreateHardLink`) and symbolic links since Vista (`CreateSymbolicLink`), so "no links" is no longer accurate. The `chmod` row reflects the fact that Win32 has no permission bits: access control on NTFS is expressed through discretionary ACLs manipulated with the security API (`SetFileSecurity`, `SetNamedSecurityInfo`), which is a different model rather than a missing feature. The structural point of the table stands: UNIX splits process creation into `fork` and `execve`, exposes mounting and signals as first-class calls, and treats almost every resource as a file descriptor.
+Two entries have aged. NTFS has supported hard links since Windows 2000 (`CreateHardLink`) and symbolic links since Vista (`CreateSymbolicLink`), so "no links" is no longer accurate. The `chmod` row reflects the fact that Win32 has no permission bits: access control on NTFS is expressed through discretionary ACLs manipulated with the security API (`SetFileSecurity`, `SetNamedSecurityInfo`), which is a different model rather than a missing feature. The point of the table stands: UNIX splits process creation into `fork` and `execve`, exposes mounting and signals as first-class calls, and treats almost every resource as a file descriptor.
 
 ### Mechanism: stub, registers and ABI
 
@@ -126,7 +127,7 @@ Before a program can issue a system call it has to exist as a **binary image**: 
 ![Compile and link pipeline: source files and headers go through the compiler to produce object files, which the linker merges with static libraries into an executable image made of a file header and .text, .data, .bss and .debug sections]({{site.url_complet}}/assets/article/linux/sye-syscalls-process/binary-image-toolchain-concept.png)
 
 - **Compilation.** Each source file (`main.c`, `printf.c`) is compiled separately into an **object file** (`main.o`, `printf.o`). Header files (`main.h`, `printf.h`, `random.h`) are not compiled on their own; they are textually included into the sources that depend on them, which is how declarations are shared between translation units. Every object file contains machine code and data for its translation unit, plus a symbol table and relocation entries describing what it exports and what it still needs.
-- **Linking.** The **linker** (also called the link editor) takes all the object files plus the **static libraries** they depend on (`libc.a`, `libmath.a`, which are archives of object files) and merges them into one executable. It resolves every unresolved symbol: the reference to `printf` in `main.o` is bound to the definition found in `printf.o` or in `libc.a`.
+- **Linking.** The **linker**, also called the link editor, takes all the object files plus the **static libraries** they depend on (`libc.a`, `libmath.a`), which are archives of object files, and merges them into one executable. It resolves every unresolved symbol: the reference to `printf` in `main.o` is bound to the definition found in `printf.o` or in `libc.a`.
 - **Output format.** The result follows a platform-defined executable format: [ELF](https://refspecs.linuxfoundation.org/elf/elf.pdf) (*Executable and Linkable Format*) on Linux and most UNIX-like systems, PE (*Portable Executable*) on Windows, ECOFF on older systems. Whatever the format, the file starts with a **header** that identifies the architecture, the entry point and the layout of the sections that follow.
 
 The sections named in the lecture are the ones every format has in some form:
@@ -240,8 +241,6 @@ Each region has a distinct role and a distinct owner:
 The sections of the executable file and the regions of the process address space correspond one to one for code, data and BSS; the stack and the heap exist only at run time, sized by the kernel and the allocator rather than by the linker. That correspondence is what the loader implements, and it is why the ELF header carries, for each loadable segment, both a file offset and a virtual address.
 
 ## Conclusion
-
-The lecture ties three subjects that are usually taught separately into one chain.
 
 A system call is a software interrupt whose number and arguments travel in registers fixed by the ABI, wrapped by a libc stub and, above it, by higher-level library functions. On ARM the number is in `r7` and the trap is `svc`; on x86-64 the number is in `rax` and the trap is `syscall`.
 

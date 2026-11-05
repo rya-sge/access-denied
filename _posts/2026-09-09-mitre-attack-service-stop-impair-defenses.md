@@ -2,6 +2,7 @@
 layout: post
 title: "Three ATT&CK Techniques Behind the Ransomware Endgame - Service Stop, Disable or Modify Tools, and Indicator Blocking"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: security
@@ -154,7 +155,9 @@ When writing new detection content, map to `T1685`; when reading older threat in
 
 ## Conclusion
 
-Disable or Modify Tools, Indicator Blocking and Service Stop describe the three moves an attacker makes to clear the way before causing damage: blind the sensors, silence the record, and unlock the data. They are reported together in ransomware and destructive intrusions because they solve the same problem for the adversary, which is operating without being seen, stopped, or reversed. For a defender, the practical consequence is that endpoint tamper protection, off-host log forwarding, and offline backups are not three separate hygiene items but one connected line of defence, each covering the failure of the others. The ATT&CK v19 move of the Impair Defenses tree into `T1685` changes the identifiers and the tactic label, not the behaviour, so existing detections keep their value once their mappings are updated.
+Disable or Modify Tools, Indicator Blocking and Service Stop describe the three moves an attacker makes to clear the way before causing damage: blind the sensors, silence the record, and unlock the data. They are reported together in ransomware and destructive intrusions because they solve the same problem for the adversary, which is operating without being seen, stopped, or reversed.
+
+For a defender, the practical consequence is that endpoint tamper protection, off-host log forwarding, and offline backups are not three separate hygiene items but one connected line of defence, each covering the failure of the others. The ATT&CK v19 move of the Impair Defenses tree into `T1685` changes the identifiers and the tactic label, not the behaviour, so existing detections keep their value once their mappings are updated.
 
 ![Mindmap of the three ATT&CK techniques covering Service Stop (T1489), Disable or Modify Tools (T1562.001) and Indicator Blocking (T1562.006), their sub-behaviours, the defensive controls against them, and the ATT&CK v19 change to T1685]({{site.url_complet}}/assets/article/securite/mitre-attack/2026-09-09-mitre-attack-disruption-evasion-mindmap.png)
 
@@ -211,7 +214,9 @@ Many services hold their data stores open and locked while running, so the files
 
 **Q: If logs are being blocked, how can a defender detect the attack?**
 
-By monitoring for absence rather than presence. A sensor that normally reports continuously and then goes silent is itself the indicator, so a SIEM that tracks a per-host heartbeat or "last seen" time can alert on the gap that Indicator Blocking creates. Some tampering also produces its own event before the silence, such as Sysmon's Event ID 16 when its configuration changes. The decisive control is forwarding logs off-host in near real time, so anything blocked locally has already left a record elsewhere.
+By monitoring for absence rather than presence. A sensor that normally reports continuously and then goes silent is itself the indicator, so a SIEM that tracks a per-host heartbeat or "last seen" time can alert on the gap that Indicator Blocking creates.
+
+Some tampering also produces its own event before the silence, such as Sysmon's Event ID 16 when its configuration changes. The decisive control is forwarding logs off-host in near real time, so anything blocked locally has already left a record elsewhere.
 
 **Q: These IDs are marked revoked on the ATT&CK website. Are they still worth learning?**
 
@@ -219,7 +224,9 @@ Yes. ATT&CK v19 revoked the `T1562` Impair Defenses tree and consolidated it int
 
 **Q: Which single control most reduces exposure to all three techniques?**
 
-No single control covers all three, which is the point of treating them as a chain. That said, restricting privilege has the broadest effect: all three normally require administrative rights to kill a protected tool, reconfigure logging, or stop a service, so limiting which accounts hold those rights raises the cost of every stage. It must be paired with off-host log forwarding and offline backups, because privilege restriction slows the teardown but does not by itself preserve visibility or enable recovery.
+No single control covers all three, which is the point of treating them as a chain. That said, restricting privilege has the broadest effect: all three normally require administrative rights to kill a protected tool, reconfigure logging, or stop a service, so limiting which accounts hold those rights raises the cost of every stage.
+
+It must be paired with off-host log forwarding and offline backups, because privilege restriction slows the teardown but does not by itself preserve visibility or enable recovery.
 
 ## References
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Stellar Classic Assets — How They Work, and How They Map to ERC-20 and ERC-7943"
 date:   2026-10-15
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -118,7 +119,7 @@ The next two sections show where these gaps fall in terms an Ethereum developer 
 
 ## Mapping a Classic asset to ERC-20
 
-ERC-20 and a Classic asset cover the same ground, holding and moving a fungible balance, but they differ in two structural ways: a Classic asset requires opt-in through a trustline, and it has no allowance mechanism unless it is accessed through its SAC.
+ERC-20 and a Classic asset cover the same ground, holding and moving a fungible balance, but they differ in two ways: a Classic asset requires opt-in through a trustline, and it has no allowance mechanism unless it is accessed through its SAC.
 
 | ERC-20 | Stellar Classic asset | Through the SAC (Soroban) |
 |---|---|---|
@@ -136,7 +137,7 @@ ERC-20 and a Classic asset cover the same ground, holding and moving a fungible 
 | Mint / burn (common extension) | Payment from / to the issuer | `mint` (admin only) / `burn`, `burn_from` |
 | Receiving without consent | Impossible: a trustline is required | Contract addresses need no trustline; Stellar accounts still do |
 
-Two remarks complete the table. First, the SAC is not a wrapper token: there is one balance, and the SAC is only a second entry point to it. Second, the Classic side has features ERC-20 does not have at all: the order book, path payments, claimable balances and a per-holder limit.
+The SAC is not a wrapper token: there is one balance, and the SAC is only a second entry point to it. The Classic side has features ERC-20 does not have at all: the order book, path payments, claimable balances and a per-holder limit.
 
 ## Mapping a Classic asset to ERC-7943 (uRWA)
 
@@ -196,7 +197,7 @@ Holders are normally left unauthorized, or in `AUTHORIZED_TO_MAINTAIN_LIABILITIE
 4. `SetTrustLineFlags`: downgrade the recipient back;
 5. `SetTrustLineFlags`: downgrade the sender back.
 
-Since the five operations are atomic, both accounts are authorized for that payment and nothing else.
+Since the five operations are atomic, both accounts are authorized for that payment only.
 
 ```mermaid
 sequenceDiagram
@@ -221,7 +222,7 @@ sequenceDiagram
     end
 ```
 
-The response statuses are `success` (signed as is), `revised` (operations added; the user must review and re-sign), `pending`, `action_required` and `rejected`.
+The response statuses are `success`, `revised`, `pending`, `action_required` and `rejected`. `success` means the transaction is signed as is, and `revised` means operations were added and the user must review and re-sign.
 
 SEP-8 gives a Classic asset an equivalent of ERC-7943's `canTransfer` and, more generally, of an ERC-3643 compliance check. Its costs follow from the design:
 
@@ -236,7 +237,17 @@ The Stellar Asset Contract has an admin, by default the issuer, that can call `m
 
 This option changes **who may exercise the issuer controls and under which conditions**. It does not change what a transfer between two holders checks: those still follow the Classic trustline rules. It is the right step when the requirement is governance over minting and enforcement, not new transfer rules.
 
-Changing the SAC admin does not change the issuer, and it does not take the issuer's Classic powers away. The issuer is part of the asset's identity (`CODE:ISSUER`), and the issuing account can still mint with a `Payment`, change trustline flags with `SetTrustLineFlags` and claw back with the `Clawback` operation, none of which goes through the SAC. A Soroban contract also cannot be a signer of a Classic account, whose signers can only be ed25519 keys, pre-authorized transaction hashes, hash-x preimages and signed payloads. To put the asset fully under the admin contract, the issuer first calls `set_admin` to hand the SAC to the contract, then locks the issuing account (master key weight zero, no other signers). From then on, `mint`, `clawback` and `set_authorized` are only reachable through the contract. The cost is the issuer actions the SAC does not expose. Deauthorizing a trustline through the SAC always downgrades it to `AUTHORIZED_TO_MAINTAIN_LIABILITIES`, so a full deauthorization that cancels offers is no longer possible; the issuer flags and the `home_domain` can no longer be changed; and SEP-8 is ruled out, since its authorization sandwich needs the issuer's signature. Without the lock, the issuer key and the admin contract both hold minting and enforcement power.
+Changing the SAC admin does not change the issuer, and it does not take the issuer's Classic powers away. The issuer is part of the asset's identity (`CODE:ISSUER`), and the issuing account can still mint with a `Payment`, change trustline flags with `SetTrustLineFlags` and claw back with the `Clawback` operation, none of which goes through the SAC. A Soroban contract also cannot be a signer of a Classic account, whose signers can only be ed25519 keys, pre-authorized transaction hashes, hash-x preimages and signed payloads.
+
+To put the asset fully under the admin contract, the issuer first calls `set_admin` to hand the SAC to the contract, then locks the issuing account (master key weight zero, no other signers). From then on, `mint`, `clawback` and `set_authorized` can only be called through the contract.
+
+The cost is the issuer actions the SAC does not expose:
+
+- Deauthorizing a trustline through the SAC always downgrades it to `AUTHORIZED_TO_MAINTAIN_LIABILITIES`, so a full deauthorization that cancels offers is no longer possible.
+- The issuer flags and the `home_domain` can no longer be changed.
+- SEP-8 is ruled out, since its authorization sandwich needs the issuer's signature.
+
+Without the lock, the issuer key and the admin contract both hold minting and enforcement power.
 
 ### SEP-41: a custom Soroban token
 
@@ -367,7 +378,9 @@ It cannot reproduce `getFrozenTokens` / `setFrozenTokens`, because Classic freez
 
 **Q: An issuer needs a maximum holding per investor and a lock-up period, but wants the asset to stay tradable on the SDEX. Which option fits?**
 
-A Classic asset with SEP-8. Both rules depend on the transfer (the amount, the date, the recipient's resulting balance), so the protocol alone cannot express them. A SEP-41 token could, but it would leave the SDEX and path payments behind. SEP-8 keeps the asset Classic: holders stay unauthorized between transactions, and the approval server applies the holding limit and the lock-up before it adds the authorization sandwich and co-signs. The cost is an off-chain rule engine that must stay available, and wallets that implement the SEP-8 flow.
+A Classic asset with SEP-8. The protocol alone cannot express them, because both rules depend on the transfer: the amount, the date, the recipient's resulting balance. A SEP-41 token could, but it would leave the SDEX and path payments behind.
+
+SEP-8 keeps the asset Classic: holders stay unauthorized between transactions, and the approval server applies the holding limit and the lock-up before it adds the authorization sandwich and co-signs. The cost is an off-chain rule engine that must stay available, and wallets that implement the SEP-8 flow.
 
 **Q: What is the difference between setting a contract as SAC admin and writing a SEP-41 token?**
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Dijkstra vs Bellman-Ford — Two Ways to Compute Shortest Paths"
 date:   2026-10-05
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation network
@@ -14,7 +15,7 @@ isMermaid: true
 
 Dijkstra's algorithm and the Bellman-Ford algorithm solve the same problem: given a weighted directed graph and a source vertex, compute the length of the shortest path from the source to every other vertex. Both are built on the same elementary operation, *edge relaxation*, and both produce a shortest-path tree. They differ in the order in which they relax edges and in how many times they do it.
 
-That single difference has measurable consequences. Dijkstra relaxes each edge once, in a greedy order, and runs in $$O(E + V \log V)$$ with a Fibonacci heap, but its result is wrong as soon as one edge weight is negative. Bellman-Ford relaxes every edge up to $$V - 1$$ times, runs in $$O(VE)$$, accepts negative weights, and detects a negative cycle when one is reachable. The same split appears in network routing: link-state protocols such as OSPF run Dijkstra, distance-vector protocols such as RIP run a distributed Bellman-Ford.
+Dijkstra relaxes each edge once, in a greedy order, and runs in $$O(E + V \log V)$$ with a Fibonacci heap, but its result is wrong as soon as one edge weight is negative. Bellman-Ford relaxes every edge up to $$V - 1$$ times, runs in $$O(VE)$$, accepts negative weights, and detects a negative cycle when one is reachable. The same split appears in network routing: link-state protocols such as OSPF run Dijkstra, distance-vector protocols such as RIP run a distributed Bellman-Ford.
 
 This article defines the problem, describes both algorithms with their correctness argument, traces them on a graph where they disagree, and compares where each one is used.
 
@@ -297,7 +298,7 @@ flowchart TD
 
 Three further considerations sit outside the flowchart:
 
-- **An undirected graph with a negative edge** always contains a negative cycle, since the edge can be traversed back and forth. Neither algorithm gives meaningful distances there; the problem has to be reformulated (for example, as a shortest simple path, which is NP-hard in general).
+- **An undirected graph with a negative edge** always contains a negative cycle, since the edge can be traversed back and forth. Neither algorithm gives meaningful distances there; the problem has to be reformulated, for example as a shortest simple path, which is NP-hard in general.
 - **A directed acyclic graph** needs neither algorithm. Relaxing edges in topological order solves SSSP with any weights in $$O(V + E)$$, because one pass in that order relaxes every path's edges in sequence.
 - **Bounded hop counts or a distributed setting** favour Bellman-Ford even when all weights are positive, for the reasons given above.
 

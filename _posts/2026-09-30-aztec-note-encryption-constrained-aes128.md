@@ -2,6 +2,7 @@
 layout: post
 title: "Is Aztec's Note Encryption Constrained? AES-128, the Three Delivery Modes and What Each One Proves"
 date:   2026-09-30
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain aztec cryptography
@@ -28,9 +29,7 @@ Two things make it reasonable to doubt.
 
 The first is that a zero-knowledge circuit is an expensive place to compute anything, and AES is a byte-oriented cipher built from S-box lookups and finite-field operations over GF(2⁸) — not a natural fit for an arithmetic circuit over a large prime field. A designer would be forgiven for pushing it outside the proof and constraining only a commitment to the result.
 
-The second is that Aztec really does push a great deal outside the circuit. The private execution environment (PXE) answers *oracle* calls from the circuit, and a value obtained that way is unproven by construction; Noir marks those call sites `unsafe` for exactly that reason. Decryption, key derivation, randomness and note discovery all lean on oracles. Encryption sitting alongside them would be entirely in keeping.
-
-So the question is a real one, and the answer has to come from the framework rather than from intuition.
+The second is that Aztec pushes a great deal outside the circuit. The private execution environment (PXE) answers *oracle* calls from the circuit, and a value obtained that way is unproven by construction; Noir marks those call sites `unsafe` for exactly that reason. Decryption, key derivation, randomness and note discovery all lean on oracles. Encryption sitting alongside them would be entirely in keeping.
 
 ## The three delivery modes
 
@@ -208,7 +207,7 @@ The transaction succeeds and the note becomes undeliverable. The library derives
 
 **Q: If a constrained delivery is 20,200 gates, when is it wrong to use one?**
 
-When the sender is the party that would suffer from non-delivery. The canonical case is a change note returning to the sender: paying to prove, to yourself, that you encrypted your own note correctly buys nothing. The same applies wherever the sender is otherwise motivated to deliver, such as a payment where the recipient withholds goods until the note arrives. Reserve the constrained mode for a recipient who has no recourse, such as a third party being minted to.
+When the sender is the party that would suffer from non-delivery. The canonical case is a change note returning to the sender: paying to prove, to yourself, that you encrypted your own note correctly buys nothing. Proving also buys nothing wherever the sender is otherwise motivated to deliver, such as a payment where the recipient withholds goods until the note arrives. Reserve the constrained mode for a recipient who has no recourse, such as a third party being minted to.
 
 ## References
 

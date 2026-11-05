@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Glamsterdam - Overview"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -15,7 +16,7 @@ isMermaid: true
 
 Glamsterdam is the Ethereum network upgrade that follows Fusaka. Its name joins the two layers it changes: *Gloas* on the consensus layer and *Amsterdam* on the execution layer. It activated on the Sepolia testnet on 2026-10-06 at 13:53:36 UTC (epoch 353,024); Hoodi and mainnet dates had not been set on 2026-10-23.
 
-The upgrade schedules 18 EIPs. Two of them change how a block is produced and validated: enshrined proposer-builder separation moves block building into the protocol and gives validators more time to execute a payload, and block-level access lists record every account and slot a block touches so that clients can execute and verify it in parallel. Most of the others reprice gas, with one structural change among them: creating state is charged as a separate *state gas*, counted apart from the 16,777,216 per-transaction cap introduced by Fusaka. This article goes through every scheduled EIP, what it changes, why, and who it affects, with the figures taken from the EIP texts and the executable specifications.
+The upgrade schedules 18 EIPs. Two of them change how a block is produced and validated: enshrined proposer-builder separation moves block building into the protocol and gives validators more time to execute a payload, and block-level access lists record every account and slot a block touches so that clients can execute and verify it in parallel. Most of the others reprice gas, and one of them also changes the accounting: creating state is charged as a separate *state gas*, counted apart from the 16,777,216 per-transaction cap introduced by Fusaka. This article goes through every scheduled EIP, what it changes, why, and who it affects, with the figures taken from the EIP texts and the executable specifications.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -112,7 +113,7 @@ sequenceDiagram
 
 ### EIP-7928: Block-Level Access Lists
 
-**What changes.** Every block carries a *block-level access list* (BAL): the accounts and storage slots touched during its execution, with their values after each transaction (balance, nonce, code and storage changes, and storage reads). The block header commits to it. The number of entries is bounded by the block gas limit: addresses plus unique storage keys may not exceed `block_gas_limit / 2,000` (`BLOCK_ACCESS_LIST_ITEM` in `forks/amsterdam/vm/gas.py`, checked in `block_access_lists.py`).
+**What changes.** Every block carries a *block-level access list* (BAL): the accounts and storage slots touched during its execution, with their values after each transaction. It records balance, nonce, code and storage changes, and storage reads. The block header commits to it. The number of entries is bounded by the block gas limit: addresses plus unique storage keys may not exceed `block_gas_limit / 2,000` (`BLOCK_ACCESS_LIST_ITEM` in `forks/amsterdam/vm/gas.py`, checked in `block_access_lists.py`).
 
 **Why.** A client cannot execute transactions in parallel without knowing which state they touch. Transaction access lists ([EIP-2930](https://eips.ethereum.org/EIPS/eip-2930)) are optional and not enforced. A BAL is enforced at block level, so a client can read all the needed state from disk in parallel, execute transactions in parallel, compute the state root in parallel, or apply the block's state changes without executing it at all.
 
@@ -186,7 +187,7 @@ State gas is metered apart from execution gas. The 16,777,216 cap of EIP-7825 no
 
 **Why.** The EIPs reduce the worst-case block size, by about 37 % for the calldata floor and about 21 % for the access-list change. A block filled with cheap data is the largest block that can be produced, and its size matters for propagation, now that blobs carry rollup data.
 
-**Impact.** Only transactions dominated by calldata pay more. A transaction that executes much more than it carries, which includes most contract calls, does not reach the floor.
+**Impact.** Only transactions dominated by calldata pay more. The floor does not bind a transaction that executes much more than it carries, which includes most contract calls.
 
 ## The EVM: new opcodes, larger contracts, logs
 
@@ -226,7 +227,7 @@ State gas is metered apart from execution gas. The 16,777,216 cap of EIP-7825 no
 
 **What changes.** A contract that self-destructs in the transaction that created it no longer burns any ETH left in it: code, storage and nonce are still cleared, but the balance is kept.
 
-**Why.** After [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) (Cancun), ETH could still be burned only in this narrow case. The EIP's replay of mainnet up to about block 25M found 2 such burns after Cancun. Removing the case simplifies `SELFDESTRUCT` and, as the EIP states, removes the last EVM mechanism by which ETH leaves the total supply (the [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) base fee burn is outside the EVM).
+**Why.** After [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) (Cancun), ETH could still be burned only in this narrow case. The EIP's replay of mainnet up to about block 25M found 2 such burns after Cancun. Removing the case simplifies `SELFDESTRUCT` and, as the EIP states, removes the last EVM mechanism by which ETH leaves the total supply. The [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) base fee burn is outside the EVM.
 
 **Impact.** Practically none for deployed contracts.
 

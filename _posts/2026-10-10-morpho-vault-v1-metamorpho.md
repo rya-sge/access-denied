@@ -2,7 +2,7 @@
 layout: post
 title: "How Morpho Vault V1 (MetaMorpho) Works, and What Vault V2 Changes"
 date:   2026-10-10
-last_modified_at: 2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -344,11 +344,13 @@ MetaMorpho is an immutable ERC-4626 vault that supplies one asset to at most 30 
 
 ### Risks
 
-A MetaMorpho depositor carries the risks of every Blue market the vault supplies to, plus the risks of the vault's own governance. Morpho's own disclosure for Vault V1 is the "Emergency" section of the [v1.0](https://github.com/morpho-org/metamorpho/tree/ded84e59668155b34d3c24906c4f7461c12828af) and [v1.1](https://github.com/morpho-org/metamorpho-v1.1/tree/3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7) READMEs, which describes what to do when a market becomes unsafe, when its funds are lost, and when the curator or an allocator acts against the vault's strategy, together with the audit reports in each repository's `audits/` folder. This section adds what the code and two deployed vaults show. On-chain values were read on Ethereum mainnet at block 26,248,480 (22 October 2026, 13:33 UTC) on two vaults the site already links from its [Steakhouse article]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/): Steakhouse USDC (`0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB`) and Steakhouse USDT (`0xbEef047a543E45807105E51A8BBEFCc5950fcfBa`). The comparison in [What Vault V2 changes](#what-vault-v2-changes) shows which of these risks V2 changes.
+A MetaMorpho depositor carries the risks of every Blue market the vault supplies to, plus the risks of the vault's own governance. Morpho's own disclosure for Vault V1 is the "Emergency" section of the [v1.0](https://github.com/morpho-org/metamorpho/tree/ded84e59668155b34d3c24906c4f7461c12828af) and [v1.1](https://github.com/morpho-org/metamorpho-v1.1/tree/3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7) READMEs, which describes what to do when a market becomes unsafe, when its funds are lost, and when the curator or an allocator acts against the vault's strategy, together with the audit reports in each repository's `audits/` folder. This section adds what the code and two deployed vaults show.
+
+On-chain values were read on Ethereum mainnet at block 26,248,480 (22 October 2026, 13:33 UTC) on two vaults the site already links from its [Steakhouse article]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/): Steakhouse USDC (`0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB`) and Steakhouse USDT (`0xbEef047a543E45807105E51A8BBEFCc5950fcfBa`). The comparison in [What Vault V2 changes](#what-vault-v2-changes) shows which of these risks V2 changes.
 
 #### Smart contracts and transparency
 
-- **Immutable, on both sides.** The factory deploys each vault without a proxy (see [Names and versions](#names-and-versions)), and Etherscan shows Steakhouse USDC's source verified as `MetaMorpho`, compiled with Solidity 0.8.21. A bug in a deployed vault cannot be patched by anyone, Morpho included: a fix means a new vault and depositors moving their funds to it. In exchange, nobody can replace the logic with a malicious or faulty version, and the limits written in the code (a fee of at most 50 %, a timelock between 1 day and 2 weeks, the guardian's veto) cannot change under a depositor.
+- **Immutable, on both sides.** The factory deploys each vault without a proxy (see [Names and versions](#names-and-versions)), and Etherscan shows Steakhouse USDC's source verified as `MetaMorpho`, compiled with Solidity 0.8.21. A bug in a deployed vault cannot be patched by anyone, Morpho included: a fix means a new vault and depositors moving their funds to it. In exchange, nobody can replace the logic with a malicious or faulty version, and the limits written in the code cannot change under a depositor: a fee of at most 50 %, a timelock between 1 day and 2 weeks, and the guardian's veto.
 - **Audits and verification.** The v1.0 folder holds a Cantina managed review (14 November 2023), an OpenZeppelin review of the periphery (16 November 2023) and a Cantina competition (5 January 2024); the v1.1 folder adds a Cantina review of the v1.0 to v1.1 diff (23 September 2024), an OpenZeppelin review (10 January 2025) and a Cantina managed review (20 February 2025). The v1.0 README states that formal verification was done with Certora. Which commit each report covered, and whether it matches the bytecode of a given vault, was not checked here.
 - **The version is fixed per vault.** Both Steakhouse vaults return `true` from `isMetaMorpho` on the v1.0 factory (`0xA9c3D3a366466Fa809d1Ae982Fb2c46E5fC41101`) and `false` on the v1.1 factory (`0x1897A8997241C1cD4bD0698647e4EB7213535c24`), and `lostAssets()` reverts on both: they are v1.0 vaults, which realise bad debt in the share price. The two versions share a name but not the loss rule, so a depositor has to check the factory of each vault.
 - **Accounting that one market can stop.** `totalAssets()` calls Blue for every market in the withdraw queue, so a single reverting market halts deposits and withdrawals until a forced removal passes the timelock (see [Market lifecycle](#market-lifecycle)). For an 18-decimal asset the virtual-share offset is zero, which leaves a new vault open to the inflation attack unless the deployer seeds it ([Share conversion](#share-conversion)); the two Steakhouse vaults hold 6-decimal stablecoins, so their offset is 12.
@@ -423,7 +425,9 @@ The vault is immutable, but its roles are not, and each role is an address that 
 
 **Q: What is the difference between the supply queue and the withdraw queue?**
 
-The supply queue lists the markets that receive deposits, in order, each up to its cap; it can be a subset of the enabled markets and can be empty, which disables deposits. The withdraw queue lists every enabled market, in the order liquidity is pulled on withdrawal. It is also the list the vault iterates to compute `totalAssets()`, which is why a market can only leave it once the vault no longer holds supply there or a forced removal has passed its timelock.
+The supply queue lists the markets that receive deposits, in order, each up to its cap; it can be a subset of the enabled markets and can be empty, which disables deposits.
+
+The withdraw queue lists every enabled market, in the order liquidity is pulled on withdrawal. It is also the list the vault iterates to compute `totalAssets()`, which is why a market can only leave it once the vault no longer holds supply there or a forced removal has passed its timelock.
 
 **Q: Which changes are timelocked in a MetaMorpho vault, and which are not?**
 
@@ -433,15 +437,21 @@ Immediate: lowering a cap, raising the timelock, setting the first guardian, and
 
 **Q: A market held by a v1.1 vault suffers bad debt equal to 5 % of the vault's assets. What happens to the share price, and who bears the loss?**
 
-The share price does not change. At the next interaction, the vault sees its real assets drop and adds the difference to `lostAssets`, so `totalAssets()` stays at its previous value. Depositors who withdraw afterwards are paid at the old price as long as the markets have liquidity. The remaining depositors hold shares backed by fewer real assets, and the last ones to leave bear the 5 %. In a v1.0 vault, the share price would drop by 5 % at the next interaction, and every holder would bear the loss in proportion to their shares.
+The share price does not change. At the next interaction, the vault sees its real assets drop and adds the difference to `lostAssets`, so `totalAssets()` stays at its previous value. Depositors who withdraw afterwards are paid at the old price as long as the markets have liquidity. The remaining depositors hold shares backed by fewer real assets, and the last ones to leave bear the 5 %.
+
+In a v1.0 vault, the share price would drop by 5 % at the next interaction, and every holder would bear the loss in proportion to their shares.
 
 **Q: Why does MetaMorpho need a forced market removal, when the curator can already set a cap to zero?**
 
-A zero cap only stops new supply. The market stays in the withdraw queue as long as the vault holds supply there, and `totalAssets()` keeps calling Blue for it. If that market reverts, every deposit and withdrawal reverts with it, and if it has no liquidity, the supply cannot be moved out. Forced removal lets allocators drop the market from the queue after the timelock even with supply still in it. The supply is written off: the share price drops in v1.0, and the amount goes into `lostAssets` in v1.1.
+A zero cap only stops new supply. The market stays in the withdraw queue as long as the vault holds supply there, and `totalAssets()` keeps calling Blue for it. If that market reverts, every deposit and withdrawal reverts with it, and if it has no liquidity, the supply cannot be moved out.
+
+Forced removal lets allocators drop the market from the queue after the timelock even with supply still in it. The supply is written off: the share price drops in v1.0, and the amount goes into `lostAssets` in v1.1.
 
 **Q: An allocator calls `reallocate` with targets of 0 for market A and `type(uint256).max` for market B. What happens?**
 
-For market A, a target of 0 makes the vault withdraw all its supply shares from A, including any shares donated by third parties. For market B, the special value `type(uint256).max` makes the vault supply everything withdrawn so far in the call and not yet resupplied, which is the amount just taken from A. The vault checks that B's new supply stays within its cap, then checks that the totals withdrawn and supplied are equal. If A's liquidity is insufficient, the Blue withdrawal reverts and the whole reallocation reverts.
+For market A, a target of 0 makes the vault withdraw all its supply shares from A, including any shares donated by third parties. For market B, the special value `type(uint256).max` makes the vault supply everything withdrawn so far in the call and not yet resupplied, which is the amount just taken from A.
+
+The vault checks that B's new supply stays within its cap, then checks that the totals withdrawn and supplied are equal. If A's liquidity is insufficient, the Blue withdrawal reverts and the whole reallocation reverts.
 
 **Q: What are the three main differences between the V1 guardian and the V2 sentinel?**
 

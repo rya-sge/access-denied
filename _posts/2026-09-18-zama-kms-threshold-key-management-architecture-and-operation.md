@@ -2,6 +2,7 @@
 layout: post
 title: "Inside the Zama KMS — Threshold Key Management for FHE, From MPC Protocol to Enclave Deployment"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -13,7 +14,7 @@ isMath: true
 
 [Zama](https://www.zama.ai/) runs confidential smart contracts on ordinary EVM chains with Fully Homomorphic Encryption (FHE): balances and amounts are ciphertexts under one global public key, off-chain coprocessors compute on them, and a smart contract decides who may read a result. The last step, turning a ciphertext back into a number for the party allowed to see it, needs the private key. The property this article depends on is that no machine ever holds that key: it exists only as thirteen shares, spread across thirteen organisations, and decryption is a multi-party computation among them. The component that does this is the **Key Management Service**, the KMS, and it is published as its own repository, `zama-ai/kms`.
 
-Two earlier articles placed the KMS in the protocol: the [architecture article]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/) gave its trust assumption, and the [whitepaper reading]({{site.url_complet}}/2026/09/18/zama-fhevm-whitepaper-vs-implementation/) its specification. This one opens the repository. It covers the threshold model and the protocol the KMS runs, the operations it exposes over gRPC and what each one costs, the anatomy of a node (core service, threshold service, connector, vaults, keychains), the enclave and networking design, the backup and recovery machinery, and what a party has to deploy to be one of the thirteen.
+Two earlier articles placed the KMS in the protocol: the [architecture article]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/) gave its trust assumption, and the [whitepaper reading]({{site.url_complet}}/2026/09/18/zama-fhevm-whitepaper-vs-implementation/) its specification. This one opens the repository. It covers the threshold model and the protocol the KMS runs, the operations it exposes over gRPC and what each one costs, the anatomy of a node (core service, threshold service, connector, vaults, keychains), the enclave and networking design, backup and recovery, and what a party has to deploy to be one of the thirteen.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -23,7 +24,9 @@ Two earlier articles placed the KMS in the protocol: the [architecture article](
 
 A classical key management system is a hardware security module: a box that holds keys and refuses to export them. The repository's introduction lists the reasons Zama did not build on one: HSMs are proprietary, support a fixed set of algorithms, and resist remote attackers rather than physical ones. For an FHE key that every user of every host chain encrypts under, a single box is also a single point of compromise and of failure.
 
-The KMS instead applies threshold cryptography. A group of $$n$$ parties jointly generates a key pair $$(pk, sk)$$ such that each party $$i$$ holds a share $$sk_i$$ and $$sk$$ itself is never assembled anywhere. A parameter $$t \lt n$$ bounds the adversary: with at most $$t$$ corrupted parties, nothing about $$sk$$ leaks, and every protocol still completes with a correct result. The flavour the KMS implements is the strong one, *maliciously secure and robust*: corrupted parties may run arbitrary code, and honest parties still finish (*guaranteed output delivery*). That guarantee requires a strong honest majority, $$t \lt n/3$$, so the smallest cluster with $$t \gt 0$$ has four parties, and the production deployment uses $$n = 13$$, $$t = 4$$.
+The KMS instead applies threshold cryptography. A group of $$n$$ parties jointly generates a key pair $$(pk, sk)$$ such that each party $$i$$ holds a share $$sk_i$$ and $$sk$$ itself is never assembled anywhere. A parameter $$t \lt n$$ bounds the adversary: with at most $$t$$ corrupted parties, nothing about $$sk$$ leaks, and every protocol still completes with a correct result.
+
+The flavour the KMS implements is the strong one, *maliciously secure and robust*: corrupted parties may run arbitrary code, and honest parties still finish (*guaranteed output delivery*). That guarantee requires a strong honest majority, $$t \lt n/3$$, so the smallest cluster with $$t \gt 0$$ has four parties, and the production deployment uses $$n = 13$$, $$t = 4$$.
 
 The protocols come from the paper [Noah's Ark: Efficient Threshold-FHE Using Noise Flooding](https://eprint.iacr.org/2023/815) (WAHC 2023), and their full specification is the cryptographic documentation Zama prepared as a NIST threshold-cryptography submission, shipped in the repository as a PDF. Parameters are chosen for 128-bit computational security and a failure probability of $$2^{-128}$$; the fhevm deployment's parameter set (`BC_PARAMS_SNS`) gives 80 bits of statistical security on top.
 
@@ -35,11 +38,11 @@ The documentation draws three consequences:
 
 ## How a key can be used without being assembled
 
-The claim that the private key never exists anywhere is the one readers stop at: if no machine holds it, what decrypts? The answer has two halves, and they are different.
+The claim that the private key never exists anywhere is the one readers stop at: if no machine holds it, what decrypts?
 
 **Computation never touches the private key at all.** Adding, comparing or selecting ciphertexts uses the *evaluation* key, which the coprocessors hold and which cannot decrypt anything. A confidential transfer is arithmetic on ciphertexts producing a ciphertext of the correct result, so the KMS is not involved and no balance is learned by anyone. Decryption is needed only when a person wants to read a number.
 
-**A share is a point, not a piece.** The word invites the wrong picture, of a key cut into thirteen fragments that could be glued back together. What each party holds is one evaluation of a polynomial. The parties jointly construct a polynomial $$f$$ of degree $$t = 4$$ whose constant term is the secret, $$f(0) = s$$, and party $$i$$ ends up holding $$s_i = f(i)$$. Two consequences follow from nothing more than the degree:
+**A share is a point, not a piece.** The word invites the wrong picture, of a key cut into thirteen fragments that could be glued back together. What each party holds is one evaluation of a polynomial. The parties jointly construct a polynomial $$f$$ of degree $$t = 4$$ whose constant term is the secret, $$f(0) = s$$, and party $$i$$ ends up holding $$s_i = f(i)$$. Two consequences follow from the degree alone:
 
 - **Any 5 points determine $$f$$**, and therefore $$s$$. That is Lagrange interpolation, and it is where the $$\lambda_i$$ coefficients below come from.
 - **Any 4 points determine nothing.** For every candidate secret there is exactly one degree-4 polynomial passing through those four points and taking that value at zero, so four shares are consistent with every possible key. The guarantee is information-theoretic: it does not weaken against an adversary with more computing power, or a quantum one.
@@ -64,7 +67,7 @@ $$
 
 So party $$i$$ computes $$b - \langle a, s_i\rangle$$ — a **partial decryption** — and publishes it. The combiner interpolates the parts and rounds, obtaining $$m$$. The implementation is that literal: `partial_decrypt128` in `core/threshold-execution` reads the mask and body out of the ciphertext, folds the party's key share against the mask, and returns `b - <a, s>` computed on that share alone.
 
-Two properties follow, and they are the whole design.
+Two properties follow.
 
 **The reconstruction is applied to the partial decryptions, never to the key shares.** What each party publishes is a number derived from *this one ciphertext*. It is useless for any other ciphertext, because the next one has a different mask. No step of the protocol ever combines the $$s_i$$ themselves, which is the precise sense in which the key is used but never assembled.
 
@@ -192,7 +195,7 @@ The benchmarks page reports distributed decryption with 13 parties and the produ
 
 ## Post-quantum status
 
-The KMS is the part of the protocol with the least to do here, and the reason is structural rather than fortunate.
+The KMS is the part of the protocol with the least to do here.
 
 **The threshold protocols carry no computational assumption of their own.** The Cryptographic Documentation describes them as resting *"mainly on information theoretic constructions"* and lightweight symmetric primitives, and the broadcast design reflects it: Dolev-Strong was rejected partly because it needs chains of digital signatures, in favour of *"symmetric key encryption, MACs and hash functions"*. Secret sharing, as above, is information-theoretic. Noise flooding is statistical. What protects a value is the lattice problem under the TFHE ciphertext, and the same document states that the only pre-quantum primitive in the protocol sits in the input proofs, which the KMS does not produce.
 

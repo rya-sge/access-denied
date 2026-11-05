@@ -2,6 +2,7 @@
 layout: post
 title: "Pricing Yield Collateral on Morpho - Huma's PST Exchange Rate and Ojo's Pendle PT Feed"
 date:   2026-10-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi oracle
@@ -154,7 +155,7 @@ P_{\text{Ojo}} = \min\left(P_{\text{TWAP}},\ P_{\text{lin}}\right)
 \end{aligned}
 $$
 
-The TWAP input is a `PendleChainlinkOracle` over the PT's market. The linear input is computed by a model contract and served through a `ChainlinkCurrentTimestampAdapter`. The adapter that reads the Pendle oracle was [audited by Three Sigma](https://threesigma.xyz/case-studies/oracle/ojo-network-smart-contract-audit-2) in December 2024 (one file, no vulnerabilities, two defensive checks added: 18-decimal markets and an initialised Pendle oracle).
+The TWAP input is a `PendleChainlinkOracle` over the PT's market. The linear input is computed by a model contract and served through a `ChainlinkCurrentTimestampAdapter`. The adapter that reads the Pendle oracle was [audited by Three Sigma](https://threesigma.xyz/case-studies/oracle/ojo-network-smart-contract-audit-2) in December 2024. The audit covered one file and reported no vulnerabilities, and two defensive checks were added: 18-decimal markets and an initialised Pendle oracle.
 
 The rationale is one-sided safety. The linear model caps the price: buying PT in the pool to inflate collateral value, and borrowing against it, cannot push the oracle above the curve. That closes the attack that matters most to lenders, an inflated collateral price.
 
@@ -281,7 +282,7 @@ Huma's PST and Ojo's PT feed are unrelated projects that answer the same questio
 
 **Q: Why does an exchange-rate oracle never cause a false liquidation?**
 
-Because it only moves when the issuer's reported value moves. Trading in the secondary market does not reach it, so no one can push a borrower past the LLTV by selling the token. A borrower is liquidated only when interest accrues past the limit or the issuer books a loss.
+Because it only moves when the issuer's reported value moves. Trading in the secondary market does not move it, so no one can push a borrower past the LLTV by selling the token. A borrower is liquidated only when interest accrues past the limit or the issuer books a loss.
 
 **Q: Why does Ojo take the minimum of the TWAP and the linear model, rather than the maximum or an average?**
 

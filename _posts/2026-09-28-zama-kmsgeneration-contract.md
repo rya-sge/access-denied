@@ -2,6 +2,7 @@
 layout: post
 title: "Reading KMSGeneration.sol — How the Zama Protocol Requests, Certifies and Activates Its FHE Keys On-Chain"
 date:   2026-09-28
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -13,7 +14,7 @@ isMermaid: true
 
 The Zama protocol encrypts every value under one global FHE public key, computes on ciphertexts with an evaluation key, and decrypts through thirteen organisations that each hold a share of the private key. Somebody has to decide that a key exists, which one is current, and where its public material can be downloaded — and that decision cannot live in a configuration file, because every contract on every supported chain depends on it.
 
-It lives in a 1,000-line Solidity contract on the Gateway chain, `KMSGeneration.sol`. It is worth reading because it is the seam between two very different worlds: a multi-party cryptographic ceremony that happens entirely off-chain, and a smart contract that must record the outcome in a way anyone can check. The contract never touches key material. What it does is decide *when thirteen independent parties have said the same thing*, and publish what they said.
+It lives in a 1,000-line Solidity contract on the Gateway chain, `KMSGeneration.sol`. It is the seam between two very different worlds: a multi-party cryptographic ceremony that happens entirely off-chain, and a smart contract that must record the outcome in a way anyone can check. The contract never touches key material. What it does is decide *when thirteen independent parties have said the same thing*, and publish what they said.
 
 Two earlier articles set the scene: the [architecture article]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/) placed the KMS in the protocol, and the [KMS article]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/) opened its repository. This one reads the contract that drives it from the chain.
 
@@ -29,14 +30,14 @@ Two earlier articles set the scene: the [architecture article]({{site.url_comple
 contract KMSGeneration is IKMSGeneration, EIP712Upgradeable, UUPSUpgradeableEmptyProxy, ACLOwnable
 ```
 
-Four responsibilities, and no more:
+The contract has only four responsibilities:
 
 1. **Order a ceremony.** `keygen` and `crsgenRequest` emit events that the thirteen KMS nodes are listening for.
 2. **Count agreement.** Each node answers with an EIP-712 signature over what it produced. The contract tallies signatures until a threshold is met.
 3. **Publish the result.** On agreement it emits the digests of the generated material and the storage URLs where it can be downloaded.
 4. **Name the current key.** `getActiveKeyId` and `getActiveCrsId` are what the rest of the protocol reads.
 
-What it does **not** do is equally important, and the article comes back to it: it never verifies that the cryptography was performed correctly. It verifies that enough registered parties signed the same statement about it.
+The contract never verifies that the cryptography was performed correctly. It verifies that enough registered parties signed the same statement about it.
 
 Two permissions govern everything. `onlyACLOwner` — the owner of the `ACL` contract, resolved at call time through `Ownable2StepUpgradeable(aclAdd).owner()` — may request, abort and upgrade. Responses come from KMS nodes, authorised not by a role but by membership of a *context*, which is the next idea to introduce.
 
@@ -132,7 +133,7 @@ if (previousKeyId != KEY_COUNTER_BASE && !$.isRequestDone[previousKeyId]) {
 }
 ```
 
-One ceremony at a time, globally. It then allocates both IDs, pairs them, stores the parameter set (`ParamsType` is only `Default` or `Test`), pins the context, and emits `PrepKeygenRequest`. Note what is *not* emitted: no `KeygenRequest` yet. The second phase is not announced until the first has concluded.
+One ceremony at a time, globally. It then allocates both IDs, pairs them, stores the parameter set (only `Default` or `Test`), pins the context, and emits `PrepKeygenRequest`. Note what is *not* emitted: no `KeygenRequest` yet. The second phase is not announced until the first has concluded.
 
 **The preprocessing response.** Each node signs `PrepKeygenVerification(uint256 prepKeygenId, bytes extraData)` and calls `prepKeygenResponse`. The contract recovers the signer, checks it, refuses a second signature from the same signer (`KmsAlreadySignedForPrepKeygen`), records the transaction sender in a tally **keyed by the digest**, and always emits `PrepKeygenResponse` for monitoring. Then:
 
@@ -183,7 +184,7 @@ emit ActivateKey(keyId, existingKeyId, consensusUrls, keyDigests);
 
 ## What "consensus" means here
 
-This is the part worth being precise about, because the word is doing unusual work. The contract is not running a consensus protocol. It is counting signatures, and four separate checks make that counting meaningful.
+The contract is not running a consensus protocol. It is counting signatures, and four separate checks make that counting meaningful.
 
 **1. The tally is keyed by the digest, not by the request.**
 
@@ -253,7 +254,7 @@ so a node cannot answer a request for one size with material for another. On con
 
 The `existingKeyId` parameter of `keygen` switches the whole flow into a different mode. Instead of producing a new key, the ceremony produces a **compressed key set** for a key already in use, and the result is filed against the old ID.
 
-`_checkMigrationRequest` is a list of five conditions, and each one is worth a sentence:
+`_checkMigrationRequest` is a list of five conditions:
 
 ```solidity
 _checkGeneratedKeyId(existingKeyId);                       // it exists, is done, was not aborted
@@ -301,7 +302,7 @@ And the things it takes on faith:
 - **That the ACL owner is honest about aborts.** Abort requires no agreement from the nodes. An owner can abandon a ceremony that was about to conclude.
 - **That the storage URLs are served.** They are strings from a node's registration record. Nothing on-chain checks that the bytes behind a URL match the digest beside it; that check is the reader's to perform, and the digest is published precisely so that it can be.
 
-None of these is a flaw so much as a boundary. The contract's job is to be the authoritative, replay-resistant, rotation-safe record of *what the committee said*. Deciding whether the committee is trustworthy is the protocol's job, and it is answered by who the thirteen are.
+The contract's job is to be the authoritative, replay-resistant, rotation-safe record of *what the committee said*. Deciding whether the committee is trustworthy is the protocol's job, and it is answered by who the thirteen are.
 
 ## Frequently Asked Questions
 

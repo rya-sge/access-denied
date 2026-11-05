@@ -2,6 +2,7 @@
 layout: post
 title: "Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -141,7 +142,7 @@ Two paths exist. Both start with the Gateway refusing any request for a handle w
 - **Public decryption** is used when a value should become readable by everyone. The contract marks the handle publicly decryptable with `FHE.makePubliclyDecryptable`, and that is the end of its involvement. Any off-chain party then asks the relayer for the plaintext, receives it with the KMS signatures, and submits both back to a function of the contract, which checks them with `FHE.checkSignatures`. Earlier versions of the protocol had an on-chain oracle carry the result back; it was removed in library version 0.9, and no component is now obliged to complete the round trip.
 - **User decryption** is used when only one person should see the value. The user generates an ephemeral key pair, signs its public key with their wallet (EIP-712), and submits the handle, the contract address and the signature. The KMS checks the ACL entry for that user and that contract, decrypts, and re-encrypts the plaintext under the user's ephemeral key. The user decrypts locally; the plaintext never touches a chain, a relayer or the Gateway.
 
-**A user decryption is not a transaction.** This is worth stating plainly, because "submits the handle, the contract address and the signature" reads like an on-chain call and is not one. The holder makes a free `view` call to read the handle, signs an EIP-712 object in their wallet, and sends the request to the relayer over HTTP. No gas is paid, nothing is written on any chain, and a refusal costs nothing and leaves no trace, so a holder with an empty wallet can still read its balance and reads cannot be observed or rate-limited on-chain. The on-chain part happened earlier and on its own: the read permission the contract wrote when the balance changed, which a holder always receives for its own balance.
+**A user decryption is not a transaction.** The phrase "submits the handle, the contract address and the signature" reads like an on-chain call and is not one. The holder makes a free `view` call to read the handle, signs an EIP-712 object in their wallet, and sends the request to the relayer over HTTP. No gas is paid, nothing is written on any chain, and a refusal costs nothing and leaves no trace, so a holder with an empty wallet can still read its balance and reads cannot be observed or rate-limited on-chain. The on-chain part happened earlier and on its own: the read permission the contract wrote when the balance changed, which a holder always receives for its own balance.
 
 The two paths are therefore mirror images. A user decryption needs a permission and no transaction; a public decryption needs a transaction first, to mark the handle, and afterwards no permission at all.
 
@@ -263,9 +264,13 @@ Nothing homomorphic. `FHEVMExecutor.fheAdd` checks that the caller is allowed on
 
 **Q: If the coprocessors do the arithmetic, why does the Solidity library have `add` and `sub` at all?**
 
-Because the contract decides *which* arithmetic is performed, on which values, under which permissions — it just does not perform it. A confidential token calls `FHE.add` the way a program emits an instruction: the call goes to `Impl.add`, which calls `FHEVMExecutor.fheAdd`, which checks the ACL and the types, derives the result handle, charges HCU and emits the event. The returned `euint64` is `bytes32`: a name for a value that does not exist yet. Every coprocessor reading the event then computes the ciphertext and stores it under that name.
+Because the contract decides *which* arithmetic is performed, on which values, under which permissions — it just does not perform it.
 
-This is what makes the token contract readable as ordinary Solidity. `_update` in OpenZeppelin's `ERC7984` subtracts from one balance and adds to another exactly as an ERC-20 would, and the fact that every one of those operations is a deferred instruction rather than a computation changes nothing in the code — only in when the result exists. Which is also why a contract can never branch on an encrypted value: at the moment the `if` would run, nothing has been computed.
+A confidential token calls `FHE.add` the way a program emits an instruction: the call goes to `Impl.add`, which calls `FHEVMExecutor.fheAdd`, which checks the ACL and the types, derives the result handle, charges HCU and emits the event. The returned `euint64` is `bytes32`: a name for a value that does not exist yet. Every coprocessor reading the event then computes the ciphertext and stores it under that name.
+
+This is what makes the token contract readable as ordinary Solidity. `_update` in OpenZeppelin's `ERC7984` subtracts from one balance and adds to another exactly as an ERC-20 would, and the fact that every one of those operations is a deferred instruction rather than a computation changes nothing in the code — only in when the result exists.
+
+That is also why a contract can never branch on an encrypted value: at the moment the `if` would run, nothing has been computed.
 
 **Q: Why does the `inputProof` in calldata contain signatures rather than the zero-knowledge proof?**
 

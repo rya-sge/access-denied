@@ -2,7 +2,7 @@
 layout: post
 title: "Double-Entry Bookkeeping On-Chain — How the Centrifuge Hub Keeps a Multi-Chain Pool's Books"
 date:   2026-08-18
-last_modified_at: 2026-08-19
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity finance
@@ -238,7 +238,7 @@ struct AssetQueueAmount {
 }
 ```
 
-When a manager submits a queue, the message carries a net amount, a direction, a nonce, and a flag that is the heart of the design:
+When a manager submits a queue, the message carries a net amount, a direction, a nonce, and a snapshot flag:
 
 ```solidity
 ISpokeMessageSender.UpdateData memory data = ISpokeMessageSender.UpdateData({
@@ -349,7 +349,7 @@ The ledger enforces its own core invariant, so the interesting questions are at 
 - **Whether every mutation of a holding has a corresponding posting.** `HubHandler.updateHoldingAmount` calls `hub.updateAccountingAmount` only when the holding is initialised, so holdings that receive value before their accounts exist rely on the catch-up posting in `initializeHolding` firing exactly once.
 - **The clamping in `decrease`.** The posted value is unclamped while the stored value floors at zero, which is the one place the two records can legitimately diverge.
 - **Who can supply a valuation.** `updateHoldingValuation` is manager-gated, and a valuation contract that returns an inflated quote moves NAV and therefore the share price directly, with no bound in the accounting layer.
-- **Snapshot liveness rather than safety.** The nonce check makes out-of-order application impossible, but a share class whose queue never reaches a quiet moment never sets `isSnapshot`, and the price simply stops updating. That is the safe failure direction, and it is also a silent one.
+- **Snapshot liveness rather than safety.** The nonce check makes out-of-order application impossible, but a share class whose queue is never quiet never sets `isSnapshot`, and the price simply stops updating. That is the safe failure direction, and it is also a silent one.
 - **The per-chain nature of NAV.** `NAVManager` documents that it assumes all assets in a pool are shared across share classes rather than segregated. A pool that needs segregation needs a different hook.
 
 ## Conclusion
@@ -381,7 +381,9 @@ The part that is specific to a multi-chain protocol is the snapshot flag. A spok
 
 **Q: Why store both a debit total and a credit total instead of one net balance?**
 
-Because a net balance loses information that both the audit trail and the sign convention need. Running totals make each posting an increment that never has to consider the account's current side, they let `accountValue` derive a balance according to the account's declared nature at read time, and they preserve gross activity, so an account that saw a million in and a million out is distinguishable from one that saw nothing. It also matches how the paper practice works, which matters when the on-chain books are meant to be reconcilable with off-chain ones.
+Because a net balance loses information that both the audit trail and the sign convention need. Running totals make each posting an increment that never has to consider the account's current side, they let `accountValue` derive a balance according to the account's declared nature at read time, and they preserve gross activity, so an account that saw a million in and a million out is distinguishable from one that saw nothing.
+
+It also matches how the paper practice works, which matters when the on-chain books are meant to be reconcilable with off-chain ones.
 
 **Q: What exactly does the `isSnapshot` flag assert, and what happens when it is false?**
 
@@ -419,7 +421,7 @@ The balance check guarantees internal consistency, not correspondence with reali
 - **Valuation contracts.** A quote is taken at face value, and revaluation posts the difference directly to gains or losses. A manager who can install a valuation can move net asset value at will, so the first thing to inspect is who holds that permission and whether the valuation has its own bounds.
 - **Prices supplied with amount updates.** `increase` and `decrease` convert quantities using a price passed in the message rather than one the hub derives.
 - **The initialisation gap.** Value can arrive before a holding's accounts exist, and correctness then depends on the catch-up posting in `initializeHolding` running exactly once.
-- **Snapshot liveness.** Nothing forces a share class to reach a quiet state, and a price that stops updating fails silently rather than loudly.
+- **Snapshot liveness.** Nothing forces a share class to reach a quiet state, and a price that stops updating reports no error.
 
 ## References
 

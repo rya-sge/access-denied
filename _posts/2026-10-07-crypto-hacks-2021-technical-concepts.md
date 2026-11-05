@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2021 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -158,7 +159,7 @@ Uniswap v2 avoids this by keeping `reserve0` and `reserve1` in storage and calli
 
 ### Single-pool prices in leverage and minting (Vee Finance, xToken)
 
-Vee Finance (~$34M, September) used one Pangolin pool price for its leverage trades and did not normalise token decimals in its slippage check, so pools the attacker created themselves passed it. xToken (~$24M, May) minted xSNXa at a price routed through a Uniswap v2 pool that a 61.8k ETH flash loan had just dumped. Both are the PancakeBunny bug with different plumbing.
+Vee Finance (~$34M, September) used one Pangolin pool price for its leverage trades and did not normalise token decimals in its slippage check, so pools the attacker created themselves passed it. xToken (~$24M, May) minted xSNXa at a price routed through a Uniswap v2 pool that a 61.8k ETH flash loan had just dumped. Both are the PancakeBunny bug, here in leverage trades and in xSNXa minting.
 
 ## Arithmetic and accounting
 
@@ -265,7 +266,7 @@ function borrowFresh(address payable borrower, uint borrowAmount) internal {
 
 The attacker's `tokensReceived` re-entered a different market, crETH, and borrowed again against collateral that did not yet carry the AMP debt. Compound's reentrancy guard is per market, so the second market did not see the first one's lock. Compound itself was safe because it never listed tokens with hooks.
 
-Two rules follow. Effects before interactions, always, even in code inherited from an audited protocol. And a protocol listing arbitrary tokens must either reject tokens with transfer hooks (ERC-777, ERC-1363, AMP) or use a global lock across all its markets.
+Effects go before interactions, always, even in code inherited from an audited protocol. A protocol listing arbitrary tokens must either reject tokens with transfer hooks (ERC-777, ERC-1363, AMP) or use a global lock across all its markets.
 
 ### A caller-chosen token (Grim Finance, ~$30M; BurgerSwap, ~$7.2M)
 
@@ -308,7 +309,7 @@ THORChain's Bifrost watched Ethereum for deposits into its router and credited t
 - **First incident.** Bifrost read the deposit amount from the transaction's `msg.value` rather than from the router's `Deposit` event. The attacker called the router through a wrapper contract that sent the ETH elsewhere and passed 0 to the router; Bifrost credited the transaction's full value.
 - **Second incident.** Bifrost accepted events shaped like the router's `TransferOut` from an attacker contract. The forged events triggered refunds of real assets.
 
-An off-chain observer has the same job as a bridge's verifier: decide whether an event really happened in the expected contract. Filter logs by emitting address, take amounts only from the canonical event, and handle internal calls and reverts explicitly ([THORChain post-mortem](https://blog.thorchain.org/post-mortem-eth-router-exploits-1-2-and-premature-return-to-trading-incident)).
+An off-chain observer has the same job as a bridge's verifier: decide whether an event happened in the expected contract. Filter logs by emitting address, take amounts only from the canonical event, and handle internal calls and reverts explicitly ([THORChain post-mortem](https://blog.thorchain.org/post-mortem-eth-router-exploits-1-2-and-premature-return-to-trading-incident)).
 
 ### ECDSA nonce reuse (Anyswap, ~$7.9M)
 

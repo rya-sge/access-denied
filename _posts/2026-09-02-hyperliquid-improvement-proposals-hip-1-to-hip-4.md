@@ -2,7 +2,7 @@
 layout: post
 title: "The Hyperliquid Improvement Proposals - HIP-1 to HIP-4"
 date:   2026-09-02
-last_modified_at: 2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -17,7 +17,7 @@ A Hyperliquid Improvement Proposal is not a governance document. Nothing is vote
 
 What the four HIPs share is a way of handling permission. On a centralised venue, listing an asset or opening a market is a decision someone makes about you. On Hyperliquid the decision is priced instead: a Dutch auction for a token ticker, a staked bond for a perp DEX, a per-deployer capacity limit for an outcome venue. Nobody approves the listing, and a deployer who operates a market badly is answerable afterwards to a stake-weighted validator vote that can burn the bond. HIP-2 is the one case with no deployer role to price, because it has no deployer at all.
 
-This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It then answers who can list a token or a market, compares each HIP with the design it replaces, records which parts are live on mainnet and which are still on testnet, and closes on what the four have in common, which is where the design shows most clearly.
+This article works through the four in order: the token standard and its five-step deployment, the operator-free market-making ladder, the builder-deployed perp DEX with its 500 000 HYPE bond, and the fully collateralised outcome markets that arrived most recently. It then answers who can list a token or a market, compares each HIP with the design it replaces, records which parts are live on mainnet and which are still on testnet, and closes on what the four have in common.
 
 This article describes how the four proposals work. Two companion articles take the next steps: [Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality]({{site.url_complet}}/2026/10/26/hyperliquid-hip-risks-market-quality/) covers what users lose when a market fails and how to judge a market before trading it, with worked examples for each HIP, and [Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration]({{site.url_complet}}/2026/10/26/hyperliquid-hip-developer-reference/) gives the request payloads, info queries, error cases and checklists.
 
@@ -79,7 +79,15 @@ Deployment is a sequence of five `spotDeploy` actions sent in a fixed order, eac
 | 4 | `registerSpot` | Creates the spot pair, base against quote. | `tokens: [base, quote]` | No | For a new token the quote is spot USDC. The same action, under its own auction, adds a pair between two existing tokens. |
 | 5 | `registerHyperliquidity` | Starts the HIP-2 ladder on the new pair, or confirms there is none. | `spot`, `startPx`, `orderSz`, `nOrders`, optional `nSeededLevels` | No | `spot` is the spot index, not the token index. With `noHyperliquidity`, `nOrders` must be 0. |
 
-Optional actions can follow at any time after step 1: `setDeployerTradingFeeShare` (downward only), `setTokenAnnotation` (at most once a day), `setDeployerLabel` (once per deployer), the quote-token actions `enableQuoteToken`, `enableAlignedQuoteToken` and their `disable` counterparts, and, in the [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) though not in the deployment documentation, a freeze privilege (`enableFreezePrivilege`, `freezeUser`, `revokeFreezePrivilege`) that lets the deployer stop an address from trading, sending or receiving the token. The Hyperliquidity inventory is itself a `userGenesis` balance, credited to the address `0xffff…ffff` in the SDK's example, and `maxSupply` is given in wei. The developer reference gives a request body for each step.
+Optional actions can follow at any time after step 1:
+
+- `setDeployerTradingFeeShare`, downward only.
+- `setTokenAnnotation`, at most once a day.
+- `setDeployerLabel`, once per deployer.
+- The quote-token actions `enableQuoteToken`, `enableAlignedQuoteToken` and their `disable` counterparts.
+- In the [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) though not in the deployment documentation, a freeze privilege (`enableFreezePrivilege`, `freezeUser`, `revokeFreezePrivilege`) that lets the deployer stop an address from trading, sending or receiving the token.
+
+The Hyperliquidity inventory is itself a `userGenesis` balance, credited to the address `0xffff…ffff` in the SDK's example, and `maxSupply` is given in wei. The developer reference gives a request body for each step.
 
 The property that catches deployers is that only the **first** step is time-sensitive and gas-charged. Once `registerToken2` lands, the ticker and the decimals are locked in and the HYPE is spent, with no time limit on the remaining four. The documentation's own warning is unusually direct: a deployment can end up stuck, for instance with incompatible Hyperliquidity and supply values, and **gas is not refunded** for a stuck deployment. Rehearsing the exact deployment on testnet is the documented mitigation, not a suggestion.
 
@@ -99,7 +107,7 @@ The sweep is skipped when the book is one-sided, or when the aggregate notional 
 
 ### Deploying an asset that already exists elsewhere
 
-A common pattern is to use HyperCore's spot books to trade an asset minted somewhere else, such as a bridged token or a tokenised RWA. The recommended shape is to mint the ERC-20 on the HyperEVM using an established bridge (LayerZero, Axelar, Chainlink CCIP, deBridge or Wormhole are the ones the documentation names), then pay the HIP-1 auction to buy the HyperCore token and order book state.
+A common pattern is to use HyperCore's spot books to trade an asset minted somewhere else, such as a bridged token or a tokenised RWA. The recommended shape is to mint the ERC-20 on the HyperEVM using an established bridge, then pay the HIP-1 auction to buy the HyperCore token and order book state. The documentation names LayerZero, Axelar, Chainlink CCIP, deBridge and Wormhole as such bridges.
 
 For that pattern, the deployer puts the max supply, or `2^64-1` for maximum flexibility, at the token's **system address** during genesis, and normally sets `noHyperliquidity` since a bridged asset already has a price. The auction fee is explicitly framed as charging the deployer for state that would otherwise be charged to future users.
 
@@ -207,7 +215,7 @@ HIP-3 markets carry two kinds of cap. **Notional** caps apply both per-asset and
 
 Slashing decided by stake-weighted validator vote is what makes the bond meaningful, and its stated principle is narrow: prevent behaviour that jeopardises protocol correctness, uptime or performance. The rule of thumb given is that any slashable behaviour should also be accompanied by a bug fix in the protocol implementation, so that HIP-3 in its final state should not need slashing at all.
 
-The guideline scale runs to 100% for irregular inputs causing invalid state transitions or prolonged downtime, up to 50% for brief downtime, and up to 20% for network degradation. The amount actually applied is a stake-weighted median of validator votes, and the stake stays slashable throughout the seven-day unstaking queue even after withdrawal is initiated.
+The guideline scale runs to 100% for irregular inputs causing invalid state transitions or prolonged downtime, up to 50% for brief downtime, and up to 20% for network degradation. The amount applied is a stake-weighted median of validator votes, and the stake stays slashable throughout the seven-day unstaking queue even after withdrawal is initiated.
 
 Three properties of the mechanism deserve to be stated rather than inferred:
 
@@ -248,7 +256,12 @@ Most operations abstract the dual book away from the user, but not all of them y
 
 ### Fees
 
-Outcome trading charges fees only when **closing or settling**, never when opening, and only fee-paying volume is counted. The six cases the documentation enumerates fall out of that rule: minting charges nothing and counts no volume; a normal trade credits both users `fee_paying_px * sz` when one side pays and nothing when neither does; burning credits `(maker_px + taker_px) * sz = 1 * sz` when both pay and `taker_px * sz` when only the taker does; and settlement credits `settle_fraction * sz`.
+Outcome trading charges fees only when **closing or settling**, never when opening, and only fee-paying volume is counted. The six cases the documentation enumerates fall out of that rule:
+
+- Minting charges nothing and counts no volume.
+- A normal trade credits both users `fee_paying_px * sz` when one side pays and nothing when neither does.
+- Burning credits `(maker_px + taker_px) * sz = 1 * sz` when both pay and `taker_px * sz` when only the taker does.
+- Settlement credits `settle_fraction * sz`.
 
 There are no rebates on outcome markets. Users who would earn a rebate on spot or perp trading instead pay zero on maker orders. Builder codes work as in spot for sell orders, and additionally apply to **buy** orders on outcomes, charged in the quote token on a best-effort basis.
 
@@ -466,7 +479,7 @@ Because the mechanism judges effect on the protocol, not intent, and intent is n
 
 The same principle runs in the other direction and is easier to overlook: inputs that cause protocol issues but are *not* irregular are not slashable, and bugs under normal operation unrelated to deployer inputs fall outside its scope entirely. The bond prices the deployer's operational security along with their competence, which is why the documentation suggests LST operators diligence deployers and consider requiring self-bonding.
 
-**Q: Which HIPs create an ongoing obligation, and what does a user actually get from the ones that do?**
+**Q: Which HIPs create an ongoing obligation, and what does a user get from the ones that do?**
 
 The obligation ends at different points for each:
 
@@ -480,11 +493,15 @@ What a user gets is narrower than it first appears. The bond is slashable by sta
 
 The difference is whether there is anything for a human to get wrong at run time. Hyperliquidity's entire behaviour is fixed by five parameters at deployment and executed thereafter by block transition logic: no one publishes a price, no one adjusts a leverage limit, no one settles anything. There is no operator, so there is nothing to bond.
 
-A HIP-3 deployer, by contrast, publishes the oracle prices that drive margining and liquidation on their DEX, sets margin tables and OI caps, and settles markets. Every one of those is a continuous opportunity to damage users or the protocol, and the bond is what makes that opportunity expensive. The general rule the pair illustrates is that Hyperliquid bonds discretion, not deployment: where a primitive can be expressed as execution logic it is, and where it needs a human in the loop, that human posts stake.
+A HIP-3 deployer, by contrast, publishes the oracle prices that drive margining and liquidation on their DEX, sets margin tables and OI caps, and settles markets. Every one of those is a continuous opportunity to damage users or the protocol, and the bond is what makes that opportunity expensive.
+
+The general rule the pair illustrates is that Hyperliquid bonds discretion, not deployment: where a primitive can be expressed as execution logic it is, and where it needs a human in the loop, that human posts stake.
 
 **Q: A HIP-3 deployer settles every asset of their DEX 90 days after deployment. Can they unstake the 500 000 HYPE?**
 
-The documentation gives two rules that point in different directions. The spec says the requirement is maintained for a minimum of 183 days after deployment; the settlement section says that once all assets are settled, the required stake is free to be unstaked. It does not say which one wins before day 183. The cautious reading treats 183 days as a floor. Whatever the answer, any stake whose withdrawal starts remains slashable for the 7 days of the unstaking queue, so conduct in the final days of the DEX is still covered.
+The documentation gives two rules that point in different directions. The spec says the requirement is maintained for a minimum of 183 days after deployment; the settlement section says that once all assets are settled, the required stake is free to be unstaked. It does not say which one wins before day 183. The cautious reading treats 183 days as a floor.
+
+Whatever the answer, any stake whose withdrawal starts remains slashable for the 7 days of the unstaking queue, so conduct in the final days of the DEX is still covered.
 
 ## References
 

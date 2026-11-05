@@ -2,6 +2,7 @@
 layout: post
 title: "HotStuff — Linear and Responsive BFT Consensus, from Basic HotStuff to the Event-Driven Pacemaker"
 date:   2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain
@@ -86,7 +87,14 @@ The fifth row is a hypothetical: the paper notes that Tendermint and Casper coul
 
 Each replica stores a tree of pending commands. A *node* holds a command (or a batch), protocol metadata, and a parent link, in practice the hash of the parent. The *branch* led by a node is the path from that node to the root. Two branches conflict when neither extends the other, and two nodes conflict when their branches do.
 
-A message carries a `type` (`new-view`, `prepare`, `pre-commit`, `commit` or `decide`), the sender's `viewNumber`, an optional `node`, and an optional `justify` QC. A vote additionally carries `partialSig`, a partial signature over the tuple ⟨type, viewNumber, node⟩. A QC over the same tuple is built from $$n - f$$ such votes.
+A message carries:
+
+- a `type`: `new-view`, `prepare`, `pre-commit`, `commit` or `decide`;
+- the sender's `viewNumber`;
+- an optional `node`;
+- an optional `justify` QC.
+
+A vote additionally carries `partialSig`, a partial signature over the tuple ⟨type, viewNumber, node⟩. A QC over the same tuple is built from $$n - f$$ such votes.
 
 Each replica keeps three variables:
 
@@ -432,7 +440,7 @@ The authors state that HotStuff scales better than BFT-SMaRt below 32 replicas, 
 
 **Q: How do Tendermint and Casper fit in the HotStuff framework, and what distinguishes them from PBFT?**
 
-All three use a Two-Chain commit rule: a replica locks on a One-Chain and commits on a Two-Chain (Casper's leaf does not need a QC on its direct parent). They differ in how a new leader overcomes stale locks. PBFT attaches a proof of the highest One-Chains reported by a quorum, which is $$O(n^2)$$ or $$O(n^3)$$. Tendermint and Casper send only the leader's own highest One-Chain, which is linear, but require the leader to wait the maximum network delay first.
+All three use a Two-Chain commit rule: a replica locks on a One-Chain and commits on a Two-Chain, except that Casper's leaf does not need a QC on its direct parent. They differ in how a new leader overcomes stale locks. PBFT attaches a proof of the highest One-Chains reported by a quorum, which is $$O(n^2)$$ or $$O(n^3)$$. Tendermint and Casper send only the leader's own highest One-Chain, which is linear, but require the leader to wait the maximum network delay first.
 
 ## References
 

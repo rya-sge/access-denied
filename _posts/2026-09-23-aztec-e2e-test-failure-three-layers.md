@@ -2,6 +2,7 @@
 layout: post
 title: "A Test That Could Never Pass — An Aztec Failure, the Explanation That Fitted, and the One That Was True"
 date:   2026-09-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -13,7 +14,7 @@ isMath: false
 
 [Aztec](https://aztec.network/) is a privacy-focused Layer 2 on Ethereum. A contract there has a private half, proved on the user's own device over encrypted *notes*, and a public half executed by a sequencer; because the private half runs against a historical snapshot, public state it needs to read has to be published in a form whose value cannot change for a known window. [An earlier article]({{site.url_complet}}/2026/09/14/aztec-delayed-public-mutable-pause-privacy-delay/) covers that mechanism and the delay it costs.
 
-This one is a debugging narrative. An end-to-end suite that had been green for weeks started failing with an assertion that named none of the things that were wrong:
+An end-to-end suite that had been green for weeks started failing with an assertion that named none of the things that were wrong:
 
 ```
 Simulation error: Assertion failed: Cannot resolve a constrained tagging secret for an invalid recipient
@@ -156,7 +157,7 @@ Deriving one from the other states the relationship instead of leaving it to be 
 const LONG_TEST_TIMEOUT = DELAY_MS + 600_000;
 ```
 
-The deployment test passed after that. The mints still failed, with the same assertion, which is where the interesting part begins: the obvious explanation was available, it fitted every symptom, and it was wrong.
+The deployment test passed after that. The mints still failed, with the same assertion.
 
 ## The explanation that fitted and was wrong
 
@@ -235,7 +236,7 @@ The sleep is gone as well. `RollupCheatCodes.advanceToSlot` warps L1, one transa
 The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step, and so did the contract. What failed was the test's model of time.
 
 - **The dependency failure was independent** and merely first: an unpinned transitive library, eleven days newer than the framework it serves, broke deployment before any contract logic ran.
-- **The timeout was a genuine defect** — a test that slept longer than the timeout guarding it could never pass — but fixing it did not fix the mints, and the difference between those two facts is the point of the article.
+- **The timeout was a genuine defect** — a test that slept longer than the timeout guarding it could never pass — but fixing it did not fix the mints.
 - **The cause was that the chain never advanced.** Anvil's clock does not follow wall time, an L2 block needs a transaction, and a private read is anchored to the tip. The issuer address was set in public and unset in private at the same moment.
 - **The auditability change made it visible.** A constrained delivery to the zero address cannot be served, where the earlier unconstrained one silently delivered to nobody.
 

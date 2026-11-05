@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Gas — How Transaction Cost and the Per-Transaction Limit Are Computed (Fusaka and Glamsterdam)"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -66,7 +67,7 @@ Each EVM operation has a cost. Arithmetic and stack operations cost 2 to 10 gas,
 | Cold account access (`CALL`, `BALANCE`, `EXTCODESIZE`…) | 2,600 |
 | `LOG` event | 375 + 375 per topic + 8 per byte of data |
 
-The table shows the property that matters for batches. Writing a slot that was zero costs more than four times as much as updating a slot that already holds a value, so the cost of a batch depends on whether the recipients already exist.
+Writing a slot that was zero costs more than four times as much as updating a slot that already holds a value, so the cost of a batch depends on whether the recipients already exist.
 
 ### Refunds and the calldata floor
 
@@ -167,7 +168,7 @@ Gas figures quoted from memory or from a table of opcode costs are approximation
 
 A local node gives exact `gasUsed` values quickly. [anvil](https://getfoundry.sh/anvil/overview), the node of the Foundry toolkit, runs the rules of a chosen fork (`anvil --hardfork osaka`); the Hardhat network does the same inside a JavaScript test suite. The method is to deploy the contract, send the transaction with `cast send --gas-limit 16777216`, and read `gasUsed` and `status` from the receipt.
 
-Two cautions apply. A local node may not enforce every rule: anvil 1.5.0 accepted a transaction with a gas limit of 16,777,217, so the cap must be applied by the person running the test, by never sending more than 16,777,216. And a local node only supports the forks its version knows; anvil 1.5.0 has no Glamsterdam mode.
+A local node may not enforce every rule: anvil 1.5.0 accepted a transaction with a gas limit of 16,777,217, so the cap must be applied by the person running the test, by never sending more than 16,777,216. And a local node only supports the forks its version knows; anvil 1.5.0 has no Glamsterdam mode.
 
 ### Against a live network: `eth_estimateGas` and `eth_simulateV1`
 
@@ -251,7 +252,7 @@ The gas of an Ethereum transaction is the sum of an intrinsic cost, the cost of 
 |------|------------|
 | **Gas** | The unit in which Ethereum measures the work of a transaction; every operation has a fixed or computed gas cost. |
 | **Gas limit** | The maximum gas the sender allows a transaction to use; if execution needs more, the transaction reverts and the gas consumed is still paid. |
-| **`gasUsed`** | The gas a transaction actually consumed, recorded in its receipt after refunds and the calldata floor. |
+| **`gasUsed`** | The gas a transaction consumed, recorded in its receipt after refunds and the calldata floor. |
 | **Intrinsic gas** | The gas charged before execution: a base cost, calldata, contract creation and access list entries. |
 | **Calldata token** | The unit used to price calldata: one per zero byte, four per non-zero byte. |
 | **Calldata floor** | The minimum gas a transaction pays per calldata token since EIP-7623, 10 per token under Fusaka; under Glamsterdam, 64 per byte, every byte counting as 4 tokens at 16 gas. |
@@ -284,7 +285,7 @@ The gas of an Ethereum transaction is the sum of an intrinsic cost, the cost of 
 
 **Q: What is the difference between the gas limit and `gasUsed`?**
 
-The gas limit is set by the sender before the transaction runs and is the most it may consume; it also bounds the fee the sender can be charged. `gasUsed` is what the transaction actually consumed, read from the receipt. A transaction that needs more than its gas limit reverts out of gas, and the sender still pays for the gas consumed.
+The gas limit is set by the sender before the transaction runs and is the most it may consume; it also bounds the fee the sender can be charged. `gasUsed` is what the transaction consumed, read from the receipt. A transaction that needs more than its gas limit reverts out of gas, and the sender still pays for the gas consumed.
 
 **Q: Why is a batch to new holders smaller than a batch to existing holders under Fusaka?**
 

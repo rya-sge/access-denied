@@ -2,7 +2,7 @@
 layout: post
 title: "How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown"
 date:   2026-10-22
-last_modified_at: 2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -240,7 +240,7 @@ If a Chainlink call reverts, returns 0 or is stale, or if the canonical-rate cal
 
 ## Branch shutdown and urgent redemptions
 
-A branch shuts down when its TCR falls below its SCR (anyone can call `BorrowerOperations.shutdown`) or when its oracle fails. Shutdown is permanent:
+A branch shuts down when its oracle fails, or when its TCR falls below its SCR, in which case anyone can call `BorrowerOperations.shutdown`. Shutdown is permanent:
 
 - Pending interest and batch fees are minted, then interest stops accruing.
 - Opening and adjusting troves, rate changes, batch operations and normal redemptions are disabled.
@@ -273,7 +273,7 @@ Governance received six audits, which found two Criticals and fifteen Highs betw
 
 ## Where the yield comes from
 
-Liquity V2 has no token emissions and no external yield source. Every return in the system is paid by another participant: mostly by borrowers, through the interest rate they choose themselves. The mechanisms are spread over the earlier sections; this one gathers who pays, who receives, and in which asset. The source references are to `ActivePool.sol` and `TroveManager.sol` at the analysed commit.
+Liquity V2 has no token emissions and no external yield source. Every return in the system is paid by another participant: mostly by borrowers, through the interest rate they choose themselves. The source references are to `ActivePool.sol` and `TroveManager.sol` at the analysed commit.
 
 ### Who pays
 
@@ -330,11 +330,21 @@ V2 has been deployed twice:
 | V6 | `2e901c7` | 6 May 2025 | Cantina competition fixes: `kickFromBatch`, closing the last trove after shutdown, liquidator compensation from the offset part only |
 | V7 | `abe7cbf` | 14 May 2025 | Price feeds without owner; redeployment |
 
-The public reports are listed in the documentation: two core audits and a review of the Cantina fixes by Dedaub, Recon, Chaos Labs (mechanism design), Certora (formal verification of batch equivalence), Coinspect (core, governance, redemption helper), ChainSecurity (core and governance), and a Cantina competition with 65 findings. Read together, they keep returning to the same few areas:
+The public reports are listed in the documentation:
+
+- Dedaub: two core audits and a review of the Cantina fixes.
+- Recon.
+- Chaos Labs: mechanism design.
+- Certora: formal verification of batch equivalence.
+- Coinspect: core, governance, redemption helper.
+- ChainSecurity: core and governance.
+- Cantina: a competition with 65 findings.
+
+Read together, they keep returning to the same few areas:
 
 - **Batch accounting.** Share rounding, and the weighted debt and weighted fee accumulators that every batch path must update together (Dedaub found fourteen Mediums there in its first audit).
 - **Zombie troves.** Lost pointers, zombies lifted above the minimum debt without becoming active again, and zombies whose batch could still change their rate.
-- **Redemption inputs.** The redemption price leaking into other checks, and unbacked debt that includes debt redemptions cannot reach.
+- **Redemption inputs.** The redemption price leaking into other checks, and unbacked debt that includes unredeemable debt.
 - **Shutdown as a terminal state.** The last trove could not be closed, a division by `totalStakes` could reach zero, and guards were missing on sibling entry points.
 - **Zappers.** Flash-loan callbacks that checked only the lender (the class of bug behind the Prisma exploit on a V1 fork), and leftovers stuck when the core repaid less than requested.
 
@@ -449,9 +459,9 @@ Collateral and debt come from `getEntireBranchColl()` and `getEntireBranchDebt()
 
 - **Verified, immutable, without owners.** The `BoldToken`, the `CollateralRegistry`, the `Governance` contract, the three `TroveManager`s, the three price feeds and the WETH `StabilityPool` are verified on Etherscan (Solidity 0.8.24) and none is a proxy. `owner()` returns the zero address on the `BoldToken`, the three `AddressesRegistry` contracts and `Governance`, which each give up ownership once their wiring call has run (`setCollateralRegistry`, `setAddresses`, `registerInitialInitiatives`). The `CollateralRegistry` and the three price feeds have no `owner()` function at all; the feeds lost theirs in V7.
 - **Immutability cuts both ways.** No one holds an admin key, so no one can upgrade the logic to a malicious or buggy version, change a parameter or freeze funds, which removes the upgrade and admin-key risk that many DeFi protocols carry. The rules a borrower accepted when opening a trove are the rules that apply for the life of the deployment (*derived* from the owner reads above). The counterpart is that a bug can only be fixed by deploying a new system, as the next point shows.
-- **A fix means a new system.** A bug cannot be patched in place. The Stability Pool fix of March 2025 therefore shipped as a new deployment, and V7 was deployed again in May (see [Deployment history and audits](#deployment-history-and-audits)). Each deployment has its own troves and its own BOLD token, so moving to it is up to each user. The V4 contracts are still on-chain: at the read block none of their branches was shut down, and their BOLD token (`0xb01d…ab98`) had a supply of 201,388, almost all of it (199,751 BOLD) debt on the old wstETH branch. The sources do not say how holders of the first deployment were migrated (listed under Gaps).
+- **A fix means a new system.** The Stability Pool fix of March 2025 shipped as a new deployment, and V7 was deployed again in May (see [Deployment history and audits](#deployment-history-and-audits)). Each deployment has its own troves and its own BOLD token, so moving to it is up to each user. The V4 contracts are still on-chain: at the read block none of their branches was shut down, and their BOLD token (`0xb01d…ab98`) had a supply of 201,388, almost all of it (199,751 BOLD) debt on the old wstETH branch. The sources do not say how holders of the first deployment were migrated (listed under Gaps).
 - **Accounting that is easy to get wrong.** Batch shares, the zombie state and the Stability Pool's product-sum are where the audits found their serious bugs (see [Deployment history and audits](#deployment-history-and-audits)). Several limits are accepted rather than fixed: aggregate debt that differs slightly from the sum of trove debts (Known Issue 6), pool rounding (7), an overflow bound near 1e23 BOLD in the pool (15), and stakes that could round to zero after about a thousand redistributions of 10% of a branch's debt (22).
-- **Zappers act on users' troves.** The zappers set themselves as add manager, remove manager and receiver on the troves they open, so a bug in a zapper can move collateral or debt of every trove opened through it. The flash-loan callback bug of this kind found before launch (CS-BOLD-002) is the class of bug behind the Prisma exploit (about $11$M, March 2024) on a V1 fork. The same applies to friendly forks that reuse the code: a fork built on V4 or earlier lacks the V5 to V7 fixes (*derived*).
+- **Zappers act on users' troves.** The zappers set themselves as add manager, remove manager and receiver on the troves they open, so a bug in a zapper can move collateral or debt of every trove opened through it. The flash-loan callback bug of this kind found before launch (CS-BOLD-002) is the class of bug behind the Prisma exploit (about $11$M, March 2024) on a V1 fork. A friendly fork that reuses the code and is built on V4 or earlier lacks the V5 to V7 fixes (*derived*).
 
 #### External dependencies
 
@@ -491,7 +501,7 @@ $$
 
 #### Centralisation and governance
 
-- **No admin power over the core.** The owner reads above show no key that can change the core contracts. `Governance` has no owner either, and its only power is the split of the 25% interest share between initiatives. The mainnet contract returns `REGISTRATION_FEE()` = 100 BOLD and `VOTING_THRESHOLD_FACTOR()` = 2%, and its other immutables (0.01% registration threshold, unregistration after 4 epochs, `MIN_CLAIM` and `MIN_ACCRUAL` of 0, 7-day epochs with a 6-day voting cutoff, first epoch on 8 May 2025) also match the deploy script.
+- **No admin power over the core.** The owner reads above show no key that can change the core contracts. `Governance` has no owner either, and its only power is the split of the 25% interest share between initiatives. The mainnet contract returns `REGISTRATION_FEE()` = 100 BOLD and `VOTING_THRESHOLD_FACTOR()` = 2%, and its other immutables also match the deploy script: a 0.01% registration threshold, unregistration after 4 epochs, `MIN_CLAIM` and `MIN_ACCRUAL` of 0, 7-day epochs with a 6-day voting cutoff, and a first epoch on 8 May 2025.
 - **Voting power follows LQTY and bribes.** Anyone can register an initiative for 100 BOLD, and `BribeInitiative` lets third parties pay voters, so the incentive budget goes where LQTY holders and bribers send it. Vetoes can still be removed after the voting cutoff (CS-V2Gov-012, accepted). How LQTY voting power is distributed was not read (listed under Gaps).
 - **The bad-debt remedy depends on governance.** The only way the README offers to fill a hole left by a shutdown is for LQTY voters to direct interest to a BOLD burn (Known Issue 9). Nothing in the contracts forces that vote.
 - **Delegates are trusted by the borrowers who choose them.** A remove manager can withdraw collateral and borrow, sending the funds to its receiver. A batch manager can charge premature-adjustment fees that push a trove below the MCR after a price fall, and the README says batch managers "should be considered trusted actors" (Known Issue 11). Managers stay attached to the trove NFT on transfer (see [Delegation and batches](#delegation-and-batches)).

@@ -2,7 +2,7 @@
 layout: post
 title: "Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget"
 date:   2026-10-07
-last_modified_at: 2026-10-30
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -116,7 +116,7 @@ Below them, about seventeen incidents sit between $10M and $20M, and 75 between 
 
 ### Statistics from the SlowMist database
 
-The figures below are computed from the entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database dated from January to September, after removing one duplicate row and one fraud (the fake GIWA bridge, covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack). They use the database's own loss figures, before recoveries:
+The figures below are computed from the entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database dated from January to September, after removing one duplicate row and one fraud, the fake GIWA bridge, which is covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack. They use the database's own loss figures, before recoveries:
 
 - **303 incidents**, of which 270 have a stated loss, for **~$2.13B**.
 - **Median loss: ~$407k.** Six incidents of $100M or more make up about 71% of the total; the 70 incidents below $100k add up to about $3M.
@@ -366,7 +366,7 @@ Official reports changed several figures, as the table shows: Step Finance and O
 - **Losses concentrate in a few events.** Six incidents of $100M or more account for about 70% of the SlowMist total, and two months (April, September) for about two-thirds of PeckShield's.
 - **The largest losses came from operators, not from contract code.** Bitget, KelpDAO, Drift, Step, Resolv, Humanity, AFX and Ostium were all lost through infrastructure, keys or signers.
 - **Minting bugs set the ceiling.** When a verifier accepts a false message or proof (Liquid, KelpDAO's forged message, Verus, Syscoin), the loss is bounded by what can be redeemed, which is why these incidents rank so high.
-- **North Korea is named in the largest cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements, and Chainalysis and Elliptic both attribute Bitget to North Korea, putting its 2026 thefts above $1B (Elliptic counts more than 51 incidents); PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
+- **North Korea is named in the largest cases.** Drift (UNC4736, medium-high confidence), LayerZero for KelpDAO (Lazarus / TraderTraitor, preliminary) and Humanity Protocol attribute their incidents to DPRK-linked actors in their own statements, and Chainalysis and Elliptic both attribute Bitget to North Korea, putting its 2026 thefts above $1B. Elliptic counts more than 51 incidents. PeckShield noted that Humanity proceeds were commingled with KelpDAO funds.
 - **Recovery came from chains, coalitions and negotiation.** The Cronos rollback, the Arbitrum Security Council freeze, the DeFi United recovery of rsETH, the Neutron and Cosmos Hub halts, and the Liquid return recovered far more than stablecoin freezes did.
 - **THORChain and Tornado Cash remained the main exits**, used in almost every large case.
 

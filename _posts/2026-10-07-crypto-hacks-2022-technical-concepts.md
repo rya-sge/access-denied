@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2022 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -117,7 +118,7 @@ function emergencyCommit(uint32 bip) external {
 
 With a flash loan of about $1B, the attacker deposited into Beanstalk's pools, received a supermajority of voting power, voted for its own proposal (BIP-18) and executed it, all before repaying the loan. Two standard defences would each have stopped it:
 
-- **Snapshots.** Voting power is read at a block before the proposal was created (OpenZeppelin's `ERC20Votes` and `Governor` do this), so tokens acquired afterwards do not count.
+- **Snapshots.** Voting power is read at a block before the proposal was created, as OpenZeppelin's `ERC20Votes` and `Governor` do, so tokens acquired afterwards do not count.
 - **Timelocks.** An approved proposal executes only after a delay, during which anyone can react.
 
 ### Unrealised profit as collateral (Mango Markets, ~$115M)
@@ -167,7 +168,7 @@ Ankr's aBNBc token was upgradeable by a deployer key. Ankr says a former employe
 
 Profanity generated vanity addresses, addresses with a chosen prefix such as `0x0000…`, by starting from a random private key and incrementing it until the derived address matched. The starting key came from a 32-bit seed, so there were only about 4.3 billion possible starting points. Given a target address, an attacker can run the same search backwards from each seed with GPUs and recover the private key.
 
-1inch published the weakness on 15 September 2022; on 20 September, Wintermute's hot wallet, a Profanity address, was drained. The rule: never derive a key from less than 128 bits of entropy, and treat any "convenience" key generator as suspect (the site's article on the [COLDCARD entropy defect]({{site.url_complet}}/2026/07/31/coldcard-rng-entropy-incident/) shows the same failure in a hardware wallet, four years later).
+1inch published the weakness on 15 September 2022; on 20 September, Wintermute's hot wallet, a Profanity address, was drained. The rule: never derive a key from less than 128 bits of entropy, and treat any "convenience" key generator as suspect. The site's article on the [COLDCARD entropy defect]({{site.url_complet}}/2026/07/31/coldcard-rng-entropy-incident/) shows the same failure in a hardware wallet, four years later.
 
 ### An address that existed on one chain only (Wintermute's 20M OP)
 
@@ -270,7 +271,7 @@ The 2022 hacks are mostly failures of verification:
 | ☐ | Signers counted toward a threshold are independent, and delegations are revoked when no longer needed. | One compromise yields a quorum (Ronin). |
 | ☐ | No mapping's default value is a valid state, especially after initialisation. | Every unproven message is accepted (Nomad). |
 | ☐ | Every field of a proof contributes to the computed root. | A fake leaf hides in an ignored field (BNB Chain). |
-| ☐ | Token transfers check that the token address has code and that the balance actually changed. | A deposit event is emitted for nothing (Qubit). |
+| ☐ | Token transfers check that the token address has code and that the balance changed. | A deposit event is emitted for nothing (Qubit). |
 
 #### Solana programs
 

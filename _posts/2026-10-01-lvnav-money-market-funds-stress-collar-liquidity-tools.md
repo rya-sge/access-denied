@@ -2,6 +2,7 @@
 layout: post
 title: "LVNAV Funds Under Stress — Amortised Cost, the 20 bp Price Band and the Article 34 Liquidity Tools"
 date:   2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation finance
@@ -67,7 +68,7 @@ flowchart TD
 
 Article 29(7) allows amortised cost for an asset with up to 75 days to maturity only while "the price of that asset calculated in accordance with paragraphs 2, 3 and 4 does not deviate from the price of that asset calculated in accordance with the first subparagraph … by more than 10 basis points". The test is applied asset by asset, every day.
 
-A worked example shows how quickly it can bite. Take commercial paper with a face value of 100 and 60 days to maturity, bought at a money market yield of 3.00 % on an actual/360 basis, which gives a purchase price of 99.5025. Amortising the discount on a straight line, the paper is carried at 99.6683 twenty days later. With 40 days left, its market price depends on the yield at which the market now trades it:
+Take commercial paper with a face value of 100 and 60 days to maturity, bought at a money market yield of 3.00 % on an actual/360 basis, which gives a purchase price of 99.5025. Amortising the discount on a straight line, the paper is carried at 99.6683 twenty days later. With 40 days left, its market price depends on the yield at which the market now trades it:
 
 | Market yield after 20 days | Market price | Amortised value | Deviation | Valuation |
 |---|---|---|---|---|
@@ -185,7 +186,7 @@ The result is a "market resilience level" of **40 %** weekly liquid assets for C
 
 ### The US took the other route
 
-The comparison with the United States shows the alternative the EU did not take. In July 2023 the SEC amended its money market fund rule to raise the minimum to 25 % daily and 50 % weekly liquid assets, to remove the ability to suspend redemptions with temporary gates, and to remove "the regulatory tie between the imposition of liquidity fees and a fund's liquidity level". Institutional prime and institutional tax-exempt funds must instead charge a mandatory liquidity fee when daily net redemptions exceed 5 % of net assets, unless liquidity costs are de minimis. The EU kept both the thresholds and the tie.
+In July 2023 the SEC amended its money market fund rule to raise the minimum to 25 % daily and 50 % weekly liquid assets, to remove the ability to suspend redemptions with temporary gates, and to remove "the regulatory tie between the imposition of liquidity fees and a fund's liquidity level". Institutional prime and institutional tax-exempt funds must instead charge a mandatory liquidity fee when daily net redemptions exceed 5 % of net assets, unless liquidity costs are de minimis. The EU kept both the thresholds and the tie.
 
 ## Stress testing an LVNAV
 

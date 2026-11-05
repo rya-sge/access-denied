@@ -2,7 +2,7 @@
 layout: post
 title: "Zama and Post-Quantum Cryptography: Everything Is Lattice-Based Except One Pairing"
 date:   2026-10-02
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama post-quantum
@@ -129,7 +129,7 @@ The widest exposure is in the signatures. Every interaction with the protocol is
 
 Shor breaks all of it. The whitepaper acknowledges the dependency: the goal is for every component to be post-quantum, *"while this is already the case for our FHE scheme and MPC protocols"*, the underlying blockchains and their signature schemes would have to follow.
 
-Replacing them is not a configuration change. The EVM offers `ecrecover` and nothing else natively, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
+Replacing them is not a configuration change. The EVM natively offers only `ecrecover`, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
 
 On the day Shor's algorithm is practical, an attacker who cannot read a single balance can still sign transactions as any address whose public key has been revealed, which on Ethereum means every address that has ever sent a transaction.
 
@@ -165,7 +165,7 @@ Read the last column rather than the fourth. Two rows are not post-quantum, and 
 
 "Harvest now, decrypt later" means recording ciphertexts today and decrypting them once a quantum computer exists. Against TLS protected by elliptic-curve key exchange the attack works: the traffic is already captured and the key agreement will one day be breakable.
 
-Against this protocol it does not, and the reason is now more complete than "the FHE is lattice-based". Three things an adversary could record today are all useless to them later:
+Against this protocol it does not. Three things an adversary could record today are all useless to them later:
 
 - the **ciphertexts**, protected by LWE;
 - the **proofs**, whose zero-knowledge property is post-quantum even though their soundness is not;

@@ -2,6 +2,7 @@
 layout: post
 title: "Merkle Patricia Forestry on Cardano — How It Differs From Other Merkle Trees"
 date:   2026-08-28
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain
@@ -17,7 +18,7 @@ That constraint applies to every application built on a large key/value store, w
 
 Merkle Patricia Forestry (MPF) is the answer that the Aiken ecosystem settled on. The datum holds a 32-byte root hash. The redeemer holds a proof under a kilobyte. From those two values a validator can verify that a key maps to a value, that a key is absent, or that a given insertion or deletion transforms one root into another. The library ships as a pair: an [Aiken](https://aiken-lang.org) package that only ever verifies, and a Node.js package that actually stores the data and produces the proofs.
 
-The name describes the construction. It is a Patricia trie, in the sense of a radix-16 prefix tree with path compression, and its branch nodes are themselves tiny Merkle trees. That second layer of hashing is what separates MPF from Ethereum's Modified Merkle Patricia Trie it borrows from, and from the binary Merkle trees and sparse Merkle trees it tends to get lumped in with. This article works through the structure as the library actually implements it, and sets it against those three neighbours.
+The name describes the construction. It is a Patricia trie, in the sense of a radix-16 prefix tree with path compression, and its branch nodes are themselves tiny Merkle trees. That second layer of hashing is what separates MPF from Ethereum's Modified Merkle Patricia Trie it borrows from, and from the binary Merkle trees and sparse Merkle trees it tends to get lumped in with. This article works through the structure as the library implements it, and sets it against those three neighbours.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -27,7 +28,7 @@ The name describes the construction. It is a Patricia trie, in the sense of a ra
 
 On an account-based chain, an authenticated map is usually a convenience. Ethereum contracts do not walk a Merkle Patricia Trie to read storage; the node does that for them, and contracts call `SLOAD`. Trie proofs surface at the boundaries, in light clients and cross-chain bridges verifying against a block header.
 
-On Cardano the situation inverts. The validator sees the transaction and nothing else, so the only way to make a statement about a large dataset is to carry the evidence in the transaction. Three budgets bound how large that evidence can be:
+On Cardano the situation inverts. The validator sees only the transaction, so the one way to make a statement about a large dataset is to carry the evidence in the transaction. Three budgets bound how large that evidence can be:
 
 - **Transaction size.** The mainnet maximum transaction size is 16 384 bytes, and everything competes for it: inputs, outputs, datums, redeemers, witnesses. A proof is not the only passenger.
 - **Execution units.** A transaction's script budget is capped in both memory and CPU steps. The library's own benchmark table notes that 140K memory units and 100M CPU units are each 1% of the respective maximum, which puts the ceilings at roughly 14M memory units and 10G CPU steps.
@@ -43,7 +44,7 @@ Three structures are routinely called "Merkle trees" and routinely confused with
 
 The classical construction. Leaves are hashed, adjacent hashes are combined pairwise, and the process repeats to a single root. An element is addressed by **position**, and a proof is the sibling hash at each level: roughly $$\log_2 n$$ hashes, so 20 hashes or 640 bytes for a million leaves.
 
-What it cannot do is the problem. There is no key, only an index, so there is no lookup by key and no way to prove that something is absent: absence would require showing every leaf. Inserting in the middle renumbers everything after it. This is the right structure for a fixed committed list, an airdrop allowlist or a transaction set inside a block, and the wrong one for a mutable registry.
+There is no key, only an index, so there is no lookup by key and no way to prove that something is absent: absence would require showing every leaf. Inserting in the middle renumbers everything after it. This is the right structure for a fixed committed list, an airdrop allowlist or a transaction set inside a block, and the wrong one for a mutable registry.
 
 ### Sparse Merkle tree
 
@@ -55,7 +56,9 @@ The cost is depth. A naive proof is 256 sibling hashes, 8 KB. In practice implem
 
 [Ethereum's MPT](https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/) is a radix-16 trie: each level consumes one hex digit (a nibble) of the path, so a branch node has 16 slots. The lineage is the [PATRICIA trie](https://dl.acm.org/doi/10.1145/321479.321481) of 1968, with path compression so that runs of single-child nodes collapse. It uses three node kinds, branch, extension and leaf, all RLP-encoded, and the state trie addresses accounts by `keccak256(address)` rather than by the raw address.
 
-The radix-16 branching factor is a real gain: depth drops to about $$\log_{16} n$$, five levels for a million entries instead of twenty. The problem is what a proof has to carry at each of those levels. A branch node's hash commits to its RLP encoding, which contains all 16 child references. To recompute the node hash, the verifier needs the whole node, which means the 15 sibling hashes it did not take. That is roughly 480 bytes of hashes plus RLP framing per level, so a five-level proof lands around 2.5 KB. The trie got shallower and each level got 15 times more expensive.
+The radix-16 branching factor is a real gain: depth drops to about $$\log_{16} n$$, five levels for a million entries instead of twenty.
+
+The problem is what a proof has to carry at each of those levels. A branch node's hash commits to its RLP encoding, which contains all 16 child references. To recompute the node hash, the verifier needs the whole node, which means the 15 sibling hashes it did not take. That is roughly 480 bytes of hashes plus RLP framing per level, so a five-level proof lands around 2.5 KB. The trie got shallower and each level got 15 times more expensive.
 
 ## What a Merkle Patricia Forestry is
 
@@ -227,7 +230,7 @@ Against the alternatives, MPF does not win on every axis:
 | Ethereum MPT | hashed key, radix 16 | ~2.5 KB | supported | 3 (RLP) |
 | Merkle Patricia Forestry | hashed key, radix 16 | ~760 B | native (`miss`) | 2 |
 
-Against a well-compressed sparse Merkle tree, MPF is in the same order of magnitude in bytes, and what it gains is structure rather than size: five proof steps to decode instead of twenty, five node reads per off-chain lookup instead of twenty, and no separate empty-subtree compression scheme that both implementations must agree on. Against Ethereum's MPT, which is the structure it is actually derived from, the gain is direct and is roughly a factor of four.
+Against a well-compressed sparse Merkle tree, MPF is in the same order of magnitude in bytes, and what it gains is structure rather than size: five proof steps to decode instead of twenty, five node reads per off-chain lookup instead of twenty, and no separate empty-subtree compression scheme that both implementations must agree on. Against Ethereum's MPT, which is the structure it is derived from, the gain is direct and is roughly a factor of four.
 
 ## The proof format
 
@@ -322,7 +325,7 @@ A delete followed by an insert would evaluate `excluding` in between; because th
 
 ## Where the boundary between the two packages sits
 
-The split is strict and worth stating plainly, because it is the part integrators most often get wrong.
+The split between the two packages is strict, and it is the part integrators most often get wrong.
 
 The **off-chain package** owns the data. It stores nodes in a [LevelDB](https://leveljs.org/)-backed store, keeps only the topmost node in memory and holds children as references, and exposes `insert`, `delete`, `get` and `prove`. Proofs serialise to JSON, to [CBOR](https://datatracker.ietf.org/doc/html/rfc8949) for use as a redeemer, to Aiken source for tests, and to textual UPLC for `aiken uplc eval`. Its `console.log` output is a pretty-printed trie, which is the fastest way to see the structure:
 
@@ -361,7 +364,7 @@ The forestry spends four extra BLAKE2b invocations per level to avoid transmitti
 
 Several behaviours will surprise a reader who arrives expecting a hashmap.
 
-**A false `has` is not a proof of absence.** The library documents this in a caution block, and it is the easiest mistake to make. `has(trie, key, value, proof)` compares `including(key, value, proof)` against the stored root, so it answers "is this key present *with this value*". A wrong value, a stale proof and a genuinely absent key all return `False`. Proving absence requires `miss`, which the on-chain changelog dates to version 2.1.0. Its own doc comment claims 1.2.0, a version that package never released, so read the changelog rather than the annotation.
+**A false `has` is not a proof of absence.** The library documents this in a caution block, and it is the easiest mistake to make. `has(trie, key, value, proof)` compares `including(key, value, proof)` against the stored root, so it answers "is this key present *with this value*". A wrong value, a stale proof and an absent key all return `False`. Proving absence requires `miss`, which the on-chain changelog dates to version 2.1.0. Its own doc comment claims 1.2.0, a version that package never released, so read the changelog rather than the annotation.
 
 **A proof is bound to one exact root.** Proofs commit to the neighbouring hashes at every level, so any write anywhere in the trie invalidates every outstanding proof, not just those near the modified key. Under eUTXO this compounds the usual contention on a single UTXO: two spenders racing to update the same registry will both hold proofs against the same old root, and the loser must rebuild against the new one. Designs that need throughput shard the registry across several UTXOs.
 
@@ -383,7 +386,7 @@ Several behaviours will surprise a reader who arrives expecting a hashmap.
 }
 ```
 
-**Values are digests off-chain.** `Leaf.computeHash` asserts that the value it receives is exactly 32 bytes, because the caller has already hashed it. Passing a raw payload where a digest is expected fails loudly rather than producing a divergent root, which is the right failure but not an obvious one from the public API.
+**Values are digests off-chain.** `Leaf.computeHash` asserts that the value it receives is exactly 32 bytes, because the caller has already hashed it. Passing a raw payload where a digest is expected fails that assertion rather than producing a divergent root, which is the right failure but not an obvious one from the public API.
 
 **Insert and delete are assertive.** `insert` fails if the key already exists, `delete` fails if it does not, and the off-chain package raises on a repeated insert too. There is no upsert; use `update`.
 
@@ -421,7 +424,7 @@ Compared with a compressed sparse Merkle tree the byte counts are similar, and t
 | A root is always exactly 32 bytes. | `expect bytearray.length(root) == 32` in `from_root`, and the opaque type having no other public constructor. | A constructor taking an arbitrary byte array is exposed. |
 | The empty trie's root is 32 zero bytes. | `empty` is defined as `null_hash`, and absent child slots use the same constant. | The null-hash convention changes without also changing the precomputed `null_hash_2`, `null_hash_4` and `null_hash_8`. |
 | A branch node has at least two non-empty children. | An assertion in `Branch.from`; a node with one child is represented as a leaf. | Single-child branches are permitted, which would give two distinct encodings of the same map and so two distinct roots. |
-| A path is the hash of the key, never the key. | Both `including` and `excluding` call `blake2b_256(key)` before walking; the path is never transmitted in a proof. | The path is taken from the proof instead of recomputed, letting a prover claim a position its key does not reach. |
+| A path is the hash of the key, never the key. | Both `including` and `excluding` call `blake2b_256(key)` before walking; the path is never transmitted in a proof. | The path is taken from the proof instead of recomputed, letting a prover claim a position its key does not hash to. |
 | Two distinct leaf suffixes never share a preimage. | The parity tag in `suffix`, `0xFF` for even-length suffixes and `0x00` plus the orphan nibble for odd ones. | The tag is dropped, letting an odd-length and an even-length suffix collide into one root. |
 | A branch and its neighbours reconstruct to the same root only if the four supplied hashes are the real siblings. | `merkle_16` folding the four neighbours in fixed positional order into the branch's inner Merkle root. | Neighbour ordering is treated as free rather than positional. |
 | An insert only succeeds from the root that excludes the key. | `expect excluding(key, proof) == self.root` before computing the new root. | The pre-state check is dropped, allowing an insert over an existing key and a silent overwrite. |
@@ -441,11 +444,11 @@ Compared with a compressed sparse Merkle tree the byte counts are similar, and t
 
 ## Frequently Asked Questions
 
-**Q: What does the word "forestry" actually refer to?**
+**Q: What does the word "forestry" refer to?**
 
 It refers to the small Merkle trees hidden inside the branch nodes. A branch has 16 child slots, and instead of committing to them as a flat list, MPF builds a complete binary Merkle tree of depth 4 over those slots and commits to its root. Every branch node is therefore a tiny tree of its own, and the whole structure is a trie of trees.
 
-The consequence is the point: proving one child requires the four siblings along that inner tree rather than the fifteen other children, which is 128 bytes per level instead of 480.
+Proving one child requires the four siblings along that inner tree rather than the fifteen other children, which is 128 bytes per level instead of 480.
 
 **Q: Why are keys hashed before use rather than used directly as trie paths?**
 

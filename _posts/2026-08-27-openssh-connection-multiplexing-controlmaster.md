@@ -2,6 +2,7 @@
 layout: post
 title: "OpenSSH Connection Multiplexing — ControlMaster, the Mux Protocol and Proxy Mode"
 date:   2026-08-27
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: network security linux
@@ -36,7 +37,7 @@ The path is expanded per destination, which is what keeps one master per target 
 
 ## Everything here is still a channel
 
-The multiplexing machinery does not sit beside the channel layer. It is built on it, using three of the type values from `channels.h`:
+The multiplexing code does not sit beside the channel layer. It is built on it, using three of the type values from `channels.h`:
 
 ```c
 #define SSH_CHANNEL_MUX_LISTENER	15	/* Listener for mux conn. */
@@ -93,7 +94,7 @@ The message codes themselves are declared in `mux.c`, with client requests and s
 #define MUX_S_PROXY		0x8000000f
 ```
 
-Most of these are reachable from the command line through `ssh -O`, whose argument is mapped in `ssh.c`:
+Most of these are available from the command line through `ssh -O`, whose argument is mapped in `ssh.c`:
 
 ```c
 if (strcmp(optarg, "check") == 0)
@@ -232,7 +233,7 @@ Passenger mode depends on passing file descriptors over the socket, and descript
 
 Multiplexing is implemented in terms of channels rather than alongside them. The `ControlPath` listener is a channel of type `SSH_CHANNEL_MUX_LISTENER`, each attached client is `SSH_CHANNEL_MUX_CLIENT`, a proxied session is `SSH_CHANNEL_MUX_PROXY`, and `struct Channel` carries `ctl_chan` specifically to associate a session with its requesting client.
 
-This is why forwardings can be added to a running connection. The master already holds an authenticated transport and a working channel layer, so `MUX_C_OPEN_FWD` needs only to create a listener and open channels through the existing machinery. Nothing about the transport has to be renegotiated, which is what makes `-O forward` cheap and its result indistinguishable from a `-L` given at startup.
+This is why forwardings can be added to a running connection. The master already holds an authenticated transport and a working channel layer, so `MUX_C_OPEN_FWD` needs only to create a listener and open channels through them. Nothing about the transport has to be renegotiated, which is what makes `-O forward` cheap and its result indistinguishable from a `-L` given at startup.
 
 ## References
 

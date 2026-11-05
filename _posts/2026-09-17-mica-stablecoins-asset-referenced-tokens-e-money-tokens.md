@@ -2,7 +2,7 @@
 layout: post
 title: "Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)"
 date:   2026-09-17
-last_modified_at: 2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation blockchain defi
@@ -16,7 +16,7 @@ isMath: false
 
 [MiCA](https://eur-lex.europa.eu/eli/reg/2023/1114/oj), Regulation (EU) 2023/1114, is the EU's framework for crypto-assets outside existing financial law, and its [first article in this series]({{site.url_complet}}/2026/09/17/mica-explained-scope-token-categories-timeline/) sets out how it sorts a token into one of three categories. Two of those categories are stablecoins, and they received the heaviest regime in the text and the earliest application date: Titles III and IV have applied since 30 June 2024, six months before the rest of the Regulation.
 
-The Regulation does not use the word "stablecoin". It distinguishes an **e-money token** (EMT), which references one official currency, from an **asset-referenced token** (ART), which references anything else that is meant to hold value: a basket of currencies, a commodity, other crypto-assets or a combination. The distinction is not cosmetic. An EMT is treated as electronic money, may only be issued by a bank or an e-money institution, and must be redeemable at par. An ART needs its own authorisation, a segregated reserve, prudential capital and a policy for redeeming at the market value of what it references. Both are forbidden from paying interest, and both become "significant" above certain sizes, at which point supervision moves from the national authority to the European Banking Authority.
+The Regulation does not use the word "stablecoin". It distinguishes an **e-money token** (EMT), which references one official currency, from an **asset-referenced token** (ART), which references anything else that is meant to hold value: a basket of currencies, a commodity, other crypto-assets or a combination. An EMT is treated as electronic money, may only be issued by a bank or an e-money institution, and must be redeemable at par. An ART needs its own authorisation, a segregated reserve, prudential capital and a policy for redeeming at the market value of what it references. Both are forbidden from paying interest, and both become "significant" above certain sizes, at which point supervision moves from the national authority to the European Banking Authority.
 
 This article walks through the two titles in the order a prospective issuer would meet them: who may issue, what the white paper and the authorisation require, how the reserve and redemption work, what the capital rules are, and what changes when a token is classified as significant. Article numbers refer to MiCA unless another act is named; the source is the consolidated text of 9 January 2024.
 
@@ -111,8 +111,6 @@ The own funds consist of Common Equity Tier 1 items under the [Capital Requireme
 
 ### The reserve of assets (Chapter 3)
 
-Chapter 3 is the substantive core of Title III and the part that distinguishes a MiCA stablecoin from an unregulated one.
-
 **Composition and segregation** (Article 36). The issuer constitutes and maintains a reserve of assets at all times, composed so that the risks of the referenced assets are covered and the liquidity risk of permanent redemption is addressed. The reserve is **legally segregated** from the issuer's estate and from the reserves of any other tokens, so that the issuer's creditors have no recourse to it, in particular in insolvency, and it is **operationally segregated** as well. EBA's technical standards set liquidity requirements by maturity bucket, and the minimum share of each referenced currency that must be held as **deposits at credit institutions cannot be lower than 30 %**. The reserve is **audited independently every six months**; the result is reported to the authority within six weeks and published within two weeks of that, unless the authority orders a delay to protect holders or financial stability.
 
 **Custody** (Article 37). Reserve assets may not be encumbered or pledged, must be held in custody by a CASP, a credit institution or an investment firm, and must be accessible promptly to meet redemptions. The custodian holds them in segregated accounts opened in the name of the issuer for each token, so that the assets of each reserve can be identified, and must compensate the issuer for any lost instrument or crypto-asset unless it proves the loss resulted from an external event beyond its reasonable control (Article 37(10)).
@@ -198,7 +196,7 @@ One carve-out keeps supervision national: for a significant EMT denominated in a
 
 ## Transition
 
-Titles III and IV applied from 30 June 2024. Article 143(4) and (5) allowed issuers already issuing ARTs under national law before that date to continue until their application was decided, provided they applied (or, for credit institutions, notified under Article 17) before **30 July 2024**. There is no equivalent transitional period for EMTs: an EMT issuer had to be a credit institution or e-money institution with a notified white paper from the application date.
+Titles III and IV applied from 30 June 2024. Article 143(4) and (5) allowed issuers already issuing ARTs under national law before that date to continue until their application was decided, provided that, before **30 July 2024**, they applied or, for credit institutions, notified under Article 17. There is no equivalent transitional period for EMTs: an EMT issuer had to be a credit institution or e-money institution with a notified white paper from the application date.
 
 ## Conclusion
 
@@ -315,23 +313,33 @@ Titles III and IV are written as conditions and ongoing obligations for issuers.
 
 **Q: A token is pegged 1:1 to the US dollar and fully backed by dollar treasury bills. Is it an ART or an EMT under MiCA?**
 
-An EMT. Article 3(1)(7) defines an e-money token by reference to one official currency, and the dollar is an official currency even though it is not an EU currency. Only a credit institution or an electronic money institution may offer it in the Union, it must be issued and redeemed at par, and the funds must be safeguarded with at least 30 % in bank deposits and the rest in highly liquid dollar-denominated instruments. The treasury-bill backing is compatible with Article 54(b), but a non-bank issuer without an e-money licence cannot offer the token in the EU at all.
+An EMT. Article 3(1)(7) defines an e-money token by reference to one official currency, and the dollar is an official currency even though it is not an EU currency.
+
+Only a credit institution or an electronic money institution may offer it in the Union, it must be issued and redeemed at par, and the funds must be safeguarded with at least 30 % in bank deposits and the rest in highly liquid dollar-denominated instruments. The treasury-bill backing is compatible with Article 54(b), but a non-bank issuer without an e-money licence cannot offer the token in the EU at all.
 
 **Q: What is the difference between how an ART and an EMT are redeemed?**
 
-An EMT is redeemed at par value, at any time, in funds, and without a fee (Article 49). An ART is redeemed at the market value of the assets it references, either in funds or by delivering those assets, under a policy that sets thresholds and timeframes, and likewise without a fee outside a recovery plan (Article 39). The difference follows from the reference: an EMT is a claim to a fixed amount of one currency, while an ART is a claim to whatever the reference basket is worth on the day of redemption.
+An EMT is redeemed at par value, at any time, in funds, and without a fee (Article 49). An ART is redeemed at the market value of the assets it references, either in funds or by delivering those assets, under a policy that sets thresholds and timeframes, and likewise without a fee outside a recovery plan (Article 39).
+
+The difference follows from the reference: an EMT is a claim to a fixed amount of one currency, while an ART is a claim to whatever the reference basket is worth on the day of redemption.
 
 **Q: Can a CASP offer a rewards programme on balances held in a MiCA stablecoin?**
 
-No, if the reward depends on how long the holder keeps the token. Articles 40 and 50 prohibit the issuer and any CASP from granting interest in relation to an ART or an EMT, and define interest as any remuneration or benefit related to the length of time the holder holds the token, including discounts or net compensation with an equivalent effect and benefits paid by third parties. A time-based yield on stablecoin balances falls within that definition regardless of who funds it.
+No, if the reward depends on how long the holder keeps the token. Articles 40 and 50 prohibit the issuer and any CASP from granting interest in relation to an ART or an EMT, and define interest as any remuneration or benefit related to the length of time the holder holds the token, including discounts or net compensation with an equivalent effect and benefits paid by third parties.
+
+A time-based yield on stablecoin balances falls within that definition regardless of who funds it.
 
 **Q: Why can a central bank block an ART authorisation when the opinions of EBA and ESMA are non-binding?**
 
-Article 20(5) makes all the opinions non-binding in principle, but Article 21(4) creates one exception: the competent authority must refuse authorisation if the ECB or the relevant national central bank gives a negative opinion on the grounds of a risk to the smooth operation of payment systems, monetary policy transmission or monetary sovereignty. The legislator reserved those three grounds to the monetary authority because they concern the currency itself rather than investor protection or market integrity, which are the competences of the financial supervisors.
+Article 20(5) makes all the opinions non-binding in principle, but Article 21(4) creates one exception: the competent authority must refuse authorisation if the ECB or the relevant national central bank gives a negative opinion on the grounds of a risk to the smooth operation of payment systems, monetary policy transmission or monetary sovereignty.
+
+The legislator reserved those three grounds to the monetary authority because they concern the currency itself rather than investor protection or market integrity, which are the competences of the financial supervisors.
 
 **Q: What happens when an ART reaches 1 million transactions and EUR 200 million per day as a means of exchange?**
 
-Under Article 23 the issuer must stop issuing the token and, within 40 working days, submit a plan to bring both figures back below the thresholds. The competent authority may require modifications, such as a minimum denomination, and permits issuance to resume only when it has evidence that use is below the thresholds. The article is the operational form of the "monetary sovereignty" concern: it caps the extent to which a private token can replace the currency in everyday payments within a currency area.
+Under Article 23 the issuer must stop issuing the token and, within 40 working days, submit a plan to bring both figures back below the thresholds. The competent authority may require modifications, such as a minimum denomination, and permits issuance to resume only when it has evidence that use is below the thresholds.
+
+The article is the operational form of the "monetary sovereignty" concern: it caps the extent to which a private token can replace the currency in everyday payments within a currency area.
 
 **Q: Combining the significance and capital rules: an e-money institution issues a euro EMT with 12 million holders, EUR 6 billion outstanding, and on average 3 million transactions worth EUR 600 million a day. What changes for it?**
 

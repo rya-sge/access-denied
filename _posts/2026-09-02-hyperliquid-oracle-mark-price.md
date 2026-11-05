@@ -2,6 +2,7 @@
 layout: post
 title: "The Hyperliquid Oracle - How Validator Medians Become Mark Price, Funding and Liquidation"
 date:   2026-09-02
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi oracle
@@ -24,7 +25,7 @@ This article takes that construction apart: how the oracle price is assembled an
 
 ## Four prices, four jobs
 
-Before the mechanics, the map. Most surprises on the platform come from confusing two of these four.
+Most surprises on the platform come from confusing two of these four.
 
 | Price | Built from | Updated | Used for |
 |---|---|---|---|
@@ -61,9 +62,9 @@ Membership is not fixed across assets, and it follows where an asset's liquidity
 - Perps on assets whose **primary spot liquidity is on Hyperliquid**, such as HYPE, exclude external sources until those venues have sufficient liquidity to be meaningful.
 - Perps on assets whose **primary spot liquidity is elsewhere**, such as BTC, exclude Hyperliquid spot.
 
-The reasoning is the same in both directions. Including a venue that barely trades the asset adds a manipulable input without adding information.
+In both directions, including a venue that barely trades the asset adds a manipulable input without adding information.
 
-This is also where the quanto detail enters. Contracts are USDC-margined but the oracle price is usually denominated in **USDT**, with no conversion applied, which makes them technically quanto contracts whose USDT PnL is denominated in USDC. The exceptions are the assets whose most liquid spot source is Hyperliquid itself, currently PURR-USD and HYPE-USD, which are USDC-denominated throughout.
+Contracts are USDC-margined but the oracle price is usually denominated in **USDT**, with no conversion applied, which makes them technically quanto contracts whose USDT PnL is denominated in USDC. The exceptions are the assets whose most liquid spot source is Hyperliquid itself, currently PURR-USD and HYPE-USD, which are USDC-denominated throughout.
 
 ### Stage two: across the validator set
 
@@ -71,7 +72,7 @@ Each validator's number is its own opinion, published onchain. The price the cle
 
 Stacking the two medians is what sets the cost of moving the price. To move stage one you need to move a weighted majority of eight venues. To move stage two you need to move a stake-weighted majority of validators. Neither a compromised exchange API nor a minority of dishonest validators changes the output, and the price becomes wrong only when a stake majority wants it wrong, which is the same assumption HyperBFT already makes for everything else.
 
-That last point should be stated without softening. The oracle adds no trust assumption beyond the one the chain already has, and it also removes none. There is no fallback that survives a colluding stake majority, because a colluding stake majority is outside the security model by construction.
+The oracle adds no trust assumption beyond the one the chain already has, and it also removes none. There is no fallback that survives a colluding stake majority, because a colluding stake majority is outside the security model by construction.
 
 ## Building the mark price
 
@@ -97,7 +98,7 @@ $$
 
 with $$\tau = 2.5$$ minutes. Weighting each sample by its own $$t$$ is what keeps the estimate correct when samples arrive unevenly: a value that stood for thirty seconds counts thirty times as much as one that stood for one.
 
-The median of three defends against something different from the median of eight venues. The venue median defends against one exchange printing a bad number. The candidate median defends against an entire **class** of price going wrong: a wick on Hyperliquid's own book moves candidate 2 and nothing else, an external spot dislocation moves candidate 1, and either way the median holds. Manipulating a liquidation price means moving two of three independently sourced indices at once.
+The venue median defends against one exchange printing a bad number. The candidate median defends against an entire **class** of price going wrong: a wick on Hyperliquid's own book moves only candidate 2, an external spot dislocation moves candidate 1, and either way the median holds. Manipulating a liquidation price means moving two of three independently sourced indices at once.
 
 Mark price is recomputed whenever validators publish new oracle prices, so both update on roughly the same three-second cadence.
 
@@ -117,8 +118,6 @@ A three-second cadence sounds slow next to a matching engine that runs in micros
 Those last two are easy to overlook and show up in the API as concrete error codes: `Oracle` ("order price too far from oracle"), `oracleRejected`, and `TooAggressiveAtOpenInterestCap`. The oracle is not only a valuation input; it also bounds what may be placed on the book.
 
 ## The oracle inside the funding rate
-
-Funding is where the oracle price does its most visible work, and where the separation from the mark price matters most.
 
 Writing $$P$$ for the average premium index and $$I$$ for the fixed interest component of 0.01% per eight hours:
 
@@ -150,7 +149,7 @@ Funding is paid hourly at one eighth of the computed eight-hour rate and capped 
 
 ## When the standard construction is not enough
 
-Two situations need a price the two-stage median cannot supply on its own: a contract whose underlying has not launched, and a contract being wound down. Each has its own mechanism.
+Two situations need a price the two-stage median cannot supply on its own: a contract whose underlying has not launched, and a contract being wound down.
 
 ### Hyperps
 
@@ -216,7 +215,7 @@ Reading from the precompile is not the same as reading an external feed. It give
 
 For everything else, the HyperEVM is an ordinary EVM chain and the usual oracle providers are deployed on it, including Chainlink, [Pyth]({{site.url_complet}}/2026/03/13/pyth-integration-security/), RedStone, Stork, DIA, Blocksense and Seda. Those carry the integration concerns any pull or push oracle carries, namely staleness checks, confidence intervals, sequencer or publisher liveness, and the update cadence the consuming protocol assumes.
 
-The practical rule is straightforward. Price a HyperCore asset with the precompile, because nothing else can match the clearinghouse. Price anything else with a third-party feed, and treat it with the scepticism any external oracle deserves.
+Price a HyperCore asset with the precompile, because nothing else can match the clearinghouse. Price anything else with a third-party feed, and treat it with the scepticism any external oracle deserves.
 
 ## Where the trust sits
 
@@ -232,7 +231,7 @@ Setting the failure modes against what bounds each of them shows where the guara
 | The asset has no external price | Hyperps: an EWMA of the contract's own marks, with caps and 1% premium sampling | Circularity remains, bounded rather than removed |
 | The oracle stops updating | Mark and oracle both hold their last values until validators publish again | Liquidations and funding run on a stale price during the gap |
 
-The pattern is that everything except the fourth row is bounded by construction, and the fourth row is not an oracle question at all. Median-of-medians buys defence in depth against venues and against individual validators; it buys nothing against the assumption the chain already rests on. That is not a criticism of the design so much as a statement of where a reader should direct their attention: for validator-operated perps, oracle risk reduces to stake distribution, and for HIP-3 perps it reduces to one deployer's competence and key hygiene.
+The pattern is that everything except the fourth row is bounded by construction, and the fourth row is not an oracle question at all. Median-of-medians buys defence in depth against venues and against individual validators; it buys nothing against the assumption the chain already rests on. For validator-operated perps, oracle risk reduces to stake distribution, and for HIP-3 perps it reduces to one deployer's competence and key hygiene.
 
 ## Conclusion
 

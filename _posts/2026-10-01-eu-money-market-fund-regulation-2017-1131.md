@@ -2,6 +2,7 @@
 layout: post
 title: "The EU Money Market Fund Regulation (EU) 2017/1131 — Fund Types, Portfolio Rules, Valuation and Liquidity Tools"
 date:   2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation finance
@@ -13,7 +14,7 @@ isMath: true
 isMermaid: true
 ---
 
-A money market fund (MMF) is an investment fund that holds short-term debt (commercial paper, certificates of deposit, treasury bills, bank deposits and repurchase agreements) and offers its investors a return close to money market rates together with daily liquidity. Corporate treasurers, banks and governments use MMFs as an alternative to bank deposits, which makes the sector both a large buyer of short-term bank and sovereign debt and a channel through which a run on one fund can spread to the funding markets it lends to. The 2008 crisis showed that channel at work, when a large US fund holding Lehman Brothers paper fell below its stable share price of one dollar and investors withdrew from the whole sector.
+A money market fund (MMF) is an investment fund that offers its investors a return close to money market rates together with daily liquidity. It holds short-term debt: commercial paper, certificates of deposit, treasury bills, bank deposits and repurchase agreements. Corporate treasurers, banks and governments use MMFs as an alternative to bank deposits, which makes the sector both a large buyer of short-term bank and sovereign debt and a channel through which a run on one fund can spread to the funding markets it lends to. The 2008 crisis showed that channel at work, when a large US fund holding Lehman Brothers paper fell below its stable share price of one dollar and investors withdrew from the whole sector.
 
 [Regulation (EU) 2017/1131](https://eur-lex.europa.eu/eli/reg/2017/1131/oj) of 14 June 2017 is the European Union's answer. It applies on top of the [UCITS Directive](https://eur-lex.europa.eu/eli/dir/2009/65/oj) and the [AIFM Directive](https://eur-lex.europa.eu/eli/dir/2011/61/oj) and sets a single rulebook for every fund that calls itself an MMF in the Union. It fixes three fund types defined by how they price their units, a closed list of eligible assets, diversification and maturity limits, daily and weekly liquidity floors, valuation rules with a numerical collar for funds that keep a stable price, liquidity fees and redemption gates, a ban on sponsor support, and weekly disclosure and quarterly supervisory reporting.
 
@@ -33,7 +34,7 @@ The Regulation applies to collective investment undertakings that meet three cum
 - they invest in **short-term assets**, defined as financial assets with a residual maturity not exceeding two years (Art. 2(1));
 - their objective is to offer returns **in line with money market rates**, to **preserve the value** of the investment, or both.
 
-The test is functional. A fund that has these characteristics must be authorised as an MMF, and Article 6 prevents the reverse case: a UCITS or AIF that is not authorised may not use the name "money market fund", a misleading designation suggesting it is one, or characteristics "substantially similar" to those of Article 1(1). The ban covers every external document, from the prospectus to an oral communication.
+A fund that has these characteristics must be authorised as an MMF, and Article 6 prevents the reverse case: a UCITS or AIF that is not authorised may not use the name "money market fund", a misleading designation suggesting it is one, or characteristics "substantially similar" to those of Article 1(1). The ban covers every external document, from the prospectus to an oral communication.
 
 Article 1(2) also makes the Regulation a maximum-harmonisation text: Member States may not add requirements in the field it covers. A fund may still impose stricter investment limits on itself (Art. 7(5)).
 
@@ -134,7 +135,7 @@ Article 9(2) forbids five activities outright:
 - **securities lending or borrowing**, or any other agreement that would encumber the fund's assets;
 - **borrowing and lending cash**.
 
-The repo rule of Article 14 follows the same logic. A repo is a short-term loan the fund takes against its securities, so it is allowed only as a liquidity bridge of up to seven working days, and the cash received may only be placed on deposit or in the public-debt assets of Article 15(6). It may not be reinvested in the portfolio.
+A repo is a short-term loan the fund takes against its securities, so Article 14 allows it only as a liquidity bridge of up to seven working days, and the cash received may only be placed on deposit or in the public-debt assets of Article 15(6). It may not be reinvested in the portfolio.
 
 ## Diversification and concentration (Articles 17 and 18)
 
@@ -291,7 +292,9 @@ flowchart TD
 
 The two triggers differ in kind. The first is discretionary: the board may decide to take no action beyond the general duty to correct a breach. The second is mandatory: below 10 % weekly liquidity, a fee or a suspension must be applied. Liquidity fees must reflect the fund's cost of obtaining liquidity, so that remaining investors are not disadvantaged by those who leave.
 
-Article 34(2) adds the backstop. If suspensions total more than 15 days in any 90-day period, the fund loses its CNAV or LVNAV status automatically and must inform every investor in writing. The March 2020 market stress showed the weakness of the first trigger: managers of LVNAV funds approaching 30 % weekly liquidity had an incentive to keep liquidity above that line rather than use it, since crossing it exposed investors to fees or gates. ESMA's 2022 opinion on the review of the Regulation recommended removing that link between liquidity thresholds and the activation of these tools. The Commission's 2023 review report did not propose amendments, and its follow-up report of May 2026 (COM(2026) 350) kept the thresholds unchanged while suggesting weekly-liquidity levels of 40 % for stable-NAV funds and 20 % for VNAVs as non-binding supervisory benchmarks.
+Article 34(2) adds the backstop. If suspensions total more than 15 days in any 90-day period, the fund loses its CNAV or LVNAV status automatically and must inform every investor in writing.
+
+The March 2020 market stress showed the weakness of the first trigger: managers of LVNAV funds approaching 30 % weekly liquidity had an incentive to keep liquidity above that line rather than use it, since crossing it exposed investors to fees or gates. ESMA's 2022 opinion on the review of the Regulation recommended removing that link between liquidity thresholds and the activation of these tools. The Commission's 2023 review report did not propose amendments, and its follow-up report of May 2026 (COM(2026) 350) kept the thresholds unchanged while suggesting weekly-liquidity levels of 40 % for stable-NAV funds and 20 % for VNAVs as non-binding supervisory benchmarks.
 
 ## Prohibition of external support (Article 35)
 
@@ -496,7 +499,13 @@ The Regulation is not written as a checklist, but its operative articles reduce 
 
 **Q: What three conditions make a fund fall within the scope of the Regulation?**
 
-The fund must be a UCITS (or require UCITS authorisation) or an AIF, it must invest in short-term assets (residual maturity of two years or less), and its objective must be to offer returns in line with money market rates, to preserve the value of the investment, or both (Art. 1(1)). A fund meeting those conditions must be authorised as an MMF, and Article 6 forbids an unauthorised fund from using the MMF name or having substantially similar characteristics.
+The conditions are set by Art. 1(1):
+
+- The fund is a UCITS, requires UCITS authorisation, or is an AIF.
+- It invests in short-term assets, with a residual maturity of two years or less.
+- Its objective is to offer returns in line with money market rates, to preserve the value of the investment, or both.
+
+A fund meeting those conditions must be authorised as an MMF, and Article 6 forbids an unauthorised fund from using the MMF name or having substantially similar characteristics.
 
 **Q: Why can a standard MMF only be a VNAV?**
 
@@ -531,7 +540,9 @@ The manager may take a rating into account but must reach its own conclusion usi
 
 **Q: A tokenised share class of a euro MMF is issued on a public blockchain. Does it fall under MiCA or under the MMF Regulation?**
 
-Under the MMF Regulation. Units in a collective investment undertaking are financial instruments under MiFID II (Annex I, Section C(3) of Directive 2014/65/EU), and MiCA does not apply to crypto-assets that qualify as financial instruments (Art. 2(4)(a) of Regulation (EU) 2023/1114). The "funds" exclusion of Art. 2(4)(c) is not the relevant one: in MiCA, "funds" means money as defined in the Payment Services Directive (Art. 3(1)(14)). Recording units on a distributed ledger does not change the fund's legal nature. The issuer remains a UCITS or AIF authorised as an MMF, and the token holders are subject to the same portfolio rules, NAV calculation, liquidity tools and marketing statements as any other investor in the fund.
+Under the MMF Regulation. Units in a collective investment undertaking are financial instruments under MiFID II (Annex I, Section C(3) of Directive 2014/65/EU), and MiCA does not apply to crypto-assets that qualify as financial instruments (Art. 2(4)(a) of Regulation (EU) 2023/1114). The "funds" exclusion of Art. 2(4)(c) is not the relevant one: in MiCA, "funds" means money as defined in the Payment Services Directive (Art. 3(1)(14)).
+
+Recording units on a distributed ledger does not change the fund's legal nature. The issuer remains a UCITS or AIF authorised as an MMF, and the token holders are subject to the same portfolio rules, NAV calculation, liquidity tools and marketing statements as any other investor in the fund.
 
 ## References
 

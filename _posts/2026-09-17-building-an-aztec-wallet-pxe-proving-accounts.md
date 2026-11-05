@@ -2,6 +2,7 @@
 layout: post
 title: "Building a Wallet for Aztec — What a MetaMask for a Private Chain Has to Contain"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -50,7 +51,7 @@ Storage in the reference extension is a password-derived, non-extractable AES-25
 
 ### The PXE: the private half of the chain, locally
 
-The PXE is a TypeScript library, `@aztec/pxe`, that runs in Node.js or a browser. It is the part of the wallet that makes it an Aztec wallet. It holds:
+The PXE is a TypeScript library, `@aztec/pxe`, that runs in Node.js or a browser. It holds:
 
 - **the key store**, from which oracles serve keys to the executing contract (the nullifier hiding key for spending, the address secret for decrypting);
 - **the note database**, filled by *sync*: for every registered account and every registered sender, the PXE computes the discovery tags it can derive, fetches the matching logs from a node, and hands them to the contract's own `sync_state` function, which decrypts, dispatches by message type, confirms each note against the transaction's note hashes and stores it;
@@ -64,14 +65,14 @@ In a Manifest V3 browser extension neither is possible in the service worker, wh
 The PXE also exposes three **execution hooks** to the wallet, callbacks it invokes mid-simulation when a policy decision is needed, and a wallet that leaves them unset gets the conservative default:
 
 - `authorizeUtilityCall` — fires when one contract's utility function calls into *another* contract, the way a private balance could be read by a contract the user never meant to expose it to. Absent, every cross-contract utility call is denied.
-- `resolveTaggingSecretStrategy` — fires when a message is sent to a recipient with whom no handshake exists yet; the wallet chooses between a non-interactive handshake (published, reveals the recipient was contacted), an interactive one (needs the recipient online), an address-derived secret or an out-of-band one. Absent, a non-interactive handshake.
+- `resolveTaggingSecretStrategy` — fires when a message is sent to a recipient with whom no handshake exists yet; the wallet chooses between a published non-interactive handshake that reveals the recipient was contacted, an interactive one that needs the recipient online, an address-derived secret or an out-of-band one. Absent, a non-interactive handshake.
 - `resolveCustomRequest` — a general channel for a contract to ask the wallet for something no oracle provides; the interactive handshake's recipient signature travels through it. Absent, such requests fail.
 
 ### The prover
 
 After simulation, `pxe.proveTx(request)` executes the private functions again under the kernel circuits and produces the client-side proof. The documentation's own figure is 10 to 60 seconds; it runs in WASM (`@aztec/bb.js`), wants worker threads and therefore a cross-origin-isolated context, and is the reason the reference build patches worker files for `crossOriginIsolated`. A wallet has to keep the user informed during that minute, keep the page or extension context alive, and never block the approval UI on it.
 
-A design point that follows from the UTXO model is worth knowing before building the progress bar: a private execution trace depends only on the input notes, so what the simulation showed is exactly what the proof attests and what the chain will apply. The one way it fails afterwards is a note nullified by a competing transaction in the meantime.
+Under the UTXO model a private execution trace depends only on the input notes, so what the simulation showed is exactly what the proof attests and what the chain will apply. The one way it fails afterwards is a note nullified by a competing transaction in the meantime.
 
 ### The transaction pipeline
 
@@ -81,7 +82,7 @@ A dApp never hands the wallet a signed transaction; it hands an **`ExecutionPayl
 
 1. **completes the fee options** (`completeFeeOptions`): who pays and how, the one method the reference extension overrides;
 2. **builds the `TxExecutionRequest`** through the account contract's entrypoint, which is where the account's authorisation scheme signs the calls;
-3. **simulates**, kernelless, to estimate gas and to *capture the private authwits the transaction needs*: when a contract asks the account "may X do Y on your behalf", the simulation records the request and the wallet signs it once at the end, so dApps do not manage private authorisations themselves (public ones are different: they are on-chain state, set up beforehand);
+3. **simulates**, kernelless, to estimate gas and to *capture the private authwits the transaction needs*: when a contract asks the account "may X do Y on your behalf", the simulation records the request and the wallet signs it once at the end, so dApps do not manage private authorisations themselves. Public ones are different: they are on-chain state, set up beforehand;
 4. **proves**;
 5. **sends** the proven transaction to a node, which gossips it to the sequencers, and returns the hash.
 

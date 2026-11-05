@@ -2,6 +2,7 @@
 layout: post
 title: "FRI and Proximity Proofs, Part 1 — Reed-Solomon Codes, IOPs of Proximity, Quotienting and Folding"
 date:   2026-09-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -13,7 +14,7 @@ isMath: true
 
 FRI stands for Fast Reed-Solomon Interactive Oracle Proof of Proximity. Fix a finite field $$\mathbb F$$, a subset $$L \subseteq \mathbb F$$ and a function $$y : L \to \mathbb F$$ that the prover has committed to. FRI lets the prover convince a verifier, who reads only a handful of positions of $$y$$, that $$y$$ is close to a Reed-Solomon codeword, in other words close to the evaluation table of some polynomial of bounded degree. That statement is modest on its own. Its value comes from what can be built on top of it: a polynomial commitment scheme with no trusted setup and no elliptic curves, and from there a hash-based SNARK.
 
-This article is based on a [ZK Whiteboard Sessions lecture by Dan Boneh](https://www.youtube.com/watch?v=MBDBrEr2XQg), the first half of a two-part module on FRI and proximity proofs. It covers everything the construction of FRI depends on but stops short of FRI itself: linear codes and list decoding, the Reed-Solomon code and its Johnson bound, interactive oracle proofs and the BCS compiler, the quotienting trick that turns a proximity test into an evaluation proof, and the two distance-preserving transformations (batching and folding) on which the FRI protocol rests. Part 2, when it is written, will assemble these pieces into FRI and its successors.
+This article is based on a [ZK Whiteboard Sessions lecture by Dan Boneh](https://www.youtube.com/watch?v=MBDBrEr2XQg), the first half of a two-part module on FRI and proximity proofs. It covers everything the construction of FRI depends on but not FRI itself: linear codes and list decoding, the Reed-Solomon code and its Johnson bound, interactive oracle proofs and the BCS compiler, the quotienting trick that turns a proximity test into an evaluation proof, and the two distance-preserving transformations (batching and folding) on which the FRI protocol rests. Part 2, when it is written, will assemble these pieces into FRI and its successors.
 
 The notation follows the slides so that they remain usable alongside the text. Where a fact is stated without proof here, the reference list points to the paper that carries the argument.
 
@@ -61,7 +62,9 @@ A linear code $$C$$ with parameters $$[n, k, \ell]$$ over $$\mathbb F$$ is a lin
 - **$$k$$**, the dimension of the subspace, so the code holds $$p^k$$ codewords;
 - **$$\ell$$**, the minimum Hamming weight, with $$\mu = \ell / n$$ the relative minimum distance.
 
-Two facts follow directly. First, any two distinct codewords $$u, v \in C$$ satisfy $$\Delta(u, v) \ge \mu$$: their difference $$u - v$$ is itself a non-zero codeword, so it has weight at least $$\ell$$. Second, the Singleton bound: $$k \le n - \ell + 1$$. The proof is one line. Delete the first $$\ell - 1$$ coordinates of every codeword. Two codewords that agreed on the remaining $$n - \ell + 1$$ coordinates would differ in fewer than $$\ell$$ positions, which is impossible, so the truncated words are all distinct and there are at most $$p^{\,n-\ell+1}$$ of them.
+Two facts follow directly. First, any two distinct codewords $$u, v \in C$$ satisfy $$\Delta(u, v) \ge \mu$$: their difference $$u - v$$ is itself a non-zero codeword, so it has weight at least $$\ell$$.
+
+Second, the Singleton bound: $$k \le n - \ell + 1$$. The proof is one line. Delete the first $$\ell - 1$$ coordinates of every codeword. Two codewords that agreed on the remaining $$n - \ell + 1$$ coordinates would differ in fewer than $$\ell$$ positions, which is impossible, so the truncated words are all distinct and there are at most $$p^{\,n-\ell+1}$$ of them.
 
 A code that meets the Singleton bound with equality, $$k = n - \ell + 1$$, is as large as a code with that minimum distance can be. Such codes are called Maximum Distance Separable, or MDS. The Reed-Solomon code is the classic example.
 
@@ -104,7 +107,7 @@ For $$\delta \lt \mu/2$$ the list has at most one element, by the argument above
 
 The Johnson bound $$J(\mu)$$ is a function of the minimum distance alone; it always exceeds the unique decoding distance, and below it the list size is bounded by an explicit expression $$1/\varepsilon_\delta$$ whose denominator tends to zero at the bound itself. The proof is about half a page and is a reasonable exercise. Everything in this article and in FRI's analysis relies on proven bounds, so $$\delta$$ is always kept below the Johnson bound.
 
-Two pieces of vocabulary close the section. A word $$w$$ is $$\delta$$-close to $$C$$ if some codeword lies within relative distance $$\delta$$ of it, written $$\Delta(w, C) \le \delta$$; it is $$\delta$$-far if every codeword is at distance greater than $$\delta$$, written $$\Delta(w, C) \gt \delta$$.
+A word $$w$$ is $$\delta$$-close to $$C$$ if some codeword lies within relative distance $$\delta$$ of it, written $$\Delta(w, C) \le \delta$$; it is $$\delta$$-far if every codeword is at distance greater than $$\delta$$, written $$\Delta(w, C) \gt \delta$$.
 
 ## The Reed-Solomon code
 
@@ -144,7 +147,9 @@ Plugging in $$\rho = 1/4$$, so that codewords are four times the size of the mes
 
 An interactive oracle proof is an information-theoretic object: it lets a proof system be designed and analysed without any cryptographic assumption, with the cryptography added afterwards by a compiler. Fix a relation $$R$$ of pairs $$(x, w)$$, where $$x$$ is the instance and $$w$$ the witness; the only requirement is that membership in $$R$$ is decidable in polynomial time. A hash preimage relation, $$x = H(w)$$, or a commitment-opening relation are typical examples.
 
-An IOP for $$R$$ is a pair of algorithms. The prover $$P$$ receives $$(x, w)$$; the verifier receives $$x$$ only. They interact in rounds: the prover sends a string $$\pi_0$$, the verifier answers with a random challenge $$\alpha_1$$, the prover sends $$\pi_1$$, and so on until the prover sends its last string $$\pi_k$$. Then the verifier runs a decision algorithm $$V$$ that takes $$x$$ and all the challenges as explicit input, and gets the strings $$\pi_0, \dots, \pi_k$$ as oracles: it may ask for the third cell of $$\pi_0$$ or the fifth cell of $$\pi_1$$, as many cells as it wants, and outputs accept or reject based on what it read.
+An IOP for $$R$$ is a pair of algorithms. The prover $$P$$ receives $$(x, w)$$; the verifier receives $$x$$ only. They interact in rounds: the prover sends a string $$\pi_0$$, the verifier answers with a random challenge $$\alpha_1$$, the prover sends $$\pi_1$$, and so on until the prover sends its last string $$\pi_k$$.
+
+Then the verifier runs a decision algorithm $$V$$ that takes $$x$$ and all the challenges as explicit input, and gets the strings $$\pi_0, \dots, \pi_k$$ as oracles: it may ask for the third cell of $$\pi_0$$ or the fifth cell of $$\pi_1$$, as many cells as it wants, and outputs accept or reject based on what it read.
 
 Four properties define a useful IOP:
 
@@ -163,9 +168,11 @@ An IOP for $$R$$ yields a SNARK for $$R$$ through the BCS compiler, named after 
 
 In the first step, the prover sends a Merkle commitment to each string $$\pi_i$$ instead of the string itself. Whenever $$V$$ queries cell $$j$$ of $$\pi_i$$, the prover answers with the value and a Merkle proof for that cell. Nothing else changes. The result is an ordinary interactive proof, with no oracles, whose security now rests on the collision resistance of the Merkle hash function rather than being unconditional.
 
-In the second step the [Fiat-Shamir transformation]({{site.url_complet}}/2026/07/28/zk-proof-systems-15-concepts-15-formulas/) removes the interaction. The prover derives each challenge by hashing the Merkle commitments sent so far, then runs the verifier itself and appends a Merkle proof for every cell the verifier asks for. The whole SNARK proof is the list of commitments plus the Merkle proofs at the queried positions, and the SNARK verifier replays the decision algorithm to confirm it accepts. A theorem states that if the IOP has a property called round-by-round soundness, the compiled system is a SNARG, or a SNARK when the IOP is knowledge sound. Chiesa and Yogev's book *Building Cryptographic Proofs from Hash Functions* is devoted to the precise definitions and to the proof that this transformation is secure.
+In the second step the [Fiat-Shamir transformation]({{site.url_complet}}/2026/07/28/zk-proof-systems-15-concepts-15-formulas/) removes the interaction. The prover derives each challenge by hashing the Merkle commitments sent so far, then runs the verifier itself and appends a Merkle proof for every cell the verifier asks for. The whole SNARK proof is the list of commitments plus the Merkle proofs at the queried positions, and the SNARK verifier replays the decision algorithm to confirm it accepts.
 
-The efficiency of the result is easy to read off. The prover's main cost is Merkle-committing to every string it sends, so shorter strings mean a faster prover. The proof size has one commitment per string and one Merkle proof per verifier query, and since a Merkle proof is a full authentication path, the query count dominates. Reducing verifier queries is the central optimisation target.
+A theorem states that if the IOP has a property called round-by-round soundness, the compiled system is a SNARG, or a SNARK when the IOP is knowledge sound. Chiesa and Yogev's book *Building Cryptographic Proofs from Hash Functions* is devoted to the precise definitions and to the proof that this transformation is secure.
+
+The prover's main cost is Merkle-committing to every string it sends, so shorter strings mean a faster prover. The proof size has one commitment per string and one Merkle proof per verifier query, and since a Merkle proof is a full authentication path, the query count dominates. Reducing verifier queries is the central optimisation target.
 
 ### IOPs of proximity
 
@@ -183,7 +190,11 @@ The IOPP that matters here is the Reed-Solomon IOPP. Its instance is the code $$
 
 ### Poly-IOPs and the two compilation routes
 
-A Poly-IOP is an IOP in which the strings the prover sends are constrained to be polynomials of bounded degree, and the verifier, instead of reading cells, may evaluate any of those polynomials at any point of $$\mathbb F$$. Completeness and soundness are defined as for IOPs. Most deployed SNARKs are Poly-IOPs compiled down: the standard route replaces each polynomial with a polynomial commitment and each evaluation query with an evaluation proof, producing an interactive proof, and then applies Fiat-Shamir. A previous article on this site, [KZG Polynomial Commitments — The Terms and Formulas, From Beginner to Advanced]({{site.url_complet}}/2026/09/09/kzg-polynomial-commitments-glossary/), covers the pairing-based instantiation of that route. Poly-IOPs over univariate polynomials, such as Plonk, and over multilinear polynomials, such as HyperPlonk, both exist; SNARKs derived from multilinear Poly-IOPs have turned out to be more efficient, and the field is moving in that direction, but this module stays with the univariate case.
+A Poly-IOP is an IOP in which the strings the prover sends are constrained to be polynomials of bounded degree, and the verifier, instead of reading cells, may evaluate any of those polynomials at any point of $$\mathbb F$$. Completeness and soundness are defined as for IOPs.
+
+Most deployed SNARKs are Poly-IOPs compiled down: the standard route replaces each polynomial with a polynomial commitment and each evaluation query with an evaluation proof, producing an interactive proof, and then applies Fiat-Shamir. A previous article on this site, [KZG Polynomial Commitments — The Terms and Formulas, From Beginner to Advanced]({{site.url_complet}}/2026/09/09/kzg-polynomial-commitments-glossary/), covers the pairing-based instantiation of that route.
+
+Poly-IOPs over univariate polynomials, such as Plonk, and over multilinear polynomials, such as HyperPlonk, both exist; SNARKs derived from multilinear Poly-IOPs have turned out to be more efficient, and the field is moving in that direction, but this module stays with the univariate case.
 
 ![Two routes from a Poly-IOP to a SNARK: through a polynomial commitment scheme and Fiat-Shamir, or through a Reed-Solomon IOPP to an IOP and then the BCS compiler]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/fri/fri-poly-iop-to-snark-pipeline-concept.png)
 
@@ -239,7 +250,7 @@ It is well defined because no $$a_i$$ lies in $$L$$, and the two facts carry ove
 
 ### A first compiler, and why it is not yet sound
 
-The pieces assemble as follows. Where the Poly-IOP prover sends $$f$$, the IOP prover sends $$\pi = \bar f$$. Where the Poly-IOP verifier queries $$f(a_1)$$ and receives $$b_1$$, the IOP parties run a Reed-Solomon IOPP to show that $$q_1 = (\pi - b_1)/(x - a_1)$$ is $$\delta$$-close to $$\mathrm{RS}[\mathbb F, L, d-1]$$, for a $$\delta$$ fixed later. The honest prover sent a codeword, so its quotient is a codeword and the IOPP accepts; a prover whose $$b_1$$ is wrong for every polynomial near $$\pi$$ produces a far quotient, and the IOPP rejects.
+Where the Poly-IOP prover sends $$f$$, the IOP prover sends $$\pi = \bar f$$. Where the Poly-IOP verifier queries $$f(a_1)$$ and receives $$b_1$$, the IOP parties run a Reed-Solomon IOPP to show that $$q_1 = (\pi - b_1)/(x - a_1)$$ is $$\delta$$-close to $$\mathrm{RS}[\mathbb F, L, d-1]$$, for a $$\delta$$ fixed later. The honest prover sent a codeword, so its quotient is a codeword and the IOPP accepts; a prover whose $$b_1$$ is wrong for every polynomial near $$\pi$$ produces a far quotient, and the IOPP rejects.
 
 Note that $$q_1$$ is never sent. Every time the IOPP verifier wants a cell of $$q_1$$, both parties compute it from the corresponding cell of $$\pi$$ by one subtraction and one division. An oracle derived this way from another oracle is called a virtual oracle.
 
@@ -261,7 +272,9 @@ $$
 
 This is where the Johnson bound enters. For $$\delta \lt 1 - \sqrt\rho$$ the list size is bounded and small, so when the field is large enough the denominator dominates and the bad event is negligible. When the field is too small for that, the verifier samples several values $$r$$ instead of one, and the same argument goes through. Either way, once the prover has answered $$s$$, with high probability exactly one polynomial in the list satisfies $$f(r) = s$$, and that is the polynomial the prover is now bound to.
 
-The full compiler then handles each evaluation query with a two-point quotient. For query $$a_1$$ with answer $$b_1$$, the parties run a Reed-Solomon IOPP showing that the quotient of $$\pi$$ by the points $$(a_1, b_1)$$ and $$(r, s)$$ is $$\delta$$-close to $$\mathrm{RS}[\mathbb F, L, d-2]$$. Acceptance implies some $$f_1$$ close to $$\pi$$ with $$f_1(a_1) = b_1$$ and $$f_1(r) = s$$. Query $$a_2$$ is handled identically, still using the same $$(r, s)$$, and yields an $$f_2$$ with $$f_2(a_2) = b_2$$ and $$f_2(r) = s$$. Since $$f_1$$ and $$f_2$$ both lie in the list and agree at $$r$$, they are equal with high probability. The verifier has learned what it needed: a single polynomial $$f$$, committed to by the prover, with $$f(a_1) = b_1$$ and $$f(a_2) = b_2$$.
+The full compiler then handles each evaluation query with a two-point quotient. For query $$a_1$$ with answer $$b_1$$, the parties run a Reed-Solomon IOPP showing that the quotient of $$\pi$$ by the points $$(a_1, b_1)$$ and $$(r, s)$$ is $$\delta$$-close to $$\mathrm{RS}[\mathbb F, L, d-2]$$. Acceptance implies some $$f_1$$ close to $$\pi$$ with $$f_1(a_1) = b_1$$ and $$f_1(r) = s$$. Query $$a_2$$ is handled identically, still using the same $$(r, s)$$, and yields an $$f_2$$ with $$f_2(a_2) = b_2$$ and $$f_2(r) = s$$.
+
+Since $$f_1$$ and $$f_2$$ both lie in the list and agree at $$r$$, they are equal with high probability. The verifier has learned what it needed: a single polynomial $$f$$, committed to by the prover, with $$f(a_1) = b_1$$ and $$f(a_2) = b_2$$.
 
 ### Two remarks on the compiler
 
@@ -271,7 +284,9 @@ The full compiler then handles each evaluation query with a two-point quotient. 
 
 ## Distance-preserving transformations
 
-A distance-preserving transformation takes functions $$u_1, \dots, u_k$$ over a domain $$L$$ and a random value $$r$$, and outputs a single function $$u$$ over a domain $$L'$$ that may differ from $$L$$. It must satisfy two conditions. If every $$u_j$$ is a codeword of a Reed-Solomon code, then $$u$$ is a codeword of some other Reed-Solomon code, possibly with a different domain and degree, for every choice of $$r$$. If even one $$u_j$$ is $$\delta$$-far from the code, then $$u$$ is $$\delta$$-far from the target code with high probability over $$r$$. Close inputs give a close output; a single far input gives a far output. Two examples are needed for FRI.
+A distance-preserving transformation takes functions $$u_1, \dots, u_k$$ over a domain $$L$$ and a random value $$r$$, and outputs a single function $$u$$ over a domain $$L'$$ that may differ from $$L$$. It must satisfy two conditions. If every $$u_j$$ is a codeword of a Reed-Solomon code, then $$u$$ is a codeword of some other Reed-Solomon code, possibly with a different domain and degree, for every choice of $$r$$. If even one $$u_j$$ is $$\delta$$-far from the code, then $$u$$ is $$\delta$$-far from the target code with high probability over $$r$$.
+
+Close inputs give a close output; a single far input gives a far output. Two examples are needed for FRI.
 
 ### Batching, and the proximity gap theorem
 
@@ -285,7 +300,13 @@ $$
 
 another function from $$L$$ to $$\mathbb F$$, and run the IOPP once on it. The batched word is a virtual oracle: to open $$u^{(r)}$$ at a cell, the prover opens every $$u_j$$ at that cell and the verifier takes the linear combination itself.
 
-The honest direction is immediate. Reed-Solomon codes are linear, so a linear combination of codewords is a codeword, for every $$r$$. The other direction is a real question about polynomials: if one $$u_j$$ is far from the code, why should the combination be far for almost every $$r$$? The answer took time to establish and is the proximity gap theorem of Ben-Sasson, Carmon, Ishai, Kopparty and Saraf, proven in 2020 and referred to as BCIKS. For $$\delta$$ below the Johnson bound it states: if $$u^{(r)}$$ is $$\delta$$-close to the code for more than an $$\mathrm{err}$$ fraction of the values $$r$$, then every $$u_j$$ is $$\delta$$-close to the code. The quantity $$\mathrm{err}$$ is explicit in the paper; in outline, it grows linearly in $$n$$ when $$\delta$$ is below the unique decoding distance and quadratically in $$n$$ between the unique decoding distance and the Johnson bound, divided in both cases by the field size. As with DEEP, the field is assumed large enough for $$\mathrm{err}$$ to be negligible, and if it is not, several values of $$r$$ are used and each combination is tested. The contrapositive is the statement needed for batching: if any $$u_j$$ is $$\delta$$-far, then $$u^{(r)}$$ is $$\delta$$-far with high probability over $$r$$.
+The honest direction is immediate. Reed-Solomon codes are linear, so a linear combination of codewords is a codeword, for every $$r$$.
+
+The other direction is a real question about polynomials: if one $$u_j$$ is far from the code, why should the combination be far for almost every $$r$$? The answer took time to establish and is the proximity gap theorem of Ben-Sasson, Carmon, Ishai, Kopparty and Saraf, proven in 2020 and referred to as BCIKS. For $$\delta$$ below the Johnson bound it states: if $$u^{(r)}$$ is $$\delta$$-close to the code for more than an $$\mathrm{err}$$ fraction of the values $$r$$, then every $$u_j$$ is $$\delta$$-close to the code.
+
+The quantity $$\mathrm{err}$$ is explicit in the paper; in outline, it grows linearly in $$n$$ when $$\delta$$ is below the unique decoding distance and quadratically in $$n$$ between the unique decoding distance and the Johnson bound, divided in both cases by the field size. As with DEEP, the field is assumed large enough for $$\mathrm{err}$$ to be negligible, and if it is not, several values of $$r$$ are used and each combination is tested.
+
+The contrapositive is the statement needed for batching: if any $$u_j$$ is $$\delta$$-far, then $$u^{(r)}$$ is $$\delta$$-far with high probability over $$r$$.
 
 The theorem says more than that, and the extra is used later. Not only is each $$u_j$$ $$\delta$$-close to a codeword; there is a single set $$S \subseteq L$$ of size at least $$(1 - \delta)\,|L|$$ such that every $$u_j$$ agrees with its nearest codeword on all of $$S$$. The words are close on the same positions. This is called correlated proximity.
 
@@ -325,15 +346,19 @@ The corollary that FRI's analysis uses is that folding does not decrease distanc
 
 ### Folding by four, and by $$2^w$$
 
-Two-way folding uses the pair $$\{a, -a\}$$. Four-way folding uses a fourth root of unity $$i$$, a square root of $$-1$$, and the four points $$a, ia, -a, -ia$$. From $$u$$ evaluated at those four points, applying the $$4 \times 4$$ Fourier transform matrix produces the values at $$a^4$$ of four functions $$u_0, u_1, u_2, u_3$$ that collect the monomials of $$u$$ whose degree is $$0, 1, 2, 3$$ modulo $$4$$. The four-way fold is $$\sum_j r^j u_j$$, defined on $$L^4$$; evaluating it at one point costs four evaluations of $$u$$. A codeword of degree bound $$d$$ folds to a codeword of degree bound $$d/4$$, a $$\delta$$-far word folds to a $$\delta$$-far word, and the same corollary holds.
+Two-way folding uses the pair $$\{a, -a\}$$. Four-way folding uses a fourth root of unity $$i$$, a square root of $$-1$$, and the four points $$a, ia, -a, -ia$$. From $$u$$ evaluated at those four points, applying the $$4 \times 4$$ Fourier transform matrix produces the values at $$a^4$$ of four functions $$u_0, u_1, u_2, u_3$$ that collect the monomials of $$u$$ whose degree is $$0, 1, 2, 3$$ modulo $$4$$.
 
-The pattern continues. A $$2^w$$-way fold needs a $$2^w$$-th root of unity in $$\mathbb F$$, is computed with a size-$$2^w$$ FFT, costs $$2^w$$ evaluations of $$u$$ per output point, and satisfies the same distance-preservation corollary.
+The four-way fold is $$\sum_j r^j u_j$$, defined on $$L^4$$; evaluating it at one point costs four evaluations of $$u$$. A codeword of degree bound $$d$$ folds to a codeword of degree bound $$d/4$$, a $$\delta$$-far word folds to a $$\delta$$-far word, and the same corollary holds.
+
+A $$2^w$$-way fold needs a $$2^w$$-th root of unity in $$\mathbb F$$, is computed with a size-$$2^w$$ FFT, costs $$2^w$$ evaluations of $$u$$ per output point, and satisfies the same distance-preservation corollary.
 
 ## Conclusion
 
 Part 1 assembles the objects that FRI is made of. A Reed-Solomon codeword is the evaluation table of a low-degree polynomial on a domain $$L$$; two distinct codewords are far apart; and the set of codewords within distance $$\delta$$ of an arbitrary word has at most one element below the unique decoding distance $$(1-\rho)/2$$, a bounded number of elements below the Johnson bound $$1 - \sqrt\rho$$, and an unknown size beyond that. The Johnson bound is where the proven analysis stops, so $$\delta$$ is always chosen below it.
 
-An IOP lets a verifier read cells of strings the prover committed to; the BCS compiler turns it into a hash-based SNARK whose proof size is governed by the number of those reads. A Poly-IOP becomes an IOP by sending each polynomial as its Reed-Solomon encoding and settling each evaluation query with a Reed-Solomon IOPP on a quotient word, with one out-of-domain sample $$(r, s)$$ binding the prover to a single polynomial in the list. Finally, batching with powers of $$r$$ and folding with the even/odd split are both distance-preserving, a fact that rests on the proximity gap theorem, and folding in particular halves the degree and the domain at each step without lowering the distance to the code. That last property is what FRI iterates, and Part 2 takes it from here.
+An IOP lets a verifier read cells of strings the prover committed to; the BCS compiler turns it into a hash-based SNARK whose proof size is governed by the number of those reads. A Poly-IOP becomes an IOP by sending each polynomial as its Reed-Solomon encoding and settling each evaluation query with a Reed-Solomon IOPP on a quotient word, with one out-of-domain sample $$(r, s)$$ binding the prover to a single polynomial in the list.
+
+Finally, batching with powers of $$r$$ and folding with the even/odd split are both distance-preserving, a fact that rests on the proximity gap theorem, and folding in particular halves the degree and the domain at each step without lowering the distance to the code. That last property is what FRI iterates, and Part 2 takes it from here.
 
 ![Mindmap of the FRI toolbox covering linear codes, the Reed-Solomon code, interactive oracle proofs, the Poly-IOP to IOP compiler with quotienting and DEEP, and the batching and folding transformations]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/fri/2026-09-11-fri-proximity-proofs-part-1-mindmap.png)
 
@@ -385,23 +410,36 @@ The compiler and transformations above have parameter conditions that a hash-bas
 
 **Q: What exactly does FRI prove, and what does it not prove?**
 
-FRI proves that a committed function $$y : L \to \mathbb F$$ is $$\delta$$-close to some codeword of $$\mathrm{RS}[\mathbb F, L, d]$$, in other words that it agrees with the evaluation table of a polynomial of degree less than $$d$$ on all but a $$\delta$$ fraction of the domain. It does not prove that $$y$$ is exactly a codeword: a verifier reading a few cells cannot distinguish a codeword from a string that deviates in a single position. The proximity guarantee is enough because the rest of the construction is built to tolerate it.
+FRI proves that a committed function $$y : L \to \mathbb F$$ is $$\delta$$-close to some codeword of $$\mathrm{RS}[\mathbb F, L, d]$$, in other words that it agrees with the evaluation table of a polynomial of degree less than $$d$$ on all but a $$\delta$$ fraction of the domain.
+
+It does not prove that $$y$$ is exactly a codeword: a verifier reading a few cells cannot distinguish a codeword from a string that deviates in a single position. The proximity guarantee is enough because the rest of the construction is built to tolerate it.
 
 **Q: Why does the article stop at the Johnson bound rather than the capacity bound?**
 
-Below the Johnson bound $$1 - \sqrt\rho$$ the size of $$\mathrm{List}(w, d, \delta)$$ is provably bounded, and every argument in the article uses that bound: the DEEP union bound over pairs of list members, the proximity gap theorem for batching, and the folding lemma. Between the Johnson bound and the capacity bound $$1 - \rho$$ the list size for Reed-Solomon codes over structured domains is an open problem; a 2024 result settles it for random domains only. Larger $$\delta$$ would give more efficient SNARKs, so the open question has practical stakes, but the analysis here uses proven results only.
+Below the Johnson bound $$1 - \sqrt\rho$$ the size of $$\mathrm{List}(w, d, \delta)$$ is provably bounded, and every argument in the article uses that bound: the DEEP union bound over pairs of list members, the proximity gap theorem for batching, and the folding lemma.
+
+Between the Johnson bound and the capacity bound $$1 - \rho$$ the list size for Reed-Solomon codes over structured domains is an open problem; a 2024 result settles it for random domains only. Larger $$\delta$$ would give more efficient SNARKs, so the open question has practical stakes, but the analysis here uses proven results only.
 
 **Q: How does the BCS compiler turn an IOP into a SNARK, and what determines the proof size?**
 
-Two steps. First, every string the prover would send is replaced by its Merkle root, and every cell the verifier reads is answered with the value plus a Merkle authentication path; security now depends on the collision resistance of the hash. Second, Fiat-Shamir replaces each verifier challenge with a hash of the commitments so far, so the prover runs the exchange alone. The proof consists of one Merkle root per string and one authentication path per verifier query. Since a path is many hashes, the number of queries dominates the size, which is why the compiler and FRI itself are optimised to minimise queries.
+Two steps:
+
+- First, every string the prover would send is replaced by its Merkle root, and every cell the verifier reads is answered with the value plus a Merkle authentication path; security now depends on the collision resistance of the hash.
+- Second, Fiat-Shamir replaces each verifier challenge with a hash of the commitments so far, so the prover runs the exchange alone.
+
+The proof consists of one Merkle root per string and one authentication path per verifier query. Since a path is many hashes, the number of queries dominates the size, which is why the compiler and FRI itself are optimised to minimise queries.
 
 **Q: Why is quotienting needed at all once the verifier knows the committed string is close to a codeword?**
 
-Knowing that $$\pi$$ is close to a codeword binds the prover to a polynomial, but gives the verifier no way to learn $$f(a)$$ for a point $$a$$ of its choosing, which is what a Poly-IOP verifier does constantly. Quotienting converts an evaluation claim into a proximity claim: if $$b = f(a)$$ then $$(\pi - b)/(x - a)$$ is a codeword of degree one less, and if $$b$$ is wrong for every polynomial near $$\pi$$ the quotient is far from that code. A proximity test on the quotient therefore decides whether the claimed evaluation is correct, using only cell reads of $$\pi$$.
+Knowing that $$\pi$$ is close to a codeword binds the prover to a polynomial, but gives the verifier no way to learn $$f(a)$$ for a point $$a$$ of its choosing, which is what a Poly-IOP verifier does constantly.
+
+Quotienting converts an evaluation claim into a proximity claim: if $$b = f(a)$$ then $$(\pi - b)/(x - a)$$ is a codeword of degree one less, and if $$b$$ is wrong for every polynomial near $$\pi$$ the quotient is far from that code. A proximity test on the quotient therefore decides whether the claimed evaluation is correct, using only cell reads of $$\pi$$.
 
 **Q: What goes wrong without the DEEP out-of-domain sample, and how does one pair $$(r, s)$$ repair it?**
 
-When $$\delta$$ exceeds the unique decoding distance, several polynomials may lie within $$\delta$$ of $$\pi$$. Each evaluation query, checked in isolation, only proves that some list member takes the claimed value, and a malicious prover can pick a different member for each query. Sampling $$r$$ outside $$L$$ and having the prover commit to $$s = f(r)$$ singles out one list member: two distinct polynomials of degree less than $$d$$ agree at fewer than $$d$$ points, so the probability that two list members share the value $$s$$ at a random $$r$$ is at most $$|\mathrm{List}|^2 \cdot d / (|\mathbb F| - |L|)$$. Folding $$(r, s)$$ into every subsequent quotient forces all answers to come from that one polynomial.
+When $$\delta$$ exceeds the unique decoding distance, several polynomials may lie within $$\delta$$ of $$\pi$$. Each evaluation query, checked in isolation, only proves that some list member takes the claimed value, and a malicious prover can pick a different member for each query.
+
+Sampling $$r$$ outside $$L$$ and having the prover commit to $$s = f(r)$$ singles out one list member: two distinct polynomials of degree less than $$d$$ agree at fewer than $$d$$ points, so the probability that two list members share the value $$s$$ at a random $$r$$ is at most $$|\mathrm{List}|^2 \cdot d / (|\mathbb F| - |L|)$$. Folding $$(r, s)$$ into every subsequent quotient forces all answers to come from that one polynomial.
 
 **Q: What is the difference between the proximity gap theorem and the folding lemma?**
 
@@ -413,7 +451,9 @@ The two are related: the folding lemma is proven using the proximity gap theorem
 
 **Q: Why does folding leave the rate unchanged, and why does that matter?**
 
-One fold takes a polynomial of degree less than $$d$$ over a domain of size $$n$$ to a polynomial of degree less than $$d/2$$ over the domain $$L^2$$ of size $$n/2$$. Both numerator and denominator of $$\rho = d/n$$ halve, so the rate is preserved. This matters because the unique decoding distance and the Johnson bound depend on $$\rho$$ alone: a $$\delta$$ chosen below the Johnson bound for the original code remains below the Johnson bound for every compressed code along the way, so the distance-preservation corollary applies at each step.
+One fold takes a polynomial of degree less than $$d$$ over a domain of size $$n$$ to a polynomial of degree less than $$d/2$$ over the domain $$L^2$$ of size $$n/2$$. Both numerator and denominator of $$\rho = d/n$$ halve, so the rate is preserved.
+
+This matters because the unique decoding distance and the Johnson bound depend on $$\rho$$ alone: a $$\delta$$ chosen below the Johnson bound for the original code remains below the Johnson bound for every compressed code along the way, so the distance-preservation corollary applies at each step.
 
 ## References
 

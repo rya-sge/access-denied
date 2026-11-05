@@ -2,6 +2,7 @@
 layout: post
 title: "How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode"
 date:   2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -221,7 +222,7 @@ The repository README lists the issues the team considered and accepted:
 
 Before launch, Trail of Bits audited the core contracts, the LQTY lockups, the LP staking contract and the proxy contracts, and Coinspect audited the system as well. The reports are linked from the [V1 documentation](https://docs.liquity.org/). An audit-time finding reproduced in public collections shows a trove updated to a zero ICR being removed from `SortedTroves` while `TroveManager` still records it.
 
-Because the code is open and the design proven, V1 has been forked many times, often for other collateral types. The most expensive fork incident is [Prisma Finance](https://hackmd.io/@PrismaRisk/PostMortem0328) in March 2024: a migration helper that users had approved as a delegate accepted a flash-loan callback from anyone, and read the victim's account from the attacker's data. The [technical concepts behind the 2024 hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) covers that callback bug in detail. The flaw was in the periphery, not in the V1 core, but it shows where forks add risk: new collateral types, new zap contracts, and new oracle wiring.
+Because the code is open and the design proven, V1 has been forked many times, often for other collateral types. The most expensive fork incident is [Prisma Finance](https://hackmd.io/@PrismaRisk/PostMortem0328) in March 2024: a migration helper that users had approved as a delegate accepted a flash-loan callback from anyone, and read the victim's account from the attacker's data. The [technical concepts behind the 2024 hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) covers that callback bug in detail. The flaw was in the periphery, not in the V1 core, but it shows where forks add risk: new collateral types, new zap contracts, and new oracle integrations.
 
 ## From V1 to V2
 
@@ -284,14 +285,16 @@ Liquity V1 issues LUSD against ETH at a 110% minimum ratio, with no interest and
 
 ### Risks
 
-Liquity's own disclosure is spread over three places: the Known Issues section of the `liquity/dev` README (summarised in [Known issues, audits and forks](#known-issues-audits-and-forks)), the audit matrix and "Risk assertions" posts on the [technical resources page](https://docs.liquity.org/documentation/resources), and a FAQ entry stating that "a hack or a bug that results in losses for the users can never be fully excluded". A bug bounty runs on Hats Finance, with a maximum pool of 250,000 USD according to the docs. The points below add what the deployed contracts and the design show. All on-chain values were read on 22 October 2026 at Ethereum block 26,248,459, with the addresses from the docs and the `lib-ethers` mainnet deployment file. Points marked (*derived*) come from this article's reasoning, not from a Liquity source.
+Liquity's own disclosure is spread over three places: the Known Issues section of the `liquity/dev` README (summarised in [Known issues, audits and forks](#known-issues-audits-and-forks)), the audit matrix and "Risk assertions" posts on the [technical resources page](https://docs.liquity.org/documentation/resources), and a FAQ entry stating that "a hack or a bug that results in losses for the users can never be fully excluded". A bug bounty runs on Hats Finance, with a maximum pool of 250,000 USD according to the docs.
+
+The points below add what the deployed contracts and the design show. All on-chain values were read on 22 October 2026 at Ethereum block 26,248,459, with the addresses from the docs and the `lib-ethers` mainnet deployment file. Points marked (*derived*) come from this article's reasoning, not from a Liquity source.
 
 #### Smart contracts and transparency
 
-- **Immutable and ownerless on-chain.** `owner()` returns the zero address on `TroveManager`, `BorrowerOperations`, `StabilityPool`, `SortedTroves`, `ActivePool`, `PriceFeed`, `LQTYStaking` and `CommunityIssuance`. `LUSDToken` has no `owner()` at all (the call reverts and the source has no ownership logic), and none of the core contracts has a `paused()` function. Etherscan shows the sources verified (Solidity 0.6.11) and none of them is a proxy.
+- **Immutable and ownerless on-chain.** `owner()` returns the zero address on `TroveManager`, `BorrowerOperations`, `StabilityPool`, `SortedTroves`, `ActivePool`, `PriceFeed`, `LQTYStaking` and `CommunityIssuance`. `LUSDToken` has no `owner()` at all: the call reverts and the source has no ownership logic. None of the core contracts has a `paused()` function. Etherscan shows the sources verified (Solidity 0.6.11) and none of them is a proxy.
 - **No upgrade risk.** Because no one holds an admin key, no one can swap the logic for a malicious or buggy version, change a parameter or freeze funds. The upgrade and admin-key risks that proxy-based protocols carry do not exist here, and the rules a borrower accepted at opening are the rules that apply at closing (*derived*).
-- **A bug cannot be patched.** The other side of immutability is that a flaw found today stays in the deployed code. The only remedy is for users to leave and for a new deployment to be adopted, which is what V2 is (*derived*).
-- **Audit coverage has a seam.** The docs' audit matrix lists Trail of Bits (January 2021, all core contracts *except the PriceFeed*, commit `f0df3ef`), Coinspect (March 2021, core and LQTY lockups, `dd7f59b9`), a second Trail of Bits report (March 2021, `8cec3fd` and `dce38b7`) and a Trail of Bits review of the proxy contracts. The mainnet deployment file records commit `5174ecd`, which is none of these.
+- **A bug cannot be patched.** The only remedy is for users to leave and for a new deployment to be adopted, which is what V2 is (*derived*).
+- **Audit coverage has a seam.** The docs' audit matrix lists Trail of Bits in January 2021 on all core contracts *except the PriceFeed* at commit `f0df3ef`, Coinspect in March 2021 on the core and LQTY lockups at `dd7f59b9`, a second Trail of Bits report in March 2021 at `8cec3fd` and `dce38b7`, and a Trail of Bits review of the proxy contracts. The mainnet deployment file records commit `5174ecd`, which is none of these.
 - **The accounting is error-prone by nature.** The product-sum scheme with scales and epochs and the corrected stakes (see The Stability Pool and liquidations above) are where the known issues and the zero-ICR audit finding sit. The liquity-v1 notes record that small rounding errors in this arithmetic caused real bugs in forks.
 
 #### External dependencies
@@ -299,7 +302,7 @@ Liquity's own disclosure is spread over three places: the Known Issues section o
 - **Chainlink is administered by a multisig V1 cannot leave.** The ETH/USD feed V1 reads is a proxy whose `owner()` is a Gnosis Safe (version 1.1.1) with a threshold of 4 out of 9 owners. That Safe can point the proxy to another aggregator, while V1 has no way to change its oracle address.
 - **The feed was healthy at the read.** `PriceFeed.status()` returned 0 (`chainlinkWorking`), and `lastGoodPrice` was 2,397.90 USD, equal to the Chainlink answer, which was 26.2 minutes old. The Tellor value read through `TellorCaller` was 2,404.02 USD, 1.86 hours old and 0.255% above Chainlink.
 - **A frozen price is still served.** When both oracles fail, V1 keeps returning `lastGoodPrice` (see The price feed above). If that price stays above the market, borrowers can mint LUSD against overvalued ETH and liquidations are delayed until the debt is undercollateralized; if it stays below, redeemers take ETH from borrowers at a discount and healthy troves can be liquidated (*derived*). The [article on pricing a lending position during an incident]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/) discusses who bears that gap.
-- **Base chain and ordering.** Liquidations depend on permissionless keepers whose transactions must be included in time, and the README's front-running issues (Stability Pool withdrawals ahead of a price update, redemptions ahead of an oracle update, griefing inserts) all rely on transaction ordering. The 200 LUSD reserve and the 0.5% of collateral pay for liquidation gas, but congestion still delays them (*derived*).
+- **Base chain and ordering.** Liquidations depend on permissionless keepers whose transactions must be included in time, and the README's front-running issues all rely on transaction ordering: Stability Pool withdrawals ahead of a price update, redemptions ahead of an oracle update, and griefing inserts. The 200 LUSD reserve and the 0.5% of collateral pay for liquidation gas, but congestion still delays them (*derived*).
 - **No wrapped collateral, but bridged LUSD.** The collateral is native ETH, so there is no WETH, LST or bridge risk on the collateral side. The docs list LUSD addresses on Optimism, Arbitrum, zkSync Era, Polygon zkEVM and Starknet: those tokens cannot be redeemed on their chain and are worth what their bridge holds on mainnet (*derived*).
 
 #### Depeg
@@ -313,12 +316,12 @@ Liquity's own disclosure is spread over three places: the Known Issues section o
 - **ETH is the only collateral.** Every trove falls with the same asset, so a crash hits all of them at once. At the read, the system held 71,297.76 ETH (170.96 million USD at `lastGoodPrice`) against 25,685,263.41 LUSD of debt, a TCR of 665.6%, confirmed by `TroveManager.getTCR`.
 - **Distance to stress.** With that TCR, ETH would have to fall 77.5% for the system to enter Recovery Mode. The riskiest trove had an ICR of 571.7%, so it would fall to 110% after an ETH drop of 80.8% (*derived*, ignoring changes to the troves in between).
 - **Reflexive loop.** Stability Pool depositors receive ETH at liquidation and may sell it, which pushes down the price that values the remaining troves. Redistribution then lowers the ratio of every other trove, and the README lists the resulting cascade as a known issue (*derived* for the selling part).
-- **Few, large positions.** `getTroveOwnersCount()` returned 68 troves. With that few positions, one large trove can move the TCR, the Stability Pool and the redemption order on its own (*derived*; the debt distribution was not read).
+- **Few, large positions.** `getTroveOwnersCount()` returned 68 troves. With that few positions, one large trove can move the TCR, the Stability Pool and the redemption order on its own (*derived*). The debt distribution was not read.
 - **No price is computed by the protocol.** V1 does not derive any price from its own state or from a DEX, so manipulation cost is that of the Chainlink and Tellor feeds.
 
 #### Liquidity
 
-- **Borrowers need LUSD to leave.** Closing a trove requires the full debt minus the 200 LUSD reserve in LUSD. LUSD supply was 25,685,263.41, equal to the system debt, so a borrower who does not hold LUSD depends on market liquidity to buy it back (*derived*; DEX depth was not read).
+- **Borrowers need LUSD to leave.** Closing a trove requires the full debt minus the 200 LUSD reserve in LUSD. LUSD supply was 25,685,263.41, equal to the system debt, so a borrower who does not hold LUSD depends on market liquidity to buy it back (*derived*). DEX depth was not read.
 - **Stability Pool exits can be blocked.** `withdrawFromSP` reverts while any trove is below 110%, so a depositor cannot exit while a liquidation is pending, and the deposit may come back partly as ETH.
 - **Redemptions compete with no one else.** There is no shared reserve: redemptions draw on troves' collateral, and surplus collateral waits in the `CollSurplusPool` until its owner claims it.
 

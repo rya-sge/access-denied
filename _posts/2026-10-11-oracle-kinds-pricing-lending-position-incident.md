@@ -2,6 +2,7 @@
 layout: post
 title: "Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap"
 date:   2026-10-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi oracle
@@ -89,7 +90,7 @@ Real deployments combine inputs, and the combination decides the class:
 The class can be established from on-chain reads alone, without trusting a name:
 
 - **Structural getters** settle many cases. A non-zero `twapDuration()` identifies a Pendle TWAP input; a `baseDiscountPerYear()` that answers identifies a linear discount; a `BASE_VAULT` set on a Morpho `ChainlinkOracleV2` is an ERC-4626 exchange rate.
-- **The round history** of a feed with rounds separates the rest. A market price falls about as often as it rises; an accrual rate almost never falls. A share of falls among the changes of the last rounds (one in five is a workable boundary) separates the two.
+- **The round history** of a feed with rounds separates the rest. A market price falls about as often as it rises; an accrual rate almost never falls. A share of falls among the changes of the last rounds separates the two; one in five is a workable boundary.
 - **An answer of exactly 1.0** with no round history is a fixed value.
 - **A pushed round history** whose value has not changed yet is still a published feed, not a fixed one: the next round can carry a loss.
 - **The verified contract name** is the last resort, when nothing structural decides.
@@ -137,7 +138,7 @@ Take a position with collateral worth 1,000,000 at the oracle, a debt of 800,000
 | 20 % | 800,000 | 766,400 | 33,600 |
 | 30 % | 700,000 | 670,600 | 129,400 |
 
-The bad debt is larger than the collateral shortfall ($$D - V_o$$, zero at 20 % and 100,000 at 30 %) because the liquidator is paid its incentive out of the collateral. When liquidators are absent, because the collateral cannot be sold or the incentive does not cover the slippage, the position stays open and the loss is the shortfall instead, with the market's liquidity locked behind it.
+The bad debt is larger than the collateral shortfall $$D - V_o$$, which is zero at 20 % and 100,000 at 30 %, because the liquidator is paid its incentive out of the collateral. When liquidators are absent, because the collateral cannot be sold or the incentive does not cover the slippage, the position stays open and the loss is the shortfall instead, with the market's liquidity locked behind it.
 
 ### Step 2b: an oracle that keeps reading
 
@@ -220,7 +221,7 @@ Under a price-tracking PT oracle, the relevant shock is not a yield assumption b
 3. Interpolate the size whose marginal price is $$1 - f_{\text{liq}}$$ of the spot. That is the sale that liquidates the position, and its own slippage is what it costs the seller.
 4. If the quotes stop routing before that size, no single sale through the pool moves the price to the liquidation level, and the report should say so with the largest routed size and its price.
 
-Two qualifications belong next to the number. The move must hold through the TWAP window, and arbitrage can reverse it first. And a linear-discount PT oracle sees none of this: the same sale that liquidates a TWAP-priced market leaves a linear-discount market untouched, with its hidden shortfall instead. The [comparison of a PT TWAP feed with an issuer exchange rate]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/) follows one such episode in detail.
+The move must hold through the TWAP window, and arbitrage can reverse it first. And a linear-discount PT oracle sees none of this: the same sale that liquidates a TWAP-priced market leaves a linear-discount market untouched, with its hidden shortfall instead. The [comparison of a PT TWAP feed with an issuer exchange rate]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/) follows one such episode in detail.
 
 ## From the impact to a decision
 
@@ -340,7 +341,9 @@ The second market also carries a drain risk. A 30 % discount is past $$d^\star =
 
 **Q: Why can one sale into a pool liquidate a one-year PT but not a 47-day PT?**
 
-The PT's price depends on its implied yield raised to the power of its time to maturity. At 47 days the exponent is small, so a liquidation fall of 6.98 % requires the implied yield to rise by 79 points, which no sale a pool can route will produce. At one year the same fall needs a rise of 7.9 points, which a sale into a shallow pool can produce. Under a TWAP oracle, that sale only has to hold for the length of the window.
+The PT's price depends on its implied yield raised to the power of its time to maturity. At 47 days the exponent is small, so a liquidation fall of 6.98 % requires the implied yield to rise by 79 points, which no sale a pool can route will produce.
+
+At one year the same fall needs a rise of 7.9 points, which a sale into a shallow pool can produce. Under a TWAP oracle, that sale only has to hold for the length of the window.
 
 **Q: How does the breakeven probability help when the incident is not certain?**
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Issuing a Token Under MiCA — The Crypto-Asset White Paper and Its Exemptions (Title II)"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation blockchain
@@ -307,15 +308,21 @@ No. Title II requires no authorisation. The offeror must be a legal person, draw
 
 **Q: What is the difference between the exemptions in Article 4(2) and those in Article 4(3)?**
 
-Article 4(2) exempts small and restricted offers from the white-paper obligations only, so the offeror must still be a legal person and still comply with the conduct rules of Article 14. Article 4(3) places certain offers outside Title II altogether: free tokens, protocol rewards, live utility tokens and limited-network tokens. Both sets of exemptions are lost under Article 4(4) as soon as an intention to seek admission to trading is communicated, and a voluntary white paper for an exempt offer brings the whole title back into application under Article 4(8).
+Article 4(2) exempts small and restricted offers from the white-paper obligations only, so the offeror must still be a legal person and still comply with the conduct rules of Article 14. Article 4(3) places certain offers outside Title II altogether: free tokens, protocol rewards, live utility tokens and limited-network tokens.
+
+Both sets of exemptions are lost under Article 4(4) as soon as an intention to seek admission to trading is communicated, and a voluntary white paper for an exempt offer brings the whole title back into application under Article 4(8).
 
 **Q: An airdrop asks users to connect a wallet, follow a social-media account and enter an email address. Is it "offered for free"?**
 
-No. The second subparagraph of Article 4(3) states that a crypto-asset is not offered for free where purchasers are required to provide personal data to the offeror in exchange for it, or where the offeror receives any fee, commission, or monetary or non-monetary benefit. An email address is personal data, and a follow is a non-monetary benefit. Such an airdrop is an offer to the public and needs a white paper unless another exemption applies, for instance the 150-person or EUR 1 million thresholds of Article 4(2).
+No. The second subparagraph of Article 4(3) states that a crypto-asset is not offered for free where purchasers are required to provide personal data to the offeror in exchange for it, or where the offeror receives any fee, commission, or monetary or non-monetary benefit.
+
+An email address is personal data, and a follow is a non-monetary benefit. Such an airdrop is an offer to the public and needs a white paper unless another exemption applies, for instance the 150-person or EUR 1 million thresholds of Article 4(2).
 
 **Q: Who is liable if the white paper is wrong, and can the offeror limit that liability in its terms of sale?**
 
-Under Article 15(1), the offeror, person seeking admission or platform operator *and the members of its administrative, management or supervisory body* are liable to a holder for losses caused by information that is not complete, fair or clear, or that is misleading. Article 15(2) deprives any contractual exclusion or limitation of that liability of legal effect. The holder must show the infringement and that their reliance on the information affected their decision, and the summary alone does not ground liability unless it is misleading or inconsistent when read with the rest of the document.
+Under Article 15(1), the offeror, person seeking admission or platform operator *and the members of its administrative, management or supervisory body* are liable to a holder for losses caused by information that is not complete, fair or clear, or that is misleading. Article 15(2) deprives any contractual exclusion or limitation of that liability of legal effect.
+
+The holder must show the infringement and that their reliance on the information affected their decision, and the summary alone does not ground liability unless it is misleading or inconsistent when read with the rest of the document.
 
 **Q: When does the 14-day right of withdrawal apply, and when does it not?**
 

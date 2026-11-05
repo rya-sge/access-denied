@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2023 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -15,7 +16,14 @@ isMermaid: true
 
 The [recap of the 2023 crypto hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2023/) names each incident's cause in a line: "a donation function without a health check", "a compiler bug in the reentrancy lock", "rounding at tick boundaries double-counted liquidity". This companion article explains those mechanisms for a developer who writes Solidity and knows how lending markets, AMMs and approvals work, but who has not taken each of these bugs apart.
 
-It follows the [technical article on 2024]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) and does not repeat what that one covers: Safe signing, upgrade initialisation, approval drains, empty Compound markets and spot-price oracles. 2023 adds different material. A lending protocol could be made insolvent on purpose, a compiler broke contracts that were correct in source, a pool's view function lied during a callback, an AMM's tick accounting counted liquidity twice, an oracle was read before it could be disputed, and Ethereum's block-building pipeline itself was exploited.
+It follows the [technical article on 2024]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) and does not repeat what that one covers: Safe signing, upgrade initialisation, approval drains, empty Compound markets and spot-price oracles. 2023 adds different material:
+
+- A lending protocol could be made insolvent on purpose.
+- A compiler broke contracts that were correct in source.
+- A pool's view function lied during a callback.
+- An AMM's tick accounting counted liquidity twice.
+- An oracle was read before it could be disputed.
+- Ethereum's block-building pipeline itself was exploited.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -164,7 +172,7 @@ The loop is correct only if "the price reached the next tick" and "the tick was 
 
 With carefully chosen amounts, the attacker made a swap push the price just past a tick boundary **without** the pool registering the crossing, so the liquidity of that tick was not updated. A reverse swap then crossed the same boundary in the other direction and applied the liquidity change again: the liquidity was counted twice ([KyberSwap post-mortem](https://blog.kyberswap.com/post-mortem-kyberswap-elastic-exploit/), [BlockSec analysis](https://blocksec.com/blog/kyberswap-incident-masterful-exploitation-of-rounding-errors-with-exceedingly-subtle-calculations)). With inflated active liquidity, swaps returned more tokens than the pool held for that range, and pools on six chains were drained.
 
-It is the most mathematically demanding exploit of the year. The general lesson is simpler: when two values must change together, compute one from the other, and make every rounding favour the pool.
+The general lesson: when two values must change together, compute one from the other, and make every rounding favour the pool.
 
 ### A rebalance anyone could sandwich (Jimbos, ~$7.5M)
 
@@ -187,7 +195,7 @@ The nominal loss was about $120M, but the BEUR could not be sold at face value, 
 
 On Ethereum, block building is split between *builders*, who assemble profitable blocks, and *proposers* (validators), who sign them, through *relays* such as MEV-Boost relays. The relay holds a block's contents until the proposer has signed its header, so the proposer cannot steal the transactions it commits to.
 
-In April 2023, a relay released block contents to a proposer in exchange for a signed header **without checking that the signature was valid**. The attackers, running their own validators, first lured sandwich bots with bait transactions, then, when it was their turn to propose, obtained the block contents with an invalid header signature, rewrote the block so the bots' purchases executed against the attackers' trades, and took about $25M from the bots. US prosecutors later charged two brothers over the scheme. The relay was patched within hours. It is a reminder that "the blockchain" includes off-chain components whose checks are part of its security.
+In April 2023, a relay released block contents to a proposer in exchange for a signed header **without checking that the signature was valid**. The attackers, running their own validators, first lured sandwich bots with bait transactions, then, when it was their turn to propose, obtained the block contents with an invalid header signature, rewrote the block so the bots' purchases executed against the attackers' trades, and took about $25M from the bots. US prosecutors later charged two brothers over the scheme. The relay was patched within hours. "The blockchain" includes off-chain components whose checks are part of its security.
 
 ### A library loaded at "latest" (Ledger Connect Kit, ~$600k)
 

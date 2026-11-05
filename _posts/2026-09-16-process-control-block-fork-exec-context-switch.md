@@ -2,6 +2,7 @@
 layout: post
 title: "The Process Control Block, fork/exec/waitpid/exit and the Context Switch"
 date:   2026-09-16
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: linux programmation
@@ -46,7 +47,7 @@ On Linux the PCB is the `struct task_struct` defined in [`include/linux/sched.h`
 
 ### Lifetime
 
-The PCB's lifetime is bracketed by two system calls, and understanding that bracket explains the zombie state discussed below.
+The PCB's lifetime is bracketed by two system calls.
 
 The PCB is **allocated by `fork()`**, in the context of the parent process that issues the call. The parent is the one paying for the new process's bookkeeping.
 
@@ -125,7 +126,7 @@ A process ends by calling [`exit()`](https://man7.org/linux/man-pages/man3/exit.
 The parent collects that status with [`waitpid()`](https://man7.org/linux/man-pages/man2/wait.2.html), which the lecture credits with three roles:
 
 - **Waiting.** The call blocks the parent until the designated child (or any child, with `-1` as the PID) terminates.
-- **Retrieving the status.** The integer passed to `exit()` by the child is written through the `wstatus` pointer. On Linux and POSIX systems it is packed with other information (whether the child was killed by a signal, and which one), so it is decoded with the `WIFEXITED` and `WEXITSTATUS` macros rather than read directly.
+- **Retrieving the status.** The integer passed to `exit()` by the child is written through the `wstatus` pointer. On Linux and POSIX systems it is packed with other information, namely whether the child was killed by a signal and which one, so it is decoded with the `WIFEXITED` and `WEXITSTATUS` macros rather than read directly.
 - **Reaping.** Once the status has been delivered, the kernel frees the child's PCB. The zombie disappears.
 
 The sequence of the two calls is therefore fixed: `exit()` in the child turns it into a zombie holding a status; `waitpid()` in the parent consumes the status and lets the kernel release the PCB. A parent that never calls `waitpid()` accumulates zombies, each occupying a PCB and a PID, until it terminates itself. When it does, its orphaned children (zombie or alive) are adopted by the root process, `init` or `systemd` on Linux, whose job includes calling `waitpid()` on them.
@@ -138,7 +139,7 @@ The sequence of the two calls is therefore fixed: `exit()` in the child turns it
 - execution starts at the new image's **entry point**, from which the start-up code calls `main()`;
 - arguments are passed to the new program, and are what `main()` receives as `argc` and `argv`.
 
-What `exec()` does **not** change is as important: the process keeps its PID, its parent, and its open file descriptors (unless they were marked close-on-exec). This is why a shell can set up redirections with `open()` and `dup2()` before calling `exec()`, and the new program inherits them without knowing.
+What `exec()` does **not** change is as important: the process keeps its PID, its parent, and its open file descriptors, unless they were marked close-on-exec. This is why a shell can set up redirections with `open()` and `dup2()` before calling `exec()`, and the new program inherits them without knowing.
 
 Strictly speaking there is no `exec()` system call. It is a **family of POSIX library functions** that differ in how they receive the program path and the arguments, and all of them end up calling the one real system call, [`execve()`](https://man7.org/linux/man-pages/man2/execve.2.html):
 

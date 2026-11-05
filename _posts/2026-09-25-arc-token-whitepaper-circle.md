@@ -2,6 +2,7 @@
 layout: post
 title: "The ARC Token Whitepaper — Circle's Coordination Asset Read Against the Arc Node"
 date:   2026-09-25
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -23,7 +24,7 @@ This article covers what the whitepaper proposes, then compares each proposal wi
 
 ## Arc as it runs today
 
-A description of the running system comes first, because every comparison below depends on it. `arc-node` has two processes that talk through the Engine API:
+`arc-node` has two processes that talk through the Engine API:
 
 - **Execution layer.** A customised Reth node (Reth v2.2.0, revm 38).
 - **Consensus layer.** A Malachite application. Malachite is a Tendermint-style BFT engine that Circle now maintains in its own fork.
@@ -166,7 +167,7 @@ The whitepaper does not list blocklist control as a governance domain.
 
 ## Where the whitepaper, the docs and the code diverge
 
-Most gaps fall into the category the whitepaper itself signals: features of a future PoS phase. The table groups all of them, and the paragraphs after it single out the ones that are more than a timing question.
+Most gaps fall into the category the whitepaper itself signals: features of a future PoS phase.
 
 | Topic | Whitepaper | Documentation | `arc-node` | Nature of the gap |
 |---|---|---|---|---|

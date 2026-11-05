@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum: A Gas Story"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -24,7 +25,7 @@ This article follows that story from Frontier to Glamsterdam: the main changes t
 
 The story relies on a few mechanisms of the EVM that it uses without deriving them:
 
-- **Opcode cost.** Every EVM instruction has a gas cost, fixed (`ADD` costs 3) or computed from its inputs (`EXP` depends on the size of the exponent). Repricing an opcode is a protocol change, made at a hard fork.
+- **Opcode cost.** Every EVM instruction has a gas cost, fixed or computed from its inputs: `ADD` costs 3, and the cost of `EXP` depends on the size of the exponent. Repricing an opcode is a protocol change, made at a hard fork.
 - **Storage slot.** A contract's persistent state is a map of 32-byte keys to 32-byte values, stored in a Merkle tree on the node's disk. Reading or writing it requires disk access, which is why storage operations are the most expensive ones.
 - **Gas limit of a transaction and of a block.** The sender sets the maximum gas a transaction may use; the block producer sets the maximum gas a whole block may contain. A transaction that runs out of gas reverts, and the gas it consumed is still paid.
 - **Refund.** Some operations, such as clearing a storage slot, give back part of their cost at the end of the transaction, to reward freeing state.
@@ -58,7 +59,7 @@ Frontier, launched on 2015-07-30, fixed the first price list. The values below a
 | `CALL` | 40 (plus 9,000 when sending value) |
 | `LOG` | 375 + 375 per topic + 8 per byte |
 
-Two numbers of that table appear again and again later. Reading state was cheap (50 for a slot, 20 for an account), and storing a value in a new slot was expensive (20,000). The first turned out to be a mistake; the second held for ten years.
+Reading state was cheap (50 for a slot, 20 for an account), and storing a value in a new slot was expensive (20,000). The first turned out to be a mistake; the second held for ten years.
 
 The fee was a first-price auction: each transaction carried a `gasPrice`, miners included the highest bids, and every included transaction paid its own bid. The block gas limit was voted by miners, each block allowed to move it by at most 1/1024 of the previous value. The genesis block had a gas limit of 5,000, too low for a single transaction (21,000 gas); miners raised it to 21,003 by block 46,147 on 2015-08-07, when the first transactions appeared, and to 3,141,592 within a week.
 
@@ -119,7 +120,7 @@ London also changed refunds. Since Frontier, clearing a slot refunded 15,000 gas
 
 ## 2022–2024: the Merge, Shanghai and Dencun
 
-**The Merge** (Paris, 2022-09-15, block 15,537,394) replaced mining with proof of stake and did not change any gas cost. It changed who receives the priority fee (the validator proposing the block) and who sets the block gas limit (block proposers, through the value their client is configured with, still within 1/1024 per block).
+**The Merge** (Paris, 2022-09-15, block 15,537,394) replaced mining with proof of stake and did not change any gas cost. The priority fee now goes to the validator proposing the block, and block proposers set the block gas limit, through the value their client is configured with, still within 1/1024 per block.
 
 **Shanghai** (2023-04-12) added `PUSH0` at 2 gas ([EIP-3855](https://eips.ethereum.org/EIPS/eip-3855)), which saves gas in almost every compiled contract; limited init code to 49,152 bytes and charged it 2 gas per 32-byte word ([EIP-3860](https://eips.ethereum.org/EIPS/eip-3860)); and made the block producer's address warm from the start ([EIP-3651](https://eips.ethereum.org/EIPS/eip-3651)).
 
@@ -145,7 +146,7 @@ The block gas limit stayed at 30M from London to the end of 2024.
 
 The block gas limit rose three times in 2025, as validators changed the value their clients were configured to target: 36M in February, 45M by September, about 60M by the end of November. The samples show 36,000,000 on 2025-02-08, 45,000,000 on 2025-09-05 and 59,940,950 on 2025-11-28.
 
-**Pectra** (Prague on the execution layer, 2025-05-07) made calldata-heavy transactions pay a floor ([EIP-7623](https://eips.ethereum.org/EIPS/eip-7623)). A transaction now pays at least 21,000 + 10 gas per calldata token (one token per zero byte, four per non-zero byte), which makes data that the EVM does not use more expensive than in a blob and bounds the size of a block filled with calldata. Pectra also raised the blob target and maximum to 6 and 9 ([EIP-7691](https://eips.ethereum.org/EIPS/eip-7691)), priced the delegations of externally owned accounts ([EIP-7702](https://eips.ethereum.org/EIPS/eip-7702), 25,000 per authorization, 12,500 refunded when the account already exists) and added BLS12-381 precompiles ([EIP-2537](https://eips.ethereum.org/EIPS/eip-2537)).
+**Pectra** (Prague on the execution layer, 2025-05-07) made calldata-heavy transactions pay a floor ([EIP-7623](https://eips.ethereum.org/EIPS/eip-7623)). A transaction now pays at least 21,000 + 10 gas per calldata token (one token per zero byte, four per non-zero byte), which makes data that the EVM does not use more expensive than in a blob and bounds the size of a block filled with calldata. Pectra also raised the blob target and maximum to 6 and 9 ([EIP-7691](https://eips.ethereum.org/EIPS/eip-7691)) and added BLS12-381 precompiles ([EIP-2537](https://eips.ethereum.org/EIPS/eip-2537)). It priced the delegations of externally owned accounts at 25,000 per authorization, with 12,500 refunded when the account already exists ([EIP-7702](https://eips.ethereum.org/EIPS/eip-7702)).
 
 ![Gas against calldata size: 16 gas per non-zero byte before Pectra, 40 gas per byte since Pectra above 2,083 bytes]({{site.url_complet}}/assets/article/blockchain/ethereum/gas/ethereum-eip7623-calldata-floor.svg)
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Packing Small Values into One Field on Aztec — The Packable Trait, Its Cost and Its Traps"
 date:   2026-09-16
-last_modified_at: 2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -16,7 +16,7 @@ isMath: false
 
 A Solidity developer who declares `struct CreditEvents { bool flagDefault; bool flagRedeemed; string rating; }` gets two storage slots without thinking about it: the compiler packs the two `bool`s into one 32-byte word and gives the string its own. The same struct in an Aztec contract written in Noir takes **three** slots, because the framework's default encoding spends one field element per struct member and nothing packs them for you. The tool to get the Solidity layout back is the `Packable` trait, written by hand.
 
-This article explains what `Packable` is and what it is not (it is the storage encoding, distinct from the ABI encoding `Serialize`), where the packed width matters (public storage slots in one cost model, note-hash inputs in another), how to write an implementation and test it, and the two facts that make packing on Aztec different from packing on the EVM: bit arithmetic is not free inside a circuit, so a saving in storage can be a loss in proving; and a change to a struct's packed width moves every storage slot declared after it, which on a deployed contract is a redeployment. A pair of `bool`s next to a short string is the running example.
+`Packable` is the storage encoding, distinct from the ABI encoding `Serialize`. This article explains where the packed width matters in public storage slots in one cost model and in note-hash inputs in another. It then covers how to write an implementation and test it, and the two facts that make packing on Aztec different from packing on the EVM: bit arithmetic is not free inside a circuit, so a saving in storage can be a loss in proving; and a change to a struct's packed width moves every storage slot declared after it, which on a deployed contract is a redeployment. A pair of `bool`s next to a short string is the running example.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -30,13 +30,13 @@ Aztec.nr converts a struct to an array of `Field` elements in two unrelated situ
 
 **`Packable` is the storage encoding.** It is used wherever a value is written to state or hashed into a note: the data type of a `PublicMutable<T>`, `PublicImmutable<T>` or `DelayedPublicMutable<T>`, and the struct behind a `#[note]`. Nothing outside the contract ever sees this layout, so its only obligation is to round-trip: `unpack(pack(x)) == x`. That freedom is what makes packing possible.
 
-The two can, and usually should, differ on the same struct. A struct that is both a function argument and a stored value derives `Serialize`/`Deserialize` (so the ABI stays intrinsic) and implements `Packable` by hand (so storage is compact). Confusing them in the other direction — hand-packing the ABI — is the defect the framework documentation warns about most loudly.
+The two can, and usually should, differ on the same struct. A struct that is both a function argument and a stored value derives `Serialize`/`Deserialize`, so the ABI stays intrinsic, and implements `Packable` by hand, so storage is compact. Confusing them in the other direction — hand-packing the ABI — is the defect the framework documentation warns about most loudly.
 
 ![A struct crosses the contract boundary through Serialize and Deserialize, which must match Noir's intrinsic layout, and reaches storage or a note hash through Packable, whose only requirement is a round trip]({{site.url_complet}}/assets/article/blockchain/aztec/aztec-packable-two-encodings-concept.png)
 
 ## What `N` costs, and in which currency
 
-`Packable` carries an associated constant `N`, the length of the `[Field; N]` the struct packs to. A derived implementation sets `N` to the number of members (each `Field`-sized member is one, each sub-`Field` member is also one). Everything a packing saves is expressed in `N`, and the currency depends on where the struct lives.
+`Packable` carries an associated constant `N`, the length of the `[Field; N]` the struct packs to. A derived implementation sets `N` to the number of members: each `Field`-sized member is one, and each sub-`Field` member is also one. Everything a packing saves is expressed in `N`, and the currency depends on where the struct lives.
 
 **Public storage is gas.** For a `PublicMutable<T>`, each element of the packed array is one storage slot: reading is `N` `SLOAD`s, writing is `N` `SSTORE`s, in the AVM's public execution, priced like an EVM L2. Halving `N` halves the storage operations of every read and write. `PublicImmutable<T>` and `DelayedPublicMutable<T>` keep more than the value — the delayed variable stores a scheduled change and a hash and occupies `2N + 2` slots — so a smaller `N` saves more there, and they also require `T: Eq` because they verify the stored value against that hash.
 
@@ -163,9 +163,19 @@ Two smaller consequences of the slot rule: append new state variables at the **e
 
 ## When to pack, and when not to
 
-Worth it when a struct has several sub-`Field` members (`bool`s, small integers) and is stored or noted; when it is read or written often; when a public function is hitting gas limits; when it is a note, because every packed field is a hash input on the private path.
+Worth it when:
 
-Not worth it when every member is already a `Field` or an address (nothing to pack); when the struct only ever crosses the ABI (that is `Serialize`, whose layout is fixed); when the struct is small and rarely touched and the contract is already deployed (the slot move costs more than the slot); and, the Aztec-specific case, when the struct is read on a private hot path and the measurement says the arithmetic costs more than the field it saves.
+- a struct has several sub-`Field` members (`bool`s, small integers) and is stored or noted;
+- it is read or written often;
+- a public function is hitting gas limits;
+- it is a note, because every packed field is a hash input on the private path.
+
+Not worth it when:
+
+- every member is already a `Field` or an address, so there is nothing to pack;
+- the struct only ever crosses the ABI, which uses `Serialize`, whose layout is fixed;
+- the struct is small and rarely touched and the contract is already deployed, because the slot move costs more than the slot;
+- the struct is read on a private hot path and the measurement says the arithmetic costs more than the field it saves, which is the Aztec-specific case.
 
 The framework adds a derive only where the struct's role strictly requires it, so what each macro does and does not derive is worth keeping at hand:
 
@@ -177,7 +187,7 @@ The framework adds a derive only where the struct's role strictly requires it, s
 | `PublicImmutable<T>`, `DelayedPublicMutable<T>` | nothing | `Packable` and `Eq` (they verify the stored value against a hash) |
 | `PublicMutable<T>` | nothing | `Packable` only |
 
-A missing derive fails to compile with a clear message. An over-broad one (`Packable` on an event, `Deserialize` on a note that never crosses the boundary) is noise rather than a defect.
+A missing derive fails to compile with a clear message. An over-broad one, such as `Packable` on an event or `Deserialize` on a note that never crosses the boundary, is noise rather than a defect.
 
 ## Conclusion
 
@@ -249,19 +259,27 @@ No. Each state variable is allocated its own slots from its own `Packable::N`; t
 
 **Q: Why did hand-packing two `bool`s make a private function *more* expensive?**
 
-Because the struct was read from a `DelayedPublicMutable` in a private function, and that read does not pay per field. The private read proves one storage slot — the hash of the whole value — and re-hashes the preimage in-circuit to check it; a second field is one more input to a hash the circuit computes anyway, a few gates. Recovering two `bool`s from one packed `Field` costs more than that: a cast to an integer (a range check), two bit masks (bit decomposition) and two comparisons. Net effect in the measured case: **+7 gates** on a 120,000-gate transfer, negligible but with the opposite sign to the prediction. The public write of the same struct did save storage operations. Measure per context and say which one the claim is about.
+Because the struct was read from a `DelayedPublicMutable` in a private function, and that read does not pay per field. The private read proves one storage slot — the hash of the whole value — and re-hashes the preimage in-circuit to check it; a second field is one more input to a hash the circuit computes anyway, a few gates.
+
+Recovering two `bool`s from one packed `Field` costs more than that: a cast to an integer (a range check), two bit masks (bit decomposition) and two comparisons. Net effect in the measured case: **+7 gates** on a 120,000-gate transfer, negligible but with the opposite sign to the prediction. The public write of the same struct did save storage operations. Measure per context and say which one the claim is about.
 
 **Q: How can a `DelayedPublicMutable` read in private cost "almost nothing" per extra field, when a public storage read costs thousands of gates?**
 
-A private function cannot read current public storage; it proves a *historical* read against the anchor block, with a Merkle inclusion path into the public data tree, at roughly 3,500–4,000 gates per slot proven. If a struct were stored as `N` plain slots, a private read would need `N` such proofs. `DelayedPublicMutable` avoids that with `WithHash`: the public write stores the `N` packed fields *plus* a Poseidon2 hash of all of them in one extra slot. The private read then proves the inclusion of **that one slot only**, fetches the `N`-field preimage from an oracle (unconstrained), and re-hashes it in the circuit to assert it matches the proven hash. The cost is therefore one inclusion proof, independent of `N`, plus one hash whose cost grows by a handful of gates per additional field. That is why packing two fields into one saves almost nothing on the private read, and why the unpacking arithmetic can outweigh it. On the public side the same variable is stored as `2N + 2` slots (current and scheduled value, the delay change and the hash), so `N` from 2 to 1 turns six `SSTORE`s into four on every scheduled write: a real saving, in gas, on the sequencer, which the private measurement says nothing about.
+A private function cannot read current public storage; it proves a *historical* read against the anchor block, with a Merkle inclusion path into the public data tree, at roughly 3,500–4,000 gates per slot proven. If a struct were stored as `N` plain slots, a private read would need `N` such proofs.
+
+`DelayedPublicMutable` avoids that with `WithHash`: the public write stores the `N` packed fields *plus* a Poseidon2 hash of all of them in one extra slot. The private read then proves the inclusion of **that one slot only**, fetches the `N`-field preimage from an oracle (unconstrained), and re-hashes it in the circuit to assert it matches the proven hash. The cost is therefore one inclusion proof, independent of `N`, plus one hash whose cost grows by a handful of gates per additional field.
+
+That is why packing two fields into one saves almost nothing on the private read, and why the unpacking arithmetic can outweigh it. On the public side the same variable is stored as `2N + 2` slots (current and scheduled value, the delay change and the hash), so `N` from 2 to 1 turns six `SSTORE`s into four on every scheduled write: a real saving, in gas, on the sequencer, which the private measurement says nothing about.
 
 **Q: A struct's `N` goes from 3 to 2. What exactly breaks on a deployed contract?**
 
-Every state variable declared after it in the storage struct is now one slot earlier. Public values at the old slots are no longer read; for private state the slot is an input to every note hash and every nullifier, so notes stored under the old slot can no longer be found or spent. There is no in-place fix: it is a redeployment and a migration of holders, which is why such a change is scheduled with a storage break that is happening anyway.
+Every state variable declared after it in the storage struct is now one slot earlier. Public values at the old slots are no longer read; for private state the slot is an input to every note hash and every nullifier, so notes stored under the old slot can no longer be found or spent.
+
+There is no in-place fix: it is a redeployment and a migration of holders, which is why such a change is scheduled with a storage break that is happening anyway.
 
 **Q: Two `u128`s in one struct: can they share a `Field`?**
 
-No. 128 + 128 = 256 bits exceeds the 253-bit safe width of a `Field`, whose modulus is just under 2^254; the sum would wrap around (the next question explains why the limit is not 256). A `u128` and a `u64` (192 bits) can share; the second `u128` needs its own `Field`. `N` for the pair is 2 either way, so there is nothing to gain by trying.
+No. 128 + 128 = 256 bits exceeds the 253-bit safe width of a `Field`, whose modulus is just under 2^254; the sum would wrap around (see the next question). A `u128` and a `u64` (192 bits) can share; the second `u128` needs its own `Field`. `N` for the pair is 2 either way, so there is nothing to gain by trying.
 
 **Q: Why is the safe width 253 bits and not 256? A Solidity word is 256 bits.**
 
@@ -271,7 +289,7 @@ Because a `Field` is not a 256-bit machine word. It is an element of the scalar 
 - **`p` has 254 bits, but not every 254-bit value fits.** `p` lies between 2^253 and 2^254, so a value with 254 significant bits may be at or above `p` and is reduced modulo `p`. Every value below 2^253 is below `p`, which makes 253 bits the largest power-of-two range that is always representable.
 - **Reduction is silent.** Two `u128`s concatenated into one `Field` (256 bits) would store `value − p` for any value at or above `p`, and `unpack` would return different members than were packed. Nothing fails at compile time or at call time; the stored state is quietly wrong.
 
-A Solidity `uint256` really is 256 bits with wrap-around at 2^256, so two 128-bit values do fit in one EVM word. On Aztec the "word" is about 2.4 bits shorter, which is enough to make the same packing unsafe.
+A Solidity `uint256` is 256 bits with wrap-around at 2^256, so two 128-bit values do fit in one EVM word. On Aztec the "word" is about 2.4 bits shorter, which is enough to make the same packing unsafe.
 
 **Q: A struct has two `bool`s and one `AztecAddress`. What is the best `N`, and what does the round-trip test need?**
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Dencun - Overview"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -15,7 +16,7 @@ isMermaid: true
 
 Dencun is the Ethereum network upgrade activated on mainnet on 2024-03-13. Its name joins *Cancun*, the execution-layer part, and *Deneb*, the consensus-layer part. It followed [Shapella]({{site.url_complet}}/2026/10/23/ethereum-shapella-upgrade-overview/) (April 2023) and was followed by [Pectra]({{site.url_complet}}/2025/05/02/ethereum-pectra-upgrade/) (May 2025).
 
-Dencun contains nine EIPs, listed in the meta EIP [EIP-7569](https://eips.ethereum.org/EIPS/eip-7569). The best known is EIP-4844, which added *blobs*: large data attachments for rollups, priced in a fee market of their own and deleted by nodes after about 18 days. The other eight change the EVM (transient storage, a memory copy opcode, a restricted `SELFDESTRUCT`, two new opcodes and a system contract exposing beacon chain roots) and three consensus rules on exits, attestations and validator activation. This article describes each EIP with the constants of the specifications, then the impact for contract developers, rollups, stakers and node operators.
+Dencun contains nine EIPs, listed in the meta EIP [EIP-7569](https://eips.ethereum.org/EIPS/eip-7569). The best known is EIP-4844, which added *blobs*: large data attachments for rollups, priced in a fee market of their own and deleted by nodes after about 18 days. The other eight change the EVM and three consensus rules on exits, attestations and validator activation. The EVM changes are transient storage, a memory copy opcode, a restricted `SELFDESTRUCT`, two new opcodes and a system contract exposing beacon chain roots. This article describes each EIP with the constants of the specifications, then the impact for contract developers, rollups, stakers and node operators.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 

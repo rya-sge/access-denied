@@ -2,6 +2,7 @@
 layout: post
 title: "Three Launchpad Bugs from the Bio Protocol Solana Audits - Stranded Supply, Refund Races and Dust Denial of Service"
 date:   2026-09-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain solana security
@@ -158,7 +159,7 @@ with `pub total_curators: u16` in the account state, so the count saturates at 6
 
 FYEO's arithmetic: an attacker who submits the minimum contribution 65,535 times fills every slot. The tokens spent are worth "0.065 USD with a 6 decimal token or 0.000065 USD for a 9 decimal token"; the transaction fees are the only real cost. The curation is then closed to every legitimate contributor while having raised effectively nothing, and it cannot reach its funding threshold by construction, since `min_contribution × 65,535` is far below any realistic target. The checked add prevents an overflow, so this is not a memory-safety bug; it is a capacity bug with a mispriced entry ticket. FYEO rated it Low, and it was open at the time of the report.
 
-The companion informational finding FYEO-02 completes the picture: `minimum_contribution` had no lower bound at all (it could be zero), and `timestamp_to_start` had no upper bound (a curation could be scheduled a hundred years out).
+The companion informational finding FYEO-02 completes the picture: `minimum_contribution` had no lower bound at all, so it could be zero, and `timestamp_to_start` had no upper bound, so a curation could be scheduled a hundred years out.
 
 ### The fix and the lesson
 

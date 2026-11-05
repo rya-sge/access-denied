@@ -2,6 +2,7 @@
 layout: post
 title: "How the MCP Python SDK Server Works: Architecture, Request Lifecycle and Security"
 date:   2026-10-19
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: ai security programmation
@@ -30,7 +31,7 @@ MCP separates three parties:
 
 A server offers three primitives. **Tools** are functions the model decides to call, with a JSON Schema for their arguments. **Resources** are data addressed by URI that the application reads, either fixed (`config://app`) or parameterised by an [RFC 6570](https://datatracker.ietf.org/doc/html/rfc6570) URI template (`greeting://{name}`). **Prompts** are reusable message templates the user selects. Around these sit utilities: progress notifications, cancellation, completions for arguments, change notifications, and elicitation (the server asking the user for input).
 
-The SDK at the analyzed commit supports two generations of the protocol, and the difference shapes the whole server:
+The SDK at the analyzed commit supports two generations of the protocol:
 
 | Era | Protocol versions | Connection model |
 |---|---|---|
@@ -67,7 +68,7 @@ Readers coming from version 1 will know the class as `FastMCP`. It was renamed `
 
 ## Architecture overview
 
-Version 2 is not version 1 with new names. The long-lived `ServerSession` receive loop of version 1 is gone, and its responsibilities are split across a stack of layers, each with one job:
+The long-lived `ServerSession` receive loop of version 1 is gone, and its responsibilities are split across a stack of layers, each with one job:
 
 ```mermaid
 flowchart TB
@@ -153,7 +154,7 @@ Errors are split into two channels, and the split is a protocol rule rather than
 
 ### Resources and URI templates
 
-`@mcp.resource(uri)` parses the URI as an RFC 6570 template. Without variables, the function becomes a static `FunctionResource`. With variables, it becomes a template, and the decorator checks that the template variables match the function parameters exactly. On `resources/read`, `ResourceManager.get_resource` tries concrete resources first, then each template in turn, and raises `ResourceNotFoundError` (a `-32602` protocol error) when nothing matches. The template matcher is a linear scan with length caps (8,192 characters per template, 256 variables, 65,536 characters per URI), not a regular expression.
+`@mcp.resource(uri)` parses the URI as an RFC 6570 template. Without variables, the function becomes a static `FunctionResource`. With variables, it becomes a template, and the decorator checks that the template variables match the function parameters exactly. On `resources/read`, `ResourceManager.get_resource` tries concrete resources first, then each template in turn, and raises `ResourceNotFoundError` (a `-32602` protocol error) when nothing matches. The template matcher is a linear scan, not a regular expression, with length caps: 8,192 characters per template, 256 variables, 65,536 characters per URI.
 
 ### Prompts and completions
 
@@ -196,7 +197,7 @@ sequenceDiagram
 
 ### The runner and its middleware
 
-`ServerRunner` is described in its docstring as "the per-connection handler kernel". For each request it builds a `ServerRequestContext` (including a fresh `ServerSession`, which in version 2 is a small per-request proxy for sending notifications and requests back to the client), wraps the call in the middleware chain, and then runs a fixed sequence:
+`ServerRunner` is described in its docstring as "the per-connection handler kernel". For each request it builds a `ServerRequestContext`, which includes a fresh `ServerSession`. In version 2 that session is a small per-request proxy for sending notifications and requests back to the client. The runner then wraps the call in the middleware chain and runs a fixed sequence:
 
 ```python
 entry = self.server.get_request_handler(method)
@@ -263,7 +264,7 @@ Over Streamable HTTP, version 2 enters the lifespan once when the session manage
 
 - **modern** (2026-07-28): one POST, one response, no session id; any worker can serve any request;
 - **stateless handshake** (`stateless_http=True`): a fresh transport per request, no session id, no server-to-client requests;
-- **stateful handshake** (the default for older clients): the server issues an `Mcp-Session-Id`, keeps per-session state, and can resume an SSE stream from `Last-Event-ID` if the developer supplies an `EventStore` implementation (the SDK ships only the abstract class).
+- **stateful handshake** (the default for older clients): the server issues an `Mcp-Session-Id`, keeps per-session state, and can resume an SSE stream from `Last-Event-ID` if the developer supplies an `EventStore` implementation; the SDK ships only the abstract class.
 
 `streamable_http_app()` returns a Starlette application, so the server can be mounted inside an existing ASGI application:
 
@@ -283,7 +284,13 @@ The explicit lifespan is required because Starlette never runs the lifespan of a
 
 ## Security
 
-The security of an MCP server is shared between three places: the transport (who can reach the server and with which session), the authorization layer (whether a caller holds a valid token for this server), and the handlers (what the server does with arguments it receives and data it returns). The SDK covers a large part of the first two, applies validation to the third when the high-level API is used, and leaves the model-facing risks to the application.
+The security of an MCP server is shared between three places:
+
+- the **transport**: who can reach the server and with which session;
+- the **authorization layer**: whether a caller holds a valid token for this server;
+- the **handlers**: what the server does with arguments it receives and data it returns.
+
+The SDK covers a large part of the first two, applies validation to the third when the high-level API is used, and leaves the model-facing risks to the application.
 
 ```mermaid
 flowchart LR
@@ -308,7 +315,12 @@ The order shown is the logical sequence of checks rather than the exact nesting 
 
 ### stdio: the process is the boundary
 
-A stdio server has no network surface and no authentication. The authorization guide is explicit that neither the bearer middleware nor the token verifier applies to stdio: the security boundary is the process that launched the server, and `get_access_token()` always returns `None` there. A stdio server runs with the privileges of the user who started the host, so a tool that reads files reads them as that user. Two further points apply. First, the stdio reader validates each line as JSON-RPC but enforces no size limit on it. Second, the descriptor redirection protects the protocol stream from accidental output, but an unflushed write at import time can still corrupt it.
+A stdio server has no network surface and no authentication. The authorization guide is explicit that neither the bearer middleware nor the token verifier applies to stdio: the security boundary is the process that launched the server, and `get_access_token()` always returns `None` there. A stdio server runs with the privileges of the user who started the host, so a tool that reads files reads them as that user.
+
+Two further points apply:
+
+- The stdio reader validates each line as JSON-RPC but enforces no size limit on it.
+- The descriptor redirection protects the protocol stream from accidental output, but an unflushed write at import time can still corrupt it.
 
 ### HTTP hardening: DNS rebinding, body size, content type
 
@@ -336,7 +348,7 @@ When the check is on, a disallowed `Host` gets `421` and a disallowed `Origin` g
 Stateful Streamable HTTP sessions have three protections, all added during 2026:
 
 - the session id is `uuid4().hex`, 122 random bits from the operating system's generator;
-- the session manager caps open sessions at 10,000 (`DEFAULT_MAX_SESSIONS`; further attempts get `503`) and expires a session after 30 minutes without HTTP activity (`DEFAULT_SESSION_IDLE_TIMEOUT`);
+- the session manager caps open sessions at 10,000 (`DEFAULT_MAX_SESSIONS`), answers further attempts with `503`, and expires a session after 30 minutes without HTTP activity (`DEFAULT_SESSION_IDLE_TIMEOUT`);
 - each session is bound to the authenticated principal that created it, the triple of client id, issuer and subject. A request carrying a valid session id but a different principal gets `404 Session not found`, the same answer as an unknown id, so the response does not confirm that the session exists.
 
 The binding has one limit: on a server without authentication, every caller is the same anonymous principal, and knowing the session id is enough to use the session. Stateless mode and the 2026-07-28 protocol have no server-side session to hijack.
@@ -353,7 +365,7 @@ class TokenVerifier(Protocol):
 The verifier is where the cryptography happens: checking a JWT signature, or calling the authorization server's introspection endpoint as in the `IntrospectionTokenVerifier` example built on [RFC 7662](https://datatracker.ietf.org/doc/html/rfc7662). The SDK adds the checks around it:
 
 - `BearerAuthBackend` extracts the bearer token, calls the verifier, and treats the request as unauthenticated if the verifier returns `None` or if `expires_at` is in the past;
-- `RequireAuthMiddleware` answers `401 invalid_token` for an unauthenticated request and `403 insufficient_scope` when any of `required_scopes` is missing (all of them are required), with a `WWW-Authenticate` header pointing to the metadata document;
+- `RequireAuthMiddleware` answers `401 invalid_token` for an unauthenticated request and `403 insufficient_scope` when any of `required_scopes` is missing, with a `WWW-Authenticate` header pointing to the metadata document;
 - when `resource_server_url` is set, the server publishes **Protected Resource Metadata** ([RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728)) at `/.well-known/oauth-protected-resource`, which tells the client which authorization server to use.
 
 The audience check deserves attention. A token issued for another service should not be accepted by this one, which is what the `resource` indicator of [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) is for. The SDK can compare the token's `resource` with `resource_server_url` itself, but only if `AuthSettings.validate_token_resource=True`. Left unset, it behaves as `False` and emits a deprecation warning saying it will default to `True` in version 3. Until then, either the setting is turned on or the `TokenVerifier` must check the audience itself.
@@ -362,7 +374,7 @@ The SDK also contains an **embedded authorization server** (`auth_server_provide
 
 ### Input validation and error disclosure
 
-With `MCPServer`, tool arguments are validated by the Pydantic model generated from the function signature before the function runs. Two behaviours are worth knowing. A string argument for a non-string field is first parsed as JSON (a workaround for clients that send `"5"` for `5`). Unknown arguments are dropped silently, since the generated model uses Pydantic's default handling of extra fields.
+With `MCPServer`, tool arguments are validated by the Pydantic model generated from the function signature before the function runs. A string argument for a non-string field is first parsed as JSON (a workaround for clients that send `"5"` for `5`). Unknown arguments are dropped silently, since the generated model uses Pydantic's default handling of extra fields.
 
 The error path is designed not to leak server internals to the model:
 

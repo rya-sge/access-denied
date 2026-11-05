@@ -2,7 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2024 Crypto Hacks"
 date:   2026-10-07
-last_modified_at: 2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -16,7 +16,7 @@ isMermaid: true
 
 The [recap of the 2024 crypto hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024/) summarises each incident in a sentence or two: "the signers approved a payload that differed from what their interface showed", "an approval granted on creation was never revoked on cancel", "a donation attack on an empty market". Those sentences are accurate, but each one compresses a mechanism that is not obvious even to someone who writes Solidity every day.
 
-This article unpacks those mechanisms. It assumes you know how a smart contract, an ERC-20 approval and a proxy work, and it does not re-explain them; it explains the parts that are specific: what a Safe signer actually signs, why an uninitialised variable can disable a bridge's quorum, how an approval becomes an attack surface, what a callback lets an attacker do, why an empty lending market is dangerous, and what makes a price manipulable. Each section names the 2024 incidents it explains.
+This article unpacks those mechanisms. It assumes you know how a smart contract, an ERC-20 approval and a proxy work, and it does not re-explain them; it explains the parts that are specific: what a Safe signer signs, why an uninitialised variable can disable a bridge's quorum, how an approval becomes an attack surface, what a callback lets an attacker do, why an empty lending market is dangerous, and what makes a price manipulable. Each section names the 2024 incidents it explains.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -99,7 +99,7 @@ A centralised exchange holds most funds in **cold** storage (keys offline), a wo
 
 The attacker rarely needs the cold keys. Two routes worked in 2024:
 
-- **Take the hot wallet's signer.** If the attacker controls the server that holds or uses the hot keys, it signs withdrawals like any other; that is the likely route at BtcTurk, BingX, M2 and Indodax (where the withdrawal system itself was breached).
+- **Take the hot wallet's signer.** If the attacker controls the server that holds or uses the hot keys, it signs withdrawals like any other; that is the likely route at BtcTurk, BingX, M2 and Indodax. At Indodax, the withdrawal system itself was breached.
 - **Alter the request before it is signed.** At DMM Bitcoin, North Korean operators compromised the company that supplied the wallet software, then modified a legitimate transaction request submitted by a DMM employee, so that the signing process sent 4,502.9 BTC to them. Nothing in the signature was forged; the input was.
 
 ## Privileged keys and thresholds
@@ -287,7 +287,7 @@ This is the same arithmetic as the "inflation attack" on ERC-4626 vaults. At Son
 
 ### Shares and amounts: the elastic/base pair
 
-Many protocols track a total as two numbers: `elastic` (the real amount, which grows with interest) and `base` (the number of shares). A user's debt is `part * elastic / base`. Conversions round, and the rounding is safe only if the ratio stays in a sane range. In Abracadabra's CauldronV4, the attacker repaid everyone's debt (`repayForAll` plus manual repayments) until `elastic` reached zero while `base` did not; the library did not handle that case, and a loop of borrow and repay inflated the ratio until rounding let it borrow without matching collateral.
+Many protocols track a total as two numbers: `elastic` is the real amount, which grows with interest, and `base` is the number of shares. A user's debt is `part * elastic / base`. Conversions round, and the rounding is safe only if the ratio stays in a sane range. In Abracadabra's CauldronV4, the attacker repaid everyone's debt (`repayForAll` plus manual repayments) until `elastic` reached zero while `base` did not; the library did not handle that case, and a loop of borrow and repay inflated the ratio until rounding let it borrow without matching collateral.
 
 ### Unchecked arithmetic
 
@@ -383,7 +383,7 @@ The 2024 hacks rest on a small set of mechanisms that recur from year to year:
 | Term | Definition |
 |------|------------|
 | **Safe singleton (master copy)** | The implementation a Safe proxy delegates to; its address sits in the proxy's storage slot 0. |
-| **safeTxHash** | The EIP-712 hash of a Safe transaction's fields and nonce; the only thing each owner actually signs. |
+| **safeTxHash** | The EIP-712 hash of a Safe transaction's fields and nonce; the only thing each owner signs. |
 | **Blind signing** | Approving a hash or payload without being able to verify what it does. |
 | **DELEGATECALL** | A call that runs the target's code in the caller's storage context. |
 | **Hot / warm / cold wallet** | Exchange wallets with keys online and automated, online behind approvals, or offline. |

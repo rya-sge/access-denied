@@ -2,6 +2,7 @@
 layout: post
 title: "Gates on Aztec — What a Private Function Costs, Where the Cost Hides, and Seven Measured Ways to Lower It"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -48,7 +49,7 @@ The Noir documentation's phrase for this is *thinking in circuits*: the size of 
 
 ![One private call as the user proves it: the account entrypoint and the contract function feed the kernel init and inner circuits, then reset and tail, about 427,000 gates in total for 14,000 of contract code]({{site.url_complet}}/assets/article/blockchain/aztec/aztec-gates-transaction-cost-concept.png)
 
-Two lessons are in that table. The fixed kernel overhead is around 290,000 gates before any contract code runs, so a 40,000-gate saving in a function is a 10% saving on the transaction, not a 30% one. And **each additional private function call costs a `private_kernel_inner` iteration of about 101,000 gates**, more than most functions cost themselves. The documentation draws the design conclusion: "inlining a verification step into the calling function saves an entire kernel fold (~101k gates), even if it slightly increases the calling function's own gate count."
+The fixed kernel overhead is around 290,000 gates before any contract code runs, so a 40,000-gate saving in a function is a 10% saving on the transaction, not a 30% one. And **each additional private function call costs a `private_kernel_inner` iteration of about 101,000 gates**, more than most functions cost themselves. The documentation draws the design conclusion: "inlining a verification step into the calling function saves an entire kernel fold (~101k gates), even if it slightly increases the calling function's own gate count."
 
 ### What the common operations cost
 
@@ -100,7 +101,7 @@ Three identical savings, because the hoisted read is the same one in all three. 
 
 ### 3. Size a loop for the common case and grow on demand
 
-The largest saving. Spending a private balance means picking notes until their sum covers the amount. The library function every transfer, bridge and burn used sized that search for the protocol maximum of **sixteen** notes, at about 3,050 gates per slot, whatever the holder actually owned:
+The largest saving. Spending a private balance means picking notes until their sum covers the amount. The library function every transfer, bridge and burn used sized that search for the protocol maximum of **sixteen** notes, at about 3,050 gates per slot, whatever the holder owned:
 
 | Note budget | `transfer_private_to_private` | `transfer_private_to_public` | `burn` |
 |---:|---:|---:|---:|
@@ -166,7 +167,7 @@ The technique is covered on its own in [an earlier article]({{site.url_complet}}
 
 Two refactors were checked for cost and found to have none, which is as useful to know as a saving:
 
-- **Library functions and inlined helpers compile identically.** Moving the mint, transfer and burn chains out of three contracts into one library module produced 48 private circuits **byte-identical** to the originals. A `#[internal("private")]` helper and a plain library function are both inlined into the caller; neither is a nested call. The corollary matters for design: the 101,000-gate nested-call cost applies to `#[external]` functions the contract calls through `call_self` or on another contract, not to how the source is organised.
+- **Library functions and inlined helpers compile identically.** Moving the mint, transfer and burn chains out of three contracts into one library module produced 48 private circuits **byte-identical** to the originals. A `#[internal("private")]` helper and a plain library function are both inlined into the caller; neither is a nested call. The 101,000-gate nested-call cost applies to `#[external]` functions the contract calls through `call_self` or on another contract, not to how the source is organised.
 - **An assertion the compiler can decide is free.** Two `assert`s checked array lengths that were compile-time constants; removing them left every gate count unchanged, because a constraint on a constant folds away. The reverse is the trap: an assertion on a *witness* value is a real constraint, and a check that is repeated (case 1) is paid each time.
 
 ## What the measurements say in general
@@ -248,7 +249,9 @@ The general point is that per-operation prices do not add linearly when operatio
 
 **Q: How was the batch cap of two recipients for `transfer_batch` found, and why is it lower than the mint cap of four?**
 
-By trying values against the test suite: three recipients aborted with `push out of bounds`, the per-call side-effect budget. A transfer recipient costs four constrained deliveries, namely the recipient's note, the change note and the `Transfer` event to each of the recipient and the issuer, where a mint recipient costs one or two, so the transfer batch reaches the budget with half the entries. Protocol constants such as the nested-call limit are irrelevant, since a batch makes no nested calls; the binding constraint had to be measured.
+By trying values against the test suite: three recipients aborted with `push out of bounds`, the per-call side-effect budget. A transfer recipient costs four constrained deliveries, namely the recipient's note, the change note and the `Transfer` event to each of the recipient and the issuer, where a mint recipient costs one or two, so the transfer batch reaches the budget with half the entries.
+
+Protocol constants such as the nested-call limit are irrelevant, since a batch makes no nested calls; the binding constraint had to be measured.
 
 **Q: In case 3, why not just use a budget of four without recursion?**
 

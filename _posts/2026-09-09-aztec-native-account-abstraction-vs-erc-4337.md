@@ -2,7 +2,7 @@
 layout: post
 title: "Native Account Abstraction on Aztec, Compared with ERC-4337"
 date:   2026-09-09
-last_modified_at: 2026-10-05
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -18,7 +18,7 @@ isMath: false
 
 Aztec has no EOAs. Every account is a contract, there is no protocol-level signature scheme at all, and an account's entrypoint decides for itself what counts as authorisation: a Schnorr signature, an ECDSA signature, a passkey, a multisig, a password, or a rule with no signature in it. None of ERC-4337's supporting components exist, because none of them are needed.
 
-The comparison is worth making carefully, because the interesting parts are not the obvious ones. Aztec's headline advantage is not that accounts are contracts, which ERC-4337 achieves too. It is that validation is proved on the user's device, so the network never runs it and therefore never has to be defended against it. The headline cost is not proving time either. It is that Aztec accounts have protocol keys baked into the address, and unlike an ERC-4337 account, they cannot be rotated.
+Aztec's headline advantage is not that accounts are contracts, which ERC-4337 achieves too. It is that validation is proved on the user's device, so the network never runs it and therefore never has to be defended against it. The headline cost is not proving time either. It is that Aztec accounts have protocol keys baked into the address, and unlike an ERC-4337 account, they cannot be rotated.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -28,13 +28,13 @@ The comparison is worth making carefully, because the interesting parts are not 
 
 ERC-4337 is deliberately an application-layer standard: it required no consensus change, which is why it shipped. A user signs a `UserOperation` rather than a transaction, sends it to a mempool that Ethereum nodes do not know about, and a bundler collects several of them and calls `handleOps` on the EntryPoint singleton. The EntryPoint calls each account's `validateUserOp`, then its execution function. The bundler is an ordinary EOA and pays real gas, so it must be reimbursed, which is what the account's deposit or a paymaster is for.
 
-Aztec inverts this. The account contract's entrypoint is where a transaction starts, full stop. There is no separate mempool, no bundler role, no singleton mediating between accounts, and no fallback path for a "plain" transaction because there is no plain transaction to fall back to.
+Aztec inverts this. The account contract's entrypoint is where every transaction starts. There is no separate mempool, no bundler role, no singleton mediating between accounts, and no fallback path for a "plain" transaction because there is no plain transaction to fall back to.
 
-That difference propagates further than it first appears. Every piece of ERC-4337 machinery is a consequence of the abstraction sitting *above* a protocol that does not know about it, and each piece brings its own security surface: the site's articles on [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/) and [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/) cover the factory, paymaster and aggregator staking rules that exist to keep those pieces honest. On Aztec that surface is absent, and a different one takes its place.
+Every supporting component of ERC-4337 is a consequence of the abstraction sitting *above* a protocol that does not know about it, and each piece brings its own security surface: the site's articles on [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/) and [SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses]({{site.url_complet}}/2026/07/23/sendercreator-entrypoint-erc4337-counterfactual-address/) cover the factory, paymaster and aggregator staking rules that exist to keep those pieces honest. On Aztec that surface is absent, and a different one takes its place.
 
 ## What an account is, and why that settles the question
 
-Ethereum has two kinds of entity and the difference is written into the protocol. An externally owned account is a keypair and nothing else: it can originate a transaction but holds no code. A contract account holds code but cannot originate anything. ERC-4337 exists to give the second kind the privileges of the first, and its EntryPoint, bundler and alternative mempool all follow from that one asymmetry.
+Ethereum has two kinds of entity and the difference is written into the protocol. An externally owned account is only a keypair: it can originate a transaction but holds no code. A contract account holds code but cannot originate anything. ERC-4337 exists to give the second kind the privileges of the first, and its EntryPoint, bundler and alternative mempool all follow from that one asymmetry.
 
 Aztec has a single kind. An account **is** a contract instance, and a contract instance is the only thing an address can refer to. There is no keypair-only entity, no `tx.origin` that has to be an EOA, and no protocol-level signature scheme a transaction must satisfy before the account's own code sees it. A wallet is not a contract pretending to be an account; it is the only thing an account ever was.
 
@@ -64,11 +64,11 @@ The practical consequences are larger than they sound:
 - **Validation logic is not visible onchain.** The circuit hides which function ran and what it checked, so an account's authentication rules are private. A 3-of-5 multisig does not announce itself as one.
 - **The cost moves to the user.** Complex validation is paid in local proving time and memory. It is free to everyone except the person doing it, which is the correct place for it, but it is not free.
 
-Aztec's own documentation makes the DoS argument explicitly, and it is the cleanest statement of why native abstraction is not merely a tidier ERC-4337.
+Aztec's own documentation makes the DoS argument explicitly.
 
 ## Keys, and what cannot be rotated
 
-Here the trade-off runs the other way, and it is the point most easily missed.
+Here the trade-off runs the other way.
 
 An ERC-4337 account has whatever keys its code says it has. Rotating a signer is a state change in the account contract; the address is unaffected, because the address came from CREATE2 over the factory, implementation and salt. Social recovery, guardian rotation and key replacement are all ordinary contract logic.
 
@@ -83,7 +83,7 @@ An Aztec account has two categories of key, and only one of them behaves that wa
 
 The signing key is the ERC-4337-like one: the account contract owns it, and swapping it is application logic. The protocol keys are different. They are hashed into the address itself — `address = hash(public_keys_hash, partial_address)` — so changing them would change the address, and the nullifier key is what makes a user's notes spendable.
 
-Two things follow, and both deserve to be said plainly:
+Two things follow:
 
 - **Key rotation is only half available.** You can replace the key that authorises transactions. You cannot replace the key that decrypts your notes or the key that spends them.
 - **Recovery has a hard limit.** A social-recovery scheme on Aztec can restore the ability to *send transactions* from the account. It cannot restore the ability to *read or spend the private notes* the account already holds, because that requires the nullifier and viewing keys, which no amount of contract logic can reissue. On an ERC-4337 account holding ERC-20s, recovering the signer recovers the funds. On Aztec the two are separable, and losing the account secret is not the same failure as losing the signing key.
@@ -123,7 +123,7 @@ The flip side is that nothing supplies replay protection by default. An Aztec ac
 
 ERC-4337 pays for sponsorship with a paymaster that holds a deposit at the EntryPoint and is staked against abuse. The account or the paymaster reimburses the bundler, which fronted real ETH.
 
-Aztec uses a **fee-paying contract** (FPC) and a dedicated **teardown phase** at the end of the transaction, in which the fee is settled after execution has determined what it actually costs. The available methods are:
+Aztec uses a **fee-paying contract** (FPC) and a dedicated **teardown phase** at the end of the transaction, in which the fee is settled after execution has determined what it costs. The available methods are:
 
 - **Fee Juice**, the default, paid from the account's own balance.
 - **Sponsored FPC**, where a contract pays on the user's behalf. This is what makes deploying a brand-new account possible when it holds nothing at all — the deployment transaction is itself sponsored.
@@ -155,7 +155,7 @@ The two execution contexts need different code around the check:
 - **In private**, the consuming contract makes a *static* call to the account contract asking whether the action is authorised. The account fetches the witness through a PXE oracle and answers. The call is static so that the account cannot re-enter and mutate state mid-verification — which also means the account cannot emit the nullifier, so the consuming contract does it instead.
 - **In public**, oracles do not exist, because the sequencer is running the code. Authorisations are written to a shared **auth registry** first and consumed from it. There is a neat efficiency here: if an authorisation is set and consumed in the same transaction, the two state changes squash.
 
-There is a further reason the public flow looks the way it does, and it is a good illustration of how Aztec's constraints interlock: **ECDSA verification is not available in the AVM at all**. Signature verification in a public function does not compile. The recommended pattern is therefore to verify the signature in private, record the approval in the registry, and consume it in public.
+There is a further reason the public flow looks the way it does: **ECDSA verification is not available in the AVM at all**. Signature verification in a public function does not compile. The recommended pattern is therefore to verify the signature in private, record the approval in the registry, and consume it in public.
 
 Replay protection comes from a nullifier: each witness is single-use. Authorising the same action repeatedly means including a nonce in the arguments. Revocation is the sharpest contrast with `approve` — a user cancels a witness by emitting its nullifier directly, invalidating it without performing the action.
 
@@ -167,7 +167,7 @@ Replay protection comes from a nullifier: each witness is single-use. Authorisin
 | Reuse | Until the allowance is spent or changed | Single-use unless a nonce is included |
 | Private state | Cannot work; the spender needs note secrets | Works, via the account contract |
 
-**One caveat matters more than the rest, and it is easy to misread the mechanism without it.** An authwit does not confer the ability to spend someone's private notes. Spending a note requires the note secrets and the owner's nullifier key, so the owner still has to participate in the transaction. A witness authorises a contract to *perform an action within a transaction the owner is part of*; it does not let a third party go and move private funds on their own later. That is a stronger guarantee than `approve` gives, and it is also a real functional limitation: the "grant now, spend whenever" pattern that ERC-20 allowances enable does not exist for private balances.
+**An authwit does not confer the ability to spend someone's private notes.** Spending a note requires the note secrets and the owner's nullifier key, so the owner still has to participate in the transaction. A witness authorises a contract to *perform an action within a transaction the owner is part of*; it does not let a third party go and move private funds on their own later. That is a stronger guarantee than `approve` gives, and it is also a real functional limitation: the "grant now, spend whenever" pattern that ERC-20 allowances enable does not exist for private balances.
 
 ## Comparison
 

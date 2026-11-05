@@ -2,6 +2,7 @@
 layout: post
 title: "Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -14,7 +15,7 @@ isMath: false
 
 Hyperliquid is a layer-1 blockchain whose state machine is a derivatives exchange. The order book, the margin engine and the liquidation logic are not a service running beside the chain, they are the thing validators agree on, and a general-purpose EVM runs next to them under the same consensus. A reader meets the protocol through its documentation, through its API, or through a contract that calls into the exchange, and in all three the vocabulary arrives before the explanation does.
 
-That vocabulary is the obstacle. Hyperliquid borrows words from centralised derivatives trading (mark price, funding, maintenance margin), gives several of them a protocol-specific meaning, and adds a layer of names that exist nowhere else: HyperCore, CoreWriter, Hyperliquidity, HIP-3. This article is a term list rather than a walkthrough. It is split into three levels, beginner, intermediate and advanced, ordered so that no entry depends on a term defined after it, and each entry is written to stand on its own for a reader who arrives at it directly.
+That vocabulary is the obstacle. Hyperliquid borrows words from centralised derivatives trading (mark price, funding, maintenance margin), gives several of them a protocol-specific meaning, and adds names that exist nowhere else: HyperCore, CoreWriter, Hyperliquidity, HIP-3. This article is a term list rather than a walkthrough. It is split into three levels, beginner, intermediate and advanced, ordered so that no entry depends on a term defined after it, and each entry is written to stand on its own for a reader who arrives at it directly.
 
 After reading it, the protocol documentation and the API reference should be legible without a second tab open, and a question about which price triggered a liquidation should have an unambiguous answer. The article defines the vocabulary and stops there. It does not walk through an integration, derive the margin formulas, or review any implementation; the narrative articles listed in the series box above do that work.
 
@@ -110,7 +111,7 @@ The amount paid is position size times [oracle price](#oracle-price) times the r
 
 ### Cross margin and isolated margin
 
-Two ways of assigning collateral to positions. Under cross margin every cross position in an account draws on one shared collateral pool, which uses capital efficiently and means a loss on any one position can liquidate all of them. Under isolated margin a position carries its own collateral, and its liquidation cannot reach the rest of the account.
+Two ways of assigning collateral to positions. Under cross margin every cross position in an account draws on one shared collateral pool, which uses capital efficiently and means a loss on any one position can liquidate all of them. Under isolated margin a position carries its own collateral, and its liquidation cannot affect the rest of the account.
 
 A third setting, strict isolated, behaves like isolated except that margin can never be withdrawn by hand; it is released only in proportion as the position closes. Cross positions may additionally count unrealized profit towards margin, so a winning position can support a new one before it is closed.
 
@@ -228,7 +229,7 @@ The advanced level splits into two halves worth learning separately. One is the 
 
 ![Mindmap of Hyperliquid vocabulary, split into beginner, intermediate and advanced terms including HyperCore, oracle price, mark price, liquidation, auto-deleveraging and the four HIPs]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-glossary-mindmap.png)
 
-The same thirty terms sort a second way, by subject rather than by reading order. That cut shows how much of the vocabulary is really one subject: six of the thirty terms describe margin and the account state it governs, and the four HIPs are one deployment idea applied to four instruments.
+The same thirty terms sort a second way, by subject rather than by reading order. That cut shows how much of the vocabulary is one subject: six of the thirty terms describe margin and the account state it governs, and the four HIPs are one deployment idea applied to four instruments.
 
 ![Mindmap grouping Hyperliquid vocabulary by theme, with branches for chain and execution, actors and access, the instrument and the book, prices, margin and account state, when a position fails, and deployable primitives]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-glossary-themes.png)
 

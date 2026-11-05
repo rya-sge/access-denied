@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2019 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security
@@ -15,7 +16,7 @@ isMermaid: true
 
 The [recap of the 2019 crypto hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2019/) summarises each incident in one line: "API keys and 2FA codes collected by phishing", "fake EOS", "transaction congestion", "XRP partial payments credited at face value". This companion article explains those mechanisms for a developer who writes smart contracts, knows how exchanges and token transfers work, and wants to see what exactly broke.
 
-2019's material is different from later years. Ethereum DeFi held little value, and its worst bugs were found before anyone exploited them. The losses came from exchanges and from gambling contracts on EOS and Tron, and most of their bugs answer the same question wrongly: did the money really arrive, and could the other side have known the outcome in advance? The technical articles on [2020]({{site.url_complet}}/2026/10/07/crypto-hacks-2020-technical-concepts/) and [2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/) pick up where Ethereum DeFi takes over.
+In 2019, unlike later years, Ethereum DeFi held little value, and its worst bugs were found before anyone exploited them. The losses came from exchanges and from gambling contracts on EOS and Tron, and most of their bugs answer the same question wrongly: did the money arrive, and could the other side have known the outcome in advance? The technical articles on [2020]({{site.url_complet}}/2026/10/07/crypto-hacks-2020-technical-concepts/) and [2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/) pick up where Ethereum DeFi takes over.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -175,7 +176,7 @@ void attacker::check(asset before) {
 
 Losing bets are reverted, winning bets stand, and the attacker wins every time they keep. WinDice, TGON and ZION lost EOS this way in 2019; on Tron, SPOKpark and 7Tron lost hundreds of thousands of TRX. A variant used accounts blacklisted by block producers: the casino's own node accepted the bet and broadcast a payout, producers dropped the bet, and only the payout was included ([SlowMist](https://medium.com/@slowmist/roll-back-attack-about-blacklist-in-eos-adf53edd8d69)).
 
-The fix for all three classes is structural. Settle the draw in a separate transaction, after the bet is irreversible, with a seed the player cannot influence: a commit-reveal scheme with a server seed committed before the bet, or a verifiable random function. On Ethereum, the equivalent mistakes are using `block.timestamp` or `blockhash` of the current block, and the equivalent fix is Chainlink VRF or commit-reveal.
+The fix for all three classes is to settle the draw in a separate transaction, after the bet is irreversible, with a seed the player cannot influence: a commit-reveal scheme with a server seed committed before the bet, or a verifiable random function. On Ethereum, the equivalent mistakes are using `block.timestamp` or `blockhash` of the current block, and the equivalent fix is Chainlink VRF or commit-reveal.
 
 ### Self-transfers on Tron (TronCrush)
 
@@ -373,7 +374,7 @@ The 2019 hacks mostly answer two questions wrongly:
 | ☐ | Dependencies are pinned and reviewed; third-party scripts are self-hosted with SRI. | Malicious package or script steals keys (Agama, MyDashWallet). |
 | ☐ | Untrusted server data is never rendered as rich content in wallets. | Fake update prompts (Electrum). |
 
-Trust nothing that arrives with a transaction until you have checked who sent it, to whom, what asset it is, how much really moved and whether it is final. Almost every 2019 contract bug in this article skipped one of those five checks.
+Trust nothing that arrives with a transaction until you have checked who sent it, to whom, what asset it is, how much moved and whether it is final. Almost every 2019 contract bug in this article skipped one of those five checks.
 
 ## Frequently Asked Questions
 

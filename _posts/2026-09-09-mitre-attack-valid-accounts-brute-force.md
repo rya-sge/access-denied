@@ -2,6 +2,7 @@
 layout: post
 title: "Four ATT&CK Techniques for Getting Into Accounts - Valid Accounts, Brute Force, Password Guessing and Password Spraying"
 date:   2026-09-09
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: security
@@ -49,7 +50,7 @@ Brute Force has four sub-techniques, distinguished by what the adversary knows a
 - **Password Spraying (T1110.003)** — try a few common passwords across many accounts.
 - **Credential Stuffing (T1110.004)** — replay username/password pairs leaked from other breaches.
 
-This article details the two the request named, Password Guessing and Password Spraying, which are the mirror image of each other.
+This article details two of them, Password Guessing and Password Spraying, which are the mirror image of each other.
 
 ### Who uses it, and how to counter it
 
@@ -149,7 +150,9 @@ Detection differs by technique: guessing shows as failure spikes and lockouts on
 
 ## Conclusion
 
-Valid Accounts, Brute Force, Password Guessing and Password Spraying describe one identity-centred path into an environment: acquire a working credential, then use it as a legitimate user. Guessing and spraying are opposite distributions of the same attempts, one deep on a single account and one wide across many, and each is tuned to the presence or absence of a lockout policy. Valid Accounts is what turns an acquired password into access, persistence and privilege, and it is hard to detect precisely because nothing about it is malware. The controls converge on a small set, with multi-factor authentication the one that appears against all four, because it separates knowing a password from being able to log in.
+Valid Accounts, Brute Force, Password Guessing and Password Spraying describe one identity-centred path into an environment: acquire a working credential, then use it as a legitimate user. Guessing and spraying are opposite distributions of the same attempts, one deep on a single account and one wide across many, and each is tuned to the presence or absence of a lockout policy.
+
+Valid Accounts is what turns an acquired password into access, persistence and privilege, and it is hard to detect precisely because nothing about it is malware. The controls converge on a small set, with multi-factor authentication the one that appears against all four, because it separates knowing a password from being able to log in.
 
 ![Mindmap of the four ATT&CK techniques covering Brute Force and its sub-techniques, Password Guessing, Password Spraying, Valid Accounts and its account types, and the shared defensive controls]({{site.url_complet}}/assets/article/securite/mitre-attack/2026-09-09-mitre-valid-accounts-brute-force-mindmap.png)
 
@@ -198,7 +201,14 @@ Guessing goes deep on one target; spraying goes wide across many. Spraying exist
 
 **Q: Why is Valid Accounts listed under four different tactics?**
 
-Because a legitimate credential is useful at every stage. It provides **Initial Access** through remote services, **Persistence** by giving a durable way back in, **Privilege Escalation** when the account has or can reach higher rights, and **Defense Evasion** because activity performed as a real user, with no malware, blends into normal behaviour. ATT&CK maps a technique to every tactic its use can satisfy, and Valid Accounts satisfies all four.
+Because a legitimate credential is useful at every stage. It provides:
+
+- **Initial Access** through remote services.
+- **Persistence** by giving a durable way back in.
+- **Privilege Escalation** when the account has or can reach higher rights.
+- **Defense Evasion** because activity performed as a real user, with no malware, blends into normal behaviour.
+
+ATT&CK maps a technique to every tactic its use can satisfy, and Valid Accounts satisfies all four.
 
 **Q: How does Brute Force relate to Valid Accounts?**
 

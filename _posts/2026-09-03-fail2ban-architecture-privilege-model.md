@@ -2,6 +2,7 @@
 layout: post
 title: "How Fail2Ban Works — Architecture, Privilege Model and Residual Risk"
 date:   2026-09-03
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: linux security network
@@ -13,7 +14,7 @@ isMath: false
 
 Fail2Ban occupies an unusual position on a server. It is a piece of infrastructure that parses attacker-controlled text with regular expressions and, on the strength of that parse, executes shell commands as root against the packet filter. Very little else on a typical Linux host combines those three properties. Understanding it therefore means understanding two things at once: the mechanism that turns log lines into firewall rules, and the trust assumptions that mechanism rests on.
 
-This article reads the Fail2Ban source at the current `master` revision and describes what the daemon is: a single Python process holding one filter thread and one action thread per jail, driven by a client that speaks a pickled command protocol over a UNIX socket. It then examines the privilege model (there is no privilege separation in the code), the escaping pipeline that stands between a log line and `/bin/sh`, and the class of failure that has produced most of the project's real vulnerabilities, which is not command injection but log injection.
+This article reads the Fail2Ban source at the current `master` revision and describes what the daemon is: a single Python process holding one filter thread and one action thread per jail, driven by a client that speaks a pickled command protocol over a UNIX socket. It then examines a privilege model with no privilege separation in the code, the escaping pipeline that stands between a log line and `/bin/sh`, and the class of failure that has produced most of the project's real vulnerabilities, which is not command injection but log injection.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -25,7 +26,7 @@ The project README states the goal plainly and also states its limit:
 
 > Though Fail2Ban is able to reduce the rate of incorrect authentication attempts, it cannot eliminate the risk presented by weak authentication. Set up services to use only two factor, or public/private authentication mechanisms if you really want to protect services.
 
-That framing matters for everything that follows. Fail2Ban is a rate-limiting control, not an authentication control. It does not sit inline on the connection path, it does not inspect packets, and it does not know whether an authentication succeeded except insofar as an application wrote a line about it. It observes a side effect, after the fact, and reacts by changing a firewall.
+Fail2Ban is a rate-limiting control, not an authentication control. It does not sit inline on the connection path, it does not inspect packets, and it does not know whether an authentication succeeded except insofar as an application wrote a line about it. It observes a side effect, after the fact, and reacts by changing a firewall.
 
 The practical benefits follow from that: it suppresses the constant background noise of credential-stuffing bots, it keeps authentication logs readable, it reduces CPU spent on password hashing during a spray, and it can escalate ban duration for hosts that keep coming back. The practical limits follow too. A single-attempt attack against a weak password is never seen. A distributed campaign that makes three attempts from each of ten thousand addresses stays below any sensible `maxretry`. And the reaction latency is bounded below by how quickly the application flushes its log.
 
@@ -62,7 +63,12 @@ The filter needs new log lines. `Jail._setBackend` resolves the `backend` option
 
 ## Anatomy of a Jail
 
-A jail is the unit of policy: one filter, one or more actions, and the parameters that connect them. The four that decide behaviour are `findtime` (the sliding window, default 600 s), `maxretry` (failures allowed in that window, default 5), `bantime` (default 600 s) and `banaction`.
+A jail is the unit of policy: one filter, one or more actions, and the parameters that connect them. The four that decide behaviour are:
+
+- `findtime`: the sliding window, default 600 s.
+- `maxretry`: failures allowed in that window, default 5.
+- `bantime`: default 600 s.
+- `banaction`.
 
 The data structure passed between the two threads is a *ticket*. A `FailTicket` records an identifier, a timestamp, an attempt count and the matched log lines. A `BanTicket` is the same object promoted once a ban has been decided. The identifier is normally an `IPAddr`, but it does not have to be: a filter that captures `<F-ID>` or `<F-USER>` instead of `<HOST>` produces tickets keyed on a username or a session identifier, which is how jails that ban by account rather than by address are built.
 
@@ -70,7 +76,7 @@ The data structure passed between the two threads is a *ticket*. A `FailTicket` 
 
 ### The filter thread
 
-Each incoming line goes through `Filter.processLine`, then `Filter.findFailure`. The order of operations is worth stating precisely, because several of the steps are security-relevant.
+Each incoming line goes through `Filter.processLine`, then `Filter.findFailure`. The steps run in this order, and several of them are security-relevant.
 
 - **Date extraction.** `DateDetector.matchTime` locates a timestamp and splits the line into a prefix, the time text and the remainder. The date detector maintains an ordered list of templates and promotes the ones that keep matching, so a log with a stable format converges on a single template.
 - **Timestamp sanity.** If the parsed date deviates from the current time by more than 60 seconds while the filter is in operation, the entry is treated as if it had just happened and a warning is emitted at most once a day. During the initial catch-up phase, entries older than `findtime` are discarded instead.
@@ -78,7 +84,7 @@ Each incoming line goes through `Filter.processLine`, then `Filter.findFailure`.
 - **`prefregex`.** An optional pre-filter that strips the syslog prefix once and exposes the message body as `<F-CONTENT>`, so that the individual fail regexes do not each have to re-match the prefix. The `sshd` filter is built this way.
 - **`failregex`.** Each expression in turn until one matches. `checkAllRegex` is false in the daemon, so matching stops at the first hit.
 - **Identifier extraction.** The named groups `ip4`, `ip6`, `dns`, `fid`, `cidr` are read out of the match.
-- **Ignore lists.** `ignoreip`, `ignoreself` (default true, covering the host's own addresses and names) and the external `ignorecommand`.
+- **Ignore lists.** `ignoreip`, `ignoreself` and the external `ignorecommand`. `ignoreself` defaults to true and covers the host's own addresses and names.
 
 Only a line that survives all of that reaches `FailManager.addFailure`.
 
@@ -96,7 +102,7 @@ Because the actions run sequentially in a single thread with a default 60 second
 
 An action is a set of command templates. `CommandAction` defines `actionstart`, `actionstop`, `actioncheck`, `actionban`, `actionunban`, `actionreban`, `actionrepair`, `actionflush` and `actionreload`, all defaulting to the empty string, plus a `timeout` of 60 seconds.
 
-The `iptables` action shows the shape. It creates a dedicated chain per jail and jumps to it from the configured chain, so that Fail2Ban's rules are separable from everything else in the ruleset:
+The `iptables` action is a concrete example. It creates a dedicated chain per jail and jumps to it from the configured chain, so that Fail2Ban's rules are separable from everything else in the ruleset:
 
 ```text
 actionstart = { <iptables> -C f2b-<name> -j <returntype> >/dev/null 2>&1; } || \
@@ -109,7 +115,7 @@ actionunban = <iptables> -D f2b-<name> -s <ip> -j <blocktype>
 
 By default `actionstart` runs lazily at the first ban rather than at server start, which avoids creating empty chains for jails that never fire.
 
-`actioncheck` implements an invariant check. Before each ban, the action verifies that its environment is still sane (that the chain still exists and the jump is still in place). If the check fails, `_invariantCheck` attempts `actionrepair`, or a stop/start cycle, and the ban is retried once. This is what allows Fail2Ban to survive an out-of-band `iptables -F` without silently failing to ban for the rest of the day.
+`actioncheck` implements an invariant check. Before each ban, the action verifies that the chain still exists and the jump is still in place. If the check fails, `_invariantCheck` attempts `actionrepair`, or a stop/start cycle, and the ban is retried once. This is what allows Fail2Ban to survive an out-of-band `iptables -F` without silently failing to ban for the rest of the day.
 
 The repertoire is broad: 66 action files ship in `config/action.d/`, covering `iptables` and its ipset variants, `nftables`, `firewalld`, `pf`, `ipfw`, `npf`, `hosts.deny`, route blackholing, Cloudflare and Netscaler APIs, and reporting endpoints such as AbuseIPDB, blocklist.de and Apprise notifications. Actions can also be Python modules: `Actions.add` accepts a file path whose module exports an `Action` class deriving from `ActionBase`, which is then imported into the server process.
 
@@ -122,7 +128,7 @@ That identity has to be sufficient for two very different jobs:
 - **Reading the logs.** On a typical distribution `/var/log/auth.log` or the systemd journal's authentication units are readable only by root or by a dedicated group.
 - **Rewriting the packet filter.** `iptables`, `nft` and their equivalents require `CAP_NET_ADMIN` in the relevant network namespace.
 
-In practice that means root. A hardened deployment can narrow this (a dedicated user with `CAP_NET_ADMIN`, group-readable logs, `sudo` rules for the firewall binary), but nothing in the project does it for you, and the shipped `files/fail2ban.service.in` contains no sandboxing directives at all: no `NoNewPrivileges`, no `ProtectSystem`, no `CapabilityBoundingSet`. Distribution packages sometimes add them; upstream does not.
+In practice that means root. A hardened deployment can narrow this through a dedicated user with `CAP_NET_ADMIN`, group-readable logs and `sudo` rules for the firewall binary, but nothing in the project does it for you, and the shipped `files/fail2ban.service.in` contains no sandboxing directives at all: no `NoNewPrivileges`, no `ProtectSystem`, no `CapabilityBoundingSet`. Distribution packages sometimes add them; upstream does not.
 
 ### The socket is the entire authorization model
 
@@ -276,7 +282,11 @@ The failure modes that cost people time are rarely the exotic ones.
 
 Fail2Ban is a small program with an unusually sharp trust profile. Its architecture follows from the client/server split: the client is the configuration compiler, the server is a thread pool of filters and actions around a shared ticket queue, and the SQLite database supplies continuity and escalation.
 
-The security properties are less obvious and worth restating. The daemon runs with the privileges needed to rewrite the packet filter and read authentication logs, and it does not reduce them; the UNIX socket is therefore a root-equivalent control channel protected by nothing but its file mode. The escaping pipeline between ticket data and the shell is carefully built, and the vulnerabilities that got through it went around it, through a downstream program's own escape syntax. And the risk that has recurred throughout the project's history is not that an attacker executes a command, but that an attacker chooses which address gets banned, by writing a plausible log line into a field the application logs verbatim.
+The security properties are less obvious and worth restating:
+
+- The daemon runs with the privileges needed to rewrite the packet filter and read authentication logs, and it does not reduce them; the UNIX socket is therefore a root-equivalent control channel protected by nothing but its file mode.
+- The escaping pipeline between ticket data and the shell is carefully built, and the vulnerabilities that got through it went around it, through a downstream program's own escape syntax.
+- The risk that has recurred throughout the project's history is not that an attacker executes a command, but that an attacker chooses which address gets banned, by writing a plausible log line into a field the application logs verbatim.
 
 Deploying it well is mostly a matter of respecting those three facts: keep the socket owner-only, know how any custom action's downstream program parses its arguments, and anchor every filter regex against the text the application generates rather than the text a user supplies.
 
@@ -339,7 +349,7 @@ The properties below separate a Fail2Ban deployment (or a locally written filter
 |-----------|-------------|-----------|
 | A ban is issued only after `maxretry` failures from one identifier within `findtime`. | `FailManager.addFailure` sliding window plus the `toBan` threshold check. | A filter matches lines that are not authentication failures, or `maxretry` is set below the application's normal retry behaviour. |
 | Dynamic tag values never introduce shell syntax into a command. | `replaceDynamicTags` relocates any value matching `ESCAPE_CRE` into a generated shell variable passed as a positional argument. | A custom action interpolates ticket data through a mechanism that bypasses the substitution path, or a downstream program has its own escape syntax. |
-| Static tag substitution terminates. | Recursion in `replaceTag` is bounded by `MAX_TAG_REPLACE_COUNT`, which raises rather than looping. | Nothing in normal configuration; the bound exists precisely to make self-referencing definitions fail loudly. |
+| Static tag substitution terminates. | Recursion in `replaceTag` is bounded by `MAX_TAG_REPLACE_COUNT`, which raises rather than looping. | Nothing in normal configuration; the bound exists precisely to make self-referencing definitions raise rather than loop. |
 | The firewall state matches the ban list at the moment of each ban. | `actioncheck` runs before every `actionban`, with `actionrepair` or a stop/start cycle on failure and one retry. | An action defines no `actioncheck`, so out-of-band flushes go undetected until the next restart. |
 | Bans survive a daemon restart for their remaining duration. | `Jail.restoreCurrentBans` replays unexpired bans from SQLite at startup. | `dbfile` is set to `None` or `:memory:`, in which case a restart releases every banned address. |
 | No shipped filter contains a greedy catch-all before `<HOST>` without hard anchoring. | The `RE_WRONG_GREED` assertion in `samplestestcase.py`, run over every file in `config/filter.d/`. | A filter is written locally rather than upstream, where the test suite never sees it. |
@@ -374,7 +384,7 @@ Changing `.*` to `.*?` makes the catch-all settle on the first match instead, wh
 
 **Q: Fail2Ban runs as root and parses attacker-controlled text. Is that not a contradiction?**
 
-It is a real tension, and the design answer is to keep the attacker-controlled data on one side of a narrow interface. The filter's job is to turn a line into an identifier and nothing else: no configuration is read from the line, no command is built from it, and the extracted value goes through the escaping pipeline before it can reach a shell.
+It is a real tension, and the design answer is to keep the attacker-controlled data on one side of a narrow interface. The filter's only job is to turn a line into an identifier: no configuration is read from the line, no command is built from it, and the extracted value goes through the escaping pipeline before it can reach a shell.
 
 What that structure cannot defend is the *decision* itself. If the regex extracts the wrong identifier, every downstream stage does exactly what it was told, correctly, against the wrong address. That is why the filter regex, and not the action, is the security-critical artefact, and why hardening effort is better spent on anchoring expressions than on the command path.
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Bio Protocol Overview - DeSci Launchpad, BIO Token Economy and Open-Source DAO Contracts"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -67,7 +68,11 @@ The documented uses of `BIO` are staking (for governance and launch access), com
 
 ### vBIO
 
-`vBIO` is the vesting representation of `BIO`. It is not a wrapped token but the balance of a `TokenVesting` contract (described below), which exposes an ERC-20 interface whose `balanceOf` returns the holder's unreleased vested amount and whose `transfer` always reverts. On Ethereum it is split over two verified contracts: the **BIO Vesting Master** at `0x0d2ADB4Af57cdac02d553e7601456739857D2eF4`, which is the address the documentation lists as `vBIO`, and a subordinate **BIO Vesting Token** at `0x2141B47A1C7De6df073d23ff94F04d9fd2aaA9b3`. The master holds schedules of its own and adds the balances of an admin-managed list of external vesting contracts to its `balanceOf` and `totalSupply`, so a wallet's `vBIO` balance is the sum across both. `BIO` and `vBIO` together remain the governance tokens of the protocol until `veBIO` is adopted through a formal proposal. `vBIO` cannot be converted into `veBIO`.
+`vBIO` is the vesting representation of `BIO`. It is not a wrapped token but the balance of a `TokenVesting` contract (described below), which exposes an ERC-20 interface whose `balanceOf` returns the holder's unreleased vested amount and whose `transfer` always reverts.
+
+On Ethereum it is split over two verified contracts: the **BIO Vesting Master** at `0x0d2ADB4Af57cdac02d553e7601456739857D2eF4`, which is the address the documentation lists as `vBIO`, and a subordinate **BIO Vesting Token** at `0x2141B47A1C7De6df073d23ff94F04d9fd2aaA9b3`. The master holds schedules of its own and adds the balances of an admin-managed list of external vesting contracts to its `balanceOf` and `totalSupply`, so a wallet's `vBIO` balance is the sum across both.
+
+`BIO` and `vBIO` together remain the governance tokens of the protocol until `veBIO` is adopted through a formal proposal. `vBIO` cannot be converted into `veBIO`.
 
 ### veBIO
 
@@ -300,11 +305,11 @@ Bio Protocol applies a conventional DeFi toolkit, a vote-escrow token, a points 
 
 **Q: What is the difference between `vBIO` and `veBIO`?**
 
-They share a prefix and nothing else. `vBIO` is the balance of a `TokenVesting` contract: it represents `BIO` that has been allocated to an address but not yet released, decreases as tokens vest and are claimed, and cannot be transferred or converted. `veBIO` is a vote-escrow position created by voluntarily locking already-liquid `BIO` for 1 week to 2 years; it decays with time remaining, earns BioXP and airdrop shares, and cannot be exited early. `vBIO` cannot be turned into `veBIO`.
+They share only a prefix. `vBIO` is the balance of a `TokenVesting` contract: it represents `BIO` that has been allocated to an address but not yet released, decreases as tokens vest and are claimed, and cannot be transferred or converted. `veBIO` is a vote-escrow position created by voluntarily locking already-liquid `BIO` for 1 week to 2 years; it decays with time remaining, earns BioXP and airdrop shares, and cannot be exited early. `vBIO` cannot be turned into `veBIO`.
 
 **Q: How is a participant's allocation computed in an oversubscribed Ignition Sale?**
 
-Each participant's share is `min(user_points / total_points_pledged * tokens_for_sale, 0.005 * tokens_for_sale)`, where `user_points` is the BioXP pledged (1 if none was pledged) and the second term caps any single allocation at 0.5 % of the tokens on sale; the documentation separately states that no wallet may buy more than 1 % of total supply. USDC committed beyond the resulting allocation is refunded. If the sale is not oversubscribed, allocation follows USDC committed and BioXP plays no role.
+Each participant's share is `min(user_points / total_points_pledged * tokens_for_sale, 0.005 * tokens_for_sale)`, where `user_points` is the BioXP pledged (default 1) and the second term caps any single allocation at 0.5 % of the tokens on sale; the documentation separately states that no wallet may buy more than 1 % of total supply. USDC committed beyond the resulting allocation is refunded. If the sale is not oversubscribed, allocation follows USDC committed and BioXP plays no role.
 
 **Q: Why does the vesting contract implement the ERC-20 interface if transfers always revert?**
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Power-Law Curves - Scale Invariance, Log-Log Lines, Bonding Curves and Heavy Tails"
 date:   2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: finance defi
@@ -128,7 +129,7 @@ Three families are easy to confuse because all three can increase:
 | Straight on | linear axes | log-log axes | semi-log axes (log $$y$$ only) |
 | Long-run growth | slowest | in between | fastest |
 
-An exponential eventually exceeds any power law, however large its exponent. Comparing $$x^{10}$$ and $$2^{x}$$: the power is larger for every $$x$$ between about 1.08 and 58.8, and from 59 on the exponential is larger and the gap keeps widening ($$59^{10} \approx 5.11 \times 10^{17}$$ against $$2^{59} \approx 5.76 \times 10^{17}$$). In finance, compound interest is exponential in time; a bonding-curve price is a power law in supply. The two should not be mixed up when reading a chart.
+An exponential eventually exceeds any power law, however large its exponent. Comparing $$x^{10}$$ and $$2^{x}$$: the power is larger for every $$x$$ between about 1.08 and 58.8, and from 59 on the exponential is larger and the gap keeps widening ($$59^{10} \approx 5.11 \times 10^{17}$$ against $$2^{59} \approx 5.76 \times 10^{17}$$). In finance, compound interest is exponential in time; a bonding-curve price is a power law in supply.
 
 ## Integrals and sums
 
@@ -298,7 +299,7 @@ The following points were stated from general knowledge rather than from a sourc
 
 ### Verification
 
-- Every numerical value in this article (doubling and tenfold factors, the two-point exponents, the $$x^{10}$$ and $$2^{x}$$ crossings, the integral, the AMM prices and the 80/20 exponent) was recomputed with qalc (Qalculate!) on 22 October 2026.
+- Every numerical value in this article was recomputed with qalc (Qalculate!) on 22 October 2026: the doubling and tenfold factors, the two-point exponents, the $$x^{10}$$ and $$2^{x}$$ crossings, the integral, the AMM prices and the 80/20 exponent.
 
 ### Related articles
 

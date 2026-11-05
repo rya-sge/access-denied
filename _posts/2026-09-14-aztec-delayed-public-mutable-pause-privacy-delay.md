@@ -2,7 +2,7 @@
 layout: post
 title: "Reading Public State from a Private Function on Aztec — Why a Pause Flag Comes with a Delay"
 date:   2026-09-14
-last_modified_at: 2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -25,7 +25,7 @@ Aztec.nr offers two ways around this, and neither is free:
 - Enqueue a public call that performs the check, which publishes the fact that the token was touched;
 - Store the flag in a `DelayedPublicMutable`, which lets the private function read it but only because every write is postponed by a fixed delay.
 
-This article works through the second option with a generic private token and a pause flag as the running example. It explains why the delay is what makes the private read sound, what the delay costs the sender (a shorter window in which the transaction can be included, and a public expiration timestamp that shrinks the privacy set) and why the same delay that protects the read makes the mechanism a poor fit for an emergency pause. The reasoning is not specific to any one token design; it applies to any public value a private function needs to read.
+This article works through the second option with a generic private token and a pause flag as the running example. It explains why the delay is what makes the private read sound, what the delay costs the sender, and why the same delay that protects the read makes the mechanism a poor fit for an emergency pause. The cost to the sender is a shorter window in which the transaction can be included, and a public expiration timestamp that shrinks the privacy set. The reasoning is not specific to any one token design; it applies to any public value a private function needs to read.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -176,13 +176,13 @@ The expiration timestamp is part of the transaction's public data. Observers can
 
 The library's own summary is that a delay smaller than every other contract's "might be large enough to uniquely identify those transactions that interact with the contract - fully defeating the purpose of `DelayedPublicMutable`". The recommendation that follows is a delay of at least a couple of hours, with `MAX_TX_LIFETIME` as the optimum from a privacy standpoint.
 
-There is a second-order effect worth noting. Nothing stops a wallet from setting an even lower expiration on purpose, so that a transaction reading a soon-to-change variable does not carry that variable's exact change timestamp. The `PrivateContext` source describes this as something a "sophisticated wallet" should do and observes that wallets deviating from a common convention would in turn reveal which wallet produced each transaction. Expiration timestamps are a fingerprinting surface in their own right, and the delay is only the largest contributor.
+Nothing stops a wallet from setting an even lower expiration on purpose, so that a transaction reading a soon-to-change variable does not carry that variable's exact change timestamp. The `PrivateContext` source describes this as something a "sophisticated wallet" should do and observes that wallets deviating from a common convention would in turn reveal which wallet produced each transaction. Expiration timestamps are a fingerprinting surface in their own right, and the delay is only the largest contributor.
 
 ## Why it is unsuitable for an emergency pause
 
 Put the two costs together with the pause use case and the two requirements pull in opposite directions. The point of a pause is to stop transfers now; the point of the delay is to guarantee that nothing changes for a while.
 
-Consider the timeline. At `t0` the pause role schedules `paused = true`, effective at `t0 + D`. Every transfer proved against an anchor block before `t0` already carries an expiration no later than `anchor + D`, so those transactions remain includable until their own horizon. Every transfer proved after `t0` reads the pending change, sets its expiration to exactly `t0 + D`, and is includable until then. The flag stops nothing before `t0 + D`. The pause window is the delay, whatever the delay is.
+At `t0` the pause role schedules `paused = true`, effective at `t0 + D`. Every transfer proved against an anchor block before `t0` already carries an expiration no later than `anchor + D`, so those transactions remain includable until their own horizon. Every transfer proved after `t0` reads the pending change, sets its expiration to exactly `t0 + D`, and is includable until then. The flag stops nothing before `t0 + D`. The pause window is the delay, whatever the delay is.
 
 ![Pause scheduled at t0 with delay D. Transfers proved before and after t0 stay includable until t0 plus D, the first block where the flag is true and transfers fail]({{site.url_complet}}/assets/article/blockchain/aztec/delayed-pause-timeline-workflow.png)
 
@@ -299,7 +299,9 @@ That this transaction called this contract, plus the function selector and argum
 
 **Q: Why does lowering the delay require a wait, while raising it is immediate?**
 
-Because the guarantee behind every private read is that a value cannot change earlier than one current delay after the anchor block. If the delay could drop from six hours to one hour instantly, a change scheduled right after would land after one hour, inside the six-hour horizon of transactions already proved. Waiting the five-hour difference first means the earliest possible change under the new delay is no earlier than under the old one. Raising the delay only pushes changes later, which cannot invalidate any existing horizon.
+Because the guarantee behind every private read is that a value cannot change earlier than one current delay after the anchor block. If the delay could drop from six hours to one hour instantly, a change scheduled right after would land after one hour, inside the six-hour horizon of transactions already proved. Waiting the five-hour difference first means the earliest possible change under the new delay is no earlier than under the old one.
+
+Raising the delay only pushes changes later, which cannot invalidate any existing horizon.
 
 **Q: Two contracts in one transaction use delays of 1,000 and 10,000 seconds. What is the expiration, and what does an observer learn?**
 

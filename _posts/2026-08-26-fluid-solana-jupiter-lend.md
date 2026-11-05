@@ -2,7 +2,7 @@
 layout: post
 title: "Fluid on Solana — Porting a Liquidity Layer from the EVM to the SVM"
 date:   2026-08-26
-last_modified_at: 2026-10-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi solana
@@ -14,7 +14,7 @@ isMath: true
 
 Fluid, the DeFi protocol formerly known as Instadapp, is built around a single idea: one contract holds every token the protocol has, and the lending market, the collateralised debt positions and the DEX are thin protocols that borrow accounting space from it rather than custody of their own. On Ethereum that contract is the Liquidity Layer, and everything above it reaches it through one function, `operate()`.
 
-In 2025 that design was deployed on Solana under the name Jupiter Lend, a partnership between Fluid and Jupiter announced in May and launched in August. It is Fluid's first non-EVM deployment. The economics carried over intact: one shared reserve per token, tick-based liquidation, dynamic borrow and withdrawal ceilings. The mechanics did not, because most of the plumbing Fluid relies on has no equivalent on Solana. There is no `msg.sender` reaching a callee, no [ERC-20](https://eips.ethereum.org/EIPS/eip-20) allowance the pool can draw on, no reentrant callback, no `mapping` that materialises storage on first write, and no way to touch an account a transaction did not name in advance.
+In 2025 that design was deployed on Solana under the name Jupiter Lend, a partnership between Fluid and Jupiter announced in May and launched in August. It is Fluid's first non-EVM deployment. The economics carried over intact: one shared reserve per token, tick-based liquidation, dynamic borrow and withdrawal ceilings. The mechanics did not, because most of the EVM features Fluid relies on have no equivalent on Solana. There is no `msg.sender` reaching a callee, no [ERC-20](https://eips.ethereum.org/EIPS/eip-20) allowance the pool can draw on, no reentrant callback, no `mapping` that materialises storage on first write, and no way to touch an account a transaction did not name in advance.
 
 This article reads the six [Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/) programs that make up the Solana deployment and looks specifically at the seams: which parts of the EVM design survived the port unchanged, which had to be rebuilt around Solana's account model, and what an integrator or a reviewer should know about the mechanisms that only exist on this side.
 
@@ -80,9 +80,9 @@ if net_amount_in < operate_amount_in
 }
 ```
 
-With `FOUR_DECIMALS` at `1e4` and `MAX_INPUT_AMOUNT_EXCESS` at `100`, the accepted range is `[operate_amount_in, operate_amount_in × 1.01]`. The lower bound is strict, so a protocol can never credit itself more than it actually sent. The upper bound absorbs a rounding difference or a small transfer-hook surcharge without failing the transaction, and the excess simply stays in the vault as revenue. A protocol that sends more than one percent above the amount it declares gets an error rather than a silent donation.
+With `FOUR_DECIMALS` at `1e4` and `MAX_INPUT_AMOUNT_EXCESS` at `100`, the accepted range is `[operate_amount_in, operate_amount_in × 1.01]`. The lower bound is strict, so a protocol can never credit itself more than it sent. The upper bound absorbs a rounding difference or a small transfer-hook surcharge without failing the transaction, and the excess simply stays in the vault as revenue. A protocol that sends more than one percent above the amount it declares gets an error rather than a silent donation.
 
-Note what the check does *not* do: it never reads the transfer instruction. It only compares two balances. Any token program behaviour that changes the vault balance between the snapshot and the check is absorbed by the same arithmetic, which is why a fee-on-transfer or Token-2022 hook token can be listed without a special case, so long as its overhead stays inside the band.
+The check never reads the transfer instruction. It only compares two balances. Any token program behaviour that changes the vault balance between the snapshot and the check is absorbed by the same arithmetic, which is why a fee-on-transfer or Token-2022 hook token can be listed without a special case, so long as its overhead stays inside the band.
 
 ## When a transfer cannot land
 
@@ -112,7 +112,7 @@ This makes claimed balances senior to the free vault balance. A user calls `clai
 
 ## Storage: mappings become accounts
 
-An EVM `mapping` needs no allocation. Writing to a new key costs gas and nothing else. Solana has no such thing: every piece of state lives in an account that must be created, rent-funded, and named by the transaction before the program runs. Fluid's vault protocol is unusually mapping-heavy, so this is where the port diverges most.
+An EVM `mapping` needs no allocation. Writing to a new key costs only gas. Solana has no such thing: every piece of state lives in an account that must be created, rent-funded, and named by the transaction before the program runs. Fluid's vault protocol is unusually mapping-heavy, so this is where the port diverges most.
 
 ![A position PDA and its SPL NFT mint link to the vault config and state, to the per-tick and per-branch accounts, and to the sixteen tick-has-debt bitmap shards]({{site.url_complet}}/assets/article/blockchain/defi/fluid/fluid-solana-tick-branch-concept.png)
 
@@ -136,7 +136,7 @@ pub const TICKS_PER_TICK_HAS_DEBT: usize =
 pub const TOTAL_INDICES_NEEDED: usize = 16;
 ```
 
-Sixteen `TickHasDebtArray` accounts, each holding eight 256-bit maps, cover $$2048 \times 16 = 32768$$ tick slots, enough for the 32767 ticks in the range $$[-16383, 16383]$$. Searching downward for the next tick with debt walks the maps inside one account, and when it runs out it returns a flag saying the search must continue in the previous account, which the caller must have supplied. That is the structural cost of the port: a search that was a loop over storage slots becomes a loop over accounts the transaction had to predict.
+Sixteen `TickHasDebtArray` accounts, each holding eight 256-bit maps, cover $$2048 \times 16 = 32768$$ tick slots, enough for the 32767 ticks in the range $$[-16383, 16383]$$. Searching downward for the next tick with debt walks the maps inside one account, and when it runs out it returns a flag saying the search must continue in the previous account, which the caller must have supplied. That is the cost of the port: a search that was a loop over storage slots becomes a loop over accounts the transaction had to predict.
 
 ### Passing the accounts
 
@@ -159,7 +159,7 @@ The program then validates ownership itself. `get_ticks_from_remaining_accounts`
 
 ### Address lookup tables
 
-A vault operation names the position, the vault config and state, two token reserves, two liquidity positions, two token vaults, two mints, the oracle and its sources, the current tick, the branches, and the bitmap shards. That does not fit in a legacy transaction. Each vault therefore carries a lookup table address on a dedicated `VaultMetadata` account, set by `update_lookup_table`, and the SDK builds every vault instruction as a versioned transaction against it. The common accounts (config, state, reserves, the first eleven branches, the oracle) live in the table; only the position-specific accounts are passed inline.
+A vault operation names the position, the vault config and state, two token reserves, two liquidity positions, two token vaults, two mints, the oracle and its sources, the current tick, the branches, and the bitmap shards. That does not fit in a legacy transaction. Each vault therefore carries a lookup table address on a dedicated `VaultMetadata` account, set by `update_lookup_table`, and the SDK builds every vault instruction as a versioned transaction against it. The table holds the common accounts: config, state, reserves, the first eleven branches and the oracle. Only the position-specific accounts are passed inline.
 
 ## Rates, exchange prices and limits
 
@@ -231,7 +231,7 @@ $$
 
 A position discovers it was liquidated lazily, on its next `operate`, by comparing its stored `tick_id` against the tick's `total_ids`, and it recovers its remaining collateral by walking the branch chain and applying the accumulated factors. Branches merge when a later liquidation absorbs an earlier one, at which point the merged branch keeps a connection factor instead of its own debt.
 
-Above `liquidation_max_limit`, a position is not liquidated but absorbed: its collateral and debt move to the vault's `absorbed_col_amount` and `absorbed_debt_amount`, and a liquidator can take them without touching the tick machinery. The cap is on the pair rather than on the penalty alone: `update_core_settings` rejects any configuration where `liquidation_max_limit + liquidation_penalty` exceeds `MAX_LIQUIDATION_PENALTY`, that is 99.7%.
+Above `liquidation_max_limit`, a position is not liquidated but absorbed: its collateral and debt move to the vault's `absorbed_col_amount` and `absorbed_debt_amount`, and a liquidator can take them without liquidating tick by tick. The cap is on the pair rather than on the penalty alone: `update_core_settings` rejects any configuration where `liquidation_max_limit + liquidation_penalty` exceeds `MAX_LIQUIDATION_PENALTY`, that is 99.7%.
 
 ### Decimal normalisation
 
@@ -247,7 +247,7 @@ fn get_scale(decimals: u8) -> Result<u128> {
 }
 ```
 
-Amounts are scaled up on the way into `operate` and unscaled on the way out, with `unscale_amounts_up` used wherever rounding must favour the protocol. A consequence worth noting is that the vault program refuses any mint with more than nine decimals outright, and the liquidity program independently refuses anything outside two to nine.
+Amounts are scaled up on the way into `operate` and unscaled on the way out, with `unscale_amounts_up` used wherever rounding must favour the protocol. As a consequence, the vault program refuses any mint with more than nine decimals outright, and the liquidity program independently refuses anything outside two to nine.
 
 The minimum-size constants are expressed in normalised units, so their real value depends on the token. `MIN_DEBT` is `1e3` at nine decimals, which becomes `1e6` raw units for a six-decimal token such as USDC. Tokens below four decimals get a separate, much smaller set of constants.
 
@@ -343,7 +343,7 @@ The code is not open source. It ships under the [Business Source License 1.1](ht
 
 ## Conclusion
 
-The port keeps Fluid's economic design intact and rebuilds its plumbing. The shared reserve, the tick-based liquidation with branches and debt factors, the dual rate curves and the per-protocol expanding limits all carry over with the same constants. What changed is everything that depended on EVM execution semantics: the pull-based deposit became a snapshot-and-compare handshake, the reentrant flash loan callback became instruction introspection, the storage mapping became a set of PDAs the caller must name in advance, and the unconditional token transfer gained a claim fallback for the case where a destination account will not accept it.
+The port keeps Fluid's economic design intact and rebuilds its mechanics. The shared reserve, the tick-based liquidation with branches and debt factors, the dual rate curves and the per-protocol expanding limits all carry over with the same constants. What changed is everything that depended on EVM execution semantics: the pull-based deposit became a snapshot-and-compare handshake, the reentrant flash loan callback became instruction introspection, the storage mapping became a set of PDAs the caller must name in advance, and the unconditional token transfer gained a claim fallback for the case where a destination account will not accept it.
 
 For a reviewer, the parts that carry the most new risk are the ones with no EVM ancestor: the `interacting_*` handshake, whose safety rests on two equality checks and a reset; the caller-supplied account lists, whose safety rests on per-account owner and `vault_id` validation; and the flash loan introspection, whose safety rests on a byte-exact match against a hardcoded discriminator.
 
@@ -486,11 +486,15 @@ The replacement inverts the direction: the caller pushes tokens first, and the p
 
 **Q: What stops one protocol from crediting itself with a deposit that another protocol made?**
 
-Three things acting together. `pre_operate` writes the caller's public key into `interacting_protocol` and the current Unix second into `interacting_timestamp`. `operate` refuses to proceed unless both match the current caller and the current second, so a snapshot cannot be reused by a different program or carried into a later transaction. `operate` then clears both fields, so a single `pre_operate` authorises exactly one deposit-carrying call.
+Three things acting together:
+
+1. `pre_operate` writes the caller's public key into `interacting_protocol` and the current Unix second into `interacting_timestamp`.
+2. `operate` refuses to proceed unless both match the current caller and the current second, so a snapshot cannot be reused by a different program or carried into a later transaction.
+3. `operate` then clears both fields, so a single `pre_operate` authorises exactly one deposit-carrying call.
 
 **Q: Why does the balance check accept up to 1% more than the declared amount, and where does the excess go?**
 
-The lower bound is what protects the protocol, and it is strict: crediting more than was actually received is impossible. The upper bound exists so that a rounding difference or a small transfer-hook surcharge does not abort an otherwise valid deposit. Anything received above the declared amount simply stays in the token vault and accrues to the protocol as revenue, so the tolerance costs the depositor rather than the pool.
+The lower bound is what protects the protocol, and it is strict: crediting more than was received is impossible. The upper bound exists so that a rounding difference or a small transfer-hook surcharge does not abort an otherwise valid deposit. Anything received above the declared amount simply stays in the token vault and accrues to the protocol as revenue, so the tolerance costs the depositor rather than the pool.
 
 **Q: What is a tick, and why does the vault store one instead of a debt figure?**
 
@@ -500,7 +504,14 @@ Storing the tick rather than the debt is what makes liquidation cheap. A liquida
 
 **Q: How does a flash loan guarantee repayment without a callback?**
 
-Before releasing anything, `flashloan_borrow` reads the instruction sysvar and scans every instruction scheduled after it in the same transaction, looking for a `flashloan_payback` that matches on four counts: the program, a sixteen-byte payload opening with the hardcoded payback discriminator, the same amount, and an account list identical to the borrow's, position by position. Exactly one match is required; zero and two or more are both errors, and an instruction belonging to the program that fails the match is itself an error rather than being ignored.
+Before releasing anything, `flashloan_borrow` reads the instruction sysvar and scans every instruction scheduled after it in the same transaction, looking for a `flashloan_payback` that matches on four counts:
+
+- The program.
+- A sixteen-byte payload opening with the hardcoded payback discriminator.
+- The same amount.
+- An account list identical to the borrow's, position by position.
+
+Exactly one match is required; zero and two or more are both errors, and an instruction belonging to the program that fails the match is itself an error rather than being ignored.
 
 Both instructions also require `get_stack_height() == 1`, because the introspection only proves anything about top-level instructions; running either through a CPI would let a caller schedule a payback that never executes.
 

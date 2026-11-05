@@ -2,7 +2,7 @@
 layout: post
 title: "Code Reuse in Aztec Contracts — Modules, Traits and Library Crates Instead of Inheritance"
 date:   2026-09-15
-last_modified_at: 2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -34,12 +34,12 @@ Together they rule out the Solidity pattern in both of its forms. You cannot inh
 
 ## What a contract module must own
 
-The line between "must be in the block" and "can be anywhere" is the design constraint, so it is worth stating precisely. Four things belong to the contract module and nothing else:
+Only four things belong to the contract module:
 
 - **Entry-point declarations and their attributes.** `#[external("private")]`, `#[external("public")]`, `#[external("utility")]`, and the modifiers stacked on them: `#[authorize_once("from", "nonce")]` for authwit checks, `#[only_self]` for functions only the contract may call, `#[view]`, `#[initializer]`. These are what the macro reads.
 - **The storage struct.** `#[storage] struct Storage<Context> { … }` declares the state variables, and the macro allocates storage slots to them in declaration order. The slot of a private state variable feeds every note hash and nullifier written under it, so the struct is not only a declaration but a commitment to a layout.
 - **Events.** `#[event] struct Transfer { … }` is a contract type. The macro also keeps a global registry of event selectors across the whole crate graph and refuses two events with the same signature — a fact that matters for dependencies, below.
-- **Calls that name the contract itself.** `self.enqueue_self.some_public_fn(args)` (queue a public function of this contract from a private one), `self.internal.helper(args)` (an inlined helper), and `self.emit(Event { … })`. The `enqueue_self` and `internal` objects are generated per contract.
+- **Calls that name the contract itself.** `self.enqueue_self.some_public_fn(args)` queues a public function of this contract from a private one, `self.internal.helper(args)` calls an inlined helper, and `self.emit(Event { … })` emits an event. The `enqueue_self` and `internal` objects are generated per contract.
 
 Everything else is ordinary Noir: the checks, the arithmetic, the note movements, the reads and writes through state variables. Ordinary Noir can be in a library crate.
 
@@ -83,7 +83,10 @@ impl Pausable<PublicContext> {
 }
 ```
 
-Two properties of this struct carry the whole approach. First, the struct is generic over the context, and the methods are written per context: `impl Pausable<PublicContext>` for what public functions may do, `impl Pausable<&mut PrivateContext>` for what private functions may do. The type system then enforces the private/public split that Aztec imposes: a `PublicMutable` has no `read` in the private `impl`, so a private function that tries to read the pause flag does not compile, which is exactly what the protocol would otherwise refuse at proving time. Second, the struct is a *value*: a context handle and a slot number. It can be copied, passed to a function, returned from one. Nothing about it is tied to the contract that holds it in storage.
+Two properties of this struct carry the whole approach:
+
+- **The struct is generic over the context, and the methods are written per context:** `impl Pausable<PublicContext>` for what public functions may do, `impl Pausable<&mut PrivateContext>` for what private functions may do. The type system then enforces the private/public split that Aztec imposes: a `PublicMutable` has no `read` in the private `impl`, so a private function that tries to read the pause flag does not compile, which is exactly what the protocol would otherwise refuse at proving time.
+- **The struct is a *value*:** a context handle and a slot number. It can be copied, passed to a function, returned from one. Nothing about it is tied to the contract that holds it in storage.
 
 A contract uses the module by holding it as a field:
 
@@ -202,7 +205,7 @@ where
 }
 ```
 
-The difference from Solidity's mechanism is not cosmetic. A `virtual` call is resolved at compile time too in the EVM sense, but the pattern is designed around a class hierarchy in which the base does not know its derivations. A Noir trait bound is monomorphised: `transfer_private::<FreezeAndLists>` and `transfer_private::<FreezeOnly>` are two functions, each compiled with the concrete screening inlined. There is no dispatch at runtime, no table, no indirection in the circuit. The generic costs nothing and the light variant's circuit does not contain the list check it never runs.
+A `virtual` call is resolved at compile time too in the EVM sense, but the pattern is designed around a class hierarchy in which the base does not know its derivations. A Noir trait bound is monomorphised: `transfer_private::<FreezeAndLists>` and `transfer_private::<FreezeOnly>` are two functions, each compiled with the concrete screening inlined. There is no dispatch at runtime, no table, no indirection in the circuit. The generic costs nothing and the light variant's circuit does not contain the list check it never runs.
 
 The trait is also where the design decisions become visible. Reading `Screening` tells a reviewer, in one place, what every variant is required to decide about a transfer, a mint and a burn; reading the two implementations tells them how the variants differ. Three copies of a file tell the same story only to someone who diffs them.
 
@@ -273,9 +276,14 @@ Two traps come with contract dependencies, and both surface as confusing errors:
 
 ### Events: emitted by the contract, shaped by the library
 
-Events deserve their own paragraph, because they are the one thing a library can neither declare nor emit, and the constraint comes from what the `#[event]` and `#[aztec]` macros generate, not from a style rule. An `#[event] struct Transfer { from, to, amount }` is turned by the macro into a contract type: it gains an `EventInterface` implementation with a selector derived from the struct's signature, and that selector is entered in the crate-graph-wide registry mentioned above. The struct therefore belongs to the contract that declares it, in the same sense that the storage struct does.
+Events are the one thing a library can neither declare nor emit, and the constraint comes from what the `#[event]` and `#[aztec]` macros generate, not from a style rule. An `#[event] struct Transfer { from, to, amount }` is turned by the macro into a contract type: it gains an `EventInterface` implementation with a selector derived from the struct's signature, and that selector is entered in the crate-graph-wide registry mentioned above. The struct therefore belongs to the contract that declares it, in the same sense that the storage struct does.
 
-Emitting it is a method of the generated `self`, and the two execution contexts differ in what emitting means. In a **public** function, `self.emit(Transfer { … })` writes a public log: plaintext, visible to everyone, the same as a Solidity event, and nothing further to do. In a **private** function, `self.emit(...)` does two things: it pushes a nullifier that is a randomised commitment to the event, so that a third party can later verify the event is authentic without learning its content; and it returns an `EventMessage` that the caller *must* deliver, or the event is lost. Delivery names a recipient and a mode: `deliver_to(to, MessageDelivery::onchain_constrained())` encrypts the event to `to` and proves in the circuit that the ciphertext matches, at a measurable gate cost per delivery; the same message can be delivered again to a second party, such as an auditor.
+Emitting it is a method of the generated `self`, and the two execution contexts differ in what emitting means:
+
+- In a **public** function, `self.emit(Transfer { … })` writes a public log: plaintext, visible to everyone, the same as a Solidity event, and nothing further to do.
+- In a **private** function, `self.emit(...)` does two things: it pushes a nullifier that is a randomised commitment to the event, so that a third party can later verify the event is authentic without learning its content; and it returns an `EventMessage` that the caller *must* deliver, or the event is lost.
+
+Delivery names a recipient and a mode: `deliver_to(to, MessageDelivery::onchain_constrained())` encrypts the event to `to` and proves in the circuit that the ciphertext matches, at a measurable gate cost per delivery; the same message can be delivered again to a second party, such as an auditor.
 
 None of that is available to a library function. It has no `self`, it cannot name the contract's event type, and its `PrivateContext` argument is not the generated object that knows how to emit. What it *can* do is decide the content and return it. The division of labour that follows is the same one as for `enqueue_self`: the library computes, the contract publishes.
 
@@ -308,7 +316,9 @@ Two things could change this. The documentation itself says the single-file rest
 
 ## Conclusion
 
-Aztec contracts cannot inherit, and every entry point must sit in one contract block, but that constraint is narrower than "one file per token". The contract module owns four things: entry-point declarations with their attributes, the storage struct that fixes the slot layout, the event types, and the calls that name the contract itself. Everything those entry points do can live in a library crate, because Aztec's state variables are values that a function can take as arguments, and because a Noir trait with a generic bound does at compile time what `virtual` and `override` do in Solidity, monomorphised into the circuit at no cost. A token with two variants becomes one library holding the rules and two short contracts holding declarations plus one trait implementation each — with a gate profile that a diff can prove unchanged.
+Aztec contracts cannot inherit, and every entry point must sit in one contract block, but that constraint is narrower than "one file per token". The contract module owns four things: entry-point declarations with their attributes, the storage struct that fixes the slot layout, the event types, and the calls that name the contract itself.
+
+Everything those entry points do can live in a library crate, because Aztec's state variables are values that a function can take as arguments, and because a Noir trait with a generic bound does at compile time what `virtual` and `override` do in Solidity, monomorphised into the circuit at no cost. A token with two variants becomes one library holding the rules and two short contracts holding declarations plus one trait implementation each — with a gate profile that a diff can prove unchanged.
 
 ![Mindmap of code reuse in Aztec contracts covering why there is no inheritance, what the contract module must own, library crates and module structs, traits instead of virtual methods, contract dependencies as interfaces only, and what still cannot be shared]({{site.url_complet}}/assets/article/blockchain/aztec/2026-09-15-aztec-code-reuse-mindmap.png)
 

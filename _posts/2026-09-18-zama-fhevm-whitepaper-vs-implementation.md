@@ -2,6 +2,7 @@
 layout: post
 title: "The Zama FHEVM Whitepaper — What It Specifies, and What the Code Does Differently"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -177,7 +178,7 @@ Two properties of the paper's design are lost, deliberately. A contract or an in
 The paper describes a protocol; the repository is a deployment, and several additions are the difference between the two:
 
 - **Fees.** A `ProtocolPayment` contract on the Gateway prices input verification, public decryption and user decryption. The paper never mentions a fee or a token; the litepaper does.
-- **Operator contexts.** Thresholds are read per `contextId` from `GatewayConfig`, so that a change of operator set can be introduced as a new context rather than a global reconfiguration. This is the machinery the paper's "committee-based MPC" future-work item would need.
+- **Operator contexts.** Thresholds are read per `contextId` from `GatewayConfig`, so that a change of operator set can be introduced as a new context rather than a global reconfiguration. The paper's "committee-based MPC" future-work item would need these contexts.
 - **Delegated user decryption.** A holder can delegate, per contract or with a wildcard and with an expiry, the right to request user decryption of its handles to another address. The stated use is account abstraction, where the decryption request is issued by a smart-contract account.
 - **Operational controls.** Pausing on both the host and the Gateway contracts, UUPS upgradeability with an on-chain version check, `KMSGeneration` mirrored on the host chain, and a `ZamaEthereumConfig` base contract that wires a dApp to the right addresses.
 

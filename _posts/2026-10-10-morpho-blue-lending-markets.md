@@ -2,6 +2,7 @@
 layout: post
 title: "How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt"
 date:   2026-10-10
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -240,7 +241,9 @@ Two consequences matter for the vaults built on Blue:
 
 The interface lists the assumptions under which Blue behaves correctly. One of them ties the oracle to the liquidation formula: the price must not be able to drop instantly to less than the previous price multiplied by $$\text{LLTV} \cdot \text{LIF}$$.
 
-The reasoning follows from the table. A position at the LLTV becomes a bad-debt position once its LTV exceeds $$1 / \text{LIF}$$, which happens if the price falls by a factor of $$\text{LLTV} \cdot \text{LIF}$$. If the oracle can make that jump in one update, a position can go from healthy to insolvent with no block in between for a liquidator to act. For an 86 % market the factor is about 0.898, a drop of about 10 %; for a 94.5 % market it is about 0.961, a drop of about 4 %. The interface gives a specific example of an oracle that breaks this assumption: pricing a vault token from its assets under management when the vault can receive donations.
+A position at the LLTV becomes a bad-debt position once its LTV exceeds $$1 / \text{LIF}$$, which happens if the price falls by a factor of $$\text{LLTV} \cdot \text{LIF}$$. If the oracle can make that jump in one update, a position can go from healthy to insolvent with no block in between for a liquidator to act. For an 86 % market the factor is about 0.898, a drop of about 10 %; for a 94.5 % market it is about 0.961, a drop of about 4 %.
+
+The interface gives a specific example of an oracle that breaks this assumption: pricing a vault token from its assets under management when the vault can receive donations.
 
 Blue does not check any of this. The interface says that selecting markets with safe oracles is the user's responsibility.
 
@@ -375,7 +378,9 @@ Interest accrues to every supplier and every borrower of a market at the same ra
 
 **Q: A market has an LLTV of 94.5 %. What is the liquidator's bonus, and why is it smaller than in a 77 % market?**
 
-The LIF is $$1 / (1 - 0.3 \cdot 0.055) \approx 1.0168$$, a bonus of about 1.7 %. In a 77 % market it is about 7.4 %. A high LLTV is chosen for collateral that tracks the loan token closely, such as a liquid staking token against ETH, and leaves little room between the liquidation threshold and insolvency. A large bonus there would itself push positions into bad debt: at a 94.5 % LLTV, any LTV above about 98.4 % already cannot support a full liquidation. Lower-LLTV markets hold more volatile collateral, so liquidators need a larger margin to cover price movement and slippage.
+The LIF is $$1 / (1 - 0.3 \cdot 0.055) \approx 1.0168$$, a bonus of about 1.7 %. In a 77 % market it is about 7.4 %.
+
+A high LLTV is chosen for collateral that tracks the loan token closely, such as a liquid staking token against ETH, and leaves little room between the liquidation threshold and insolvency. A large bonus there would itself push positions into bad debt: at a 94.5 % LLTV, any LTV above about 98.4 % already cannot support a full liquidation. Lower-LLTV markets hold more volatile collateral, so liquidators need a larger margin to cover price movement and slippage.
 
 **Q: A borrower's position is underwater but still holds some collateral. Has the market realised the loss?**
 
@@ -394,7 +399,9 @@ Closing the position uses the `repay` callback in the same way, in reverse.
 
 **Q: Why does the interface require that an oracle price cannot fall by more than a factor of LLTV times LIF in one update?**
 
-A position opened at the LLTV becomes impossible to liquidate fully, without leaving bad debt, once its LTV exceeds $$1 / \text{LIF}$$. Going from an LTV equal to the LLTV to an LTV of $$1 / \text{LIF}$$ corresponds to a price drop by a factor of $$\text{LLTV} \cdot \text{LIF}$$. If an oracle can jump down by more than that in one update, positions can become insolvent before any liquidator has a chance to act, and the market accumulates bad debt even with perfect liquidators. For an 86 % market this is a drop of about 10 %.
+A position opened at the LLTV becomes impossible to liquidate fully, without leaving bad debt, once its LTV exceeds $$1 / \text{LIF}$$. Going from an LTV equal to the LLTV to an LTV of $$1 / \text{LIF}$$ corresponds to a price drop by a factor of $$\text{LLTV} \cdot \text{LIF}$$.
+
+If an oracle can jump down by more than that in one update, positions can become insolvent before any liquidator has a chance to act, and the market accumulates bad debt even with perfect liquidators. For an 86 % market this is a drop of about 10 %.
 
 **Q: Which actions require an authorization, and which can anyone perform on behalf of another account?**
 

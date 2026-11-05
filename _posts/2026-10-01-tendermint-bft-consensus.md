@@ -2,6 +2,7 @@
 layout: post
 title: "Tendermint — BFT Consensus over Gossip, Locks and the validValue Termination Mechanism"
 date:   2026-10-01
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain
@@ -71,13 +72,13 @@ The paper adds one property that captures gossip:
 
 The second half is what Tendermint builds on. Anything a correct process has seen, every correct process will see within $$\Delta$$ after GST, including messages originally sent by Byzantine processes. A proposer therefore does not need to forward evidence: the evidence is already travelling.
 
-The paper notes that the algorithm also works in a weaker model where good periods (reliable and timely) alternate with bad periods (asynchronous, messages may be lost), as long as good periods last long enough.
+The paper notes that the algorithm also works in a weaker model where reliable, timely good periods alternate with asynchronous bad periods in which messages may be lost, as long as good periods last long enough.
 
 ## The consensus problem
 
 ### State machine replication requirements
 
-Following Schneider, a Byzantine-tolerant replicated state machine needs *replica coordination*: all non-faulty replicas receive and process the same sequence of requests. This splits into **Agreement** (every non-faulty replica receives every request) and **Order** (they receive them in the same order). Byzantine tolerance adds a third requirement: only requests that clients proposed are executed. In Tendermint, checking that a transaction is valid is the job of the replicated application, which the consensus engine queries before processing it.
+Following Schneider, a Byzantine-tolerant replicated state machine needs *replica coordination*: all non-faulty replicas receive and process the same sequence of requests. This splits into **Agreement**, meaning every non-faulty replica receives every request, and **Order**, meaning they receive them in the same order. Byzantine tolerance adds a third requirement: only requests that clients proposed are executed. In Tendermint, checking that a transaction is valid is the job of the replicated application, which the consensus engine queries before processing it.
 
 ### Validity-predicate-based consensus
 
@@ -203,7 +204,7 @@ Gossip turns this into a guarantee after GST. **Lemma 6** shows that if a correc
 
 So after GST, either some correct process locked recently, in which case every correct process now holds that value as `validValue` with a `validRound` at least as high as every lock, or no correct process locked, in which case any correct process's `validValue` is acceptable to all. In both cases, the first correct proposer of a later round proposes a value every correct process accepts.
 
-The paper's argument for why a non-deciding sequence of rounds is finite rests on one observation: at the start of every round there is a correct process $$c$$ whose `validValue` and `validRound` are acceptable to every correct process, namely the one that locked most recently (or any, if none did). The weighted round-robin eventually makes $$c$$ the proposer.
+The paper's argument for why a non-deciding sequence of rounds is finite rests on one observation: at the start of every round there is a correct process $$c$$ whose `validValue` and `validRound` are acceptable to every correct process, namely the one that locked most recently, or any correct process if none did. The weighted round-robin eventually makes $$c$$ the proposer.
 
 Nothing in this mechanism adds a message or a field beyond what the normal case already sends. The `validRound` integer in the PROPOSAL is the only addition, and the justifying prevotes are not forwarded by the proposer: each process already received them through gossip.
 

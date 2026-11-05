@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2017 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security solidity
@@ -156,7 +157,7 @@ Classic Ether Wallet lost its domain when an attacker convinced its hosting prov
 
 ### Spear phishing, then the network (NiceHash)
 
-NiceHash's [investigation update](https://web.archive.org/web/2018id_/https://www.nicehash.com/news/niceHash-security-breach-investigation-update) describes the classic path of an intrusion into a company: a spear-phishing email gave the attacker a foothold, stolen VPN credentials let them move through the data centre, and the hot wallet's keys were within reach of that network. Group-IB describes the same pattern, with malicious documents sent as job applications, in the attacks on Korean exchanges it attributes to Lazarus ([Security Affairs](https://securityaffairs.com/77213/hacking/cyber-attacks-crypto-exchanges.html)). The defences are network ones: wallet-signing systems on an isolated network, no VPN path from staff machines to them, and hardware-backed keys that require several people to approve large transfers.
+NiceHash's [investigation update](https://web.archive.org/web/2018id_/https://www.nicehash.com/news/niceHash-security-breach-investigation-update) describes the classic path of an intrusion into a company: a spear-phishing email gave the attacker a foothold, stolen VPN credentials let them move through the data centre, and the hot wallet's keys were accessible from that network. Group-IB describes the same pattern, with malicious documents sent as job applications, in the attacks on Korean exchanges it attributes to Lazarus ([Security Affairs](https://securityaffairs.com/77213/hacking/cyber-attacks-crypto-exchanges.html)). The defences are network ones: wallet-signing systems on an isolated network, no VPN path from staff machines to them, and hardware-backed keys that require several people to approve large transfers.
 
 ### An issuer's freeze through a client release (Tether)
 

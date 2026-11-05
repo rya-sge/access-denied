@@ -2,6 +2,7 @@
 layout: post
 title: "How Charrette Works: Architecture of an Agent Skill Collection That Plans Before It Codes"
 date:   2026-10-13
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: ai programmation
@@ -51,7 +52,7 @@ The plugin manifest `.claude-plugin/plugin.json` lists the eight group folders e
 
 ### Skills written for a router and a reader
 
-A skill is read at two moments, and Charrette writes for both. The harness's router reads only the `description` field when deciding which skill to load, so the description states what triggers the skill, what it produces and what it excludes, and nothing else. The agent reads the body only after loading it, so the method lives there.
+A skill is read at two moments, and Charrette writes for both. The harness's router reads only the `description` field when deciding which skill to load, so the description states only what triggers the skill, what it produces and what it excludes. The agent reads the body only after loading it, so the method lives there.
 
 Several of the repository's own conventions (in its `AGENTS.md`) follow from the cost of loading:
 
@@ -93,7 +94,17 @@ One pass through this loop is one iteration and delivers one increment. What the
 
 ### Above the loop: the roadmap
 
-The `roadmap` skill keeps one document per project. It orders the iterations, and each iteration is made of *slots*: something a customer can use, or a system that can be deployed. A slot's state is never typed by hand. It is derived from the documents tagged with the slot's slug: no document means *empty*, a board or an unapproved plan means *in design*, an approved plan means *planned*, a tracker with a step in progress means *in progress*, and *landed* requires the person's evidence (a URL, a deployment, a customer). A separate *foundation* reference records technology decisions (stack, database, hosting), each closed no later than the first slot that needs it.
+The `roadmap` skill keeps one document per project. It orders the iterations, and each iteration is made of *slots*: something a customer can use, or a system that can be deployed.
+
+A slot's state is never typed by hand. It is derived from the documents tagged with the slot's slug:
+
+- no document means *empty*;
+- a board or an unapproved plan means *in design*;
+- an approved plan means *planned*;
+- a tracker with a step in progress means *in progress*;
+- *landed* requires the person's evidence (a URL, a deployment, a customer).
+
+A separate *foundation* reference records technology decisions on stack, database and hosting, each closed no later than the first slot that needs it.
 
 ## The plan document
 
@@ -193,7 +204,7 @@ Before the first dispatch, the orchestrator settles the *mandate*, a set of fiel
 | `tests` | at the plan end · at the slice end · none |
 | `verify` | each slice · slot done · off |
 
-While subagents work, the orchestrator runs a digest script (`watch-agents.mjs`) every few minutes. It prints one line per live subagent (call count, idle time, last tool, last words) and marks a command that crosses the brief's boundary; the orchestrator reports a stall or a breach and steers only a drift from the brief. The orchestrator never opens a full transcript, because that would exhaust its own context. Forks run in separate git worktrees, and merges are done by a dedicated subagent that stops on a conflict instead of resolving it.
+While subagents work, the orchestrator runs a digest script (`watch-agents.mjs`) every few minutes. It prints one line per live subagent, with its call count, idle time, last tool and last words, and marks a command that crosses the brief's boundary; the orchestrator reports a stall or a breach and steers only a drift from the brief. The orchestrator never opens a full transcript, because that would exhaust its own context. Forks run in separate git worktrees, and merges are done by a dedicated subagent that stops on a conflict instead of resolving it.
 
 ### Swarm mode
 
@@ -247,7 +258,9 @@ flowchart TB
   SK -.->|"write-conventions,<br/>technical-writing"| AG
 ```
 
-Documents are filed one folder per project under `docs/<project>/`, and a project record lists the working directories it covers. That way, a session started in a repository resolves to its project by longest-prefix match. Each file follows the `YYYY-MM-DD-<topic>.<kind>.md` pattern. The kind is mandatory (`brainstorm`, `plan`, `slice`, `module`, `mockup`, `workbench`, `pr-analysis`, `report`, `roadmap` and a few others), and a plan gets its own group shared with its slice documents. Agents never build a path by hand: `aiview path <filename>` returns it for the current operating system, and `aiview open` registers the file, starts the server if needed and prints the URL to give the person.
+Documents are filed one folder per project under `docs/<project>/`, and a project record lists the working directories it covers. That way, a session started in a repository resolves to its project by longest-prefix match. Each file follows the `YYYY-MM-DD-<topic>.<kind>.md` pattern. The kind is mandatory, and a plan gets its own group shared with its slice documents. The kinds are `brainstorm`, `plan`, `slice`, `module`, `mockup`, `workbench`, `pr-analysis`, `report`, `roadmap` and a few others.
+
+Agents never build a path by hand: `aiview path <filename>` returns it for the current operating system, and `aiview open` registers the file, starts the server if needed and prints the URL to give the person.
 
 Beyond rendering, aiview carries the checks the protocols depend on: `mermaid-check` parses every diagram in a document with the bundled Mermaid parser, `tracker check` judges a tracker against its own protocol, and `check` resolves the bindings between mockups (a screen binding components from a parts sheet).
 
@@ -257,10 +270,10 @@ Beyond rendering, aiview carries the checks the protocols depend on: `mermaid-ch
 
 ## Distribution and releases
 
-Charrette reaches users as a Claude Code plugin, with the repository acting as its own marketplace. Two properties of that channel shape the release procedure, documented in `RELEASING.md`:
+Charrette reaches users as a Claude Code plugin, with the repository acting as its own marketplace. Two properties of that channel drive the release procedure, documented in `RELEASING.md`:
 
 - **The version is the delivery.** Claude Code caches an installed plugin by version and skips an update when the declared version matches the installed one. The version is declared in both `plugin.json` and `marketplace.json`, and `plugin.json` takes precedence. A push without a version bump reaches no existing user, and nothing reports it.
-- **Build output is committed.** An update installs into a new, empty cache directory, so anything not in git would have to be rebuilt by every user. The aiview UI (`dist/`) and the bundled CLI (`dist-cli/`, built by esbuild with dependencies such as `parse5` and `mermaid` inlined) are therefore versioned, and the only runtime requirement is Node.
+- **Build output is committed.** An update installs into a new, empty cache directory, so anything not in git would have to be rebuilt by every user. The aiview UI in `dist/` and the bundled CLI in `dist-cli/` are therefore versioned, and the only runtime requirement is Node. The CLI is built by esbuild with dependencies such as `parse5` and `mermaid` inlined.
 
 A release runs the builds and tests, bumps both manifests to the same version and pushes; a GitHub workflow creates the `charrette--v<version>` tag. The repository's conventions also warn that the plugin cache is itself a clone with push rights. Work committed there is real and leaves the development checkout behind, which has happened once.
 
@@ -331,7 +344,13 @@ They live in the data home, `$CHARRETTE_HOME` or `charrette_appdata` in the user
 
 **Q: What does a later session need in order to resume a half-executed plan?**
 
-Only the plan document. The tracker's glyphs show which steps are done, in progress, blocked or dropped. The state node gives the branch, commit, next step, blockers and parked work. The line under the diagram states the mandate in force. `execute-plan` reconciles the tracker against the repository before resuming and reports any difference it finds.
+Only the plan document:
+
+- the tracker's glyphs show which steps are done, in progress, blocked or dropped;
+- the state node gives the branch, commit, next step, blockers and parked work;
+- the line under the diagram states the mandate in force.
+
+`execute-plan` reconciles the tracker against the repository before resuming and reports any difference it finds.
 
 **Q: How do `execute-plan`, `orchestrate-plan` and `execute-slice` divide the work?**
 
@@ -343,7 +362,7 @@ The split is by role:
 
 **Q: Why does a release that changes only aiview's TypeScript source fail to reach users?**
 
-Two mechanisms combine. Claude Code updates a plugin only when its declared version changes, so the version must be bumped in both manifests. Users also never build anything: an update installs into an empty cache directory and runs the committed `dist/` and `dist-cli/` output. A source change without a rebuild therefore ships the old viewer, even with a correct version bump.
+Claude Code updates a plugin only when its declared version changes, so the version must be bumped in both manifests. Users also never build anything: an update installs into an empty cache directory and runs the committed `dist/` and `dist-cli/` output. A source change without a rebuild therefore ships the old viewer, even with a correct version bump.
 
 **Q: A team of five plans in parallel with Charrette. Which parts of the design cause friction, and why?**
 

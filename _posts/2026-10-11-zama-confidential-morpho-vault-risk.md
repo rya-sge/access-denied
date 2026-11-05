@@ -2,6 +2,7 @@
 layout: post
 title: "Risk of a Zama Confidential Morpho Vault - Losses, Exits, Contagion and What Can Be Watched"
 date:   2026-10-11
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum zama
@@ -96,7 +97,7 @@ The instant exit can beat the incident, but only with warning, and at the price 
 
 The stay-or-exit decision is computed the same way for a confidential holder. In the example, staying loses 29,201 USDC on the 235,890 position, and leaving first loses nothing, so the verdict given the incident is EXIT.
 
-When the incident is not certain, the decision becomes a breakeven probability. Leaving forgoes 1,939 USDC of yield over 30 days (the vault pays about 10 % a year), so it pays if the incident's probability over 30 days is above 1,939 ÷ 29,201 = 6.64 %. The confidential holder faces the same arithmetic. The difference is which exit actually achieves "leaving first", and what it reveals.
+When the incident is not certain, the decision becomes a breakeven probability. Leaving forgoes 1,939 USDC of yield over 30 days (the vault pays about 10 % a year), so it pays if the incident's probability over 30 days is above 1,939 ÷ 29,201 = 6.64 %. The confidential holder faces the same arithmetic. The difference is which exit achieves "leaving first", and what it reveals.
 
 ## Contagion
 
@@ -104,7 +105,7 @@ Contagion has two channels here, and only one of them carries a loss.
 
 ### Through the markets
 
-A shock on one collateral hits every market that prices it, through the same feed or the same oracle. In the example, the same 30 % markdown costs the lenders of two sibling markets (markets the vault does not supply, lending against the same token) 4,455,716 PYUSD and 632,835 AUSD. This channel is computed the same way for a confidential vault: a dependency graph of markets, oracles and feeds, and a propagation of the price change through it.
+A shock on one collateral hits every market that prices it, through the same feed or the same oracle. In the example, two sibling markets lend against the same token, and the vault does not supply them. The same 30 % markdown costs their lenders 4,455,716 PYUSD and 632,835 AUSD. This channel is computed the same way for a confidential vault: a dependency graph of markets, oracles and feeds, and a propagation of the price change through it.
 
 ### Through Zama
 

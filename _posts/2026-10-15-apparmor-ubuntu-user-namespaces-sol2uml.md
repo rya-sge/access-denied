@@ -2,6 +2,7 @@
 layout: post
 title: "AppArmor on Ubuntu, User Namespace Restrictions, and Why sol2uml Cannot Export a PNG"
 date:   2026-10-15
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: linux security
@@ -227,7 +228,7 @@ The weakness is the path. AppArmor identifies the program by where it is, and th
 sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 ```
 
-The setting lasts until reboot; a file in `/etc/sysctl.d/` makes it permanent. Every unconfined program regains full-capability user namespaces, and with them the kernel attack surface described above. It is the right tool for a short diagnosis ("is AppArmor the cause?"), not for a workstation that stays in that state.
+The setting lasts until reboot; a file in `/etc/sysctl.d/` makes it permanent. Every unconfined program regains full-capability user namespaces, and with them the kernel attack surface described above. It is the right tool for a short diagnosis of whether AppArmor is the cause, not for a workstation that stays in that state.
 
 ### What does not work
 

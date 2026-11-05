@@ -2,6 +2,7 @@
 layout: post
 title: "SHAKE128 — The Extendable-Output Function of the SHA-3 Standard (FIPS 202)"
 date:   2026-08-24
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography
@@ -36,7 +37,7 @@ All six functions are modes of operation of one permutation, `KECCAK-p[1600, 24]
 | **SHAKE128** | **XOF** | **any $$d$$** | **256** | **1344** | **168** | `1111` |
 | SHAKE256 | XOF | any $$d$$ | 512 | 1088 | 136 | `1111` |
 
-Two conventions in this table are worth reading carefully. For the four hash functions the capacity is always twice the digest length, so the parameters follow from the name. For the two XOFs the suffix "128" and "256" denotes a **security strength, not an output length**, which is the opposite of what the hash function names mean. SHAKE128 does not produce 128 bits of output; it produces however many bits were requested, at up to 128 bits of security.
+For the four hash functions the capacity is always twice the digest length, so the parameters follow from the name. For the two XOFs the suffix "128" and "256" denotes a **security strength, not an output length**, which is the opposite of what the hash function names mean. SHAKE128 does not produce 128 bits of output; it produces however many bits were requested, at up to 128 bits of security.
 
 ## The Sponge Construction
 
@@ -131,8 +132,6 @@ SHAKE128("", 256) = 7f9c2ba4e88f827d616045507605853ed73b8093f6efbc88eb1a6eacfa66
 
 ## Why the Capacity Is 256 Bits
 
-The choice of capacity is where SHAKE128 differs from every other function in the standard, and it explains the function's performance.
-
 Generic attacks against a sponge cost roughly $$2^{c/2}$$ operations, so a capacity of 256 bits supports 128 bits of security. Fixing $$c = 256$$ leaves $$r = 1344$$ bits, or 168 bytes, absorbed per invocation of the permutation.
 
 SHA3-256 is constrained differently, and the binding constraint is preimage resistance rather than collision resistance. It is specified to behave like a random 256-bit function, which means 256 bits of preimage resistance, and a sponge reaches that only when $$2^{c/2}$$ is at least $$2^{256}$$. That forces $$c = 2d = 512$$ and leaves 136 bytes per permutation call. SHAKE128 makes the weaker claim of 128 bits overall, so the smaller capacity is enough. Collision resistance is 128 bits either way, capped for SHA3-256 by its 256-bit output rather than by its capacity.
@@ -149,7 +148,7 @@ Annex A of FIPS 202 gives the strengths of all six functions. The two XOF rows a
 | SHAKE128 | $$d$$ | $$\min(d/2, 128)$$ | $$\ge \min(d, 128)$$ | $$\min(d, 128)$$ |
 | SHAKE256 | $$d$$ | $$\min(d/2, 256)$$ | $$\ge \min(d, 256)$$ | $$\min(d, 256)$$ |
 
-Two readings follow. A short output caps the strength: at $$d = 224$$, SHAKE128 and SHAKE256 both give 112 bits of collision resistance, because no function with a 224-bit output can do better. Their preimage resistance at that length differs, however, at 128 bits for SHAKE128 against 224 for SHAKE256, which is the point at which the "128" in the name becomes the binding constraint. A long output raises it: once $$d$$ exceeds $$r + c/2$$ the preimage resistance exceeds the nominal strength, and beyond 1600 bits a preimage probably does not exist at all.
+A short output caps the strength: at $$d = 224$$, SHAKE128 and SHAKE256 both give 112 bits of collision resistance, because no function with a 224-bit output can do better. Their preimage resistance at that length differs, however, at 128 bits for SHAKE128 against 224 for SHAKE256, which is the point at which the "128" in the name becomes the binding constraint. A long output raises it: once $$d$$ exceeds $$r + c/2$$ the preimage resistance exceeds the nominal strength, and beyond 1600 bits a preimage probably does not exist at all.
 
 The SHA-3 functions also gain a property that the SHA-2 family lacks. Because the capacity is never emitted, a SHA-3 or SHAKE output reveals nothing about the internal state, so **length extension does not apply**. Given `SHA-256(secret || msg)` an attacker can compute `SHA-256(secret || msg || padding || suffix)` without knowing the secret; the same manoeuvre against SHAKE128 has nothing to work with. A related benefit shows up in the second-preimage column: for SHA-2 that strength degrades with message length as $$n - \log_2(\text{len}(M)/B)$$, while the SHA-3 figures carry no such term.
 
@@ -176,7 +175,7 @@ SHAKE128(keymaterial, 168) = f g h        (each letter = 56 bits)
 
 The two parties now hold keys sharing their first 112 bits, and against Triple DES, whose structure the example targets, that overlap is exploitable.
 
-The fix is not to avoid XOFs. It is to make the output length part of the input, so that a disagreement about the length produces unrelated outputs rather than nested ones. A key derivation function that encodes the length and the key type into the message it hashes has no such failure mode, which is exactly what KMAC does with `right_encode(L)`. Domain separation through a customisation string achieves the same end by a different route.
+The fix is to make the output length part of the input, so that a disagreement about the length produces unrelated outputs rather than nested ones. A key derivation function that encodes the length and the key type into the message it hashes has no such failure mode, which is exactly what KMAC does with `right_encode(L)`. Domain separation through a customisation string achieves the same end by a different route.
 
 ## Domain Separation
 
@@ -219,7 +218,9 @@ The pattern is the same in each: the algorithm needs an arbitrary quantity of re
 
 ## Conclusion
 
-SHAKE128 is the sponge over `KECCAK-p[1600, 24]` with a 256-bit capacity and a `1111` domain suffix, absorbing and emitting 168 bytes per permutation call. The capacity, not the output length, sets its 128-bit security level, and holding the capacity at the minimum that supports that level is what makes it faster than SHA3-256 while producing output of any length. The same design decision that provides the flexibility also produces the related-output property: outputs at different lengths are prefixes of one another, so any caller deriving keys must bind the length into the input or use KMAC, which does so already. Within FIPS 202, SHAKE128 is approved as an XOF and deliberately not as a hash function, and its principal use is now as a seed-expansion primitive inside the post-quantum standards.
+SHAKE128 is the sponge over `KECCAK-p[1600, 24]` with a 256-bit capacity and a `1111` domain suffix, absorbing and emitting 168 bytes per permutation call. The capacity, not the output length, sets its 128-bit security level, and holding the capacity at the minimum that supports that level is what makes it faster than SHA3-256 while producing output of any length.
+
+The same design decision that provides the flexibility also produces the related-output property: outputs at different lengths are prefixes of one another, so any caller deriving keys must bind the length into the input or use KMAC, which does so already. Within FIPS 202, SHAKE128 is approved as an XOF and deliberately not as a hash function, and its principal use is now as a seed-expansion primitive inside the post-quantum standards.
 
 ![Mindmap of SHAKE128 covering the sponge construction, the Keccak-p permutation, parameters and padding, security strengths, the related-output hazard, domain separation and deployment]({{site.url_complet}}/assets/article/cryptographie/sha3/2026-08-24-shake128-extendable-output-function-fips-202.png)
 
@@ -275,7 +276,9 @@ SHAKE128 is the sponge over `KECCAK-p[1600, 24]` with a 256-bit capacity and a `
 
 **Q: What does the "128" in SHAKE128 refer to, given that the output can be any length?**
 
-It is the security strength in bits, not the output size. This is the opposite of the convention used for the hash functions in the same standard, where the number after the dash is the digest length: SHA3-256 always produces 256 bits, while SHAKE128 produces whatever length was requested. The 128 is a ceiling set by the 256-bit capacity, and it is reached only when the requested output is long enough. At $$d = 128$$, for example, SHAKE128 gives 64 bits of collision resistance, not 128.
+It is the security strength in bits, not the output size. This is the opposite of the convention used for the hash functions in the same standard, where the number after the dash is the digest length: SHA3-256 always produces 256 bits, while SHAKE128 produces whatever length was requested.
+
+The 128 is a ceiling set by the 256-bit capacity, and it is reached only when the requested output is long enough. At $$d = 128$$, for example, SHAKE128 gives 64 bits of collision resistance, not 128.
 
 **Q: Why does SHAKE128 have a smaller capacity than SHA3-256, when both offer 128-bit collision resistance?**
 
@@ -294,7 +297,9 @@ FIPS 202 therefore approves SHAKE128 as an XOF and withholds approval of it as a
 
 **Q: How does a caller safely derive keys of different lengths from one secret with SHAKE128?**
 
-By making the length part of what is hashed, so that different lengths produce unrelated streams rather than nested ones. Encoding the length and the key's purpose into the input is enough; a customisation string with cSHAKE128 achieves the same separation. KMAC128 does this by construction, appending `right_encode(L)` to its input, which is why it is the approved keyed construction. The one case to watch is KMACXOF128, which deliberately encodes a length of zero so that its output stays extendable, restoring the prefix property for callers who want it.
+By making the length part of what is hashed, so that different lengths produce unrelated streams rather than nested ones. Encoding the length and the key's purpose into the input is enough; a customisation string with cSHAKE128 achieves the same separation. KMAC128 does this by construction, appending `right_encode(L)` to its input, which is why it is the approved keyed construction.
+
+The one case to watch is KMACXOF128, which deliberately encodes a length of zero so that its output stays extendable, restoring the prefix property for callers who want it.
 
 **Q: What distinguishes SHAKE128 from Ethereum's `keccak256`, given that both use the same permutation?**
 
@@ -304,7 +309,9 @@ The consequence is that the two produce entirely different values for the same i
 
 **Q: Why do the post-quantum standards use SHAKE128 for matrix expansion rather than a hash function?**
 
-Because the amount of output required is not known in advance. ML-KEM regenerates its public matrix from a 32-byte seed by sampling coefficients and rejecting any that fall outside the modulus, so the number of bytes consumed depends on how many rejections occur. A fixed-length hash would force the designer to specify a counter-based expansion and argue for its soundness; an XOF supplies an indefinite stream from the seed directly, and the algorithm simply reads until it has enough. The same reasoning applies to noise sampling and to ML-DSA's mask expansion.
+Because the amount of output required is not known in advance. ML-KEM regenerates its public matrix from a 32-byte seed by sampling coefficients and rejecting any that fall outside the modulus, so the number of bytes consumed depends on how many rejections occur.
+
+A fixed-length hash would force the designer to specify a counter-based expansion and argue for its soundness; an XOF supplies an indefinite stream from the seed directly, and the algorithm simply reads until it has enough. The same reasoning applies to noise sampling and to ML-DSA's mask expansion.
 
 **Q: Does SHAKE128 need an HMAC wrapper to be used as a MAC?**
 

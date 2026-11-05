@@ -2,6 +2,7 @@
 layout: post
 title: "CIP-113 Programmable Tokens on Cardano"
 date:   2026-08-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain
@@ -70,7 +71,7 @@ Which one a given deployment uses is an off-chain convention, not an on-chain ru
 
 ### What the model costs
 
-Nothing here requires a hard fork, and the tokens are native assets at the ledger level throughout. The cost lands entirely on tooling. A wallet that queries by payment credential gets every holder's tokens at once rather than the user's; an explorer that does the same attributes the entire supply to one script address; a DEX contract has to become invokable as a stake validator before it can hold anything. The design trades ledger changes for integration work, and it is worth being explicit that the trade is real rather than free.
+Nothing here requires a hard fork, and the tokens are native assets at the ledger level throughout. The cost lands entirely on tooling. A wallet that queries by payment credential gets every holder's tokens at once rather than the user's; an explorer that does the same attributes the entire supply to one script address; a DEX contract has to become invokable as a stake validator before it can hold anything. The design trades ledger changes for integration work.
 
 ## The validator set
 
@@ -114,9 +115,9 @@ validator programmable_logic_base(params_policy: PolicyId) {
 }
 ```
 
-The redeemer names one of three delegates and says where that delegate's credential sits in the transaction's withdrawal map. The base validator reads the delegate's current credential out of the protocol-parameters datum, jumps straight to the witnessed withdrawal entry, and checks one equality. That is the whole of it.
+The redeemer names one of three delegates and says where that delegate's credential sits in the transaction's withdrawal map. The base validator reads the delegate's current credential out of the protocol-parameters datum, jumps straight to the witnessed withdrawal entry, and checks one equality.
 
-The three arms differ only in *which* datum field they read, and that field accessor is passed to `check` as a function argument. The shaping is deliberate rather than stylistic: this validator runs once per programmable input, so anything left inside an arm is paid per input, and anything duplicated across arms is paid in reference-script bytes on every transaction that loads the script. Hoisting the shared work into one closure pays for itself on both axes.
+The three arms differ only in *which* datum field they read, and that field accessor is passed to `check` as a function argument. This validator runs once per programmable input, so anything left inside an arm is paid per input, and anything duplicated across arms is paid in reference-script bytes on every transaction that loads the script. Hoisting the shared work into one closure pays for itself on both axes.
 
 ### Why the work lives in a withdraw-zero validator
 
@@ -162,7 +163,7 @@ The list terminates in a 30-byte sentinel of `0xff` bytes rather than a 28-byte 
 
 ### Registration binds the policy ID to a credential
 
-A registry entry is only trustworthy if a policy cannot register itself under someone else's rules. The binding is cryptographic. The issuance minting policy is a parameterized script, and the `IssuanceCborHex` reference NFT holds the compiled template as a prefix and a postfix. To register a policy under a given credential, `registry_mint` reconstructs the script bytes from that credential's hash and hashes the result:
+A registry entry is only trustworthy if a policy cannot register itself under someone else's rules. The issuance minting policy is a parameterized script, and the `IssuanceCborHex` reference NFT holds the compiled template as a prefix and a postfix. To register a policy under a given credential, `registry_mint` reconstructs the script bytes from that credential's hash and hashes the result:
 
 ```aiken
 pub fn apply_hashed_parameter(
@@ -182,7 +183,7 @@ pub fn apply_hashed_parameter(
 }
 ```
 
-If the result does not equal the policy ID being registered, the insertion fails. Collision resistance of blake2b-224 therefore forces `minting_logic_script` to be the credential the policy was actually parameterized with, so that field cannot lie. The constructor tag distinguishing a script credential from a verification-key credential is baked into the prefix by the off-chain bootstrap, so variant agreement is enforced by the same derivation.
+If the result does not equal the policy ID being registered, the insertion fails. Collision resistance of blake2b-224 therefore forces `minting_logic_script` to be the credential the policy was parameterized with, so that field cannot lie. The constructor tag distinguishing a script credential from a verification-key credential is baked into the prefix by the off-chain bootstrap, so variant agreement is enforced by the same derivation.
 
 ### The cost of a linked list: registration contention
 
@@ -198,14 +199,12 @@ The lifecycle path supports update only. A node cannot be removed, and it cannot
 
 ## How a transfer validates
 
-With the pieces in place, an ordinary transfer is legible end to end.
-
 ![Sequence of a programmable-token transfer: the base validator checking the witnessed withdrawal index, the transfer validator authenticating parameters, walking registry proofs and checking value containment, then the substandard transfer logic approving]({{site.url_complet}}/assets/article/blockchain/cardano/cip113-transfer-flow-sequence.png)
 
 The transaction carries two zero-lovelace withdrawals, one for the `transfer` validator and one for the token's own `transfer_logic_script`, plus two reference inputs, the protocol-parameters UTxO and the registry node. The base validator runs per input and checks its one equality. The `transfer` validator then runs once and enforces three things over the whole transaction.
 
 - **Ownership.** Every input at the shared payment credential has to be authorised by its own stake credential, by signature for a verification key or by a withdraw-zero invocation for a script. One unauthorised input fails the transaction, which is what stops a transfer from sweeping up a stranger's UTxO.
-- **Registry resolution.** One proof per distinct policy in the inputs, in ascending policy order. A `TokenExists` proof additionally requires that node's `transfer_logic_script` to appear in the withdrawals, which is the step that actually invokes the token's rules.
+- **Registry resolution.** One proof per distinct policy in the inputs, in ascending policy order. A `TokenExists` proof additionally requires that node's `transfer_logic_script` to appear in the withdrawals, which is the step that invokes the token's rules.
 - **Value containment.** The programmable-token value across outputs at the shared payment credential has to be at least the value drawn from authorised inputs. Tokens can move between owners but not out of the address space.
 
 Only then does the substandard's own logic run, and it can refuse for any reason it likes, a denylist hit being the canonical one.
@@ -216,7 +215,7 @@ Three separate index hints appear across the redeemers: `params_idx` for the pro
 
 Reference inputs are sorted by output reference, meaning transaction ID then output index. Withdrawals are ordered with every script credential before every verification-key credential, and bytewise by hash within each group. Neither matches insertion order, and the withdrawal ordering does not match bech32 string order either. A builder that computes these positions from its own list gets them wrong, and the failure surfaces as a validator rejection rather than anything more descriptive.
 
-The design is deliberately self-validating rather than trusting: a wrong `params_idx` fails the NFT authentication, a wrong `wdrl_idx` fails the credential equality, and a wrong node index fails the proof. A dishonest hint costs its author a transaction and gains nothing.
+A wrong `params_idx` fails the NFT authentication, a wrong `wdrl_idx` fails the credential equality, and a wrong node index fails the proof. A dishonest hint costs its author a transaction and gains nothing.
 
 ## Administrative authority and its limits
 
@@ -243,7 +242,7 @@ The third-party redeemer resolves exactly one registry node, so a single action 
 
 ### Fragmentation is not prevented either
 
-An action operates only on the inputs the transaction actually spends. A holder's balance may be spread across many UTxOs, and nothing forces consolidation, so a holder can fragment a balance to push a full seizure past the transaction-size or execution-budget limit. This is inherent to the eUTXO model rather than a defect of the framework: there is no account-style "seize the whole balance in one call" to reach for. An administrator has to plan for multiple transactions.
+An action operates only on the inputs the transaction spends. A holder's balance may be spread across many UTxOs, and nothing forces consolidation, so a holder can fragment a balance to push a full seizure past the transaction-size or execution-budget limit. This is inherent to the eUTXO model rather than a defect of the framework: there is no account-style "seize the whole balance in one call" to reach for. An administrator has to plan for multiple transactions.
 
 ### Freeze and extraction are not symmetric
 
@@ -264,7 +263,9 @@ So the framework ships primitives and leaves the policy to the substandard, with
 
 The repository's architecture and control-scope documents describe a `protected_prefixes` field on the registry node: an append-only list of [CIP-67](https://cips.cardano.org/cip/CIP-0067) label prefixes that a third-party action may never seize or burn, intended to shield [CIP-68](https://cips.cardano.org/cip/CIP-0068) reference NFTs and [CIP-102](https://cips.cardano.org/cip/CIP-0102) royalty tokens from an administrator sweeping up the metadata infrastructure alongside the user token.
 
-That field is not in the code at the analyzed revision. It was added and then removed, with the reasoning recorded in the removal commit: prefix protection is substandard responsibility rather than framework policy, because the framework already guarantees that the subject policy's third-party logic script runs on every action, so a substandard can protect its own reference tokens without a framework field. The removal took out the datum field, its accessor, the registry well-formedness and append-only checks, the per-pair protected-subset equality, and thirteen dedicated tests. Anyone reading the published documents alongside the code should treat the prefix machinery as historical. The scope boundary it enforced is still real; it now lives one layer up.
+That field is not in the code at the analyzed revision. It was added and then removed, with the reasoning recorded in the removal commit: prefix protection is substandard responsibility rather than framework policy, because the framework already guarantees that the subject policy's third-party logic script runs on every action, so a substandard can protect its own reference tokens without a framework field.
+
+The removal took out the datum field, its accessor, the registry well-formedness and append-only checks, the per-pair protected-subset equality, and thirteen dedicated tests. Anyone reading the published documents alongside the code should treat the `protected_prefixes` field and its checks as historical. The scope boundary it enforced is still real; it now lives one layer up.
 
 ## Unfracking, and the freeze-for-ransom problem
 
@@ -289,7 +290,7 @@ The `unfracking` validator lets a holder restructure the UTxOs they already own 
 
 ADA is deliberately unconstrained here, for the same reason the third-party path uses a ratchet rather than equality: the owner authorised the action, ADA is not a programmable asset, and an equality would recreate the minimum-UTxO hazard.
 
-The upshot for users is simple: the scam only works if the tokens cannot be separated. A wallet that avoids co-location and supports this separation defeats it, and there is no reason to pay.
+The scam only works if the tokens cannot be separated. A wallet that avoids co-location and supports this separation defeats it, and there is no reason to pay.
 
 ## Upgradability: what can change, and who changes it
 
@@ -309,19 +310,21 @@ pub type ProgrammableLogicGlobalParams {
 }
 ```
 
-Fields two through four are what makes the delegates swappable in place. The base validator's hash anchors every programmable-token address, so redeploying it would move everyone's tokens; rewriting a credential in this datum replaces a delegate without touching a single holder. Field five names the authority permitted to rewrite the datum, and making it a datum field rather than a script parameter is what lets the authority itself be replaced later, a federated multisig now and a governance validator afterwards, without moving the coordination UTxO. The field ordering is not cosmetic either: the fields are sorted by read frequency, and `max_inline_datum_bytes` was appended last precisely so that adding it left every existing accessor at its original traversal depth.
+Fields two through four are what makes the delegates swappable in place. The base validator's hash anchors every programmable-token address, so redeploying it would move everyone's tokens; rewriting a credential in this datum replaces a delegate without touching a single holder. Field five names the authority permitted to rewrite the datum, and making it a datum field rather than a script parameter is what lets the authority itself be replaced later, a federated multisig now and a governance validator afterwards, without moving the coordination UTxO.
 
-That last field exists for a reason worth following. A seizure has to reproduce the paired input's datum byte for byte on the continuing output, so an unbounded datum lets a holder inflate the seizure transaction past the maximum transaction size, or short of that, collapse how many UTxOs an issuer can process at once. The holder pays nothing for the tactic, because the transfer path never pairs inputs to outputs and so never reads the datum. Bounding the datum at creation is what keeps every UTxO seizable later.
+The fields are sorted by read frequency, and `max_inline_datum_bytes` was appended last precisely so that adding it left every existing accessor at its original traversal depth.
+
+That last field exists because a seizure has to reproduce the paired input's datum byte for byte on the continuing output, so an unbounded datum lets a holder inflate the seizure transaction past the maximum transaction size, or short of that, collapse how many UTxOs an issuer can process at once. The holder pays nothing for the tactic, because the transfer path never pairs inputs to outputs and so never reads the datum. Bounding the datum at creation is what keeps every UTxO seizable later.
 
 **Token-level.** A registry node's `transfer_logic_script`, `third_party_transfer_logic_script`, `unfracking_logic_script`, and `global_state_cs` are mutable through the lifecycle path, authorised by the node's `minting_logic_script`. Its `key`, `next`, and `minting_logic_script` are frozen.
 
-Two consequences follow, and integrators need both. The change is **retroactive**, governing every existing holder's tokens on their next spend, and it can **flip credential type** between script and verification key, moving a token between script-enforced and signature-gated logic. The registry node is therefore the live source of truth. Caching a token's logic credentials as facts established at registration is a correctness bug, not an optimisation.
+The change is **retroactive**, governing every existing holder's tokens on their next spend, and it can **flip credential type** between script and verification key, moving a token between script-enforced and signature-gated logic. The registry node is therefore the live source of truth. Caching a token's logic credentials as facts established at registration is a correctness bug, not an optimisation.
 
-One separation is enforced structurally. `registry_spend` is the sole spender of every registry node, and it forbids minting or burning that node's own token in the same transaction. A registry lifecycle operation can therefore never double as an issuance of the same policy; the two are always separate, independently authorised transactions. The authorising credential is nonetheless *shared* between issuance and lifecycle, so by default whoever can mint can also update the node. A substandard that needs those to be distinct powers has to separate them inside its own issuance logic.
+`registry_spend` is the sole spender of every registry node, and it forbids minting or burning that node's own token in the same transaction. A registry lifecycle operation can therefore never double as an issuance of the same policy; the two are always separate, independently authorised transactions. The authorising credential is nonetheless *shared* between issuance and lifecycle, so by default whoever can mint can also update the node. A substandard that needs those to be distinct powers has to separate them inside its own issuance logic.
 
 ## The integration surface
 
-The framework's cost lands on integrators, so it is worth collecting what each audience actually has to change.
+The framework's cost lands on integrators, so this section collects what each audience has to change.
 
 **Wallets** query by the full address rather than by payment credential, since the payment credential alone returns every holder's tokens. They sign with whichever key matches the credential in the stake slot, which is not necessarily the payment key. They add the two withdraw-zero invocations and the two reference inputs, compute three ledger-ordered indices, and resolve the registry node fresh at build time.
 
@@ -339,7 +342,12 @@ The specification itself is likewise unfinished. [CIP-113](https://github.com/ca
 
 CIP-113 gets issuer-enforced transfer rules onto Cardano without a ledger change, and the mechanism is a single reinterpretation of the address: hold every programmable token under one payment credential, and use the stake credential to record ownership. One spending validator then sees every movement, and a registry tells it which rules to invoke. The rest of the design is the consequences of that choice being worked through, including several that are not free.
 
-The parts worth reading closely are the ones where a boundary had to be chosen rather than derived from the model. Extraction is gated and freeze is not, because hiding behind an uncooperative script is self-freezing rather than evasion. Who is seizable is left to substandards, because a script credential does not say whether it is a wallet or a lending pool. A holder can always separate a frozen policy out of a co-mingled UTxO without the freezer's consent, but only if the issuer declared a hook, since the default is deny. And registration is one-way, because de-registration would void the custody guarantee for tokens already issued.
+The parts worth reading closely are the ones where a boundary had to be chosen rather than derived from the model:
+
+- Extraction is gated and freeze is not, because hiding behind an uncooperative script is self-freezing rather than evasion.
+- Who is seizable is left to substandards, because a script credential does not say whether it is a wallet or a lending pool.
+- A holder can always separate a frozen policy out of a co-mingled UTxO without the freezer's consent, but only if the issuer declared a hook, since the default is deny.
+- Registration is one-way, because de-registration would void the custody guarantee for tokens already issued.
 
 Two caveats bound all of it. The specification is still in its final review window, and the implementation is waiting on its audit report. The design reads clearly and the reasoning behind each choice is documented in the repository, which is not the same thing as the work being finished.
 
@@ -403,7 +411,7 @@ Putting every programmable token behind one payment credential manufactures the 
 
 The Cardano ledger executes a stake validator whenever a transaction withdraws from its reward address, and the withdrawal amount may be zero. A zero withdrawal has no economic effect; it exists purely to force the script to run with the whole transaction in scope.
 
-The reason it matters here is arithmetic. A spending validator runs once for every input it guards, so a transaction consolidating eight programmable-token UTxOs would run the registry lookups and the value-containment check eight times. A stake validator runs once per transaction regardless. Moving the expensive work behind a withdraw-zero invocation converts per-input cost into per-transaction cost, and leaves the base validator with one credential comparison.
+A spending validator runs once for every input it guards, so a transaction consolidating eight programmable-token UTxOs would run the registry lookups and the value-containment check eight times. A stake validator runs once per transaction regardless. Moving the expensive work behind a withdraw-zero invocation converts per-input cost into per-transaction cost, and leaves the base validator with one credential comparison.
 
 **Q: What does a covering-node proof prove, and why is it needed on ordinary transfers?**
 
@@ -421,7 +429,11 @@ The check is worth knowing about because it used to be an equality, which pinned
 
 Through an unfracking action, if the issuer of the token you want to separate has declared a hook for it. Unfracking lets you restructure the UTxOs you already own for one policy, moving that policy's tokens into their own UTxO while everything else in the pair stays byte-identical. The frozen policy's transfer logic is never invoked, so the party doing the freezing cannot block the separation.
 
-Three conditions apply. The acted policy's `unfracking_logic_script` has to be set, since an unset hook is a denial rather than a permission. Every input has to belong to the same owner, or the action would be a transfer in disguise. And the strip has to be complete, because an output still holding some of the acted policy would still require that policy's transfer proof on every future spend, which in the freeze case means still stuck.
+Three conditions apply:
+
+- The acted policy's `unfracking_logic_script` has to be set, since an unset hook is a denial rather than a permission.
+- Every input has to belong to the same owner, or the action would be a transfer in disguise.
+- The strip has to be complete, because an output still holding some of the acted policy would still require that policy's transfer proof on every future spend, which in the freeze case means still stuck.
 
 **Q: The architecture document describes a `protected_prefixes` field. Where is it in the code?**
 

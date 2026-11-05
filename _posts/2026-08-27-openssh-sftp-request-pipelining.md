@@ -2,6 +2,7 @@
 layout: post
 title: "SFTP Request Pipelining in OpenSSH — Window Ramping, Negotiated Limits and scp"
 date:   2026-08-27
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: network security linux
@@ -14,7 +15,7 @@ isMath: false
 
 SFTP is a request and response protocol carried inside a single SSH channel. Implemented in the obvious way, a file transfer costs one network round trip per block, which caps throughput at the block size divided by the round-trip time no matter how much bandwidth is available. On a 100 ms link with 32 KiB blocks that ceiling is about 320 KiB per second, and no amount of extra capacity moves it.
 
-The OpenSSH client does not work that way. A large part of `sftp-client.c` exists to keep many requests outstanding at once, to size those requests against limits the server advertises, and to recover when a server returns less data than was asked for. This article reads that machinery, and then follows it into `scp`, which has been a front end to the same code since OpenSSH 9.0. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.
+The OpenSSH client does not work that way. A large part of `sftp-client.c` exists to keep many requests outstanding at once, to size those requests against limits the server advertises, and to recover when a server returns less data than was asked for. This article reads that code, and then follows it into `scp`, which has been a front end to the same code since OpenSSH 9.0. The revision analysed declares `OpenSSH_10.5p1` in `version.h`.
 
 The protocol itself was never finished as an RFC. The working document is [draft-ietf-secsh-filexfer-02](https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-02), and OpenSSH's extensions to it are recorded in the `PROTOCOL` file distributed with the source.
 
@@ -31,7 +32,7 @@ The defaults are declared at the top of `sftp-client.c`:
 #define DEFAULT_NUM_REQUESTS	64
 ```
 
-The first is how much data a single read or write asks for. The second is how many such requests may be outstanding at any moment. Together they describe a sliding window of about 2 MiB, and both are reachable from the command line. `sftp -B` sets the buffer size and `sftp -R` sets the request ceiling, which `sftp.1` documents as "how many requests may be outstanding at any one time", noting that "the default is 64 outstanding requests".
+The first is how much data a single read or write asks for. The second is how many such requests may be outstanding at any moment. Together they describe a sliding window of about 2 MiB, and both can be set from the command line. `sftp -B` sets the buffer size and `sftp -R` sets the request ceiling, which `sftp.1` documents as "how many requests may be outstanding at any one time", noting that "the default is 64 outstanding requests".
 
 The product of the two is what matters for throughput. A window of 64 requests at 32 KiB stays busy on a link whose bandwidth-delay product is under 2 MiB, and becomes the limiting factor above that.
 
@@ -77,7 +78,7 @@ if (ret->exts & SFTP_EXT_LIMITS) {
 		ret->upload_buflen = MAXIMUM(ret->upload_buflen, 64);
 ```
 
-Two details are worth noting. The negotiated value applies only when the user did not ask for a specific size, so an explicit `-B` overrides the server's advice rather than being clamped by it. And the result is floored at 64 bytes, so a server advertising an unusable limit cannot drive the client into requests so small that no progress is made.
+The negotiated value applies only when the user did not ask for a specific size, so an explicit `-B` overrides the server's advice rather than being clamped by it. And the result is floored at 64 bytes, so a server advertising an unusable limit cannot drive the client into requests so small that no progress is made.
 
 ## The window opens gradually
 
@@ -139,7 +140,7 @@ if (TAILQ_FIRST(&requests) != NULL)
 	fatal("Transfer complete, but requests still in queue");
 ```
 
-This is the check that separates a pipelined implementation from a correct one. Outstanding requests tracked in a queue can be lost through a logic error in exactly the paths that are hardest to test, and the failure mode without this line is a truncated file that reports success.
+Outstanding requests tracked in a queue can be lost through a logic error in exactly the paths that are hardest to test, and the failure mode without this line is a truncated file that reports success.
 
 ## What the server side looks like
 

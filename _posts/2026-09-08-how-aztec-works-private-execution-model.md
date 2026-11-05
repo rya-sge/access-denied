@@ -2,6 +2,7 @@
 layout: post
 title: "How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun"
 date:   2026-09-08
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -61,7 +62,7 @@ Public state lives in a sparse public data tree, written by the sequencer during
 
 Both kinds of storage are **siloed by contract address** so that contracts cannot collide or reach into each other's state. The kernel circuit performs the siloing: a public slot becomes `H(contract_address, storage_slot)`, and a note hash becomes `H(contract_address, note_hash)` before insertion. For notes there is a further step, mixing in a nonce derived from the transaction, so that two identical notes produce distinct leaves.
 
-One consequence is worth stating plainly, because it constrains contract design more than anything else: **a private function cannot read current public state.** Private execution happens before the sequencer touches the block, so the current value is not knowable. Aztec offers three ways around this, and the choice is a real trade-off rather than a formality.
+One consequence constrains contract design more than anything else: **a private function cannot read current public state.** Private execution happens before the sequencer touches the block, so the current value is not knowable. Aztec offers three ways around this.
 
 | State variable | Mutable | Readable in private | Typical use |
 |---|---|---|---|
@@ -135,7 +136,7 @@ The sequencer then verifies the private proof, executes the enqueued public call
 
 ## Fees
 
-Aztec renames Ethereum's fee vocabulary but keeps the mechanism. **Mana** is the unit of computational effort, the equivalent of gas. **Fee Juice** is the fee token, bridged from Ethereum and deliberately **non-transferable** on Aztec: it can pay fees and nothing else.
+Aztec renames Ethereum's fee vocabulary but keeps the mechanism. **Mana** is the unit of computational effort, the equivalent of gas. **Fee Juice** is the fee token, bridged from Ethereum and deliberately **non-transferable** on Aztec: it can only pay fees.
 
 Mana has two dimensions, priced separately, because the underlying costs are unrelated:
 
@@ -153,7 +154,7 @@ Aztec cannot do synchronous cross-chain calls. A private function is proved agai
 
 Messages travel through message boxes with one end on each side, an inbox for L1 to L2 and an outbox for the reverse. A sender inserts into a pending set; the rollup moves the message to a ready set on the other side; the recipient consumes it, which nullifies it. Because a message can legitimately be sent many times, the boxes are multi-sets.
 
-The design decision worth noticing is that Aztec **pulls** messages rather than pushing them. On most rollups, execution originates from the message bridge, which calls the target contract — and that requires full calldata, which for L1 to L2 messages is committed on L1 and therefore public. Pushing would expose the inputs of the private function that consumes the message. By pulling, the message can be a value *derived* from the arguments instead: a deposit still leaks the value and the depositor on L1, where it happened publicly, but the new owner on L2 stays hidden.
+Aztec **pulls** messages rather than pushing them. On most rollups, execution originates from the message bridge, which calls the target contract — and that requires full calldata, which for L1 to L2 messages is committed on L1 and therefore public. Pushing would expose the inputs of the private function that consumes the message. By pulling, the message can be a value *derived* from the arguments instead: a deposit still leaks the value and the depositor on L1, where it happened publicly, but the new owner on L2 stays hidden.
 
 The corollary is that every cross-domain call is unilateral, and applications have to handle failure explicitly. A token bridge that assumes the far side succeeded is a bridge that eventually locks funds on one side without minting on the other.
 
@@ -211,7 +212,9 @@ Three groupings fall out of that question:
 
 Zama takes the opposite side of the central trade-off. Because the state is encrypted under a single network key and computed on homomorphically, **a contract can operate on two users' values at once without either user participating**: a sealed auction can compare bids, a confidential token can move a balance between two accounts, and neither party needs to produce a proof about their own state. That is beyond what a note model does.
 
-The price is who holds the key. Nobody does, in full: it is split across a threshold KMS committee, and reading a value means an authorised request that the committee answers, sealed to a transport key. So reading your own balance requires a live third party and permission, decryption is a protocol event rather than a local computation, and a threshold breach is global and retroactive rather than confined to one account. Zero-knowledge appears in the design too, but in a narrow role: a proof of knowledge attached to encrypted inputs, showing the submitter knows the plaintext. The article [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/) covers exactly where that proof sits and what it does not assert.
+The price is who holds the key. Nobody does, in full: it is split across a threshold KMS committee, and reading a value means an authorised request that the committee answers, sealed to a transport key. So reading your own balance requires a live third party and permission, decryption is a protocol event rather than a local computation, and a threshold breach is global and retroactive rather than confined to one account.
+
+Zero-knowledge appears in the design too, but in a narrow role: a proof of knowledge attached to encrypted inputs, showing the submitter knows the plaintext. The article [Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified]({{site.url_complet}}/2026/07/24/zero-knowledge-proofs-zama-protocol/) covers exactly where that proof sits and what it does not assert.
 
 The two designs also fail differently. Aztec's confidentiality rests on encryption to per-user keys and the soundness of its proofs; Zama's rests on the FHE scheme and on the committee's threshold assumption holding.
 
@@ -219,7 +222,9 @@ The two designs also fail differently. Aztec's confidentiality rests on encrypti
 
 Zcash is the closest relative and the origin of most of the vocabulary: note commitments in an append-only tree, nullifiers for spend prevention, viewing keys for selective disclosure. Aztec's key hierarchy, with separate nullifier and incoming-viewing keys, mirrors the structure of Orchard's key tree closely.
 
-The differences are scope and discovery. Zcash shields payments in its own asset; it has no general smart contracts and no notion of public state to compose with. Aztec is trying to run arbitrary contracts over the same substrate, which is where all its additional machinery comes from: the public/private split, the kernel circuits, delayed public state, portals. On discovery, Zcash's shielded wallets trial-decrypt candidate outputs, whose cost grows with total network activity; Aztec's tagging lets a recipient query for logs addressed to them, at the cost of a handshake that reveals contact occurred. On proving, Sapling used Groth16 with a trusted setup, and Orchard moved to Halo 2 without one.
+The differences are scope and discovery. Zcash shields payments in its own asset; it has no general smart contracts and no notion of public state to compose with. Aztec is trying to run arbitrary contracts over the same substrate, which is where all its additional machinery comes from: the public/private split, the kernel circuits, delayed public state, portals.
+
+On discovery, Zcash's shielded wallets trial-decrypt candidate outputs, whose cost grows with total network activity; Aztec's tagging lets a recipient query for logs addressed to them, at the cost of a handshake that reveals contact occurred. On proving, Sapling used Groth16 with a trusted setup, and Orchard moved to Halo 2 without one.
 
 ### Canton
 
@@ -311,7 +316,9 @@ A note commitment is a hash of a note, inserted as a leaf in an append-only tree
 
 A nullifier is a separate value derived from the note *and* the owner's nullifier key, emitted when the note is spent. It goes into a different tree, which supports non-membership proofs.
 
-Two structures are needed because the trees answer different questions and neither can answer both. The note hash tree answers "does this note exist?" and must be append-only, since editing a leaf in place would reveal that its owner transacted. The nullifier tree answers "has this note already been spent?", which is a non-membership query. Keeping them apart is also what decouples creating, updating and deleting private state, and what makes a nullifier unlinkable to its note without the owner's key.
+Two structures are needed because the trees answer different questions and neither can answer both. The note hash tree answers "does this note exist?" and must be append-only, since editing a leaf in place would reveal that its owner transacted. The nullifier tree answers "has this note already been spent?", which is a non-membership query.
+
+Keeping them apart is also what decouples creating, updating and deleting private state, and what makes a nullifier unlinkable to its note without the owner's key.
 
 **Q: A contract's private transfer function compiles, tests pass, and no assertion can be bypassed. What can still make it fail at its purpose?**
 

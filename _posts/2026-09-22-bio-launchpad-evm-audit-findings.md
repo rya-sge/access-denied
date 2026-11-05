@@ -2,6 +2,7 @@
 layout: post
 title: "Three Launchpad Bugs from the Bio Protocol EVM Audits - Units, Donations and Partial Claims"
 date:   2026-09-22
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum security
@@ -181,7 +182,7 @@ Walk through a claim after the balance has been drained:
 - `createVestingSchedule(user, ..., vbioAmount)` is still called for the full amount. `TokenVesting` checks that its *pool* has enough uncommitted balance, not that this particular transfer arrived, so as long as earlier claims' tokens are sitting in the pool the schedule is accepted.
 - `claim()` succeeds and emits `Claim(user, bioAmount, vbioAmount)` for amounts that were never paid.
 
-The user has received zero `BIO`, holds a `vBIO` schedule that the pool cannot honour for everyone, and can never call `claim()` again. Pashov rated the impact High (loss of the claim) and the likelihood Low (it requires the admin's emergency withdrawal first), giving a Medium.
+The user has received zero `BIO`, holds a `vBIO` schedule that the pool cannot honour for everyone, and can never call `claim()` again. Pashov rated the impact High for the loss of the claim and the likelihood Low because it requires the admin's emergency withdrawal first, giving a Medium.
 
 ### The fix and the lesson
 
@@ -189,7 +190,7 @@ The recommendation was to delete `_safeClaimTransfer` and use a plain `safeTrans
 
 ## Other findings worth knowing
 
-The three findings above are not the only ones of interest in the reports. Four others are short enough to summarise:
+Four others are short enough to summarise:
 
 - **Cap bypass through a counter that never decrements (Curation H-01, High).** `_whitelistPledge` increased `whitelistPledges[user]` but `_unpledge` never decreased it. A whitelisted user who pledged and unpledged 10 tokens twice had `whitelistPledges == 20` with nothing pledged, and the public phase then allowed them `maxTotalPledgePerAddress + 20`. The sibling M-02 is the same drift on the global `totalPledgedForWhitelist`. Every counter used in a cap check needs a reverse path.
 - **Wrong denominator after unpledging (Curation M-01, Medium).** `claim()` computed `amount * bioDaoTokenToDistribute / bioTarget`, but users could still unpledge after success, so `totalPledged` fell below `bioTarget`, each claimer received less than their share and the remainder was stranded. The fix divides by the final `totalPledged`.
@@ -264,12 +265,13 @@ Because the impact in either branch is total. If the timestamp had passed `Token
 
 **Q: How can one wei permanently disable a contract, and why is `>=` enough to fix it?**
 
-Because `balanceOf` is written by anyone who transfers tokens to the address, while `bioDaoTokenToDistribute` is a fixed expectation. An equality between them holds only if nobody ever sends a single extra unit, and the contract has no function to remove one. 
+Because `balanceOf` is written by anyone who transfers tokens to the address, while `bioDaoTokenToDistribute` is a fixed expectation. An equality between them holds only if nobody ever sends a single extra unit, and the contract has no function to remove one.
+
 Changing the check to `bioDaoTokenToDistribute > balance`, reverting only when short, makes surplus irrelevant: the fundraiser's transfer still has to arrive, and extra tokens simply sit there. The stronger pattern is to not read `balanceOf` at all and to record receipts inside the function that receives them.
 
 **Q: What is wrong with a transfer helper that sends whatever balance is available?**
 
-It converts an underfunded contract from a loud failure into a quiet one. A plain `safeTransfer` reverts when the balance is short, the transaction is rolled back, `hasClaimed` stays false, and the user can retry once the contract is funded. The clamped helper succeeds, writes `hasClaimed = true`, emits an event for the full amount and pays zero.
+It turns a revert on an underfunded contract into a successful call. A plain `safeTransfer` reverts when the balance is short, the transaction is rolled back, `hasClaimed` stays false, and the user can retry once the contract is funded. The clamped helper succeeds, writes `hasClaimed = true`, emits an event for the full amount and pays zero.
 
 The user's claim is consumed with nothing in return, and in this contract a vesting schedule is also created for tokens the vesting contract never received.
 

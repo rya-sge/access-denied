@@ -2,6 +2,7 @@
 layout: post
 title: "Market Abuse and Enforcement Under MiCA — Insider Dealing, Manipulation, Penalties and Supervision (Titles VI and VII)"
 date:   2026-09-17
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: regulation blockchain security
@@ -99,7 +100,15 @@ Each Member State designates one or more competent authorities and a single poin
 - carry out **on-site inspections**, enter premises to seize documents and data on suspicion of insider dealing or manipulation, require existing data-traffic records from telecommunications operators where national law permits, request the **freezing or sequestration** of assets, and refer matters for criminal prosecution;
 - require ISPs and hosting providers to **remove content or restrict access** to an online interface, and make public any measure taken.
 
-Chapter 1 also organises cooperation: between national authorities (Article 95), with EBA and ESMA (Article 96), on the **classification of crypto-assets**, where ESMA, EBA and the authorities work towards a common view of which tokens are financial instruments (Article 97), with other authorities such as anti-money-laundering supervisors and the ECB (Article 98), and with third countries (Article 107). A host authority with clear grounds to suspect irregularities notifies the home authority and ESMA and, if the home authority does not act, may take **precautionary measures** itself (Article 102).
+Chapter 1 also organises cooperation:
+
+- between national authorities (Article 95);
+- with EBA and ESMA (Article 96);
+- on the **classification of crypto-assets**, where ESMA, EBA and the authorities work towards a common view of which tokens are financial instruments (Article 97);
+- with other authorities such as anti-money-laundering supervisors and the ECB (Article 98);
+- with third countries (Article 107).
+
+A host authority with clear grounds to suspect irregularities notifies the home authority and ESMA and, if the home authority does not act, may take **precautionary measures** itself (Article 102).
 
 ### Product intervention (Articles 103 to 106)
 
@@ -135,7 +144,12 @@ For infringements of Title VI (Article 111(5)):
 - for natural persons, at least **EUR 1 000 000** for a breach of the disclosure duty (Article 88) and **EUR 5 000 000** for insider dealing, unlawful disclosure, manipulation or failure to detect and report (Articles 89 to 92);
 - for legal persons, at least **EUR 2 500 000 or 2 %** of annual turnover for Article 88, and **EUR 15 000 000 or 15 %** of annual turnover for Articles 89 to 92.
 
-Turnover is consolidated at the level of the ultimate parent where group accounts are prepared. Article 112 lists the factors an authority weighs: gravity, duration, degree of responsibility, financial strength, profits, losses to third parties, cooperation and previous infringements. Article 113 guarantees a right of appeal, Article 114 requires decisions to be **published**, in anonymised form where identification would be disproportionate, and Article 116 applies the [Whistleblower Directive](https://eur-lex.europa.eu/eli/dir/2019/1937/oj) (Directive (EU) 2019/1937) to reports of MiCA infringements.
+Turnover is consolidated at the level of the ultimate parent where group accounts are prepared. The chapter also provides:
+
+- Article 112 lists the factors an authority weighs: gravity, duration, degree of responsibility, financial strength, profits, losses to third parties, cooperation and previous infringements.
+- Article 113 guarantees a right of appeal.
+- Article 114 requires decisions to be **published**, in anonymised form where identification would be disproportionate.
+- Article 116 applies the [Whistleblower Directive](https://eur-lex.europa.eu/eli/dir/2019/1937/oj) (Directive (EU) 2019/1937) to reports of MiCA infringements.
 
 | Infringement | Natural person, at least | Legal person, at least |
 |---|---|---|
@@ -170,7 +184,7 @@ For a **trading platform**, Title VI adds surveillance to the venue rules of Tit
 
 For a **project team or foundation** with a listed token, Article 88 imposes a continuous disclosure duty of the kind listed companies live under. Announcing a partnership, a token burn or a security incident selectively, to a Discord channel before the public, or to a market maker before the community, is unlawful disclosure by the discloser and insider dealing by any recipient who trades. A delay must be documented and justified on the three conditions of Article 88(2).
 
-For **individuals**, the criminal-law analogy holds. Trading on knowledge of an unannounced listing, front-running a client's order, or promoting a token one holds without disclosing the position, is now an administrative offence throughout the Union with fines starting at EUR 5 000 000 for a natural person, whether or not the Member State also treats it as a crime.
+For **individuals**, trading on knowledge of an unannounced listing, front-running a client's order, or promoting a token one holds without disclosing the position, is now an administrative offence throughout the Union with fines starting at EUR 5 000 000 for a natural person, whether or not the Member State also treats it as a crime.
 
 For **anyone checking a counterparty**, the ESMA registers are the first stop: an entity that claims to be a MiCA CASP either appears in the Article 109 register or does not, and one that appears in the Article 110 register is one an authority has already reported as non-compliant.
 
@@ -271,19 +285,31 @@ Title VI is a set of prohibitions and duties on market participants; Title VII i
 
 **Q: Does Title VI apply to a token that is traded only on decentralised exchanges and has never been listed on a MiCA-authorised platform?**
 
-Only if the token is admitted to trading, or a request for admission has been made, on a trading platform for crypto-assets within the meaning of MiCA. Article 86(1) ties the title to that status, not to where the trading happens. A token with no such admission is outside Title VI, though its offer remains subject to Title II. Once a token is admitted anywhere in the Union, Article 86(2) and (3) extend the prohibitions to every transaction in it, on any venue, on-chain or off, inside or outside the Union.
+Only if the token is admitted to trading, or a request for admission has been made, on a trading platform for crypto-assets within the meaning of MiCA. Article 86(1) ties the title to that status, not to where the trading happens. A token with no such admission is outside Title VI, though its offer remains subject to Title II.
+
+Once a token is admitted anywhere in the Union, Article 86(2) and (3) extend the prohibitions to every transaction in it, on any venue, on-chain or off, inside or outside the Union.
 
 **Q: What are the three conditions for delaying the disclosure of inside information?**
 
-Under Article 88(2), an issuer may delay disclosure on its own responsibility only where immediate disclosure is likely to prejudice its legitimate interests, the delay is not likely to mislead the public, and the issuer can ensure the confidentiality of the information. All three must hold, the issuer must inform the competent authority that disclosure was delayed and give a written explanation, and the delay ends the moment confidentiality is lost. A security vulnerability under active remediation is the standard example of a legitimate delay; a poor quarterly reserve figure is not.
+Under Article 88(2), an issuer may delay disclosure on its own responsibility only where:
+
+- immediate disclosure is likely to prejudice its legitimate interests;
+- the delay is not likely to mislead the public;
+- the issuer can ensure the confidentiality of the information.
+
+All three must hold, the issuer must inform the competent authority that disclosure was delayed and give a written explanation, and the delay ends the moment confidentiality is lost. A security vulnerability under active remediation is the standard example of a legitimate delay; a poor quarterly reserve figure is not.
 
 **Q: Who counts as an insider under MiCA, and why does the text mention the distributed ledger?**
 
-Article 89(5) covers members of the issuer's governing bodies, shareholders, persons with access to the information through their employment, profession or duties "or in relation to its role in the distributed ledger technology", persons involved in criminal activity, and any other person who knows or ought to know that the information is inside information. The reference to the DLT was added because in crypto-asset markets some of the persons best placed to know about an upgrade, a fork, a pending large transaction or a governance outcome are validators, sequencers, core developers and node operators rather than corporate officers.
+Article 89(5) covers members of the issuer's governing bodies, shareholders, persons with access to the information through their employment, profession or duties "or in relation to its role in the distributed ledger technology", persons involved in criminal activity, and any other person who knows or ought to know that the information is inside information.
+
+The reference to the DLT was added because in crypto-asset markets some of the persons best placed to know about an upgrade, a fork, a pending large transaction or a governance outcome are validators, sequencers, core developers and node operators rather than corporate officers.
 
 **Q: Is promoting a token on social media market manipulation?**
 
-It can be. Article 91(3)(c) treats as manipulation the act of voicing an opinion about a crypto-asset in the traditional or electronic media, having previously taken a position in it, and profiting from the effect of that opinion on its price, without having disclosed the conflict of interest to the public in a proper and effective way. The elements are a prior position, a public opinion, a subsequent profit and no adequate disclosure. Disclosure of the position at the time of the opinion takes the conduct outside the provision; false statements about the token would fall under Article 91(2)(c) regardless.
+It can be. Article 91(3)(c) treats as manipulation the act of voicing an opinion about a crypto-asset in the traditional or electronic media, having previously taken a position in it, and profiting from the effect of that opinion on its price, without having disclosed the conflict of interest to the public in a proper and effective way.
+
+The elements are a prior position, a public opinion, a subsequent profit and no adequate disclosure. Disclosure of the position at the time of the opinion takes the conduct outside the provision; false statements about the token would fall under Article 91(2)(c) regardless.
 
 **Q: How do the fines for market abuse compare with those for breaching the CASP rules?**
 

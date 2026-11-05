@@ -2,7 +2,7 @@
 layout: post
 title: "Crypto Hacks of September 2026 - Bitget, Liquid Network and 50 Smaller Incidents"
 date:   2026-10-06
-last_modified_at: 2026-10-14
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -31,7 +31,7 @@ The article covers incidents that **occurred** between 1 and 30 September 2026. 
 
 Figures come from first alerts and are often revised. Three practical consequences:
 
-- **Totals differ between trackers.** PeckShield reports ~$766.49M for 55 hacks; CertiK first posted ~$766.4M on 30 September and ~$772.4M two days later. The difference comes from scope (phishing, scams and rug pulls are counted differently) and from price snapshots.
+- **Totals differ between trackers.** PeckShield reports ~$766.49M for 55 hacks; CertiK first posted ~$766.4M on 30 September and ~$772.4M two days later. The difference comes from price snapshots and from scope: phishing, scams and rug pulls are counted differently.
 - **Gross and net losses differ.** Liquid Network's ~$320M is a gross figure; 3,400 BTC were returned. PeckShield records ~$285M returned, CertiK about $268M, because the BTC was valued at different moments.
 - **Per-incident amounts disagree.** Limit Break's Payment Processor V2 appears as ~$6.6M (with ~$3.4M returned) at PeckShield and ~$2.8M at SlowMist; Likwid appears as 74.31 BNB in the alert and ~$55,721 in the database. Where two values exist, both are given.
 - **Some incidents are dated by disclosure.** The Nomic nBTC exploit ran on 25 June 2026 and was disclosed on 7 September; SlowMist files it under September, and so does this article.
@@ -60,7 +60,7 @@ Two incidents represent about 92% of the gross total. Without Bitget and Liquid,
 
 ### Statistics from the SlowMist database
 
-The figures below are computed from the September entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database, after removing one duplicate row (Flamincome is listed twice) and one fraud, the fake GIWA bridge, which is covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack. They use the database's own loss figures, before returns, and they give a second count, independent of PeckShield's:
+The figures below are computed from the September entries of the [SlowMist Hacked](https://hacked.slowmist.io/) database, after removing Flamincome's duplicate row and one fraud, the fake GIWA bridge, which is covered in [Frauds and scams](#frauds-and-scams) and not counted as a hack. They use the database's own loss figures, before returns, and they give a second count, independent of PeckShield's:
 
 - **49 incidents**, 46 with a stated loss, for a total of **~$760M**. The same calculation for August gives 37 incidents and ~$188M.
 - **Median loss: ~$170k.** The mean, ~$16.5M, is meaningless here: the two largest incidents make up 93.1% of the total, and the other 47 add up to ~$52.5M.
@@ -74,7 +74,7 @@ The figures below are computed from the September entries of the [SlowMist Hacke
 | < $100k | 18 | $709.2k | 0.1% |
 | Not stated | 3 | n/a | n/a |
 
-Grouping the entries by category gives a different picture by count than by value. Smart contract bugs are the most frequent incidents but a small share of the money:
+By category, smart contract bugs are the most frequent incidents but a small share of the money:
 
 | Category | Incidents | Loss (approx. USD) | Share of loss |
 |---|--:|--:|--:|
@@ -87,7 +87,11 @@ Grouping the entries by category gives a different picture by count than by valu
 | Phishing / account takeover | 1 | not stated | n/a |
 | Supply chain | 1 | $118k | < 0.1% |
 
-The category is derived from the database's attack method first, and from the target and description when the method is generic. Bitget counts as an infrastructure compromise and Liquid as a sidechain bug. The database also files the Neutron governance attack as two rows, Drop (governance, ~$4.4M) and Astroport (administrator privileges, ~$4.9M, counted under key / infrastructure); the official post-mortem puts the whole attack at ~$6.24M withdrawn and ~$2.23M net, so these tables overstate it by about $3M. The loss is concentrated in time as well: the week of 22 to 28 September (Bitget, Duelbits, Astroport, Drop, Payy, Meter, Limit Break) accounts for 54% of the month's total.
+The category is derived from the database's attack method first, and from the target and description when the method is generic. Bitget counts as an infrastructure compromise and Liquid as a sidechain bug.
+
+The database also files the Neutron governance attack as two rows. Drop (~$4.4M) is filed under governance. Astroport (~$4.9M) is filed under administrator privileges and counted under key / infrastructure. The official post-mortem puts the whole attack at ~$6.24M withdrawn and ~$2.23M net, so these tables overstate it by about $3M.
+
+The loss is concentrated in time as well: the week of 22 to 28 September accounts for 54% of the month's total, with Bitget, Duelbits, Astroport, Drop, Payy, Meter and Limit Break.
 
 ```mermaid
 %%{init: {"themeVariables": {"pie1": "#56B4E9", "pie2": "#E69F00", "pie3": "#009E73", "cScale1": "#56B4E9", "cScale2": "#E69F00", "cScale3": "#009E73", "pieSectionTextColor": "#000000"}}}%%
@@ -221,7 +225,7 @@ After Bitget, the largest group by value is off-chain: keys or privileged creden
   SingularityNET's [statement of 22 September](https://x.com/SingularityNET/status/2102221596752482469) confirms it: on 19 September an unauthorised party reached part of its cloud infrastructure and used it to mint tokens and withdraw assets through the bridges. It describes "a coordinated, multi-stage attack with a high degree of automation". The team revoked the access, deactivated the bridges and conversion contracts, and paused AGIX and NTX transfers on Ethereum. Treasury and exchange wallets were not affected, and FET minting controls were intact; the FET loss came from the token converter's balance. NTX, WMTX and CGV saw unauthorised mints.
 
   In an [update on 24 September](https://x.com/SingularityNET/status/2103104425879347512), SingularityNET announced that AGIX, its legacy token, would be retired and replaced by a new token for affected holders, and asked exchanges to resume FET deposits and withdrawals on Ethereum.
-- **Smaller key incidents.** Dominion Market lost ~$238k when 3 of the 5 keys of its Solana treasury multisig were compromised; the owner of WealthManagementV2 on BSC was replaced, and the new owner set `period = 0` and a 528,300,000 interest multiplier through an unbounded, non-timelocked `updatePlanConfig` (~$26k); about 4,011 XRPH Wallet accounts were emptied through leaked seed phrases (~$452k); and a software flaw let an attacker empty a few dozen custodial accounts at Blink Wallet.
+- **Smaller key incidents.** Dominion Market lost ~$238k when 3 of the 5 keys of its Solana treasury multisig were compromised. The owner of WealthManagementV2 on BSC was replaced, and the new owner set `period = 0` and a 528,300,000 interest multiplier through an unbounded, non-timelocked `updatePlanConfig` (~$26k). About 4,011 XRPH Wallet accounts were emptied through leaked seed phrases (~$452k). A software flaw let an attacker empty a few dozen custodial accounts at Blink Wallet.
 
 Dedaub's classification of 135 Rekt News incidents from January 2024 to August 2026, posted on 28 September, gives the context: stolen keys, phishing, malware and privileged access made up 32.6% of incidents and 66.9% of losses. September fits that pattern, with Bitget alone above the rest of the month combined.
 
@@ -317,7 +321,7 @@ The rest of the contract incidents are bookkeeping errors, often scaled with a f
 
 Most of these protocols are small or dormant, and several contracts were years old: Notional V1 and GebProxyActions in September, then Set Protocol's vault and a 2020 MakerDAO keeper proxy in early October.
 
-Notional's [post-mortem](https://x.com/NotionalFinance/status/2097463462062408152) states the problem plainly. V1 had been deprecated in January 2022, but withdrawals stayed open indefinitely, so user assets remained in its Escrow for almost five years. The team paused and upgraded the contract after the exploit, recovered nothing so far, and is working with US law enforcement and the incident response firm ZeroShadow. It now commits to migrating or returning all user assets whenever it deprecates a contract, because "legacy contracts must be handled with the same ongoing scrutiny as production contracts".
+According to Notional's [post-mortem](https://x.com/NotionalFinance/status/2097463462062408152), V1 had been deprecated in January 2022, but withdrawals stayed open indefinitely, so user assets remained in its Escrow for almost five years. The team paused and upgraded the contract after the exploit, recovered nothing so far, and is working with US law enforcement and the incident response firm ZeroShadow. It now commits to migrating or returning all user assets whenever it deprecates a contract, because "legacy contracts must be handled with the same ongoing scrutiny as production contracts".
 
 The number of old contracts drained within a few weeks suggests that attackers, possibly assisted by automated tools, are now scanning old deployments systematically. BlockThreat's week 38 issue noted "AI bug hunters found chains nobody was watching".
 
@@ -330,7 +334,7 @@ SlowMist lists Drop (~$4.4M, governance attack) and Astroport (~$4.9M, compromis
 - **Two failed attempts.** The attacker bought the 1M NTRN expedited-proposal deposit for a few hundred dollars. Proposal 5 (24 August), presented as a testnet experiment with AI agents, carried ten `MsgUpdateAdmin` messages targeting Astroport and Drop mainnet contracts and was rejected. Proposal 7 (12 September), with the same payload, was heading for a heavy defeat and was cancelled.
 - **Proposal 9 (submitted 19 September).** The same payload, plus an eleventh message targeting the Neutron investor vesting contract (76.22M NTRN).
 - **The vote was bought.** A second wallet, funded with USDC withdrawn from Secret Network's privacy layer, spent 20,199 USDC on 31.6M NTRN and staked it 11 minutes before voting closed. Native governance weighs stake at the end of the vote, so that stake counted in full: 84.7% of the YES vote, without which the proposal would not have reached quorum.
-- **Drain.** At 02:24 UTC on 22 September the eleven admin changes executed with no timelock. Within 26 minutes the attacker migrated ten contracts (six Astroport pools, Astroport Staking, two Drop contracts and the investor vesting) to its own code and withdrew their balances. The Astroport Treasury was taken over but never drained.
+- **Drain.** At 02:24 UTC on 22 September the eleven admin changes executed with no timelock. Within 26 minutes the attacker migrated ten contracts to its own code and withdrew their balances: six Astroport pools, Astroport Staking, two Drop contracts and the investor vesting. The Astroport Treasury was taken over but never drained.
 
 The withdrawn assets were worth about $6.24M at the investigation's prices. About $4.01M (64%) was secured: ~$1.86M never left Neutron, because the ICS20 rate limiter blocked repeated transfers and validators halted the chain at 07:43 UTC, and 1,227,121 ATOM (~$2.15M) was moved to a recovery multisig by a one-time state change when the Cosmos Hub restarted. The net loss is about $2.23M. Neutron resumed on 25 September with a recovery release that restored the eleven contracts, removed the purchased stake, locked both attacker accounts, froze new delegations and restricted governance to software upgrades and text proposals.
 

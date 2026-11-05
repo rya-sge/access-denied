@@ -2,6 +2,7 @@
 layout: post
 title: "The OpenSSH Channel Layer — One Abstraction Behind Forwarding, X11, Agent Access and Tunnels"
 date:   2026-08-27
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: network security linux
@@ -49,8 +50,6 @@ The clearest statement of the design is the type enumeration in `channels.h`, wh
 #define SSH_CHANNEL_RDYNAMIC_FINISH	22	/* reverse SOCKS, finishing connect */
 ```
 
-Two things follow from reading it as a whole.
-
 The field is named `type`, but several of its values are lifecycle stages rather than kinds. A channel passes through `SSH_CHANNEL_OPENING`, `SSH_CHANNEL_OPEN`, `SSH_CHANNEL_CLOSED` and `SSH_CHANNEL_ZOMBIE` while remaining the same object throughout. The mixing is deliberate: the value is used as the dispatch key for the event loop, so encoding both the kind and the stage in one field lets a handler be selected with a single lookup.
 
 Features that a user would describe as unrelated sit next to each other. `SSH_CHANNEL_DYNAMIC` is the local SOCKS proxy created by `ssh -D`, whose opening bytes are a SOCKS request that must be parsed in band before the real destination is known. `SSH_CHANNEL_RDYNAMIC_OPEN` and `SSH_CHANNEL_RDYNAMIC_FINISH` are the same idea in reverse for `ssh -R`. `SSH_CHANNEL_AUTH_SOCKET` is agent forwarding. None of these needed a subsystem of its own.
@@ -79,7 +78,7 @@ c = channel_new(ssh,
     ...
 ```
 
-`tun@openssh.com` is likewise handled in `clientloop.c` and `serverloop.c`. The allocation site varies, but every one of them produces the same `struct Channel` and is then serviced by the same event loop, which is the property that matters.
+`tun@openssh.com` is likewise handled in `clientloop.c` and `serverloop.c`. The allocation site varies, but every one of them produces the same `struct Channel` and is then serviced by the same event loop.
 
 The consequence is visible in the command-line syntax. Unix-domain-socket forwarding was added by defining two new type strings rather than a new subsystem, which is why `-L` and `-R` accept a socket path in the same argument position as a port number, and why the two forms share their option parsing, their permission checks and their teardown.
 

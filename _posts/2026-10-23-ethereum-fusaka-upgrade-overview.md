@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Fusaka - Overview"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -147,7 +148,7 @@ EIP-7939 adds `CLZ` (opcode `0x1E`, 5 gas), which pops a 256-bit word and pushes
 The `MODEXP` precompile at address `0x05` computes `base^exponent mod modulus` on arbitrary-size integers. Two EIPs change it:
 
 - **EIP-7823** limits each of the three lengths to 1,024 bytes (8,192 bits). A call with a longer input fails and consumes all its gas. The EIP's motivation is that `MODEXP` "has been a source of numerous consensus bugs", many triggered by impractical input lengths, and that a bounded precompile could later be replaced by EVM code.
-- **EIP-7883** raises the price, stating that the precompile was underpriced in some cases and that this stood in the way of higher block gas limits. The minimum cost rises from 200 to 500 gas, the general cost triples (the division by 3 of [EIP-2565](https://eips.ethereum.org/EIPS/eip-2565) is removed), the cost of exponents longer than 32 bytes doubles, and inputs shorter than 32 bytes are priced as if they were 32 bytes long.
+- **EIP-7883** raises the price, stating that the precompile was underpriced in some cases and that this stood in the way of higher block gas limits. The minimum cost rises from 200 to 500 gas, the general cost triples through the removal of the division by 3 of [EIP-2565](https://eips.ethereum.org/EIPS/eip-2565), the cost of exponents longer than 32 bytes doubles, and inputs shorter than 32 bytes are priced as if they were 32 bytes long.
 
 Contracts that verify RSA signatures or run other big-integer arithmetic through `MODEXP` pay more after Fusaka, and inputs above 1,024 bytes (RSA keys above 8,192 bits) are no longer accepted.
 

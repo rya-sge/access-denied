@@ -2,6 +2,7 @@
 layout: post
 title: "The Technical Concepts Behind the 2020 Crypto Hacks"
 date:   2026-10-07
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain security defi solidity
@@ -15,7 +16,7 @@ isMermaid: true
 
 The [recap of the 2020 crypto hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2020/) summarises each incident in one line: "the first flash-loan attack", "an ERC-777 hook re-entered `withdraw` during a deposit", "a self-transfer doubled the balance". This companion article explains those mechanisms for a developer who writes Solidity, knows how AMMs, lending markets and vaults work, and wants to see what exactly broke.
 
-2020 is where most of DeFi's attack classes start. Flash loans turned every manipulable price into a free attack, tokens with hooks or transfer fees broke contracts written for plain ERC-20s, and small accounting slips (a cached balance, a `msg.value` read inside a loop, a struct copied to memory too early) became million-dollar bugs. The technical articles on [2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/), [2022]({{site.url_complet}}/2026/10/07/crypto-hacks-2022-technical-concepts/), [2023]({{site.url_complet}}/2026/10/07/crypto-hacks-2023-technical-concepts/) and [2024]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) follow the same classes into later years.
+2020 is where most of DeFi's attack classes start. Flash loans turned every manipulable price into a free attack, tokens with hooks or transfer fees broke contracts written for plain ERC-20s, and small accounting slips, such as a cached balance, a `msg.value` read inside a loop or a struct copied to memory too early, became million-dollar bugs. The technical articles on [2021]({{site.url_complet}}/2026/10/07/crypto-hacks-2021-technical-concepts/), [2022]({{site.url_complet}}/2026/10/07/crypto-hacks-2022-technical-concepts/), [2023]({{site.url_complet}}/2026/10/07/crypto-hacks-2023-technical-concepts/) and [2024]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/) follow the same classes into later years.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -45,7 +46,7 @@ function onFlashLoan(...) external {
 
 The first attack, on 15 February, combined a loan of 10,000 ETH from dYdX with a 5x short on bZx, whose trade pushed WBTC's price up on Uniswap through Kyber, while the attacker sold WBTC borrowed from Compound at the inflated price. [PeckShield](https://peckshield.medium.com/bzx-hack-full-disclosure-with-detailed-profit-analysis-e6b1fa9b18fc) found that bZx skipped its position health check (`shouldLiquidate`) in a specific branch of the margin trade, so the absurd position was accepted. The second, on 18 February, was a pure oracle attack: sUSD was pumped on Kyber, the exchange bZx used as its price source, and borrowed against.
 
-What changed is the threat model. Before flash loans, manipulating a price required capital the attacker could lose. After them, every value a contract reads on-chain must be safe against an adversary with effectively unlimited capital for one block.
+Before flash loans, manipulating a price required capital the attacker could lose. After them, every value a contract reads on-chain must be safe against an adversary with effectively unlimited capital for one block.
 
 ### A share price computed from a Curve pool (Harvest Finance, ~$24M)
 
@@ -214,7 +215,7 @@ function deposit(address _lpToken, uint256 _amount) external {
 
 The miner's write-off was computed from the old, lower reward index, while a later claim used the new, higher one, so the depositor could claim the difference. The pool held only 1 wei of LP tokens, so `updatePool` divided the period's rewards by one and increased the index by about 10^17 in a single update. One deposit and claim minted about 40 quintillion COVER ([Cover](https://coverprotocol.medium.com/12-28-post-mortem-34c5f9f718d4)).
 
-Two lessons. A `memory` copy of a struct is a snapshot, not a reference; re-read it, or use `storage`, after any call that modifies it. And reward indices divided by a total stake need a minimum stake, or the first depositor controls the denominator, the same weakness as the share inflation of later years.
+A `memory` copy of a struct is a snapshot, not a reference; re-read it, or use `storage`, after any call that modifies it. And reward indices divided by a total stake need a minimum stake, or the first depositor controls the denominator, the same weakness as the share inflation of later years.
 
 ### Actions taken on behalf of others (YFValue, August)
 
@@ -274,7 +275,7 @@ Eminence's EMN token was minted and burned against DAI on a bonding curve, and i
 
 ### Hot wallets (KuCoin, EXMO, Eterbase)
 
-The year's largest losses came from exchange hot wallets whose private keys were stolen. No contract was involved, and contract-level defences did not apply. Two mechanisms limited the damage at KuCoin: token contracts with freeze or upgrade powers (USDT and several project tokens), and exchanges that blocked the addresses. For a developer, the takeaway is about design choices that cut both ways: an admin freeze function is a centralisation risk in normal times and the only recovery path after a theft.
+The year's largest losses came from exchange hot wallets whose private keys were stolen. No contract was involved, and contract-level defences did not apply. Two mechanisms limited the damage at KuCoin: token contracts with freeze or upgrade powers (USDT and several project tokens), and exchanges that blocked the addresses. An admin freeze function is a centralisation risk in normal times and the only recovery path after a theft.
 
 ### 51% attacks and confirmation depth (Ethereum Classic, August)
 

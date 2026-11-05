@@ -2,6 +2,7 @@
 layout: post
 title: "OpenSSH Certificates — Critical Options, Extensions and the KRL Encoding"
 date:   2026-08-27
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: network security linux
@@ -76,7 +77,7 @@ if (k->cert->nprincipals == 0) {
 }
 ```
 
-Three properties of this function are worth naming. A user certificate can never be accepted where a host certificate is expected, so a CA that signs both cannot have one repurposed as the other. The validity window is half-open, since `valid_after` is compared with `<` and `valid_before` with `>=`. And a certificate with an empty principal list is rejected outright rather than treated as matching everything, which is the safe reading of an ambiguous document.
+A user certificate can never be accepted where a host certificate is expected, so a CA that signs both cannot have one repurposed as the other. The validity window is half-open, since `valid_after` is compared with `<` and `valid_before` with `>=`. And a certificate with an empty principal list is rejected outright rather than treated as matching everything, which is the safe reading of an ambiguous document.
 
 Principal matching then follows, with the wildcard behaviour selected by the caller rather than by the certificate:
 
@@ -92,7 +93,7 @@ for (i = 0; i < k->cert->nprincipals; i++) {
 
 ## Critical options and extensions
 
-The two option bags are the part of the design that carries the most weight. Both are parsed by the same function in `auth-options.c`, called twice with different arguments:
+Both option bags are parsed by the same function in `auth-options.c`, called twice with different arguments:
 
 ```c
 /* Handle options and critical extensions separately */
@@ -137,7 +138,7 @@ The extensions are grants: `permit-pty`, `permit-port-forwarding`, `permit-agent
 
 A server that does not understand a restriction cannot apply it, and accepting the certificate anyway would hand out access the issuer intended to constrain. A server that does not understand a grant simply fails to grant it, which errs toward less access. So critical options fail closed and extensions fail open, and the same certificate can be deployed across servers of different vintages without becoming more permissive on the older ones.
 
-The practical rule for an issuer follows directly. A restriction that must hold belongs in the critical bag, where an incapable server refuses the certificate rather than ignoring the constraint.
+A restriction that must hold belongs in the critical bag, where an incapable server refuses the certificate rather than ignoring the constraint.
 
 ## Revocation lists
 
@@ -185,7 +186,7 @@ The switching cost is why the calculation is not a simple per-run comparison. St
 
 The certificate format is small because it delegates. There is no chain to validate, so the trust decision reduces to whether the signing key is configured as an authority. The validation function is a list of refusals with operator-readable reasons, and the interesting behaviour is concentrated in the option bags rather than in the parsing.
 
-The split between critical options and extensions is the part worth carrying to other systems. Separating a bag that must be understood from a bag that may be ignored lets one artefact be consumed by implementations of different capability without the older ones quietly becoming more permissive. The KRL encoder is a smaller lesson in the same direction, where measuring three candidate encodings against each other keeps a revocation list small enough to actually deploy.
+The split between critical options and extensions is the part worth carrying to other systems. Separating a bag that must be understood from a bag that may be ignored lets one artefact be consumed by implementations of different capability without the older ones quietly becoming more permissive. The KRL encoder is a smaller lesson in the same direction, where measuring three candidate encodings against each other keeps a revocation list small enough to deploy.
 
 ![Mindmap of OpenSSH certificates covering the certificate structure, validation checks, critical options versus extensions, and KRL revocation encodings]({{site.url_complet}}/assets/article/network/openssh-certificates.png)
 
