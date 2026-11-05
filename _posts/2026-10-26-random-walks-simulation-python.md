@@ -2,6 +2,7 @@
 layout: post
 title: "Random Walks in Python - Simulating the Drunkard's Walk and the Square-Root Law"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -147,7 +148,7 @@ JG points out an asymmetry that classes impose: distance is symmetric, but `self
 
 ### Drunk, a base class, and two kinds of drunks
 
-`Drunk` carries only a name. It is a **base class**, not meant to be used on its own, only to be inherited. Its subclasses supply the one method that matters, `takeStep`, which returns a displacement `(dx, dy)`.
+`Drunk` carries only a name. It is a **base class**, not meant to be used on its own, only to be inherited. Its subclasses supply one method, `takeStep`, which returns a displacement `(dx, dy)`.
 
 ```python
 import random
@@ -278,7 +279,7 @@ With `numSteps` restored, the sanity check passes: a mean, max and min of 0 for 
 | 1000 | 27.297 | 66.3 | 4.2 |
 | 10000 | 89.241 | 226.5 | 10.0 |
 
-JG's comment on passing the check is measured: it "doesn't mean my simulation is right, but at least I have reason to be hopeful". A sanity check can refute a simulation; it cannot validate it.
+JG says of passing the check that it "doesn't mean my simulation is right, but at least I have reason to be hopeful". A sanity check can refute a simulation; it cannot validate it.
 
 The Python file distributed with the lecture still contains the `numTrials` line, so anyone running it as published gets the buggy numbers.
 
@@ -346,7 +347,7 @@ The lecture's corrected results agree with this prediction within the noise of 1
 
 The ratio of the lecture's mean to $$\sqrt n$$ stays between about 0.83 and 0.91. On JG's linear plot up to 100,000 steps the $$\sqrt n$$ curve and the data are visually close, which is why the comparison looks good; the remaining gap of about 11 % is the factor $$\sqrt\pi / 2$$, and it puts the drunk slightly *slower* than $$\sqrt n$$, not faster.
 
-The practical reading is the one the poll missed: the drunk does drift away, but slowly. Going 10 times further on average takes 100 times more steps.
+The poll missed that the drunk does drift away, but slowly. Going 10 times further on average takes 100 times more steps.
 
 ## The biased walk: drift grows linearly
 

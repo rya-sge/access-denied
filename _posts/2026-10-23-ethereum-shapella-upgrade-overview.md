@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Shapella (Shanghai and Capella) - Overview"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -56,7 +57,7 @@ From the upgrade schedule of `forks/shanghai/__init__.py` and `CAPELLA_FORK_EPOC
 | Goerli | 2023-03-14 22:25:36 | 162,304 |
 | Mainnet | 2023-04-12 22:27:35 | 194,048 |
 
-Mainnet headers show the transition. Block 17,034,869 has no `withdrawalsRoot`; block 17,034,870, the first Shanghai block, has one but carries no withdrawal; it was produced 24 seconds after the fork time, two slots later. Block 17,034,871 carried the first three withdrawals, starting with withdrawal index 0 for validator 24,862 (4.4515 ETH). From then on, blocks carried up to 16 withdrawals each, the per-payload maximum.
+On mainnet, block 17,034,869 has no `withdrawalsRoot`; block 17,034,870, the first Shanghai block, has one but carries no withdrawal; it was produced 24 seconds after the fork time, two slots later. Block 17,034,871 carried the first three withdrawals, starting with withdrawal index 0 for validator 24,862 (4.4515 ETH). From then on, blocks carried up to 16 withdrawals each, the per-payload maximum.
 
 ## Staking withdrawals
 
@@ -106,7 +107,7 @@ The EIP's design choices explain how withdrawals behave for contracts:
 
 Before Shanghai, pushing zero cost `PUSH1 0x00`: 3 gas and two bytes of code. Compilers often replaced it with cheaper one-byte opcodes whose value happens to be zero, such as `RETURNDATASIZE` or `CALLVALUE`. EIP-3855 adds `PUSH0` (opcode `0x5F`), which costs 2 gas and one byte. The EIP measured that about 11.5 % of executed `PUSH*` instructions pushed zero, and that 340,557,331 bytes of deployed code were `PUSH1 00`.
 
-The change had a side effect outside mainnet. Solidity 0.8.20 made Shanghai its default EVM version, so its output contains `PUSH0`, and its [release announcement](https://www.soliditylang.org/blog/2023/05/10/solidity-0.8.20-release-announcement/) warns that on chains which do not yet support `PUSH0`, "such as L2 chains", deployment fails unless an older EVM version is selected.
+Solidity 0.8.20 made Shanghai its default EVM version, so its output contains `PUSH0`, and its [release announcement](https://www.soliditylang.org/blog/2023/05/10/solidity-0.8.20-release-announcement/) warns that on chains which do not yet support `PUSH0`, "such as L2 chains", deployment fails unless an older EVM version is selected.
 
 ### EIP-3860: limit and meter initcode
 
@@ -218,7 +219,7 @@ The following points were not settled by the sources used for this article:
 | Why block 17,034,870 carried no withdrawal is not established. | It may reflect the proposer's client or the empty sweep at the fork slot. | The beacon block of the corresponding slot on a beacon chain explorer. |
 | The time for the sweep to visit every validator is not computed. | It sets how often a validator receives its rewards. | The number of validators and eligible withdrawals in April 2023, from beacon chain data. |
 | Which L2 chains lacked `PUSH0` and when each added it is not documented. | The deployment failures depended on each chain's EVM version. | The release notes of each L2 for its Shanghai-equivalent upgrade. |
-| The volume of `BLSToExecutionChange` operations and the queue of withdrawals after activation are not covered. | They determined how fast stakers could actually withdraw. | Beacon chain explorers and analyses of April and May 2023. |
+| The volume of `BLSToExecutionChange` operations and the queue of withdrawals after activation are not covered. | They determined how fast stakers could withdraw. | Beacon chain explorers and analyses of April and May 2023. |
 | The consensus-layer client versions released for Capella are not listed. | Only the execution-layer releases appear in the execution specification. | Release notes of Prysm, Lighthouse, Teku, Nimbus and Lodestar for Capella. |
 
 ## References

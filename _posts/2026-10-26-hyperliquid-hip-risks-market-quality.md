@@ -2,6 +2,7 @@
 layout: post
 title: "Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -33,7 +34,7 @@ The examples assume the mechanics of the four HIPs and a few Hyperliquid terms:
 
 ## The risk matrix
 
-Each row names a way a HIP market can fail, who is in a position to cause or prevent it, who absorbs the loss, and what the protocol does about it. The last column is the point of the table: what is left after every protection has done its work.
+Each row names a way a HIP market can fail, who is in a position to cause or prevent it, who absorbs the loss, and what the protocol does about it. The last column shows what is left after every protection has done its work.
 
 | HIP | Failure mode | Who controls it | Who bears the loss | Protection that exists | What remains |
 |-----|--------------|-----------------|--------------------|------------------------|--------------|
@@ -102,7 +103,7 @@ Continue with the LUME ladder: `startPx = 0.01` USDC, `nOrders = 1000`, `orderSz
 What this example shows about the strategy's risks:
 
 - **Inventory imbalance.** At every moment the strategy is all tokens above the current price and all USDC below. A large one-directional move empties one side. Above level 999 there are no Hyperliquidity asks left, and below the start price there are no bids unless levels were seeded.
-- **No price feed, so adverse selection.** The ladder does not know the external price. If LUME becomes worth 0.02 elsewhere, an arbitrageur buys every level up to 0.02 at stale prices, and the strategy has sold those tokens below their market value. A conventional market maker would move its quotes; Hyperliquidity cannot.
+- **No price feed, so adverse selection.** If LUME becomes worth 0.02 elsewhere, an arbitrageur buys every level up to 0.02 at stale prices, and the strategy has sold those tokens below their market value. A conventional market maker would move its quotes; Hyperliquidity cannot.
 - **Capital efficiency.** Most of the inventory sits far from the current price. In the example, tokens at levels 500 to 999 are only reached after the price has risen more than fourfold.
 - **Quotes that cannot be placed.** Orders are ALO, so a level that would cross a resting order is rejected rather than executed. The documentation's guarantee is qualified accordingly: the quotes are ensured "to the extent that ALO orders are not rejected". When another trader's order sits across a level, the ladder has a gap there until the next update.
 - **Price gaps between levels.** Between two levels the strategy offers nothing, so a trade that consumes one level moves the best price by a full 0.3% step unless other makers quote inside the ladder.
@@ -152,7 +153,14 @@ A HIP-3 or HIP-4 market carries the quality of whoever deployed it, so the quest
 
 ### Exit risk
 
-Being unable to close a position costs as much as being wrong about it. On a HIP-3 market the exits can close in four ways: the book is too thin for the size; the deployer halts trading, which settles every position at the current mark; an open-interest cap blocks orders that would flip a position; or the market is delisted. On a HIP-4 market the only certain exit is settlement, and before that the book may be empty. On a HIP-1 market with a Hyperliquidity ladder, the strategy only bids where it has previously sold tokens, so the bid side can be empty for a newly launched token.
+On a HIP-3 market the exits can close in four ways:
+
+- The book is too thin for the size.
+- The deployer halts trading, which settles every position at the current mark.
+- An open-interest cap blocks orders that would flip a position.
+- The market is delisted.
+
+On a HIP-4 market the only certain exit is settlement, and before that the book may be empty. On a HIP-1 market with a Hyperliquidity ladder, the strategy only bids where it has previously sold tokens, so the bid side can be empty for a newly launched token.
 
 ### Evaluating a deployer
 
@@ -177,19 +185,17 @@ Validators decide slashing by stake-weighted vote, and the amount applied is the
 
 Three further triggers involve a validator judgment rather than a rule. Every time an asset's `externalPerpPx` moves more than 50% from its start-of-day value, validators review whether the deployer manipulated it. Assets with cross margin enabled must meet eligibility standards that validators enforce. And a HIP-4 market that contradicts its template's `semanticRestriction` is malformed and slashable. In each case the evidence is onchain, but the reading of "irregular" or "contradicts" is a vote.
 
-**What recourse a deployer has.** The documentation describes no appeal procedure, no notice period and no published record of past votes. A deployer's recourse is the evidence (every deployer transaction is public and can be analysed by anyone) and the social layer. The specification itself says that the deployer's reputation is always at stake. A deployer who wants predictability has only the stated guideline levels and the principle that slashable behaviour should normally be matched by a protocol bug fix.
+**What recourse a deployer has.** The documentation describes no appeal procedure, no notice period and no published record of past votes. A deployer's recourse is the evidence, since every deployer transaction is public and can be analysed by anyone, and the social layer. The specification itself says that the deployer's reputation is always at stake. A deployer who wants predictability has only the stated guideline levels and the principle that slashable behaviour should normally be matched by a protocol bug fix.
 
 **When validators act outside slashing.** On 26 March 2025, a JELLY perp position of about 4.5 million USD was deliberately pushed into liquidation on a validator-operated market. The book was too thin to close it, so it passed to the liquidator vault, while the JELLY spot price was driven up about 250%. The vault's unrealised loss reached roughly 12 million USD, and ADL did not trigger. Validators voted to delist the asset and close the position at a price that removed the loss, and the Hyperliquid Foundation reimbursed affected long holders apart from addresses it flagged as involved ([OAK Research analysis](https://oakresearch.io/en/analyses/investigations/hyperliquid-jelly-attack-context-vulnerability-team-solution)). This was not a HIP-3 market and not a slashing vote. It shows that a validator supermajority can override prices when it judges the protocol threatened, and that reimbursement, when it happened, came from a foundation decision rather than from any mechanism a user could rely on in advance.
 
 ## Risks by proposal
 
-The matrix gives the outline. The points below go into the risks that matter most in practice for each HIP.
-
 ### HIP-1
 
 - **Token distribution and holder concentration.** Genesis balances are set entirely by the deployer and are visible in `tokenDetails`. HIP-1 has no vesting or lock-up, so a large genesis holder can sell from the first block.
 - **Supply verification.** `maxSupply` is a ceiling that can only fall. For a bridged asset the deployer often puts the maximum value, up to `2^64-1`, in the token's system address, so the real circulating supply is whatever has crossed the bridge. Checking it means reading the system address balance and the HyperEVM contract, not the HyperCore `maxSupply`.
-- **Bridge security.** A bridged HIP-1 token inherits every risk of the bridge that minted the ERC-20 (LayerZero, Axelar, Chainlink CCIP, deBridge and Wormhole are the ones the documentation names) and of whoever controls the ERC-20 contract. An unbacked mint on the HyperEVM can be moved to HyperCore through the system address like any other balance.
+- **Bridge security.** A bridged HIP-1 token inherits every risk of the bridge that minted the ERC-20 and of whoever controls the ERC-20 contract. The documentation names LayerZero, Axelar, Chainlink CCIP, deBridge and Wormhole. An unbacked mint on the HyperEVM can be moved to HyperCore through the system address like any other balance.
 - **Freeze privilege.** The [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) exposes `enableFreezePrivilege`, `freezeUser` and `revokeFreezePrivilege` for spot deployers. A frozen address cannot trade, send or receive the token. The deployment documentation does not list these actions, so before holding a token, check whether its deployer enabled the privilege and whether it was revoked.
 - **Duplicate tickers.** A phishing token can carry the same six-character name as a popular one. Frontends may show a different display name again, since the annotation is set by the deployer. Only the token index and token ID are reliable identifiers.
 

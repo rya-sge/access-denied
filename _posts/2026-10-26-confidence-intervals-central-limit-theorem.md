@@ -2,6 +2,7 @@
 layout: post
 title: "Confidence Intervals and the Central Limit Theorem - MIT 6.0002 Lecture 7 in Python"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -56,7 +57,7 @@ print('Fraction within ~200 of mean =', sum(v[0][30:70]))
 Two features of `pylab.hist` are new in this code:
 
 - **`weights`.** By default each value adds 1 to the height of its bin, so the y-axis shows counts. Giving every value the weight $$1/N$$ makes the bar heights fractions of the sample that sum to 1, which is easier to read.
-- **The return value.** `hist` returns a tuple whose first element holds the bar heights and whose second describes the bins (the lecture says "patches"; in matplotlib the tuple is `(n, bins, patches)`). Summing `v[0][30:70]` adds up 40 of the 100 bars.
+- **The return value.** `hist` returns a tuple whose first element holds the bar heights and whose second describes the bins. The lecture says "patches"; in matplotlib the tuple is `(n, bins, patches)`. Summing `v[0][30:70]` adds up 40 of the 100 bars.
 
 The lecture's run prints `0.957147`, and the lecture reads it as the fraction within two standard deviations, slightly above 95 % because the exact factor for 95 % is 1.96 and not 2. The exact fraction within $$\pm 2\sigma$$ is 95.45 %.
 
@@ -81,7 +82,7 @@ def gaussian(x, mu, sigma):
     return factor1 * factor2
 ```
 
-Nothing in this function is random: it maps $$x$$ to a number. The question is what that number means.
+Nothing in this function is random: it maps $$x$$ to a number.
 
 **The y-values are not probabilities.** The peak of the standard normal is $$1/\sqrt{2\pi} \approx 0.399$$, yet the probability that a continuous variable takes any single exact value is 0. The y-value can also exceed 1: shrink $$\sigma$$ and the peak $$1/(\sigma\sqrt{2\pi})$$ grows without bound. The lecture says that $$\sigma = 0.1$$ gives a peak "something like 40"; the formula gives 3.99 for $$\sigma = 0.1$$, and a peak near 40 needs $$\sigma = 0.01$$. The argument holds either way.
 
@@ -125,7 +126,7 @@ The slides show three trials, with $$\mu = 9, \sigma = 6$$, then $$\mu = -6, \si
 | $$\mu \pm 1.96\sigma$$ | 0.95 | 0.950004 |
 | $$\mu \pm 3\sigma$$ | 0.9973 | 0.997300 |
 
-The values do not depend on $$\mu$$ and $$\sigma$$, and this has a one-line reason: the substitution $$z = (x-\mu)/\sigma$$ turns every normal into the standard normal, so $$P(|X - \mu| \le k\sigma) = \operatorname{erf}(k/\sqrt 2)$$. The lecture presents the check as illustrating the rule, not proving it, which is accurate. Without SciPy, the standard library computes the same numbers exactly:
+The values do not depend on $$\mu$$ and $$\sigma$$, because the substitution $$z = (x-\mu)/\sigma$$ turns every normal into the standard normal, so $$P(|X - \mu| \le k\sigma) = \operatorname{erf}(k/\sqrt 2)$$. The lecture presents the check as illustrating the rule, not proving it, which is accurate. Without SciPy, the standard library computes the same numbers exactly:
 
 ```python
 import math
@@ -333,7 +334,7 @@ At 512,000 needles the lecture computes $$3.14155671875 \pm 1.96 \times 0.002101
 1. "95 % of the time we run this simulation, we will estimate that the value of pi is between 3.13743875875 and 3.14567467875."
 2. "With a probability of 0.95, the actual value of pi is between 3.13743875875 and 3.14567467875."
 
-The lecture says both are true, but only the first can be inferred from the simulation, and that with probability 1 the second is also true, since $$\pi = 3.14159\ldots$$ lies in the interval. The intent is right. The wording of both statements needs tightening.
+The lecture says both are true, but only the first can be inferred from the simulation, and that with probability 1 the second is also true, since $$\pi = 3.14159\ldots$$ lies in the interval. The wording of both statements needs tightening.
 
 **The precise frequentist statement.** A 95 % confidence interval is the output of a *procedure*. Before the data are drawn, the random interval $$[\hat\theta - 1.96\,\widehat{SE}, \hat\theta + 1.96\,\widehat{SE}]$$ contains the true parameter $$\theta$$ with probability about 0.95, where $$\theta$$ here is the expectation of the simulation's output. Repeat the whole experiment many times, and about 95 % of the intervals produced will contain $$\theta$$. The probability belongs to the procedure, not to any one interval.
 
@@ -343,7 +344,7 @@ Read against that statement:
 - **Statement 1 is close to correct only for a different reason.** Because `sDev` is the spread of single trials, the interval says that a new single trial of 512,000 needles will land within it about 95 % of the time. That is a prediction interval for one more trial, not a confidence interval for the mean of 100 trials.
 - **The 95 % CI for the reported mean** uses the standard error: $$3.14156 \pm 1.96 \times 0.00021 = 3.14156 \pm 0.00041$$, ten times narrower. It still contains $$\pi$$, whose distance to the estimate is 0.000036.
 
-A quick coverage experiment makes the difference concrete. With 100 trials of 10,000 needles, repeated 2,000 times, the lecture's interval (mean $$\pm 1.96 \times$$ `sDev`) contained $$\pi$$ in all 2,000 repetitions, a coverage near 100 % rather than 95 %, while the interval built with the standard error contained it in about 94 % of them, as a 95 % procedure should up to simulation noise.
+In a coverage experiment with 100 trials of 10,000 needles, repeated 2,000 times, the lecture's interval (mean $$\pm 1.96 \times$$ `sDev`) contained $$\pi$$ in all 2,000 repetitions, a coverage near 100 % rather than 95 %, while the interval built with the standard error contained it in about 94 % of them, as a 95 % procedure should up to simulation noise.
 
 ## Statistically valid is not the same as true
 

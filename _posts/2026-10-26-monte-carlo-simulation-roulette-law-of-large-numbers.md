@@ -2,6 +2,7 @@
 layout: post
 title: "Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -77,7 +78,7 @@ The lecture builds the intuition with a coin whose fairness is unknown. The ques
 - **100 flips, all heads.** Now a guess of heads for the 101st flip is reasonable; the coin may well be two-headed or weighted.
 - **100 flips, 52 heads and 48 tails.** The best estimate of the probability of heads is $$52/100$$, but confidence in that number should be low: with a fair coin, 52 heads is an ordinary outcome, and so would 48 or 55 be.
 
-Two properties of the sample explain the difference. The first is its **size**: 100 flips support a stronger conclusion than 2. The second is its **variance**: 100 identical results leave little doubt, whereas a near even split leaves the next flip almost unpredictable. As the variance grows, a larger sample is needed for the same degree of confidence. The rest of the lecture turns both properties into numbers.
+Two properties of the sample explain the difference. The first is its **size**: 100 flips support a stronger conclusion than 2. The second is its **variance**: 100 identical results leave little doubt, whereas a near even split leaves the next flip almost unpredictable. As the variance grows, a larger sample is needed for the same degree of confidence.
 
 ## Roulette as a test bench
 
@@ -247,7 +248,7 @@ The lecture then plays 20 trials of each length on each wheel and averages the 2
 
 With a million spins per trial, every estimate is within 0.08 percentage points of the exact value. With 1,000 spins, the fair wheel shows a 6.56 % gain and the European wheel loses less than the exact value; neither is evidence of anything. The lecture's spoken summary, "you'll lose 2.7 % in Europe and over 5 % in Las Vegas", matches the exact values.
 
-The question this raises is the central one of computational statistics: sampling never guarantees an exact answer, although a session can happen to hit it, for instance one win in 36 spins on the fair wheel. So **how many samples are needed before the answer deserves justified confidence?** The coin flips already suggested the answer depends on the variability of the underlying distribution, so the next step is to measure it.
+Sampling never guarantees an exact answer, although a session can happen to hit it, for instance one win in 36 spins on the fair wheel. So **how many samples are needed before the answer deserves justified confidence?** The coin flips already suggested the answer depends on the variability of the underlying distribution, so the next step is to measure it.
 
 ## Quantifying variation
 
@@ -406,7 +407,7 @@ It is symmetric about its mean, which is also its most probable value. With $$\m
 
 A single spin is nothing like a normal variable: it takes two values, $$-1$$ and $$+35$$. The lecture defers the explanation to the next one. In short, the mean of many independent spins *is* approximately normal, by the **central limit theorem**, and that is the result that justifies applying the empirical rule to the mean return of a long session. The approximation is good for the trial sizes used here; the series' next article develops the theorem and the confidence intervals built on it.
 
-The approximation also has limits that matter in practice. The number of wins in a 100-spin session averages under 3 and is visibly skewed, so the 95 % figure is only approximate there. And financial returns, unlike roulette spins, are often heavy-tailed, so the empirical rule understates their extremes, a point the site's [article on power-law curves]({{site.url_complet}}/2026/10/22/power-law-curves/) develops.
+The number of wins in a 100-spin session averages under 3 and is visibly skewed, so the 95 % figure is only approximate there. And financial returns, unlike roulette spins, are often heavy-tailed, so the empirical rule understates their extremes, a point the site's [article on power-law curves]({{site.url_complet}}/2026/10/22/power-law-curves/) develops.
 
 ## Conclusion
 
@@ -453,7 +454,7 @@ Monte Carlo simulation estimates an unknown quantity from a random sample of a m
 
 **Q: Why does the lecture simulate roulette when its probabilities can be computed exactly?**
 
-Because the exact answer is known, every simulated number can be compared with it. That makes visible how far a 100-spin estimate can be from the truth, how a million-spin estimate converges, and whether the confidence intervals produced by the empirical rule actually contain the true value. Once the method has been checked on a problem with a known answer, it can be applied to problems without one, such as Ulam's solitaire.
+Because the exact answer is known, every simulated number can be compared with it. That makes visible how far a 100-spin estimate can be from the truth, how a million-spin estimate converges, and whether the confidence intervals produced by the empirical rule contain the true value. Once the method has been checked on a problem with a known answer, it can be applied to problems without one, such as Ulam's solitaire.
 
 **Q: What are the expected returns per spin of a one-unit single-number bet on the three wheels, and where does the casino's edge come from?**
 

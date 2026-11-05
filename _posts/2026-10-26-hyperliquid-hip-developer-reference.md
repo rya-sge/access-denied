@@ -2,6 +2,7 @@
 layout: post
 title: "Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -26,7 +27,7 @@ The examples assume familiarity with the HIP mechanics and with a few API conven
 
 - **Exchange and info endpoints.** Actions are `POST`ed to `/exchange` and must be signed; read queries are `POST`ed to `/info` and need no signature. Mainnet is `https://api.hyperliquid.xyz`, testnet `https://api.hyperliquid-testnet.xyz`.
 - **L1 actions.** `spotDeploy`, `perpDeploy`, `outcomeDeploy` and `userOutcome` are L1 actions, signed with the L1 scheme (`sign_l1_action` in the Python SDK), not the user-signed scheme used for transfers.
-- **Token index, spot index, asset ID.** Three different numbers. A token has a token index; a trading pair has a spot index; orders use an asset ID derived from the spot index, the perp index or the outcome encoding. They also differ between mainnet and testnet.
+- **Token index, spot index, asset ID.** A token has a token index; a trading pair has a spot index; orders use an asset ID derived from the spot index, the perp index or the outcome encoding. All three also differ between mainnet and testnet.
 - **The five-step HIP-1 deployment.** `registerToken2`, `userGenesis`, `genesis`, `registerSpot`, `registerHyperliquidity`, in that order; only the first is gas-charged and time-sensitive.
 - **Decimal strings.** Prices, sizes, amounts and fractions are passed as decimal strings without trailing zeros, because a trailing zero changes the signed payload.
 
@@ -63,7 +64,7 @@ The nonce is the current time in milliseconds. The documentation strongly recomm
 - upper-case characters in addresses (lowercase every address before signing);
 - trusting a local signer recovery, whose payload may not match what the node reconstructs.
 
-The [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) (`hyperliquid/utils/signing.py`) shows what an L1 action signature actually covers, which explains why these mistakes break it:
+The [Hyperliquid Python SDK](https://github.com/hyperliquid-dex/hyperliquid-python-sdk) (`hyperliquid/utils/signing.py`) shows what an L1 action signature covers, which explains why these mistakes break it:
 
 1. The action is msgpack-encoded as given, so field order is part of the hash.
 2. The nonce is appended as 8 big-endian bytes, then one byte `0x00` when there is no vault address, or `0x01` followed by the 20-byte vault or sub-account address.
@@ -102,7 +103,7 @@ The response contains `gasAuction` with `startTimeSeconds`, `durationSeconds` (1
 }
 ```
 
-`maxGas` caps what the deployer accepts to pay, in units of 10^-8 HYPE (the SDK's deployment example states that `1000000000000` is 10 000 HYPE, so `130000000000` here is 1 300 HYPE), so the transaction fails rather than overpays if the auction price is higher than expected. After this step the token index is assigned (read it from `spotDeployState`), the name and decimals are final, and the gas is spent.
+`maxGas` caps what the deployer accepts to pay, in units of 10^-8 HYPE, so the transaction fails rather than overpays if the auction price is higher than expected. The SDK's deployment example states that `1000000000000` is 10 000 HYPE, so `130000000000` here is 1 300 HYPE. After this step the token index is assigned (read it from `spotDeployState`), the name and decimals are final, and the gas is spent.
 
 ### Step 2: `userGenesis` (repeatable)
 
@@ -172,7 +173,10 @@ The pair is `[base, quote]`, with USDC as token 0. The new pair gets a **spot in
 { "type": "spotDeploy", "enableQuoteToken": { "token": 1234 } }
 ```
 
-The fee share starts at 100%, can only decrease, and moves in steps of 0.001%. The annotation can change at most once a day, and the label can be set once per deployer. `enableQuoteToken` requires the fee share to be zero and the token to be allowed as a quote token.
+- The fee share starts at 100%, can only decrease, and moves in steps of 0.001%.
+- The annotation can change at most once a day.
+- The label can be set once per deployer.
+- `enableQuoteToken` requires the fee share to be zero and the token to be allowed as a quote token.
 
 The freeze actions come from the SDK, not from the deployment page of the documentation. After `enableFreezePrivilege` (shown in the SDK example right after `userGenesis`), the deployer can freeze an address, which then cannot trade, send or receive the token, and unfreeze it again. `revokeFreezePrivilege` gives the power up. Integrators should treat a token whose deployer still holds the privilege as one whose balances the deployer can lock.
 
@@ -213,7 +217,9 @@ The response has the same shape as the spot auction (`startTimeSeconds`, `durati
 }
 ```
 
-The `schema` field creates the DEX; later assets are registered without it. `marginMode` is `strictIsolated` (isolated margin cannot be withdrawn from open positions), `noCross` or `normal`. The legacy `registerAsset` takes a boolean `onlyIsolated` instead. The coin name carries the DEX prefix (`idx:IDX`), as in the SDK's `perp_deploy.py`. At commit `2fdb18f` (2026-06-04) the SDK's `perp_deploy_register_asset` still sends the legacy `registerAsset` and its schema has no `isStar`, so `registerAsset2`, `marginMode` and HIP-3\* need a hand-built action signed with `sign_l1_action`. On testnet, `"isStar": true` in the schema creates a HIP-3\* venue; this choice is made once, at creation.
+The `schema` field creates the DEX; later assets are registered without it. `marginMode` is `strictIsolated` (isolated margin cannot be withdrawn from open positions), `noCross` or `normal`. The legacy `registerAsset` takes a boolean `onlyIsolated` instead. The coin name carries the DEX prefix (`idx:IDX`), as in the SDK's `perp_deploy.py`.
+
+At commit `2fdb18f` (2026-06-04) the SDK's `perp_deploy_register_asset` still sends the legacy `registerAsset` and its schema has no `isStar`, so `registerAsset2`, `marginMode` and HIP-3\* need a hand-built action signed with `sign_l1_action`. On testnet, `"isStar": true` in the schema creates a HIP-3\* venue; this choice is made once, at creation.
 
 Two traps sit in `maxGas`. Leaving it out pays the current auction price. Setting it to **0 uses a reserve deployment, whether or not the auction has completed**, so the documentation advises querying the auction status first.
 
@@ -252,7 +258,13 @@ The constraints the documentation sets on this action define the operator's main
 { "type": "perpDeploy", "setDeployerFees": [["idx:IDX", { "scale": "0.5", "growthMode": false }]] }
 ```
 
-Open-interest caps are integer notionals; the documentation sets the minimum at the larger of 1 000 000 (which it describes as one size unit of the collateral asset) and half the current open interest, and `null` removes a custom cap. The scale of that integer is not spelled out, so confirm it on testnet by reading the cap back from `perpDexs`. Funding multipliers lie between 0 and 10, interest rates between -0.01 and 0.01 per 8 hours, and clamps between 0 and 0.01. A margin table holds at most three tiers, with leverage from 1 to 50. The fee `scale` lies in [0, 3], or [0, 10) in growth mode, and can change at most once per 30 days on mainnet. Enabling cross margin on an asset cannot be undone.
+- **Open-interest caps** are integer notionals. The documentation sets the minimum at the larger of 1 000 000, which it describes as one size unit of the collateral asset, and half the current open interest, and `null` removes a custom cap. The scale of that integer is not spelled out, so confirm it on testnet by reading the cap back from `perpDexs`.
+- **Funding multipliers** lie between 0 and 10.
+- **Interest rates** lie between -0.01 and 0.01 per 8 hours.
+- **Clamps** lie between 0 and 0.01.
+- **A margin table** holds at most three tiers, with leverage from 1 to 50.
+- **The fee `scale`** lies in [0, 3], or [0, 10) in growth mode, and can change at most once per 30 days on mainnet.
+- **Enabling cross margin** on an asset cannot be undone.
 
 ### Settling and recycling an asset: `haltTrading`
 
@@ -456,7 +468,7 @@ Deploying on Hyperliquid is a sequence of signed actions rather than a contract 
 
 - **Reading state comes first.** `spotDeployState`, the auction status queries and `outcomeTemplates` decide what the next action should contain, and reading back after each step catches mistakes before they become permanent.
 - **A few steps are one-way.** `registerToken2`, enabling cross margin, the DEX schema (including HIP-3\*), the venue name and HIP-4 deactivation cannot be undone, and the checklists mark them.
-- **Operation is ongoing for HIP-3 and HIP-4.** The oracle loop and settlement are services the deployer runs for as long as the market exists, under rate limits and clamps that shape how they must be built.
+- **Operation is ongoing for HIP-3 and HIP-4.** The oracle loop and settlement are services the deployer runs for as long as the market exists, under rate limits and clamps.
 - **IDs are looked up, never stored.** Token, spot, perp and outcome IDs differ by scheme and by network.
 
 ![Mindmap of the Hyperliquid HIP developer reference covering prerequisites, signing, the HIP-1 to HIP-4 deployment walkthroughs, asset-ID lookups, error cases and checklists]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-hip-developer-reference.png)

@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Paris (The Merge) - Overview"
 date:   2026-10-23
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -45,7 +46,7 @@ On the consensus side, Bellatrix added the execution payload to the beacon block
 
 ### Activation
 
-The Merge happened in two steps. Bellatrix activated first, at a fixed epoch, to prepare beacon blocks to carry execution payloads. Paris then activated when the proof-of-work chain reached the terminal total difficulty (TTD):
+Bellatrix activated first, at a fixed epoch, to prepare beacon blocks to carry execution payloads. Paris then activated when the proof-of-work chain reached the terminal total difficulty (TTD):
 
 | Network | Terminal total difficulty | Expected date |
 |---|---|---|
@@ -216,7 +217,14 @@ EIP-3675 describes the attack a block number would allow: a minority of hash pow
 
 **Q: Which header fields changed at the transition block, and what did they become?**
 
-`difficulty` became 0, `nonce` became zero, `ommers` became an empty list and `ommersHash` the hash of an empty list. `mixHash` was kept as a field but now carries the RANDAO mix, under the name `prevRandao`. `extraData` was limited to 32 bytes. The other fields, including the gas limit and the base fee, kept their meaning, and the block format did not change.
+- **`difficulty`**: 0.
+- **`nonce`**: zero.
+- **`ommers`**: an empty list.
+- **`ommersHash`**: the hash of an empty list.
+- **`mixHash`**: kept as a field, but now carries the RANDAO mix, under the name `prevRandao`.
+- **`extraData`**: limited to 32 bytes.
+
+The other fields, including the gas limit and the base fee, kept their meaning, and the block format did not change.
 
 **Q: Can a contract use `block.prevrandao` as a secure source of randomness?**
 

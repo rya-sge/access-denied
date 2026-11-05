@@ -2,6 +2,7 @@
 layout: post
 title: "Sampling and Standard Error - Estimating a Population Mean from One Random Sample"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -67,13 +68,13 @@ The lecture's examples of bad samples are a stratification that misses a group a
 
 The magazine mailed ballots to names taken largely from its subscriber lists, telephone directories and car registrations, received about 2.4 million replies and predicted a clear win for Alf Landon; Franklin Roosevelt won with about 61 % of the popular vote. A sample of millions did not help, because the error came from who was asked and who answered, not from the sample size.
 
-The point carries over to everything that follows: the standard error measures only the random error of a probability sample. It says nothing about selection bias, and a larger biased sample is a more precise estimate of the wrong quantity.
+The standard error measures only the random error of a probability sample. It says nothing about selection bias, and a larger biased sample is a more precise estimate of the wrong quantity.
 
 ## The temperature data
 
 The running example comes from the US National Centers for Environmental Information (NCEI): daily high and low temperatures for 21 US cities from 1961 to 2015, 421,848 rows according to the slides. The cities are Albuquerque, Baltimore, Boston, Charlotte, Chicago, Dallas, Detroit, Las Vegas, Los Angeles, Miami, New Orleans, New York, Philadelphia, Phoenix, Portland, San Diego, San Francisco, San Juan, Seattle, St Louis and Tampa.
 
-The course code reads only one value per line, the second comma-separated field, as a temperature in degrees Celsius, and skips any line where that conversion fails (the header, for instance). The file is ordered by city, a detail that matters at the end of the lecture.
+The course code reads only one value per line, the second comma-separated field, as a temperature in degrees Celsius, and skips any line where that conversion fails (the header, for instance). The file is ordered by city, which the lecture returns to at its end.
 
 ```python
 def get_highs(path="temperatures.csv"):
@@ -103,7 +104,7 @@ To find out, the code draws 1,000 samples of 100 and records each sample mean. T
 
 The slide then computes a "95 % confidence interval" as $$16.28 \pm 1.96 \times 0.94$$, which gives 14.44 to 18.12 °C (14.5 to 18.1 on the slide). That interval contains the population mean, but it is wide.
 
-That interval needs a precise reading, which the lecture does not give. It is the range in which the mean of **one** sample of 100 falls about 95 % of the time. It is not the uncertainty of the average of the 1,000 means, which is far smaller ($$0.94/\sqrt{1000}$$), and in practice only one sample exists, so the 1,000 means are a teaching device rather than a procedure.
+The lecture does not say so, but that interval is the range in which the mean of **one** sample of 100 falls about 95 % of the time. It is not the uncertainty of the average of the 1,000 means, which is far smaller ($$0.94/\sqrt{1000}$$), and in practice only one sample exists, so the 1,000 means are a teaching device rather than a procedure.
 
 ### More samples, or larger samples?
 
@@ -169,7 +170,7 @@ def sem(pop_sd, sample_size):
     return pop_sd / sample_size ** 0.5
 ```
 
-A small correction to the attribution. The third claim is not really a consequence of the CLT. For independent draws with variance $$\sigma^2$$, $$\operatorname{Var}(\bar x) = \sigma^2/n$$ holds **exactly**, for every $$n$$ and every distribution with a finite variance; it follows from the variance of a sum of independent variables. What the CLT adds is the first claim, normality, which is what allows the factor 1.96 to be read off a normal table.
+The third claim is not a consequence of the CLT. For independent draws with variance $$\sigma^2$$, $$\operatorname{Var}(\bar x) = \sigma^2/n$$ holds **exactly**, for every $$n$$ and every distribution with a finite variance; it follows from the variance of a sum of independent variables. What the CLT adds is the first claim, normality, which is what allows the factor 1.96 to be read off a normal table.
 
 The lecture tests the formula: for $$n$$ from 25 to 600, it draws 50 samples per size, takes the standard deviation of their means, and plots it against $$9.44/\sqrt n$$. The two curves track each other closely, and almost coincide for the largest sizes.
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Graph-Theoretic Models — Depth-First and Breadth-First Search (MIT 6.0002, Lecture 3)"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -51,7 +52,7 @@ The slide on social networks shows a graph of *The Wizard of Oz*: one node per c
 
 ### Inference on a graph
 
-A graph supports questions, not only pictures. The lecture names four:
+The lecture names four questions a graph supports:
 
 1. **Reachability.** Is there a sequence of edges from A to B, and which one?
 2. **Shortest path.** Which path from A to B is the least expensive, measured in edges or in total weight?
@@ -76,7 +77,7 @@ The graph is the same in all three cases; the optimisation problem, and therefor
 
 The first recorded use of graph theory answered a navigation question. Königsberg had four land masses (two river banks and two islands) joined by seven bridges, and the question was whether a walk could cross every bridge exactly once. Leonhard Euler's 1736 answer modelled each land mass as a node and each bridge as an undirected edge, discarding the size of the islands and the length of the bridges. EG uses the example for exactly that abstraction step, states that the answer is no, and leaves the proof to the reader.
 
-The argument is short. A walk that enters a land mass on one bridge must leave on another, so every land mass other than the start and the end of the walk is touched by an even number of bridges. In Königsberg the four land masses have degrees 5, 3, 3 and 3 (the degrees add up to 14, twice the 7 bridges), so all four are odd. A walk crossing each edge once allows at most two odd nodes, hence no such walk exists.
+A walk that enters a land mass on one bridge must leave on another, so every land mass other than the start and the end of the walk is touched by an even number of bridges. In Königsberg the four land masses have degrees 5, 3, 3 and 3 (the degrees add up to 14, twice the 7 bridges), so all four are odd. A walk crossing each edge once allows at most two odd nodes, hence no such walk exists.
 
 ## Vocabulary: nodes, edges, digraphs, weights and trees
 
@@ -92,7 +93,7 @@ A **tree** is a special graph. The slide defines it as "a directed graph in whic
 - An undirected tree is a graph that is connected and has no cycle; equivalently, every pair of nodes is joined by exactly one simple path. A tree on $$n$$ nodes has exactly $$n-1$$ edges.
 - A directed tree, the kind drawn root-first in computer science (EG's "upside-down" trees), is a *rooted* tree, or arborescence: one root, and exactly one directed path from the root to every other node. Two arbitrary nodes, such as two siblings, are not connected by any directed path at all.
 
-EG's family-tree example also needs a correction. Every person has two parents, so a genealogy is a directed acyclic graph (DAG), not a tree, and as soon as two ancestors share an ancestor of their own, two different paths lead to the same person. The site's [hypergraph and hypertree article]({{site.url_complet}}/2025/11/25/hypergraph-hypertree/) covers the generalisation in the other direction, where an edge can join more than two nodes.
+EG's family tree is not a tree: every person has two parents, so a genealogy is a directed acyclic graph (DAG), and as soon as two ancestors share an ancestor of their own, two different paths lead to the same person. The site's [hypergraph and hypertree article]({{site.url_complet}}/2025/11/25/hypergraph-hypertree/) covers the generalisation in the other direction, where an edge can join more than two nodes.
 
 ## Representing a graph: adjacency matrix or adjacency list
 
@@ -435,7 +436,7 @@ The three algorithms side by side:
 
 ## What the lecture simplifies
 
-The lecture is an introduction, and some statements in it are loose. The points below are discussed in the sections above; this table collects them.
+The points below are discussed in the sections above; this table collects them.
 
 | Lecture statement | More precise version |
 |-------------------|----------------------|
