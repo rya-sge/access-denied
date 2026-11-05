@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* How Ethereum finalises blocks
+** Two layers
+*** Fork choice: always answers
+*** Finality gadget: answers at 2/3
+*** One attestation feeds both
+** Time and votes
+*** 12 s slots, 32 slot epochs
+*** Committees per slot
+*** Head, source, target
+** LMD GHOST
+*** on_attestation, on_block
+*** get_weight, get_head
+*** Proposer boost: 40 %
+*** equivocating_indices
+*** get_proposer_head
+left side
+** Casper FFG
+*** Checkpoints and links
+*** Justification at 2/3
+*** Four finalisation rules
+*** Double and surround votes
+*** Accountable safety: 1/3
+** Connection
+*** Start at justified root
+*** filter_node_tree
+*** get_voting_source
+*** compute_pulled_up_tip
+** Inactivity leak
+*** Delay above 4 epochs
+*** Score driven penalty
+*** 517 to 4,690 epochs
+** What changes next
+*** Gloas: payload status
+*** Fast Confirmation Rule
+*** FOCIL, Quick Slots
+@endmindmap

@@ -72,3 +72,6 @@ SMARTCONTRACTSECURITY, no date. semver_floating_pragma.sol. *SWC Registry*. Onli
 
 SMARTCONTRACTSECURITY, 2018. SWC-103. *SWC Registry*. Online. 24 September 2018. [Accessed 29 October 2022]. Retrieved from: [https://swcregistry.io/docs/SWC-103](https://swcregistry.io/docs/SWC-103)
 
+## Related articles
+
+- [What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs]({{site.url_complet}}/2026/11/04/solc-bytecode-metadata-compiler-bugs/)

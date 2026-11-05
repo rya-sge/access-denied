@@ -1,0 +1,25 @@
+Same data, two encodings
+one withdrawal                     rlp      35 ssz      44 ratio  1.257 | calldata gas rlp      560 ssz      536 | zlib rlp      46 ssz      46
+16 withdrawals as a list           rlp     565 ssz     704 ratio  1.246 | calldata gas rlp     9040 ssz     8600 | zlib rlp     208 ssz     205
+260 transactions, concatenated     rlp  164232 ssz  198453 ratio  1.208 | calldata gas rlp  1563108 ssz  1673520 | zlib rlp   61566 ssz   62606
+260 transactions, as a list        rlp  164781 ssz  199493 ratio  1.211 | calldata gas rlp  1571892 ssz  1685996 | zlib rlp   61894 ssz   63504
+
+Per type, signed form against EIP-6404 Transaction
+type 0: n= 25 median rlp      170 median ssz      280 median extra     106 total rlp     9817 total ssz    12468
+type 2: n=229 median rlp      180 median ssz      316 median extra     134 total rlp   145459 total ssz   176013
+type 3: n=  3 median rlp      319 median ssz      476 median extra     157 total rlp     1405 total ssz     1872
+type 4: n=  3 median rlp     2261 median ssz     2444 median extra     183 total rlp     7551 total ssz     8100
+all: min extra 101 median 133.0 max 183, smaller in SSZ: 0 of 260
+
+Whole objects, not field-for-field equal
+rlp(execution header) 649 ExecutionPayloadHeader ssz 608
+rlp(execution block) 166000 SignedBeaconBlock ssz 172318
+ExecutionPayload ssz 166528 of which opaque transactions 164232
+receipts rlp total 226617 for 260 receipts
+
+Inclusion proofs on this block
+tx MPT proof bytes without the transaction: min 598 median 1354.0 max 18765
+withdrawal MPT proof bytes: min 121 median 621.0 max 622
+note: the last MPT node holds the leaf value, so the sizes above include one full copy of it
+SSZ branch for one element of Transactions (limit 2^20): 672 bytes, 21 siblings
+SSZ branch for one element of Withdrawals (limit 16): 160 bytes, 5 siblings

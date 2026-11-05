@@ -273,3 +273,4 @@ The following points were not settled by the sources used for this article:
 - [Ethereum Staking - How It Works]({{site.url_complet}}/2024/03/28/ethereum-staking/)
 - [Ethereum: A Gas Story]({{site.url_complet}}/2026/10/23/ethereum-a-gas-story/)
 - [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)
+- [How Ethereum Finalises Blocks: LMD GHOST and Casper FFG]({{site.url_complet}}/2026/11/04/ethereum-finality-lmd-ghost-casper-ffg/)

@@ -1,0 +1,37 @@
+@startuml
+title Fork-aware verification of a Validator field
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+start
+:Read root from EIP-4788 with timestamp T;
+if (staticcall failed or returndata is not 32 bytes?) then (yes)
+  :Revert: no root for T;<<#FDEEEE>>
+  stop
+endif
+:Prove header.slot at gindex 8
+(3 siblings, stable since phase0);
+:Select the layout from header.slot,
+never from block.timestamp;
+if (layout known for this slot?) then (no)
+  :Revert: unknown fork layout;<<#FDEEEE>>
+  stop
+endif
+:Compute the gindex from
+layout, validator index and field;
+:Walk the branch from the gindex bits;
+if (proof length equals floor(log2(gindex))?) then (no)
+  :Revert: wrong proof length;<<#FDEEEE>>
+  stop
+endif
+if (computed root equals block root?) then (no)
+  :Revert: invalid proof;<<#FDEEEE>>
+  stop
+endif
+:Decode the leaf (little-endian uint64,
+prefix and address of the credentials);
+:Apply replay and freshness rules;
+stop
+@enduml

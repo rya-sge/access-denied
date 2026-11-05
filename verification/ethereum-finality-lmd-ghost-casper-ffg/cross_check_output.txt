@@ -1,0 +1,31 @@
+# test_process_justification_and_finalization.py
+PASS  test_234_ok_support
+PASS  test_234_poor_support
+PASS  test_23_ok_support
+PASS  test_23_poor_support
+PASS  test_123_ok_support
+PASS  test_123_poor_support
+PASS  test_12_ok_support
+PASS  test_12_poor_support
+# threshold of weigh_justification_and_finalization
+PASS  exactly two thirds justifies (>=, not >)
+# test_get_head.py
+PASS  test_split_tie_breaker_no_attestations: higher root wins
+PASS  test_shorter_chain_but_heavier_weight: long chain while boosted
+PASS  test_shorter_chain_but_heavier_weight: short block after one committee vote
+PASS  test_discard_equivocations_on_attester_slashing: votes lift the lower root
+PASS  test_discard_equivocations_on_attester_slashing: equivocators removed, tie-break back
+# test_ex_ante.py
+PASS  test_ex_ante_vanilla: A is head
+PASS  test_ex_ante_vanilla: C is head
+PASS  test_ex_ante_vanilla: C is head after B
+PASS  test_ex_ante_vanilla: C is head after the single vote
+# is_slashable_attestation_data, both orders of the surround
+PASS  outer first is slashable
+PASS  inner first is not: callers must try the outer attestation first
+# verbatim check
+spec_functions.py matches a fresh extraction: True
+sha256: ca28c08ad4b3794ca42a67cd0c03c2fa5aa3677c68de16fdb5a1c8d258d1e45a
+PASS  spec_functions.py equals a fresh extraction
+
+21/21 passed

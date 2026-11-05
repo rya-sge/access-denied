@@ -1280,3 +1280,63 @@ _posts/2026-10-29-post-quantum-cryptography-algorithms-overview.md
 _posts/2026-10-29-post-quantum-cryptography-blockchains.md
   assets/article/blockchain/post-quantum/2026-10-29-post-quantum-cryptography-blockchains-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-10-30-bybit-hack-february-2025.md
+  assets/article/blockchain/hack/2026-10-30-bybit-hack-february-2025-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/hack/2026-10-30-bybit-hack-february-2025-cex-comparison.py   (matplotlib -> .png/.svg, exchange-hack comparison chart)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-beacon-state-proofs-hard-fork-deneb-to-gloas.md
+  assets/article/blockchain/ethereum/staking/2026-11-04-beacon-state-proofs-hard-fork-deneb-to-gloas-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/ethereum/staking/2026-11-04-beacon-state-proofs-hard-fork-deneb-to-gloas-proof-chain-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/ethereum/staking/2026-11-04-beacon-state-proofs-hard-fork-deneb-to-gloas-verifier-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-ethereum-system-contracts.md
+  assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-workflow.puml   (workflow -> .png, asset only)
+  assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-fee-curve.py   (in-section figure -> .svg, embedded in "The fee"; matplotlib, create-plot)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-solc-bytecode-metadata-compiler-bugs.md
+  assets/article/blockchain/solidity/2026-11-04-solc-bytecode-metadata-compiler-bugs-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/solidity/2026-11-04-solc-bytecode-metadata-compiler-bugs-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/solidity/2026-11-04-solc-bytecode-metadata-compiler-bugs-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-transient-storage-solidity-reentrancy-locks.md
+  assets/article/blockchain/solidity/2026-11-04-transient-storage-solidity-reentrancy-locks-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/solidity/2026-11-04-transient-storage-solidity-reentrancy-locks-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/solidity/2026-11-04-transient-storage-solidity-reentrancy-locks-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-ethereum-finality-lmd-ghost-casper-ffg.md
+  assets/article/blockchain/ethereum/staking/2026-11-04-ethereum-finality-lmd-ghost-casper-ffg-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/ethereum/staking/2026-11-04-ethereum-finality-lmd-ghost-casper-ffg-two-layers-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/ethereum/staking/2026-11-04-ethereum-finality-lmd-ghost-casper-ffg-epoch-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-04-ssz-vs-rlp-ethereum-serialization.md
+  assets/article/blockchain/ethereum/serialization/2026-11-04-ssz-vs-rlp-ethereum-serialization-mindmap.puml   (mindmap -> .png, cover image, embedded in Conclusion)
+  assets/article/blockchain/ethereum/serialization/2026-11-04-ssz-vs-rlp-ethereum-serialization-layers-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/ethereum/serialization/2026-11-04-ssz-vs-rlp-ethereum-serialization-decode-workflow.puml   (workflow -> .png, asset only)
+  assets/article/blockchain/ethereum/serialization/2026-11-04-ssz-vs-rlp-ethereum-serialization-read-cost.py   (in-section figure -> .svg, embedded in "Decoding in Solidity"; matplotlib, create-plot)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-05-how-github-dependabot-works.md
+  assets/article/outil-securite/dependabot/2026-11-05-how-github-dependabot-works-mindmap.puml   (mindmap)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-05-github-advisory-database-what-the-data-says.md
+  assets/article/outil-securite/dependabot/2026-11-05-github-advisory-database-mindmap.puml   (mindmap)
+  assets/article/outil-securite/dependabot/2026-11-05-advisory-database-published-vs-reviewed.py   (in-section plot)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-05-dependabot-credential-proxy-isolation.md
+  assets/article/outil-securite/dependabot/2026-11-05-dependabot-credential-proxy-isolation-mindmap.puml   (mindmap)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-05-dependency-update-path-threat-model.md
+  assets/article/outil-securite/dependabot/2026-11-05-dependency-update-path-threat-model-mindmap.puml   (mindmap)
+  in-section diagrams: inline Mermaid in the article, no .puml

@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Transient storage in practice
+** EIP-1153 semantics
+*** TLOAD and TSTORE, 100 gas
+*** One space per contract
+*** Reverted frame rolls back
+*** Successful return keeps the value
+*** Discarded at transaction end
+*** Caller space under DELEGATECALL
+*** No TSTORE in a static frame
+** Solidity support
+*** Yul builtins, 0.8.24
+*** transient variables, 0.8.28
+*** Value types only
+*** Own layout from slot 0
+*** No warning 2394 on keyword writes
+** Reentrancy locks
+*** Transient, 284 to 528 gas
+*** Storage guard, 2,327 gas
+*** Refund capped at one fifth
+*** uint256 cheaper than bool
+left side
+** What can go wrong
+*** Lock not reset breaks batches
+*** Assembly return skips the reset
+*** Flash-loan flag left open
+*** Bundle residue across senders
+*** TSTORE under the 2,300 stipend
+** Startale
+*** Constructor flag stays set
+*** 22 accounts, 213.775580 USDC in one tx
+*** Nexus fix 40 days earlier
+*** Consume the flag when checked
+** solc helper collision
+*** 0.8.28 to 0.8.33, via-IR
+*** delete hits the wrong location
+*** Lock stays set, owner zeroed
+*** Fixed in 0.8.34
+@endmindmap

@@ -1,0 +1,37 @@
+@startuml
+title Gasper: one attestation feeds two protocols
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam package {
+  BorderColor #4A78B5
+}
+package "Node view (Store): can differ between nodes" {
+  component "on_block / on_attestation" as H
+  component "get_filtered_node_tree" as FT
+  component "get_weight + proposer boost" as W
+  component "get_head" as GH
+  component "compute_pulled_up_tip" as PU
+}
+package "Beacon state: same for every node on a block" {
+  component "participation flags" as P
+  component "process_justification_and_finalization" as JF
+  component "justified, finalized checkpoints" as CP
+}
+component "Attestation: head, source, target" as A
+A --> H : head vote
+A --> P : source and target
+H --> W
+W --> GH
+FT --> GH : viable nodes only
+P --> JF
+JF --> CP
+CP --> FT : checkpoints
+CP --> GH : start at justified root
+H --> PU
+PU --> FT : unrealized justification
+GH --> A : next attestation
+@enduml

@@ -1,0 +1,9 @@
+keccak256: 3 known digests
+RLP rlptest.json: 28 vectors, encode and round trip
+RLP invalidRLPTest.json: 26 vectors, all refused
+RLP go-ethereum decode table: 18 cases
+SSZ ssz-specs v0.1.0: 109 valid vectors (decode, re-encode, root), 8 rejection vectors, types not mapped: none
+SSZ book examples: 8 checked
+RLP fuzz: 200000 inputs, 10736 accepted, all re-encode to the same bytes
+SSZ fuzz: 200000 mutated inputs, 27067 accepted, all re-encode to the same bytes
+FAILURES: 0

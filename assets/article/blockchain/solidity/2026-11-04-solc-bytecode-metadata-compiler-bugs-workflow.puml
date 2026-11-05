@@ -1,0 +1,43 @@
+@startuml
+title Comparing builds and testing a known compiler bug
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam activityDiamond {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+start
+:Find the exact compiler and effective settings
+from metadata, build output or the trailer;
+:List the bugs for that version
+in bugs_by_version.json;
+if (conditions hold for the effective settings?) then (no)
+  :Not affected: settings;
+  stop
+else (yes)
+endif
+if (description trigger present in the code?) then (no)
+  :Not affected: pattern absent;
+  stop
+else (yes or unclear)
+endif
+:Rebuild with the buggy and the fixed compiler,
+both with --no-cbor-metadata;
+if (bytes identical?) then (yes)
+  :Not affected;
+  stop
+else (no)
+endif
+:Test behaviour on both compilers,
+checking every storage location;
+if (behaviour differs?) then (yes)
+  :Finding: rate the impact in this contract;<<#FDEEEE>>
+else (no)
+  :Inspect the difference,
+  record what was checked;
+endif
+stop
+@enduml

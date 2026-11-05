@@ -1,0 +1,17 @@
+@startuml
+title Reviewing a transient flag
+skinparam shadowing false
+start
+:Find tstore, tload and transient;<<#EEF5FF>>
+:For each slot, list where it is set and cleared;<<#EEF5FF>>
+if (Does it gate authorisation?) then (yes)
+  :Consume it when checked, or clear before control leaves;<<#EEF5FF>>
+else (no)
+  :Clear on every successful path;<<#EEF5FF>>
+endif
+:Check assembly return and stop before the reset;<<#EEF5FF>>
+:Check who can call between set and clear;<<#EEF5FF>>
+:Test two calls in one transaction;<<#EEF5FF>>
+:Check compiler: 0.8.34 or later under via-IR;<<#EEF5FF>>
+stop
+@enduml

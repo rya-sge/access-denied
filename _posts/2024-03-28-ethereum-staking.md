@@ -279,3 +279,6 @@ Reference: [Figment - What The Pectra And Fusaka Ethereum Upgrades Mean For Inst
 ### Related articles
 
 - [Ethereum Upgrade Shapella (Shanghai and Capella) - Overview]({{site.url_complet}}/2026/10/23/ethereum-shapella-upgrade-overview/)
+- [Ethereum's Hidden Contracts: The System Contracts Behind Every Block]({{site.url_complet}}/2026/11/04/ethereum-system-contracts/)
+- [When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/)
+- [How Ethereum Finalises Blocks: LMD GHOST and Casper FFG]({{site.url_complet}}/2026/11/04/ethereum-finality-lmd-ghost-casper-ffg/)

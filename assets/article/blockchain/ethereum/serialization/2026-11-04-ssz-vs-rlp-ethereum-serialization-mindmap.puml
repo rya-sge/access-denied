@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* SSZ vs RLP
+** RLP (execution layer)
+*** Length prefixes, no types
+*** Canonical decoder rules
+*** Schema lives in the client
+*** Commitment: keccak over bytes, MPT
+** SSZ (consensus layer)
+*** Fixed part plus offsets
+*** Little-endian, no self-description
+*** Vectors, lists, bitfields, containers
+*** Limit shapes the tree
+left side
+** hash_tree_root
+*** Chunks, padding, length mix-in
+*** Subtree caching: 39 hashes per update
+*** Same bytes can share a root
+** Measured on one mainnet block
+*** SSZ 21% larger on transactions
+*** Calldata: SSZ wins on withdrawals
+*** Read: 296 against 4,102 gas
+** Direction of travel
+*** EIP-7688 scheduled for Glamsterdam
+*** Progressive types come with it
+*** SSZ transactions and receipts: Draft, unscheduled
+*** EIP-7807 declined for Hegota
+@endmindmap

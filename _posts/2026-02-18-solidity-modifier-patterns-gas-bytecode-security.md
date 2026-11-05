@@ -432,3 +432,8 @@ For most application-level contracts with a small number of guarded functions, i
 - [EIP-1153 — Transient Storage Opcodes](https://eips.ethereum.org/EIPS/eip-1153)
 - [EIP-170 — Contract Code Size Limit](https://eips.ethereum.org/EIPS/eip-170)
 - [Foundry Book — Forge Lint](https://book.getfoundry.sh/reference/forge/forge-lint)
+
+## Related articles
+
+- [What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs]({{site.url_complet}}/2026/11/04/solc-bytecode-metadata-compiler-bugs/)
+- [Transient Storage in Practice: Reentrancy Locks, Solidity's `transient` and Two Real Failures]({{site.url_complet}}/2026/11/04/transient-storage-solidity-reentrancy-locks/)

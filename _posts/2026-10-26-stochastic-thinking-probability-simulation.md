@@ -2,6 +2,7 @@
 layout: post
 title: "Stochastic Thinking - Probability, Simulation and the Birthday Problem (MIT 6.0002, Lecture 4)"
 date:   2026-10-26
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: programmation
@@ -46,7 +47,7 @@ In the early twentieth century the **Copenhagen doctrine**, associated with Bohr
 
 JG then borrows two coins from the audience, shakes them, covers them on the table and asks whether they show two heads, two tails, or one of each. Most of the audience picks "one of each", the most probable outcome (probability $$1/2$$, against $$1/4$$ for each of the other two). Yet nothing is undetermined here: the coins have landed, and the instructor can see them. The students still cannot predict the answer, because they lack the information.
 
-That is the lecture's moral. Whether or not the world is inherently unpredictable, our knowledge of it is incomplete, so we might as well treat it as unpredictable. The lecture calls this **predictive nondeterminism**, and it is the stance behind every model in the rest of the course.
+Whether or not the world is inherently unpredictable, our knowledge of it is incomplete, so we might as well treat it as unpredictable. The lecture calls this **predictive nondeterminism**, and it is the stance behind every model in the rest of the course.
 
 ## Stochastic processes and random choices in Python
 
@@ -163,7 +164,7 @@ An outer loop runs the trials; inside it, one trial (here, five rolls) is genera
 
 ### Why 1,000 trials gave 0
 
-With seed 0 and 1,000 trials, the program prints an actual probability of 0.0001286 and an estimated probability of 0.0. The estimate is 0 because none of the 1,000 trials produced `11111`. That is not surprising: the expected number of hits in 1,000 trials is $$1000/7776 \approx 0.129$$, and the probability of seeing none at all is
+With seed 0 and 1,000 trials, the program prints an actual probability of 0.0001286 and an estimated probability of 0.0. The estimate is 0 because none of the 1,000 trials produced `11111`. The expected number of hits in 1,000 trials is $$1000/7776 \approx 0.129$$, and the probability of seeing none at all is
 
 $$
 \begin{aligned}
@@ -276,7 +277,7 @@ Now ask for the probability that at least *three* people share a birthday. In th
 - two pairs share and the rest are distinct, or
 - and so on, up to as many pairs as $$N$$ allows.
 
-The lecture calls this complicated and, as far as it goes, the point holds. The uniform case still has an exact formula. It sums over the number $$k$$ of pairs: choose which people form the pairs, then give the resulting $$N - k$$ groups distinct dates.
+The lecture calls this complicated, and it is, but the uniform case still has an exact formula. It sums over the number $$k$$ of pairs: choose which people form the pairs, then give the resulting $$N - k$$ groups distinct dates.
 
 $$
 \begin{aligned}
@@ -332,9 +333,9 @@ During the lecture the students filled in an anonymous form with their birth dat
 
 ## Simulation models
 
-The lecture ends by naming what it has been building. A **simulation model** is a program that describes a computation giving information about the possible behaviours of a system. The lecture adds three properties:
+The lecture ends by defining a **simulation model**: a program that describes a computation giving information about the possible behaviours of a system. The lecture adds three properties:
 
-- **Descriptive, not prescriptive.** A simulation answers "if I do this, what happens?". An optimisation model, like the knapsack and shortest-path models of the earlier lectures, answers "what should I do to get the best outcome?". The course needs both.
+- **Descriptive, not prescriptive.** A simulation answers "if I do this, what happens?". An optimisation model, like the knapsack and shortest-path models of the earlier lectures, answers "what should I do to get the best outcome?".
 - **An approximation to reality.** The birthday weights were a rough approximation of the heat map. JG quotes the statistician George Box: "All models are wrong, but some are useful."
 - **Built by successive refinement.** The birthday model started with two people and uniform dates, then asked about three people, then changed the distribution. Each step was a small edit followed by a "what if" run.
 

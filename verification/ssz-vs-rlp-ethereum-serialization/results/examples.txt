@@ -1,0 +1,110 @@
+
+## RLP rules
+empty string             80
+integer 0                80
+byte 0x00                00
+integer 15               0f
+byte 0x7f                7f
+byte 0x80                8180
+integer 1024             820400
+"dog"                    83646f67
+empty list               c0
+["cat","dog"]            c88363617483646f67
+[[],[[]],[[],[[]]]]      c7c0c1c0c3c0c1c0
+string of 55    bytes -> prefix b7
+string of 56    bytes -> prefix b838
+string of 1024  bytes -> prefix b90400
+list with 55 byte payload -> prefix f7
+list with 56 byte payload -> prefix f838
+
+## RLP carries no type: one encoding, three readings
+bytes 820400 decode to 0400: integer 1024, bytes 0x0400, or text b'\x04\x00'
+rlp(0) == rlp(b'') == rlp(False): True 80
+
+## One real withdrawal, block 26341215
+index 148900059 validator 572344 address 0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f amount (gwei) 12663254
+RLP 35 bytes: e28408e008db8308bbb894b9d7934878b5fb9610b3fe8a5e441e8fad7e293f83c139d6
+  list prefix e2
+  index            prefix 84   payload 08e008db
+  validator_index  prefix 83   payload 08bbb8
+  address          prefix 94   payload b9d7934878b5fb9610b3fe8a5e441e8fad7e293f
+  amount           prefix 83   payload c139d6
+SSZ 44 bytes: db08e00800000000b8bb080000000000b9d7934878b5fb9610b3fe8a5e441e8fad7e293fd639c10000000000
+  offset  0 index            db08e00800000000
+  offset  8 validator_index  b8bb080000000000
+  offset 16 address          b9d7934878b5fb9610b3fe8a5e441e8fad7e293f
+  offset 36 amount           d639c10000000000
+
+## Variable-size layout
+SSZ 18 34120b000000ff0f00000001000200aabbcc
+  a 3412 | off(b) 0b000000 | c ff | off(d) 0f000000 | b 01000200 | d aabbcc
+RLP same values 16 cf821234c2010281ffc681aa81bb81cc
+real block: first 4 bytes of SignedBeaconBlock 64000000 = 100 (4 + 96 fixed bytes, the message starts there)
+
+## Vectors, lists, fixed and variable
+Vector[Uint16,4](1,2,3,4) 0100020003000400
+Vector[Uint8,8](1,0,2,0,3,0,4,0) 0100020003000400
+List[Uint16,4](1,2,3,4) 0100020003000400
+root Vector[Uint16,4] 0100020003000400000000000000000000000000000000000000000000000000
+root Vector[Uint8,8]  0100020003000400000000000000000000000000000000000000000000000000
+root List[Uint16,4]   4b336327072189d0b279bf03edd7deb1a352f44657a124b7c3f7b5032991a35a
+root List[Uint16,8]   4b336327072189d0b279bf03edd7deb1a352f44657a124b7c3f7b5032991a35a
+root List[Uint16,64]  628f0d98a4f2230433f73f4cd6eb657cf1f376f418ece022a4e3387803cce26a
+Vector[List[Uint8,3],4] 10000000120000001500000015000000010203040506
+
+## Bitfields
+BitVector[5](1,0,1,0,1) 15
+Vector[Boolean,5]       0100010001
+BitList[8](1,0,1)       0d
+BitList[8](0,0,0)       08
+BitList[8](eight 0)     0001
+BitVector[8](eight 0)   00
+real attestation 0: aggregation_bits 25414 bits, 3177 bytes, set 25309 last byte 7f committee_bits set 64
+real sync aggregate bits set 510 of 512, 64 bytes
+
+## hash_tree_root of the real withdrawal, step by step
+  chunk index            db08e00800000000000000000000000000000000000000000000000000000000
+  chunk validator_index  b8bb080000000000000000000000000000000000000000000000000000000000
+  chunk address          b9d7934878b5fb9610b3fe8a5e441e8fad7e293f000000000000000000000000
+  chunk amount           d639c10000000000000000000000000000000000000000000000000000000000
+  h(c0,c1) db1768e0a64e730597e3ffab9029ff3fba668ad3e77f297069af1719c20139cc
+  h(c2,c3) 181b12d072706332392761c8bbf443d307f0b709f3d0ab40d0229e4ed1ab9f79
+  root     3f941324cd5d327ee7c72a2d72f6859601d042dbec06715bd42314185d1f3fc1
+  codec root equal: True
+  sha256(ssz bytes)    86e4b09e42d713a7c8c0150eabbdae4c6ba2fc3d8bb528550afcea83560757ae
+  keccak256(rlp bytes) fbce33975fd04994729fe9bf3e6cc160ad489d0f9f7167a3f8a97d85d600a3ae
+
+## Summary and expansion, on the real block
+BeaconBlockHeader root equals BeaconBlock root: True e74a493ea847047c52b1e139879e7010cb4fb8f785922bdf6c418bc48c1d542a
+header bytes 112 block bytes 172218
+
+## RLP decoder strictness
+8105                 0x05 written with a prefix             refused: single-byte-with-prefix
+b80105               long form for a short string           refused: long-form-for-short-payload
+b8000000             length byte zero                       refused: length-leading-zero
+b90038aaaaaaaaaaaa   length with a leading zero             refused: length-leading-zero
+c26401               well formed list, shown for contrast   accepted: [b'd', b'\x01']
+c2640102             one byte after the list ends           refused: trailing-bytes
+83646f               string shorter than announced          refused: truncated
+c4640102             list overruns input                    refused: truncated
+f800                 long form for empty list               refused: length-leading-zero
+8000                 extra byte after an empty string       refused: trailing-bytes
+as integer 820400       accepted: 1024
+as integer 820004       refused: integer-leading-zero
+as integer 00           refused: integer-leading-zero
+as integer 80           accepted: 0
+
+## SSZ decoder strictness, type {a: Uint16, b: List[Uint8,4]}
+good 0100060000000708
+0100060000000708           canonical                              accepted: {'a': 1, 'b': [7, 8]}
+010007000000000708         first offset past end of fixed part    refused: first-offset-not-end-of-fixed-part
+0100050000000708           first offset inside the fixed part     refused: first-offset-not-end-of-fixed-part
+01000600                   truncated offset                       refused: truncated
+0100060000000102030405     list above its limit                   refused: over-limit
+02                         Boolean byte other than 0 or 1         refused: boolean-not-0-or-1
+0500                       BitList with no sentinel               refused: bitlist-no-sentinel
+e0                         BitVector[5] padding bits set          refused: bitvector-padding-nonzero
+0100ff                     Uint16 with a spare byte               refused: wrong-size
+two-list type {x: List[Uint8,4], y: List[Uint8,4]}, canonical 0800000009000000aabb
+0800000007000000aabb       offsets out of order                   refused: offsets-not-monotonic
+0800000011000000aabb       last offset past the end               refused: offset-past-scope

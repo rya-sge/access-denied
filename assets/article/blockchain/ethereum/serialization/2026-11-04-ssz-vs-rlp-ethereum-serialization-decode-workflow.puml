@@ -1,0 +1,25 @@
+@startuml
+title Reading field k from calldata
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+start
+if (encoding?) then (RLP)
+  :Parse outer list header\nreject non-canonical length;
+  :Set position to first item;
+  while (item index < k?) is (yes)
+    :Parse item header\nreject non-canonical form;
+    :Jump to end of item;
+  endwhile (no)
+  :Parse header of item k;
+  :Read big-endian integer\nreject leading zero;
+else (SSZ)
+  :Check total length\nagainst the type;
+  :Read at the constant offset of k;
+  :Swap little-endian to EVM order;
+endif
+:Return value;
+stop
+@enduml

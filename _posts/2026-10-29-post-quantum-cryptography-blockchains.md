@@ -2,6 +2,7 @@
 layout: post
 title: "Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026"
 date:   2026-10-29
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography post-quantum
@@ -37,13 +38,13 @@ The article relies on a few blockchain and cryptography mechanisms:
 
 Three different things depend on elliptic curves in a blockchain, and they fail differently.
 
-- **User accounts** are the main target. A **long-exposure attack** targets public keys already visible on-chain: early Bitcoin pay-to-public-key outputs, reused addresses, Taproot outputs (whose tweaked public key is in the output), and any account that has signed before. A **short-exposure attack** must recover the key in the window between a transaction's broadcast and its confirmation, which requires a much faster machine.
+- **User accounts** are the main target. A **long-exposure attack** targets public keys already visible on-chain: early Bitcoin pay-to-public-key outputs, reused addresses, Taproot outputs and any account that has signed before. A Taproot output carries its tweaked public key. A **short-exposure attack** must recover the key in the window between a transaction's broadcast and its confirmation, which requires a much faster machine.
 - **Consensus** depends on validator signatures (Ed25519 in most proof-of-stake chains, BLS12-381 in Ethereum). Forging them would allow equivocation or fake finality, but validators can rotate keys at a coordinated upgrade, which is far easier than migrating every user.
 - **Privacy and proof systems** built on pairings or elliptic-curve commitments (Groth16, KZG, PLONK over BN254) lose soundness or hiding. Here harvest-now-decrypt-later does apply: data encrypted on-chain today can be decrypted later.
 
 Hash functions survive. Grover's algorithm halves preimage security, which leaves SHA-256 and Keccak-256 at around 128 bits, so proof-of-work, Merkle trees and hash-based addresses are not the problem.
 
-The timing estimate that matters here dropped in 2026. On 31 March 2026, [Google Quantum AI](https://research.google/blog/safeguarding-cryptocurrency-by-disclosing-quantum-vulnerabilities-responsibly/) published circuits that solve the 256-bit elliptic-curve discrete logarithm with fewer than 1,200 logical qubits and 90 million Toffoli gates, which it translates into fewer than 500,000 physical qubits running for a few minutes. Earlier estimates were around nine million physical qubits. Google disclosed the result with a zero-knowledge proof of the estimate instead of the circuits, and named cryptocurrency explicitly as the reason for caution.
+On 31 March 2026, [Google Quantum AI](https://research.google/blog/safeguarding-cryptocurrency-by-disclosing-quantum-vulnerabilities-responsibly/) published circuits that solve the 256-bit elliptic-curve discrete logarithm with fewer than 1,200 logical qubits and 90 million Toffoli gates, which it translates into fewer than 500,000 physical qubits running for a few minutes. Earlier estimates were around nine million physical qubits. Google disclosed the result with a zero-knowledge proof of the estimate instead of the circuits, and named cryptocurrency explicitly as the reason for caution.
 
 ## Three migration patterns
 
@@ -146,7 +147,7 @@ The pattern column is the article's reading of each proposal against the three p
 
 ## The size problem
 
-The choice of scheme on each chain follows from block space. An Ed25519 signature is 64 bytes; ML-DSA-65 is 3,309 bytes, SLH-DSA-SHA2-128s is 7,856 bytes and Falcon-512 about 666 bytes. That explains the pattern in the summary table:
+The choice of scheme on each chain follows from block space. An Ed25519 signature is 64 bytes; ML-DSA-65 is 3,309 bytes, SLH-DSA-SHA2-128s is 7,856 bytes and Falcon-512 about 666 bytes. The chains in the summary table fall into three groups:
 
 - **Falcon** is chosen where every transaction is affected (Solana, Algorand, one of Ethereum's precompiles), because it is the smallest standard-track scheme, even though its signing is the hardest to implement safely.
 - **Hash-based signatures** are chosen where assumptions must be minimal (Bitcoin's SHRINCS, Ethereum's consensus, Aptos), and made smaller either with state (XMSS, Winternitz) or by aggregating many of them in one STARK.

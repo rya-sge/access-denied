@@ -1,0 +1,35 @@
+@startuml
+title From a vote to finality
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+start
+:Proposer publishes a block;
+:Node runs on_block: state transition,
+timeliness, boost, pulled-up tip;
+:Committee attests at the deadline
+with get_head, source and target;
+:Votes reach the Store next slot
+through on_attestation;
+:A later block includes the votes
+and sets participation flags;
+if (Last slot of the epoch?) then (yes)
+  :process_justification_and_finalization;
+  if (Target balance at or above 2/3?) then (yes)
+    :Checkpoint justified;
+    if (A finalisation rule matches?) then (yes)
+      :Checkpoint finalised;
+    else (no)
+      :Wait for the next boundary;
+    endif
+  else (no)
+    :No justification;
+    if (Finality delay above 4 epochs?) then (yes)
+      :Inactivity leak: drain absent validators;
+    else (no)
+    endif
+  endif
+else (no)
+endif
+stop
+@enduml

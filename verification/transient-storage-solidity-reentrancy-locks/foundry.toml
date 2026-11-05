@@ -1,0 +1,83 @@
+# Pinned compiler and EVM. Run from this directory. See README.md.
+[profile.default]
+src = "src"
+test = "test"
+out = "out/default"
+cache_path = "cache/default"
+libs = []
+solc_version = "0.8.38"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+# Each top-level call made by a test function is a separate transaction, so
+# transient storage is cleared between them. A single transaction is modelled
+# with one call into src/Common.sol:Tx.
+isolate = true
+offline = true
+ignored_error_codes = [5159, 9207, 2394]
+
+# solc TransientStorageClearingHelperCollision: same sources, compiler and pipeline vary.
+[profile.bug-0833-ir]
+src = "bug/src"
+test = "bug/test"
+out = "out/bug-0833-ir"
+cache_path = "cache/bug-0833-ir"
+libs = []
+solc_version = "0.8.33"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+offline = true
+
+[profile.bug-0833-ir-noopt]
+src = "bug/src"
+test = "bug/test"
+out = "out/bug-0833-ir-noopt"
+cache_path = "cache/bug-0833-ir-noopt"
+libs = []
+solc_version = "0.8.33"
+evm_version = "cancun"
+optimizer = false
+via_ir = true
+offline = true
+
+[profile.bug-0833-legacy]
+src = "bug/src"
+test = "bug/test"
+out = "out/bug-0833-legacy"
+cache_path = "cache/bug-0833-legacy"
+libs = []
+solc_version = "0.8.33"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+offline = true
+
+[profile.bug-0834-ir]
+src = "bug/src"
+test = "bug/test"
+out = "out/bug-0834-ir"
+cache_path = "cache/bug-0834-ir"
+libs = []
+solc_version = "0.8.34"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+offline = true
+
+[profile.bug-0838-ir]
+src = "bug/src"
+test = "bug/test"
+out = "out/bug-0838-ir"
+cache_path = "cache/bug-0838-ir"
+libs = []
+solc_version = "0.8.38"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+offline = true

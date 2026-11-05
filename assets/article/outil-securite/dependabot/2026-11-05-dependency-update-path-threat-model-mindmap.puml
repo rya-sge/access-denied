@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Dependency update path
+** Trust boundaries
+*** Registry to job
+*** Job to pull request
+*** Pull request to CI
+*** CI to default branch
+** Threats
+*** Short-lived malicious release
+*** Patient backdoor
+*** Code running in CI
+*** Mutable references
+*** Confused auto-merge
+*** Forged commits
+left side
+** Incidents
+*** chalk and debug
+*** Shai-Hulud
+*** tj-actions
+*** Kong Ingress Controller
+** Controls
+*** Default cooldown
+*** SHA pinning
+*** Dependabot secrets
+*** PR metadata warnings
+** Auto-merge rules
+*** Check the PR author
+*** Narrow scope
+*** Fix every branch
+*** Never trust a bot's name
+@endmindmap

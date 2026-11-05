@@ -1,0 +1,9 @@
+real BeaconBlock: 172218 bytes
+  flat sha256: 1 message, 2692 compressions
+  hash_tree_root: 11790 two-chunk hashes, 23580 compressions without precomputed padding
+List[Uint64, 2**40] with 2000000 values: 16000000 bytes, 500000 chunks
+  flat sha256: 250001 compressions, every change repeats all of them
+  hash_tree_root, first computation: 500027 hashes
+  update one value through the cached tree: 39 hashes, depth 38 + 1 length mix-in
+  incremental root equals a full recomputation: True (and differs from before: True )
+  ratio full / incremental: 12821

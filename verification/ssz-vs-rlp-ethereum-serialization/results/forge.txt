@@ -1,0 +1,136 @@
+Compiling 5 files with Solc 0.8.30
+Solc 0.8.30 finished in 467.92ms
+Compiler run successful!
+
+Ran 14 tests for test/Decode.t.sol:DecodeTest
+[PASS] test_gas_commitments() (gas: 49881)
+Logs:
+  net keccakOfRlp: 177
+  net sha256OfSsz: 445
+  net withdrawalRoot: 2732
+
+[PASS] test_gas_decode_all() (gas: 346132)
+Logs:
+  net rlpSumAll: 93069
+  net sszSumAll: 19776
+
+[PASS] test_gas_list_position() (gas: 871399)
+Logs:
+  position: 0
+  net rlpListAmount: 5489
+  net sszListAmount: 518
+  position: 1
+  net rlpListAmount: 6183
+  net sszListAmount: 519
+  position: 2
+  net rlpListAmount: 6876
+  net sszListAmount: 517
+  position: 3
+  net rlpListAmount: 7569
+  net sszListAmount: 517
+  position: 4
+  net rlpListAmount: 8262
+  net sszListAmount: 518
+  position: 5
+  net rlpListAmount: 8955
+  net sszListAmount: 518
+  position: 6
+  net rlpListAmount: 9648
+  net sszListAmount: 518
+  position: 7
+  net rlpListAmount: 10460
+  net sszListAmount: 518
+  position: 8
+  net rlpListAmount: 11153
+  net sszListAmount: 517
+  position: 9
+  net rlpListAmount: 11728
+  net sszListAmount: 518
+  position: 10
+  net rlpListAmount: 12421
+  net sszListAmount: 518
+  position: 11
+  net rlpListAmount: 13113
+  net sszListAmount: 518
+  position: 12
+  net rlpListAmount: 13806
+  net sszListAmount: 519
+  position: 13
+  net rlpListAmount: 14499
+  net sszListAmount: 519
+  position: 14
+  net rlpListAmount: 15191
+  net sszListAmount: 518
+  position: 15
+  net rlpListAmount: 15885
+  net sszListAmount: 518
+
+[PASS] test_gas_real_tx() (gas: 4634019)
+Logs:
+  net rlpTxValue small: 6145
+  net sszTxValue small: 944
+  net rlpTxValue big: 6265
+  net sszTxValue big: 945
+  big tx rlp bytes: 17527
+  big tx ssz bytes: 17660
+  field: 0
+  net rlpTxField big: 1922
+  field: 1
+  net rlpTxField big: 2599
+  field: 2
+  net rlpTxField big: 3277
+  field: 3
+  net rlpTxField big: 3955
+  field: 4
+  net rlpTxField big: 4632
+  field: 5
+  net rlpTxField big: 5309
+  field: 6
+  net rlpTxField big: 5985
+  field: 7
+  net rlpTxField big: 7354
+  field: 8
+  net rlpTxField big: 8049
+  field: 9
+  net rlpTxField big: 8484
+  field: 10
+  net rlpTxField big: 9162
+  field: 11
+  net rlpTxField big: 9838
+
+[PASS] test_gas_single_withdrawal() (gas: 54514)
+Logs:
+  net rlpAmount: 4102
+  net sszAmount: 296
+  abi calldata bytes: 132
+  gross abiAmount: 871
+  gross noop 44 bytes: 979
+
+[PASS] test_gas_tx_list() (gas: 2517335)
+Logs:
+  list rlp bytes: 11847
+  list ssz bytes: 11900
+  position: 0
+  net rlpListTxHash: 2886
+  net sszListTxHash: 1699
+  position: 7
+  net rlpListTxHash: 11914
+  net sszListTxHash: 1759
+  position: 15
+  net rlpListTxHash: 22163
+  net sszListTxHash: 1675
+  position: 31
+  net rlpListTxHash: 42484
+  net sszListTxHash: 1290
+
+[PASS] test_rlp_rejects_integer_leading_zero() (gas: 12304)
+[PASS] test_rlp_rejects_overrun() (gas: 9235)
+[PASS] test_rlp_rejects_prefixed_single_byte() (gas: 11981)
+[PASS] test_rlp_rejects_trailing_byte() (gas: 9323)
+[PASS] test_ssz_rejects_bad_first_offset() (gas: 9122)
+[PASS] test_ssz_rejects_descending_offsets() (gas: 10140)
+[PASS] test_ssz_rejects_wrong_length() (gas: 8622)
+[PASS] test_values_match_python() (gas: 5371530)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 22.93ms (40.29ms CPU time)
+
+Ran 1 test suite in 26.77ms (22.93ms CPU time): 14 tests passed, 0 failed, 0 skipped (14 total tests)

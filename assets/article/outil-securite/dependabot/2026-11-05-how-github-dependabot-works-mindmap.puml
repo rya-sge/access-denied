@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* GitHub Dependabot
+** Three features
+*** Alerts: detection
+*** Security updates: minimum fix
+*** Version updates: dependabot.yml
+** Components
+*** dependabot-core: updater and gems
+*** dependabot/cli: runs jobs locally
+*** Credential proxy
+*** Advisory Database
+*** Private Dependabot API
+** Update job
+*** Fetch and parse files
+*** Select an operation
+*** Check, update, request a PR
+*** Mark as processed
+left side
+** Choosing a target
+*** Version: highest, 3-day cooldown
+*** Security: lowest safe, no cooldown
+*** Unlock: none, own, all
+** Advisories
+*** Passed in the job
+*** Reviewed ones trigger alerts
+*** Version ranges, no symbols
+** Limits
+*** Version matching only
+*** No govulncheck
+*** Reachability preview: alerts, JS and TS
+** Trust boundaries
+*** Internal network
+*** No credentials in the updater
+*** API creates the pull request
+@endmindmap

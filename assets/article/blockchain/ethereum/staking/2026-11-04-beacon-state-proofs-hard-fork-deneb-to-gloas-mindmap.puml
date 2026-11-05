@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Beacon state proofs\nacross hard forks
+** Proof chain
+*** EIP-4788 ring buffer: 8,191 entries
+*** Root of the parent beacon block
+*** Header gindex 11: state_root
+*** State field, then list element
+*** Validator field: gindex 8 to 15
+** Generalized index
+*** Root 1, children 2g and 2g+1
+*** Proof length = floor(log2(g))
+*** concat() of nested trees
+*** List: data 2, length 3
+** Per fork
+*** Deneb: 28 fields, depth 5
+*** Electra: 37 fields, depth 6
+*** Fulu: 38 fields, depth 6
+*** Gloas: progressive, length depends on i
+left side
+** Stale proofs
+*** Deep path: dead end, revert
+*** Shallow path: internal node accepted
+*** Old 105 proves a zero chunk
+*** Caller-chosen depth: node as leaf
+** Design
+*** Select layout from proven header.slot
+*** Derive proof length from gindex
+*** Keep historical layouts
+*** Update under a timelock
+** Findings
+*** C4 2023-04 H-01: empty proofs
+*** Cantina Mar 2024: > instead of >=
+@endmindmap

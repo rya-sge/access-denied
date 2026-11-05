@@ -2,6 +2,7 @@
 layout: post
 title: "Post-Quantum Cryptography in 2026 — The Algorithms, What They Do and Who Deploys Them"
 date:   2026-10-29
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -225,7 +226,7 @@ The key exchange: Chrome negotiates X25519MLKEM768 with any server that supports
 
 **Q: Why are FN-DSA and HQC still being standardised when ML-DSA and ML-KEM already exist?**
 
-They answer different needs. FN-DSA gives signatures three to five times smaller than ML-DSA, which matters for certificates and blockchains, at the cost of a harder constant-time implementation. HQC rests on error-correcting codes rather than lattices, so it remains available if a cryptanalytic advance weakens Module-LWE.
+FN-DSA gives signatures three to five times smaller than ML-DSA, which shrinks certificate chains and blockchain transactions, at the cost of a harder constant-time implementation. HQC rests on error-correcting codes rather than lattices, so it remains available if a cryptanalytic advance weakens Module-LWE.
 
 ## Gaps
 

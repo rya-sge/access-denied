@@ -229,6 +229,7 @@ This file is maintained as the lookup table for the `update-article` skill: when
 | `2026-10-26-hyperliquid-hip-flashcards.md` | Hyperliquid HIP-1 to HIP-4 in Twelve Cards — The Definitions to Memorise | blockchain defi | Twelve flashcards for Hyperliquid HIP-1 to HIP-4: native tokens, Hyperliquidity, builder-deployed perp DEXs, slashing and outcome markets, with a revision table. |
 | `2026-10-26-hyperliquid-hip-risks-market-quality.md` | Hyperliquid HIPs in Practice - Risks, Failure Scenarios and Market Quality | blockchain defi | What users lose when a HIP-1 to HIP-4 market fails on Hyperliquid, how to judge a market before trading it, and worked examples for each proposal. |
 | `2026-10-26-hyperliquid-hip-developer-reference.md` | Building on Hyperliquid HIPs - A Developer Reference for Deployment and Integration | blockchain defi | Request payloads, info queries, asset-ID lookups, error cases, testnet steps and checklists for deploying and integrating Hyperliquid HIP-1 to HIP-4. |
+| `2026-10-30-bybit-hack-february-2025.md` | The Bybit Hack of February 2025 - One Blind-Signed delegatecall and the Largest Exchange Thefts Compared | blockchain security | How Lazarus drained 1.46B USD from Bybit's Safe cold wallet with one blind-signed delegatecall, what was recovered, and how it compares with exchange hacks. |
 
 ---
 

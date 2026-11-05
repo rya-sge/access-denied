@@ -10,13 +10,13 @@ lang: "en_GB"
 
 # Author
 author-name:    Ryan S.
-author-image:   1.jpg
+author-image:   1.png
 
 # jekyll-seo-tag reads `author`, `logo` and `social` (it does NOT read the
 # `author-name` / `social-*` keys above, which are only used by the templates).
 # These populate the JSON-LD author/publisher blocks and the social profile links.
 author: Ryan S.
-logo: /assets/1.jpg
+logo: /assets/1.png
 twitter:
   username: ADCDIII
   card: summary_large_image
@@ -128,3 +128,6 @@ exclude:
   # Diagram sources (~1.8 MB of .drawio / .excalidraw). Kept in the repo as the
   # source of truth, but there is no reason to publish them.
   - schema
+  # Code that tests what articles claim (contracts, scripts). Kept in the repo so
+  # a result can be reproduced, but it is not part of the site.
+  - verification

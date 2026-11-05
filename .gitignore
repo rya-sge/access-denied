@@ -12,3 +12,9 @@ _site
 *.bkp
 *.dtmp
 polyfills.md
+# Build output of the article verification projects. The sources stay in git.
+verification/**/out/
+verification/**/cache/
+verification/**/broadcast/
+verification/**/__pycache__/
+verification/**/.venv/

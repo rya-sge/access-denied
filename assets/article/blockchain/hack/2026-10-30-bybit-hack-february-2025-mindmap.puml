@@ -1,0 +1,39 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* Bybit hack, 21 Feb 2025
+** Attack chain
+*** Safe developer's Mac compromised (4 Feb)
+*** Malicious JavaScript in the Safe{Wallet} S3 bucket
+*** Signers blind-sign a delegatecall
+*** masterCopy (slot 0) set to the backdoor
+** On-chain
+*** 14:13:35 UTC: masterCopy replaced
+*** 14:16:11 UTC: sweepETH, 401,347 ETH
+*** 90,376 stETH, 15,000 cmETH, 8,000 mETH
+*** About 1.46B USD in total
+** Laundering
+*** THORChain: about 361,255 ETH
+*** eXch: about 79,655 ETH
+*** 4 Mar 2025: 77% traceable, 20% dark, 3% frozen
+** Response
+*** ETH gap closed in three days (about 446,870 ETH)
+*** Bounty up to about 140M USD
+*** 8 Aug 2026: 48.4M recovered, 30.5M frozen (5.3%)
+*** FBI: TraderTraitor (North Korea)
+** Compared with other exchange hacks
+*** 2.7x Coincheck (2018)
+*** Since 2024: the signing process, not the keys
+*** DMM Bitcoin, WazirX, Bitget, Binance 2026
+*** Binance 2026: about 6.3B USD, stablecoins frozen
+@endmindmap

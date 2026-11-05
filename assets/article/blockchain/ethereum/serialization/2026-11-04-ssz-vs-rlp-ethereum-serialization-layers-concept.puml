@@ -1,0 +1,24 @@
+@startuml
+title One mainnet block: each encoding nested in the other
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+package "Consensus layer (SSZ, sha256 trees)" {
+  [SignedBeaconBlock] --> [ExecutionPayload]
+  [ExecutionPayload] --> [withdrawals: containers]
+  [ExecutionPayload] --> [transactions: opaque bytes]
+  [ExecutionPayload] --> [block_hash]
+}
+package "Execution layer (RLP, keccak256, MPT)" {
+  [Execution header]
+  [RLP transactions]
+  [RLP withdrawals]
+}
+[transactions: opaque bytes] --> [RLP transactions] : same bytes
+[withdrawals: containers] ..> [RLP withdrawals] : same data, other root
+[block_hash] --> [Execution header] : keccak256(rlp(header))
+[Execution header] --> [SignedBeaconBlock] : parent_beacon_block_root\n(previous block)
+@enduml

@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Ethereum system contracts
+** System call
+*** Caller 0xff...fe, value 0, 30M gas
+*** Not counted in block gas
+*** Unchecked: 4788, 2935
+*** Checked: 7002, 7251, failure invalidates block
+** Ring buffers
+*** EIP-4788 beacon roots, keyed by timestamp
+*** EIP-2935 block hashes, keyed by number
+*** 8191 entries, about 27 hours
+** Request queues
+*** EIP-7002 withdrawals, 56-byte input
+*** EIP-7251 consolidations, 96-byte input
+*** Fee: fake exponential of excess
+*** Overpayment is not refunded
+*** EIP-7685 requests_hash to the CL
+left side
+** Deposit contract
+*** Solidity 0.6.11, not a system contract
+*** EIP-6110 scans DepositEvent logs
+*** CL verifies the BLS signature later
+** In development (Amsterdam, unscheduled)
+*** EIP-8282 builder queues
+**** Spec says permanently disabled
+**** Code re-enables without input
+*** EIP-7997 CREATE2 factory
+*** EIP-8272 recent roots, Draft
+** Integrator checks
+*** CALLER must match the credentials
+*** Read the fee, cap it, pay exactly
+*** Queued does not mean accepted
+*** Empty account returns success
+*** 4788 code hash: use the deployed 97 bytes
+@endmindmap

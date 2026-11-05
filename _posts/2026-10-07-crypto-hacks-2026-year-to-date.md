@@ -2,7 +2,7 @@
 layout: post
 title: "Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget"
 date:   2026-10-07
-last_modified_at: 2026-10-14
+last_modified_at: 2026-10-30
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -21,6 +21,18 @@ The four largest incidents share one trait: none of them was a smart contract bu
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## Update, 30 October 2026: the Binance hot-wallet drain
+
+On 29 October 2026, between 20:05 and 20:21 UTC, Binance hot wallets on the XRP Ledger, Solana, Tron, Bitcoin, Ethereum, Avalanche, Arbitrum, Polygon, Optimism and Base sent their balances to attacker addresses. [Binance](https://x.com/binance/status/2115993361517891592) puts the total impact at about **$6.3B**. [TRM Labs](https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history) puts it at about $6.36B at the time of theft and attributes the attack "with high confidence" to North Korea's TraderTraitor. About $3B was frozen by stablecoin issuers, and the Arbitrum Security Council moved 74.6M ARB and 8,426 ETH from the attacker's wallet into a frozen wallet.
+
+The incident falls outside this article's January to September window, so none of the statistics below include it. For scale:
+
+- **It is larger than everything above.** The drain is about three times the ~$2.08B that PeckShield counted for 306 hacks from January to September 2026, and about 2.4 times PeckShield's ~$2.67B for all hacks in 2025.
+- **It follows the same pattern as the largest incidents.** Binance's [initial finding](https://www.binance.com/en/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7) is a compromised DevOps engineer's laptop that gave access to a service container, which submitted unauthorized withdrawals. Binance found no evidence of a private-key leak. Bitget lost $387.5M in September the same way: through a compromised infrastructure component that submitted forged withdrawals.
+- **It reuses an EIP-7702 delegation.** On Ethereum, the attacker used Binance's signing system to delegate the hot wallet *Binance 14* to a sweeper contract that only the attacker could call. The authorizations covered 50 consecutive nonces, because the wallet kept processing withdrawals.
+
+A detailed post-mortem from Binance is still to come.
 
 ## Scope, sources and caveats
 
@@ -461,6 +473,8 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 
 ### Official post-mortems and statements
 
+- [Binance: initial investigation of the 29 October 2026 incident (on X)](https://x.com/binance/status/2115993361517891592) and [support announcement](https://www.binance.com/en/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7)
+- [TRM Labs: North Korea steals USD 6.36 billion from Binance in the largest hack in history](https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history)
 - [Kelp DAO: rsETH incident statement (on X)](https://x.com/KelpDAO/status/2046332070277091807) and [recovery update (on X)](https://x.com/KelpDAO/status/2047599909692727799)
 - [LayerZero: rsETH incident statement (on X)](https://x.com/LayerZero_Core/status/2046081551574983137)
 - [LayerZero: KelpDAO incident statement](https://layerzero.network/blog/kelpdao-incident-statement)
@@ -516,3 +530,4 @@ In both, the cryptography was sound but the key's origin was not. COLDCARD devic
 - [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)
 - [Zero-Knowledge Proof Hacks — A Documented Record of Exploits and Vulnerabilities (2023–2026)]({{site.url_complet}}/2026/06/19/zkp-hacks-history/)
 - [Security of Cryptocurrency Exchanges - Overview]({{site.url_complet}}/2025/11/06/crypto-exchange-security-overview/)
+- [The Bybit Hack of February 2025 - One Blind-Signed delegatecall and the Largest Exchange Thefts Compared]({{site.url_complet}}/2026/10/30/bybit-hack-february-2025/)

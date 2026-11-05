@@ -267,3 +267,7 @@ The following points were not settled by the sources used for this article:
 - [The 2,300 Gas Stipend in Ethereum - Origin, Breakages and Alternatives]({{site.url_complet}}/2026/10/23/ethereum-2300-gas-stipend/)
 - [Ethereum: A Gas Story]({{site.url_complet}}/2026/10/23/ethereum-a-gas-story/)
 - [Ethereum Staking - How It Works]({{site.url_complet}}/2024/03/28/ethereum-staking/)
+- [What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs]({{site.url_complet}}/2026/11/04/solc-bytecode-metadata-compiler-bugs/)
+- [Ethereum's Hidden Contracts: The System Contracts Behind Every Block]({{site.url_complet}}/2026/11/04/ethereum-system-contracts/)
+- [When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/)
+- [Transient Storage in Practice: Reentrancy Locks, Solidity's `transient` and Two Real Failures]({{site.url_complet}}/2026/11/04/transient-storage-solidity-reentrancy-locks/)

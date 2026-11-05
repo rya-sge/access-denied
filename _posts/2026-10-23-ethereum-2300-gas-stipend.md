@@ -316,6 +316,7 @@ The following points were not settled by the sources used for this article:
 - [EIP-7702 Smart Wallet Security: Threat Model and Attack Surface Analysis]({{site.url_complet}}/2026/02/17/eip-7702-security-threat-model/)
 - [Solidity Modifier Patterns: Gas, Bytecode Size, and Security Trade-offs]({{site.url_complet}}/2026/02/18/solidity-modifier-patterns-gas-bytecode-security/)
 - [EIP-6780, selfdestruct, we won't miss you]({{site.url_complet}}/2024/03/13/EIP-6780-selfdestruct/)
+- [Transient Storage in Practice: Reentrancy Locks, Solidity's `transient` and Two Real Failures]({{site.url_complet}}/2026/11/04/transient-storage-solidity-reentrancy-locks/)
 
 ### Tooling
 

@@ -1,0 +1,28 @@
+@startuml
+title Beacon state proof chain, from the EIP-4788 root to a Validator field
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #4A78B5
+}
+component "EIP-4788 contract\nslot T % 8191: timestamp\nslot T % 8191 + 8191: root" as C4788
+component "BeaconBlockHeader (root = hash_tree_root of the parent beacon block)\nslot 8, proposer_index 9, parent_root 10, state_root 11, body_root 12" as H
+component "BeaconState\nDeneb 32+i, Electra and Fulu 64+i, Gloas progressive" as S
+component "validators list root\ndata 2, length 3" as L
+component "Validator element\n2**40 + i until Fulu, progressive position in Gloas" as E
+component "Validator field\npubkey 8 ... withdrawable_epoch 15" as V
+C4788 --> H : block root
+H --> S : state_root (3 siblings)
+S --> L : field (fork dependent)
+L --> E : list path
+E --> V : 3 siblings
+note right of S
+  Only this step and the list step
+  change with the forks
+end note
+@enduml

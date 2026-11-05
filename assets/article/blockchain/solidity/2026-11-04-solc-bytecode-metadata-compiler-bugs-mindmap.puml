@@ -1,0 +1,45 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* What is in solc bytecode
+** Runtime structure
+*** Executable code, final fe
+*** CBOR map
+*** Two-byte length suffix
+** CBOR trailer
+*** ipfs or bzzr1
+*** experimental
+*** solc version
+** Metadata JSON
+*** Compiler, sources, ABI, NatSpec
+*** Settings are normalised
+*** Rebuilds identical bytes
+*** CID v0 recomputed
+left side
+** Verification
+*** Exact match: hash agrees
+*** Match: code agrees
+*** Immutables and libraries differ
+** Comparing builds
+*** Stripping fails on factories
+*** --metadata-hash none: one compiler
+*** --no-cbor-metadata: across compilers
+*** swarm (CLI), bzzr1 (Standard JSON)
+** Known compiler bugs
+*** bugs_by_version.json ignores conditions
+*** conditions omit the code pattern
+*** A listing is not a finding
+*** TransientStorageClearingHelperCollision
+**** 0.8.33 via-IR: wrong location cleared
+**** Legacy and 0.8.34: correct
+@endmindmap

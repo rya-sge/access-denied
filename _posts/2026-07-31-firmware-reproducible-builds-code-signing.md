@@ -401,3 +401,4 @@ controls are worth treating as separate questions rather than as details.
 - [COLDCARD Firmware - Architecture and Security Model]({{site.url_complet}}/2026/07/31/coldcard-firmware-security/)
 - [STM32 Memory Protection in Practice]({{site.url_complet}}/2026/07/31/stm32-memory-protection-firmware-security/)
 - [Trezor Crypto Wallet - Cryptography and Security]({{site.url_complet}}/2024/10/15/trezor-wallet-security/)
+- [How GitHub Dependabot Works: From an Update Job to a Pull Request]({{site.url_complet}}/2026/11/05/how-github-dependabot-works/)

@@ -1,0 +1,38 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDEEEE
+    LineColor #B54A4A
+  }
+  :depth(1) {
+    BackgroundColor #B54A4A
+    FontColor white
+  }
+}
+</style>
+* GitHub Advisory Database
+** Sources
+*** Repository advisories
+*** NVD and ecosystem databases
+*** Community contributions
+** Two trees
+*** Reviewed: 37,522, package data
+*** Unreviewed: 362,041, almost none
+** Anatomy
+*** GHSA, aliases, modified
+*** Severity vector and label
+*** Affected packages
+left side
+** Version ranges
+*** introduced, fixed, last_affected
+*** 13.5% with no fixed event
+*** Go major versions are separate
+** Two clocks
+*** 2022: dating effect
+*** 2026: repository advisories
+** Reading counts
+*** Exclude withdrawn
+*** No denominator
+*** Reports, not software risk
+@endmindmap

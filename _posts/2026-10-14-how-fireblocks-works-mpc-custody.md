@@ -2,6 +2,7 @@
 layout: post
 title: "How Fireblocks Works - MPC Custody, Enclaves, HSMs and Lessons from Real Hacks"
 date:   2026-10-14
+last_modified_at: 2026-10-30
 lang: en
 locale: en-GB
 categories: blockchain security wallet cryptography
@@ -212,7 +213,7 @@ Fortress Trust is the most instructive case. The attacker never touched a key sh
 
 ### Bybit, February 2025
 
-The largest crypto theft on record, about 401,000 ETH (1.46 billion USD), was attributed by the FBI to the North Korean group TraderTraitor ([IC3 PSA](https://www.ic3.gov/PSA/2025/PSA250226)). The chain of events, from Safe's statement and the interim forensics of Sygnia and Verichains ([The Block](https://www.theblock.co/post/343530)):
+About 401,000 ETH (1.46 billion USD) was stolen, the largest crypto theft on record until the Binance hot-wallet drain of 29 October 2026 (about 6.3 billion USD, per [Binance](https://x.com/binance/status/2115993361517891592)). The FBI attributed it to the North Korean group TraderTraitor ([IC3 PSA](https://www.ic3.gov/PSA/2025/PSA250226)). The chain of events, from Safe's statement and the interim forensics of Sygnia and Verichains ([The Block](https://www.theblock.co/post/343530)):
 
 1. A Safe{Wallet} developer's macOS machine was compromised on 4 February through a trojanised Docker project delivered by social engineering. The attackers then used live AWS session tokens.
 2. Malicious JavaScript was placed in the Safe{Wallet} front-end bucket on AWS S3 about two days before the attack. It activated only for Bybit's Safe and one other address.
@@ -232,6 +233,8 @@ flowchart LR
 ```
 
 No Safe contract bug and no key extraction were involved. The signers' keys were used as intended, on a transaction they could not read.
+
+**Recovery, 18 months later.** On 8 August 2026, Bybit's CEO Ben Zhou [reported](https://x.com/benbybit/status/2085969090225815768) that Bybit had recovered about 48.4 million USD, with another 30.5 million USD frozen across more than 28 exchanges and custodians. Together that is about 5.3% of the stolen amount. On the same day Bybit announced a [civil lawsuit against the DPRK and the Lazarus Group](https://www.bybit.com/en/press/post/bybit-sues-north-korea-and-lazarus-group-secures-preliminary-injunction-freezing-stolen-assets-in-landmark-crypto-asset-recovery-effort-bb55bb16f1710f487aa), with a preliminary injunction freezing identified stolen assets. The low share follows from what was taken: almost all of it was ETH, which no issuer can freeze, so recovery depended on exchanges and custodians catching the funds after they moved.
 
 ### WazirX and Radiant Capital, 2024
 
@@ -442,6 +445,8 @@ A Safe exposes its signer set and threshold on-chain, so anyone can audit who co
 ### Incidents
 
 - [FBI IC3 - North Korea responsible for 1.5 billion USD Bybit hack](https://www.ic3.gov/PSA/2025/PSA250226)
+- [Ben Zhou (Bybit CEO) - recovery update, 8 August 2026 (on X)](https://x.com/benbybit/status/2085969090225815768) and [Bybit - lawsuit against the DPRK and Lazarus Group, preliminary injunction](https://www.bybit.com/en/press/post/bybit-sues-north-korea-and-lazarus-group-secures-preliminary-injunction-freezing-stolen-assets-in-landmark-crypto-asset-recovery-effort-bb55bb16f1710f487aa)
+- [Binance - initial investigation of the 29 October 2026 incident (on X)](https://x.com/binance/status/2115993361517891592)
 - [The Block - Sygnia and Verichains findings on Bybit](https://www.theblock.co/post/343530)
 - [Fireblocks - In response to the Fortress Trust hack](https://www.fireblocks.com/blog/in-response-to-the-fortress-trust-hack-dated-september-12-2023)
 - [Deribit - 1 November incident report and next steps](https://insights.deribit.com/exchange-updates/1-november-incident-report-and-next-steps/)
@@ -474,3 +479,4 @@ A Safe exposes its signer set and threshold on-chain, so anyone can audit who co
 - [How to create a multisig wallet with Gnosis Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/)
 - [PCI PTS HSM v4.0 — How Payment Hardware Security Modules Are Evaluated]({{site.url_complet}}/2026/07/20/pci-pts-hsm-security-requirements-v4/)
 - [Crypto Hacks of 2024 - DMM Bitcoin, WazirX and a Year of Exchange Breaches]({{site.url_complet}}/2026/10/07/crypto-hacks-2024/)
+- [The Bybit Hack of February 2025 - One Blind-Signed delegatecall and the Largest Exchange Thefts Compared]({{site.url_complet}}/2026/10/30/bybit-hack-february-2025/)

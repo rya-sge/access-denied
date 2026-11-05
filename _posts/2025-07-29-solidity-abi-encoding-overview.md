@@ -283,3 +283,7 @@ If you’re building anything with signature verification, unique identifiers, o
 The mindmap below summarizes the article.
 
 ![Solidity ABI encoding mindmap]({{site.url_complet}}/assets/article/blockchain/solidity/2025-07-29-solidity-abi-encoding-overview-mindmap.png)
+
+## Related articles
+
+- [SSZ vs RLP: How Ethereum Serialises Data on Each Layer]({{site.url_complet}}/2026/11/04/ssz-vs-rlp-ethereum-serialization/)

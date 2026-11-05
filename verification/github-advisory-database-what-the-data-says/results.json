@@ -1,0 +1,238 @@
+{
+ "reviewed_files": 37522,
+ "live": 36266,
+ "withdrawn": 1256,
+ "published_by_year": {
+  "2017": 217,
+  "2018": 742,
+  "2019": 731,
+  "2020": 1371,
+  "2021": 2547,
+  "2022": 8656,
+  "2023": 3270,
+  "2024": 3545,
+  "2025": 3569,
+  "2026": 11618
+ },
+ "reviewed_by_year": {
+  "2019": 378,
+  "2020": 2682,
+  "2021": 2817,
+  "2022": 4564,
+  "2023": 4842,
+  "2024": 5207,
+  "2025": 4086,
+  "2026": 11690
+ },
+ "repo_linked_by_year": {
+  "2018": 1,
+  "2019": 60,
+  "2020": 364,
+  "2021": 933,
+  "2022": 1134,
+  "2023": 1315,
+  "2024": 1576,
+  "2025": 1945,
+  "2026": 9880
+ },
+ "jan_oct_2025": 2952,
+ "jan_oct_2026": 11606,
+ "may_2022": 4968,
+ "cohort_2025": {
+  "advisories": 3569,
+  "repositories": 878,
+  "top_repositories": [
+   [
+    "mmaitre314/picklescan",
+    52
+   ],
+   [
+    "xwiki/xwiki-platform",
+    37
+   ],
+   [
+    "vllm-project/vllm",
+    25
+   ],
+   [
+    "flowiseai/flowise",
+    22
+   ],
+   [
+    "getgrav/grav",
+    19
+   ]
+  ],
+  "severity": {
+   "HIGH": 1106,
+   "MODERATE": 1672,
+   "LOW": 433,
+   "CRITICAL": 358
+  },
+  "same_year_cve": 2857,
+  "no_cve": 333,
+  "no_nvd_date": 450
+ },
+ "cohort_2026": {
+  "advisories": 11618,
+  "repositories": 1986,
+  "top_repositories": [
+   [
+    "openclaw/openclaw",
+    598
+   ],
+   [
+    "mervinpraison/praisonai",
+    178
+   ],
+   [
+    "imagemagick/imagemagick",
+    149
+   ],
+   [
+    "wwbn/avideo",
+    147
+   ],
+   [
+    "open-webui/open-webui",
+    140
+   ]
+  ],
+  "severity": {
+   "HIGH": 4601,
+   "MODERATE": 4796,
+   "CRITICAL": 1240,
+   "LOW": 981
+  },
+  "same_year_cve": 9924,
+  "no_cve": 1320,
+  "no_nvd_date": 4043
+ },
+ "may_2022_cve_before_2022": 4757,
+ "may_2022_reviewed_in_may_2022": 171,
+ "range_shapes": {
+  "fixed": 60710,
+  "with_last_known_bound": 11353,
+  "last_affected": 5772,
+  "open_ended": 802,
+  "versions_only": 953
+ },
+ "advisories_without_fixed_event": 4913,
+ "advisories_multi_package": 10734,
+ "advisories_multi_ecosystem": 309,
+ "max_affected_entries": 406,
+ "cvss": {
+  "v3": 29128,
+  "v4": 9234,
+  "both": 4733,
+  "none": 2637
+ },
+ "severity": {
+  "HIGH": 13206,
+  "MODERATE": 15715,
+  "CRITICAL": 4717,
+  "LOW": 2628
+ },
+ "no_cve_alias": 3692,
+ "no_cwe": 1419,
+ "top_cwe": [
+  [
+   "CWE-79",
+   4861
+  ],
+  [
+   "CWE-22",
+   2158
+  ],
+  [
+   "CWE-200",
+   1632
+  ],
+  [
+   "CWE-20",
+   1553
+  ],
+  [
+   "CWE-400",
+   1540
+  ],
+  [
+   "CWE-863",
+   1270
+  ]
+ ],
+ "ecosystems": [
+  [
+   "npm",
+   7664
+  ],
+  [
+   "Maven",
+   7107
+  ],
+  [
+   "PyPI",
+   6562
+  ],
+  [
+   "Packagist",
+   6457
+  ],
+  [
+   "Go",
+   4921
+  ],
+  [
+   "crates.io",
+   1527
+  ],
+  [
+   "NuGet",
+   1145
+  ],
+  [
+   "RubyGems",
+   1097
+  ],
+  [
+   "Hex",
+   120
+  ],
+  [
+   "SwiftURL",
+   61
+  ],
+  [
+   "GitHub Actions",
+   56
+  ],
+  [
+   "Pub",
+   12
+  ]
+ ],
+ "withdrawn_by_year": {
+  "2019": 4,
+  "2020": 71,
+  "2021": 46,
+  "2022": 26,
+  "2023": 87,
+  "2024": 138,
+  "2025": 149,
+  "2026": 735
+ },
+ "withdrawn_titled_duplicate": 955,
+ "withdrawn_with_cve": 199,
+ "unreviewed": {
+  "2021": 1976,
+  "2022": 175311,
+  "2023": 25231,
+  "2024": 35936,
+  "2025": 44775,
+  "2026": 78812,
+  "files": 362041,
+  "no_severity_label": 11316,
+  "with_ecosystem": 3,
+  "withdrawn": 1
+ }
+}
