@@ -257,7 +257,7 @@ Both instructions transfer out of `stats_pay_token`, and each computes its amoun
 
 **Q: `checked_add` prevents the overflow in FYEO-01, so where is the bug?**
 
-In the price of a slot. `checked_add` turns the 65,536th contribution into an error rather than a wrap-around, which is correct, but it means the curation stops accepting contributors after 65,535 of them. With a minimum contribution of one base unit, buying all 65,535 slots costs a fraction of a cent in tokens plus fees.
+In the price of a slot. `checked_add` turns the 65,536th contribution into an error rather than a wrap-around, which is correct, but it means the curation stops accepting contributors after 65,535 of them. With a minimum contribution of one base unit, buying all 65,535 slots costs about 6.5 cents in tokens for a 6-decimal token worth one dollar, or a fraction of a cent for a 9-decimal one, plus fees.
 
 The width of the counter is a capacity, and a capacity that is nearly free to consume is a denial-of-service vector. The fix is not a wider integer but a minimum contribution large enough that filling the table would fund the curation.
 
@@ -267,7 +267,7 @@ A property test over the accounting identity after every instruction sequence: f
 
 **Q: How do these findings compare with the EVM launchpad audits?**
 
-The EVM reports found the same two families, accounting drift and admin-versus-user conflicts on a shared balance, plus a unit mismatch at a contract boundary. The Solana reports add the chain-specific items: floating point in money paths, `transfer_checked`, bounded integer counters in account state, and rollback awareness. In both cases the Critical finding was an accounting error rather than an access-control or reentrancy bug.
+The EVM reports found the same two families, accounting drift and admin-versus-user conflicts on a shared balance, plus a unit mismatch at a contract boundary. The Solana reports add the chain-specific items: floating point in money paths, `transfer_checked`, bounded integer counters in account state, and rollback awareness. The Critical findings were an accounting error on Solana and a unit mismatch on the EVM side, neither of them an access-control or reentrancy bug.
 
 ## References
 

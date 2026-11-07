@@ -230,7 +230,7 @@ The 2023 vesting review is the one that changed the code described above. Its fo
 
 The two lows, an unbounded per-holder schedule loop and a modifier that accepted non-existent schedule IDs, were also fixed.
 
-The two 2025 critical findings were both accounting errors in the launchpad rather than in the DAO contracts. On Solana, unclaimed tokens were locked permanently in a stats account. On the EVM `Curation` contract, an incorrect `vestingDuration` was passed to the vesting schedule, and a one-wei donation could permanently block `updateFundraiser()`.
+The two 2025 critical findings were both in the launchpad rather than in the DAO contracts. On Solana, unclaimed tokens were locked permanently in a stats account. On the EVM `Curation` contract, an incorrect `vestingDuration` was passed to the vesting schedule; the one-wei donation that could permanently block `updateFundraiser()` was a separate High finding in the same report.
 
 The July 2025 FYEO review of the V2 agent launchpad is the most recent public description of the live system. Its single medium finding was a missing `_disableInitializers()` in a UUPS implementation, and its informational findings include a gas-exhaustion risk in `releaseAvailableTokensForHolder`, unbounded growth of a `locks[]` array in the vote-escrow contract, and unbounded `setProjectTaxRates`. The contract names in that scope, `AgentFactory`, `AgentToken` and `AgentVeToken`, match those of Virtuals Protocol's agent launch contracts, covered on this site in [Virtual Protocol, create co-ownership AI agents]({{site.url_complet}}/2024/12/05/virtual-protocol-architecture/).
 
@@ -253,7 +253,7 @@ Bio Protocol applies a conventional DeFi toolkit, a vote-escrow token, a points 
 - **Tokens.** `BIO` has a fixed deployed supply that only a replacement contract could extend; `vBIO` is a vesting balance exposed as a non-transferable ERC-20; `veBIO` decays linearly over a lock of at most two years; BioXP is off-chain, expires in 14 days and decides allocation only when a sale is oversubscribed.
 - **Launchpad.** A sale either meets its USDC goal or refunds everything; participants get liquid tokens capped at 1 % of supply each; `veBIO` holders get a six-month-unlocking airdrop; the team's funding arrives through FDV-triggered limit orders and a 1 % swap fee split 70/30 with the protocol.
 - **Contracts.** The public code is three small Foundry projects on OpenZeppelin 4.x with a shared multisig hand-over pattern. The vesting contract doubles as the `vBIO` governance token, and the airdrop contract resets its claim state on every root rotation.
-- **Audits.** Six reports, two criticals, both in launchpad accounting; the DAO building blocks have had no high-severity finding. The launchpad code itself is not public, so the audit scopes are the only place its contract surface is documented.
+- **Audits.** Six reports, two criticals, both in the launchpad; the DAO building blocks have had no high-severity finding. The launchpad code itself is not public, so the audit scopes are the only place its contract surface is documented.
 
 ![Mindmap of Bio Protocol covering launched assets, the BIO, vBIO, veBIO and BioXP tokens, the V2 launchpad mechanics, the open-source Token, Vesting and MerkleAirdrop contracts, and the audit history]({{site.url_complet}}/assets/article/blockchain/defi/bio-protocol/2026-09-18-bio-protocol-overview-mindmap.png)
 

@@ -249,7 +249,7 @@ fn get_scale(decimals: u8) -> Result<u128> {
 
 Amounts are scaled up on the way into `operate` and unscaled on the way out, with `unscale_amounts_up` used wherever rounding must favour the protocol. As a consequence, the vault program refuses any mint with more than nine decimals outright, and the liquidity program independently refuses anything outside two to nine.
 
-The minimum-size constants are expressed in normalised units, so their real value depends on the token. `MIN_DEBT` is `1e3` at nine decimals, which becomes `1e6` raw units for a six-decimal token such as USDC. Tokens below four decimals get a separate, much smaller set of constants.
+The minimum-size constants are expressed in raw token units, so their real value depends on the token. `MIN_DEBT` is `1e3` at nine decimals, which becomes `1e6` normalised units for a six-decimal token such as USDC. Tokens below four decimals get a separate, much smaller set of constants.
 
 ### Position ownership is an SPL NFT
 

@@ -129,7 +129,7 @@ The widest exposure is in the signatures. Every interaction with the protocol is
 
 Shor breaks all of it. The whitepaper acknowledges the dependency: the goal is for every component to be post-quantum, *"while this is already the case for our FHE scheme and MPC protocols"*, the underlying blockchains and their signature schemes would have to follow.
 
-Replacing them is not a configuration change. The EVM natively offers only `ecrecover`, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
+Replacing them is not a configuration change. The EVM has no native post-quantum signature verification, only elliptic-curve precompiles such as `ecrecover`, and the contracts hard-code the layout: `InputVerifier` slices the `inputProof` at `65 * numSigners` bytes, which is the ECDSA signature size. The KMS side already supports ML-DSA for its own signing, but it cannot present an ML-DSA signature to a contract that can only recover secp256k1.
 
 On the day Shor's algorithm is practical, an attacker who cannot read a single balance can still sign transactions as any address whose public key has been revealed, which on Ethereum means every address that has ever sent a transaction.
 

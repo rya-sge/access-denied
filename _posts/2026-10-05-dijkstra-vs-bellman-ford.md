@@ -340,7 +340,7 @@ Dijkstra and Bellman-Ford are two schedules for the same relaxation step, and th
 
 | Invariant | Enforced by | Breaks if |
 |-----------|-------------|-----------|
-| $$d(v) \ge \delta(s, v)$$ at every step, in both algorithms. | Relaxation only assigns the weight of an existing path. | A negative cycle is reachable: $$\delta$$ is $$-\infty$$ and the estimates keep decreasing. |
+| $$d(v) \ge \delta(s, v)$$ at every step, in both algorithms. | Relaxation only assigns the weight of an existing path. | Does not break: with a reachable negative cycle, $$\delta$$ is $$-\infty$$ on the vertices it reaches, so the estimates keep decreasing and the bound still holds. |
 | Every settled vertex in Dijkstra has $$d(v) = \delta(s, v)$$. | Extract-min order, together with non-negative weights. | Any edge weight is negative: a later path can undercut a settled vertex. |
 | Dijkstra settles vertices in non-decreasing order of distance. | The priority queue returns the minimum key. | The queue is replaced by a FIFO or LIFO structure, or weights are negative. |
 | After pass $$i$$ of Bellman-Ford, $$d(v)$$ is at most the weight of the best path to $$v$$ with at most $$i$$ edges. | Each pass relaxes every edge. | Some edges are skipped in a pass. |

@@ -64,14 +64,14 @@ function investedUnderlyingBalance() public view returns (uint256) {
 }
 ```
 
-The attacker swapped about 17M USDT into the pool, which made USDC look cheaper to `calc_withdraw_one_coin` and lowered the vault's value by about 1%. They deposited about 49M USDC at the lower share price, swapped back, and withdrew at the restored price, keeping the difference. Harvest had a guard that reverted deposits when the Curve price deviated from a reference by more than 3%; the attack needed only about 1% ([post-mortem](https://medium.com/harvest-finance/harvest-flashloan-economic-attack-post-mortem-3cf900d65217)).
+The attacker swapped about 17M USDT into the pool, which took USDC out of the pool and made it scarcer, so `calc_withdraw_one_coin` returned less USDC and the vault's value fell by about 1%. They deposited about 49M USDC at the lower share price, swapped back, and withdrew at the restored price, keeping the difference. Harvest had a guard that reverted deposits when the Curve price deviated from a reference by more than 3%; the attack needed only about 1% ([post-mortem](https://medium.com/harvest-finance/harvest-flashloan-economic-attack-post-mortem-3cf900d65217)).
 
 ```mermaid
 sequenceDiagram
     participant A as Attacker
     participant C as Curve Y pool
     participant V as fUSDC vault
-    A->>C: Swap USDT -> USDC (USDC looks cheap)
+    A->>C: Swap USDT -> USDC (USDC scarcer)
     A->>V: deposit(49M USDC)
     V->>C: calc_withdraw_one_coin()
     Note over V: Low value, many shares minted

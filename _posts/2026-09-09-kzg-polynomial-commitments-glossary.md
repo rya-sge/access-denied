@@ -284,7 +284,7 @@ The idealised protocol supplies soundness, the commitment supplies the cryptogra
 
 ### Post-quantum exposure
 
-Every security property above rests on discrete logarithms in a pairing group, which Shor's algorithm solves. A sufficiently large quantum computer recovers $$\alpha$$ from the reference string and destroys binding for every commitment ever made under it, retroactively.
+Every computational security property above rests on discrete logarithms in a pairing group, which Shor's algorithm solves. A sufficiently large quantum computer recovers $$\alpha$$ from the reference string and destroys binding for every commitment ever made under it, retroactively.
 
 That is why a system aiming at post-quantum plausibility does not use KZG. FRI commits through Merkle trees over Reed-Solomon codewords and needs only a collision-resistant hash, at the price of proofs measured in kilobytes; the Bulletproofs inner product argument needs only discrete logarithms and no setup, at the price of logarithmic proofs and linear verification. The choice among the three is a choice among constant proofs, no trusted setup, and quantum resistance, and no deployed scheme offers all three.
 

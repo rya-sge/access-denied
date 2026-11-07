@@ -62,7 +62,7 @@ Public state lives in a sparse public data tree, written by the sequencer during
 
 Both kinds of storage are **siloed by contract address** so that contracts cannot collide or reach into each other's state. The kernel circuit performs the siloing: a public slot becomes `H(contract_address, storage_slot)`, and a note hash becomes `H(contract_address, note_hash)` before insertion. For notes there is a further step, mixing in a nonce derived from the transaction, so that two identical notes produce distinct leaves.
 
-One consequence constrains contract design more than anything else: **a private function cannot read current public state.** Private execution happens before the sequencer touches the block, so the current value is not knowable. Aztec offers three ways around this.
+One consequence constrains contract design more than anything else: **a private function cannot read current public state.** Private execution happens before the sequencer touches the block, so the current value is not knowable. Two of the three public state variables below offer a way around this.
 
 | State variable | Mutable | Readable in private | Typical use |
 |---|---|---|---|

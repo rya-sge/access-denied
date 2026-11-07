@@ -25,7 +25,7 @@ The connection protocol itself is specified in [RFC 4254](https://datatracker.ie
 
 ## A single type list as the layer's vocabulary
 
-The clearest statement of the design is the type enumeration in `channels.h`, which puts 23 values into one namespace:
+The clearest statement of the design is the type enumeration in `channels.h`, which puts 20 values into one namespace:
 
 ```c
 #define SSH_CHANNEL_X11_LISTENER	1	/* Listening for inet X11 conn. */

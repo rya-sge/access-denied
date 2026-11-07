@@ -275,3 +275,4 @@ Several statements come from press coverage or from proposals that are still cha
 - [ML-DSA in Rust — Inside the Quantus qp-rusty-crystals Implementation]({{site.url_complet}}/2026/08/25/ml-dsa-rust-implementation-quantus/)
 - [Overview of ECDSA - Elliptic Curve Digital Signature Algorithm]({{site.url_complet}}/2024/10/23/ecdsa-overview/)
 - [Winternitz One-Time Signature(OTS)]({{site.url_complet}}/2024/05/30/winternitz-signature-scheme/)
+- [Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography]({{site.url_complet}}/2026/11/06/grover-algorithm-quantum-search/)

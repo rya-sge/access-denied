@@ -144,7 +144,7 @@ The Johnson bound always exceeds the unique decoding distance; at rate $$1/4$$ i
 
 A word $$w$$ is $$\delta$$-close to a code $$C$$ if some codeword lies within relative distance $$\delta$$ of it, written $$\Delta(w, C) \le \delta$$. It is $$\delta$$-far if every codeword is at distance greater than $$\delta$$, written $$\Delta(w, C) \gt \delta$$.
 
-The two terms carve $$\mathbb F^n$$ into the words a proximity test must accept, the words it must reject, and nothing in between: a word is one or the other for any fixed $$\delta$$. The parameter $$\delta$$ is called the proximity parameter, and larger values give more efficient proof systems, which is the pressure that pushes $$\delta$$ up towards the [Johnson bound](#johnson-bound).
+The two terms carve $$\mathbb F^n$$ into the words a proximity test may accept, the words it must reject, and nothing in between: a word is one or the other for any fixed $$\delta$$. The parameter $$\delta$$ is called the proximity parameter, and larger values give more efficient proof systems, which is the pressure that pushes $$\delta$$ up towards the [Johnson bound](#johnson-bound).
 
 ### Interactive oracle proof (IOP)
 

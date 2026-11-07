@@ -1,0 +1,41 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #F3EEFB
+    LineColor #7A5BB5
+  }
+  :depth(1) {
+    BackgroundColor #7A5BB5
+    FontColor white
+  }
+}
+</style>
+* Grover's algorithm
+** The problem
+*** N candidates, M solutions
+*** Only an oracle to test one
+*** No structure to exploit
+** One iteration
+*** Oracle flips the phase
+*** Diffusion D = WRW
+*** Inversion about the average
+*** Rotation by 2θ
+** Iteration count
+*** sin²θ = M/N
+*** About (π/4)√(N/M)
+*** Too many iterations undo the work
+*** Unknown M: random counts (BBHT)
+left side
+** Limits
+*** Ω(√N) lower bound (BBBV)
+*** Exactly optimal (Zalka)
+*** √S gain from S machines
+*** Generalised by amplitude amplification
+** Cryptography
+*** Key search: 2^(k/2) iterations
+*** Hash preimages: same bound
+*** Reversible oracle, error correction
+*** NIST: 2^170 / MAXDEPTH for AES-128
+*** Public keys fall to Shor, not Grover
+@endmindmap

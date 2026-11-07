@@ -190,7 +190,7 @@ Two consequences follow from this table.
 
 The litepaper compares this to optimistic-rollup security: anyone can recompute and challenge. The chain, for its part, fixes exactly *what* must be computed, since the handle derivation binds the operation, the inputs and the block, so the argument is only about the ciphertext content, never about which operation was requested. The stated long-term direction is ZK-FHE, where a proof of correct evaluation would replace the majority assumption.
 
-**Confidentiality rests on the KMS, and the KMS rests on two things.** The threshold protocol guarantees that fewer than one third of nodes learn nothing, by mathematics. Above that, the second line of defence is hardware: each share sits in a Nitro Enclave, so extracting it requires the operator and the cloud provider to cooperate. The litepaper states that this makes verifiability of the MPC depend on hardware assumptions, and names ZK-MPC as the planned replacement. Until then, the confidentiality claim is "a colluding two-thirds of thirteen named organisations, or a break of the enclave model".
+**Confidentiality rests on the KMS, and the KMS rests on two things.** The threshold protocol guarantees that fewer than one third of nodes learn nothing, by mathematics. Above that, the second line of defence is hardware: each share sits in a Nitro Enclave, so extracting it requires the operator and the cloud provider to cooperate. The litepaper states that this makes verifiability of the MPC depend on hardware assumptions, and names ZK-MPC as the planned replacement. Until then, the confidentiality claim is "more than one third of thirteen named organisations colluding, or a break of the enclave model".
 
 ## How a user can tell the computation happened
 
@@ -211,7 +211,7 @@ The Zama protocol keeps FHE off the host chain and replaces it with two on-chain
 - **Two verifiers guard the chain boundary**: `InputVerifier` admits an input only with a threshold of coprocessor signatures, `KMSVerifier` admits a plaintext only with a threshold of KMS signatures.
 - **The ACL is checked at use and at read**, is never revoked, and is replicated to the Gateway for the KMS to enforce.
 - **Correctness is attested by majority**, not proven: redundant execution, commitment consensus and slashing, with ZK-FHE as the announced replacement.
-- **Confidentiality is a 2/3-of-13 threshold plus enclaves**, with ZK-MPC as the announced replacement for the hardware assumption.
+- **Confidentiality is a threshold of more than one third of 13 nodes plus enclaves**, with ZK-MPC as the announced replacement for the hardware assumption.
 - **The Gateway and the relayer are trusted for liveness only.**
 
 ![Mindmap of the Zama FHEVM architecture covering the two design ideas, the six components, the three keys, the life of a value, access control and the trust model]({{site.url_complet}}/assets/article/blockchain/zamafhe/2026-09-18-zama-fhevm-architecture-mindmap.png)

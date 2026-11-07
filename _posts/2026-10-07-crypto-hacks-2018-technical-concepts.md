@@ -196,9 +196,9 @@ sequenceDiagram
     A->>P: Deposit BTG to the exchange
     A->>S: Mine a longer chain without the deposit
     P-->>E: Deposit confirmed (N blocks)
-    E-->>A: Credit; attacker trades and withdraws BTC
+    E-->>A: Credit, attacker trades and withdraws BTC
     A->>P: Publish the private chain (longer)
-    Note over P,E: Deposit disappears; exchange is short
+    Note over P,E: Deposit disappears, exchange is short
 ```
 
 Exchanges set the number of confirmations per coin; after these attacks several raised them sharply or delisted the coins. The right number depends on how much it costs to rent the hash power to rewrite that many blocks, compared with the value at risk.

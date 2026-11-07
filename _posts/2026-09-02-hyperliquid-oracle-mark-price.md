@@ -15,7 +15,7 @@ isMath: true
 
 A liquidation on Hyperliquid is decided by a price that no trade on Hyperliquid has to print. The protocol maintains several prices, computed differently and updated on different schedules, and each drives a different part of the system. Funding settles on one; liquidation runs on another; the premium that feeds funding comes from a third.
 
-Underneath all of them sits a single mechanism: every validator computes a weighted median of external spot venues roughly every three seconds and publishes it onchain, and the clearinghouse takes a stake-weighted median of those submissions. Two medians in series, one over venues and one over validators. Everything else in this article is either built on top of that number or is the special case where no external price exists to build it from.
+Underneath all of them sits a single mechanism: every validator computes a weighted median of spot venues roughly every three seconds and publishes it onchain, and the clearinghouse takes a stake-weighted median of those submissions. Two medians in series, one over venues and one over validators. Everything else in this article is either built on top of that number or is the special case where no external price exists to build it from.
 
 This article takes that construction apart: how the oracle price is assembled and why the aggregation is built the way it is, how the mark price differs from it and why both are needed, what a single three-second tick sets in motion across margin and funding, what happens for assets with no external reference, and where the trust sits once the medians have done their work.
 
@@ -29,12 +29,12 @@ Most surprises on the platform come from confusing two of these four.
 
 | Price | Built from | Updated | Used for |
 |---|---|---|---|
-| **Oracle price** | Weighted median of external spot venues, then a stake-weighted median across validators | Roughly every 3 s | Funding: both the premium and the notional conversion in the payment |
+| **Oracle price** | Weighted median of spot venues, then a stake-weighted median across validators | Roughly every 3 s | Funding: both the premium and the notional conversion in the payment |
 | **Mark price** | Median of three indices, one of which is the oracle corrected for basis | Whenever validators publish, so roughly every 3 s | Margining, liquidation, TP/SL triggering, unrealised PnL |
 | **Impact bid and ask** | The average execution price for a fixed notional on each side of Hyperliquid's own book | Sampled every 5 s | The funding premium |
 | **Borrow oracle price** | The oracle price for the collateral asset | Roughly every 3 s | Portfolio margin: borrow capacity, the margin ratio, and borrow liquidation thresholds |
 
-The division of labour is deliberate. Funding is supposed to pull the perpetual toward the underlying spot market, so it uses a price that ignores Hyperliquid's own book entirely. Margining is supposed to reflect a fair price for the contract itself, so it uses one that blends external spot, external perps and the local book. A single "the price" would have to be wrong for one of the two jobs.
+The division of labour is deliberate. Funding is supposed to pull the perpetual toward the underlying spot market, so it measures the contract against a price that does not read Hyperliquid's perp book. Margining is supposed to reflect a fair price for the contract itself, so it uses one that blends external spot, external perps and the local book. A single "the price" would have to be wrong for one of the two jobs.
 
 ## Building the oracle price
 
@@ -78,7 +78,7 @@ The oracle adds no trust assumption beyond the one the chain already has, and it
 
 ![Mark price is the median of three candidates: the oracle plus a 150 second basis EMA, the median of best bid, best ask and last trade, and five external perpetual mids]({{site.url_complet}}/assets/article/blockchain/hyperliquid/hyperliquid-mark-price-concept.png)
 
-The oracle price is a spot price. Perpetual contracts trade at a basis to spot, so margining a perp position against a spot price would systematically misprice it. The mark price is the fair-value estimate that solves this, and it is a median over three independently sourced candidates:
+The oracle price is a spot price. Perpetual contracts trade at a basis to spot, so margining a perp position against a spot price would systematically misprice it. The mark price is the fair-value estimate that solves this, and it is a median over three candidates:
 
 1. **The oracle price plus a 150-second exponential moving average** of the difference between Hyperliquid's mid price and the oracle. This is the external spot price corrected for the local basis.
 2. **The median of Hyperliquid's best bid, best ask and last trade.** The local book, reduced to a single robust number rather than a single quote.
@@ -98,7 +98,7 @@ $$
 
 with $$\tau = 2.5$$ minutes. Weighting each sample by its own $$t$$ is what keeps the estimate correct when samples arrive unevenly: a value that stood for thirty seconds counts thirty times as much as one that stood for one.
 
-The venue median defends against one exchange printing a bad number. The candidate median defends against an entire **class** of price going wrong: a wick on Hyperliquid's own book moves only candidate 2, an external spot dislocation moves candidate 1, and either way the median holds. Manipulating a liquidation price means moving two of three independently sourced indices at once.
+The venue median defends against one exchange printing a bad number. The candidate median defends against an entire **class** of price going wrong: a wick on Hyperliquid's own book moves candidate 2 directly and candidate 1 only through its 150-second EMA, an external spot dislocation moves candidate 1, and either way the median holds. Manipulating a liquidation price means moving two of three indices at once.
 
 Mark price is recomputed whenever validators publish new oracle prices, so both update on roughly the same three-second cadence.
 
@@ -224,7 +224,7 @@ Setting the failure modes against what bounds each of them shows where the guara
 | Failure | What bounds it | Residual risk |
 |---|---|---|
 | One spot venue prints a manipulated price | Weighted median over eight venues, with a maximum single weight of 3 out of 12 | An attacker who moves several venues at once |
-| Hyperliquid's own book is wicked | Mark price is a median over three indices, only one of which reads the book | A move large enough to drag two of the three |
+| Hyperliquid's own book is wicked | Mark price is a median over three indices, only one of which reads the book directly | A move large enough to drag two of the three |
 | A minority of validators publish a false price | Stake-weighted median across the validator set | None below the stake majority threshold |
 | A stake majority colludes | Nothing inside the oracle | This is the base HyperBFT assumption, not an oracle property |
 | A HIP-3 deployer publishes a wrong price | 500 000 HYPE slashable by validator vote, plus a review on any 50% daily move | Slashed stake is burned, so users are not compensated |
@@ -235,9 +235,9 @@ The pattern is that everything except the fourth row is bounded by construction,
 
 ## Conclusion
 
-Hyperliquid's oracle is two medians in series. Each validator reduces eight external spot venues to one number by weighted median, and the clearinghouse reduces the validators' submissions to one number by stake-weighted median, roughly every three seconds. The mark price is then a third median, over the oracle corrected for basis, the local book, and external perp markets, so that margining reflects the contract rather than the spot asset.
+Hyperliquid's oracle is two medians in series. Each validator reduces eight spot venues to one number by weighted median, and the clearinghouse reduces the validators' submissions to one number by stake-weighted median, roughly every three seconds. The mark price is then a third median, over the oracle corrected for basis, the local book, and external perp markets, so that margining reflects the contract rather than the spot asset.
 
-Keeping the two separate lets each do its job: funding uses a price that ignores Hyperliquid entirely, so it pulls the contract toward spot, while margining uses one that includes the local book, so it prices the contract. The same tick that recomputes them also re-evaluates maintenance margin, fires trigger orders, restates unrealised PnL, samples the funding premium, revalues portfolio-margin collateral and re-applies the order-entry bands.
+Keeping the two separate lets each do its job: funding measures the contract against a price that does not read Hyperliquid's perp book, so it pulls the contract toward spot, while margining uses one that includes the local book, so it prices the contract. The same tick that recomputes them also re-evaluates maintenance margin, fires trigger orders, restates unrealised PnL, samples the funding premium, revalues portfolio-margin collateral and re-applies the order-entry bands.
 
 Where an external price does not exist, the construction degrades in a documented way rather than silently: hyperps feed the contract's own mark price back in with caps and a premium damped to 1%, delisting settles on a one-hour TWAP, and HIP-3 replaces the median entirely with a bonded deployer under standing validator review. Each of those is a different answer to the same question, and each moves the trust somewhere a reader can name.
 
@@ -266,7 +266,7 @@ Where an external price does not exist, the construction degrades in a documente
 |-----------|-------------|-----------|
 | No single venue can set the oracle price. | A weighted median over eight venues, maximum single weight 3 of 12. | The aggregation becomes a mean, or one venue's weight exceeds half the total. |
 | No minority of validators can set the oracle price. | The stake-weighted median taken across validator submissions. | The aggregation becomes a mean, or submissions are taken from a single source. |
-| The mark price is never derived from one class of source. | A median over three independently sourced candidates, with a fourth added when only two exist. | Two of the three candidate sources become unavailable simultaneously. |
+| The mark price is never derived from one class of source. | A median over three candidates, with a fourth added when only two exist. | Two of the three candidate sources become unavailable simultaneously. |
 | Funding never reads Hyperliquid's mark price. | The premium is computed from impact prices against the oracle, and the payment converts on the oracle price. | The oracle is replaced by the mark price in either the premium or the settlement conversion. |
 | A perp trading inside its own spread relative to spot pays no premium. | The `max(b - o, 0) - max(o - a, 0)` form, which is zero when the oracle lies between the impact prices. | The premium is computed from a mid price rather than from two clamped one-sided terms. |
 | A one-lot quote cannot manufacture a funding premium. | The premium uses impact prices for a fixed notional, not the top of book. | The impact notional is reduced toward zero. |
@@ -295,7 +295,7 @@ Where an external price does not exist, the construction degrades in a documente
 
 Because the two are answering different questions.
 
-The oracle price is meant to represent the **underlying spot market**, so it is computed entirely from external spot venues, and for assets whose liquidity is elsewhere it excludes Hyperliquid's own spot book. That independence is the property that makes it a valid funding input: funding exists to pull the perpetual toward spot, and an input that already contained the perpetual's price would be measuring itself.
+The oracle price is meant to represent the **underlying spot market**, so it is computed entirely from spot venues, and for assets whose liquidity is elsewhere it excludes Hyperliquid's own spot book. That independence is the property that makes it a valid funding input: funding exists to pull the perpetual toward spot, and an input that already contained the perpetual's price would be measuring itself.
 
 The mark price is meant to represent the **fair value of the contract**, which trades at a basis to spot. It blends the oracle corrected for that basis, the local book, and external perp markets. That is the right input for margin and liquidation, and the wrong input for funding.
 
@@ -311,7 +311,7 @@ Stacking the two means an attacker has to compromise a weighted majority of venu
 
 **Q: A position was liquidated but no trade printed near the liquidation price. How?**
 
-Because liquidation runs on the mark price, and the mark price is a median over three candidates, only one of which reads Hyperliquid's book.
+Because liquidation runs on the mark price, and the mark price is a median over three candidates, only one of which reads Hyperliquid's book directly.
 
 If external spot moved, candidate 1 moves. If external perp markets moved, candidate 3 moves. Two candidates moving is enough to carry the median, and neither of them requires a single trade on Hyperliquid at that level. Trigger orders behave the same way, which is why a stop can fire without a print at its price.
 

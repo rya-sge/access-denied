@@ -118,7 +118,7 @@ SHA3-512("") = a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a6
 SHA3-256("abc") = 3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532
 ```
 
-SHA3-512 withholds 1024 of the 1600 state bits, so only 72 bytes of message are absorbed per invocation of the permutation, against 136 for SHA3-256. **SHA3-512 is therefore close to twice as slow as SHA3-256**, which inverts the intuition carried over from SHA-2, where SHA-512 is often the faster of the two on 64-bit hardware because it processes larger blocks with the same number of rounds.
+SHA3-512 withholds 1024 of the 1600 state bits, so only 72 bytes of message are absorbed per invocation of the permutation, against 136 for SHA3-256. **SHA3-512 is therefore close to twice as slow as SHA3-256**, which inverts the intuition carried over from SHA-2, where SHA-512 is often the faster of the two on 64-bit hardware because it processes larger blocks with 80 rounds against 64.
 
 ## The Sponge and the Permutation, Briefly
 
@@ -242,7 +242,7 @@ SHA-3 is built on a sponge over a permutation, so an advance against the Merkle-
 
 **Q: Why is SHA3-512 slower than SHA3-256, when SHA-512 is often faster than SHA-256?**
 
-Because the two families scale in opposite directions. In SHA-2, SHA-512 works on 1024-bit blocks with 64-bit words and roughly the same round count as SHA-256, so on 64-bit hardware it can process more message per unit of work.
+Because the two families scale in opposite directions. In SHA-2, SHA-512 works on 1024-bit blocks with 64-bit words and 80 rounds against the 64 of SHA-256, so on 64-bit hardware it can process more message per unit of work.
 
 In SHA-3 the permutation is the same 1600-bit, 24-round function regardless of digest length, and a longer digest is bought entirely with capacity. SHA3-512 sets $$c = 1024$$, leaving only 72 bytes of rate per permutation call against SHA3-256's 136. Roughly half the message is absorbed per unit of work, so it runs close to half the speed.
 

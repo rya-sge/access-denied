@@ -263,7 +263,7 @@ Press reports describe a Tether-led recovery package of up to about $147.5M.
 
 ## Operators, keys and infrastructure
 
-Bitget, KelpDAO and Drift set the pattern for the rest of the year: the code did what it was told, and the attacker controlled who told it. The other incidents of this class:
+Bitget, KelpDAO and Drift show the year's pattern: the code did what it was told, and the attacker controlled who told it. The other incidents of this class:
 
 - **Step Finance (31 January, ~$27.3M to ~$40M).** Step's [statement](https://x.com/StepFinance_/status/2018379876642804213) says the executive team's devices were compromised, through "a well known attack vector", and gives a loss of about $40M; trackers counted the 261,854 SOL unstaked from a treasury stake account (~$27.3M to ~$28.9M). About $4.7M was recovered. Rekt News: "The smart contracts worked flawlessly. The humans didn't."
 - **Resolv (22 March, ~$25M).** Resolv's [post-mortem](https://x.com/ResolvLabs/status/2040480752643580252) traces a chain of access: a contractor's credential leaked from another, compromised project; it gave GitHub access; a malicious workflow pulled cloud credentials; and the attacker reached the signing key of the off-chain minting service (an AWS KMS key, according to press reports). With no effective mint cap and no oracle check, 80M USR were minted against about $200k to $300k of USDC and sold; the 80% depeg left bad debt in Morpho, Euler and Fluid markets that used USR. About 46M USR were later neutralised by burns and blacklisting.
@@ -289,7 +289,7 @@ The second class mints value instead of moving it: a verifier accepts something 
 | 21 to 22 Jun | Taiko bridge | ~$1.75M (users made whole) | Forged proofs from rogue SGX provers: the enclave signing key had been committed to Taiko's public repository, and attestation accepted debug-mode enclaves |
 | 11 Jul | Bonzo Lend (Hedera) | $9.05M | A zero BLS signature `[0,0]` passed the oracle's pairing check |
 | 21 Jul | Wanchain Cardano-BNB bridge | $10M (SlowMist; ~$13M per PeckShield) | A forged message minted 203M NIGHT |
-| 20 to 25 Aug | Six Cosmos EVM chains (MANTRA, TAC, KiiChain…) | $5.72M (Cosmos Labs) | An unchecked underflow in `SubBalance` reached through vesting delegation |
+| 20 to 25 Aug | Six Cosmos EVM chains (MANTRA, TAC, KiiChain…) | $5.72M sold (sum of Cosmos Labs figures) | An unchecked underflow in `SubBalance` reached through vesting delegation |
 | 6 Sep | Liquid Network | $320M | Range-proof cache key collision |
 | 24 Sep | Payy | $1.92M | The verifier accepted an invalid burn proof |
 

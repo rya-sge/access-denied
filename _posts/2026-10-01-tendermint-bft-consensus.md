@@ -206,7 +206,7 @@ So after GST, either some correct process locked recently, in which case every c
 
 The paper's argument for why a non-deciding sequence of rounds is finite rests on one observation: at the start of every round there is a correct process $$c$$ whose `validValue` and `validRound` are acceptable to every correct process, namely the one that locked most recently, or any correct process if none did. The weighted round-robin eventually makes $$c$$ the proposer.
 
-Nothing in this mechanism adds a message or a field beyond what the normal case already sends. The `validRound` integer in the PROPOSAL is the only addition, and the justifying prevotes are not forwarded by the proposer: each process already received them through gossip.
+Nothing in this mechanism adds a message or a field beyond what the normal case already sends. The `validRound` integer is part of every PROPOSAL, and the justifying prevotes are not forwarded by the proposer: each process already received them through gossip.
 
 ### A remark on the acceptance rule
 

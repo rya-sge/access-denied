@@ -2,6 +2,7 @@
 layout: post
 title: "Running a Zama Coprocessor — Architecture, Services and Operator Setup"
 date:   2026-09-18
+last_modified_at: 2026-11-05
 lang: en
 locale: en-GB
 categories: blockchain cryptography security zama
@@ -32,7 +33,7 @@ Everything else in the node exists to make those four flows reliable across chai
 
 ## The six services
 
-The node is not one binary. `fhevm-engine` is a Cargo workspace of services that share a PostgreSQL database and talk to each other through it, using `LISTEN`/`NOTIFY` channels as a work queue. The operator repository deploys six of them, each as its own Kubernetes workload.
+The node is not one binary. `fhevm-engine` is a Cargo workspace of services that share a PostgreSQL database and talk to each other through it, using `LISTEN`/`NOTIFY` channels as a work queue. The operator repository deploys six of them, each as its own Kubernetes workload, and the host-listener adds a second workload for its poller.
 
 ![The six coprocessor services around PostgreSQL: host-listener and gw-listener write work, tfhe-worker, zkproof-worker and sns-worker consume it, and tx-sender posts signed results to the Gateway; ciphertexts go to S3]({{site.url_complet}}/assets/article/blockchain/zamafhe/zama-coprocessor-services-concept.png)
 
@@ -46,7 +47,7 @@ The node is not one binary. `fhevm-engine` is a Cargo workspace of services that
 | **sns-worker** | `event_pbs_computations`, `event_ciphertext_computed` | `ciphertexts128`, `ciphertext_digest`; S3 | tx-sender (`event_ciphertexts_uploaded`) | Switch-and-squash, S3 upload, digest computation |
 | **tx-sender** | `event_zkpok_computed`, `event_ciphertexts_uploaded` | `transactions` | Gateway | Signs the EIP-712 attestation over verified handles, then sends `InputVerification` responses and `CiphertextCommits.addCiphertextMaterial` transactions with the operator's key |
 
-A seventh workload, **db-migration**, is a one-shot job that applies the schema migrations before any service starts. Two more, `consensus-detector` and `upgrade-controller`, exist in the workspace for the blue-green upgrade mechanism described later and are not part of the v0.13 operator deployment.
+A further workload, **db-migration**, is a one-shot job that applies the schema migrations before any service starts. Two more, `consensus-detector` and `upgrade-controller`, exist in the workspace for the blue-green upgrade mechanism described later and are not part of the v0.13 operator deployment.
 
 ### host-listener: from events to a computation graph
 

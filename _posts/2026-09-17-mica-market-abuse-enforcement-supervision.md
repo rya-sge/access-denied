@@ -131,18 +131,18 @@ Article 111 requires Member States to give their authorities the power to impose
 For infringements of Titles II to V (Article 111(2) and (3)):
 
 - a public statement naming the person and the infringement, and an order to cease and desist;
-- for **natural persons**, fines of at least **EUR 700 000**;
-- for **legal persons**, fines of at least **EUR 5 000 000**, or a percentage of total annual turnover: **3 %** for Title II infringements, **5 %** for Title V infringements, and **12.5 %** for Title III and IV infringements;
-- in all cases at least **twice the profit gained or loss avoided**, where determinable, even above those amounts;
+- for **natural persons**, maximum fines of at least **EUR 700 000**;
+- for **legal persons**, maximum fines of at least **EUR 5 000 000**, or a percentage of total annual turnover: **3 %** for Title II infringements, **5 %** for Title V infringements, and **12.5 %** for Title III and IV infringements;
+- in all cases maximum fines of at least **twice the profit gained or loss avoided**, where determinable, even above those amounts;
 - for Title V infringements, a temporary ban on the responsible individuals from exercising management functions in a CASP.
 
 For infringements of Title VI (Article 111(5)):
 
 - the same public statement and cease-and-desist order, plus disgorgement of profits;
 - a temporary ban from management functions in a CASP and from dealing on own account, and a ban of **at least ten years** for a repeated infringement of Articles 89 to 92;
-- fines of at least **three times** the profit gained or loss avoided;
-- for natural persons, at least **EUR 1 000 000** for a breach of the disclosure duty (Article 88) and **EUR 5 000 000** for insider dealing, unlawful disclosure, manipulation or failure to detect and report (Articles 89 to 92);
-- for legal persons, at least **EUR 2 500 000 or 2 %** of annual turnover for Article 88, and **EUR 15 000 000 or 15 %** of annual turnover for Articles 89 to 92.
+- maximum fines of at least **three times** the profit gained or loss avoided;
+- for natural persons, maximum fines of at least **EUR 1 000 000** for a breach of the disclosure duty (Article 88) and **EUR 5 000 000** for insider dealing, unlawful disclosure, manipulation or failure to detect and report (Articles 89 to 92);
+- for legal persons, maximum fines of at least **EUR 2 500 000 or 2 %** of annual turnover for Article 88, and **EUR 15 000 000 or 15 %** of annual turnover for Articles 89 to 92.
 
 Turnover is consolidated at the level of the ultimate parent where group accounts are prepared. The chapter also provides:
 
@@ -151,7 +151,7 @@ Turnover is consolidated at the level of the ultimate parent where group account
 - Article 114 requires decisions to be **published**, in anonymised form where identification would be disproportionate.
 - Article 116 applies the [Whistleblower Directive](https://eur-lex.europa.eu/eli/dir/2019/1937/oj) (Directive (EU) 2019/1937) to reports of MiCA infringements.
 
-| Infringement | Natural person, at least | Legal person, at least |
+| Infringement | Natural person, maximum fine of at least | Legal person, maximum fine of at least |
 |---|---|---|
 | Title II (Arts 4–14) | EUR 700 000 | EUR 5 000 000 or 3 % of turnover |
 | Titles III–IV (issuers of ARTs and EMTs) | EUR 700 000 | EUR 5 000 000 or 12.5 % of turnover |
@@ -184,7 +184,7 @@ For a **trading platform**, Title VI adds surveillance to the venue rules of Tit
 
 For a **project team or foundation** with a listed token, Article 88 imposes a continuous disclosure duty of the kind listed companies live under. Announcing a partnership, a token burn or a security incident selectively, to a Discord channel before the public, or to a market maker before the community, is unlawful disclosure by the discloser and insider dealing by any recipient who trades. A delay must be documented and justified on the three conditions of Article 88(2).
 
-For **individuals**, trading on knowledge of an unannounced listing, front-running a client's order, or promoting a token one holds without disclosing the position, is now an administrative offence throughout the Union with fines starting at EUR 5 000 000 for a natural person, whether or not the Member State also treats it as a crime.
+For **individuals**, trading on knowledge of an unannounced listing, front-running a client's order, or promoting a token one holds without disclosing the position, is now an administrative offence throughout the Union with maximum fines of at least EUR 5 000 000 for a natural person, whether or not the Member State also treats it as a crime.
 
 For **anyone checking a counterparty**, the ESMA registers are the first stop: an entity that claims to be a MiCA CASP either appears in the Article 109 register or does not, and one that appears in the Article 110 register is one an authority has already reported as non-compliant.
 
@@ -197,7 +197,7 @@ Titles VI and VII give MiCA the two things a disclosure-and-authorisation regime
 - **Insider dealing includes ledger insiders.** Validators, developers and node operators are primary insiders, and cancelling an order on inside information is use.
 - **Manipulation includes order-book games and undisclosed promotion.** Spoofing, layering, cornering and voicing an opinion while holding a position are named in the text.
 - **Intermediaries must detect and report**, including anomalies in the consensus mechanism.
-- **Fines have floors, not ceilings.** EUR 700 000 for individuals and 3 % to 12.5 % of turnover for firms across Titles II to V; EUR 5 000 000 and 15 % of turnover for market abuse, and at least three times the profit.
+- **Maximum fines have statutory minimums.** EUR 700 000 for individuals and 3 % to 12.5 % of turnover for firms across Titles II to V; EUR 5 000 000 and 15 % of turnover for market abuse, and at least three times the profit.
 - **Supervision is national with two European layers.** ESMA keeps the registers and can intervene on ordinary crypto-assets; EBA directly supervises, inspects and fines significant stablecoin issuers.
 
 ![Mindmap of Titles VI and VII covering market-abuse scope, inside information, insider dealing and manipulation, detection, authority powers, intervention, registers, penalties and EBA supervision]({{site.url_complet}}/assets/article/regulation/mica/2026-09-17-mica-market-abuse-mindmap.png)
@@ -221,7 +221,7 @@ Titles VI and VII give MiCA the two things a disclosure-and-authorisation regime
 
 ### Requirements Checklist
 
-Title VI is a set of prohibitions and duties on market participants; Title VII is a set of powers and penalties Member States must provide. The rows below transcribe the provisions that bind persons and firms, and the penalty floors, so a compliance function can check a programme against the text.
+Title VI is a set of prohibitions and duties on market participants; Title VII is a set of powers and penalties Member States must provide. The rows below transcribe the provisions that bind persons and firms, and the minimum levels of the maximum penalties, so a compliance function can check a programme against the text.
 
 #### Articles 86 to 92 — Market abuse
 
@@ -259,10 +259,10 @@ Title VI is a set of prohibitions and duties on market participants; Title VII i
 | Check | # | Requirement |
 |:---:|:---:|------------|
 | ☐ | 111(1) | Administrative penalties for infringements of Arts 4–14, 16–47 (listed), 48–55 (listed), 59–83 (listed), 88–92 and failure to cooperate, unless already criminal under national law. |
-| ☐ | 111(2) | For Titles II–V: public statement; cease-and-desist order; fines of at least twice the profit or loss avoided; natural persons at least EUR 700 000. |
-| ☐ | 111(3) | Legal persons: at least EUR 5 000 000, or 3 % of turnover (Title II), 5 % (Title V), 12.5 % (Titles III–IV), consolidated at the ultimate parent. |
+| ☐ | 111(2) | For Titles II–V: public statement; cease-and-desist order; maximum fines of at least twice the profit or loss avoided; natural persons maximum fines of at least EUR 700 000. |
+| ☐ | 111(3) | Legal persons: maximum fines of at least EUR 5 000 000, or 3 % of turnover (Title II), 5 % (Title V), 12.5 % (Titles III–IV), consolidated at the ultimate parent. |
 | ☐ | 111(4) | Title V infringements: temporary ban on management functions in a CASP. |
-| ☐ | 111(5) | Title VI: public statement; cease-and-desist; disgorgement; management and own-account dealing bans, at least 10 years on repetition; at least three times the profit; natural persons EUR 1 000 000 (Art. 88) or EUR 5 000 000 (Arts 89–92); legal persons EUR 2 500 000 or 2 % (Art. 88), EUR 15 000 000 or 15 % (Arts 89–92). |
+| ☐ | 111(5) | Title VI: public statement; cease-and-desist; disgorgement; management and own-account dealing bans, at least 10 years on repetition; maximum fines of at least three times the profit, natural persons EUR 1 000 000 (Art. 88) or EUR 5 000 000 (Arts 89–92), legal persons EUR 2 500 000 or 2 % (Art. 88), EUR 15 000 000 or 15 % (Arts 89–92). |
 | ☐ | 112 | Penalties weigh gravity, duration, responsibility, financial strength, profits, third-party losses, cooperation and previous infringements. |
 | ☐ | 113–114 | Right of appeal; publication of decisions, anonymised where identification would be disproportionate. |
 | ☐ | 116 | Directive (EU) 2019/1937 protects persons reporting infringements. |
@@ -315,9 +315,9 @@ The elements are a prior position, a public opinion, a subsequent profit and no 
 
 Article 111 sets minimum maximum fines, and market abuse sits at the top.
 
-A CASP infringing Title V faces a fine of at least EUR 5 000 000 or 5 % of turnover, and a natural person at least EUR 700 000.
+A CASP infringing Title V faces a maximum fine of at least EUR 5 000 000 or 5 % of turnover, and a natural person a maximum fine of at least EUR 700 000.
 
-Insider dealing, unlawful disclosure, manipulation or failure to detect and report under Articles 89 to 92 carries at least EUR 15 000 000 or 15 % of turnover for a legal person and EUR 5 000 000 for a natural person, plus at least three times the profit gained or loss avoided, management and dealing bans, and a ban of at least ten years on repetition. Member States may set higher ceilings, and criminal law may apply in addition.
+Insider dealing, unlawful disclosure, manipulation or failure to detect and report under Articles 89 to 92 carries a maximum fine of at least EUR 15 000 000 or 15 % of turnover for a legal person and EUR 5 000 000 for a natural person, or of at least three times the profit gained or loss avoided where that is higher, plus management and dealing bans, and a ban of at least ten years on repetition. Member States may set higher ceilings, and criminal law may apply in addition.
 
 **Q: Combining the titles: a trading platform's employee learns from the listing committee that a token will be listed next week, buys it on another venue, and tells a friend who does the same. What has happened under MiCA, and who acts?**
 
@@ -326,9 +326,9 @@ The listing decision is inside information under Article 87: precise, non-public
 - **The employee** possesses the information through employment (Article 89(5)(c)), and buying the token on another venue is insider dealing under Article 89(1), since Article 86(2) covers transactions off the platform.
 - **Telling the friend** is unlawful disclosure under Article 90, and the friend's purchase is insider dealing under Article 89(4) if they knew or ought to have known the source.
 - **The platform** must have had systems under Article 92 and Article 76(7) capable of flagging the pattern, and any CASP that executed the orders must report the suspicion to its national competent authority.
-- **The authority** investigates under Article 94, may freeze assets, and imposes penalties under Article 111(5): for each individual, a fine of at least EUR 5 000 000 or three times the profit, a management and dealing ban, and publication of the decision under Article 114.
+- **The authority** investigates under Article 94, may freeze assets, and imposes penalties under Article 111(5): for each individual, a maximum fine of at least EUR 5 000 000 or three times the profit, a management and dealing ban, and publication of the decision under Article 114.
 
-If the platform's surveillance was inadequate, the platform itself has infringed Article 92, with a floor of EUR 15 000 000 or 15 % of turnover.
+If the platform's surveillance was inadequate, the platform itself has infringed Article 92, with a maximum fine of at least EUR 15 000 000 or 15 % of turnover.
 
 ## References
 

@@ -601,7 +601,7 @@ The gap matters because $K$ is exactly the input that makes deterministic signin
 
 Because a move in Rust is a copy. Returning a secret-bearing struct by value copies it into the caller's frame and leaves the source copy in the callee's frame, dead but never dropped, so `ZeroizeOnDrop` never runs on it. Whether the compiler elides that copy is an optimisation decision, not a guarantee.
 
-The crate's response is to place secrets in the caller's frame and fill them through `&mut`, as `UnpackedSecretKey::zeroed` plus `unpack_secret_key_for_signing` do, and to build values in tail position rather than binding them to a named local first. Since none of that is checkable by reading the source, four release-only integration tests paint a stack region, run the operation on it, and scan for secret patterns afterwards.
+The crate's response is to place secrets in the caller's frame and fill them through `&mut`, as `UnpackedSecretKey::zeroed` plus `unpack_secret_key_for_signing` do, and to build values in tail position rather than binding them to a named local first. Since none of that is checkable by reading the source, three release-only integration tests paint a stack region, run the operation on it, and scan for secret patterns afterwards.
 
 ## References
 

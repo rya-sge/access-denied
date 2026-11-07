@@ -283,3 +283,4 @@ Several facts above come from secondary coverage or from general knowledge rathe
 - [Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem]({{site.url_complet}}/2025/04/24/short-integer-solution/)
 - [Winternitz One-Time Signature(OTS)]({{site.url_complet}}/2024/05/30/winternitz-signature-scheme/)
 - [Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-blockchains/)
+- [Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography]({{site.url_complet}}/2026/11/06/grover-algorithm-quantum-search/)

@@ -439,7 +439,7 @@ Quotienting converts an evaluation claim into a proximity claim: if $$b = f(a)$$
 
 When $$\delta$$ exceeds the unique decoding distance, several polynomials may lie within $$\delta$$ of $$\pi$$. Each evaluation query, checked in isolation, only proves that some list member takes the claimed value, and a malicious prover can pick a different member for each query.
 
-Sampling $$r$$ outside $$L$$ and having the prover commit to $$s = f(r)$$ singles out one list member: two distinct polynomials of degree less than $$d$$ agree at fewer than $$d$$ points, so the probability that two list members share the value $$s$$ at a random $$r$$ is at most $$|\mathrm{List}|^2 \cdot d / (|\mathbb F| - |L|)$$. Folding $$(r, s)$$ into every subsequent quotient forces all answers to come from that one polynomial.
+Sampling $$r$$ outside $$L$$ and having the prover commit to $$s = f(r)$$ singles out one list member: two distinct polynomials of degree less than $$d$$ agree at fewer than $$d$$ points, so the probability that two list members share the value $$s$$ at a random $$r$$ is at most $$|\mathrm{List}|^2 \cdot d / (|\mathbb F| - |L|)$$. Including $$(r, s)$$ in every subsequent quotient forces all answers to come from that one polynomial.
 
 **Q: What is the difference between the proximity gap theorem and the folding lemma?**
 

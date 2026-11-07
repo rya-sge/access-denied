@@ -174,7 +174,7 @@ Any quote asset can serve as the DEX's collateral. If a quote asset loses its st
 
 ### Fees
 
-The deployer sets a fee `scale` between 0% and 300%, or 0% to 100% under growth mode. On mainnet the deployer fee setting can change at most once every 30 days. Taking a base user fee of one unit and non-aligned collateral, the split behaves as follows:
+The deployer sets a fee share between 0% and 300%, or 0% to 100% under growth mode. On mainnet the deployer fee setting can change at most once every 30 days. Taking a base user fee of one unit and non-aligned collateral, the split behaves as follows:
 
 | `growthMode` | `feeScale` | To protocol | To deployer |
 |:---:|:---:|:---:|:---:|
@@ -418,7 +418,7 @@ What that means in practice, for a trader judging a market or a builder deployin
 
 | Invariant | Enforced by | Breaks if |
 |-----------|-------------|-----------|
-| A HIP-1 deployer's fee share can never increase. | `setDeployerTradingFeeShare` rejects any value above the current one. | The ratchet is removed, at which case a deployer could attract volume cheaply and reprice it. |
+| A HIP-1 deployer's fee share can never increase. | `setDeployerTradingFeeShare` rejects any value above the current one. | The ratchet is removed, in which case a deployer could attract volume cheaply and reprice it. |
 | A HIP-1 token's supply never exceeds `maxSupply`. | Supply is fixed at genesis and can only fall through fees or burns. | A mint path is added after genesis. |
 | Hyperliquidity requires no user transaction to stay quoting. | The strategy runs in block transition logic, not as a contract call. | It is reimplemented as a keeper-driven contract. |
 | Hyperliquidity never takes liquidity. | It places ALO (post-only) orders, which are rejected rather than crossing. | The order type is changed to GTC. |

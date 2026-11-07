@@ -271,3 +271,4 @@ Both costs come from the tower of hash trees. A signature must carry a FORS sign
 - [Winternitz One-Time Signature(OTS)]({{site.url_complet}}/2024/05/30/winternitz-signature-scheme/)
 - [The SHA-3 Standard (FIPS 202) — A Second Family of Hash Functions]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/)
 - [Post-Quantum Cryptography in 2026 — The Algorithms, What They Do and Who Deploys Them]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-algorithms-overview/)
+- [Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography]({{site.url_complet}}/2026/11/06/grover-algorithm-quantum-search/)

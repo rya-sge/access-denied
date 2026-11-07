@@ -225,7 +225,7 @@ Five points survive the specifics.
 - **A public view and a private read are two different questions.** A public simulation is evaluated at the current time; a private function is proved against the chain tip. They can disagree about the same variable, and a test that asserts the public one has asserted the easier question.
 - **A delayed value has a dead window after deployment.** If a constructor schedules rather than writes, everything reading that value sees the default until the delay elapses *and* a block exists past that point. What is easy to miss is that some entry points then fail outright rather than read a stale value.
 - **Two constants in a fixed relationship should be written as that relationship.** `LONG_TEST_TIMEOUT = 900_000` was correct for one value of a delay it did not mention. Deriving it costs nothing and removes an invariant from the list of things a human has to remember.
-- **An unpinned transitive dependency is an unowned decision.** Nothing in the project changed between the run that worked and the run that did not; a library eleven days younger than the framework did.
+- **An unpinned transitive dependency is an unowned decision.** Nothing in the project changed between the run that worked and the run that did not; a library twelve days younger than the framework did.
 
 Two of these only became visible because the first explanation was tested rather than believed. The timeout was a real defect, it fitted every symptom, and fixing it changed the outcome — the deployment test started passing. It was still not the cause of the failure being investigated, and the evidence that said so was one assertion passing in a test whose later steps failed. A fix that improves the symptoms is the easiest kind of wrong answer to keep.
 
@@ -235,7 +235,7 @@ The sleep is gone as well. `RollupCheatCodes.advanceToSlot` warps L1, one transa
 
 The visible error named a cryptographic mechanism: a tagging secret that could not be resolved for a recipient the framework refused to encrypt to. That mechanism worked exactly as designed at every step, and so did the contract. What failed was the test's model of time.
 
-- **The dependency failure was independent** and merely first: an unpinned transitive library, eleven days newer than the framework it serves, broke deployment before any contract logic ran.
+- **The dependency failure was independent** and merely first: an unpinned transitive library, twelve days newer than the framework it serves, broke deployment before any contract logic ran.
 - **The timeout was a genuine defect** — a test that slept longer than the timeout guarding it could never pass — but fixing it did not fix the mints.
 - **The cause was that the chain never advanced.** Anvil's clock does not follow wall time, an L2 block needs a transaction, and a private read is anchored to the tip. The issuer address was set in public and unset in private at the same moment.
 - **The auditability change made it visible.** A constrained delivery to the zero address cannot be served, where the earlier unconstrained one silently delivered to nobody.
@@ -302,7 +302,7 @@ The fix is not to assert harder but to advance the chain: warp the clock, submit
 
 **Q: How could an unpinned dependency break a project whose own code did not change?**
 
-Five framework packages declare their dependency on the validation library as `^4`, which permits any 4.x release. A resolution taken after a newer 4.x appeared installed a version published eleven days after the framework, containing a recursion check that overflows on a self-referential schema the framework uses. Nothing in the project changed; what changed was what `^4` meant on the day the dependencies were resolved.
+Five framework packages declare their dependency on the validation library as `^4`, which permits any 4.x release. A resolution taken after a newer 4.x appeared installed a version published twelve days after the framework, containing a recursion check that overflows on a self-referential schema the framework uses. Nothing in the project changed; what changed was what `^4` meant on the day the dependencies were resolved.
 
 **Q: Would running the test suite more often have caught this earlier?**
 

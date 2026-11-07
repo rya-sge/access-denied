@@ -279,7 +279,7 @@ The two threads run this sequence concurrently, on two processors or interleaved
 | 5 | `str 42` | | 42 |
 | 6 | | `str 42` | 42 |
 
-Two increments were executed and `count` grew by one: the update of T1 was **lost**, overwritten by T2's store of a stale value. Every time the scheduler or the hardware interleaves the two threads inside the load-add-store window, one increment disappears, which is why the total is always at most `200000` and usually below it. The runs that print `200000` are those in which the interleaving happened to fall between complete increments every time, or in which one thread ran its whole loop before the other started.
+Two increments were executed and `count` grew by one: the update of T1 was **lost**, overwritten by T2's store of a stale value. Every time the scheduler or the hardware interleaves the two threads inside the load-add-store window, at least one increment disappears, which is why the total is always at most `200000` and usually below it. The runs that print `200000` are those in which the interleaving happened to fall between complete increments every time, or in which one thread ran its whole loop before the other started.
 
 This is a **data race**: two threads access the same memory location without synchronisation, and at least one access is a write. In C11 and later a program containing a data race has undefined behaviour, so the compiler is even allowed to keep `count` in a register for the whole loop and store it once at the end, which would make the outcome worse still.
 
@@ -336,7 +336,7 @@ Because `pthread_create()` is a single library function that has to start any us
 
 **Q: In the lecture's two-thread program, why is the final counter sometimes 200000 and sometimes much less, but never more?**
 
-Each thread performs one hundred thousand increments, so 200000 is the upper bound. An increment is a load, an add and a store; when the two threads interleave inside that window, both load the same value, both add one, and both store the same result, so one of the two increments is lost. Every such collision lowers the total by one and nothing can raise it.
+Each thread performs one hundred thousand increments, so 200000 is the upper bound. An increment is a load, an add and a store; when the two threads interleave inside that window, both load the same value, both add one, and both store the same result, so one of the two increments is lost. Every such collision lowers the total by one, or by more when a preempted thread's stale store overwrites several increments of the other, and nothing can raise it.
 
 A run prints 200000 when no collision happened, for instance because one thread finished its loop before the other started.
 

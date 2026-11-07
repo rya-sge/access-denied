@@ -1340,3 +1340,8 @@ _posts/2026-11-05-dependabot-credential-proxy-isolation.md
 _posts/2026-11-05-dependency-update-path-threat-model.md
   assets/article/outil-securite/dependabot/2026-11-05-dependency-update-path-threat-model-mindmap.puml   (mindmap)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-06-grover-algorithm-quantum-search.md
+  assets/article/cryptographie/post-quantum/2026-11-06-grover-algorithm-mindmap.puml   (mindmap)
+  assets/article/cryptographie/post-quantum/grover-success-probability.py   (in-section figure -> .svg, embedded in "How many iterations"; matplotlib, create-plot)
+  in-section diagrams: inline Mermaid in the article, no other .puml

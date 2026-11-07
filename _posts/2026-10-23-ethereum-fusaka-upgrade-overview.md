@@ -74,7 +74,7 @@ The mechanism, with the mainnet values of the Fulu configuration in `consensus-s
 
 - **Extension.** Each blob is extended with an erasure code to twice its size, then cut into 128 *cells* of 64 field elements. Any half of the cells is enough to rebuild the blob.
 - **Columns.** The cells at the same index across all blobs of a block form a *column*. There are 128 columns, each with its own gossip subnet.
-- **Custody.** Each node keeps a deterministic set of columns derived from its node ID: at least 4 custody groups for any node. A node with validators keeps at least 8, plus one per 32 ETH of attached effective balance, up to all 128.
+- **Custody.** Each node keeps a deterministic set of columns derived from its node ID: at least 4 custody groups for any node. A node with validators keeps one per 32 ETH of attached effective balance, with a minimum of 8 and a maximum of all 128.
 - **Sampling.** Each slot, a node checks at least 8 columns (`SAMPLES_PER_SLOT`), or its custody count if higher. If they are all available, it treats the block's data as available.
 - **Reconstruction.** A node that obtains at least half of the columns rebuilds the full data and republishes the columns it was missing.
 
@@ -191,7 +191,7 @@ Rollup and blob-submitting software must compute cell proofs and use the new tra
 
 ## Impact for node operators and stakers
 
-- **Bandwidth and storage of blob data fall per node**, since a node without validators keeps 4 of 128 columns. Nodes with validators keep more: 8 groups at minimum, and one more per 32 ETH of attached effective balance, so a node running 4,096 ETH of validators or more keeps all 128 columns and behaves as a *supernode*.
+- **Bandwidth and storage of blob data fall per node**, since a node without validators keeps 4 of 128 columns. Nodes with validators keep more: one group per 32 ETH of attached effective balance, with a minimum of 8, so a node running 4,096 ETH of validators or more keeps all 128 columns and behaves as a *supernode*.
 - **Blob capacity rises through BPO forks**, from a maximum of 9 to 21 per block between December 2025 and January 2026, with no client feature change but with new client releases carrying the schedule.
 - **Clients must speak `eth/69`** and, if they want to serve history, announce the range they serve.
 - **`eth_config`** gives a way to check, before each fork, that every node of an operator has the same configuration.

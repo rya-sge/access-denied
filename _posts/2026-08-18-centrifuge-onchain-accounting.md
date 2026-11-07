@@ -21,7 +21,7 @@ isMath: true
 
 ## The ledger
 
-An account is four numbers and a flag:
+An account is three numbers, a flag and a metadata field:
 
 ```solidity
 struct Account {

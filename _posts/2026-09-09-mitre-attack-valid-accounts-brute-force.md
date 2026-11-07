@@ -152,7 +152,7 @@ Detection differs by technique: guessing shows as failure spikes and lockouts on
 
 Valid Accounts, Brute Force, Password Guessing and Password Spraying describe one identity-centred path into an environment: acquire a working credential, then use it as a legitimate user. Guessing and spraying are opposite distributions of the same attempts, one deep on a single account and one wide across many, and each is tuned to the presence or absence of a lockout policy.
 
-Valid Accounts is what turns an acquired password into access, persistence and privilege, and it is hard to detect precisely because nothing about it is malware. The controls converge on a small set, with multi-factor authentication the one that appears against all four, because it separates knowing a password from being able to log in.
+Valid Accounts is what turns an acquired password into access, persistence and privilege, and it is hard to detect precisely because nothing about it is malware. The controls converge on a small set, with multi-factor authentication, password policies and account use policies appearing against all four, and multi-factor authentication the strongest because it separates knowing a password from being able to log in.
 
 ![Mindmap of the four ATT&CK techniques covering Brute Force and its sub-techniques, Password Guessing, Password Spraying, Valid Accounts and its account types, and the shared defensive controls]({{site.url_complet}}/assets/article/securite/mitre-attack/2026-09-09-mitre-valid-accounts-brute-force-mindmap.png)
 
@@ -220,7 +220,7 @@ Online guessing and spraying interact with a live service, so every attempt prod
 
 **Q: Which single control most reduces exposure across all four techniques?**
 
-Multi-factor authentication. It is the only mitigation ATT&CK lists against all four, because it breaks the assumption every one of them relies on: that a correct password equals access. An adversary can still guess, spray, crack or steal a password, but without the second factor the credential does not authenticate. It must be paired with password policies and cross-account monitoring, because MFA reduces the value of a stolen password without stopping the attempts that produce failure telemetry.
+Multi-factor authentication. ATT&CK lists it against all four, as it does Password Policies and Account Use Policies, and it stands out because it breaks the assumption every one of them relies on: that a correct password equals access. An adversary can still guess, spray, crack or steal a password, but without the second factor the credential does not authenticate. It must be paired with password policies and cross-account monitoring, because MFA reduces the value of a stolen password without stopping the attempts that produce failure telemetry.
 
 **Q: A burst of failed logins hits one account, then stops. Guessing or spraying?**
 

@@ -167,7 +167,7 @@ A complete analysis of a confidential vault still has gaps:
 
 ## Conclusion
 
-A Zama confidential vault is a public Morpho vault with a confidential layer in front of it. Most of a risk analysis carries over unchanged. Three parts do not:
+A Zama confidential vault is a public Morpho vault with a confidential layer in front of it. Most of a risk analysis carries over unchanged. Part by part:
 
 - **Losses are unchanged.** Bad debt in a market lowers the share price, and confidential shares lose pro rata like any others.
 - **The holder structure changes.** The cShare is a pool of depositors, not one holder: it must be skipped when picking a representative depositor, and it must not be counted as a fast holder in a run.

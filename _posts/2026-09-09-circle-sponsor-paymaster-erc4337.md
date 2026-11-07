@@ -179,7 +179,7 @@ The owner holds a wide set of powers, and the pause modifier covers more functio
 - **A paused paymaster cannot be topped up.** Both `deposit()` and the `receive()` fallback are gated, and the test suite asserts that a plain ETH transfer to a paused contract fails.
 - **It cannot be drained either.** `withdrawTo` is gated too, so a pause freezes the deposit in both directions until the owner unpauses.
 
-The one function that stays open is the upgrade path: `_authorizeUpgrade` carries `onlyOwner` and no pause check.
+The owner can still unpause and transfer ownership, and the upgrade path also stays open: `_authorizeUpgrade` carries `onlyOwner` and no pause check.
 
 The contract emits no events of its own. Adding or removing a verifying signer, the single most security-relevant state change available, produces no log. Monitoring signer rotation, or reconstructing the history of the set after the fact, means reading `getAllSigners()` on a schedule or decoding calldata.
 
@@ -275,7 +275,7 @@ Three things:
 
 **Q: Why does this contract need to be staked, when its deposit is what pays for gas?**
 
-Deposit and stake answer different questions. The deposit is the money the EntryPoint debits for gas. The stake is collateral that ERC-7562 requires before an entity may read its **own** storage during the validation phase, because such an entity can invalidate many pending operations at once with a single state change and a bundler needs something to slash against.
+Deposit and stake answer different questions. The deposit is the money the EntryPoint debits for gas. The stake is locked ETH that ERC-7562 requires before an entity may read its **own** storage during the validation phase, because such an entity can invalidate many pending operations at once with a single state change, and the lock-up makes such an entity costly to recreate once throttled. The stake is never slashed.
 
 `_validatePaymasterUserOp` calls `verifyingSigners.contains(recovered)`, a read of the paymaster's own storage, so a conforming bundler will reject its operations if it is unstaked. Funding without staking produces a paymaster that looks solvent and is never used.
 

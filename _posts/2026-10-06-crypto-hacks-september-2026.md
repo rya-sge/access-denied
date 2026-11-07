@@ -257,14 +257,14 @@ The Long bridge case shows that a bridge's trust boundary includes its data prov
 
 ### The Cosmos EVM tail
 
-A Cosmos EVM underflow bug, patched publicly in May but not released until 19 August, kept producing losses. Cosmos Labs' [post-mortem](https://github.com/cosmos/security/blob/main/communications/cosmos_evm_GHSA-7g4w-cg88-2cq2_post_mortem.md) describes an unchecked underflow in `SubBalance`, reached through vesting-account delegation and chained with an overflow; six chains were exploited between 20 and 25 August, for about $5.72M, and the team acknowledges it misjudged the severity and patched silently. These are **August incidents and are not counted in the September figures** above; they appear here because Rekt News published its post-mortems in the first half of September, with the publication date in brackets:
+A Cosmos EVM underflow bug, patched publicly in May but not released until 19 August, kept producing losses. Cosmos Labs' [post-mortem](https://github.com/cosmos/security/blob/main/communications/cosmos_evm_GHSA-7g4w-cg88-2cq2_post_mortem.md) describes an unchecked underflow in `SubBalance`, reached through vesting-account delegation and chained with an overflow; six chains were exploited between 20 and 25 August, attackers sold about $5.72M of the stolen tokens (about $2.87M on DEXes and an estimated $2.85M on centralised exchanges), and the team acknowledges it misjudged the severity and patched silently. These are **August incidents and are not counted in the September figures** above; they appear here because Rekt News published its post-mortems in the first half of September, with the publication date in brackets:
 
 - **MANTRA** (exploited 20 Aug, published 31 Aug): 720,923,967.99 MANTRA, about $3.6M; 94.7% had reached an exchange before the halt. MANTRA's [own statement](https://x.com/MANTRA_Chain/status/2093311678205374867) confirms the Cosmos EVM vulnerability and states that no validator key, admin key or multisig signer was compromised.
 - **TAC** (1 Sep): 2.985B TAC (~$7.5M) from its bonded-token pool; the chain halted four hours too late.
 - **KiiChain** (2 Sep): 148.3M KII (~$9.7M at pre-exploit price); 54.4% immobilised on-chain, the rest bridged to BNB Chain.
 - **Nesa** (11 Sep): 257.7M NES (nominally ~$50M) bridged to Ethereum; Bubblemaps estimated the attacker's net profit at ~$60k after slippage.
 
-The Nesa figure shows how far nominal and realisable losses can diverge for an illiquid token.
+The TAC and KiiChain figures value the tokens taken, not what they fetched: Cosmos Labs reports about 1.2085B TAC swapped for 950,293 USDT and 64.6M KII for 1,607,323 USDT. The Nesa figure shows how far nominal and realisable losses can diverge for an illiquid token.
 
 ## Smart contract vulnerabilities
 
@@ -374,7 +374,7 @@ The table records, for the main incidents, what the affected project itself publ
 | Liquid Network | [Blockstream assessment](https://blog.blockstream.com/liquid-network-security-incident-assessment/), [status page](https://status.blockstream.com/incidents/b8b719f3-db70-4487-9cff-946e69509228), [Elements v23.3.4](https://github.com/ElementsProject/elements/releases/tag/elements-23.3.4) | Two cache-key bugs; about 4,000 BTC pegged out through SideSwap; 3,400 BTC returned, about 598.5 BTC outstanding; three-stage recovery plan ([incident report](https://x.com/Liquid_BTC/status/2097404704028545175), [release update](https://x.com/Liquid_BTC/status/2097695714310521331) on X). |
 | D'CENT Wallet | [App Wallet incident report](https://store.dcentwallet.com/blogs/post/app-wallet-incident-report) | App Wallet before 8.1.0 only; root cause and loss withheld. |
 | Chainflip | [TRON USDT exploit post-mortem](https://chainflip.io/blog/tron-usdt-exploit-what-happened-and-what-happens-next) | Six unauthorised payouts, 736,442.17 USDT; users to be made whole. |
-| Cosmos EVM (August) | [Cosmos Labs post-mortem](https://github.com/cosmos/security/blob/main/communications/cosmos_evm_GHSA-7g4w-cg88-2cq2_post_mortem.md) | Underflow via vesting delegation; six chains; ~$5.72M. |
+| Cosmos EVM (August) | [Cosmos Labs post-mortem](https://github.com/cosmos/security/blob/main/communications/cosmos_evm_GHSA-7g4w-cg88-2cq2_post_mortem.md) | Underflow via vesting delegation; six chains; ~$5.72M sold. |
 | Astroport, Drop (Neutron) | [Final post-mortem by Solva, Neutron's security maintainer (on X)](https://x.com/crypto_crew/status/2104924316357841306) | One attack via governance proposal 9 and a bought vote; ~$6.24M withdrawn, ~$4.01M secured, ~$2.23M net loss; contracts restored on 25 September. |
 | AtomicQueue (ether.fi Liquid) | [CEO replies on X](https://x.com/MikeSilagadze/status/2098361664500298092) | Legacy Veda contract approved by a few users; issue resolved; affected users to be reimbursed; no written post-mortem. |
 | Notional Finance | [V1 exploit post-mortem (on X)](https://x.com/NotionalFinance/status/2097463462062408152) | Integer overflow around `mintfCashPair`; ~1.65M USDC and 69K DAI from the legacy V1 Escrow, deprecated since 2022; contract paused; no recovery yet. |

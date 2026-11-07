@@ -316,7 +316,7 @@ Its signature is validated, deduplicated and recorded, and `KeygenResponse` is e
 
 **Q: Could two different key materials both reach the threshold?**
 
-Not for the same request. Tallies are per digest, but `isRequestDone` is per request and is set by whichever digest crosses first. A second group agreeing on different material afterwards would find the request already closed. For that to be a problem at all, more than the threshold of nodes would have to have produced material inconsistent with the others.
+Not for the same request. Tallies are per digest, but `isRequestDone` is per request and is set by whichever digest crosses first. A second group agreeing on different material afterwards would find the request already closed. For that to be a problem at all, at least the threshold of nodes would have to have produced material inconsistent with the others.
 
 **Q: Is the evaluation key a secret held by the coprocessors?**
 

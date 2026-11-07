@@ -156,7 +156,7 @@ The initial allocation of decisions is:
 | Validator membership | Circle decides |
 | Treasury and budgets | Circle, with transparency obligations |
 
-The code matches the present-day column:
+Domain by domain, the code today shows:
 
 - **Economic parameters.** Every parameter the whitepaper would hand to token holders is set by a single `controller` of `ProtocolConfig` (`updateFeeParams`, `updateConsensusParams`, `updateBlockGasLimit`). The mainnet genesis fixes that controller as one externally owned account. ADR-0003 describes `ProtocolConfig` as a "governance smart contract", but the contract contains no voting logic.
 - **Validator membership.** Membership and voting power belong to the `PermissionedValidatorManager` owner and its controllers.

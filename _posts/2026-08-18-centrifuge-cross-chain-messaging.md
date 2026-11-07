@@ -350,7 +350,7 @@ The items below are the properties an n-of-m cross-chain messaging layer has to 
 | ☐ | Counters, not booleans, so byte-identical payloads accumulate independently. | Two legitimate identical requests are merged and one is silently dropped. |
 | ☐ | Changing the adapter set invalidates votes accumulated under the old set. | A newly installed adapter inherits the positional votes of the one it replaced. |
 | ☐ | An adapter must be registered for the exact destination chain and pool whose message it delivers. | An adapter authorised for one pool injects messages on behalf of another. |
-| ☐ | Deployments with a threshold of one are treated as trusted-transport deployments, not verified ones. | A configuration that bypasses the vote path entirely is mistaken for an n-of-m guarantee. |
+| ☐ | Deployments with a quorum of one are treated as trusted-transport deployments, not verified ones. | A configuration that bypasses the vote path entirely is mistaken for an n-of-m guarantee. |
 
 #### Message authenticity and scope
 
@@ -411,7 +411,7 @@ So that provenance can be checked from the message alone. The top 16 bits of the
 
 The guarantee is that `threshold` of the configured adapters must be compromised or must independently deliver a forged payload. That is weakest when the transports are not as independent as they appear, so the first thing to check is the actual configuration rather than the code.
 
-- The quorum and threshold for the pool and destination in question, since a threshold of one skips the vote path entirely and a threshold equal to one out of two is barely stronger.
+- The quorum and threshold for the pool and destination in question, since a quorum of one skips the vote path entirely and a threshold equal to one out of two is barely stronger.
 - How many configured adapters are genuinely distinct systems, as opposed to different products sharing validators, relayers, or an underlying attestation service.
 - Where `recoveryIndex` sits, because adapters above it are standby transports and should not be counted toward everyday security.
 - Whether the recovery adapter's authority is held by the same entity that controls the guardian, which would collapse two supposedly separate recovery paths into one.

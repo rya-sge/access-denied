@@ -155,7 +155,7 @@ Morpho's API raises comparable warnings on a vault: `bad_debt_unrealized`, `time
 
 ## A watcher built on these signals
 
-The prototype is a Python command-line tool, written for this analysis, that follows one vault block by block using only keyless public endpoints. Its loop has five steps:
+The prototype is a Python command-line tool, written for this analysis, that follows one vault block by block using only keyless public endpoints. Its loop has six steps:
 
 ```mermaid
 flowchart LR

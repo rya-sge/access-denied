@@ -161,7 +161,7 @@ sequenceDiagram
         TM->>TM: reduce debt and coll at price P
     end
     TM->>AP: send ETH minus redemption fee
-    TM->>R: ETH; LUSD burned
+    TM->>R: ETH, LUSD burned
 ```
 
 The redemption fee is paid in ETH and goes to LQTY stakers:
