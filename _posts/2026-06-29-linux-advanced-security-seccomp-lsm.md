@@ -2,7 +2,7 @@
 layout: post
 title: Advanced GNU/Linux Security - SECCOMP and Linux Security Modules (LSM)
 date:   2026-06-29
-last_modified_at: 2026-06-30
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: linux security
@@ -19,6 +19,18 @@ The base GNU/Linux security primitives (authentication, file permissions, ACLs, 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## What you need to know first
+
+The article assumes the basics of Linux (processes, file permissions, root) and relies on these mechanisms without developing them:
+
+- **Base security primitives.** File permissions, ACLs, extended attributes and capabilities form the discretionary layer that SECCOMP and LSM extend. [GNU/Linux Base Security Primitives]({{site.url_complet}}/2026/06/29/linux-base-security-primitives/) covers them, and this article is the second part of that series.
+- **System call numbers.** The kernel identifies each system call by a number, and that numbering differs between CPU architectures. A seccomp filter matches these numbers, which is why a filter written for one architecture does not carry over to another. [System Calls, Binary Images and Processes]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/) explains how a call enters the kernel.
+- **BPF (Berkeley Packet Filter).** A small virtual machine inside the kernel, first used to filter network packets for tools such as `tcpdump`. seccomp-bpf reuses it to run a filter program on each system call.
+- **Inodes, paths and hard links.** A file's data and metadata live in an inode, and a path is a directory entry that points to it. Several hard links can name the same inode. SELinux puts its labels on inodes and AppArmor writes its rules on paths, and most differences between the two follow from that choice.
+- **Extended attributes.** Name-value pairs stored with an inode by the filesystem. SELinux keeps each file's security context in one of them.
+- **Capabilities.** Root's privileges split into separate units such as `CAP_NET_ADMIN` or `CAP_SETUID`, which a process can hold individually. AppArmor profiles list the capabilities a confined program may use.
+- **ptrace.** The system call that lets one process inspect and control another, used by debuggers and by `strace`. The Yama module restricts it.
 
 ## How Programs Talk to the Kernel
 
@@ -212,6 +224,30 @@ This is the MULTICS syndrome: the simplicity that made UNIX practical is gradual
 
 ![Advanced GNU/Linux security mindmap]({{site.url_complet}}/assets/article/securite/linux-advanced-security/2026-06-29-linux-advanced-security-seccomp-lsm.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **System call (syscall)** | A synchronous request from a process into the kernel to perform a privileged operation, such as `write`. |
+| **Signal** | An asynchronous POSIX notification delivered to a process, such as `SIGKILL` or `SIGSEGV`. |
+| **SECCOMP strict mode (mode 1)** | The original SECCOMP, which confines a process to `exit`, `sigreturn`, `read` and `write` on already-open descriptors and kills it on any other call. |
+| **seccomp-bpf (mode 2)** | SECCOMP with a BPF filter program, written by the developer, that the kernel runs on each system call to choose a verdict. |
+| **SIGSYS** | The signal a seccomp filter can raise instead of letting a refused system call run. |
+| **Discretionary Access Control (DAC)** | Access decided by the identity of subjects and groups, where a holder of a permission can pass it on; the standard UNIX model. |
+| **Mandatory Access Control (MAC)** | Access decided by a central policy on security attributes of files and processes, which the owner, root included, cannot override. |
+| **TCSEC (Orange Book)** | The 1983 US Department of Defense criteria that define the DAC and MAC vocabulary. |
+| **Linux Security Modules (LSM)** | The kernel's neutral hook framework, consulted after the DAC check, on which MAC modules such as SELinux and AppArmor are built. |
+| **LSM stacking** | Running one comprehensive MAC module alongside targeted modules such as Yama or LoadPin. |
+| **Security context** | The SELinux label `user:role:type:range` attached to every file and process, shown by `ls -Z` and `ps -Z`. |
+| **Type enforcement** | The SELinux rule that decides access from the type of the object and the domain of the subject, not from the UID. |
+| **Domain transition** | The change of a process to a new SELinux domain when it runs an executable with a given type, such as `passwd_exec_t` to `passwd_t`. |
+| **Multi-level security (MLS)** | The SELinux policy type that adds sensitivity levels, the `range` field of the context. |
+| **SELinux boolean** | A named switch that turns a common policy behaviour on or off without editing rules, set with `setsebool`. |
+| **Permissive / complain mode** | A mode in which SELinux (permissive) or an AppArmor profile (complain) logs what it would block without blocking it. |
+| **AppArmor profile** | A text file in `/etc/apparmor.d/` that lists the paths, capabilities and network access one program may use, identified by the program's path. |
+
 ## Frequently Asked Questions
 
 **Q: What are the two channels a program uses to communicate with the kernel, and how do they differ?**
@@ -254,6 +290,20 @@ Each primitive answers a different, narrowly stated adversary model:
 Stacking these produces a powerful but complex toolkit with no single global view of risk, and the technical entropy keeps rising (the MULTICS syndrome). Because attackers increasingly start from *inside* a compromised process rather than at the perimeter, defending only the walls (the castle model) leaves the interior exposed. 
 
 The logical next step is least privilege applied in depth, then isolating processes from one another through namespaces, containers, and virtualization, which is the subject that follows this lecture.
+
+## Gaps
+
+The article follows a 2021 lecture. These points were not checked against current kernel sources or rest on the lecture alone, and should be verified before relying on them.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The article gives four filter verdicts, while the kernel documents eight return values, including `SECCOMP_RET_KILL_THREAD`, `SECCOMP_RET_USER_NOTIF`, `SECCOMP_RET_TRACE` and `SECCOMP_RET_LOG`. | `SECCOMP_RET_LOG` is the usual way to discover the syscall set a program needs, and `USER_NOTIF` lets a supervisor handle refused calls. | The return values section of the [seccomp_filter kernel documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html). |
+| The article says programs must be recompiled to embed a filter, but the kernel documentation states that children inherit their parent's filters. | A launcher, a service manager or a container runtime can install a filter before starting an unmodified program, which weakens the "recompile" trade-off. | The [seccomp_filter documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html) on inheritance, and how systemd and container runtimes apply profiles. |
+| The article does not say that installing a filter requires `PR_SET_NO_NEW_PRIVS` or `CAP_SYS_ADMIN`. | The kernel documents the rule as preventing a filter from being applied to child processes with greater privileges than the task that installed it. | The usage section of the [seccomp_filter documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html). |
+| LoadPin is described as verifying kernel modules, while the kernel documents it as requiring every file the kernel loads (modules, firmware) to come from a single filesystem. | LoadPin checks where a file comes from, not a signature, so "verifies" overstates it. | The [LoadPin documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/LoadPin.html). |
+| Landlock and the BPF LSM, added after the lecture's material, are not covered. | Landlock lets an unprivileged process sandbox itself, which changes the comparison with seccomp. | The [Landlock documentation](https://docs.kernel.org/userspace-api/landlock.html) and the [LSM documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/index.html). |
+| The stacking rules (one major module plus minor ones) come from the lecture and may be out of date. | Newer kernels have extended which modules can be stacked together. | The [LSM documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/index.html) and `/sys/kernel/security/lsm` on the target host. |
+| The dates (SECCOMP 2005, adoption by Chrome, OpenSSH and qemu, LSM 2002, AppArmor merged in 2010) and the MULTICS origin of SELinux MLS come from the lecture slides. | They were not checked against kernel history or project changelogs. | The kernel changelogs and each project's history, and the [TCSEC](https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/dod85.pdf) for the MLS vocabulary. |
 
 ## References
 

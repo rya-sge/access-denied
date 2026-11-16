@@ -2,7 +2,7 @@
 layout: post
 title: GNU/Linux Base Security Primitives - Authentication, Permissions, ACLs, Attributes, Capabilities
 date:   2026-06-29
-last_modified_at: 2026-06-30
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: linux security
@@ -19,6 +19,17 @@ UNIX was designed as a simplified version of MULTICS, the first operating system
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## What you need to know first
+
+The article assumes the reader knows what a process, a file permission and root are, and relies on these mechanisms without developing them:
+
+- **Kernel enforcement at the system call.** Every access a process makes to a file or a socket goes through a system call, and the kernel checks permissions, ACLs, attributes and capabilities at that point. [System Calls, Binary Images and Processes]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/) describes that boundary.
+- **Process credentials and `exec`.** Each process carries user and group IDs that the kernel uses for access checks, and `exec` replaces the program while keeping or changing those credentials. SUID, SGID and file capabilities all act at `exec`; [The Process Control Block, fork/exec/waitpid/exit and the Context Switch]({{site.url_complet}}/2026/09/16/process-control-block-fork-exec-context-switch/) covers the call.
+- **Inode metadata.** A file's owner, group, mode bits, ACL and attribute flags are stored with its inode by the filesystem, not in the file's data. This is why several primitives below depend on the filesystem and can be lost when a file is copied.
+- **Directory permissions.** On a directory, `r` lists names, `x` allows traversal, and `w` allows creating, renaming and deleting entries, whoever owns them. The sticky bit exists to narrow that last right.
+- **Password storage.** Accounts are listed in `/etc/passwd`, and their password hashes sit in the root-only `/etc/shadow`, which a login process compares against the hash of what the user typed.
+- **Privileged ports and raw sockets.** By default only root may bind TCP or UDP ports below 1024 or open raw sockets that read and forge whole packets. The network capabilities in the last section split exactly these rights out of root.
 
 ## GNU/Linux in One Paragraph
 
@@ -248,6 +259,32 @@ The base security of GNU/Linux is a stack of primitives layered over a deliberat
 
 ![GNU/Linux base security mindmap]({{site.url_complet}}/assets/article/securite/linux-base-security/2026-06-29-linux-base-security-primitives.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Adversary model** | The statement of who the attacker is and what they can do, against which a primitive is judged. |
+| **Least privilege** | The principle of granting a user or program only the rights its task needs, and only for as long as it needs them. |
+| **Shared secret** | What a login process verifies to authenticate a user: a password, a cryptographic key or a fingerprint. |
+| **PAM** | Pluggable Authentication Modules, a framework that lets an administrator compose authentication steps without changing each application. |
+| **Permission class** | One of the three groups a POSIX mode assigns rights to: owner (`u`), group (`g`) and other (`o`). |
+| **First matching class** | The rule by which the kernel uses only the bits of the first class that matches the caller, without combining classes. |
+| **Real and effective UID** | The real UID identifies who started a process; the effective UID is the one used for permission checks. |
+| **SUID** | A mode bit that makes a program run with the effective UID of the file's owner instead of the caller's. |
+| **SGID** | On a file, runs the program with the file's group; on a directory, makes new entries inherit the directory's group. |
+| **Sticky bit** | On a directory, restricts renaming and deleting entries to their owner, as on `/tmp`. |
+| **POSIX ACL** | A list of per-user and per-group access entries attached to a file or directory, managed with `getfacl` and `setfacl`. |
+| **ACL mask** | An ACL entry that caps the effective rights of all named users, named groups and the owning group. |
+| **Default ACL** | The `default:` entries of a directory, which become the starting ACL of files created inside it. |
+| **Extended attributes** | In this article, the filesystem flags managed with `lsattr` and `chattr`, such as immutable and append-only. |
+| **Immutable flag (`i`)** | A flag that forbids modifying, deleting, renaming or linking a file; root can clear it. |
+| **Append-only flag (`a`)** | A flag that allows data to be added to a file but not overwritten or truncated, suited to logs. |
+| **Capability** | One of about forty units into which Linux splits root's privileges, each grantable to a file or a process on its own. |
+| **Capability sets** | The Permitted, Effective and Inheritable sets attached to a process, which decide which capabilities it may use, uses now, and passes across `exec`. |
+| **`CAP_SYS_ADMIN`** | An overloaded capability that bundles so many operations that holding it is close to holding root. |
+
 ## Frequently Asked Questions
 
 **Q: Why is telnet considered unsuitable for authentication on untrusted networks, and what replaced it?**
@@ -274,6 +311,21 @@ The mask is an upper bound on the rights granted by all named-user, named-group,
 
 A SUID-root `tcpdump` runs with the entire root privilege set merely to open raw sockets, so a flaw in it gives an attacker all of root. Capabilities decompose root into independent units, so `setcap cap_net_raw+ep /usr/bin/tcpdump` grants only `CAP_NET_RAW`, the single right packet capture needs. The program never holds root, and a compromise is bounded by that one capability instead of escalating to full system control. This is least privilege made concrete: the privilege granted matches the task instead of the all-or-nothing root/user duality that SUID depends on. The caveat is that some capabilities (such as `CAP_SYS_ADMIN`) are broad enough to approach root again, so the choice of capability still matters.
 
+## Gaps
+
+The article follows a lecture, and these points were not checked against current kernel documentation or rest on general knowledge.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The lecture slides behind the article are not public, so most claims rest on them alone. | A reader cannot check the source of the adversary models and trade-offs. | The man pages cited below, for each primitive. |
+| The article lists three capability sets, but current kernels also have the Bounding and Ambient sets (Ambient since Linux 4.3). | The process model described is incomplete for modern systems. | The "Thread capability sets" section of [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html). |
+| "Roughly forty" capabilities is approximate: the current page lists 41, and the exact number depends on the kernel version. | A precise count changes as kernels add capabilities such as `CAP_BPF` or `CAP_PERFMON`. | [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html) and `/proc/sys/kernel/cap_last_cap` on the target system. |
+| The `c` (compressed) and `s` (secure deletion) flags are presented as working, but chattr(1) says ext2, ext3 and ext4 do not honour them in mainline kernels. | A reader may rely on `s` for secure deletion on a filesystem that ignores it. | The "Bugs and limitations" section of [chattr(1)](https://man7.org/linux/man-pages/man1/chattr.1.html). |
+| "Extended attributes" here means the `chattr` flags, which Linux also calls inode flags; the name usually refers to the separate `xattr` key-value mechanism (`getfattr`, `setfattr`). | The two mechanisms are easily confused, and POSIX ACLs are themselves stored as `xattr`s. | [chattr(1)](https://man7.org/linux/man-pages/man1/chattr.1.html) and [xattr(7)](https://man7.org/linux/man-pages/man7/xattr.7.html). |
+| The limit of 32 ACL entries on ext2/ext3 comes from the lecture; [acl(5)](https://man7.org/linux/man-pages/man5/acl.5.html) states no limit. | The real limit depends on the filesystem and its block size. | The documentation of the filesystem in use. |
+| "Root can clear" the `i` and `a` flags holds because root normally has `CAP_LINUX_IMMUTABLE`; the article does not discuss removing it. | Dropping that capability from the bounding set changes the conclusion that the flags never resist root. | The `CAP_LINUX_IMMUTABLE` entry of [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html). |
+| Kernel restrictions on SUID, such as the `nosuid` mount option and the `no_new_privs` flag, are not covered. | They are the usual mitigations for the SUID risk the article describes. | [mount(8)](https://man7.org/linux/man-pages/man8/mount.8.html) and [prctl(2)](https://man7.org/linux/man-pages/man2/prctl.2.html) (`PR_SET_NO_NEW_PRIVS`). |
+
 ## References
 
 - HEIG-VD - "Sécurité des systèmes d'exploitation"
@@ -281,8 +333,11 @@ A SUID-root `tcpdump` runs with the entire root privilege set merely to open raw
 - [OpenSSH](https://www.openssh.com/)
 - [Linux PAM](https://github.com/linux-pam/linux-pam)
 - [capabilities(7) — man7.org](https://man7.org/linux/man-pages/man7/capabilities.7.html)
-- [acl(5) — man7.org](https://man7.org/linux/man-pages/man7/acl.5.html)
+- [acl(5) — man7.org](https://man7.org/linux/man-pages/man5/acl.5.html)
 - [chattr(1) — man7.org](https://man7.org/linux/man-pages/man1/chattr.1.html)
+- [xattr(7) — man7.org](https://man7.org/linux/man-pages/man7/xattr.7.html)
+- [mount(8) — man7.org](https://man7.org/linux/man-pages/man8/mount.8.html)
+- [prctl(2) — man7.org](https://man7.org/linux/man-pages/man2/prctl.2.html)
 - [Claude Code](https://claude.com/product/claude-code)
 
 ### Related articles

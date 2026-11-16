@@ -47,7 +47,7 @@ Section 5.1 sets the following constraints:
 - the key shall be used **only for CCM**;
 - the total number of block cipher invocations under one key shall not exceed $$2^{61}$$.
 
-Only the *forward cipher function* $$\mathrm{CIPH_K}$$ is ever used, for both encryption and decryption. An AES-CCM implementation never needs the AES inverse cipher.
+A block cipher has two functions under a key $$K$$: the *forward cipher function* $$\mathrm{CIPH_K}$$, which encrypts one block (AES encryption of 128 bits), and the *inverse cipher function* $$\mathrm{CIPH_K^{-1}}$$, which undoes it. CCM uses only $$\mathrm{CIPH_K}$$, for both encryption and decryption, so an AES-CCM implementation never needs AES decryption.
 
 ## The two primitives inside CCM
 
@@ -379,7 +379,7 @@ The design is sequential and requires the message length in advance. In exchange
 | Term | Definition |
 |------|------------|
 | **Block cipher** | A keyed family of permutations on fixed-length bit strings; CCM requires one with a 128-bit block, in practice AES. |
-| **Forward cipher function** | The direction of the block cipher used by CCM, written CIPH_K; the inverse cipher is never needed. |
+| **Forward cipher function** | The block cipher in its encryption direction, written CIPH_K: it maps one 128-bit block to another under the key K. Its inverse, CIPH_K⁻¹, is block decryption. CCM calls only CIPH_K, even when decrypting, so AES-CCM needs no AES decryption code. |
 | **Mode of operation** | An algorithm that uses a block cipher to protect data longer than one block. |
 | **Authenticated encryption (AEAD)** | A scheme providing confidentiality and authenticity together, with optional associated data that is authenticated only. |
 | **Payload** | The data that CCM both encrypts and authenticates, denoted P. |

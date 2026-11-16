@@ -2,7 +2,7 @@
 layout: post
 title: Linux Isolation Primitives - Defense in Depth Beyond the Castle Model
 date:   2026-06-29
-last_modified_at: 2026-06-30
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: linux security
@@ -19,6 +19,18 @@ Classical operating-system security follows a castle model: walls are raised aro
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## What you need to know first
+
+The article relies on these mechanisms without developing them:
+
+- **System calls.** A program asks the kernel for every privileged action through a system call, and `mount`, `chroot`, `clone`, `unshare` and `setns` in this article are all system calls. [System Calls, Binary Images and Processes]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/) explains how a program reaches the kernel.
+- **The SUID bit.** A set-user-ID executable runs with the identity of its owner rather than that of the caller, so a SUID binary owned by root runs as root. The `nosuid` mount option and the `firejail` listing both concern this bit, which [GNU/Linux Base Security Primitives]({{site.url_complet}}/2026/06/29/linux-base-security-primitives/) describes.
+- **Capabilities.** Linux splits the privileges of root into separate units that can be granted or dropped one by one. "A privileged operation, available through the relevant capability" and the capability-dropping step of the container workflow refer to them; the same base-primitives article covers them.
+- **seccomp and Linux Security Modules.** seccomp filters the system calls a process may issue, and LSMs such as AppArmor and SELinux add mandatory access control on top of file permissions. This article treats both as the earlier, heavier mechanisms; [Advanced GNU/Linux Security - SECCOMP and LSM]({{site.url_complet}}/2026/06/29/linux-advanced-security-seccomp-lsm/) develops them.
+- **File descriptors.** A process holds each open file or directory as a small integer, its file descriptor. The chroot escape described below relies on a descriptor to a directory outside the new root; [File Descriptors, the IPC Subsystem and Pipes]({{site.url_complet}}/2026/09/16/file-descriptors-ipc-pipes/) covers them.
+- **Process creation with clone.** A new process is created by duplicating an existing one, and `clone` is the Linux system call behind `fork` that also takes flags selecting what the child shares with its parent. [The Process Control Block, fork/exec/waitpid/exit and the Context Switch]({{site.url_complet}}/2026/09/16/process-control-block-fork-exec-context-switch/) describes the duplication.
+- **Trusted computing base (TCB).** The set of components whose failure breaks the security of everything that depends on them. The article orders isolation techniques by how much of it, mainly the kernel, the isolated workloads share.
 
 ## From Perimeter Defense to Internal Isolation
 
@@ -166,6 +178,29 @@ Linux offers a graduated set of isolation primitives, from the trivial to the in
 
 ![Linux isolation primitives mindmap]({{site.url_complet}}/assets/article/virtualization/linux-isolation/2026-06-29-linux-isolation-primitives-defense-in-depth.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Castle model** | A security posture that guards the perimeter and its entry points and treats everything inside as trusted. |
+| **Defense in depth** | A strategy that adds internal barriers so that one compromised component does not give control of the whole system. |
+| **Adversary model** | The statement of what an attacker can do, against which a defense is evaluated; also called a threat model. |
+| **Trusted computing base (TCB)** | The components whose failure breaks the security of everything relying on them; here, mainly the shared kernel or hypervisor. |
+| **Mount options** | Restrictions applied when a filesystem is attached (`nosuid`, `noexec`, `nodev`, `ro`) that neutralise SUID bits, executables, device nodes or writes on that volume. |
+| **chroot** | A system call that gives a process a new apparent root directory; it restricts the filesystem view but is not a security boundary against a root process. |
+| **Netfilter** | The in-kernel framework that filters and routes network traffic, driven from userspace by tools such as `iptables`, `nftables` and `ufw`. |
+| **Control group (cgroup)** | A hierarchical grouping of processes whose consumption of CPU, memory, I/O, process count or device access is accounted for and limited. |
+| **cgroup controller** | The part of cgroups that governs one resource class, such as `memory`, `pids` or `devices`. |
+| **Namespace** | A partition of one class of kernel resources (PIDs, network, mounts, hostname, IPC, users, cgroups, time) so that processes inside see only a private slice. |
+| **User namespace** | The namespace that maps user and group IDs, letting a process be root inside it while staying unprivileged on the host. |
+| **clone / unshare / setns** | The three system calls that create a process in new namespaces, move the caller into new namespaces, and join an existing namespace. |
+| **Container** | A set of processes isolated by namespaces, cgroups, seccomp, LSMs and capabilities while sharing the host kernel. |
+| **Type-2 hypervisor** | A hypervisor that runs as an application on a host operating system, each guest carrying its own full system. |
+| **Type-1 hypervisor** | A hypervisor that runs on a minimal host reduced to what virtualization and device management require, often called bare metal. |
+| **Qubes OS domain** | A virtual machine on Xen that holds the programs of one trust level, shown by the colour of its window borders. |
+
 ## Frequently Asked Questions
 
 **Q: What distinguishes the castle model from defense in depth?**
@@ -191,6 +226,20 @@ A container shares the single host kernel with every other container, so the ent
 **Q: Combining the primitives, how is a container actually assembled from them, and where does Qubes OS sit relative to that construction?**
 
 A container runtime issues `clone` or `unshare` with the new-namespace flags to give the process a private PID space, network stack, and mount table, attaches the process to a cgroup that caps CPU, memory, and process count, restructures the filesystem view with pivot_root or chroot under `nosuid`/`noexec`/`nodev` mounts, applies a seccomp filter to limit system calls, and drops capabilities before `exec`. All of this still rests on the one shared kernel. Qubes OS sits a level higher: instead of sharing a kernel, it places each trust domain in its own virtual machine on a type-1 hypervisor (Xen), so the boundary between domains is a hypervisor boundary rather than a namespace boundary, at the cost of running full guest kernels.
+
+## Gaps
+
+These points were not settled by the sources read, or come from general knowledge, and should be checked before relying on them.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The Netfilter section describes `nftables` and `bpfilter` as built on BPF, but `nftables` runs rules in its own in-kernel virtual machine. | The sentence likely misattributes the mechanism, and `bpfilter`'s current status was not checked. | [What is nftables?](https://wiki.nftables.org/wiki-nftables/index.php/What_is_nftables%3F) and the kernel history of `bpfilter`. |
+| The article is based on a 2021 lecture, which is not public, and the `/proc/cgroups` listing shows the v1 layout. | cgroup v2 is now the default on most distributions, so the controller list and hierarchy differ on a current system. | The [cgroup v2 documentation](https://docs.kernel.org/admin-guide/cgroup-v2.html) and [cgroups(7)](https://man7.org/linux/man-pages/man7/cgroups.7.html). |
+| The dates (Netfilter around 1998 to 2000, namespaces in 2002 and from 2006, Qubes OS in 2010) come from the lecture and were not checked. | A wrong date would misplace the primitives in Linux history. | The [Netfilter project](https://www.netfilter.org/), [namespaces(7)](https://man7.org/linux/man-pages/man7/namespaces.7.html) and [Qubes OS](https://www.qubes-os.org/). |
+| The chroot escape is described in general terms only. | The exact conditions (which privilege, which descriptor) decide whether a given confinement can be broken. | [chroot(2)](https://man7.org/linux/man-pages/man2/chroot.2.html), whose notes state that it is not a sandbox and require `CAP_SYS_CHROOT`. |
+| The claim that user namespaces let any user create a container leaves out distribution restrictions. | Ubuntu, for example, restricts unprivileged user namespaces through AppArmor. | [user_namespaces(7)](https://man7.org/linux/man-pages/man7/user_namespaces.7.html) and [AppArmor on Ubuntu, User Namespace Restrictions]({{site.url_complet}}/2026/10/15/apparmor-ubuntu-user-namespaces-sol2uml/). |
+| The speed ordering (containers faster than type-1, type-1 faster than type-2) is stated without measurements. | Overhead depends on the workload and on hardware-assisted virtualization. | Benchmarks for the workloads concerned; the lecture gives no figures. |
+| The description of Qubes OS as two layers of virtualization separating hardware and software concerns comes from the lecture. | The actual split (network, USB and application qubes) is what a reader would configure. | The [Qubes OS architecture](https://www.qubes-os.org/doc/architecture/) page. |
 
 ## References
 
