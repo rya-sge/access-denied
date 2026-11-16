@@ -12,7 +12,9 @@ isMath: false
 isMermaid: true
 ---
 
-Ethereum encodes the same facts twice. A validator withdrawal in block 26,341,215 exists as 35 bytes of RLP on the execution layer, where it is hashed with Keccak-256 into a Merkle-Patricia trie, and as 44 bytes of SSZ on the consensus layer, where it is merkleized with SHA-256. The two encodings give two different roots for the same list.
+Ethereum runs on two layers, and each one writes its data in its own format. The execution layer, which runs the EVM, uses RLP. The consensus layer, the beacon chain, uses SSZ. Some data belongs to both: a validator withdrawal is decided by the beacon chain and paid out by the execution layer, so the same facts are written twice, hashed with two different functions and committed under two different roots.
+
+For the first withdrawal of block 26,341,215, that means 35 bytes of RLP, hashed with Keccak-256 into a Merkle-Patricia trie, and 44 bytes of SSZ, merkleized with SHA-256.
 
 RLP asks how to write a nested value compactly. SSZ asks how to give a typed value a Merkle root in which any field can be proven and any change rehashed cheaply. This article compares them at byte level and measures size and gas on that real block. Every byte shown comes from code that first reproduced the block's hash and its beacon root, and the last section reads the fork meta EIPs to separate what is scheduled from what is only proposed.
 

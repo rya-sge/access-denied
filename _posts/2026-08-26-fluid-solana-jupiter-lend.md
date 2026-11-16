@@ -16,7 +16,7 @@ Fluid, the DeFi protocol formerly known as Instadapp, is built around a single i
 
 In 2025 that design was deployed on Solana under the name Jupiter Lend, a partnership between Fluid and Jupiter announced in May and launched in August. It is Fluid's first non-EVM deployment. The economics carried over intact: one shared reserve per token, tick-based liquidation, dynamic borrow and withdrawal ceilings. The mechanics did not, because most of the EVM features Fluid relies on have no equivalent on Solana. There is no `msg.sender` reaching a callee, no [ERC-20](https://eips.ethereum.org/EIPS/eip-20) allowance the pool can draw on, no reentrant callback, no `mapping` that materialises storage on first write, and no way to touch an account a transaction did not name in advance.
 
-This article reads the six [Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/) programs that make up the Solana deployment and looks specifically at the seams: which parts of the EVM design survived the port unchanged, which had to be rebuilt around Solana's account model, and what an integrator or a reviewer should know about the mechanisms that only exist on this side.
+This article reads the six [Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/) programs that make up the Solana deployment and compares each mechanism with its EVM original: which parts of the EVM design survived the port unchanged, which had to be rebuilt around Solana's account model, and what an integrator or a reviewer should know about the mechanisms that only exist on this side.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 

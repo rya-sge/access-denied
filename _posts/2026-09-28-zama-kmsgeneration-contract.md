@@ -14,7 +14,7 @@ isMermaid: true
 
 The Zama protocol encrypts every value under one global FHE public key, computes on ciphertexts with an evaluation key, and decrypts through thirteen organisations that each hold a share of the private key. Somebody has to decide that a key exists, which one is current, and where its public material can be downloaded — and that decision cannot live in a configuration file, because every contract on every supported chain depends on it.
 
-It lives in a 1,000-line Solidity contract on the Gateway chain, `KMSGeneration.sol`. It is the seam between two very different worlds: a multi-party cryptographic ceremony that happens entirely off-chain, and a smart contract that must record the outcome in a way anyone can check. The contract never touches key material. What it does is decide *when thirteen independent parties have said the same thing*, and publish what they said.
+It lives in a 1,000-line Solidity contract on the Gateway chain, `KMSGeneration.sol`. It records the outcome of a multi-party cryptographic ceremony that happens entirely off-chain, in a form anyone can check. The contract never touches key material. What it does is decide *when thirteen independent parties have said the same thing*, and publish what they said.
 
 Two earlier articles set the scene: the [architecture article]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/) placed the KMS in the protocol, and the [KMS article]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/) opened its repository. This one reads the contract that drives it from the chain.
 
