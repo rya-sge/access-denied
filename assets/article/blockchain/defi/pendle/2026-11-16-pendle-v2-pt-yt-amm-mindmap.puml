@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* How Pendle V2 works
+** SY wrapper
+*** exchangeRate = asset per SY
+*** narrow token-out set
+*** pausable, upgradeable
+** PT + YT split
+*** mintPY: SY x pyIndex PT and YT
+*** pyIndex never decreases
+*** YT accrues interest in SY
+*** post-expiry yield to treasury
+** Market AMM (PT / SY)
+*** logit curve, rateScalar = scalarRoot / tau
+*** rateAnchor re-solved each trade
+*** ln implied rate stored
+*** fee on the rate, reserve share
+*** 96 % PT cap, rate >= 0
+** PT price
+*** e^(-r tau) without trades
+*** 1 asset at expiry if SY solvent
+*** no AMM after expiry
+left side
+** Oracles
+*** TWAP of ln implied rate
+*** cardinality, 900-1800 s windows
+*** linear discount 1 - d tau
+*** price to SY, not asset
+** Router V4
+*** zaps, binary search, aggregator
+*** YT via flash swaps
+** PT as collateral
+*** Morpho Blue base feed
+*** pool depth, out of range
+*** oracle choice, SY depeg
+*** pause and upgrade keys
+@endmindmap

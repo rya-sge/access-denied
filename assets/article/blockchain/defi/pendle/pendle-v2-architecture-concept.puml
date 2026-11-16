@@ -1,0 +1,37 @@
+@startuml
+title Pendle V2: SY, PT/YT and the market
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+
+rectangle "Yield token\n(sUSDe, wstETH, ERC-4626 share)" as YTK
+component "SY (StandardizedYield)\nexchangeRate() = asset per SY\npausable, upgradeable proxy" as SY
+component "YT contract (PendleYieldToken)\nholds SY, pyIndex = max(rate, stored)\nmintPY / redeemPY" as YC
+component "PT\n1 asset at expiry\n(if SY solvent)" as PT
+component "YT\ninterest + rewards until expiry" as YT
+component "PendleMarket (V7)\nPT / SY AMM, LP token\nln implied rate TWAP" as MK
+component "PendleRouterV4\n(diamond proxy)" as RT
+component "Oracles\nPendlePYLpOracle (TWAP)\nlinear-discount oracle" as OR
+component "Money market\n(Morpho Blue, Aave)" as MM
+
+YTK --> SY : deposit / redeem
+SY --> YC : SY in
+YC --> PT : mint
+YC --> YT : mint
+PT --> MK : swap PT <-> SY
+SY --> MK
+RT --> MK : swaps, flash swaps for YT
+RT --> SY : token zaps
+MK --> OR : observations
+PT ..> OR : maturity only (linear)
+OR --> MM : PT price feed
+PT --> MM : collateral
+@enduml

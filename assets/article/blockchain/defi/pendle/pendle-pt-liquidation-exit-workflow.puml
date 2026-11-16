@@ -1,0 +1,20 @@
+@startuml
+title Selling seized PT collateral (BoringPtSeller logic)
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+start
+:Liquidator receives PT from the money market;
+if (PT.isExpired()?) then (no)
+  :market.swapExactPtForSy\n(reverts if PT share > 96 % or rate < 0);
+else (yes)
+  :YT.redeemPY: PT alone,\nSY = PT / pyIndexCurrent;
+endif
+:SY.redeem into a token of getTokensOut()\n(e.g. sUSDe only for SY-sUSDe);
+:Sell the yield token for the loan token\n(DEX, or the issuer's own exit);
+:Repay the loan, keep the bonus;
+stop
+@enduml
