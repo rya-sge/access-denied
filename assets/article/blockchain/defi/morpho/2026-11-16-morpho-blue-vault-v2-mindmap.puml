@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* How Morpho works
+** Morpho Blue markets
+*** Loan, collateral, oracle, IRM, LLTV
+*** id = keccak256(params)
+*** Shares with virtual offset
+*** Immutable singleton
+** AdaptiveCurveIRM
+*** Target utilisation 90%
+*** Curve x4 above, /4 below
+*** Rate at target drifts 50/year
+** Liquidations
+*** Unhealthy when debt > collateral x LLTV
+*** LIF = min(1.15, 1/(0.3 LLTV + 0.7))
+*** Bad debt cut from supply
+** Oracle
+*** price() scaled by 1e36
+*** MorphoChainlinkOracleV2
+*** Vault rate x feeds, no staleness check
+left side
+** Vault V1 (MetaMorpho)
+*** Supply and withdraw queues
+*** One cap per market
+*** Guardian, one timelock
+** Vault V2
+*** Adapters
+*** Owner, curator, allocator, sentinel
+*** Absolute and relative caps by id
+*** Timelocks, abdication, gates
+*** forceDeallocate exit
+*** Public allocator
+** Depositor risks
+*** Oracle
+*** Collateral
+*** Curator
+*** Liquidity
+@endmindmap

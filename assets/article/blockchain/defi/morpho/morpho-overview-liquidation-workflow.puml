@@ -1,0 +1,24 @@
+@startuml
+title Morpho Blue liquidation and bad debt
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+start
+:Liquidator calls liquidate(seizedAssets or repaidShares);
+:Accrue interest, read oracle price();
+if (collateral x price x LLTV >= debt?) then (yes)
+  :revert HEALTHY_POSITION;
+  stop
+else (no)
+endif
+:LIF = min(1.15, 1 / (1 - 0.3 x (1 - LLTV)));
+:Seize collateral worth repaid debt x LIF;
+if (borrower collateral == 0 and debt left?) then (yes)
+  :Remove remaining debt from totalBorrowAssets
+  and totalSupplyAssets (bad debt);<<#FDEEEE>>
+  :Every supplier's share is worth less;
+else (no)
+endif
+:Callback (optional), then pull repaid loan assets;
+stop
+@enduml

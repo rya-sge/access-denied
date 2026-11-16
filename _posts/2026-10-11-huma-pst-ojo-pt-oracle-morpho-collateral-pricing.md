@@ -335,6 +335,7 @@ Both oracles price the collateral in the loan token directly and include no USDC
 
 ### Related articles
 
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
 - [Integrating Pyth Network Price Feeds — A Security-Focused Guide]({{site.url_complet}}/2026/03/13/pyth-integration-security/)
 - [The Unified Risk Layer for DeFi - From Price Oracles to Protocol-Owned Risk Oracles]({{site.url_complet}}/2026/07/02/defi-unified-risk-layer-llama-guard/)

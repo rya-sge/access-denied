@@ -1,0 +1,37 @@
+@startuml
+title Chainlink CCIP onchain components (EVM, v1.6 and v2.0)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF2FC
+  BorderColor #375BD2
+}
+skinparam package {
+  BorderColor #375BD2
+}
+package "Source chain" {
+  [Sender] --> [Router (source)] : ccipSend
+  [Router (source)] --> [OnRamp] : forwardFromRouter
+  [OnRamp] --> [FeeQuoter] : fees, extraArgs checks
+  [OnRamp] --> [Token pool (source)] : lockOrBurn
+  [Router (source)] ..> [TokenAdminRegistry (source)] : token -> pool
+  [OnRamp] ..> [RMN (source)] : isCursed
+}
+package "Offchain" {
+  [v1.6: Role DON\ncommit + execute plugins] as DON
+  [v2.0: CCVs\n(CommitteeVerifier, CCTP, Lombard...)] as CCV
+  [v2.0: Executors\n(permissionless)] as EXE
+}
+package "Destination chain" {
+  [OffRamp] --> [Token pool (dest)] : releaseOrMint
+  [OffRamp] --> [Router (dest)] : routeMessage
+  [Router (dest)] --> [Receiver] : ccipReceive
+  [OffRamp] ..> [RMN (dest)] : isCursed
+  [OffRamp] ..> [CCV contracts] : verifyMessage (v2.0)
+}
+[OnRamp] ..> DON : CCIPMessageSent
+[OnRamp] ..> CCV : CCIPMessageSent
+DON --> [OffRamp] : commit(root) / execute(proofs)
+CCV ..> EXE : published proofs
+EXE --> [OffRamp] : execute(message, ccvs, results)
+@enduml

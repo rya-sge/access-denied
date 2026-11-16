@@ -303,6 +303,7 @@ Each trades protection against manipulation for slower reaction to a genuine los
 
 ### Related articles
 
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
 - [Risk of Ethena's USDe and sUSDe - Backing Venues, Depeg Priors and a Leveraged PT Position]({{site.url_complet}}/2026/10/11/ethena-usde-risk-backing-venues-leveraged-positions/)
 - [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)

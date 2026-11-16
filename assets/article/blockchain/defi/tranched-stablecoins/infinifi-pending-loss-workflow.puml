@@ -1,0 +1,26 @@
+@startuml
+title infiniFi: a loss from farm mark to iUSD price
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EAF6F0
+  ParticipantBorderColor #2E8B67
+  LifeLineBorderColor #2E8B67
+}
+participant "Farm" as F
+participant "YieldSharingV3" as YS
+participant "siUSD holder" as S
+participant "iUSD holder" as I
+participant "Keeper (ACCRUE_YIELD)" as K
+F -> YS : assets() falls, unaccruedYield() < 0
+note over YS : pending loss, applied to nobody
+S -> YS : unstake through the gateway
+YS --> S : revert PendingLossesUnapplied
+I -> YS : redeem iUSD
+YS --> I : paid at the old oracle price
+K -> YS : accrue()
+alt safety buffer >= loss
+  YS -> YS : burn buffer iUSD
+else
+  YS -> YS : lockers, then siUSD, then iUSD price
+end
+@enduml

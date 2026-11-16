@@ -330,6 +330,7 @@ Morpho Blue is a single contract for all markets, so filtering by its address re
 
 ### Related articles
 
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [Vault Curator - Steak House Finance]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/)
 - [Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/)
 - [Insuring Composable DeFi - First-Loss Capital Along the Attack Graph]({{site.url_complet}}/2026/07/02/defi-composable-first-loss-capital-insurance/)

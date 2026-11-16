@@ -1,0 +1,60 @@
+@startuml
+title LayerZero V2 message lifecycle (EVM, ULN302)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #4A78B5
+  LifeLineBorderColor #4A78B5
+  ArrowColor #2F4F7F
+}
+skinparam noteBackgroundColor #FFFBEA
+skinparam noteBorderColor #B59A4A
+
+box "Source chain (eid A)" #F5F9FF
+actor User
+participant "OApp (A)" as OA
+participant "EndpointV2 (A)" as EA
+participant "SendUln302" as SL
+end box
+participant "DVNs\n(off chain)" as DVN
+participant "Executor\n(off chain)" as EX
+box "Destination chain (eid B)" #F5FFF8
+participant "ReceiveUln302" as RL
+participant "EndpointV2 (B)" as EB
+participant "OApp (B)" as OB
+participant "Composer" as CO
+end box
+
+User -> OA : send(dstEid, message, options) + native fee
+OA -> EA : send(params, refundAddress)\nchecks peers[dstEid] set, msg.value == fee
+EA -> EA : nonce = ++outboundNonce[sender][dstEid][receiver]\nguid = keccak(nonce, srcEid, sender, dstEid, receiver)
+EA -> SL : send(packet, options, payInLzToken)
+SL -> SL : split options: executor part / DVN part
+SL -> EX : assignJob (executor fee)
+SL -> DVN : assignJob on each required + optional DVN (fee_i)
+SL -> SL : treasury fee; fees[worker] += ... (withdrawn later)
+EA -> EA : emit PacketSent(encodedPacket, options, sendLib)
+EA --> User : refund msg.value minus fee
+
+note over DVN : each DVN waits its configured\nblock confirmations on chain A
+DVN -> RL : verify(header, payloadHash, confirmations)\n(one call per DVN)
+note over RL : only DVNs in the receive-side\nUlnConfig count
+
+== threshold reached: all required + optionalDVNThreshold optional ==
+
+EX -> RL : commitVerification(header, payloadHash)\n(permissionless: anyone, here the executor)
+RL -> EB : verify(origin, receiver, payloadHash)
+EB -> EB : caller is the receive library (or grace library)\npath initializable: peers[srcEid] == sender\nstore inboundPayloadHash[...][nonce]
+
+EX -> EB : lzReceive(origin, receiver, guid, message, extraData)\n(permissionless, gas from options)
+EB -> EB : _clearPayload: no gap below nonce,\nhash matches, delete slot
+EB -> OB : lzReceive(origin, guid, message, executor, extraData)
+OB -> OB : msg.sender == endpoint\norigin.sender == peers[srcEid]\n_lzReceive (app logic)
+
+opt composed message
+OB -> EB : sendCompose(to, guid, index, composeMsg)
+EX -> EB : lzCompose(from, to, guid, index, composeMsg, extraData)
+EB -> EB : check hash, mark the slot as received
+EB -> CO : lzCompose(from, guid, composeMsg, executor, extraData)
+end
+@enduml

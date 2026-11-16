@@ -261,6 +261,7 @@ Leaving forgoes 1,939 USDC of yield over 30 days and saves a loss of 29,201 USDC
 
 ### Related articles
 
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)
 - [Zama FHEVM Architecture — Components, Data Flow and What Has to Be Trusted]({{site.url_complet}}/2026/09/18/zama-fhevm-architecture-components-trust-model/)
 - [Inside the Zama KMS — Threshold Key Management for FHE, From MPC Protocol to Enclave Deployment]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/)

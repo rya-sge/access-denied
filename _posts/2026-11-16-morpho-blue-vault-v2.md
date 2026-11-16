@@ -1,0 +1,485 @@
+---
+layout: post
+title: "How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2"
+date:   2026-11-16
+lang: en
+locale: en-GB
+categories: blockchain defi ethereum
+tags: morpho defi ethereum lending oracle liquidation bad-debt erc-4626 tokenized-vault risk-management
+series: morpho
+description: "Morpho from its code: isolated Blue markets, shares, the AdaptiveCurveIRM, liquidations and bad debt, the Chainlink oracle, Vault V1 and V2, depositor risks."
+image: /assets/article/blockchain/defi/morpho/2026-11-16-morpho-blue-vault-v2-mindmap.png
+isMath: true
+isMermaid: true
+---
+
+[Morpho](https://morpho.org) is a lending protocol on Ethereum and other EVM chains, built in two layers. At the bottom, Morpho Blue is a single immutable contract that holds many small lending markets, each with one loan asset, one collateral asset and one oracle, so a failure in one market does not touch the others. On top, vaults take deposits of one asset and spread them over several of those markets, under rules that a curator sets and that depositors can read on-chain.
+
+This article walks through the whole stack once, from the code: how a Blue market is defined and accounted, how the AdaptiveCurveIRM sets the rate, how a liquidation and a bad-debt write-off work, what the standard Chainlink-based oracle computes, how Vault V1 (MetaMorpho) and Vault V2 differ, what the public allocator does, and which risks a vault depositor carries. The Morpho series on this site has one deep dive per layer; this article is the map that connects them.
+
+> This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
+
+[TOC]
+
+## What you need to know first
+
+The article assumes the reader knows what a lending protocol and a stablecoin are. A few mechanisms one level below are used without being derived:
+
+- **Overcollateralised lending.** A borrower locks collateral worth more than the loan; if the ratio of debt to collateral value (the loan-to-value, LTV) crosses a threshold, anyone may repay part of the debt and take collateral at a discount. Morpho calls that threshold the LLTV, the liquidation loan-to-value.
+- **Share-based accounting.** Instead of storing each lender's balance, a pool issues shares and stores two totals, assets and shares; interest raises the asset total, so every share is worth more without any per-user write. The [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) tokenized-vault standard is the same idea with a token interface.
+- **Utilisation.** Borrowed assets divided by supplied assets. Most lending protocols set the interest rate as a function of it, and a lender can only withdraw what is not borrowed.
+- **Price feeds.** A Chainlink-style feed exposes `latestRoundData()`, an answer with a fixed number of decimals and the time it was last updated. Feeds can be chained (asset/ETH then ETH/USD) to price an asset that has no direct feed.
+- **Fixed-point arithmetic.** Solidity has no decimals, so fractions are integers scaled by a constant: `WAD` is $$10^{18}$$, so an LLTV of 86 % is stored as $$0.86 \times 10^{18}$$, and Morpho scales oracle prices by $$10^{36}$$.
+- **Flash loans.** A loan that must be repaid within the same transaction, used here by liquidators and by the in-kind exit of Vault V2. Morpho Blue lends any token it holds for free this way.
+
+## The stack at a glance
+
+A depositor usually touches Morpho through a vault, and the vault touches Blue through an adapter. A borrower goes to a Blue market directly.
+
+```mermaid
+flowchart TD
+    D["Depositor"] -->|"deposit / redeem"| V["Vault V2 (ERC-4626 shares)"]
+    PA["Public allocator"] -->|"reallocate, allocator role"| V
+    V -->|"allocate / deallocate"| A["MorphoMarketV1AdapterV2"]
+    A -->|"supply"| M1["Blue market: wstETH / USDC"]
+    A -->|"supply"| M2["Blue market: WBTC / USDC"]
+    B["Borrower"] -->|"collateral + borrow"| M1
+    M1 --> O["Oracle: price()"]
+    M1 --> I["AdaptiveCurveIRM"]
+```
+
+Three properties hold across the stack, and the rest of the article comes back to them:
+
+- **Immutability.** Morpho Blue and the vault contracts cannot be upgraded. The Vault V2 README states it directly: "All the contracts are immutable."
+- **Isolation.** Risk is separated at the market level in Blue, and combined again, deliberately and within caps, at the vault level.
+- **Curation is a role, not the protocol.** Morpho governance only whitelists LLTVs and interest-rate models; which markets a vault uses is chosen by whoever holds the curator and allocator roles of that vault.
+
+## Morpho Blue: isolated markets
+
+### Five parameters define a market
+
+Every market lives inside one contract, `Morpho.sol`, and is defined by a `MarketParams` struct of five fields: the loan token, the collateral token, the oracle, the interest-rate model (IRM) and the LLTV. The market id is the hash of those five values, `keccak256(abi.encode(marketParams))`, so two markets that differ in any one of them (the same pair with another oracle, say) are two separate markets with separate liquidity.
+
+`createMarket` is permissionless, with two checks: the IRM and the LLTV must have been enabled by the Morpho owner, which is governance. The `morpho-protocol` reference lists nine enabled LLTVs, 0 % and the eight values of the LIF table below, and the AdaptiveCurveIRM as the only enabled IRM. Once created, nothing about a market can change: its oracle, its LLTV and its IRM are fixed for life. The owner's remaining powers over a live market are limited to a protocol fee on interest, capped at 25 % by `MAX_FEE`, and the address that receives it.
+
+The five operations are the familiar ones: `supply` and `withdraw` for lenders, `supplyCollateral`, `borrow`, `repay` and `withdrawCollateral` for borrowers, and `liquidate` for anyone. Collateral is never lent out, which is what keeps the market's accounting small: the loan token pool is the only pool. [How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/) follows each of these functions through the source.
+
+### Share accounting
+
+A market stores four totals (`totalSupplyAssets`, `totalSupplyShares`, `totalBorrowAssets`, `totalBorrowShares`) and, per user, supply shares, borrow shares and collateral. Conversions between assets and shares use a virtual offset of $$10^6$$ shares and 1 asset (`SharesMathLib`):
+
+$$
+\begin{aligned}
+\text{shares} &= \text{assets} \times \frac{\text{totalShares} + 10^6}{\text{totalAssets} + 1}
+\end{aligned}
+$$
+
+The offset makes the first deposit expensive to manipulate: donating a few wei to an empty market no longer inflates its share price. Each conversion rounds in the protocol's favour: a supplier's shares round down, a borrower's debt rounds up.
+
+Interest accrues lazily. On the first interaction with a market in a block, `_accrueInterest` asks the IRM for a per-second borrow rate, compounds it over the elapsed time with a third-order Taylor expansion of $$e^{rt} - 1$$ (`wTaylorCompounded`), and adds the result to both `totalBorrowAssets` and `totalSupplyAssets`. If a fee is set, part of that interest is minted as supply shares to the fee recipient. A borrow or a withdrawal then reverts with `INSUFFICIENT_LIQUIDITY` if it would leave more borrowed than supplied.
+
+### When a position is healthy
+
+A position is healthy when its collateral, valued at the oracle price and multiplied by the LLTV, covers its debt:
+
+$$
+\begin{aligned}
+\text{maxBorrow} &= \frac{\text{collateral} \times \text{price}}{10^{36}} \times \text{LLTV} \\
+\text{healthy} &\iff \text{maxBorrow} \geq \text{borrowed}
+\end{aligned}
+$$
+
+The borrowed amount is the borrower's shares converted to assets, rounded up. There is no separate "collateral factor" below the LLTV: a borrower may borrow up to the liquidation threshold itself, and a position one wei over it is liquidatable.
+
+## AdaptiveCurveIRM: the rate model
+
+The AdaptiveCurveIRM sets the borrow rate from the utilisation $$u$$ in two layers, read from `AdaptiveCurveIrm.sol` and its `ConstantsLib` in `morpho-blue-irm`.
+
+**The curve.** The utilisation is turned into a normalised error $$\varepsilon$$ against a 90 % target, $$\varepsilon = (u - 0.9)/0.1$$ above the target and $$\varepsilon = (u - 0.9)/0.9$$ below it, so $$\varepsilon$$ runs from $$-1$$ at zero utilisation to $$+1$$ at full utilisation. With the rate at target $$r_T$$ and a steepness $$C = 4$$:
+
+$$
+\begin{aligned}
+r(u) &= r_T \times \left(1 + k \cdot \varepsilon\right), \qquad k = \begin{cases} 1 - 1/C = 0.75 & \varepsilon \lt 0 \\ C - 1 = 3 & \varepsilon \geq 0 \end{cases}
+\end{aligned}
+$$
+
+At full utilisation the borrow rate is four times $$r_T$$, and at zero utilisation it is a quarter of it.
+
+**The adaptation.** $$r_T$$ itself moves over time, at a speed proportional to the error: $$r_T(t) = r_T(0) \cdot e^{s \varepsilon t}$$ with $$s = 50$$ per year, bounded between 0.1 % and 200 % a year. It starts at 4 % when a market is created. Computed with `qalc`, a market held at 100 % utilisation, where $$\varepsilon = 1$$, doubles its rate at target in $$\ln 2 / 50$$ years, about 5.1 days. At 95 % utilisation the doubling takes about 10.1 days, and at 45 % the rate halves in the same 10.1 days. Between two interactions, the rate returned to Blue is the average over the interval, approximated with the trapezoidal rule.
+
+The design has a consequence for lenders. A market that stays fully used does not jump to a punitive rate; it grows its rate by a factor of two every five days or so until borrowers repay or new suppliers arrive. Liquidity for withdrawals therefore returns through prices over days, not through a fixed kink.
+
+## Liquidations and bad debt
+
+### The incentive factor
+
+`liquidate` takes either the collateral to seize or the debt shares to repay, and exactly one of the two must be zero. It accrues interest, reads the oracle and reverts with `HEALTHY_POSITION` if the borrower is still healthy. The liquidator's reward is the liquidation incentive factor (LIF), fixed by the market's LLTV:
+
+$$
+\begin{aligned}
+\text{LIF} &= \min\left(1.15,\ \frac{1}{1 - 0.3 \times (1 - \text{LLTV})}\right)
+\end{aligned}
+$$
+
+The constants are `LIQUIDATION_CURSOR = 0.3` and `MAX_LIQUIDATION_INCENTIVE_FACTOR = 1.15`. A safer market (lower LLTV) pays a larger bonus, because the distance between the threshold and insolvency leaves room for it. Computed with `qalc`:
+
+| LLTV | LIF | Bonus to the liquidator |
+|---|---|---|
+| 38.5 % | 1.15 (cap; uncapped 1.226) | 15 % |
+| 62.5 % | 1.1268 | 12.7 % |
+| 77 % | 1.0741 | 7.4 % |
+| 86 % | 1.0438 | 4.4 % |
+| 91.5 % | 1.0262 | 2.6 % |
+| 94.5 % | 1.0168 | 1.7 % |
+| 96.5 % | 1.0106 | 1.1 % |
+| 98 % | 1.0060 | 0.6 % |
+
+There is no close factor: one call may repay the whole debt. There is no protocol cut either, and no auction; the first transaction to land wins.
+
+A worked example, at LLTV 86 %. A borrower has collateral worth 100,000 USDC at the oracle price and owes 87,000 USDC, an LTV of 87 %, so the position is liquidatable. A liquidator repays the full 87,000 and seizes collateral worth $$87{,}000 \times 1.0438 \approx 90{,}814$$ USDC. The borrower keeps about 9,186 USDC of collateral and no debt; the liquidator's gross margin is about 3,814 USDC, before swap costs and gas.
+
+### When the collateral runs out
+
+The same arithmetic shows where liquidation stops working. Seizing all the collateral repays at most collateral value divided by LIF; at LLTV 86 %, that is 95.8 % of the collateral value. A position whose debt exceeds that figure cannot be cleared by liquidation alone.
+
+Blue handles that case in the same call. If a liquidation leaves the borrower with zero collateral and some debt, the remaining borrow shares are erased, and their asset value is subtracted from both `totalBorrowAssets` and `totalSupplyAssets`. Take the example above with a debt of 97,000 USDC: a liquidator who seizes the whole 100,000 of collateral repays about 95,800, and the remaining 1,200 USDC is removed from the market's supply. Every supplier's shares are now worth slightly less; the loss is shared pro rata at the moment it is realised, and the `Liquidate` event reports it in `badDebtAssets` and `badDebtShares`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant L as Liquidator
+    participant M as Morpho Blue
+    participant O as Oracle
+    L->>M: liquidate(params, borrower, seizedAssets, 0, data)
+    M->>M: accrue interest
+    M->>O: price()
+    M->>M: check unhealthy, compute LIF and repaid shares
+    M->>M: if collateral is 0, erase remaining debt from supply and borrow totals
+    M->>L: transfer seized collateral
+    M->>L: onMorphoLiquidate callback, if data is set
+    L->>M: transfer repaid loan assets
+```
+
+The callback before payment is what lets a liquidator sell the seized collateral within the same transaction and repay with the proceeds, with no capital of its own. An opt-in `PreLiquidation` contract also exists: a borrower who authorises it accepts partial liquidations from a lower threshold (`preLLTV`) with smaller incentives, before the full liquidation applies.
+
+## The oracle
+
+### What Blue expects
+
+Blue's oracle interface has one function, `price()`, that returns the value of one unit of collateral in units of loan token, scaled by $$10^{36}$$ and expressed in raw token units, so the token decimals are folded into the number. Blue applies no staleness check, no bounds and no fallback of its own: whatever `price()` returns is the price. Because the oracle address is part of the market id, a market cannot switch to a better oracle later; the lenders would have to move to a new market.
+
+### The MorphoChainlinkOracleV2 formula
+
+Morpho's standard implementation, `MorphoChainlinkOracleV2` in `morpho-blue-oracles`, multiplies up to two ERC-4626 conversions and four Chainlink-interface feeds:
+
+$$
+\begin{aligned}
+\text{price} &= \text{SCALE} \times \frac{\text{baseVault}(s_B) \times B_1 \times B_2}{\text{quoteVault}(s_Q) \times Q_1 \times Q_2} \\
+\text{SCALE} &= 10^{\,36 + d_Q + f_{Q1} + f_{Q2} - d_B - f_{B1} - f_{B2}} \times \frac{s_Q}{s_B}
+\end{aligned}
+$$
+
+Here the base asset is the collateral and the quote asset the loan token; $$B_1, B_2, Q_1, Q_2$$ are the feeds' latest answers, $$d_B, d_Q$$ the token decimals, $$f$$ the feed decimals, and $$s_B, s_Q$$ the sample share amounts converted with `convertToAssets`. A feed set to the zero address counts as 1 with 0 decimals, and a vault set to the zero address counts as 1. `SCALE` is computed once in the constructor and is immutable.
+
+A worked example, computed with `qalc`: WETH collateral with 18 decimals, a USDC loan with 6 decimals, and one base feed, ETH/USD, with 8 decimals answering 3,000. Then $$\text{SCALE} = 10^{36 + 6 - 18 - 8} = 10^{16}$$, the price is $$10^{16} \times 3000 \times 10^{8} = 3 \times 10^{27}$$, and one WETH ($$10^{18}$$ raw units) is valued at $$10^{18} \times 3 \times 10^{27} / 10^{36} = 3 \times 10^{9}$$ raw USDC, that is 3,000 USDC.
+
+Two properties of this code matter for risk:
+
+- **No freshness or sanity checks.** `getPrice` reads `latestRoundData()` and only requires a non-negative answer; it ignores `updatedAt`. A stalled feed keeps pricing the market at its last value.
+- **A vault rate is trusted as a price.** When the collateral is a yield-bearing share priced through the oracle's vault parameter, the oracle reads the issuer's own exchange rate. That rate does not fall when the market price of the share does, so a depeg on secondary markets leaves the oracle price unchanged; only the issuer's accounting moves it.
+
+The constructor's NatSpec gives the condition a market should satisfy: the price should not be able to drop in one step below the old price multiplied by LLTV × LIF. At LLTV 86 % that product is about 0.898, so a single jump of more than about 10.2 % can take a position from healthy straight to insolvent, with no profitable liquidation in between. The same comment warns against using as quote asset a vault that can receive donations. [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/) goes through each oracle kind under stress.
+
+## Vault V1: MetaMorpho
+
+The first vault generation, MetaMorpho (v1.0 and v1.1), is an immutable ERC-4626 vault that supplies one asset to Blue markets only. Its configuration is market-by-market:
+
+- **Queues.** An allocator sets a supply queue, the ordered list of markets that receive deposits, and a withdraw queue, the list that withdrawals draw from. Each holds up to 30 markets (`MAX_QUEUE_LENGTH`).
+- **Caps.** The curator submits one supply cap per market; raising a cap waits for the timelock.
+- **Timelock.** One timelock for the whole vault, between 1 day and 2 weeks in v1.1 (`POST_INITIALIZATION_MIN_TIMELOCK`, `MAX_TIMELOCK`), covers cap increases, market removals, guardian changes and the timelock itself.
+- **Roles.** Owner, curator, allocators and a guardian who can revoke pending actions.
+- **Fee.** One performance fee, at most 50 %.
+
+The two versions differ on bad debt. In v1.0, `totalAssets` is the sum of what the vault can claim from each market, so a bad-debt write-off in Blue lowers the share price at the next accrual. In v1.1, a fall in that sum is added to `lostAssets`, and `totalAssets` is the real assets plus `lostAssets`: the share price does not fall, and the shortfall stays inside the vault. In a run on a v1.1 vault with lost assets, the depositors who exit last are the ones who cannot be paid in full (*derived*).
+
+[How Morpho Vault V1 (MetaMorpho) Works, and What Vault V2 Changes]({{site.url_complet}}/2026/10/10/morpho-vault-v1-metamorpho/) reads both versions in detail.
+
+## Vault V2
+
+Vault V2 keeps the ERC-4626 face and changes most of what is behind it. A deposit no longer goes into a list of Blue markets; it goes into adapters, and the limits are set on risk factors rather than on markets.
+
+### Adapters
+
+An adapter is a separate contract that holds positions on the vault's behalf and reports their value through `realAssets()`. The vault sums the idle balance and every adapter's `realAssets()` to get its assets. Two adapters are in the code read here:
+
+- **`MorphoMarketV1AdapterV2`** supplies to Blue markets;
+- **`MorphoVaultV1Adapter`** deposits into a MetaMorpho vault.
+
+An optional adapter registry restricts which adapters a vault may add. Adapters are fully trusted by the vault, so the choice of adapter is a curator's decision with the same weight as the choice of market. [Morpho Vault V2 Adapters - How a Vault Allocates, and Why It Wraps a Vault V1]({{site.url_complet}}/2026/10/10/morpho-vault-v2-adapters/) covers the adapter rules.
+
+### Roles
+
+Vault V2 splits the configuration across four roles, read from `VaultV2.sol`:
+
+| Role | Who sets it | What it can do |
+|---|---|---|
+| **Owner** | itself (`setOwner`) | Set the curator and the sentinels, the name and the symbol. No direct control of funds. |
+| **Curator** | owner, immediately | Submit timelocked changes: allocators, adapters, the adapter registry, caps up, gates, fees and recipients, timelocks, `forceDeallocate` penalties, abdications. Decrease caps immediately. |
+| **Allocator(s)** | curator, timelocked | Allocate and deallocate within the caps, set the liquidity adapter and `maxRate`. |
+| **Sentinel(s)** | owner, immediately | Revoke pending timelocked actions, decrease caps, deallocate to idle. |
+
+The curator's actions go through `submit(data)`, which records the time at which that exact calldata becomes executable. When the timelock has passed, anyone can execute it. Each function has its own timelock, and decreasing a timelock is itself timelocked by the current timelock of that function. `abdicate(selector)` disables a function for good, for example to freeze the adapter set. Timelocks are zero at deployment, so a vault's guarantees depend on what its curator has set since.
+
+### Caps by id
+
+A cap applies to an id, a hash that names a common risk factor. For each Blue market it touches, `MorphoMarketV1AdapterV2` returns three ids:
+
+- `keccak256(abi.encode("this", adapter))`, the whole adapter;
+- `keccak256(abi.encode("collateralToken", collateralToken))`, every market with that collateral;
+- `keccak256(abi.encode("this/marketParams", adapter, marketParams))`, the single market.
+
+On every allocation, the vault updates the allocation of each returned id and requires three things:
+
+- the absolute cap is not zero;
+- the allocation does not exceed the absolute cap;
+- unless the relative cap is 100 %, the allocation does not exceed the relative cap times `firstTotalAssets`, the vault's total assets at the start of the transaction.
+
+So a curator can say "at most 50 million in any wstETH market, and at most 30 % of the vault across all of them" with two caps on one id. Caps are checked only when assets go in: withdrawals from the vault and accrued interest can push an allocation above its relative cap, as the README notes.
+
+### Liquidity, maxRate and fees
+
+Withdrawals take idle assets first, then the liquidity adapter, a single adapter (typically a liquid Blue market) that the allocator sets with `setLiquidityAdapterAndData` and that also receives new deposits. 
+
+If neither is enough, a depositor can use `forceDeallocate`: anyone may move assets from any adapter back to idle, paying a penalty of up to 2 % per adapter, set by the curator. Combined with a flash loan, this is the in-kind exit described in the README: flash-borrow the asset, supply it directly to the adapter's illiquid market, call `forceDeallocate` so that the vault pulls that liquidity to idle, withdraw it from the vault, and repay the flash loan. The depositor leaves holding a Blue supply position instead of vault shares.
+
+The vault's `totalAssets` grows at most at `maxRate` (up to 200 % a year), set by the allocator: on each accrual, the new total is the lower of the real assets and the previous total grown at `maxRate`. Fees are a performance fee on interest, capped at 50 %, and a management fee on assets, capped at 5 % a year. A loss passes into the share price at the next accrual because the minimum picks the lower real value. ERC-4626's `max*` functions always return zero on this vault, which integrators must know.
+
+### Gates
+
+Four optional gate contracts can restrict who receives shares, who sends shares, who receives assets and who sends assets. A vault with no gates is open. The audit skill records ChainSecurity's trust model: the two share gates and the receive-assets gate are fully trusted, because a gate that blocks can stop exits, while the send-assets gate can only block entries. [How Morpho Vault V2 Works - Adapters, Caps, Timelocks and In-Kind Redemption]({{site.url_complet}}/2026/10/10/morpho-vault-v2-architecture/) covers gates, fees and the timelock mechanics in depth.
+
+## The public allocator
+
+A borrower who wants more than a market currently has must wait for an allocator to move vault liquidity there. The public allocator removes that wait, within limits the vault sets. `BluePublicAllocator`, in the `vault-v2` periphery, is a contract that a vault appoints as one of its allocators. The vault's real allocators then configure it per vault:
+
+- which adapters are active for it, which markets it may pull from (`canPullFromMarket`) and whether it may pull from idle;
+- an absolute cap per market, separate from the vault's own caps;
+- a penalty, a fraction of the moved amount, at most 100 %.
+
+Anyone may then call `reallocate` (deallocate from one market, allocate to another) or `allocateFromIdle`, paying the penalty in the vault's asset. The penalty goes to the vault, where it accrues to depositors like a `forceDeallocate` penalty. The vault's own caps still apply on top of the allocator's caps. The developer docs describe the intended use: a front end bundles the reallocation with the borrow or the withdrawal, so the user gets the liquidity atomically.
+
+The contract's own comments list what this opens: anyone can move relative-cap headroom with short-term deposits (with capital), reallocations can drain idle and the liquidity market and so reduce the vault's direct liquidity, and filling the liquidity market's caps can block deposits.
+
+## What a depositor is exposed to
+
+A vault depositor's money is, in the end, a supply position in some Blue markets, chosen by people other than the depositor. The losses come from four places; the annex's [Risks](#risks) section goes through each category in full.
+
+```mermaid
+flowchart LR
+    O["Oracle: wrong or stale price"] --> BD["Bad debt in a Blue market"]
+    C["Collateral: depeg or crash faster than liquidations"] --> BD
+    BD --> SP["Vault share price falls at next accrual"]
+    CU["Curator / allocator: bad markets, high caps, short timelocks"] --> BD
+    L["Liquidity: market at 100% utilisation"] --> W["Withdrawal waits, or in-kind exit with penalty"]
+```
+
+- **Oracle.** The market's oracle is fixed for life and Blue trusts it without checks. A stale feed, a wrong exchange rate, or a jump larger than about $$1 - \text{LLTV} \times \text{LIF}$$ turns into bad debt that suppliers absorb.
+- **Collateral.** If the collateral loses value faster than liquidators can sell it, or cannot be sold at all at the size needed, liquidations stop being profitable and the shortfall is written off against supply.
+- **Curator.** The curator decides the markets, the caps, the adapters, the timelocks and the gates. With zero timelocks, a curator can do anything at once; with long ones, depositors can leave before a change lands. The owner can replace the curator immediately.
+- **Liquidity.** A lender can withdraw only what is not borrowed. At full utilisation the AdaptiveCurveIRM raises rates over days; meanwhile the depositor waits, or exits in kind into the market position with the `forceDeallocate` penalty.
+
+[Monitoring a Morpho Vault V2 - What a Depositor Needs to Watch]({{site.url_complet}}/2026/10/10/morpho-vault-v2-risk-monitoring/) lists the events and views that reveal each of these on-chain. Curators in practice are specialised firms; [Vault Curator - Steak House Finance]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/) presents one of them and its Morpho vaults. When the collateral of a market is a Pendle principal token, the oracle and collateral questions are those of [How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral]({{site.url_complet}}/2026/11/16/pendle-v2-pt-yt-amm/).
+
+## Conclusion
+
+Morpho separates a lending protocol into an immutable market engine and a curation layer above it. The engine fixes the rules of each market at creation; the vaults decide which of those rules a depositor's money is exposed to.
+
+- **A Blue market** is five immutable parameters hashed into an id, with share accounting that rounds against the user and a virtual offset against inflation attacks.
+- **The AdaptiveCurveIRM** targets 90 % utilisation, multiplies the rate by up to 4 along its curve, and moves the curve itself at 50 per year, so a fully used market doubles its rate in about five days.
+- **Liquidations** pay a bonus fixed by the LLTV, $$\min(1.15, 1/(0.3\,\text{LLTV} + 0.7))$$, with no close factor; when the collateral runs out, the remaining debt is subtracted from the suppliers' assets in the same transaction.
+- **The standard oracle** multiplies vault conversions and feed answers into one $$10^{36}$$-scaled number, with no staleness check, and is fixed for the life of the market.
+- **Vault V1** configures market by market with queues and one timelock; **Vault V2** routes through adapters, caps risk factors by id, timelocks each curator action separately, and offers an in-kind exit through `forceDeallocate` that no role can switch off, though a gate can still block a withdrawal.
+- **The public allocator** lets anyone move vault liquidity between markets against a penalty, within limits the allocators set.
+- **A depositor's main risks** are the oracle and collateral of each market the vault reaches, the curator's choices and timelocks, and the liquidity of those markets.
+
+![Mindmap of how Morpho works covering Blue markets, the AdaptiveCurveIRM, liquidations, the oracle, Vault V1, Vault V2 and depositor risks]({{site.url_complet}}/assets/article/blockchain/defi/morpho/2026-11-16-morpho-blue-vault-v2-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Morpho Blue** | The immutable singleton contract that holds every isolated lending market, also called Markets V1 in the documentation. |
+| **Market id** | `keccak256` of the five market parameters; any change to one parameter is a different market. |
+| **LLTV** | Liquidation loan-to-value: the debt-to-collateral ratio above which a position can be liquidated, chosen from a governance whitelist. |
+| **LIF** | Liquidation incentive factor: the multiplier on repaid debt that sets the collateral a liquidator receives, from 1.15 down to about 1.006. |
+| **Bad debt** | Debt left on a position whose collateral is exhausted; Blue erases it and subtracts it from the market's supply assets. |
+| **Virtual shares** | The offset of $$10^6$$ shares and 1 asset in every conversion, which makes share-price inflation on an empty market costly. |
+| **AdaptiveCurveIRM** | The only enabled interest-rate model: a curve around 90 % utilisation whose level adapts over time. |
+| **Rate at target** | The borrow rate the IRM charges at exactly 90 % utilisation; it drifts up or down with the utilisation error. |
+| **`price()`** | The oracle function Blue calls: loan-token units per collateral unit, in raw units, scaled by $$10^{36}$$. |
+| **MorphoChainlinkOracleV2** | Morpho's standard oracle: up to two ERC-4626 conversions and four feeds, multiplied and scaled by an immutable factor. |
+| **MetaMorpho** | Morpho Vault V1: an ERC-4626 vault over Blue markets with supply and withdraw queues, one cap per market and one timelock. |
+| **`lostAssets`** | In MetaMorpho v1.1, the cumulative loss kept inside `totalAssets` so that the share price does not fall. |
+| **Adapter** | A Vault V2 contract that holds positions on the vault's behalf and reports their value with `realAssets()`. |
+| **Curator** | The Vault V2 role that sets adapters, caps, gates, fees and timelocks; its actions go through `submit` and the timelock. |
+| **Allocator** | The Vault V2 role that moves assets between adapters within the caps and sets the liquidity adapter and `maxRate`. |
+| **Sentinel** | The Vault V2 role that can only reduce risk: revoke pending actions, decrease caps, deallocate. |
+| **Id (cap id)** | A hash naming a risk factor (an adapter, a collateral token, a market) on which absolute and relative caps apply. |
+| **`forceDeallocate`** | The permissionless function that moves assets from an adapter to idle against a penalty of up to 2 %, the basis of the in-kind exit. |
+| **Gate** | An optional contract that controls who may send or receive shares or assets of a Vault V2. |
+| **Public allocator** | `BluePublicAllocator`, an allocator contract that lets anyone reallocate vault liquidity into a market against a penalty. |
+
+### Invariants
+
+| Invariant | Enforced by | Breaks if |
+|-----------|-------------|-----------|
+| A market's oracle, IRM and LLTV never change. | They are hashed into the market id and Blue has no setter. | Never in Blue; a vault can only move to another market. |
+| Total borrowed never exceeds total supplied in a market. | `require(totalBorrowAssets <= totalSupplyAssets)` in `borrow` and `withdraw`. | Not reachable through Blue's functions. |
+| A healthy position cannot be liquidated. | `liquidate` reverts with `HEALTHY_POSITION`. | The oracle returns a wrong price, which Blue cannot detect. |
+| Bad debt is socialised in the transaction that exhausts the collateral. | The `collateral == 0` branch of `liquidate`. | Nobody liquidates the last collateral, so the debt stays on the books. |
+| A Vault V2 allocation never exceeds an absolute cap at the time it is made. | The cap loop in `allocateInternal`. | Interest or withdrawals push it over later, which caps do not prevent. |
+| A curator change waits for its timelock. | `timelocked()` checks `executableAt[msg.data]`. | The timelock was left at zero or decreased earlier. |
+| A Vault V2 share price grows at most at `maxRate`. | `newTotalAssets = min(realAssets, maxTotalAssets)`. | Not breakable upward; downward, a loss passes through at once. |
+
+### Risks
+
+The risks below are those of a depositor in a Morpho vault, and of a lender supplying to a Blue market directly. Morpho's documentation and the audit reports are the starting point; points marked (*derived*) come from this article's reading of the code.
+
+#### Smart contracts and transparency
+
+- **Immutable core.** Morpho Blue, MetaMorpho and Vault V2 are immutable and published with their audits and Certora specifications. No party can replace the logic or change the rules under a depositor, and no party can patch a bug either.
+- **Audited Vault V2.** The audit skill lists reports by Spearbit, Zellic, Cantina, Blackthorn, ChainSecurity and Certora on Vault V2 and its adapters, including acknowledged issues such as the ability of a user to exit before a pending loss is realised.
+
+#### External dependencies
+
+- **Oracles.** Each market trusts one oracle contract with no check in Blue. The standard oracle ignores feed timestamps and uses issuer exchange rates for vault-share collateral (see [The oracle](#the-oracle)).
+- **Adapters and IRMs.** A Vault V2 trusts its adapters' `realAssets()`; a reverting IRM view can block a vault's accrual, as ChainSecurity's trust model notes.
+- **Collateral issuers.** A market's collateral is often itself a protocol (a staking token, a synthetic dollar, a Pendle PT), whose failure reaches Morpho through the oracle or through liquidation proceeds.
+
+#### Depeg
+
+- **Loan asset.** A vault denominated in a stablecoin is exposed to that stablecoin's peg; Morpho has no mechanism of its own here.
+- **Collateral priced by exchange rate.** When the oracle reads the issuer's rate, a market depeg of the collateral does not trigger liquidations, while the collateral that liquidators would sell is worth less than the oracle says (*derived*).
+
+#### Collateral and market risk
+
+- **Jumps larger than the buffer.** A price fall of more than $$1 - \text{LLTV} \times \text{LIF}$$ in one oracle update can move a position from healthy to insolvent with no profitable liquidation in between. Computed with `qalc`, that threshold is about 10.2 % at LLTV 86 % and about 3.9 % at LLTV 94.5 %.
+- **Thin exit markets.** Liquidations are profitable only if the collateral can be sold near the oracle price at the liquidation size; a high LLTV leaves a small bonus to absorb slippage.
+
+#### Liquidity
+
+- **Utilisation.** Suppliers can withdraw only unborrowed assets. At 100 % utilisation the rate at target doubles in about five days, which is the mechanism that brings liquidity back.
+- **Vault exits.** A Vault V2 withdrawal draws on idle and the liquidity adapter; beyond that, the depositor needs an allocator, the public allocator or an in-kind exit with a penalty of up to 2 %.
+- **Public allocator.** Its comments state that reallocations can reduce the vault's direct liquidity by pulling from idle and from the liquidity market.
+
+#### Centralisation and governance
+
+- **Morpho governance.** The Morpho owner, a multisig per the `morpho-protocol` reference, can enable LLTVs and IRMs and set a fee of up to 25 % of interest on a market. It cannot change a market's parameters or move funds.
+- **Vault roles.** The owner can replace the curator immediately; the curator controls everything else through timelocks that start at zero. A depositor should read each vault's timelocks, abdications, sentinels and gates. These were not read on-chain for this article, as it describes the design and no particular deployment.
+- **Gates.** A gate that blocks share transfers or asset withdrawals can stop exits; three of the four gates are fully trusted.
+
+#### Loss sharing
+
+- **Blue.** Bad debt is shared pro rata by the suppliers of the market in the transaction that realises it.
+- **Vault V2.** The loss passes into the share price at the next accrual; a depositor who exits before that accrual avoids it and leaves it to the others (ChainSecurity finding, accepted by design).
+- **MetaMorpho v1.1.** The loss is kept in `lostAssets` and not in the share price, so it falls on whoever cannot withdraw last (*derived*).
+
+#### Regulatory
+
+- **None found** in the design itself. Gates can be used to restrict access to whitelisted addresses, which is a choice of each vault.
+
+#### Summary
+
+| Risk | Where it comes from | What the design does about it | What remains |
+|---|---|---|---|
+| Wrong or stale oracle price | Each market's immutable oracle | Isolation: one oracle affects one market | Bad debt in that market; no staleness check in the standard oracle |
+| Collateral crash or depeg | The collateral asset and its exit liquidity | LIF scaled by LLTV; isolated markets | Jumps beyond $$1 - \text{LLTV} \times \text{LIF}$$ become bad debt |
+| Curator decisions | Vault V2 curator and allocators | Timelocks, caps by id, sentinels, abdication | Zero timelocks at deployment; owner can replace the curator at once |
+| Liquidity | Utilisation of the underlying markets | Adaptive rate, liquidity adapter, `forceDeallocate`, public allocator | Waits of days, or an in-kind exit with up to 2 % penalty |
+| Loss timing | Accrual-based loss recognition | Losses realised in Blue at liquidation; V2 share price follows at accrual | Early exits shift a pending loss to the remaining depositors |
+| Gates | Optional gate contracts | Unset gates restrict nothing | A malicious or broken gate can block exits |
+
+## Frequently Asked Questions
+
+**Q: What are the five parameters of a Morpho Blue market, and which of them can change after creation?**
+
+The loan token, the collateral token, the oracle, the interest-rate model and the LLTV. None of them can change: they are hashed into the market id, and Blue has no function to modify them. A different oracle or LLTV means a different market with separate liquidity.
+
+**Q: How large is the liquidation bonus on a market with an LLTV of 91.5 %, and why is it smaller than on a 77 % market?**
+
+The LIF is $$1/(1 - 0.3 \times 0.085) \approx 1.0262$$, a bonus of about 2.6 %, against about 7.4 % at LLTV 77 %. The formula ties the bonus to the gap between the LLTV and 100 %: a higher LLTV leaves less collateral above the debt, so a large bonus would push positions into bad debt as soon as they are liquidated.
+
+**Q: A Blue market sits at 100 % utilisation for a week. What happens to its borrow rate?**
+
+Two things act at once:
+
+- On the curve, the rate is four times the rate at target, because the normalised error is $$+1$$.
+- The rate at target grows as $$e^{50 \cdot t}$$ with $$t$$ in years, doubling about every 5.1 days, up to a ceiling of 200 % a year.
+
+After a week the borrow rate is therefore about 2.6 times ($$e^{50 \times 7/365}$$, computed with `qalc`) what it was at the start of the week, still on the 4× curve. Borrowers are pushed to repay and suppliers attracted, which is how withdrawal liquidity returns.
+
+**Q: Why does `MorphoChainlinkOracleV2` not protect a market against a depeg of a staked-token collateral?**
+
+When the collateral is an ERC-4626 share, the oracle reads the share's `convertToAssets`, the issuer's own exchange rate, and multiplies it by a feed for the underlying asset. A fall of the share's market price does not change that rate, so the oracle price does not move and no liquidation is triggered. The code also does not check feed timestamps, so a stalled feed is not detected either.
+
+**Q: What is the difference between an absolute cap and a relative cap in Vault V2, and when is each checked?**
+
+An absolute cap is an amount of assets; a relative cap is a fraction of the vault's total assets at the start of the transaction. Both apply to an id, such as a collateral token, and both are checked when the vault allocates to an adapter. Neither is checked on withdrawal or interest accrual, so an allocation can end above its relative cap after other depositors leave.
+
+**Q: A Vault V2 has all its assets in one Blue market that is fully borrowed. How can a depositor get out?**
+
+There are three routes:
+
+- Wait for an allocator to move assets, or for borrowers to repay as the rate rises.
+- Use the public allocator, if the vault appointed one, to pull liquidity from another market into the target market, paying the configured penalty.
+- Exit in kind: flash-borrow the asset, supply it directly to the market, call `forceDeallocate` so that the vault pulls that liquidity to idle (penalty up to 2 %), withdraw it from the vault, and repay the flash loan. The depositor ends up holding a supply position in the illiquid market instead of vault shares.
+
+**Q: How does a bad-debt event in a Blue market reach a Vault V2 depositor, and who bears it?**
+
+When a liquidation exhausts a borrower's collateral, Blue subtracts the remaining debt from the market's supply assets, so the adapter's supply shares are worth less. At the vault's next accrual, `realAssets()` reports the lower value, `totalAssets` takes the minimum, and the share price falls for every depositor still in the vault. A depositor who redeemed before that accrual is not affected, which is the "users can escape losses" finding accepted by Morpho.
+
+## Gaps
+
+These points were not settled by the local sources and should be checked before relying on the article.
+
+| Gap | Why it matters | What to read or verify |
+|-----|----------------|------------------------|
+| The list of enabled LLTVs and IRMs comes from the `morpho-protocol` reference, not from an on-chain read of `isLltvEnabled` and `isIrmEnabled`. | The LIF table and the claim that AdaptiveCurveIRM is the only IRM depend on it. | Call the two getters on the [Morpho Blue deployment](https://docs.morpho.org/developers/contracts/addresses) on each chain. |
+| The developer docs say the curator can set `maxRate`, while `VaultV2.sol` at the pinned commit restricts `setMaxRate` to allocators. | The article follows the code; a later revision may differ. | `setMaxRate` in [`VaultV2.sol`](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/src/VaultV2.sol). |
+| The MetaMorpho-era public allocator (a separate contract for Vault V1) is not in the local sources; only `BluePublicAllocator` for Vault V2 was read. | V1 vaults may expose liquidity through a different contract with other rules. | The [public allocator page of the Morpho learn docs](https://docs.morpho.org/learn/concepts/public-allocator/), not in the local copy and not read here. |
+| The `PreLiquidation` contract is described from the `morpho-protocol` reference, not from its source. | Its parameters and its oracle choice affect when a borrower is partially liquidated. | The [morpho-org/pre-liquidation](https://github.com/morpho-org/pre-liquidation) repository, not in the local sources. |
+| No particular vault's roles, timelocks, gates or caps were read on-chain. | The risk section describes what the design allows, not what a given vault does. | `curator()`, `owner()`, `timelock(selector)`, `abdicated(selector)` and the gate getters on the vault in question. |
+| The audit findings cited (ChainSecurity's loss-escape finding, the gate trust model) come from the audit skill's summary, not from re-reading the PDFs. | Wording and severity are as summarised. | The reports in the [`vault-v2` audits folder](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e/audits). |
+| The governance multisig threshold is quoted from the `morpho-protocol` reference (read on 2026-10-22). | It sets who can enable LLTVs and set fees. | `getThreshold()` and `getOwners()` on the Morpho owner address. |
+
+## References
+
+### Analyzed source
+
+- [morpho-org/morpho-blue](https://github.com/morpho-org/morpho-blue) — analyzed at commit [`8e26ca6a8dbc5089edcd67fb576248810fd2870a`](https://github.com/morpho-org/morpho-blue/tree/8e26ca6a8dbc5089edcd67fb576248810fd2870a), 2026-11-16 (`src/Morpho.sol`, `src/libraries/ConstantsLib.sol`, `src/libraries/SharesMathLib.sol`)
+- [morpho-org/morpho-blue-irm](https://github.com/morpho-org/morpho-blue-irm) — analyzed at commit [`b9a580635f5890ca07e9deb6198b22c9078aedb8`](https://github.com/morpho-org/morpho-blue-irm/tree/b9a580635f5890ca07e9deb6198b22c9078aedb8), 2026-11-16 (`src/adaptive-curve-irm/`)
+- [morpho-org/morpho-blue-oracles](https://github.com/morpho-org/morpho-blue-oracles) — analyzed at commit [`a6fff8bab1255baed052694935aa04998aafb50b`](https://github.com/morpho-org/morpho-blue-oracles/tree/a6fff8bab1255baed052694935aa04998aafb50b), 2026-11-16 (`src/morpho-chainlink/MorphoChainlinkOracleV2.sol`)
+- [morpho-org/metamorpho](https://github.com/morpho-org/metamorpho) — analyzed at commit [`ded84e59668155b34d3c24906c4f7461c12828af`](https://github.com/morpho-org/metamorpho/tree/ded84e59668155b34d3c24906c4f7461c12828af), 2026-11-16
+- [morpho-org/metamorpho-v1.1](https://github.com/morpho-org/metamorpho-v1.1) — analyzed at commit [`3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7`](https://github.com/morpho-org/metamorpho-v1.1/tree/3b17547ee464d00370d1e5e7cd997c3cdb8b0fb7), 2026-11-16
+- [morpho-org/vault-v2](https://github.com/morpho-org/vault-v2) — analyzed at commit [`d992cb8438b8630b3fee4649311d78d649264a5e`](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e), 2026-11-16 (`README.md`, `src/VaultV2.sol`, `src/adapters/MorphoMarketV1AdapterV2.sol`, `src/periphery/blue-public-allocator/BluePublicAllocator.sol`)
+
+### Documentation and standards
+
+- [Morpho documentation, Learn](https://docs.morpho.org/learn) (curator and Vault V2 concept pages)
+- [Morpho developer documentation, shared liquidity](https://docs.morpho.org/developers/borrow/concepts/shared-liquidity)
+- [Morpho developer documentation, Vault V2 public allocator tutorial](https://docs.morpho.org/developers/borrow/tutorials/public-allocator)
+- [ERC-4626: Tokenized Vaults](https://eips.ethereum.org/EIPS/eip-4626)
+- [Claude Code](https://claude.com/product/claude-code)
+
+### Related articles
+
+- [Pricing Yield Collateral on Morpho - Huma's PST Exchange Rate and Ojo's Pendle PT Feed]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/)
+- [The PT-reUSD Liquidations on Morpho - How a 320,000 SY Trade Liquidated 36M, Replayed from On-Chain State]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/)
+- [Risk of a Zama Confidential Morpho Vault - Losses, Exits, Contagion and What Can Be Watched]({{site.url_complet}}/2026/10/11/zama-confidential-morpho-vault-risk/)
+- [Vault Curator - Steak House Finance]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/)
+- [How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral]({{site.url_complet}}/2026/11/16/pendle-v2-pt-yt-amm/)
+- [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
+- [Compound V2 Overview]({{site.url_complet}}/2024/08/27/compound-protocol-v2/)
+- [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)

@@ -430,6 +430,7 @@ If an oracle can jump down by more than that in one update, positions can become
 
 ### Related articles
 
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
 - [Compound V2 Overview]({{site.url_complet}}/2024/08/27/compound-protocol-v2/)
 - [Vault Curator - Steak House Finance]({{site.url_complet}}/2025/11/06/steakhouse-finance-overview/)

@@ -1,0 +1,40 @@
+@startuml
+title CCIP 2.0 message lifecycle (EVM to EVM)
+skinparam shadowing false
+skinparam sequence {
+  ParticipantBackgroundColor #EEF2FC
+  ParticipantBorderColor #375BD2
+  LifeLineBorderColor #375BD2
+}
+participant Sender
+participant "Router\n(source)" as RS
+participant OnRamp
+participant "Source pool" as SP
+participant "CCVs" as V
+participant "Executor\n(anyone)" as E
+participant OffRamp
+participant "Dest pool" as DP
+participant "Router\n(dest)" as RD
+participant Receiver
+Sender -> RS : getFee(dest, message)
+Sender -> RS : ccipSend(dest, message)
+RS -> SP : transferFrom(sender, pool, amount)
+RS -> OnRamp : forwardFromRouter
+OnRamp -> SP : lockOrBurn (outbound bucket)
+OnRamp -> OnRamp : messageId = keccak256(MessageV1)
+OnRamp --> V : CCIPMessageSent
+note over V : wait for source finality\n(or the opted-in FTF depth)
+V -> V : attest messageId, publish proof
+E -> OffRamp : execute(encodedMessage, ccvs, results, gasOverride)
+OffRamp -> OffRamp : curse? lane? required CCV set?
+OffRamp -> V : verifyMessage for each required CCV
+OffRamp -> DP : releaseOrMint (inbound bucket)
+OffRamp -> RD : routeMessage (exact gas)
+RD -> Receiver : ccipReceive(Any2EVMMessage)
+alt receiver succeeds
+  OffRamp -> OffRamp : ExecutionStateChanged(SUCCESS)
+else receiver reverts
+  OffRamp -> OffRamp : token delivery reverted,\nExecutionStateChanged(FAILURE)
+  E -> OffRamp : retry later (any caller)
+end
+@enduml

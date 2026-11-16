@@ -1345,3 +1345,37 @@ _posts/2026-11-06-grover-algorithm-quantum-search.md
   assets/article/cryptographie/post-quantum/2026-11-06-grover-algorithm-mindmap.puml   (mindmap)
   assets/article/cryptographie/post-quantum/grover-success-probability.py   (in-section figure -> .svg, embedded in "How many iterations"; matplotlib, create-plot)
   in-section diagrams: inline Mermaid in the article, no other .puml
+
+_posts/2023-11-20-makerdao.md
+  assets/article/blockchain/defi/maker/maker-versions-timeline.puml   (in-section -> .png)
+
+_posts/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity.md
+  assets/article/blockchain/defi/2024-12-16-10-Key-Differences-Between-MakerDAO-and-Liquity-mindmap.puml   (mindmap -> .png, cover image)
+
+_posts/2026-11-16-chainlink-ccip-architecture.md
+  assets/article/blockchain/defi/cross-chain-bridge/ccip/2026-11-16-chainlink-ccip-architecture-mindmap.puml   (mindmap)
+  assets/article/blockchain/defi/cross-chain-bridge/ccip/ccip-components-concept.puml   (concept)
+  assets/article/blockchain/defi/cross-chain-bridge/ccip/ccip-v2-message-lifecycle-workflow.puml   (workflow)
+  in-section diagrams: inline Mermaid in the article (component flowchart, lifecycle sequence)
+
+_posts/2026-11-16-layerzero-v2-architecture.md
+  assets/article/blockchain/defi/cross-chain-bridge/2026-11-16-layerzero-v2-architecture-mindmap.puml   (mindmap)
+  assets/article/blockchain/defi/cross-chain-bridge/2026-11-16-layerzero-v2-message-lifecycle.puml   (workflow, in-section)
+
+_posts/2026-11-16-morpho-blue-vault-v2.md
+  assets/article/blockchain/defi/morpho/2026-11-16-morpho-blue-vault-v2-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/morpho/morpho-overview-stack-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/morpho/morpho-overview-liquidation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-16-pendle-v2-pt-yt-amm.md
+  assets/article/blockchain/defi/pendle/2026-11-16-pendle-v2-pt-yt-amm-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/pendle/pendle-v2-architecture-concept.puml   (concept)
+  assets/article/blockchain/defi/pendle/pendle-pt-liquidation-exit-workflow.puml   (workflow)
+  assets/article/blockchain/defi/pendle/pendle-pt-price-expiry.py   (in-section figure -> .svg, embedded in "The PT price to expiry and after"; matplotlib, create-plot)
+
+_posts/2026-11-16-tranched-stablecoins-loss-waterfall.md
+  assets/article/blockchain/defi/tranched-stablecoins/2026-11-16-tranched-stablecoins-loss-waterfall-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/defi/tranched-stablecoins/tranched-stablecoins-waterfalls-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/defi/tranched-stablecoins/infinifi-pending-loss-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article, no .puml

@@ -1,0 +1,43 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Who absorbs the loss?
+** Liquity (baseline)
+*** Trove collateral
+*** Stability pool offset
+**** Gain above 100 % ICR
+**** Loss below 100 % ICR
+*** Redistribution to troves
+*** V2: branch shutdown, bad debt
+** infiniFi
+*** Loss = unaccruedYield < 0
+*** 0. Safety buffer (all or nothing)
+*** 1. liUSD lockers, pro rata
+*** 2. siUSD rewards, then principal
+*** 3. iUSD price for every holder
+*** Pending loss until accrue()
+**** siUSD exits blocked
+**** iUSD redeems at old price
+left side
+** f(x) Protocol
+*** Rebalance zone: partial deleverage
+*** Liquidation zone + bonus
+*** ReservePool tops up bonus
+*** Bad debt: debtIndex raised
+*** fxBASE swaps at par
+*** fxSAVE NAV: fxUSD EMA, USDC
+** Comparison
+*** Who loses without opting in
+*** When the loss is applied
+*** Exit limits in stress
+@endmindmap

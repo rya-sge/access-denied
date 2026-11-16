@@ -1,0 +1,49 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* LayerZero V2
+** EndpointV2
+*** One per chain, identified by an eid
+*** Immutable, not proxied
+*** Owner: register libraries, set defaults
+*** Nonces, payload hashes, compose queue
+** Security stack per OApp and pathway
+*** Send / receive library (ULN302)
+*** DVNs: X required + Y of N optional
+*** Block confirmations
+*** Executor
+*** Delegate sets the configuration
+** Message lifecycle
+*** quote, send, PacketSent
+*** DVN verify, commitVerification
+*** Endpoint verify, lzReceive
+*** lzCompose as a second transaction
+** Nonces and recovery
+*** Unordered by default, no gaps
+*** skip, clear, nilify, burn
+** Options and fees
+*** TYPE_3 options, enforced options
+*** DVN + executor + treasury fees
+** Defaults are dangerous
+*** Unset fields follow the endpoint owner
+*** Pin libraries, DVNs, confirmations
+** OApp and OFT
+*** peers per eid
+*** Shared decimals and dust
+*** OFT burn/mint, adapter lock/unlock
+** lzRead
+*** Read channel, DVNs run the query
+** Kelp DAO, April 2026
+*** 1-of-1 DVN, poisoned RPC
+*** 116,500 rsETH released from the adapter
+@endmindmap

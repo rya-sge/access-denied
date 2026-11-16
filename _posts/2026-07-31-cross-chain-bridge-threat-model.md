@@ -2,11 +2,12 @@
 layout: post
 title: "Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register"
 date:   2026-07-31
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: blockchain security defi
 tags: BA-bridge threat-model stride cross-chain bridge attack-tree security-architecture risk
-description: A structured OWASP threat model for cross-chain bridges, built from the Ronin 2022, Poly Network 2023, Ronin 2024 and Kelp DAO 2026 incidents, covering assets, trust boundaries, STRIDE analysis, an attack tree and a prioritised threat register.
+description: An OWASP threat model for cross-chain bridges built from the Ronin, Poly Network and Kelp DAO incidents, with STRIDE, an attack tree and a threat register.
 image: /assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-threat-model-mindmap.png
 isMath: false
 ---
@@ -215,7 +216,7 @@ Risk is scored qualitatively. Likelihood reflects whether the attack is remotely
 
 ### Prioritised mitigation list
 
-The register above orders threats by risk. Grouped by what actually has to be built, the work falls into four tiers.
+The register above orders threats by risk. Grouped by what has to be built, the work falls into four tiers.
 
 - **Tier 1, loss limitation.** Per-transaction value caps with manual approval above the limit, per-token daily volume limits, and a withdrawal delay with a challenge window. These address T-04, T-10 and T-11 and, unusually, they do not depend on knowing which attack is coming. All three teams converged on them independently.
 - **Tier 2, attestation integrity.** At least two independent required verifiers, a pinned configuration, several independent origin-chain data sources per attestor, and a refusal to attest when those sources stop agreeing. These address T-16, T-17 and T-18. Nothing in the other tiers touches them, which is why a bridge with exemplary key custody and reproducible builds still lost $292M in 2026.
@@ -227,7 +228,7 @@ Tier 1 is listed first deliberately. It is the only tier that bounds the loss wh
 
 ## Assumptions and Open Questions
 
-- **The signer count is assumed to overstate independence.** Counting keys is easy and counting failure domains is not. Any real application of this model should replace the assumption with an audit of where each signer actually runs and who administers it.
+- **The signer count is assumed to overstate independence.** Counting keys is easy and counting failure domains is not. Any real application of this model should replace the assumption with an audit of where each signer runs and who administers it.
 - **The relay chain is treated as part of the attestation layer**, not as an independent chain with its own security. Poly Network's incident supports that treatment, but a bridge whose relay chain has genuinely independent validators would need TB2 decomposed further.
 - **Recovery is assumed to be out of band.** None of the four incidents was resolved by an on-chain mechanism; outcomes were determined by corporate balance sheets, the attacker's goodwill, or a coordinated industry effort. A model that assumes on-chain recoverability is assuming something no evidence here supports.
 - **Fund destination after the fact is only partly documented.** The Ronin 2022 laundering path is well traced, Ronin 2024 was returned, and Poly Network 2023 has no published account of what was realised. Any threat model that reasons about attacker economics inherits that gap.
@@ -269,7 +270,7 @@ The practical consequence for anyone applying this model is that scope determine
 | **Attack tree** | A goal-oriented decomposition of the routes to a single attacker objective, with the root as the goal and branches as alternative paths. |
 | **Abuse case** | The adversarial counterpart of a use case, describing how the same functionality is exercised by an attacker. |
 | **Threat register** | The table of identified threats with likelihood, impact, risk rating, a decision to mitigate, accept, eliminate or transfer, and an owner. |
-| **Failure domain** | A set of components that fail together; the unit that actually matters when counting the independence of a threshold signing set. |
+| **Failure domain** | A set of components that fail together; the unit that matters when counting the independence of a threshold signing set. |
 | **Attestation layer** | The off-chain component that observes the origin chain and authorises releases on the target chain, whether by threshold signature or relay chain proof. |
 | **Challenge window** | A delay between authorisation and release during which a monitor can veto a transaction, converting detection into prevention. |
 | **Residual risk** | The risk that remains after countermeasures are applied, which must be explicitly accepted rather than assumed to be zero. |
@@ -327,7 +328,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
-| ☐ | Every storage variable read by a new implementation is written by an initializer the upgrade actually executes. | An uninitialised threshold defaults to zero and all authorisation passes. |
+| ☐ | Every storage variable read by a new implementation is written by an initializer the upgrade executes. | An uninitialised threshold defaults to zero and all authorisation passes. |
 | ☐ | Post-upgrade invariants are asserted before the contract is unpaused. | A misconfiguration goes live and is discoverable by anyone reading the mempool. |
 | ☐ | The gateway is paused for the duration of a multi-step upgrade. | The window between two transactions is exploitable, 48 minutes in the Ronin 2024 case. |
 | ☐ | `ProxyAdmin` is behind a multi-signature and a timelock, with the diff published before execution. | A single key is a shorter path to the escrow than the entire signer set. |
@@ -345,7 +346,7 @@ Organised by trust boundary, so it can be run directly against the diagram. It c
 
 ## Frequently Asked Questions
 
-**Q: Why is TB2 called the decisive boundary when four different boundaries were actually crossed in the four incidents?**
+**Q: Why is TB2 called the decisive boundary when four different boundaries were crossed in the four incidents?**
 
 Because TB2 is where every attack has to end. The gateway contract is the only component that can move escrowed assets, and it authorises a release by counting valid signatures against a threshold. Crossing TB3 (stealing keys from a host) or TB4 (backdooring the binary) is a means of producing signatures that TB2 will accept; crossing TB5 is a means of lowering the threshold TB2 enforces.
 
@@ -371,6 +372,14 @@ The Kelp DAO incident of 18 April 2026 executed that exact threat for 116,500 rs
 
 So T-16 moves to Critical, its countermeasure now specifies failing closed, and T-18 splits out the availability attack that made the integrity attack possible.
 
+**Q: How do LayerZero's changes after Kelp DAO, and Chainlink CCIP's design, map onto T-17 and Tier 1?**
+
+LayerZero's response addresses the inherited-default half of T-17. According to its [May 2026 update](https://layerzero.network/blog/an-overdue-apology) and [incident report](https://layerzero.network/blog/layerzero-labs-kelpdao-incident-report), the LayerZero Labs DVN no longer signs as the sole required attestor on any channel, and default pathways are moving to 5-of-5 where five DVNs are available and never below 3-of-3. The on-chain protocol is unchanged and still enforces whatever each application configures, so a pinned configuration that requires one DVN run by someone else remains possible. The register's countermeasure, an owner who reviews the choice, still applies.
+
+[Chainlink CCIP](https://rya-sge.github.io/access-denied/2026/11/16/chainlink-ccip-architecture/) puts parts of Tier 1 into the protocol. Each token pool enforces a token-bucket rate limit per remote chain and per direction, which is the per-token volume limit of Tier 1 without an application having to add it, and the RMN contract's curse makes the Router, the ramps and every pool revert for a cursed chain, which is the tested pause of T-10.
+
+CCIP 2.0's Cross-Chain Verifiers cover T-17: the receiver, the token pool and the lane can each require verifiers, a pool can raise the requirement above an amount threshold, and a pool that names none falls back to the default committee rather than to zero. In [LayerZero V2](https://rya-sge.github.io/access-denied/2026/11/16/layerzero-v2-architecture/) the equivalent of the rate limit is an optional add-on to the OFT. None of these controls touches T-16 or T-18 inside a single verifier, since a verifier with a poisoned view of the origin chain still signs.
+
 **Q: An auditor reviews the bridge contracts thoroughly and finds nothing. Which threats in the register remain open?**
 
 Most of the critical ones:
@@ -394,7 +403,7 @@ A per-transaction cap and a challenge window bound the loss regardless of how th
 
 Because it contradicts what a bridge design usually implies. A protocol that holds user assets in escrow reads as though the protocol itself is responsible for their safety, and a threat model that omitted the assumption would leave a reader thinking some on-chain mechanism handles the worst case.
 
-None of the four incidents was resolved on-chain. Ronin 2022 users were made whole from a funding round and company balance sheet, Ronin 2024 was resolved because the exploiter chose to return the funds for a bounty, Kelp DAO's backing was restored by an industry recovery effort that raised around $300M and by liquidating the attacker's own leveraged positions, and Poly Network 2023 has no published recovery at all. Every one of those depended on someone outside the protocol choosing to act. Stating the assumption makes it visible that the residual risk after every countermeasure is a total, unrecoverable loss of escrow, which is what justifies putting loss limitation ahead of everything else.
+None of the four incidents was resolved on-chain. Ronin 2022 users were made whole from a funding round and company balance sheet, Ronin 2024 was resolved because the exploiter chose to return the funds for a bounty, Kelp DAO's backing was restored by an industry recovery effort that gathered commitments of around $300M and by liquidating the attacker's own leveraged positions, and Poly Network 2023 has no published recovery at all. Every one of those depended on someone outside the protocol choosing to act. Stating the assumption makes it visible that the residual risk after every countermeasure is a total, unrecoverable loss of escrow, which is what justifies putting loss limitation ahead of everything else.
 
 **Q: How would this model change for a bridge that uses a light client or a validity proof instead of a signing set?**
 
@@ -424,6 +433,7 @@ Given that the observed losses came from integrity failures and not from livenes
 - [KelpDAO Incident Statement](https://layerzero.network/blog/kelpdao-incident-statement) — LayerZero, 19 April 2026
 - [LayerZero Update](https://layerzero.network/blog/an-overdue-apology) — LayerZero, 8 May 2026
 - [April 18, 2026 rsETH Incident Post Mortem](https://x.com/aave/status/2060901386611499378) — Aave
+- [smartcontractkit/chainlink-ccip](https://github.com/smartcontractkit/chainlink-ccip) — Chainlink CCIP contracts 2.0.0 (`RateLimiter.sol`, `RMN.sol`, `OffRamp.sol`)
 
 ### Threat modelling methodology
 
@@ -435,6 +445,8 @@ Given that the observed losses came from integrity failures and not from livenes
 
 - [Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-hacks/)
 - [Zero-Knowledge Proof Failures in Cross-Chain Bridges](https://rya-sge.github.io/access-denied/2026/06/19/zkp-cross-chain-bridge-hacks/)
+- [How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson](https://rya-sge.github.io/access-denied/2026/11/16/layerzero-v2-architecture/)
+- [Chainlink CCIP — from DONs to Cross-Chain Verifiers](https://rya-sge.github.io/access-denied/2026/11/16/chainlink-ccip-architecture/)
 
 ### Tooling
 

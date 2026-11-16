@@ -1,0 +1,34 @@
+@startuml
+title MakerDAO to Sky - successive versions (Ethereum mainnet)
+skinparam defaultFontSize 13
+skinparam ActivityBackgroundColor #EAF6F0
+skinparam ActivityBorderColor #2E8B67
+skinparam ArrowColor #2E8B67
+
+start
+:Single-Collateral DAI (Sai)
+ETH only, one CDP engine
+(code not covered here);<<#F4F4F4>>
+:Multi-Collateral DAI (dss 1.0, launch spell 2019-11-18)
+Vat, Jug, Pot (DSR), Spot, Vow
+Cat + Flip English auctions, Flap, Flop
+End + ESM (Emergency Shutdown);
+:PSM-USDC-A (spell 2020-12-20)
+USDC <-> DAI 1:1, fees tin / tout;
+:Liquidations 2.0 (dss 1.3.0, first spell 2021-04-19)
+Dog + Clipper Dutch auctions (abacus curves)
+flash liquidation through clipperCall;
+:Cure (dss commit 2022-05-18)
+pre-minted DAI excluded from shutdown settlement;
+:LitePSM (onboarded 2024-07-25)
+pre-minted pool, pocket, fill / trim / chug;
+:Sky Endgame (spell 2024-09-13)
+USDS, sUSDS, DAI <-> USDS converter
+SKY and the MKR -> SKY converter, Splitter;
+:Surplus path (spells 2024-09-27, 2025-10-30)
+FlapperUniV2SwapOnly, then the Kicker;
+:Current state (spells-mainnet, 2026-11-09)
+debt and Vow surplus auctions off (sump, hump = max)
+ESM threshold = max: shutdown by governance only;<<#FFF4E0>>
+stop
+@enduml

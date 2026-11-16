@@ -1,0 +1,32 @@
+@startuml
+title Morpho stack: from a depositor to isolated Blue markets
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ComponentBackgroundColor #EEF5FF
+skinparam ComponentBorderColor #4A78B5
+skinparam RectangleBackgroundColor #F7FAFF
+skinparam RectangleBorderColor #4A78B5
+skinparam ActorBorderColor #4A78B5
+actor Depositor
+actor Borrower
+rectangle "Vault V2 (ERC-4626)" as V {
+  component "idle assets" as Idle
+  component "caps by id\n(absolute, relative)" as Caps
+}
+component "MorphoMarketV1AdapterV2" as A
+component "BluePublicAllocator" as PA
+rectangle "Morpho Blue singleton" as B {
+  component "market wstETH/USDC\n(oracle, IRM, LLTV)" as M1
+  component "market WBTC/USDC\n(oracle, IRM, LLTV)" as M2
+}
+component "Oracle price()" as O
+component "AdaptiveCurveIRM" as I
+Depositor --> V : deposit / redeem shares
+V --> A : allocate / deallocate
+PA --> V : reallocate (allocator role)
+A --> M1 : supply
+A --> M2 : supply
+Borrower --> M1 : collateral + borrow
+M1 --> O
+M1 --> I
+@enduml

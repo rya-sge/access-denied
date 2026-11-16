@@ -2,18 +2,19 @@
 layout: post
 title: "Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes"
 date:   2026-07-31
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: blockchain security defi
 tags: BA-bridge cross-chain bridge exploit ronin poly-network wormhole nomad layerzero post-mortem validator supply-chain
-description: A comparative analysis of ten major cross-chain bridge exploits between 2021 and 2026, grouped into five failure classes, covering the architecture of each bridge, the root cause of each failure, and the destination of the stolen funds.
+description: Ten cross-chain bridge exploits from 2021 to 2026 in five failure classes, with each bridge's architecture, root cause and the fate of the stolen funds.
 image: /assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-cross-chain-bridge-hacks-mindmap.png
 isMath: false
 ---
 
 Cross-chain bridges concentrate value in a way few other components of a blockchain system do. A bridge holding the escrow for several chains is, in practice, a custodian, and the contract that releases those assets answers to an off-chain attestation layer rather than to the consensus of either chain. Between 2021 and 2026 that arrangement produced a steady run of nine and ten figure losses.
 
-This article works through ten of them. They are grouped by what actually failed rather than by date, because the same headline ("bridge drained") covers at least five distinct engineering problems, and the controls that stop one of them do nothing against the others.
+This article works through ten of them. They are grouped by what failed rather than by date, because the same headline ("bridge drained") covers at least five distinct engineering problems, and the controls that stop one of them do nothing against the others.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -169,7 +170,7 @@ For a threat model, the useful observation is that the operational reality (one 
 
 **Architecture.** Poly Network routes every cross-chain transaction through its own relay chain. A user locks assets on the origin chain via a LockProxy contract; the event is submitted to the relay chain, which produces a cross-chain proof; that proof, consisting of a signed relay chain block header and a Merkle proof, is submitted to the target chain to unlock the assets. On the target chain, `verifyHeaderAndExecuteTx` checks the header signatures against a fixed keeper list and then verifies the Merkle path against the state root carried in the header.
 
-**Cause.** [Dedaub's post-mortem](https://dedaub.com/blog/poly-network-hack/) reconstructed the attack and found no fault in the contracts. `verifySig` was invoked correctly, the header genuinely carried three valid keeper signatures satisfying the k-1 of k scheme, and the keeper list had not been modified in two years. The Merkle prover behaved as specified. There was no logic bug to exploit, because the attacker did not need one. The keepers had signed a state root that the attacker constructed.
+**Cause.** [Dedaub's post-mortem](https://dedaub.com/blog/poly-network-hack/) reconstructed the attack and found no fault in the contracts. `verifySig` was invoked correctly, the header carried three valid keeper signatures satisfying the k-1 of k scheme, and the keeper list had not been modified in two years. The Merkle prover behaved as specified. There was no logic bug to exploit, because the attacker did not need one. The keepers had signed a state root that the attacker constructed.
 
 Dedaub did flag one implementation characteristic worth carrying into any bridge review. The Merkle verifier accepts a zero-length witness: an attacker can submit the leaf alone, with an empty path, in which case the leaf hash must itself equal the signed root. That is consistent with the algorithm, but it means a signed root places no structural constraint whatsoever on what can be authorised. Here the attacker passed a 240-byte leaf whose only content was an unlock command directed at their own address.
 
@@ -185,7 +186,7 @@ This is why the multi-party structure provided no protection. The consensus node
 
 **Where the money went.** The proceeds were consolidated into a small number of addresses. On Ethereum the attackers used `0xe0Afadad1d93704761c8550F21A53DE3468Ba599`, `0x8E0001966e6997db3e45c5F75D4C89a610255b2E` and `0xdddE20a5F569DFB11F5c405751367E939ebC5886`. The first of those three was reused across BNB Chain, OKX, Heco, Polygon, Optimism, Avalanche, Arbitrum, Andromeda, Fantom and Gnosis.
 
-The headline figure requires a caveat that Dedaub supplied at the time: the notional value of around $34B never corresponded to realisable value, because most of the affected tokens were illiquid. What an attacker can actually extract from a bridge is bounded by the depth of the markets for the assets it holds, not by the sum printed on a dashboard.
+The headline figure requires a caveat that Dedaub supplied at the time: the notional value of around $34B never corresponded to realisable value, because most of the affected tokens were illiquid. What an attacker can extract from a bridge is bounded by the depth of the markets for the assets it holds, not by the sum printed on a dashboard.
 
 Neither Poly Network's analysis nor its remediation post documents a recovery, and neither states how much was ultimately realised or where it was moved. Comments left on the official post-mortem as late as August 2025 report that assets bridged to Ontology through Poly Network remain lost. On the question of final destination, this incident is the least well documented of the ten.
 
@@ -221,7 +222,7 @@ The operator turned out to be a whitehat. The contract was paused at 10:15:23 UT
 
 ### Kelp DAO and LayerZero 2026: attacking what the verifier reads
 
-**Architecture.** Kelp's rsETH moves between chains as a LayerZero V2 Omnichain Fungible Token. LayerZero does not impose a security configuration; each application chooses which Decentralized Verifier Networks must attest to its inbound messages, and how many. LayerZero's published guidance is to require at least two independent DVNs, and it says three to five is better.
+**Architecture.** Kelp's rsETH moves between chains as a LayerZero V2 Omnichain Fungible Token (OFT). On Ethereum the token sits behind an `OFTAdapter`, which locks rsETH when it leaves and unlocks it when a verified inbound message says it was burned on another chain, so the adapter holds the backing for every bridged copy and is the single pot a forged message can empty. The endpoint, the DVNs and the OFT variants are described in [LayerZero V2 architecture](https://rya-sge.github.io/access-denied/2026/11/16/layerzero-v2-architecture/). LayerZero does not impose a security configuration; each application chooses which Decentralized Verifier Networks must attest to its inbound messages, and how many. LayerZero's published guidance is to require at least two independent DVNs, and it says three to five is better.
 
 Kelp's rsETH pathway was configured **1-of-1**, with the LayerZero Labs DVN as the sole verifier. One party decided whether an incoming message was genuine, and there was no second attestation that could disagree with it.
 
@@ -233,7 +234,7 @@ That still was not enough, because the DVN read from internal and external RPC n
 
 ![Kelp DAO 2026 RPC poisoning workflow]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/2026-07-31-kelp-dao-rpc-poisoning-workflow.png)
 
-**The forged message.** At 17:35 UTC on 18 April 2026 the Ethereum endpoint accepted inbound nonce 308 and released 116,500 rsETH, approximately $292M, from the `RSETH_OFTAdapter`. Unichain's outbound nonce was still 307. The source-side burn the message described had never happened.
+**The forged message.** According to [Aave's post-mortem](https://x.com/aave/status/2060901386611499378), at 17:35 UTC on 18 April 2026 the Ethereum endpoint accepted inbound nonce 308 and released 116,500 rsETH, approximately $292M, from the `RSETH_OFTAdapter`. Unichain's outbound nonce was still 307. The source-side burn the message described had never happened.
 
 Within minutes the attacker dispersed the rsETH across seven recipient addresses and put 89,567 of it into eight Aave V3 positions on Ethereum Core and Arbitrum, borrowing 82,650 WETH and 821 wstETH against it and holding health factors between 1.01 and 1.03. Aave's Protocol Guardian froze rsETH and set its loan-to-value to zero at 19:00 UTC, and Kelp paused 43,373 rsETH between 18:00 and 19:00.
 
@@ -241,7 +242,7 @@ Mandiant, CrowdStrike and independent researchers attribute the intrusion to the
 
 **Where the money went.** Unusually for this list, the backing was restored. Aave Labs convened an industry recovery effort that grew to around $300M in commitments. Aave governance liquidated the eight attacker positions on 6 May, Kelp burned the liquidated rsETH on Arbitrum on 12 May, and the adapter was refilled in five tranches totalling 116,131.72 rsETH by 26 May, at which point rsETH backing was whole again. The Arbitrum Security Council separately froze 30,766 ETH linked to the attacker, which then became the subject of a restraining notice in an unrelated federal matter and a court-supervised transfer.
 
-**Responsibility.** All three parties have published, and they do not agree. LayerZero states that Kelp chose a 1-of-1 configuration despite explicit written recommendations to the contrary. Kelp states that the compromised verification infrastructure sat outside its operational domain and is run by a third party. LayerZero separately concedes that it erred by letting its own DVN act as a sole attestor for high-value transactions, and has since changed that: the LayerZero Labs DVN now refuses to sign as the only required verifier on any channel, and Endpoint v2 pathway defaults have moved to a minimum 3-of-3 configuration.
+**Responsibility.** All three parties have published, and they do not agree. LayerZero states that Kelp chose a 1-of-1 configuration although LayerZero and other external parties had communicated the multi-DVN best practice to it beforehand. Kelp states that the compromised verification infrastructure sat outside its operational domain and is run by a third party. LayerZero separately concedes that it erred by letting its own DVN act as a sole attestor for high-value transactions, and has since changed that: the LayerZero Labs DVN now refuses to sign as the only required verifier on any channel, and the default DVN sets of all pathways are being moved to 5-of-5 where five DVNs are available and never below 3-of-3. On 10 July 2026 LayerZero reported the 3-of-3 minimum in place on Endpoint v2, with about 0.5 % of pathways still to update.
 
 **Why this is its own class.** In every other incident here, the attacker either broke the verification code or obtained the credentials that the verification code trusts. Here they did neither. The verifier's software was sound, its keys were never compromised, and least-privilege controls kept the attacker out of the DVN instances themselves. What the attacker changed was the verifier's picture of the source chain.
 
@@ -275,7 +276,13 @@ Poly Network's response splits into two halves. On the build pipeline, it added 
 
 Binance disabled the vulnerable precompiles outright before repairing them, and added a blacklist so that stolen balances could be immobilised on a chain it could halt.
 
-LayerZero changed its operating stance rather than its protocol. Its DVN will no longer sign as the sole required attestor on any channel, whatever an application configures, and Endpoint v2 pathway defaults moved to a minimum of three verifiers. The compromised cloud environment was rebuilt rather than patched, with no credentials or configuration carried over, and privileged access now requires just-in-time elevation and multi-person review.
+LayerZero changed its operating stance rather than its protocol. Its DVN will no longer sign as the sole required attestor on any channel, whatever an application configures, and pathway defaults are moving to five required verifiers where five are available, and no fewer than three anywhere. The compromised cloud environment was rebuilt rather than patched, with no credentials or configuration carried over, and privileged access now requires just-in-time elevation and multi-person review.
+
+For comparison, Chainlink CCIP builds two of the loss-limitation controls into the token layer instead of leaving them to the application. Every CCIP token pool runs a token-bucket rate limiter per remote chain and per direction: an inbound release larger than the bucket's capacity reverts until the capacity is raised, and one larger than the tokens currently available fails and can be re-executed once the bucket refills. In LayerZero, rate limiting is an optional add-on to the OFT, not part of the default contract.
+
+A limiter bounds the rate of loss rather than the loss, since an attacker who can forge one message can forge several smaller ones, but it turns a single $292M release into a sequence that a monitor has time to notice. CCIP also has a curse switch in its RMN contract: once a remote chain, or the whole system, is cursed, the Router, the OnRamp, the OffRamp and every token pool revert, and in-flight messages become executable again only after the curse is lifted.
+
+Neither control decides whether a message is authentic. CCIP 2.0 handles that part with Cross-Chain Verifiers (CCVs): the OffRamp requires the union of the verifiers named by the receiver, the token pool and the lane, a pool can require extra verifiers above an amount threshold, and a pool that names none falls back to the default Chainlink committee rather than to nothing. An issuer can therefore require a second, independent verifier on large transfers, which is the control a second required DVN would have provided at Kelp. [Chainlink CCIP architecture](https://rya-sge.github.io/access-denied/2026/11/16/chainlink-ccip-architecture/) describes these components in detail.
 
 Harmony reduced its cloud attack surface, decoupled access to bridge nodes, and rotated the multisig signers on its unaffected Bitcoin bridge before draining it and taking it offline.
 
@@ -349,7 +356,7 @@ The items below are derived from the failure modes observed in the ten incidents
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
-| ☐ | Every storage variable read by a new implementation is written by an initializer that the upgrade actually executes. | An uninitialized threshold defaults to zero and all authorisation checks pass, as in Ronin 2024. |
+| ☐ | Every storage variable read by a new implementation is written by an initializer that the upgrade executes. | An uninitialized threshold defaults to zero and all authorisation checks pass, as in Ronin 2024. |
 | ☐ | No initialisation sets a trusted value to one that the contract elsewhere treats as untrusted. | A trusted root of `0x00` makes every unproven message valid, as at Nomad. |
 | ☐ | Post-upgrade invariants (threshold greater than zero, operator count and weight non-zero, escrow balance unchanged) are asserted before the contract is unpaused. | A misconfiguration goes live and is discoverable by anyone reading the mempool. |
 | ☐ | The gateway is paused for the duration of a multi-step upgrade. | A window between two transactions is exploitable, which in 2024 was 48 minutes wide. |
@@ -438,7 +445,7 @@ The distinction matters when prioritising bridge risk: exposure should be assess
 
 Recovery was decided outside the protocol in every single case, and the deciding factor was who held the funds and what they wanted.
 
-Poly Network in 2021 and Ronin in 2024 were returned because the people who took the funds chose to give them back, in the second case for a $500K bounty coordinated with the SEAL 911 volunteer group. Ronin 2022 users were made whole from a funding round and the company balance sheet, because the attacker was Lazarus Group and no negotiation was available. Kelp DAO was restored by an industry recovery effort that raised around $300M, combined with liquidating the attacker's own leveraged positions. Horizon, Multichain and Poly Network 2023 have no published recovery.
+Poly Network in 2021 and Ronin in 2024 were returned because the people who took the funds chose to give them back, in the second case for a $500K bounty coordinated with the SEAL 911 volunteer group. Ronin 2022 users were made whole from a funding round and the company balance sheet, because the attacker was Lazarus Group and no negotiation was available. Kelp DAO was restored by an industry recovery effort that gathered commitments of around $300M, combined with liquidating the attacker's own leveraged positions. Horizon, Multichain and Poly Network 2023 have no published recovery.
 
 No on-chain mechanism produced any of these outcomes. A threat model that assumes the protocol handles its own worst case is assuming something no incident here supports, which is the argument for bounding the loss before it happens.
 
@@ -503,13 +510,16 @@ No on-chain mechanism produced any of these outcomes. A threat model that assume
 - [KelpDAO Incident Statement](https://layerzero.network/blog/kelpdao-incident-statement) — LayerZero, 19 April 2026
 - [LayerZero Update](https://layerzero.network/blog/an-overdue-apology) — LayerZero, 8 May 2026
 - [Ongoing Security Updates 7/10](https://layerzero.network/blog/ongoing-security-updates-july-10) — LayerZero, 10 July 2026
-- Kelp DAO Incident Response — Kelp DAO, 19 April 2026
+- [Kelp DAO · Incident Response · April 19, 2026](https://blogs.kerneldao.com/blog/kelp-dao-%C2%B7-incident-response-%C2%B7-april-19-2026) — Kelp DAO, 19 April 2026
 - [April 18, 2026 rsETH Incident Post Mortem](https://x.com/aave/status/2060901386611499378) — Aave
+- [smartcontractkit/chainlink-ccip](https://github.com/smartcontractkit/chainlink-ccip) — Chainlink CCIP contracts 2.0.0 (`RateLimiter.sol`, `RMN.sol`, `OffRamp.sol`)
 
 ### Related articles
 
 - [Cross-Chain Bridge Threat Model](https://rya-sge.github.io/access-denied/2026/07/31/cross-chain-bridge-threat-model/)
 - [Zero-Knowledge Proof Failures in Cross-Chain Bridges](https://rya-sge.github.io/access-denied/2026/06/19/zkp-cross-chain-bridge-hacks/)
+- [How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson](https://rya-sge.github.io/access-denied/2026/11/16/layerzero-v2-architecture/)
+- [Chainlink CCIP — from DONs to Cross-Chain Verifiers](https://rya-sge.github.io/access-denied/2026/11/16/chainlink-ccip-architecture/)
 - [Crypto Hacks of 2022 - Ronin, Wormhole, Nomad and the Year of Bridge Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2022/)
 - [Crypto Hacks of September 2026 - Bitget, Liquid Network and 50 Smaller Incidents]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/)
 - [Three Launchpad Bugs from the Bio Protocol EVM Audits - Units, Donations and Partial Claims]({{site.url_complet}}/2026/09/22/bio-launchpad-evm-audit-findings/)

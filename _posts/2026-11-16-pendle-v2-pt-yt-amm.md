@@ -475,7 +475,6 @@ The points below were not settled by the sources read for this article.
 | Only the sUSDe and ERC-4626 SY implementations were read. | Output sets, caps and pause hooks differ per SY. | The specific SY under `Pendle-SY-Public/.../implementations/`. |
 | The audit reports were listed, not read. | Known findings on markets V6/V7 and the oracles are not summarised. | `pendle-core-v2-public/audits/`. |
 | The documentation's wstETH example gives 0.8928 wstETH per PT at a rate of 1.2, which would give 0.8333. | One of the two figures in the doc is wrong; the article quotes neither as fact. | `HighLevelArchitecture.md`, PT section. |
-| The title of the planned Morpho Blue and Vault V2 article was not known when this one was written. | The link text under Related articles must match its title. | `_posts/2026-11-16-morpho-blue-vault-v2.md`. |
 
 ## References
 
@@ -500,7 +499,7 @@ The points below were not settled by the sources read for this article.
 ### Related articles
 
 - [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)
-- [Morpho Blue and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
+- [How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/)
 - [How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/)
 - [The PT-reUSD Liquidations on Morpho - How a 320,000 SY Trade Liquidated 36M, Replayed from On-Chain State]({{site.url_complet}}/2026/10/11/pt-reusd-morpho-liquidations-pendle-twap-replay/)
 - [Pricing Yield Collateral on Morpho - Huma's PST Exchange Rate and Ojo's Pendle PT Feed]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/)

@@ -2,7 +2,7 @@
 layout: post
 title: "USD₮0 - Omnichain Fungible Token"
 date:   2025-11-07
-last_modified_at: 2025-11-19
+last_modified_at: 2026-11-16
 lang: en
 locale: en-GB
 categories: blockchain ethereum 
@@ -107,6 +107,19 @@ Both networks must verify the payload hash before a cross-chain message is execu
 
 More details: [LayerZero DVN Documentation](https://docs.layerzero.network/v2/home/modular-security/security-stack-dvns)
 
+### Why the DVN configuration matters
+
+In LayerZero V2 the endpoint does not decide whether a message is genuine. Each application sets its own security stack per pathway: a receive library, a list of required DVNs, an optional set with a threshold, and a number of block confirmations. A packet verifies once every required DVN and the optional threshold have attested. [How LayerZero V2 Works]({{site.url_complet}}/2026/11/16/layerzero-v2-architecture/) covers this mechanism, the message lifecycle and the OFT adapter in detail.
+
+Two properties of that configuration bear on a token like USD₮0:
+
+- **Defaults belong to LayerZero Labs.** A configuration field left unset inherits the endpoint owner's default for that pathway, field by field. LayerZero's [May 2026 update](https://layerzero.network/blog/an-overdue-apology) states that an application on defaults is fully reliant on the LayerZero Labs multisig, and recommends pinning every configuration, setting reorg-safe confirmations and using at least two DVNs, three to five being better.
+- **The adapter holds all the backing.** On Ethereum, USD₮0's `OAdapterUpgradeable` locks USD₮ for every other chain, so a single forged inbound message that passes verification can unlock from that one contract.
+
+The Kelp DAO incident of 18 April 2026 shows what a single verifier allows. Kelp's rsETH pathway from Unichain to Ethereum used a 1-of-1 DVN configuration with the LayerZero Labs DVN as the only verifier. Attackers poisoned the RPC nodes that DVN read and forced a failover to them with a denial-of-service attack on its external provider; the DVN attested to a burn that never happened, and the Ethereum adapter released 116,500 rsETH, about $292M ([LayerZero Labs KelpDAO Incident Report](https://layerzero.network/blog/layerzero-labs-kelpdao-incident-report)). Since then the LayerZero Labs DVN no longer serves 1/1 configurations.
+
+USD₮0's dual-DVN setup requires two parties to attest, the minimum LayerZero recommends. The configuration deployed on each pathway was not read on chain for this update.
+
 ------
 
 ## Deployments
@@ -131,6 +144,8 @@ USD₮0 combines **cross-chain interoperability, consistent asset backing, and s
 
 ## Related articles
 
+- [How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson]({{site.url_complet}}/2026/11/16/layerzero-v2-architecture/)
+- [Cross-Chain Bridge Hacks - Ten Incidents, Five Failure Classes]({{site.url_complet}}/2026/07/31/cross-chain-bridge-hacks/)
 - [Cross-chain tokens Standard (ERC-7281, xERC20) - Overview]({{site.url_complet}}/2025/05/07/cross-chain-token-overview/)
 - [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/)
 - [Stablecoins Under MiCA — Asset-Referenced Tokens and E-Money Tokens (Titles III and IV)]({{site.url_complet}}/2026/09/17/mica-stablecoins-asset-referenced-tokens-e-money-tokens/)

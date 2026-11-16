@@ -1,0 +1,51 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF2FC
+    LineColor #375BD2
+  }
+  :depth(1) {
+    BackgroundColor #375BD2
+    FontColor white
+  }
+}
+</style>
+* Chainlink CCIP
+** Onchain components
+*** Router 1.2.0, immutable entry point
+*** OnRamp / OffRamp per chain
+*** FeeQuoter: prices, gas caps
+*** RMN: curse switch
+*** TokenAdminRegistry: token -> pool
+** v1.5 - v1.6
+*** Role DON, two OCR plugins
+*** Commit: merkle roots on OffRamp
+*** Execute: merkle proofs
+*** NonceManager, in-order option
+*** manual execution, 8 h window
+** v2.0
+*** Cross-Chain Verifiers (CCVs)
+*** CommitteeVerifier = former DON
+*** receiver + pool + lane quorum
+*** permissionless executors
+*** messageId = hash of MessageV1
+*** no NonceManager, RMN curse-only
+left side
+** Messages
+*** EVM2AnyMessage / Any2EVMMessage
+*** extraArgs V1, V2, V3
+*** finality or opt-in FTF
+** Tokens
+*** burn/mint, lock/release
+*** ERC20LockBox (1.6.4+)
+*** CCT self-serve registration
+*** rate limiter token buckets
+*** decimals: round down, dust lost
+** Integrators
+*** only Router calls ccipReceive
+*** check (chain, sender) pair
+*** do not revert, store and retry
+*** gas limit not refunded
+*** FAILURE is retryable
+@endmindmap

@@ -11,10 +11,13 @@ mindmapDiagram {
   }
 }
 </style>
-* MakerDAO\nvs Liquity V1
-** Protocols
-*** MakerDAO (DAI)
-*** Liquity V1 (LUSD)
+* MakerDAO / Sky\nvs Liquity
+** Versions
+*** Maker: SCD (2017), MCD (2019)
+*** Maker: PSM (2020), Liquidations 2.0 (2021)
+*** Maker: LitePSM, Sky / USDS (2024)
+*** Liquity V1 (LUSD, 2021)
+*** Liquity V2 (BOLD, 2025)
 ** Governance
 *** Active governance\nvs immutable
 ** Collateral
@@ -26,8 +29,8 @@ mindmapDiagram {
 *** Interest-free loans
 *** Collateralisation ratios
 ** Risk management
-*** Liquidation mechanisms
+*** Liquidation mechanisms\nEnglish then Dutch auctions
 *** Savings & incentives
-*** Secondary token role
-*** Emergency shutdown\nvs recovery mode
+*** Secondary token role\ndebt auctions now off
+*** Emergency shutdown\n(governance only today)\nvs recovery mode
 @endmindmap

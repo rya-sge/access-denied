@@ -1,0 +1,36 @@
+@startuml
+title Loss order in three designs
+skinparam shadowing false
+skinparam rectangle {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam ArrowColor #2E8B67
+rectangle "Liquity" as LQ {
+  rectangle "1. Trove collateral" as L1
+  rectangle "2. Stability pool deposits" as L2
+  rectangle "3. Redistribution to other troves" as L3
+  rectangle "V2: bad debt on a shut-down branch" as L4
+}
+rectangle "infiniFi" as IF {
+  rectangle "0. Safety buffer, only if it covers the whole loss" as I0
+  rectangle "1. liUSD lockers and unwinding" as I1
+  rectangle "2. siUSD rewards, then principal" as I2
+  rectangle "3. iUSD price, every holder" as I3
+}
+rectangle "f(x) Protocol" as FX {
+  rectangle "1. Rebalance: position's own collateral" as F1
+  rectangle "2. Liquidation: tick collateral and bonus" as F2
+  rectangle "3. ReservePool pays the bonus" as F3
+  rectangle "4. Other positions of the pool (debtIndex)" as F4
+}
+L1 -down-> L2
+L2 -down-> L3
+L3 -down-> L4
+I0 -down-> I1
+I1 -down-> I2
+I2 -down-> I3
+F1 -down-> F2
+F2 -down-> F3
+F3 -down-> F4
+@enduml
