@@ -2,17 +2,17 @@
 layout: post
 title: "Three Vulnerabilities from the OpenZeppelin Stellar Contracts Audits"
 date:   2026-07-10
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security
 tags: stellar soroban smart-contracts audit rust security vulnerability
-description: A technical walkthrough of three real, resolved findings from the OpenZeppelin Stellar Contracts audits — silent supply inflation via self-recovery, signer aliasing through non-canonical keys, and a ledger-arithmetic TTL underflow — each with the vulnerable code, a flow diagram, and the fix.
+description: "Three resolved findings from the OpenZeppelin Stellar Contracts audits: self-recovery supply inflation, signer key aliasing and a TTL underflow, with fixes."
 image: /assets/article/blockchain/stellar/stellar-soroban-vulnerabilities-audit.png
 isMath: false
 ---
 
-The OpenZeppelin Stellar Contracts library ships its [audit reports](https://github.com/OpenZeppelin/stellar-contracts/tree/main/audits) in the repository. Seven differential audits between February 2025 and April 2026 recorded 143 findings: 4 Critical, 12 High, 35 Medium, 55 Low, and 37 notes. Reading them is one of the better ways to learn how Soroban contracts actually break, because each finding names a broken invariant and the reviewers proposed a concrete fix that later landed in the code.
+The OpenZeppelin Stellar Contracts library ships its [audit reports](https://github.com/OpenZeppelin/stellar-contracts/tree/main/audits) in the repository. Seven differential audits between February 2025 and April 2026 recorded 143 findings: 4 Critical, 12 High, 35 Medium, 55 Low, and 37 notes. Reading them shows how Soroban contracts break in practice, because each finding names a broken invariant and the reviewers proposed a concrete fix that later landed in the code.
 
 This article works through three of them. They were chosen for diversity rather than severity alone: one breaks a supply invariant, one breaks a cryptographic identity assumption, and one is pure ledger arithmetic. They live in three different packages (real-world-asset tokens, smart accounts, and non-fungible tokens), and each has a fix that is instructive in its own right. Every code path below was checked against the library at commit `1e51389`.
 
@@ -26,13 +26,13 @@ Three properties of the Soroban execution model recur across all three findings,
 
 **Token amounts are `i128`; ledger sequences are `u32`.** Balances, allowances and supply use a signed 128-bit integer. The ledger sequence number, and any TTL derived from it, are unsigned 32-bit. Mixing the two, or subtracting on the `u32` side without a guard, is a recurring source of bugs.
 
-**Storage has three tiers, each with a Time-To-Live.** `instance` holds contract-wide singletons, `persistent` holds long-lived per-key data such as balances, and `temporary` holds time-bounded data such as allowances and pending transfers. Every entry carries a TTL and is archived (persistent) or deleted (temporary) when it expires. `extend_ttl` can only ever *raise* a TTL, never lower it.
+**Storage has three tiers, each with a Time-To-Live.** `instance` holds contract-wide singletons, `persistent` holds long-lived per-key data such as balances, and `temporary` holds time-bounded data such as allowances and pending transfers. Every entry carries a TTL; when it expires, a persistent entry is archived and a temporary entry is deleted. `extend_ttl` can only ever *raise* a TTL, never lower it.
 
 **Smart accounts delegate signature checking to verifier contracts.** A Soroban smart account composes signers, context rules, and pluggable policies. A signer is modelled as a `(verifier_contract, key_bytes)` pair, and cryptographic verification is offloaded to the verifier. The framework's security therefore depends on those verifiers being strict about what they accept.
 
 The audits are **differential**: reviewers diff a new HEAD commit against a previously-audited base and focus on what changed. That is why the same class of bug can reappear across versions, and why a fix that changes a data model warrants its own re-review.
 
-## Vulnerability 1 — Silent supply inflation through self-recovery
+## Vulnerability 1 — Untracked supply inflation through self-recovery
 
 **Finding: v0.5.0 C-01 (Critical), `packages/tokens/src/rwa`.**
 
@@ -80,7 +80,7 @@ When `from == to`, the destination read happens **after** the source write, so i
 
 ### The fix
 
-The remediation (PR #432) rewrote recovery to route through `forced_transfer`, which calls `Base::update`, and added the identity-continuity check that a sibling finding (C-02) required. The current `recover_balance` fetches the recovery target from the identity verifier, refuses to proceed unless it matches, and only then moves funds through the canonical path:
+The remediation in PR #432 rewrote recovery to route through `forced_transfer`, which calls `Base::update`, and added the identity-continuity check that sibling finding C-02 required. The current `recover_balance` fetches the recovery target from the identity verifier, refuses to proceed unless it matches, and only then moves funds through the canonical path:
 
 ```rust
 pub fn recover_balance(e: &Env, old_account: &Address, new_account: &Address) -> bool {
@@ -116,7 +116,7 @@ Recall the smart-account model: a signer is a `(verifier_contract, key_bytes)` p
 
 ### The bug
 
-The Ed25519 and WebAuthn verifiers accepted `key_data` that was **at least** the required length and then silently truncated it to the first 32 bytes (Ed25519) or 65 bytes (uncompressed P-256 / WebAuthn). The verifier only used the truncated prefix, but the smart-account layer keyed the signer's identity on the full, untruncated byte string.
+The Ed25519 and WebAuthn verifiers accepted `key_data` that was **at least** the required length and then silently truncated it: to the first 32 bytes for Ed25519, or 65 bytes for uncompressed P-256 / WebAuthn. The verifier only used the truncated prefix, but the smart-account layer keyed the signer's identity on the full, untruncated byte string.
 
 That gap is the whole bug. A malicious user registers several "different" signers that share one real public key `K` and differ only in trailing junk:
 
@@ -130,7 +130,7 @@ To the account these are three distinct signers. To the verifier they are all `K
 
 ### The impact
 
-A multisig is only as strong as the number of *independent* keys behind it. Aliasing collapses that number. An attacker holding one key can appear to satisfy a 3-of-5 threshold, or accumulate weight in a weighted policy, with no additional keys. The audit rated the practical impact as severe: fake signers that look like authorization diversity while there is really only one key behind them, undermining exactly the guarantee a smart account exists to provide.
+A multisig is only as strong as the number of *independent* keys behind it. Aliasing collapses that number. An attacker holding one key can appear to satisfy a 3-of-5 threshold, or accumulate weight in a weighted policy, with no additional keys. The audit rated the practical impact as severe: fake signers that look like authorization diversity but are all backed by a single key, undermining exactly the guarantee a smart account exists to provide.
 
 ### The fix
 
@@ -229,11 +229,15 @@ Reading these reports against the fixed source is a practical way to build a men
 
 **Q: Why did the self-recovery bug inflate the balance instead of leaving it unchanged?**
 
-Because the function performed a read-read-write on a single storage key. It read the balance `b`, computed the new destination balance as `b + b = 2b`, then wrote `0` and then `2b` to the same `Balance(A)` key, so the last write won and the account ended with `2b`. The extra `b` was created out of nothing, and because the function never called `Base::update`, the `total_supply` counter was never adjusted to match. Routing the same operation through `Base::update` would have made it a no-op, because `update` reads the destination balance *after* writing the source, so a self-transfer nets to the original value.
+Because the function performed a read-read-write on a single storage key. It read the balance `b`, computed the new destination balance as `b + b = 2b`, then wrote `0` and then `2b` to the same `Balance(A)` key, so the last write won and the account ended with `2b`. The extra `b` was created out of nothing, and because the function never called `Base::update`, the `total_supply` counter was never adjusted to match.
+
+Routing the same operation through `Base::update` would have made it a no-op, because `update` reads the destination balance *after* writing the source, so a self-transfer nets to the original value.
 
 **Q: What makes `BytesN<32>` a stronger fix than checking the length of a `Bytes` value?**
 
-A length check is a runtime guard that a reviewer must remember to write and keep in place on every path that accepts a key. `BytesN<32>` is a fixed-size type: a value of the wrong length cannot be constructed or deserialized into it at all, so the invariant is enforced by the deserializer and the compiler rather than by hand-written validation. The bug in the original verifiers was precisely that they accepted a longer `Bytes` and truncated it; once the parameter type is `BytesN<32>`, the trailing junk that produced the aliases is not a representable input.
+A length check is a runtime guard that a reviewer must remember to write and keep in place on every path that accepts a key. `BytesN<32>` is a fixed-size type: a value of the wrong length cannot be constructed or deserialized into it at all, so the invariant is enforced by the deserializer and the compiler rather than by hand-written validation.
+
+The bug in the original verifiers was precisely that they accepted a longer `Bytes` and truncated it; once the parameter type is `BytesN<32>`, the trailing junk that produced the aliases is not a representable input.
 
 **Q: Why did the `approve_for_all` underflow escape the test suite?**
 
@@ -241,15 +245,25 @@ The test `revoke_approve_for_all_works` ran in `Env::default()`, whose ledger se
 
 **Q: All three bugs were fixed. Why is reading the reports still useful?**
 
-The value is in the *class* of bug, not the individual instance. The library will keep adding features, and the same patterns recur: a new privileged function that reimplements a mutation instead of delegating, a new input treated as an identity without canonicalization, a new TTL computation on unsigned ledger values. A reviewer who has internalized these three will look for the canonical-path bypass, the non-canonical-identity gap, and the unguarded subtraction in code that has not been audited yet. The reports are a training set for that pattern recognition.
+The value is in the *class* of bug, not the individual instance. The library will keep adding features, and the same patterns recur:
+
+- a new privileged function that reimplements a mutation instead of delegating;
+- a new input treated as an identity without canonicalization;
+- a new TTL computation on unsigned ledger values.
+
+A reviewer who has internalized these three will look for the canonical-path bypass, the non-canonical-identity gap, and the unguarded subtraction in code that has not been audited yet. The reports are a training set for that pattern recognition.
 
 **Q: Combine two of the findings. How do the self-recovery inflation and the TTL underflow each illustrate the same underlying reviewing failure, despite being different bug classes?**
 
-Both slipped through because a critical case was never exercised with the values that trigger it. The self-recovery inflation required `lost_wallet == new_wallet`, an input the original tests presumably never passed because it looks nonsensical, yet it is trivially reachable by an attacker. The TTL underflow required a non-zero ledger sequence, which the tests never set. In both cases the code path "worked" under the conditions it was tested against and failed under the conditions it would actually meet. The shared lesson is adversarial boundary testing: self-referential inputs (`from == to`), zero and maximal values, and realistic environment state are exactly where invariants tend to break, so they are exactly what the tests must cover.
+Both slipped through because a critical case was never exercised with the values that trigger it. The self-recovery inflation required `lost_wallet == new_wallet`, an input the original tests presumably never passed because it looks nonsensical, yet it is trivially reachable by an attacker. The TTL underflow required a non-zero ledger sequence, which the tests never set. In both cases the code path "worked" under the conditions it was tested against and failed under the conditions it would meet in production.
+
+The shared lesson is adversarial boundary testing: self-referential inputs (`from == to`), zero and maximal values, and realistic environment state are exactly where invariants tend to break, so they are exactly what the tests must cover.
 
 **Q: What is a differential audit, and why does it matter that these were differential?**
 
-A differential audit reviews the changes between a new commit and a previously-audited baseline, rather than re-reviewing the whole codebase from scratch. It concentrates effort on what is new or modified, which is efficient, but it also means a bug can be reintroduced or a fix can create a fresh problem in a later diff. The OpenZeppelin Stellar audits are differential, and the v0.5.0 re-audit demonstrated the risk directly: the fixes for two earlier findings introduced new invariant bugs of their own. It is why a remediation that changes a data structure should be treated as new code needing its own review, not as a settled matter.
+A differential audit reviews the changes between a new commit and a previously-audited baseline, rather than re-reviewing the whole codebase from scratch. It concentrates effort on what is new or modified, which is efficient, but it also means a bug can be reintroduced or a fix can create a fresh problem in a later diff.
+
+The OpenZeppelin Stellar audits are differential, and the v0.5.0 re-audit demonstrated the risk directly: the fixes for two earlier findings introduced new invariant bugs of their own. It is why a remediation that changes a data structure should be treated as new code needing its own review, not as a settled matter.
 
 ## References
 

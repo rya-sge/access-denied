@@ -2,7 +2,7 @@
 layout: post
 title: "Windows Domain Persistence - Golden Tickets and the Skeleton Key"
 date:   2026-06-30
-last_modified_at: 2026-08-19
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security network
@@ -14,9 +14,9 @@ image: /assets/article/securite/windows-persistence/2026-06-30-windows-persisten
 isMath: false
 ---
 
-The two previous articles in this series looked at hardening authentication ([smartcards, Hello, FIDO2]({{site.url_complet}}/windows-advanced-authentication)) and protecting credentials ([LAPS, Credential Guard, Protected Users]({{site.url_complet}}/windows-credentials-protection)). This one assumes the defender has already lost: the attacker holds a Domain Controller. The question becomes *persistence*, the techniques an intruder uses to guarantee a way back even after the initial hole is closed. Two are specific to Active Directory and rest entirely on how Kerberos and LSASS work: the **Golden Ticket** and the **Skeleton Key**. Both are documented here for defensive and authorized-testing purposes, with detection and mitigation as the goal.
+The two previous articles in this series looked at hardening authentication with [smartcards, Hello, FIDO2]({{site.url_complet}}/windows-advanced-authentication) and protecting credentials with [LAPS, Credential Guard, Protected Users]({{site.url_complet}}/windows-credentials-protection). This one assumes the defender has already lost: the attacker holds a Domain Controller. The question becomes *persistence*, the techniques an intruder uses to guarantee a way back even after the initial hole is closed. Two are specific to Active Directory and rest entirely on how Kerberos and LSASS work: the **Golden Ticket** and the **Skeleton Key**. Both are documented here for defensive and authorized-testing purposes, with detection and mitigation as the goal.
 
-> **Source and currency note.** This article is based on the lecture *SOS 2021 - 05 Windows persistence* (JMB, HEIG-VD, April 2021), targeting Windows Server 2016-era domains. The underlying mechanics (a stateless KDC trusting any TGT signed with the krbtgt key, an in-memory LSASS patch) are unchanged, but tradecraft and defenses have evolved: modern forged tickets favour **AES** over **RC4** and have variants designed to evade detection (**Diamond** and **Sapphire** tickets), and **Credential Guard** plus **LSA Protection** raise the bar for the LSASS access both techniques need. Treat exact Mimikatz syntax and version specifics as a 2021 snapshot.
+> **Source and currency note.** This article is based on the lecture *SOS 2021 - 05 Windows persistence* (JMB, HEIG-VD, April 2021), targeting Windows Server 2016-era domains. The underlying mechanics are unchanged: a stateless KDC trusts any TGT signed with the krbtgt key, and the Skeleton Key is an in-memory LSASS patch. Tradecraft and defenses have evolved, however: modern forged tickets favour **AES** over **RC4** and have variants designed to evade detection (**Diamond** and **Sapphire** tickets), and **Credential Guard** plus **LSA Protection** raise the bar for the LSASS access both techniques need. Treat exact Mimikatz syntax and version specifics as a 2021 snapshot.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -28,7 +28,7 @@ An attacker who has reached the Domain Controller (DC) with high privilege wants
 
 Classical techniques apply here as on any host: install a backdoor, weaken the local configuration, create a rogue account. But a Domain Controller is the root of trust for an entire domain, and that role exposes techniques that are specific to it. The two below do not drop a file on disk that an antivirus might catch; they abuse the legitimate trust relationships of Kerberos and the LSASS authentication process. That is what makes them both powerful and instructive.
 
-A precondition worth stating clearly: both techniques *assume the attacker has already fully compromised the DC* (SYSTEM, and the ability to read secrets or patch LSASS). They are not entry vectors. They are what an intruder does *after* winning, to keep winning.
+Both techniques share a precondition: they *assume the attacker has already fully compromised the DC*, with SYSTEM privilege and the ability to read secrets or patch LSASS. They are not entry vectors. They are what an intruder does *after* winning, to keep winning.
 
 ## Golden Ticket
 
@@ -95,7 +95,7 @@ Two properties define its character. First, it is **transparent**: legitimate au
 
 Both techniques converge on two defensive levers, which is why the lecture ends on them.
 
-**Monitor LSASS debug access.** Skeleton Key requires patching LSASS, and dumping the krbtgt hash typically requires reading LSASS or replicating secrets. Debug access to the LSASS process on a Domain Controller is not a normal event; it should be logged and alerted on. The credential-protection controls from the [companion article]({{site.url_complet}}/windows-credentials-protection) raise the cost of this access directly: **LSA Protection (RunAsPPL)** blocks user-mode tampering with LSASS, and **Credential Guard** isolates the secrets so a memory read finds nothing reusable. Neither is a perfect wall (a signed kernel driver can still reach LSASS), but both turn a quiet operation into a noisy, detectable one.
+**Monitor LSASS debug access.** Skeleton Key requires patching LSASS, and dumping the krbtgt hash typically requires reading LSASS or replicating secrets. Debug access to the LSASS process on a Domain Controller is not a normal event; it should be logged and alerted on. The credential-protection controls from the [companion article]({{site.url_complet}}/windows-credentials-protection) raise the cost of this access directly: **LSA Protection (RunAsPPL)** blocks user-mode tampering with LSASS, and **Credential Guard** isolates the secrets so a memory read finds nothing reusable. Neither is absolute, since a signed kernel driver can still access LSASS, but both turn a quiet operation into a noisy, detectable one.
 
 **Rotate the krbtgt password.** Because the Golden Ticket is forged from the krbtgt hash, changing that password invalidates every forged (and legitimate) TGT signed with the old key. The lecture's guidance: reset krbtgt **every year and whenever a domain administrator leaves**. One subtlety matters: the reset must be performed **twice**, because the krbtgt account keeps a password history of two keys and TGTs signed with the immediately previous key remain valid until the second rotation flushes it. A single reset does not fully evict an attacker.
 
@@ -105,7 +105,7 @@ Beyond the lecture, modern detection also watches for Kerberos anomalies: ticket
 
 Golden Tickets and the Skeleton Key are post-compromise persistence techniques that weaponise the design of Active Directory itself rather than any software bug. The Golden Ticket exploits a stateless KDC that trusts any TGT encrypted with the krbtgt key, so stealing that one hash lets an attacker mint tickets for any identity, offline and indefinitely. The Skeleton Key patches the LSASS authentication routine on a Domain Controller to accept a universal master password while leaving legitimate logins untouched, at the cost of being volatile across reboots.
 
-The defenses follow directly from the mechanisms. Both require privileged access to LSASS on a DC, so monitoring debug access to that process and deploying LSA Protection and Credential Guard attack the shared precondition. The Golden Ticket specifically is undone by rotating the krbtgt password, performed twice to clear the two-entry key history, on a schedule and whenever a privileged administrator departs. These techniques also sit at the end of the attack chain that the earlier articles try to prevent: strong authentication and credential protection exist precisely so that an attacker never reaches the Domain Controller from which this persistence becomes possible.
+The defenses follow directly from the mechanisms. Both require privileged access to LSASS on a DC, so monitoring debug access to that process and deploying LSA Protection and Credential Guard attack the shared precondition. The Golden Ticket specifically is undone by rotating the krbtgt password, performed twice to clear the two-entry key history, on a schedule and whenever a privileged administrator departs. These techniques also sit at the end of the attack chain that the earlier articles try to prevent: strong authentication and credential protection exist precisely to stop an attacker from gaining the Domain Controller access this persistence requires.
 
 ![Windows Domain Persistence mindmap]({{site.url_complet}}/assets/article/securite/windows-persistence/2026-06-30-windows-persistence.png)
 
@@ -113,27 +113,39 @@ The defenses follow directly from the mechanisms. Both require privileged access
 
 **Q: What exactly is forged in a Golden Ticket, and what key makes it possible?**
 
-A Golden Ticket is a forged Ticket Granting Ticket (TGT). It is possible because every TGT is encrypted and signed with a key derived from the password hash of the **krbtgt** account, a key shared only among the Domain Controllers. An attacker who steals the krbtgt hash can construct a TGT for any user with any group memberships and encrypt it with that key. Since the DC validates a returning TGT only by checking the krbtgt encryption, the forgery is accepted.
+A Golden Ticket is a forged Ticket Granting Ticket (TGT). It is possible because every TGT is encrypted and signed with a key derived from the password hash of the **krbtgt** account, a key shared only among the Domain Controllers.
+
+An attacker who steals the krbtgt hash can construct a TGT for any user with any group memberships and encrypt it with that key. Since the DC validates a returning TGT only by checking the krbtgt encryption, the forgery is accepted.
 
 **Q: Why does a stateless KDC make the Golden Ticket so powerful?**
 
-Because the Domain Controller keeps no record of the TGTs it has issued. It does not consult a list of valid tickets, and it does not re-check that the named user still exists or that the ticket was ever legitimately granted. It trusts the contents of any TGT that decrypts correctly under the krbtgt key. Statelessness means the only thing standing between an attacker and a valid-looking ticket is possession of that key, so once the key is stolen, fabricated tickets (even for non-existent users) are indistinguishable from real ones.
+Because the Domain Controller keeps no record of the TGTs it has issued. It does not consult a list of valid tickets, and it does not re-check that the named user still exists or that the ticket was ever legitimately granted. It trusts the contents of any TGT that decrypts correctly under the krbtgt key.
+
+Statelessness means the only thing standing between an attacker and a valid-looking ticket is possession of that key, so once the key is stolen, fabricated tickets (even for non-existent users) are indistinguishable from real ones.
 
 **Q: How does the Skeleton Key differ from the Golden Ticket in what it modifies and how durable it is?**
 
-The Golden Ticket modifies nothing on the DC at attack time; it forges tickets offline using a previously stolen krbtgt hash, and those tickets stay valid until the krbtgt key is rotated. The Skeleton Key instead patches the running LSASS process on the DC so it accepts a hidden master password for any account. The Golden Ticket is durable (forge anytime, from anywhere, until krbtgt rotation), whereas the Skeleton Key is volatile: it lives only in memory and is lost when the DC reboots, although an attacker with DC access can re-apply it.
+The Golden Ticket modifies nothing on the DC at attack time; it forges tickets offline using a previously stolen krbtgt hash, and those tickets stay valid until the krbtgt key is rotated. The Skeleton Key instead patches the running LSASS process on the DC so it accepts a hidden master password for any account.
+
+The Golden Ticket is durable: tickets can be forged anytime, from anywhere, until krbtgt rotation. The Skeleton Key is volatile: it lives only in memory and is lost when the DC reboots, although an attacker with DC access can re-apply it.
 
 **Q: Why must the krbtgt password be reset twice rather than once?**
 
 The krbtgt account retains a password history of two keys, and TGTs signed with the immediately previous key remain valid for compatibility. A single reset replaces the current key but leaves the previous one (the one the attacker may hold) still trusted. Performing the reset a second time pushes the attacker's key out of the two-entry history, invalidating tickets forged with it. Resetting only once therefore leaves a window in which a Golden Ticket still works.
 
-**Q: Combining this article with the credential-protection one, why do LSA Protection and Credential Guard help against both persistence techniques, and where do they fall short?**
+**Q: Combining this article with the credential-protection one, why do LSA Protection and Credential Guard help against both persistence techniques, and what are their limits?**
 
-Both techniques depend on privileged access to LSASS on the Domain Controller: the Skeleton Key patches LSASS directly, and obtaining the krbtgt hash typically means reading LSASS or abusing replication from a position of LSASS-level control. LSA Protection (RunAsPPL) marks LSASS a Protected Process and blocks user-mode debugging and memory access, and Credential Guard moves the usable secrets into a VBS-isolated world so a memory dump yields nothing reusable. They therefore attack the shared precondition rather than each technique individually. They fall short because they are not absolute: a signed kernel driver can bypass RunAsPPL, Credential Guard has hardware requirements and does not cover every secret or a keylogger, and neither helps once the krbtgt hash has already been exfiltrated, at which point only rotating the key (twice) closes the Golden Ticket.
+Both techniques depend on privileged access to LSASS on the Domain Controller: the Skeleton Key patches LSASS directly, and obtaining the krbtgt hash typically means reading LSASS or abusing replication from a position of LSASS-level control.
+
+LSA Protection (RunAsPPL) marks LSASS a Protected Process and blocks user-mode debugging and memory access, and Credential Guard moves the usable secrets into a VBS-isolated world so a memory dump yields nothing reusable. They therefore attack the shared precondition rather than each technique individually. Neither control is absolute:
+
+- a signed kernel driver can bypass RunAsPPL;
+- Credential Guard has hardware requirements and does not cover every secret or a keylogger;
+- neither helps once the krbtgt hash has already been exfiltrated, at which point only rotating the key twice closes the Golden Ticket.
 
 **Q: Are these techniques an initial attack vector?**
 
-No. Both assume the attacker has already fully compromised a Domain Controller with SYSTEM-level privilege and the ability to read secrets or patch LSASS. They are persistence mechanisms used after a successful intrusion to keep access, not ways to break in. This is why prevention focuses earlier in the chain (strong authentication, credential protection, limiting privileged-account exposure): the goal is to ensure an attacker never reaches the Domain Controller where these techniques become available.
+No. Both assume the attacker has already fully compromised a Domain Controller with SYSTEM-level privilege and the ability to read secrets or patch LSASS. They are persistence mechanisms used after a successful intrusion to keep access, not ways to break in. This is why prevention focuses earlier in the chain, on strong authentication, credential protection and limiting privileged-account exposure, so that an attacker never gains control of a Domain Controller in the first place.
 
 ## References
 

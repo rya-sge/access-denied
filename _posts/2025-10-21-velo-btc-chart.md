@@ -2,7 +2,7 @@
 layout: post
 title: Velo - BTC chart Overview
 date:   2025-10-21
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -131,7 +131,7 @@ Average return per minute, grouped by each day of the week.
 
 ### BTC Cumulative Return By Session
 
-Total return over time, grouped by sessions (e.g., Asia, Europe, US trading hours).
+Total return over time, grouped by trading session: Asia, Europe and US hours.
 
 - **Why it matters**: Lets you see which trading session is driving the market. For example, maybe Asia is mostly selling and US is buying.
 
@@ -148,7 +148,7 @@ Total return over time, grouped by sessions (e.g., Asia, Europe, US trading hour
 
 ### BTC Implied Volatility Term Structure
 
-A curve showing *implied volatility (IV)* for BTC options across different expirations (e.g. 7d, 30d, 90d, 180d, etc.).
+A curve showing *implied volatility (IV)* for BTC options across expirations such as 7d, 30d, 90d and 180d.
 
 ------
 

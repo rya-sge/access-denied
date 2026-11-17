@@ -2,7 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proofs in the Zama Protocol — What They Prove and Where They Are Verified"
 date:   2026-07-24
-last_modified_at: 2026-09-08
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography ZKP zama
@@ -12,7 +12,7 @@ image: /assets/article/cryptographie/zero-knowledge-proof/zama/zero-knowledge-pr
 isMath: true
 ---
 
-The Zama Confidential Blockchain Protocol is built on Fully Homomorphic Encryption, yet it also carries zero-knowledge proofs and multi-party computation. Each of the three covers a distinct boundary, and the zero-knowledge part is deliberately confined to one of them: the moment a user hands an encrypted value to the network. This article looks at what that proof asserts, which construction produces it, who verifies it, what it costs, and which parts of the protocol people often mistake for zero-knowledge machinery when they are in fact signature checks.
+The Zama Confidential Blockchain Protocol is built on Fully Homomorphic Encryption, yet it also carries zero-knowledge proofs and multi-party computation. Each of the three covers a distinct boundary, and the zero-knowledge part is deliberately confined to one of them: the moment a user hands an encrypted value to the network. This article looks at what that proof asserts, which construction produces it, who verifies it, what it costs, and which parts of the protocol people often mistake for zero-knowledge proofs when they are in fact signature checks.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -32,7 +32,9 @@ A confidential contract receives a ciphertext from an address it does not trust.
 
 The first is a malformed ciphertext. The FHE schemes behind the protocol come from the learning-with-errors family, so it is worth recalling what that family assumes.
 
-Learning with errors, usually shortened to LWE, is a linear-algebra problem made hard on purpose. Fix a secret vector $$s$$ and publish many pairs $$(a, b)$$, where each $$a$$ is drawn uniformly at random and $$b = \langle a, s \rangle + e$$ for a small random error $$e$$. Drop the errors and recovering $$s$$ is Gaussian elimination on a linear system, a matter of seconds. Keep them and every equation is slightly wrong, no subset of them can be trusted, and the best known algorithms, quantum ones included, need exponential time. That gap is the hardness assumption the lattice-based schemes rest on, and it also explains why a ciphertext carries noise: encryption reuses the same shape, hiding the message inside the linear relation and letting the error mask it.
+Learning with errors, usually shortened to LWE, is a linear-algebra problem made hard on purpose. Fix a secret vector $$s$$ and publish many pairs $$(a, b)$$, where each $$a$$ is drawn uniformly at random and $$b = \langle a, s \rangle + e$$ for a small random error $$e$$. Drop the errors and recovering $$s$$ is Gaussian elimination on a linear system, a matter of seconds.
+
+Keep them and every equation is slightly wrong, no subset of them can be trusted, and the best known algorithms, quantum ones included, need exponential time. That gap is the hardness assumption the lattice-based schemes rest on. It also explains why a ciphertext carries noise: encryption reuses the same equation, hiding the message inside the linear relation and letting the error mask it.
 
 Writing the LWE form of a ciphertext under a secret key $$s$$:
 
@@ -85,13 +87,13 @@ function exampleFunction(
 
 `param1`, `param2` and `param3` are handles into the packed proof. Argument order in Solidity is free and need not match the order used client-side when the inputs were assembled. The `inputProof` parameter is not the zero-knowledge proof itself, a point developed two sections below.
 
-## Which proof system is actually used
+## Which proof system is used
 
 The proving happens in TFHE-rs, whose [zero-knowledge proof documentation](https://docs.zama.org/tfhe-rs/fhe-computation/advanced-features/zk-pok) names its source: the construction is derived from Benoît Libert's [Vector Commitments With Proofs of Smallness](https://eprint.iacr.org/2023/800). The library ships two variants. ZKV1 follows the paper closely, while ZKV2, selected by default with the standard parameters, departs from it and performs better on both the proving and the verification side.
 
 That lineage matters for a reason that comes back later in this article. Libert's construction builds short range proofs out of vector commitments, counted in a handful of group elements, and its security rests on assumptions in a group rather than on lattices.
 
-Three parameters of the API shape what a client can do with it:
+Three parameters of the API determine what a client can do with it:
 
 - **The CRS.** Proving and verification both take a `CompactPkeCrs`, a Common Reference String generated in advance and shared between clients and servers. It is reusable across encryptions that share the same parameters. In the Zama Protocol, the KMS is the party that produces it.
 - **Where the work lands.** `ZkComputeLoad::Proof` makes proving slower and verification faster; `ZkComputeLoad::Verify` does the opposite. The Relayer SDK calls `build_with_proof_packed` with the `Verify` variant, which keeps proof generation light in a browser and pushes the heavier side onto the coprocessors that verify it.
@@ -142,7 +144,7 @@ struct CiphertextVerification {
 
 The same triple of user, contract and chain that went into the proof metadata reappears here as signed typed data. A caller who is not `userAddress`, or a contract that is not `contractAddress`, cannot make the attestation check out. There is no partial acceptance: deserialisation failures, an unknown signer, or too few signatures each revert before any FHE operation is scheduled.
 
-Client-side the whole construction sits behind a few calls, here with the Hardhat plugin, the Relayer SDK exposing the same shape. Both the contract address and the user address go in, because the proof is bound to that pair:
+Client-side the whole construction sits behind a few calls, here with the Hardhat plugin, the Relayer SDK exposing equivalent calls. Both the contract address and the user address go in, because the proof is bound to that pair:
 
 ```typescript
 const encInput = await fhevm
@@ -177,7 +179,7 @@ Two engineering consequences follow. Packing every input of a call into a single
 
 Zama's FHE and MPC components are already resistant to quantum adversaries. The proof system is not. The litepaper is explicit: "Zama's FHE and MPC technologies are already resistant to quantum computers. However, the ZKPoK is not (similar to most ZK-SNARKs). We are working on replacing it with a lattice-based ZK scheme that is post-quantum."
 
-The reason is structural rather than incidental. The FHE and MPC layers stand on lattice problems, whereas the proof system inherits its security from the vector-commitment construction described earlier, whose hardness assumptions live in a group. Swapping it for a lattice-based argument is therefore a change of proof system, not a parameter bump, which is why it appears in the roadmap rather than in a release note.
+The FHE and MPC layers stand on lattice problems, whereas the proof system inherits its security from the vector-commitment construction described earlier, whose hardness assumptions live in a group. Swapping it for a lattice-based argument is therefore a change of proof system, not a parameter bump, which is why it appears in the roadmap rather than in a release note.
 
 The gap also has a bounded blast radius. An adversary with a quantum computer could forge a proof of knowledge for a ciphertext they did not create, which breaks the anti-replay property at the input boundary. Confidentiality of the data itself rests on the FHE layer and does not fall with the proof system.
 
@@ -206,7 +208,9 @@ In a shielded-pool design, the user is the one who knows the state and proves th
 
 Zero-knowledge occupies one boundary in the Zama Protocol: the handover of an encrypted value from a client to the network. The proof asserts knowledge of the plaintext, correct encryption under the global public key, and binding to the caller and target contract. It is verified off-chain by coprocessors, settled by Gateway consensus, and surfaced on the host chain as a set of EIP-712 signatures that `InputVerifier` checks before any ciphertext enters a computation. Everything past that point relies on other primitives: homomorphic evaluation for computation, threshold MPC for decryption, and signatures to carry cleartexts back on-chain.
 
-The construction behind it is a compact public-key-encryption proof from TFHE-rs, derived from Libert's vector commitments with proofs of smallness, run over a packed list of at most 2048 bits and tied to a metadata string holding the contract, the user, the ACL address and the chain id. That choice explains both the cost profile, a proof cheap enough for a browser and priced per input verification, and the current post-quantum gap, since group-based assumptions are the one place where the protocol still departs from lattices. The announced work on lattice-based proofs, ZK-MPC and ZK-FHE would widen the role of zero-knowledge without moving it back to the centre of the design.
+The construction behind it is a compact public-key-encryption proof from TFHE-rs, derived from Libert's vector commitments with proofs of smallness, run over a packed list of at most 2048 bits and tied to a metadata string holding the contract, the user, the ACL address and the chain id.
+
+That choice explains both the cost profile, a proof cheap enough for a browser and priced per input verification, and the current post-quantum gap, since group-based assumptions are the one place where the protocol still departs from lattices. The announced work on lattice-based proofs, ZK-MPC and ZK-FHE would widen the role of zero-knowledge without moving it back to the centre of the design.
 
 ![Zero-knowledge proofs in the Zama Protocol]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zama/zero-knowledge-proofs-zama-protocol.png)
 
@@ -273,7 +277,9 @@ Because FHE computation is already publicly verifiable by recomputation: anyone 
 
 **Q: Which proof system produces the ZKPoK?**
 
-The proving code lives in TFHE-rs and is derived from Benoît Libert's *Vector Commitments With Proofs of Smallness* (eprint 2023/800), a vector-commitment construction yielding very short range proofs. Two variants ship: ZKV1, close to the paper, and ZKV2, the default, which trades fidelity to the paper for better performance on both sides. The client builds one packed proof over a list of encrypted values with `build_with_proof_packed`, against a CRS and a metadata string; verification uses `verify_and_expand` with the same CRS and metadata.
+The proving code lives in TFHE-rs and is derived from Benoît Libert's *Vector Commitments With Proofs of Smallness* (eprint 2023/800), a vector-commitment construction yielding very short range proofs. Two variants ship: ZKV1, close to the paper, and ZKV2, the default, which trades fidelity to the paper for better performance on both sides.
+
+The client builds one packed proof over a list of encrypted values with `build_with_proof_packed`, against a CRS and a metadata string; verification uses `verify_and_expand` with the same CRS and metadata.
 
 **Q: Where is the proof verified, on the host chain or off-chain?**
 

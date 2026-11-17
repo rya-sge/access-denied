@@ -2,6 +2,7 @@
 layout: post
 title: "The Black-Scholes Model - Pricing Options and Corporate Liabilities"
 date: 2026-07-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: finance
@@ -94,7 +95,9 @@ As $$x$$ and $$t$$ change, the number of options to hold short changes with them
 
 ![Black-Scholes hedged portfolio concept]({{site.url_complet}}/assets/article/finance/black-scholes-hedged-portfolio-concept.png)
 
-The paper illustrates the position numerically. Take the option maturity curve $$T_2$$ of the paper's figure, with the stock at $$\$15.00$$, the option worth $$\$5.00$$, and the slope $$w_1 = 1/2$$. The hedge is one share long and two options short. The share costs $$\$15.00$$, the two options bring in $$\$10.00$$, so the equity is $$\$5.00$$. If the hedge is left unadjusted, the equity varies slightly with a large stock move: a $$\$5.00$$ move in either direction produces about a $$\$0.75$$ decline in equity, and the direction of that decline does not depend on the direction of the stock move. Because the shift is independent of direction, the covariance between the hedged return and the stock return is zero, and so is the covariance with the market. The residual risk of an unadjusted hedge is therefore diversifiable, and it vanishes entirely when the hedge is adjusted continuously.
+The paper illustrates the position numerically. Take the option maturity curve $$T_2$$ of the paper's figure, with the stock at $$\$15.00$$, the option worth $$\$5.00$$, and the slope $$w_1 = 1/2$$. The hedge is one share long and two options short. The share costs $$\$15.00$$, the two options bring in $$\$10.00$$, so the equity is $$\$5.00$$.
+
+If the hedge is left unadjusted, the equity varies slightly with a large stock move: a $$\$5.00$$ move in either direction produces about a $$\$0.75$$ decline in equity, and the direction of that decline does not depend on the direction of the stock move. Because the shift is independent of direction, the covariance between the hedged return and the stock return is zero, and so is the covariance with the market. The residual risk of an unadjusted hedge is therefore diversifiable, and it vanishes entirely when the hedge is adjusted continuously.
 
 ## The option pricing differential equation
 
@@ -190,7 +193,11 @@ w_1(x,t) = N(d_1).
 \end{aligned}
 $$
 
-This is the modern **delta**: the number of shares to hold against one option, or the slope of the value curve. The factor $$x w_1 / w$$ is always greater than one. This follows from the formula itself: since $$x w_1 = x N(d_1)$$ and $$w = x N(d_1) - c\, e^{r(t-t^*)} N(d_2)$$, their difference is $$x w_1 - w = c\, e^{r(t-t^*)} N(d_2)$$, which is strictly positive because the exercise price, the discount factor, and the probability $$N(d_2)$$ are all positive. So $$x w_1$$ exceeds $$w$$, and the ratio exceeds one. The economic reason is leverage: holding the call is like owning $$N(d_1)$$ shares while having borrowed part of the cost, so the amount actually put in is smaller than the shares it controls, and a given stock move is a larger percentage move on that smaller base. This ratio is the amplification from the stock's return to the option's return, since the dominant random part of the option move is $$\Delta w \approx w_1 \Delta x$$, which in percentage terms reads $$\Delta w / w \approx (x w_1 / w)(\Delta x / x)$$. The option's percentage return is the stock's percentage return magnified by $$x w_1 / w$$, so its volatility is larger by that same factor. The option is therefore always more volatile than the underlying stock, which is why a hedge of options against stock is needed in the first place.
+This is the modern **delta**: the number of shares to hold against one option, or the slope of the value curve. The factor $$x w_1 / w$$ is always greater than one. This follows from the formula itself: since $$x w_1 = x N(d_1)$$ and $$w = x N(d_1) - c\, e^{r(t-t^*)} N(d_2)$$, their difference is $$x w_1 - w = c\, e^{r(t-t^*)} N(d_2)$$, which is strictly positive because the exercise price, the discount factor, and the probability $$N(d_2)$$ are all positive. So $$x w_1$$ exceeds $$w$$, and the ratio exceeds one.
+
+The economic reason is leverage: holding the call is like owning $$N(d_1)$$ shares while having borrowed part of the cost, so the amount invested is smaller than the value of the shares it controls, and a given stock move is a larger percentage move on that smaller base.
+
+This ratio is the amplification from the stock's return to the option's return, since the dominant random part of the option move is $$\Delta w \approx w_1 \Delta x$$, which in percentage terms reads $$\Delta w / w \approx (x w_1 / w)(\Delta x / x)$$. The option's percentage return is the stock's percentage return magnified by $$x w_1 / w$$, so its volatility is larger by that same factor. The option is therefore always more volatile than the underlying stock, which is why a hedge of options against stock is needed in the first place.
 
 ## An alternative derivation through the CAPM
 
@@ -238,7 +245,9 @@ The parity relation was first noted by Stoll (1969), though the paper observes t
 
 The reach of the paper comes from a reinterpretation. Almost every corporate liability can be read as an option on the firm's assets, so the same formula prices them.
 
-Consider a company whose only assets are shares of a second company, financed by common stock and a single issue of pure discount bonds with face value $$c$$ maturing in ten years, with no dividends allowed until the bonds are paid. At maturity the firm sells its assets, pays the bondholders if it can, and hands the rest to the stockholders. The stockholders hold a call option on the firm's assets: they own the assets but have granted the bondholders the right to take them back for $$c$$. Whichever party has the claim, the stock is worth $$w(x,t)$$ from the option formula, where $$x$$ is now the total asset value and $$v^2$$ the variance rate of the assets, and the bonds are worth $$x - w(x,t)$$.
+Consider a company whose only assets are shares of a second company, financed by common stock and a single issue of pure discount bonds with face value $$c$$ maturing in ten years, with no dividends allowed until the bonds are paid. At maturity the firm sells its assets, pays the bondholders if it can, and hands the rest to the stockholders.
+
+The stockholders hold a call option on the firm's assets. As the paper puts it, the bondholders in effect own the assets but have given the stockholders options to buy them back, at an exercise price equal to the face value $$c$$. At maturity the stock is worth the assets minus $$c$$, or zero, whichever is greater. Before maturity, the stock is worth $$w(x,t)$$ from the option formula, where $$x$$ is now the total asset value and $$v^2$$ the variance rate of the assets, and the bonds are worth $$x - w(x,t)$$.
 
 ![Corporate liabilities as options on firm assets]({{site.url_complet}}/assets/article/finance/black-scholes-corporate-liabilities-concept.png)
 
@@ -292,27 +301,39 @@ The volatility $$v^2$$ is the only input not directly observable, and it became 
 
 **Q: Why does the expected return on the stock not appear in the formula?**
 
-The valuation is built from a hedged position that is riskless over each short interval, so its return must equal the interest rate regardless of anyone's forecast for the stock. The option is priced relative to the current stock price, which already embeds the market's view of the expected return. Two investors who disagree about how fast the stock will rise, but agree on its volatility, therefore compute the same option value. The expected return does affect how fast the option price rises over time, because that price moves with the stock, but it does not enter the level of the formula.
+The valuation is built from a hedged position that is riskless over each short interval, so its return must equal the interest rate regardless of anyone's forecast for the stock. The option is priced relative to the current stock price, which already embeds the market's view of the expected return.
+
+Two investors who disagree about how fast the stock will rise, but agree on its volatility, therefore compute the same option value. The expected return does affect how fast the option price rises over time, because that price moves with the stock, but it does not enter the level of the formula.
 
 **Q: What role does the volatility $$v^2$$ play, and why is it special among the inputs?**
 
-The variance rate $$v^2$$ is the only input to the formula that is not directly observable in the market. The stock price, exercise price, interest rate, and time to maturity are all quoted or contractual, but volatility must be estimated. It governs the width of the distribution of possible future stock prices, and a higher volatility raises the option value because it increases the chance of a large favourable move while the downside is capped at the premium. Because it is the single free quantity, option markets came to quote and trade implied volatility directly.
+The variance rate $$v^2$$ is the only input to the formula that is not directly observable in the market. The stock price, exercise price, interest rate, and time to maturity are all quoted or contractual, but volatility must be estimated.
+
+It governs the width of the distribution of possible future stock prices, and a higher volatility raises the option value because it increases the chance of a large favourable move while the downside is capped at the premium. Because it is the single free quantity, option markets came to quote and trade implied volatility directly.
 
 **Q: How is the hedged position constructed, and why must it be rebalanced?**
 
-The position holds one share long and sells short $$1/w_1$$ options, where $$w_1$$ is the slope of the option value with respect to the stock price. A small stock move changes the long share and the short options by offsetting amounts, so the stock-price risk cancels to first order. The slope $$w_1$$ itself depends on the stock price and on time, so as either changes the correct number of options to hold short changes too. Keeping the hedge riskless therefore requires continuous rebalancing; if the position is left unadjusted, a residual risk appears, but it is diversifiable and its covariance with the market is zero.
+The position holds one share long and sells short $$1/w_1$$ options, where $$w_1$$ is the slope of the option value with respect to the stock price. A small stock move changes the long share and the short options by offsetting amounts, so the stock-price risk cancels to first order.
+
+The slope $$w_1$$ itself depends on the stock price and on time, so as either changes the correct number of options to hold short changes too. Keeping the hedge riskless therefore requires continuous rebalancing; if the position is left unadjusted, a residual risk appears, but it is diversifiable and its covariance with the market is zero.
 
 **Q: In what sense is a company's common stock an option?**
 
-For a firm financed by stock and a single issue of discount bonds with face value $$c$$, the stockholders receive the firm's assets minus $$c$$ at maturity if that difference is positive, and nothing otherwise. That payoff is exactly the payoff of a call option on the firm's assets with exercise price $$c$$. The stockholders effectively own the assets but have sold the bondholders the right to reclaim them for $$c$$. Applying the option formula with $$x$$ set to the total asset value and $$v^2$$ to the variance of the assets prices the stock, and the bonds are worth the assets minus that option value.
+For a firm financed by stock and a single issue of discount bonds with face value $$c$$, the stockholders receive the firm's assets minus $$c$$ at maturity if that difference is positive, and nothing otherwise. That payoff is exactly the payoff of a call option on the firm's assets with exercise price $$c$$.
+
+The bondholders effectively own the assets but have given the stockholders the right to buy them back for $$c$$. Applying the option formula with $$x$$ set to the total asset value and $$v^2$$ to the variance of the assets prices the stock, and the bonds are worth the assets minus that option value.
 
 **Q: How does the CAPM derivation reach the same differential equation as the hedging argument?**
 
-The capital asset pricing model expresses each asset's expected excess return through its beta. Using the stochastic expansion of the option's change, the option's beta equals its elasticity $$x w_1 / w$$ times the stock's beta. Writing the expected returns on the stock and option through the CAPM, expanding the option change with stochastic calculus, and taking expectations, the terms carrying the market risk premium and the stock's beta cancel. What remains is the same option pricing equation. Both routes encode one fact: the option's systematic risk is entirely inherited from the stock, so no separate risk premium survives, which is why the expected return drops out.
+The capital asset pricing model expresses each asset's expected excess return through its beta. Using the stochastic expansion of the option's change, the option's beta equals its elasticity $$x w_1 / w$$ times the stock's beta.
+
+Writing the expected returns on the stock and option through the CAPM, expanding the option change with stochastic calculus, and taking expectations, the terms carrying the market risk premium and the stock's beta cancel. What remains is the same option pricing equation. Both routes encode one fact: the option's systematic risk is entirely inherited from the stock, so no separate risk premium survives, which is why the expected return drops out.
 
 **Q: Why does the formula apply to a European call and an American call alike but not to an American put?**
 
-Merton showed that the value of a live call always exceeds its immediate exercise value $$x - c$$, so a rational holder of an American call on a non-dividend-paying stock never exercises early. Early exercise is never optimal, and the American call is worth the same as the European call the formula prices. A put is different: if the stock price falls near zero, exercising the put early collects the exercise price sooner and earns interest on it, which can be worth more than waiting. Early exercise can therefore be optimal for an American put, its value exceeds the European put, and no closed-form formula for it was known when the paper was written.
+Merton showed that the value of a live call always exceeds its immediate exercise value $$x - c$$, so a rational holder of an American call on a non-dividend-paying stock never exercises early. Early exercise is never optimal, and the American call is worth the same as the European call the formula prices.
+
+A put is different: if the stock price falls near zero, exercising the put early collects the exercise price sooner and earns interest on it, which can be worth more than waiting. Early exercise can therefore be optimal for an American put, its value exceeds the European put, and no closed-form formula for it was known when the paper was written.
 
 ## References
 

@@ -2,7 +2,7 @@
 layout: post
 title: Machine Learning - Supervised vs. Unsupervised Learning
 date: 2025-01-22
-last_modified_at: 2025-01-24
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai
@@ -213,7 +213,7 @@ While there is overlap, machine learning is more application-driven, and statist
 
 A detection system is typically a **classification system**. Its goal is to classify whether a particular object or event is present or absent in the input data.
 
-**Example:** A face detection system classifies regions of an image as either containing a face (positive class) or not containing a face (negative class).
+**Example:** A face detection system classifies regions of an image as either containing a face, the positive class, or not containing a face, the negative class.
 
 ## Reference
 

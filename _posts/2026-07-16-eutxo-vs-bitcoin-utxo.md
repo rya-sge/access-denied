@@ -2,6 +2,7 @@
 layout: post
 title: "The Extended UTXO Model, and How It Differs from Bitcoin"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -11,7 +12,7 @@ image: /assets/article/blockchain/cardano/eutxo-vs-bitcoin-utxo.png
 isMath: false
 ---
 
-Cardano's ledger is built on the same idea as Bitcoin's: value is held in discrete, immutable coins rather than in mutable account balances. Cardano then extends that idea so that scripts can express far more than Bitcoin's allow, without giving up the properties that make the coin model predictable. The result is the Extended UTXO (eUTXO) model. This article works through what Cardano keeps from Bitcoin, what the word "Extended" actually adds, and where the two models diverge for anyone writing or reasoning about on-chain logic. The model description follows the Cardano [developer portal](https://developers.cardano.org/).
+Cardano's ledger is built on the same idea as Bitcoin's: value is held in discrete, immutable coins rather than in mutable account balances. Cardano then extends that idea so that scripts can express far more than Bitcoin's allow, without giving up the properties that make the coin model predictable. The result is the Extended UTXO (eUTXO) model. This article works through what Cardano keeps from Bitcoin, what the word "Extended" adds, and where the two models diverge for anyone writing or reasoning about on-chain logic. The model description follows the Cardano [developer portal](https://developers.cardano.org/).
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -40,7 +41,7 @@ Four properties follow from this design, and they hold identically in Bitcoin an
 
 1. **A UTXO is consumed entirely.** You cannot partially spend one; spending part of a UTXO means consuming all of it and creating change.
 2. **Inputs equal outputs plus fees, exactly.** The protocol enforces the balance; value is not created or destroyed in an ordinary transaction.
-3. **A UTXO is immutable.** Once created it never changes. There is no update, only create (as an output) and consume (as an input).
+3. **A UTXO is immutable.** Once created it never changes. There is no update: a UTXO is created as the output of one transaction and consumed as the input of another.
 4. **A UTXO is spent once.** Consuming it in a confirmed transaction removes it from circulation forever, which is how double-spending is prevented.
 
 The **UTXO set** is the collection of all unspent outputs at a given moment, and it is the current state of the chain. Each entry is identified by the transaction that created it plus an output index, the `(TxId, index)` pair known as a transaction output reference. On both networks every node keeps this set for validation.
@@ -53,7 +54,9 @@ In Bitcoin, an output is a pair: an amount in satoshis and a **locking script** 
 
 Bitcoin Script is a stack-based language, and it is deliberately restricted. It has no loops and is not Turing-complete, which keeps validation bounded and predictable. The common templates are familiar: pay-to-public-key-hash requires a signature matching a public key, pay-to-script-hash commits to a redeem script revealed at spend time, and multisig requires several signatures.
 
-The point that matters for the comparison is what a Bitcoin script can actually observe. It sees the unlocking data provided to it. Signature-checking opcodes such as `OP_CHECKSIG` verify a signature over a serialization of the spending transaction, and the `SIGHASH` flags choose which parts of that transaction the signature commits to, so a spend can be bound to particular outputs to a limited degree. Time is available through `nLockTime` together with `OP_CHECKLOCKTIMEVERIFY` (absolute) and `OP_CHECKSEQUENCEVERIFY` (relative). What Bitcoin does not provide is any persistent state attached to a coin, or a general ability for a script to read the other inputs and outputs of its transaction. There is also no notion of assets other than bitcoin at the base layer.
+The point that matters for the comparison is what a Bitcoin script can observe. It sees the unlocking data provided to it. Signature-checking opcodes such as `OP_CHECKSIG` verify a signature over a serialization of the spending transaction, and the `SIGHASH` flags choose which parts of that transaction the signature commits to, so a spend can be bound to particular outputs to a limited degree.
+
+Time is available through `nLockTime` together with `OP_CHECKLOCKTIMEVERIFY` for absolute locks and `OP_CHECKSEQUENCEVERIFY` for relative ones. What Bitcoin does not provide is any persistent state attached to a coin, or a general ability for a script to read the other inputs and outputs of its transaction. There is also no notion of assets other than bitcoin at the base layer.
 
 These limits are a design choice, not an oversight. They keep the surface small and validation simple. They also mean that expressing a rule like "this coin may only be spent into an output that preserves some updated state" (a covenant) is not generally possible in deployed Bitcoin Script; such capabilities are the subject of ongoing proposals rather than shipped features.
 
@@ -61,7 +64,7 @@ These limits are a design choice, not an oversight. They keep the surface small 
 
 Cardano keeps the coin model in full and extends the output with three elements. Two of them live on the output or are supplied at spend time; the third is a view the ledger hands to the script.
 
-- **Datum**: data attached to a UTXO. This is state that lives inside a specific output. Where an account-based contract keeps state in mutable storage, an eUTXO contract keeps it in a datum, and it advances that state by consuming the UTXO and creating a new one carrying new data. Cardano supports a datum hash (only the hash is stored on-chain, the full value supplied when spending) and an inline datum (the full value stored in the output so anyone can read it without off-chain coordination).
+- **Datum**: data attached to a UTXO. This is state that lives inside a specific output. Where an account-based contract keeps state in mutable storage, an eUTXO contract keeps it in a datum, and it advances that state by consuming the UTXO and creating a new one carrying new data. Cardano supports two forms. A datum hash stores only the hash on-chain, and the spender supplies the full value when spending. An inline datum stores the full value in the output, so anyone can read it without off-chain coordination.
 - **Redeemer**: the argument the spender supplies when unlocking a script-controlled UTXO. The validator uses it to decide whether the spend is allowed, and it is roughly the analogue of Bitcoin's unlocking data, but typed and structured.
 - **Script context**: the view the validator receives of the entire transaction, including all inputs, all outputs, the fee, the validity interval, and the signatories.
 
@@ -116,11 +119,17 @@ The extensions do not cost the model its predictability, because a validator rea
 
 Several practical properties follow, and they are stronger than in the account model:
 
-- **Fail-fast, off-chain checkable.** The builder can evaluate the scripts locally before submitting. If a chosen input has already been spent, validation fails without the transaction ever landing on-chain. Structural (phase-1) failures cost nothing; only script (phase-2) failures consume collateral.
+- **Fail-fast, off-chain checkable.** The builder can evaluate the scripts locally before submitting. If a chosen input has already been spent, validation fails without the transaction ever landing on-chain. Structural failures, checked in phase 1, cost nothing; only script failures, checked in phase 2, consume collateral.
 - **Atomic, no partial state.** Either every condition holds and the transaction applies in full, or it fails and nothing changes. There is no equivalent of running out of gas halfway through a state change.
 - **Exact fees.** Because the computation is fixed at build time, the fee is computed precisely rather than estimated.
 
-Concurrency is inherited from the UTXO model and is explicit in both Bitcoin and Cardano: two transactions cannot consume the same UTXO, so if both try, only one succeeds and the other fails because it references a spent output. On Cardano, protocols manage this contention with UTXO fan-out (spreading state across many outputs), batching (a single transaction consuming many user orders plus a shared state UTXO), and reference inputs (reading a UTXO, such as an oracle, without consuming it). These are design patterns rather than protocol changes, and they exist precisely because the eUTXO model makes contention visible instead of hiding it behind a mutable balance.
+Concurrency is inherited from the UTXO model and is explicit in both Bitcoin and Cardano: two transactions cannot consume the same UTXO, so if both try, only one succeeds and the other fails because it references a spent output. On Cardano, protocols manage this contention with three patterns:
+
+- **UTXO fan-out** spreads state across many outputs.
+- **Batching** has a single transaction consume many user orders together with a shared state UTXO.
+- **Reference inputs** read a UTXO, such as an oracle, without consuming it.
+
+These are design patterns rather than protocol changes, and they exist precisely because the eUTXO model makes contention visible instead of hiding it behind a mutable balance.
 
 ## Side-by-side comparison
 
@@ -169,26 +178,44 @@ The trade-off is deliberate. Cardano gains expressiveness without reading mutabl
 
 **Q: What does Bitcoin's UTXO model and Cardano's eUTXO model have in common?**
 
-They share the entire coin-based foundation. Both track value as discrete unspent transaction outputs rather than mutable balances, both consume whole UTXOs as inputs and create new UTXOs as outputs (with change handled like physical cash), both enforce that the sum of inputs equals the sum of outputs plus fees exactly, and both treat every UTXO as immutable and spendable exactly once. The current state of each chain is its UTXO set, and each output is identified by a `(TxId, index)` reference. The differences are not in this foundation but in what an output can carry and what a script may inspect.
+They share the entire coin-based foundation. Both:
+
+- track value as discrete unspent transaction outputs rather than mutable balances;
+- consume whole UTXOs as inputs and create new UTXOs as outputs, with change handled like physical cash;
+- require the inputs to pay for the outputs, with the difference going to the fee. Bitcoin leaves the fee implicit and only requires inputs to cover outputs. Cardano states the fee in the transaction and requires an exact balance, where the equation also counts minted or burned tokens, reward withdrawals, and stake deposits and refunds;
+- treat every UTXO as immutable and spendable exactly once.
+
+The current state of each chain is its UTXO set, and each output is identified by a `(TxId, index)` reference. The differences are not in this foundation but in what an output can carry and what a script may inspect.
 
 **Q: What are the three things the "Extended" in eUTXO refers to?**
 
-Datum, redeemer, and script context. The datum is data attached to a UTXO, giving it persistent state. The redeemer is the typed argument a spender supplies when unlocking a script-controlled UTXO. The script context is the view of the whole transaction (all inputs, all outputs, fee, validity interval, signatories) that the ledger passes to the validator. Bitcoin has an analogue of the redeemer in its unlocking script, but nothing equivalent to a datum or a general script context.
+Datum, redeemer, and script context. The datum is data attached to a UTXO, giving it persistent state. The redeemer is the typed argument a spender supplies when unlocking a script-controlled UTXO. The script context is the view of the whole transaction that the ledger passes to the validator: all inputs, all outputs, fee, validity interval and signatories.
+
+Bitcoin has an analogue of the redeemer in its unlocking script, but nothing equivalent to a datum or a general script context.
 
 **Q: Why can a Cardano validator enforce conditions on a transaction's outputs when a Bitcoin script generally cannot?**
 
-Because of the script context. A Cardano validator receives the entire transaction as input, so it can read the other outputs and require, for example, that spending its UTXO also produces a specific output or recreates its own script address with an updated datum. A Bitcoin script primarily sees the unlocking data supplied to it and the signature commitments selected by SIGHASH flags; it has no general facility to read the sibling inputs and outputs of its transaction, which is why output-constraining covenants are not a deployed feature of Bitcoin Script.
+Because of the script context. A Cardano validator receives the entire transaction as input, so it can read the other outputs and require, for example, that spending its UTXO also produces a specific output or recreates its own script address with an updated datum.
+
+A Bitcoin script primarily sees the unlocking data supplied to it and the signature commitments selected by SIGHASH flags; it has no general facility to read the sibling inputs and outputs of its transaction, which is why output-constraining covenants are not a deployed feature of Bitcoin Script.
 
 **Q: How does a contract keep and update state if UTXOs are immutable?**
 
-It never mutates a UTXO. Instead, state advances by a destroy-and-create cycle: the transaction consumes the UTXO holding the current state (with its datum) and creates a new UTXO at the same script address carrying the updated datum. The validator, reading the script context, enforces that this successor output exists and that the transition from old state to new state is legal. This is how vesting contracts, auctions, and exchange pools hold evolving state on Cardano despite every individual UTXO being immutable.
+It never mutates a UTXO. Instead, state advances by a destroy-and-create cycle: the transaction consumes the UTXO holding the current state and its datum, and creates a new UTXO at the same script address carrying the updated datum. The validator, reading the script context, enforces that this successor output exists and that the transition from old state to new state is legal.
+
+This is how vesting contracts, auctions, and exchange pools hold evolving state on Cardano despite every individual UTXO being immutable.
 
 **Q: The eUTXO model adds programmability. Why does that not cost it the determinism that Bitcoin's model has?**
 
-Because the added visibility stops at the transaction boundary. A Cardano validator can read everything in its own transaction, but it cannot read arbitrary mutable global chain state, which is the source of unpredictability in account-based systems. Since a transaction names its exact inputs by reference and fixes all script arguments at build time, its outcome is fully determined before submission: it either produces exactly the result the builder saw or fails with no effect. This is why fees can be computed exactly, scripts can be evaluated off-chain before submitting, and a transaction that references an already-spent input simply fails rather than executing against changed state. Cardano keeps the coin model's determinism while extending its expressiveness precisely because it declined to give scripts access to global state.
+Because the added visibility stops at the transaction boundary. A Cardano validator can read everything in its own transaction, but it cannot read arbitrary mutable global chain state, which is the source of unpredictability in account-based systems.
+
+Since a transaction names its exact inputs by reference and fixes all script arguments at build time, its outcome is fully determined before submission: it either produces exactly the result the builder saw or fails with no effect. This is why fees can be computed exactly, scripts can be evaluated off-chain before submitting, and a transaction that references an already-spent input simply fails rather than executing against changed state.
+
+Cardano keeps the coin model's determinism while extending its expressiveness precisely because it declined to give scripts access to global state.
 
 ## References
 
+- [Ogmios - ValueNotConserved error](https://ogmios.dev/typescript/api/interfaces/_cardano_ogmios_schema.SubmitTransactionFailureValueNotConserved.html)
 - [Cardano developer portal](https://developers.cardano.org/)
 - [The Extended UTXO Model (Chakravarty et al., IOHK)](https://iohk.io/en/research/library/papers/the-extended-utxo-model/)
 - [eUTXO handbook (PDF)](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook_for_EC.pdf)

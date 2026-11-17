@@ -2,7 +2,7 @@
 layout: post
 title: "Vault Curator - Steak House Finance"
 date:   2025-11-06
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -27,7 +27,7 @@ Here a  list of some of their vaults.
 [USDC prime](https://app.kamino.finance/earn/HDsayqAsDWy3QvANGqh2yNraqcD8Fnjgh73Mhb3WRS5E)
 
 - Risk: conservative
-- USDC Prime is a conservative lending strategy designed to deliver consistent, risk-adjusted yields by allocating funds across highly liquid markets and premium collateral. Managed by Steakhouse Financial, this vault optimizes returns by lending USDC against both core collateral markets (ain/JLP) and select real-world asset (RWA) pools, dynamically adapting to market conditions to ensure robust yield performance and capital preservation.
+- USDC Prime is a conservative lending strategy designed to deliver consistent, risk-adjusted yields by allocating funds across highly liquid markets and premium collateral. Managed by Steakhouse Financial, this vault lends USDC against both core collateral markets, such as ain/JLP, and selected real-world asset (RWA) pools. It adapts its allocation to market conditions, with yield and capital preservation as its stated aims.
 
 [Steakhouse USDC High Yield](https://app.kamino.finance/earn/BEEfo7xwgK2ZP13Pxo7qqTPzAteKJmXjVWtMWcXSvbn2)
 
@@ -146,7 +146,7 @@ Reference:
 
 #### Example
 
-According to an [announcement](https://www.businesswire.com/news/home/20250624393365/en/Grove-Announces-Launch-of-Institutional-Grade-Credit-Infrastructure-DeFi-Protocol-with-%241-Billion-Allocation-to-Tokenized-Janus-Henderson-Anemoy-AAA-CLO-Strategy), Sky (formerly MakerDAO) approved a $1 billion allocation into the Janus Henderson Anemoy AAA CLO Strategy — an onchain collateralized loan obligation (CLO) launched in collaboration with tokenized real-world asset lending protocol [Centrifuge](https://www.theblock.co/post/288846/centrifuge-raises-15-million-in-series-a-funding-for-institutional-defi-adoption) — using Grove's decentralized infrastructure.
+According to an [announcement](https://www.businesswire.com/news/home/20250624393365/en/Grove-Announces-Launch-of-Institutional-Grade-Credit-Infrastructure-DeFi-Protocol-with-%241-Billion-Allocation-to-Tokenized-Janus-Henderson-Anemoy-AAA-CLO-Strategy), Sky, formerly MakerDAO, approved a $1 billion allocation into the Janus Henderson Anemoy AAA CLO Strategy, using Grove's decentralized infrastructure. The strategy is an onchain collateralized loan obligation (CLO) launched in collaboration with the tokenized real-world asset lending protocol [Centrifuge](https://www.theblock.co/post/288846/centrifuge-raises-15-million-in-series-a-funding-for-institutional-defi-adoption).
 
 Reference: [theblock.co - Sky approves $1 billion allocation for Janus Henderson's onchain fund using fresh-out-of-stealth Grove infrastructure](https://www.theblock.co/post/359687/sky-approves-1-billion-allocation-for-janus-hendersons-onchain-fund-using-fresh-out-of-stealth-grove-infrastructure)
 

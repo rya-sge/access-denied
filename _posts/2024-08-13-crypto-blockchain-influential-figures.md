@@ -2,7 +2,7 @@
 layout: post
 title:  Influential figures in Crypto and Blockchain
 date:   2024-08-13
-last_modified_at: 2024-09-19
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -35,7 +35,7 @@ This list is also intended to be neutral. It does not indicate whether the impac
 
 #### David Chaum (eCash / Blind Signature)
 
-- **Impact:** David Chaum’s pioneering work in cryptography and digital cash laid the groundwork for Bitcoin. He created **eCash**, an early form of anonymous digital currency, and developed **blind signatures**, enabling secure, private transactions. Though eCash was centralized, it influenced Bitcoin's decentralized design. Chaum's ideas on privacy and cryptography inspired the **cypherpunk movement**, which played a key role in Bitcoin’s development. While Bitcoin differs in its use of a decentralized ledger, it builds on Chaum's vision of privacy and secure digital payments.
+- **Impact:** David Chaum’s early work in cryptography and digital cash preceded Bitcoin and influenced it. He created **eCash**, an early form of anonymous digital currency, and developed **blind signatures**, enabling secure, private transactions. Though eCash was centralized, it influenced Bitcoin's decentralized design. Chaum's ideas on privacy and cryptography inspired the **cypherpunk movement**, which played a key role in Bitcoin’s development. While Bitcoin differs in its use of a decentralized ledger, it builds on Chaum's vision of privacy and secure digital payments.
 - **X:** [chaumdotcom](https://x.com/chaumdotcom)
 - [Wikipedia](https://en.wikipedia.org/wiki/David_Chaum)
 

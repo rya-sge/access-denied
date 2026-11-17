@@ -2,7 +2,7 @@
 layout: post
 title: Cross-chain tokens Standard (ERC-7281, xERC20) - Overview
 date:  2025-05-07
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum
@@ -164,7 +164,7 @@ The interface also defines two standardized events, `CrosschainMint` and `Crossc
 
 These events facilitate deterministic indexing and monitoring of crosschain activities by off-chain agents, such as indexers, analytics tools, and auditors.
 
-`IERC7802` is intentionally lightweight, ensuring minimal overhead for implementation. Its modular design enables extensibility, allowing additional features (such as mint/burn limits, transfer fees, or bridge-specific access control mechanisms) to be layered on top without modifying the base interface.
+`IERC7802` is intentionally small, so it adds little implementation overhead. Additional features can be layered on top without modifying the base interface, for example mint and burn limits, transfer fees, or bridge-specific access control.
 
 ### Optimism superchain ERC20
 
@@ -293,7 +293,7 @@ First, grant the `SuperchainTokenBridge` (at `0x42000000000000000000000000000000
 
 **Q: Why does ERC-7905 exist if ERC-7281 already covers xERC20?**
 
-ERC-7281 carries Lockbox wrappers, structs, and extensive configuration functions that exceed the minimum needed for core interoperability. ERC-7905 strips this down to the essential xERC20-native functionality (mint, burn, and the limit views), giving a smaller and more focused interface for tokens that do not need the full ERC-7281 machinery.
+ERC-7281 carries Lockbox wrappers, structs, and extensive configuration functions that exceed the minimum needed for core interoperability. ERC-7905 keeps only the xERC20-native functions: mint, burn and the limit views. Tokens that do not need the rest of ERC-7281 get a smaller interface.
 
 ## References
 

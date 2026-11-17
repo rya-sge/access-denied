@@ -2,6 +2,7 @@
 layout: post
 title: "Writing Cardano Smart Contracts with Aiken"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -234,7 +235,7 @@ From there the off-chain application takes over: it reads `plutus.json`, derives
 
 ## Security considerations specific to eUTXO
 
-Aiken removes whole classes of bugs by construction (no reentrancy, no unbounded loops, deterministic costs), but eUTXO has its own catalogue of mistakes that the compiler cannot catch. A validator only enforces what it explicitly checks, and forgetting a check is the usual failure mode. The recurring classes:
+Aiken removes whole classes of bugs by construction: there is no reentrancy, no unbounded loop, and costs are deterministic. eUTXO still has its own catalogue of mistakes that the compiler cannot catch. A validator only enforces what it explicitly checks, and forgetting a check is the usual failure mode. The recurring classes:
 
 - **Double satisfaction**: one output is counted as satisfying two independent validators in the same transaction.
 - **Arbitrary or unbounded datum**: trusting an attacker-supplied datum, or one large enough to make the output expensive to spend.
@@ -273,27 +274,39 @@ Two limits are worth restating. The compiler removes reentrancy, unbounded loops
 
 **Q: Why is a Cardano smart contract described as a validator rather than a program that executes actions?**
 
-Because in the eUTXO model the ledger, not the contract, moves value. A contract is a pure predicate that receives a fully-formed transaction and returns `True` or `False`. It cannot initiate a transfer, call another contract imperatively, or read outside state. Everything it can influence, it influences by rejecting transactions that fail its checks. This is what makes execution deterministic: the same transaction always produces the same verdict and the same cost, which can be computed off-chain before submission.
+Because in the eUTXO model the ledger, not the contract, moves value. A contract is a pure predicate that receives a fully-formed transaction and returns `True` or `False`. It cannot initiate a transfer, call another contract imperatively, or read outside state.
 
-**Q: If every language compiles to UPLC, what does choosing Aiken actually change?**
+Everything it can influence, it influences by rejecting transactions that fail its checks. This is what makes execution deterministic: the same transaction always produces the same verdict and the same cost, which can be computed off-chain before submission.
 
-Nothing about on-chain semantics, since UPLC and the ledger rules fix those. The choice affects developer ergonomics and the properties of the compiled output. Aiken was built only for writing validators, so it has a small learning curve, produces compact and efficient scripts, ships a built-in test runner, and generates a CIP-57 blueprint automatically. A language such as Plinth gives the full Haskell type system and shared on/off-chain types instead, at the cost of larger scripts and a steeper ramp. The tradeoff is tooling and output size, not capability.
+**Q: If every language compiles to UPLC, what does choosing Aiken change?**
+
+Nothing about on-chain semantics, since UPLC and the ledger rules fix those. The choice affects developer ergonomics and the properties of the compiled output.
+
+Aiken was built only for writing validators, so it has a small learning curve, produces compact and efficient scripts, ships a built-in test runner, and generates a CIP-57 blueprint automatically. A language such as Plinth gives the full Haskell type system and shared on/off-chain types instead, at the cost of larger scripts and a steeper ramp. The tradeoff is tooling and output size, not capability.
 
 **Q: What are the arguments a `spend` handler receives, and why is the datum wrapped in `Option`?**
 
-A `spend` handler receives the datum attached to the UTXO being unlocked, the redeemer supplied by the spender, a reference to the specific input being validated (`OutputReference`), and the whole transaction as context. The datum is an `Option` because, under Plutus V3, an output at a script address is not required to carry a datum. The handler must therefore account for its absence, typically with `expect Some(...) = datum`, which rejects the spend when no valid datum is present instead of assuming one exists.
+A `spend` handler receives the datum attached to the UTXO being unlocked, the redeemer supplied by the spender, a reference to the specific input being validated (`OutputReference`), and the whole transaction as context.
+
+The datum is an `Option` because, under Plutus V3, an output at a script address is not required to carry a datum. The handler must therefore account for its absence, typically with `expect Some(...) = datum`, which rejects the spend when no valid datum is present instead of assuming one exists.
 
 **Q: How does a one-shot minting policy guarantee that a token is minted only once?**
 
-By parameterizing the validator on a specific UTXO reference and requiring, in the `Mint` branch, that this exact UTXO be spent in the same transaction. A UTXO can be consumed only once across the entire ledger, so once it is spent the minting condition can never be satisfied again. The `gift_card` example pairs this with checks that pin the exact asset name and a minted amount of `1`, so the policy authorizes precisely one token of one name and nothing else.
+By parameterizing the validator on a specific UTXO reference and requiring, in the `Mint` branch, that this exact UTXO be spent in the same transaction. A UTXO can be consumed only once across the entire ledger, so once it is spent the minting condition can never be satisfied again.
+
+The `gift_card` example pairs this with checks that pin the exact asset name and a minted amount of `1`, so the policy authorizes exactly one token under one asset name.
 
 **Q: How do Aiken's tests relate to the execution cost a contract pays on-chain?**
 
-The test runner evaluates each `test` against the same execution-budget model the ledger uses and reports the CPU and memory units consumed. A test is therefore also a cost measurement: a change that pushes a validator's units up shows immediately in `aiken check` output. This matters because Cardano bounds script execution units per transaction, so a validator that grows too expensive will fail on-chain even if it is logically correct. Property tests extend this by sampling many inputs and shrinking any failure to a minimal counterexample.
+The test runner evaluates each `test` against the same execution-budget model the ledger uses and reports the CPU and memory units consumed. A test is therefore also a cost measurement: a change that pushes a validator's units up shows immediately in `aiken check` output.
+
+This matters because Cardano bounds script execution units per transaction, so a validator that grows too expensive will fail on-chain even if it is logically correct. Property tests extend this by sampling many inputs and shrinking any failure to a minimal counterexample.
 
 **Q: A validator passed all its unit tests. Why is a separate eUTXO security review still necessary?**
 
-Unit tests confirm the checks a validator does perform behave as intended. They cannot reveal a check the author never wrote. Most eUTXO vulnerabilities are omissions: a minting policy that verifies quantity but forgets the asset name, a spend that trusts a UTXO's state without an authenticating token, or an output double-counted across two validators. These follow from the model rather than from Aiken, and the compiler cannot flag them. A review against the known eUTXO vulnerability classes checks for the constraints that should exist and do not, which testing of existing logic will not surface.
+Unit tests confirm the checks a validator does perform behave as intended. They cannot reveal a check the author never wrote. Most eUTXO vulnerabilities are omissions: a minting policy that verifies quantity but forgets the asset name, a spend that trusts a UTXO's state without an authenticating token, or an output double-counted across two validators.
+
+These follow from the model rather than from Aiken, and the compiler cannot flag them. A review against the known eUTXO vulnerability classes checks for the constraints that should exist and do not, which testing of existing logic will not surface.
 
 ## References
 

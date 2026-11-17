@@ -2,6 +2,7 @@
 layout: post
 title: "Rundler — Inside Alchemy's ERC-4337 Bundler"
 date:   2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum programmation
@@ -13,7 +14,7 @@ isMath: false
 
 A bundler occupies an uncomfortable position in [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337). It spends its own ETH to submit a transaction containing other people's user operations, and it is reimbursed only if those operations validate on-chain. Everything between accepting an operation and being paid for it is the bundler's problem: deciding what to admit, predicting what will still be valid several seconds later, and getting a transaction mined at a price that leaves a margin.
 
-Rundler is Alchemy's answer, written in Rust and running in production behind their Bundler API. This article walks through how it is built — the three tasks it splits into, what the mempool actually checks, how bundles are proposed and submitted, and how it estimates the three gas limits that ERC-4337 makes the client's responsibility. The standard itself, and the roles around the bundler, are covered in [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/).
+Rundler is Alchemy's answer, written in Rust and running in production behind their Bundler API. This article walks through how it is built: the three tasks it splits into, what the mempool checks, how bundles are proposed and submitted, and how it estimates the three gas limits that ERC-4337 makes the client's responsibility. The standard itself, and the roles around the bundler, are covered in [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/).
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -44,7 +45,7 @@ The split is what makes horizontal scaling possible. RPC and Builder are statele
 
 Communication is deliberately narrow. RPC pushes operations into the Pool on `eth_sendUserOperation`, and reaches the Builder only through the `debug_` namespace, to set bundling mode and trigger a bundle in tests. The interesting channel is Pool ↔ Builder: the Builder subscribes to the Pool's block stream, asks for the most valuable operations after each new block, re-simulates them, and reports back anything that failed so the Pool can evict it.
 
-The codebase is around 72 000 lines of Rust — a binary crate plus a dozen libraries — with `builder` (~16 600 lines) and `pool` (~15 800) carrying most of the weight.
+The codebase is around 72 000 lines of Rust in a binary crate plus a dozen libraries. The `builder` crate (~16 600 lines) and the `pool` crate (~15 800) hold most of the code.
 
 ## Pool
 
@@ -177,7 +178,7 @@ The parsing rules are strict in a way that is worth copying. A malformed value *
 
 `X-Rundler-Max-Block-Range` is the odd one out: it is lookup configuration, not a permission, and it never affects `eth_sendUserOperation`. On `eth_sendUserOperation`, headers take precedence over the deprecated positional `permissions` parameter when both are present.
 
-What the permissions actually do:
+What the permissions do:
 
 | Permission | Effect |
 |------------|--------|
@@ -287,7 +288,7 @@ Rundler supports EntryPoint **v0.6.0, v0.7.0, v0.8.0 and v0.9.0** at their canon
 
 Addresses can be overridden through the chain spec, but Rundler expects the contracts themselves to be unmodified — the override exists for chains lacking a deterministic deployment mechanism, not for forks.
 
-Only **two ABIs** are needed: every version from v0.7 onward shares one. The type layer reflects that with a `UserOperation` trait for the common interface, a `UserOperationVariant` container implementing the trait by passthrough, and version-specific `v0_6::UserOperation` / `v0_7::UserOperation` types. The convention is that only genuinely version-specific code touches the concrete types; everything else takes the trait as a generic or handles the variant.
+Only **two ABIs** are needed: every version from v0.7 onward shares one. The type layer reflects that with a `UserOperation` trait for the common interface, a `UserOperationVariant` container implementing the trait by passthrough, and version-specific `v0_6::UserOperation` / `v0_7::UserOperation` types. The convention is that only code that differs between versions touches the concrete types; everything else takes the trait as a generic or handles the variant.
 
 Each task absorbs the multiplicity differently. The Pool runs a **separate mempool per entry point**. The Builder's shared worker pool selects an entry point per cycle. The RPC runs **one server** and routes by the entry point address in the request — and for methods that do not carry one, such as `eth_getUserOperationReceipt`, searches every enabled entry point's logs.
 
@@ -323,13 +324,13 @@ That third point is a good example of what separates a bundler design document f
 
 Chain-specific parameters come from a layered resolution, highest precedence first: `CHAIN_*` environment variables, then the `--chain_spec` TOML file, then the hardcoded spec named by `--network`, then a `base` spec if one is declared, then defaults. `base` resolution is **one level only** — a base that itself names a base does not resolve further. Hardcoded specs ship in `bin/rundler/chain_specs/`.
 
-Rundler is tested on Ethereum, OP Stack chains (Optimism, Base, Zora, Frax explicitly), Arbitrum Orbit chains (Arbitrum One explicitly) and Polygon PoS, with the general claim that any OP Stack or Orbit chain should work.
+Rundler is tested on Ethereum, on OP Stack chains, naming Optimism, Base, Zora and Frax explicitly, on Arbitrum One, and on Polygon PoS. The README files Arbitrum One under "Arbitrum Orbit", but Arbitrum One is the public Arbitrum L2; Orbit chains are the self-managed chains other teams build with the same Arbitrum technology ([Arbitrum docs](https://docs.arbitrum.io/launch-arbitrum-chain/a-gentle-introduction)). The general claim is that any OP Stack or Orbit chain should work.
 
 The repository runs the ERC-4337 `bundler-spec-tests` for both v0.6 and v0.7 through `make test-spec-integrated`, alongside unit tests. Docker is the recommended way to run it, though no pre-built image is published.
 
 Two licences apply: the library — everything outside `bin/` — is **LGPL-3.0**, and the binaries in `bin/` are **GPL-3.0**. Both are copyleft, which matters before vendoring any of it.
 
-The status banner in the README is not boilerplate and should be read as written: Rundler is under active development, interfaces have breaking changes, and it is offered for production use *at your own risk* — even though Alchemy runs it in their own cloud.
+The status banner in the README is meant literally: Rundler is under active development, interfaces have breaking changes, and it is offered for production use *at your own risk*, even though Alchemy runs it in their own cloud.
 
 ## Conclusion
 
@@ -451,12 +452,13 @@ Several, and Rundler's own configuration surface names most of them:
 
 **Q: How does one RPC server handle four EntryPoint versions without four code paths?**
 
-Two ABIs cover all four, because every version from v0.7 onward shares one — so only v0.6 needs separate handling. The type layer expresses this with a `UserOperation` trait for the shared interface, a `UserOperationVariant` container that implements the trait by passthrough, and concrete `v0_6::UserOperation` / `v0_7::UserOperation` types reserved for genuinely version-specific code.
+Two ABIs cover all four, because every version from v0.7 onward shares one, so only v0.6 needs separate handling. The type layer expresses this with a `UserOperation` trait for the shared interface, a `UserOperationVariant` container that implements the trait by passthrough, and concrete `v0_6::UserOperation` / `v0_7::UserOperation` types reserved for code that differs between versions.
 
 Routing happens by the entry point address carried in the request. For methods that do not carry one — `eth_getUserOperationReceipt` being the example — Rundler searches every enabled entry point's logs for the hash.
 
 ## References
 
+- [Arbitrum docs - A gentle introduction to Arbitrum chains](https://docs.arbitrum.io/launch-arbitrum-chain/a-gentle-introduction)
 - [Rundler](https://github.com/alchemyplatform/rundler) — Alchemy, including `docs/architecture/`, `docs/cli.md` and `docs/designs/poison-user-operations.md`
 - [Wallet APIs documentation](https://alchemy.com/docs/wallets) — Alchemy
 - [ERC-4337 bundler reference implementation](https://github.com/eth-infinitism/bundler) and [bundler-spec-tests](https://github.com/eth-infinitism/bundler-spec-tests) — eth-infinitism

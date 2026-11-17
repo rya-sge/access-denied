@@ -2,7 +2,7 @@
 layout: post
 title:  EIP-6780, selfdestruct, we won't miss you
 date:   2024-03-13
-last_modified_at: 2025-04-03
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum
@@ -66,7 +66,7 @@ This section describes the common vulnerabilities and risks related to the use o
 
 ### Impossibility to work (DoS)
 
-If a contract A called a contrat B (or a library) to execute code without verifying that the contract is still in live (not destructed), a self destruct on the contract B can block the contract A for ever. 
+If a contract A calls a contract B or a library to execute code without verifying that B has not been destructed, a self-destruct of contract B can block contract A forever. 
 
 #### Parity multisig wallet
 

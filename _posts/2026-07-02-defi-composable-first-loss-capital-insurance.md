@@ -2,7 +2,7 @@
 layout: post
 title: Insuring Composable DeFi - First-Loss Capital Along the Attack Graph
 date:   2026-07-02
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -12,7 +12,7 @@ image: /assets/article/blockchain/defi/composable-insurance/2026-07-02-defi-comp
 isMath: true
 ---
 
-Several of the largest DeFi incidents of the last few months share a pattern: the attack did not exploit a single protocol in isolation, it chained several protocols together and turned composability against them. The reflexive response has been to add more insurance at the protocol or asset level. This article is based on a [conference talk on the subject](https://www.youtube.com/watch?v=BgNGjJgTw2E) and follows its argument that the more useful question is *where* in a composable system the insurance should sit. Placing first-loss capital along the path an attacker actually travels, rather than only at the endpoint where the loss lands, turns out to be far more capital efficient.
+Several of the largest DeFi incidents of the last few months share a pattern: the attack did not exploit a single protocol in isolation, it chained several protocols together and turned composability against them. The reflexive response has been to add more insurance at the protocol or asset level. This article is based on a [conference talk on the subject](https://www.youtube.com/watch?v=BgNGjJgTw2E) and follows its argument that the more useful question is *where* in a composable system the insurance should sit. Placing first-loss capital along the path an attacker takes, rather than only at the endpoint where the loss lands, turns out to be far more capital efficient.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -42,9 +42,9 @@ The first instinct after such an incident is to add coverage at the protocol or 
 
 Concretely, the industry response has been to add junior pools and first-loss capital: mechanisms such as Aave Umbrella and similar staking-backed backstops, mostly funded from protocol revenue or from users who stake capital into the first-loss tranche. A first-loss pool absorbs the initial losses before senior depositors are touched, which is a sound idea in isolation.
 
-The problem is *placement*. These pools sit at the destination, the final state in the graph where coverage is actually paid out. But an attack traverses many components before it gets there: it goes through a bridge, the bridge attests to backing, new collateral is created, and only then does the loss land at the endpoint. Insuring only the endpoint means every asset is effectively backstopped by a single pool against every possible cyber incident, which is both expensive and badly targeted.
+The problem is *placement*. These pools sit at the destination, the final state in the graph where coverage is paid out. But an attack traverses many components before it gets there: it goes through a bridge, the bridge attests to backing, new collateral is created, and only then does the loss land at the endpoint. Insuring only the endpoint means every asset is effectively backstopped by a single pool against every possible cyber incident, which is both expensive and badly targeted.
 
-This placement problem produces a tragedy of the commons. A bridge or an oracle is a shared dependency of many protocols, yet no individual protocol wants to fund coverage for a component it does not own. Everyone protects their own endpoint of the graph, and the shared factors, the parts that actually caused the incident, go uninsured.
+This placement problem produces a tragedy of the commons. A bridge or an oracle is a shared dependency of many protocols, yet no individual protocol wants to fund coverage for a component it does not own. Everyone protects their own endpoint of the graph, and the shared factors, the parts that caused the incident, go uninsured.
 
 ## Reframing First-Loss Capital as a Flow Problem
 
@@ -52,15 +52,17 @@ The proposed reframing is to stop thinking of first-loss capital as a static buf
 
 ![Attack graph with shared factors feeding composable protocols]({{site.url_complet}}/assets/article/blockchain/defi/composable-insurance/attack-graph-coverage-concept.png)
 
-Viewed this way, exposure has two different decompositions. One is by asset and protocol: which endpoint holds the position. The other is by factor: which particular signer, bridge, or oracle caused a given issue. If you insure by the first decomposition, you appear to need coverage for every asset against every possible attack at the same time, which is why endpoint insurance looks so expensive. If you insure by the second, you notice that only certain paths through the graph correspond to incidents that were ever actually reported.
+Viewed this way, exposure has two different decompositions. One is by asset and protocol: which endpoint holds the position. The other is by factor: which particular signer, bridge, or oracle caused a given issue. If you insure by the first decomposition, you appear to need coverage for every asset against every possible attack at the same time, which is why endpoint insurance looks so expensive. If you insure by the second, you notice that only certain paths through the graph correspond to incidents that were ever reported.
 
 In an ideal arrangement, a shared factor such as a bridge would be insured by each protocol that uses it, in proportion to that usage. If roughly 40% of a bridge's volume flows to Aave, 30% to Morpho, and the remainder to Spark, each would contribute to the bridge's coverage in that proportion. That is the opposite of the current state, where the shared dependency is nobody's responsibility.
 
 ## Loss Attribution and Capital Efficiency
 
-To make this concrete, consider why one smaller, well-placed pool can provide the same protection as several larger ones. Suppose four protocols each post $50M$ of their own revenue or users' capital as first-loss capital, for $200M$ in total. Now suppose a particular factor failure, say a faulty oracle, can only ever affect two of those four protocols, because the other two have larger buffers and larger supply caps and are essentially never touched by that specific route. If the maximum loss along that route is $100M$, the four-endpoint arrangement is holding $200M$ of capital against a $100M$ exposure. On that route it is over-collateralised by a factor of two, which is capital that could have been doing something else.
+To make this concrete, consider why one smaller, well-placed pool can provide the same protection as several larger ones. Suppose four protocols each post $50M$ of their own revenue or users' capital as first-loss capital, for $200M$ in total. Now suppose a particular factor failure, say a faulty oracle, can only ever affect two of those four protocols, because the other two have larger buffers and larger supply caps and are essentially never touched by that specific route.
 
-Placing the capital by route instead of by endpoint recovers that inefficiency. If the worst-case insured loss is $200M$, spreading the same first-loss budget across the right vaults might cover most of it with $120M$; targeting the responsible factors directly can lower the requirement further; and a mix of some protocol-level and some factor-level coverage can be lower still. The point is not the exact figures but the direction: matching coverage to where risk actually flows removes the systematic over-provisioning that endpoint-only insurance forces.
+If the maximum loss along that route is $100M$, the four-endpoint arrangement is holding $200M$ of capital against a $100M$ exposure. On that route it is over-collateralised by a factor of two, which is capital that could have been doing something else.
+
+Placing the capital by route instead of by endpoint recovers that inefficiency. If the worst-case insured loss is $200M$, spreading the same first-loss budget across the right vaults might cover most of it with $120M$; targeting the responsible factors directly can lower the requirement further; and a mix of some protocol-level and some factor-level coverage can be lower still. The point is not the exact figures but the direction: matching coverage to where risk flows removes the systematic over-provisioning that endpoint-only insurance forces.
 
 The mechanism for choosing *which* parts of the graph should carry coverage is a loss-attribution rule. Think of an attack as a flow of value through the graph, and attribute the resulting loss to each factor according to how much of that flow passed through it and how much of the damage it caused. Writing $L$ for the total loss of an incident and $f_i$ for the fraction of the attack flow that traversed factor $i$, a first-order attribution assigns
 
@@ -96,7 +98,9 @@ The takeaway is deliberately narrow. The recommendation is to insure where risk 
 
 ## Conclusion
 
-The composable incidents of 2026 exposed a mismatch between where losses land and where they are caused. Endpoint insurance, junior pools and first-loss tranches sitting at each protocol, backstops the destination while leaving the shared factors that actually failed uninsured, which is both costly and poorly targeted. Reframing first-loss capital as coverage placed along the attack graph, attributing losses to factors in proportion to the malicious flow through them and allocating a fixed budget by optimisation, matches capital to risk and removes the over-provisioning that endpoint-only coverage forces. The same framing yields per-path instruments that are easier to price and, ultimately, formal guarantees about which compositions are safe. The mindmap below summarises the argument.
+The composable incidents of 2026 exposed a mismatch between where losses land and where they are caused. Endpoint insurance, junior pools and first-loss tranches sitting at each protocol, backstops the destination while leaving the shared factors that failed uninsured, which is both costly and poorly targeted.
+
+Reframing first-loss capital as coverage placed along the attack graph, attributing losses to factors in proportion to the malicious flow through them and allocating a fixed budget by optimisation, matches capital to risk and removes the over-provisioning that endpoint-only coverage forces. The same framing yields per-path instruments that are easier to price and, ultimately, formal guarantees about which compositions are safe. The mindmap below summarises the argument.
 
 ![Mindmap summarising first-loss capital along the DeFi attack graph]({{site.url_complet}}/assets/article/blockchain/defi/composable-insurance/2026-07-02-defi-composable-first-loss-capital-mindmap.png)
 
@@ -104,15 +108,19 @@ The composable incidents of 2026 exposed a mismatch between where losses land an
 
 **Q: What does "composability" mean in DeFi, and why is it described as an attack surface?**
 
-Composability is the ability to assemble on-chain positions permissionlessly by plugging protocols into one another: a bridged token can be posted as collateral in a lending market and borrowed against in one transaction. It gives DeFi its capital efficiency because arrangements that would need legal contracts off-chain can be built directly on-chain. It is an attack surface because each hop looks locally valid while a fault in one component can propagate unchecked into the next, producing a composite failure that no single protocol's risk model sees.
+Composability is the ability to assemble on-chain positions permissionlessly by plugging protocols into one another: a bridged token can be posted as collateral in a lending market and borrowed against in one transaction. It gives DeFi its capital efficiency because arrangements that would need legal contracts off-chain can be built directly on-chain.
 
-**Q: In the rETH bridge example, where did the bad debt actually come from?**
+It is an attack surface because each hop looks locally valid while a fault in one component can propagate unchecked into the next, producing a composite failure that no single protocol's risk model sees.
+
+**Q: In the rETH bridge example, where did the bad debt come from?**
 
 The attacker forged the cross-chain message that the bridge relied on, so the bridge attested that collateral existed on the origin chain when it did not. From that forged attestation the attacker minted an unbacked amount of the asset, deposited it as collateral in lending vaults that had already whitelisted it, and borrowed real assets against it. The bad debt is the gap between the real value the lending protocol paid out and the unbacked collateral it received in return.
 
 **Q: What is "endpoint insurance" and what is its main weakness?**
 
-Endpoint insurance places first-loss capital at the destination, junior pools and staking-backed backstops such as Aave Umbrella sitting at each protocol, so that these tranches absorb losses before senior depositors are affected. Its weakness is placement, not concept. An attack traverses a bridge, an attestation, and newly created collateral before the loss ever lands, so insuring only the endpoint covers every asset against every incident with a single pool, which is expensive and badly targeted, and it leaves shared factors uninsured.
+Endpoint insurance places first-loss capital at the destination, junior pools and staking-backed backstops such as Aave Umbrella sitting at each protocol, so that these tranches absorb losses before senior depositors are affected. Its weakness is placement, not concept.
+
+An attack traverses a bridge, an attestation, and newly created collateral before the loss ever lands, so insuring only the endpoint covers every asset against every incident with a single pool, which is expensive and badly targeted, and it leaves shared factors uninsured.
 
 **Q: Why does insuring shared factors lead to a "tragedy of the commons" when it is not addressed?**
 
@@ -120,11 +128,15 @@ A bridge or oracle is a shared dependency of many protocols, but no individual p
 
 **Q: How does loss attribution by flow make insurance more capital efficient, and how is it computed?**
 
-Instead of buffering every endpoint against every attack, the model attributes each incident's loss to the factors along the path the attack took. Writing $L$ for the total loss and $f_i$ for the fraction of the attack flow through factor $i$, the attributed loss is $L_i = f_i \cdot L$ with $\sum_i f_i = 1$. These attributed losses score how much coverage each factor needs, so a fixed budget can be concentrated on the most likely failure paths first. The efficiency gain is concrete: four endpoints holding $200M$ against a route whose maximum loss is $100M$ are over-collateralised twofold, whereas allocating the same budget by route can cover the same worst case with materially less capital.
+Instead of buffering every endpoint against every attack, the model attributes each incident's loss to the factors along the path the attack took. Writing $L$ for the total loss and $f_i$ for the fraction of the attack flow through factor $i$, the attributed loss is $L_i = f_i \cdot L$ with $\sum_i f_i = 1$. These attributed losses score how much coverage each factor needs, so a fixed budget can be concentrated on the most likely failure paths first.
+
+The efficiency gain is concrete: four endpoints holding $200M$ against a route whose maximum loss is $100M$ are over-collateralised twofold, whereas placing capital by route can cover the same $100M$ worst case with about half of it, freeing the rest for other uses.
 
 **Q: What is meant by "formal coverage guarantees," and how does the credit-default-swap analogy relate to them?**
 
-Each path through the graph, together with its attached coverage, behaves like a bespoke credit-default-swap-style instrument: it pays out on a specific composite failure along a specific route, which makes it easier to price than a blanket policy standing behind everything. Once coverage is defined over paths this way, one can reason about how it moves across the graph and state a guarantee such as "any position that stays within this set of protocols and borrows less than a given amount is always fully covered." Because that guarantee is a property of the graph and its coverage, it can in principle be verified formally and checked live rather than asserted after an incident.
+Each path through the graph, together with its attached coverage, behaves like a bespoke credit-default-swap-style instrument: it pays out on a specific composite failure along a specific route, which makes it easier to price than a blanket policy standing behind everything.
+
+Once coverage is defined over paths this way, one can reason about how it moves across the graph and state a guarantee such as "any position that stays within this set of protocols and borrows less than a given amount is always fully covered." Because that guarantee is a property of the graph and its coverage, it can in principle be verified formally and checked live rather than asserted after an incident.
 
 ## References
 

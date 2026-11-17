@@ -2,11 +2,12 @@
 layout: post
 title: "Smart Contract Security on Cardano: What the eUTXO Model Removes and What Remains"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
 tags: cardano security eutxo smart-contracts plutus aiken validator audit
-description: A technical guide to Cardano smart-contract security. Covers the attack classes the eUTXO model removes by design (reentrancy, double-spend, MEV) and the vulnerabilities that remain (double satisfaction, datum hijacking, token forgery, resource exhaustion) with defensive patterns.
+description: "Cardano smart-contract security: what the eUTXO model removes by design, what it only reduces (MEV), and the bugs left to developers, with defensive patterns."
 image: /assets/article/blockchain/cardano/cardano-smart-contract-security.png
 isMath: false
 ---
@@ -25,11 +26,11 @@ Within that scope, [the eUTXO model]({{site.url_complet}}/2026/07/16/eutxo-vs-bi
 
 ## What the eUTXO model removes by design
 
-Four attack classes that dominate account-based smart-contract security do not exist on Cardano, and they are removed structurally rather than by careful coding.
+Three attack classes that dominate account-based smart-contract security do not exist on Cardano, and a fourth, MEV, is reduced. These guarantees come from the structure of the model rather than from careful coding.
 
 - **Reentrancy is impossible.** The reentrancy attack, responsible for the 2016 DAO hack, relies on a contract calling another that calls back before the first finishes, exploiting state that has not yet been updated. In eUTXO a transaction is a complete, atomic unit; a validator runs once per input to decide whether that UTXO may be spent, and there is no notion of a contract calling another mid-execution. There is no intermediate state for a reentrant call to exploit.
 - **Double-spending is prevented at the protocol level.** The ledger removes a UTXO the instant it is consumed, so any second attempt to spend the same output is structurally invalid. This is stronger than the account model's reliance on nonce tracking.
-- **Determinism eliminates MEV.** A Cardano transaction names its exact inputs and outputs; if those inputs still exist when it reaches the chain, it executes exactly as built, otherwise it fails with no effect. This removes the reordering, insertion, and front-running that constitute Maximal Extractable Value on chains whose outcomes depend on global state at execution time.
+- **Determinism removes state-dependent MEV.** A Cardano transaction names its exact inputs and outputs; if those inputs still exist when it reaches the chain, it executes exactly as built, otherwise it fails with no effect. An attacker cannot change the result of a transaction by placing another one before it, which removes the classic form of Maximal Extractable Value (MEV) seen on chains whose outcomes depend on global state at execution time. Ordering power does not disappear, though: a block producer still chooses which of two transactions spending the same UTXO gets in first, and a DEX batcher that orders user orders can sandwich them ([Optim Finance - Transaction chaining background](https://optim-finance.gitbook.io/optim-finance/guides/transaction-chaining/background)).
 - **Native assets share the ledger's security.** Tokens on Cardano are handled by the ledger, not by a per-token contract. The minting policy controls creation, but once tokens exist there is no token contract to exploit, unlike the ERC-20 surface where every token contract is its own target.
 
 These are real guarantees, but they are not the whole story. The remaining classes are where audits find bugs.
@@ -52,7 +53,7 @@ Attacker's transaction:
 
 ![Component diagram of a double-satisfaction attack where one output satisfies two validators]({{site.url_complet}}/assets/article/blockchain/cardano/double-satisfaction-attack-concept.png)
 
-The defense is to require *your specific* output rather than that *some* output meets the condition, typically by tagging the intended output with a unique state or beacon token and validating that the tagged output exists. It is the on-chain analogue of an insecure direct object reference: the fix is confirming the resource you validate is actually yours.
+The defense is to require *your specific* output rather than that *some* output meets the condition, typically by tagging the intended output with a unique state or beacon token and validating that the tagged output exists. It is the on-chain analogue of an insecure direct object reference: the fix is confirming that the resource you validate belongs to you.
 
 ### Datum hijacking and arbitrary datum
 
@@ -69,7 +70,7 @@ The defense is datum-continuity validation: check that immutable fields such as 
 
 ### Token forgery
 
-A careless minting policy can let an attacker mint unauthorized tokens, whether through a missing authorization check, a supposedly one-time NFT policy that can actually run twice, or an unvalidated policy parameter. The correct **one-shot** pattern ties minting to consuming a specific UTXO, which can never exist again:
+A careless minting policy can let an attacker mint unauthorized tokens, whether through a missing authorization check, an NFT policy meant to run once that can run twice, or an unvalidated policy parameter. The correct **one-shot** pattern ties minting to consuming a specific UTXO, which can never exist again:
 
 ```text
 Policy: minting allowed only if this specific UTXO is consumed as input
@@ -85,11 +86,17 @@ Anyone can create a UTXO at a script address with any datum. A validator that tr
 
 ### Time handling
 
-Validators do not see a wall-clock timestamp; they see the transaction's validity interval, a slot range. Reasoning about the wrong bound (for example enforcing a deadline against the lower bound when the upper is what matters, or leaving a bound open) enables time manipulation. The defense is to enforce deadlines through the validity range, which the ledger checks at the protocol level, and to normalize the interval so both bounds are reasoned about explicitly.
+Validators do not see a wall-clock timestamp; they see the transaction's validity interval, a slot range. Reasoning about the wrong bound enables time manipulation, for example enforcing a deadline against the lower bound when the upper is what matters, or leaving a bound open. The defense is to enforce deadlines through the validity range, which the ledger checks at the protocol level, and to normalize the interval so both bounds are reasoned about explicitly.
 
 ### Resource exhaustion
 
-Validators run under execution-unit (ExUnits) budgets, and a transaction bounded by size and resource limits. An attacker can craft inputs that push a validator toward those limits, creating denial-of-service conditions or, worse, a UTXO that can no longer be spent. This family includes **unbounded value** (a UTXO carrying so many assets it cannot be spent), **unbounded datum** (state that grows past resource limits), and **unbounded inputs** (logic requiring too many UTXOs at once). The defense is to bound worst-case cost: parameterize scripts, cap iteration, and precompute expensive work off-chain.
+Validators run under execution-unit (ExUnits) budgets, and transactions are bounded by size and resource limits. An attacker can craft inputs that push a validator toward those limits, creating denial-of-service conditions or, worse, a UTXO that can no longer be spent. This family includes three classes:
+
+- **unbounded value**: a UTXO carrying so many assets it cannot be spent;
+- **unbounded datum**: state that grows past resource limits;
+- **unbounded inputs**: logic requiring too many UTXOs at once.
+
+The defense is to bound worst-case cost: parameterize scripts, cap iteration, and precompute expensive work off-chain.
 
 ### Others worth knowing
 
@@ -123,9 +130,11 @@ Security is layered, from cheapest to strongest, and each layer catches what the
 
 ## Conclusion
 
-Cardano's eUTXO model removes a set of attack classes that dominate account-based security: reentrancy cannot occur because transactions are atomic, double-spends are prevented by the ledger, determinism removes MEV, and native assets avoid a per-token contract surface. Those guarantees are structural, not the product of careful coding.
+Cardano's eUTXO model removes a set of attack classes that dominate account-based security: reentrancy cannot occur because no script can call another mid-execution, double-spends are prevented by the ledger, determinism removes MEV based on execution-time state, and native assets avoid a per-token contract surface. Those guarantees are structural, not the product of careful coding.
 
-The vulnerabilities that remain are specific to the model and are the developer's responsibility. Double satisfaction, datum hijacking, token forgery, missing UTXO authentication, time-bound handling, and resource exhaustion all reduce to the same discipline: validate the whole transaction against explicit invariants, and never trust that a UTXO, datum, or output is well-formed or authorized because it is present. The established patterns (beacon tokens, value preservation, datum continuity, deadline enforcement, minimal logic) encode that discipline, and layered verification from unit tests through property-based testing and audit confirms it before deployment. The mindmap below collects the removed classes, the remaining ones, the patterns, and the verification layers.
+The vulnerabilities that remain are specific to the model and are the developer's responsibility. Double satisfaction, datum hijacking, token forgery, missing UTXO authentication, time-bound handling, and resource exhaustion all reduce to the same discipline: validate the whole transaction against explicit invariants, and never trust that a UTXO, datum, or output is well-formed or authorized because it is present.
+
+The established patterns encode that discipline: beacon tokens, value preservation, datum continuity, deadline enforcement and minimal logic. Layered verification, from unit tests through property-based testing and audit, confirms it before deployment. The mindmap below collects the removed classes, the remaining ones, the patterns, and the verification layers.
 
 ![Mindmap summarizing Cardano contract security: attack classes removed by the eUTXO model, vulnerabilities that remain, defensive patterns, and verification layers]({{site.url_complet}}/assets/article/blockchain/cardano/cardano-smart-contract-security.png)
 
@@ -137,8 +146,8 @@ The vulnerabilities that remain are specific to the model and are the developer'
 |------|------------|
 | **eUTXO (Extended UTXO)** | Cardano's ledger model, in which a validator guards a UTXO and approves or rejects a whole transaction; its structure removes several attack classes by design. |
 | **Validator** | the on-chain pure function that runs once per script input and returns approval or rejection for spending that UTXO. |
-| **Reentrancy** | an attack where a contract calls back into another before the first call finishes, exploiting stale state; impossible on Cardano because transactions are atomic. |
-| **MEV (Maximal Extractable Value)** | value extracted by reordering, inserting, or censoring transactions; eliminated by eUTXO's deterministic outcomes. |
+| **Reentrancy** | an attack where a contract calls back into another before the first call finishes, exploiting stale state; impossible on Cardano because a validator cannot call another script mid-execution. |
+| **MEV (Maximal Extractable Value)** | value extracted by reordering, inserting, or censoring transactions; eUTXO's deterministic outcomes remove the state-dependent form, but transaction ordering by block producers and DEX batchers remains. |
 | **Double satisfaction** | a flaw where one output satisfies several validators in one transaction, letting an attacker discharge multiple obligations with a single payment. |
 | **Datum hijacking** | substituting a malicious datum on a continuing script output to change a critical field such as ownership, when the validator fails to check datum continuity. |
 | **Beacon (state) token** | a uniquely minted NFT placed in the UTXOs a protocol treats as authoritative, used to prevent rogue UTXOs and to defeat double satisfaction and missing authentication. |
@@ -150,11 +159,20 @@ The vulnerabilities that remain are specific to the model and are the developer'
 
 **Q: Which attack classes does the eUTXO model remove, and why are they gone rather than merely mitigated?**
 
-Four: reentrancy, double-spending, MEV, and the per-token-contract attack surface. They are gone structurally rather than mitigated because the model's design leaves no place for them to occur. A transaction is atomic and a validator runs once per input with no ability to call another contract mid-execution, so there is no intermediate state a reentrant call could exploit. The ledger deletes a spent UTXO immediately, so a second spend of it is invalid by construction. Outcomes are deterministic because a transaction names its exact inputs, so there is nothing for a block producer to reorder profitably. And native assets are ledger entries rather than contracts, so there is no token contract to attack. None of these depend on the developer writing careful code.
+Three are gone: reentrancy, double-spending, and the per-token-contract attack surface, because the model's design leaves no place for them to occur. A fourth, MEV, is reduced but not removed. Each case in turn:
+
+- **Reentrancy.** A transaction is atomic and a validator runs once per input with no ability to call another contract mid-execution, so there is no intermediate state a reentrant call could exploit.
+- **Double-spending.** The ledger deletes a spent UTXO immediately, so a second spend of it is invalid by construction.
+- **MEV.** Outcomes are deterministic because a transaction names its exact inputs, so a block producer cannot change what a transaction does by reordering it. It can still decide which of two transactions spending the same UTXO goes first, and a DEX batcher that orders user orders can still sandwich them, so this class is reduced rather than removed.
+- **Token contracts.** Native assets are ledger entries rather than contracts, so there is no token contract to attack.
+
+None of these depend on the developer writing careful code.
 
 **Q: What is double satisfaction, and what is the standard defense?**
 
-Double satisfaction is a flaw in which a single output in a transaction satisfies the spending conditions of two or more validators at once, letting an attacker fulfill several obligations while paying only once. It arises when each validator checks that *some* output meets its condition rather than that *its own* output does. The standard defense is the beacon-token pattern: tag the specific output your protocol expects with a uniquely minted token and validate that this tagged output is present, so another validator's requirement cannot be satisfied by the same output.
+Double satisfaction is a flaw in which a single output in a transaction satisfies the spending conditions of two or more validators at once, letting an attacker fulfill several obligations while paying only once. It arises when each validator checks that *some* output meets its condition rather than that *its own* output does.
+
+The standard defense is the beacon-token pattern: tag the specific output your protocol expects with a uniquely minted token and validate that this tagged output is present, so another validator's requirement cannot be satisfied by the same output.
 
 **Q: Why must a minting policy check the asset name and not only the minted quantity?**
 
@@ -162,15 +180,28 @@ Because a policy ID can cover many asset names. A policy that only verifies the 
 
 **Q: How does a developer defend against resource-exhaustion attacks specific to eUTXO?**
 
-By bounding worst-case cost, since validators run under execution-unit budgets and transactions under size limits. The concrete measures are to parameterize scripts so their work does not scale with attacker-controlled data, to cap any iteration over inputs or list elements, and to precompute expensive work off-chain so the validator only checks a result. This defends against the unbounded-value, unbounded-datum, and unbounded-inputs classes, where an attacker inflates a UTXO's assets, a datum's size, or the number of required inputs until the transaction cannot be built or the UTXO can no longer be spent.
+By bounding worst-case cost, since validators run under execution-unit budgets and transactions under size limits. The concrete measures are:
+
+- parameterize scripts so their work does not scale with attacker-controlled data;
+- cap any iteration over inputs or list elements;
+- precompute expensive work off-chain so the validator only checks a result.
+
+This defends against the unbounded-value, unbounded-datum, and unbounded-inputs classes, where an attacker inflates a UTXO's assets, a datum's size, or the number of required inputs until the transaction cannot be built or the UTXO can no longer be spent.
 
 **Q: A team relies on the eUTXO model's guarantees and writes thorough unit tests. Why is that still not enough security assurance for a contract holding real value?**
 
-Because the model's guarantees and unit tests cover different, incomplete parts of the risk. The eUTXO model removes reentrancy, double-spends, and MEV, but it does nothing about double satisfaction, datum hijacking, token forgery, or missing authentication, which are exactly the bugs the model leaves to the developer. Unit tests, in turn, only confirm the behaviors the author thought to test; most eUTXO vulnerabilities are omissions, a check that was never written. Closing that gap needs property-based testing to probe invariants against random inputs, and a professional audit to look for the constraints that should exist and do not. Formal verification adds proof over all inputs for the most critical properties. Assurance for real value comes from these layers together, not from the model plus unit tests alone.
+Because the model's guarantees and unit tests cover different, incomplete parts of the risk. The eUTXO model removes reentrancy and double-spends and reduces MEV, but it does nothing about double satisfaction, datum hijacking, token forgery, or missing authentication, which are the bugs the model leaves to the developer.
+
+Unit tests, in turn, only confirm the behaviors the author thought to test; most eUTXO vulnerabilities are omissions, a check that was never written.
+
+Closing that gap needs property-based testing to probe invariants against random inputs, and a professional audit to look for the constraints that should exist and do not. Formal verification adds proof over all inputs for the most critical properties.
+
+Assurance for real value comes from these layers together, not from the model plus unit tests alone.
 
 ## References
 
 - [Cardano developer portal](https://developers.cardano.org/)
+- [Optim Finance - Transaction chaining background](https://optim-finance.gitbook.io/optim-finance/guides/transaction-chaining/background)
 - [Common Plutus Security Vulnerabilities (MLabs)](https://www.mlabs.city/blog/common-plutus-security-vulnerabilities)
 - [Invariant0 security analysis](https://medium.com/@invariant0)
 - [Mesh (code examples)](https://github.com/MeshJS/mesh)

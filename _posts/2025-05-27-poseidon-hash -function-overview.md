@@ -2,6 +2,7 @@
 layout: post
 title: "Poseidon Hash Function - Overview"
 date: 2025-05-27
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -43,7 +44,7 @@ Reference: [official paper](https://eprint.iacr.org/2019/458.pdf), page 4
 
 ### Global overview
 
-The Posiedon hash function takes a preimage of `t−1`  prime field Z*p* elements to a single field element. 
+The Poseidon hash function takes a preimage of `t−1`  prime field Z*p* elements to a single field element. 
 
 Poseidon operates on an internal state `state`of `t` field elements which, in the unoptimized algorithm, are transformed over *R* number of rounds of: 
 
@@ -53,7 +54,7 @@ Poseidon operates on an internal state `state`of `t` field elements which, in th
 
 Once all rounds have been performed, Poseidon outputs the second element of the state.
 
-A Posiedon hash function is instantiated by a parameter triple (*p*,*M*,*t*) which sets the prime field, the security level, and the size of Poseidon’s internal state buffer statestate.
+A Poseidon hash function is instantiated by a parameter triple (*p*,*M*,*t*) which sets the prime field, the security level, and the size of Poseidon’s internal state buffer state.
 
  From (*p*,*M*,*t*) the remaining Poseidon parameters are computed (α*,*R**F*,*R**P,RoundConstants,M), i.e. the S-box exponent, the round numbers, the round constants, and the MDS matrix.
 
@@ -83,7 +84,7 @@ Poseidon is a **sponge construction**, composed of a **permutation-based design*
 
 
 
-Depedning of the use case, it exits several Poseidon Sponge instance,
+Depending on the use case, several Poseidon sponge instances exist,
 
 - Depending on the use case (see Section 3 and Section 4 for more details), determine the capacity element value and the input padding if needed
 
@@ -130,7 +131,7 @@ The motivation to have different types of rounds is that:
 
 The HADES design strategy consists of `Rf`full rounds in the beginning, in which S-boxes are applied to the full state. 
 
-After these rounds, RP rounds in the middle contain only a single S-box in each round, and the rest of the state goes through the nonlinear layer unchanged (i.e., identity functions are used instead of the missing Sboxes). 
+After these rounds, RP rounds in the middle contain only a single S-box in each round, and the rest of the state goes through the nonlinear layer unchanged: identity functions replace the missing S-boxes. 
 
 Finally, `Rf` rounds at the end are applied by again using S-boxes for the full state. 
 
@@ -144,7 +145,7 @@ On the other hand, the `RP` rounds with partial S-box layers are a more efficien
 
 ### Parameterization
 
-A Posiedon hash function is instantiated by a parameter triple (*p*,*M*,*t*) which sets the prime field, the security level, and the size of Poseidon’s internal state buffer statestate.
+A Poseidon hash function is instantiated by a parameter triple (*p*,*M*,*t*) which sets the prime field, the security level, and the size of Poseidon’s internal state buffer state.
 
  From (*p*,*M*,*t*) the remaining Poseidon parameters are computed (α*,*R**F*,*R**P,RoundConstants,M), i.e. the S-box exponent, the round numbers, the round constants, and the MDS matrix.
 
@@ -238,7 +239,7 @@ This S-Box is suitable for the most popular prime fields in ZK applications,conc
 
 or more generally:
 
-This step provides **non-linearity**, crucial for security.
+This step provides the round's **non-linearity**.
 
 ------
 
@@ -341,7 +342,7 @@ In order to determine the right version of Poseidon for your scenario, you need 
 
 Poseidon maps sequences of `F` elements to a fixed length sequence of `F`elements.
 
-- You hash messages of *arbitrary* length or *fixed* length (like in a Merkle tree, where almost always 2 elements are hashed).
+- You hash messages of *arbitrary* length or *fixed* length, as in a Merkle tree, where almost always 2 elements are hashed.
 - The *security level*  M against collision and preimage attacks (most  likely, 128 bits).
 
 With this information, you determine the *width w,* measured in the number of F elements, of Poseidon permutation as follows:
@@ -381,7 +382,7 @@ Poseidon is based on the sponge construction. It means that there is a `squeeze`
 
 When the function **`squeeze()` `0`** elements, the right result is that nothing is happening, *i.e.* there is no `permutation` (the internal `state` of the sponge remains intact) and no element is output.
 
-But in their implementation, calling `squeeze` (`squeeze_native_field_elements` in the code) on `0` right after an `absorb` results in a `permutation` on the internal `state` (instead of doing nothing).
+But in their implementation, calling `squeeze`, named `squeeze_native_field_elements` in the code, on `0` right after an `absorb` results in a `permutation` on the internal `state` instead of doing nothing.
 
 Reference: [fuzzinglabs - POSEIDON SPONGE BUGS IN ARKWORKS - Avoiding Cryptographic Failures in Hashing](https://fuzzinglabs.com/poseidon-sponge-bugs-arkworks-cryptography-zkp/)
 

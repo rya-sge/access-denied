@@ -2,7 +2,7 @@
 layout: post
 title: Winternitz One-Time Signature(OTS)
 date:   2024-05-30
-last_modified_at: 2025-03-27
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography blockchain post-quantum
@@ -212,7 +212,7 @@ $$
 s'[0] =H(s)^{1} = H(sk[0])^{253}
 \end{aligned}
 $$
-Indeed, to pass from 252 (s) hash operation to 253 (s`) , we only have to perform one supplementary hash operation.
+Indeed, *s* is the result of 252 hash operations and *s'* the result of 253, so going from *s* to *s'* takes only one more hash operation.
 
 The verification process works as usual on our message m\` and the signature s`.
 

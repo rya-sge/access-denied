@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Securities Management — The semt Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -15,7 +16,7 @@ isMath: false
 
 
 
-If `camt` is how a bank reports your cash, `semt` is how a custodian reports your securities. The **securities management** business area of ISO 20022 is the reporting and querying layer of the custody world: the holdings statements, transaction statements, penalty reports, and account queries that tell an investor or its agent what it owns, what is settling, and what has moved. This article organises the area's forty-eight messages into families, goes deep on the holdings statement that anchors it, and shows where it meets the settlement messages it reports on.
+If `camt` is how a bank reports your cash, `semt` is how a custodian reports your securities. The **securities management** business area of ISO 20022 is the reporting and querying layer of the custody world: the holdings statements, transaction statements, penalty reports, and account queries that tell an investor or its agent what it owns, what is settling, and what has moved. This article organises the area's forty-eight messages into families, goes deep on the holdings statement that anchors it, and shows how it links to the settlement messages it reports on.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -61,7 +62,14 @@ The `semt.002` custody balance report shows the shape the statements share.
 
 ![The structure of a semt.002 securities holdings report]({{site.url_complet}}/assets/article/finance/semt-holdings-report-concept.png)
 
-It opens with **pagination** (`Pgntn`), because a large portfolio's statement spans many pages, and **statement general details** (`StmtGnlDtls`) giving the report identifier, the dates it covers, and its frequency. It then identifies the **account owner** and the **safekeeping account**, and lists a **balance for each security**, keyed by ISIN, with the quantity held, a price, and a market value. Each security's balance can break down into **sub-balances** that classify part of the holding as available, blocked, pledged, on loan, or otherwise restricted. That sub-balance detail is what makes the securities statement more than a list of quantities: it tells the owner not just how much it holds but how much it can actually use.
+It opens with two blocks:
+
+- **pagination** (`Pgntn`), because a large portfolio's statement spans many pages;
+- **statement general details** (`StmtGnlDtls`), giving the report identifier, the dates it covers, and its frequency.
+
+It then identifies the **account owner** and the **safekeeping account**, and lists a **balance for each security**, keyed by ISIN, with the quantity held, a price, and a market value. Each security's balance can break down into **sub-balances** that classify part of the holding as available, blocked, pledged, on loan, or otherwise restricted.
+
+That sub-balance detail is what makes the securities statement more than a list of quantities: it tells the owner not just how much it holds but how much of that it can use.
 
 ## Requesting and receiving statements
 
@@ -71,7 +79,7 @@ An owner receives `semt` statements on a reporting cycle set with its servicer, 
 
 A `semt.021` **SecuritiesStatementQuery** asks the servicer for a statement. The servicer returns the holdings in a `semt.002` custody balance report, the settled movements in a `semt.017` posting report, and the outstanding ones in a `semt.018` pending report. Across the cycle it also sends penalty reports (`semt.044`) where fails have been charged. If a query cannot be processed, the servicer answers with a `semt.001` **SecuritiesMessageRejection** rather than a statement.
 
-## Where semt meets sese
+## How semt links to sese
 
 The securities management package ships with four `sese` messages (`sese.020` to `sese.023`), which is a useful reminder that reporting and settlement are two halves of one picture. `semt` reports what has happened to an account; `sese` instructs what should happen. When a `semt.018` pending report shows a transaction still to settle, the underlying instruction is a `sese.023` settlement instruction, and a `semt.019` allegement report echoes the `sese.028` allegement raised in the settlement area. Reading a `semt` statement often means following its entries back into the settlement messages that produced them.
 
@@ -110,7 +118,9 @@ Both report the same account's holdings, but from different angles. The `semt.00
 
 **Q: Why do securities balances have sub-balances?**
 
-Because owning a security and being able to use it are not the same thing. Part of a holding may be blocked, pledged as collateral, on loan, or otherwise restricted, and the owner needs to know how much is actually free to deliver or sell. The sub-balance detail on a `semt` statement classifies the holding into these categories, so the statement reports not just the total quantity but the usable quantity. This is the main way a securities statement is richer than a simple list of positions.
+Because owning a security and being able to use it are not the same thing. Part of a holding may be blocked, pledged as collateral, on loan, or otherwise restricted, and the owner needs to know how much is free to deliver or sell.
+
+The sub-balance detail on a `semt` statement classifies the holding into these categories, so the statement reports not just the total quantity but the usable quantity. This is the main way a securities statement is richer than a simple list of positions.
 
 **Q: What does the semt.044 penalties report cover, and why does it exist?**
 
@@ -118,7 +128,9 @@ It reports the cash penalties charged when securities transactions fail to settl
 
 **Q: If semt is about reporting, why does its package include sese messages?**
 
-Because reporting and settlement describe the same transactions from two sides, and the package bundles the settlement messages a reporting user most needs to cross-reference. `semt` tells you what has happened to an account; the `sese` messages instruct what should happen. A pending transaction on a `semt.018` report corresponds to a `sese.023` settlement instruction, and a `semt.019` allegement report echoes a `sese.028` allegement. Including a few `sese` messages alongside `semt` makes it easier to follow a reported entry back to the instruction that created it.
+Because reporting and settlement describe the same transactions from two sides, and the package bundles the settlement messages a reporting user most needs to cross-reference. `semt` tells you what has happened to an account; the `sese` messages instruct what should happen.
+
+A pending transaction on a `semt.018` report corresponds to a `sese.023` settlement instruction, and a `semt.019` allegement report echoes a `sese.028` allegement. Including a few `sese` messages alongside `semt` makes it easier to follow a reported entry back to the instruction that created it.
 
 **Q: How does an account owner get exactly the information it wants from semt?**
 

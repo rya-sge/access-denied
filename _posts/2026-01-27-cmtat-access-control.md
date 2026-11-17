@@ -2,7 +2,7 @@
 layout: post
 title: "Flexible Access Control in smart contracts (CMTAT)"
 date:   2026-01-27
-last_modified_at: 2026-01-29
+last_modified_at: 2026-11-17
 locale: en-GB
 lang: en
 categories: blockchain solidity
@@ -35,14 +35,14 @@ This design is based on the pattern used by OpenZeppelin for their [AccessManage
 
 - **Separation of concerns**:  
   - Modules focus on *functional behavior* (pause, mint, burn, document management, etc.).  
-  - Access‑control code focuses on *authorization logic* (which caller is permitted to execute which operation).
+  - Access‑control code focuses on *authorization logic*: which caller is permitted to execute which operation.
 - **Reusability of business logic**:  
   - The same `PauseModule` or `ERC20MintModule` can be reused across deployments that differ only in their access control requirements.
 - **Configurable access control per deployment**:
   - A deployment can choose role‑based access control (RBAC), a single owner, a policy contract such as OpenZeppelin's `AccessManager`, or any other scheme without modifying module internals.
 - **Auditability**:  
   - Auditors can review each module’s state transitions and invariants independently from the access‑control implementation.  
-  - The authorization wiring can be reviewed as a separate concern.
+  - The hook overrides that enforce authorization can be reviewed as a separate concern.
 
 Informally, the pattern can be viewed as a **policy “socket”**: modules expose authorization hooks, and deployments plug in the desired policy by overriding those hooks.
 
@@ -51,7 +51,7 @@ Informally, the pattern can be viewed as a **policy “socket”**: modules expo
 CMTAT is structured in three layers:
 
 1. **Functional modules**
-    Each module implements a single concern (pause, mint, burn, documents, enforcement, etc.).
+    Each module implements a single concern, such as pause, mint, burn, documents or enforcement.
 
    e.g.`PauseModule`
 
@@ -210,9 +210,9 @@ Instead, the module:
 - Delegates authorization to **abstract internal functions** (`_authorizePause`, `_authorizeDeactivate`).
 - Expects a **separate contract** to implement the policy by overriding those internal functions.
 
-### `CMTATBaseAccessControl`: wiring modules to RBAC
+### `CMTATBaseAccessControl`: connecting modules to RBAC
 
-`CMTATBaseAccessControl` is the concrete wiring used in the standard CMTAT deployment. It inherits from the access‑control wrapper (`AccessControlModule`) and from several functional modules, and **overrides** each authorization hook to enforce a role‑based access‑control model:
+`CMTATBaseAccessControl` is the base contract that connects the modules to RBAC in the standard CMTAT deployment. It inherits from the access‑control wrapper (`AccessControlModule`) and from several functional modules, and **overrides** each authorization hook to enforce a role‑based access‑control model:
 
 ```solidity
 abstract contract CMTATBaseAccessControl is
@@ -393,7 +393,7 @@ If you are authoring new modules or customizing access control in CMTAT:
   - Keep the module agnostic to concrete roles or ownership.
   - Document the expected access‑control behavior in NatSpec (`@custom:access-control`).
 
-- **When wiring a deployment:**
+- **When assembling a deployment:**
   - Create a base access‑control contract (for example, `CMTATBaseAccessControl`).
   - Override all required hooks with your chosen model:
     - Roles via `AccessControl`.
@@ -403,7 +403,7 @@ If you are authoring new modules or customizing access control in CMTAT:
   - Keep the overrides small and explicit so auditors can easily review them.
 
 - **When changing the access control model later:**
-  - Prefer changing the wiring, not the modules:
+  - Prefer changing the base contract's hook overrides, not the modules:
     - Override hooks differently in a new base.
     - Or point hooks to a new external policy contract.
   - This way you preserve the safety of previously‑audited business logic.

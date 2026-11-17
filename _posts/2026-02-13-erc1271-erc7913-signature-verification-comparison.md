@@ -2,7 +2,7 @@
 layout: post
 title: ERC-1271 and ERC-7913 Signature Verification — OpenZeppelin, Solady, Coinbase Smart Wallet, and Solarity Solidity Library
 date: 2026-02-13
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solidity security
@@ -55,7 +55,7 @@ ERC-191 is the foundational layer for all Ethereum message signing. Both OpenZep
 | **Created** | 2017-09-12 |
 | **Authors** | Remco Bloemen, Leonid Logvinov, Jacob Evans |
 
-EIP-712 defines a standard for hashing and signing typed structured data, as opposed to raw bytestrings. It introduces the concept of a **domain separator** (chain ID, contract address, name, version, salt) and **type hashing** (`hashStruct`) so that signatures are bound to a specific application and chain. The resulting hash is formed as:
+EIP-712 defines a standard for hashing and signing typed structured data, as opposed to raw bytestrings. It introduces a **domain separator**, built from the chain ID, contract address, name, version and salt, and **type hashing** with `hashStruct`, so that signatures are bound to a specific application and chain. The resulting hash is formed as:
 
 ```
 keccak256("\x19\x01" || domainSeparator || hashStruct(message))
@@ -77,9 +77,9 @@ ERC-1271 defines a standard way for smart contracts to validate signatures on th
 function isValidSignature(bytes32 hash, bytes calldata signature) external view returns (bytes4 magicValue);
 ```
 
-A contract MUST return `0x1626ba7e` (the function selector) when the signature is valid. The standard enables protocols to accept signatures from both EOAs (via `ecrecover`) and smart contract wallets (via `isValidSignature`) through a unified verification path.
+A contract MUST return `0x1626ba7e` (the function selector) when the signature is valid. The standard lets protocols accept signatures from both EOAs, checked with `ecrecover`, and smart contract wallets, checked with `isValidSignature`, through a single verification path.
 
-Implementation is context-dependent: contracts can use any signature scheme (ECDSA, multisig, BLS, etc.) and any validation logic (time-based, state-based, role-based). The function MUST NOT modify state (enforced by `view`/`STATICCALL`).
+Implementation is context-dependent: contracts can use any signature scheme, such as ECDSA, multisig or BLS, and any validation logic, whether time-based, state-based or role-based. The function MUST NOT modify state (enforced by `view`/`STATICCALL`).
 
 ### ERC-2098 — Compact Signature Representation
 
@@ -89,7 +89,7 @@ Implementation is context-dependent: contracts can use any signature scheme (ECD
 | **Created** | 2019-03-14 |
 | **Authors** | Richard Moore, Nick Johnson |
 
-ERC-2098 defines a 64-byte compact encoding for secp256k1 signatures by exploiting two properties: (1) `yParity` is always 0 or 1, and (2) the top bit of `s` is always 0 (due to canonical signature enforcement from EIP-2). The compact format stores `yParity` in the top bit of `s`:
+ERC-2098 defines a 64-byte compact encoding for secp256k1 signatures by exploiting two properties: `yParity` is always 0 or 1, and the top bit of `s` is always 0 because EIP-2 enforces canonical signatures. The compact format stores `yParity` in the top bit of `s`:
 
 ```
 Standard:  [32-byte r][32-byte s][1-byte v]    = 65 bytes
@@ -138,7 +138,7 @@ Solady's `ERC1271` mixin implements ERC-7739 natively. OpenZeppelin provides `dr
 | **Created** | 2025-03-21 |
 | **Authors** | Hadrien Croubois, Ernesto Garcia, Francisco Giordano, Aryeh Greenberg |
 
-ERC-7913 extends the concept of signer identity beyond Ethereum addresses to keys that have no on-chain address (P256, RSA, WebAuthn, ZK-based signers, etc.). It introduces a verifier interface:
+ERC-7913 extends the concept of signer identity beyond Ethereum addresses to keys that have no on-chain address, such as P256, RSA, WebAuthn or ZK-based signers. It introduces a verifier interface:
 
 ```solidity
 interface IERC7913SignatureVerifier {
@@ -151,7 +151,7 @@ A signer is represented as a `bytes` value: `verifier || key`. The first 20 byte
 
 The standard is backward-compatible:
 - `signer.length < 20`: verification fails.
-- `signer.length == 20`: falls back to ERC-1271/ECDSA (the signer is an address).
+- `signer.length == 20`: the signer is an address, so verification falls back to ERC-1271/ECDSA.
 - `signer.length > 20`: calls `IERC7913SignatureVerifier(verifier).verify(key, hash, signature)`.
 
 OpenZeppelin provides the only full implementation among the three libraries compared here, including verifiers for P256, RSA, and WebAuthn, as well as single-signer and multi-signer (threshold, weighted) abstractions.
@@ -415,7 +415,7 @@ The domain separator includes `address(this)` and `block.chainid`, which prevent
 
 **Compared to Solady's ERC-7739 approach**, Coinbase's scheme is much simpler but has a key limitation: the original signed content becomes opaque. A wallet UI only sees `CoinbaseSmartWalletMessage(bytes32 hash)` -- the actual data behind `hash` (e.g. a Permit2 approval, an NFT listing) is not visible to the user during signing.
 
-Solady's ERC-7739 `TypedDataSign` workflow preserves the original struct fields in the wallet UI by embedding them in a nested typed data structure, which gives users visibility into what they are actually signing.
+Solady's ERC-7739 `TypedDataSign` workflow preserves the original struct fields in the wallet UI by embedding them in a nested typed data structure, which shows users what they are signing.
 
 | Aspect | Coinbase ERC1271 | Solady ERC1271 |
 |--------|------------------|----------------|
@@ -484,7 +484,7 @@ OpenZeppelin's `MultiSignerERC7913` solves a similar problem (multi-owner with h
 
 **Replacing with Solady's ERC1271 mixin:**
 
-Partially possible. Solady's `ERC1271` provides stronger anti-replay (ERC-7739) and richer features (ERC-6492 unwrapping, RPC fallback, safe caller bypass). However:
+Partially possible. Solady's `ERC1271` provides stronger anti-replay through ERC-7739, and adds ERC-6492 unwrapping, an RPC fallback and a safe caller bypass. However:
 
 - Solady's `_erc1271Signer()` returns a single `address`. Supporting multiple owners of different key types requires overriding `_erc1271IsValidSignatureNowCalldata` with the same kind of dispatch logic Coinbase already has.
 - The `MultiOwnable` index-based ownership model has no equivalent in Solady -- it would need to be kept.
@@ -629,7 +629,16 @@ Signature verification is a security-critical operation. Several cross-cutting c
 
 ## 11. Conclusion
 
-OpenZeppelin is the only library of the four that implements the full ERC-1271 + ERC-7913 stack, including signer management, multi-signature with thresholds and weights, and pre-built verifiers for P256, RSA, and WebAuthn. Solady focuses on gas-optimized ERC-1271 verification with unique features like ERC-6492 and ERC-7739, but does not support ERC-7913. The Coinbase Smart Wallet demonstrates what a production ERC-1271 implementation looks like: a deliberate simplification over Solady's full ERC-7739 approach, trading content readability for auditability, while reusing Solady's `SignatureCheckerLib` for the actual cryptographic verification. Solidity-lib takes a different path entirely, providing low-level cryptographic primitives for exotic curves rather than standard-based signature routing. The choice depends on whether you need ERC-7913 multi-key support (OpenZeppelin), gas-minimal ERC-1271 verification (Solady), a production-tested multi-owner wallet pattern (Coinbase), or custom-curve cryptography (Solidity-lib).
+OpenZeppelin is the only library of the four that implements the full ERC-1271 + ERC-7913 stack, including signer management, multi-signature with thresholds and weights, and pre-built verifiers for P256, RSA, and WebAuthn. Solady focuses on gas-optimized ERC-1271 verification with unique features like ERC-6492 and ERC-7739, but does not support ERC-7913.
+
+The Coinbase Smart Wallet demonstrates what a production ERC-1271 implementation looks like: a deliberate simplification over Solady's full ERC-7739 approach, trading content readability for auditability, while reusing Solady's `SignatureCheckerLib` for the cryptographic verification. Solidity-lib takes a different path, providing low-level cryptographic primitives for exotic curves rather than standard-based signature routing.
+
+The choice depends on what the project needs:
+
+- ERC-7913 multi-key support: OpenZeppelin;
+- gas-minimal ERC-1271 verification: Solady;
+- a production-tested multi-owner wallet pattern: Coinbase;
+- custom-curve cryptography: Solidity-lib.
 
 ![solidity-contract-signatre-lib-mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/solidity/solidity-contract-signatre-lib-mindmap.png)
 

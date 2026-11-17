@@ -2,7 +2,7 @@
 layout: post
 title: "Solana Staking - Overview"
 date:   2025-11-09
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solana security
@@ -125,7 +125,7 @@ Here’s a step-by-step example of how a stake account moves through states:
 
 - **Cooldown/activation:** SOL doesn’t instantly become active or withdrawable. Warm-up/cooldown periods are defined in epochs.
 - **Delegation balance:** The entire stake account balance is delegated, minus any lamports reserved for rent exemption.
-- **Authority separation:** You can have separate keys for staking (manage delegation) and withdrawal (take out SOL).
+- **Authority separation:** You can have separate keys for staking, which manages delegation, and for withdrawal, which takes out SOL.
 
 ## Instruction
 

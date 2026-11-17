@@ -2,7 +2,7 @@
 layout: post
 title: AI security and threats
 date: 2025-01-22
-last_modified_at: 2025-03-14
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security ai
@@ -14,7 +14,7 @@ isMath: false
 
 Artificial Intelligence (AI) has become an integral part of modern life, driving advancements across industries and reshaping how we interact with technology. 
 
-However, as AI continues to evolve, it brings with it a range of new challenges and security concerns. From the creation of realistic deepfakes to vulnerabilities like prompt injection and the use of "Shadow AI" systems inside an organization, these issues highlight the need for vigilance and proactive measures. 
+However, as AI evolves, it also brings new security problems: realistic deepfakes, vulnerabilities such as prompt injection, and "Shadow AI" systems used inside an organization. 
 
 This article examines the potential risks posed by AI technologies and considers strategies to address them effectively.
 
@@ -91,7 +91,7 @@ Organizations must discover and assess all instances of AI in their environments
 
 To tackle this challenge, the first step is discovery. Businesses should start by mapping out the cloud environments they operate, as these are common locations for hosting powerful, compute-intensive AI models. 
 
-Shadow AI deployments often involve a model, data used for training and tuning, and applications leveraging the model. Identifying these components is crucial.
+Shadow AI deployments often involve a model, data used for training and tuning, and applications leveraging the model. Discovery means finding each of these components.
 
 Furthermore, there are also disparities between models (open source or closed source) with regard to guarantees in terms of security and respect for data. It is important to make an assessment before accepting the use of a model within the company.
 
@@ -141,7 +141,7 @@ The implications of prompt injection attacks are profound. They can lead to data
 
 ### Conclusion
 
-Addressing this threat requires a multi-faceted approach: curating high-quality training data, implementing robust input validation, and integrating human oversight. As AI evolves, combating prompt injection will remain an ongoing challenge, akin to an arms race between developers and attackers.
+Defences against prompt injection combine three measures: curating high-quality training data, validating inputs, and keeping a human in the loop. As AI evolves, combating prompt injection will remain an ongoing challenge, akin to an arms race between developers and attackers.
 
 See [The Washington Post - The clever trick that turns ChatGPT into its evil twin](https://www.washingtonpost.com/technology/2023/02/14/chatgpt-dan-jailbreak/)
 

@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Cash Management — The camt Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -63,7 +64,15 @@ A `camt.053` is a structured document, not a flat list of lines. Its shape is wo
 
 ![The nested structure of a camt.053 bank-to-customer statement]({{site.url_complet}}/assets/article/finance/camt-statement-anatomy-concept.png)
 
-At the top sits a **group header** (`GrpHdr`) with the message identifier and creation timestamp. Below it comes one or more **statements** (`Stmt`), each tied to an **account** (`Acct`) and its servicer. Each statement carries **balances** (`Bal`), typed by code, so an opening booked balance (`OPBD`) and a closing booked balance (`CLBD`) frame the day, with intermediate and available balances as needed. It then carries a series of **entries** (`Ntry`), and each entry has an amount, a credit-or-debit indicator (`CdtDbtInd`), a status (booked or pending), a **booking date** and a **value date**. An entry can be broken down further into **entry details** and **transaction details** (`NtryDtls`, `TxDtls`) that carry references, the parties involved, and structured remittance information. That nesting is what lets a single statement line carry enough machine-readable detail for a treasury system to reconcile it automatically, which the old fixed-format MT statement struggled to do.
+The message nests its content in levels:
+
+- **Group header** (`GrpHdr`). It holds the message identifier and creation timestamp.
+- **Statements** (`Stmt`). A message carries one or more, each tied to an **account**, tagged `Acct`, and its servicer.
+- **Balances** (`Bal`), typed by code. The opening booked balance, code `OPBD`, and the closing booked balance, code `CLBD`, frame the day, with intermediate and available balances as needed.
+- **Entries** (`Ntry`). Each entry has an amount, a credit-or-debit indicator `CdtDbtInd`, a booked or pending status, a **booking date** and a **value date**.
+- **Entry details and transaction details** (`NtryDtls`, `TxDtls`). An entry can be broken down into these, and they carry references, the parties involved and structured remittance information.
+
+That nesting is what lets a single statement line carry enough machine-readable detail for a treasury system to reconcile it automatically, which the old fixed-format MT statement struggled to do.
 
 ![How a customer requests and receives account information]({{site.url_complet}}/assets/article/finance/camt-account-reporting-workflow.png)
 
@@ -71,38 +80,63 @@ In practice a customer registers for reporting or sends a `camt.060` to request 
 
 ## Exceptions and investigations
 
-Payments go wrong: they are sent twice, sent for the wrong amount, or sent to the wrong beneficiary. The exceptions and investigations family is how banks and their customers try to fix them after the fact. It is a genuinely two-sided, negotiated process, which is why it has more message types than any other `camt` family.
+Payments go wrong: they are sent twice, sent for the wrong amount, or sent to the wrong beneficiary. The exceptions and investigations family is how banks and their customers try to fix them after the fact. It is a two-sided, negotiated process, which is why it needs so many message types, together with the case-management messages that administer each investigation.
 
 ![Cancelling a payment and escalating to an investigation]({{site.url_complet}}/assets/article/finance/camt-cancellation-investigation-workflow.png)
 
 The entry points are the cancellation requests. A customer who wants to recall a payment it initiated sends its bank a **`camt.055` CustomerPaymentCancellationRequest**. A bank that needs another bank to return funds sends a **`camt.056` FIToFIPaymentCancellationRequest**, the interbank recall that replaces the legacy MT n92 request for cancellation. Where the payment should be changed rather than cancelled, **`camt.087` RequestToModifyPayment** applies. The outcome of any of these, whether the funds were returned or the request refused, comes back in a **`camt.029` ResolutionOfInvestigation**.
 
-Around these sit the older exception messages: **`camt.026` UnableToApply** when a bank cannot process a payment because information is missing, **`camt.027` ClaimNonReceipt** when a beneficiary says money never arrived, and **`camt.028` AdditionalPaymentInformation** to supply missing detail. The classic model wrapped all of this in a *case*, administered by a run of case-management messages (`camt.030` NotificationOfCaseAssignment, `camt.031` RejectInvestigation, `camt.032` CancelCaseAssignment, `camt.033`/`camt.034` request and supply a duplicate, `camt.038`/`camt.039` case status).
+Around these sit the older exception messages: **`camt.026` UnableToApply** when a bank cannot process a payment because information is missing, **`camt.027` ClaimNonReceipt** when a beneficiary says money never arrived, and **`camt.028` AdditionalPaymentInformation** to supply missing detail. The classic model wrapped all of this in a *case*, administered by a run of case-management messages:
 
-More recently the standard introduced a streamlined pair, **`camt.110` InvestigationRequest** and **`camt.111` InvestigationResponse**, that generalise the request-and-answer of an enquiry without the heavier case scaffolding. In a modern flow a `camt.056` recall may resolve directly with a `camt.029`, or escalate into a `camt.110`/`camt.111` exchange when the receiving bank needs to enquire before it can resolve.
+- `camt.030` NotificationOfCaseAssignment;
+- `camt.031` RejectInvestigation;
+- `camt.032` CancelCaseAssignment;
+- `camt.033`/`camt.034`, which request and supply a duplicate;
+- `camt.038`/`camt.039`, which handle case status.
+
+More recently the standard introduced a streamlined pair, **`camt.110` InvestigationRequest** and **`camt.111` InvestigationResponse**, that generalise the request-and-answer of an enquiry without opening a case and its administrative messages. In a modern flow a `camt.056` recall may resolve directly with a `camt.029`, or escalate into a `camt.110`/`camt.111` exchange when the receiving bank needs to enquire before it can resolve.
 
 ## Managing a market infrastructure
 
 A large slice of `camt` exists to operate real-time gross settlement systems and central securities depositories, where participants hold accounts of central-bank money and the operator must expose those accounts for query and control. These messages follow a consistent verb pattern built from a small set of actions applied to a small set of objects.
 
-The verbs are **Get**, **Return**, **Modify**, **Delete**, and **Create**; the objects are accounts, transactions, limits, members, reservations, and standing orders. So a participant sends a `camt.003` **GetAccount** and receives a `camt.004` **ReturnAccount**; queries a payment with `camt.005` **GetTransaction** and receives `camt.006` **ReturnTransaction**, or acts on it with `camt.007` **ModifyTransaction** or `camt.008` **CancelTransaction**. Bilateral and multilateral **limits** are administered with `camt.009` to `camt.012` and `camt.101`; **members** with `camt.013` to `camt.015` and `camt.104`; **reservations** of liquidity with `camt.046` to `camt.049` and `camt.103`; and **standing orders** with `camt.024`, `camt.069` to `camt.071`, and `camt.102`. Supporting queries return reference data the operator publishes: `camt.016`/`camt.017` for currency exchange rates, `camt.018`/`camt.019` for business-day information, and `camt.020`/`camt.021` for general business information such as broadcasts.
+The verbs are **Get**, **Return**, **Modify**, **Delete**, and **Create**; the objects are accounts, transactions, limits, members, reservations, and standing orders. So a participant sends a `camt.003` **GetAccount** and receives a `camt.004` **ReturnAccount**; queries a payment with `camt.005` **GetTransaction** and receives `camt.006` **ReturnTransaction**, or acts on it with `camt.007` **ModifyTransaction** or `camt.008` **CancelTransaction**.
 
-Two further messages actually move money between accounts inside such a system: **`camt.050` LiquidityCreditTransfer** and **`camt.051` LiquidityDebitTransfer**, used to fund and defund settlement accounts and to sweep liquidity between them. Alongside them, the **notification to receive** trio (`camt.057` NotificationToReceive, `camt.058` its cancellation advice, and `camt.059` its status report) lets a party warn an account servicer that incoming funds are expected, so the servicer can anticipate them.
+The other objects each have their own range of messages:
+
+- bilateral and multilateral **limits**: `camt.009` to `camt.012` and `camt.101`;
+- **members**: `camt.013` to `camt.015` and `camt.104`;
+- **reservations** of liquidity: `camt.046` to `camt.049` and `camt.103`;
+- **standing orders**: `camt.024`, `camt.069` to `camt.071`, and `camt.102`.
+
+Supporting queries return reference data the operator publishes: `camt.016`/`camt.017` for currency exchange rates, `camt.018`/`camt.019` for business-day information, and `camt.020`/`camt.021` for general business information such as broadcasts.
+
+Two further messages move money between accounts inside such a system: **`camt.050` LiquidityCreditTransfer** and **`camt.051` LiquidityDebitTransfer**, used to fund and defund settlement accounts and to sweep liquidity between them.
+
+Alongside them, the **notification to receive** trio lets a party warn an account servicer that incoming funds are expected, so the servicer can anticipate them. It consists of `camt.057` NotificationToReceive, the `camt.058` cancellation advice for it, and the `camt.059` status report on it.
 
 ## The rest of the area, in brief
 
 The remaining families are narrower but fill out the picture of what "cash management" spans.
 
-- **Intra-balance movement** (`camt.066` to `camt.085`) moves cash between sub-positions of a securities account, the machinery behind collateral and settlement cash in TARGET2-Securities. It has its own instruction, status, confirmation, modification, cancellation, and query messages.
+- **Intra-balance movement** (`camt.066` to `camt.085`) moves cash between sub-positions of a securities account; TARGET2-Securities uses these movements to allocate cash to collateral and settlement. It has its own instruction, status, confirmation, modification, cancellation, and query messages.
 - **Fund cash forecast** (`camt.040` to `camt.045`) reports estimated and confirmed cash flows in and out of an investment fund, so a transfer agent can manage subscriptions and redemptions.
 - **Pay-in** (`camt.061` PayInCall, `camt.062` PayInSchedule, `camt.063` PayInEventAcknowledgement) schedules and calls funding into a settlement system of the kind used for currency settlement.
 - **Billing and charges** (`camt.076`, `camt.077`, `camt.086` bank services billing, plus `camt.105`/`camt.106` for charges) report what a bank charges for its services.
-- **Cheques** (`camt.107` presentment notification, `camt.108` cancellation or stop request, `camt.109` its report) cover the cheque instrument.
+- **Cheques** are covered by three messages: `camt.107` notifies a presentment, `camt.108` requests a cancellation or a stop, and `camt.109` reports on that request.
 - **Cash deposit and withdrawal** (`camt.113` to `camt.116`) instruct and track physical cash operations at a branch or agent.
 
 ## Conclusion
 
-The `camt` business area is cash management in the full sense: not only the statement a customer reads each morning, but the recall of a mistaken payment, the query a bank runs against a settlement system, the liquidity it sweeps between accounts, and the charges it bills. Ninety-nine messages is a lot, but they organise into families around a few shared ideas: a nested, machine-readable account statement in the `camt.05x` trio; a negotiated request-and-resolution pattern for exceptions; and a Get/Return/Modify/Delete/Create verb set for administering an infrastructure. Its flagship reporting messages are the ISO 20022 replacements for the MT940, MT942, and MT900/MT910 statements, which is why, of all the areas in this series, `camt` is the one a working treasury or operations team is most likely to meet first.
+The `camt` business area is cash management in the full sense: not only the statement a customer reads each morning, but the recall of a mistaken payment, the query a bank runs against a settlement system, the liquidity it sweeps between accounts, and the charges it bills.
+
+Ninety-nine messages is a lot, but they organise into families around a few shared ideas:
+
+- a nested, machine-readable account statement in the `camt.05x` trio;
+- a negotiated request-and-resolution pattern for exceptions;
+- a Get/Return/Modify/Delete/Create verb set for administering an infrastructure.
+
+Its flagship reporting messages are the ISO 20022 replacements for the MT940, MT942, and MT900/MT910 statements, which is why, of all the areas in this series, `camt` is the one a working treasury or operations team is most likely to meet first.
 
 ![Mindmap summarising the ISO 20022 cash management area and its camt families]({{site.url_complet}}/assets/article/finance/iso20022-cash-management-camt.png)
 
@@ -127,27 +161,64 @@ The `camt` business area is cash management in the full sense: not only the stat
 
 **Q: What is the difference between camt.052, camt.053, and camt.054?**
 
-They report account activity at different moments and granularities. `camt.053` is the Bank-to-Customer Statement, the authoritative end-of-day record of a period's balances and entries. `camt.052` is the Bank-to-Customer Account Report, an intraday or interim view sent one or more times before the books close, used for real-time cash positioning. `camt.054` is the Bank-to-Customer Debit/Credit Notification, which advises individual postings as they happen rather than summarising a period. A treasury typically uses `camt.052` through the day for positioning, `camt.054` to be alerted to specific movements, and `camt.053` as the definitive statement to reconcile against.
+They report account activity at different moments and granularities:
+
+- `camt.053` is the Bank-to-Customer Statement, the authoritative end-of-day record of a period's balances and entries.
+- `camt.052` is the Bank-to-Customer Account Report, an intraday or interim view sent one or more times before the books close, used for real-time cash positioning.
+- `camt.054` is the Bank-to-Customer Debit/Credit Notification, which advises individual postings as they happen rather than summarising a period.
+
+A treasury typically uses `camt.052` through the day for positioning, `camt.054` to be alerted to specific movements, and `camt.053` as the definitive statement to reconcile against.
 
 **Q: How do the camt reporting messages relate to the old SWIFT MT statements?**
 
-They are the ISO 20022 replacements. `camt.053` replaces the MT940 customer statement and the MT950 statement message; `camt.052` replaces the MT941 and MT942 interim reports; and `camt.054` replaces the MT900 and MT910 debit and credit confirmations. The MX messages carry the same information as the MT ones but in a nested, richly typed XML structure, which lets a statement line carry structured references, party details, and remittance information that a fixed-format MT line could not hold. The industry-wide migration from MT to MX is why these `camt` messages are now the default for account information.
+They are the ISO 20022 replacements:
+
+- `camt.053` replaces the MT940 customer statement and the MT950 statement message.
+- `camt.052` replaces the MT941 and MT942 interim reports.
+- `camt.054` replaces the MT900 and MT910 debit and credit confirmations.
+
+The MX messages carry the same information as the MT ones but in a nested, richly typed XML structure, which lets a statement line carry structured references, party details, and remittance information that a fixed-format MT line could not hold. The industry-wide migration from MT to MX is why these `camt` messages are now the default for account information.
 
 **Q: Why does the exceptions and investigations family have so many message types?**
 
-Because resolving a problem payment is a negotiation, not a single instruction, and several distinct situations can arise. A customer may want to recall its own payment (`camt.055`) or a bank may recall from another bank (`camt.056`); a payment might need modifying rather than cancelling (`camt.087`); a beneficiary might claim non-receipt (`camt.027`); a bank might be unable to apply a payment for missing information (`camt.026`). Each of these needs its own request, an outcome has to be reported back (`camt.029`), and the classic model wrapped the whole exchange in a case with its own administrative messages. The newer `camt.110`/`camt.111` investigation pair streamlines the request-and-answer without the full case scaffolding. The variety reflects the many ways a payment can go wrong and the back-and-forth needed to put each right.
+Because resolving a problem payment is a negotiation, not a single instruction, and several distinct situations can arise:
+
+- A customer may want to recall its own payment (`camt.055`).
+- A bank may recall a payment from another bank (`camt.056`).
+- A payment might need modifying rather than cancelling (`camt.087`).
+- A beneficiary might claim non-receipt (`camt.027`).
+- A bank might be unable to apply a payment for missing information (`camt.026`).
+
+Each of these needs its own request, the outcome has to be reported back in a `camt.029`, and the classic model wrapped the whole exchange in a case with its own administrative messages. The newer `camt.110`/`camt.111` investigation pair streamlines the request-and-answer without opening a case.
+
+The variety reflects the many ways a payment can go wrong and the back-and-forth needed to put each right.
 
 **Q: What is the Get/Return/Modify/Delete/Create pattern, and where is it used?**
 
-It is the query and administration convention for the messages that operate a market infrastructure such as a real-time gross settlement system. A small set of verbs (Get, Return, Modify, Delete, Create) is applied to a small set of objects (accounts, transactions, limits, members, reservations, standing orders). A participant reads an object with a Get message and receives the answer in the matching Return, and changes it with Modify, Delete, or Create. For example `camt.003` GetAccount is answered by `camt.004` ReturnAccount, and `camt.009` to `camt.012` get, return, modify, and delete a limit. The pattern gives the operator and its participants a uniform, predictable interface to the state of the system.
+It is the query and administration convention for the messages that operate a market infrastructure such as a real-time gross settlement system. Five verbs, Get, Return, Modify, Delete and Create, are applied to six kinds of object: accounts, transactions, limits, members, reservations and standing orders.
+
+A participant reads an object with a Get message and receives the answer in the matching Return, and changes it with Modify, Delete, or Create. For example `camt.003` GetAccount is answered by `camt.004` ReturnAccount, and `camt.009` to `camt.012` get, return, modify, and delete a limit. The pattern gives the operator and its participants a uniform, predictable interface to the state of the system.
 
 **Q: Where does camt sit relative to pain and pacs?**
 
-They divide the payment lifecycle. `pain` (payments initiation) is how a customer instructs its bank to make a payment. `pacs` (payments clearing and settlement) is how banks exchange that payment between themselves. `camt` (cash management) is everything about the account and the exceptions around those payments: reporting the resulting balances and entries, cancelling or investigating a payment that went wrong, and administering the accounts and liquidity in a settlement system. A single cross-border transfer might be initiated with a `pain` message, carried between banks with a `pacs` message, reported to the payer and payee with `camt.054` and `camt.053`, and, if it was a mistake, recalled with a `camt.056`.
+They divide the payment lifecycle:
+
+- `pain` (payments initiation) is how a customer instructs its bank to make a payment.
+- `pacs` (payments clearing and settlement) is how banks exchange that payment between themselves.
+- `camt` (cash management) is everything about the account and the exceptions around those payments: reporting the resulting balances and entries, cancelling or investigating a payment that went wrong, and administering the accounts and liquidity in a settlement system.
+
+A single cross-border transfer might be initiated with a `pain` message, carried between banks with a `pacs` message, reported to the payer and payee with `camt.054` and `camt.053`, and, if it was a mistake, recalled with a `camt.056`.
 
 **Q: Why is a camt.053 statement nested rather than a flat list of lines?**
 
-Because a flat line cannot carry enough structured detail to reconcile automatically. A `camt.053` groups its content: a group header identifies the message, each statement is tied to an account and carries typed balances, and each entry carries an amount, a credit-or-debit indicator, a status, and booking and value dates. An entry can then expand into entry and transaction details holding references, the parties to the underlying payment, and structured remittance information. That hierarchy lets a treasury system match an entry to the invoice or instruction it settles without a human reading a free-text narrative, which is the main practical gain of the ISO 20022 statement over the older fixed-format MT one.
+Because a flat line cannot carry enough structured detail to reconcile automatically. A `camt.053` groups its content:
+
+- a group header identifies the message;
+- each statement is tied to an account and carries typed balances;
+- each entry carries an amount, a credit-or-debit indicator, a status, and booking and value dates;
+- an entry can then expand into entry and transaction details holding references, the parties to the underlying payment, and structured remittance information.
+
+That hierarchy lets a treasury system match an entry to the invoice or instruction it settles without a human reading a free-text narrative, which is the main practical gain of the ISO 20022 statement over the older fixed-format MT one.
 
 ## References
 

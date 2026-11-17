@@ -2,7 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proof Failures in Cross-Chain Bridges — Exploits, Vulnerabilities, and Bug Bounties"
 date: 2026-06-19
-last_modified_at: 2026-07-31
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security ZKP defi
@@ -121,7 +121,7 @@ The ZK circuit did not include `numRealTxs` as a public input. The proof atteste
 
 #### Contributing Factors
 
-A secondary issue: `processRollup()` had no on-chain access control enforced. Documentation described requirements for an authorized rollup provider, but the implementation accepted calls from arbitrary addresses. The protocol had been inactive for three years, with no team oversight of the live contracts.
+A secondary issue: `processRollup()` had no on-chain access control enforced. Documentation described requirements for an authorized rollup provider, but the implementation accepted calls from arbitrary addresses. Aztec had stopped running the sequencer on March 31, 2024, more than two years earlier, and deposits had closed in March 2023. Nobody on the team was watching the live contracts.
 
 #### Root Cause in One Sentence
 
@@ -171,10 +171,10 @@ Emergency exit paths in ZK-rollup bridges receive less routine coverage than nor
 
 ### 3. [ZKSpace — Proxy Contract Exploit](https://www.ainvest.com/news/zkspace-proxy-contract-exploited-4-million-stolen-2507/) (~July 2025, ~$4$M)
 
-**Chain:** BNB Chain (funding) → Ethereum (drained)  
+**Chain:** funded on BNB Chain, drained on Ethereum  
 **Status:** ~$1.3$M laundered via Tornado Cash; ~$2.7$M distributed
 
-ZKSpace was a ZK-rollup bridge. An address pre-funded through Tornado Cash executed a series of transactions targeting the ZKSpace proxy contract on Ethereum. Approximately $4$M was drained. The specific proxy vulnerability (upgrade mechanism misuse, storage slot collision, or delegatecall target replacement) was not publicly disclosed in available post-mortems.
+ZKSpace was a ZK-rollup bridge. An address pre-funded through Tornado Cash executed a series of transactions targeting the ZKSpace proxy contract on Ethereum. Approximately $4$M was drained. The available post-mortems do not disclose the specific proxy vulnerability: whether it was misuse of the upgrade mechanism, a storage slot collision, or replacement of the delegatecall target.
 
 This incident is categorized as a ZK-rollup bridge exploit where the failure layer was the proxy contract governance or upgrade path rather than the ZK circuit or settlement logic. The ZKSpaceOfficial X account was suspended at the time of the attack, and no official post-mortem was published.
 
@@ -189,7 +189,7 @@ These three vulnerabilities were found by security researchers before exploitati
 ### 4. [zkSync Era — RAM Permutation Soundness Bug](https://blog.chainlight.io/uncovering-a-zk-evm-soundness-bug-in-zksync-era-f3bc1b2a66d8) (September 2023, $1.9$B at Risk)
 
 **Discoverer:** ChainLight  
-**Reported:** September 19, 2023  
+**Reported:** September 15, 2023 (disclosure published September 19, 2023)  
 **Bounty:** 50,000 USDC  
 **TVL at risk:** ~$1.9$B  
 **System:** EraVM ZK-EVM (Matter Labs)  
@@ -370,7 +370,7 @@ Aztec Connect batched user interactions: multiple users deposited funds, the bri
 
 **Proof backend access as a prerequisite.** The zkSync Era RAM Permutation bug required modifying the EraVM backend before a proof was generated. In the current centralized sequencer model, this means compromising the backend or the sequencer private key. As zkSync Era and similar protocols move toward decentralized sequencer and prover networks, this prerequisite weakens, and the exploitability of such bugs increases.
 
-**Dormant contracts retain live risk.** Two of the three confirmed exploits targeted deprecated or dormant systems: Aztec Connect (inactive three years) and ZKSwap (inactive since February 2025). Immutable contracts on Ethereum do not expire and do not stop holding user funds unless funds are explicitly withdrawn. A protocol that deprecates without draining retains full exploit exposure indefinitely.
+**Dormant contracts retain live risk.** Two of the three confirmed exploits targeted deprecated or dormant systems: Aztec Connect had been without its official sequencer since March 2024, and ZKSwap inactive since February 2025. Immutable contracts on Ethereum do not expire and do not stop holding user funds unless funds are explicitly withdrawn. A protocol that deprecates without draining retains full exploit exposure indefinitely.
 
 ---
 
@@ -384,7 +384,7 @@ The six incidents in this article span three failure modes:
 | ZK circuit soundness (disclosed pre-exploit) | zkSync Era, zkSync Lite, Aztec claim proof | $0$ | $700$K in bounties paid |
 | Settlement/contract layer on ZK bridge | ZKSpace | ~$4$M | Proxy, not ZK |
 
-(*ZKSwap's bug was in the verifier call, not the ZK circuit itself, but the effect was equivalent to a soundness failure.)
+\*ZKSwap's bug was in the verifier call, not the ZK circuit itself, but the effect was equivalent to a soundness failure.
 
 The disclosed-but-unexploited category represents approximately $1.9$B in at-risk TVL (zkSync Era alone) for bugs caught before exploitation. This is the expected outcome when active bug bounty programs cover circuit code at appropriate reward levels. The $700$K paid in bounties for three bugs stands against a potential loss that exceeds $1.9$B.
 
@@ -392,9 +392,11 @@ The disclosed-but-unexploited category represents approximately $1.9$B in at-ris
 
 ## Conclusion
 
-ZK-rollup bridge security depends on the integrity of multiple layers, and each layer has failed in production. The most architecturally novel failures are those where the ZK proof was valid but the system was still exploited: the Aztec Connect June 2026 boundary bypass (the proof did not commit to `numRealTxs`) and the zkSync Era RAM permutation bug (the proof did not constrain the upper bits of withdrawal amounts). These incidents show that a correct ZK proof is a necessary but insufficient condition for bridge security. The proof must commit to all parameters that govern fund movement on L1.
+ZK-rollup bridge security depends on the integrity of multiple layers, and each layer has failed in production. The most architecturally novel failures are those where the ZK proof was valid but the system was still exploitable. In the Aztec Connect June 2026 boundary bypass, the proof did not commit to `numRealTxs`. In the zkSync Era RAM permutation bug, caught before anyone exploited it, the proof did not constrain the upper bits of withdrawal amounts.
 
-The disclosed vulnerabilities demonstrate that production ZK bridge circuits contain exploitable soundness errors, and that bug bounty programs are a functional mechanism for finding them before exploitation. The three circuits that were fixed pre-exploitation (Aztec Connect claim proof, zkSync Era RAM Permutation, zkSync Lite mantissa) covered a combined at-risk value exceeding $1.9$B.
+These incidents show that a correct ZK proof is a necessary but insufficient condition for bridge security. The proof must commit to all parameters that govern fund movement on L1.
+
+The disclosed vulnerabilities demonstrate that production ZK bridge circuits contain exploitable soundness errors, and that bug bounty programs are a functional mechanism for finding them before exploitation. Three circuit bugs were fixed before exploitation: the Aztec Connect claim proof, the zkSync Era RAM permutation and the zkSync Lite mantissa. Together they covered an at-risk value exceeding $1.9$B.
 
 ![ZK Bridge Security mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-cross-chain-bridge-hacks-mindmap.png)
 
@@ -402,27 +404,57 @@ The disclosed vulnerabilities demonstrate that production ZK bridge circuits con
 
 **Q: What is the structural difference between the ZKSwap exploit and the zkSync Era bug?**
 
-In the ZKSwap exploit, the ZK proof was never executed: the verifier function contained `return true` as its first statement, so no cryptographic check took place. The ZK system was bypassed entirely. In the zkSync Era bug, the ZK proof ran correctly and was accepted as valid, but the circuit failed to constrain the upper 128 bits of memory write values. The proof system was sound for the circuit as written; the problem was that the circuit did not correctly encode the property it was supposed to prove. Both result in the same practical outcome (forged withdrawal), but the root cause is structurally different: one is a dead-code stub, the other is a circuit soundness failure.
+In the ZKSwap exploit, the ZK proof was never executed: the verifier function contained `return true` as its first statement, so no cryptographic check took place. The ZK system was bypassed entirely.
+
+In the zkSync Era bug, the ZK proof ran correctly and was accepted as valid, but the circuit failed to constrain the upper 128 bits of memory write values. The proof system was sound for the circuit as written; the problem was that the circuit did not correctly encode the property it was supposed to prove.
+
+Both result in a forged withdrawal, but the causes differ: one is a dead-code stub, the other is a circuit soundness failure.
 
 **Q: Why does the Aztec Connect June 2026 exploit qualify as a ZK security failure if the ZK proof was valid?**
 
-The ZK proof was valid for the computation described by the circuit. However, the ZK circuit committed to all 32 transaction slots in a rollup block while the L1 settlement function read a separate `numRealTxs` parameter from calldata to determine how many slots to process. These two were not linked: the ZK proof did not include `numRealTxs` as a public input. The security requirement for a ZK bridge is that the L1 settlement processes exactly the transactions the proof attests to. When `numRealTxs` can be set independently of the proof, this requirement fails. The failure is a ZK bridge design error: a parameter governing fund movement was outside the proof's scope.
+The ZK proof was valid for the computation described by the circuit. However, the ZK circuit committed to all 32 transaction slots in a rollup block while the L1 settlement function read a separate `numRealTxs` parameter from calldata to determine how many slots to process. These two were not linked: the ZK proof did not include `numRealTxs` as a public input.
+
+The security requirement for a ZK bridge is that the L1 settlement processes exactly the transactions the proof attests to. When `numRealTxs` can be set independently of the proof, this requirement fails. The failure is a ZK bridge design error: a parameter governing fund movement was outside the proof's scope.
 
 **Q: Could the zkSync Era RAM Permutation bug have been exploited without controlling the prover backend?**
 
-No, not in the centralized configuration that existed at the time of disclosure. To exploit the bug, an attacker needed to modify the witness-generation code in the prover backend (`uma.rs` or `write_query.rs`) so that it substituted arbitrary high-bit values into memory write queries before generating the proof. This required either compromising the Matter Labs prover infrastructure or obtaining the sequencer's private key. The 21-hour execution delay between proof submission and L1 finalization provided an additional detection window. As zkSync Era progresses toward a decentralized prover network, the prerequisite of controlling the backend weakens: any permissioned prover in the network could potentially generate a malicious proof.
+No, not in the centralized configuration that existed at the time of disclosure. To exploit the bug, an attacker needed to modify the witness-generation code in the prover backend (`uma.rs` or `write_query.rs`) so that it substituted arbitrary high-bit values into memory write queries before generating the proof. This required either compromising the Matter Labs prover infrastructure or obtaining the sequencer's private key.
+
+The 21-hour execution delay between proof submission and L1 finalization provided an additional detection window. As zkSync Era progresses toward a decentralized prover network, the prerequisite of controlling the backend weakens: any permissioned prover in the network could potentially generate a malicious proof.
 
 **Q: What is the role of the bug bounty program in ZK bridge security for the incidents in this article?**
 
-Three bugs in this article were caught and patched before exploitation through responsible disclosure programs: Aztec Connect Claim Proof ($450$K bounty), zkSync Era RAM Permutation ($50$K USDC), and zkSync Lite Insufficient Proof Verification ($200$K). Combined, these three bugs put over $1.9$B in TVL at risk. The bounty payments totaled $700$K, which represents less than 0.04% of the at-risk value. The three exploited incidents (Aztec Connect June 2026, ZKSwap, ZKSpace) either did not have active circuit-level bounty programs covering the relevant code paths or the vulnerability was in contract/proxy logic rather than the circuit. The pattern suggests that circuit-level bounties with meaningful rewards are among the most cost-effective risk controls available to ZK bridge operators.
+Three bugs in this article were caught and patched before exploitation through responsible disclosure programs:
+
+- Aztec Connect Claim Proof, with a $450$K bounty;
+- zkSync Era RAM Permutation, with a $50$K USDC bounty;
+- zkSync Lite Insufficient Proof Verification, with a $200$K bounty.
+
+Combined, these three bugs put over $1.9$B in TVL at risk. The bounty payments totaled $700$K, which represents less than 0.04% of the at-risk value.
+
+The three exploited incidents were Aztec Connect June 2026, ZKSwap and ZKSpace. In each, either no active circuit-level bounty program covered the relevant code paths, or the vulnerability was in contract/proxy logic rather than the circuit. The pattern suggests that circuit-level bounties with meaningful rewards are among the most cost-effective risk controls available to ZK bridge operators.
 
 **Q: How can a ZK circuit team verify that all relevant parameters are correctly bound to public inputs?**
 
-The procedure involves three steps. First, enumerate all parameters that govern fund movement on L1: iteration bounds, amount fields, recipient addresses, token identifiers. Second, for each parameter, trace whether it appears as a public input to the ZK circuit (i.e., the verifier contract checks it as part of the proof verification, not just reads it from calldata separately). Third, verify that the circuit constrains the relationship between the public input and the on-chain representation. Parameters that influence L1 behavior but are not in the circuit's public input set are potential attack vectors of the Aztec Connect type. This audit should be repeated after any change to the settlement function's calldata parsing logic or to the circuit's public input list.
+The procedure involves three steps:
+
+1. Enumerate all parameters that govern fund movement on L1: iteration bounds, amount fields, recipient addresses, token identifiers.
+2. For each parameter, trace whether it appears as a public input to the ZK circuit. A public input is one the verifier contract checks as part of the proof verification, rather than reading it from calldata separately.
+3. Verify that the circuit constrains the relationship between the public input and the on-chain representation.
+
+Parameters that influence L1 behavior but are not in the circuit's public input set are potential attack vectors of the Aztec Connect type. This audit should be repeated after any change to the settlement function's calldata parsing logic or to the circuit's public input list.
 
 **Q: Is a deprecated ZK bridge safe to leave unpaused on-chain?**
 
-No. Smart contracts on Ethereum are immutable and continue to accept function calls and hold funds indefinitely unless a pause or self-destruct is explicitly implemented. Both ZKSwap and Aztec Connect were inactive for months or years before exploitation. The dormant period does not reduce exploit risk; it often increases it, because the security team's monitoring and response capacity diminishes, the on-chain state diverges from documentation, and the funds remain accessible to anyone who finds a vulnerability. The correct practice for a deprecated ZK bridge is to pause the contract, drain user funds to individual claimants or a safe multisig, and document a final state root. Leaving a dormant bridge on-chain with user funds is operationally equivalent to maintaining the full attack surface without the corresponding oversight.
+No. Smart contracts on Ethereum are immutable and continue to accept function calls and hold funds indefinitely unless a pause or self-destruct is explicitly implemented. Both ZKSwap and Aztec Connect were inactive for months or years before exploitation.
+
+The dormant period does not reduce exploit risk; it often increases it, because:
+
+- the security team's monitoring and response capacity diminishes;
+- the on-chain state diverges from documentation;
+- the funds remain accessible to anyone who finds a vulnerability.
+
+The correct practice for a deprecated ZK bridge is to pause the contract, drain user funds to individual claimants or a safe multisig, and document a final state root. Leaving a dormant bridge on-chain with user funds is operationally equivalent to maintaining the full attack surface without the corresponding oversight.
 
 ## References
 
@@ -431,7 +463,8 @@ No. Smart contracts on Ethereum are immutable and continue to accept function ca
 - [ZKSwap Exploit — Blockaid](https://www.blockaid.io/blog/how-zkswaps-5m-exploit-couldve-been-prevented-with-onchain-monitoring)
 - [zkSync Era Soundness Bug — ChainLight](https://blog.chainlight.io/uncovering-a-zk-evm-soundness-bug-in-zksync-era-f3bc1b2a66d8)
 - [zkSync Lite Proof Verification Bugfix — Immunefi](https://medium.com/immunefi/zksync-insufficient-proof-verification-bugfix-review-dcd57944d0e2)
-- Aztec Connect claim proof bug write-up (HackMD) and Aztec multiple-spend bugfix review (Immunefi), September–October 2023
+- Aztec Connect claim proof bug write-up on HackMD, and Aztec multiple-spend bugfix review on Immunefi, September–October 2023
+- [Aztec Connect Sunset — Aztec documentation](https://docs.aztec.network/aztec_connect_sunset)
 - [ZKSpace Exploit — ainvest.com](https://www.ainvest.com/news/zkspace-proxy-contract-exploited-4-million-stolen-2507/)
 - [SlowMist Hacked database](https://hacked.slowmist.io/)
 - [Claude Code](https://claude.com/product/claude-code)

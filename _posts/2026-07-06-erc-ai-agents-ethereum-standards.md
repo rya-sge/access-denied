@@ -2,7 +2,7 @@
 layout: post
 title: "ERC Standards for AI Agents - The On-Chain Agent Stack on Ethereum"
 date:   2026-07-06
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai blockchain ethereum
@@ -20,9 +20,11 @@ A wave of ERC drafts submitted since 2024 addresses a single question: how does 
 
 ## Why Ethereum needs agent-specific standards
 
-An AI agent that holds funds, calls contracts, and negotiates with other agents raises problems that existing token and account standards do not solve. Three gaps recur across the proposals.
+An AI agent that holds funds, calls contracts, and negotiates with other agents raises problems that existing token and account standards do not solve. Three gaps recur across the proposals:
 
-The first is **discovery across trust boundaries**. Two agents built by different teams, running on different infrastructure, need a shared way to find each other and read each other's capabilities without a central directory. The second is **trust proportional to stake**. Ordering a pizza and authorising a medical diagnosis carry different risk, so a single binary "trusted / untrusted" flag is insufficient. The third is **bounded authority**. An owner who delegates a wallet to an agent wants the agent to act, but only within a policy, and wants a tamper-evident record of what the agent did.
+- **Discovery across trust boundaries.** Two agents built by different teams, running on different infrastructure, need a shared way to find each other and read each other's capabilities without a central directory.
+- **Trust proportional to stake.** Ordering a pizza and authorising a medical diagnosis carry different risk, so a single binary "trusted / untrusted" flag is insufficient.
+- **Bounded authority.** An owner who delegates a wallet to an agent wants the agent to act, but only within a policy, and wants a tamper-evident record of what the agent did.
 
 The ERCs described here answer these gaps as composable modules rather than one monolith. The following sections walk through each functional group. The count and status figures reflect the local ERC repository snapshot used to compile this survey; most proposals remain in `Draft`, with a smaller set at `Final` or `Last Call`.
 
@@ -66,7 +68,7 @@ The nineteen standards covered in this article, grouped by function. Status valu
 
 Registering an agent is a short sequence: publish a JSON metadata file describing the agent and its A2A or MCP endpoints, call `register()` to mint the [ERC-721](https://eips.ethereum.org/EIPS/eip-721) identity, call `setAgentURI(agentId, uri)` to bind that identity to the file, optionally call `setAgentWallet()` with an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) or [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271) signature to attach a verified receiving wallet, then accumulate history through `giveFeedback()` on the Reputation Registry.
 
-[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) does not replace the agent-communication layer. Google's Agent-to-Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) still handle how agents talk and reach tools; ERC-8004 handles who an agent is and whether it can be trusted, and an agent advertises its A2A or MCP endpoints inside the registration file.
+[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) does not replace the agent-communication layer. Google's Agent-to-Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) still handle how agents talk and call tools; ERC-8004 handles who an agent is and whether it can be trusted, and an agent advertises its A2A or MCP endpoints inside the registration file.
 
 The defining idea is that **trust models are pluggable and tiered**, with security proportional to the value at risk. A developer integrating [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) can select among reputation systems built on client feedback, validation through stake-secured re-execution, zero-knowledge machine-learning (zkML) proofs, or trusted-execution-environment (TEE) oracles. Low-stake tasks lean on cheap reputation signals; high-stake tasks demand cryptographic or economic guarantees. Almost every other agent ERC references ERC-8004 as the identity substrate it builds on.
 
@@ -150,13 +152,15 @@ Once an agent is trusted, it must act, and the sharpest security questions live 
 
 > **Status:** Draft · [Ethereum Magicians discussion](https://ethereum-magicians.org/t/erc-8273-attestation-gated-agentic-actions/28617)
 
-[ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) specifies an on-chain Agent Attestation Registry with an atomic execution model. Issuance and action execution happen inside a single transaction. Active authorisation state is held in [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) transient storage (`TSTORE` / `TLOAD`) and is cleared automatically at the end of the transaction, so no long-lived or session-based authorisation persists. Each attestation carries a `capability` (a coarse authorisation class) and an `actionDigest` (a fine-grained action fingerprint that must include the target contract, selector, arguments, and a nonce for replay protection). A bundled `attestAndCall` entry point opens the authorisation window, executes the action through a chosen execution profile, and relies on the EVM to tear the window down. Execution profiles cover direct wallet execution for [ERC-7702](https://eips.ethereum.org/EIPS/eip-7702) EOAs and [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) UserOperations, so the target DApp still sees the agent's own wallet as `msg.sender`.
+[ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) specifies an on-chain Agent Attestation Registry with an atomic execution model. Issuance and action execution happen inside a single transaction. Active authorisation state is held in [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) transient storage (`TSTORE` / `TLOAD`) and is cleared automatically at the end of the transaction, so no long-lived or session-based authorisation persists.
+
+Each attestation carries a `capability`, a coarse authorisation class, and an `actionDigest`, a fine-grained action fingerprint. The digest must include the target contract, selector, arguments, and a nonce for replay protection. A bundled `attestAndCall` entry point opens the authorisation window, executes the action through a chosen execution profile, and relies on the EVM to tear the window down. Execution profiles cover direct wallet execution for [ERC-7702](https://eips.ethereum.org/EIPS/eip-7702) EOAs and [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) UserOperations, so the target DApp still sees the agent's own wallet as `msg.sender`.
 
 ### ERC-8257 — Agent Tool Registry
 
 > **Status:** Draft · [Ethereum Magicians discussion](https://ethereum-magicians.org/t/erc-8257-agent-tool-registry/28457)
 
-[ERC-8257](https://eips.ethereum.org/EIPS/eip-8257) sits alongside execution as a permissionless registry for the tools an agent may invoke. Each registration commits a metadata URI and a content hash; invocation is gated by an optional external predicate contract. Registrations bind to an off-chain manifest through origin-binding (the manifest is served at a well-known path on the endpoint's origin) and creator self-attestation.
+[ERC-8257](https://eips.ethereum.org/EIPS/eip-8257) sits alongside execution as a permissionless registry for the tools an agent may invoke. Each registration commits a metadata URI and a content hash; invocation is gated by an optional external predicate contract. Registrations bind to an off-chain manifest in two ways: origin-binding, where the manifest is served at a well-known path on the endpoint's origin, and creator self-attestation.
 
 ## Commerce, compliance, and oracles
 
@@ -174,7 +178,7 @@ Agents that transact need a settlement grammar and, where regulated assets are i
 
 > **Status:** Draft · [Ethereum Magicians discussion](https://ethereum-magicians.org/t/erc-8226-regulated-agent-mandate/28208)
 
-[ERC-8226](https://eips.ethereum.org/EIPS/eip-8226), or RAMS, is a compliance-delegation layer for agents operating on tokenised regulated assets. A verified principal delegates scoped, time-bounded, and financially capped authority to an on-chain agent, and a regulated token verifies the mandate before an agent-initiated action. RAMS is agnostic to the identity system, the token standard, and the compliance framework, so it works with [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) identities, with [ERC-20](https://eips.ethereum.org/EIPS/eip-20) / [ERC-721](https://eips.ethereum.org/EIPS/eip-721) / [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens, and with regulated standards such as [ERC-7943](https://eips.ethereum.org/EIPS/eip-7943) or [ERC-3643](https://eips.ethereum.org/EIPS/eip-3643).
+[ERC-8226](https://eips.ethereum.org/EIPS/eip-8226), the Regulated Agent Mandate Standard (RAMS), is a compliance-delegation layer for agents operating on tokenised regulated assets. A verified principal delegates scoped, time-bounded, and financially capped authority to an on-chain agent, and a regulated token verifies the mandate before an agent-initiated action. RAMS is agnostic to the identity system, the token standard, and the compliance framework, so it works with [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) identities, with [ERC-20](https://eips.ethereum.org/EIPS/eip-20) / [ERC-721](https://eips.ethereum.org/EIPS/eip-721) / [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) tokens, and with regulated standards such as [ERC-7943](https://eips.ethereum.org/EIPS/eip-7943) or [ERC-3643](https://eips.ethereum.org/EIPS/eip-3643).
 
 ### ERC-8033 — Agent Council Oracles
 
@@ -200,7 +204,7 @@ Two earlier standards treat the agent itself as a tradeable NFT, with special ha
 
 ## Verifiable AI computation
 
-The stack's outer edge concerns proving what an AI model actually did, and controlling how content feeds AI systems in the first place.
+The stack's outer edge concerns proving what an AI model computed, and controlling how content feeds AI systems in the first place.
 
 ### ERC-7007 — Verifiable AI-Generated Content Token
 
@@ -212,7 +216,7 @@ The stack's outer edge concerns proving what an AI model actually did, and contr
 
 > **Status:** Draft · [Ethereum Magicians discussion](https://ethereum-magicians.org/t/erc-7992-verifiable-ml-model-inference-zkml/24896)
 
-[ERC-7992](https://eips.ethereum.org/EIPS/eip-7992) standardises how contracts reference ML models and accept zero-knowledge attestations of their inferences. A registry issues a `modelId` for a `ModelCommitment` (hashes of weights, architecture, proving circuit, and verifying key) plus a `proofSystemId`. A `verifyInference(modelId, inputCommitment, output, proof)` call dispatches to the declared proof system and reverts on any mismatch, emitting `InferenceVerified` on success. Inputs are bound by domain-separated, nonceable commitments for replay protection, and proof systems (Groth16, Plonk, STARK) are pluggable without ABI changes.
+[ERC-7992](https://eips.ethereum.org/EIPS/eip-7992) standardises how contracts reference ML models and accept zero-knowledge attestations of their inferences. A registry issues a `modelId` for a `ModelCommitment` plus a `proofSystemId`. The commitment holds hashes of the weights, architecture, proving circuit, and verifying key. A `verifyInference(modelId, inputCommitment, output, proof)` call dispatches to the declared proof system and reverts on any mismatch, emitting `InferenceVerified` on success. Inputs are bound by domain-separated, nonceable commitments for replay protection, and proof systems such as Groth16, Plonk and STARK are pluggable without ABI changes.
 
 ### ERC-7517 — Content Consent for AI/ML Data Mining
 
@@ -244,15 +248,19 @@ One qualification matters. This is a new agent-native ecosystem rather than esta
 
 Execution infrastructure is also being built against [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004). MetaMask's [server-wallet tutorial](https://docs.metamask.io/tutorials/design-server-wallets) describes a backend signer that holds private keys on behalf of an AI agent, where clients authenticate a request and receive a signature to submit on-chain. The design keeps signing away from the agent through a dual-key split: the agent holds only an authentication key, while control of the on-chain account derives from a separate signing key the agent never sees.
 
-The signing path runs inside a trusted execution environment, such as an AWS Nitro enclave with no external networking or persistent storage, which handles key generation, decryption, policy application, and signature production. Before a signature is produced, the request passes a policy layer of spend limits, scope limits, chain limits, frequency limits, simulation checks, and optional human approval. MetaMask frames [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) as the piece that standardises how an agent expresses what it intends to do, so pairing a registered ERC-8004 identity with a policy-bounded server wallet is what makes an agent transaction attributable and verifiable end to end. While the production offering is being finalised, the tutorial points builders at the MetaMask Node.js Embedded Wallets SDK for the same pattern.
+The signing path runs inside a trusted execution environment, such as an AWS Nitro enclave with no external networking or persistent storage, which handles key generation, decryption, policy application, and signature production.
+
+Before a signature is produced, the request passes a policy layer of spend limits, scope limits, chain limits, frequency limits, simulation checks, and optional human approval. MetaMask frames [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) as the piece that standardises how an agent expresses what it intends to do, so pairing a registered ERC-8004 identity with a policy-bounded server wallet is what makes an agent transaction attributable and verifiable end to end. While the production offering is being finalised, the tutorial points builders at the MetaMask Node.js Embedded Wallets SDK for the same pattern.
 
 This is a useful reference point for the draft execution standards in the article. The server-wallet pattern implements in production what [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196) specifies as policy-bound execution without key exposure, what [ERC-8199](https://eips.ethereum.org/EIPS/eip-8199) frames as a sandboxed agent wallet detached from the owner, and the TEE trust model already named in [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004), but it does so directly rather than through the draft interfaces. It shows the execution layer arriving as concrete infrastructure ahead of the standards that describe it.
 
 ### Verifiable agents in a TEE: Oasis ROFL
 
-Where MetaMask secures the signing side, [Oasis wires ERC-8004 to confidential compute](https://docs.oasis.io/build/use-cases/trustless-agent) on the validation side. Its guide deploys an Eliza AI agent inside ROFL, the Oasis confidential-compute framework, so the agent runs in a trusted execution environment whose code can be audited and proved to be the deployed instance, with no silent alteration. A `rofl-8004` service derives an Ethereum address for the agent, and once that address holds a little ether for fees the agent is registered and validated in the ERC-8004 registry automatically. ROFL performs the startup attestation of the container and injects secrets such as an `OPENAI_API_KEY` as end-to-end-encrypted environment variables stored on-chain, while registry interaction runs on Sapphire, the Oasis confidential EVM.
+Where MetaMask secures the signing side, [Oasis connects ERC-8004 to confidential compute](https://docs.oasis.io/build/use-cases/trustless-agent) on the validation side. Its guide deploys an Eliza AI agent inside ROFL, the Oasis confidential-compute framework, so the agent runs in a trusted execution environment whose code can be audited and proved to be the deployed instance, with no silent alteration.
 
-This is the TEE trust model from [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) made concrete. Rather than a reputation score or a zkML proof, the agent's trustworthiness rests on a hardware attestation that the registered code is what actually runs, which sits at the high-assurance end of the tiered trust spectrum the standard describes. Taken together, the three deployments cover the standard's surface from different angles: Taiko brings identity and reputation live cheaply on an L2, MetaMask secures policy-bound signing, and Oasis supplies the TEE-backed validation that ERC-8004's own registries have not yet shipped.
+A `rofl-8004` service derives an Ethereum address for the agent, and once that address holds a little ether for fees the agent is registered and validated in the ERC-8004 registry automatically. ROFL performs the startup attestation of the container and injects secrets such as an `OPENAI_API_KEY` as end-to-end-encrypted environment variables stored on-chain, while registry interaction runs on Sapphire, the Oasis confidential EVM.
+
+This is the TEE trust model from [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) made concrete. Rather than a reputation score or a zkML proof, the agent's trustworthiness rests on a hardware attestation that the registered code is the code that runs, which sits at the high-assurance end of the tiered trust spectrum the standard describes. Taken together, the three deployments cover the standard's surface from different angles: Taiko brings identity and reputation live cheaply on an L2, MetaMask secures policy-bound signing, and Oasis supplies the TEE-backed validation that ERC-8004's own registries have not yet shipped.
 
 ### Vendor-shipped token standards: ERC-7857 and ERC-7007
 
@@ -304,11 +312,20 @@ The mindmap below summarises the standards by function.
 
 **Q: What are the three layers of the modular trust stack, and which ERC fills each?**
 
-The stack, named in [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196), has Layer 1 Register ([ERC-8004](https://eips.ethereum.org/EIPS/eip-8004), on-chain identity and registration), Layer 2 Verify ([ERC-8126](https://eips.ethereum.org/EIPS/eip-8126), verification and a 0-to-100 risk score), and Layer 3 Execute (ERC-8196, policy-bound execution with an immutable audit trail). An agent flows through them in order: it registers, gets verified and scored, then acts through a wallet that checks each action against an owner-defined policy.
+The stack, named in [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196), has three layers:
+
+- **Layer 1 Register:** [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004), on-chain identity and registration.
+- **Layer 2 Verify:** [ERC-8126](https://eips.ethereum.org/EIPS/eip-8126), verification and a 0-to-100 risk score.
+- **Layer 3 Execute:** ERC-8196, policy-bound execution with an immutable audit trail.
+
+An agent flows through them in order: it registers, gets verified and scored, then acts through a wallet that checks each action against an owner-defined policy.
 
 **Q: How does [ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) prevent a granted authorisation from being reused for an unrelated action?**
 
-[ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) uses an atomic execution model with two defences. First, authorisation lives in [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) transient storage, which the EVM clears at the end of the transaction, so no session-based authorisation persists beyond the single call. Second, an attestation can carry a non-zero `actionDigest` that fingerprints the concrete action, and this digest must include the target contract, function selector, arguments, and a nonce or attestation ID. A DApp querying with that digest only accepts the authorisation for the exact action it computes, so it cannot be replayed against a different operation even under the same coarse `capability`.
+[ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) uses an atomic execution model with two defences:
+
+- **Transient authorisation.** Authorisation lives in [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) transient storage, which the EVM clears at the end of the transaction, so no session-based authorisation persists beyond the single call.
+- **Action digest.** An attestation can carry a non-zero `actionDigest` that fingerprints the concrete action, and this digest must include the target contract, function selector, arguments, and a nonce or attestation ID. A DApp querying with that digest only accepts the authorisation for the exact action it computes, so it cannot be replayed against a different operation even under the same coarse `capability`.
 
 **Q: Why does [ERC-8126](https://eips.ethereum.org/EIPS/eip-8126) use zero-knowledge proofs instead of publishing verification results directly?**
 
@@ -316,11 +333,18 @@ The stack, named in [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196), has Lay
 
 **Q: How do [ERC-8001](https://eips.ethereum.org/EIPS/eip-8001) and [ERC-8107](https://eips.ethereum.org/EIPS/eip-8107) combine to coordinate agents, and why are they two standards rather than one?**
 
-[ERC-8001](https://eips.ethereum.org/EIPS/eip-8001) provides the coordination primitive: an initiator posts an intent, participants attach verifiable acceptance attestations, and once the required fresh set is present the intent is executable. It deliberately omits trust, reputation, and bonding. [ERC-8107](https://eips.ethereum.org/EIPS/eip-8107) supplies exactly that missing trust module as an ENS-based web of trust with four levels, propagating through signature chains. A coordinator uses ERC-8107 trust paths to decide who may participate in an ERC-8001 intent. Keeping them separate follows the stack's composability principle: the coordination mechanics stay minimal, and trust policy plugs in as an independent, swappable module.
+[ERC-8001](https://eips.ethereum.org/EIPS/eip-8001) provides the coordination primitive: an initiator posts an intent, participants attach verifiable acceptance attestations, and once the required fresh set is present the intent is executable. It deliberately omits trust, reputation, and bonding.
+
+[ERC-8107](https://eips.ethereum.org/EIPS/eip-8107) supplies exactly that missing trust module as an ENS-based web of trust with four levels, propagating through signature chains. A coordinator uses ERC-8107 trust paths to decide who may participate in an ERC-8001 intent. Keeping them separate follows the stack's composability principle: the coordination mechanics stay minimal, and trust policy plugs in as an independent, swappable module.
 
 **Q: A builder wants agents to trade tokenised real-world assets under regulatory constraints. Which standards combine, and how?**
 
-This spans several layers. The agent gets an identity from [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) and a risk score from [ERC-8126](https://eips.ethereum.org/EIPS/eip-8126). [ERC-8226](https://eips.ethereum.org/EIPS/eip-8226) (Regulated Agent Mandate) delegates scoped, time-bounded, financially capped authority from a verified principal to the agent, and the regulated token checks that mandate before any agent-initiated action; because RAMS is agnostic to the token framework, it works with [ERC-3643](https://eips.ethereum.org/EIPS/eip-3643) or [ERC-7943](https://eips.ethereum.org/EIPS/eip-7943) regulated tokens. Execution runs through an [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196) authenticated wallet so each transaction carries proof of policy compliance and an audit trail, and [ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) can gate individual actions atomically. Settlement of any resulting work can use [ERC-8183](https://eips.ethereum.org/EIPS/eip-8183) escrowed jobs, with completion attestations feeding back into ERC-8004 reputation.
+This spans several layers:
+
+- **Identity and risk.** The agent gets an identity from [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) and a risk score from [ERC-8126](https://eips.ethereum.org/EIPS/eip-8126).
+- **Mandate.** [ERC-8226](https://eips.ethereum.org/EIPS/eip-8226) (Regulated Agent Mandate Standard, RAMS) delegates scoped, time-bounded, financially capped authority from a verified principal to the agent, and the regulated token checks that mandate before any agent-initiated action. Because RAMS is agnostic to the token framework, it works with [ERC-3643](https://eips.ethereum.org/EIPS/eip-3643) or [ERC-7943](https://eips.ethereum.org/EIPS/eip-7943) regulated tokens.
+- **Execution.** Execution runs through an [ERC-8196](https://eips.ethereum.org/EIPS/eip-8196) authenticated wallet so each transaction carries proof of policy compliance and an audit trail, and [ERC-8273](https://eips.ethereum.org/EIPS/eip-8273) can gate individual actions atomically.
+- **Settlement.** Settlement of any resulting work can use [ERC-8183](https://eips.ethereum.org/EIPS/eip-8183) escrowed jobs, with completion attestations feeding back into ERC-8004 reputation.
 
 ## References
 
@@ -353,7 +377,7 @@ This spans several layers. The agent gets an identity from [ERC-8004](https://ei
 - [Trustless Agent with ERC-8004 registration and validation - Oasis docs](https://docs.oasis.io/build/use-cases/trustless-agent)
 - [Understanding Coinbase's x402 and Ethereum's ERC-8004 - The Graph](https://thegraph.com/blog/understanding-x402-erc8004/)
 - [0G Introducing ERC-7857 - 0G Labs](https://0g.ai/blog/0g-introducing-erc-7857)
-- ERC-7007 in the ORA Protocol (Initial Model Offering) — ORA's documentation at `docs.ora.io` is currently unreachable (DNS failure as of July 2026); see the [ERC-7007 specification](https://eips.ethereum.org/EIPS/eip-7007) instead
+- ERC-7007 in the ORA Protocol (Initial Model Offering): ORA's documentation at `docs.ora.io` was unreachable in July 2026 because its domain did not resolve; see the [ERC-7007 specification](https://eips.ethereum.org/EIPS/eip-7007) instead
 
 ### Ecosystem analysis and reporting
 
@@ -365,7 +389,7 @@ This spans several layers. The agent gets an identity from [ERC-8004](https://ei
 ### Repositories and proposal tracking
 
 - [ethereum/ERCs repository](https://github.com/ethereum/ERCs)
-- [ERCs category - Fellowship of Ethereum Magicians](https://ethereum-magicians.org/c/ercs/57) (unmerged agent proposals are linked individually in the "Proposals not yet merged" table)
+- [ERCs category - Fellowship of Ethereum Magicians](https://ethereum-magicians.org/c/ercs/57): unmerged agent proposals are linked individually in the "Proposals not yet merged" table
 
 ### Related articles
 

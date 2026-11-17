@@ -2,7 +2,7 @@
 layout: post
 title: Differential Cryptanalysis - Targeting Hash Functions and Cryptographic Algorithms
 date:   2024-10-30
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography
@@ -22,7 +22,7 @@ While initially applied to block ciphers, differential cryptanalysis can also be
 
 ## Introduction
 
-Differential cryptanalysis focuses on how small changes in the input (plaintext) can create predictable changes in the output (ciphertext or hash output). It is especially effective in targeting the "confusion" and "diffusion" mechanisms within block ciphers and hash functions. The attack exploits certain properties within these mechanisms to find specific relationships, known as differential characteristics, that reveal patterns and weaknesses in the algorithm.
+Differential cryptanalysis focuses on how small changes in the plaintext input can create predictable changes in the output, a ciphertext or a hash. It is especially effective in targeting the "confusion" and "diffusion" mechanisms within block ciphers and hash functions. The attack exploits certain properties within these mechanisms to find specific relationships, known as differential characteristics, that reveal patterns and weaknesses in the algorithm.
 
 ### Key Concepts
 
@@ -68,7 +68,7 @@ In block ciphers, input differences can often lead to patterns in the encryption
 
 ### Differential cryptanalysis against FEAl
 
-FEAL (Fast data Encipherment ALgorithm) is a [block cipher](https://en.wikipedia.org/wiki/Block_cipher) considered at the beginning as an alternative to the [Data Encryption Standard](https://en.wikipedia.org/wiki/Data_Encryption_Standard) (DES) but it is vulnerable to several attacks against it.
+FEAL (Fast data Encipherment ALgorithm) is a [block cipher](https://en.wikipedia.org/wiki/Block_cipher) considered at the beginning as an alternative to the [Data Encryption Standard](https://en.wikipedia.org/wiki/Data_Encryption_Standard) (DES), but it is vulnerable to several attacks.
 
 - Feal-4 had four rounds. This version was broken by Den Boer using a chosen plaintext attack with 100 to 10000 ciphertexts and another attack by Sean Murphy uses [differential cryptanalysis](https://en.wikipedia.org/wiki/Differential_cryptanalysis) that needs only 20 chosen plaintexts
 -  For Feal-8, [Eli Biham](https://en.wikipedia.org/wiki/Eli_Biham) and [Adi Shamir](https://en.wikipedia.org/wiki/Adi_Shamir) described a differential attack on this version in 1989.
@@ -77,7 +77,7 @@ FEAL (Fast data Encipherment ALgorithm) is a [block cipher](https://en.wikipedia
 
 FEAL-4 is a 4 round Feistel cipher with a 64 bit block size. This means that the algorithm encrypts/decrypts data in 64 bit chunks. 
 
-- The Feistel structure means that the blocks are actually split in half for processing
+- The Feistel structure splits each block in half for processing
 - These halves are mixed together via XOR operations throughout the encryption. 
 - The non-linear component (the heart of the cipher) is called the **round function**
   -  It is a one-way/trapdoor function that takes a 32 bit input and produces a 32 bit output. 
@@ -138,7 +138,7 @@ In IOTA, users uses winternitz to sign the hash of a message.
 
 Thus, the security of ISS relies on its cryptographic hash function, which was Curl-P-27.
 
-The vulnerability was used to generate practical collisions and to produce two payments (p1 and p2) in IOTA (they call them “bundles”) which are different, but hash to the same value h, and thus have the same signature s. 
+The vulnerability was used to generate practical collisions: two different IOTA payments p1 and p2, which IOTA calls “bundles”, hash to the same value h and thus have the same signature s. 
 $$
 Hash(p1) == hash (p2)
 $$

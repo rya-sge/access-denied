@@ -2,12 +2,12 @@
 layout: post
 title: Trezor Crypto Wallet – Cryptography and Security
 date:   2024-10-15
-last_modified_at: 2025-10-21
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf cryptography security wallet
 tags: blockchain wallet trezor hardware
-description: This article presents the different types of crypto wallets (hot, warm, cold) and their associated risks
+description: How Trezor hardware wallets protect keys with a PIN, passphrase, recovery seed and storage encryption based on PBKDF2, HMAC-SHA256 and ChaCha20-Poly1305.
 image: /assets/article/blockchain/wallet/trezor/trezor-encryption-pin.drawio.png
 isMath: true
 ---
@@ -109,11 +109,11 @@ What happens when the user enters their PIN?
 
 **PBKDF2** is a cryptographic key derivation function, which is resistant to [dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack) and [rainbow table attacks](https://en.wikipedia.org/wiki/Rainbow_table) by using a salt. 
 
-In summary,it is a key derivation function that uses a password (in this case, the PIN), a salt (a random value), and multiple iterations of a cryptographic hash function (e.g **HMAC**) to generate a derived key.
+In summary, it is a key derivation function that generates a derived key from three inputs: a password, here the PIN; a salt, which is a random value; and a number of iterations of a cryptographic hash function such as **HMAC**.
 
 - It is described in the Internet standard [RFC 2898 (PKCS #5)](http://ietf.org/rfc/rfc2898.txt). 
 - **Purpose** in Trezor: It is used to transform the user's **PIN** into a strong cryptographic key (in this case, the KEK and KEIV). The function also incorporates a salt to prevent precomputed attacks (such as rainbow tables).
-- **How it works**: PBKDF2 uses the user's PIN as input and combines it with a salt derived from hardware identifiers (e.g., ProcessorID) and the random salt from flash storage. It runs the hash function (HMAC-SHA256) for 10,000 iterations (or more), producing 352 bits of output: the first 256 bits become the **KEK** and the last 96 bits form the **KEIV**.
+- **How it works**: PBKDF2 uses the user's PIN as input and combines it with a salt derived from hardware identifiers (e.g., ProcessorID) and the random salt from flash storage. It runs the hash function, HMAC-SHA256, for at least 10,000 iterations, producing 352 bits of output: the first 256 bits become the **KEK** and the last 96 bits form the **KEIV**.
 
 See [cryptobook.nakov.com - pbkdf2](https://cryptobook.nakov.com/mac-and-key-derivation/pbkdf2)
 
@@ -140,7 +140,7 @@ See [datatracker.ietf.org/doc/html/rfc4868#page-3](https://datatracker.ietf.org/
 
 - **Purpose**: It is used to **encrypt and decrypt data securely**, ensuring both confidentiality and integrity of the data. In Trezor, it is used to encrypt the **EDEK** and the protected entries stored in the flash.
 - **How it works:**
-  - **ChaCha20** is the encryption part, which transforms plaintext data into ciphertext using a key (e.g., KEK or DEK) and an IV (like the KEIV or entry IV).
+  - **ChaCha20** is the encryption part, which transforms plaintext data into ciphertext using a key, such as the KEK or the DEK, and an IV, such as the KEIV or the entry IV.
   - **Poly1305** is the authentication part, which generates a **tag** (a type of checksum) that ensures the data hasn’t been tampered with. The tag is checked during decryption to verify the data's integrity.
 - ChaCha20-Poly1305 ensures that even if an attacker modifies the encrypted data or its associated metadata (like the IV), the decryption process will fail due to a tag mismatch.
 
@@ -163,7 +163,7 @@ The **DEK** is the actual key used to encrypt and decrypt protected data stored 
 
 ##### (E)SAK (Storage authentication key)
 
-The storage authentication key (SAK) is used to authenticate the list of (APP, KEY) values for all protected entries that have been set in the storage. This prevents an attacker from erasing or adding entries to the storage.
+The storage authentication key (SAK) authenticates the list of `(APP, KEY)` values for all protected entries that have been set in the storage. This prevents an attacker from erasing or adding entries to the storage.
 
 - The key is encrypted with the key derived from the user's pin
 
@@ -188,7 +188,7 @@ KEK || KEIV = PBKDF2(PRF = HMAC-SHA256, Password = pin, Salt = salt, iterations 
 \end{aligned}
 $$
 
-The KEK is used to decrypt the Encrypted Data Encryption Key **(EDEK)**, allowing access to the actual Data Encryption Key (DEK).
+The KEK decrypts the Encrypted Data Encryption Key, or **EDEK**, which gives access to the actual Data Encryption Key (DEK).
 
 - **How it works**: The KEK is part of a layered security approach: instead of encrypting data directly with the PIN, Trezor derives the KEK from the PIN to ensure additional protection. This is notably useful against [fault injection attacks](https://www.dekra.com/en/fault-injection-attacks/).
 - This means an attacker would need the KEK, derived from a valid PIN, to access the encrypted key (EDEK).
@@ -197,7 +197,7 @@ The KEK is used to decrypt the Encrypted Data Encryption Key **(EDEK)**, allowin
 
 The KEIV is a 96-bit value derived alongside the KEK using the **PBKDF2** algorithm.
 
-- **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**, which helps ensure that even if the same key (KEK) is reused, the output will be different by combining it with the KEIV.
+- **Purpose**: It is used as an **initialization vector (IV)** for the encryption algorithm **ChaCha20Poly1305**. Combining the key with the KEIV ensures that the output differs even when the same KEK is reused.
 - **How it works**: The KEIV ensures that the encryption process is randomized and secure, so that identical data encrypted with the same key will result in different ciphertexts.
 
 ### Summary of the Workflow:
@@ -378,7 +378,7 @@ Moreover, this passphrase is not stored inside the device, therefore if someone 
 
 ### Supply Chain Attacks
 
-To address concerns over possible **supply chain attacks** (where the hardware is tampered with before it reaches the user), Trezor implements  several measures:
+In a **supply chain attack**, the hardware is tampered with before the user receives it. To counter this, Trezor implements several measures:
 
 - Seal on the device or the package. Users are encouraged to inspect the device for any signs of tampering, such as broken seals (**Tamper-evident** packaging). 
 - A legitimate device will always arrive without firmware installed. The bootloader verifies that the firmware you install has been signed by SatoshiLabs (=secure boot).

@@ -47,7 +47,7 @@ Section 5.1 sets the following constraints:
 - the key shall be used **only for CCM**;
 - the total number of block cipher invocations under one key shall not exceed $$2^{61}$$.
 
-A block cipher has two functions under a key $$K$$: the *forward cipher function* $$\mathrm{CIPH_K}$$, which encrypts one block (AES encryption of 128 bits), and the *inverse cipher function* $$\mathrm{CIPH_K^{-1}}$$, which undoes it. CCM uses only $$\mathrm{CIPH_K}$$, for both encryption and decryption, so an AES-CCM implementation never needs AES decryption.
+A block cipher has two functions under a key $$K$$: the *forward cipher function* $$\mathrm{CIPH_K}$$, which encrypts one 128-bit block, and the *inverse cipher function* $$\mathrm{CIPH_K^{-1}}$$, which maps the block back. AES defines both, but CCM calls only $$\mathrm{CIPH_K}$$, even to decrypt a message: counter mode recovers the payload by recomputing the same keystream and XORing it again, and the MAC is checked by recomputing it. An AES-CCM implementation can therefore omit the AES inverse cipher.
 
 ## The two primitives inside CCM
 
@@ -379,7 +379,7 @@ The design is sequential and requires the message length in advance. In exchange
 | Term | Definition |
 |------|------------|
 | **Block cipher** | A keyed family of permutations on fixed-length bit strings; CCM requires one with a 128-bit block, in practice AES. |
-| **Forward cipher function** | The block cipher in its encryption direction, written CIPH_K: it maps one 128-bit block to another under the key K. Its inverse, CIPH_K⁻¹, is block decryption. CCM calls only CIPH_K, even when decrypting, so AES-CCM needs no AES decryption code. |
+| **Forward cipher function** | The block cipher in its encryption direction, written CIPH_K: it maps one 128-bit block to another under the key K. AES also defines the inverse, CIPH_K⁻¹, which maps the block back. CCM never calls the inverse: it decrypts by recomputing the counter-mode keystream with CIPH_K and XORing it again, so an AES-CCM implementation can omit the AES inverse cipher. |
 | **Mode of operation** | An algorithm that uses a block cipher to protect data longer than one block. |
 | **Authenticated encryption (AEAD)** | A scheme providing confidentiality and authenticity together, with optional associated data that is authenticated only. |
 | **Payload** | The data that CCM both encrypts and authenticates, denoted P. |

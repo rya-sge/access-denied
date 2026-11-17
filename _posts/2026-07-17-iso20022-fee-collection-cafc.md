@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Card Fee Collection — The cafc Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -15,7 +16,7 @@ isMath: false
 
 
 
-Card transactions do not just move a purchase amount. Around every payment sits a set of fees: scheme fees, processing fees, and service charges that flow between the acquirer, the issuer, and the network that connects them. Collecting those fees is its own small process, and ISO 20022 gives it a dedicated business area, `cafc`: **fee collection**. It is the smallest area covered in this series, just two messages, but it sits on the same card-message machinery as authorisation and clearing. This article covers what the two `cafc` messages are, how they exchange, and what they carry.
+Card transactions do not just move a purchase amount. Around every payment sits a set of fees: scheme fees, processing fees, and service charges that flow between the acquirer, the issuer, and the network that connects them. Collecting those fees is its own small process, and ISO 20022 gives it a dedicated business area, `cafc`: **fee collection**. It is the smallest area covered in this series, just two messages, but its messages share the card-message structure used for authorisation and clearing. This article covers what the two `cafc` messages are, how they exchange, and what they carry.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -67,7 +68,14 @@ Because the process is a single request and answer. One party asks to collect a 
 
 **Q: What does a cafc.001 message contain?**
 
-Four parts, visible in the schema. A header (`Hdr`, type `Header72`) with the message function and the routing and versioning data shared across the card messages; an acquirer block (`Acqrr`) identifying the acquiring party; a transaction identification (`TxId`) naming the fee-collection transaction; and transaction amounts (`TxAmts`) giving the amount to be collected. Together they say who is involved, which collection this is, and how much is due.
+Four parts, visible in the schema:
+
+- A header (`Hdr`, type `Header72`) with the message function and the routing and versioning data shared across the card messages.
+- An acquirer block (`Acqrr`) identifying the acquiring party.
+- A transaction identification (`TxId`) naming the fee-collection transaction.
+- Transaction amounts (`TxAmts`) giving the amount to be collected.
+
+Together they say who is involved, which collection this is, and how much is due.
 
 **Q: How is a cafc message protected?**
 

@@ -2,7 +2,7 @@
 layout: post
 title: "SIP - The Session Initiation Protocol (RFC 3261)"
 date:   2026-07-20
-last_modified_at: 2026-07-21
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network security rfc
@@ -30,7 +30,14 @@ The specification frames SIP around five facets of establishing and terminating 
 - **Session setup.** Establishing session parameters at both the calling and called party, the "ringing" and pickup phase.
 - **Session management.** Transferring and terminating sessions, modifying parameters mid-call, and invoking supplementary services.
 
-Two boundaries are worth stating clearly, because they explain much of SIP's design. First, SIP is not a vertically integrated communications system: it is one component that works alongside other IETF protocols to build a complete multimedia architecture. Media transport uses the Real-time Transport Protocol ([RTP, RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)), streaming uses RTSP, gateway control uses MEGACO, and the session itself is described using the Session Description Protocol ([SDP, RFC 4566](https://datatracker.ietf.org/doc/html/rfc4566)). SIP carries that SDP description in its message bodies but does not interpret the media.
+Two boundaries are worth stating clearly, because they explain much of SIP's design. First, SIP is not a vertically integrated communications system. It is one component that works alongside other IETF protocols to build a complete multimedia architecture:
+
+- media transport uses the Real-time Transport Protocol, [RTP, RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550);
+- streaming uses RTSP;
+- gateway control uses MEGACO;
+- the session itself is described using the Session Description Protocol, [SDP, RFC 4566](https://datatracker.ietf.org/doc/html/rfc4566).
+
+SIP carries that SDP description in its message bodies but does not interpret the media.
 
 Second, SIP does not provide services; it provides primitives that can be used to build services. A single primitive, delivering an opaque object to a user's current location, becomes a session invitation when the object is an SDP body and a caller-ID feature when the object is the caller's photo. This primitive-not-service philosophy is why SIP is small at its core and extensible at its edges. It runs over several transports (UDP, TCP, TLS, SCTP) and works with both IPv4 and IPv6.
 
@@ -148,7 +155,7 @@ A transaction is the unit the transaction layer manages. It comes in a client ha
 
 The **INVITE transaction** uses a three-way handshake. The client sends `INVITE`, the server may send any number of provisional `1xx` responses, and it eventually sends a final response. The client then confirms the final response with `ACK`. The separate `ACK` exists because a human takes time to answer a call: an `INVITE` can sit unanswered for many seconds, far longer than a normal request/response, so its reliability is handled specially and the acknowledgment is explicit.
 
-The **non-INVITE transaction** (used by `BYE`, `REGISTER`, `OPTIONS`, and others) is a simpler request/final-response exchange with no separate acknowledgment. Over unreliable transports like UDP, both flavors rely on retransmission driven by timers. The base retransmission interval is `T1`, an estimate of the round-trip time that defaults to 500 milliseconds, and a client retransmits with an exponential backoff (`T1`, `2·T1`, `4·T1`, and so on) until it receives a response or the transaction times out.
+The **non-INVITE transaction**, used by `BYE`, `REGISTER`, `OPTIONS` and others, is a simpler request/final-response exchange with no separate acknowledgment. Over unreliable transports like UDP, both flavors rely on retransmission driven by timers. The base retransmission interval is `T1`, an estimate of the round-trip time that defaults to 500 milliseconds, and a client retransmits with an exponential backoff of `T1`, `2·T1`, `4·T1` and so on, until it receives a response or the transaction times out.
 
 ### Dialogs
 
@@ -174,7 +181,9 @@ When a proxy later receives a request for that AOR, it queries the location serv
 
 Request routing in SIP is a cooperation between the `Request-URI`, the `Via` header, and, for in-dialog requests, the route set. On the way toward the callee, each proxy adds a `Via` value; on the way back, each response is routed hop by hop using that stack of `Via` values, with each proxy removing its own entry. This is what lets a `180 (Ringing)` reach the caller without any element having to look up the path a second time, and it guarantees that any proxy that saw the request also sees its responses.
 
-A proxy that wants to stay on the path for future in-dialog requests, rather than just this one transaction, inserts a `Record-Route` header. The endpoints copy the accumulated `Record-Route` values into their route sets and address subsequent requests through those proxies using the `Route` header. RFC 3261 mandates **loose routing** for this, where the request's ultimate destination (in the `Request-URI`) is kept separate from the list of proxies to traverse (in `Route`). This replaces the older **strict routing** of RFC 2543, which overwrote the `Request-URI` at each hop and proved fragile. The `Max-Forwards` counter, decremented at every proxy, backs all of this up by bounding loops that routing mistakes might otherwise create.
+A proxy that wants to stay on the path for future in-dialog requests, rather than just this one transaction, inserts a `Record-Route` header. The endpoints copy the accumulated `Record-Route` values into their route sets and address subsequent requests through those proxies using the `Route` header.
+
+RFC 3261 mandates **loose routing** for this: the request's ultimate destination, carried in the `Request-URI`, is kept separate from the list of proxies to traverse, carried in `Route`. This replaces the older **strict routing** of RFC 2543, which overwrote the `Request-URI` at each hop and proved fragile. The `Max-Forwards` counter, decremented at every proxy, backs all of this up by bounding loops that routing mistakes might otherwise create.
 
 ## Security: threat model and mechanisms
 
@@ -192,7 +201,14 @@ The specification presents five illustrative attacks, each motivating a specific
 
 ### The mechanisms
 
-From those threats the specification identifies the required security services (confidentiality and integrity of signaling, protection against replay and spoofing, authentication and privacy of participants, and DoS resistance) and, rather than inventing new cryptography, reuses mechanisms from the HTTP and SMTP world.
+From those threats the specification identifies the required security services:
+
+- confidentiality and integrity of signaling;
+- protection against replay and spoofing;
+- authentication and privacy of participants;
+- DoS resistance.
+
+Rather than inventing new cryptography, it reuses mechanisms from the HTTP and SMTP world.
 
 - **Transport and network layer security (TLS, IPsec).** Encrypting the signaling on the wire gives hop-by-hop confidentiality and integrity. Because fields such as the `Request-URI`, `Route`, and `Via` must stay visible to proxies for routing, SIP cannot simply encrypt whole messages end-to-end; it secures them hop by hop instead. When TLS is used, `TLS_RSA_WITH_AES_128_CBC_SHA` must be supported at minimum.
 - **The SIPS URI scheme.** A SIPS URI (`sips:bob@biloxi.com`) signals that the request must be delivered over TLS-secured hops all the way to the target domain, after which local policy governs the final leg. It is the caller-visible way to demand secure transport.
@@ -203,7 +219,9 @@ No single mechanism covers everything. The specification's own framing is that S
 
 ## Conclusion
 
-RFC 3261 defines SIP as a text-based, HTTP-like signaling protocol whose job is to locate participants and manage the lifetime of a session, while leaving the media itself to protocols like RTP and the session description to SDP. Its design rests on a few reusable ideas: logical elements that a device can adopt per transaction, a layered model that separates syntax, transport, transactions, and the transaction-user core, and the transaction and dialog abstractions that give short exchanges and long conversations their structure. Registration feeds a location service that turns a stable address-of-record into a current device, and a threat model built around impersonation, tampering, session teardown, and denial of service justifies the TLS, SIPS, Digest, and S/MIME mechanisms the protocol adopts. The specification is over twenty years old and has accumulated many extensions, but the core it establishes is still the vocabulary of Internet real-time communication.
+RFC 3261 defines SIP as a text-based, HTTP-like signaling protocol whose job is to locate participants and manage the lifetime of a session, while leaving the media itself to protocols like RTP and the session description to SDP. Its design rests on a few reusable ideas: logical elements that a device can adopt per transaction, a layered model that separates syntax, transport, transactions, and the transaction-user core, and the transaction and dialog abstractions that give short exchanges and long conversations their structure.
+
+Registration feeds a location service that turns a stable address-of-record into a current device, and a threat model built around impersonation, tampering, session teardown, and denial of service justifies the TLS, SIPS, Digest, and S/MIME mechanisms the protocol adopts. The specification is over twenty years old and has accumulated many extensions, but the core it establishes is still the vocabulary of Internet real-time communication.
 
 The mindmap below summarizes the article's structure.
 
@@ -230,27 +248,39 @@ The mindmap below summarizes the article's structure.
 
 **Q: What is the difference between SIP and RTP?**
 
-They operate at different layers of a call. SIP is the signaling protocol: it locates the other party, negotiates what media will be exchanged, and sets up, modifies, or tears down the session. RTP is the media transport protocol that actually carries the voice or video packets once the session is established. SIP messages carry an SDP body describing the media, and after the endpoints agree, the RTP streams flow directly between them, often bypassing the proxies that handled the signaling.
+They operate at different layers of a call. SIP is the signaling protocol: it locates the other party, negotiates what media will be exchanged, and sets up, modifies, or tears down the session. RTP is the media transport protocol that carries the voice or video packets once the session is established.
+
+SIP messages carry an SDP body describing the media, and after the endpoints agree, the RTP streams flow directly between them, often bypassing the proxies that handled the signaling.
 
 **Q: Why does an INVITE need a separate ACK when other requests do not?**
 
-Because answering a call involves a human and can take many seconds, far longer than a normal request/response round trip. The INVITE transaction therefore uses a three-way handshake: the caller sends `INVITE`, the callee eventually sends a final response such as `200 (OK)`, and the caller confirms it with `ACK`. This explicit acknowledgment makes the exchange reliable even over an unreliable transport like UDP, where a `200 (OK)` might be lost and need retransmission. Non-INVITE transactions like `BYE` complete quickly and need no separate acknowledgment.
+Because answering a call involves a human and can take many seconds, far longer than a normal request/response round trip. The INVITE transaction therefore uses a three-way handshake: the caller sends `INVITE`, the callee eventually sends a final response such as `200 (OK)`, and the caller confirms it with `ACK`.
+
+This explicit acknowledgment makes the exchange reliable even over an unreliable transport like UDP, where a `200 (OK)` might be lost and need retransmission. Non-INVITE transactions like `BYE` complete quickly and need no separate acknowledgment.
 
 **Q: What three values identify a dialog, and why does that matter?**
 
-A dialog is identified by the `Call-ID`, the local tag, and the remote tag. Because the remote tag is contributed by the answering UAS, a dialog is only fully specified once the callee has responded. This three-part identifier matters for security as much as for routing: a UA can reject a mid-dialog request, such as a forged `BYE` meant to tear down the session, if its tags do not match an existing dialog. An attacker who has not observed all three values cannot fabricate a request the endpoint will accept.
+A dialog is identified by the `Call-ID`, the local tag, and the remote tag. Because the remote tag is contributed by the answering UAS, a dialog is only fully specified once the callee has responded.
+
+This three-part identifier matters for security as much as for routing: a UA can reject a mid-dialog request, such as a forged `BYE` meant to tear down the session, if its tags do not match an existing dialog. An attacker who has not observed all three values cannot fabricate a request the endpoint will accept.
 
 **Q: Why can a SIP proxy not simply encrypt the entire message end-to-end?**
 
-Because proxies must read and sometimes modify certain header fields to route the message. Fields such as the `Request-URI`, `Route`, and `Via` have to stay visible so that intermediaries can forward the request toward its destination and route responses back; proxies also add their own `Via` values. Encrypting the whole message end-to-end would make it non-routable. SIP resolves this by securing signaling hop by hop with TLS or IPsec, while using S/MIME to encrypt only the message body end-to-end, protecting the media parameters that proxies have no need to read.
+Because proxies must read and sometimes modify certain header fields to route the message. Fields such as the `Request-URI`, `Route`, and `Via` have to stay visible so that intermediaries can forward the request toward its destination and route responses back; proxies also add their own `Via` values. Encrypting the whole message end-to-end would make it non-routable.
+
+SIP resolves this by securing signaling hop by hop with TLS or IPsec, while using S/MIME to encrypt only the message body end-to-end, protecting the media parameters that proxies have no need to read.
 
 **Q: A registrar decides who may change an address-of-record's bindings by reading the From header. Combining the registration and security sections, what goes wrong, and how is it fixed?**
 
-The `From` header can be set to any value by the sender, so on its own it proves nothing. This is the registration hijacking threat: an attacker forges a `REGISTER` whose `From` claims to be the victim, de-registers the victim's real contacts, and registers their own device, so all of the victim's incoming calls are redirected to the attacker. Because registration feeds the location service that proxies query to route requests, one forged registration can silently steal a user's calls. The fix is to authenticate the originator of the `REGISTER` rather than trusting the `From` field, typically with HTTP Digest, so the registrar accepts binding changes only from a sender who can prove they hold the shared secret for that address-of-record.
+The `From` header can be set to any value by the sender, so on its own it proves nothing. This is the registration hijacking threat: an attacker forges a `REGISTER` whose `From` claims to be the victim, de-registers the victim's real contacts, and registers their own device, so all of the victim's incoming calls are redirected to the attacker.
+
+Because registration feeds the location service that proxies query to route requests, one forged registration can silently steal a user's calls. The fix is to authenticate the originator of the `REGISTER` rather than trusting the `From` field, typically with HTTP Digest, so the registrar accepts binding changes only from a sender who can prove they hold the shared secret for that address-of-record.
 
 **Q: What does the SIPS URI scheme guarantee, and what does it not?**
 
-A SIPS URI signals that the request must be carried over TLS-secured hops all the way to the domain responsible for the target. It guarantees confidentiality and integrity of the signaling on every hop up to that domain. It does not guarantee TLS on the final leg from the target domain to the callee's device, which is left to that domain's local policy, and it does not by itself encrypt or authenticate the message body. End-to-end body protection is a separate concern addressed by S/MIME.
+A SIPS URI signals that the request must be carried over TLS-secured hops all the way to the domain responsible for the target. It guarantees confidentiality and integrity of the signaling on every hop up to that domain.
+
+It does not guarantee TLS on the final leg from the target domain to the callee's device, which is left to that domain's local policy, and it does not by itself encrypt or authenticate the message body. End-to-end body protection is a separate concern addressed by S/MIME.
 
 ## References
 

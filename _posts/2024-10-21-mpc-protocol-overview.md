@@ -2,7 +2,7 @@
 layout: post
 title:  Overview, security and applications of Multi-Party Computation (MPC)
 date:   2024-10-21
-last_modified_at: 2024-11-27
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography
@@ -134,7 +134,7 @@ Reference: [Partisia - MPC Techniques Series, Part 7: Homomorphic Encryption](ht
 
 **2. Communication Complexity:**
 
-Many MPC protocols require parties to exchange a large number of messages. For example, in the **GMW protocol** (Goldreich, Micali, Wigderson), every gate in a Boolean circuit requires a round of communication (an interactive *OT*) for AND gates, which can be inefficient in complex circuits.
+Many MPC protocols require parties to exchange a large number of messages. For example, in the **GMW protocol** (Goldreich, Micali, Wigderson), every AND gate in a Boolean circuit requires a round of communication, an interactive *OT*, which can be inefficient in complex circuits.
 
 See also [NPTEL - Lec 36 GMW MPC protocol](https://www.youtube.com/watch?v=YiwTVQFkAQQ&list=PLgMDNELGJ1Ca3l-xioOzN86BIZ2a0N8Ds&index=37), [GMW vs. Yao? Efficient Secure Two-Party Computation with Low Depth Circuits](https://fc13.ifca.ai/proc/8-3.pdf)
 
@@ -154,20 +154,20 @@ The **security** of an MPC protocol ensures that no party can learn anything bey
 
 ### 1. Semi-Honest
 
-**Semi-Honest (passive) Attackers (Honest-but-Curious):**
+**Semi-honest attackers, also called passive or honest-but-curious attackers:**
 
-External attackers might attempt to intercept communication between parties. 
+Unlike in traditional cryptography, the attacker here is not an outsider: it is one or several of the participating parties, which the attacker has corrupted.
 
 - In this model, the attacker follows the protocol correctly but may try to infer information from the messages they receive. MPC protocols secure against semi-honest adversaries ensure that the protocol does not leak information and no party learns any private input beyond the final output.
 - **Example**: In Yao's Garbled Circuits, each party receives garbled values but cannot infer the actual inputs.
 
-Secure MPC protocols rely on encryption to protect against such eavesdropping attacks.
+External eavesdroppers on the network are a separate concern: most MPC models assume a secure (encrypted and authenticated) channel between every pair of parties.
 
 ### 2. Malicious (active) Attackers
 
 Malicious attackers may deviate from the protocol in an attempt to corrupt the computation or learn private data. To be secure against malicious adversaries, MPC protocols must incorporate additional mechanisms to detect and prevent cheating, such as **zero-knowledge proofs** to ensure correct behavior.
 
-- **Example**: Protocols like SPDZ (pronounced "SPeeDz") offer malicious security by using **MACs (Message Authentication Codes)** and public-key encryption to ensure integrity and correctness, even when some parties behave maliciously.
+- **Example**: Protocols like SPDZ, pronounced "SPeeDz", offer malicious security by using **MACs (Message Authentication Codes)** and public-key encryption to ensure integrity and correctness, even when some parties behave maliciously.
 
 See [Partisia - MPC Techniques Series, Part 9: SPDZ](https://medium.com/partisia-blockchain/mpc-techniques-series-part-9-spdz-dbe1b7381e3b)
 
@@ -257,6 +257,7 @@ The threat models considered in MPC protect against malicious adversaries, collu
 ## Reference
 
 - [wiki.mpcalliance.org](https://wiki.mpcalliance.org)
+- [Wikipedia - Secure multi-party computation](https://en.wikipedia.org/wiki/Secure_multi-party_computation)
 - MPC Partisia article:
   - [MPC Techniques Series, Part 1: Secret Sharing](https://medium.com/partisia-blockchain/mpc-techniques-series-part-1-secret-sharing-d8f98324674a)
   - [MPC Techniques Series, Part 2: Security Taxonomy and Active Security](https://medium.com/partisia-blockchain/mpc-techniques-series-part-2-security-taxonomy-and-active-security-6b5f14a15217)

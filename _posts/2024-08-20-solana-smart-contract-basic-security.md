@@ -2,7 +2,7 @@
 layout: post
 title:  Solana Programs - Basic Security with Anchor
 date:   2024-08-20
-last_modified_at: 2024-09-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security solana 
@@ -32,7 +32,7 @@ Over $500 millions were stolen on Solana ecosystem
 ## Basic Security Tips
 
 - Use [Anchor](https://www.anchor-lang.com) in most cases
-  - Saves a lot of boilerplate code
+  - Generates the account deserialization and validation code you would otherwise write by hand
   - Most Solana specific checks within context <> structs
   - Easier for others to review your code
 - Tests extensively

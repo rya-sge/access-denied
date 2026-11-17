@@ -2,7 +2,7 @@
 layout: post
 title: "Merkle DAGs(IPFS, GIT) - Overview"
 date: 2025-04-09
-last_modified_at: 2025-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain programmation
@@ -59,7 +59,7 @@ Reference: [docs.ipfs.tech  - merkle-dag](https://docs.ipfs.tech/concepts/merkle
 1. **Content Addressability**
    Each node in a Merkle DAG is identified by its cryptographic hash, which uniquely represents its content. This ensures that nodes with identical content have the same identifier, reducing redundancy.
 2. **Immutability**
-   Once a node is added to the Merkle DAG, its hash—and by extension, its position in the graph—cannot change without altering its entire lineage. This property is crucial for ensuring data integrity.
+   Once a node is added to the Merkle DAG, its hash—and by extension, its position in the graph—cannot change without altering its entire lineage. This property ensures data integrity.
 3. **Efficient Verification**
    Like Merkle trees, Merkle DAGs allow for efficient proof and verification processes. Verifying the integrity of a single node or file requires only the hashes along its path to the root.
 4. **Deduplication**
@@ -153,7 +153,7 @@ A Merkle DAG in IPFS is a DAG where each node has an identifier called a CID, an
 
 This example came from [proto.school/merkle-dags/07](https://proto.school/merkle-dags/07)
 
-For an example of small-scale data duplication, consider the use case of tracking changes files in a directory over time (this is often called *versioning*).
+For an example of small-scale data duplication, consider the use case of tracking changes to files in a directory over time, which is often called *versioning*.
 
 We have this dag, constructed from a file directory `pics`which contain two folders inside: `fish`and `cats`.
 

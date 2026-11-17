@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Collateral Management — The colr Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -36,7 +37,7 @@ Two distinct exposures are collateralised, and the distinction runs through the 
 
 ### The arithmetic of a margin call
 
-The amount called is not simply the raw exposure. A CSA defines a **threshold** (an amount of exposure a party is willing to leave unsecured) and a **minimum transfer amount (MTA)** (a floor below which no call is made, to avoid moving trivial sums). Posted securities are valued after a **haircut**, a percentage discount that protects the taker against a fall in the collateral's own price. The delivery amount is therefore
+The amount called is not simply the raw exposure. A CSA defines a **threshold**, an amount of exposure a party is willing to leave unsecured, and a **minimum transfer amount (MTA)**, a floor below which no call is made so that trivial sums are not moved. Posted securities are valued after a **haircut**, a percentage discount that protects the taker against a fall in the collateral's own price. The delivery amount is therefore
 
 $$
 \begin{aligned}
@@ -140,7 +141,9 @@ The triparty set carries pagination (`Pgntn`) and general parameters (`GnlParams
 
 ## Conclusion
 
-The `colr` business area models the full lifecycle of collateral against derivatives and financing exposures. A bilateral core runs the daily margin cycle: value the exposure, call the margin, agree the amount or dispute it, propose and accept specific assets, then substitute and pay interest over the life of the trade. A triparty extension delegates the mechanics to a custodian through instruction, allegement, status, and reporting messages. Every message is an XML document validated against a schema and anchored by a shared obligation block, so the parties act on the same identified agreement and the same agreed figures. Read alongside the settlement (`sese`) and clearing (`secl`) areas that it hands off to, `colr` completes the ISO 20022 picture of what happens to a trade after it is struck.
+The `colr` business area models the full lifecycle of collateral against derivatives and financing exposures. A bilateral core runs the daily margin cycle: value the exposure, call the margin, agree the amount or dispute it, propose and accept specific assets, then substitute and pay interest over the life of the trade. A triparty extension delegates the mechanics to a custodian through instruction, allegement, status, and reporting messages.
+
+Every message is an XML document validated against a schema and anchored by a shared obligation block, so the parties act on the same identified agreement and the same agreed figures. Read alongside the settlement (`sese`) and clearing (`secl`) areas that it hands off to, `colr` completes the ISO 20022 picture of what happens to a trade after it is struck.
 
 ![Mindmap summarising ISO 20022 collateral management with the colr message set]({{site.url_complet}}/assets/article/finance/iso20022-collateral-management-colr.png)
 
@@ -165,27 +168,47 @@ The `colr` business area models the full lifecycle of collateral against derivat
 
 **Q: What is the difference between variation margin and initial margin?**
 
-Variation margin covers the current exposure: the mark-to-market value one party owes the other right now, exchanged daily so the net stays near zero as prices move. Initial margin covers potential future exposure, the additional loss that could build up in the gap between a counterparty defaulting and its positions being closed out. Initial margin is posted up front rather than in response to daily moves, and under the uncleared margin rules it must be segregated so the taker cannot reuse it. In the `colr` schemas initial margin surfaces as the segregated independent amount (`SgrtdIndpdntAmt`).
+Variation margin covers the current exposure: the mark-to-market value one party owes the other right now, exchanged daily so the net stays near zero as prices move.
+
+Initial margin covers potential future exposure, the additional loss that could build up in the gap between a counterparty defaulting and its positions being closed out. Initial margin is posted up front rather than in response to daily moves, and under the uncleared margin rules it must be segregated so the taker cannot reuse it. In the `colr` schemas initial margin surfaces as the segregated independent amount (`SgrtdIndpdntAmt`).
 
 **Q: Why does agreeing a margin call take more than one message?**
 
-Because a margin call involves several separable agreements. First the two sides must agree that a call is due and for how much, which is the `MarginCallRequest` (`colr.003`) and `MarginCallResponse` (`colr.004`). Then they must agree which specific assets will satisfy it, since a party has discretion over what eligible collateral to deliver, which is the `CollateralProposal` (`colr.007`) and `CollateralProposalResponse` (`colr.008`). And if either side disagrees on the exposure or valuation, that is a dispute (`colr.009`) rather than a delivery. Splitting the amount from the asset selection from the dispute lets each be handled and, if necessary, re-tried independently.
+Because a margin call involves several separable agreements:
 
-**Q: How is the amount of a margin call actually calculated?**
+- **The amount.** The two sides agree that a call is due and for how much, through the `MarginCallRequest` (`colr.003`) and `MarginCallResponse` (`colr.004`).
+- **The assets.** A party has discretion over what eligible collateral to deliver, so the two sides then agree which specific assets will satisfy the call, through the `CollateralProposal` (`colr.007`) and `CollateralProposalResponse` (`colr.008`).
+- **A dispute.** If either side disagrees on the exposure or valuation, it raises a dispute (`colr.009`) rather than a delivery.
 
-The call is the exposure minus the threshold minus the haircut-adjusted value of collateral already held, floored at zero, and only issued if the result reaches the minimum transfer amount. Formally, $$\text{Call} = \max(0, (E - T) - C_{\text{adj}})$$ with $$C_{\text{adj}} = \sum_k V_k (1 - h_k)$$. The threshold is unsecured exposure the parties tolerate, the MTA avoids moving trivial sums, and the haircut discounts each posted security against a fall in its own value. These parameters come from the CSA, and the `colr` messages carry the resulting figures for both sides to agree.
+Splitting the amount from the asset selection from the dispute lets each be handled and, if necessary, re-tried independently.
+
+**Q: How is the amount of a margin call calculated?**
+
+The call is the exposure minus the threshold minus the haircut-adjusted value of collateral already held, floored at zero, and only issued if the result reaches the minimum transfer amount. Formally, $$\text{Call} = \max(0, (E - T) - C_{\text{adj}})$$ with $$C_{\text{adj}} = \sum_k V_k (1 - h_k)$$.
+
+The threshold is unsecured exposure the parties tolerate, the MTA avoids moving trivial sums, and the haircut discounts each posted security against a fall in its own value. These parameters come from the CSA, and the `colr` messages carry the resulting figures for both sides to agree.
 
 **Q: What does the obligation (`Oblgtn`) block do, and why is it in nearly every message?**
 
-The obligation block identifies the two counterparties, the exposure being collateralised, and the collateral account. It is the shared key that ties every message in a cycle to the same underlying agreement. Because the `MarginCallRequest`, its response, the collateral proposal, and any substitution all carry the same obligation, a receiver can associate them without reconstructing the context each time. It is the same design idea as the shared building blocks in other ISO 20022 areas: put the common identifying data in one reusable component so the messages compose cleanly.
+The obligation block identifies the two counterparties, the exposure being collateralised, and the collateral account. It is the shared key that ties every message in a cycle to the same underlying agreement.
+
+Because the `MarginCallRequest`, its response, the collateral proposal, and any substitution all carry the same obligation, a receiver can associate them without reconstructing the context each time. It is the same design idea as the shared building blocks in other ISO 20022 areas: put the common identifying data in one reusable component so the messages compose cleanly.
 
 **Q: When would parties use the triparty messages instead of the bilateral ones?**
 
-They use triparty when they want a custodian to run the collateral mechanics for them. In the bilateral model the two firms value exposure, select assets, apply haircuts, and arrange substitutions between themselves. In the triparty model a custodian or CSD holds the collateral and does that work automatically, so both firms instruct the agent (`colr.019`), receive processing status (`colr.020`), are alleged into transactions (`colr.021`), and get holdings and status reports (`colr.022`, `colr.023`). This scales far better when a firm faces many counterparties, which is why large dealers and their clients often prefer it.
+They use triparty when they want a custodian to run the collateral mechanics for them. In the bilateral model the two firms value exposure, select assets, apply haircuts, and arrange substitutions between themselves.
+
+In the triparty model a custodian or CSD holds the collateral and does that work automatically, so both firms instruct the agent (`colr.019`), receive processing status (`colr.020`), are alleged into transactions (`colr.021`), and get holdings and status reports (`colr.022`, `colr.023`). This scales far better when a firm faces many counterparties, which is why large dealers and their clients often prefer it.
 
 **Q: How do the colr messages relate to secl and sese?**
 
-They cover adjacent stages of the post-trade lifecycle. The clearing area (`secl`) is where a CCP tells a member what it owes and what margin it must post; `colr` is the general collateral language used to actually value exposure, call margin, and agree which assets move, whether against cleared or uncleared trades; and the settlement area (`sese`) performs the physical delivery of those assets. A margin call handled in `colr` therefore ends with a `sese` settlement instruction, and a CCP margin requirement reported in `secl` is covered by collateral whose movement `colr` and `sese` describe.
+They cover adjacent stages of the post-trade lifecycle:
+
+- **`secl`**, the clearing area, is where a CCP tells a member what it owes and what margin it must post.
+- **`colr`** is the general collateral language used to value exposure, call margin, and agree which assets move, whether against cleared or uncleared trades.
+- **`sese`**, the settlement area, performs the physical delivery of those assets.
+
+A margin call handled in `colr` therefore ends with a `sese` settlement instruction, and a CCP margin requirement reported in `secl` is covered by collateral whose movement `colr` and `sese` describe.
 
 ## References
 

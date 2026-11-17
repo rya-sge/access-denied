@@ -2,7 +2,7 @@
 layout: post
 title: "ERC-8004 Trustless Agents - Identity, Reputation and Validation for On-Chain AI Agents"
 date:   2026-07-06
-last_modified_at: 2026-07-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai blockchain ethereum
@@ -26,7 +26,7 @@ It is a companion to an earlier [survey of the AI-agent ERC standards](https://r
 
 Two agent-communication protocols already exist. Anthropic's Model Context Protocol (MCP) lets a server list its prompts, resources, and tools. Google's Agent-to-Agent (A2A) protocol handles authentication, skill advertisement through AgentCards, direct messaging, and task orchestration. Neither answers the two questions that matter when agents from different organisations meet: how do I find an agent, and why should I trust it?
 
-[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) addresses discovery and trust with three lightweight registries. Its abstract frames the goal as using the blockchain to discover, choose, and interact with agents across organisational boundaries without a pre-existing relationship. The authorship is made of several different authors: Marco De Rossi (MetaMask), Davide Crapis (Ethereum Foundation), Jordan Ellis (Google), and Erik Reppel (Coinbase). 
+[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) addresses discovery and trust with three lightweight registries. Its abstract frames the goal as using the blockchain to discover, choose, and interact with agents across organisational boundaries without a pre-existing relationship. The authors are Marco De Rossi of MetaMask, Davide Crapis of the Ethereum Foundation, Jordan Ellis of Google, and Erik Reppel of Coinbase.
 
 The standard is `Draft`, created in August 2025, and it requires [EIP-155](https://eips.ethereum.org/EIPS/eip-155), [EIP-712](https://eips.ethereum.org/EIPS/eip-712), [ERC-721](https://eips.ethereum.org/EIPS/eip-721), and [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271).
 
@@ -34,7 +34,7 @@ The design keeps a strict separation:
 
 - Communication stays with MCP and A2A. 
 - Payments are handled elsewhere, with Coinbase's x402 given only as an example. 
-- ERC-8004 covers identity, reputation, and validation, and nothing else.
+- ERC-8004 covers only identity, reputation, and validation.
 
 ## Architecture: three per-chain singletons
 
@@ -172,7 +172,7 @@ function validationResponse(bytes32 requestHash, uint8 response, string response
 
 Only `requestHash` and `response` are mandatory, and the call MUST come from the `validatorAddress` in the original request. The `response` is a value from 0 to 100, usable as a binary pass or fail (0 or 100) or as a graded score. A validator can respond more than once for the same request, which supports progressive states such as a soft finality followed by a hard finality, distinguished through the `tag`. The registry stores `requestHash`, `validatorAddress`, `agentId`, `response`, `responseHash`, `lastUpdate`, and `tag`, and exposes them through `getValidationStatus`, `getSummary`, `getAgentValidations`, and `getValidatorRequests`.
 
-What a validator actually does is left open. The standard names stake-secured re-execution, zkML verifiers, and TEE oracles as examples, and it puts incentives and slashing outside its own scope, in the validation protocol itself.
+The standard leaves open what a validator does. The standard names stake-secured re-execution, zkML verifiers, and TEE oracles as examples, and it puts incentives and slashing outside its own scope, in the validation protocol itself.
 
 This is the least settled of the three registries. The [official contracts repository](https://github.com/erc-8004/erc-8004-contracts) publishes no Validation Registry address on any chain, and the specification notes that this section is still under active update and discussion with the TEE community, to be expanded in a follow-up revision later in 2026. The interface above should therefore be read as a design in progress rather than a deployed contract.
 
@@ -183,7 +183,7 @@ The single idea that ties the three registries together is that trust should sca
 - **Reputation**: client feedback, cheap and immediate, suited to low-stake tasks.
 - **Crypto-economic**: stake-secured re-execution, where a validator re-runs the job and risks a bond.
 - **zkML**: a zero-knowledge proof that a specific model produced a specific output.
-- **TEE attestation**: a hardware enclave attesting that the registered code is what actually ran.
+- **TEE attestation**: a hardware enclave attesting that the code it ran is the registered code.
 
 The `supportedTrust` field in the registration file advertises which of these an agent stands behind. The design does not force a choice; it standardises how the choice is expressed and read.
 
@@ -212,7 +212,12 @@ Coinbase's x402 fills that last slot by reviving the HTTP 402 status code:
 - an agent settles stablecoins inside the HTTP request and response cycle, and rather than touching the chain on every call it issues cryptographically signed vouchers that batch and settle later, which is what lets an agent field thousands of paid queries per minute. 
 - [The Graph connects discovery to this flow](https://thegraph.com/blog/understanding-x402-erc8004/) by indexing the ERC-8004 registries across eight chains into a cross-chain directory, so one agent can check another's identity, reputation, and validation status before it engages, pay for the work through x402, and resell the result to a third agent.
 
-The subsections below map the ecosystem forming around the standard: the chains that carry the registries and their cost, what the on-chain data shows, an explorer that makes it browsable (AltLayer's 8004scan), and the products wiring ERC-8004 into execution (MetaMask), validation (Oasis and ZyFai), payments (Brickken), and live agents (Toppa and Agentic Eye).
+The subsections below map the ecosystem forming around the standard:
+
+- the chains that carry the registries, and their cost;
+- what the on-chain data shows;
+- AltLayer's 8004scan, an explorer that makes the registries browsable;
+- the products that integrate ERC-8004: MetaMask for execution, Oasis and ZyFai for validation, Brickken for payments, and Toppa and Agentic Eye as live agents.
 
 ### Blockchain support
 
@@ -238,13 +243,19 @@ For agents expected to register once and then post feedback continuously, that r
 
 ### What the on-chain data shows
 
-Raw adoption looks large and is partly hollow. The [first empirical study of ERC-8004](https://arxiv.org/abs/2606.26028), from a group at Imperial College London, Ohio State, Bristol, CSIRO, and Manchester, crawled Ethereum, BSC, and Base through 13 May 2026 and counted more than 170,000 registered agents and over 150,000 feedback records. Most of that is noise. Registration is dominated by batch-minted placeholders and templated deployments, ownership is concentrated (a Gini coefficient of 0.733 on Ethereum and 0.708 on Base), and many identities never resolve to anything: 53% of Ethereum registrations carry no URI at all, and only 3% to 15% across the three chains expose a valid registration file with at least one live service endpoint. Raw registration volume, in other words, is a poor proxy for how many agents actually exist.
+Raw adoption looks large and is partly hollow. The [first empirical study of ERC-8004](https://arxiv.org/abs/2606.26028), from a group at Imperial College London, Ohio State, Bristol, CSIRO, and Manchester, crawled Ethereum, BSC, and Base through 13 May 2026 and counted more than 170,000 registered agents and over 150,000 feedback records.
 
-The reputation picture is worse, and it turns the standard's own Sybil caveat into measured fact. The study finds that the Reputation Registry, as deployed, meets none of the four conditions for a trustworthy score: the values are not commensurable, the feedback is rarely tied to a verifiable interaction, a single input can move the aggregate, and a reputation can be fabricated or destroyed for cents (a median of $0.055 on Ethereum, and fractions of a cent on BSC and Base). Coordinated reviewers account for 73.6%, 59.2%, and 90.6% of all reviewers on Ethereum, BSC, and Base. Strip their feedback out and 15.5%, 72.3%, and 89.4% of rated agents are left with no valid feedback at all. This is the concrete reason the `getSummary` read function forces a caller-chosen reviewer set: an unfiltered score reflects mostly Sybils.
+Most of that is noise. Registration is dominated by batch-minted placeholders and templated deployments, ownership is concentrated, with a Gini coefficient of 0.733 on Ethereum and 0.708 on Base, and many identities never resolve to anything: 53% of Ethereum registrations carry no URI at all, and only 3% to 15% across the three chains expose a valid registration file with at least one live service endpoint. Raw registration volume, in other words, is a poor proxy for how many usable agents exist.
+
+The reputation picture is worse, and it turns the standard's own Sybil caveat into measured fact. The study finds that the Reputation Registry, as deployed, meets none of the four conditions for a trustworthy score: the values are not commensurable, the feedback is rarely tied to a verifiable interaction, a single input can move the aggregate, and a reputation can be fabricated or destroyed for cents, with a median cost of $0.055 on Ethereum and fractions of a cent on BSC and Base.
+
+Coordinated reviewers account for 73.6%, 59.2%, and 90.6% of all reviewers on Ethereum, BSC, and Base. Strip their feedback out and 15.5%, 72.3%, and 89.4% of rated agents are left with no valid feedback at all. This is the concrete reason the `getSummary` read function forces a caller-chosen reviewer set: an unfiltered score reflects mostly Sybils.
 
 ### Discovery and explorers: AltLayer's 8004scan
 
-Raw registry events are hard to read directly, the same problem block explorers solved for tokens. [AltLayer's 8004scan](https://docs.altlayer.io/altlayer-documentation/8004-scan/overview) is an explorer for the agent economy, a web application for browsing agents registered under ERC-8004. It lists featured and live agents, lets a user filter by domain such as data access, workflow, or orchestration, and shows activity feeds of agent interactions alongside network stats meant to signal growth and ecosystem health. It adds reputation and behaviour tracking so a prospective client can weigh an agent before engaging, and a builder section for launching a new ERC-8004 agent. Under the surface it indexes the on-chain registration metadata, the same events the empirical study crawled, and renders them for people rather than for a subgraph query.
+Raw registry events are hard to read directly, the same problem block explorers solved for tokens. [AltLayer's 8004scan](https://docs.altlayer.io/altlayer-documentation/8004-scan/overview) is an explorer for the agent economy, a web application for browsing agents registered under ERC-8004. It lists featured and live agents, lets a user filter by domain such as data access, workflow, or orchestration, and shows activity feeds of agent interactions alongside network stats meant to signal growth and ecosystem health.
+
+It adds reputation and behaviour tracking so a prospective client can weigh an agent before engaging, and a builder section for launching a new ERC-8004 agent. Under the surface it indexes the on-chain registration metadata, the same events the empirical study crawled, and renders them for people rather than for a subgraph query.
 
 AltLayer positions this inside a wider protocol for rollups and agents: its Restaked Rollups framework secures rollups through EigenLayer restaking, while a suite of x402 and ERC-8004 products, of which 8004scan is the explorer, targets agent discovery, reputation, and payment. The explorer is a sign that the tooling layer, not just the registries, is filling in.
 
@@ -270,15 +281,17 @@ How it works:
 
 - A `rofl-8004` service derives an Ethereum address for the agent, and once that address holds a little ether for fees, the agent is registered and validated in the ERC-8004 registry automatically. 
 - ROFL performs the startup attestation of the container and injects secrets, such as an `OPENAI_API_KEY`, as end-to-end-encrypted environment variables stored on-chain, while registry interaction runs on Sapphire, the Oasis confidential EVM. 
-- The result is the high-assurance end of the tiered trust model realised in production: an agent's trustworthiness rests not on a reputation score but on a hardware attestation that the registered code is what actually runs.
+- The result is the high-assurance end of the tiered trust model realised in production: an agent's trustworthiness rests not on a reputation score but on a hardware attestation that the code running in the enclave is the registered code.
 
 ### zkML validation and DeFi: ZyFai
 
 Oasis attests that the right code ran; [ZyFai](https://docs.zyf.ai/docs/product/execution/8004) proves that it ran correctly. ZyFai is a DeFi execution platform whose agents rebalance yield positions across pools. Its logic is a deterministic rule set, so the same input always produces the same verifiable output, which is what makes the result provable in the first place.
 
-Each rebalance is checked by a zero-knowledge circuit. ZyFai uses a Circom 2.0 circuit with fifteen public signals enforcing five constraints on the move, among them a minimum APY improvement of 0.1% and stability bounds on APY and TVL. ZyFai deploys its own `RebalancerVerifier` for this and links each proof to the agent's ERC-8004 identity, so the agent builds a tamper-proof history of verified actions rather than self-reported scores. Its docs describe this as populating the Validation Registry, but since that registry is not deployed anywhere yet, ZyFai is best read as a preview of the standard's zkML trust model built on a custom verifier rather than the registry itself. It is also the closest thing in this section to a DeFi use case, though ZyFai is an agent-native product rather than an established protocol.
+Each rebalance is checked by a zero-knowledge circuit. ZyFai uses a Circom 2.0 circuit with fifteen public signals enforcing five constraints on the move, among them a minimum APY improvement of 0.1% and stability bounds on APY and TVL. ZyFai deploys its own `RebalancerVerifier` for this and links each proof to the agent's ERC-8004 identity, so the agent builds a tamper-proof history of verified actions rather than self-reported scores.
 
-It runs on testnets so far, Base Sepolia (chain 84532) and Ethereum Sepolia (chain 11155111), using the canonical Sepolia Identity and Reputation registries (`0x8004A818...` and `0x8004B663...`) alongside its own `RebalancerVerifier` contract on each.
+Its docs describe this as populating the Validation Registry, but since that registry is not deployed anywhere yet, ZyFai is best read as a preview of the standard's zkML trust model built on a custom verifier rather than the registry itself. It is also the closest thing in this section to a DeFi use case, though ZyFai is an agent-native product rather than an established protocol.
+
+It runs only on testnets so far: Base Sepolia, chain 84532, and Ethereum Sepolia, chain 11155111. On each it uses the canonical Sepolia Identity and Reputation registries, at `0x8004A818...` and `0x8004B663...`, alongside its own `RebalancerVerifier` contract.
 
 ### Payments and identity: Brickken's x402 API
 
@@ -295,13 +308,23 @@ The caller picks between a Brickken-relayed mode, where the API signs and pays g
 
 Most of this section is infrastructure. [Toppa](https://toppa.cc/docs/) is a concrete agent that puts the whole stack together. It is a consumer assistant on Telegram and WhatsApp that buys airtime and mobile data, pays utility bills, and buys gift cards, settling in cUSD on Celo, and it accepts natural-language requests and voice notes. Its ERC-8004 registration lives on Celo mainnet as agent ID 1870, and its agent card at the conventional `https://api.toppa.cc/.well-known/agent-card.json` path declares MCP, A2A, and x402 support, exactly the `services` list the registration file is built to carry.
 
-The three protocols map onto the roles the standard keeps separate. A2A, at `https://api.toppa.cc/a2a` over JSON-RPC, handles machine-to-machine delegation. MCP, at `https://api.toppa.cc/mcp` with thirteen tools over streamable HTTP, exposes Toppa to clients such as Claude Desktop. x402 handles payment: a caller requests pricing, receives an HTTP 402 with a recipient address, transfers cUSD on-chain, and resubmits with the transaction proof, against a flat 1.5% fee. Discovery endpoints for operators, billers, and gift cards are free, while fulfilment endpoints such as `/send-airtime` and `/pay-bill` are paid. Its computed reputation is visible on ERC-8004 explorers, including its [8004scan profile](https://8004scan.io/users/0x558e7bfaf2cf1a494f44e50d92431afc060c9d12). Toppa is a useful reference because it uses the standard as intended: one on-chain identity, communication over A2A and MCP, payment over x402, and a reputation any explorer can read.
+The three protocols map onto the roles the standard keeps separate:
 
-[Agentic Eye](https://agenticeye.co/for-agents) is a second Celo agent, registered as [agent ID 1865](https://8004scan.io/agents/celo/1865) under the on-chain name `agenticeye.x`. It is a content-intelligence service: on each call it pulls live data from fourteen sources across YouTube, TikTok, Reddit, and Google Trends and scores the opportunity, data a general model cannot reach from its training set. Other agents discover it through the ERC-8004 registry and card, then pay per call over x402, which it accepts in several tokens, cUSD, USDC, and USDT on Celo and USDC on Base, against tiered pricing from $0.10 to $8.00 per call. Two production agents sharing one chain, one identity standard, and one payment rail is a small but real sign of an agent-native cluster forming on Celo rather than a single isolated deployment.
+- **A2A**, at `https://api.toppa.cc/a2a` over JSON-RPC, handles machine-to-machine delegation.
+- **MCP**, at `https://api.toppa.cc/mcp` with thirteen tools over streamable HTTP, exposes Toppa to clients such as Claude Desktop.
+- **x402** handles payment: a caller requests pricing, receives an HTTP 402 with a recipient address, transfers cUSD on-chain, and resubmits with the transaction proof, against a flat 1.5% fee.
+
+Discovery endpoints for operators, billers, and gift cards are free, while fulfilment endpoints such as `/send-airtime` and `/pay-bill` are paid. Its computed reputation is visible on ERC-8004 explorers, including its [8004scan profile](https://8004scan.io/users/0x558e7bfaf2cf1a494f44e50d92431afc060c9d12). Toppa is a useful reference because it uses the standard as intended: one on-chain identity, communication over A2A and MCP, payment over x402, and a reputation any explorer can read.
+
+[Agentic Eye](https://agenticeye.co/for-agents) is a second Celo agent, registered as [agent ID 1865](https://8004scan.io/agents/celo/1865) under the on-chain name `agenticeye.x`. It is a content-intelligence service: on each call it pulls live data from fourteen sources across YouTube, TikTok, Reddit, and Google Trends and scores the opportunity, using data that a general model does not have in its training set. Other agents discover it through the ERC-8004 registry and card, then pay per call over x402, with tiered pricing from $0.10 to $8.00 per call. It accepts cUSD, USDC, and USDT on Celo, and USDC on Base.
+
+Two production agents sharing one chain, one identity standard, and one payment rail is a small but real sign of an agent-native cluster forming on Celo rather than a single isolated deployment.
 
 ## Conclusion
 
-ERC-8004 is a discovery and trust layer, not a communication or payment protocol. Its Identity Registry gives an agent a transferable ERC-721 handle that resolves to a structured registration file. Its Reputation Registry records signed, filterable feedback on-chain while keeping detail off-chain. Its Validation Registry lets validators post verdicts that other contracts can read. Around these sits a tiered trust model that ranges from cheap reputation to hardware attestation, expressed through a single `supportedTrust` field. The standard is still `Draft` and its interfaces can change, but the registries are already deployed and the surrounding infrastructure is being built out.
+ERC-8004 is a discovery and trust layer, not a communication or payment protocol. Its Identity Registry gives an agent a transferable ERC-721 handle that resolves to a structured registration file. Its Reputation Registry records signed, filterable feedback on-chain while keeping detail off-chain. Its Validation Registry lets validators post verdicts that other contracts can read.
+
+Around these sits a tiered trust model that ranges from cheap reputation to hardware attestation, expressed through a single `supportedTrust` field. The standard is still `Draft` and its interfaces can change, but the registries are already deployed and the surrounding infrastructure is being built out.
 
 The mindmap below summarises the standard.
 
@@ -315,7 +338,9 @@ Reusing ERC-721 with the URIStorage extension makes every agent immediately brow
 
 **Q: What is the `agentWallet` key, and why is it reset when the agent is transferred?**
 
-The `agentWallet` is a reserved metadata key holding the address where the agent receives payments. It cannot be set through the generic `setMetadata()` or during `register()`; it can only be changed through `setAgentWallet()`, which requires an EIP-712 signature (for an EOA) or an ERC-1271 signature (for a smart-contract wallet) proving control of the new address. On transfer it is cleared to the zero address, so a buyer or recipient of the agent token cannot silently inherit a payment address they have not re-proved. This blocks an attack where a payment address rides along with a transferred agent.
+The `agentWallet` is a reserved metadata key holding the address where the agent receives payments. It cannot be set through the generic `setMetadata()` or during `register()`; it can only be changed through `setAgentWallet()`, which requires an EIP-712 signature from an EOA or an ERC-1271 signature from a smart-contract wallet, proving control of the new address.
+
+On transfer it is cleared to the zero address, so a buyer or recipient of the agent token cannot silently inherit a payment address they have not re-proved. This blocks an attack where a payment address rides along with a transferred agent.
 
 **Q: How does the Reputation Registry decide what is stored on-chain versus off-chain?**
 
@@ -327,7 +352,9 @@ Because anyone can post feedback, an unfiltered aggregate is trivially manipulab
 
 **Q: How do the Reputation and Validation registries differ, and when would you use each?**
 
-The Reputation Registry captures subjective client experience: scores, uptime, success rate, and similar signals that accumulate over time. The Validation Registry captures objective verification of a specific piece of work: an owner opens a `validationRequest` referencing the inputs and outputs, and a named validator returns a `response` from 0 to 100. Reputation suits low-stake, cumulative judgement; validation suits a high-stake task where you want a stake-secured re-execution, a zkML proof, or a TEE attestation of one result. In the tiered trust model they sit at different points on the cost and assurance curve.
+The Reputation Registry captures subjective client experience: scores, uptime, success rate, and similar signals that accumulate over time. The Validation Registry captures objective verification of a specific piece of work: an owner opens a `validationRequest` referencing the inputs and outputs, and a named validator returns a `response` from 0 to 100.
+
+Reputation suits low-stake, cumulative judgement; validation suits a high-stake task where you want a stake-secured re-execution, a zkML proof, or a TEE attestation of one result. In the tiered trust model they sit at different points on the cost and assurance curve.
 
 **Q: If an agent is registered on one chain, can it work on another?**
 

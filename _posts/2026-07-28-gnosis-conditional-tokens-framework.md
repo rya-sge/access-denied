@@ -2,7 +2,7 @@
 layout: post
 title: "Gnosis Conditional Tokens — Combinatorial Prediction Markets on ERC-1155"
 date:   2026-07-28
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity
@@ -27,7 +27,9 @@ Consider two oracles reporting on two independent questions:
 1. Which **choice** out of Alice, Bob, and Carol will be made?
 2. Will the **score** be high or low?
 
-There are two ways to nest them. Either the *choice* market is created first and its outcome tokens collateralise a *score* market, or the reverse. Both routes produce a token that pays out when Alice is chosen and the score is high, and economically those two tokens are identical. On-chain they are not. They live in different contracts, hold different balances, and cannot be traded against each other. Liquidity fragments across every ordering of the same set of conditions, and the fragmentation grows factorially with depth.
+There are two ways to nest them. Either the *choice* market is created first and its outcome tokens collateralise a *score* market, or the reverse. Both routes produce a token that pays out when Alice is chosen and the score is high, and economically those two tokens are identical.
+
+On-chain they are not. They live in different contracts, hold different balances, and cannot be traded against each other. Liquidity fragments across every ordering of the same set of conditions, and the fragmentation grows factorially with depth.
 
 Partial redemption inherits the same problem. In the nested design, unwinding a second-layer token back to a first-layer token requires the second layer's condition to have resolved, because the second-layer contract is the only place that knows how to convert. The dependency runs in one direction only, fixed at market creation time.
 
@@ -186,7 +188,7 @@ if(x2 != 0) {
 }
 ```
 
-The `require` on `mulmod(y2, y2, P) == yy` rejects any word that is not the compressed form of a real curve point. It is worth being precise about what this check does and does not buy. Roughly half of all 32-byte values happen to encode a point, so passing it is not evidence that the caller derived the identifier legitimately. Its job is to guarantee that what reaches the `ecAdd` precompile is a genuine group element, so that the group structure the collision argument depends on actually applies.
+The `require` on `mulmod(y2, y2, P) == yy` rejects any word that is not the compressed form of a real curve point. It is worth being precise about what this check does and does not buy. Roughly half of all 32-byte values happen to encode a point, so passing it is not evidence that the caller derived the identifier legitimately. Its job is to guarantee that what reaches the `ecAdd` precompile is a valid curve point, so that the group structure the collision argument depends on applies.
 
 What keeps an attacker out of a position they never backed is the combination of that group structure with the split rules. Stake can only be minted by splitting down from a parent the caller already holds, and that chain bottoms out at the identity when collateral enters the contract. Every reachable collection identifier is therefore a sum of legitimately derived points. Landing on one of them from a different set of collections means finding a discrete logarithm relation among hashed curve points, which is the problem the multiset hash construction rests on.
 
@@ -417,15 +419,25 @@ The items below are the properties a deployment or a fork of this framework must
 
 **Q: What is the difference between a condition identifier, a collection identifier and a position identifier?**
 
-They are the three layers of the data model. A condition identifier is `keccak256(oracle, questionId, outcomeSlotCount)` and names a question. A collection identifier is a compressed alt_bn128 point derived from a condition identifier and an index set, and it names a subset of that condition's answers, possibly combined with subsets from other conditions by point addition. A position identifier is `keccak256(collateralToken, collectionId)` and names the tradable ERC-1155 token that pairs a collection with the ERC-20 that backs it. Only the position identifier appears in balances; only the condition identifier appears in the payout mappings.
+They are the three layers of the data model:
+
+- A **condition identifier** is `keccak256(oracle, questionId, outcomeSlotCount)` and names a question.
+- A **collection identifier** is a compressed alt_bn128 point derived from a condition identifier and an index set, and it names a subset of that condition's answers, possibly combined with subsets from other conditions by point addition.
+- A **position identifier** is `keccak256(collateralToken, collectionId)` and names the tradable ERC-1155 token that pairs a collection with the ERC-20 that backs it.
+
+Only the position identifier appears in balances; only the condition identifier appears in the payout mappings.
 
 **Q: Why can a condition have at most 256 outcome slots?**
 
-Because a subset of slots is represented as an index set, a bitmask stored in a single `uint256`. Bit $j$ of the mask indicates whether slot $j$ belongs to the collection, so 256 bits accommodate exactly 256 slots. The bound is a consequence of the representation rather than an economic choice. The full mask for a 256-slot condition is computed as `(1 << 256) - 1`, where the shift evaluates to zero under Solidity 0.5 semantics and the unchecked subtraction wraps to the correct all-ones word.
+Because a subset of slots is represented as an index set, a bitmask stored in a single `uint256`. Bit $j$ of the mask indicates whether slot $j$ belongs to the collection, so 256 bits accommodate exactly 256 slots. The bound is a consequence of the representation rather than an economic choice.
+
+The full mask for a 256-slot condition is computed as `(1 << 256) - 1`, where the shift evaluates to zero under Solidity 0.5 semantics and the unchecked subtraction wraps to the correct all-ones word.
 
 **Q: Why does the framework hash to an elliptic curve point instead of simply hashing the concatenated collection data?**
 
-Because the identifiers must be combinable after the fact. A position spanning two conditions has to have the same identifier whichever condition it was split on first, so the combining operation must be commutative and associative. Plain concatenation and hashing is neither. The earlier design achieved commutativity by summing hashes, but modular sums are vulnerable to a generalized birthday attack that finds colliding sets. Elliptic curve point addition keeps commutativity and associativity while making the collision search equivalent to a discrete logarithm problem on alt_bn128.
+Because the identifiers must be combinable after the fact. A position spanning two conditions has to have the same identifier whichever condition it was split on first, so the combining operation must be commutative and associative. Plain concatenation and hashing is neither.
+
+The earlier design achieved commutativity by summing hashes, but modular sums are vulnerable to a generalized birthday attack that finds colliding sets. Elliptic curve point addition keeps commutativity and associativity while making the collision search equivalent to a discrete logarithm problem on alt_bn128.
 
 **Q: How does `reportPayouts` restrict who may resolve a condition, given that it has no access control modifier?**
 
@@ -437,7 +449,11 @@ It means the supplied partition does not cover every outcome slot of the conditi
 
 **Q: Combining the audit findings, why did the mint-before-burn ordering only become exploitable in the presence of the AdHash collision weakness?**
 
-The reentrancy window alone gives an attacker control during an operation, but not a target worth reaching. To profit, the attacker needs a parent collection whose split produces a position that is already redeemable for collateral the attacker never backed, and constructing such a parent is exactly the collision problem. AdHash made it solvable, because the combined identifier was a modular sum the attacker could work backwards from. Once identifiers are curve points, no such parent is reachable, so the reentrancy window has nothing to exploit. Either fix alone closes this particular exploit path. They were both applied because the collision weakness is also dangerous by itself: it lets two legitimately built positions collide, which no amount of careful ordering would prevent.
+The reentrancy window alone gives an attacker control during an operation, but nothing worth taking. To profit, the attacker needs a parent collection whose split produces a position that is already redeemable for collateral the attacker never backed, and constructing such a parent is exactly the collision problem.
+
+AdHash made it solvable, because the combined identifier was a modular sum the attacker could work backwards from. Once identifiers are curve points, no such parent can be constructed, so the reentrancy window has nothing to exploit.
+
+Either fix alone closes this particular exploit path. They were both applied because the collision weakness is also dangerous by itself: it lets two legitimately built positions collide, which no amount of careful ordering would prevent.
 
 **Q: Why is `getCollectionId` declared `view` on the contract while `getConditionId` and `getPositionId` are `pure`?**
 

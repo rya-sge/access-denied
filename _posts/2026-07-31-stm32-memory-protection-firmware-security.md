@@ -2,13 +2,13 @@
 layout: post
 title: "STM32 Memory Protection in Practice - RDP, WRP, Firewall and OTP"
 date:   2026-07-31
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security programmation
 tags: stm32 firmware embedded security memory-protection coldcard
 series: firmware-security
-description: What STM32L4 readout protection, write protection, the hardware firewall, PCROP, OTP and flash ECC actually do, how a shipping product combines them, and where each one stops helping.
+description: What STM32L4 readout and write protection, the firewall, PCROP, OTP and flash ECC do, how a shipping product combines them, and where each stops helping.
 image: /assets/article/blockchain/wallet/coldcard/2026-07-31-stm32-memory-protection-mindmap.png
 isMath: false
 ---
@@ -20,7 +20,7 @@ It does not tell you which ones a real product ends up using, in what order they
 or which ones turn out to be unhelpful once you try.
 
 This article goes through those features on the STM32L4 family, then looks at how one shipping
-product actually combines them. The example is the [COLDCARD](https://coldcard.com) bootloader,
+product combines them. The example is the [COLDCARD](https://coldcard.com) bootloader,
 chosen because the firmware is published in full, including the comments where the developers
 explain why they rejected one of the features that the marketing material would suggest using.
 
@@ -419,7 +419,9 @@ The cost is real and falls on the vendor as much as the attacker: no post-mortem
 
 **Q: Is flash ECC a security feature?**
 
-Not by design, but it acts as one. With eight correction bits per 64-bit word, single-bit errors are corrected transparently and double-bit errors raise a non-maskable interrupt that stops the processor. An attacker attempting to induce a specific bit flip, for example by exposing the bare die to UV-C, cannot make a subtle change: they either fail to alter behaviour or they crash the device. That converts a modification attack into a denial-of-service attack, which for a device with a seed backup is a good trade.
+Not by design, but it acts as one. With eight correction bits per 64-bit word, single-bit errors are corrected transparently and double-bit errors raise a non-maskable interrupt that stops the processor.
+
+An attacker attempting to induce a specific bit flip, for example by exposing the bare die to UV-C, cannot make a subtle change: they either fail to alter behaviour or they crash the device. That converts a modification attack into a denial-of-service attack, which for a device with a seed backup is a good trade.
 
 **Q: Where does this stack of protections still leave an opening?**
 

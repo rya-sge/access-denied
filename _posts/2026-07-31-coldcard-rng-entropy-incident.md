@@ -2,7 +2,7 @@
 layout: post
 title: "When the Hardware RNG Was Not Called - Anatomy of an Entropy Defect"
 date:   2026-07-31
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography security blockchain wallet
@@ -23,7 +23,7 @@ The defect is instructive because of where it lived. Nothing was wrong with the 
 the hashing, or the entropy source itself. The code that generated seeds called what it believed
 was the hardware random number generator, and the linker resolved that call to a software
 pseudo-random generator instead. This article reconstructs the mechanism from the published
-source, works out where the entropy actually came from, and looks at what does and does not catch
+source, works out where the entropy came from, and looks at what does and does not catch
 this class of bug.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
@@ -88,7 +88,7 @@ good as the assumption that **at least one** input is unpredictable.
 
 ------
 
-## What was actually linked
+## What the linker selected
 
 The board configuration in `stm32/COLDCARD_MK4/mpconfigboard.h` disables MicroPython's own RNG
 module:
@@ -149,7 +149,7 @@ def rng_seeding():
     ngu.random.reseed(n)
 ```
 
-The entropy source here is genuinely good: 32 bytes from the ATECC608 and 8 bytes from the
+The entropy source here is good: 32 bytes from the ATECC608 and 8 bytes from the
 DS28C36B, both read through authenticated callgate paths so a man-in-the-middle on the bus would
 be detected. But the result is hashed and then **truncated to four bytes**, because `reseed()`
 sets a single 32-bit `pad` value. Three hundred and twenty bits of secure-element entropy are
@@ -194,9 +194,14 @@ that returns constant or near-constant bytes, which is the classic hardware fail
 PRNG passes trivially.
 
 **The defect was not in any file a reviewer would open.** Every source file involved is correct in
-isolation. The board's `rng.c` correctly reads the hardware peripheral. The upstream `rng.c`
-correctly implements a documented fallback. `libngu` correctly XORs two sources. `seed.py`
-correctly requests 32 bytes and hashes them. The bug exists only in the relationship between two
+isolation:
+
+- the board's `rng.c` correctly reads the hardware peripheral;
+- the upstream `rng.c` correctly implements a documented fallback;
+- `libngu` correctly XORs two sources;
+- `seed.py` correctly requests 32 bytes and hashes them.
+
+The bug exists only in the relationship between two
 compilation units, and it is visible only in the link map.
 
 ------
@@ -255,7 +260,7 @@ commonly recommended ones would not.
 
 - **Checking which object defines each cryptographic symbol**, not which source file appears to
   implement it. `nm --defined-only` over the build tree is cheap and mechanical.
-- **A known-answer test in the wrong direction.** If the hardware generator is genuinely being
+- **A known-answer test in the wrong direction.** If the hardware generator is being
   read, two consecutive calls after a reset must differ; a PRNG seeded identically after reset
   produces the same sequence. A power-cycle comparison distinguishes them, whereas any single-run
   statistical test does not.
@@ -350,7 +355,7 @@ Derived from this incident, for any device generating long-lived secrets.
 |:---:|------------|------------|
 | ☐ | Every entropy source used for long-lived keys is traced to the object file that defines it, not the source file that appears to. | A fallback or stub implementation is linked in and never noticed. |
 | ☐ | The build fails if an unintended implementation of an RNG symbol is present. | A refactor or dependency bump silently reintroduces the weak path. |
-| ☐ | Hardware RNG accessors fail loudly rather than returning a value when the peripheral does not respond. | A silent fallback substitutes predictable data for random data. |
+| ☐ | Hardware RNG accessors return an error rather than a value when the peripheral does not respond. | A silent fallback substitutes predictable data for random data. |
 | ☐ | Entropy from a high-quality source is not truncated below the target security level when seeding a generator. | The generator's state, not the source, becomes the search space. |
 | ☐ | The written entropy budget states how many unpredictable bits enter each generated secret. | Implicit assumptions about entropy go unreviewed for years. |
 
@@ -361,13 +366,13 @@ Derived from this incident, for any device generating long-lived secrets.
 | ☐ | Tests distinguish a TRNG from a PRNG (e.g. sequences must differ across a power cycle), not merely test output distribution. | A seeded PRNG passes every statistical suite. |
 | ☐ | Runtime sanity checks are documented as detecting stuck outputs only, not low entropy. | A passing assertion is read as evidence of good randomness. |
 | ☐ | Whitening (hashing) is applied only after entropy is established, never as a substitute for it. | Low-entropy output looks indistinguishable from high-entropy output. |
-| ☐ | Startup self-tests cover the generator each consumer actually reaches, not only the one the bootloader uses. | The tested path and the used path differ. |
+| ☐ | Startup self-tests cover the generator each consumer calls, not only the one the bootloader uses. | The tested path and the used path differ. |
 
 #### Combining sources
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
-| ☐ | When XOR-combining sources, at least one is verified to be genuinely unpredictable at build or test time. | The construction hedges nothing while appearing to add safety. |
+| ☐ | When XOR-combining sources, at least one is verified to be unpredictable at build or test time. | The construction hedges nothing while appearing to add safety. |
 | ☐ | Software PRNGs mixed into a key path are seeded from a source with at least the target entropy. | A constant or clock-derived seed bounds the whole output. |
 | ☐ | Device-unique identifiers are not counted as entropy. | Values printed on the device or exposed over USB are treated as secret. |
 
@@ -387,7 +392,9 @@ Derived from this incident, for any device generating long-lived secrets.
 
 Because the call was resolved by the linker, not by the source. Setting `MICROPY_HW_ENABLE_RNG`
 to zero did not remove upstream's `ports/stm32/rng.c` from the build; it selected that file's
-software-fallback branch, which defines a global `rng_get()`. The board's own `rng.c` provided
+software-fallback branch, which defines a global `rng_get()`.
+
+The board's own `rng.c` provided
 several hardware-backed functions but not one with that name. When libngu's `CHIP_TRNG_32()`
 macro expanded to `rng_get()`, the only definition available was the fallback, and the linker
 used it. Every file involved was individually correct.
@@ -434,12 +441,14 @@ Not the usual kind:
 What distinguishes the two cases is behaviour across a power cycle: a hardware generator produces
 different values after a reset, while a PRNG seeded the same way produces the same sequence. The
 other reliable approach is mechanical rather than behavioural, checking with `nm` which object
-actually defines each RNG symbol, which is exactly what the fix now does on every build.
+defines each RNG symbol, which is what the fix now does on every build.
 
 **Q: I have a device that ran affected firmware. What should I do?**
 
 Upgrade, then generate a **new** seed on the patched firmware and move funds to it. Upgrading
-alone does not help, because it does not change a key that already exists. Seeds you imported
+alone does not help, because it does not change a key that already exists.
+
+Seeds you imported
 rather than generated on the device are unaffected. Other secrets produced by the same generator
 deserve the same treatment, including backup file passwords and Key Teleport transfer passwords.
 For Mk3, where no fix is planned, the vendor's stopgap is to add a BIP-39 passphrase, which

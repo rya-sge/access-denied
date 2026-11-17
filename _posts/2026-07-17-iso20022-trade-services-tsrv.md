@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Trade Services — The tsrv Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -55,7 +56,7 @@ The nineteen messages follow the life of an undertaking through four stages: iss
 | `tsrv.018` | TradeStatusReport | Status |
 | `tsrv.019` | UndertakingStatusReport | Status |
 
-The recurring trio of **issuance**, **advice**, and **notification** reflects the routing chain. The `tsrv.001` UndertakingIssuance is the undertaking itself, whose content is carried in an undertaking-issuance-details (`UdrtkgIssncDtls`) block. The advice (`tsrv.002`) informs the party being sent the undertaking, and the notification (`tsrv.003`) tells the beneficiary it exists. The amendment stage repeats the same pattern for changes, adding a response because an amendment to a guarantee usually needs the beneficiary's agreement to take effect.
+The recurring trio of **issuance**, **advice**, and **notification** reflects the routing chain. The `tsrv.001` UndertakingIssuance is the undertaking itself, whose content is carried in an undertaking-issuance-details (`UdrtkgIssncDtls`) block. The `tsrv.002` advice informs the party being sent the undertaking, and the `tsrv.003` notification tells the beneficiary it exists. The amendment stage repeats the same pattern for changes, adding a response because an amendment to a guarantee usually needs the beneficiary's agreement to take effect.
 
 ## The life of an undertaking
 
@@ -63,7 +64,7 @@ The messages make most sense followed through a single undertaking's life.
 
 ![Life of an undertaking: issue, amend, and demand]({{site.url_complet}}/assets/article/finance/tsrv-undertaking-workflow.png)
 
-**Issuance.** At the applicant's request, the guarantor issues the undertaking with a `tsrv.001` **UndertakingIssuance**, routed through any advising party with an advice (`tsrv.002`) and reaching the beneficiary as a notification (`tsrv.003`). The beneficiary now holds an enforceable promise.
+**Issuance.** At the applicant's request, the guarantor issues the undertaking with a `tsrv.001` **UndertakingIssuance**, routed through any advising party with a `tsrv.002` advice and delivered to the beneficiary as a `tsrv.003` notification. The beneficiary now holds an enforceable promise.
 
 **Amendment.** Terms change: an amount is reduced as a contract is fulfilled, or an expiry date is pushed out. The applicant asks with a `tsrv.004` **AmendmentRequest**, the guarantor issues the `tsrv.005` **Amendment** with its advice and notification, and the beneficiary accepts or rejects it in a `tsrv.008` **AmendmentResponse**, itself notified onward by `tsrv.009`. Because an amendment can only bind the beneficiary with consent, the response is an essential part of the flow rather than an afterthought.
 
@@ -100,23 +101,37 @@ The `tsrv` business area brings bank guarantees and standby letters of credit in
 
 **Q: What is an independent undertaking, and why does independence matter?**
 
-An independent undertaking is a bank's promise to pay a beneficiary on presentation of a compliant demand, separate from the underlying commercial contract. Independence means the beneficiary does not have to prove that the applicant breached the contract; it only has to present the documents the undertaking specifies. This makes the instrument fast and reliable for the beneficiary, which is exactly why demand guarantees and standby letters of credit are used to secure trade and construction obligations. The `tsrv` messages carry these undertakings without needing to reference the merits of the underlying dispute.
+An independent undertaking is a bank's promise to pay a beneficiary on presentation of a compliant demand, separate from the underlying commercial contract. Independence means the beneficiary does not have to prove that the applicant breached the contract; it only has to present the documents the undertaking specifies.
+
+This makes the instrument fast and reliable for the beneficiary, which is why demand guarantees and standby letters of credit are used to secure trade and construction obligations. The `tsrv` messages carry these undertakings without needing to reference the merits of the underlying dispute.
 
 **Q: Why do issuance and amendment each involve three messages (issuance, advice, notification)?**
 
-Because an undertaking travels through a chain of parties, and each link needs the right message. The `tsrv.001` UndertakingIssuance is the undertaking itself, sent by the guarantor. The advice (`tsrv.002`) informs a party in the routing chain, such as an advising bank, that is being asked to pass the undertaking on. The notification (`tsrv.003`) tells the beneficiary the undertaking exists. The amendment stage repeats the pattern for changes. Splitting the roles lets each party in the chain receive a message suited to its position rather than a single message overloaded with every purpose.
+Because an undertaking travels through a chain of parties, and each link needs the right message:
+
+- the `tsrv.001` UndertakingIssuance is the undertaking itself, sent by the guarantor;
+- the `tsrv.002` advice informs a party in the routing chain, such as an advising bank, that is being asked to pass the undertaking on;
+- the `tsrv.003` notification tells the beneficiary the undertaking exists.
+
+The amendment stage repeats the pattern for changes. Splitting the roles lets each party in the chain receive a message suited to its position rather than a single message overloaded with every purpose.
 
 **Q: What is the extend-or-pay mechanism?**
 
-Extend-or-pay is a common response to a demand under a guarantee. Instead of paying immediately or refusing, the guarantor, usually prompted by the applicant, offers the beneficiary a choice: allow the undertaking's validity to be extended, or be paid now. It is carried by the `tsrv.014` ExtendOrPayRequest and the `tsrv.015` ExtendOrPayResponse. The mechanism gives the applicant time to resolve the underlying issue while leaving the beneficiary protected, because if it declines the extension it is paid. It is one of the distinctive features of demand-guarantee practice that `tsrv` models directly.
+Extend-or-pay is a common response to a demand under a guarantee. Instead of paying immediately or refusing, the guarantor, usually prompted by the applicant, offers the beneficiary a choice: allow the undertaking's validity to be extended, or be paid now.
+
+It is carried by the `tsrv.014` ExtendOrPayRequest and the `tsrv.015` ExtendOrPayResponse. The mechanism gives the applicant time to resolve the underlying issue while leaving the beneficiary protected, because if it declines the extension it is paid. It is one of the distinctive features of demand-guarantee practice that `tsrv` models directly.
 
 **Q: Why does an amendment need a response when an issuance does not?**
 
-Because an amendment changes the terms of a promise the beneficiary already holds, and it cannot be forced on the beneficiary. Reducing an amount, changing an expiry, or altering a condition affects the beneficiary's protection, so the amendment takes effect only if the beneficiary consents. The `tsrv.008` AmendmentResponse carries that acceptance or rejection. An issuance, by contrast, creates a new undertaking in the beneficiary's favour, which it can simply hold; there is nothing for it to agree to for the undertaking to exist.
+Because an amendment changes the terms of a promise the beneficiary already holds, and it cannot be forced on the beneficiary. Reducing an amount, changing an expiry, or altering a condition affects the beneficiary's protection, so the amendment takes effect only if the beneficiary consents.
+
+The `tsrv.008` AmendmentResponse carries that acceptance or rejection. An issuance, by contrast, creates a new undertaking in the beneficiary's favour, which it can simply hold; there is nothing for it to agree to for the undertaking to exist.
 
 **Q: How does tsrv relate to the older SWIFT MT guarantee messages?**
 
-`tsrv` is the ISO 20022 successor to the MT760 family that banks have long used to issue and amend guarantees and standby letters of credit over SWIFT. It expresses the same lifecycle, issuance, amendment, demand, and termination, in ISO 20022's structured XML, aligned with the ICC rules (URDG 758 and ISP98) that govern these instruments. As with other areas, the MX form carries richer, explicitly typed data than the older message, which helps automate the checking of demands and the tracking of an undertaking's state.
+`tsrv` is the ISO 20022 successor to the MT760 family that banks have long used to issue and amend guarantees and standby letters of credit over SWIFT. It expresses the same lifecycle of issuance, amendment, demand and termination in ISO 20022's structured XML, aligned with the ICC rules that govern these instruments, URDG 758 and ISP98.
+
+As with other areas, the MX form carries richer, explicitly typed data than the older message, which helps automate the checking of demands and the tracking of an undertaking's state.
 
 ## References
 

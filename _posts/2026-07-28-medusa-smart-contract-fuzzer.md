@@ -2,7 +2,7 @@
 layout: post
 title: "Medusa — Architecture and Practical Use of a Coverage-Guided Solidity Fuzzer"
 date:   2026-07-28
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -151,7 +151,7 @@ Three providers run concurrently, each registering a `CallSequenceTestFunc` that
 
 ### Assertion tests
 
-The assertion provider watches for EVM-level panics raised during any call the fuzzer makes. Which panic codes count as failures is governed by `testing.assertionTesting.panicCodeConfig`. By default only `failOnAssertion` is enabled, so a plain `assert(false)` fails the test and nothing else does.
+The assertion provider watches for EVM-level panics raised during any call the fuzzer makes. Which panic codes count as failures is governed by `testing.assertionTesting.panicCodeConfig`. By default only `failOnAssertion` is enabled, so an `assert` failure such as a plain `assert(false)` is the only panic that fails the test.
 
 Every other panic class is opt-in: `failOnArithmeticUnderflow`, `failOnDivideByZero`, `failOnOutOfBoundsArrayAccess`, `failOnPopEmptyArray`, `failOnEnumTypeConversionOutOfBounds`, `failOnIncorrectStorageAccess`, `failOnAllocateTooMuchMemory`, `failOnCallUninitializedVariable`, and the catch-all `failOnCompilerInsertedPanic`. Enabling arithmetic panics on a codebase that uses checked arithmetic as a deliberate guard will produce findings that are not bugs, which is why they default to off.
 
@@ -184,7 +184,11 @@ A failing sequence of 100 calls with 256-bit arguments is not a usable bug repor
 
 ![From a failing sequence to a minimal reproduction]({{site.url_complet}}/assets/article/blockchain/solidity/medusa/medusa-failure-shrinking-sequence.png)
 
-The loop applies candidate reductions and keeps only those for which the verifier still reproduces the failure. The reductions include removing calls that reverted (using the execution results already attached to each element, so no replay is needed), removing one call at random, and mutating arguments toward smaller values through a dedicated shrinking mutator whose `ShrinkValueProbability` is 1.
+The loop applies candidate reductions and keeps only those for which the verifier still reproduces the failure. The reductions include:
+
+- removing calls that reverted, using the execution results already attached to each element, so no replay is needed;
+- removing one call at random;
+- mutating arguments toward smaller values through a dedicated shrinking mutator whose `ShrinkValueProbability` is 1.
 
 Removing a call transfers its block-number and timestamp delays to the preceding call, so that the timing structure of the sequence survives the reduction. The source notes a known limitation here: reverted calls are dropped without preserving their delays, so a bug that depends on the exact block progression contributed by a reverted call may shrink imperfectly. The final call is always retained, since it is usually the one that triggered the failure.
 
@@ -348,7 +352,7 @@ By default `testing.stopOnFailedTest` is `true`, so the campaign halts at the fi
 
 Two report families are produced at the end of a campaign, written to `<corpusDirectory>/coverage/` or to `crytic-export/coverage/` when no corpus directory is configured.
 
-**Coverage reports** are controlled by `fuzzing.coverageFormats`, defaulting to `["lcov", "html"]`. Note that the reporting page of the documentation still shows this key as `coverageReports`, which the configuration parser does not recognise; the field declared in `fuzzing/config` is `coverageFormats`. The HTML report at `corpus/coverage/coverage_report.html` highlights executed source lines and is the fastest way to see whether the fuzzer is actually reaching the logic you care about. The LCOV output feeds standard tooling: `genhtml corpus/coverage/lcov.info --output-dir corpus --rc derive_function_end_line=0`, where the flag is required to stop `genhtml` from crashing on Solidity sources, or the [Coverage Gutters](https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters) extension for in-editor annotation. `fuzzing.coverageExclusions` accepts glob patterns such as `["lib/**"]` to keep dependencies out of the numbers.
+**Coverage reports** are controlled by `fuzzing.coverageFormats`, defaulting to `["lcov", "html"]`. Note that the reporting page of the documentation still shows this key as `coverageReports`, which the configuration parser does not recognise; the field declared in `fuzzing/config` is `coverageFormats`. The HTML report at `corpus/coverage/coverage_report.html` highlights executed source lines and is the fastest way to see whether the fuzzer executes the logic you care about. The LCOV output feeds standard tooling: `genhtml corpus/coverage/lcov.info --output-dir corpus --rc derive_function_end_line=0`, where the flag is required to stop `genhtml` from crashing on Solidity sources, or the [Coverage Gutters](https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters) extension for in-editor annotation. `fuzzing.coverageExclusions` accepts glob patterns such as `["lib/**"]` to keep dependencies out of the numbers.
 
 **Revert reports** are experimental and disabled by default (`fuzzing.revertReporterEnabled`). They record which functions revert most often and why, in both HTML and JSON. This is a harness debugging tool rather than a security finding: a wrapper that reverts on 99% of calls is a wrapper whose clamping is wrong, and the revert report is what makes that visible.
 
@@ -377,7 +381,7 @@ Committing the corpus directory to the repository lets each CI run start from th
 
 **Genesis state.** `chainConfig.genesisStateFile` loads a snapshot of EVM state (balances, nonces, bytecode and storage) captured elsewhere, so that deployment pipelines too complex to replicate in a constructor do not have to be. The typical route is a Foundry broadcast script against Anvil followed by `cast rpc anvil_dumpState > state.json`; the compressed Anvil dump, a decompressed wrapper JSON, and a plain account map are all detected automatically. Loaded accounts merge with Medusa's own fuzzer accounts, and the fuzzer accounts win on address conflicts.
 
-Genesis state needs a companion setting. `genesisContractMappings` binds an address in the snapshot to a compiled contract name so that Medusa has an ABI for it. Without a mapping, the bytecode is present but no calls can be generated against it. The mapping controls ABI binding only: dependencies such as tokens and oracles belong there so that internal calls resolve, while only the contracts you actually want driven belong in `targetContracts` as well.
+Genesis state needs a companion setting. `genesisContractMappings` binds an address in the snapshot to a compiled contract name so that Medusa has an ABI for it. Without a mapping, the bytecode is present but no calls can be generated against it. The mapping controls ABI binding only: dependencies such as tokens and oracles belong there so that internal calls resolve, while only the contracts the fuzzer should call directly belong in `targetContracts` as well.
 
 **Predeployed contracts.** `fuzzing.predeployedContracts` places named contracts at fixed addresses, which is useful when the system expects a canonical deployment. Constructor arguments are not supported for these.
 
@@ -387,10 +391,10 @@ Genesis state needs a companion setting. `genesisContractMappings` binds an addr
 
 A short list of settings that determine whether a campaign produces anything useful.
 
-- **`callSequenceLength`** selects stateless (`1`) or stateful (`50`+) testing. Getting this wrong is the most common reason a system-level property never fails despite a real bug.
+- **`callSequenceLength`** selects stateless testing with `1` or stateful testing with `50` or more. Getting this wrong is the most common reason a system-level property never fails despite a real bug.
 - **`corpusDirectory`** turns each campaign into an increment on the last. Empty means every run starts blind.
 - **`workers` with `workerResetLimit`** together determine throughput and memory. The defaults of 10 and 50 are a reasonable starting point on developer hardware.
-- **`blockNumberDelayMax`** and **`blockTimestampDelayMax`** default to 60480 blocks and 604800 seconds. They let the fuzzer jump forward to reach time-gated code such as vesting cliffs and cooldowns, and they should be sized against the periods the system actually uses.
+- **`blockNumberDelayMax`** and **`blockTimestampDelayMax`** default to 60480 blocks and 604800 seconds. They let the fuzzer jump forward to reach time-gated code such as vesting cliffs and cooldowns, and they should be sized against the periods the system uses.
 - **`senderAddresses`** defaults to `[0x10000, 0x20000, 0x30000]`. Any system where authorisation or per-user accounting matters needs these to be exercised rather than bypassed by a single-caller wrapper.
 - **`targetFunctionSignatures`** and **`excludeFunctionSignatures`** narrow the campaign to specific ABI signatures. Property and optimization tests are always called regardless.
 - **`panicCodeConfig`** should be tuned to the codebase. Enabling arithmetic panics is informative on unchecked-heavy code and noisy on code that relies on checked arithmetic reverting.
@@ -422,7 +426,7 @@ The tool is only as good as the harness. Coverage reports and revert reports exi
 
 ### Security Implementation Checklist
 
-A fuzzing harness fails silently. A campaign that never reaches the code under test, or whose properties can never return `false`, terminates cleanly and reports success. The checklist below covers the harness and configuration properties that separate a campaign providing genuine assurance from one providing only the appearance of it.
+A broken fuzzing harness raises no error. A campaign that never executes the code under test, or whose properties can never return `false`, terminates cleanly and reports success. The checklist below covers the harness and configuration properties that separate a campaign providing genuine assurance from one providing only the appearance of it.
 
 #### Harness reachability
 
@@ -431,7 +435,7 @@ A fuzzing harness fails silently. A campaign that never reaches the code under t
 | ☐ | Coverage of the contracts under test is inspected in the HTML report after each campaign. | An unreached function is reported as passing, so absence of findings is mistaken for absence of bugs. |
 | ☐ | The revert report is consulted when coverage is low, and wrappers reverting on most calls are corrected. | Over-tight clamping makes the fuzzer spend its whole budget on transactions that revert before reaching any assertion. |
 | ☐ | Clamping bounds inputs to the valid range without excluding boundary values such as zero and the exact maximum. | Off-by-one and boundary bugs sit outside the range the fuzzer is ever allowed to generate. |
-| ☐ | `targetContracts` names the harness, and the contracts under test are deployed and reachable from it. | Fuzzing the wrong contract produces a green campaign that exercised none of the target logic. |
+| ☐ | `targetContracts` names the harness, and the contracts under test are deployed and called by it. | Fuzzing the wrong contract produces a green campaign that exercised none of the target logic. |
 | ☐ | Startup warnings about test functions with invalid signatures are read and resolved. | A `property_` function with the wrong return type is demoted to an ordinary call target and its invariant is never evaluated. |
 
 #### Property design
@@ -448,11 +452,11 @@ A fuzzing harness fails silently. A campaign that never reaches the code under t
 
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
-| ☐ | `corpusDirectory` is set and the corpus is preserved between runs. | Each campaign restarts blind, so deep states reached previously must be rediscovered within the same budget. |
+| ☐ | `corpusDirectory` is set and its contents are kept between runs. | Each campaign restarts blind, so deep states reached previously must be rediscovered within the same budget. |
 | ☐ | `medusa corpus clean` is run after ABI changes, contract reordering, or a change of deployer and sender addresses. | Stale corpus entries no longer replay, silently reducing the effective corpus to a fraction of its recorded size. |
 | ☐ | `testLimit` or `timeout` is large enough that the campaign is not cut short before coverage plateaus. | A short campaign reports success purely because it stopped before reaching the interesting states. |
 | ☐ | CI treats exit code `7` as a build failure, distinctly from `1` and `6`. | A genuine invariant violation is swallowed by a pipeline that only checks for a non-zero status it also gets from build errors. |
-| ☐ | `enableFFI` remains `false` unless the harness genuinely needs it and the code under test is trusted. | The `ffi` cheatcode permits arbitrary command execution on the machine running the campaign. |
+| ☐ | `enableFFI` remains `false` unless the harness uses the `ffi` cheatcode and the code under test is trusted. | The `ffi` cheatcode permits arbitrary command execution on the machine running the campaign. |
 | ☐ | `stopOnFailedTest` is set to `false` for established suites so all violations surface in one run. | Halting at the first failure hides subsequent independent violations behind a single known one. |
 
 ## Frequently Asked Questions
@@ -479,7 +483,7 @@ Use assertions for function-level reasoning with a short sequence, and propertie
 
 At minimum, three things:
 
-- Open the HTML coverage report and confirm the fuzzer actually executed the logic of interest; a green campaign over unreached code proves nothing.
+- Open the HTML coverage report and confirm the fuzzer executed the logic of interest; a green campaign over unreached code proves nothing.
 - Enable the revert report and check that the wrappers are not rejecting most generated inputs, which indicates clamping bounds that are too tight.
 - Confirm that each property can in fact fail, by injecting a bug and observing the campaign catch it. Beyond that, check that `callSequenceLength` matches the kind of invariant being tested and that `testLimit` was large enough for coverage to plateau.
 
@@ -491,7 +495,7 @@ The same reasoning applies to changing `deployerAddress` or `senderAddresses`. T
 
 **Q: How do coverage guidance and Slither constant mining work together?**
 
-They attack the same problem from opposite ends. Coverage guidance is a feedback loop: it observes which sequences reached new bytecode and biases future generation toward mutating those sequences, with the weight table favouring corpus prefixes ten to one over argument mutation so that state-building work is preserved.
+They attack the same problem from opposite ends. Coverage guidance is a feedback loop: it observes which sequences reached new bytecode and biases future generation toward mutating those sequences, with the weight table favouring corpus prefixes ten to one over argument mutation so that sequences that built up state are kept and extended.
 
 Slither constant mining is a priming step with no feedback: before fuzzing begins, it extracts literals from the target's source so that the value generator can propose them directly.
 

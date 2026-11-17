@@ -2,7 +2,7 @@
 layout: post
 title: Fuzzing Solana Programs with Trident
 date: 2026-03-13
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solana security blockchain
@@ -208,7 +208,7 @@ fn deposit_flow(&mut self) {
 Address storages (`fuzz_accounts.*`) are containers that accumulate addresses across multiple flow invocations within a single iteration. They serve two purposes:
 
 - Ensuring that the same accounts are reused realistically across flows (e.g., the same user deposits then withdraws)
-- Allowing the fuzzer to sometimes pass incorrect or unexpected addresses (which is what makes it effective at finding authorization bugs)
+- Allowing the fuzzer to sometimes pass incorrect or unexpected addresses, which is what makes it effective at finding authorization bugs
 
 | Method | Behavior |
 |--------|----------|

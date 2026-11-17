@@ -2,7 +2,7 @@
 layout: post
 title: "Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge"
 date: 2026-05-11
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -61,7 +61,7 @@ The two-party atomic swap proceeds in four steps:
 
 4. **Refund (fallback).** If either party fails to act before their timelock expires, each can reclaim their own funds. Neither party is ever at risk of losing funds: either both legs settle or both legs are refunded.
 
-The atomicity guarantee is cryptographic: either the secret is revealed (both legs settle) or the timelocks expire (both legs refund). The final outcome is always symmetric (both parties settle or both parties reclaim), with no path where one party walks away with both assets.
+The atomicity guarantee is cryptographic. If the secret is revealed, both legs settle; if the timelocks expire, both legs refund. The final outcome is always symmetric, with no path where one party walks away with both assets.
 
 ```
 Alice (BTC)                                        Bob (ETH)
@@ -86,7 +86,12 @@ The protocol provides three security properties under the assumption that both b
 - **Non-custodial safety.** No third party ever holds both assets simultaneously.
 - **Liveness.** Any party can unilaterally reclaim their funds after their timelock expires, even if the counterparty becomes unresponsive.
 
-The critical assumption is **timelock ordering**: Bob's timelock must expire strictly before Alice's (`T_B < T_A`). This ordering is essential for two reasons. First, it gives Bob a defined window (`T_A - T_B`) to observe Alice's redemption on the ETH chain, extract the now-public secret `s`, and submit his own BTC redemption before Alice's timelock `T_A` expires. Second, if Bob's ETH leg expires before Alice acts (`T_B` reached), Bob can refund his ETH safely. At that point Alice has not yet revealed `s`, so she cannot redeem and will similarly refund her BTC when `T_A` arrives. If the margin `T_A - T_B` is too small, there is a risk that the secret is revealed on-chain but Bob cannot confirm his BTC redemption transaction before `T_A` expires, causing Alice to claim both assets.
+The critical assumption is **timelock ordering**: Bob's timelock must expire strictly before Alice's (`T_B < T_A`). This ordering is essential for two reasons:
+
+- **Bob gets a redemption window.** The interval `T_A - T_B` lets Bob observe Alice's redemption on the ETH chain, extract the now-public secret `s`, and submit his own BTC redemption before Alice's timelock `T_A` expires.
+- **Bob can refund safely.** If Bob's ETH leg expires before Alice acts (`T_B` reached), Bob can refund his ETH. At that point Alice has not yet revealed `s`, so she cannot redeem and will similarly refund her BTC when `T_A` arrives.
+
+If the margin `T_A - T_B` is too small, there is a risk that the secret is revealed on-chain but Bob cannot confirm his BTC redemption transaction before `T_A` expires, causing Alice to claim both assets.
 
 ---
 
@@ -161,7 +166,7 @@ bytes32 private constant _INITIATE_TYPEHASH =
     keccak256("Initiate(address redeemer,uint256 timelock,uint256 amount,bytes32 secretHash)");
 ```
 
-The relayer then submits the transaction. `SignatureChecker.isValidSignatureNow` is used to support both ECDSA (EOA) and ERC-1271 (smart wallet) signers.
+The relayer then submits the transaction. `SignatureChecker.isValidSignatureNow` is used to support two kinds of signer: EOAs signing with ECDSA, and smart wallets verified through ERC-1271.
 
 ### Unique Deposit Addresses (UDA)
 
@@ -192,7 +197,7 @@ User                 HTLCRegistry              UDA Clone              HTLC
 | Sui | `main.move` | Milliseconds (bounded to < 7 days) |
 | Solana | Anchor programs | Slots (~400 ms/slot) |
 
-Arbitrum requires a dedicated variant because `block.number` on Arbitrum returns the L1 block number (updating every ~12 s), while `ArbSys.arbBlockNumber()` returns the L2 block number (updating every ~0.25 s). Using the wrong value would produce dramatically different effective timelocks.
+Arbitrum requires a dedicated variant because `block.number` on Arbitrum returns the L1 block number, which updates every ~12 s, while `ArbSys.arbBlockNumber()` returns the L2 block number, which updates every ~0.25 s. Using the wrong value would produce dramatically different effective timelocks.
 
 ---
 
@@ -272,7 +277,7 @@ Several spelling mistakes exist across the EVM and Starknet codebases. EVM error
 The following properties must hold at all times across every supported chain:
 
 1. **Single fulfillment.** `fulfilledAt != 0` after any call to `redeem`, `refund`, or `instantRefund`. No orderID can be fulfilled twice.
-2. **Correct recipient.** Funds move only to `order.initiator` (on refund) or `order.redeemer` (on redeem). No other address can receive protocol funds.
+2. **Correct recipient.** Funds move only to `order.initiator` on refund or to `order.redeemer` on redeem. No other address can receive protocol funds.
 3. **Secret binding.** Redeeming requires `SHA-256(secret) == secretHash` as encoded in the orderID. Wrong secrets always revert.
 4. **Timelock enforcement.** `refund` reverts unless `block.number > order.initiatedAt + order.timelock`.
 5. **Consent for instant refund.** `instantRefund` requires either `msg.sender == order.redeemer` or a valid EIP-712 signature from the redeemer.

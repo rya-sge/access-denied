@@ -2,7 +2,7 @@
 layout: post
 title: "AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data"
 date: 2025-07-17
-last_modified_at: 2025-07-29
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security
@@ -90,7 +90,7 @@ Nitro Enclaves are **processor-agnostic** and work on most **Intel, AMD, and AWS
 
 - **Intel/AMD**: At least **4 vCPUs**
 - **Graviton**: At least **2 vCPUs**
-- **Linux-only** enclaves (parent instance can run Linux or Windows)
+- **Linux-only** enclaves, although the parent instance can run Linux or Windows
 
 Some instance types (e.g., `t3`, `g5g`, `u-*`) are excluded. Also, Nitro Enclaves are not supported on **Outposts**, **Local Zones**, or **Wavelength Zones**.
 

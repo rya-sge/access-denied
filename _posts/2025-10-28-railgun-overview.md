@@ -2,7 +2,7 @@
 layout: post
 title: "RAILGUN: Privacy Infrastructure for DeFi"
 date:   2025-10-28
-last_modified_at: 2025-11-06
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP
@@ -123,7 +123,7 @@ This model mirrors Bitcoin’s UTXO structure — but with full zero-knowledge e
 
 ### Shielding and Unshielding
 
-- **Shielding** transfers tokens from the public blockchain (0x address) into the private pool (0zk).
+- **Shielding** transfers tokens from a public 0x address on the blockchain to a private 0zk address in the pool.
 - **Unshielding** reverses the process, sending tokens back to a public address.
 
 Both rely on RAILGUN’s `shield()` and `transact()` smart contract functions, which leverage Poseidon hashing and zk-SNARK validation.

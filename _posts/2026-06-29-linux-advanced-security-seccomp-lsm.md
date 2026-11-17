@@ -2,7 +2,7 @@
 layout: post
 title: Advanced GNU/Linux Security - SECCOMP and Linux Security Modules (LSM)
 date:   2026-06-29
-last_modified_at: 2026-11-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: linux security
@@ -45,7 +45,7 @@ The compilation and execution chain is therefore: source code, compiled to a bin
 
 A process has access to *every* system call the kernel provides, and some of those require superuser rights. This breadth conflicts with the second UNIX rule, "do one thing and do it well": a program that should only read and write a file has no legitimate need for `socket`, `ptrace`, or `mount`. The adversary model makes the risk concrete: a program's execution is not fixed. It can be redirected at run time by exploiting little-known options (the classic `vi` shell escape) or by injecting code through a buffer overflow. Once redirected, the attacker inherits the program's full syscall reach.
 
-The security primitive is to filter system calls like a firewall, allowing only those a program actually needs, in keeping with least privilege.
+The security primitive is to filter system calls like a firewall, allowing only those a program needs, in keeping with least privilege.
 
 ## SECCOMP (Secure Computing)
 
@@ -60,7 +60,9 @@ SECCOMP was created in 2005 by Andrea Arcangeli. Its first form, **mode 1 (stric
 
 ### How seccomp-bpf Works
 
-The filter is expressed in the program's source code, so existing programs must be recompiled to embed one. A BPF program lists the system calls to allow (a whitelist) and/or to refuse (a blacklist), and the kernel evaluates it on each syscall. Every rule returns a verdict: allow the call, fail it with an error code, raise a `SIGSYS` signal, or kill the process outright.
+The filter is usually installed by the program itself, but filters are inherited across `fork`, `clone` and `execve`, so a launcher, a service manager or a container runtime can also install one before starting an unmodified program. Before installing a filter, the task must set `PR_SET_NO_NEW_PRIVS` or hold `CAP_SYS_ADMIN` in its namespace, which stops a filter from being applied to a child process with more privileges than the task that installed it.
+
+A BPF program works as a whitelist of system calls to allow, a blacklist of calls to refuse, or a mix of both, and the kernel evaluates it on each syscall. Every rule returns one of eight verdicts: allow the call, log and then allow it, fail it with an error code, raise a `SIGSYS` signal, pass it to a `ptrace` tracer, forward it to a userspace supervisor, or kill the calling thread or the whole process.
 
 ![seccomp-bpf filtering a system call]({{site.url_complet}}/assets/article/securite/linux-advanced-security/seccomp-bpf-filter-workflow.png)
 
@@ -104,22 +106,32 @@ static int install_syscall_filter(void)
 }
 ```
 
-**Trade-offs.** SECCOMP answers a long-standing risk (unrestricted access to all syscalls), reuses the BPF machinery, and can be retrofitted to an existing binary with modest effort. The costs are significant: the developer must determine the exact allow/deny list, some programs legitimately need many syscalls (in tension with the do-one-thing rule), an update to a program can change its syscall set and break the filter, the program must be recompiled, the filter is CPU-architecture-dependent because syscall numbers differ across architectures, the protection is barely visible from outside the process (`cat /proc/*/status | grep Seccomp`), and in practice it remains little used.
+**Trade-offs.** SECCOMP answers a long-standing risk, unrestricted access to all syscalls. It reuses the BPF virtual machine and can be retrofitted to an existing binary with modest effort. The costs are significant:
+
+- the developer must determine the exact allow/deny list;
+- some programs legitimately need many syscalls, which is in tension with the do-one-thing rule;
+- an update to a program can change its syscall set and break the filter;
+- the program must be modified to install its own filter, unless a launcher installs one for it;
+- the filter is CPU-architecture-dependent because syscall numbers differ across architectures;
+- the protection is barely visible from outside the process: `cat /proc/*/status | grep Seccomp`;
+- in practice it remains little used.
 
 ## Linux Security Modules (LSM)
 
-SECCOMP narrows the syscall interface but does not express an access-control *policy*. For that, Linux needed **mandatory access control (MAC)**, and the vocabulary comes from the [TCSEC (Trusted Computer System Evaluation Criteria, 1983, the "Orange Book")](https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/dod85.pdf).
+SECCOMP narrows the syscall interface but does not express an access-control *policy*. For that, Linux needed **mandatory access control (MAC)**. The vocabulary comes from the [Trusted Computer System Evaluation Criteria (TCSEC)](https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/dod85.pdf), published in 1983 and known as the "Orange Book".
 
 ### DAC versus MAC
 
 - **Discretionary Access Control (DAC):** access is limited based on the identity of subjects or the groups they belong to. It is *discretionary* because a subject holding a permission can pass that permission to any other subject. This is the standard UNIX permission model.
 - **Mandatory Access Control (MAC):** used when the security policy requires that protection decisions are *not* made by the owner of the objects. The system associates and manages security attributes on files and processes according to a central policy, and even the owner (including root) cannot override it.
 
-The kernel implements MAC through hooks. **LSM places hooks on kernel functions** (the code paths behind syscalls, signals, and similar operations) so that a security module can be consulted before the operation proceeds. A generic interface named Linux Security Modules was developed in 2002 specifically so the kernel would not privilege any single MAC project. The history explains the design: the NSA had been developing Security-Enhanced Linux (SELinux) since the late 1990s and proposed integrating it into the kernel in 2001; rather than merge one vendor's system, the kernel community built LSM as a neutral hook layer that any module could use.
+The kernel implements MAC through hooks. **LSM places hooks on kernel functions**, the code paths behind syscalls, signals and similar operations, so that a security module can be consulted before the operation proceeds. A generic interface named Linux Security Modules was developed in 2002 specifically so the kernel would not privilege any single MAC project.
+
+The history explains the design: the NSA had been developing Security-Enhanced Linux (SELinux) since the late 1990s and proposed integrating it into the kernel in 2001; rather than merge one vendor's system, the kernel community built LSM as a neutral hook layer that any module could use.
 
 ![LSM hooks, DAC first then mandatory access control]({{site.url_complet}}/assets/article/securite/linux-advanced-security/lsm-hook-architecture-concept.png)
 
-The crucial point is the order: the standard DAC check runs first, and only if it permits the operation does the LSM hook consult the active module(s). Access is granted only when DAC *and* every consulted module agree. Many modules build on LSM: SELinux, SMACK, AppArmor, TOMOYO, Yama, LoadPin, SafeSetID, and Lockdown.
+The checks run in a fixed order: the standard DAC check runs first, and only if it permits the operation does the LSM hook consult the active module(s). Access is granted only when DAC *and* every consulted module agree. Many modules build on LSM: SELinux, SMACK, AppArmor, TOMOYO, Yama, LoadPin, SafeSetID, and Lockdown.
 
 ## SELinux
 
@@ -140,15 +152,20 @@ system_u:system_r:sshd_t:s0-s0:c0.c1023 1932 ? S 0:00 sshd: alice@pts/1
 
 ### Type Enforcement
 
-The heart of SELinux is **type enforcement**: access is decided by the *type* labels of subject and object, not by the UID. A type is a label assigned to a resource (`/bin/passwd` is labelled `passwd_exec_t`), and a domain is a security state identified by the rights it holds (`passwd_t`). Running the labelled executable triggers a domain transition, and a policy rule then permits or refuses the access regardless of who the calling user is.
+The heart of SELinux is **type enforcement**: access is decided by the *type* labels of subject and object, not by the UID. A type is a label assigned to a resource; for example, `/bin/passwd` is labelled `passwd_exec_t`. A domain is a security state identified by the rights it holds, such as `passwd_t`. Running the labelled executable triggers a domain transition, and a policy rule then permits or refuses the access regardless of who the calling user is.
 
 ![SELinux type enforcement, access decided by labels not UID]({{site.url_complet}}/assets/article/securite/linux-advanced-security/selinux-type-enforcement-concept.png)
 
-The label components are: the **user** (distinct from a login account, a group of roles, with no possible direct login), the **role** (which governs which subjects can enter which domains), the **type/domain** (the type is the label on a resource, the domain is the runtime security state of a subject), and the MLS **range**.
+The label has four components:
+
+- **user**: a group of roles, distinct from a login account; no one can log in directly as an SELinux user.
+- **role**: governs which subjects can enter which domains.
+- **type/domain**: the type is the label on a resource, the domain is the runtime security state of a subject.
+- **range**: the MLS level.
 
 ### Configuration
 
-SELinux is configured under `/etc/selinux/` and runs in one of three modes: **Disabled**, **Permissive** (monitoring only, logs what it would block), and **Enforcing** (active). Three policy types exist: `default` (targeted), `mls` (Multi-Level Security), and `src` (custom). Useful commands:
+SELinux is configured under `/etc/selinux/` and runs in one of three modes: **Disabled**; **Permissive**, which only monitors and logs what it would block; and **Enforcing**, which blocks. Three policy types exist: `default` for the targeted policy, `mls` for Multi-Level Security, and `src` for a custom policy. Useful commands:
 
 ```text
 sestatus ; getenforce ; setenforce        # status and mode control
@@ -162,13 +179,22 @@ restorecon alice-file.txt                  # restore the policy-defined context
 
 Booleans exist precisely because writing raw policy is hard; they toggle common behaviours without editing rules.
 
-**Trade-offs.** SELinux is the most complete LSM, a US standard, used mainly by RHEL/CentOS, offers incomparable granularity, ships with many default rules, and has improvements (booleans) that ease its use. Against that, it brings back the complexity of MULTICS: immense technical and administrative overhead, a steep learning curve, difficulty writing rules for a specific threat model, deactivation by some distributions (which may need a kernel recompile to change), reliance on filesystem extended attributes, and rights that depend on how a file is handled (`mv` preserves the context, `cp` can reset it).
+**Trade-offs.** SELinux is the most complete LSM, a US standard, used mainly by RHEL/CentOS, offers incomparable granularity, ships with many default rules, and has improvements (booleans) that ease its use. Against that, it brings back the complexity of MULTICS:
+
+- immense technical and administrative overhead;
+- a steep learning curve;
+- difficulty writing rules for a specific threat model;
+- deactivation by some distributions, which may need a kernel recompile to change;
+- reliance on filesystem extended attributes;
+- rights that depend on how a file is handled: `mv` preserves the context, `cp` can reset it.
 
 ## AppArmor
 
-[AppArmor](https://apparmor.net/) (Application Armor) was created by the company Immunix under the name SubDomain, then developed by Novell (SUSE) and Canonical (Ubuntu), and integrated into the Linux kernel in 2010. It is a deliberate counter-project to SELinux: simpler, and built on path-based identification.
+[AppArmor](https://apparmor.net/), short for Application Armor, was created by the company Immunix under the name SubDomain, then developed by Novell for SUSE and Canonical for Ubuntu, and integrated into the Linux kernel in 2010. It is a deliberate counter-project to SELinux: simpler, and built on path-based identification.
 
-The key design difference is the identifier. **SELinux labels inodes (files); AppArmor uses paths.** A profile constrains a program identified by the path to its executable, and confines it at the level of process rights (capabilities; file read/write/append/execute/lock/link; sockets, ports, I/O). Because it does not label objects, there is no `ls -lZ` output and no `.` appended to the mode string; the configuration lives in per-program text files. AppArmor is enabled by default on several distributions and supports two modes that can coexist for different processes: **enforce** and **complain** (log only).
+The key design difference is the identifier. **SELinux labels inodes; AppArmor uses paths.** A profile constrains a program identified by the path to its executable, and confines it at the level of process rights. Those rights cover capabilities, file operations such as read, write, append, execute, lock and link, and sockets, ports and I/O.
+
+Because it does not label objects, there is no `ls -lZ` output and no `.` appended to the mode string; the configuration lives in per-program text files. AppArmor is enabled by default on several distributions and supports two modes that can coexist for different processes: **enforce**, and **complain**, which only logs.
 
 ### Profiles
 
@@ -202,12 +228,12 @@ Beyond the two main MAC systems, several focused modules exist:
 
 - **SMACK** (Simplified Mandatory Access Control): attribute-based, aimed at embedded systems.
 - **TOMOYO:** path-based, embedded systems, builds a profile of process interactions.
-- **LoadPin:** verifies kernel modules, for embedded systems.
+- **LoadPin:** ensures that every file the kernel loads (modules, firmware) comes from the same filesystem, expected to be read-only, for embedded systems.
 - **Yama:** restricts `ptrace()`, an improved DAC.
 - **SafeSetID:** hardens UID/GID management.
 - **Lockdown:** protects kernel integrity.
 
-These modules can be **stacked**, with a notion of major and minor modules, so a system can run one comprehensive MAC (for example SELinux or AppArmor) alongside several targeted modules (Yama, LoadPin). Solutions also exist outside LSM, such as the paid grsecurity and RSBAC.
+These modules can be **stacked**, with a notion of major and minor modules, so a system can run one comprehensive MAC, such as SELinux or AppArmor, alongside targeted modules such as Yama and LoadPin. Solutions also exist outside LSM, such as the paid grsecurity and RSBAC.
 
 Defining a single adversary model for the LSM family is hard because the options are so numerous. A reasonable division: SELinux, AppArmor, SMACK, and TOMOYO target general mandatory access control, while Yama, LoadPin, SafeSetID, and Lockdown provide targeted protection against specific attacks.
 
@@ -256,7 +282,9 @@ System calls and signals. System calls are synchronous requests a process makes 
 
 **Q: Why was SECCOMP strict mode (mode 1) too limited, and what did mode 2 change?**
 
-Strict mode allowed only four system calls (`exit`, `sigreturn`, `read`, `write`, the last two on already-open descriptors), which suited an untrusted grid-computing workload but is unusable for ordinary programs that need to open files, allocate memory, or use the network. Mode 2 (seccomp-bpf) replaced the fixed list with a BPF filter program that the developer writes, so each application can permit exactly the syscalls it needs and choose the verdict (allow, error, SIGSYS, or kill) for the rest.
+Strict mode allowed only four system calls: `exit`, `sigreturn`, `read` and `write`, the last two only on already-open descriptors. That suited an untrusted grid-computing workload but is unusable for ordinary programs that need to open files, allocate memory, or use the network.
+
+Mode 2, seccomp-bpf, replaced the fixed list with a BPF filter program that the developer writes. Each application can then permit exactly the syscalls it needs and choose the verdict for the rest, for example allow, log, error, SIGSYS or kill.
 
 **Q: What is the difference between discretionary and mandatory access control?**
 
@@ -266,7 +294,7 @@ Under MAC, a central policy decides, security attributes are attached to files a
 
 **Q: In SELinux type enforcement, why can an access be refused even when the UNIX permissions and the UID would allow it?**
 
-Because SELinux decides on the *type labels* of the subject domain and the object, not on the UID. After the DAC check passes, the LSM hook consults SELinux, which looks for an `allow` rule matching the subject's domain (for example `passwd_t`) and the object's type (for example `shadow_t`). 
+Because SELinux decides on the *type labels* of the subject domain and the object, not on the UID. After the DAC check passes, the LSM hook consults SELinux, which looks for an `allow` rule matching the subject's domain and the object's type, for example `passwd_t` and `shadow_t`. 
 
 If no such rule exists, the access is denied regardless of ownership, so even root is bound by the policy. 
 
@@ -278,7 +306,7 @@ SELinux identifies objects by labelling their inodes (stored in filesystem exten
 
 The practical consequence is that AppArmor's protection follows the path rather than the data: moving or copying a file out of a protected path leaves it unconfined, and because different paths can point to the same inode, a hard-link attack is possible. 
 
-SELinux's inode labels travel with the file under `mv` (though `cp` can reset them), giving stronger but more complex guarantees, which is why AppArmor is considered an incomplete MAC by TCSEC standards yet easier to operate.
+SELinux's inode labels travel with the file under `mv`, though `cp` can reset them. This gives stronger but more complex guarantees, which is why AppArmor is considered an incomplete MAC by TCSEC standards yet easier to operate.
 
 **Q: Combining SECCOMP and LSM with the earlier base primitives, why does the lecture conclude that the castle model is no longer enough?**
 
@@ -297,10 +325,6 @@ The article follows a 2021 lecture. These points were not checked against curren
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The article gives four filter verdicts, while the kernel documents eight return values, including `SECCOMP_RET_KILL_THREAD`, `SECCOMP_RET_USER_NOTIF`, `SECCOMP_RET_TRACE` and `SECCOMP_RET_LOG`. | `SECCOMP_RET_LOG` is the usual way to discover the syscall set a program needs, and `USER_NOTIF` lets a supervisor handle refused calls. | The return values section of the [seccomp_filter kernel documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html). |
-| The article says programs must be recompiled to embed a filter, but the kernel documentation states that children inherit their parent's filters. | A launcher, a service manager or a container runtime can install a filter before starting an unmodified program, which weakens the "recompile" trade-off. | The [seccomp_filter documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html) on inheritance, and how systemd and container runtimes apply profiles. |
-| The article does not say that installing a filter requires `PR_SET_NO_NEW_PRIVS` or `CAP_SYS_ADMIN`. | The kernel documents the rule as preventing a filter from being applied to child processes with greater privileges than the task that installed it. | The usage section of the [seccomp_filter documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html). |
-| LoadPin is described as verifying kernel modules, while the kernel documents it as requiring every file the kernel loads (modules, firmware) to come from a single filesystem. | LoadPin checks where a file comes from, not a signature, so "verifies" overstates it. | The [LoadPin documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/LoadPin.html). |
 | Landlock and the BPF LSM, added after the lecture's material, are not covered. | Landlock lets an unprivileged process sandbox itself, which changes the comparison with seccomp. | The [Landlock documentation](https://docs.kernel.org/userspace-api/landlock.html) and the [LSM documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/index.html). |
 | The stacking rules (one major module plus minor ones) come from the lecture and may be out of date. | Newer kernels have extended which modules can be stacked together. | The [LSM documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/index.html) and `/sys/kernel/security/lsm` on the target host. |
 | The dates (SECCOMP 2005, adoption by Chrome, OpenSSH and qemu, LSM 2002, AppArmor merged in 2010) and the MULTICS origin of SELinux MLS come from the lecture slides. | They were not checked against kernel history or project changelogs. | The kernel changelogs and each project's history, and the [TCSEC](https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/dod85.pdf) for the MLS vocabulary. |
@@ -309,6 +333,7 @@ The article follows a 2021 lecture. These points were not checked against curren
 
 - HEIG-VD -  "Sécurité des systèmes d'exploitation" 
 - [seccomp_filter — Linux kernel documentation](https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html)
+- [LoadPin — Linux kernel documentation](https://docs.kernel.org/admin-guide/LSM/LoadPin.html)
 - [Linux Security Modules — kernel documentation](https://www.kernel.org/doc/html/latest/admin-guide/LSM/index.html)
 - [SELinux Project](https://github.com/SELinuxProject)
 - [AppArmor](https://apparmor.net/)

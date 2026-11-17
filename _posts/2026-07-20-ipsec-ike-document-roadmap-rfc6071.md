@@ -2,7 +2,7 @@
 layout: post
 title: "The IPsec and IKE Document Roadmap (RFC 6071)"
 date:   2026-07-20
-last_modified_at: 2026-07-21
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network security cryptography rfc
@@ -22,18 +22,18 @@ IPsec secures traffic at the IP layer, and IKE negotiates the keys that make it 
 
 Over the years the number of RFCs defining and using IPsec and IKE grew large, and the growth was messy because the documents came from many sources: the original IPsec working group, its spin-offs such as IPsecME (IPsec Maintenance and Extensions), and other groups that use IPsec or IKE to protect their own protocols. [RFC 6071](https://datatracker.ietf.org/doc/html/rfc6071) is a snapshot of that ecosystem as of early 2011. It obsoletes the earlier [RFC 2411](https://datatracker.ietf.org/doc/html/rfc2411), the previous IPsec roadmap, which had a narrower focus on the recommended contents of encryption and authentication algorithm documents.
 
-The roadmap is informational, not standards-track. It defines nothing of its own: it restates the requirement levels and relationships found in the documents it points at, and if it ever conflicts with one of them, the other RFC wins. Each RFC it lists is tagged with its series category (S for Standards Track, E for Experimental, B for Best Current Practice, I for Informational) and its publication date, so a reader can judge the maturity and status of any given piece.
+The roadmap is informational, not standards-track. It defines nothing of its own: it restates the requirement levels and relationships found in the documents it points at, and if it ever conflicts with one of them, the other RFC wins. Each RFC it lists is tagged with its series category and its publication date, so a reader can judge the maturity and status of any given piece. The categories are S for Standards Track, E for Experimental, B for Best Current Practice and I for Informational.
 
 Two conventions from the roadmap are worth adopting up front, because the whole field uses them:
 
-- **IPsec-v2 vs IPsec-v3.** "Old" IPsec (IPsec-v2, from the 1998 RFCs) was obsoleted by "new" IPsec (IPsec-v3, from the 2005 RFCs), but IPsec-v2 is still found in operational use. When the roadmap writes "IPsec" without a qualifier, it means both.
-- **IKEv1 vs IKEv2.** "Old" IKE (IKEv1) was obsoleted by "new" IKE (IKEv2), while IKEv1 remains in the field. "IKE" without a qualifier means both.
+- **IPsec-v2 vs IPsec-v3.** IPsec-v2, the "old" IPsec from the 1998 RFCs, was obsoleted by IPsec-v3, the "new" IPsec from the 2005 RFCs, but IPsec-v2 is still found in operational use. When the roadmap writes "IPsec" without a qualifier, it means both.
+- **IKEv1 vs IKEv2.** IKEv1, the "old" IKE, was obsoleted by IKEv2, the "new" IKE, while IKEv1 remains in the field. "IKE" without a qualifier means both.
 
 ## Core concepts: SA, SPI, and the databases
 
-The roadmap's background section defines the vocabulary the rest of the documents assume. A **Security Association (SA)** is a one-way (inbound or outbound) agreement between two peers that specifies the IPsec protections to apply: the security protocol, the cryptographic algorithms, the keys, and which traffic is covered. Because SAs are one-way, protecting a two-way conversation always takes a pair of them.
+The roadmap's background section defines the vocabulary the rest of the documents assume. A **Security Association (SA)** is a one-way agreement between two peers that specifies the IPsec protections to apply to either inbound or outbound traffic: the security protocol, the cryptographic algorithms, the keys, and which traffic is covered. Because SAs are one-way, protecting a two-way conversation always takes a pair of them.
 
-Each SA is named by a **Security Parameters Index (SPI)**. In IPsec-v2 an SA is identified by the combination of the SPI, the protocol (AH or ESP), and the destination address; IPsec-v3 simplified this so that a unicast SA is identified by the SPI alone (optionally the protocol), while a multicast SA uses the SPI, the destination address, and optionally the source address.
+Each SA is named by a **Security Parameters Index (SPI)**. In IPsec-v2 an SA is identified by the combination of the SPI, the protocol (AH or ESP), and the destination address. IPsec-v3 simplified this: a unicast SA is identified by the SPI alone, optionally with the protocol, while a multicast SA uses the SPI, the destination address, and optionally the source address.
 
 Three databases organize the processing, with a fourth added in IPsec-v3:
 
@@ -80,7 +80,9 @@ In practice these four were viewed as the single protocol "IKEv1." IKEv2 collaps
 
 ## IKEv1 versus IKEv2
 
-IKE is the preferred key management protocol for IPsec: it authenticates the peers, negotiates SAs, and produces the keying material for them. A completed IKE negotiation yields two kinds of SA. The first is the **IKE SA**, which protects the IKE signaling itself. The second is the **IPsec SA** that actually protects data traffic. The terminology shifts between versions, which the roadmap is careful to untangle: what IKEv1 calls the IPsec SA, IKEv2 calls a CHILD_SA. Because IKEv1 ran as two sequential negotiations called phases, its IKE SA is also known as a Phase 1 SA and its IPsec SA as a Phase 2 SA.
+IKE is the preferred key management protocol for IPsec: it authenticates the peers, negotiates SAs, and produces the keying material for them. A completed IKE negotiation yields two kinds of SA. The first is the **IKE SA**, which protects the IKE signaling itself. The second is the **IPsec SA**, which protects the data traffic.
+
+The terminology shifts between versions, which the roadmap is careful to untangle: what IKEv1 calls the IPsec SA, IKEv2 calls a CHILD_SA. Because IKEv1 ran as two sequential negotiations called phases, its IKE SA is also known as a Phase 1 SA and its IPsec SA as a Phase 2 SA.
 
 IKEv2 folded in the same "lessons learned" spirit as IPsec-v3, replacing multiple, sometimes contradictory documents with one. Its notable changes include:
 
@@ -99,13 +101,13 @@ Once the base IKEv1 and IPsec-v2 documents were finalized, gaps surfaced that se
 
 - **NAT traversal.** IPsec and NAT interact badly, a real problem because IPsec is the standard corporate-VPN mechanism and NATs sit in front of most remote users. [RFC 3715](https://datatracker.ietf.org/doc/html/rfc3715) states the compatibility requirements, [RFC 3947](https://datatracker.ietf.org/doc/html/rfc3947) negotiates NAT traversal in IKEv1, and [RFC 3948](https://datatracker.ietf.org/doc/html/rfc3948) defines UDP encapsulation of ESP so packets survive a NAT.
 - **Extended sequence numbers.** [RFC 4304](https://datatracker.ietf.org/doc/html/rfc4304) adds 64-bit sequence numbers for anti-replay on high-volume SAs while still sending only 32 bits on the wire.
-- **Peer authentication and PKI.** The PKI4IPsec effort produced [RFC 4809](https://datatracker.ietf.org/doc/html/rfc4809) (certificate management requirements) and [RFC 4945](https://datatracker.ietf.org/doc/html/rfc4945) (the PKI profile for IKE), while [RFC 4754](https://datatracker.ietf.org/doc/html/rfc4754) adds ECDSA authentication and [RFC 4806](https://datatracker.ietf.org/doc/html/rfc4806) adds OCSP certificate-status checking to IKEv2.
+- **Peer authentication and PKI.** The PKI4IPsec effort produced the certificate management requirements in [RFC 4809](https://datatracker.ietf.org/doc/html/rfc4809) and the PKI profile for IKE in [RFC 4945](https://datatracker.ietf.org/doc/html/rfc4945), while [RFC 4754](https://datatracker.ietf.org/doc/html/rfc4754) adds ECDSA authentication and [RFC 4806](https://datatracker.ietf.org/doc/html/rfc4806) adds OCSP certificate-status checking to IKEv2.
 - **Dead peer detection.** [RFC 3706](https://datatracker.ietf.org/doc/html/rfc3706) detects a peer that has silently gone away, so an SA is not left tunneling packets into a black hole; IKEv2 builds this in as its liveness check.
 - **Remote access and mobility.** [RFC 4555](https://datatracker.ietf.org/doc/html/rfc4555) (MOBIKE) lets a host keep its SAs as its IP address changes, [RFC 5723](https://datatracker.ietf.org/doc/html/rfc5723) resumes a session without a full renegotiation, and [RFC 5685](https://datatracker.ietf.org/doc/html/rfc5685) lets a gateway redirect clients to another gateway.
 
 ## Cryptographic algorithms and requirement levels
 
-A large part of the roadmap is a survey of the algorithm documents, and its central idea is that an algorithm needs two things before it can be used: an assigned IANA value (so IKE can name it during negotiation) and an RFC describing how to use it with the protocol. The roadmap then classifies each algorithm's requirement level separately for IKEv1, IKEv2, IPsec-v2, and IPsec-v3.
+A large part of the roadmap is a survey of the algorithm documents, and its central idea is that an algorithm needs two things before it can be used: an assigned IANA value, which lets IKE name it during negotiation, and an RFC describing how to use it with the protocol. The roadmap then classifies each algorithm's requirement level separately for IKEv1, IKEv2, IPsec-v2, and IPsec-v3.
 
 Those requirement levels use the vocabulary of [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119) plus the trend markers from [RFC 4835](https://datatracker.ietf.org/doc/html/rfc4835):
 
@@ -123,17 +125,32 @@ The mandatory-to-implement algorithms are deliberately pulled out into their own
 
 ## Outgrowths and other protocols
 
-The final sections show how far IPsec and IKE reach beyond their own base documents, and they are the reason the roadmap is genuinely useful rather than a plain bibliography.
+The final sections list the work outside the base documents that grew from, uses or adapts IPsec and IKE, and they make the roadmap more than a plain bibliography.
 
-**Outgrowths of IPsec/IKE** are efforts that grew from the core work: IPsec policy configuration, IPsec MIBs for management, IP compression (IPComp), Better-Than-Nothing Security (BTNS) for unauthenticated protection, Kerberized key negotiation (KINK), secure remote access (IPSRA), and the IPSECKEY DNS resource record for publishing keying material.
+**Outgrowths of IPsec/IKE** are efforts that grew from the core work:
 
-**Other protocols that use IPsec/IKE** are unrelated protocols that call on IPsec for their own protection. The roadmap catalogs how Mobile IPv4 and IPv6, OSPF, the Host Identity Protocol (HIP), SCTP, Robust Header Compression (ROHC), BGP, and even SIP lean on IPsec, along with IPsec benchmarking and NAT-interaction documents.
+- IPsec policy configuration;
+- IPsec MIBs for management;
+- IP compression (IPComp);
+- Better-Than-Nothing Security (BTNS) for unauthenticated protection;
+- Kerberized key negotiation (KINK);
+- secure remote access (IPSRA);
+- the IPSECKEY DNS resource record for publishing keying material.
 
-**Other protocols that adapt IKE** borrow IKE's machinery for non-IPsec purposes, including EAP, Fibre Channel security, and wireless security work. This last group makes the point that IKE has become a general-purpose authenticated key exchange, not only the front end to IPsec.
+**Other protocols that use IPsec/IKE** are unrelated protocols that call on IPsec for their own protection. The roadmap catalogs how Mobile IPv4 and IPv6, OSPF, the Host Identity Protocol (HIP), SCTP, Robust Header Compression, BGP, and even SIP lean on IPsec, along with IPsec benchmarking and NAT-interaction documents.
+
+**Other protocols that adapt IKE** reuse IKE's authenticated key exchange for non-IPsec purposes, including EAP, Fibre Channel security, and wireless security work. This last group makes the point that IKE has become a general-purpose authenticated key exchange, not only the front end to IPsec.
 
 ## Conclusion
 
-RFC 6071 does not add to IPsec or IKE; it makes the existing pile navigable. It contributes a small number of organizing ideas: the seven-group document structure with an architecture document at the top and IKE at the bottom, the clean separation of IPsec-v2 from IPsec-v3 and IKEv1 from IKEv2, the vocabulary of SA, SPI, and the SPD/SAD/PAD databases, and a requirement-level survey that tells an implementer which algorithms are current. Because it is a February 2011 snapshot, some specifics have since moved on, IKEv2 has been re-published and algorithm requirements have shifted, but the map it draws still matches how practitioners think about IPsec today. Read as a map rather than a specification, it turns a hundred scattered RFCs into a structure a reader can hold in their head.
+RFC 6071 does not add to IPsec or IKE; it makes the existing pile navigable. It contributes a small number of organizing ideas:
+
+- the seven-group document structure, with an architecture document at the top and IKE at the bottom;
+- the clean separation of IPsec-v2 from IPsec-v3 and of IKEv1 from IKEv2;
+- the vocabulary of SA, SPI, and the SPD/SAD/PAD databases;
+- a requirement-level survey that tells an implementer which algorithms are current.
+
+It is a February 2011 snapshot, so some specifics have since moved on: IKEv2 has been re-published and algorithm requirements have shifted. The map it draws still matches how practitioners think about IPsec today. Read as a map rather than a specification, it turns a hundred scattered RFCs into a structure a reader can hold in their head.
 
 The mindmap below summarizes the article's structure.
 
@@ -160,7 +177,9 @@ The mindmap below summarizes the article's structure.
 
 **Q: What problem does RFC 6071 solve, and what does it deliberately not do?**
 
-It solves discoverability. IPsec and IKE are defined across dozens of RFCs from several working groups, some obsoleting others and many reused by unrelated protocols, so finding the right document and understanding how it relates to the rest is hard. RFC 6071 catalogs those RFCs, describes each briefly, tags it with its series category and date, and places it in an overall structure. What it deliberately does not do is define anything of its own: it restates the requirement levels and relationships already set by the documents it points at, and if it ever conflicts with one of them, the other RFC takes precedence.
+It solves discoverability. IPsec and IKE are defined across dozens of RFCs from several working groups, some obsoleting others and many reused by unrelated protocols, so finding the right document and understanding how it relates to the rest is hard.
+
+RFC 6071 catalogs those RFCs, describes each briefly, tags it with its series category and date, and places it in an overall structure. What it deliberately does not do is define anything of its own: it restates the requirement levels and relationships already set by the documents it points at, and if it ever conflicts with one of them, the other RFC takes precedence.
 
 **Q: What is the difference between AH and ESP?**
 
@@ -172,15 +191,33 @@ An SA specifies the protection for traffic in a single direction: it fixes the p
 
 **Q: How did the IKE base documents change from IKEv1 to IKEv2?**
 
-IKEv1 was not a single document. It was assembled from IKE itself (RFC 2409), ISAKMP (RFC 2408) for the generic SA procedures and packet formats, the IPsec DOI (RFC 2407) binding ISAKMP to IPsec, and Oakley (RFC 2412) for the key-determination theory, and in practice these four were treated as one protocol. IKEv2 consolidated all of that into a single specification, first as RFC 4306, then clarified by RFC 4718, and finally merged into RFC 5996. Beyond consolidation, IKEv2 shortened the exchange, added responder DoS protection, made every request expect a response, and supported EAP-based and asymmetric authentication.
+IKEv1 was not a single document. It was assembled from four RFCs that in practice were treated as one protocol:
+
+- IKE itself (RFC 2409);
+- ISAKMP (RFC 2408), for the generic SA procedures and packet formats;
+- the IPsec DOI (RFC 2407), binding ISAKMP to IPsec;
+- Oakley (RFC 2412), for the key-determination theory.
+
+IKEv2 consolidated all of that into a single specification, first as RFC 4306, then clarified by RFC 4718, and finally merged into RFC 5996. Beyond consolidation, IKEv2 shortened the exchange, added responder DoS protection, made every request expect a response, and supported EAP-based and asymmetric authentication.
 
 **Q: The roadmap lists requirement levels like SHOULD+ and MUST-. Combining the algorithm and versioning sections, why are these levels version-specific and time-sensitive?**
 
-The plus and minus markers encode direction of travel: SHOULD+ is recommended and likely to become MUST, while MUST- is currently required but likely to be downgraded. They exist because cryptographic algorithms age, so the mandatory set has to shift over time, and the roadmap deliberately places mandatory-to-implement algorithms in their own documents (RFC 4835, RFC 4307, RFC 4109) precisely so those levels can be revised without touching the base protocol. The levels are also version-specific because IKEv1, IKEv2, IPsec-v2, and IPsec-v3 each negotiate a different algorithm set: an algorithm can be MUST in one and merely optional or not applicable in another, as with NULL encryption, which makes sense for ESP but never for IKE, which must always encrypt. Combined with the fact that the whole survey is a February 2011 snapshot, this is why the roadmap warns that later RFCs may have changed the picture.
+The plus and minus markers encode direction of travel: SHOULD+ is recommended and likely to become MUST, while MUST- is currently required but likely to be downgraded.
+
+They exist because cryptographic algorithms age, so the mandatory set has to shift over time. The roadmap places mandatory-to-implement algorithms in their own documents, RFC 4835, RFC 4307 and RFC 4109, so those levels can be revised without touching the base protocol.
+
+The levels are also version-specific because IKEv1, IKEv2, IPsec-v2, and IPsec-v3 each negotiate a different algorithm set. An algorithm can be MUST in one and optional or not applicable in another: NULL encryption makes sense for ESP but never for IKE, which must always encrypt.
+
+The whole survey is also a February 2011 snapshot, which is why the roadmap warns that later RFCs may have changed the picture.
 
 **Q: What does it mean that other protocols "use IPsec" versus "adapt IKE"?**
 
-They are two different kinds of reuse the roadmap separates. Protocols that use IPsec/IKE, such as Mobile IP, OSPF, HIP, SCTP, BGP, and SIP, call on IPsec to protect their own traffic while leaving IPsec and IKE unchanged. Protocols that adapt IKE, such as EAP, Fibre Channel security, and wireless security, borrow IKE's authenticated key-exchange machinery for a purpose other than setting up IPsec SAs. The second category is evidence that IKE has become a general-purpose key exchange in its own right, not only the front end to IPsec.
+They are two different kinds of reuse the roadmap separates:
+
+- Protocols that use IPsec/IKE, such as Mobile IP, OSPF, HIP, SCTP, BGP, and SIP, call on IPsec to protect their own traffic while leaving IPsec and IKE unchanged.
+- Protocols that adapt IKE, such as EAP, Fibre Channel security, and wireless security, borrow IKE's authenticated key exchange for a purpose other than setting up IPsec SAs.
+
+The second category is evidence that IKE has become a general-purpose key exchange in its own right, not only the front end to IPsec.
 
 ## References
 

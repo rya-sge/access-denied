@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Trade Services Initiation — The tsin Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -23,7 +24,11 @@ Suppliers are often paid long after they deliver. Bridging that gap, by financin
 
 ## What tsin is for
 
-`tsin` is the **corporate-to-bank** front end of trade finance. Its counterpart `tsrv` handles bank-issued undertakings between banks and beneficiaries; `tsin` handles the requests a company makes to its bank to obtain financing and related services against its trade receivables. The core use cases are **invoice financing** (borrowing against unpaid invoices), **invoice assignment** (transferring the right to collect an invoice, the mechanism behind factoring), and the **registration and guarantee** arrangements that set up a financing programme, together with an **application** channel into the guarantee area.
+`tsin` is the **corporate-to-bank** front end of trade finance. Its counterpart `tsrv` handles bank-issued undertakings between banks and beneficiaries; `tsin` handles the requests a company makes to its bank to obtain financing and related services against its trade receivables. The core use cases are:
+
+- **Invoice financing**: borrowing against unpaid invoices.
+- **Invoice assignment**: transferring the right to collect an invoice, the mechanism behind factoring.
+- The **registration and guarantee** arrangements that set up a financing programme, together with an **application** channel into the guarantee area.
 
 ![Corporate-to-bank supply chain finance]({{site.url_complet}}/assets/article/finance/tsin-supply-chain-concept.png)
 
@@ -91,23 +96,31 @@ The `tsin` business area is the corporate-facing entry point to trade finance. I
 
 **Q: How does tsin differ from tsrv?**
 
-They are two ends of trade finance. `tsin` is the corporate-to-bank front end: a company uses it to request financing, assign invoices, register in a programme, and apply for a guarantee. `tsrv` is the bank-facing area that carries the undertakings, demand guarantees and standby letters of credit, that a bank issues and manages. The link between them is the undertaking application (`tsin.005`): a corporate applies through `tsin`, and the guarantee it asks for is then issued and administered through `tsrv`. In short, `tsin` is where the request starts and `tsrv` is where the bank's promise lives.
+They are two ends of trade finance. `tsin` is the corporate-to-bank front end: a company uses it to request financing, assign invoices, register in a programme, and apply for a guarantee. `tsrv` is the bank-facing area that carries the undertakings, demand guarantees and standby letters of credit, that a bank issues and manages.
+
+The link between them is the undertaking application (`tsin.005`): a corporate applies through `tsin`, and the guarantee it asks for is then issued and administered through `tsrv`. In short, `tsin` is where the request starts and `tsrv` is where the bank's promise lives.
 
 **Q: What is invoice assignment, and why does it need a notification?**
 
-Invoice assignment transfers the right to collect an invoice from the supplier to a financier, which is the mechanism underlying factoring. It matters because once an invoice is assigned, the party who owes the money must pay the new owner rather than the original supplier. That is why the assignment flow includes a `tsin.008` notification: it informs the party who must now pay that the invoice has been assigned and to whom. Without that notification, the payer would not know where to direct payment.
+Invoice assignment transfers the right to collect an invoice from the supplier to a financier, which is the mechanism underlying factoring. It matters because once an invoice is assigned, the party who owes the money must pay the new owner rather than the original supplier.
+
+That is why the assignment flow includes a `tsin.008` notification: it informs the party who must now pay that the invoice has been assigned and to whom. Without that notification, the payer would not know where to direct payment.
 
 **Q: What does the party registration and guarantee process set up?**
 
 It establishes the framework a financing programme runs in: who the parties are and what guarantee underpins their arrangement. The supplier sends a `tsin.009` PartyRegistrationAndGuaranteeRequest, the bank reports progress with `tsin.010`, informs the relevant parties with `tsin.011`, and confirms the arrangement with `tsin.012`. This registration is a precondition for the financing and assignment flows, because it defines who may participate and under what terms before any specific invoice is financed or assigned.
 
-**Q: How does a supplier actually obtain financing through tsin?**
+**Q: How does a supplier obtain financing through tsin?**
 
-Once the programme is set up and invoices can be assigned, the supplier sends a `tsin.001` InvoiceFinancingRequest asking the bank to fund against specific invoices. The bank evaluates it and answers with a `tsin.002` InvoiceFinancingRequestStatus stating whether the financing is granted and on what terms. If the supplier decides it no longer needs the funding, it can withdraw the request with a `tsin.003` cancellation request. The financing request is the message that actually draws money from the arrangement the earlier steps established.
+Once the programme is set up and invoices can be assigned, the supplier sends a `tsin.001` InvoiceFinancingRequest asking the bank to fund against specific invoices. The bank evaluates it and answers with a `tsin.002` InvoiceFinancingRequestStatus stating whether the financing is granted and on what terms.
+
+If the supplier decides it no longer needs the funding, it can withdraw the request with a `tsin.003` cancellation request. The financing request is the message that draws money from the arrangement the earlier steps established.
 
 **Q: Why is supply chain finance modelled as a corporate-to-bank flow rather than bank-to-bank?**
 
-Because the initiating party is the corporate, not a bank. Supply chain finance exists to help a company manage its own working capital: a supplier wants to be paid before its buyer's payment term expires. The requests, finance this invoice, assign this receivable, register me in this programme, naturally originate from the corporate and go to its bank. `tsin` therefore models a corporate-to-bank conversation, which distinguishes it from the interbank and bank-to-beneficiary flows of other trade-finance areas and places it at the entry point of the process.
+Because the initiating party is the corporate, not a bank. Supply chain finance exists to help a company manage its own working capital: a supplier wants to be paid before its buyer's payment term expires. The requests, such as "finance this invoice", "assign this receivable" and "register me in this programme", naturally originate from the corporate and go to its bank.
+
+`tsin` therefore models a corporate-to-bank conversation, which distinguishes it from the interbank and bank-to-beneficiary flows of other trade-finance areas and places it at the entry point of the process.
 
 ## References
 

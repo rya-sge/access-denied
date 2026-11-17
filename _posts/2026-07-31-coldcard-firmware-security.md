@@ -2,7 +2,7 @@
 layout: post
 title: "COLDCARD Firmware - Architecture and Security Model"
 date:   2026-07-31
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography security wallet
@@ -46,7 +46,9 @@ Two hardware families share this tree. The Mk line (Mk4, Mk5) uses an OLED scree
 
 The code that enforces PIN policy is not the code that runs the wallet, and the separation is enforced by hardware rather than by convention.
 
-The bootloader occupies the first 112 KB of flash and is written in C. It is set at the factory and cannot be replaced in the field, not even by a firmware upgrade signed with a factory key. It holds the pairing secrets that authenticate the device to its secure elements, and it is the only code that can talk to them. Around it, the STM32 hardware firewall is configured to reset the processor if any address inside the protected range is touched from outside. Write protection on the first 14 flash pages and readout protection at level 2 (RDP=2) close the remaining paths. `docs/secure-elements.md` also credits PCROP here, but `storage.c` says otherwise in a comment: PCROP is exec-only and blocks even D-bus reads from inside the protected area, so the lockdown code sets `WRP1AR` and the RDP level instead.
+The bootloader occupies the first 112 KB of flash and is written in C. It is set at the factory and cannot be replaced in the field, not even by a firmware upgrade signed with a factory key. It holds the pairing secrets that authenticate the device to its secure elements, and it is the only code that can talk to them.
+
+Around it, the STM32 hardware firewall is configured to reset the processor if any address inside the protected range is touched from outside. Write protection on the first 14 flash pages and readout protection at level 2 (RDP=2) close the remaining paths. `docs/secure-elements.md` also credits PCROP here, but `storage.c` says otherwise in a comment: PCROP is exec-only and blocks even D-bus reads from inside the protected area, so the lockdown code sets `WRP1AR` and the RDP level instead.
 
 Above it sits MicroPython, which is everything a user would call "the wallet". It reaches the bootloader through a single narrow entry point, the callgate, exposed in Python as `shared/callgate.py` and implemented in `stm32/mk4-bootloader/dispatch.c`. Each call is dispatched by method number, every pointer is range-checked against main SRAM before use, the input length is capped, and the bootloader wipes its own SRAM on entry and on exit. The comment in `dispatch.c` is explicit about the reason: *"range check pointers so we aren't tricked into revealing our secrets"*.
 
@@ -100,7 +102,9 @@ md = SHA256(SHA256(pairing_secret || purpose_salt || pin_digits))
 
 The pairing secret makes the result unique per device, so the same PIN on two COLDCARDs produces unrelated values. The purpose salt separates the anti-phishing computation from the login computation.
 
-That digest is then stretched by repeated HMAC-SHA256 operations whose key lives only inside SE1, eight rounds for a login attempt and twelve for the anti-phishing words in the documented constants. The point is not computational hardness in the usual sense, because SHA-256 is cheap. It is that each round requires a full round trip over SE1's single-wire protocol at 230,400 bps, including a nonce exchange and a `CheckMac` challenge on the pairing secret. `docs/pin-entry.md` works the arithmetic out to about 30 ms per iteration in the best case, and measures the real login delay at roughly four seconds. No attacker can go faster, because only the chip knows the HMAC key.
+That digest is then stretched by repeated HMAC-SHA256 operations whose key lives only inside SE1, eight rounds for a login attempt and twelve for the anti-phishing words in the documented constants. The point is not computational hardness in the usual sense, because SHA-256 is cheap. It is that each round requires a full round trip over SE1's single-wire protocol at 230,400 bps, including a nonce exchange and a `CheckMac` challenge on the pairing secret.
+
+`docs/pin-entry.md` works the arithmetic out to about 30 ms per iteration in the best case, and measures the real login delay at roughly four seconds. No attacker can go faster, because only the chip knows the HMAC key.
 
 ### The attempt counter
 
@@ -135,7 +139,9 @@ Three properties of the implementation are worth separating from the feature lis
 - **The most sensitive effects are invisible to the wallet code.** `TC_HIDDEN_MASK` covers wipe, brick, fake-out, and both duress-wallet flags, and those bits are stripped before the result is handed to MicroPython. The Python layer cannot report what it is not told. Delta mode is deliberately excluded from the mask, because the application needs to know it is running hobbled.
 - **Duress wallets are derivable from the real seed.** They come from [BIP-85](https://github.com/bitcoin/bips/blob/master/bip-0085.mediawiki) derivation at reserved account indices (1001 to 1003 for 24-word wallets, 2001 to 2003 for 12-word), so backing up the main seed also backs up the decoy and its funds. Legacy duress wallets sit at the fixed path `m/2147431408'/0'/0'`.
 
-Delta mode deserves its own note because it inverts the usual duress logic. Rather than presenting a decoy wallet, it opens the real one: the trick PIN differs from the true PIN only in the last four digits, and the bootloader reconstructs the true PIN by substituting four digits carried in the slot argument. The device then behaves normally, with the real extended public keys and the real UTXO set, which defeats an attacker who has researched the target's wallet and would notice a decoy. What it will not do is produce valid signatures, and any attempt to view seed words or reach the trick PIN menu wipes the seed. The threat model it addresses is an attacker who already knows which wallet they are looking for.
+Delta mode deserves its own note because it inverts the usual duress logic. Rather than presenting a decoy wallet, it opens the real one: the trick PIN differs from the true PIN only in the last four digits, and the bootloader reconstructs the true PIN by substituting four digits carried in the slot argument. The device then behaves normally, with the real extended public keys and the real UTXO set, which defeats an attacker who has researched the target's wallet and would notice a decoy.
+
+What it will not do is produce valid signatures, and any attempt to view seed words or reach the trick PIN menu wipes the seed. The threat model it addresses is an attacker who already knows which wallet they are looking for.
 
 `docs/security-model.md` is candid about the residual risk: an attacker sophisticated enough to probe the buses can tell that *something* different happened when a duress PIN succeeds, even though the payload is encrypted, because traffic analysis is not hard. The documentation's own advice is that in that situation the brick PIN is the better answer, since it completes in about 50 ms, well before any on-screen confirmation appears.
 
@@ -172,15 +178,15 @@ Since Mk4 the external SPI flash chip is gone, and firmware images are staged in
 The ordering is the security-relevant part. The world checksum for the *new* image is computed and written into SE1 **before** any flash is erased. Every recovery path then requires a candidate image to reproduce that stored value.
 
 - If the device resets while PSRAM still holds the image, the bootloader re-verifies the signature and the world checksum and resumes.
-- If power was actually lost, PSRAM is empty, and the screen asks for a microSD card. Every DFU file found is checked for a valid factory signature and for a world checksum matching the value in SE1.
+- If power was lost, PSRAM is empty, and the screen asks for a microSD card. Every DFU file found is checked for a valid factory signature and for a world checksum matching the value in SE1.
 
-`docs/upgrade-recovery.md` explains the attack this ordering blocks. An attacker could corrupt one bit of main flash to force recovery mode, then place a different factory-signed image in PSRAM, perhaps an older version with a feature they want. The world checksum makes that fail, because only the image that was actually being installed reproduces it. The same rule means recovery mode cannot be used to load new code, only to finish an interrupted install, which is why the project deliberately provides no key combination to enter recovery mode.
+`docs/upgrade-recovery.md` explains the attack this ordering blocks. An attacker could corrupt one bit of main flash to force recovery mode, then place a different factory-signed image in PSRAM, perhaps an older version with a feature they want. The world checksum makes that fail, because only the image that was being installed reproduces it. The same rule means recovery mode cannot be used to load new code, only to finish an interrupted install, which is why the project deliberately provides no key combination to enter recovery mode.
 
 ------
 
 ## The wallet layer
 
-Above the security machinery sits a conventional but strict Bitcoin wallet.
+Above the bootloader and the secure elements sits a conventional but strict Bitcoin wallet.
 
 **Transaction signing.** `shared/psbt.py`, the largest module at about 101 KB, parses [PSBT](https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki) files up to 2 MB held in PSRAM. Its central concern is change-output validation: the presence of a derivation path in the PSBT is treated as a claim to be verified, not as information to be trusted. A mismatch between the claimed key path and the actual output script raises `FraudulentChangeOutput` rather than a warning, on the reasoning stated in the code that these are not innocent errors. Fees above a configurable share of the transaction value (10% by default) are rejected outright, and anything above 5% raises a warning. Non-`ALL` sighash flags produce warnings, and `NONE` variants are rejected unless explicitly enabled.
 
@@ -344,7 +350,7 @@ Derived from the mechanisms described above. Each row is a property that separat
 
 Because the failure being designed against is not weak silicon in general but an undisclosed flaw in one specific part. SE1 (Microchip ATECC608) and SE2 (Maxim DS28C36B) come from different vendors, so they do not share design bugs or errata. Combined with the processor's own key share, the arrangement means a break in any single component leaves the seed encrypted under material the attacker still does not have.
 
-**Q: What actually stops someone from brute-forcing a numeric PIN?**
+**Q: What stops someone from brute-forcing a numeric PIN?**
 
 Two independent mechanisms:
 
@@ -367,11 +373,16 @@ The choice between them is a duress decision. Wipe is recoverable from a backup 
 
 **Q: The device stages a firmware image in an external, unauthenticated PSRAM chip. Why is that not an obvious attack surface?**
 
-Because the acceptance rule for a staged image is not "is it validly signed" but "does it reproduce the world checksum already written into SE1". That value is committed before any erase begins and covers the specific image the owner approved. An attacker who corrupts one bit of flash to force recovery mode and swaps in a different factory-signed image fails at that check, since a different image produces a different checksum. The same rule is why recovery from a microSD card can only finish an interrupted install and cannot load new code.
+Because the acceptance rule for a staged image is not "is it validly signed" but "does it reproduce the world checksum already written into SE1". That value is committed before any erase begins and covers the specific image the owner approved.
+
+An attacker who corrupts one bit of flash to force recovery mode and swaps in a different factory-signed image fails at that check, since a different image produces a different checksum. The same rule is why recovery from a microSD card can only finish an interrupted install and cannot load new code.
 
 **Q: How can a user verify that the binary on their device matches this source?**
 
-By combining two checks. `make repro` rebuilds the published release inside Docker and diffs it byte for byte against the download from `coldcard.com`, with only the 64 signature bytes excluded, which ties the published binary to the published source. For the bootloader, which is factory-set and not part of that build, callgate method 1 makes the device hash its own bootloader region with a caller-supplied nonce, so stored responses cannot be replayed, and the result can be compared against a hash computed from the tree.
+By combining two checks:
+
+- **Firmware.** `make repro` rebuilds the published release inside Docker and diffs it byte for byte against the download from `coldcard.com`, with only the 64 signature bytes excluded, which ties the published binary to the published source.
+- **Bootloader.** For the bootloader, which is factory-set and not part of that build, callgate method 1 makes the device hash its own bootloader region with a caller-supplied nonce, so stored responses cannot be replayed, and the result can be compared against a hash computed from the tree.
 
 ------
 

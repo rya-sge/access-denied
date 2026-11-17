@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for ATM Management — The caam Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -43,7 +44,15 @@ The sixteen messages group by management function, mostly as request-and-respons
 | Exception | `caam.011`, `caam.012` | Advise and acknowledge an exception |
 | Configuration | `caam.013`, `caam.014` | Report and control the ATM's configuration |
 
-The **device** pair reports the state of the ATM's hardware and lets the manager control it. The **key download** pair loads the cryptographic keys the machine needs to protect PIN and card data in its `catp` transactions. The **diagnostic** pair checks the machine's health. The **configuration** pair reports and updates how the ATM is set up. The **reconciliation** messages agree the machine's activity totals with the manager, and the **exception** pair reports faults and confirms them. The host-to-ATM pair lets the manager push a request to the machine and receive an acknowledgement.
+Each group has one job:
+
+- **Device.** The pair reports the state of the ATM's hardware and lets the manager control it.
+- **Key download.** The pair loads the cryptographic keys the machine needs to protect PIN and card data in its `catp` transactions.
+- **Diagnostic.** The pair checks the machine's health.
+- **Configuration.** The pair reports and updates how the ATM is set up.
+- **Reconciliation.** The messages agree the machine's activity totals with the manager.
+- **Exception.** The pair reports faults and confirms them.
+- **Host-to-ATM.** The pair lets the manager push a request to the machine and receive an acknowledgement.
 
 ## Managing a machine
 
@@ -78,7 +87,9 @@ The `caam` business area is the operator's control plane for automated teller ma
 
 **Q: What is the difference between caam and catp?**
 
-They serve the same machine but different purposes. `catp` is the ATM transaction protocol: it carries the withdrawals, deposits, transfers, and PIN changes a customer performs. `caam` is the ATM management area: it carries what the operator does to the machine, downloading keys, pushing configuration, running diagnostics, reconciling activity, and handling faults. `catp` is the customer's transaction plane; `caam` is the operator's control plane. Both run to the same ATM, but they are kept as separate message sets because they are separate concerns.
+They serve the same machine but different purposes. `catp` is the ATM transaction protocol: it carries the withdrawals, deposits, transfers, and PIN changes a customer performs. `caam` is the ATM management area: it carries what the operator does to the machine, such as downloading keys, pushing configuration, running diagnostics, reconciling activity, and handling faults.
+
+`catp` is the customer's transaction plane; `caam` is the operator's control plane. Both run to the same ATM, but they are kept as separate message sets because they are separate concerns.
 
 **Q: Why does key download have its own pair of messages?**
 

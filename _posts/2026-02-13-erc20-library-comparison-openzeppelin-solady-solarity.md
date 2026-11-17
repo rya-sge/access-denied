@@ -2,7 +2,7 @@
 layout: post
 title: ERC-20 Implementation Comparison — OpenZeppelin, Solady, and Solarity Solidity Library
 date: 2026-02-13
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solidity defi
@@ -28,7 +28,7 @@ The versions compared in this article are:
 | Solady | v0.1.26 | `acd959aa` |
 | Solarity solidity-lib | v3.3.2 | `783a334b` |
 
-Note: Solarity solidity-lib declares `solady: 0.1.24` in its `package.json`. Between Solady v0.1.24 and v0.1.26 (16 commits), the ERC-20 contract (`src/tokens/ERC20.sol`) has **zero changes**. The only token-adjacent change is a new `safeMoveETH` function added to `SafeTransferLib.sol`. All ERC-20 analysis below applies identically to both versions.
+Note: Solarity solidity-lib declares `solady: 0.1.24` in its `package.json`. Across the 16 commits between Solady v0.1.24 and v0.1.26, the ERC-20 contract `src/tokens/ERC20.sol` has **zero changes**. The only token-adjacent change is a new `safeMoveETH` function added to `SafeTransferLib.sol`. All ERC-20 analysis below applies identically to both versions.
 
 The comparison focuses on the core ERC-20 base contracts and their extensions. Solarity solidity-lib does not implement a standalone ERC-20; it depends on OpenZeppelin for token contracts and uses Solady for complementary utilities. The analysis therefore treats solidity-lib as a higher-level library that builds on OpenZeppelin’s ERC-20.
 
@@ -214,7 +214,7 @@ A separate [ERC-20 benchmark repository](https://github.com/eugenioclrc/erc20-be
 
 Solady sits between Solmate and pure Yul in runtime gas. The deployment cost gap is the most significant: Solady’s assembly-heavy bytecode is roughly one-third the size of OpenZeppelin’s, producing a ~66% deployment savings.
 
-(Exact numbers depend on compiler version, optimizer settings, and `via-ir` pipeline.)
+Exact numbers depend on the compiler version, the optimizer settings and whether the `via-ir` pipeline is enabled.
 
 ### 3.3 OpenZeppelin Gas Optimizations
 
@@ -309,14 +309,14 @@ Both provide structured error handling for off-chain tooling.
 - **Cantina-Spearbit-Coinbase Solady Report** — A joint review with Spearbit, sponsored by Coinbase.
 - **Ackee Blockchain Solady Report** — An additional independent review by Ackee Blockchain.
 
-However, Solady’s **Permit2 integration** (the `_givePermit2InfiniteAllowance` feature and related logic in the base ERC-20) was flagged as a concern in a public decision tracked by the Optimism team. In October 2024, Optimism opened [Issue #12573](https://github.com/ethereum-optimism/optimism/issues/12573) titled *“Track Decision: Solady vs OpenZeppelin for SuperchainERC20 Implementation”* to evaluate whether to use Solady or OpenZeppelin for their SuperchainERC20 contract. The issue states:
+However, Solady’s **Permit2 integration**, the `_givePermit2InfiniteAllowance` feature and its related logic in the base ERC-20, was flagged as a concern in a public decision tracked by the Optimism team. In October 2024, Optimism opened [Issue #12573](https://github.com/ethereum-optimism/optimism/issues/12573) titled *“Track Decision: Solady vs OpenZeppelin for SuperchainERC20 Implementation”* to evaluate whether to use Solady or OpenZeppelin for their SuperchainERC20 contract. The issue states:
 
 > *“The current PR includes a new version of Solady with Permit2 support, which hasn’t been audited yet. After discussing this with @maurelian and @mds1 it has been decided that is acceptable for the devnet phase, but we should revisit the decision before moving to testnet.”*
 
 Action items included:
 - Revisiting the Solady vs OZ decision between devnet and testnet phases.
 - Ensuring auditors have sufficient experience with assembly if the Solady implementation is included in an audit scope.
-- Planning for a potential switch to OZ (which would introduce a “noisy diff”).
+- Planning for a potential switch to OZ, which would introduce a “noisy diff”.
 
 The issue was closed on March 18, 2025, with the comment “the decision has been made.” Optimism proceeded with Solady for the SuperchainERC20 production deployment.
 

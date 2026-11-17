@@ -2,7 +2,7 @@
 layout: post
 title: "Windows Advanced Authentication - Smartcards, Virtual Smartcards and Hello for Business"
 date:   2026-06-30
-last_modified_at: 2026-08-19
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security network
@@ -39,7 +39,7 @@ A smartcard replaces the shared password with an asymmetric key pair. The privat
 Two properties follow directly:
 
 - **The user does not know the secret.** There is nothing to phish. An attacker who builds a convincing fake logon page gains nothing, because the credential is a signature produced by hardware, not a string the user can type.
-- **The private key is protected by a PIN.** Authentication becomes two-factor: something you have (the card) and something you know (the PIN). The PIN unlocks the card locally and is never sent to the domain controller.
+- **The private key is protected by a PIN.** Authentication becomes two-factor: the card is something you have and the PIN is something you know. The PIN unlocks the card locally and is never sent to the domain controller.
 
 ### Hardware
 
@@ -128,7 +128,7 @@ The biometric never leaves the device and is only a local gesture to release the
 
 ## What these mechanisms do not fix
 
-The techniques above genuinely solve the two problems they target: they remove weak, guessable passwords and they remove the phishing of a known secret, because the user no longer holds one. They do not, however, change what happens *after* authentication.
+The techniques above solve the two problems they target: they remove weak, guessable passwords and they remove the phishing of a known secret, because the user no longer holds one. They do not, however, change what happens *after* authentication.
 
 - **NTLM still applies.** As described above, the domain controller can hand back an NTLM credential in `PAC_CREDENTIAL_INFO` for compatibility. Services and lateral-movement techniques that rely on NTLM remain reachable.
 - **Kerberos tickets are exposed as before.** PKINIT only replaces pre-authentication. The TGT and service tickets issued afterwards are identical to those of a password logon, so ticket-theft techniques (pass-the-ticket, overpass-the-hash, Golden and Silver Tickets) are unaffected by the choice of credential.
@@ -137,7 +137,7 @@ Strengthening the *front door* of authentication does not secure the *tokens* it
 
 ## Conclusion
 
-Smartcards, virtual smartcards and Windows Hello for Business share one design move: the authentication secret becomes a non-exportable private key held in tamper-resistant hardware, unlocked locally by a PIN or biometric and never transmitted. That move removes guessable passwords and the phishing of known secrets, and Kerberos PKINIT is the standardised plumbing that lets a domain accept these asymmetric credentials. The progression from physical card to TPM virtual smartcard to Windows Hello for Business is mostly a reduction in operational cost (no reader, no removable card) while keeping the same cryptographic guarantees, though all of them still depend on PKI.
+Smartcards, virtual smartcards and Windows Hello for Business share one design move: the authentication secret becomes a non-exportable private key held in tamper-resistant hardware, unlocked locally by a PIN or biometric and never transmitted. That move removes guessable passwords and the phishing of known secrets, and Kerberos PKINIT is the standardised pre-authentication extension that lets a domain accept these asymmetric credentials. The progression from physical card to TPM virtual smartcard to Windows Hello for Business is mostly a reduction in operational cost (no reader, no removable card) while keeping the same cryptographic guarantees, though all of them still depend on PKI.
 
 The boundary of these mechanisms is equally clear. They protect the act of authenticating, not the tokens it produces. NTLM credentials can still appear in the PAC for compatibility, and Kerberos tickets remain exactly as exposed as before. Read in 2026, this 2021 material describes a front-door control whose residual gaps (NTLM and ticket theft) are what later work on NTLM deprecation, FIDO2 and passkeys set out to close.
 
@@ -147,7 +147,9 @@ The boundary of these mechanisms is equally clear. They protect the act of authe
 
 **Q: Why is a smartcard credential resistant to phishing while a password is not?**
 
-A password is knowledge: the user can recite it, so the user can be tricked into typing it into a fake page. A smartcard credential is a signature produced by a private key the user never sees and that never leaves the card. There is no recitable secret to disclose, so a convincing fake logon page captures nothing usable. The PIN only unlocks the card locally and is never sent to the domain controller, so capturing it remotely is of no use without the physical card.
+A password is knowledge: the user can recite it, so the user can be tricked into typing it into a fake page. A smartcard credential is a signature produced by a private key the user never sees and that never leaves the card. There is no recitable secret to disclose, so a convincing fake logon page captures nothing usable.
+
+The PIN only unlocks the card locally and is never sent to the domain controller, so capturing it remotely is of no use without the physical card.
 
 **Q: What does PKINIT change in the Kerberos exchange, and what does it leave unchanged?**
 
@@ -163,11 +165,17 @@ A virtual smartcard has no physical card or reader. Instead it uses the TPM, a c
 
 **Q: Combining several sections, why is deploying smartcards or virtual smartcards not sufficient to secure a Windows domain on its own?**
 
-Because these mechanisms only harden the authentication step, not the artefacts it produces. Three gaps remain. First, they still require a PKI to issue, renew and revoke certificates, which is itself a security-critical system. Second, NTLM credentials can still be delivered through the PAC for compatibility, keeping pass-the-hash-style exposure alive. Third, the Kerberos tickets issued after PKINIT are identical to those from a password logon, so pass-the-ticket and Golden/Silver Ticket attacks are unchanged. Securing a domain therefore also requires retiring NTLM and protecting tickets, which is the direction later Windows authentication work (NTLM deprecation, FIDO2, passkeys) has taken.
+Because these mechanisms only harden the authentication step, not the artefacts it produces. Three gaps remain:
+
+- **PKI.** They still require a PKI to issue, renew and revoke certificates, which is itself a security-critical system.
+- **NTLM.** NTLM credentials can still be delivered through the PAC for compatibility, keeping pass-the-hash-style exposure alive.
+- **Tickets.** The Kerberos tickets issued after PKINIT are identical to those from a password logon, so pass-the-ticket and Golden/Silver Ticket attacks are unchanged.
+
+Securing a domain therefore also requires retiring NTLM and protecting tickets, which is the direction later Windows authentication work has taken: NTLM deprecation, FIDO2 and passkeys.
 
 **Q: How does Windows Hello for Business differ from a virtual smartcard?**
 
-Cryptographically they are nearly the same: both store an asymmetric key on the TPM and present a signature to the domain. The difference is the unlock factor. Windows Hello for Business adds biometric gestures (fingerprint, face, iris) alongside the PIN. The biometric stays on the device and only releases the TPM-held key; it is never sent to the domain, so the anti-phishing property is preserved while the logon experience improves.
+Cryptographically they are nearly the same: both store an asymmetric key on the TPM and present a signature to the domain. The difference is the unlock factor. Windows Hello for Business adds biometric gestures (fingerprint, face, iris) alongside the PIN. The biometric stays on the device and only releases the TPM-held key; it is never sent to the domain, so there is still no secret to phish, and the logon experience improves.
 
 ## References
 

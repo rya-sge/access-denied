@@ -2,17 +2,17 @@
 layout: post
 title: Security of Cryptocurrency Exchanges - Overview"
 date:   2025-11-06
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum security
 tags: wallet hack FTX Mt.Gox QuadrigaCX 
-description: Cryptocurrency exchanges play a pivotal role in the digital asset ecosystem, serving as platforms for on-ramp, trading, storing, and converting cryptocurrencies. As central nodes in a highly valuable and rapidly evolving industry, these exchanges are frequent targets for cyberattacks and financial fraud.
+description: Exchanges let users on-ramp, trade, store and convert cryptocurrencies, which makes them frequent targets of cyberattacks and financial fraud.
 image: /assets/article/blockchain/2025-11-06-crypto-exchange-security-overview-mindmap.png
 isMath: 
 ---
 
-Cryptocurrency exchanges play a pivotal role in the digital asset ecosystem, serving as platforms for on-ramp, trading, storing, and converting cryptocurrencies. As central nodes in a highly valuable and rapidly evolving industry, these exchanges are frequent targets for cyberattacks and financial fraud. 
+Cryptocurrency exchanges are the platforms where users on-ramp, trade, store and convert cryptocurrencies. As central nodes in a highly valuable and rapidly evolving industry, these exchanges are frequent targets for cyberattacks and financial fraud. 
 
 ### Threat Landscape and Attack Vectors
 
@@ -54,7 +54,7 @@ In response to these threats, many exchanges have adopted comprehensive security
 
 As the cryptocurrency sector matures, regulators and industry bodies are increasingly involved in setting security and operational standards for exchanges. Jurisdictions like the United States, European Union, Singapore, and Japan have introduced or proposed frameworks that emphasize cybersecurity, consumer protection, and operational transparency.
 
-Furthermore, decentralized exchanges (DEXs), which operate without central custody of assets, have emerged as alternatives that reduce certain types of risk (e.g., custodial theft) while introducing new vulnerabilities (e.g., smart contract exploits).
+Furthermore, decentralized exchanges (DEXs), which operate without central custody of assets, have emerged as alternatives: they reduce the risk of custodial theft but introduce new vulnerabilities such as smart contract exploits.
 
 ## Notable Cryptocurrency Exchange Hacks and Failures
 

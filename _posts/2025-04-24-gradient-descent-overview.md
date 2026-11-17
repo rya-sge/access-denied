@@ -2,7 +2,7 @@
 layout: post
 title: "Gradient Descent in Machine Learning - Overview"
 date: 2025-04-09
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai
@@ -162,8 +162,8 @@ Gradient descent  comes with its own set of challenges, depending notably if it 
 
 Most **real-world machine learning problems** (especially deep learning) are **non-convex**, meaning:
 
-- The cost surface can have **multiple valleys** (local minima) and **flat regions** (saddle points).
-- Gradient descent might **not reach the best solution**.
+- The cost surface can have **multiple valleys**, the local minima, and **flat regions**, the saddle points.
+- Gradient descent might **converge to a solution that is not the best one**.
 
      ```
          __       _     ___
@@ -175,7 +175,7 @@ Most **real-world machine learning problems** (especially deep learning) are **n
 
 ### Challenges
 
-When the **slope (gradient) ≈ 0**, gradient descent **stops or slows down** — this is interpreted as a "minimum" (but not necessarily the best one).
+When the **slope, or gradient, ≈ 0**, gradient descent **stops or slows down**. This point is interpreted as a "minimum", but not necessarily the best one.
 
 Three places this can happen:
 
@@ -269,13 +269,9 @@ $$
 > What about the convergence with stochastic gradient descent?
 >
 
-The convergence is trickier to observe as we may select favorable and less
-favorable points in the training set. In practice we may compute an “averaged”
-cost function over the past U updates. Typically U<=N and U<<N if N is really
-large.
-We never actually converges like batch gradient descent does, but ends up
-wandering around close to the global minimum. In practice, this isn't a problem -
-as long as we are close to the minimum that's probably OK
+The convergence is harder to observe, because the points picked from the training set may be more or less favourable. In practice we may compute an “averaged” cost function over the past U updates. Typically U<=N, and U<<N when N is large.
+
+Stochastic gradient descent never converges the way batch gradient descent does. It ends up wandering around close to the global minimum, which in practice is acceptable as long as it stays close to the minimum.
 
 >Stochastic gradient descent properties? And its advantages?
 
@@ -293,7 +289,7 @@ Advantages:
 
 > List some advantages of gradient descent algorithm
 
- - It can handle very large sets of data (especially the stochastic or mini-batch form of gradient descent)
+ - It can handle very large sets of data, especially in its stochastic or mini-batch form
 - It allows for incremental learning, i.e. on-the-fly adaptation of the model on new incoming data
 - The learning principle is generalisable to many other form of “hypothesis families” hθ (x)﻿, including neural networks, deep neural networks, etc.
 

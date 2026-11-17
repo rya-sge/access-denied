@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Acceptor-to-Acquirer Card Transactions — The caaa Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -63,7 +64,9 @@ The core messages trace an ordinary card payment at a merchant.
 
 ## Conclusion
 
-The `caaa` business area standardises the merchant-terminal-to-acquirer conversation of a card payment. Its twenty-seven messages, almost all request-and-response pairs, authorise a transaction, report its completion, cancel it if needed, reconcile and batch the day's captures, offer currency conversion, and run diagnostics, all on the card family's protected envelope. It is the acquiring-side successor to ISO 8583 and the middle leg of the card acceptance chain, between the `casp` sale-to-POI interface at the till and the `cain` acquirer-to-issuer link beyond. Read alongside the ATM protocol `catp` that mirrors it for cash machines, `caaa` is where a card payment at a shop actually gets approved.
+The `caaa` business area standardises the merchant-terminal-to-acquirer conversation of a card payment. Its twenty-seven messages, almost all request-and-response pairs, authorise a transaction, report its completion, cancel it if needed, reconcile and batch the day's captures, offer currency conversion, and run diagnostics, all on the card family's protected envelope. It is the acquiring-side successor to ISO 8583 and the middle leg of the card acceptance chain, between the `casp` sale-to-POI interface at the till and the `cain` acquirer-to-issuer link beyond.
+
+Read alongside the ATM protocol `catp` that mirrors it for cash machines, `caaa` is where a shop terminal requests approval of a card payment, which the acquirer obtains from the issuer over `cain`.
 
 ![Mindmap summarising the ISO 20022 caaa acceptor-to-acquirer area]({{site.url_complet}}/assets/article/finance/iso20022-acceptor-to-acquirer-caaa.png)
 
@@ -88,15 +91,23 @@ The `caaa` business area standardises the merchant-terminal-to-acquirer conversa
 
 **Q: What leg of a card payment does caaa cover?**
 
-`caaa` covers the leg between the acceptor (the merchant's terminal) and the acquirer (the merchant's bank or processor). When a card is presented, the terminal uses `caaa` to ask the acquirer to authorise the payment and later to report its completion, reconcile totals, and transfer captured transactions. It does not reach the issuer directly; the acquirer forwards to the issuer over the acquirer-to-issuer rails. `caaa` is specifically the merchant-side, acquiring link of the transaction.
+`caaa` covers the leg between the acceptor, which is the merchant's terminal, and the acquirer, which is the merchant's bank or processor. When a card is presented, the terminal uses `caaa` to ask the acquirer to authorise the payment and later to report its completion, reconcile totals, and transfer captured transactions. `caaa` messages do not go to the issuer directly; the acquirer forwards to the issuer over the acquirer-to-issuer rails. `caaa` is specifically the merchant-side, acquiring link of the transaction.
 
 **Q: Why are authorisation and completion separate messages?**
 
-Because the amount authorised and the amount finally captured can differ, and both events need recording. The `caaa.001` authorisation request reserves funds in real time while the cardholder waits, but the final amount may change afterwards, for example when a tip is added or an order is only partly fulfilled. The `caaa.003` completion advice reports that final outcome. Separating the two lets the terminal get a fast approval and then settle the true amount, which a single message could not express.
+Because the amount authorised and the amount finally captured can differ, and both events need recording. The `caaa.001` authorisation request reserves funds in real time while the cardholder waits, but the final amount may change afterwards, for example when a tip is added or an order is only partly fulfilled. The `caaa.003` completion advice reports that final outcome.
+
+Separating the two lets the terminal get a fast approval and then settle the true amount, which a single message could not express.
 
 **Q: How does caaa relate to casp and cain?**
 
-They are three legs of the card acceptance chain. `casp` is the sale-to-POI interface, where the cash register drives the payment terminal. `caaa` is the acceptor-to-acquirer leg, where that terminal talks to the acquirer. `cain` is the acquirer-to-issuer leg, where the acquirer reaches the card issuer. A single shop payment flows through all three: the till instructs the terminal (`casp`), the terminal authorises with the acquirer (`caaa`), and the acquirer authorises with the issuer (`cain`).
+They are three legs of the card acceptance chain:
+
+- `casp` is the sale-to-POI interface, where the cash register drives the payment terminal.
+- `caaa` is the acceptor-to-acquirer leg, where that terminal talks to the acquirer.
+- `cain` is the acquirer-to-issuer leg, where the acquirer talks to the card issuer.
+
+A single shop payment flows through all three in order: the till instructs the terminal over `casp`, the terminal authorises with the acquirer over `caaa`, and the acquirer authorises with the issuer over `cain`.
 
 **Q: What is dynamic currency conversion in caaa?**
 

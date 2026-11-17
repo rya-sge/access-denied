@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Card Network Management — The canm Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -40,9 +41,16 @@ The area is two request-and-response pairs, one for general network management a
 | `canm.003` | KeyExchangeInitiation | Key exchange |
 | `canm.004` | KeyExchangeResponse | Key exchange |
 
-The **`canm.001` NetworkManagementInitiation** and its `canm.002` response carry the general control functions: signing on at the start of a session, signing off, running an echo test (a keep-alive that confirms the host is reachable), and cutover or status operations. Which function a given message performs is indicated in its header. The **`canm.003` KeyExchangeInitiation** and its `canm.004` response handle cryptographic key management: loading new keys and rotating existing ones, so the keys that protect PIN and card data in the transaction messages stay current.
+The **`canm.001` NetworkManagementInitiation** and its `canm.002` response carry the general control functions:
 
-Like the rest of the card family, each message opens with the shared header (carrying the message function) and includes control fields visible in the schema such as a **system trace audit number (`SysTracAudtNb`)** and a **transmission date-time (`TrnsmssnDtTm`)**, which identify and time-stamp the exchange. Key material is carried in protected form and messages are authenticated.
+- signing on at the start of a session;
+- signing off;
+- running an echo test, a keep-alive that confirms the host is reachable;
+- cutover or status operations.
+
+Which function a given message performs is indicated in its header. The **`canm.003` KeyExchangeInitiation** and its `canm.004` response handle cryptographic key management: loading new keys and rotating existing ones, so the keys that protect PIN and card data in the transaction messages stay current.
+
+Like the rest of the card family, each message opens with the shared header, which carries the message function. It also includes control fields visible in the schema, such as the **system trace audit number**, `SysTracAudtNb`, and the **transmission date-time**, `TrnsmssnDtTm`, which identify and time-stamp the exchange. Key material is carried in protected form and messages are authenticated.
 
 ## Keeping the link running
 
@@ -91,7 +99,9 @@ Because rotating cryptographic keys is a distinct, security-critical operation t
 
 **Q: What is an echo test and why does it matter?**
 
-An echo test is a keep-alive: the terminal sends a `canm.001` network-management message whose function is an echo test, and the host answers with a `canm.002`. It carries no business content; its only purpose is to prove the link is still working. It matters because a card terminal must know its host is reachable before it accepts a transaction, and the host must know which terminals are live. Missed echo tests tell either side that the connection has dropped and needs re-establishing.
+An echo test is a keep-alive: the terminal sends a `canm.001` network-management message whose function is an echo test, and the host answers with a `canm.002`. It carries no business content; its only purpose is to prove the link is still working.
+
+It matters because a card terminal must know its host is reachable before it accepts a transaction, and the host must know which terminals are live. Missed echo tests tell either side that the connection has dropped and needs re-establishing.
 
 **Q: How does canm relate to ISO 8583?**
 

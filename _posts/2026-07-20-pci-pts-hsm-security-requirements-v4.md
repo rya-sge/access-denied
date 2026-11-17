@@ -2,6 +2,7 @@
 layout: post
 title: "PCI PTS HSM v4.0 — How Payment Hardware Security Modules Are Evaluated"
 date:   2026-07-20
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security
@@ -43,7 +44,9 @@ Each requirement is written as a testable statement that a laboratory answers Ye
 
 The physical requirements protect against an attacker who has the device in hand. The central mechanism is tamper detection and response: requirement A1 states that the device must detect penetration attempts and respond with automatic and immediate erasure of any sensitive data it holds, so that recovering that data becomes infeasible. Zeroization is the defining behaviour of a payment HSM; a device that could be opened and read is worthless regardless of the algorithms it runs.
 
-The requirements grade the difficulty of an attack using an **attack-potential** score, a methodology inherited from the Common Criteria and defined in the accompanying PCI HSM Derived Test Requirements. The score aggregates factors such as the time required, the expertise and knowledge of the target needed, the window of opportunity, and the equipment involved. Two thresholds appear throughout the standard: a total value for *identification and initial exploitation* combined, and a smaller minimum for the *initial exploitation* phase alone. The distinction matters because finding an attack for the first time (identification) is often far harder than repeating it, and a control is only meaningful if repeating a discovered attack is also costly.
+The requirements grade the difficulty of an attack using an **attack-potential** score, a methodology inherited from the Common Criteria and defined in the accompanying PCI HSM Derived Test Requirements. The score aggregates factors such as the time required, the expertise and knowledge of the target needed, the window of opportunity, and the equipment involved.
+
+Two thresholds appear throughout the standard: a total value for *identification and initial exploitation* combined, and a smaller minimum for the *initial exploitation* phase alone. The distinction matters because finding an attack for the first time (identification) is often far harder than repeating it, and a control is only meaningful if repeating a discovered attack is also costly.
 
 The core physical thresholds are:
 
@@ -84,7 +87,12 @@ Section C adds a single but important policy requirement, C1: the vendor must pu
 
 ## Modules 2 and 3 — Key Loading, MAC, Key Generation, and Signatures
 
-Module 2 (Section D) covers **key-loading devices**. Its requirements ensure that a device generating or transferring keys never exposes them in the clear: D1 requires that when generating asymmetric key pairs or secret keys, the private or secret value and its precursors are never visible in clear-text during generation; D2 requires that keys not used by the device itself, together with their seed elements, are deleted immediately after transfer; D3 requires that the device retains nothing that could disclose a key it has already transferred into another device; and D5 requires that once loaded with keys, the device cannot have its functional capabilities modified without erasing those keys or detectably flagging the change before the next key load.
+Module 2 (Section D) covers **key-loading devices**. Its requirements ensure that a device generating or transferring keys never exposes them in the clear:
+
+- **D1.** When the device generates asymmetric key pairs or secret keys, the private or secret value and its precursors are never visible in clear-text during generation.
+- **D2.** Keys not used by the device itself, together with their seed elements, are deleted immediately after transfer.
+- **D3.** The device retains nothing that could disclose a key it has already transferred into another device.
+- **D5.** Once loaded with keys, the device cannot have its functional capabilities modified without erasing those keys or detectably flagging the change before the next key load.
 
 Module 3 covers **remote administration** and optional functional blocks. Section E governs logical security of remote management: E1 requires that the device cannot enter operational service until initialization is complete, and E2 requires that operator functions able to influence security, such as enabling or disabling functions or changing authentication codes, are permitted only under **dual or multiple control**, with the interface designed so it is highly unlikely the device is inadvertently left in a sensitive state.
 
@@ -98,7 +106,7 @@ The three remaining sections apply only to devices offering the corresponding fu
 
 The one substantive addition in v4.0 is Module 4, which addresses HSMs delivered as a multi-tenant cloud service. This module recognises a deployment model that the earlier standard did not anticipate: many independent customers, called HSM Solution Consumers, share physical hardware while each retains sole authority over its own keys. The problem it solves is isolation between tenants who do not trust one another, on infrastructure operated by a third party.
 
-The module introduces a vocabulary for the layers involved. The **HSM processing element** is the certified cryptographic engine that actually performs operations; the **HSM virtualization system** switches and routes secure channels between consumers and processing elements; and the **HSM Solution Consumer** is the tenant who owns a set of keys. The diagram below shows how a single processing element serves two consumers without letting either reach the other's keys.
+The module introduces a vocabulary for the layers involved. The **HSM processing element** is the certified cryptographic engine that performs the operations; the **HSM virtualization system** switches and routes secure channels between consumers and processing elements; and the **HSM Solution Consumer** is the tenant who owns a set of keys. The diagram below shows how a single processing element serves two consumers without letting either reach the other's keys.
 
 ![Cloud HSM multi-tenant isolation model]({{site.url_complet}}/assets/article/securite/pci-hsm/pci-hsm-cloud-multitenant-concept.png)
 
@@ -121,7 +129,14 @@ The final module protects the device before it ever reaches a customer, on the p
 
 ![PCI HSM life-cycle chain of trust]({{site.url_complet}}/assets/article/securite/pci-hsm/pci-hsm-lifecycle-workflow.png)
 
-Section L covers **manufacturing**. Change-control procedures trigger re-certification when the device's physical or functional security characteristics change (L1); firmware is inspected through a documented, auditable process and verified free of hidden or undocumented functions (L2), then protected against unauthorized modification throughout the manufacturing lifecycle using dual control or cryptographic authentication (L3). Hardware assembly uses only the certified components with no unauthorized substitutions (L4), and production software is transported and loaded under dual control (L5). A pivotal control is L7: the device is authenticated at the facility of initial deployment by means of a secret placed in it during manufacturing, unique to each device, unknown and unpredictable to any person, and installed under dual control, or by an authenticated public-key method. Authentication by secret information is mandatory in HSM v4.
+Section L covers **manufacturing**. Its requirements cover change control, firmware and assembly:
+
+- **L1.** Change-control procedures trigger re-certification when the device's physical or functional security characteristics change.
+- **L2 and L3.** Firmware is inspected through a documented, auditable process and verified free of hidden or undocumented functions, then protected against unauthorized modification throughout the manufacturing lifecycle using dual control or cryptographic authentication.
+- **L4.** Hardware assembly uses only the certified components, with no unauthorized substitutions.
+- **L5.** Production software is transported and loaded under dual control.
+
+L7 sets how the device is first authenticated: at the facility of initial deployment, by means of a secret placed in it during manufacturing, unique to each device, unknown and unpredictable to any person, and installed under dual control, or by an authenticated public-key method. Authentication by secret information is mandatory in HSM v4.
 
 Section M covers the interval **between the manufacturer and initial deployment**. The device is protected by tamper-detection features with authenticity-validation instructions provided to customers, and where that is not possible it is shipped and stored under auditable controls that can account for every device at every point in time (M1). 
 
@@ -133,7 +148,9 @@ Each device carries a unique visible identifier, its model name and hardware ver
 
 ## Conclusion
 
-The PCI PTS HSM v4.0 requirements describe a device defined by what it refuses to do. It refuses to reveal a clear-text key, refuses to use a key for a purpose other than the one assigned, refuses to run firmware it cannot authenticate, and refuses to survive a physical intrusion with its secrets intact. The five modules apply this posture across every stage: physical and logical controls at runtime, dedicated rules for key loading and remote administration, tenant isolation for cloud deployments, and a chain of custody that reaches back to the factory. The v4.0 addition of the cloud module extends the same key-separation and zeroization principles from a single sealed box to shared infrastructure, where the boundary being defended is now between tenants rather than only between the device and the outside world.
+The PCI PTS HSM v4.0 requirements describe a device defined by what it refuses to do. It refuses to reveal a clear-text key, refuses to use a key for a purpose other than the one assigned, refuses to run firmware it cannot authenticate, and refuses to survive a physical intrusion with its secrets intact.
+
+The five modules apply this posture across every stage: physical and logical controls at runtime, dedicated rules for key loading and remote administration, tenant isolation for cloud deployments, and a chain of custody that reaches back to the factory. The v4.0 addition of the cloud module extends the same key-separation and zeroization principles from a single sealed box to shared infrastructure, where the boundary being defended is now between tenants rather than only between the device and the outside world.
 
 For anyone integrating, procuring, or auditing payment cryptography, the standard is useful as a checklist of the properties that matter, and as a reminder that the security of a payment key depends as much on manufacturing, shipping, and multi-tenant isolation as on the algorithm that uses it.
 
@@ -158,7 +175,7 @@ For anyone integrating, procuring, or auditing payment cryptography, the standar
 
 ### Requirements Checklist
 
-The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its functionality, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage.
+The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its functionality, and an N/A is acceptable when a requirement's characteristic is absent from the device or another option provides equivalent coverage.
 
 #### Module 1, Section A — Physical Security
 
@@ -312,27 +329,47 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 
 **Q: What is the single most important behaviour that distinguishes a payment HSM from ordinary hardware?**
 
-Tamper response, also called zeroization. Requirement A1 states that the device must detect physical penetration and respond by automatically and immediately erasing any sensitive data, so that recovering it becomes infeasible. Because the whole trust model assumes an attacker may eventually gain physical possession of the device, a payment HSM is only as valuable as its guarantee that a break-in destroys the keys before they can be read. Every other physical control exists to raise the cost of reaching that sensitive material in the first place.
+Tamper response, also called zeroization. Requirement A1 states that the device must detect physical penetration and respond by automatically and immediately erasing any sensitive data, so that recovering it becomes infeasible.
 
-**Q: What does "attack potential of at least 26, with a minimum of 13 for initial exploitation" actually mean?**
+Because the whole trust model assumes an attacker may eventually gain physical possession of the device, a payment HSM is only as valuable as its guarantee that a break-in destroys the keys before they can be read. Every other physical control exists to raise the cost of reaching that sensitive material in the first place.
 
-Attack potential is a score that grades how hard an attack is, aggregating factors such as time, required expertise, knowledge of the device, window of opportunity, and equipment. The two numbers separate two phases. The larger value covers *identification plus initial exploitation*, that is, discovering a working attack and carrying it out the first time. The smaller value is the floor for *initial exploitation* alone, meaning how hard it is to repeat the attack once known. Requiring both stops a device from passing on the strength of a hard-to-find attack that becomes trivial to repeat. For secret and private keys, requirement A4 raises the combined threshold to 35 with a floor of 15, because key recovery is the highest-impact outcome.
+**Q: What does "attack potential of at least 26, with a minimum of 13 for initial exploitation" mean?**
+
+Attack potential is a score that grades how hard an attack is, aggregating factors such as time, required expertise, knowledge of the device, window of opportunity, and equipment.
+
+The two numbers separate two phases. The larger value covers *identification plus initial exploitation*, that is, discovering a working attack and carrying it out the first time. The smaller value is the floor for *initial exploitation* alone, meaning how hard it is to repeat the attack once known.
+
+Requiring both stops a device from passing on the strength of a hard-to-find attack that becomes trivial to repeat. For secret and private keys, requirement A4 raises the combined threshold to 35 with a floor of 15, because key recovery is the highest-impact outcome.
 
 **Q: Why does the standard insist that each key be usable for only one function?**
 
-This is key separation, requirement B12. If a single key could both encrypt PINs and decrypt arbitrary data, an attacker could feed chosen ciphertext through the device and use the PIN-encryption key as a general-purpose decryption oracle, defeating the confidentiality of everything it protects. By binding each key to one function, and forbidding any change to the key-usage metadata that would widen its use, the device prevents these cross-purpose attacks. Requirement B10's mandate for key blocks reinforces this at the format level: the usage attributes are cryptographically bound to the key so they cannot be stripped or altered in transit.
+This is key separation, requirement B12. If a single key could both encrypt PINs and decrypt arbitrary data, an attacker could feed chosen ciphertext through the device and use the PIN-encryption key as a general-purpose decryption oracle, defeating the confidentiality of everything it protects.
+
+By binding each key to one function, and forbidding any change to the key-usage metadata that would widen its use, the device prevents these cross-purpose attacks. Requirement B10's mandate for key blocks reinforces this at the format level: the usage attributes are cryptographically bound to the key so they cannot be stripped or altered in transit.
 
 **Q: How does the cloud module keep one tenant's keys away from another's on shared hardware?**
 
-Module 4 layers several controls. Physically, clear-text keys of different consumers must be processed in isolated execution paths and memory areas (I5), and any storage must be zeroized before it is reused for a different tenant, accounting for memory virtualization and wear-levelling (J6). Logically, keys cannot be imported, exported, or operated on without a cryptographically authenticated approval from their owner (J1, J3). For provisioning, each consumer gets a unique provisioning key established by a key-agreement process with perfect forward secrecy (K4), and tamper keys protecting more than one consumer are unique per processing element and never exportable (K5). Together these ensure a tenant can neither reach nor influence another tenant's keys.
+Module 4 layers several controls:
+
+- **Physical isolation.** Clear-text keys of different consumers must be processed in isolated execution paths and memory areas (I5). Any storage must be zeroized before it is reused for a different tenant, accounting for memory virtualization and wear-levelling (J6).
+- **Owner approval.** Keys cannot be imported, exported, or operated on without a cryptographically authenticated approval from their owner (J1, J3).
+- **Provisioning.** Each consumer gets a unique provisioning key established by a key-agreement process with perfect forward secrecy (K4). Tamper keys protecting more than one consumer are unique per processing element and never exportable (K5).
+
+Together these ensure a tenant can neither reach nor influence another tenant's keys.
 
 **Q: The standard covers a device only up to the point of deployment. Combining the life-cycle and logical modules, why is that boundary defensible?**
 
-The life-cycle module (Sections L and M) builds a chain of custody from design through initial key loading: firmware is inspected for hidden functions, assembly uses only certified components, and a unique device secret is installed under dual control during manufacturing (L7) so the deployment facility can authenticate the device before trusting it. In transit the device is either in tamper-evident packaging or carries a self-erasing secret (M3), and accountability passes formally from party to party (M2). By the time keys are loaded, the device has proven its authenticity and its integrity is intact. From that point the runtime logical controls take over: self-tests (B1), authenticated firmware updates with anti-rollback (B3, and J8 in cloud), fail-secure behaviour on tamper or power loss (B11), and the operational responsibility shifts to the acquiring institution under the PCI PIN Security Requirements. The two halves meet cleanly because the life-cycle controls guarantee a trustworthy starting state and the logical controls preserve it thereafter.
+The life-cycle module, Sections L and M, builds a chain of custody from design through initial key loading. Firmware is inspected for hidden functions, assembly uses only certified components, and a unique device secret is installed under dual control during manufacturing (L7), so the deployment facility can authenticate the device before trusting it.
+
+In transit the device is either in tamper-evident packaging or carries a self-erasing secret (M3), and accountability passes formally from party to party (M2). By the time keys are loaded, the device has proven its authenticity and its integrity is intact.
+
+From that point the runtime logical controls take over: self-tests (B1), authenticated firmware updates with anti-rollback (B3, and J8 in cloud), fail-secure behaviour on tamper or power loss (B11), and the operational responsibility shifts to the acquiring institution under the PCI PIN Security Requirements. The two halves meet cleanly because the life-cycle controls guarantee a trustworthy starting state and the logical controls preserve it thereafter.
 
 **Q: What changed between v3.0 and v4.0?**
 
-The headline change is the addition of Module 4, "Cloud-based HSMs as a Service — Multi-tenant Usage and Remote Management Security Requirements," which introduces the vocabulary of processing elements, virtualization systems, and solution consumers, and the isolation, provisioning, and disclosure rules that govern them. Beyond that, the earlier version (v3.0, June 2016) had already added requirements for key-loading devices and remote administration platforms and required validation of device management information submitted by vendors. Some individual requirements were also tightened; for example, authentication of the device by secret information became mandatory in HSM v4 under L7.
+The headline change is the addition of Module 4, "Cloud-based HSMs as a Service — Multi-tenant Usage and Remote Management Security Requirements," which introduces the vocabulary of processing elements, virtualization systems, and solution consumers, and the isolation, provisioning, and disclosure rules that govern them.
+
+Beyond that, the earlier version (v3.0, June 2016) had already added requirements for key-loading devices and remote administration platforms and required validation of device management information submitted by vendors. Some individual requirements were also tightened; for example, authentication of the device by secret information became mandatory in HSM v4 under L7.
 
 ## References
 

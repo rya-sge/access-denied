@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 — A Map of the Financial Messaging Standard"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -75,7 +76,7 @@ The standard divides the financial world into business areas. The ones covered i
 | Securities events | `seev` | [The seev message set]({{site.url_complet}}/2026/07/17/iso20022-securities-events-seev/) |
 | Collateral management | `colr` | [The colr message set]({{site.url_complet}}/2026/07/17/iso20022-collateral-management-colr/) |
 
-These trace a security through its post-trade life: cleared by a CCP (`secl`), covered by collateral (`colr`), settled at a depository (`sese`), reported to the owner (`semt`), and subject to corporate actions and votes (`seev`).
+These trace a security through its post-trade life: cleared by a CCP in `secl`, covered by collateral in `colr`, settled at a depository in `sese`, reported to the owner in `semt`, and subject to corporate actions and votes in `seev`.
 
 ### Trade finance and foreign exchange
 
@@ -103,7 +104,14 @@ These trace a security through its post-trade life: cleared by a CCP (`secl`), c
 | Fee collection | `cafc` | [The cafc message set]({{site.url_complet}}/2026/07/17/iso20022-fee-collection-cafc/) |
 | Settlement reporting | `casr` | [The casr message set]({{site.url_complet}}/2026/07/17/iso20022-settlement-reporting-casr/) |
 
-The card family is the largest group. The transaction areas (`catp`, `caaa`, `cain`) carry payments at ATMs, merchant terminals, and between acquirer and issuer; `casp` drives the terminal from the till; the management areas (`canm`, `caam`, `catm`) keep the devices signed on, keyed, and configured; and `cafr`, `cafc`, and `casr` handle fraud, fees, and settlement reporting. All share a protected, authenticated message envelope, because card traffic carries PINs and card data across untrusted networks.
+The card family is the largest group:
+
+- the transaction areas `catp`, `caaa` and `cain` carry payments at ATMs, merchant terminals, and between acquirer and issuer;
+- `casp` drives the terminal from the till;
+- the management areas `canm`, `caam` and `catm` keep the devices signed on, keyed, and configured;
+- `cafr`, `cafc`, and `casr` handle fraud, fees, and settlement reporting.
+
+All share a protected, authenticated message envelope, because card traffic carries PINs and card data across untrusted networks.
 
 ### Regulatory and reference data
 
@@ -112,7 +120,7 @@ The card family is the largest group. The transaction areas (`catp`, `caaa`, `ca
 | Authorities | `auth` | [The auth message set]({{site.url_complet}}/2026/07/17/iso20022-authorities-auth/) |
 | Reference data | `reda` | [The reda message set]({{site.url_complet}}/2026/07/17/iso20022-reference-data-reda/) |
 
-`auth` carries regulatory reporting to authorities across many regimes (MiFIR, EMIR, SFTR, and more); `reda` manages the static data (securities, parties, accounts, standing settlement instructions) that all the other areas look up.
+`auth` carries regulatory reporting to authorities across many regimes, including MiFIR, EMIR and SFTR. `reda` manages the static data that all the other areas look up: securities, parties, accounts and standing settlement instructions.
 
 ## Patterns that recur across the standard
 
@@ -156,7 +164,9 @@ ISO 20022 is a single standard with many faces. A shared methodology, dictionary
 
 **Q: Is ISO 20022 just a new message format?**
 
-No. It is a methodology for modelling financial processes, a central dictionary of reusable business concepts, and a set of physical syntaxes (chiefly XML) into which messages are serialised. The format you see, an XML document, is only the last of the three. The deeper value is that every message is built from the same dictionary and validated against a published schema, so concepts mean the same thing across areas and messages can be checked automatically. Calling it a format captures the surface but misses the model underneath.
+No. It is a methodology for modelling financial processes, a central dictionary of reusable business concepts, and a set of physical syntaxes (chiefly XML) into which messages are serialised. The format you see, an XML document, is only the last of the three.
+
+The deeper value is that every message is built from the same dictionary and validated against a published schema, so concepts mean the same thing across areas and messages can be checked automatically. Calling it a format captures the surface but misses the model underneath.
 
 **Q: How do I find the right message for a task?**
 
@@ -164,19 +174,27 @@ Start from the business-area prefix. The four-letter prefix of a message identif
 
 **Q: What does the Business Application Header add to a message?**
 
-Routing, control, and integrity, kept separate from the business content. The header names the sender and receiver, identifies exactly which message definition the payload is, timestamps and can prioritise the message, links it to related exchanges, and carries a signature that proves it is authentic. Because this sits outside the payload, an intermediary can route or log a message without parsing its content, and the same envelope works for every message type. In most market infrastructures the header is a required part of every exchange.
+Routing, control, and integrity, kept separate from the business content. The header names the sender and receiver, identifies exactly which message definition the payload is, timestamps and can prioritise the message, links it to related exchanges, and carries a signature that proves it is authentic.
+
+Because the header is separate from the payload, an intermediary can route or log a message without parsing its content, and the same envelope works for every message type. In most market infrastructures the header is a required part of every exchange.
 
 **Q: Why does the card family look so different from the payments and securities areas?**
 
-Because it is a real-time device protocol carrying sensitive data across untrusted networks. Card messages run between terminals, acquirers, and issuers, and they carry PINs and card numbers, so the card family wraps its content in a shared header with encrypted sensitive fields and a message authentication code. The payments and securities areas, exchanged between institutions over trusted infrastructures, do not need that per-message envelope in the same way and instead rely on the Business Application Header. The difference reflects the different threat models the two kinds of traffic face.
+Because it is a real-time device protocol carrying sensitive data across untrusted networks. Card messages run between terminals, acquirers, and issuers, and they carry PINs and card numbers, so the card family wraps its content in a shared header with encrypted sensitive fields and a message authentication code.
+
+The payments and securities areas, exchanged between institutions over trusted infrastructures, do not need that per-message envelope in the same way and instead rely on the Business Application Header. The difference reflects the different threat models the two kinds of traffic face.
 
 **Q: How do the business areas connect into end-to-end processes?**
 
-They hand off to one another. A payment is initiated in `pain`, cleared and settled between banks in `pacs`, and reported to customers in `camt`. A securities trade is cleared by a CCP in `secl`, covered by collateral in `colr`, settled at a depository in `sese`, reported to the owner in `semt`, and reported to regulators in `auth`, while corporate actions on the holding flow through `seev`. No single area does everything; each owns one stage, and the standard's shared dictionary is what lets them pass a consistent picture of the same transaction between them.
+They hand off to one another. A payment is initiated in `pain`, cleared and settled between banks in `pacs`, and reported to customers in `camt`. A securities trade is cleared by a CCP in `secl`, covered by collateral in `colr`, settled at a depository in `sese`, reported to the owner in `semt`, and reported to regulators in `auth`, while corporate actions on the holding flow through `seev`.
+
+No single area does everything; each owns one stage, and the standard's shared dictionary is what lets them pass a consistent picture of the same transaction between them.
 
 **Q: Why is the migration from MT to MX significant?**
 
-Because it changes the data that the world's payments run on. The SWIFT MT messages that have carried interbank payments for decades use terse, fixed-format fields; ISO 20022 MX messages carry richer, structured, validated data. Correspondent banking (through CBPR+) and major real-time gross settlement systems are replacing MT with MX, chiefly in the `pacs` and `camt` areas. The gain is automation and clarity: structured remittance information, longer identifiers, and clearer party data that let systems reconcile and process payments without human interpretation. The migration is the reason ISO 20022 is a present concern and not just a design.
+Because it changes the data that the world's payments run on. The SWIFT MT messages that have carried interbank payments for decades use terse, fixed-format fields; ISO 20022 MX messages carry richer, structured, validated data. Correspondent banking (through CBPR+) and major real-time gross settlement systems are replacing MT with MX, chiefly in the `pacs` and `camt` areas.
+
+The gain is automation and clarity: structured remittance information, longer identifiers, and clearer party data that let systems reconcile and process payments without human interpretation. The migration is the reason ISO 20022 is a present concern and not just a design.
 
 ## References
 

@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for ATM Card Transactions — The catp Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -23,7 +24,7 @@ Most ISO 20022 business areas describe messages between banks and market infrast
 
 ## What catp is for
 
-The card world is usually drawn as four corners: the cardholder, the acceptor (here the ATM), the acquirer, and the issuer. The `catp` business area covers the first leg of that chain, between the ATM and the acquiring **ATM Manager** (the host that drives the terminal and authorises transactions, forwarding to the card scheme and issuer when needed). It is one of two ISO 20022 areas for automated teller machines. Its sibling `catm` handles **management** (terminal configuration, cryptographic key download, and reporting), while `catp` handles the **transactions** themselves.
+The card world is usually drawn as four corners: the cardholder, the acceptor (here the ATM), the acquirer, and the issuer. The `catp` business area covers the first leg of that chain, between the ATM and the acquiring **ATM Manager**, the host that drives the terminal and authorises transactions, forwarding to the card scheme and issuer when needed. It is one of two ISO 20022 areas for automated teller machines. Its sibling `catm` handles **management**: terminal configuration, cryptographic key download, and reporting. `catp` handles the **transactions** themselves.
 
 ![Where the catp protocol sits between the ATM, its host, and the card rails]({{site.url_complet}}/assets/article/finance/catp-atm-topology-concept.png)
 
@@ -43,7 +44,7 @@ This built-in protection is the feature that distinguishes card messaging. Becau
 
 ## The catp message catalogue
 
-The ATM card transactions package defines seventeen messages. They fall into a handful of operations, and within each operation they follow one of two patterns: a two-message **request/response** for authorisation, and, for anything that physically dispenses or accepts value, an additional two-message **completion advice/acknowledgement** that reports what actually happened.
+The ATM card transactions package defines seventeen messages. They fall into a handful of operations, and within each operation they follow one of two patterns: a two-message **request/response** for authorisation, and, for anything that physically dispenses or accepts value, an additional two-message **completion advice/acknowledgement** that reports the physical outcome.
 
 | Identifier | Message | Group |
 |------------|---------|-------|
@@ -91,7 +92,14 @@ First, **confidentiality**: the body of a message can be sent as protected conte
 
 ## Conclusion
 
-The `catp` business area applies ISO 20022 to the point where a customer meets a machine. Seventeen messages cover the ATM's repertoire: withdrawals and deposits with a full authorise-then-complete lifecycle, inquiries, PIN management and transfers as simple request and response, a generic completion pair, and a reject for messages that cannot be processed. Two design choices define the area. The request/response then completion-advice/acknowledgement pattern separates authorisation from the physical outcome, which matters when a machine can approve a withdrawal yet fail to dispense it. And the three-part message shape, header plus clear-or-protected body plus MAC trailer, builds encryption and authentication into every exchange, because the traffic carries PINs and card data across an untrusted network. Read next to the `catm` management area that provisions its keys, `catp` completes the ISO 20022 picture of the ATM.
+The `catp` business area applies ISO 20022 to the messages an ATM exchanges when a customer uses it. Seventeen messages cover the ATM's repertoire: withdrawals and deposits with a full authorise-then-complete lifecycle, inquiries, PIN management and transfers as simple request and response, a generic completion pair, and a reject for messages that cannot be processed.
+
+Two design choices define the area:
+
+- **Two phases.** The request/response then completion-advice/acknowledgement pattern separates authorisation from the physical outcome, which matters when a machine can approve a withdrawal yet fail to dispense it.
+- **Three-part messages.** A header, a clear-or-protected body and a MAC trailer build encryption and authentication into every exchange, because the traffic carries PINs and card data across an untrusted network.
+
+Read next to the `catm` management area that provisions its keys, `catp` completes the ISO 20022 picture of the ATM.
 
 ![Mindmap summarising ISO 20022 ATM card transactions with the catp message set]({{site.url_complet}}/assets/article/finance/iso20022-atm-card-transactions-catp.png)
 
@@ -116,27 +124,43 @@ The `catp` business area applies ISO 20022 to the point where a customer meets a
 
 **Q: Why does an ATM withdrawal need four messages instead of one request and one response?**
 
-Because authorising a withdrawal and physically dispensing the cash are two separate events, and either can succeed while the other fails. The request (`catp.001`) and response (`catp.002`) reserve the funds, but the cash has not moved yet. Only after the ATM tries to dispense does the real outcome become known, and it might be a full dispense, a partial one, or a jam. The completion advice (`catp.003`) reports that actual outcome and the acknowledgement (`catp.004`) confirms the host received it. Without the second phase there would be no reliable way to reverse an authorisation when the machine approved a withdrawal but failed to pay it out.
+Because authorising a withdrawal and physically dispensing the cash are two separate events, and either can succeed while the other fails. The request (`catp.001`) and response (`catp.002`) reserve the funds, but the cash has not moved yet.
+
+Only after the ATM tries to dispense does the real outcome become known, and it might be a full dispense, a partial one, or a jam. The completion advice (`catp.003`) reports that outcome and the acknowledgement (`catp.004`) confirms the host received it. Without the second phase there would be no reliable way to reverse an authorisation when the machine approved a withdrawal but failed to pay it out.
 
 **Q: What are the three parts of a catp message, and what does each do?**
 
-A header, a body, and a security trailer. The header (`Hdr`) carries routing and correlation data: the message function, protocol version, exchange identifier, timestamp, and initiating party. The body carries the operation's content and is sent either in the clear or, more usually for sensitive data, as an encrypted protected element. The security trailer (`SctyTrlr`) carries a MAC computed over the message so the receiver can verify it was not tampered with. Together they let a receiver route the message, read its content only if authorised, and trust that it is genuine.
+A header, a body, and a security trailer. The header (`Hdr`) carries routing and correlation data: the message function, protocol version, exchange identifier, timestamp, and initiating party. The body carries the operation's content and is sent either in the clear or, more usually for sensitive data, as an encrypted protected element.
+
+The security trailer (`SctyTrlr`) carries a MAC computed over the message so the receiver can verify it was not tampered with. Together they let a receiver route the message, read its content only if authorised, and trust that it is genuine.
 
 **Q: Which catp flows use only a request and response, and why?**
 
-Inquiries (`catp.006` / `catp.007`), PIN management (`catp.010` / `catp.011`), and transfers (`catp.016` / `catp.017`). These need only two messages because their result is fully determined the moment the host answers: an inquiry returns information, a PIN change either succeeds or not, and a transfer is booked or declined. Nothing is physically dispensed or accepted, so there is no later divergence between an authorisation and a physical outcome to report. Withdrawals and deposits, which do move cash, add the completion advice and acknowledgement for exactly that reason.
+Inquiries (`catp.006` / `catp.007`), PIN management (`catp.010` / `catp.011`), and transfers (`catp.016` / `catp.017`). These need only two messages because their result is fully determined the moment the host answers: an inquiry returns information, a PIN change either succeeds or not, and a transfer is booked or declined.
+
+Nothing is physically dispensed or accepted, so there is no later divergence between an authorisation and a physical outcome to report. Withdrawals and deposits, which do move cash, add the completion advice and acknowledgement for exactly that reason.
 
 **Q: How does catp differ from catm, and why are they separate?**
 
-`catp` carries the transactions an ATM performs: withdrawals, deposits, transfers, inquiries, and PIN changes. `catm` carries the management of the terminal itself: downloading configuration, provisioning and rotating cryptographic keys, and collecting operational reports. They are separate because they have different lifecycles and trust requirements. Transaction traffic is high-frequency and customer-driven; management traffic is periodic and administrative. Keeping key provisioning in `catm` also means the keys that protect `catp` messages are administered on their own channel rather than mixed into the transaction flow that depends on them.
+`catp` carries the transactions an ATM performs: withdrawals, deposits, transfers, inquiries, and PIN changes. `catm` carries the management of the terminal itself: downloading configuration, provisioning and rotating cryptographic keys, and collecting operational reports.
+
+They are separate because they have different lifecycles and trust requirements. Transaction traffic is high-frequency and customer-driven; management traffic is periodic and administrative. Keeping key provisioning in `catm` also means the keys that protect `catp` messages are administered on their own channel rather than mixed into the transaction flow that depends on them.
 
 **Q: What is the difference between an ATMReject and a declined transaction?**
 
-A decline is a valid business answer to a valid request: the host understood a withdrawal request and answered that it will not authorise it, for example for insufficient funds. That answer travels in a normal response message such as `catp.002`. An `ATMReject` (`catp.005`) is a protocol-level failure: the message could not be processed at all, perhaps because the protocol version is unsupported, the structure is invalid, or the MAC did not verify. Keeping the two distinct lets the ATM tell the difference between "your request was refused" and "your message was never understood", which call for different handling.
+A decline is a valid business answer to a valid request: the host understood a withdrawal request and answered that it will not authorise it, for example for insufficient funds. That answer travels in a normal response message such as `catp.002`.
+
+An `ATMReject` (`catp.005`) is a protocol-level failure: the message could not be processed at all, perhaps because the protocol version is unsupported, the structure is invalid, or the MAC did not verify. Keeping the two distinct lets the ATM tell the difference between "your request was refused" and "your message was never understood", which call for different handling.
 
 **Q: How do the header's exchange identifier and the security mechanisms work together to prevent fraud?**
 
-They address different attacks that combine into a defence. The encrypted body keeps the PIN and card data confidential, so an eavesdropper on the network cannot read them. The MAC in the security trailer proves the message was not altered and came from a party holding the shared key, so an attacker cannot forge or tamper with a message. The exchange identifier in the header binds a request, its response, and its completion into one correlated exchange, so a captured message cannot be replayed as if it belonged to a different transaction. Confidentiality, integrity, and correlation together mean an attacker can neither read, forge, nor replay the traffic, which is the threat model a device on an untrusted network must assume.
+They address different attacks that combine into a defence:
+
+- **Confidentiality.** The encrypted body keeps the PIN and card data confidential, so an eavesdropper on the network cannot read them.
+- **Integrity.** The MAC in the security trailer proves the message was not altered and came from a party holding the shared key, so an attacker cannot forge or tamper with a message.
+- **Correlation.** The exchange identifier in the header binds a request, its response, and its completion into one correlated exchange, so a captured message cannot be replayed as if it belonged to a different transaction.
+
+With all three, an attacker can neither read, forge, nor replay the traffic, which is the threat model a device on an untrusted network must assume.
 
 ## References
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 44 - Beatland Festival"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
@@ -13,7 +13,7 @@ image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-44-beatlan
 isMath: false
 ---
 
-A festival NFT ecosystem on Ethereum where users purchase tiered passes (ERC1155), attend virtual(or not) performances to earn BEAT tokens (ERC20), and redeem unique memorabilia NFTs (integrated in the same ERC1155 contract) using BEAT tokens.
+A festival NFT ecosystem on Ethereum where users purchase tiered passes (ERC1155). They attend performances, virtual or not, to earn BEAT tokens (ERC20), and spend BEAT tokens to redeem unique memorabilia NFTs held in the same ERC1155 contract.
 
 This article describes the [First Fight 44](https://codehawks.cyfrin.io/c/2025-07-beatland-festival) from Cyfrin.
 
@@ -23,7 +23,7 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-07-
 
 ## About the project
 
-A festival NFT ecosystem on Ethereum where users purchase tiered passes (ERC1155), attend virtual(or not) performances to earn BEAT tokens (ERC20), and redeem unique memorabilia NFTs (integrated in the same ERC1155 contract) using BEAT tokens.
+A festival NFT ecosystem on Ethereum where users purchase tiered passes (ERC1155). They attend performances, virtual or not, to earn BEAT tokens (ERC20), and spend BEAT tokens to redeem unique memorabilia NFTs held in the same ERC1155 contract.
 
 ### Actors
 
@@ -83,25 +83,25 @@ L-02. FestivalPass.sol - URI Function Returns Metadata for Non-Existent Items[Se
 ```
 function attendPerformance(uint256 performanceId) external {
 
-​    require(isPerformanceActive(performanceId), "Performance is not active");
+    require(isPerformanceActive(performanceId), "Performance is not active");
 
 @>  require(hasPass(msg.sender), "Must own a pass"); // Only checks current ownership
 
 @>  require(!hasAttended[performanceId][msg.sender], "Already attended this performance"); // Per-user tracking
 
-​    require(block.timestamp >= lastCheckIn[msg.sender] + COOLDOWN, "Cooldown period not met");
+    require(block.timestamp >= lastCheckIn[msg.sender] + COOLDOWN, "Cooldown period not met");
 
-​    
+    
 
 @>  hasAttended[performanceId][msg.sender] = true; // Marks user as attended
 
-​    lastCheckIn[msg.sender] = block.timestamp;
+    lastCheckIn[msg.sender] = block.timestamp;
 
-​    
+    
 
-​    uint256 multiplier = getMultiplier(msg.sender);
+    uint256 multiplier = getMultiplier(msg.sender);
 
-​    BeatToken(beatToken).mint(msg.sender, performances[performanceId].baseReward * multiplier);
+    BeatToken(beatToken).mint(msg.sender, performances[performanceId].baseReward * multiplier);
 
 }
 
@@ -109,14 +109,14 @@ function hasPass(address user) public view returns (bool) {
 
 @>  return balanceOf(user, GENERAL_PASS) > 0 || 
 
-​           balanceOf(user, VIP_PASS) > 0 || 
+           balanceOf(user, VIP_PASS) > 0 || 
 
-​           balanceOf(user, BACKSTAGE_PASS) > 0; // Only checks current balance
+           balanceOf(user, BACKSTAGE_PASS) > 0; // Only checks current balance
 
 }
 ```
 
-The vulnerability exists in the combination of per-user attendance tracking (`hasAttended[performanceId][msg.sender]`) and point-in-time pass ownership validation (`hasPass(msg.sender)`). The system records that a specific user attended a specific performance, but does not track which pass was used or prevent the same pass from being used by multiple users for the same performance through transfers.
+The vulnerability comes from combining two checks: per-user attendance tracking with `hasAttended[performanceId][msg.sender]`, and point-in-time pass ownership validation with `hasPass(msg.sender)`. The system records that a specific user attended a specific performance, but does not track which pass was used or prevent the same pass from being used by multiple users for the same performance through transfers.
 
 #### Risk
 
@@ -297,99 +297,34 @@ L-02. FestivalPass.sol - URI Function Returns Metadata for Non-Existent Items[Se
 
 ### Description
 
-The `uri` function returns metadata URLs for any token ID that belongs to an existing collection, even if the specific item within that collection was never minted. This creates confusion about which tokens actually exist and can cause integration issues with external systems that rely on URI responses to determine token validity.
+The `uri` function returns metadata URLs for any token ID that belongs to an existing collection, even if the specific item within that collection was never minted. This creates confusion about which tokens exist and can cause integration issues with external systems that rely on URI responses to determine token validity.
 
 ### Root Cause
 
 The URI function only validates that the collection exists but doesn't verify that the specific item was actually minted:
 
-Copy to clipboard
-
-1
-
-2
-
-3
-
-4
-
-5
-
-6
-
-7
-
-8
-
-9
-
-10
-
-11
-
-12
-
-13
-
-14
-
-15
-
-16
-
-17
-
-18
-
-19
-
-20
-
-21
-
+```solidity
 function uri(uint256 tokenId) public view override returns (string memory) {
-
-​    // Handle regular passes (IDs 1-3)
-
-​    if (tokenId <= BACKSTAGE_PASS) {
-
-​        return string(abi.encodePacked("ipfs://beatdrop/", Strings.toString(tokenId)));
-
-​    }
-
-​    
-
-​    // Decode collection and item IDs
-
-​    (uint256 collectionId, uint256 itemId) = decodeTokenId(tokenId);
-
-​    
-
-​    // Check if it's a valid memorabilia token
-
-​    if (collections[collectionId].priceInBeat > 0) {
-
-​        // ❌ Returns URI even for non-existent items!
-
-​        return string(abi.encodePacked(
-
-​            collections[collectionId].baseUri,
-
-​            "/metadata/",
-
-​            Strings.toString(itemId)
-
-​        ));
-
-​    }
-
-​    
-
-​    return super.uri(tokenId);
-
+    // Handle regular passes (IDs 1-3)
+    if (tokenId <= BACKSTAGE_PASS) {
+        return string(abi.encodePacked("ipfs://beatdrop/", Strings.toString(tokenId)));
+    }
+    // Decode collection and item IDs
+    (uint256 collectionId, uint256 itemId) = decodeTokenId(tokenId);
+    // Check if it's a valid memorabilia token
+    if (collections[collectionId].priceInBeat > 0) {
+        // ❌ Returns URI even for non-existent items!
+        return string(abi.encodePacked(
+            collections[collectionId].baseUri,
+            "/metadata/",
+            Strings.toString(itemId)
+        ));
+    }
+    return super.uri(tokenId);
 }
+```
 
-The function should also verify that `itemId` is within the range of actually minted items (`itemId > 0 && itemId < collections[collectionId].currentItemId`).
+The function should also verify that `itemId` is within the range of minted items (`itemId > 0 && itemId < collections[collectionId].currentItemId`).
 
 ### Risk
 
@@ -401,321 +336,86 @@ The function should also verify that `itemId` is within the range of actually mi
 
 - External systems receive metadata URLs for tokens that were never minted
 - NFT marketplaces might display non-existent items as available
-- Inconsistent behavior between `balanceOf()` (returns 0 for non-existent tokens) and `uri()` (returns metadata)
-- Confusion about which items in a collection actually exist
+- Inconsistent behavior between `balanceOf()`, which returns 0 for non-existent tokens, and `uri()`, which returns metadata
+- Confusion about which items in a collection exist
 - Potential integration failures with systems expecting URI calls to fail for non-existent tokens
 
 ### Proof of Concept
 
 This test demonstrates how the URI function returns metadata for items that were never minted:
 
-Copy to clipboard
-
-1
-
-2
-
-3
-
-4
-
-5
-
-6
-
-7
-
-8
-
-9
-
-10
-
-11
-
-12
-
-13
-
-14
-
-15
-
-16
-
-17
-
-18
-
-19
-
-20
-
-21
-
-22
-
-23
-
-24
-
-25
-
-26
-
-27
-
-28
-
-29
-
-30
-
-31
-
-32
-
-33
-
-34
-
-35
-
-36
-
-37
-
-38
-
-39
-
-40
-
-41
-
-42
-
-43
-
-44
-
-45
-
-46
-
-47
-
-48
-
-49
-
-50
-
-51
-
-52
-
+```solidity
 function test_URIReturnsInvalidMetadataForNonExistentItems() public {
-
-​    // Organizer creates a collection with maxSupply = 5
-
-​    vm.prank(organizer);
-
-​    uint256 collectionId = festivalPass.createMemorabiliaCollection(
-
-​        "Test Collection",
-
-​        "ipfs://testbase",
-
-​        50e18,
-
-​        5,  // maxSupply = 5
-
-​        true
-
-​    );
-
-​    
-
-​    // Give user BEAT tokens and let them redeem 2 items
-
-​    vm.prank(address(festivalPass));
-
-​    beatToken.mint(user1, 200e18);
-
-​    
-
-​    // User redeems 2 items (itemIds 1 and 2)
-
-​    vm.startPrank(user1);
-
-​    festivalPass.redeemMemorabilia(collectionId);  // Item 1
-
-​    festivalPass.redeemMemorabilia(collectionId);  // Item 2
-
-​    vm.stopPrank();
-
-​    
-
-​    // Collection now has currentItemId = 3 (next item to be minted)
-
-​    // Only items 1 and 2 actually exist
-
-​    
-
-​    // Encode token IDs for existing and non-existing items
-
-​    uint256 existingItem1 = festivalPass.encodeTokenId(collectionId, 1);
-
-​    uint256 existingItem2 = festivalPass.encodeTokenId(collectionId, 2);
-
-​    uint256 nonExistentItem3 = festivalPass.encodeTokenId(collectionId, 3);
-
-​    uint256 nonExistentItem6 = festivalPass.encodeTokenId(collectionId, 6);
-
-​    
-
-​    // Verify only items 1 and 2 actually exist (user owns them)
-
-​    assertEq(festivalPass.balanceOf(user1, existingItem1), 1);
-
-​    assertEq(festivalPass.balanceOf(user1, existingItem2), 1);
-
-​    assertEq(festivalPass.balanceOf(user1, nonExistentItem3), 0);
-
-​    assertEq(festivalPass.balanceOf(user1, nonExistentItem6), 0);
-
-​    
-
-​    // BUT uri() function returns metadata URLs for ALL items, even non-existent ones!
-
-​    string memory uri1 = festivalPass.uri(existingItem1);
-
-​    string memory uri2 = festivalPass.uri(existingItem2);
-
-​    string memory uri3 = festivalPass.uri(nonExistentItem3);  // Should not exist!
-
-​    string memory uri6 = festivalPass.uri(nonExistentItem6);  // Should not exist!
-
-​    
-
-​    // All URIs are returned even for non-existent items
-
-​    assertEq(uri1, "ipfs://testbase/metadata/1");
-
-​    assertEq(uri2, "ipfs://testbase/metadata/2");
-
-​    assertEq(uri3, "ipfs://testbase/metadata/3"); // ❌ This shouldn't exist
-
-​    assertEq(uri6, "ipfs://testbase/metadata/6"); // ❌ This shouldn't exist
-
-​    
-
-​    // This creates confusion - external systems get metadata URLs for tokens that were never minted
-
-​    console.log("URI for non-existent item 3:", uri3);
-
-​    console.log("URI for non-existent item 6:", uri6);
-
+    // Organizer creates a collection with maxSupply = 5
+    vm.prank(organizer);
+    uint256 collectionId = festivalPass.createMemorabiliaCollection(
+        "Test Collection",
+        "ipfs://testbase",
+        50e18,
+        5,  // maxSupply = 5
+        true
+    );
+    // Give user BEAT tokens and let them redeem 2 items
+    vm.prank(address(festivalPass));
+    beatToken.mint(user1, 200e18);
+    // User redeems 2 items (itemIds 1 and 2)
+    vm.startPrank(user1);
+    festivalPass.redeemMemorabilia(collectionId);  // Item 1
+    festivalPass.redeemMemorabilia(collectionId);  // Item 2
+    vm.stopPrank();
+    // Collection now has currentItemId = 3 (next item to be minted)
+    // Only items 1 and 2 actually exist
+    // Encode token IDs for existing and non-existing items
+    uint256 existingItem1 = festivalPass.encodeTokenId(collectionId, 1);
+    uint256 existingItem2 = festivalPass.encodeTokenId(collectionId, 2);
+    uint256 nonExistentItem3 = festivalPass.encodeTokenId(collectionId, 3);
+    uint256 nonExistentItem6 = festivalPass.encodeTokenId(collectionId, 6);
+    // Verify only items 1 and 2 actually exist (user owns them)
+    assertEq(festivalPass.balanceOf(user1, existingItem1), 1);
+    assertEq(festivalPass.balanceOf(user1, existingItem2), 1);
+    assertEq(festivalPass.balanceOf(user1, nonExistentItem3), 0);
+    assertEq(festivalPass.balanceOf(user1, nonExistentItem6), 0);
+    // BUT uri() function returns metadata URLs for ALL items, even non-existent ones!
+    string memory uri1 = festivalPass.uri(existingItem1);
+    string memory uri2 = festivalPass.uri(existingItem2);
+    string memory uri3 = festivalPass.uri(nonExistentItem3);  // Should not exist!
+    string memory uri6 = festivalPass.uri(nonExistentItem6);  // Should not exist!
+    // All URIs are returned even for non-existent items
+    assertEq(uri1, "ipfs://testbase/metadata/1");
+    assertEq(uri2, "ipfs://testbase/metadata/2");
+    assertEq(uri3, "ipfs://testbase/metadata/3"); // ❌ This shouldn't exist
+    assertEq(uri6, "ipfs://testbase/metadata/6"); // ❌ This shouldn't exist
+    // This creates confusion - external systems get metadata URLs for tokens that were never minted
+    console.log("URI for non-existent item 3:", uri3);
+    console.log("URI for non-existent item 6:", uri6);
 }
+```
 
 ### Recommended Mitigation
 
-Add validation to ensure the requested item actually exists within the collection:
+Add validation to ensure the requested item exists within the collection:
 
-Copy to clipboard
-
-1
-
-2
-
-3
-
-4
-
-5
-
-6
-
-7
-
-8
-
-9
-
-10
-
-11
-
-12
-
-13
-
-14
-
-15
-
-16
-
-17
-
-18
-
-19
-
-20
-
-21
-
-22
-
-23
-
-function uri(uint256 tokenId) public view override returns (string memory) {
-
-​    // Handle regular passes (IDs 1-3)
-
-​    if (tokenId <= BACKSTAGE_PASS) {
-
-​        return string(abi.encodePacked("ipfs://beatdrop/", Strings.toString(tokenId)));
-
-​    }
-
-​    
-
-​    // Decode collection and item IDs
-
-​    (uint256 collectionId, uint256 itemId) = decodeTokenId(tokenId);
-
-​    
-
-​    // Check if it's a valid memorabilia token
-
-​    if (collections[collectionId].priceInBeat > 0) {
-
-\+       // Validate that the item actually exists
-
-\+       require(itemId > 0 && itemId < collections[collectionId].currentItemId, "Item does not exist");
-
-​        
-
-​        return string(abi.encodePacked(
-
-​            collections[collectionId].baseUri,
-
-​            "/metadata/",
-
-​            Strings.toString(itemId)
-
-​        ));
-
-​    }
-
-​    
-
-​    return super.uri(tokenId);
-
-}
+```diff
+ function uri(uint256 tokenId) public view override returns (string memory) {
+     // Handle regular passes (IDs 1-3)
+     if (tokenId <= BACKSTAGE_PASS) {
+         return string(abi.encodePacked("ipfs://beatdrop/", Strings.toString(tokenId)));
+     }
+     // Decode collection and item IDs
+     (uint256 collectionId, uint256 itemId) = decodeTokenId(tokenId);
+     // Check if it's a valid memorabilia token
+     if (collections[collectionId].priceInBeat > 0) {
++       // Validate that the item actually exists
++       require(itemId > 0 && itemId < collections[collectionId].currentItemId, "Item does not exist");
+         return string(abi.encodePacked(
+             collections[collectionId].baseUri,
+             "/metadata/",
+             Strings.toString(itemId)
+         ));
+     }
+     return super.uri(tokenId);
+ }
+```
 
 This ensures that URI calls will fail for non-existent items, providing consistent behavior with the rest of the contract and preventing confusion for external integrators.
 

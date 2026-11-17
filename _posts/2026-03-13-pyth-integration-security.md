@@ -2,7 +2,7 @@
 layout: post
 title: Integrating Pyth Network Price Feeds — A Security-Focused Guide
 date: 2026-03-13
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain defi security solidity solana
@@ -12,7 +12,7 @@ image: /assets/article/blockchain/oracle/pyth-network-security.png
 isMath: true
 ---
 
-Pyth Network is a first-party oracle protocol that aggregates real-time price data from major financial institutions and market makers. Unlike traditional push oracles (e.g., Chainlink), Pyth uses a **pull model**: prices are published on a dedicated blockchain (Pythnet) and must be explicitly fetched and posted on the target chain by the caller. This architectural choice delivers sub-second latency and broader asset coverage, but it also introduces unique integration patterns and a specific set of security considerations that every developer must understand before going to production.
+Pyth Network is a first-party oracle protocol that aggregates real-time price data from major financial institutions and market makers. Unlike traditional push oracles such as Chainlink, Pyth uses a **pull model**: prices are published on Pythnet, a dedicated blockchain, and must be explicitly fetched and posted on the target chain by the caller. The pull model gives sub-second latency and broader asset coverage, but it changes how a contract integrates the oracle and adds security checks that a push-oracle integration does not need.
 
 This article covers how Pyth works internally, how to integrate it correctly on EVM and Solana, and — most importantly — which vulnerabilities arise when the integration is incomplete or misunderstood.
 
@@ -32,7 +32,7 @@ Pyth operates across three layers:
 2. **Pythnet** — an application-specific blockchain operated by Pyth's data providers, built on Solana's validator software. Price aggregation occurs on-chain at every slot (approximately every 400 ms, matching Solana's slot duration).
 3. **Wormhole / Hermes** — At each Pythnet slot, validators send the Merkle root of all price updates to the Wormhole contract. Wormhole guardians observe this message and produce a signed VAA (Verifiable Action Approval) attesting the Merkle root. Hermes, a web service run by the Pyth Data Association (and optionally by anyone), listens to both Pythnet and Wormhole, stores each price message with its Merkle proof and the corresponding signed VAA, and exposes REST/WebSocket APIs for retrieving the latest update.
 
-This architecture means that **prices live on Pythnet, not on your target chain**. To use a price on Ethereum, Solana, or any other supported network, the caller must retrieve the latest update message from Hermes (which bundles the signed Merkle root VAA and the Merkle proof of the specific price) and submit it to the local Pyth contract, which verifies the Wormhole signatures and Merkle proof before storing the price on-chain.
+This architecture means that **prices live on Pythnet, not on your target chain**. To use a price on Ethereum, Solana, or any other supported network, the caller must retrieve the latest update message from Hermes, which bundles the signed Merkle root VAA with the Merkle proof of the specific price. The caller then submits it to the local Pyth contract, which verifies the Wormhole signatures and the Merkle proof before storing the price on-chain.
 
 ### Price Aggregation
 
@@ -198,7 +198,7 @@ This ensures the price used is from *when the user committed*, not from when the
 
 ### The Pull Flow
 
-On Solana, prices are posted into **price update accounts** (ephemeral, closeable) or **price feed accounts** (persistent PDAs, maintained by the Pyth Data Association). Both conform to the `PriceUpdateV2` struct from `pyth-solana-receiver-sdk`.
+On Solana, prices are posted into one of two account types: **price update accounts**, which are ephemeral and closeable, or **price feed accounts**, persistent PDAs maintained by the Pyth Data Association. Both conform to the `PriceUpdateV2` struct from `pyth-solana-receiver-sdk`.
 
 ```
 Off-chain:
@@ -290,7 +290,7 @@ The following sections catalogue the most impactful integration mistakes. Each i
 
 ### 1. Using `getPrice()` / Reading Without Staleness Check (Critical)
 
-**Root cause**: `getPrice()` (EVM) and reading `price_update.price_message` directly (Solana) return the stored price with no age validation. A price stored days ago is returned as if it were current.
+**Root cause**: `getPrice()` on EVM and a direct read of `price_update.price_message` on Solana both return the stored price with no age validation. A price stored days ago is returned as if it were current.
 
 **Attack scenario**: The attacker monitors the chain. They find that no price update has been submitted for 10 minutes (e.g., during a network hiccup). They interact with the protocol, which reads the 10-minute-old price. If the asset has moved 5%, they profit from the discrepancy.
 

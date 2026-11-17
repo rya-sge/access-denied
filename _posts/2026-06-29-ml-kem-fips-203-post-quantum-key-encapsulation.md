@@ -2,7 +2,7 @@
 layout: post
 title: "ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)"
 date:   2026-06-29
-last_modified_at: 2026-06-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -12,7 +12,7 @@ image: /assets/article/cryptographie/lattice/2026-06-29-ml-kem-fips-203-post-qua
 isMath: true
 ---
 
-ML-KEM is the key-encapsulation mechanism standardized by NIST in [FIPS 203](https://doi.org/10.6028/NIST.FIPS.203), published on 13 August 2024. It is the standardized form of [CRYSTALS-Kyber](https://pq-crystals.org/kyber/) and is the companion to the two signature standards (ML-DSA in FIPS 204 and SLH-DSA in FIPS 205). Where those produce signatures, ML-KEM does something different: it lets two parties agree on a shared secret key over a public channel, the role classically played by Diffie-Hellman key exchange or RSA key transport, both of which a quantum computer breaks. This article explains what a KEM is, the module-lattice problem ML-KEM rests on, the internal K-PKE encryption scheme, the Fujisaki-Okamoto transform with implicit rejection that upgrades it to chosen-ciphertext security, and the three parameter sets.
+ML-KEM is the key-encapsulation mechanism standardized by NIST in [FIPS 203](https://doi.org/10.6028/NIST.FIPS.203), published on 13 August 2024. It is the standardized form of [CRYSTALS-Kyber](https://pq-crystals.org/kyber/) and is the companion to the two signature standards: ML-DSA, specified in FIPS 204, and SLH-DSA, specified in FIPS 205. Where those produce signatures, ML-KEM does something different: it lets two parties agree on a shared secret key over a public channel, the role classically played by Diffie-Hellman key exchange or RSA key transport, both of which a quantum computer breaks. This article explains what a KEM is, the module-lattice problem ML-KEM rests on, the internal K-PKE encryption scheme, the Fujisaki-Okamoto transform with implicit rejection that upgrades it to chosen-ciphertext security, and the three parameter sets.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -28,7 +28,7 @@ The 2016 NIST Post-Quantum Cryptography process (82 submissions) selected a smal
 
 A KEM is not encryption of a chosen message and not an interactive key exchange. It is three algorithms:
 
-- **KeyGen** produces an encapsulation key (public) and a decapsulation key (private).
+- **KeyGen** produces a public encapsulation key and a private decapsulation key.
 - **Encaps** takes the public encapsulation key and outputs a fresh shared secret $K$ together with a ciphertext $c$ that carries it.
 - **Decaps** takes the private decapsulation key and the ciphertext and recovers the same shared secret $K$.
 
@@ -40,7 +40,7 @@ The shared secret is generated *inside* Encaps, not chosen by Bob. The two halve
 
 **Why not encryption of a chosen message.** In public-key encryption the sender picks the plaintext and encrypts it under the recipient's key. A KEM removes that choice: the secret $K$ is produced inside Encaps as a fresh random value, and neither party selects it. This matters because attacker-influenced plaintexts are the raw material of most chosen-ciphertext attacks against lattice encryption. By transporting a value that is random by construction, and (as shown later) deriving the encryption randomness deterministically from that value, ML-KEM removes the degrees of freedom an active attacker would otherwise probe. A KEM is therefore best read as encryption of a random key the algorithm chose, not of data the sender chose, which is both sufficient for session setup and simpler to prove secure.
 
-**Why not an interactive key exchange.** In Diffie-Hellman both parties contribute a value and the secret is derived jointly from a two-message round trip. A KEM is one-directional: only the key owner holds a long-term key pair, the secret originates entirely on the encapsulator's side, and a single ciphertext travels back. That asymmetry is what lets ML-KEM slot into protocols organized around a published public key (a TLS certificate, for example) without adding an interactive round, and it is why a KEM composes cleanly with a separate signature for authentication. Put together, a KEM does the *job* of Diffie-Hellman (agree on a session key) using the *shape* of public-key encryption (publish a key, return a ciphertext), while carrying a random secret rather than a chosen one. That precise shape is what the Fujisaki-Okamoto transform in the later sections is built to protect.
+**Why not an interactive key exchange.** In Diffie-Hellman both parties contribute a value and the secret is derived jointly from a two-message round trip. A KEM is one-directional: only the key owner holds a long-term key pair, the secret originates entirely on the encapsulator's side, and a single ciphertext travels back. That asymmetry is what lets ML-KEM slot into protocols organized around a published public key (a TLS certificate, for example) without adding an interactive round, and it is why a KEM composes cleanly with a separate signature for authentication. Put together, a KEM does the *job* of Diffie-Hellman, agreeing on a session key, with the *message pattern* of public-key encryption: publish a key, return a ciphertext. Unlike encryption, it carries a random secret rather than a chosen one. The Fujisaki-Okamoto transform in the later sections is built to protect this construction.
 
 ## The Hard Problem: Module-LWE
 
@@ -85,7 +85,7 @@ v &= \mathsf{NTT}^{-1}(\hat{\mathbf{t}}^\top \circ \hat{\mathbf{y}}) + e_2 + \ma
 \end{aligned}
 $$
 
-Both parts are compressed (dropping low-order bits via $d_u, d_v$) and serialized: $c = (c_1 \,\|\, c_2)$.
+Both parts are compressed, which drops low-order bits according to $d_u$ and $d_v$, and then serialized into $c = c_1 \,\|\, c_2$.
 
 **Decrypt** recovers $\mathbf{u}', v'$ from the ciphertext and uses the secret to compute $w = v' - \mathsf{NTT}^{-1}(\hat{\mathbf{s}}^\top \circ \mathsf{NTT}(\mathbf{u}'))$, then decodes $m$ from $w$. The noise terms are small enough that compression and the leftover error round away, so $m$ is recovered correctly with overwhelming probability.
 
@@ -93,7 +93,7 @@ K-PKE alone is only IND-CPA secure: safe against a passive eavesdropper, but not
 
 ## From CPA to CCA: Fujisaki-Okamoto With Implicit Rejection
 
-ML-KEM upgrades K-PKE to IND-CCA2 security (resistance to chosen-ciphertext attacks) with a variant of the **Fujisaki-Okamoto (FO) transform**. The construction uses three hash functions from FIPS 202: $G = \text{SHA3-512}$ (producing two 32-byte outputs), $H = \text{SHA3-256}$, and $J = \text{SHAKE256}$.
+ML-KEM upgrades K-PKE to IND-CCA2 security, which resists chosen-ciphertext attacks, with a variant of the **Fujisaki-Okamoto (FO) transform**. The construction uses three hash functions from FIPS 202: $G = \text{SHA3-512}$ (producing two 32-byte outputs), $H = \text{SHA3-256}$, and $J = \text{SHAKE256}$.
 
 The central trick is **derandomized re-encryption**. In Encaps, the message $m$ is itself random, and both the shared secret $K$ and the encryption randomness $r$ are derived deterministically from it:
 
@@ -119,7 +119,7 @@ Implicit rejection is what defeats chosen-ciphertext attacks. A classic CCA atta
 
 ## ML-KEM KeyGen, Encaps, and Decaps
 
-The public ML-KEM algorithms wrap K-PKE with the FO machinery. They split into "internal" deterministic functions (used for testing) and external functions that draw their own randomness.
+The public ML-KEM algorithms wrap K-PKE with the FO transform. They split into "internal" deterministic functions (used for testing) and external functions that draw their own randomness.
 
 **KeyGen** generates two 32-byte seeds $d, z$ and bundles the K-PKE keys with the implicit-rejection value:
 
@@ -137,7 +137,12 @@ The decapsulation key carries everything Decaps needs: the K-PKE decryption key,
 
 ![ML-KEM key generation, encapsulation, and decapsulation]({{site.url_complet}}/assets/article/cryptographie/lattice/ml-kem-keygen-encaps-decaps.png)
 
-A subtle but mandatory detail is **input checking**. Before Encaps runs, the encapsulation key must pass a type check (correct byte length $384k + 32$) and a modulus check (a `ByteDecode`/`ByteEncode` round-trip must be the identity, proving every coefficient is in range $[0, q-1]$). Before Decaps runs, the decapsulation key must pass a type check and a hash check (the stored $H(\mathsf{ek})$ must match). Ciphertext length must always be verified. Skipping these checks can break the security guarantees.
+**Input checking** is mandatory. Before Encaps runs, the encapsulation key must pass two checks:
+
+- a **type check**: its byte length must be $384k + 32$;
+- a **modulus check**: a `ByteDecode`/`ByteEncode` round-trip must be the identity, which proves every coefficient is in range $[0, q-1]$.
+
+Before Decaps runs, the decapsulation key must pass a type check and a hash check, in which the stored $H(\mathsf{ek})$ must match. Ciphertext length must always be verified. Skipping these checks can break the security guarantees.
 
 ## Parameter Sets and Sizes
 
@@ -162,7 +167,7 @@ The encoded sizes follow from $k$ and the compression parameters. The shared sec
 | Ciphertext | 768 | 1088 | 1568 |
 | Shared secret | 32 | 32 | 32 |
 
-The categories map to the NIST levels (1 ≈ AES-128 key search, 3 ≈ AES-192, 5 ≈ AES-256). Keys and ciphertexts are roughly one kilobyte, far larger than the 32 bytes of an X25519 public value, which is the bandwidth cost of post-quantum key establishment. NIST recommends ML-KEM-768 as the default.
+The categories map to the NIST levels: category 1 is comparable to AES-128 key search, category 3 to AES-192 and category 5 to AES-256. Keys and ciphertexts are roughly one kilobyte, far larger than the 32 bytes of an X25519 public value, which is the bandwidth cost of post-quantum key establishment. NIST recommends ML-KEM-768 as the default.
 
 ## ML-KEM in Context
 
@@ -182,7 +187,10 @@ ML-KEM replaces Diffie-Hellman / RSA key transport; it does not authenticate any
 
 **Q: How does a KEM differ from public-key encryption and from a key exchange?**
 
-A KEM transports a *randomly generated* shared secret, not a chosen message. Encaps produces the secret $K$ internally and a ciphertext $c$ that encapsulates it; Decaps recovers $K$ from $c$. Unlike public-key encryption, the sender cannot pick the payload (which makes the construction simpler to secure and exactly fits session-key setup). Unlike an interactive Diffie-Hellman exchange, it is one-directional: a single ciphertext flows from the encapsulator to the key owner. The result is a 256-bit secret both sides share, usable directly for symmetric cryptography.
+A KEM transports a *randomly generated* shared secret, not a chosen message. Encaps produces the secret $K$ internally and a ciphertext $c$ that encapsulates it; Decaps recovers $K$ from $c$. The result is a 256-bit secret both sides share, usable directly for symmetric cryptography.
+
+- **Unlike public-key encryption**, the sender cannot pick the payload, which makes the construction simpler to secure and fits session-key setup.
+- **Unlike an interactive Diffie-Hellman exchange**, it is one-directional: a single ciphertext flows from the encapsulator to the key owner.
 
 **Q: Why is K-PKE not approved for use on its own?**
 
@@ -190,7 +198,9 @@ K-PKE is only IND-CPA secure, meaning it withstands a passive eavesdropper but n
 
 **Q: What is implicit rejection and why does it matter?**
 
-When Decaps re-encrypts the recovered message and the resulting ciphertext does not match the received one, the ciphertext is invalid. Rather than returning an error (which would tell an attacker that decryption failed), ML-KEM returns a pseudorandom value $\bar{K} = J(z \,\|\, c)$ derived from a secret $z$ in the decapsulation key and the ciphertext. The caller cannot distinguish this from a real shared secret, so a chosen-ciphertext attacker learns nothing from probing with malformed ciphertexts. This silent failure is what gives ML-KEM its CCA security.
+When Decaps re-encrypts the recovered message and the resulting ciphertext does not match the received one, the ciphertext is invalid. ML-KEM does not return an error, which would tell an attacker that decryption failed. It returns a pseudorandom value $\bar{K} = J(z \,\|\, c)$ derived from the ciphertext and from a secret $z$ in the decapsulation key.
+
+The caller cannot distinguish this value from a real shared secret, so a chosen-ciphertext attacker learns nothing from probing with malformed ciphertexts. Returning a key instead of an error is what gives ML-KEM its CCA security.
 
 **Q: Why does the encryption randomness $r$ come from the message $m$, and what does that enable?**
 
@@ -198,15 +208,26 @@ In Encaps, $(K, r) = G(m \,\|\, H(\mathsf{ek}))$, so the randomness is a determi
 
 **Q: Combining the algebra and the transform, trace how the same shared secret ends up on both sides.**
 
-Bob runs Encaps: he picks random $m$, computes $(K, r) = G(m \,\|\, H(\mathsf{ek}))$, and sends $c = \mathsf{K\text{-}PKE.Encrypt}(\mathsf{ek}, m, r)$, keeping $K$. Alice runs Decaps: using her secret $\hat{\mathbf{s}}$ she decrypts $c$ to recover $m' = m$ (the lattice noise rounds away, so decryption is correct with overwhelming probability), then recomputes $(K', r') = G(m' \,\|\, h)$. Since $m' = m$ and $h = H(\mathsf{ek})$, she gets $K' = K$. She re-encrypts with $r'$ and confirms $c' = c$, so she returns $K' = K$ rather than the implicit-rejection value. Both sides now hold the identical 256-bit secret, and its secrecy reduces to MLWE because recovering $m$ (or $\mathbf{s}$) from $c$ and $\mathsf{ek}$ is an MLWE instance.
+Bob runs Encaps: he picks random $m$, computes $(K, r) = G(m \,\|\, H(\mathsf{ek}))$, and sends $c = \mathsf{K\text{-}PKE.Encrypt}(\mathsf{ek}, m, r)$, keeping $K$.
+
+Alice runs Decaps: using her secret $\hat{\mathbf{s}}$ she decrypts $c$ to recover $m' = m$, because the lattice noise rounds away and decryption is correct with overwhelming probability. She then recomputes $(K', r') = G(m' \,\|\, h)$. Since $m' = m$ and $h = H(\mathsf{ek})$, she gets $K' = K$. She re-encrypts with $r'$ and confirms $c' = c$, so she returns $K' = K$ rather than the implicit-rejection value.
+
+Both sides now hold the identical 256-bit secret, and its secrecy reduces to MLWE because recovering $m$ (or $\mathbf{s}$) from $c$ and $\mathsf{ek}$ is an MLWE instance.
 
 **Q: ML-KEM establishes a key but is often deployed in a hybrid with X25519 and alongside a signature. Why both?**
 
-Two separate reasons. The hybrid with X25519 hedges the *assumption*: the session key is derived from both the ML-KEM secret and the ECDH secret, so the channel stays secure as long as either lattice or elliptic-curve security holds, which protects against an unforeseen weakness in the new scheme. The signature addresses a different gap: a KEM provides confidentiality but no *authentication*, so on its own it is vulnerable to a man-in-the-middle who substitutes their own encapsulation key. A signature (ML-DSA or SLH-DSA) over the handshake, anchored in a certificate, authenticates the parties. Confidentiality and authentication are distinct services, and ML-KEM supplies only the first.
+Two separate reasons:
+
+- **The hybrid with X25519 hedges the *assumption*.** The session key is derived from both the ML-KEM secret and the ECDH secret, so the channel stays secure as long as either lattice or elliptic-curve security holds. This protects against an unforeseen weakness in the new scheme.
+- **The signature addresses a different gap.** A KEM provides confidentiality but no *authentication*, so on its own it is vulnerable to a man-in-the-middle who substitutes their own encapsulation key. A signature, ML-DSA or SLH-DSA, over the handshake and anchored in a certificate authenticates the parties.
+
+Confidentiality and authentication are distinct services, and ML-KEM supplies only the first.
 
 ## Conclusion
 
-ML-KEM is the post-quantum replacement for Diffie-Hellman key establishment. It builds an IND-CPA encryption scheme, K-PKE, on the module-LWE problem, then applies the Fujisaki-Okamoto transform with implicit rejection to reach IND-CCA2 security: Encaps derives both the shared secret and the encryption randomness from a random message, and Decaps re-encrypts to detect tampering, returning a pseudorandom key instead of an error when the check fails. The three parameter sets vary only the module rank and the compression parameters, producing keys and ciphertexts of roughly one kilobyte and a 256-bit shared secret, with ML-KEM-768 as the recommended default. ML-KEM supplies confidentiality only, so real deployments pair it with a signature for authentication and often with X25519 for assumption hedging.
+ML-KEM is the post-quantum replacement for Diffie-Hellman key establishment. It builds an IND-CPA encryption scheme, K-PKE, on the module-LWE problem, then applies the Fujisaki-Okamoto transform with implicit rejection to reach IND-CCA2 security: Encaps derives both the shared secret and the encryption randomness from a random message, and Decaps re-encrypts to detect tampering, returning a pseudorandom key instead of an error when the check fails.
+
+The three parameter sets vary only the module rank and the compression parameters, producing keys and ciphertexts of roughly one kilobyte and a 256-bit shared secret, with ML-KEM-768 as the recommended default. ML-KEM supplies confidentiality only, so real deployments pair it with a signature for authentication and often with X25519 for assumption hedging.
 
 ![ML-KEM FIPS 203 mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/2026-06-29-ml-kem-fips-203-post-quantum-key-encapsulation.png)
 

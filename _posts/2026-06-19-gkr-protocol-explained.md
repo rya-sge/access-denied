@@ -2,7 +2,7 @@
 layout: post
 title: "The GKR Protocol — How to Check a Million Calculations Without Doing Them"
 date:   2026-06-19
-last_modified_at: 2026-07-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography ZKP eli10
@@ -26,7 +26,7 @@ This article walks through the core ideas using everyday analogies, building tow
 
 Suppose your teacher needs to know whether the entire school cafeteria (say, 512 students) all received the correct change at lunch. Checking each receipt one by one takes all day. What if there were a way to ask a few smart questions and be almost certain the accounts are correct?
 
-Computer scientists call this the **delegation problem**. A *verifier* (the person checking, who has very little time) wants to check the output of a large computation. Somebody else did that computation. That somebody is called the *prover*, and nobody has any reason to trust them.
+Computer scientists call this the **delegation problem**. The person checking is called the *verifier*, and they have very little time. They want to check the output of a large computation. Somebody else did that computation. That somebody is called the *prover*, and nobody has any reason to trust them.
 
 The obvious approach is to redo the work. That costs exactly as much as doing it yourself in the first place, so it helps nobody.
 
@@ -42,7 +42,7 @@ A baker claims to have baked exactly 1,024 cookies. Each cookie has a quality sc
 
 ### The game
 
-You and the baker play a game with several rounds. The cookies sit on a grid, so every cookie has a position, and every position has several coordinates (like a seat number that says "row 3, column 7, shelf 2").
+You and the baker play a game with several rounds. The cookies sit on a grid, so every cookie has a position, and every position has several coordinates, like a seat number that says "row 3, column 7, shelf 2".
 
 **Round 1.** You ask the baker a question about the *first* coordinate only: "add up the scores of every cookie whose first coordinate is 0, then do the same for the ones where it is 1." The baker sends back two numbers. Every cookie belongs to exactly one of those two groups, so the two numbers have to add up to the grand total. You check that: 2,500 plus 3,644 does indeed make 6,144.
 
@@ -166,13 +166,13 @@ $$
 \end{aligned}
 $$
 
-That is a wall of symbols, so here is what it says in words. Go through every possible pair of machines in the stage above, written $$w_1$$ and $$w_2$$. The two pieces $$\tilde A_i$$ and $$\tilde M_i$$ are the rubber sheets of the wiring plan, one for adding machines and one for multiplying machines. Each of them equals 1 when the wiring really does connect that pair to machine $$z$$ through that kind of machine, and 0 otherwise. So every pair that is not actually wired up contributes nothing, and the pair that *is* wired up contributes either the sum or the product of its two values.
+That is a wall of symbols, so here is what it says in words. Go through every possible pair of machines in the stage above, written $$w_1$$ and $$w_2$$. The two pieces $$\tilde A_i$$ and $$\tilde M_i$$ are the rubber sheets of the wiring plan, one for adding machines and one for multiplying machines. Each of them equals 1 when the wiring connects that pair to machine $$z$$ through that kind of machine, and 0 otherwise. So every pair that is not wired up to $$z$$ contributes nothing, and the pair that *is* wired up contributes either the sum or the product of its two values.
 
 The important thing is the shape. It is a giant total over every pair. And checking a giant total is exactly what the cookie game does.
 
 ### One stage in five steps
 
-1. The inspector says: "convince me that this machine really produced that value."
+1. The inspector says: "convince me that this machine produced that value."
 2. They play the cookie game over the stage above.
 3. The game ends with the inspector holding *two* questions instead of one, about two randomly chosen machines in that stage.
 4. A short extra step, the **line trick**, turns those two questions back into one.
@@ -184,7 +184,9 @@ Why does the inspector end up with two questions? Because each machine has two i
 
 Two questions per stage would be a disaster. Two becomes four at the next stage, four becomes eight, and after twenty stages the inspector is holding over a million questions. She might as well have run the factory herself.
 
-The line trick fixes this. Picture the two machines the inspector is asking about as two points. Draw the straight line through them. The manager describes what the rubber sheet looks like along that line, which takes only a handful of numbers. The inspector checks that the description matches her two questions at the two ends. Then she picks a random spot somewhere along the line and keeps only the question at that spot.
+The line trick fixes this. Picture the two machines the inspector is asking about as two points. Draw the straight line through them.
+
+The manager describes what the rubber sheet looks like along that line, which takes only a handful of numbers. The inspector checks that the description matches her two questions at the two ends. Then she picks a random spot somewhere along the line and keeps only the question at that spot.
 
 Two questions in, one question out, every time. The inspector never carries more than one.
 
@@ -192,7 +194,7 @@ Two questions in, one question out, every time. The inspector never carries more
 
 At the very top stage sit the raw ingredients, and the inspector brought those herself. She can check the last remaining question on her own, without asking the manager anything. If it matches, the whole factory ran honestly.
 
-## Why Is This Actually Faster?
+## Why Is This Faster?
 
 Let us count who does what.
 
@@ -247,7 +249,7 @@ With that addition, the inspector still ends up certain the answer is right, and
 
 The GKR protocol replaces "redo the work" with "play a short game". Three ideas make it work. A table of values turns into a smooth rubber sheet, so one measurement at a random spot stands in for the whole table. The cookie game shrinks a huge total down to one single lookup, one coordinate per round, with the checker always choosing her random number after the other side has answered. And the line trick keeps the checker carrying exactly one open question as the inspection climbs from the finished product back to the raw ingredients, which is what stops the questions from doubling at every stage.
 
-None of this makes cheating impossible, and it is worth being precise about that. It makes cheating so unlikely that you would expect to wait longer than the age of the universe to see it happen once. In exchange, a checker with a phone can verify work that took a data centre to produce. That is why the same machinery now sits inside blockchain proof systems and inside tools for checking computations run on somebody else's computer.
+None of this makes cheating impossible, and it is worth being precise about that. It makes cheating so unlikely that you would expect to wait longer than the age of the universe to see it happen once. In exchange, a checker with a phone can verify work that took a data centre to produce. That is why GKR is now used inside blockchain proof systems and inside tools for checking computations run on somebody else's computer.
 
 ![GKR protocol explained in plain words, summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/gkr/2026-06-19-gkr-protocol-explained.png)
 
@@ -276,15 +278,21 @@ Not at all. In real systems both sides are programs on different computers, send
 
 **Q: But why bother with rubber sheets? Would checking a few random cookies not be enough?**
 
-Random tasting catches sloppy cheating, like half the cookies being wrong. It does not catch careful cheating. A clever baker could get one single cookie wrong and you would almost certainly never pick that one. The rubber sheet closes the loophole, because changing even one entry in the table shifts the sheet nearly everywhere. So one measurement at a random spot notices a single wrong cookie just as reliably as a thousand wrong ones.
+Random tasting catches sloppy cheating, like half the cookies being wrong. It does not catch careful cheating. A clever baker could get one single cookie wrong and you would almost certainly never pick that one.
+
+The rubber sheet closes the loophole, because changing even one entry in the table shifts the sheet nearly everywhere. So one measurement at a random spot notices a single wrong cookie just as reliably as a thousand wrong ones.
 
 **Q: What if the baker guesses your random numbers before you pick them?**
 
-That is exactly the attack the game is built to stop, and the defence is the order of play. You pick your random number only after the baker has already sent their answer for that round. They cannot see the future, so they are locked in. If they lied, they cannot go back and adjust a message you have already received. The chance of them simply getting lucky is roughly 1 in $$10^{37}$$ per round.
+That is exactly the attack the game is built to stop, and the defence is the order of play. You pick your random number only after the baker has already sent their answer for that round.
+
+They cannot see the future, so they are locked in. If they lied, they cannot go back and adjust a message you have already received. The chance of them simply getting lucky is roughly 1 in $$10^{37}$$ per round.
 
 **Q: What goes wrong if you skip the line trick?**
 
-The inspector's workload explodes. After each stage she is holding two questions instead of one. Skip the trick and those two become four at the next stage, then eight, then sixteen. After twenty stages she is juggling more than a million questions, roughly one per machine in the factory, so she is back to checking everything by hand. The line trick squashes two questions into one after every stage, so she always carries exactly one, no matter how many stages there are.
+The inspector's workload explodes. After each stage she is holding two questions instead of one. Skip the trick and those two become four at the next stage, then eight, then sixteen.
+
+After twenty stages she is juggling more than a million questions, roughly one per machine in the factory, so she is back to checking everything by hand. The line trick squashes two questions into one after every stage, so she always carries exactly one, no matter how many stages there are.
 
 **Q: Could the manager just send all the intermediate values to the inspector?**
 
@@ -302,7 +310,7 @@ It lets small devices trust big ones. A phone, or a blockchain smart contract wi
 
 - Goldwasser, S., Kalai, Y. T., Rothblum, G. N.: [*Delegating Computation: Interactive Proofs for Muggles*](https://dl.acm.org/doi/10.1145/2699436). STOC 2008 / JACM 2015. (The original GKR paper.)
 - Lund, C., Fortnow, L., Karloff, H., Nisan, N.: *Algebraic Methods for Interactive Proof Systems*. JACM 1992. (Where the cookie game comes from.)
-- Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. (Chapters 4 and 5 are a self-contained treatment.)
+- Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. Chapters 4 and 5 give a self-contained treatment.
 - Xie, T., Zhang, J., Zhang, Y., Papamanthou, C., Song, D.: [*Libra: Succinct Zero-Knowledge Proofs with Optimal Prover Computation*](https://eprint.iacr.org/2019/317). CRYPTO 2019.
 - Setty, S.: [*Spartan: Efficient and general-purpose zkSNARKs without trusted setup*](https://eprint.iacr.org/2019/550). CRYPTO 2020.
 

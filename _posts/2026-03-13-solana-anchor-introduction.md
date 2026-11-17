@@ -2,7 +2,7 @@
 layout: post
 title: Introduction to Solana Anchor — Core Concepts and Testing
 date: 2026-03-13
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solana
@@ -12,7 +12,7 @@ image: /assets/article/blockchain/solana/2026-03-13-solana-anchor-introduction-m
 isMath: false
 ---
 
-Anchor is the leading framework for writing Solana programs in Rust. It eliminates boilerplate through a set of macros, enforces security checks automatically, and generates a standardized IDL that client applications can consume. This article walks through the core concepts every Anchor developer needs to understand, ending with the testing ecosystem.
+Anchor is the leading framework for writing Solana programs in Rust. Its macros replace the repetitive account-handling code of a native program, it enforces security checks automatically, and generates a standardized IDL that client applications can consume. This article walks through the core concepts every Anchor developer needs to understand, ending with the testing ecosystem.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -105,7 +105,7 @@ pub new_account: Account<'info, NewAccount>,
 
 ## The IDL File
 
-Running `anchor build` produces `/target/idl/<program-name>.json` — an Interface Description Language file. It describes every instruction (name, accounts, parameters) and every account type (name, fields). The Anchor TypeScript/JavaScript client reads this file to:
+Running `anchor build` produces `/target/idl/<program-name>.json`, an Interface Description Language file. It lists every instruction with its name, accounts and parameters, and every account type with its name and fields. The Anchor TypeScript/JavaScript client reads this file to:
 - Auto-resolve account addresses (especially PDAs)
 - Encode instruction data correctly
 - Decode account data returned from the chain

@@ -2,7 +2,7 @@
 layout: post
 title:  Solana Core Concept
 date:   2024-09-19
-last_modified_at: 2024-10-29
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solana
@@ -88,7 +88,7 @@ The `AccountInfo` for each account includes the following fields:
 - `is_signer`
 
   - Flag indicating if an account has signed a transaction
-  - It is not actually stored in the account
+  - It is not stored in the account
   - It's just runtime metadata
 
 - `data`
@@ -160,7 +160,7 @@ There are several different program
 
 Tokens on Solana can be created through the **Token Program**, which defines a common implementation for Fungible and Non Fungible tokens.
 
-There are two others accounts which are crucial:
+Two other accounts are involved:
 
 - A [Mint Account](https://solana.com/docs/core/tokens#mint-account) represents a specific type of token and stores global metadata about the token such as the total supply and mint authority, which is the address authorized to create new units of a token.
 - A [Token Account](https://solana.com/docs/core/tokens#token-account) keeps track of individual ownership of how many units of a specific type of token (mint account) are owned by a specific address.
@@ -197,7 +197,7 @@ Program Derived Addresses (PDAs) provide developers on Solana with two main use 
 - **Deterministic Account Addresses**: PDAs provide a mechanism to deterministically derive an address using a combination of optional "seeds" (predefined inputs) and a specific program ID.
 - **Enable Program Signing**: The Solana runtime enables programs to "sign" for PDAs which are derived from its program ID.
 
-You can think of PDAs as a way to create hashmap-like structures on-chain from a predefined set of inputs (e.g. strings, numbers, and other account addresses).
+You can think of PDAs as a way to create hashmap-like structures on-chain from a predefined set of inputs such as strings, numbers and other account addresses.
 
 Learn more about [Program Derived Address](https://solana.com/docs/core/pda) here.
 

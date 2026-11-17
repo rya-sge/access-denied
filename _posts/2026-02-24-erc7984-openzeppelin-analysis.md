@@ -2,7 +2,7 @@
 layout: post
 title: Technical Analysis of the OpenZeppelin ERC-7984 Implementation
 date: 2026-02-24
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solidity cryptography zama
@@ -97,7 +97,7 @@ if (from == address(0)) {
 }
 ```
 
-For a transfer or burn, `FHESafeMath.tryDecrease` attempts to subtract `amount` from `fromBalance` and returns an encrypted boolean `success`. Crucially, the new balance handle `ptr` is immediately stored and ACL-granted to the contract and to `from`. The decrement happens unconditionally at the FHE level — the success flag is only used in the next phase to determine the actual transferred amount.
+For a transfer or burn, `FHESafeMath.tryDecrease` attempts to subtract `amount` from `fromBalance` and returns an encrypted boolean `success`. The new balance handle `ptr` is immediately stored and ACL-granted to the contract and to `from`. The decrement happens unconditionally at the FHE level, and the success flag is only used in the next phase to determine the actual transferred amount.
 
 Note the cleartext guard: `require(FHE.isInitialized(fromBalance))`. This is the only plaintext check in the function. It verifies that the sender has ever received tokens; it does not reveal whether the balance is sufficient. An account that has received and then spent all its tokens still has an initialized handle, and `tryDecrease` will correctly compute `success = false` in the FHE domain.
 
@@ -265,7 +265,7 @@ function _transferAndCall(address from, address to, euint64 amount, bytes callda
 }
 ```
 
-The receiver contract's `onConfidentialTransferReceived` function returns an `ebool`. If it returns false, a refund is issued via a second `_update` call. The refund amount is `FHE.select(success, 0, sent)` — the entire transferred amount is refunded on failure. `transferred` is the net amount: `sent - refund`, which is either `sent` (accepted) or `0` (rejected). Both outcomes are private; the on-chain observer sees two `_update` calls but cannot determine whether the callback was accepted.
+The receiver contract's `onConfidentialTransferReceived` function returns an `ebool`. If it returns false, a refund is issued via a second `_update` call. The refund amount is `FHE.select(success, 0, sent)`, so the entire transferred amount is refunded on failure. `transferred` is the net amount, `sent - refund`: it equals `sent` when the callback accepts and `0` when it rejects. Both outcomes are private; the on-chain observer sees two `_update` calls but cannot determine whether the callback was accepted.
 
 `ERC7984Utils.checkOnTransferReceived` skips the callback for EOAs, returning an encrypted `true`, consistent with the ERC-1363 approach.
 
@@ -390,8 +390,8 @@ The following invariants are maintained by the core implementation:
 
 The OpenZeppelin ERC-7984 implementation translates the well-known ERC-20 accounting model into the FHE domain with minimal structural changes. 
 
-- The `_update` / `_mint` / `_burn` / `_transfer` pattern is preserved. 
-- Overflow and underflow safety is moved from the Solidity type system (which does not apply to ciphertexts) into the `FHESafeMath` library, which produces encrypted success flags and uses `FHE.select` for conditional result selection. 
+- Minting, burning and transfers still all go through `_update`, as in the ERC-20 `_update` / `_mint` / `_burn` / `_transfer` structure. 
+- Overflow and underflow safety moves from the Solidity type system, whose checks do not apply to ciphertexts, into the `FHESafeMath` library, which produces encrypted success flags and uses `FHE.select` for conditional result selection. 
 - The dual-overload transfer API cleanly separates the case where the caller submits a fresh encrypted input (with a ZKPoK) from the case where the caller already holds a ciphertext handle with ACL access.
 
 The extension system is well-layered: 

@@ -2,6 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proof Systems — 15 Concepts and 15 Formulas to Read the Foundational Papers"
 date:   2026-07-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -67,7 +68,7 @@ The ordering matters more than the algebra. The prover commits before seeing the
 
 A rank-1 constraint system describes a computation with three matrices $$A$$, $$B$$, $$C$$ and a vector $$\mathbf z$$ holding the constant 1, the public input, and the witness. Each row is one constraint saying that a linear combination of $$\mathbf z$$ times another linear combination equals a third.
 
-R1CS is NP-complete and generalises arithmetic circuit satisfiability, which is why it became the interchange format. Marlin, Spartan, and Nova all take R1CS as input. When a paper says "we support R1CS", it means you can compile ordinary code to it with existing tooling and plug the paper's machinery underneath.
+R1CS is NP-complete and generalises arithmetic circuit satisfiability, which is why it became the interchange format. Marlin, Spartan, and Nova all take R1CS as input. When a paper says "we support R1CS", it means you can compile ordinary code to it with existing tooling and run the paper's prover and verifier on the result.
 
 *Where to read it*: `2019-550.pdf` (Spartan) has a clean treatment.
 
@@ -160,7 +161,7 @@ The subtlety is what "everything sent so far" means. If the hash omits the publi
 
 *Where to read it*: every paper applies it; `2019-1021.pdf` (Halo) is notable because the transform has to be consistent inside and outside a circuit.
 
-### Group E: What the definitions actually promise
+### Group E: What the definitions promise
 
 #### 14. Soundness, knowledge soundness, and simulation
 
@@ -397,9 +398,16 @@ Two notes on using it. First, `2008-DelegatingComputation.pdf` is the original G
 
 The fifteen concepts above are not fifteen independent things to memorise. Three of them (Schwartz-Zippel, low-degree extension, sum-check) are the mathematical engine. Three more (R1CS, QAP, AIR) are alternative front ends. Three are the cryptographic back ends (pairings, discrete-log commitments, hash-based commitments), and the setup spectrum follows from which back end you pick. The remaining six describe how the pieces are bolted together and what the resulting object is guaranteed to do.
 
-The formulas map onto the same structure. F1 to F3 are the engine, F4 to F6 the front ends, F7 to F12 the back ends, and F13 to F15 the composition and recursion machinery.
+The formulas map onto the same structure. F1 to F3 are the engine, F4 to F6 the front ends, F7 to F12 the back ends, and F13 to F15 cover composition and recursion.
 
-A practical way to use this: for any paper in the library, answer four questions before reading past the introduction. Which arithmetisation does it use? What is the information-theoretic protocol underneath? Which commitment scheme instantiates it? What does the setup require? Four answers place the paper in the family tree, and the rest of the paper becomes the details of one particular route.
+A practical way to use this: for any paper in the library, answer four questions before reading past the introduction:
+
+1. Which arithmetisation does it use?
+2. What is the information-theoretic protocol underneath?
+3. Which commitment scheme instantiates it?
+4. What does the setup require?
+
+Four answers place the paper in the family tree, and the rest of the paper becomes the details of one particular route.
 
 ![Zero-knowledge proof systems concepts and formulas summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/foundations/2026-07-28-zk-proof-systems-concepts-formulas.png)
 
@@ -429,7 +437,7 @@ The properties below are the recurring places where a correct-on-paper proof sys
 | Check | Security requirement | Failure mode if violated |
 |:---:|------------|------------|
 | ☐ | The field is large enough that (total degree) x (number of checks) divided by field size is negligible at the target security level. | Soundness degrades linearly with each reuse of Schwartz-Zippel; a small field makes a cheating prover's guess feasible. |
-| ☐ | Every constraint the computation relies on is actually present in the constraint system, including range and boolean constraints on witness values. | An under-constrained witness is the most common real-world proof-system bug: the proof verifies for values the program would never produce. |
+| ☐ | Every constraint the computation relies on is present in the constraint system, including range and boolean constraints on witness values. | An under-constrained witness is the most common real-world proof-system bug: the proof verifies for values the program would never produce. |
 | ☐ | Public inputs are bound into the statement the proof commits to, not passed alongside it. | An unbound public input lets a valid proof be replayed against different claimed inputs. |
 
 #### Setup and reference string
@@ -469,31 +477,57 @@ The properties below are the recurring places where a correct-on-paper proof sys
 
 **Q: If everything reduces to checking a polynomial identity at a random point, why are there so many different systems?**
 
-Because the reduction is only half the problem. The verifier cannot actually evaluate the prover's polynomial, since receiving it would cost as much as redoing the computation. So the polynomial has to be committed, and the commitment scheme is where the real trade-offs live. Pairing-based commitments give constant-size proofs but need a trusted setup and break under quantum attack. Discrete-log commitments need no setup but verify in linear time. Hash-based commitments assume almost nothing and survive quantum computers but produce proofs that are one or two orders of magnitude larger. Every system in the library is a different answer to that question, and the differences in arithmetisation follow from which commitment you intend to use.
+Because the reduction is only half the problem. The verifier cannot evaluate the prover's polynomial itself, since receiving it would cost as much as redoing the computation. So the polynomial has to be committed, and the commitment scheme is where the real trade-offs live:
+
+- **Pairing-based commitments** give constant-size proofs but need a trusted setup and break under quantum attack.
+- **Discrete-log commitments** need no setup but verify in linear time.
+- **Hash-based commitments** assume almost nothing and survive quantum computers, but produce proofs that are one or two orders of magnitude larger.
+
+Every system in the library is a different answer to that question, and the differences in arithmetisation follow from which commitment you intend to use.
 
 **Q: What is the actual difference between R1CS, QAP, and AIR? They all sound like ways of writing down a circuit.**
 
-They are, but they differ in what shape of computation they express naturally. R1CS is a flat list of constraints with no assumed structure, which makes it a good interchange format and a good match for sum-check, since the constraint system becomes a low-degree multivariate polynomial. A QAP is R1CS transformed into univariate polynomials interpolated over gate points, which converts satisfiability into a divisibility question that a pairing can check in one equation. AIR assumes the computation is a repeated state transition, so the constraints are described once and reused for every step, which is what lets a STARK prover scale to very long executions. Choosing AIR for a computation with no repetitive structure wastes its main advantage.
+They are, but they differ in what kind of computation they express naturally.
+
+- **R1CS** is a flat list of constraints with no assumed structure, which makes it a good interchange format and a good match for sum-check, since the constraint system becomes a low-degree multivariate polynomial.
+- **A QAP** is R1CS transformed into univariate polynomials interpolated over gate points, which converts satisfiability into a divisibility question that a pairing can check in one equation.
+- **AIR** assumes the computation is a repeated state transition, so the constraints are described once and reused for every step, which is what lets a STARK prover scale to very long executions.
+
+Choosing AIR for a computation with no repetitive structure wastes its main advantage.
 
 **Q: Why does Bulletproofs verification take linear time when the proof is logarithmic in size?**
 
-The proof is short because the folding argument sends only two group elements per round, and there are $$\log_2 d$$ rounds. But the last check requires the verifier to confirm that the folded generator equals a specific combination of all $$d$$ original generators, and that is a multi-scalar multiplication over $$d$$ elements. The corresponding scalar quantity is cheap, because the challenge vector has a product structure that F11 makes explicit, but the group computation has no such shortcut. Short proof, expensive verification, and the two are not in tension because they measure different things.
+The proof is short because the folding argument sends only two group elements per round, and there are $$\log_2 d$$ rounds. But the last check requires the verifier to confirm that the folded generator equals a specific combination of all $$d$$ original generators, and that is a multi-scalar multiplication over $$d$$ elements.
+
+The corresponding scalar quantity is cheap, because the challenge vector has a product structure that F11 makes explicit, but the group computation has no such shortcut. Short proof, expensive verification, and the two are not in tension because they measure different things.
 
 **Q: How does Halo remove that linear check when it is inherent to the argument?**
 
-It does not remove it, it moves it. Halo splits verification into the logarithmic part and the linear multi-scalar multiplication, puts only the logarithmic part inside the recursive circuit, and carries the outstanding linear check forward as a fixed-size deferred state. Each step merges the new outstanding check into the accumulated one, so the state never grows. The final verifier, standing outside every circuit, performs the linear computation exactly once for the whole chain. The cost of verifying a million steps ends up close to the cost of verifying one.
+It does not remove it, it moves it. Halo splits verification into the logarithmic part and the linear multi-scalar multiplication, puts only the logarithmic part inside the recursive circuit, and carries the outstanding linear check forward as a fixed-size deferred state.
+
+Each step merges the new outstanding check into the accumulated one, so the state never grows. The final verifier, standing outside every circuit, performs the linear computation exactly once for the whole chain. The cost of verifying a million steps ends up close to the cost of verifying one.
 
 **Q: Which of these systems are broken by a quantum computer, and why is only one safe?**
 
-Pairing-based systems (Pinocchio, Groth16, Sonic, Marlin) and discrete-log systems (Bulletproofs, Halo, Spartan in its discrete-log instantiation, Nova) all rest on the hardness of discrete logarithms in some group, which Shor's algorithm solves efficiently. STARKs rest only on collision resistance of a hash function, and the best known quantum attack on that is Grover's algorithm, which merely halves the effective security level and is compensated by doubling the output size. So the dividing line is not the proof system's design but the commitment scheme underneath it, which is another reason to read these papers in terms of their layers.
+Pairing-based systems and discrete-log systems all rest on the hardness of discrete logarithms in some group, which Shor's algorithm solves efficiently. The pairing-based ones in the library are Pinocchio, Groth16, Sonic and Marlin; the discrete-log ones are Bulletproofs, Halo, Spartan in its discrete-log instantiation, and Nova.
+
+STARKs rest only on collision resistance of a hash function, and the best known quantum attack on that is Grover's algorithm, which merely halves the effective security level and is compensated by doubling the output size.
+
+So the dividing line is not the proof system's design but the commitment scheme underneath it, which is another reason to read these papers in terms of their layers.
 
 **Q: Combining several of these ideas, why is knowledge soundness rather than plain soundness the property Zerocash needs?**
 
-Zerocash spends a coin by proving that a valid unspent coin exists in the Merkle tree and that its nullifier is being revealed. Plain soundness would only guarantee that such a coin exists somewhere in the tree, which is trivially true for any honest user's coin and therefore proves nothing about the spender. What the system needs is that the party producing the proof actually holds the coin's secret, and that is exactly what knowledge soundness formalises through the extractor of F14. This is also why the compilation step matters: Marlin's recipe insists on an *extractable* polynomial commitment scheme, because a merely binding commitment would give an argument, not an argument of knowledge.
+Zerocash spends a coin by proving that a valid unspent coin exists in the Merkle tree and that its nullifier is being revealed. Plain soundness would only guarantee that such a coin exists somewhere in the tree, which is trivially true for any honest user's coin and therefore proves nothing about the spender.
+
+What the system needs is that the party producing the proof holds the coin's secret, and that is exactly what knowledge soundness formalises through the extractor of F14.
+
+This is also why the compilation step matters: Marlin's recipe insists on an *extractable* polynomial commitment scheme, because a merely binding commitment would give an argument, not an argument of knowledge.
 
 **Q: The library has one paper that proves things cannot be done. Is it worth reading?**
 
-Yes, and reading it early saves time later. Goldreich and Krawczyk establish that the plain zero-knowledge definition does not survive sequential composition, that black-box simulation zero knowledge does not survive parallel execution, and that three-round black-box simulation zero-knowledge interactive proofs exist only for languages already in BPP. Those results are the reason later papers state their round complexity carefully, use auxiliary-input definitions of zero knowledge, and treat parallel repetition as something requiring proof rather than an obvious optimisation. Without that context, a lot of otherwise unmotivated care in the constructions looks arbitrary.
+Yes, and reading it early saves time later. Goldreich and Krawczyk establish that the plain zero-knowledge definition does not survive sequential composition, that black-box simulation zero knowledge does not survive parallel execution, and that three-round black-box simulation zero-knowledge interactive proofs exist only for languages already in BPP.
+
+Those results are the reason later papers state their round complexity carefully, use auxiliary-input definitions of zero knowledge, and treat parallel repetition as something requiring proof rather than an obvious optimisation. Without that context, a lot of otherwise unmotivated care in the constructions looks arbitrary.
 
 ## References
 

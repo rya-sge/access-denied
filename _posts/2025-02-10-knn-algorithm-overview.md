@@ -2,7 +2,7 @@
 layout: post
 title: K-Nearest Neighbor (KNN) Algorithm  - Overview
 date: 2025-02-10
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai
@@ -186,7 +186,7 @@ The answers come mainly from ChatGPT with some modifications on my part
 - **Is K-NN a non-parametric approach?**
   Yes, K-NN is non-parametric because it makes no assumptions about the data distribution and relies on the training data itself for predictions.
 - **What does K-NN require?**
-  K-NN requires a labeled dataset, a distance metric (e.g., Euclidean distance), and a value for `K` (the number of nearest neighbors to consider).
+  K-NN requires a labeled dataset, a distance metric (e.g., Euclidean distance), and a value for `K`, the number of nearest neighbors to consider.
 
 ### Handling Ties and Class Imbalance
 
@@ -201,7 +201,7 @@ The answers come mainly from ChatGPT with some modifications on my part
 ### Instance-Based vs. Model-Based Learning
 
 - **What is the difference between instance-based learning and model-based learning?**
-  Instance-based learning (e.g., K-NN) stores all training examples and makes predictions by comparing new instances to stored examples, while model-based learning (e.g., linear regression, neural networks) builds an explicit model from training data.
+  Instance-based learning, such as K-NN, stores all training examples and makes predictions by comparing new instances to stored examples, while model-based learning, such as linear regression or neural networks, builds an explicit model from training data.
 - **Is K-NN an instance-based or model-based learning algorithm?**
   K-NN is an instance-based learning algorithm because it does not create a generalized model but instead memorizes the training data and makes predictions based on comparisons.
 

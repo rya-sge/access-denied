@@ -2,7 +2,7 @@
 layout: post
 title:  Fiscalité des cryptomonnaies en Suisse
 date:   2024-09-18
-last_modified_at: 2024-09-19
+last_modified_at: 2026-11-17
 lang: fr
 locale: fr-FR
 categories: blockchain 
@@ -132,7 +132,7 @@ Il n'a pas à payer pour les cryptomonnaies reçues lors d'un « airdrop ». **L
 
 ## Trading: consideration en tant que professionnel
 
-Les gains réalisés dans le cadre de l'achat et la vente (*cash out*) de cryptomonnaies considérées comme faisant partie du patrimoine privé ne sont pas soumis à l’impôt sur le revenu (*tax-exempt capital gains)*, sauf s’il s’agit d’un négoce considéré comme professionnel.
+Les gains réalisés dans le cadre de l'achat et de la vente (*cash out*) de cryptomonnaies considérées comme faisant partie du patrimoine privé ne sont pas soumis à l’impôt sur le revenu, sauf s’il s’agit d’un négoce considéré comme professionnel. On parle alors de gains en capital exonérés, en anglais *tax-exempt capital gains*.
 
 Tout dépend dès lors de ce qu’on appelle le patrimoine privé. Ce critère est essentiel car l'article 16, alinéa 3 de la loi fédérale sur l'impôt fédéral direct (LIFD) prévoit que les plus-values sur la fortune privée ne sont pas imposables. En principe, la loi fédérale considère qu'une plus-value provient en premier lieu de la fortune privée. 
 

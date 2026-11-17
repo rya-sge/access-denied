@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Card Fraud Reporting — The cafr Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -15,7 +16,7 @@ isMath: false
 
 
 
-Card fraud is a shared problem. When an issuer confirms that a transaction was fraudulent, that fact is useful to the acquirer, to the card scheme, and to the fraud-scoring systems that will judge the next transaction. Getting the information to move cleanly between organisations needs a common format, and ISO 20022 provides one in its `cafr` business area: **fraud reporting and disposition**. It is one of the smallest areas in the standard, just four messages, but it sits on top of the same card-message machinery as authorisation and clearing. This article covers what the four `cafr` messages are, how the reporting and disposition flows fit together, and what each message carries.
+Card fraud is a shared problem. When an issuer confirms that a transaction was fraudulent, that fact is useful to the acquirer, to the card scheme, and to the fraud-scoring systems that will judge the next transaction. Getting the information to move cleanly between organisations needs a common format, and ISO 20022 provides one in its `cafr` business area: **fraud reporting and disposition**. It is one of the smallest areas in the standard, just four messages, but it is built from the same card-message components as authorisation and clearing. This article covers what the four `cafr` messages are, how the reporting and disposition flows fit together, and what each message carries.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -95,9 +96,15 @@ Reporting is flagging a transaction as fraudulent; disposition is the agreement 
 
 Because the area does one narrow job: exchanging fraud information, not preventing or authorising transactions. That job decomposes into exactly two request-and-response pairs, one for the report and one for the disposition. The heavier work of the card lifecycle, authorising and clearing transactions and handling disputes, lives in the acquirer-to-issuer area, so `cafr` does not need to duplicate it. A small, well-scoped area is a sign the standard has drawn its boundaries cleanly rather than a sign it is incomplete.
 
-**Q: What does a cafr.001 message actually contain?**
+**Q: What does a cafr.001 message contain?**
 
-Three parts. A header (`Hdr`, type `Header72`) carrying the message function and the routing and versioning data shared across the card messages. A reported-fraud block (`RptdFrd`) describing the fraud itself: its classification, the reporting party, and the relevant dates. And a fraudulent-transaction-data block (`FrdlntTxData`) identifying the specific transactions being flagged, which ties the report back to the authorisation or clearing records that were fraudulent. Together they let a receiver understand what kind of fraud occurred and exactly which transactions it applies to.
+Three parts:
+
+- A header (`Hdr`, type `Header72`) carrying the message function and the routing and versioning data shared across the card messages.
+- A reported-fraud block (`RptdFrd`) describing the fraud itself: its classification, the reporting party, and the relevant dates.
+- A fraudulent-transaction-data block (`FrdlntTxData`) identifying the specific transactions being flagged, which ties the report back to the authorisation or clearing records that were fraudulent.
+
+Together they let a receiver understand what kind of fraud occurred and exactly which transactions it applies to.
 
 **Q: How does cafr protect the sensitive data it carries?**
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Double-Entry Bookkeeping On-Chain — How the Centrifuge Hub Keeps a Multi-Chain Pool's Books"
 date:   2026-08-18
-last_modified_at: 2026-11-05
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi solidity finance
@@ -344,7 +344,7 @@ The result goes to `hub.updateSharePrice`, which stores it and, if a fee hook is
 
 ## What a reviewer should look at
 
-The ledger enforces its own core invariant, so the interesting questions are at the edges where it meets the rest of the protocol.
+The ledger enforces its own core invariant, so the open questions concern the parts of the protocol that post to it, value its holdings or read its snapshots.
 
 - **Whether every mutation of a holding has a corresponding posting.** `HubHandler.updateHoldingAmount` calls `hub.updateAccountingAmount` only when the holding is initialised, so holdings that receive value before their accounts exist rely on the catch-up posting in `initializeHolding` firing exactly once.
 - **The clamping in `decrease`.** The posted value is unclamped while the stored value floors at zero, which is the one place the two records can legitimately diverge.

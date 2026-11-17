@@ -2,7 +2,7 @@
 layout: post
 title: "Designing for Coercion - Duress PINs, Decoy Wallets and Plausible Deniability"
 date:   2026-07-31
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security wallet
@@ -18,7 +18,7 @@ designed to help them prove their identity now works against them. A hardware wa
 the few consumer devices whose designers must treat this as a routine case rather than an edge
 case, because the asset is bearer-controlled, irreversible, and worth a physical confrontation.
 
-This article looks at how that problem is actually solved in firmware, using the
+This article looks at how that problem is solved in firmware, using the
 [COLDCARD](https://coldcard.com) implementation as the primary example and contrasting it with
 the passphrase-based approach taken by [Trezor](https://trezor.io), covered in an
 [earlier article]({{site.url_complet}}/2024/10/15/trezor-wallet-security/) on this site. The
@@ -373,9 +373,11 @@ They optimise for different properties. A passphrase-derived hidden wallet leave
 
 Both fail against the same adversary, the one who already knows the extended public key they are looking for, and both depend on setup the user must do before anything goes wrong.
 
-**Q: Which of these features is actually worth enabling?**
+**Q: Which of these features is worth enabling?**
 
-The ones requiring no action under pressure, on the reasoning that a coerced person cannot be relied on to execute a plan. Enrolling a memory card as a second factor and then keeping no card in the device means a coerced login wipes the seed automatically, with nothing shown on screen and no decision to make. A configured kill key is second, since it needs one keystroke during a login that was happening anyway. Decoy wallets need funding, maintenance, and an attacker who has not done their homework, which is a longer list of conditions.
+The ones requiring no action under pressure, on the reasoning that a coerced person cannot be relied on to execute a plan. Enrolling a memory card as a second factor and then keeping no card in the device means a coerced login wipes the seed automatically, with nothing shown on screen and no decision to make.
+
+A configured kill key is second, since it needs one keystroke during a login that was happening anyway. Decoy wallets need funding, maintenance, and an attacker who has not done their homework, which is a longer list of conditions.
 
 ------
 

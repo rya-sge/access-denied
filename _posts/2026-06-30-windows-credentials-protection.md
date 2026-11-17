@@ -2,7 +2,7 @@
 layout: post
 title: "Windows Credentials Protection - LAPS, WDigest, LSA Protection, Credential Guard and Protected Users"
 date:   2026-06-30
-last_modified_at: 2026-08-19
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security network
@@ -56,13 +56,13 @@ Whether a password ends up cached in the LSASS process depends on **how** the us
 | 10 — Remote Interactive | Logon via Remote Desktop | Yes |
 | 11 — Cached Interactive | Keyboard logon using cached domain credentials (MSCACHE) | Yes |
 
-The practical rule follows from the table: **interactive-style logons (2, 7, 10, 11) leave harvestable secrets in memory; network logon (type 3) does not.** Therefore, for administration and remote management, prefer tooling that uses **network logon**:
+The practical rule follows from the table: **the interactive-style logon types 2, 7, 10 and 11 leave harvestable secrets in memory; network logon, type 3, does not.** Therefore, for administration and remote management, prefer tooling that uses **network logon**:
 
 - Windows Management Instrumentation (WMI),
 - PowerShell remoting (WinRM),
 - Windows Admin Center.
 
-Using these instead of an interactive RDP session means an administrator's credentials are not deposited in the target machine's LSASS, shrinking the loot available to an attacker who later compromises that host. Where an interactive logon is genuinely required, the in-memory hardening below applies.
+Using these instead of an interactive RDP session means an administrator's credentials are not deposited in the target machine's LSASS, shrinking the loot available to an attacker who later compromises that host. Where a task cannot be done without an interactive logon, the in-memory hardening below applies.
 
 ## Disable WDigest
 
@@ -85,7 +85,7 @@ If nothing matches, WDigest is unused and can be disabled safely; if something m
 
 ## LSA Protection (RunAsPPL)
 
-LSASS holds the secrets, so the next step is to make the process itself harder to read. **LSA Protection** runs LSASS as a **Protected Process**, which prevents non-protected processes from debugging it or reading its memory. (Protected Process technology was originally built to stop key extraction for DRM and was repurposed here.)
+LSASS holds the secrets, so the next step is to make the process itself harder to read. **LSA Protection** runs LSASS as a **Protected Process**, which prevents non-protected processes from debugging it or reading its memory. Protected Process technology was originally built to stop key extraction for DRM and was repurposed here.
 
 - Available on Windows 8.1, 10, Server 2012 R2 and 2016.
 - Enabled by setting `RunAsPPL = 1` under `HKLM\SYSTEM\CurrentControlSet\Control\Lsa`.
@@ -96,7 +96,7 @@ LSASS holds the secrets, so the next step is to make the process itself harder t
 
 **Credential Guard** is the stronger answer to the same problem. Instead of merely protecting the LSASS process, it **moves the secrets out of the normal operating system entirely** using **Virtualization-Based Security (VBS)**.
 
-The mechanism: the hypervisor creates an isolated, higher-trust environment (a separate virtual trust level) and runs an isolated LSA (often called LSAIso) there. The ordinary LSA in the normal world becomes only an **interface** that asks the isolated component to use a secret on its behalf. NT hashes and Kerberos keys live inside the isolated world and never cross back into normal-world memory.
+The mechanism: the hypervisor creates a separate virtual trust level, an isolated environment with higher trust than the normal operating system, and runs an isolated LSA there. That isolated component is often called LSAIso. The ordinary LSA in the normal world becomes only an **interface** that asks the isolated component to use a secret on its behalf. NT hashes and Kerberos keys live inside the isolated world and never cross back into normal-world memory.
 
 ![Where credentials live and the layers that protect them]({{site.url_complet}}/assets/article/securite/windows-credentials-protection/credential-protection-layers-concept.png)
 
@@ -113,7 +113,7 @@ It also protects only what it covers: it does not retrofit protection onto crede
 
 ## Privileged account discipline
 
-Technical controls are undercut by sloppy account use. Domain administrator accounts should be reserved for the few tasks that genuinely require them on a Domain Controller:
+Technical controls are undercut by sloppy account use. Domain administrator accounts should be reserved for the few tasks on a Domain Controller that need Domain Admin rights:
 
 - promoting a member server to a Domain Controller,
 - modifying the default and Domain Controller GPOs,
@@ -133,13 +133,21 @@ The **Protected Users** group (introduced with Windows Server 2012 R2) enforces 
 - **No delegation.** The account cannot be delegated via Kerberos, constrained or unconstrained. Existing setups that relied on delegation may break.
 - **Short TGT lifetime.** The default Ticket Granting Ticket lifetime is **4 hours** (configurable via Authentication Policy in the AD Administrative Center), after which the user must re-authenticate.
 
-These restrictions cut off exactly the mechanisms credential-theft attacks abuse (NTLM hashes, RC4 Kerberoasting, delegation), which is why the group is a strong control for privileged accounts.
+These restrictions cut off exactly the mechanisms credential-theft attacks abuse, namely NTLM hashes, RC4 Kerberos keys and delegation, which is why the group is a strong control for privileged accounts.
 
 **It is not complete.** Protected Users cannot defend against everything: prior Windows versions do not enforce the protections, the restrictions can break legitimate legacy connections, and nothing here stops a **keylogger** from capturing a credential at the keyboard. It reduces the attack surface of privileged accounts; it does not eliminate it.
 
 ## Conclusion
 
-Windows credential protection is defense in depth around one asset: the secret. Policy makes the secret strong (length, passphrases, managers); LAPS makes local admin secrets unique and disposable so one theft does not cascade; logon-type awareness and management tooling keep secrets out of remote machines' memory in the first place; disabling WDigest removes a cleartext copy; LSA Protection raises the cost of reading LSASS (though a signed kernel driver bypasses it); Credential Guard moves the secrets into a VBS-isolated world where a normal-world memory dump finds nothing reusable; and account discipline plus the Protected Users group limit where and how privileged credentials can be exposed.
+Windows credential protection is defense in depth around one asset: the secret. Each control covers a different exposure:
+
+- Policy makes the secret strong through length, passphrases and password managers.
+- LAPS makes local admin secrets unique and disposable, so one theft does not cascade.
+- Logon-type awareness and management tooling keep secrets out of remote machines' memory in the first place.
+- Disabling WDigest removes a cleartext copy.
+- LSA Protection raises the cost of reading LSASS, though a signed kernel driver bypasses it.
+- Credential Guard moves the secrets into a VBS-isolated world where a normal-world memory dump finds nothing reusable.
+- Account discipline and the Protected Users group limit where and how privileged credentials can be exposed.
 
 Two boundaries are worth keeping in view. First, each layer has a defeat: RunAsPPL falls to a kernel driver, Credential Guard does not cover pre-existing caches or keyloggers, and Protected Users is unenforced on old systems. Second, these are protections for credentials that already exist on the host; they pair with the front-door controls (smartcards, Windows Hello, FIDO2) from the [companion article]({{site.url_complet}}/windows-advanced-authentication), and with token-theft defenses, to cover the whole authentication lifecycle rather than a single point in it.
 
@@ -153,23 +161,45 @@ LAPS solves the shared-local-administrator-password problem. When every machine 
 
 **Q: Why does the logon type determine whether credentials can be stolen from a machine?**
 
-Because only some logon types cache reusable credentials in LSASS. Interactive, unlock, remote-interactive (RDP) and cached-interactive logons (types 2, 7, 10, 11) leave secrets in memory; a network logon (type 3) does not. An attacker who compromises a host can only harvest what is cached there, so administering remote machines with network-logon tools (WMI, PowerShell remoting, Windows Admin Center) instead of interactive RDP means the administrator's credentials are never deposited on the target in the first place.
+Because only some logon types cache reusable credentials in LSASS. Logon types 2, 7, 10 and 11, which are interactive, unlock, remote-interactive (RDP) and cached-interactive, leave secrets in memory; a network logon, type 3, does not.
+
+An attacker who compromises a host can only harvest what is cached there. Administering remote machines with network-logon tools such as WMI, PowerShell remoting or Windows Admin Center, instead of interactive RDP, therefore means the administrator's credentials are never deposited on the target in the first place.
 
 **Q: What is WDigest, and why disable it?**
 
-WDigest is a legacy provider that offers single sign-on for HTTP digest authentication. To produce digest responses it keeps the user's cleartext password in LSASS memory, which is an obvious theft target. It is rarely needed, so Microsoft added the `UseLogonCredential` registry value to disable it. Before disabling it you should audit (enable "Audit Credential Validation" and watch for Event ID 4776 entries mentioning WDigest) to confirm nothing on the domain still depends on it, because turning off a provider in use causes authentication failures.
+WDigest is a legacy provider that offers single sign-on for HTTP digest authentication. To produce digest responses it keeps the user's cleartext password in LSASS memory, which is an obvious theft target. It is rarely needed, so Microsoft added the `UseLogonCredential` registry value to disable it.
+
+Before disabling it, enable "Audit Credential Validation" and watch for Event ID 4776 entries mentioning WDigest, to confirm nothing on the domain still depends on it: turning off a provider in use causes authentication failures.
 
 **Q: How does Credential Guard differ from LSA Protection, and why is it stronger?**
 
-LSA Protection (RunAsPPL) keeps LSASS in the normal operating system but marks it a Protected Process, blocking user-mode debugging and memory reads. It is a user-mode boundary, so a signed kernel driver (such as Mimikatz's `mimidrv.sys`) can bypass it by reaching kernel memory and disabling the flag. Credential Guard instead uses Virtualization-Based Security to move the secrets into a hypervisor-isolated world; the normal-world LSA only holds an interface, and the hashes and Kerberos keys never return to normal-world memory. Dumping LSASS therefore yields nothing reusable, which is why it is the stronger control, at the cost of performance and hardware requirements (UEFI, virtualization extensions, TPM, Enterprise/Education edition).
+LSA Protection (RunAsPPL) keeps LSASS in the normal operating system but marks it a Protected Process, blocking user-mode debugging and memory reads. It is a user-mode boundary, so a signed kernel driver such as Mimikatz's `mimidrv.sys` can bypass it by reaching kernel memory and disabling the flag.
+
+Credential Guard instead uses Virtualization-Based Security to move the secrets into a hypervisor-isolated world; the normal-world LSA only holds an interface, and the hashes and Kerberos keys never return to normal-world memory. Dumping LSASS therefore yields nothing reusable, which is why it is the stronger control.
+
+It costs some performance and has hardware and edition requirements: UEFI, virtualization extensions, a TPM and the Enterprise or Education edition.
 
 **Q: Combining several controls, an administrator enables RunAsPPL and Credential Guard and adds privileged accounts to Protected Users. Which credential-theft techniques are mitigated, and which still work?**
 
-Mitigated: dumping LSASS to recover hashes and Kerberos keys is defeated by Credential Guard (the secrets are not in normal-world memory), and RunAsPPL adds detection and friction even where Credential Guard is absent. Protected Users blocks NTLM, Digest and CredSSP for its members, disables SSO caching, forbids weak DES/RC4 Kerberos and delegation, and shortens the TGT lifetime, which cuts off pass-the-hash, RC4 Kerberoasting and delegation abuse for those accounts. Still working: a keylogger capturing the password as it is typed is unaffected by any of these; pre-existing cached credentials from before Credential Guard was enabled are not retroactively protected; older Windows versions do not enforce Protected Users; and a kernel-level attacker who can load a driver can still attack RunAsPPL where Credential Guard is not present. The controls reduce the attack surface substantially but do not make a privileged credential unstealable.
+**Mitigated:**
+
+- Dumping LSASS to recover hashes and Kerberos keys is defeated by Credential Guard, because the secrets are not in normal-world memory. RunAsPPL adds detection and friction even where Credential Guard is absent.
+- Protected Users blocks NTLM, Digest and CredSSP for its members, disables SSO caching, forbids weak DES/RC4 Kerberos and delegation, and shortens the TGT lifetime. That cuts off pass-the-hash, overpass-the-hash with an RC4 key and delegation abuse for those accounts. It does not stop Kerberoasting, which targets the service tickets of service accounts, and Microsoft advises against adding service accounts to the group.
+
+**Still working:**
+
+- A keylogger capturing the password as it is typed is unaffected by any of these.
+- Pre-existing cached credentials from before Credential Guard was enabled are not retroactively protected.
+- Older Windows versions do not enforce Protected Users.
+- A kernel-level attacker who can load a driver can still attack RunAsPPL where Credential Guard is not present.
+
+The controls reduce the attack surface substantially but do not make a privileged credential unstealable.
 
 **Q: Why are password policy and account discipline part of "credentials protection" alongside memory-hardening features?**
 
-Because credential protection is defense in depth, not a single feature. Memory and process hardening (WDigest, RunAsPPL, Credential Guard) protect a secret that already exists on a host, but they do nothing about a weak secret that is guessed offline, a reused secret exposed by another breach, or a privileged credential needlessly deposited on an ordinary workstation. Strong passphrases, password managers, LAPS, restricting privileged-account use to Domain Controller tasks, and the Protected Users group address those gaps. Layered together, policy plus discipline plus memory hardening cover more of the lifecycle than any one of them alone.
+Because credential protection is defense in depth, not a single feature. Memory and process hardening, meaning disabling WDigest, RunAsPPL and Credential Guard, protects a secret that already exists on a host. It does nothing about a weak secret that is guessed offline, a reused secret exposed by another breach, or a privileged credential needlessly deposited on an ordinary workstation.
+
+Strong passphrases, password managers, LAPS, restricting privileged-account use to Domain Controller tasks, and the Protected Users group address those gaps. Layered together, policy, account discipline and memory hardening cover more of the lifecycle than any one of them alone.
 
 ## References
 

@@ -2,7 +2,7 @@
 layout: post
 title:  Zero Knowledge Proofs with Bulletproof 
 date:   2024-08-13
-last_modified_at: 2024-10-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography blockchainBestOf blockchain ZKP
@@ -14,7 +14,7 @@ isMath: false
 
 [TOC]
 
-Bulletproofs have been developed in 2017 by a Stanford Applied Cryptography Group composed of **Jonathan Bootle** (University College London), Benedict Bunz (Stanford University), Dan Boneh, Andrew Poelstra, Pieter Wuille and Greg Maxwell. 
+Bulletproofs were developed in 2017 by six authors: Benedikt Bünz and Dan Boneh from Stanford University, **Jonathan Bootle** from University College London, Andrew Poelstra and Pieter Wuille from Blockstream, and Greg Maxwell. 
 
 This protocol is defined in this specification paper: [Bulletproofs: Short Proofs for Confidential Transactions and More](https://eprint.iacr.org/2017/1066.pdf)
 

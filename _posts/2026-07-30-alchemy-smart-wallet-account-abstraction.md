@@ -2,6 +2,7 @@
 layout: post
 title: "How Alchemy Implements Smart Wallets and Account Abstraction"
 date:   2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity wallet
@@ -13,7 +14,7 @@ isMath: false
 
 [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) defines how a smart account proves to the `EntryPoint` that a `UserOperation` is authorised. It says nothing about how the account decides *which* key signed, how a key's permissions are scoped, or how a session key gets installed without spending a separate transaction. Those questions are left to the account implementation, and answering them is most of the work.
 
-Alchemy has published its answer at every layer — the account contracts, the bundler, and the API that hides both — which makes the stack readable end to end. This article follows that path, from the Solidity that validates a signature to the handful of JSON-RPC methods an application actually calls.
+Alchemy has published its answer at every layer: the account contracts, the bundler, and the API that hides both. That makes the stack readable end to end. This article follows that path, from the Solidity that validates a signature to the handful of JSON-RPC methods an application calls.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -176,7 +177,7 @@ Runtime validation for the single-signer and fallback cases needs no signature �
 
 ### Replay-safe hashing
 
-The hash an ERC-1271 signature actually covers is never the raw hash passed to `isValidSignature`. It is wrapped:
+An ERC-1271 signature never covers the raw hash passed to `isValidSignature`. It is wrapped:
 
 ```
 ReplaySafeHash(bytes32 hash)
@@ -243,7 +244,7 @@ A third consequence follows from the same property. `handleOps` and `handleAggre
 
 ## Session keys
 
-Session keys are where all the preceding machinery is spent. The API-level permission types map onto hook modules, and every one of them is checked on-chain — there is no off-chain policy engine that a compromised backend could bypass.
+Session keys build on all the preceding mechanisms. The API-level permission types map onto hook modules, and every one of them is checked on-chain; there is no off-chain policy engine that a compromised backend could bypass.
 
 | API permission | Enforced by | Notes |
 |----------------|-------------|-------|
@@ -327,7 +328,7 @@ Signing supports a raw private key, a BIP-39 mnemonic, or AWS KMS. The KMS path 
 
 ### Per-operation permissions
 
-Rundler accepts non-standard per-request permissions, as HTTP headers (preferred) or a third positional parameter on `eth_sendUserOperation` (deprecated; headers win when both appear). They are honoured only if `rpc.permissions_enabled` is set.
+Rundler accepts non-standard per-request permissions, as HTTP headers, which are preferred, or as a third positional parameter on `eth_sendUserOperation`, which is deprecated. Headers win when both appear. They are honoured only if `rpc.permissions_enabled` is set.
 
 | Permission | Effect |
 |------------|--------|
@@ -344,7 +345,7 @@ Every one of these disables a protection. Rundler's documentation is direct abou
 
 Rundler implements [ERC-7766](https://eips.ethereum.org/EIPS/eip-7766) but requires an **explicit registry** of supported aggregators rather than open participation. The reasoning is that the EntryPoint offers no on-chain gas metering for aggregators, so a bundler must know an aggregator's cost model in advance to charge for it, and an aggregator it does not understand can DoS it. Costs are hardcoded per implementation as `execution_fixed_gas`, `execution_variable_gas`, `sig_fixed_length` and `sig_variable_length`, and charged through `preVerificationGas`.
 
-The aggregator address travels as an extra field on `eth_sendUserOperation` and `eth_estimateUserOperationGas` — a documented deviation from both ERC-4337 and ERC-7766, letting the bundler act on the aggregator without first running `validateUserOp`. It is not part of `PackedUserOperation` and never reaches the chain.
+The aggregator address travels as an extra field on `eth_sendUserOperation` and `eth_estimateUserOperationGas`, a documented deviation from both ERC-4337 and ERC-7766, letting the bundler act on the aggregator without first running `validateUserOp`. It is not part of `PackedUserOperation` and is never submitted on-chain.
 
 One limitation caps the feature's usefulness today: PVG estimation and fee checks assume a bundle size of 1, so every operation pays the aggregator's full fixed cost. Rundler's own documentation notes this "renders a large class of aggregators as not useful". The shipped implementations are BLS (explicitly a proof of concept) and World Chain's Priority Blockspace for Humans.
 
@@ -389,11 +390,16 @@ From the open `aa-benchmarks` repository, in EVM gas units. For scale, a plain U
 | ERC-20 transfer | 182 665 | 181 014 | 188 136 | 214 817 | 200 732 | 175 283 |
 | Uniswap V3 swap | 201 790 | 200 573 | 207 286 | 234 378 | 220 464 | 194 829 |
 
-The deployment row is where the design shows. On the per-operation rows MAv2 sits within a few thousand gas of Coinbase Smart Wallet and SimpleAccount, neither of which offers modules — which is the more defensible claim: the modular machinery costs almost nothing when it is not used, because the fallback validation and the nonce-encoded selection avoid searching for it.
+The deployment row is where the design shows. On the per-operation rows MAv2 sits within a few thousand gas of Coinbase Smart Wallet and SimpleAccount, neither of which offers modules. That is the more defensible claim: module support costs almost nothing when it is not used, because the fallback validation and the nonce-encoded selection avoid searching for it.
 
 ## Conclusion
 
-Alchemy's stack is a set of consistent answers to the questions ERC-4337 declines to answer. Validation selection lives in the nonce, which buys a compact encoding at the cost of a global-uniqueness rule on entity IDs. The common single-owner case gets a fallback validation compiled into the account, which buys sub-100k deployment at the cost of four implementation variants that are not interchangeable. Session keys get their permissions enforced by hook modules on-chain, which buys real guarantees at the cost of a permission model the integrator has to read carefully — the ERC-20 allowance covering approvals as well as transfers being the clearest example. Deferred actions buy atomic session-key installation at the cost of a bundler-substitutable payload.
+Alchemy's stack is a set of consistent answers to the questions ERC-4337 declines to answer, and each answer has a cost:
+
+- **Validation selection** lives in the nonce, which buys a compact encoding at the cost of a global-uniqueness rule on entity IDs.
+- **The common single-owner case** gets a fallback validation compiled into the account, which buys sub-100k deployment at the cost of four implementation variants that are not interchangeable.
+- **Session keys** get their permissions enforced by hook modules on-chain, which buys real guarantees at the cost of a permission model the integrator has to read carefully. The ERC-20 allowance covering approvals as well as transfers is the clearest example.
+- **Deferred actions** buy atomic session-key installation at the cost of a bundler-substitutable payload.
 
 None of these are free, and the repository documentation is unusually direct about the prices — the EIP-7702 delegate warning, the deferred-action malleability note, the aggregator bundle-size limitation and the "use in production at your own risk" banner on Rundler are all upstream text, not external criticism. That candour is what makes the stack readable as a case study rather than a product page.
 
@@ -502,7 +508,7 @@ The other MAv2 variants have initializer functions with no access control. They 
 
 `SemiModularAccount7702` is written for this position — its fallback signer defaults to `address(this)`, so the EOA is its own owner from the first block, and `upgradeToAndCall` is disabled because a 7702-delegated account cannot upgrade that way.
 
-**Q: A session key is granted `erc20-token-transfer` with a 100 USDC allowance and `contract-access` on a staking contract. What can it actually do with the USDC?**
+**Q: A session key is granted `erc20-token-transfer` with a 100 USDC allowance and `contract-access` on a staking contract. What can it do with the USDC?**
 
 More than the permission name suggests. The allowance is cumulative across transfers *and* approvals, not per-operation, so within that 100 USDC the key may issue `approve` calls rather than transfers. Whether it can approve an attacker-controlled spender depends on the second permission: `contract-access` scoped to the staking contract does not authorize calling the USDC contract at all, so in this configuration the allowance is only spendable through paths the staking contract itself opens.
 
@@ -518,7 +524,9 @@ Exposed publicly it removes the mechanism that stops an attacker submitting oper
 
 For the SMA fallback validation, `verifyingContract` in the EIP-712 domain is the **account**. For `SingleSignerValidationModule` and `WebAuthnValidationModule` it is the **module**, with the account address carried in the domain `salt` as `0x000000000000 ‖ account`.
 
-They differ because of where the verifying code sits. The fallback is part of the account contract, so the account is the natural verifier. A validation module is one contract serving many accounts, so using the module as `verifyingContract` isolates it from other modules, and the account has to be reintroduced through the `salt` to keep a signature bound to one account. Both arrangements achieve the same property — a signature valid for one account on one chain — through different fields, and both are required because one signer commonly owns several accounts at addresses derived from the same key.
+They differ because of where the verifying code sits. The fallback is part of the account contract, so the account is the natural verifier. A validation module is one contract serving many accounts, so using the module as `verifyingContract` isolates it from other modules, and the account has to be reintroduced through the `salt` to keep a signature bound to one account.
+
+Both arrangements achieve the same property, a signature valid for one account on one chain, through different fields, and both are required because one signer commonly owns several accounts at addresses derived from the same key.
 
 **Q: MAv2 deploys for roughly half the gas of Safe or Kernel, yet lands within a few thousand gas of SimpleAccount on a token transfer. Is the modularity therefore free?**
 

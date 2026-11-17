@@ -2,7 +2,7 @@
 layout: post
 title: OpenZeppelin v5 Data - Overview
 date: 2025-07-29
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain ethereum
@@ -57,7 +57,7 @@ Maps have the following properties:
 
 - Entries are added, removed, and checked for existence in constant time (O(1)).
 - Entries are enumerated in O(n). No guarantees are made on the ordering.
-- Map can be cleared (all entries removed) in O(n).
+- Map can be cleared in O(n), which removes all entries.
 
 ```solidity
 contract Example {
@@ -177,12 +177,12 @@ The structure is ordered so that each node is bigger than its parent. An immedia
 
 The structure is designed to perform the following operations with the corresponding complexities:
 
-- peek (get the highest priority value): O(1)
-- insert (insert a value): O(log(n))
-- pop (remove the highest priority value): O(log(n))
-- replace (replace the highest priority value with a new value): O(log(n))
-- length (get the number of elements): O(1)
-- clear (remove all elements): O(1)
+- peek, which gets the highest priority value: O(1)
+- insert, which inserts a value: O(log(n))
+- pop, which removes the highest priority value: O(log(n))
+- replace, which replaces the highest priority value with a new value: O(log(n))
+- length, which gets the number of elements: O(1)
+- clear, which removes all elements: O(1)
 
 ------
 
@@ -208,7 +208,7 @@ A tree is defined by the following parameters:
 
 OpenZeppelin’s data structures offer powerful building blocks for secure, efficient, and readable smart contracts. Understanding when and how to use them can greatly improve your smart contract design and reliability.
 
-Whether you're managing whitelists (`EnumerableSet`), tracking history (`Checkpoints`), handling events (`CircularBuffer`, `Deque`), or implementing airdrop (`MerkleTree`), OpenZeppelin Contracts v5 offers several data structures to help you.
+OpenZeppelin Contracts v5 provides a data structure for each of these uses: `EnumerableSet` for whitelists, `Checkpoints` for tracking history, `CircularBuffer` and `Deque` for handling events, and `MerkleTree` for airdrops.
 
 
 

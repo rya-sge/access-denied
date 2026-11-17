@@ -2,6 +2,7 @@
 layout: post
 title: The Chinese Wall Security Policy - Brewer and Nash Model
 date:   2026-07-20
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security
@@ -69,20 +70,22 @@ X(o) \neq X(o_r) \;\;\text{or}\;\; Y(o) = Y(o_r).
 \end{aligned}
 $$
 
-The first time any subject reads anything, $$N$$ is empty for that subject, so the request is trivially granted (axioms **A3** and **A4** in the annex set the initially secure state and make the first access unconstrained). Freedom of choice lives here: a fresh analyst may open any dataset at all.
+The first time any subject reads anything, $$N$$ is empty for that subject, so the request is trivially granted. Axioms **A3** and **A4** in the annex set the initially secure state and make the first access unconstrained. This is where freedom of choice comes in: a fresh analyst may open any dataset at all.
 
 ![Access decision workflow for the Chinese Wall simple security rule]({{site.url_complet}}/assets/article/securite/security-model/chinese-wall-access-decision-workflow.png)
 
-The metaphor names itself once you trace a sequence. Say the analyst reads the Oil Company A dataset first. Later they request Bank A: granted, because banks and oil companies are different conflict classes. Later still they request Oil Company B: **denied**, because Oil Company B and the already-possessed Oil Company A are in the same conflict class but different datasets. A wall has gone up between our analyst and Oil Company B. The wall's exact position was not fixed in advance; it took shape around the first oil company the analyst happened to choose. This is the subtle blend of free choice and mandatory control: the analyst chose the side of the wall, but once chosen, the wall is mandatory.
+The metaphor names itself once you trace a sequence. Say the analyst reads the Oil Company A dataset first. Later they request Bank A: granted, because banks and oil companies are different conflict classes. Later still they request Oil Company B: **denied**, because Oil Company B and the already-possessed Oil Company A are in the same conflict class but different datasets.
+
+A wall has gone up between our analyst and Oil Company B. The wall's exact position was not fixed in advance; it formed around the first oil company the analyst happened to choose. The policy combines free choice and mandatory control: the analyst chose the side of the wall, but once chosen, the wall is mandatory.
 
 ## Three Theorems, One Staffing Consequence
 
-From the simple security rule, Brewer and Nash prove three theorems. The first two confirm that the informal metaphor really is enforced by the formal rule.
+From the simple security rule, Brewer and Nash prove three theorems. The first two prove that the formal rule enforces the informal metaphor.
 
 - **Theorem T1.** Once a subject has accessed an object, the only other objects accessible to that subject lie within the same company dataset, or within a different conflict of interest class. There is no third option, which is the wall.
 - **Theorem T2.** A subject can have access to at most one company dataset in each conflict of interest class. Having stepped inside one oil company, every other oil company is sealed off.
 
-The third theorem is the pragmatic payoff, and it answers a question the metaphor alone does not: how many analysts does a firm actually need?
+The third theorem is the pragmatic payoff, and it answers a question the metaphor alone does not: how many analysts does a firm need?
 
 - **Theorem T3.** If a conflict of interest class $$X$$ contains $$X_y$$ company datasets, then the minimum number of subjects that will allow every object to be accessed by at least one subject is $$X_y$$.
 
@@ -94,11 +97,13 @@ That is a floor, not a ceiling. In practice the number climbs. If two analysts h
 
 The simple security rule protects against *direct* reading across a wall. It does nothing about *indirect* flows, where information crosses the wall by being written into a dataset that a competitor's analyst can legitimately read. Bell-LaPadula met the same problem and answered it with a *-property; the Chinese Wall model needs its own.
 
-Consider two analysts. User A has access to Oil Company A and Bank A. User B has access to Oil Company B and Bank A. Both legitimately share Bank A. Now User A reads Oil Company A information and writes it into the Bank A dataset. User B, reading Bank A, can now see Oil Company A's secrets, even though the wall between Oil Company A and Oil Company B was never directly crossed. The simple security rule alone permits this leak.
+Consider two analysts. User A has access to Oil Company A and Bank A. User B has access to Oil Company B and Bank A. Both legitimately share Bank A.
+
+Now User A reads Oil Company A information and writes it into the Bank A dataset. User B, reading Bank A, can now see Oil Company A's secrets, even though the wall between Oil Company A and Oil Company B was never directly crossed. The simple security rule alone permits this leak.
 
 ![Indirect information flow through a shared dataset that the *-property blocks]({{site.url_complet}}/assets/article/securite/security-model/chinese-wall-indirect-flow-workflow.png)
 
-Before stating the fix, the model separates sensitive from *sanitized* data. Sanitization disguises a corporation's information so its origin can no longer be inferred, for example by aggregating it into general market statistics. The model reserves one distinguished company dataset, written $$y_0$$, to hold sanitized information relating to all corporations, and gives it its own distinguished conflict of interest class $$x_0$$ (axiom **A5** ties the two together: an object bears label $$y_0$$ if and only if it bears $$x_0$$). Everything outside $$y_0$$ is treated as sensitive and belonging to some particular corporation.
+Before stating the fix, the model separates sensitive from *sanitized* data. Sanitization disguises a corporation's information so its origin can no longer be inferred, for example by aggregating it into general market statistics. The model reserves one distinguished company dataset, written $$y_0$$, to hold sanitized information relating to all corporations, and gives it its own distinguished conflict of interest class $$x_0$$. Axiom **A5** ties the two together: an object bears label $$y_0$$ if and only if it bears $$x_0$$. Everything outside $$y_0$$ is treated as sensitive and belonging to some particular corporation.
 
 The **\*-property** (axiom **A6**) then restricts writing. A write by subject $$s_u$$ to object $$o_b$$ is permitted only if:
 
@@ -170,27 +175,46 @@ The comparison with Bell-LaPadula sets the model apart. Because the policy requi
 
 **Q: What are the three levels of the Chinese Wall data hierarchy?**
 
-From the bottom up: objects (individual items of information, each about one corporation), company datasets (all objects concerning the same corporation), and conflict of interest classes (all company datasets whose corporations compete). Every object carries a label $$(x, y)$$ giving its conflict class and its company dataset, and axiom A1 ties them together: two objects in the same dataset are always in the same conflict class.
+From the bottom up:
+
+- **objects**: individual items of information, each about one corporation;
+- **company datasets**: all objects concerning the same corporation;
+- **conflict of interest classes**: all company datasets whose corporations compete.
+
+Every object carries a label $$(x, y)$$ giving its conflict class and its company dataset, and axiom A1 ties them together: two objects in the same dataset are always in the same conflict class.
 
 **Q: Why does the access decision depend on history rather than on the data's label alone?**
 
-Because the policy protects against carrying one client's secrets to a competitor, and whether that risk exists depends entirely on what the subject has previously read. The same dataset is freely readable by a subject who has touched nothing conflicting and forbidden to a subject who has already entered a competitor's dataset. The model records this history in the boolean possession matrix $$N(u, o)$$, and the simple security rule reads it on every request. A model with only static labels, such as Bell-LaPadula, has no place to store this history.
+Because the policy protects against carrying one client's secrets to a competitor, and whether that risk exists depends entirely on what the subject has previously read. The same dataset is freely readable by a subject who has touched nothing conflicting and forbidden to a subject who has already entered a competitor's dataset.
+
+The model records this history in the boolean possession matrix $$N(u, o)$$, and the simple security rule reads it on every request. A model with only static labels, such as Bell-LaPadula, has no place to store this history.
 
 **Q: How does the simple security rule decide whether to grant a read?**
 
-A read of object $$o_r$$ by subject $$s_u$$ is granted if and only if, for every object the subject already possesses, the target is either in the same company dataset (inside a wall the subject already occupies) or in an entirely different conflict of interest class. If the target shares a conflict class with something already held but sits in a different dataset, it is a competitor and access is denied. A subject's very first access is always granted, since it possesses nothing yet.
+A read of object $$o_r$$ by subject $$s_u$$ is granted if and only if, for every object the subject already possesses, the target is either in the same company dataset, inside a wall the subject already occupies, or in an entirely different conflict of interest class.
+
+If the target shares a conflict class with something already held but belongs to a different dataset, it is a competitor and access is denied. A subject's very first access is always granted, since it possesses nothing yet.
 
 **Q: What does the \*-property add that the simple security rule misses, and why is it needed?**
 
-The simple security rule blocks direct reads across a wall but not indirect flows. Two analysts can legitimately share a neutral dataset, say Bank A; if one writes a client's secrets into Bank A, the other reads them without ever directly crossing the wall. The \*-property (axiom A6) closes this by forbidding a write whenever the subject can also read unsanitized information from a different dataset. Theorem T4 proves the result: unsanitized information stays confined to its own company dataset, while sanitized information flows freely.
+The simple security rule blocks direct reads across a wall but not indirect flows. Two analysts can legitimately share a neutral dataset, say Bank A; if one writes a client's secrets into Bank A, the other reads them without ever directly crossing the wall.
+
+The \*-property (axiom A6) closes this by forbidding a write whenever the subject can also read unsanitized information from a different dataset. Theorem T4 proves the result: unsanitized information stays confined to its own company dataset, while sanitized information flows freely.
 
 **Q: Combining the theorems, why can Bell-LaPadula not represent the Chinese Wall policy?**
 
-Two independent reasons, each rooted in the model's core features. First, Bell-LaPadula labels are static and carry no access history, so it cannot decide requests that depend on what a subject previously read, such as whether extending a need-to-know is safe. Second, the Chinese Wall policy needs free choice (any first dataset) and mandatory control (all competitors then sealed) at the same time; Bell-LaPadula can encode one or the other but not both, since granting free choice requires need-to-know over all datasets, which erases the mandatory separation. Theorems T1 and T2 show the enforced separation is real and history-driven, which is exactly what Bell-LaPadula cannot reproduce.
+Two independent reasons, each rooted in the model's core features:
+
+- **No access history.** Bell-LaPadula labels are static and carry no access history, so it cannot decide requests that depend on what a subject previously read, such as whether extending a need-to-know is safe.
+- **Free choice and mandatory control at once.** The Chinese Wall policy lets the subject pick any first dataset and then seals all competitors. Bell-LaPadula can encode one or the other but not both, since granting free choice requires need-to-know over all datasets, which erases the mandatory separation.
+
+Theorems T1 and T2 show the enforced separation is real and history-driven, which is what Bell-LaPadula cannot reproduce.
 
 **Q: What is Theorem T3's practical meaning for a financial institution?**
 
-Theorem T3 states that if the largest conflict of interest class contains $$L$$ company datasets, then at least $$L$$ subjects are required for every object to be accessible by someone, because by Theorem T2 no single subject can cover two datasets in the same class. It gives the firm a hard lower bound on analyst headcount. The real number is usually higher, since analysts choosing the same or scattered datasets leave some datasets uncovered, but $$L$$ is the minimum the policy can ever demand.
+Theorem T3 states that if the largest conflict of interest class contains $$L$$ company datasets, then at least $$L$$ subjects are required for every object to be accessible by someone, because by Theorem T2 no single subject can cover two datasets in the same class. It gives the firm a hard lower bound on analyst headcount.
+
+The real number is usually higher, since analysts choosing the same or scattered datasets leave some datasets uncovered, but $$L$$ is the minimum the policy can ever demand.
 
 ## References
 

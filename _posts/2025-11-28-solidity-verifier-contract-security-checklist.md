@@ -2,7 +2,7 @@
 layout: post
 title: "Solidity Verifier Contract - Security Checklist"
 date:   2025-11-28
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 locale: en-GB
 lang: en
 categories: blockchain solidity ZKP
@@ -12,7 +12,7 @@ isMath: false
 image: /assets/article/blockchain/zkp/2025-11-28-solidity-verifier-contract-security-checklist-mindmap.png
 ---
 
-Zero-knowledge proof (ZKP) verifier contracts (typically used in zk-SNARK or zk-proof systems) play a fundamental role in ensuring that proofs submitted on-chain are valid. 
+Zero-knowledge proof (ZKP) verifier contracts, typically used in zk-SNARK systems, check on-chain that a submitted proof is valid. 
 
 Although the cryptography behind ZKPs is strong, real-world vulnerabilities have frequently originated from:
 
@@ -64,7 +64,7 @@ means:
 
 ### Details
 
-Curve coordinates live in the base field `q` (check coordinates `< q`), while public *scalar* inputs are elements of the scalar field `r` (check `0 ≤ pub < r`). Confusing these two fields is a common and dangerous mistake. See [BN254 point compression](https://xn--2-umb.com/23/bn254-compression/).
+Curve coordinates live in the base field `q` and must be checked `< q`, while public *scalar* inputs are elements of the scalar field `r` and must satisfy `0 ≤ pub < r`. Confusing these two fields is a common and dangerous mistake. See [BN254 point compression](https://xn--2-umb.com/23/bn254-compression/).
 
 ## Proof-Element Validation Before Cryptographic Operations
 
@@ -110,7 +110,7 @@ Things to confirm:
 3. Negation of `A` is properly applied if required by the protocol.
 4. The order and layout of pairing arguments match the specification of the ZKP scheme.
 
-Small deviations (such as swapped x/y coordinates, wrong G1/G2 ordering, or missing negation) break the verifier.
+Small deviations, such as swapped x/y coordinates, a wrong G1/G2 ordering or a missing negation, break the verifier.
 
 ### Verification-Key Constants Must Match Exactly
 
@@ -222,7 +222,7 @@ Test `pub = r`, `pub = r+1`, `pub = r-1`. Also test proofs where proof points ar
 
 Even a flawless verifier does not guarantee system integrity. Common systemic issues include:
 
-- Under-constrained circuits (the prover can “prove” something incorrect)
+- Under-constrained circuits, which let the prover “prove” something incorrect
 - Business-logic vulnerabilities in contracts that consume the verifier
 - Incorrect assumption that verification implies authorization
 - Replay attacks when proofs lack uniqueness constraints
@@ -245,7 +245,9 @@ A Solidity verifier is correct only when every layer holds. Public inputs must b
 
 **Q: Why must every public input satisfy `0 ≤ value < r` before use?**
 
-All arithmetic inside a SNARK circuit happens in the scalar field `F_r`, where `r` is a large prime and every value is taken modulo `r`. A public input greater than or equal to `r` is silently reduced modulo `r`, so two distinct inputs can map to the same field element. If the verifier does not reject out-of-range inputs before folding them into the linear combination, a prover can exploit this wraparound to satisfy the pairing check with values the circuit never intended, bypassing its constraints.
+All arithmetic inside a SNARK circuit happens in the scalar field `F_r`, where `r` is a large prime and every value is taken modulo `r`. A public input greater than or equal to `r` is silently reduced modulo `r`, so two distinct inputs can map to the same field element.
+
+If the verifier does not reject out-of-range inputs before folding them into the linear combination, a prover can exploit this wraparound to satisfy the pairing check with values the circuit never intended, bypassing its constraints.
 
 **Q: What is the difference between the base field `q` and the scalar field `r`, and why does it matter?**
 
@@ -253,7 +255,9 @@ Curve point coordinates live in the base field `q`, while scalars (such as publi
 
 **Q: How can a wrong verification key let invalid proofs verify?**
 
-The verification key (α, β, γ, δ, and the IC points) is hardcoded in the contract and must byte-for-byte match the trusted setup output. If the constants are merely wrong, proofs simply never verify and the system is unusable. But if they are *structurally* wrong, such as shifted IC indices, swapped G2 components, or a key copied from a different circuit, the pairing equation can be satisfied by proofs for a different or weaker circuit. This "cross-circuit verification" lets an attacker submit a valid proof for the wrong statement.
+The verification key, made of α, β, γ, δ and the IC points, is hardcoded in the contract and must match the trusted setup output byte for byte. If the constants are wrong, proofs never verify and the system is unusable.
+
+If they are *structurally* wrong, such as shifted IC indices, swapped G2 components, or a key copied from a different circuit, the pairing equation can be satisfied by proofs for a different or weaker circuit. This "cross-circuit verification" lets an attacker submit a valid proof for the wrong statement.
 
 **Q: Why isn't relying on the EVM precompiles to fail on malformed points sufficient?**
 

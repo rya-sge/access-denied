@@ -2,7 +2,7 @@
 layout: post
 title: "Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem"
 date: 2025-04-23
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography security post-quantum
@@ -110,7 +110,7 @@ The bigger the n is, the harder the problem becomes.
 - The modulus `q` can be set to be any `q = poly(n)`, but concretely, just think of `q = O(n^2 )`. 
 - The norm bound `B << q` should also be set depending on the specific applications
 
-It is conjectured that for any sufficiently large `n ∈ N` (this is the security parameter), for any `m, q, B ∈ N`, satisfying `q > B · poly(n)` (for any polynomial poly), the SIS(n, m, q, B) is hard. 
+It is conjectured that for any sufficiently large security parameter `n ∈ N`, for any `m, q, B ∈ N` satisfying `q > B · poly(n)` for any polynomial poly, the SIS(n, m, q, B) is hard. 
 
 The SIS(n, m, q, B) problem can be used to construct a collision resistant hash function.
 

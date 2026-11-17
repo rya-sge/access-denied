@@ -2,6 +2,7 @@
 layout: post
 title: "Ouroboros: How Cardano Reaches Consensus with Proof of Stake"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -30,7 +31,7 @@ Who produces the next block? What goes in it? When is it final?
 What if Node B fabricates T5?
 ```
 
-The network must agree on **who** produces the next block, **what** it contains, and **when** it is final, tolerating delay, failure, and malice. If you have used Raft or Paxos, the shape is familiar (a leader sequences writes, terms map to epochs, log entries to blocks), but the threat model is stronger: Raft assumes honest nodes and tolerates only crashes, whereas Ouroboros assumes some nodes are Byzantine, which is why it needs verifiable randomness, stake-weighted election, and a formal proof.
+The network must agree on **who** produces the next block, **what** it contains, and **when** it is final, tolerating delay, failure, and malice. If you have used Raft or Paxos, the structure is familiar: a leader sequences writes, terms map to epochs, and log entries map to blocks. The threat model is stronger, though: Raft assumes honest nodes and tolerates only crashes, whereas Ouroboros assumes some nodes are Byzantine, which is why it needs verifiable randomness, stake-weighted election, and a formal proof.
 
 ## Proof of Work and Proof of Stake
 
@@ -47,7 +48,7 @@ Proof of Stake replaces computational work with economic commitment. The right t
 
 ## Ouroboros: structuring time into epochs and slots
 
-Ouroboros (Kiayias, Russell, David, and Oliynykov, CRYPTO 2017) divides time into fixed units. A **slot** is one second, and an **epoch** is 432,000 slots, exactly five days. A slot may or may not contain a block; the protocol targets roughly one block every 20 seconds, so most slots are empty. Epochs are the administrative boundary at which stake snapshots are taken, rewards are distributed, protocol parameters change, and pool registrations are processed.
+Ouroboros, published by Kiayias, Russell, David, and Oliynykov at CRYPTO 2017, divides time into fixed units. A **slot** is one second, and an **epoch** is 432,000 slots, exactly five days. A slot may or may not contain a block; the protocol targets roughly one block every 20 seconds, so most slots are empty. Epochs are the administrative boundary at which stake snapshots are taken, rewards are distributed, protocol parameters change, and pool registrations are processed.
 
 ## Slot-leader election with a VRF
 
@@ -85,11 +86,11 @@ The security parameter **k**, currently 2160, defines the settlement bound: a bl
 
 When a pool is elected it selects transactions, assembles the block, signs it, and publishes it with the VRF proof; the block must diffuse to other nodes quickly (Cardano targets about five seconds) or risk being orphaned. Every receiving node then verifies the VRF proof, the signature, and every transaction before extending its chain.
 
-Block production relies on a layered key setup, and one part deserves attention. Blocks are signed with a **Key-Evolving Signature (KES)** key, a forward-secure key that evolves at fixed intervals while old key material is deleted. If a pool's KES key is compromised, an attacker can forge blocks only from that point forward, never retroactively, and the operator rotates to a fresh KES key from their offline cold keys. The mechanism is comparable to short-lived, auto-rotating TLS certificates applied to block production. The VRF key handles election, and the cold keys form the offline root of the pool's identity.
+Block production relies on a layered key setup, and one part deserves attention. Blocks are signed with a **Key-Evolving Signature (KES)** key, a forward-secure key that evolves at fixed intervals while old key material is deleted. If a pool's KES key is compromised, an attacker can forge blocks only from that point forward, never retroactively, and the operator rotates to a freshly generated KES key, which the offline cold key certifies through a new operational certificate. The mechanism is comparable to short-lived, auto-rotating TLS certificates applied to block production. The VRF key handles election, and the cold keys form the offline root of the pool's identity.
 
 ## Rewards and the drift toward decentralization
 
-Each epoch the protocol distributes rewards, drawn from transaction fees and a controlled monetary expansion, to pool operators (a fixed cost plus a margin) and delegators (the remainder, proportional to their stake). The reward formula deliberately caps oversized pools:
+Each epoch the protocol distributes rewards, drawn from transaction fees and a controlled monetary expansion, to pool operators and delegators. Operators receive a fixed cost plus a margin, and delegators receive the remainder, proportional to their stake. The reward formula deliberately caps oversized pools:
 
 ```text
 Desirable pool size ~ 1 / k0     (k0 = target number of pools, currently 500)
@@ -145,11 +146,15 @@ The protocol's defining property is that its security rests on economics and a f
 
 **Q: What is a slot leader, and how does a pool learn it is one?**
 
-A slot leader is the stake pool entitled to produce the block for a particular slot. A pool learns it has been elected by evaluating a VRF locally: it computes `VRF_eval(pool_vrf_key, epoch_nonce + slot_number)` and compares the output to a threshold set by its share of total stake. If the output is below the threshold, the pool is a leader for that slot. No coordination or announcement is involved; the result is known only to the pool until it publishes the block together with the VRF proof, at which point anyone can verify the election was legitimate.
+A slot leader is the stake pool entitled to produce the block for a particular slot. A pool learns it has been elected by evaluating a VRF locally: it computes `VRF_eval(pool_vrf_key, epoch_nonce + slot_number)` and compares the output to a threshold set by its share of total stake. If the output is below the threshold, the pool is a leader for that slot.
+
+No coordination or announcement is involved; the result is known only to the pool until it publishes the block together with the VRF proof, at which point anyone can verify the election was legitimate.
 
 **Q: Why does Ouroboros use a stake snapshot from two epochs ago instead of current stake?**
 
-The delay is a security measure. If elections used current stake, an attacker could acquire a large amount of stake and immediately use it to produce blocks, or move stake around to manipulate outcomes. By fixing the electing stake to a snapshot taken two epochs (ten days) earlier, the protocol removes that possibility and limits long-range attacks. The visible side effect for ordinary users is that a newly placed delegation does not start earning rewards until it has passed through this snapshot cycle, a ramp of roughly 15 to 20 days.
+The delay is a security measure. If elections used current stake, an attacker could acquire a large amount of stake and immediately use it to produce blocks, or move stake around to manipulate outcomes.
+
+By fixing the electing stake to a snapshot taken two epochs (ten days) earlier, the protocol removes that possibility and limits long-range attacks. The visible side effect for ordinary users is that a newly placed delegation does not start earning rewards until it has passed through this snapshot cycle, a ramp of roughly 15 to 20 days.
 
 **Q: How does Cardano decide between two competing chains?**
 
@@ -157,15 +162,20 @@ Nodes apply the longest-chain rule: the chain with more blocks wins. When two ch
 
 **Q: What problem does the KES key solve that an ordinary signing key would not?**
 
-Forward security. A pool must keep a block-signing key online to produce blocks, and an online key is exposed to compromise. A Key-Evolving Signature key evolves at fixed intervals and deletes its old key material, so if an attacker steals the current key they can forge blocks only from that moment forward, never rewrite blocks the pool already produced. The operator can then rotate to a new KES key derived from their offline cold keys. An ordinary static signing key, if stolen, would let an attacker forge signatures over the whole history the key was valid for.
+Forward security. A pool must keep a block-signing key online to produce blocks, and an online key is exposed to compromise. A Key-Evolving Signature key evolves at fixed intervals and deletes its old key material, so if an attacker steals the current key they can forge blocks only from that moment forward, never rewrite blocks the pool already produced.
+
+The operator can then generate a new KES key and sign a new operational certificate for it with the offline cold key, which binds the new KES key to the pool. An ordinary static signing key, if stolen, would let an attacker forge signatures over the whole history the key was valid for.
 
 **Q: Ouroboros does not enforce a maximum pool size, yet the network tends toward around 500 pools. How does that happen?**
 
-Through the reward formula rather than a hard rule. The formula defines a desirable pool size near `1/k0`, where k0 is the target number of pools (currently 500), and caps rewards for stake beyond that size. Once a pool saturates, additional delegated stake earns nothing extra, so rational delegators move to smaller, unsaturated pools to keep their returns high. Pledge reinforces this by making one well-pledged pool more profitable than many tiny ones, which resists Sybil splitting. The result is an economic equilibrium tending toward roughly k0 evenly sized pools, so decentralization emerges from incentives rather than being imposed.
+Through the reward formula rather than a hard rule. The formula defines a desirable pool size near `1/k0`, where k0 is the target number of pools (currently 500), and caps rewards for stake beyond that size. Once a pool saturates, additional delegated stake earns nothing extra, so rational delegators move to smaller, unsaturated pools to keep their returns high.
+
+Pledge reinforces this by making one well-pledged pool more profitable than many tiny ones, which resists Sybil splitting. The result is an economic equilibrium tending toward roughly k0 evenly sized pools, so decentralization emerges from incentives rather than being imposed.
 
 ## References
 
 - [Cardano developer portal](https://developers.cardano.org/)
+- [Cardano developer portal - Block producer keys](https://developers.cardano.org/docs/operators/block-producer/block-producer-keys)
 - [Ouroboros: A Provably Secure Proof-of-Stake Blockchain Protocol (Kiayias, Russell, David, Oliynykov, CRYPTO 2017)](https://eprint.iacr.org/2016/889)
 - [Ouroboros Praos (David, Gaži, Kiayias, Russell)](https://eprint.iacr.org/2017/573)
 - [Ouroboros Genesis](https://eprint.iacr.org/2018/378)

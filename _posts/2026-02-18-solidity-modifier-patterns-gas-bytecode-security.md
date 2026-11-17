@@ -2,7 +2,7 @@
 layout: post
 title: "Solidity Modifier Patterns: Gas, Bytecode Size, and Security Trade-offs"
 date: 2026-02-18
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity security ethereum
@@ -190,9 +190,9 @@ contract OwnablePause is PauseModule, Ownable {
 }
 ```
 
-This pattern separates business logic (what happens when you pause) from authorization policy (who is allowed to pause). Modules remain agnostic to the access control mechanism, and deployments choose their policy by overriding the hooks. This is particularly valuable for open-source libraries where different users may require different access control models without rewriting core logic.
+This pattern separates the business logic, what happens on a pause, from the authorization policy, which decides who may trigger it. Modules remain agnostic to the access control mechanism, and deployments choose their policy by overriding the hooks. This is particularly valuable for open-source libraries where different users may require different access control models without rewriting core logic.
 
-For a detailed case study of this pattern applied to a security token framework, see [Flexible Access Control in Smart Contracts (CMTAT)](https://rya-sge.github.io/access-denied/2026/01/27/cmtat-access-control/).
+For a detailed case study of this pattern applied to a security token framework, see [Flexible Access Control in Smart Contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/).
 
 ### Characteristics
 
@@ -224,7 +224,7 @@ The wrapped function pattern provides **deterministic** bytecode savings that do
 
 ### Optimizer Runs Parameter
 
-The `runs` parameter (e.g., `optimizer_runs = 999999`) tells the compiler to optimize for **runtime gas** at the expense of **deployment gas**. High values favor inlining. This means the optimizer may actually **undo** the wrapped function pattern's bytecode savings by inlining the internal function back into each call site.
+The `runs` parameter (e.g., `optimizer_runs = 999999`) tells the compiler to optimize for **runtime gas** at the expense of **deployment gas**. High values favor inlining. This means the optimizer may **undo** the wrapped function pattern's bytecode savings by inlining the internal function back into each call site.
 
 In practice, the internal function is usually small enough that the optimizer preserves the JUMP rather than inlining it, but this is an implementation detail rather than a guarantee.
 
@@ -265,11 +265,11 @@ Solady's design philosophy targets contracts where every gas unit matters (e.g.,
 
 ### CMTAT (Security Token Framework)
 
-CMTAT uses the combined Pattern 2 + 4 approach (authorization hooks) across its entire module system. Each module (pause, mint, burn, documents, snapshots, enforcement) defines modifiers that delegate to `internal virtual` functions (`_authorizePause`, `_authorizeMint`, etc.). A dedicated base contract (`CMTATBaseAccessControl`) overrides all hooks with RBAC policy. This architecture allows the same tokenization modules to work with different access control models — roles, ownership, `AccessManager`, or external policy contracts — without modifying module code. See [Flexible Access Control in Smart Contracts (CMTAT)](https://rya-sge.github.io/access-denied/2026/01/27/cmtat-access-control/) for a full walkthrough.
+CMTAT uses the combined Pattern 2 + 4 approach (authorization hooks) across its entire module system. Each module defines modifiers that delegate to `internal virtual` functions such as `_authorizePause` and `_authorizeMint`, and the modules cover pause, mint, burn, documents, snapshots and enforcement. A dedicated base contract (`CMTATBaseAccessControl`) overrides all hooks with RBAC policy. This architecture allows the same tokenization modules to work with different access control models, such as roles, ownership, `AccessManager` or external policy contracts, without modifying module code. See [Flexible Access Control in Smart Contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/) for a full walkthrough.
 
 ### Major Smart Accounts
 
-Account abstraction wallets (Coinbase Smart Wallet, Safe, Light Account) use inline modifiers for access control guards. These contracts have a small, fixed set of external functions (typically 3-5), so the bytecode duplication from inline modifiers is minimal and the readability benefit of self-contained guards is valuable during security audits.
+Account abstraction wallets such as Coinbase Smart Wallet, Safe and Light Account use inline modifiers for access control guards. These contracts have a small, fixed set of external functions (typically 3-5), so the bytecode duplication from inline modifiers is minimal and the readability benefit of self-contained guards is valuable during security audits.
 
 ## When to Use Which Pattern
 
@@ -350,7 +350,7 @@ function _nonReentrantAfter() private {
 }
 ```
 
-The `uint256` values 1 and 2 (rather than 0 and 1) are a gas optimization: writing non-zero to non-zero with `SSTORE` avoids the cold-to-warm penalty and triggers a gas refund (see [EIP-2200](https://eips.ethereum.org/EIPS/eip-2200)). This requires a constructor to initialize the slot to `NOT_ENTERED` (1). The storage slot itself uses [ERC-7201](https://eips.ethereum.org/EIPS/eip-7201) namespaced storage.
+The `uint256` values 1 and 2, rather than 0 and 1, are a gas optimization. Entering the guard writes 2 over 1, a non-zero to non-zero `SSTORE` that costs far less than the 20,000 gas of writing to a zero slot, and leaving it writes the original value 1 back, which [EIP-2200](https://eips.ethereum.org/EIPS/eip-2200) partly refunds because the slot ends the transaction unchanged. With 0 and 1, every call would pay the zero-to-non-zero cost and depend on a much larger refund, which [EIP-3529](https://eips.ethereum.org/EIPS/eip-3529) caps at one fifth of the transaction's gas. This requires a constructor to initialize the slot to `NOT_ENTERED` (1). The storage slot itself uses [ERC-7201](https://eips.ethereum.org/EIPS/eip-7201) namespaced storage.
 
 #### Transient Storage `ReentrancyGuardTransient` (Recommended)
 
@@ -425,7 +425,7 @@ For most application-level contracts with a small number of guarded functions, i
 - [OpenZeppelin Contracts v5 — Ownable](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol)
 - [OpenZeppelin — AccessManaged](https://docs.openzeppelin.com/contracts/5.x/api/access#AccessManaged)
 - [Solady — Ownable](https://github.com/Vectorized/solady/blob/main/src/auth/Ownable.sol)
-- [Flexible Access Control in Smart Contracts (CMTAT)](https://rya-sge.github.io/access-denied/2026/01/27/cmtat-access-control/) — Case study of the authorization hook pattern (Pattern 2 + 4) applied to a security token framework
+- [Flexible Access Control in Smart Contracts (CMTAT)]({{site.url_complet}}/2026/01/27/cmtat-access-control/) — Case study of the combined Pattern 2 + 4 authorization hooks applied to a security token framework
 - [The Road to Core Solidity](https://www.soliditylang.org/blog/2025/10/21/the-road-to-core-solidity/) — Solidity team roadmap announcing virtual modifier removal in 0.9
 - [OpenZeppelin ReentrancyGuard v5.5.0](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol) — Storage-based reentrancy guard (deprecated)
 - [OpenZeppelin ReentrancyGuardTransient v5.5.0](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuardTransient.sol) — Transient storage reentrancy guard (recommended)

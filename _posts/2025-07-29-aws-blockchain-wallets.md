@@ -2,6 +2,7 @@
 layout: post
 title: "Blockchain wallets on AWS with Fireblocks and Circle"
 date: 2025-07-29
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security cryptography wallet
@@ -113,7 +114,7 @@ Fireblocks customers can choose to utilize an `AWS Nitro Enclave` for their API 
 
 - Fireblocks employs `MPC algorithms` to generate and distribute private key shards, ensuring that a complete and whole private key never exists in any single location. 
   - See also my article [Overview, security and applications of Multi-Party Computation (MPC)](https://rya-sge.github.io/access-denied/2024/10/21/mpc-protocol-overview/)
-- The key shards that are stored in Fireblocks’ servers (called co-signers) and the customer’s mobile device or co-signer server (on-prem or in a public cloud) is used to sign transactions in a trustless manner. 
+- The key shards are stored on Fireblocks’ servers, called co-signers, and on the customer’s mobile device or co-signer server, which runs on-premises or in a public cloud. Together they sign transactions in a trustless manner. 
 - This ensures that no single party, including Fireblocks, can be a point of failure.
 
 To enhance security, all operations involving these shards are performed within secure environments, such as AWS Nitro Enclaves, ensuring that sensitive data is never exposed nor manipulated, whether in storage or in use.

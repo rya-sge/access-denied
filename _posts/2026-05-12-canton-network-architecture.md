@@ -2,7 +2,7 @@
 layout: post
 title: Canton Network — Architecture, Privacy Model, and Comparison with Ethereum, Railgun, Zcash, Zama fhEVM, and Besu
 date: 2026-05-12
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography
@@ -50,7 +50,10 @@ Parties interact with contracts through three roles:
 
 **Stakeholders** (signatories + observers) are the parties entitled to see a contract. Validators store contracts only for their hosted parties' stakeholder relationships.
 
-Two kinds of parties exist: **local parties** (keys held by the validator; suited for automation) and **external parties** (keys held externally; required for wallet-like user experiences).
+Two kinds of parties exist:
+
+- **Local parties** have their keys held by the validator, which suits automation.
+- **External parties** have their keys held externally, which wallet-like user experiences require.
 
 ### Validators (Participant Nodes)
 
@@ -139,9 +142,9 @@ Transaction 2: Archive Contract A  →  Create Contract B
 Transaction 3: Archive Contract B  →  Create Contract C + Contract D
 ```
 
-This immutability enables natural parallelism (independent contracts process concurrently without contention) and provides double-spend prevention at the structural level (a contract can be archived exactly once).
+This immutability enables natural parallelism, since independent contracts process concurrently without contention. It also prevents double spends, because a contract can be archived exactly once.
 
-Choices on contracts are either **consuming** (default: the contract is archived on exercise) or **non-consuming** (the contract remains active). The former is used for state transitions and transfers; the latter for read operations, queries, and notifications.
+Choices on contracts are either **consuming**, the default, where the contract is archived on exercise, or **non-consuming**, where the contract remains active. The former is used for state transitions and transfers; the latter for read operations, queries, and notifications.
 
 > **Contract keys** (identifiers for looking up contracts without knowing the contract ID) are planned for Canton 3.5 and are not yet available in production.
 
@@ -224,7 +227,7 @@ When a transaction involves multiple parties, Canton decomposes it into **views*
 Consider a chain of payments within a single atomic transaction: Alice pays Bob, Bob pays Charlie.
 
 - Alice sees: her payment to Bob; not Bob's payment to Charlie; not Charlie's identity
-- Bob sees: both payments (he is involved in both)
+- Bob sees: both payments, since he is involved in both
 - Charlie sees: his receipt from Bob; not Alice's involvement; not the source of funds
 
 The sequencer sees encrypted blobs and routing metadata only. The mediator sees informee lists and confirmation outcomes only.
@@ -310,7 +313,7 @@ Zama's fhEVM enables confidential smart contracts on EVM chains using **Fully Ho
 The architecture consists of:
 
 - A Solidity library with encrypted types (`euint8` to `euint256`, `ebool`, `eaddress`) and FHE operations
-- A **coprocessor** (off-chain Rust service using TFHE-rs) that performs FHE computations using an evaluation key (not the private key)
+- A **coprocessor**, an off-chain Rust service built on TFHE-rs, that performs FHE computations with an evaluation key rather than the private key
 - A **gateway** (Arbitrum rollup) that orchestrates decryption requests and enforces consensus among coprocessors
 - A **KMS** (13-node threshold MPC) that holds the FHE private key in threshold shares; no single node ever reconstructs it
 
@@ -331,7 +334,7 @@ FHE operations use **symbolic execution** on-chain: `FHE.add(a, b)` produces a d
 
 fhEVM and Canton address privacy from fundamentally different perspectives. fhEVM keeps computation private by ensuring values are never decrypted during processing: even the validators executing the contract never see the plaintext. Canton keeps data private by selective distribution: the right data is sent only to the right parties, and no party receives what it is not entitled to see.
 
-fhEVM is appropriate when computation must remain private even from the parties directly involved (a sealed auction where neither bidder knows the other's bid until resolution). Canton is appropriate when different parties in a multi-party workflow each need to see their own portion of shared state but not others' (a trade settlement where buyer and seller each see their leg, but not the counterparty's internal details).
+fhEVM is appropriate when computation must remain private even from the parties directly involved, as in a sealed auction where neither bidder knows the other's bid until resolution. Canton is appropriate when different parties in a multi-party workflow each need to see their own portion of shared state but not others', as in a trade settlement where buyer and seller each see their leg but not the counterparty's internal details.
 
 ### Ethereum Besu (Permissioned Private Blockchain)
 
@@ -371,7 +374,7 @@ Besu benefits from full EVM compatibility and the existing Solidity toolchain. C
 
 The **Global Synchronizer** is the public synchronizer for Canton Network, operated by **Super Validators** (SVs) running BFT consensus across distributed sequencer and mediator nodes. It is governed by the **Global Synchronizer Foundation** (under the Linux Foundation). Transaction fees are referred to as "traffic" and are paid in **Canton Coin (CC)**, the native utility token.
 
-**Splice** (Hyperledger Labs) provides the open-source infrastructure for decentralized Canton synchronizers, including Canton Coin, Validator App, Wallet, Scan (network explorer), and on-chain Governance.
+**Splice**, a Hyperledger Labs project, provides the open-source infrastructure for decentralized Canton synchronizers, including Canton Coin, Validator App, Wallet, Scan (network explorer), and on-chain Governance.
 
 Network environments follow a progression from local development to production:
 
@@ -390,7 +393,7 @@ The two-layer consensus (Proof of Stakeholder for correctness combined with BFT 
 
 For regulated financial infrastructure, multi-party business workflows, and any application where data residency and selective disclosure are first-class requirements, Canton provides an architecture where those properties are enforced at the protocol level rather than delegated to application-layer conventions.
 
-The trade-offs are real: no EVM compatibility, a different programming model (Daml), and a smaller ecosystem than Ethereum. For the use cases Canton targets (syndicated lending, trade finance, tokenized securities, cross-institution settlement), those trade-offs are justified by the compliance and privacy properties the architecture provides.
+The trade-offs are real: no EVM compatibility, a different programming model (Daml), and a smaller ecosystem than Ethereum. Canton targets syndicated lending, trade finance, tokenized securities and cross-institution settlement. For those use cases, the trade-offs are justified by the compliance and privacy properties the architecture provides.
 
 ![canton-mindmap]({{site.url_complet}}/assets/article/blockchain/canton/canton-mindmap.png)
 

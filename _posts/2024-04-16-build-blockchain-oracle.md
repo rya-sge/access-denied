@@ -2,7 +2,7 @@
 layout: post
 title:  How to build a blockchain oracle
 date:   2024-04-16
-last_modified_at: 2025-01-23
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum oracle
@@ -43,9 +43,9 @@ But how concretely build a blockchain oracle ? It is not an easy task and you ha
 One of the most known and battle tested oracle is the one set up by Chainlink, one of whose products is [Chainlink Data feeds (2.)](https://docs.chain.link/data-feeds). Its operation, without going into details, is as follows:
 
 - The oracle is composed of many decentralized nodes from different organization (Swisscom) to avoid an unique point of failure and a price manipulation by a malicious node.
-- These nodes fetch the prices from known price aggregators like CoinCeko or GSR
+- These nodes fetch the prices from known price aggregators like CoinGecko or GSR
 - Each node has to provide observations, signed by themselves.
-- These observations are aggregated into a report by a node (leader) and this report is sent to the smart contract by a designed node (round robin).
+- A leader node aggregates these observations into a report, and a node designated by round robin sends this report to the smart contract.
 - The smart contract verifies the different signatures, compute the median value from the different observations before making them available for other smart contracts.
 
 **You can also use a [TWAP oracle](https://www.halborn.com/blog/post/what-are-twap-oracles), but it is another topic.
@@ -58,7 +58,7 @@ You have traditionally two types of oracles:
 
 - **Pull oracles** require smart contracts to request data explicitly. They pull data from external sources in response to a query from the smart contract.
 
-Chainlink provides a pull based oracle ([Chainlink data streams (3)](https://docs.chain.link/data-streams)) and a push based oracle ([Chainlink data feeds](https://chain.link/data-feeds))
+Chainlink provides a pull-based oracle, [Chainlink data streams (3)](https://docs.chain.link/data-streams), and a push-based oracle, [Chainlink data feeds](https://chain.link/data-feeds).
 
 Here a schema from [Chainlink documentation](https://docs.chain.link/data-streams)
 
@@ -119,11 +119,11 @@ We have now our oracle network and we are protected:
 
 If the nodes fetch information from the same website/data source, the oracle will no longer be able to retrieve the information if the original data source breaks down.
 
-For example, the exchange FTX was used by several oracles, including Chainlin. When the exchange crashed, the price of the exchange could no longer be considered reliable.
+For example, the exchange FTX was used by several oracles, including Chainlink. When the exchange crashed, the price of the exchange could no longer be considered reliable.
 
 Solution: the oracle has to fetch information from multiple websites to avoid a single point of failure.
 
-- For Chainlink, you have the list of data providers in their [ecosystem page (7)](https://www.chainlinkecosystem.com/ecosystem) and [in this article (8)](https://blog.chain.link/chainlink-price-feeds-secure-defi/). For example, there is [CoinCecko](https://www.chainlinkecosystem.com/ecosystem/coin-gecko) and  [kaio](https://www.chainlinkecosystem.com/ecosystem/kaiko)
+- For Chainlink, you have the list of data providers in their [ecosystem page (7)](https://www.chainlinkecosystem.com/ecosystem) and [in this article (8)](https://blog.chain.link/chainlink-price-feeds-secure-defi/). For example, there are [CoinGecko](https://www.chainlinkecosystem.com/ecosystem/coin-gecko) and [Kaiko](https://www.chainlinkecosystem.com/ecosystem/kaiko).
 
 During a certain time, there were also CoinMarketCap and CryptoCompare but their name is no longer present in the chainlink ecosystem list.
 

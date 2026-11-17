@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Foreign Exchange Trade — The fxtr Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -23,11 +24,11 @@ A foreign exchange trade is agreed in seconds, but the work of confirming it, ma
 
 ## What fxtr covers
 
-The `fxtr` area is about the FX trade *after* it is executed. It does not match orders or make prices; it takes a done deal (a spot, a forward, a swap, or a non-deliverable forward) and carries it through the confirmation and settlement chain. The parties are the two counterparties to the trade, the matching and confirmation services that sit between them, and the settlement systems, most importantly CLS, that settle the two currency legs.
+The `fxtr` area is about the FX trade *after* it is executed. It does not match orders or make prices; it takes a done deal, whether a spot, a forward, a swap or a non-deliverable forward, and carries it through the confirmation and settlement chain. The parties are the two counterparties to the trade, the matching and confirmation services that sit between them, and the settlement systems, most importantly CLS, that settle the two currency legs.
 
 ![FX post-trade flow and where the fxtr messages fit]({{site.url_complet}}/assets/article/finance/fxtr-posttrade-concept.png)
 
-The reason this needs a standard is settlement risk. In FX, each side must pay the currency it sold and receive the currency it bought, and a party that pays out before it receives is exposed to its counterparty failing in between. Confirmation (agreeing the trade's terms precisely) and matching (checking that both sides recorded the same deal) are the controls that make settlement safe, and `fxtr` is the message vocabulary for both.
+The reason this needs a standard is settlement risk. In FX, each side must pay the currency it sold and receive the currency it bought, and a party that pays out before it receives is exposed to its counterparty failing in between. Two controls make settlement safe: confirmation agrees the trade's terms precisely, and matching checks that both sides recorded the same deal. `fxtr` is the message vocabulary for both.
 
 ## The fxtr message catalogue
 
@@ -75,7 +76,7 @@ The three groups map onto three stages a trade passes through.
 
 **Confirmation.** The confirmation exchange establishes that both sides agree the terms. A party raises a `fxtr.034` **ConfirmationRequest**, adjusts it with the `fxtr.035` amendment request or withdraws it with the `fxtr.036` cancellation request, and the service reports the confirmation outcome in a `fxtr.037` **ConfirmationStatusAdvice**, which the party acknowledges with `fxtr.038`. A matched, confirmed trade is one both counterparties have agreed identically and is safe to settle.
 
-**Net settlement.** Where trades are settled on a net basis, the `camt.088` **NetReport** reports the netted amounts per currency that will actually move, the figures a party funds into a settlement system such as CLS. Netting many trades down to one payment per currency is what keeps FX settlement volumes manageable, and the net report is how those final positions are communicated.
+**Net settlement.** Where trades are settled on a net basis, the `camt.088` **NetReport** reports the netted amounts per currency, the figures a party funds into a settlement system such as CLS. Netting many trades down to one payment per currency is what keeps FX settlement volumes manageable, and the net report is how those final positions are communicated.
 
 ## Conclusion
 
@@ -104,7 +105,9 @@ The `fxtr` business area applies ISO 20022 to the foreign exchange post-trade pr
 
 **Q: What is the difference between confirmation and matching in fxtr?**
 
-Confirmation is agreeing the precise terms of a trade with the counterparty; matching is checking that both sides recorded the same deal. Confirmation is handled by the dedicated `fxtr.034` to `fxtr.038` messages, which raise, adjust, and report the status of a confirmation. Matching is reflected in the status notifications (`fxtr.008`, `fxtr.017`, `fxtr.030`), where a party learns whether its submitted trade lined up with the other side's. Both must succeed before a trade is safe to settle: the terms have to be agreed and both records have to align.
+Confirmation is agreeing the precise terms of a trade with the counterparty; matching is checking that both sides recorded the same deal. Confirmation is handled by the dedicated `fxtr.034` to `fxtr.038` messages, which raise, adjust, and report the status of a confirmation. Matching is reflected in the status notifications (`fxtr.008`, `fxtr.017`, `fxtr.030`), where a party learns whether its submitted trade lined up with the other side's.
+
+Both must succeed before a trade is safe to settle: the terms have to be agreed and both records have to align.
 
 **Q: What are the core economic terms carried by a trade instruction?**
 
@@ -112,15 +115,26 @@ Four blocks in the `fxtr.014` instruction carry them: trade information identify
 
 **Q: Why does FX settlement need this much process around a simple trade?**
 
-Because of settlement risk. Each side of an FX trade must deliver the currency it sold and receive the currency it bought, and if one party pays out before it receives, it is exposed to the other failing in the gap. Confirmation and matching are the controls that reduce this risk by ensuring both sides agree the same terms before any money moves, and settling on a net basis through a system like CLS reduces the number and size of payments at risk. The `fxtr` messages exist to carry those controls in a standard, machine-readable form.
+Because of settlement risk. Each side of an FX trade must deliver the currency it sold and receive the currency it bought, and if one party pays out before it receives, it is exposed to the other failing in the gap.
+
+Confirmation and matching are the controls that reduce this risk by ensuring both sides agree the same terms before any money moves, and settling through a payment-versus-payment system like CLS removes the gap: CLS settles each trade gross, paying out one currency only if the other is received, while netting the amounts each party must pay in. The `fxtr` messages exist to carry those controls in a standard, machine-readable form.
 
 **Q: What does the camt.088 net report do, and why is it here rather than in cash management?**
 
-The `camt.088` NetReport reports the netted amounts per currency that will actually settle after many trades are combined. It ships alongside `fxtr` because FX settlement is where net positions matter most: rather than settling every trade gross, parties net them down to one payable or receivable per currency and fund that figure into a settlement system. The message carries a `camt` identifier because it is a cash-management report by nature, but it is packaged with the FX trade messages because that is the flow it serves.
+The `camt.088` NetReport reports the netted amounts per currency that settle after many trades are combined. It ships alongside `fxtr` because FX settlement is where net positions matter most: rather than settling every trade gross, parties net them down to one payable or receivable per currency and fund that figure into a settlement system.
+
+The message carries a `camt` identifier because it is a cash-management report by nature, but it is packaged with the FX trade messages because that is the flow it serves.
 
 **Q: How does a trade move through the three fxtr groups in order?**
 
-A party can pull the service's record of the trade through the capture group (`fxtr.032` request, `fxtr.031` report, `fxtr.033` acknowledgement). It submits the trade for processing with an instruction (`fxtr.014`), amending or cancelling as needed, and receives matching progress through the status notifications (`fxtr.008`, `fxtr.017`, `fxtr.030`). It agrees the exact terms through the confirmation group (`fxtr.034` to `fxtr.038`). Once the trade is matched and confirmed, its net settlement amounts are reported in `camt.088`. The groups are not strictly sequential in every implementation, but capture, instruction and status, and confirmation together take a trade from executed to settleable.
+A party uses the groups as follows:
+
+- **Capture.** It pulls the service's record of the trade with the `fxtr.032` request, `fxtr.031` report and `fxtr.033` acknowledgement.
+- **Instruction and status.** It submits the trade for processing with an `fxtr.014` instruction, amending or cancelling as needed, and receives matching progress through the `fxtr.008`, `fxtr.017` and `fxtr.030` status notifications.
+- **Confirmation.** It agrees the exact terms through the `fxtr.034` to `fxtr.038` messages.
+- **Net settlement.** Once the trade is matched and confirmed, its net settlement amounts are reported in `camt.088`.
+
+The groups are not strictly sequential in every implementation, but capture, instruction and status, and confirmation together take a trade from executed to settleable.
 
 ## References
 

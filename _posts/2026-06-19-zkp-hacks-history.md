@@ -2,7 +2,7 @@
 layout: post
 title: "Zero-Knowledge Proof Hacks — A Documented Record of Exploits and Vulnerabilities (2023–2026)"
 date: 2026-06-19
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security defi ZKP
@@ -26,7 +26,11 @@ Incidents are grouped into three categories:
 - **Part II — ZK-Rollup Protocol Exploits:** the bug was in surrounding contract logic rather than the proof itself, but ZK infrastructure was integral to the attack surface.
 - **Part III — Disclosed Vulnerabilities (No Exploitation):** responsibly disclosed, patched before exploitation, and in several cases rewarded with a bug bounty.
 
-The **ZK Bug?** column in the summary table uses three values: ✅ (ZK proof system directly vulnerable), ⚠️ (ZK chain or rollup, but contract-level bug), ❌ (ZK-branded protocol, DeFi bug only).
+The **ZK Bug?** column in the summary table uses three values:
+
+- ✅: the ZK proof system is directly vulnerable.
+- ⚠️: a ZK chain or rollup, but the bug is at contract level.
+- ❌: a ZK-branded protocol with a DeFi bug only.
 
 ---
 
@@ -96,7 +100,7 @@ Because `remainder` was unconstrained, a malicious sequencer could choose any `r
 
 **Technical detail:**
 
-EraVM stores 256-bit register values but the BN254 proving field supports only 253-bit elements. The RAM Permutation circuit decomposes each value into `value` (lower 192 bits) and `value_residual` (upper 64 bits). When constructing a `MemoryWriteQuery`, the upper 128 bits were computed via a `LinearCombination` in `from_key_and_value_witness`:
+EraVM stores 256-bit register values but the BN254 proving field supports only 253-bit elements. The RAM Permutation circuit decomposes each value into `value` (lower 192 bits) and `value_residual` (upper 64 bits). When constructing a `MemoryWriteQuery`, the upper 128 bits were computed via a `LinearCombination` in `from_key_and_value_witness`. This `highest_128` value spans the top 64 bits of `value` and all of `value_residual`, and the combination was meant to tie it to the two upper 64-bit words:
 
 ```rust
 lc.add_assign_number_with_coeff(&u64_word_2.inner, shifts[0]);
@@ -228,7 +232,9 @@ The protocol's Bitcointalk listing stated: *"THE ONLY RULE IS CODE. If your code
 
 **Technical detail:**
 
-HermesVault was a ZK-based privacy protocol on Algorand. An attacker found a mechanism to reset the cryptographic keys governing the ZK proof verifier, decoupling the verifier's expected public parameters from those used to generate legitimate proofs. With verification neutralized, the attacker extracted funds without submitting valid ZK proofs. The specific implementation detail (whether the key reset was achieved via governance, an upgrade path, or a parameter mutation in the on-chain verifier state) was not fully disclosed.
+HermesVault was a ZK-based privacy protocol on Algorand. An attacker found a mechanism to reset the cryptographic keys governing the ZK proof verifier, decoupling the verifier's expected public parameters from those used to generate legitimate proofs. With verification neutralized, the attacker extracted funds without submitting valid ZK proofs.
+
+The specific implementation detail was not fully disclosed. The key reset may have been achieved via governance, an upgrade path, or a parameter mutation in the on-chain verifier state.
 
 ---
 
@@ -388,7 +394,7 @@ Detection occurred within 24 hours via Socket's supply chain monitoring. This in
 
 ## Conclusion
 
-Across the 15 incidents documented here, eight involved a direct vulnerability in the ZK proof system (trusted setup, Fiat-Shamir binding, circuit soundness, proof verification bypass, settlement boundary). The remaining seven involved the surrounding protocol infrastructure on ZK chains or ecosystems. The total value lost in confirmed exploits is approximately $19$M at the application layer, with an additional $1.9$B+ in peak at-risk TVL for the three largest disclosed vulnerabilities.
+Across the 15 incidents documented here, eight involved a direct vulnerability in the ZK proof system: trusted setup, Fiat-Shamir binding, circuit soundness, proof verification bypass or settlement boundary. The remaining seven involved the surrounding protocol infrastructure on ZK chains or ecosystems. The total value lost in confirmed exploits is approximately $19$M at the application layer, with an additional $1.9$B+ in peak at-risk TVL for the three largest disclosed vulnerabilities.
 
 ![ZKP hacks 2023–2026 mindmap]({{site.url_complet}}/assets/article/blockchain/zkp/2026-06-19-zkp-hacks-history-mindmap.png)
 
@@ -396,11 +402,15 @@ Across the 15 incidents documented here, eight involved a direct vulnerability i
 
 **Q: What is the difference between a "direct ZK exploit" and a "ZK-rollup protocol exploit" as used in this article?**
 
-A direct ZK exploit targets a failure in the proof system itself: the ZK circuit is missing a constraint, the trusted setup was not executed, the Fiat-Shamir transcript omits a component, or the verifier function is bypassed. In all such cases, the ZK proof system accepted a false statement as true. A ZK-rollup protocol exploit targets the surrounding contract logic (access control, share accounting, proxy upgradeability) while the ZK proof system itself functioned correctly. zkLend's precision loss and ZKSpace's proxy exploit are examples: the proofs were valid, but the protocol's economic logic had independent flaws.
+A direct ZK exploit targets a failure in the proof system itself: the ZK circuit is missing a constraint, the trusted setup was not executed, the Fiat-Shamir transcript omits a component, or the verifier function is bypassed. In all such cases, the ZK proof system accepted a false statement as true.
+
+A ZK-rollup protocol exploit targets the surrounding contract logic, such as access control, share accounting or proxy upgradeability, while the ZK proof system itself functioned correctly. zkLend's precision loss and ZKSpace's proxy exploit are examples: the proofs were valid, but the protocol's economic logic had independent flaws.
 
 **Q: How did the FoomCash attackers learn about the trusted setup vulnerability so quickly?**
 
-The Veil Cash post-mortem was published by Rekt News six days before the FoomCash attack. The post-mortem described the root cause ($$\gamma = \delta = G_{2,\text{gen}}$$), the attack method (submitting fabricated proofs), and the verification key structure. FoomCash used an identical verifier. The attacker read the post-mortem and replicated the exploit on a protocol with a much larger TVL. This illustrates the dual-use nature of security disclosures: public post-mortems accelerate both defenses and copycat attacks.
+The Veil Cash post-mortem was published by Rekt News six days before the FoomCash attack. It described the root cause, $$\gamma = \delta = G_{2,\text{gen}}$$; the attack method, which was to submit fabricated proofs; and the verification key structure.
+
+FoomCash used an identical verifier. The attacker read the post-mortem and replicated the exploit on a protocol with a much larger TVL. This illustrates the dual-use nature of security disclosures: public post-mortems accelerate both defenses and copycat attacks.
 
 **Q: Why did Aztec Connect remain exploitable three years after being deprecated?**
 
@@ -417,11 +427,20 @@ Total documented: $700,000$ in ZK circuit bug bounties for the three incidents. 
 
 **Q: In the OtterSec zkVM disclosures, all six implementations had the same bug class but were developed independently. What does this indicate about the state of Fiat-Shamir implementation guidance?**
 
-The recurrence of the same binding failure across six independent implementations over six months indicates that protocol specifications for zkVM proof systems do not consistently define which elements must be included in the Fiat-Shamir transcript before each challenge is derived. Developers implementing the transcript construction from a paper or specification may omit elements that the paper does not explicitly identify as necessary, either because the paper focuses on the algebraic construction rather than the implementation detail, or because the necessity of binding a particular element only becomes apparent from a security analysis of the specific combination of prover algorithms. The fix in each case was one or two lines of code, but the design documents did not prevent the error.
+The recurrence of the same binding failure across six independent implementations over six months indicates that protocol specifications for zkVM proof systems do not consistently define which elements must be included in the Fiat-Shamir transcript before each challenge is derived.
+
+Developers implementing the transcript construction from a paper or specification may omit elements that the paper does not explicitly identify as necessary. This can happen for two reasons:
+
+- the paper focuses on the algebraic construction rather than the implementation detail;
+- the need to bind a particular element only becomes apparent from a security analysis of the specific combination of prover algorithms.
+
+The fix in each case was one or two lines of code, but the design documents did not prevent the error.
 
 **Q: Does the Haven Protocol incident mean that Bulletproofs are fundamentally insecure?**
 
-No. Bulletproofs as a cryptographic construction are secure under the discrete logarithm assumption. The Haven Protocol incident reflects a failure in the application of Bulletproof range proofs within the consensus rules, not a break in the underlying proof system. Specifically, the consensus validation did not correctly enforce that all committed transaction amounts fell within the valid range $$[0, 2^{64})$$. A valid Bulletproof range proof guarantees that the committed value lies in the range only if the verifier correctly enforces all proof components. If the enforcement logic has a gap, transactions with amounts outside the range may pass validation even though the proof system itself is sound.
+No. Bulletproofs as a cryptographic construction are secure under the discrete logarithm assumption. The Haven Protocol incident reflects a failure in the application of Bulletproof range proofs within the consensus rules, not a break in the underlying proof system.
+
+Specifically, the consensus validation did not correctly enforce that all committed transaction amounts fell within the valid range $$[0, 2^{64})$$. A valid Bulletproof range proof guarantees that the committed value lies in the range only if the verifier correctly enforces all proof components. If the enforcement logic has a gap, transactions with amounts outside the range may pass validation even though the proof system itself is sound.
 
 ## References
 

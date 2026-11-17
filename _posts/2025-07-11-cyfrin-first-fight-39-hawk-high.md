@@ -2,7 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 39 - Hawk High"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
@@ -96,7 +96,7 @@ If the principal upgrade the contract LevelOne by calling this function, the con
 
 If the principal calls instead `graduateAndUpgrade`
 
-This will not actually change the implementation that the UUPS points to since `_authorizeUpgrade`does not change the implementation address stored in the proxy.
+This will not change the implementation that the UUPS proxy points to, since `_authorizeUpgrade` does not change the implementation address stored in the proxy.
 
 Reference: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/utils/UUPSUpgradeable.sol#L86
 
@@ -161,7 +161,9 @@ Manual analysis + Foundry + ChatGPT (for the recommandation)
 
 Include the number of teacher in the calculation, here a simplist example:
 
+```solidity
 uint256 payPerTeacher = (bursary * TEACHER_WAGE) / (PRECISION * numberOfTeachers);
+```
 
 ### M-03. LevelTwo has storage collisions with levelOne
 
@@ -186,7 +188,7 @@ As a result, the two following variable `istOfStudents `and `listOfTeachers`will
 
 #### Vulnerability Details
 
-`istOfStudents `and `listOfTeachers` will overwrite the slots used by `reviewCount`and `lastReviewTime` , slots which contain the location where their data is actually stored
+`istOfStudents `and `listOfTeachers` will overwrite the slots used by `reviewCount` and `lastReviewTime`, which hold the location where their data is stored
 
 #### Impact
 

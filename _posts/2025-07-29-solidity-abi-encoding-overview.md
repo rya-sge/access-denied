@@ -2,7 +2,7 @@
 layout: post
 title: Solidity ABI Encoding – Overview
 date: 2025-07-29
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity ethereum blockchain
@@ -28,7 +28,7 @@ Each serves a specific purpose, and choosing the right one is important—not ju
 
 | Function                       | Encodes?       | Output Size | Use For                                       | Use                                                       | Security Notes                |
 | ------------------------------ | -------------- | ----------- | --------------------------------------------- | --------------------------------------------------------- | ----------------------------- |
-| `abi.encode(...)`              | Standard ABI   | Larger      | <br />Hashing, Calldata, cross-contract calls | Data integrity is crucial, with variable-length arguments | Safe and precise              |
+| `abi.encode(...)`              | Standard ABI   | Larger      | <br />Hashing, Calldata, cross-contract calls | Data integrity matters, with variable-length arguments | Safe and precise              |
 | `abi.encodePacked(...)`        | Tightly Packed | Smaller     | Hashing, gas efficiency                       | Gas optimization, fixed-length arguments                  | ⚠️ Risk of hash collisions     |
 | `abi.encodeWithSignature(...)` | ABI + selector | Normal      | Low-level contract calls                      |                                                           | Safe if signature is accurate |
 
@@ -47,7 +47,7 @@ Each argument gets padded to a fixed 32-byte size, reducing the risk of ambiguit
 ### Characteristics:
 
 - **Returns**: Dynamic `bytes` array
-- **Includes**: Padding (each parameter is 32 bytes), data type info
+- **Includes**: Padding of each parameter to 32 bytes, data type info
 - **Use Case**: When interacting with other contracts or building calldata manually
 
 ### Example:
@@ -110,7 +110,7 @@ Here a list of dynamic types:
 4. **`mapping`** (conceptually dynamic, but cannot be directly encoded)
 5. **`structs` containing any of the above dynamic types**
 
-*(Note: `bytes1`…`bytes32` and fixed-size arrays are **static types** and do not pose this specific risk.)*
+*Note: `bytes1`…`bytes32` and fixed-size arrays are **static types** and do not pose this specific risk.*
 
 #### Example:
 
@@ -125,7 +125,7 @@ but `abi.encode(0x123,0x456)` => `0x0...1230...456`). \
 
 
 
-abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c")
+`abi.encodePacked("a", "bc") == abi.encodePacked("ab", "c")`
 
 This becomes dangerous if you're using such hashes as **unique identifiers**, **nonces**, or **keys in mappings**.
 
@@ -252,7 +252,7 @@ abi.encodeWithSelector(bytes4(keccak256("transfer(address,uint256)")), recipient
  Yes, **but**:
 
 - You must make sure the function signature string is **correctly spelled and formatted**.
-- **Does not check if the target contract actually has that function**. You’re sending raw bytes to a low-level `call`.
+- **Does not check that the target contract has that function**. You’re sending raw bytes to a low-level `call`.
 
 ------
 

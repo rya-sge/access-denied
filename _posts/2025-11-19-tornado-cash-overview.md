@@ -2,6 +2,7 @@
 layout: post
 title: Tornado Cash Circuits - Overview
 date:   2025-11-19
+last_modified_at: 2026-11-17
 locale: en-GB
 lang: en
 categories: blockchain ZKP solidity
@@ -135,7 +136,7 @@ Takes **two inputs**: `left` and `right`
 
 Feeds them into a **MiMC sponge hasher** as a 2-element input array
 
-Sets the MiMC key (`k`) to **0** (Tornado Cash uses MiMC with a zero key)
+Sets the MiMC key `k` to **0**, because Tornado Cash uses MiMC with a zero key
 
 Returns the resulting hash
 

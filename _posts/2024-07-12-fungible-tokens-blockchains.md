@@ -2,7 +2,7 @@
 layout: post
 title: Fungible Tokens across blockchains
 date:   2024-07-12
-last_modified_at: 2025-01-22
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum defi
@@ -26,11 +26,11 @@ A) By providing a common interface or standard, like Ethereum with the well-know
 
 B) or by incorporated into the blockchain a fungible token implementation.
 
-In the first case, the standard is a common interface that the fungible token must follow and enables **interoperability** between the difference application build on the blockchain, for example a decentralized exchange. This offers great flexibility in terms of implementation, but this is a source of vulnerabilities if the interface is not fully respected by the developers.
+In the first case, the standard is a common interface that the fungible token must follow and enables **interoperability** between the different applications built on the blockchain, for example a decentralized exchange. This offers great flexibility in terms of implementation, but this is a source of vulnerabilities if the interface is not fully respected by the developers.
 
 With the second case, the choice is more restricted but it is easier to launch a token respecting blockchain standards
 
-Some blockchains, like Stellar, choose to offer a common interface (A) as well as an implementation incorporated into the blockchain (B) to have the best of both worlds.
+Some blockchains, like Stellar, offer both A and B: a common interface, and an implementation built into the blockchain. Developers get the flexibility of the first and the easier token launch of the second.
 
 Finally, I decided to create a specific category for **Bitcoin**, which its development is not managed by a foundation and where the different way to represent fungible tokens on Bitcoin are more proposals from various persons and projects rather than a common standard incorporated into the network.
 
@@ -578,7 +578,7 @@ Specification: [tzip.tezosagora.org/proposal/tzip-12/](https://tzip.tezosagora.o
 
 Fungible token can also be represented with the standard TZIP-012, which proposes a standard for a unified token contract interface.
 
-This standard supports a wide range of token types, in addition to the fungible tokens, and implementations: non-fungible ([ERC-721](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum),non-transferable ([ERC-1238](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum) and also multi-asset contracts [ERC-1155](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum).
+In addition to fungible tokens, this standard supports a wide range of token types and implementations: non-fungible tokens, like [ERC-721](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum; non-transferable tokens, like [ERC-1238](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum; and multi-asset contracts, like [ERC-1155](https://ethereum.org/en/developers/docs/standards/tokens/) on Ethereum.
 
 A variety of transfer permission policies can also be defined to control who can perform a transfer or receiver tokens.
 
@@ -628,7 +628,7 @@ This is the same principle for the implementation of NFT.
 
 You just need to specify:
 
-- A few parameters to identify it as an FT  (e.g. total count is greater than 1) 
+- A few parameters to identify it as an FT, for example a total count greater than 1
 - Attach metadata so that  potential owners have the information they need to validate the integrity of the asset. 
 
 The implementation defines also eight immutable parameters:
@@ -795,7 +795,7 @@ Specification: [github.com/stellar - cap-0046-06.md](https://github.com/stellar/
 
 Tokens exist in two forms on Stellar:
 
-1. Assets issued by Stellar accounts (`G...` addresses) and their built-in [Stellar Asset Contract (SAC)](https://developers.stellar.org/docs/tokens/stellar-asset-contract) implementation, and
+1. Assets issued by Stellar accounts, which have `G...` addresses, with their built-in [Stellar Asset Contract (SAC)](https://developers.stellar.org/docs/tokens/stellar-asset-contract) implementation, and
 2. [Custom tokens](https://developers.stellar.org/docs/tokens/token-interface) issued by a deployed WASM contract (`C...` addresses).
 
 This proposal introduces a native contract implementation for classic tokens. The interface tries to follow an ERC-20 model but adds several functions not available in the ERC-20 standard such as `burn`, `burn_from` and `authorized`.

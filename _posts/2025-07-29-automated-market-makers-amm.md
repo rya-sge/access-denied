@@ -2,7 +2,7 @@
 layout: post
 title: Automated Market Makers (AMMs) - Overview
 date: 2025-07-29
-last_modified_at: 2025-09-01
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: defi blockchain ethereum
@@ -12,7 +12,7 @@ image: /assets/article/blockchain/defi/curve/curve-formula.png
 isMath: true
 ---
 
-Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi), enabling to swap crypto assets without intermediaries. 
+Automated Market Makers (AMMs) are a core component of decentralized finance (DeFi): they let users swap crypto assets without intermediaries. 
 
 Unlike traditional order book-based exchanges, AMMs use mathematical formulas to determine the price of assets and facilitate liquidity. These formulas govern how users trade assets and earn rewards inside a liquidity pool. 
 
@@ -26,7 +26,7 @@ This article covers the most commonly used formulas in AMM design, their benefit
 
 ## Brief history
 
-The original AMMs based on `constant product market makers`were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread (often 10% or even higher) during a trade on the plaform available at that moment (MKR market, etherdelta). 
+The original AMMs based on `constant product market makers` were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread, often 10% or higher, of the trading platforms available at that moment, such as the MKR market and EtherDelta. 
 
 The spreads were high because market making is very expensive, as creating an order and removing an order both take gas fees, even if the orders are never "finalized". 
 
@@ -298,7 +298,7 @@ Curve Finance introduced the **StableSwap** formula, optimized for assets with s
 
  The **constant D** represents the total amount of coins in the pool when their prices are equal. To minimize price slippage, an "amplified" invariant should have low curvature, leading to smaller price changes. A "zero slippage" invariant corresponds to infinite leverage, but it’s essentially a constant-price or constant-sum invariant. On the other hand, a constant-product invariant corresponds to zero leverage.
 
-To find a balance between these two extremes, the proposed solution introduces a dimensionless **leverage parameter (χ)**. By adjusting χ, the invariant can smoothly transition between a constant-product invariant (when χ = 0) and a constant-sum invariant (when χ = ∞). To ensure consistency, the constant-sum invariant is multiplied by χDn−1, where D represents the total value of coins in the pool and n is the number of coins. This results in an invariant that incorporates both characteristics and allows for flexible adjustment of leverage.
+To find a balance between these two extremes, the proposed solution introduces a dimensionless **leverage parameter (χ)**. By adjusting χ, the invariant can smoothly transition between a constant-product invariant, when χ = 0, and a constant-sum invariant, when χ = ∞. To ensure consistency, the constant-sum invariant is multiplied by χDn−1, where D represents the total value of coins in the pool and n is the number of coins. This results in an invariant that incorporates both characteristics and allows for flexible adjustment of leverage.
 
 ![curve-formula]({{site.url_complet}}/assets/article/blockchain/defi/curve/curve-formula.png)
 
@@ -312,7 +312,7 @@ Graphs are from the StableSwap whitepaper
 
 The price slippage (Fig. 2) is much smaller, if compared to constant-product invariant. The StableSwap invariant has an “amplification coefficient” parameter: the lower it is, the closer the invariant is to the constant product. When calculating slippage, we use a practical value of A = 100. This is somewhat comparable to using Uniswap with 100x leverage.
 
-Price slippage: Uniswap invariant (dashed line) vs Stableswap (solid line)
+Price slippage: Uniswap invariant as a dashed line, Stableswap as a solid line
 
 ![curve-price-slippage]({{site.url_complet}}/assets/article/blockchain/defi/curve/curve-price-slippage.png)
 
@@ -337,7 +337,7 @@ Several AMMs, like **Bancor** and **Kyber Network**, use hybrid formulas that co
 
 
 
-**Hybrid Constant Function Market Maker (HCFMM)** is mentioned in a [KPMG report](https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2021/10/crypto-insights-part-2-decentralised-exchanges-and-automated-market-makers.pdf), but I haven't really found any further explanation
+**Hybrid Constant Function Market Maker (HCFMM)** is mentioned in a [KPMG report](https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2021/10/crypto-insights-part-2-decentralised-exchanges-and-automated-market-makers.pdf), but I have not found any further explanation
 
 
 

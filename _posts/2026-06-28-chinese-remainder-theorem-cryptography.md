@@ -2,6 +2,7 @@
 layout: post
 title: The Chinese Remainder Theorem and its Cryptographic Applications
 date:   2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography
@@ -202,7 +203,11 @@ Modulo a prime $$p$$, the ring $$\mathbb{Z}_p$$ is a field, so the degree-2 equa
 
 **Q: Combining the applications, why does the CRT both speed up RSA and threaten it through square roots?**
 
-Both facts come from the same isomorphism $$\mathbb{Z}_n \cong \mathbb{Z}_p \times \mathbb{Z}_q$$. The speedup uses it constructively: the signer, who knows $$p$$ and $$q$$, moves into the product ring to compute cheaply. The threat uses it destructively: an attacker who can obtain two distinct square roots of the same value (for instance via a single-branch fault in RSA-CRT signing) recovers a factor of $$n$$ through $$\gcd$$, because the differing roots disagree in exactly one CRT component. The structure that helps the key holder also leaks the factorization to anyone who can observe inconsistent results across the two components.
+Both facts come from the same isomorphism $$\mathbb{Z}_n \cong \mathbb{Z}_p \times \mathbb{Z}_q$$. The speedup uses it constructively: the signer, who knows $$p$$ and $$q$$, moves into the product ring to compute cheaply.
+
+The threat uses it destructively: an attacker who obtains two values that agree in one CRT component and differ in the other recovers a factor of $$n$$ through $$\gcd$$.
+
+With square roots, these are two roots of the same value that are not negatives of each other (the Rabin setting). With RSA-CRT, they are a correct signature and a faulty one where the fault hit a single branch, so $$\gcd(s - s',\ n)$$ is a prime factor. The structure that helps the key holder also leaks the factorization to anyone who can observe inconsistent results across the two components.
 
 **Q: Why must an RSA-CRT implementation verify the signature before releasing it?**
 

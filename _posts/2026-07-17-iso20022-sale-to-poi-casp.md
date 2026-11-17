@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Sale to POI — The casp Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -23,7 +24,7 @@ At a shop checkout, two devices talk to each other before your card is ever char
 
 ## What casp covers
 
-`casp` sits at a very specific interface: between the **sale system** (the retailer's till or point-of-sale application) and the **POI**, the Point of Interaction, which is the payment terminal or acceptance device. It does not reach the acquirer. When the cashier presses "pay", the sale system tells the POI to take a payment; the POI runs the card transaction with the acquirer over its own rails and reports the result back to the sale system. `casp` is only the sale-to-POI leg, standardising what has historically been a mess of proprietary, terminal-specific integrations.
+`casp` sits at a very specific interface: between the **sale system** (the retailer's till or point-of-sale application) and the **POI**, the Point of Interaction, which is the payment terminal or acceptance device. It does not cover the link to the acquirer. When the cashier presses "pay", the sale system tells the POI to take a payment; the POI runs the card transaction with the acquirer over its own rails and reports the result back to the sale system. `casp` is only the sale-to-POI leg, standardising what has historically been a mess of proprietary, terminal-specific integrations.
 
 ![Where casp sits: sale system, POI, and acquirer]({{site.url_complet}}/assets/article/finance/casp-sale-poi-concept.png)
 
@@ -89,15 +90,21 @@ The `casp` business area standardises the conversation between a retailer's sale
 
 **Q: What interface does casp standardise, and what does it deliberately leave out?**
 
-`casp` standardises the interface between the sale system (the cash register or point-of-sale application) and the POI (the payment terminal). It lets the till tell the terminal to take a payment, drive its printer and display, manage sessions, and reconcile totals. It deliberately leaves out the leg from the POI to the acquirer: the terminal runs the actual card authorisation over its own rails. `casp` is only the sale-to-POI conversation, which is exactly the part that used to require bespoke, terminal-specific integration.
+`casp` standardises the interface between the sale system, meaning the cash register or point-of-sale application, and the POI, the payment terminal. It lets the till tell the terminal to take a payment, drive its printer and display, manage sessions, and reconcile totals.
+
+It deliberately leaves out the leg from the POI to the acquirer: the terminal runs the actual card authorisation over its own rails. `casp` is only the sale-to-POI conversation, which is exactly the part that used to require bespoke, terminal-specific integration.
 
 **Q: Why is the device pair (casp.016 / casp.017) important?**
 
-Because it lets the sale system drive the terminal's peripherals directly, so the two devices behave as one integrated system. Through a `casp.016` DeviceRequest and its `casp.017` response, the sale system can make the POI print a receipt, show a message or prompt on its display, or capture input from the cardholder. Without this, the till and terminal would be two disconnected devices; with it, the cashier's application controls the whole customer-facing flow, which is a large part of what a modern point-of-sale integration needs.
+Because it lets the sale system drive the terminal's peripherals directly, so the two devices behave as one integrated system. Through a `casp.016` DeviceRequest and its `casp.017` response, the sale system can make the POI print a receipt, show a message or prompt on its display, or capture input from the cardholder.
+
+Without this, the till and terminal would be two disconnected devices; with it, the cashier's application controls the whole customer-facing flow, which is a large part of what a modern point-of-sale integration needs.
 
 **Q: How does a typical payment flow through the casp messages?**
 
-The sale system opens a session with a `casp.005` request and `casp.006` response, then asks for the payment with a `casp.001` ServiceRequest carrying the amount. The POI prompts the cardholder, reads the card, authorises with the acquirer over its own connection, and returns the result in a `casp.002` ServiceResponse. The sale system then prints the receipt with a `casp.016` DeviceRequest. At end of day it reconciles totals with a `casp.003` reconciliation request. Control messages such as abort (`casp.011`) and rejection (`casp.013`) handle the exceptions.
+The sale system opens a session with a `casp.005` request and `casp.006` response, then asks for the payment with a `casp.001` ServiceRequest carrying the amount. The POI prompts the cardholder, reads the card, authorises with the acquirer over its own connection, and returns the result in a `casp.002` ServiceResponse.
+
+The sale system then prints the receipt with a `casp.016` DeviceRequest. At end of day it reconciles totals with a `casp.003` reconciliation request. Control messages handle the exceptions, such as the `casp.011` abort and the `casp.013` rejection.
 
 **Q: Why does standardising the sale-to-POI interface matter for retailers?**
 
@@ -105,7 +112,9 @@ Because it delivers portability. Historically, integrating a till with a payment
 
 **Q: How does casp relate to the other card areas?**
 
-`casp` is the front of the chain, at the point of sale. The POI it drives then talks to the acquirer using the acquirer-to-issuer transaction messages, maintains that link with the network-management messages, and the whole chain shares the card family's protection model. So a purchase begins as a `casp` exchange between till and terminal, becomes an acquirer-to-issuer authorisation once the POI reaches the acquirer, and settles through the card clearing and settlement traffic. `casp` covers only the first leg, but it is the one the customer and cashier actually see.
+`casp` is the front of the chain, at the point of sale. The POI it drives then talks to the acquirer using the acquirer-to-issuer transaction messages, maintains that link with the network-management messages, and the whole chain shares the card family's protection model.
+
+So a purchase begins as a `casp` exchange between till and terminal, becomes an acquirer-to-issuer authorisation once the POI forwards it to the acquirer, and settles through the card clearing and settlement traffic. `casp` covers only the first leg, but it is the leg the customer and cashier see.
 
 ## References
 

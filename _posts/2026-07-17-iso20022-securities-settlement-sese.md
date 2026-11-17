@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Securities Settlement — The sese Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -15,7 +16,7 @@ isMath: false
 
 
 
-When a securities trade is agreed, nothing has really happened until the securities move from seller to buyer and the cash moves the other way. That final step, at a central securities depository or a custodian, is **settlement**, and ISO 20022 models it in the `sese` business area. This is where the earlier stages land: a clearing obligation, a collateral delivery, an FX-funded purchase all end in a `sese` settlement instruction. This article walks through the area's core settlement lifecycle, its securities-financing and transfer families, and the regulatory messages that surround a failed settlement.
+When a securities trade is agreed, it is not complete until the securities move from seller to buyer and the cash moves the other way. That final step, at a central securities depository or a custodian, is **settlement**, and ISO 20022 models it in the `sese` business area. This is where the earlier stages land: a clearing obligation, a collateral delivery, an FX-funded purchase all end in a `sese` settlement instruction. This article walks through the area's core settlement lifecycle, its securities-financing and transfer families, and the regulatory messages that surround a failed settlement.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -60,10 +61,10 @@ Repo and securities-lending transactions settle through their own `sese` family,
 
 ## Transfers
 
-A separate group moves an entire position or portfolio between accounts rather than settling a trade, the machinery behind moving assets from one custodian or fund platform to another.
+A separate group moves an entire position or portfolio between accounts rather than settling a trade. These are the messages used to move assets from one custodian or fund platform to another.
 
 - **Transfer in and out** (`sese.001` to `sese.011`) instruct, confirm, cancel, and reverse the transfer of a holding into or out of an account, with status reports for each.
-- **Portfolio transfer** (`sese.012` to `sese.014`, plus the `sese.037` notification and `sese.043` completion) moves a whole portfolio, coordinating the many individual holdings it contains.
+- **Portfolio transfer** (`sese.012` to `sese.014`) moves a whole portfolio, coordinating the many individual holdings it contains. The `sese.037` notification and the `sese.043` completion message belong to the same family.
 - **Account holding information** (`sese.018`, `sese.019`) requests and provides the list of holdings to be transferred, so the receiving side knows what is coming.
 
 ## Settlement discipline and buy-in
@@ -72,7 +73,9 @@ Settlement fails carry regulatory consequences, and `sese` includes the messages
 
 ## Conclusion
 
-The `sese` business area is where a securities trade finally happens. Its core is the `sese.023` settlement instruction and the matched lifecycle around it: instruct, match, allege the missing side, modify or cancel, then settle and confirm, or reverse. Around that core sit the securities-financing family for repo and stock lending, the transfer family for moving positions and whole portfolios between accounts, and the buy-in advice that supports the settlement-discipline regime. Read together with the clearing area `secl` that feeds it, the collateral area `colr` whose deliveries it performs, and the reporting area `semt` that describes its results, `sese` is the settlement engine at the end of the securities post-trade chain.
+The `sese` business area is where a securities trade finally happens. Its core is the `sese.023` settlement instruction and the matched lifecycle around it: instruct, match, allege the missing side, modify or cancel, then settle and confirm, or reverse.
+
+Around that core sit the securities-financing family for repo and stock lending, the transfer family for moving positions and whole portfolios between accounts, and the buy-in advice that supports the settlement-discipline regime. Read together with the clearing area `secl` that feeds it, the collateral area `colr` whose deliveries it performs, and the reporting area `semt` that describes its results, `sese` is the settlement engine at the end of the securities post-trade chain.
 
 ![Mindmap summarising the ISO 20022 sese securities settlement area]({{site.url_complet}}/assets/article/finance/iso20022-securities-settlement-sese.png)
 
@@ -97,11 +100,15 @@ The `sese` business area is where a securities trade finally happens. Its core i
 
 **Q: Why must a settlement transaction be matched before it settles?**
 
-Because settlement is instructed by both sides independently, and matching is the check that they agree. The deliverer sends an instruction to deliver and the receiver one to receive, and the CSD compares them on the key economic terms: the security, the quantity, the settlement date, the amount, and the parties. Only when the two line up does the transaction settle. This two-sided confirmation prevents one participant's error or unilateral instruction from moving securities and cash that the other side never agreed to.
+Because settlement is instructed by both sides independently, and matching is the check that they agree. The deliverer sends an instruction to deliver and the receiver one to receive, and the CSD compares them on the key economic terms: the security, the quantity, the settlement date, the amount, and the parties.
+
+Only when the two line up does the transaction settle. This two-sided confirmation prevents one participant's error or unilateral instruction from moving securities and cash that the other side never agreed to.
 
 **Q: What does delivery versus payment mean, and where is it set in a sese.023?**
 
-Delivery versus payment (DvP) means the securities and the cash move together or not at all: the delivery of securities is conditioned on the payment, and vice versa, so neither party is left having given up its leg without receiving the other. It is set in the settlement type and additional parameters (`SttlmTpAndAddtlParams`) of the `sese.023` instruction, which state whether the transaction is DvP or free of payment and whether the participant delivers or receives. DvP is the mechanism that removes principal risk from settlement.
+Delivery versus payment (DvP) means the securities and the cash move together or not at all: the delivery of securities is conditioned on the payment, and vice versa, so neither party is left having given up its leg without receiving the other.
+
+It is set in the settlement type and additional parameters (`SttlmTpAndAddtlParams`) of the `sese.023` instruction, which state whether the transaction is DvP or free of payment and whether the participant delivers or receives. DvP is the mechanism that removes principal risk from settlement.
 
 **Q: What is an allegement, and which message carries it?**
 
@@ -109,11 +116,15 @@ An allegement is the CSD telling a participant that its counterparty has instruc
 
 **Q: How does securities settlement differ from securities financing in sese?**
 
-An outright settlement moves securities against cash once, and is handled by the core `sese.023` instruction and its lifecycle. A financing transaction, a repo or a securities loan, has two legs: an opening leg that lends the securities or cash and a closing leg that returns them later. Because of that two-legged shape, financing has its own family: `sese.033` instructs it, `sese.034` reports status, `sese.035` confirms, and `sese.036` modifies it. The separate family lets the standard capture the opening and closing legs and the financing terms that an outright trade does not have.
+An outright settlement moves securities against cash once, and is handled by the core `sese.023` instruction and its lifecycle. A financing transaction, a repo or a securities loan, has two legs: an opening leg that lends the securities or cash and a closing leg that returns them later.
+
+Because of that two-legged shape, financing has its own family: `sese.033` instructs it, `sese.034` reports status, `sese.035` confirms, and `sese.036` modifies it. The separate family lets the standard capture the opening and closing legs and the financing terms that an outright trade does not have.
 
 **Q: How does sese connect to the clearing, collateral, and reporting areas?**
 
-`sese` is the settlement step the others feed into or read from. The clearing area `secl` ends with a settlement obligation that becomes a `sese.023` instruction. The collateral area `colr` agrees which assets move in a margin call, and their delivery is performed by `sese`. The reporting area `semt` then describes the results: a `sese.023` instruction still to settle appears on a `semt.018` pending report, and a `sese.028` allegement appears on a `semt.019` allegement report. `sese` is the engine; the others instruct it, cover it, or report on it.
+`sese` is the settlement step the others feed into or read from. The clearing area `secl` ends with a settlement obligation that becomes a `sese.023` instruction. The collateral area `colr` agrees which assets move in a margin call, and their delivery is performed by `sese`.
+
+The reporting area `semt` then describes the results: a `sese.023` instruction still to settle appears on a `semt.018` pending report, and a `sese.028` allegement appears on a `semt.019` allegement report. `sese` is the engine; the others instruct it, cover it, or report on it.
 
 **Q: What regulatory messages does sese include for settlement fails?**
 

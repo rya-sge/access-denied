@@ -2,7 +2,7 @@
 layout: post
 title: "The GKR Protocol — Delegating Computation with Interactive Proofs"
 date:   2026-06-19
-last_modified_at: 2026-07-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -31,7 +31,7 @@ The verifier runs in polynomial time in $$\lvert x \rvert$$, while the prover ma
 
 ### The Delegation Problem
 
-Consider a verifier with limited computational resources (for example a mobile device, or a smart contract with strict gas limits) that wishes to evaluate a large arithmetic circuit $$C$$ on an input $$x$$. A naive approach requires the verifier to re-execute $$C$$, which is prohibitive when $$\lvert C \rvert$$ is large. The GKR protocol solves this: the verifier can delegate the computation to an untrusted prover and verify the claimed output in time sublinear in $$\lvert C \rvert$$.
+Consider a verifier with limited computational resources, such as a mobile device or a smart contract with strict gas limits, that wishes to evaluate a large arithmetic circuit $$C$$ on an input $$x$$. A naive approach requires the verifier to re-execute $$C$$, which is prohibitive when $$\lvert C \rvert$$ is large. The GKR protocol solves this: the verifier can delegate the computation to an untrusted prover and verify the claimed output in time sublinear in $$\lvert C \rvert$$.
 
 ## The Sum-Check Protocol
 
@@ -47,7 +47,7 @@ H = \sum_{b_1 \in \{0,1\}} \sum_{b_2 \in \{0,1\}} \cdots \sum_{b_v \in \{0,1\}} 
 \end{aligned}
 $$
 
-The verifier knows $$H$$ and has oracle access to $$g$$ (it can query the polynomial at a single point), but cannot afford to evaluate the entire sum over all $$2^v$$ inputs.
+The verifier knows $$H$$ and has oracle access to $$g$$: it can query the polynomial at a single point, but cannot afford to evaluate the entire sum over all $$2^v$$ inputs.
 
 ### Protocol
 
@@ -97,7 +97,7 @@ $$
 \end{aligned}
 $$
 
-where $$\chi_{h_i}(x_i) = h_i \cdot x_i + (1 - h_i)(1 - x_i)$$ is the Lagrange basis polynomial for the $$i$$-th variable (equal to 1 when $$x_i = h_i$$, and 0 when $$x_i = 1 - h_i$$).
+where $$\chi_{h_i}(x_i) = h_i \cdot x_i + (1 - h_i)(1 - x_i)$$ is the Lagrange basis polynomial for the $$i$$-th variable. It equals 1 when $$x_i = h_i$$, and 0 when $$x_i = 1 - h_i$$.
 
 ### Why MLEs Enable Efficient Verification
 
@@ -109,7 +109,7 @@ The Schwartz-Zippel lemma implies that two distinct multilinear polynomials over
 
 The GKR protocol operates on **layered arithmetic circuits** over a field $$\mathbb{F}$$. Such a circuit $$C$$ consists of $$D+1$$ layers (numbered 0 through $$D$$), where:
 
-- **Layer 0** is the output layer (a single gate, or a small number of output gates).
+- **Layer 0** is the output layer, with a single gate or a small number of output gates.
 - **Layer $$D$$** is the input layer, containing the circuit's inputs.
 - Every gate in layer $$i$$ receives its inputs from gates in layer $$i+1$$ only.
 
@@ -144,7 +144,7 @@ $$
 \end{aligned}
 $$
 
-This holds for all $$z \in \mathbb{F}^m$$, not just $$z \in \{0,1\}^m$$. The sum is a sum-check instance over $$2m$$ variables ($$w_1$$ and $$w_2$$, each of length $$m$$). The polynomial $$f_i$$ has degree at most 2 in each of its $$2m$$ variables: each wiring predicate is multilinear (degree 1 per variable), and the multiplication term contributes an additional degree-1 factor from $$\tilde V_{i+1}$$.
+The equation is valid for every $$z \in \mathbb{F}^m$$, not just $$z \in \{0,1\}^m$$. The sum is a sum-check instance over $$2m$$ variables ($$w_1$$ and $$w_2$$, each of length $$m$$). The polynomial $$f_i$$ has degree at most 2 in each of its $$2m$$ variables: each wiring predicate is multilinear (degree 1 per variable), and the multiplication term contributes an additional degree-1 factor from $$\tilde V_{i+1}$$.
 
 ### Protocol Description
 
@@ -210,7 +210,7 @@ This is precisely the efficiency gain that GKR provides: the prover works propor
 
 ## Zero-Knowledge Variants
 
-The basic GKR protocol is not zero-knowledge: the messages exchanged by the prover (the univariate polynomials $$g_j$$) may reveal information about the witness (the gate values of the circuit). To obtain a zero-knowledge variant, one standard technique masks each univariate polynomial $$g_j$$ with a random polynomial of the same degree:
+The basic GKR protocol is not zero-knowledge: the univariate polynomials $$g_j$$ sent by the prover may reveal information about the witness, which here is the gate values of the circuit. To obtain a zero-knowledge variant, one standard technique masks each univariate polynomial $$g_j$$ with a random polynomial of the same degree:
 
 $$
 \begin{aligned}
@@ -218,7 +218,7 @@ $$
 \end{aligned}
 $$
 
-where $$r_j$$ is chosen uniformly at random subject to $$r_j(0) + r_j(1) = 0$$, ensuring that the sum over the boolean hypercube is preserved. The verifier adjusts its consistency check accordingly. This technique achieves perfect zero knowledge for the sum-check sub-protocol; a detailed treatment appears in Thaler (2022), Chapter 6.
+where $$r_j$$ is chosen uniformly at random subject to $$r_j(0) + r_j(1) = 0$$, so that adding $$r_j$$ does not change the sum over the boolean hypercube. The verifier adjusts its consistency check accordingly. This technique achieves perfect zero knowledge for the sum-check sub-protocol; a detailed treatment appears in Thaler (2022), Chapter 6.
 
 ## Applications and Impact
 
@@ -281,7 +281,7 @@ The protocol is an interactive proof rather than an argument of knowledge, and o
 
 ### Security Implementation Checklist
 
-The items below are the properties an implementation of GKR (or of a sum-check-based proof system built on it) has to satisfy for its soundness and zero-knowledge claims to hold. Each row states the requirement and what breaks when it is violated.
+The items below are the properties an implementation of GKR, or of a sum-check-based proof system built on it, has to satisfy for its soundness and zero-knowledge claims to hold. Each row states the requirement and what breaks when it is violated.
 
 #### Field and parameter selection
 
@@ -325,7 +325,9 @@ No. A deterministic challenge sequence can be predicted by the prover before sen
 
 **Q: What happens if the line-restriction trick is omitted?**
 
-Without the trick, each sum-check at layer $$i$$ ends with two evaluation claims on $$\tilde V_{i+1}$$. Carrying both claims independently through $$D$$ layers doubles the number of open claims at each layer, ending with $$2^D$$ claims at the input layer. The verifier would then need $$O(S)$$ time to check all of them, eliminating the sub-linear complexity advantage. The line-restriction trick collapses two claims into one at the cost of one additional degree-$$m$$ polynomial, keeping the claim count at exactly 1 throughout.
+Without the trick, each sum-check at layer $$i$$ ends with two evaluation claims on $$\tilde V_{i+1}$$. Carrying both claims independently through $$D$$ layers doubles the number of open claims at each layer, ending with $$2^D$$ claims at the input layer. The verifier would then need $$O(S)$$ time to check all of them, eliminating the sub-linear complexity advantage.
+
+The line-restriction trick collapses two claims into one at the cost of one additional degree-$$m$$ polynomial, keeping the claim count at exactly 1 throughout.
 
 **Q: Why must the MLE be multilinear (degree at most 1 in each variable) rather than a higher-degree extension?**
 
@@ -349,11 +351,15 @@ No. GKR is an interactive proof for the decision problem "does circuit $$C$$ eva
 
 **Q: What is a typical soundness error in a realistic deployment?**
 
-Each sum-check over $$2m$$ rounds with degree-2 polynomials contributes error at most $$4m / \lvert\mathbb{F}\rvert$$. Over $$D$$ layers the total error is $$O(D \cdot m / \lvert\mathbb{F}\rvert)$$. For a circuit with $$n = 2^{20}$$ inputs, depth $$D = 40$$, and $$m = 20$$ (since $$2^m$$ bounds gates per layer), over a 128-bit prime field the total error is roughly $$40 \cdot 20 \cdot 2 / 2^{128} \approx 2^{-118}$$. This is negligible for all practical purposes.
+Each sum-check over $$2m$$ rounds with degree-2 polynomials contributes error at most $$4m / \lvert\mathbb{F}\rvert$$, and the line-restriction step adds $$m / \lvert\mathbb{F}\rvert$$, so a layer costs at most $$5m / \lvert\mathbb{F}\rvert$$. Over $$D$$ layers the total error is $$O(D \cdot m / \lvert\mathbb{F}\rvert)$$.
+
+For a circuit with $$n = 2^{20}$$ inputs, depth $$D = 40$$, and $$m = 20$$ (since $$2^m$$ bounds gates per layer), over a 128-bit prime field the total error is roughly $$40 \cdot (4 \cdot 20 + 20) / 2^{128} = 4000 / 2^{128} \approx 2^{-116}$$. This is negligible for all practical purposes.
 
 **Q: How do the sum-check bound and the line-restriction step combine to give the protocol's overall soundness?**
 
-They compose additively. Each of the $$D$$ layer reductions contributes two independent chances for a cheating prover to survive: the $$2m$$ sum-check rounds, bounded by $$2m \cdot d / \lvert\mathbb{F}\rvert$$ with $$d = 2$$, and the line-restriction step, where a dishonest degree-$$m$$ polynomial $$q$$ agreeing with the true restriction at the random $$t^\star$$ costs a further $$m / \lvert\mathbb{F}\rvert$$. Summing over all layers gives $$O(D \cdot m / \lvert\mathbb{F}\rvert)$$. The point worth noting is that the line-restriction trick, introduced purely as an efficiency measure, adds a term of the same order as the sum-check itself and so does not change the security level.
+They compose additively. Each of the $$D$$ layer reductions contributes two independent chances for a cheating prover to survive: the $$2m$$ sum-check rounds, bounded by $$2m \cdot d / \lvert\mathbb{F}\rvert$$ with $$d = 2$$, and the line-restriction step, where a dishonest degree-$$m$$ polynomial $$q$$ agreeing with the true restriction at the random $$t^\star$$ costs a further $$m / \lvert\mathbb{F}\rvert$$. Summing over all layers gives $$O(D \cdot m / \lvert\mathbb{F}\rvert)$$.
+
+The line-restriction trick, introduced purely as an efficiency measure, adds a term of the same order as the sum-check itself, so it does not change the security level.
 
 ## References
 
@@ -377,7 +383,7 @@ They compose additively. Each of the $$D$$ layer reductions contributes two inde
 
 ### Lecture notes
 
-- Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. (Chapters 4 and 5 cover sum-check and GKR in depth.)
+- Thaler, J.: [*Proofs, Arguments, and Zero-Knowledge*](https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html). Lecture notes, 2022. Chapters 4 and 5 cover sum-check and GKR in depth.
 
 ### Related articles
 

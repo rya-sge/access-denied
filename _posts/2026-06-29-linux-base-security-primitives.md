@@ -2,7 +2,7 @@
 layout: post
 title: GNU/Linux Base Security Primitives - Authentication, Permissions, ACLs, Attributes, Capabilities
 date:   2026-06-29
-last_modified_at: 2026-11-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: linux security
@@ -33,7 +33,9 @@ The article assumes the reader knows what a process, a file permission and root 
 
 ## GNU/Linux in One Paragraph
 
-GNU/Linux is a UNIX clone made of the [GNU project](https://www.gnu.org/gnu/about-gnu.html) (started 1983) and the Linux kernel (1991). The kernel is monolithic: drivers, system calls, and memory management run in a single kernel address space. It follows the POSIX standard (as do UNIX, BSD, Windows, and macOS to varying degrees) and ships in many distributions (Slackware, Debian, Ubuntu, Red Hat). Because the inherited UNIX model is too permissive for current threat models, GNU/Linux layers additional protection mechanisms on top of it, recovering several MULTICS features and answering new adversary models. The primitives below are the base of that layering, the ones an administrator meets first.
+GNU/Linux is a UNIX clone made of the [GNU project](https://www.gnu.org/gnu/about-gnu.html), started in 1983, and the Linux kernel, first released in 1991. The kernel is monolithic: drivers, system calls, and memory management run in a single kernel address space. It follows the POSIX standard, as do UNIX, BSD and macOS to varying degrees; Windows offers POSIX compatibility only through add-on layers such as the Windows Subsystem for Linux. It ships in many distributions, such as Slackware, Debian, Ubuntu and Red Hat.
+
+Because the inherited UNIX model is too permissive for current threat models, GNU/Linux layers additional protection mechanisms on top of it, recovering several MULTICS features and answering new adversary models. The primitives below are the base of that layering, the ones an administrator meets first.
 
 ## Login and Authentication
 
@@ -42,13 +44,13 @@ Authentication establishes *who* is interacting with the system. The historical 
 - **Terminal (virtual):** the local console.
 - **telnet:** a remote login service on TCP port 23, transmitted in cleartext. Credentials travel unencrypted, so it is unsuitable for hostile networks.
 - **[Secure Shell (SSH)](https://www.openssh.com/), 1995:** a service on TCP port 22 that provides confidentiality, authentication, and integrity through cryptography. It is the standard replacement for telnet.
-- **[PAM](https://github.com/linux-pam/linux-pam) (Pluggable Authentication Modules):** a modular framework that lets administrators compose authentication steps (password, one-time token, biometric driver) without changing each application.
+- **[PAM](https://github.com/linux-pam/linux-pam) (Pluggable Authentication Modules):** a modular framework that lets administrators compose authentication steps, such as a password, a one-time token or a biometric driver, without changing each application.
 
 **Adversary model.** Unauthorized people must not access the system, and every legitimate user must be identified.
 
 **Security primitive.** A login process (`login`, `sshd`, PAM stack) verifies a *shared secret*: a password, a cryptographic key, or a fingerprint.
 
-**Trade-offs.** Authentication is simple in principle, modular through PAM, and sometimes cryptographically secure (SSH). Against that, it is a critical service (its compromise is a full breach), it depends on a shared secret, and it becomes complex when cryptography is involved (SSH) or when device drivers are needed (PAM modules).
+**Trade-offs.** Authentication is simple in principle, modular through PAM, and cryptographically secure in the case of SSH. Against that, it is a critical service whose compromise is a full breach, and it depends on a shared secret. It also becomes complex when cryptography is involved, as with SSH, or when device drivers are needed, as with PAM modules.
 
 ## POSIX File Permissions
 
@@ -56,7 +58,7 @@ The core of UNIX access control is a 9-bit permission set attached to every file
 
 **Adversary model.** Grant limited access (read, write, execute) to files according to users and groups.
 
-**The classes and rights.** Each file has an owner (`u`), a group (`g`), and everyone else (`o`, meaning not the owner and not in the group). Each class carries three bits: read (`r`), write (`w`), execute (`x`).
+**The classes and rights.** Each file has an owner (`u`), a group (`g`), and everyone else (`o`), meaning anyone who is neither the owner nor in the group. Each class carries three bits: read (`r`), write (`w`), execute (`x`).
 
 ```text
 -rwxr-xr-x  2 alice vip 4096 Feb 25 10:36 tool.sh
@@ -104,7 +106,7 @@ Three extra bits sit above the nine permission bits and change *how* execution a
 
 ### Sticky Bit
 
-**Adversary model.** In a directory writable by many (the canonical case is `/tmp`), a user with write permission can rename or delete *other users'* files, since directory write permission normally allows that.
+**Adversary model.** In a directory writable by many, of which `/tmp` is the canonical case, a user with write permission can rename or delete *other users'* files, since directory write permission normally allows that.
 
 **Security primitive.** The sticky bit, a repurposing of an older mechanism (it once kept program text resident in swap), restricts deletion and renaming inside a directory to the file's owner.
 
@@ -140,11 +142,17 @@ chmod u+s ./program     ->  -rwsr-xr-x   (SUID shown as 's' in the owner-execute
 chmod 4455 ./program    ->  -r-Sr-xr-x   ('S' = SUID without owner-execute)
 ```
 
-The mechanism rests on the difference between the real UID (the caller) and the effective UID (used for permission checks). At `exec`, the kernel sets the effective UID to the file owner.
+The mechanism rests on the difference between the real UID, which identifies the caller, and the effective UID, which is used for permission checks. At `exec`, the kernel sets the effective UID to the file owner.
 
 ![SUID at exec, temporary identity change]({{site.url_complet}}/assets/article/securite/linux-base-security/suid-privilege-elevation-workflow.png)
 
-**Trade-offs of the permission family** (`chown`/`chmod`/SUID/SGID/sticky): the model is simple, widely known across operating systems, manages users and groups through `/etc/passwd` and `/etc/group`, and can transfer privileged rights to specific programs. The drawbacks are sharp: SUID and SGID are dangerous because they lean on the all-or-nothing root/user duality (any flaw in a SUID-root binary yields full root), SGID has a confusing double meaning (file vs directory), the sticky bit is a reused mechanism that is little used today, group management becomes laborious as the user count grows, and a group cannot contain other groups.
+**Trade-offs of the permission family** (`chown`/`chmod`/SUID/SGID/sticky): the model is simple, widely known across operating systems, manages users and groups through `/etc/passwd` and `/etc/group`, and can transfer privileged rights to specific programs. The drawbacks are sharp:
+
+- SUID and SGID are dangerous because they lean on the all-or-nothing root/user duality: any flaw in a SUID-root binary yields full root.
+- SGID has a confusing double meaning, one on files and another on directories.
+- The sticky bit is a reused mechanism that is little used today.
+- Group management becomes laborious as the user count grows.
+- A group cannot contain other groups.
 
 ## POSIX Access Control Lists (ACLs)
 
@@ -152,7 +160,7 @@ The owner/group/other model is coarse: it cannot express "grant access to this o
 
 **Adversary model.** Finer-grained rights are needed (also for compatibility with other operating systems), including default rights applied to new files in a directory.
 
-**Security primitive.** ACLs add per-user and per-group access control entries to files and directories, enforced by the kernel. They depend on the filesystem and are limited in number (32 entries on ext2/ext3). Two commands manage them: `getfacl` and `setfacl`.
+**Security primitive.** ACLs add per-user and per-group access control entries to files and directories, enforced by the kernel. They depend on the filesystem, which may cap the number of entries per file. Two commands manage them: `getfacl` and `setfacl`.
 
 ```text
 $ setfacl -m u:bob:- ok-for-vip-but-not-bob.txt   # deny user bob explicitly
@@ -185,7 +193,7 @@ default:mask::r-x
 default:other::---
 ```
 
-**Trade-offs.** ACLs give greater granularity, allow access to a file by several distinct groups, are known across operating systems, and have a simple interface (`getfacl`/`setfacl`). Costs: file access is slower, copying a file can lose its ACL (the properties do not always travel with the data), and the model is more complex to maintain.
+**Trade-offs.** ACLs give greater granularity, allow access to a file by several distinct groups, are known across operating systems, and have a simple interface (`getfacl`/`setfacl`). Costs: file access is slower, copying a file can lose its ACL, and the model is more complex to maintain. The ACL does not always travel with the data it protects.
 
 ## Extended Attributes
 
@@ -193,7 +201,7 @@ Standard write permission is atomic: a process either may modify a file or may n
 
 **Adversary model.** Additional file behaviours are useful, such as immutability or append-only logging, which the `rwx` model cannot express.
 
-**Security primitive.** Extended attributes add kernel-enforced flags to files and directories. They are filesystem-dependent and are managed with `lsattr` and `chattr`. The most security-relevant flags:
+**Security primitive.** Extended attributes add kernel-enforced flags to files and directories. The chattr(1) manual calls them file attributes. They are distinct from the `xattr` key-value pairs managed with `getfattr` and `setfattr`, which xattr(7) also names extended attributes. They are filesystem-dependent and are managed with `lsattr` and `chattr`. The most security-relevant flags:
 
 | Flag | Meaning |
 |------|---------|
@@ -201,6 +209,8 @@ Standard write permission is atomic: a process either may modify a file or may n
 | `c` | compressed (kernel compresses the file) |
 | `i` | immutable (no modification, deletion, rename, or link) |
 | `s` | secure deletion (overwrite blocks on delete) |
+
+chattr(1) warns that ext2, ext3 and ext4, as implemented in mainline kernels, do not honour the `c` and `s` flags, so `s` cannot be relied on for secure deletion there.
 
 ```text
 $ chattr +i immutable.txt
@@ -212,15 +222,15 @@ $ lsattr append-only.txt
 -----a--------e------ append-only.txt
 ```
 
-**Trade-offs.** Extended attributes are a known primitive on other operating systems with a simple interface. However, they add complexity, depend heavily on the filesystem (a portability concern), and crucially **root can clear them**: the immutable flag protects against accidents and unprivileged tampering, not against an attacker who already holds root. They remain little used in practice.
+**Trade-offs.** Extended attributes are a known primitive on other operating systems with a simple interface. However, they add complexity, depend heavily on the filesystem, which hurts portability, and **root can clear them**, because only a process holding `CAP_LINUX_IMMUTABLE` can set or clear `a` and `i`, and root holds it unless it has been dropped from the bounding set. The immutable flag protects against accidents and unprivileged tampering, not against an attacker who already holds root. They remain little used in practice.
 
 ## Capabilities
 
-The root/user duality is the root cause of the SUID danger: a program that needs one privileged operation (change an IP address, sniff traffic, reboot) has to be granted *all* of root.
+The root/user duality is the root cause of the SUID danger: a program that needs one privileged operation, such as changing an IP address, sniffing traffic or rebooting, has to be granted *all* of root.
 
 **Adversary model.** Coarse privilege means an adversary who subverts a SUID-root tool gains total access for what should be a narrow task. Least privilege calls for splitting root into independent rights.
 
-**Security primitive.** [Capabilities](https://man7.org/linux/man-pages/man7/capabilities.7.html) decompose root's omnipotence into roughly forty distinct units, each grantable on its own. A few network examples:
+**Security primitive.** [Capabilities](https://man7.org/linux/man-pages/man7/capabilities.7.html) decompose root's omnipotence into distinct units, each grantable on its own; the current capabilities(7) page lists 41, and the count grows as kernels add new ones such as `CAP_BPF` and `CAP_PERFMON`. A few network examples:
 
 - **`CAP_NET_BIND_SERVICE`:** bind a socket to a privileged port (below 1024).
 - **`CAP_NET_RAW`:** use RAW and PACKET sockets, and bind to any address for transparent proxying.
@@ -242,7 +252,11 @@ Granting `tcpdump` only `CAP_NET_RAW` lets it capture packets without ever runni
 
 ![Privilege granularity from coarse to fine]({{site.url_complet}}/assets/article/securite/linux-base-security/privilege-granularity-concept.png)
 
-**Trade-offs.** Capabilities give finer granularity than root/user, are more secure than `su`/`sudo`/SUID/SGID, can be administered on both files and processes, are transparent to programs, and have a simple interface (`getcap`/`setcap`). The costs are the complexity of the three capability sets (Permitted, Effective, Inheritable) attached to each process, the difficulty of mastering the OS behaviour hidden behind capabilities, and the fact that some capabilities are overloaded (notably `CAP_SYS_ADMIN`, which bundles so much that it is close to root again).
+**Trade-offs.** Capabilities give finer granularity than root/user, are more secure than `su`/`sudo`/SUID/SGID, can be administered on both files and processes, are transparent to programs, and have a simple interface (`getcap`/`setcap`). The costs are:
+
+- the complexity of the five capability sets attached to each thread: Permitted, Effective and Inheritable, plus Bounding and Ambient (the latter since Linux 4.3);
+- the difficulty of mastering the OS behaviour hidden behind capabilities;
+- some capabilities are overloaded, notably `CAP_SYS_ADMIN`, which bundles so much that it is close to root again.
 
 ## How the Primitives Relate
 
@@ -255,7 +269,9 @@ Authentication sits before all of these as the gate that establishes identity. S
 
 ## Conclusion
 
-The base security of GNU/Linux is a stack of primitives layered over a deliberately simple UNIX foundation. Authentication (terminal, telnet, SSH, PAM) verifies identity through a shared secret. POSIX permissions assign `rwx` rights to owner, group, and other, with the first-matching-class rule and the sticky, SGID, and SUID bits adjusting execution and directory behaviour. ACLs add per-user and per-group entries with masks and defaults; extended attributes add immutability and append-only behaviour; capabilities split root into narrow units. The primitives differ in granularity and in the adversaries they actually stop: SUID rests on the root/user duality that capabilities exist to break, and an immutable flag does not hold against root. Choosing among them is a matter of matching the primitive to a stated threat model rather than assuming any single one is sufficient.
+The base security of GNU/Linux is a stack of primitives layered over a deliberately simple UNIX foundation. Authentication, whether on a terminal, over telnet or SSH, or through PAM, verifies identity through a shared secret. POSIX permissions assign `rwx` rights to owner, group, and other, with the first-matching-class rule and the sticky, SGID, and SUID bits adjusting execution and directory behaviour. ACLs add per-user and per-group entries with masks and defaults; extended attributes add immutability and append-only behaviour; capabilities split root into narrow units.
+
+The primitives differ in granularity and in the adversaries they stop: SUID rests on the root/user duality that capabilities exist to break, and an immutable flag does not hold against root. Choosing among them is a matter of matching the primitive to a stated threat model rather than assuming any single one is sufficient.
 
 ![GNU/Linux base security mindmap]({{site.url_complet}}/assets/article/securite/linux-base-security/2026-06-29-linux-base-security-primitives.png)
 
@@ -301,7 +317,9 @@ On a file, SGID makes the program execute with the file's group identity, granti
 
 **Q: How do the real UID and effective UID make SUID work?**
 
-A process carries a real UID (who started it) and an effective UID (used for permission checks). When a program with the SUID bit is executed, the kernel sets the effective UID to the file's owner while the real UID stays the caller's. Permission checks then use the effective UID, so a user running root-owned `passwd` temporarily gains the effective identity needed to modify `/etc/shadow`, without becoming root permanently. The danger is that any vulnerability in such a binary executes with the owner's full rights.
+A process carries a real UID, which identifies who started it, and an effective UID, which is used for permission checks. When a program with the SUID bit is executed, the kernel sets the effective UID to the file's owner while the real UID stays the caller's. Permission checks then use the effective UID, so a user running root-owned `passwd` temporarily gains the effective identity needed to modify `/etc/shadow`, without becoming root permanently.
+
+The danger is that any vulnerability in such a binary executes with the owner's full rights.
 
 **Q: What does the mask entry in a POSIX ACL do, and why does an ACL entry sometimes show a different effective right?**
 
@@ -309,7 +327,9 @@ The mask is an upper bound on the rights granted by all named-user, named-group,
 
 **Q: Combining capabilities and SUID, why are capabilities considered a more secure way to grant `tcpdump` packet-capture rights than making it SUID-root?**
 
-A SUID-root `tcpdump` runs with the entire root privilege set merely to open raw sockets, so a flaw in it gives an attacker all of root. Capabilities decompose root into independent units, so `setcap cap_net_raw+ep /usr/bin/tcpdump` grants only `CAP_NET_RAW`, the single right packet capture needs. The program never holds root, and a compromise is bounded by that one capability instead of escalating to full system control. This is least privilege made concrete: the privilege granted matches the task instead of the all-or-nothing root/user duality that SUID depends on. The caveat is that some capabilities (such as `CAP_SYS_ADMIN`) are broad enough to approach root again, so the choice of capability still matters.
+A SUID-root `tcpdump` runs with the entire root privilege set merely to open raw sockets, so a flaw in it gives an attacker all of root. Capabilities decompose root into independent units, so `setcap cap_net_raw+ep /usr/bin/tcpdump` grants only `CAP_NET_RAW`, the single right packet capture needs. The program never holds root, and a compromise is bounded by that one capability instead of escalating to full system control.
+
+This is least privilege made concrete: the privilege granted matches the task instead of the all-or-nothing root/user duality that SUID depends on. The caveat is that some capabilities, such as `CAP_SYS_ADMIN`, are broad enough to approach root again, so the choice of capability still matters.
 
 ## Gaps
 
@@ -318,12 +338,6 @@ The article follows a lecture, and these points were not checked against current
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
 | The lecture slides behind the article are not public, so most claims rest on them alone. | A reader cannot check the source of the adversary models and trade-offs. | The man pages cited below, for each primitive. |
-| The article lists three capability sets, but current kernels also have the Bounding and Ambient sets (Ambient since Linux 4.3). | The process model described is incomplete for modern systems. | The "Thread capability sets" section of [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html). |
-| "Roughly forty" capabilities is approximate: the current page lists 41, and the exact number depends on the kernel version. | A precise count changes as kernels add capabilities such as `CAP_BPF` or `CAP_PERFMON`. | [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html) and `/proc/sys/kernel/cap_last_cap` on the target system. |
-| The `c` (compressed) and `s` (secure deletion) flags are presented as working, but chattr(1) says ext2, ext3 and ext4 do not honour them in mainline kernels. | A reader may rely on `s` for secure deletion on a filesystem that ignores it. | The "Bugs and limitations" section of [chattr(1)](https://man7.org/linux/man-pages/man1/chattr.1.html). |
-| "Extended attributes" here means the `chattr` flags, which Linux also calls inode flags; the name usually refers to the separate `xattr` key-value mechanism (`getfattr`, `setfattr`). | The two mechanisms are easily confused, and POSIX ACLs are themselves stored as `xattr`s. | [chattr(1)](https://man7.org/linux/man-pages/man1/chattr.1.html) and [xattr(7)](https://man7.org/linux/man-pages/man7/xattr.7.html). |
-| The limit of 32 ACL entries on ext2/ext3 comes from the lecture; [acl(5)](https://man7.org/linux/man-pages/man5/acl.5.html) states no limit. | The real limit depends on the filesystem and its block size. | The documentation of the filesystem in use. |
-| "Root can clear" the `i` and `a` flags holds because root normally has `CAP_LINUX_IMMUTABLE`; the article does not discuss removing it. | Dropping that capability from the bounding set changes the conclusion that the flags never resist root. | The `CAP_LINUX_IMMUTABLE` entry of [capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html). |
 | Kernel restrictions on SUID, such as the `nosuid` mount option and the `no_new_privs` flag, are not covered. | They are the usual mitigations for the SUID risk the article describes. | [mount(8)](https://man7.org/linux/man-pages/man8/mount.8.html) and [prctl(2)](https://man7.org/linux/man-pages/man2/prctl.2.html) (`PR_SET_NO_NEW_PRIVS`). |
 
 ## References

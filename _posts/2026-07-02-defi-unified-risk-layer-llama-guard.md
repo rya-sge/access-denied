@@ -2,7 +2,7 @@
 layout: post
 title: The Unified Risk Layer for DeFi - From Price Oracles to Protocol-Owned Risk Oracles
 date:   2026-07-02
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain defi oracle
@@ -28,7 +28,7 @@ Once a risk signal exists, a protocol needs a way to translate it into an on-cha
 
 **On-chain controllers.** A programmatic controller executes in real time with no human in the loop. It removes the trust and latency problems, but it is narrow: it has access only to a small set of on-chain inputs, which is too thin a data diet for the nuanced decisions that resilient risk management requires.
 
-Each path resolves one of three requirements (real-time responsiveness, programmatic execution, data-rich methodology) at the expense of the others. A unified risk layer is defined precisely as the component that satisfies all three at once, with consistent guarantees, sitting between the risk signals in the outside world and the appropriate response action inside the protocol.
+There are three requirements: real-time responsiveness, programmatic execution and a data-rich methodology. Each path resolves one of them at the expense of the others. A unified risk layer is defined precisely as the component that satisfies all three at once, with consistent guarantees, sitting between the risk signals in the outside world and the appropriate response action inside the protocol.
 
 ## From Price Oracles to a Risk Layer
 
@@ -48,7 +48,7 @@ Introducing a **risk layer** on top of the oracle network immediately widens the
    - *risk-managed pricing*, a price that already accounts for the asset's risk profile, and
    - *risk-managed responses*, such as circuit breakers or risk-parameter changes.
 
-Those outputs are then fed on-chain and consumed by the protocol exactly as a price feed is today. The claim behind this design is that a risk layer of this kind will become the dominant way DeFi protocols ingest external data over the next couple of years, because price alone cannot express the conditions that actually drive protocol risk.
+Those outputs are then fed on-chain and consumed by the protocol exactly as a price feed is today. The claim behind this design is that a risk layer of this kind will become the dominant way DeFi protocols ingest external data over the next couple of years, because price alone cannot express the conditions that drive protocol risk.
 
 ## Aave's Risk-Management Journey
 
@@ -69,7 +69,7 @@ At the time the first risk oracles were built, there was no credibly neutral, hi
 That opacity has several consequences.
 
 - **Dependency.** The protocol depends entirely on the operator to keep executing reliably, with no independent way to see what the system is doing.
-- **Silent failure.** If the oracle failed to push an update when it should have, the failure was silent. Nobody could see that an expected action had not happened.
+- **Silent failure.** If the oracle failed to push an update when it should have, nobody could see that the expected action had not happened.
 - **No root-cause visibility.** If the oracle pushed an update that contradicted its stated methodology, there was no way to reconstruct what caused the deviation.
 - **Manipulability under the guise of automation.** Because the operator controls the back-end, it can update the logic without notice, stop the oracle from running, or push a *manual* update while presenting it as the output of an automation. From the protocol's point of view, all three are indistinguishable from normal operation.
 
@@ -102,7 +102,7 @@ P_{\text{linear}} \approx FV \cdot \left(1 - y \cdot \tau\right)
 \end{aligned}
 $$
 
-This is safe but conservative. A conservative discount leaves headroom between the price the protocol uses and the price the market would support, and that headroom is **unused collateral efficiency**: a borrower backed by PT collateral can borrow less than the asset could actually justify, which degrades the borrower experience.
+This is safe but conservative. A conservative discount leaves headroom between the price the protocol uses and the price the market would support, and that headroom is **unused collateral efficiency**: a borrower backed by PT collateral can borrow less than the market price of the asset would justify, which degrades the borrower experience.
 
 ### Using the asset's time-varying risk profile
 
@@ -111,7 +111,7 @@ A PT token is not equally risky across its life, and that structure is what a ri
 Two kinds of optimisation follow from this:
 
 - **Discount adjustment.** The linear discount can be adjusted so that the price it produces tracks the actual PT market price more closely, recovering the collateral efficiency that a flat conservative discount throws away.
-- **Liquidation-parameter tapering.** The market's liquidation parameters (borrowing power, or loan-to-value; the liquidation threshold; and the bonus paid to liquidators) can start conservatively while the token is young and volatile, and taper toward more aggressive values as maturity approaches and the price becomes more predictable.
+- **Liquidation-parameter tapering.** The market has three liquidation parameters: the borrowing power, or loan-to-value, the liquidation threshold, and the bonus paid to liquidators. They can start conservatively while the token is young and volatile, and taper toward more aggressive values as maturity approaches and the price becomes more predictable.
 
 The net effect is a price and a set of parameters that follow the asset's real risk profile through time instead of pinning them to the worst case for the entire life of the token.
 
@@ -144,7 +144,11 @@ Stated positively, the risk layer must respond in **real time** as conditions ev
 
 ## Conclusion
 
-The oracle stack solved the problem of getting trustworthy *prices* on-chain, but price is only one of the inputs that determine a protocol's risk. The unified risk layer generalises the oracle from a price transport into a decision layer: it ingests diverse signals, applies an explicit methodology, and emits either risk-managed prices or risk-managed responses. Aave's path from governance to manual stewards to automated risk oracles shows both the pull toward automation and the cost of the first attempt, an opaque operator-run black box. Running the methodology on neutral, verifiable infrastructure such as Chainlink CRE removes that opacity and returns ownership of the logic to the protocol. The Pendle PT pricing case makes the payoff concrete: a price and liquidation parameters that follow the asset's time-varying risk profile recover collateral efficiency that a flat conservative discount leaves on the table, without giving up transparency.
+The oracle stack solved the problem of getting trustworthy *prices* on-chain, but price is only one of the inputs that determine a protocol's risk. The unified risk layer generalises the oracle from a price transport into a decision layer: it ingests diverse signals, applies an explicit methodology, and emits either risk-managed prices or risk-managed responses.
+
+Aave's path from governance to manual stewards to automated risk oracles shows both the pull toward automation and the cost of the first attempt, an opaque operator-run black box. Running the methodology on neutral, verifiable infrastructure such as Chainlink CRE removes that opacity and returns ownership of the logic to the protocol.
+
+The Pendle PT pricing case makes the payoff concrete: a price and liquidation parameters that follow the asset's time-varying risk profile recover collateral efficiency that a flat conservative discount leaves on the table, without giving up transparency.
 
 ![Mindmap summarising the DeFi unified risk layer, its friction points, Aave's journey, and the Pendle PT use case]({{site.url_complet}}/assets/article/blockchain/defi/risk-layer/2026-07-02-defi-unified-risk-layer-llama-guard-mindmap.png)
 
@@ -152,27 +156,43 @@ The oracle stack solved the problem of getting trustworthy *prices* on-chain, bu
 
 **Q: What are the three response paths a protocol can use to act on a risk signal, and what does each fail to provide?**
 
-On-chain governance, delegated operators, and on-chain controllers. Governance is credibly neutral and consistent but slow and unscalable because it relies on the consensus of non-specialist stakeholders plus a timelock. Delegated operators execute efficiently but are trust-based: the protocol cannot verify their security or monitoring, or that they will act at the critical moment. On-chain controllers are programmatic and real-time but have access to too narrow a set of data for nuanced decisions. Each resolves one of the three requirements (real-time execution, programmatic execution, data-rich methodology) while leaving the other two open.
+The three paths are on-chain governance, delegated operators and on-chain controllers:
+
+- **On-chain governance** is credibly neutral and consistent but slow and unscalable, because it relies on the consensus of non-specialist stakeholders plus a timelock.
+- **Delegated operators** execute efficiently but are trust-based: the protocol cannot verify their security or monitoring, or that they will act at the critical moment.
+- **On-chain controllers** are programmatic and real-time but have access to too narrow a set of data for nuanced decisions.
+
+Each meets one of the three requirements, among real-time responsiveness, programmatic execution and a data-rich methodology, and leaves the other two open.
 
 **Q: How does the risk layer differ from the price oracle network beneath it?**
 
-The oracle network transports and aggregates raw data, almost always market price, and delivers a value on-chain. The risk layer sits above it and turns diverse data into decisions. It ingests signals beyond price (liquidity, volatility, macroeconomic data, derivatives data, credit ratings), defines threshold conditions and protocol-appropriate responses, and emits either a risk-managed price or a risk-managed response such as a circuit breaker or a parameter change. In short, the oracle network answers "what is the value?" while the risk layer answers "what should the protocol do about it?".
+The oracle network transports and aggregates raw data, almost always market price, and delivers a value on-chain. The risk layer sits above it and turns diverse data into decisions. It ingests signals beyond price, such as liquidity, volatility, macroeconomic data, derivatives data and credit ratings. It defines threshold conditions and protocol-appropriate responses, and emits either a risk-managed price or a risk-managed response such as a circuit breaker or a parameter change.
+
+In short, the oracle network answers "what is the value?" while the risk layer answers "what should the protocol do about it?".
 
 **Q: Why is a simple linear discount for Pendle PT tokens described as leaving collateral efficiency unused?**
 
-A linear discount prices the PT token at roughly $$FV \cdot (1 - y\tau)$$, applying the full expected yield as a flat haircut for the entire life of the token. Because it is deliberately conservative, the price the protocol uses sits below the price the market would support, and the gap is headroom that no one is using. A borrower posting PT collateral can therefore borrow less than the asset could safely justify, which is the sense in which the conservatism is a cost: the unused headroom is lost collateral efficiency and a worse borrower experience.
+A linear discount prices the PT token at roughly $$FV \cdot (1 - y\tau)$$, applying the full expected yield as a flat haircut for the entire life of the token.
+
+Because it is deliberately conservative, the price the protocol uses sits below the price the market would support, and the gap is headroom that no one is using. A borrower posting PT collateral can therefore borrow less than the asset could safely justify, which is the sense in which the conservatism is a cost: the unused headroom is lost collateral efficiency and a worse borrower experience.
 
 **Q: Why can PT pricing and liquidation parameters be made more aggressive as the token approaches maturity?**
 
-A PT token's risk profile changes over its life. Early on it is highly volatile: a small move in the underlying yield moves the PT price disproportionately. Near maturity the price path toward the one-to-one redemption is much more deterministic and carries greater assurance. Because the uncertainty shrinks over time, the discount can be tightened to track the market price more closely, and the liquidation parameters (loan-to-value, liquidation threshold, liquidation bonus) can be tapered from conservative early values toward more aggressive ones, matching the parameters to the actual risk at each point in time.
+A PT token's risk profile changes over its life. Early on it is highly volatile: a small move in the underlying yield moves the PT price disproportionately. Near maturity the price path toward the one-to-one redemption is much more deterministic and carries greater assurance.
+
+Because the uncertainty shrinks over time, the discount can be tightened to track the market price more closely. The liquidation parameters can likewise be tapered from conservative early values toward more aggressive ones, so that loan-to-value, liquidation threshold and liquidation bonus follow the risk at each point in time.
 
 **Q: What specific problem of first-generation risk oracles does running the workflow on Chainlink CRE solve?**
 
-First-generation risk oracles were built as proprietary black boxes on an operator's own back-end because no credibly neutral, reliable infrastructure existed to run them. That made the logic opaque to the protocol, auditors, and other service providers, which in turn allowed silent failures, unexplained deviations from the stated methodology, and manipulation under the guise of automation (the operator could change the logic, stop it, or push manual updates unnoticed). Running the workflow on CRE makes the off-chain code validatable by the protocol team and auditors and executes it across a decentralised node network, so the methodology becomes transparent and protocol-owned rather than a dependency on one opaque operator.
+First-generation risk oracles were built as proprietary black boxes on an operator's own back-end because no credibly neutral, reliable infrastructure existed to run them. That made the logic opaque to the protocol, auditors, and other service providers, which in turn allowed silent failures, unexplained deviations from the stated methodology, and manipulation under the guise of automation: the operator could change the logic, stop it, or push manual updates unnoticed.
+
+Running the workflow on CRE makes the off-chain code validatable by the protocol team and auditors and executes it across a decentralised node network, so the methodology becomes transparent and protocol-owned rather than a dependency on one opaque operator.
 
 **Q: How do the two data inputs and the on-chain write fit together in the Pendle PT workflow?**
 
-The workflow consumes the Pendle AMM price of the token and a parameter registry that holds the per-asset configuration for every asset with a Pendle price feed. It runs the risk methodology over those inputs, evaluating threshold conditions and computing the appropriate response. When it finds an optimisation, CRE pushes the value on-chain through the Llama Guard oracle, which authorises the resulting updates to the target Aave market and its market oracle. The AMM price supplies the live market signal, the registry supplies the per-asset rules and bounds, and the on-chain write applies the result within those bounds.
+The workflow consumes the Pendle AMM price of the token and a parameter registry that holds the per-asset configuration for every asset with a Pendle price feed. It runs the risk methodology over those inputs, evaluating threshold conditions and computing the appropriate response. When it finds an optimisation, CRE pushes the value on-chain through the Llama Guard oracle, which authorises the resulting updates to the target Aave market and its market oracle.
+
+The AMM price supplies the live market signal, the registry supplies the per-asset rules and bounds, and the on-chain write applies the result within those bounds.
 
 ## References
 

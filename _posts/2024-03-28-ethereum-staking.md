@@ -2,7 +2,7 @@
 layout: post
 title:  Ethereum Staking - How It Works
 date:   2024-03-28
-last_modified_at: 2025-05-02
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum cryptography
@@ -29,7 +29,7 @@ For this purpose, Ethereum does not use the traditional Elliptic curve signature
 
 - These signatures use a different Elliptic curve called BLS12-381.
 
-- For staking, two keys pair are generated: the  **Signing (Validator) key pair**, to actively sign on-chain (ETH2) operations such as block proposals and attestations and optionally a **Withdrawal key pair** to set the withdrawal address.
+- For staking, two key pairs are generated: the **Signing key pair**, also called the validator key pair, to sign consensus-layer operations such as block proposals and attestations, and optionally a **Withdrawal key pair** to set the withdrawal address.
 - The **advantage** of BLS over the traditional Elliptice curve signature is the ability to aggregate signature. With BLS, you can combine multiple signatures and/or public keys from different users into a single representation. Therefore, it makes it possible to verify many signatures in a single operation, instead of verifying each signature individually.
 
 Reference: [6. KEYS IN PROOF-OF-STAKE ETHEREUM](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/keys/), [7. docs.prylabs - bls cryptography](https://docs.prylabs.network/docs/how-prysm-works/bls-cryptography), [8. kb.beaconcha.in - Ethereum 2.0 Keys](https://kb.beaconcha.in/ethereum-staking/ethereum-2-keys)
@@ -113,7 +113,7 @@ Reference: [4. eth2book.info - signatures](https://eth2book.info/capella/part2/b
 
 #### Verification
 
-The verification mechanism works because every public part of a Signing  key (Public Signing Key) is published on-chain, so every signature done with the private part of the Signing key (Private Signing Key) can be  verified by every other validator.
+The verification mechanism works because the public part of every Signing key, the Public Signing Key, is published on-chain. Every signature made with the private part, the Private Signing Key, can therefore be verified by every other validator.
 
 #### Move funds with Signing keys
 
@@ -121,7 +121,7 @@ Despite having the power for creating blockchain content, the Signing keys can n
 
 ## Client
 
-To process incoming validator deposits from the execution layer (formerly 'Eth1' chain), the operator needs to run an execution client as well as a consensus client (formerly 'Eth2').
+To process incoming validator deposits from the execution layer, the operator needs to run an execution client as well as a consensus client. The execution layer was formerly called the 'Eth1' chain, and the consensus layer 'Eth2'.
 
 #### Execution client
 
@@ -170,17 +170,21 @@ See also [Ethereum - History](https://ethereum.org/en/history/)
 
 [EIP specification](https://eips.ethereum.org/EIPS/eip-3675), [Paris Upgrade specification](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/paris.md)
 
-This EIP deprecates Proof-of-Work (PoW) and supersedes it with the new Proof-of-Stake consensus mechanism (PoS) driven by the beacon chain. Information on the bootstrapping of the new consensus mechanism is documented in [EIP-2982](https://eips.ethereum.org/EIPS/eip-2982). Full specification of the beacon chain can be found in the `ethereum/consensus-specs` repository.
+The EIP abstract states:
 
-This document specifies the set of changes to the block structure, block processing, fork choice rule and network interface introduced by the consensus upgrade.
+> This EIP deprecates Proof-of-Work (PoW) and supersedes it with the new Proof-of-Stake consensus mechanism (PoS) driven by the beacon chain. Information on the bootstrapping of the new consensus mechanism is documented in [EIP-2982](https://eips.ethereum.org/EIPS/eip-2982). Full specification of the beacon chain can be found in the `ethereum/consensus-specs` repository.
+>
+> This document specifies the set of changes to the block structure, block processing, fork choice rule and network interface introduced by the consensus upgrade.
 
 ### EIP-4895: Beacon chain push withdrawals as operations (Shanghai/2023)
 
 [EIP specification](https://eips.ethereum.org/EIPS/eip-4895), [Shanghai Network Upgrade Specification](https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/shanghai.md)
 
-Introduce a system-level “operation” to support validator withdrawals that are “pushed” from the beacon chain to the EVM.
+The EIP abstract states:
 
-These operations create unconditional balance increases to the specified recipients.
+> Introduce a system-level “operation” to support validator withdrawals that are “pushed” from the beacon chain to the EVM.
+>
+> These operations create unconditional balance increases to the specified recipients.
 
 This EIP provides a way for validator withdrawals made on the beacon chain to enter into the EVM. The architecture is “push”-based, rather than “pull”-based, where withdrawals are required to be processed in the execution layer as soon as they are dequeued from the consensus layer.
 
@@ -197,55 +201,53 @@ Withdrawals are represented as a new type of object,  called a `withdrawal` , in
 
 ### EIP-4788: Beacon block root in the EVM
 
-Commit to the hash tree root of each beacon chain block in the corresponding execution payload header.
+[EIP reference](https://eips.ethereum.org/EIPS/eip-4788)
 
-Store each of these roots in a smart contract.
+The EIP abstract states:
+
+> Commit to the hash tree root of each beacon chain block in the corresponding execution payload header.
+>
+> Store each of these roots in a smart contract.
 
 See also [Consensys - Ethereum Evolved: Dencun Upgrade Part 3, EIP-4788](https://consensys.io/blog/ethereum-evolved-dencun-upgrade-part-3-eip-4788)
 
-### EIP-6110: Supply validator deposits on chain (Last call)
+### EIP-6110: Supply validator deposits on chain (Pectra/2025)
 
 [EIP reference](https://eips.ethereum.org/EIPS/eip-6110)
 
-Appends validator deposits to the Execution Layer block structure. This shifts responsibility of deposit inclusion and validation to the Execution Layer and removes the need for deposit (or `eth1data`) voting from the Consensus Layer.
+The EIP abstract states:
 
-Validator deposits list supplied in a block is obtained by parsing deposit contract log events emitted by each deposit transaction included in a given block.
+> Appends validator deposits to the Execution Layer block structure. This shifts responsibility of deposit inclusion and validation to the Execution Layer and removes the need for deposit (or `eth1data`) voting from the Consensus Layer.
+>
+> Validator deposits list supplied in a block is obtained by parsing deposit contract log events emitted by each deposit transaction included in a given block.
 
-### EIP-7002: Execution layer triggerable withdrawals (Last call)
+### EIP-7002: Execution layer triggerable withdrawals (Pectra/2025)
 
 [EIP reference](https://eips.ethereum.org/EIPS/eip-7002)
 
-Adds a new mechanism to allow validators to trigger withdrawals and exits from their execution layer (0x01) withdrawal credentials.
+The EIP abstract states:
 
-These new execution layer exit messages are appended to the execution layer block and then processed by the consensus layer.
+> Adds a new mechanism to allow validators to trigger withdrawals and exits from their execution layer (0x01) withdrawal credentials.
+>
+> These new execution layer exit messages are appended to the execution layer block and then processed by the consensus layer.
 
-Validators have two keys – an active key and a withdrawal credential. 
+Its motivation section explains why:
 
-- The active key takes the form of a BLS key, whereas the withdrawal credential can either be a BLS key (0x00) or an execution layer address (0x01). 
-- The active key is “hot”, actively signing and performing validator duties, whereas the withdrawal credential can remain “cold”, only performing limited operations in relation to withdrawing and ownership of the staked ETH. 
-- Due to this security relationship, the withdrawal credential ultimately is the key that owns the staked ETH and any rewards.
+> Validators have two keys – an active key and a withdrawal credential. The active key takes the form of a BLS key, whereas the withdrawal credential can either be a BLS key (0x00) or an execution layer address (0x01). The active key is “hot”, actively signing and performing validator duties, whereas the withdrawal credential can remain “cold”, only performing limited operations in relation to withdrawing and ownership of the staked ETH. Due to this security relationship, the withdrawal credential ultimately is the key that owns the staked ETH and any rewards.
+>
+> As currently specified, only the active key can initiate a validator exit. This means that in any non-standard custody relationship (i.e., the active key is a separate entity from the withdrawal credentials), the ultimate owner of the funds – the possessor of the withdrawal credentials – cannot independently choose to exit and begin the withdrawal process. This leads to either trust issues (e.g. ETH can be “held hostage” by the active key owner) or insufficient work-arounds such as pre-signed exits. Additionally, in the event that active keys are lost, a user should still be able to recover their funds by using their cold withdrawal credentials.
+>
+> To ensure that the withdrawal credentials (owned by both EOAs and smart contracts) can trustlessly control the destiny of the staked ETH, this specification enables exits triggerable by 0x01 withdrawal credentials.
+>
+> Note, 0x00 withdrawal credentials can be changed into 0x01 withdrawal credentials with a one-time signed message. Thus any functionality enabled for 0x01 credentials is defacto enabled for 0x00 credentials.
 
-As currently specified, only the active key can initiate a validator exit. This means that in any non-standard custody relationships (i.e. active key is separate entity from withdrawal credentials), that the ultimate owner of the funds – the possessor of the withdrawal credentials – cannot independently choose to exit and begin the withdrawal process. 
-
-This leads to:
-
--  either trust issues (e.g. ETH can be “held hostage” by the active key owner) 
-- insufficient work-arounds such as pre-signed exits. 
-- Additionally, in the event that active keys are lost, a user should still be able to recover their funds by using their cold withdrawal credentials.
-
-To ensure that the withdrawal credentials (owned by both EOAs and smart contracts) can trustlessly control the destiny of the staked ETH, this specification enables exits triggerable by 0x01 withdrawal credentials.
-
-Note, 0x00 withdrawal credentials can be changed into 0x01 withdrawal credentials with a one-time signed message. Thus any functionality enabled for 0x01 credentials is defacto enabled for 0x00 credentials.
-
-## 
-
-### EIP-7251: Increase the MAX_EFFECTIVE_BALANCE (Last call)
+### EIP-7251: Increase the MAX_EFFECTIVE_BALANCE (Pectra/2025)
 
 [EIP reference](https://eips.ethereum.org/EIPS/eip-7251)
 
 This EIP increases the constant `MAX_EFFECTIVE_BALANCE`, while keeping the minimum staking balance `32 ETH`. This permits large node operators to consolidate into fewer validators while also allowing solo-stakers to earn compounding rewards and stake in more flexible increments.
 
-MAX_EFFECTIVE_BALANCE is changed from 32 ETH t0 2,048 ETH
+MAX_EFFECTIVE_BALANCE is changed from 32 ETH to 2,048 ETH
 
 This offers new opportunities for staking operations:
 
@@ -255,10 +257,6 @@ This offers new opportunities for staking operations:
 - Compounding for balances greater than 32 ETH
 
 Reference: [Figment - What The Pectra And Fusaka Ethereum Upgrades Mean For Institutional Staking](https://figment.io/insights/what-the-pectra-and-fusaka-ethereum-upgrades-mean-for-institutional-staking/)
-
-## 
-
-
 
 ## References
 

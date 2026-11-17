@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Regulatory Reporting — The auth Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -42,7 +43,7 @@ The clearest way to navigate ninety messages is by the regime each serves.
 
 ## The major regimes
 
-**MiFIR and MiFID II** account for the largest cluster. The `auth.016` **FinancialInstrumentReportingTransactionReport** is the RTS 22 transaction report, in which an investment firm reports each executed transaction to its NCA with the instrument, quantities, prices, parties, and decision-makers. Around it sit reference-data reports (`auth.017` and its delta and index variants), pre- and post-trade transparency reports for equity and non-equity instruments (`auth.032`, `auth.033`), trading-activity and volume-cap reports (`auth.040`, `auth.041`, `auth.035`), and the market-data and order-book reports (`auth.113`, `auth.122` to `auth.124`) that venues must keep and provide.
+**MiFIR and MiFID II** account for the largest cluster. The `auth.016` **FinancialInstrumentReportingTransactionReport** is the RTS 22 transaction report, in which an investment firm reports each executed transaction to its NCA with the instrument, quantities, prices, parties, and decision-makers. The cluster also includes the `auth.017` reference-data report with its delta and index variants, pre- and post-trade transparency reports for equity and non-equity instruments (`auth.032`, `auth.033`), trading-activity and volume-cap reports (`auth.040`, `auth.041`, `auth.035`), and the market-data and order-book reports (`auth.113`, `auth.122` to `auth.124`) that venues must keep and provide.
 
 **EMIR** covers derivatives. Firms report their derivatives trades to a trade repository, and the repository and authorities exchange the `auth.030` **DerivativesTradeReport**, position-set reports (`auth.090`), reconciliation and rejection statistics (`auth.091`, `auth.092`), and margin and state reports (`auth.108`, `auth.107`). **SFTR** does the equivalent for securities financing: the `auth.052` **SecuritiesFinancingReportingTransactionReport** covers repo, buy-sell-backs, and securities lending, with companion messages for margin data (`auth.070`), reused collateral (`auth.071`), pairing and reconciliation (`auth.078`, `auth.080`), and transaction state (`auth.079`).
 
@@ -87,19 +88,29 @@ The `auth` business area is ISO 20022's home for regulatory reporting. Its ninet
 
 **Q: Why is the auth area so large compared with other business areas?**
 
-Because it serves many separate regulatory regimes rather than one business process. Each major post-crisis regulation, MiFIR, EMIR, SFTR, the money-market statistics framework, CCP supervision, and CSDR settlement discipline, created its own detailed reporting obligation with its own data content. Rather than invent a new standard for each, ISO 20022 put them all in the `auth` area, so ninety messages cover what are really a dozen different reporting frameworks. The right way to read it is regime by regime, not as a single coherent set.
+Because it serves many separate regulatory regimes rather than one business process. Each major post-crisis regulation, MiFIR, EMIR, SFTR, the money-market statistics framework, CCP supervision, and CSDR settlement discipline, created its own detailed reporting obligation with its own data content.
+
+Rather than invent a new standard for each, ISO 20022 put them all in the `auth` area, so its ninety messages belong to a dozen different reporting frameworks.
+
+The right way to read it is regime by regime, not as a single coherent set.
 
 **Q: What does a MiFIR transaction report contain, and who sends it?**
 
-The `auth.016` transaction report is sent by an investment firm to its national competent authority for each executed transaction covered by MiFIR. It carries the financial instrument, the quantities and prices, the buyer and seller, the decision-makers on each side, the venue, and various flags required by the regulation. Its purpose is to let the authority monitor for market abuse and reconstruct market activity. It is one of the highest-volume regulatory reports, which is why it anchors the MiFIR cluster of the `auth` area.
+The `auth.016` transaction report is sent by an investment firm to its national competent authority for each executed transaction covered by MiFIR. It carries the financial instrument, the quantities and prices, the buyer and seller, the decision-makers on each side, the venue, and various flags required by the regulation.
+
+Its purpose is to let the authority monitor for market abuse and reconstruct market activity. It is one of the highest-volume regulatory reports, which is why it anchors the MiFIR cluster of the `auth` area.
 
 **Q: What is the difference between the report-and-status-advice pattern and the information-request pattern?**
 
-They differ in who initiates. In the report-and-status-advice pattern, the reporting entity takes the initiative: it submits a report, such as an `auth.016`, `auth.030`, or `auth.052`, and the receiver answers with a status advice accepting or rejecting it, sometimes followed by reconciliation. In the information-request pattern, the authority takes the initiative: an `auth.001` InformationRequestOpening asks a party for specific information, answered by `auth.002` and tracked by `auth.003`. The first is routine, scheduled reporting; the second is an authority pulling information on demand, often for investigation.
+They differ in who initiates. In the report-and-status-advice pattern, the reporting entity takes the initiative: it submits a report, such as an `auth.016`, `auth.030`, or `auth.052`, and the receiver answers with a status advice accepting or rejecting it, sometimes followed by reconciliation.
+
+In the information-request pattern, the authority takes the initiative: an `auth.001` InformationRequestOpening asks a party for specific information, answered by `auth.002` and tracked by `auth.003`. The first is routine, scheduled reporting; the second is an authority pulling information on demand, often for investigation.
 
 **Q: How do EMIR and SFTR reporting differ within auth?**
 
-They report different instruments to trade repositories but follow parallel shapes. EMIR covers derivatives: the `auth.030` DerivativesTradeReport and its position, reconciliation, and margin companions. SFTR covers securities financing transactions, repos, buy-sell-backs, and securities lending: the `auth.052` transaction report with margin (`auth.070`), reused-collateral (`auth.071`), pairing (`auth.078`), and state (`auth.079`) companions. Both regimes report trades to a repository, both include reconciliation between the two sides of a trade, and both use the report-then-status-advice pattern, but the instruments and the specific data content differ.
+They report different instruments to trade repositories but follow parallel structures. EMIR covers derivatives: the `auth.030` DerivativesTradeReport and its position, reconciliation, and margin companions. SFTR covers securities financing transactions such as repos, buy-sell-backs, and securities lending: the `auth.052` transaction report with margin (`auth.070`), reused-collateral (`auth.071`), pairing (`auth.078`), and state (`auth.079`) companions.
+
+Both regimes report trades to a repository, both include reconciliation between the two sides of a trade, and both use the report-then-status-advice pattern, but the instruments and the specific data content differ.
 
 **Q: Which auth messages are aimed at central counterparties, and what do they cover?**
 

@@ -2,7 +2,7 @@
 layout: post
 title:  Code4Arena Contest - Renzo Oracle
 date:   2024-05-30
-last_modified_at: 2024-08-12
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum defi
@@ -368,7 +368,7 @@ File: contracts/Bridge/L2/Oracle/RenzoOracleL2.sol
 
 Use scientific notation (e.g. `1e18`) rather than exponentiation (e.g. `10**18`)
 
-While this won't save gas in the recent solidity versions, this is  shorter and more readable (this is especially true in calculations).
+This does not save gas in recent Solidity versions, but it is shorter and more readable, especially in calculations.
 
 - [[NC-27]](https://github.com/code-423n4/2024-04-renzo/blob/main/4naly3er-report.md#nc-27-contract-does-not-follow-the-solidity-style-guides-suggested-layout-ordering) Contract does not follow the Solidity style guide's suggested layout ordering
 

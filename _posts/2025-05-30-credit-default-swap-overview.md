@@ -2,7 +2,7 @@
 layout: post
 title: "Credit Default Swaps - Overview"
 date: 2025-05-30
-last_modified_at: 2025-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: finance blockchain
@@ -14,7 +14,7 @@ isMath: true
 
 A **Credit Default Swap (CDS)** is a financial derivative that functions as a form of insurance against the default of a borrower. It allows one party to transfer the credit risk of a fixed income product to another party in exchange for a premium. 
 
-Since their inception in the early 1990s, CDS contracts have played a pivotal role in credit markets, offering both hedging tools and speculative opportunities.
+Since their inception in the early 1990s, CDS contracts have been used in credit markets both to hedge credit risk and to speculate on it.
 
 [TOC]
 
@@ -30,7 +30,7 @@ In a CDS agreement, there are typically two parties:
 
 The buyer of a CDS obtain the right to sell the bonds issue by the reference entity for their face value, when there is a credit event, that is a default.
 
-- **Protection seller**: Promises to compensate the buyer if a credit event (e.g., default, bankruptcy, or restructuring of the reference entity) occurs.
+- **Protection seller**: Promises to compensate the buyer if a credit event occurs, such as a default, a bankruptcy or a restructuring of the reference entity.
 
 The seller of a CDS is obliged to buy the bonds for their face value when the credit event occurs
 
@@ -47,10 +47,10 @@ Reference: [TW3421x - Week 7 - Credit Default Swaps](https://www.youtube.com/wat
 
 #### CDS spread
 
-The **CDS spread** is nothing more than the total amount paid every year by the buyer as a percent of the nominal principal.
+The **CDS spread** is the total amount paid every year by the buyer as a percent of the nominal principal.
 
 - The CDS spread is the "price" (the extra rate) required by the seller of the CDS to bear the risk of default of the reference entity.
-- CDS spread (but in general all credit spreads) can be used to quicly estimate the **probability of default** (PD) of a counterparty
+- The CDS spread, like any credit spread, can be used to quickly estimate the **probability of default** (PD) of a counterparty
   - In general, we can compute the average PD of the reference entity, conditional on no previous default, as
 
 $$
@@ -154,13 +154,13 @@ Reference: [Regulation on Short Selling and Credit Default Swaps - Frequently as
 
 #### Covered CDS
 
-A **covered CDS** is when you own the underlying bond **and** buy a CDS to protect against its default. It's like insuring something you actually own.
+A **covered CDS** is when you own the underlying bond **and** buy a CDS to protect against its default. It's like insuring something you own.
 
 #### Naked CDS
 
 A **naked CDS** is when you buy the CDS **without owning the bond**. You're not protecting against a loss — you're speculating.
 
-- This means the investor doesn't actually hold the bond but buys the CDS betting that the **issuer’s creditworthiness will worsen** (i.e., default risk increases).
+- This means the investor does not hold the bond but buys the CDS betting that the **issuer’s creditworthiness will worsen** (i.e., default risk increases).
 - If the market thinks the issuer is more likely to default, the **value of the CDS increases**, and the buyer can potentially sell it at a profit.
 
 ##### Why it's like short selling
@@ -187,7 +187,7 @@ Traditionally, CDS contracts have been traded over-the-counter (OTC), meaning th
 
 ### Speculation and Leverage
 
-CDSs can be used not only for hedging but also for speculation. Investors can buy CDS contracts on debt they don’t actually own—akin to buying insurance on a neighbor’s house. This speculative use can amplify losses in a downturn.
+CDSs can be used not only for hedging but also for speculation. Investors can buy CDS contracts on debt they don’t own, akin to buying insurance on a neighbor’s house. This speculative use can amplify losses in a downturn.
 
 ------
 

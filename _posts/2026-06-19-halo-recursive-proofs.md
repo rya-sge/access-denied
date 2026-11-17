@@ -2,7 +2,7 @@
 layout: post
 title: "Halo — Recursive Proof Composition without a Trusted Setup"
 date:   2026-06-19
-last_modified_at: 2026-07-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography ZKP
@@ -12,7 +12,7 @@ image: /assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-r
 isMath: true
 ---
 
-Recursive proof composition (building proofs that attest to the correctness of earlier instances of themselves) is the mechanism behind incrementally verifiable computation (IVC): verifying an arbitrarily long computation with a single constant-size proof. All prior practical realisations required either a trusted setup or cycles of expensive pairing-friendly elliptic curves operating over 780-bit fields. Halo, introduced by Bowe, Grigg, and Hopwood in 2019, achieves recursive proof composition without a trusted setup and without pairing-friendly curves, relying solely on the discrete logarithm assumption over 255-bit prime-order curves. Fully recursive proofs are 3.5 KiB in size.
+Recursive proof composition means building proofs that attest to the correctness of earlier instances of themselves. It is the mechanism behind incrementally verifiable computation (IVC): verifying an arbitrarily long computation with a single constant-size proof. All prior practical realisations required either a trusted setup or cycles of expensive pairing-friendly elliptic curves operating over 780-bit fields. Halo, introduced by Bowe, Grigg, and Hopwood in 2019, achieves recursive proof composition without a trusted setup and without pairing-friendly curves, relying solely on the discrete logarithm assumption over 255-bit prime-order curves. Fully recursive proofs are 3.5 KiB in size.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -253,7 +253,7 @@ Halo removes two requirements that earlier recursive proof systems treated as un
 
 Nested amortisation is what carries the construction. The linear-time multi-scalar multiplication at the end of the inner product argument is not made cheaper; it is deferred, carried forward as a fixed-size public input, and merged with the next step's deferred check. Only the ultimate verifier pays it, once, for a chain of any length. That change is what brings the verification circuit below $$2^{17}$$ multiplication gates and allows a step to verify its predecessor.
 
-The trade-off is the security assumption. Halo rests on the discrete log relation assumption over elliptic curve groups, which a large quantum computer would break, whereas the concurrent Fractal construction is post-quantum plausible at the cost of proofs above 120 KiB. Later folding-based schemes, Nova in particular, keep the deferral idea and replace the polynomial commitment machinery with a cheaper per-step folding operation.
+The trade-off is the security assumption. Halo rests on the discrete log relation assumption over elliptic curve groups, which a large quantum computer would break, whereas the concurrent Fractal construction is post-quantum plausible at the cost of proofs above 120 KiB. Later folding-based schemes, Nova in particular, keep the deferral idea and replace the polynomial commitment scheme with a cheaper per-step folding operation.
 
 ![Halo recursive proof composition summary mindmap]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/halo/2026-06-19-halo-recursive-proofs.png)
 
@@ -321,7 +321,9 @@ The deferred state has fixed size regardless of the recursion depth: it is a con
 
 **Q: What is the discrete log relation assumption and how does it differ from standard DLOG?**
 
-The discrete log relation assumption (DLRA) states that for $$n \geq 2$$ random group elements $$G_1, \ldots, G_n$$, no efficient adversary can find scalars $$a_1, \ldots, a_n$$ (not all zero) such that $$\sum_i a_i G_i = \mathcal{O}$$. For $$n = 2$$ this reduces to standard DLOG, since finding $$a_1$$ with $$a_1 G_1 = G_2$$ is equivalent to a non-trivial relation $$(a_1, -1)$$. No attack is known that breaks DLRA without also breaking DLOG, and it is conjectured to hold at the same security level.
+The discrete log relation assumption (DLRA) states that for $$n \geq 2$$ random group elements $$G_1, \ldots, G_n$$, no efficient adversary can find scalars $$a_1, \ldots, a_n$$, not all zero, such that $$\sum_i a_i G_i = \mathcal{O}$$.
+
+For $$n = 2$$ this reduces to standard DLOG, since finding $$a_1$$ with $$a_1 G_1 = G_2$$ is equivalent to a non-trivial relation $$(a_1, -1)$$. No attack is known that breaks DLRA without also breaking DLOG, and it is conjectured to hold at the same security level.
 
 **Q: Why are pairing-friendly curves not needed for the curve cycle in Halo?**
 
@@ -329,23 +331,33 @@ Pairing-friendly curves were required in prior work because those SNARKs use bil
 
 **Q: How does the verification circuit avoid encoding the linear-time MSM?**
 
-The circuit receives $$G_\text{old}$$ (the group element that would need the MSM to verify) as a public input, not as a value it recomputes. It treats this input as correct and propagates it forward as a new public input for the next step, applying the amortisation argument to merge it with the current proof's own $$G$$. The circuit never evaluates $$\langle \mathbf{s}, \mathbf{G} \rangle$$. The only entity that ever performs this computation is the final external verifier, who sits outside all circuits.
+The circuit receives $$G_\text{old}$$ as a public input, not as a value it recomputes. $$G_\text{old}$$ is the group element whose verification would need the MSM. It treats this input as correct and propagates it forward as a new public input for the next step, applying the amortisation argument to merge it with the current proof's own $$G$$.
+
+The circuit never evaluates $$\langle \mathbf{s}, \mathbf{G} \rangle$$. The only entity that ever performs this computation is the final external verifier, who runs outside all circuits.
 
 **Q: Is Halo zero-knowledge?**
 
-Yes. The protocol achieves perfect special honest-verifier zero knowledge. The prover's blinding factors in the Pedersen commitments are chosen uniformly at random, ensuring that the committed polynomial cannot be recovered from the commitment alone. The opening argument also includes per-round blinding factors that mask the coefficient vectors. A perfect simulator can produce transcripts indistinguishable from honest proofs without knowing the witness.
+Yes. The protocol achieves perfect special honest-verifier zero knowledge.
+
+The prover's blinding factors in the Pedersen commitments are chosen uniformly at random, ensuring that the committed polynomial cannot be recovered from the commitment alone. The opening argument also includes per-round blinding factors that mask the coefficient vectors. A perfect simulator can produce transcripts indistinguishable from honest proofs without knowing the witness.
 
 **Q: How does the Rescue hash function fit into the protocol?**
 
-The Fiat-Shamir transform derives verifier challenges by hashing the prover's messages. Inside the verification circuit, this hash must be expressed as arithmetic constraints. SHA-256 requires thousands of constraints per call because of its bitwise operations. Rescue is an algebraic hash function designed to be efficient over prime fields: its S-box is $$x \mapsto x^5$$ (or its inverse), which requires only a constant number of multiplication constraints. The condition $$\gcd(p-1, 5) = 1$$ ensures that $$x^5$$ is a bijection on $$\mathbb F_p$$, which the hash needs in order to be a permutation. This reduces the Fiat-Shamir overhead inside the circuit by orders of magnitude compared to SHA-256.
+The Fiat-Shamir transform derives verifier challenges by hashing the prover's messages. Inside the verification circuit, this hash must be expressed as arithmetic constraints. SHA-256 requires thousands of constraints per call because of its bitwise operations.
+
+Rescue is an algebraic hash function designed to be efficient over prime fields: its S-box is $$x \mapsto x^5$$ (or its inverse), which requires only a constant number of multiplication constraints. The condition $$\gcd(p-1, 5) = 1$$ ensures that $$x^5$$ is a bijection on $$\mathbb F_p$$, which the hash needs in order to be a permutation. This reduces the Fiat-Shamir overhead inside the circuit by orders of magnitude compared to SHA-256.
 
 **Q: How does Halo compare to Nova, the subsequent folding-based IVC scheme?**
 
-Nova (Kothapalli, Setty, Tzialla 2022) avoids the polynomial commitment scheme entirely by folding relaxed R1CS instances. Nova's prover requires only 2 MSMs per step, against Halo's $$O(N \log N)$$ work, and the recursion overhead per step is roughly 10,000 R1CS constraints. Nova does not achieve zero knowledge natively (the folded witness leaks information) and is not a SNARK by itself, so a final zkSNARK must be applied to produce a succinct proof. Halo produces a zero-knowledge proof at each step but with a higher per-step prover cost. The two sit at different points in the same trade-off.
+Nova (Kothapalli, Setty, Tzialla 2022) avoids the polynomial commitment scheme entirely by folding relaxed R1CS instances. Nova's prover requires only 2 MSMs per step, against Halo's $$O(N \log N)$$ work, and the recursion overhead per step is roughly 10,000 R1CS constraints. Nova does not achieve zero knowledge natively, because the folded witness leaks information, and it is not a SNARK by itself, so a final zkSNARK must be applied to produce a succinct proof.
+
+Halo produces a zero-knowledge proof at each step but with a higher per-step prover cost. The two sit at different points in the same trade-off.
 
 **Q: Putting the amortisation and the curve cycle together, why does Halo need both to recurse?**
 
-They remove two independent obstacles, and either one alone leaves the circuit too expensive. Nested amortisation addresses the cost in gate count: it keeps the $$O(d)$$ multi-scalar multiplication out of the circuit, so the circuit's size grows logarithmically rather than linearly in the degree bound. The curve cycle addresses the cost per gate: without it, every field operation the circuit performs would be simulated arithmetic in a non-native field, which inflates each operation by orders of magnitude. Halo needs the circuit to fit under $$2^{17}$$ multiplication gates, and only the two techniques together bring it there.
+They remove two independent obstacles, and either one alone leaves the circuit too expensive. Nested amortisation addresses the cost in gate count: it keeps the $$O(d)$$ multi-scalar multiplication out of the circuit, so the circuit's size grows logarithmically rather than linearly in the degree bound.
+
+The curve cycle addresses the cost per gate: without it, every field operation the circuit performs would be simulated arithmetic in a non-native field, which inflates each operation by orders of magnitude. Halo needs the circuit to fit under $$2^{17}$$ multiplication gates, and only the two techniques together bring it there.
 
 ## References
 

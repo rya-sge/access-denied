@@ -2,7 +2,7 @@
 layout: post
 title: Crypto Wallets Explained - Types, Risks, and How to select it
 date:   2024-10-08
-last_modified_at: 2025-03-27
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain cryptography wallet
@@ -203,13 +203,13 @@ Here the common to step to use a crypto wallet:
 1. **Setting up the wallet**: Download the appropriate software for your wallet type or purchase a hardware wallet. Follow the instructions to generate your public and private keys. Make sure to store securely a backup of your private key / recovery phrase .
 2. **Receiving crypto**: Share your public key (wallet address) with the sender. Once the transaction is initiated, the cryptocurrency will appear in your wallet after the network verifies it.
 3. **Sending crypto**: Enter the recipient’s public key, specify the amount, and confirm the transaction. The process takes a few minutes to hours, depending on the network's congestion and the blockchain you are using.
-4. **Monitoring your balance**: Use your wallet interface to check your balance and track incoming and outgoing transactions. You can also interact with decentralized applications (dApps) or stake your assets (depending on the blockchain) using your wallet if it is supported.
+4. **Monitoring your balance**: Use your wallet interface to check your balance and track incoming and outgoing transactions. If your wallet and the blockchain support it, you can also use the wallet to interact with decentralized applications (dApps) or to stake your assets.
 
 -----
 
 ## Main Risks and Security Concerns
 
-While crypto wallets offer secure management of digital assets, they are not without risks. It’s crucial to be aware of potential pitfalls:
+Crypto wallets offer secure management of digital assets, but they come with the following risks:
 
 ### 1. Scam and Phishing Attacks
 
@@ -247,7 +247,7 @@ Sending crypto to the wrong address or making mistakes in transactions is irreve
 
 In general, it is advised to regularly update your wallet software to get the latest security features. 
 
-In practice, the majority of upgrades add new features and blockchains, and therefore potentially new vulnerabilities. For established and already battle-tested hardware wallets, like Ledger or Trezor, it is unlikely that a new feature will really improve the security of the wallet.
+In practice, the majority of upgrades add new features and blockchains, and therefore potentially new vulnerabilities. For established and already battle-tested hardware wallets, like Ledger or Trezor, it is unlikely that a new feature will improve the security of the wallet.
 
 
 
@@ -267,7 +267,7 @@ Crypto wallets are a fundamental part of participating in the cryptocurrency eco
 
 Whether you are a casual user or an investor looking to store large sums of crypto, it's vital to approach wallet management with caution and find the right balance between your own competence, constraints, desires and security. Ideally, always prioritize security. 
 
-Finally, if you want to know if your Bitcoin wallet is truly open-source and secure, you can visit this excellent website [wallet scrutiny](https://walletscrutiny.com)
+Finally, to check whether your Bitcoin wallet is open-source and secure, you can visit the website [wallet scrutiny](https://walletscrutiny.com).
 
 ## Reference
 

@@ -2,6 +2,7 @@
 layout: post
 title: "Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs"
 date:   2025-07-29
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP
@@ -15,7 +16,7 @@ zk-SNARK stands for **Zero-Knowledge Succinct Non-Interactive Argument of Knowle
 
 They were introduced in a [2012 paper](https://dl.acm.org/doi/10.1145/2090236.2090263) co-authored by Nir Bitansky, Ran Canetti, Alessandro Chiesa, and Eran Tromer.
 
-It is a cryptographic technique that allows one party (the prover) to prove to another party (the verifier) that they know a piece of information, such as a secret key, without revealing the information itself. 
+It is a cryptographic technique that allows one party, the prover, to prove to another party, the verifier, that they know a piece of information, such as a secret key, without revealing the information itself. 
 
 Zero-Knowledge  Proof are widely used in blockchain technology to enhance privacy and/or scalability.
 
@@ -180,7 +181,7 @@ Reference: [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.b
 
 ### Types of preprocessing Setup (trusted setup)
 
-The Trusted Setup is a crucial step where parameters are generated. These parameters are public and enable the creation of proofs, but their security depends on the assumption that the private "toxic waste" from the setup remains undisclosed. "As such, trusted setups are commonly run with many participants to render the possibility of this occurrence low enough."
+The Trusted Setup is the step where the parameters are generated. These parameters are public and enable the creation of proofs, but their security depends on the assumption that the private "toxic waste" from the setup remains undisclosed. "As such, trusted setups are commonly run with many participants to render the possibility of this occurrence low enough."
 
 Recall setup for circuit C: S(C) -> public parameters (Sp, Sv)
 
@@ -230,7 +231,7 @@ Where:
 
 - P(x), Q(x): Encoded left and right input polynomials.
 - Z(x): Target polynomial (vanishing polynomial).
-- h(x): Witness polynomial (proof that computation is correct).
+- h(x): Witness polynomial, the proof that the computation is correct.
 
 ### Pairing-Based Cryptography
 

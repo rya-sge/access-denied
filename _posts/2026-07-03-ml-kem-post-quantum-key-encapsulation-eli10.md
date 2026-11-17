@@ -2,7 +2,7 @@
 layout: post
 title: "How Two Computers Agree on a Secret Code That a Quantum Computer Cannot Steal — Explained for a 10-Year-Old"
 date:   2026-07-03
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography eli10 post-quantum
@@ -22,17 +22,21 @@ Imagine you and your best friend want to agree on a secret password. The trouble
 
 Think of a nosy neighbour with a tape recorder. Right now you and your friend use a secret handshake to agree on a password, and the neighbour cannot follow it. But the neighbour records every handshake on tape and keeps the tapes in a drawer. He is betting that one day he will own a machine that can figure out the handshake. When that day comes, he pulls out the old tapes and learns every password you ever used.
 
-Computers have the same worry. Today, two computers agree on a secret using a math trick (its common names are Diffie-Hellman and RSA). The trick is safe because cracking it needs a giant number puzzle solved, and normal computers are far too slow. But scientists are building a new machine called a quantum computer, and it can solve that exact puzzle quickly. Worse, a spy can record scrambled messages today and simply wait. Once the spy has a quantum computer, he can unscramble all those saved messages. This waiting game even has a nickname: "harvest now, decrypt later" (grab the locked messages now, unlock them later).
+Computers have the same worry. Today, two computers agree on a secret using a math trick, such as Diffie-Hellman or RSA. The trick is safe because cracking it needs a giant number puzzle solved, and normal computers are far too slow. But scientists are building a new machine called a quantum computer, and it can solve that exact puzzle quickly.
 
-That is why we cannot wait for quantum computers to actually arrive. Anything secret we send today needs a lock that the future machine still cannot pick. ML-KEM (its full name is the Module-Lattice-Based Key-Encapsulation Mechanism) is that new lock. A group of experts at a place called NIST tested many ideas for years and chose it as the standard in 2024.
+Worse, a spy can record scrambled messages today and simply wait. Once the spy has a quantum computer, he can unscramble all those saved messages. This waiting game even has a nickname: "harvest now, decrypt later" (grab the locked messages now, unlock them later).
+
+That is why we cannot wait for quantum computers to arrive. Anything secret we send today needs a lock that the future machine still cannot pick. ML-KEM, short for Module-Lattice-Based Key-Encapsulation Mechanism, is that new lock. A group of experts at a place called NIST tested many ideas for years and chose it as the standard in 2024.
 
 ## How Do You Share a Secret Using a Padlock?
 
-Picture an open padlock, the kind that snaps shut with a click and needs a key to open again. Alice wants to receive a secret from Bob. So Alice makes lots of these padlocks, leaves them hanging open, and hands them out to anyone who asks. She keeps only one thing to herself: the little key that opens them. Bob takes one open padlock, writes a secret number on a card, drops the card in a box, and snaps Alice's padlock shut on it. He mails the locked box back to Alice. Only Alice has the key, so only Alice can open the box and read the number. Now both Bob and Alice know the number, and nobody in between could peek inside.
+Picture an open padlock, the kind that snaps shut with a click and needs a key to open again. Alice wants to receive a secret from Bob. So Alice makes lots of these padlocks, leaves them hanging open, and hands them out to anyone who asks. She keeps only one thing to herself: the little key that opens them.
+
+Bob takes one open padlock, writes a secret number on a card, drops the card in a box, and snaps Alice's padlock shut on it. He mails the locked box back to Alice. Only Alice has the key, so only Alice can open the box and read the number. Now both Bob and Alice know the number, and nobody in between could peek inside.
 
 That padlock-and-box idea is exactly what ML-KEM does, and it comes in three simple steps.
 
-1. **Make the padlocks.** Alice creates a public padlock (called the encapsulation key) that anyone can use, and a private key (called the decapsulation key) that only she keeps.
+1. **Make the padlocks.** Alice creates a public padlock that anyone can use, called the encapsulation key, and a private key that only she keeps, called the decapsulation key.
 2. **Lock a secret inside.** Bob rolls a random secret number, uses Alice's padlock to seal it into a locked box (called the ciphertext), and keeps his own copy of the number.
 3. **Unlock it.** Alice opens the box with her private key and reads the same number.
 
@@ -44,7 +48,7 @@ Both sides then run the number through the same recipe to turn it into the final
 
 Here is the puzzle that makes the padlock so hard to open. Imagine a huge multiplication done in front of everyone, but with a little dust sprinkled on the answer. You pick a small secret number, multiply it by a big number that everyone can see, and then sprinkle a bit of "fuzz" so the answer is slightly off. You show people the big number and the dusty answer, but never your secret. Because of the fuzz, nobody can simply divide to get your secret back.
 
-The open padlock Alice hands out is really one of these dusty answers. Her private key is the small secret numbers hidden inside it. To build the lock (going forward) is easy. To pick the lock (working backward from the padlock to the secret) means cleaning off all the fuzz, and nobody knows how to do that quickly, not even a quantum computer.
+The open padlock Alice hands out is one of these dusty answers. Her private key is the small secret numbers hidden inside it. To build the lock (going forward) is easy. To pick the lock (working backward from the padlock to the secret) means cleaning off all the fuzz, and nobody knows how to do that quickly, not even a quantum computer.
 
 Here is a tiny worked example with small numbers:
 
@@ -61,13 +65,17 @@ If there were no fuzz, you could do 50 divided by 10 and instantly find the secr
 
 Think about a spelling test where the teacher must pick words that nobody can plan for. If the teacher let students choose their own test words, a sneaky student could pick easy words on purpose and learn how the grading works. Picking the words at random takes that trick away.
 
-ML-KEM does the same thing on purpose. Bob never locks a message he chose. He locks a fresh random number, like a dice roll. This might seem odd, because you would think the whole point is to send real information. But the job here is only to agree on a shared secret, and a random number does that perfectly. The reason for the dice roll is safety. If Bob could stuff a chosen message into the box, a clever attacker could craft trick messages, feed them to Alice's lock, and slowly learn how it works. By only ever locking a random number, there is nothing to craft and nothing to learn. The lock stays a mystery.
+ML-KEM does the same thing on purpose. Bob never locks a message he chose. He locks a fresh random number, like a dice roll. This might seem odd, because you would think the whole point is to send real information. But the job here is only to agree on a shared secret, and a random number does that perfectly.
+
+The reason for the dice roll is safety. If Bob could stuff a chosen message into the box, a clever attacker could craft trick messages, feed them to Alice's lock, and slowly learn how it works. By only ever locking a random number, there is nothing to craft and nothing to learn. The lock stays a mystery.
 
 ## What Is the Double-Check That Catches Cheaters?
 
 Imagine Alice has a magic rule: any given secret number can only ever be packed into a box in one exact way. So when Alice opens a box and reads the number, she can re-pack a brand-new box herself, using that same number and the same steps, and the two boxes should look identical. If her fresh box matches the one Bob sent, she knows Bob packed it honestly. If they do not match, someone tampered with the box along the way.
 
-ML-KEM does exactly this. After Alice unlocks the box and reads the number, she re-locks a fresh box the same way and compares it to the one she received. A match means the message is genuine. A mismatch means trouble. And here is the clever part: when there is a mismatch, Alice does not shout "this is fake!" Instead she quietly hands back a made-up key that looks completely normal. She builds this fake key from a secret ingredient only she knows, mixed with the box itself, so it always looks like a real shared key.
+ML-KEM does exactly this. After Alice unlocks the box and reads the number, she re-locks a fresh box the same way and compares it to the one she received. A match means the message is genuine. A mismatch means trouble.
+
+Here is the clever part: when there is a mismatch, Alice does not shout "this is fake!" Instead she quietly hands back a made-up key that looks completely normal. She builds this fake key from a secret ingredient only she knows, mixed with the box itself, so it always looks like a real shared key.
 
 Why stay silent? Because a cheater's whole plan is to send box after box and watch how Alice reacts. If Alice ever shouted "fake", the cheater would learn something from each shout and slowly figure out her key. By never reacting differently, Alice gives the cheater nothing to go on. This silent trick is what makes ML-KEM safe even against an attacker who gets to send it thousands of tampered boxes.
 
@@ -91,7 +99,9 @@ To picture how much bigger this is than the older method: an older key-sharing v
 
 Here is one thing the padlock does not do. It keeps the secret safe, but it does not prove who left the open padlock hanging out. A trickster in the middle could take down Alice's padlock, hang up his own that looks just like it, and fool Bob into locking the secret with the wrong padlock. Now the trickster can open the box, not Alice. This sneaky move is called a man-in-the-middle.
 
-To stop it, ML-KEM is used together with a signature, which is a separate tool that proves who someone really is (think of a wax seal that only Alice can stamp). ML-KEM keeps the secret hidden, and the signature proves who you are talking to. They are two different jobs. On top of that, people often use ML-KEM alongside an older lock at the same time, as a backup. If one lock ever turned out to be pickable, the other would still hold. Using two locks at once costs almost nothing and buys peace of mind.
+To stop it, ML-KEM is used together with a signature, a separate tool that proves who sent something. Think of a wax seal that only Alice can stamp. ML-KEM keeps the secret hidden, and the signature proves who you are talking to. They are two different jobs.
+
+On top of that, people often use ML-KEM alongside an older lock at the same time, as a backup. If one lock ever turned out to be pickable, the other would still hold. Using two locks at once costs almost nothing and buys peace of mind.
 
 ## Putting It All Together
 
@@ -101,13 +111,17 @@ Let us follow one secret from start to finish, using all the ideas above.
 2. **Locking a secret.** Bob rolls a random number, seals it into a box using Alice's padlock, and keeps his own copy of the number.
 3. **Unlocking.** Alice opens the box with her private key and reads the same number.
 4. **The double-check.** Alice re-locks a fresh box the same way. If it matches Bob's box, she trusts it and both sides turn the number into the same shared key. If it does not match, she quietly hands back a fake key so a cheater learns nothing.
-5. **Adding a name and a backup.** A signature proves the padlock really came from Alice, and an older lock runs alongside as a safety net.
+5. **Adding a name and a backup.** A signature proves the padlock came from Alice, and an older lock runs alongside as a safety net.
 
 Every step keeps the secret hidden from anyone listening, and every step leans on the fuzzy puzzle that quantum computers cannot solve. That is how two computers agree on a secret code over a channel where everyone can listen.
 
 ## Summary
 
-ML-KEM is a new way for two computers to agree on a shared secret over a public channel, even though a future quantum computer could break the old way. Alice hands out a padlock built from a fuzzy multiplication that only she can undo. Bob locks a random secret number in a box and sends it, and Alice opens it with her private key. To catch cheaters, Alice re-locks the box herself and compares, and if it does not match she quietly returns a harmless fake key instead of an error. The lock comes in three sizes, keeps secrets but does not prove who you are talking to, and so it teams up with a signature and often an older lock as backup. The price for this quantum-proof safety is that the padlocks and boxes are bigger than the ones we use today, but for keeping secrets safe for years to come, that is a fair trade.
+ML-KEM is a new way for two computers to agree on a shared secret over a public channel, even though a future quantum computer could break the old way. Alice hands out a padlock built from a fuzzy multiplication that only she can undo. Bob locks a random secret number in a box and sends it, and Alice opens it with her private key.
+
+To catch cheaters, Alice re-locks the box herself and compares, and if it does not match she quietly returns a harmless fake key instead of an error.
+
+The lock comes in three sizes, keeps secrets but does not prove who you are talking to, and so it teams up with a signature and often an older lock as backup. The price for this quantum-proof safety is that the padlocks and boxes are bigger than the ones we use today, but for keeping secrets safe for years to come, that is a fair trade.
 
 ![ML-KEM explained for a 10-year-old mindmap]({{site.url_complet}}/assets/article/cryptographie/lattice/2026-07-03-ml-kem-post-quantum-key-encapsulation-eli10-mindmap.png)
 
@@ -115,23 +129,33 @@ ML-KEM is a new way for two computers to agree on a shared secret over a public 
 
 **Q: But why does Bob lock up a random number instead of just sending the secret he wants?**
 
-Because the only job here is for both sides to end up holding the same secret, and a random number does that just as well as a chosen one. Choosing the contents would actually make things less safe. If Bob could pack a message he picked, a clever attacker could craft special trick messages, feed them to the lock, and learn how it works from the results. A random number gives an attacker nothing to craft. Once both sides share the number, they use it as the key to lock up the rest of their conversation.
+Because the only job here is for both sides to end up holding the same secret, and a random number does that just as well as a chosen one. Choosing the contents would make things less safe. If Bob could pack a message he picked, a clever attacker could craft special trick messages, feed them to the lock, and learn how it works from the results. A random number gives an attacker nothing to craft.
+
+Once both sides share the number, they use it as the key to lock up the rest of their conversation.
 
 **Q: What if someone changes the box while it is on its way to Alice?**
 
-Alice catches it with her double-check. Because any given number can only be packed into a box one exact way, Alice re-packs a fresh box from the number she read and compares it to the one she got. A tampered box will not match. When that happens, Alice does not announce the problem. She quietly hands back a fake key that looks real but is useless, so the attacker cannot tell that anything went wrong and learns nothing.
+Alice catches it with her double-check. Because any given number can only be packed into a box one exact way, Alice re-packs a fresh box from the number she read and compares it to the one she got. A tampered box will not match.
+
+When that happens, Alice does not announce the problem. She quietly hands back a fake key that looks real but is useless, so the attacker cannot tell that anything went wrong and learns nothing.
 
 **Q: How does this help in real life?**
 
-Almost every time you visit a website that starts with a little padlock icon, your computer and the website first agree on a secret key, then use it to scramble everything you send. That secret-sharing step is exactly what ML-KEM protects. Without it, a spy who records your traffic today could unlock it years from now with a quantum computer, exposing your passwords, messages, and payments. Switching to ML-KEM now keeps those secrets safe even against a machine that does not exist yet.
+Almost every time you visit a website that starts with a little padlock icon, your computer and the website first agree on a secret key, then use it to scramble everything you send. That secret-sharing step is exactly what ML-KEM protects.
+
+Without it, a spy who records your traffic today could unlock it years from now with a quantum computer, exposing your passwords, messages, and payments. Switching to ML-KEM now keeps those secrets safe even against a machine that does not exist yet.
 
 **Q: What goes wrong if Alice skips the silent double-check?**
 
-Then ML-KEM would only be safe against someone who just quietly listens, not against someone who actively sends fake boxes. An attacker could send box after box, each changed a little, and watch whether Alice's answer works or fails. Every success or failure would leak a tiny clue about her private key, and after enough tries the attacker could piece the key together. The double-check, plus the silent fake key on a mismatch, is what removes those clues and keeps the lock safe against an active cheater.
+Then ML-KEM would only be safe against someone who just quietly listens, not against someone who actively sends fake boxes. An attacker could send box after box, each changed a little, and watch whether Alice's answer works or fails. Every success or failure would leak a tiny clue about her private key, and after enough tries the attacker could piece the key together.
+
+The double-check, plus the silent fake key on a mismatch, is what removes those clues and keeps the lock safe against an active cheater.
 
 **Q: Can you give me another example of sharing a secret without saying it out loud?**
 
-Think of a mailbox with a slot on top. Alice owns the mailbox and keeps the only key. Anyone can walk up and drop a letter through the slot, but only Alice can open the box and take letters out. If Bob drops a card with a random number through the slot, only Alice can read it, even though the mailbox stood in public the whole time. ML-KEM works like a mailbox that a quantum computer still cannot break into, so the number Bob drops in stays a secret between the two of them.
+Think of a mailbox with a slot on top. Alice owns the mailbox and keeps the only key. Anyone can walk up and drop a letter through the slot, but only Alice can open the box and take letters out. If Bob drops a card with a random number through the slot, only Alice can read it, even though the mailbox stood in public the whole time.
+
+ML-KEM works like a mailbox that a quantum computer still cannot break into, so the number Bob drops in stays a secret between the two of them.
 
 ## References
 

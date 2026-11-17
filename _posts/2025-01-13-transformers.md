@@ -2,7 +2,7 @@
 layout: post
 title: Transformers - Attention is All You Need
 date:   2025-01-13
-last_modified_at: 2025-05-02
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai
@@ -16,7 +16,7 @@ Transformers are a foundational neural network architecture widely used in moder
 
 Introduced in 2017 by Vaswani et al. in the seminal paper *"[Attention is All You Need](https://arxiv.org/abs/1706.03762) ([pdf](https://arxiv.org/pdf/1706.03762)),"* transformers address the limitations of earlier architectures by leveraging a self-attention mechanism to process sequential and structured data more effectively. 
 
-This article provides an in-depth exploration of transformer architecture, its operational principles, and a comparison to traditional models like perceptrons, recurrent neural networks (RNNs), and convolutional neural networks (CNNs).
+This article explains the transformer architecture and how it works, and compares it with earlier models: perceptrons, recurrent neural networks (RNNs) and convolutional neural networks (CNNs).
 
 Transformers are at the foundation of Bert and Chat GPT models
 

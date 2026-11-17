@@ -2,7 +2,7 @@
 layout: post
 title:  Introduction to Arbitrum, an Optimistic rollup protocol
 date:   2024-01-31
-last_modified_at: 2024-11-29
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum
@@ -170,7 +170,7 @@ Reference: [docs.arbitrum.io/tx-lifecycle](https://docs.arbitrum.io/tx-lifecycle
 
 Ethereum adopts an [“innocent until proven guilty"](https://insights.deribit.com/market-research/making-sense-of-rollups-part-2-dispute-resolution-on-arbitrum-and-optimism/) attitude to Arbitrum. Layer 1 initially “optimistically assumes” activity on Arbitrum is following the proper rules. 
 
-If a violation occurs (i.e., somebody claims “now I have all of your money”),
+If a violation occurs, for example somebody claims “now I have all of your money”,
 
 - This claim can be disputed back on L1; 
 - Fraud will be proven, the invalid claim disregarded, and the malicious party will be financially penalized.
@@ -238,7 +238,7 @@ The main advantages of Arbitrum is :
 
 - low fees
 - Scalability
-- Inherits security from Ethereum  (can also be a disadvantage)
+- Inherits security from Ethereum, which can also be a disadvantage
 - Ethereum/EVM compatibility
 
 See [Possibilities and Advantages of Using Arbitrum Compared to Ethereum](https://medium.com/@floating_monkey/possibilities-and-advantages-of-using-arbitrum-compared-to-ethereum-78a4cafc44d5)

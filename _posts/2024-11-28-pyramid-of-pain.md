@@ -2,7 +2,7 @@
 layout: post
 title: The Pyramid of Pain in Cybersecurity
 date:   2024-11-28
-last_modified_at: 2025-01-15
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security tryhackme
@@ -50,7 +50,7 @@ From [attackiq.com - pyramid-of-pain/](https://www.attackiq.com/glossary/pyramid
 
 ### 1. Hash Values (Bottom of the Pyramid)
 
-Hash values are cryptographic representations of data, typically file contents. Common hashing algorithms include MD5 (deprecated), SHA-1 (deprecated), and SHA-256..
+Hash values are cryptographic representations of data, typically file contents. Common hashing algorithms include MD5 and SHA-1, both deprecated, and SHA-256.
 
 - **Defender**: Hash values are easy to identify and can be quickly flagged by antivirus or intrusion detection systems.
 
@@ -58,7 +58,7 @@ Hash values are cryptographic representations of data, typically file contents. 
 
 Hashes are the simplest form of detection, and though useful for identifying known malicious files, they are relatively easy for attackers to bypass by making minor modifications to their files.
 
-You've probably read ransomware reports in the past, where security researchers would provide the hashes related to the malicious or suspicious files used at the end of the report. You can check out [The DFIR Report](https://thedfirreport.com/) and [FireEye Threat Research Blogs](https://www.fireeye.com/blog/threat-research.html) if you’re interested in seeing an example.
+Ransomware reports by security researchers often list, at the end of the report, the hashes of the malicious or suspicious files used. You can check out [The DFIR Report](https://thedfirreport.com/) and [FireEye Threat Research Blogs](https://www.fireeye.com/blog/threat-research.html) if you’re interested in seeing an example.
 
 Various online tools can be used to do hash lookups like [VirusTotal](https://www.virustotal.com/gui/), [Metadefender Cloud - OPSWAT](https://metadefender.opswat.com/?lang=en) or [abuse.ch](https://abuse.ch)
 
@@ -125,7 +125,7 @@ An attacker might use a User-Agent string that hasn’t been observed in your en
 
 **Defender** 
 
-Network artifacts can be detected in Wireshark PCAPs (file that contains the packet data of a network) by using a network protocol analyzer such as [TShark](https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark.html) or exploring IDS (Intrusion Detection System) logging from a source such as [Snort](https://www.snort.org/).
+A Wireshark PCAP is a file that contains the packet data captured on a network. Network artifacts can be detected in PCAPs by using a network protocol analyzer such as [TShark](https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark.html), or in the logs of an IDS (Intrusion Detection System) such as [Snort](https://www.snort.org/).
 
 You can also use [urlscan](https://urlscan.io) to find information (domain, stats, IP) related to an URL
 
@@ -145,7 +145,7 @@ Tools refer to the specific software, scripts, or frameworks attackers use to co
 
 - **Pain for attacker**: High. If their tools are detected and blocked, attackers must find or develop alternative methods, which is time-consuming and costly. Tools represent a higher level of pain for adversaries because finding or creating new tools is more challenging than modifying technical indicators. It also means the attacker’s usual techniques become less effective, potentially reducing their success rate.
 
-Attackers would use the utilities to create malicious macro documents (maldocs) for spearphishing attempts, a backdoor that can be used to establish [C2 (Command and Control Infrastructure)](https://www.varonis.com/blog/what-is-c2/), any custom .EXE, and .DLL files, payloads, or password crackers.
+Attackers would use the utilities to create malicious macro documents, or maldocs, for spearphishing attempts, a backdoor that can be used to establish [C2 (Command and Control Infrastructure)](https://www.varonis.com/blog/what-is-c2/), any custom .EXE, and .DLL files, payloads, or password crackers.
 
 - **Defender** 
 
@@ -194,7 +194,7 @@ The Pyramid of Pain is a valuable framework for security teams to prioritize the
 
 The Pyramid of Pain emphases the importance of strategic detection over simple blocking. 
 
-Contrary to other framework (Cyber Kill Chain, Unified Kill Chain, MITRE), this framework looks at how to make it difficult for an adversary to change their approach when detected.
+Unlike other frameworks such as the Cyber Kill Chain, the Unified Kill Chain or MITRE ATT&CK, this framework looks at how to make it difficult for an adversary to change their approach when detected.
 
 By focusing on the top layers of the pyramid—especially TTPs—cybersecurity teams can inflict maximum disruption to adversaries and create stronger, more resilient defenses. 
 

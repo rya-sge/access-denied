@@ -2,7 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 42 - Snowman Merkle Airdrop"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
@@ -747,7 +747,9 @@ Contradicts protocol documentation promising **"free weekly claims per user"**
 
 **Likelihood**:
 
-• Triggered by normal protocol usage (any purchase) • Requires only one transaction every 7 days to maintain blockage • Incentivized attack (low-cost disruption)
+- Triggered by normal protocol usage (any purchase)
+- Requires only one transaction every 7 days to maintain blockage
+- Incentivized attack (low-cost disruption)
 
 **Impact**:
 

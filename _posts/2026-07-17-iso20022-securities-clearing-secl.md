@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Securities Clearing — The secl Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -21,7 +22,7 @@ ISO 20022 is the financial industry's common language for structured messaging. 
 
 [TOC]
 
-## What ISO 20022 actually is
+## What ISO 20022 is
 
 ISO 20022 is often called "the new SWIFT format", which is a useful shorthand but not quite accurate. The standard is not a single message format. It is a **methodology** for describing financial business processes, a **central repository** of reusable business concepts (the data dictionary), and a set of **physical syntaxes** into which those concepts are serialised. XML is the dominant syntax; ASN.1 and JSON are also defined.
 
@@ -66,7 +67,7 @@ A securities transaction passes through three broad stages:
 
 - **execution**: the trade is agreed on a venue or over the counter;
 - **clearing**: obligations are established, novated and netted, and risk is collateralised;
-- **settlement**: securities and cash actually change hands at a central securities depository.
+- **settlement**: securities and cash change hands at a central securities depository.
 
 Clearing is the risk-management stage in the middle, and it is where a CCP earns its place.
 
@@ -119,7 +120,7 @@ Because these blocks are shared, a system that can parse a `NetPosition` already
 
 ### A concrete shape
 
-The `MarginReport` (`secl.005`) illustrates the style. Below its report parameters and pagination, it carries the clearing member and a margin figure expressed as either an excess amount (`XcssAmt`) or a deficit amount (`DfcitAmt`), qualified by a code or proprietary type. Rendered as illustrative XML, and omitting the outer `Document` and Business Application Header for brevity, a margin call for a shortfall looks like this:
+The `MarginReport` (`secl.005`) illustrates the style. Below its report parameters and pagination, it carries the clearing member and a margin figure expressed as either an excess amount, `XcssAmt`, or a deficit amount, `DfcitAmt`, qualified by a code or proprietary type. Rendered as illustrative XML, and omitting the outer `Document` and Business Application Header for brevity, a margin call for a shortfall looks like this:
 
 ```xml
 <MrgnRpt>
@@ -150,7 +151,7 @@ The lifecycle below strings the `secl` messages together in the order a member t
 
 **Settlement handover.** Once positions and cover are settled, the CCP issues a **SettlementObligationReport** (`secl.010`) listing the net deliver and receive obligations. These feed the settlement stage, where the member instructs its custodian or the CSD using `sese` messages, and the securities and cash finally move.
 
-**Buy-in.** If a member fails to deliver securities by the settlement date, the CCP can initiate a buy-in: it goes to the market, sources the securities, delivers them to the buyer it had guaranteed through novation, and charges the failing member the cost. This is the one genuinely conversational exchange in `secl`, because it is a process with a decision point and an uncertain outcome rather than a one-way report. It runs across the three buy-in messages:
+**Buy-in.** If a member fails to deliver securities by the settlement date, the CCP can initiate a buy-in: it goes to the market, sources the securities, delivers them to the buyer it had guaranteed through novation, and charges the failing member the cost. This is the one conversational exchange in `secl`, because it is a process with a decision point and an uncertain outcome rather than a one-way report. It runs across the three buy-in messages:
 
 - **BuyInNotification** (`secl.007`, CCP → member) announces the buy-in against a specific failed delivery. Its schema carries the failing `ClrMmb`, an `OrgnlSttlmOblgtn` reference that pins down exactly which settlement obligation failed, and a buy-in date. In many markets this is sent after a grace period, giving the member a final chance to deliver.
 - **BuyInResponse** (`secl.008`, member → CCP) is the member's reply and the only member-to-CCP message in the set. It can quantify the position with `Unit`, `FaceAmt` or `AmtsdVal`, together with `UnitCcy`, `QtdCcy`, `XchgRate` and a `RsltgAmt`, typically to signal a late delivery that cures the fail or to acknowledge the buy-in.
@@ -199,7 +200,7 @@ The `secl` business area is a compact, self-contained illustration of how ISO 20
 
 **Q: What does the identifier `secl.004.001.04` mean?**
 
-It is a four-part ISO 20022 message identifier. `secl` is the business area (securities clearing), `004` is the message number within that area (NetPosition), `001` is the variant, and `04` is the version. Reading the identifier alone tells you which family a message belongs to and how mature the definition is, before you open the schema.
+It is a four-part ISO 20022 message identifier. `secl` is the business area, securities clearing; `004` is the message number within that area, here NetPosition; `001` is the variant; and `04` is the version. Reading the identifier alone tells you which family a message belongs to and how mature the definition is, before you open the schema.
 
 **Q: How do MX messages differ from the older SWIFT MT messages?**
 
@@ -211,15 +212,25 @@ Netting requires a single common counterparty. Novation is precisely what create
 
 **Q: Which functions of clearing are handled outside the secl area, and why?**
 
-Two important flows sit outside `secl`. Posting collateral to cover a margin deficit belongs to the collateral management area (`colr`), and the actual movement of securities and cash belongs to the settlement area (`sese`). This is deliberate: ISO 20022 assigns each business process to the area that owns it, so `secl` reports what is owed and required (net positions, margin, default fund, settlement obligations) while the delivery of collateral and the final settlement are modelled where those processes properly live. The `secl.010` SettlementObligationReport is the explicit handover point between clearing and settlement.
+Two related flows are defined outside `secl`. Posting collateral to cover a margin deficit belongs to the collateral management area, `colr`, and the movement of securities and cash belongs to the settlement area, `sese`.
+
+This is deliberate: ISO 20022 assigns each business process to the area that owns it. `secl` reports what is owed and required, namely net positions, margin, default fund and settlement obligations, while the delivery of collateral and the final settlement are modelled in their own areas. The `secl.010` SettlementObligationReport is the explicit handover point between clearing and settlement.
 
 **Q: The buy-in exchange uses three messages while most secl flows use one. Why?**
 
-Most `secl` messages are one-way reports: the CCP calculates something (a net position, a margin figure, a default-fund contribution) and informs the member, so a single message suffices. A buy-in is a negotiation triggered by a settlement failure. The CCP must announce it (`secl.007`), the member must be able to respond, for example by supplying late-delivery information or accepting the action (`secl.008`), and the CCP must report the actual outcome once it has sourced the securities in the market (`secl.009`). Because the process has genuine back-and-forth with an uncertain result, it needs a request, a response, and a confirmation rather than a single notification.
+Most `secl` messages are one-way reports: the CCP calculates a net position, a margin figure or a default-fund contribution and informs the member, so a single message suffices. A buy-in is a negotiation triggered by a settlement failure, in three steps:
+
+- the CCP must announce it, with `secl.007`;
+- the member must be able to respond, with `secl.008`, for example by supplying late-delivery information or accepting the action;
+- the CCP must report the outcome, with `secl.009`, once it has sourced the securities in the market.
+
+Because the process has back-and-forth with an uncertain result, it needs a request, a response, and a confirmation rather than a single notification.
 
 **Q: The download folder is called `archive_business_area_securities_clearing`. Does that mean the secl messages are retired?**
 
-No. Every business area on the ISO 20022 message definitions catalogue is offered as a ZIP whose name begins with `archive_business_area_`, so the word describes the download package, not the status of the messages. The `secl` set is a registered business area with published Message Definition Reports. It does sit in a narrow part of the securities post-trade stack and overlaps with `colr`, `sese` and `semt`, and CCPs sometimes use proprietary interfaces as well, but that is a matter of scope and adoption, not of the messages being withdrawn from the standard.
+No. Every business area on the ISO 20022 message definitions catalogue is offered as a ZIP whose name begins with `archive_business_area_`, so the word describes the download package, not the status of the messages. The `secl` set is a registered business area with published Message Definition Reports.
+
+It does sit in a narrow part of the securities post-trade stack and overlaps with `colr`, `sese` and `semt`, and CCPs sometimes use proprietary interfaces as well, but that is a matter of scope and adoption, not of the messages being withdrawn from the standard.
 
 ## References
 

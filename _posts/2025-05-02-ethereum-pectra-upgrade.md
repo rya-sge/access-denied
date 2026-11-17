@@ -2,7 +2,7 @@
 layout: post
 title: "Ethereum Upgrade Pectra - Overview"
 date:  2025-05-02
-last_modified_at: 2026-10-23
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -14,9 +14,9 @@ isMath: false
 isMermaid: true
 ---
 
-Pectra is the Ethereum network upgrade activated on mainnet on 2025-05-07. Its name joins the two layers it changes: *Prague* on the execution layer, which runs transactions and the EVM, and *Electra* on the consensus layer, which runs proof of stake. It followed Dencun (March 2024) and was followed by Fusaka (December 2025).
+Pectra is the Ethereum network upgrade activated on mainnet on 2025-05-07. Its name joins the two layers it changes: *Prague* on the execution layer, which runs transactions and the EVM, and *Electra* on the consensus layer, which runs proof of stake. It followed Dencun, activated in March 2024, and was followed by Fusaka in December 2025.
 
-Pectra contains ten core EIPs, listed in the meta EIP [EIP-7600](https://eips.ethereum.org/EIPS/eip-7600). They fall into three groups: externally owned accounts that can run code (EIP-7702), a reworked validator lifecycle (larger validators, deposits and exits triggered from the execution layer), and capacity changes (more blobs, more expensive calldata for data-heavy transactions). This article describes each EIP with the constants of the specifications, then the impact for smart contract developers, stakers and node operators.
+Pectra contains ten core EIPs, listed in the meta EIP [EIP-7600](https://eips.ethereum.org/EIPS/eip-7600). They fall into three groups: externally owned accounts that can run code, through EIP-7702; a reworked validator lifecycle, with larger validators and with deposits and exits triggered from the execution layer; and capacity changes, with more blobs and more expensive calldata for data-heavy transactions. This article describes each EIP with the constants of the specifications, then the impact for smart contract developers, stakers and node operators.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -26,7 +26,7 @@ Pectra contains ten core EIPs, listed in the meta EIP [EIP-7600](https://eips.et
 
 The article relies on the following mechanisms without developing them:
 
-- **Execution layer and consensus layer.** Since the Merge, an Ethereum node runs two clients: an execution client (Geth, Nethermind, Reth…) for transactions and state, and a consensus client (Prysm, Lighthouse, Teku…) for validators, attestations and finality. A network upgrade changes both, under two names.
+- **Execution layer and consensus layer.** Since the Merge, an Ethereum node runs two clients: an execution client such as Geth, Nethermind or Reth for transactions and state, and a consensus client such as Prysm, Lighthouse or Teku for validators, attestations and finality. A network upgrade changes both, under two names.
 - **Externally owned account (EOA).** An account controlled by a private key, with no code, as opposed to a contract account. Before Pectra, an EOA could only sign transactions; it could not batch calls or define its own validation rules.
 - **Validator and withdrawal credentials.** A validator is a 32 ETH stake with a BLS signing key. Its withdrawal credentials say where its funds go: `0x01` credentials point to an execution-layer address. Before Pectra, only the BLS signing key could start an exit.
 - **Blobs.** Data attachments of 128 KiB introduced by Dencun ([EIP-4844](https://eips.ethereum.org/EIPS/eip-4844)) for rollups, priced in a separate *blob gas* market with its own target and maximum per block.
@@ -48,7 +48,7 @@ The article relies on the following mechanisms without developing them:
 | [EIP-7691](https://eips.ethereum.org/EIPS/eip-7691) | Blob throughput increase | Both | Blob target and maximum from 3 and 6 to 6 and 9. |
 | [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) | Set EOA account code | Execution | An EOA can delegate to contract code. |
 
-The meta EIP also lists two non-core EIPs: [EIP-7840](https://eips.ethereum.org/EIPS/eip-7840) (Informational), which adds the blob schedule to execution client configuration files, and [EIP-7642](https://eips.ethereum.org/EIPS/eip-7642) (eth/69, Networking), which clients could support at Pectra and had to support by the next upgrade.
+The meta EIP also lists two non-core EIPs. The Informational [EIP-7840](https://eips.ethereum.org/EIPS/eip-7840) adds the blob schedule to execution client configuration files. The Networking EIP [EIP-7642](https://eips.ethereum.org/EIPS/eip-7642), eth/69, was optional for clients at Pectra and mandatory by the next upgrade.
 
 ### Activation
 
@@ -102,7 +102,7 @@ Before Pectra, only the validator's BLS signing key could start an exit, so a st
 
 ### EIP-7251: validators of up to 2,048 ETH
 
-Before Pectra, every validator's effective balance was capped at 32 ETH, so a large staker ran thousands of validators, and rewards above 32 ETH did not compound. EIP-7251 raises the maximum effective balance to 2,048 ETH (64 times 32 ETH) for validators with the new `0x02` *compounding* withdrawal credentials, keeps 32 ETH as the minimum, and adds *consolidation*: merging an existing validator into another, requested through a second system contract at `0x0000BBdDc7CE488642fb579F8B00f3a590007251` (target 1 request per block, maximum 2).
+Before Pectra, every validator's effective balance was capped at 32 ETH, so a large staker ran thousands of validators, and rewards above 32 ETH did not compound. EIP-7251 raises the maximum effective balance to 2,048 ETH (64 times 32 ETH) for validators with the new `0x02` *compounding* withdrawal credentials, keeps 32 ETH as the minimum, and adds *consolidation*: merging an existing validator into another, requested through a second system contract at `0x0000BBdDc7CE488642fb579F8B00f3a590007251`, with a target of 1 request per block and a maximum of 2.
 
 The intent stated by the EIP is to reduce the number of validators, and with it the number of signatures and messages the network handles, while letting solo stakers compound rewards in increments smaller than 32 ETH.
 
@@ -151,7 +151,7 @@ The `BLOCKHASH` opcode returns only the last 256 block hashes. EIP-2935 stores t
 - **Account assumptions changed.** An EOA may now have code (EIP-7702). Checks such as `tx.origin == msg.sender` or `extcodesize(addr) == 0` no longer identify an account without code, and an EOA that receives ETH may run a fallback function. The latter interacts with the 2,300 gas stipend of `transfer` and `send`, measured in [The 2,300 Gas Stipend in Ethereum - Origin, Breakages and Alternatives]({{site.url_complet}}/2026/10/23/ethereum-2300-gas-stipend/).
 - **Calldata-heavy transactions cost more.** A transaction that posts data and executes little pays 10 or 40 gas per byte instead of 4 or 16 (EIP-7623); gas estimates for such transactions made before Pectra are too low.
 - **New precompiles and a system contract.** BLS12-381 verification (EIP-2537) and block hashes up to 8,191 blocks back (EIP-2935) are available on chain.
-- **Staking contracts can control exits.** A contract that holds withdrawal credentials (a liquid staking protocol, a staking vault) can now request exits, partial withdrawals and consolidations itself, by paying the request fee (EIP-7002, EIP-7251).
+- **Staking contracts can control exits.** A contract that holds withdrawal credentials, such as a liquid staking protocol or a staking vault, can now request exits, partial withdrawals and consolidations itself, by paying the request fee (EIP-7002, EIP-7251).
 
 ### For stakers and node operators
 

@@ -2,6 +2,7 @@
 layout: post
 title: "HOTP - An HMAC-Based One-Time Password Algorithm (RFC 4226)"
 date:   2026-07-20
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography security rfc
@@ -19,11 +20,11 @@ HOTP is the algorithm behind the six-digit codes that hardware tokens and authen
 
 ## Why a One-Time Password
 
-A static password has one structural weakness: it is the same value on every use, so an attacker who captures it once can replay it forever. Two-factor authentication addresses this by asking for *something you know* (a PIN or password) alongside *something you have* (a token). The token contributes a one-time password (OTP): a value that changes on every authentication and is therefore useless to an eavesdropper after a single use.
+A static password has one structural weakness: it is the same value on every use, so an attacker who captures it once can replay it forever. Two-factor authentication addresses this by asking for *something you know*, such as a PIN or password, alongside *something you have*, such as a token. The token contributes a one-time password (OTP): a value that changes on every authentication and is therefore useless to an eavesdropper after a single use.
 
 At the time RFC 4226 was written, two-factor authentication was deployed narrowly. Vendors shipped tokens and validation servers coupled through proprietary technology, which produced high-cost solutions and poor interoperability. The OATH members set out to specify an algorithm that any hardware manufacturer or software developer could implement freely, so that a token from one vendor could be validated by a server from another. The design targets are worth keeping in mind because they shape the algorithm: it had to run on low-cost, battery-limited devices with no numeric keypad, such as Java smart cards, USB dongles, and GSM SIM cards.
 
-HOTP is *event-based*. The moving factor is a counter that increments each time a new password is produced, not a clock. That choice keeps the token cheap (no accurate time source is required) but introduces a synchronization problem between token and server that the specification spends considerable effort solving.
+HOTP is *event-based*. The moving factor is a counter that increments each time a new password is produced, not a clock. That choice keeps the token cheap, because no accurate time source is required, but introduces a synchronization problem between token and server that the specification spends considerable effort solving.
 
 ## The HOTP Construction
 
@@ -38,7 +39,7 @@ $$
 The two inputs are the shared secret and the counter.
 
 - **$$K$$ — the shared secret.** A symmetric key known only to the token and the validation server. Each token holds a distinct key. The specification requires at least 128 bits and recommends 160 bits, matching the SHA-1 output width.
-- **$$C$$ — the counter.** An 8-byte value, the moving factor, that must stay synchronized between the token (generator) and the server (validator). Key, counter, and any data are processed high-order byte first, and the generated values are treated as big-endian.
+- **$$C$$ — the counter.** An 8-byte value, the moving factor, that must stay synchronized between the token, which generates the codes, and the server, which validates them. Key, counter, and any data are processed high-order byte first, and the generated values are treated as big-endian.
 
 HMAC-SHA-1 returns a 160-bit (20-byte) string. That is far too long to read off a small display and type into a login form, so HOTP truncates it down to a short number. The interesting part of the algorithm is *how* it truncates.
 
@@ -93,7 +94,7 @@ The specification also publishes a table of test vectors that every implementati
 | 8 | 399871 |
 | 9 | 520489 |
 
-These ten values are the canonical HOTP test vectors. Anyone who has configured an authenticator app has effectively relied on the same reference numbers, because TOTP reuses this exact construction.
+These ten values are the canonical HOTP test vectors. Authenticator apps run the same truncation through TOTP, which publishes its own reference vectors in RFC 6238.
 
 ![HOTP generation pipeline from secret and counter to a six-digit code]({{site.url_complet}}/assets/article/cryptographie/hotp/hotp-generation-pipeline.png)
 
@@ -218,7 +219,9 @@ This is precisely the idea that [RFC 6238](https://datatracker.ietf.org/doc/html
 
 ## Conclusion
 
-RFC 4226 specifies HOTP by composing HMAC-SHA-1 with dynamic truncation to convert a shared secret and a counter into a short numeric code. The dynamic offset keeps the full width of the MAC in play while exposing only six digits, and the accompanying analysis shows that this truncation introduces only negligible bias, leaving brute force as the best available attack. Because guessing is the limiting factor, the security of a deployment rests on the server: a throttling parameter and a bounded look-ahead window are what keep the million-strong code space out of reach. The event-based counter makes the token cheap but creates the drift that the resynchronization rules manage. The same construction, run over a time-derived moving factor, became TOTP, which is how these codes reached everyday use.
+RFC 4226 specifies HOTP by composing HMAC-SHA-1 with dynamic truncation to convert a shared secret and a counter into a short numeric code. The dynamic offset keeps the full width of the MAC in play while exposing only six digits, and the accompanying analysis shows that this truncation introduces only negligible bias, leaving brute force as the best available attack.
+
+Because guessing is the limiting factor, the security of a deployment rests on the server: a throttling parameter and a bounded look-ahead window limit how many of the million possible codes an attacker can try. The event-based counter makes the token cheap but creates the drift that the resynchronization rules manage. The same construction, run over a time-derived moving factor, became TOTP, which is how these codes reached everyday use.
 
 ![HOTP RFC 4226 mindmap covering construction, validation, security analysis, and extensions]({{site.url_complet}}/assets/article/cryptographie/hotp/2026-07-20-hotp-hmac-one-time-password-rfc4226.png)
 
@@ -251,11 +254,15 @@ Dynamic truncation reads the starting offset from the low 4 bits of the last HMA
 
 **Q: A 6-digit code has only a million possibilities. What stops an attacker from guessing it?**
 
-The algorithm itself does not; the server does. Because the guessing probability is approximately $$sv/10^{d}$$, the server must bound the number of verification attempts $$v$$ with a throttling parameter $$T$$ (or a growing delay) and keep the look-ahead window $$s$$ small. Crucially, the lockout or delay must apply across login sessions, otherwise an attacker could split guesses over many parallel sessions to sidestep the cap. With those controls, the effective space is far larger than a single unthrottled million-guess search.
+The algorithm itself does not; the server does. Because the guessing probability is approximately $$sv/10^{d}$$, the server must bound the number of verification attempts $$v$$ with a throttling parameter $$T$$ (or a growing delay) and keep the look-ahead window $$s$$ small. The lockout or delay must also apply across login sessions; otherwise an attacker could split guesses over many parallel sessions to sidestep the cap.
+
+With those controls, the attacker's success probability stays at $$sv/10^{d}$$ for a small $$v$$, instead of the near-certain success of an unthrottled search through the million codes.
 
 **Q: Why can the token and server counters fall out of synchronization, and how is that resolved?**
 
-The token increments its counter every time a code is generated, whether or not the user submits it, while the server increments only after a successful login. Generating codes without logging in therefore advances the token past the server. The server resolves this with a look-ahead window: it recomputes HOTP for the next $$s$$ counter values and accepts a match anywhere in that range, then resynchronizes its counter to one past the matched value. The window is bounded so it cannot be abused as a denial-of-service vector or widen the attacker's target set.
+The token increments its counter every time a code is generated, whether or not the user submits it, while the server increments only after a successful login. Generating codes without logging in therefore advances the token past the server.
+
+The server resolves this with a look-ahead window: it recomputes HOTP for the next $$s$$ counter values and accepts a match anywhere in that range, then resynchronizes its counter to one past the matched value. The window is bounded so it cannot be abused as a denial-of-service vector or widen the attacker's target set.
 
 **Q: SHA-1 collision attacks were announced in 2005. Does that break HOTP?**
 
@@ -263,7 +270,9 @@ No. Those attacks find collisions in the bare SHA-1 hash, but HOTP relies on HMA
 
 **Q: How does HOTP relate to TOTP, the codes an authenticator app displays?**
 
-TOTP (RFC 6238) is HOTP with the counter replaced by a time-derived value: the moving factor becomes UNIX time divided by a fixed step, so the code changes on a clock rather than on a button press. This idea appears already in RFC 4226 Appendix E as the data-field extension. The truncation, the HMAC base function, and the security reasoning are identical; only the source of the moving factor differs, which is why the canonical HOTP test vectors also govern TOTP implementations.
+TOTP (RFC 6238) is HOTP with the counter replaced by a time-derived value: the moving factor becomes UNIX time divided by a fixed step, so the code changes on a clock rather than on a button press. This idea appears already in RFC 4226 Appendix E as the data-field extension.
+
+The truncation and the security reasoning are the same. Two things differ besides the moving factor: TOTP may also use HMAC-SHA-256 or HMAC-SHA-512, and RFC 6238 publishes its own test vectors (Appendix B, 8-digit codes for each of the three hash functions), so a TOTP implementation should be checked against those, not only against the RFC 4226 HOTP vectors.
 
 ## References
 

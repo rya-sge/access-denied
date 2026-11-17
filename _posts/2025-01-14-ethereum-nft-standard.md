@@ -2,7 +2,7 @@
 layout: post
 title: "Ethereum NFT Standards: ERC-721, ERC-1155, ERC-6551, and More"
 date:   2025-01-14
-last_modified_at: 2025-04-24
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solidity ethereum
@@ -336,7 +336,7 @@ ERC-1155, also known as the "multi-token standard," was introduced by [Enjin](ht
 
 - **Batch Transfers:** Multiple tokens can be transferred in a single transaction.
 - **Lower Costs:** Reduced gas fees by optimizing token operations.
-- **Flexibility:** Supports fungible (e.g., in-game currency) and non-fungible (e.g., unique items) assets.
+- **Flexibility:** Supports both fungible assets, such as an in-game currency, and non-fungible assets, such as unique items.
 - Note that contrary to [ERC-1400](https://github.com/ethereum/EIPs/issues/1411) and [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525), you don't have a decimal field attached to a specific token. Therefore you can have several amount of a specific token, represented by its tokenId, but from the outside, it will be a whole number. If you want more info about ERC-1400, you can read my article written as part of my work at Taurus SA: [ERC-1400 for Tokenized Securities: Analysis and Deployment with Taurus-CAPITAL](https://www.taurushq.com/blog/erc-1400-for-tokenized-securities-analysis-and-deployment-with-taurus-capital/)
 
 #### Main functions
@@ -532,7 +532,7 @@ It is common for NFTs to have utility other than ownership. That being said, it 
 
 Example of kinds of contracts and applications that can benefit from this standard are:
 
-- metaverses that have land and other types of digital assets in those metaverses (scene deployment on land, renting land / characters / clothes / passes to events etc.)
+- metaverses that have land and other types of digital assets, for example to deploy a scene on a piece of land or to rent land, characters, clothes or event passes.
 - NFT-based yield-farming. Adopting the standard enables the “staker” (owner of the NFT) to have access to the utility benefits even after transferring his NFT to the staking contract
 
 #### Specification
@@ -1426,11 +1426,11 @@ ERC-998 allows NFTs to own other ERC-721 or ERC-20 tokens. This "composability" 
 **Key Features:**
 
 - **Nested Ownership:** An ERC-721 NFT can hold other NFTs or fungible tokens.
-- **Asset Bundling:** Useful for grouping assets as a single entity (e.g., an NFT representing a house can include furniture NFTs).
+- **Asset Bundling:** Useful for grouping assets as a single entity: an NFT representing a house can include furniture NFTs.
 
 **Popular Use Cases:**
 
-- Bundling gaming assets (e.g., a character NFT that owns weapons, armor, and currency).
+- Bundling gaming assets, such as a character NFT that owns weapons, armor and currency.
 - Tokenizing complex assets like virtual real estate and properties.
 
 Example: [A Technical Overview of zkPass — zkTLS Oracle Protocol](https://medium.com/zkpass/a-technical-overview-of-zkpass-protocol-e28303e472e9)

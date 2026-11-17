@@ -2,7 +2,7 @@
 layout: post
 title: "Deploying a SEP-41 Fungible Token on Stellar with OpenZeppelin"
 date:   2026-07-09
-last_modified_at: 2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain programmation
@@ -20,7 +20,7 @@ Every Rust snippet below was compiled against the library at commit `1e51389`, a
 
 [TOC]
 
-## What SEP-41 actually specifies
+## What SEP-41 specifies
 
 [SEP-41](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0041.md) is the Stellar ecosystem proposal that defines the standard token interface for Soroban contracts. It is deliberately narrow. The interface consists of exactly ten functions:
 
@@ -84,7 +84,7 @@ The two paths are not mutually exclusive. `set_admin` lets the asset issuer tran
 
 The library ships two flavours of this, and the choice between them is a genuine design decision:
 
-- **`sac_admin_wrapper`** defines an explicit entry point per admin function and forwards to the SAC after running custom checks. Modular and easy to reason about, at the cost of splitting the user-facing interface (on the SAC) from the admin interface (on the wrapper).
+- **`sac_admin_wrapper`** defines an explicit entry point per admin function and forwards to the SAC after running custom checks. Modular and easy to reason about, at the cost of splitting the interface: user-facing functions stay on the SAC, admin functions live on the wrapper.
 - **`sac_admin_generic`** implements `__check_auth` so the admin contract itself acts as a custom account. Authorization logic is injected while both interfaces stay unified.
 
 Here is the wrapper approach as it appears in the repository's `examples/sac-admin-wrapper`:
@@ -151,7 +151,12 @@ The remainder of this article follows path 2.
 
 ## Architecture of the OpenZeppelin fungible module
 
-The library is published as a set of crates rather than a monolith. A typical token pulls in four of them: `stellar-tokens` (the token logic), `stellar-access` (ownership and roles), `stellar-contract-utils` (pausable, upgradeable) and `stellar-macros` (the attribute macros that glue the previous three together).
+The library is published as a set of crates rather than a monolith. A typical token pulls in four of them:
+
+- `stellar-tokens`: the token logic.
+- `stellar-access`: ownership and roles.
+- `stellar-contract-utils`: pausable and upgradeable utilities.
+- `stellar-macros`: attribute macros such as `#[only_owner]` and `#[when_not_paused]`, which apply the ownership, role and pause checks of the other crates to a contract function.
 
 ### The trait, the associated type, and the override hook
 
@@ -195,7 +200,7 @@ As a contract author you never name `ContractOverrides`. You pick a `ContractTyp
 
 ### High-level and low-level functions
 
-The module exposes two layers. High-level functions perform authorization, mutate state and emit events. Low-level `_no_auth` siblings do neither, take a `caller: &Address` purely so the event carries the right actor, and leave verification to you. Mixing the two halves (calling a `_no_auth` function and then separately requiring auth) is how subtle authorization bugs get written, so the library documents each function that intentionally skips a check with a `# Security Warning` block. `Base::mint` is one of them: it has no authorization at all, by design, because only the contract knows who is allowed to mint.
+The module exposes two layers. High-level functions perform authorization, mutate state and emit events. Low-level `_no_auth` siblings do neither, take a `caller: &Address` purely so the event carries the right actor, and leave verification to you. Mixing the two halves, for example calling a `_no_auth` function and then separately requiring auth, is how subtle authorization bugs get written, so the library documents each function that intentionally skips a check with a `# Security Warning` block. `Base::mint` is one of them: it has no authorization at all, by design, because only the contract knows who is allowed to mint.
 
 ## A minimal SEP-41 token
 
@@ -383,7 +388,7 @@ fn transfer_blocked_when_paused() {
 }
 ```
 
-Error `106` is `FungibleTokenError::ExceededCap`; `1000` is `PausableError::EnforcedPause`. Panic assertions use the numeric form because contract errors cross the host boundary as codes, not names. Each package occupies its own numeric range (fungible in the 100s, pausable in the 1000s, access-control in the 2000s, ownable in the 2100s), so a code alone identifies the module that rejected the call.
+Error `106` is `FungibleTokenError::ExceededCap`; `1000` is `PausableError::EnforcedPause`. Panic assertions use the numeric form because contract errors cross the host boundary as codes, not names. Each package occupies its own numeric range: fungible errors are in the 100s, pausable in the 1000s, access-control in the 2000s and ownable in the 2100s. A code alone therefore identifies the module that rejected the call.
 
 One trap in the client API: `transfer` accepts `impl Into<MuxedAddress>`, so `client.transfer(&owner, &to, &10)` compiles while `client.transfer(&owner, &to.into(), &10)` does not, because the target type of `.into()` is ambiguous.
 
@@ -564,7 +569,7 @@ The archival model, including the automatic-restoration behaviour introduced in 
 
 ## Generating a starting point
 
-The [OpenZeppelin Contracts Wizard](https://wizard.openzeppelin.com/stellar) supports Stellar and emits a Rust contract from a checkbox UI (name, symbol, pre-mint amount, mintable, burnable, pausable, access control). It can export a single file, a Rust package, or a [Scaffold Stellar](https://scaffoldstellar.org/) package.
+The [OpenZeppelin Contracts Wizard](https://wizard.openzeppelin.com/stellar) supports Stellar and emits a Rust contract from a checkbox UI. The options cover the name, symbol and pre-mint amount, and the mintable, burnable, pausable and access-control features. It can export a single file, a Rust package, or a [Scaffold Stellar](https://scaffoldstellar.org/) package.
 
 The wizard is a scaffold, not a substitute for reading the output. The library's own contributing guidelines are blunt about generated code: treat it as a first draft, read every line, and run `cargo +nightly fmt`, `cargo clippy` and `cargo test` before shipping.
 
@@ -586,23 +591,39 @@ The library is explicitly labelled experimental software by its authors. The [au
 
 **Q: What prevents a contract from being both an allowlist token and a blocklist token?**
 
-The associated type. `FungibleToken` declares `type ContractType: ContractOverrides`, and a type has exactly one implementation of a given trait, so a contract has exactly one `ContractType`. `FungibleAllowList` is declared with the supertrait bound `FungibleToken<ContractType = AllowList>` and `FungibleBlockList` with `FungibleToken<ContractType = BlockList>`. Implementing both would require `ContractType` to equal `AllowList` and `BlockList` simultaneously, which does not type-check. The exclusion is enforced at compile time, with no runtime check and no gas cost.
+The associated type. `FungibleToken` declares `type ContractType: ContractOverrides`, and a type has exactly one implementation of a given trait, so a contract has exactly one `ContractType`. `FungibleAllowList` is declared with the supertrait bound `FungibleToken<ContractType = AllowList>` and `FungibleBlockList` with `FungibleToken<ContractType = BlockList>`.
+
+Implementing both would require `ContractType` to equal `AllowList` and `BlockList` simultaneously, which does not type-check. The exclusion is enforced at compile time, with no runtime check and no gas cost.
 
 **Q: Why does a minimal token that never writes `MuxedAddress` still fail to compile without importing it?**
 
-`#[contractimpl(contracttrait)]` copies the default bodies of any trait methods you did not override into your module. The default body of `FungibleToken::transfer` has the signature `fn transfer(e: &Env, from: Address, to: MuxedAddress, amount: i128)`. When that body is expanded at your call site, the name `MuxedAddress` must resolve in your module's scope. Rust macro hygiene does not automatically bring type paths along, so the import is required even though nothing you wrote refers to it. The error surfaces as `E0425: cannot find type MuxedAddress in this scope`, pointing at the attribute rather than at any line you typed.
+`#[contractimpl(contracttrait)]` copies the default bodies of any trait methods you did not override into your module. The default body of `FungibleToken::transfer` has the signature `fn transfer(e: &Env, from: Address, to: MuxedAddress, amount: i128)`. When that body is expanded at your call site, the name `MuxedAddress` must resolve in your module's scope.
+
+Rust macro hygiene does not automatically bring type paths along, so the import is required even though nothing you wrote refers to it. The error surfaces as `E0425: cannot find type MuxedAddress in this scope`, pointing at the attribute rather than at any line you typed.
 
 **Q: The `Pausable` trait supplies a default body for `paused()` but not for `pause()` and `unpause()`. What is the reasoning?**
 
-`paused()` is a pure read with one correct implementation. `pause()` and `unpause()` change state and must be authorized, and the library has no way to know whether the right gate is an owner, a role, a multisig or a governance vote. Rather than ship an unauthenticated default that a careless integrator might leave in place, the trait declares them without bodies so the compiler forces you to write one. The underlying free functions `pausable::pause(e)` and `pausable::unpause(e)` do exist and carry an explicit `# Security Warning` noting that they perform no authorization. This is the same reasoning behind `Base::mint`, `set_admin` and `set_owner` being auth-free.
+`paused()` is a pure read with one correct implementation. `pause()` and `unpause()` change state and must be authorized, and the library has no way to know whether the right gate is an owner, a role, a multisig or a governance vote. Rather than ship an unauthenticated default that a careless integrator might leave in place, the trait declares them without bodies so the compiler forces you to write one.
+
+The underlying free functions `pausable::pause(e)` and `pausable::unpause(e)` do exist and carry an explicit `# Security Warning` noting that they perform no authorization. This is the same reasoning behind `Base::mint`, `set_admin` and `set_owner` being auth-free.
 
 **Q: Combine two ideas from the article. A token holder receives tokens once and then never touches the contract for a year. Explain what happens to their balance, and why the outcome would differ if the same data had been stored as an allowance.**
 
-Balances live in `persistent` storage. The library extends a balance's TTL on *reads*, not on writes, so receiving a transfer does not by itself refresh the recipient's entry (though `Base::transfer` happens to read both sides, which does refresh it at transfer time). With no further activity for a year, the entry's TTL lapses and the balance is archived. Archival is recoverable: a restored persistent entry keeps its original value, so the holder's tokens are not destroyed, and Protocol 23's automatic restoration makes this largely transparent. An allowance would behave differently. Allowances live in `temporary` storage, which is deleted rather than archived on expiry, and is never restorable. That is a deliberate match to SEP-41's own semantics, where an allowance past its `live_until_ledger` "should be treated as a 0 amount allowance". Losing an expired allowance is the specified behaviour; losing a balance would be a bug, which is why the two use different tiers.
+Balances live in `persistent` storage. The library extends a balance's TTL on *reads*, not on writes, so receiving a transfer does not by itself refresh the recipient's entry. `Base::transfer` happens to read both sides, though, which refreshes it at transfer time.
+
+With no further activity for a year, the entry's TTL lapses and the balance is archived. Archival is recoverable: a restored persistent entry keeps its original value, so the holder's tokens are not destroyed, and Protocol 23's automatic restoration makes this largely transparent.
+
+An allowance would behave differently. Allowances live in `temporary` storage, which is deleted rather than archived on expiry, and is never restorable. That is a deliberate match to SEP-41's own semantics, where an allowance past its `live_until_ledger` "should be treated as a 0 amount allowance".
+
+Losing an expired allowance is the specified behaviour; losing a balance would be a bug, which is why the two use different tiers.
 
 **Q: You want a token that trades on Stellar's classic DEX but whose minting is controlled by a three-of-five multisig with a daily rate limit. Which path do you take, and what can you still not do?**
 
-Path 3: issue a classic asset, then call `set_admin` on its Stellar Asset Contract to transfer administration to an OpenZeppelin SAC-admin contract that implements the multisig and rate limit. The asset stays classic, so it keeps DEX listing, path payments and anchor support, while `mint`, `clawback`, `set_authorized` and `set_admin` now route through your authorization logic. What you cannot do is change transfer semantics. User-facing `transfer`, `approve` and `balance` remain on the SAC and follow protocol-fixed rules, so a transfer allowlist, a transfer fee, or a pause switch on transfers is out of reach. Those would require path 2 and the loss of classic DEX integration. Within path 3 you would then choose `sac_admin_wrapper` (explicit admin entry points, split interface) or `sac_admin_generic` (custom `__check_auth`, unified interface).
+Path 3: issue a classic asset, then call `set_admin` on its Stellar Asset Contract to transfer administration to an OpenZeppelin SAC-admin contract that implements the multisig and rate limit. The asset stays classic, so it keeps DEX listing, path payments and anchor support, while `mint`, `clawback`, `set_authorized` and `set_admin` now route through your authorization logic.
+
+What you cannot do is change transfer semantics. User-facing `transfer`, `approve` and `balance` remain on the SAC and follow protocol-fixed rules, so a transfer allowlist, a transfer fee, or a pause switch on transfers is not possible. Those would require path 2 and the loss of classic DEX integration.
+
+Within path 3 you would then choose between `sac_admin_wrapper`, with explicit admin entry points and a split interface, and `sac_admin_generic`, with a custom `__check_auth` and a unified interface.
 
 ## References
 

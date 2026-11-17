@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Securities Events — The seev Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -50,7 +51,14 @@ The flagship announcement is the **`seev.031` CorporateActionNotification**, whi
 
 ![Corporate action lifecycle expressed with seev messages]({{site.url_complet}}/assets/article/finance/seev-corporate-action-workflow.png)
 
-The lifecycle runs as follows. The servicer announces the event with a `seev.031` **Notification** and reports its processing state with a `seev.032` **EventProcessingStatusAdvice**. For an elective event, the holder responds with a `seev.033` **CorporateActionInstruction** carrying its election, and the servicer confirms receipt with a `seev.034` **InstructionStatusAdvice**. As payment approaches, a `seev.035` **MovementPreliminaryAdvice** tells the holder what it is due to receive, and on the payment date a `seev.036` **MovementConfirmation** confirms the securities or cash actually credited. If a booked movement must be undone, a `seev.037` **MovementReversalAdvice** reverses it, and free-text detail that does not fit the structured fields travels in a `seev.038` **CorporateActionNarrative**. Cancellations of an event or of an instruction are handled by `seev.039` and `seev.040`.
+The lifecycle runs as follows:
+
+- The servicer announces the event with a `seev.031` **Notification** and reports its processing state with a `seev.032` **EventProcessingStatusAdvice**.
+- For an elective event, the holder responds with a `seev.033` **CorporateActionInstruction** carrying its election, and the servicer confirms receipt with a `seev.034` **InstructionStatusAdvice**.
+- As payment approaches, a `seev.035` **MovementPreliminaryAdvice** tells the holder what it is due to receive, and on the payment date a `seev.036` **MovementConfirmation** confirms the securities or cash credited.
+- If a booked movement must be undone, a `seev.037` **MovementReversalAdvice** reverses it.
+- Free-text detail that does not fit the structured fields travels in a `seev.038` **CorporateActionNarrative**.
+- Cancellations of an event or of an instruction are handled by `seev.039` and `seev.040`.
 
 ## General meetings and proxy voting
 
@@ -66,7 +74,9 @@ Three further processes round out the area.
 
 ## Conclusion
 
-The `seev` business area carries the events in the life of a security across the custody chain. Its seventy-three messages cover corporate actions, from the `seev.031` notification through elections to the movement confirmation that pays them, general meetings and the proxy-voting chain that lets distant investors vote, shareholder identification for issuer transparency, market claims that compensate entitlements on unsettled trades, and buyer protection for elective events in flight. What ties them together is direction: an event is announced downward from issuer to investor, and the investor's choice, an election or a vote, is gathered back upward. Read next to the settlement area `sese` that moves the resulting securities and cash, `seev` is how a security's corporate life reaches the people who own it.
+The `seev` business area carries the events in the life of a security across the custody chain. Its seventy-three messages cover corporate actions, from the `seev.031` notification through elections to the movement confirmation that pays them, general meetings and the proxy-voting chain that lets distant investors vote, shareholder identification for issuer transparency, market claims that compensate entitlements on unsettled trades, and buyer protection for elective events in flight.
+
+What ties them together is direction: an event is announced downward from issuer to investor, and the investor's choice, an election or a vote, is gathered back upward. Read next to the settlement area `sese` that moves the resulting securities and cash, `seev` carries a security's corporate events to the people who own it.
 
 ![Mindmap summarising the ISO 20022 seev securities events area]({{site.url_complet}}/assets/article/finance/iso20022-securities-events-seev.png)
 
@@ -82,7 +92,7 @@ The `seev` business area carries the events in the life of a security across the
 | **Voluntary event** | A corporate action that occurs only if the holder elects to take part. |
 | **Corporate action notification (`seev.031`)** | The announcement of a corporate action, carrying the event type, key dates, and affected account. |
 | **Corporate action instruction (`seev.033`)** | The holder's election in response to an elective event. |
-| **Movement confirmation (`seev.036`)** | The message confirming the securities or cash actually credited on the payment date. |
+| **Movement confirmation (`seev.036`)** | The message confirming the securities or cash credited on the payment date. |
 | **Proxy voting** | The process by which an investor casts votes at a general meeting through the custody chain, using the `seev.001` to `seev.008` messages. |
 | **Market claim** | A compensation for an entitlement on a trade that was unsettled over a corporate action's record date, raised by `seev.050`. |
 | **Buyer protection** | The mechanism (`seev.060`) letting a buyer instruct its election on an elective event before the trade settles. |
@@ -91,23 +101,37 @@ The `seev` business area carries the events in the life of a security across the
 
 **Q: What are the three kinds of corporate action, and how do they differ?**
 
-Mandatory, mandatory with choice, and voluntary. A mandatory event, such as a cash dividend or a stock split, happens automatically and the holder simply receives the outcome. A mandatory-with-choice event requires the holder to pick from options but applies a default if it does not respond. A voluntary event, such as a tender offer or the exercise of rights, happens only if the holder actively elects to take part. The distinction matters because elective events need the holder to send a `seev.033` instruction, while a purely mandatory event needs no response.
+Mandatory, mandatory with choice, and voluntary:
+
+- **Mandatory.** The event, such as a cash dividend or a stock split, happens automatically and the holder simply receives the outcome.
+- **Mandatory with choice.** The holder picks from options, and a default applies if it does not respond.
+- **Voluntary.** The event, such as a tender offer or the exercise of rights, happens only if the holder actively elects to take part.
+
+The distinction matters because elective events need the holder to send a `seev.033` instruction, while a purely mandatory event needs no response.
 
 **Q: Why does a securities event have to travel through a chain of intermediaries?**
 
-Because the investor usually does not hold its securities directly with the issuer. Its holding sits with a custodian, which holds with another custodian or a CSD, which connects to the issuer's agent. When an event occurs, the announcement has to pass down this chain from the issuer to the investor, and the investor's response (an election or a vote) has to pass back up. `seev` provides messages for each link, which is why the corporate-action distribution and agent-corporate-action sub-domains both exist: they carry the same event at different points in the chain.
+Because the investor usually does not hold its securities directly with the issuer. Its holding sits with a custodian, which holds with another custodian or a CSD, which connects to the issuer's agent. When an event occurs, the announcement has to pass down this chain from the issuer to the investor, and the investor's response, an election or a vote, has to pass back up.
+
+`seev` provides messages for each link, which is why the corporate-action distribution and agent-corporate-action sub-domains both exist: they carry the same event at different points in the chain.
 
 **Q: What is the corporate-action lifecycle in seev messages?**
 
-It begins with a `seev.031` CorporateActionNotification announcing the event and a `seev.032` status advice on its processing. For an elective event, the holder sends a `seev.033` instruction with its election and receives a `seev.034` status advice. Before payment, a `seev.035` movement preliminary advice states what the holder is due, and on the payment date a `seev.036` movement confirmation records what was actually credited. A `seev.037` reversal advice can undo a booked movement, and cancellations are handled by `seev.039` and `seev.040`. The arc runs from announcement, through election where needed, to the confirmed payment.
+It begins with a `seev.031` CorporateActionNotification announcing the event and a `seev.032` status advice on its processing. For an elective event, the holder sends a `seev.033` instruction with its election and receives a `seev.034` status advice.
+
+Before payment, a `seev.035` movement preliminary advice states what the holder is due, and on the payment date a `seev.036` movement confirmation records what was credited. A `seev.037` reversal advice can undo a booked movement, and cancellations are handled by `seev.039` and `seev.040`. The arc runs from announcement, through election where needed, to the confirmed payment.
 
 **Q: What problem do market claims solve?**
 
-They solve who gets an entitlement when a trade is unsettled over a corporate action's record date. If you buy shares just before a dividend record date but the trade has not settled by then, the dividend is paid to the seller who is still the holder of record, even though you are economically entitled to it. A market claim corrects this: a `seev.050` MarketClaimCreation raises a claim so the benefit is passed to the party that should have received it. Buyer protection (`seev.060`) addresses a related timing problem for elective events, letting a buyer instruct its election before its trade settles.
+They solve who gets an entitlement when a trade is unsettled over a corporate action's record date. If you buy shares just before a dividend record date but the trade has not settled by then, the dividend is paid to the seller who is still the holder of record, even though you are economically entitled to it.
+
+A market claim corrects this: a `seev.050` MarketClaimCreation raises a claim so the benefit is passed to the party that should have received it. Buyer protection (`seev.060`) addresses a related timing problem for elective events, letting a buyer instruct its election before its trade settles.
 
 **Q: How does shareholder identification in seev relate to regulation?**
 
-The shareholder-identification messages (`seev.045` to `seev.049`) implement an issuer's right to know who its shareholders are, a right strengthened in the EU by the Shareholder Rights Directive II. Because holdings are layered through intermediaries, an issuer cannot see the underlying investors directly. A `seev.045` disclosure request travels down the custody chain and `seev.047` responses return the identities back up, so the issuer can assemble a picture of its beneficial owners. It is an example of regulation driving a dedicated sub-domain into an ISO 20022 business area.
+The shareholder-identification messages (`seev.045` to `seev.049`) implement an issuer's right to know who its shareholders are, a right strengthened in the EU by the Shareholder Rights Directive II. Because holdings are layered through intermediaries, an issuer cannot see the underlying investors directly.
+
+A `seev.045` disclosure request travels down the custody chain and `seev.047` responses return the identities back up, so the issuer can assemble a picture of its beneficial owners. It is an example of regulation driving a dedicated sub-domain into an ISO 20022 business area.
 
 **Q: How does seev connect to sese?**
 

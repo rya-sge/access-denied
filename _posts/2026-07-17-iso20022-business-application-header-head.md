@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 and the Business Application Header — The head Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -15,7 +16,12 @@ isMath: false
 
 
 
-Across this series of articles, one phrase keeps recurring: the business message is "paired with a Business Application Header". That header is not part of any one business area; it is the shared envelope that every ISO 20022 message travels in. This article is about the `head` area itself: the **Business Application Header** (`head.001`) that carries the routing and control information for a message, and the **Business File Header** (`head.002`) that groups many messages into a file. It is a small area, but understanding it explains how ISO 20022 messages are routed, linked, and signed.
+Across this series of articles, one phrase keeps recurring: the business message is "paired with a Business Application Header". That header is not part of any one business area; it is the shared envelope that every ISO 20022 message travels in. This article is about the `head` area itself, which holds two messages:
+
+- the **Business Application Header** (`head.001`) carries the routing and control information for a message;
+- the **Business File Header** (`head.002`) groups many messages into a file.
+
+It is a small area, but understanding it explains how ISO 20022 messages are routed, linked, and signed.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -68,7 +74,9 @@ Sometimes many messages travel together as one file, for example a batch of repo
 
 ## Conclusion
 
-The `head` area is small but foundational. The Business Application Header (`head.001`) is the routing and control envelope that accompanies every ISO 20022 business message: it names the sender and receiver, identifies the exact message definition, timestamps and prioritises the message, links it to related exchanges, and carries the signature that makes it authentic, all without touching the business payload. The Business File Header (`head.002`) does the same job for a file of many messages. Because it is shared across every business area, the BAH is the piece that makes ISO 20022 messages uniformly routable and verifiable, which is why it appears beside the payload in every other area of the standard.
+The `head` area is small but foundational. The Business Application Header (`head.001`) is the routing and control envelope that accompanies every ISO 20022 business message: it names the sender and receiver, identifies the exact message definition, timestamps and prioritises the message, links it to related exchanges, and carries the signature that makes it authentic, all without touching the business payload.
+
+The Business File Header (`head.002`) does the same job for a file of many messages. Because it is shared across every business area, the BAH is the piece that makes ISO 20022 messages uniformly routable and verifiable, which is why it appears beside the payload in every other area of the standard.
 
 ![Mindmap summarising the ISO 20022 Business Application Header]({{site.url_complet}}/assets/article/finance/iso20022-business-application-header-head.png)
 
@@ -93,15 +101,26 @@ The `head` area is small but foundational. The Business Application Header (`hea
 
 **Q: What is the Business Application Header, and why is it separate from the message?**
 
-The BAH is a routing and control envelope, message `head.001`, that travels alongside a business message rather than inside it. The business message says what happened; the header says who is sending it, to whom, which message definition it is, when it was created, and whether it is authentic. Keeping them separate means an intermediary can route or log a message by reading only the header without parsing the payload, and the same header structure works for every message type in the standard. It is the piece that makes ISO 20022 messages uniformly routable.
+The BAH is a routing and control envelope, message `head.001`, that travels alongside a business message rather than inside it. The business message says what happened; the header says who is sending it, to whom, which message definition it is, when it was created, and whether it is authentic.
+
+Keeping them separate means an intermediary can route or log a message by reading only the header without parsing the payload, and the same header structure works for every message type in the standard. It is the piece that makes ISO 20022 messages uniformly routable.
 
 **Q: Which BAH fields are mandatory, and what do they do?**
 
-The routing core is mandatory: From (`Fr`) and To (`To`) identify the sender and receiver; the Business Message Identifier (`BizMsgIdr`) is the message's unique reference; the Message Definition Identifier (`MsgDefIdr`) names exactly which definition the payload is; and the Creation Date (`CreDt`) timestamps it. Together they let a receiver know who sent the message, that it is addressed to it, precisely how to parse the payload, and when it was made. The other fields, such as business service, priority, signature, and related, are optional refinements.
+The routing core is mandatory:
+
+- From (`Fr`) and To (`To`) identify the sender and receiver.
+- The Business Message Identifier (`BizMsgIdr`) is the message's unique reference.
+- The Message Definition Identifier (`MsgDefIdr`) names exactly which definition the payload is.
+- The Creation Date (`CreDt`) timestamps it.
+
+Together they let a receiver know who sent the message, that it is addressed to it, precisely how to parse the payload, and when it was made. The other fields, such as business service, priority, signature, and related, are optional refinements.
 
 **Q: How does the signature in the BAH work?**
 
-The signature field (`Sgntr`) carries a digital signature computed over the message. When a receiver gets the message, it verifies the signature to confirm two things: that the content was not altered in transit, and that it genuinely came from the party named in the From field. Because the signature sits in the header rather than the payload, the same signing mechanism protects any business message regardless of its area. This is how many market infrastructures and schemes ensure the authenticity and integrity of ISO 20022 traffic.
+The signature field (`Sgntr`) carries a digital signature computed over the message. When a receiver gets the message, it verifies the signature to confirm two things: that the content was not altered in transit, and that it came from the party named in the From field.
+
+Because the signature sits in the header rather than the payload, the same signing mechanism protects any business message regardless of its area. This is how many market infrastructures and schemes ensure the authenticity and integrity of ISO 20022 traffic.
 
 **Q: What is the Related field for?**
 
@@ -109,7 +128,9 @@ The Related field (`Rltd`) embeds the header of a prior message, linking the cur
 
 **Q: What is the difference between head.001 and head.002?**
 
-They are envelopes at different scales. The `head.001` Business Application Header accompanies a single business message with its routing and control data. The `head.002` Business File Header describes a file that contains many business messages, opening with a payload description of what the file holds. You use the BAH for message-by-message exchange and the business file header when many messages are delivered together as one file, such as a batch of reports, so the receiver can identify and split the contents.
+They are envelopes at different scales. The `head.001` Business Application Header accompanies a single business message with its routing and control data. The `head.002` Business File Header describes a file that contains many business messages, opening with a payload description of what the file holds.
+
+You use the BAH for message-by-message exchange and the business file header when many messages are delivered together as one file, such as a batch of reports, so the receiver can identify and split the contents.
 
 **Q: Does every ISO 20022 message need a BAH?**
 

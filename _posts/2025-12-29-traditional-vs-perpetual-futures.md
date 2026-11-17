@@ -2,7 +2,7 @@
 layout: post
 title: "Traditional Futures vs. Perpetual Futures: A Technical Comparison"
 date:   2025-12-29
-last_modified_at: 2026-09-09
+last_modified_at: 2026-11-17
 locale: en-GB
 lang: en
 categories: defi blockchain
@@ -99,7 +99,7 @@ F(0,T) = S(0)\,e^{rT}, \qquad F(t,T) = S(t)\,e^{r(T-t)}.
 \end{aligned}
 $$
 
-The price obtained this way does not depend on the distribution of $$S(T)$$. The formula holds as long as the underlying generates no income (such as dividends) and incurs no holding cost (such as storage or insurance). Once those are present, the relation generalises to the **cost-of-carry model**:
+The price obtained this way does not depend on the distribution of $$S(T)$$. The formula holds as long as the underlying generates no income, such as dividends, and incurs no holding cost, such as storage or insurance. Once those are present, the relation generalises to the **cost-of-carry model**:
 
 $$
 \begin{aligned}
@@ -267,11 +267,19 @@ The expected-value price depends on the assumed probability distribution of the 
 
 **Q: How does the funding rate keep a perpetual contract close to the spot price?**
 
-When the perpetual trades above spot, the funding rate is positive and longs pay shorts, which makes holding a long position costly and discourages further buying, pushing the price down. When the perpetual trades below spot, the rate is negative and shorts pay longs, pushing the price up. The payment equals the position notional times the funding rate and is exchanged each interval (commonly every 8 hours), so persistent deviations become progressively expensive to hold and arbitrageurs are paid to close the gap.
+Funding works in both directions:
+
+- **Perpetual above spot.** The funding rate is positive and longs pay shorts. Holding a long position becomes costly, which discourages further buying and pushes the price down.
+- **Perpetual below spot.** The rate is negative and shorts pay longs, which pushes the price up.
+
+The payment equals the position notional times the funding rate and is exchanged each interval, commonly every 8 hours. Persistent deviations therefore become progressively expensive to hold, and arbitrageurs are paid to close the gap.
 
 **Q: What is "marking to market", and how does its tempo differ between the two instruments?**
 
-Marking to market means settling the change in a position's value as a cash flow rather than letting it accumulate to maturity. A traditional future is marked to market daily: the holder of a long position receives the day's price increase or pays the day's decrease, and the position value is reset to zero after each settlement. A perpetual future is margined continuously, with unrealised profit and loss updated in near-real time and funding exchanged at each interval, so there is no single daily settlement point.
+Marking to market means settling the change in a position's value as a cash flow rather than letting it accumulate to maturity.
+
+- **Traditional future.** It is marked to market daily: the holder of a long position receives the day's price increase or pays the day's decrease, and the position value is reset to zero after each settlement.
+- **Perpetual future.** It is margined continuously. Unrealised profit and loss is updated in near-real time and funding is exchanged at each interval, so there is no single daily settlement point.
 
 **Q: Why are perpetual futures considered more sensitive to short-term volatility than traditional futures?**
 

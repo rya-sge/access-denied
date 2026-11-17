@@ -2,7 +2,7 @@
 layout: post
 title: "Hypergraph and Hypertree - Overview"
 date:   2025-11-25
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 locale: en-GB
 lang: en
 categories: programmation
@@ -18,7 +18,7 @@ A **hypergraph** is a generalization of a graph where an edge may connect **any 
 Examples:
 
 - Ordinary graphs → hypergraphs where all edges have size 2
-- Fano plane → a 3-uniform hypergraph (all edges have size 3)
+- Fano plane → a 3-uniform hypergraph: all edges have size 3
 
 [TOC]
 
@@ -189,9 +189,9 @@ Every set in E has 3 elements ⇒ the Fano plane is a **3-uniform hypergraph**.
 
 ##### So what type of hypergraph is it?
 
-- It is **3-uniform** (every line has 3 points).
+- It is **3-uniform**: every line has 3 points.
 - It is **linear** (every pair of hyperedges intersects in at most one point).
-- It is **regular** (each point is in exactly 3 hyperedges).
+- It is **regular**: each point is in exactly 3 hyperedges.
 - It is **symmetric** (same number of points and lines: 7).
 - It is **not acyclic** — it contains multiple cycle structures.
 

@@ -2,7 +2,7 @@
 layout: post
 title: Main Concept Behind Zero-Knowledge Proof
 date:   2024-06-17
-last_modified_at: 2024-08-20
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography blockchain ZKP
@@ -99,7 +99,7 @@ A simulator gives the same probability distribution of the view of the interacti
 
 Example:
 
-Upon receiving an input string x, Prover (P) and Verifier (V) pass a series of message strings a1, . . . , am, through which P attempts to convince V whether x is in the language L.
+Upon receiving an input string x, the prover P and the verifier V pass a series of message strings a1, . . . , am, through which P attempts to convince V whether x is in the language L.
 
 > Given any verifier V , and an honest prover P, there is some simulator S 
 > if x ∈ L, then the distribution of S(x) is indistinguishable from the interaction transcript a1, a2, . . . , am between P and V .
@@ -117,7 +117,7 @@ References:
 
 ## Efficiency
 
-1. **Efficiency**: The measure of computational resources (time, space) required to generate and verify the proof, crucial for practical implementation.
+1. **Efficiency**: The computational resources (time, space) required to generate and verify the proof. They decide whether the system can be used in practice.
 1. **Succinctness**: A feature of some ZKPs where the size of the proof is very small compared to the size of the statement or the witness, i.e., the size of the computation itself.
 3. Used in ZK-SNARKs and ZK-STARKs
 

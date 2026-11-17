@@ -2,7 +2,7 @@
 layout: post
 title: "Firmware Supply Chain - Reproducible Builds and Code Signing"
 date:   2026-07-31
-last_modified_at: 2026-08-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security blockchain
@@ -294,7 +294,7 @@ For a firmware project intending to be independently verifiable.
 | ☐ | The build refuses to run from a dirty working tree. | A local modification silently enters the "reproducible" binary. |
 | ☐ | The build refuses to run with submodules off their recorded revisions. | Dependency source differs from what the verifier reviews. |
 | ☐ | Clock reads are eliminated or fixed via `SOURCE_DATE_EPOCH` or a version-keyed constant. | The binary differs by build date and can never be reproduced. |
-| ☐ | Absolute paths and hostnames do not reach the output. | The binary depends on where it was built, so only the vendor can reproduce it. |
+| ☐ | Absolute paths and hostnames do not appear in the output. | The binary depends on where it was built, so only the vendor can reproduce it. |
 
 #### Comparison procedure
 
@@ -335,7 +335,7 @@ emit different debug metadata, all from identical source. Without pinning, a mis
 nothing, because you cannot distinguish a malicious build from a toolchain difference. Pinning
 turns any mismatch into a signal worth investigating.
 
-**Q: What does `SOURCE_DATE_EPOCH` actually do here?**
+**Q: What does `SOURCE_DATE_EPOCH` do here?**
 
 It replaces the clock as an input. Build tooling that would embed "now" reads the variable
 instead, and the repro script derives its value from the timestamp in the published release
@@ -359,7 +359,9 @@ modified is not a secure device, and the checksum is the mechanism that notices.
 
 It is a documented limit with a partial mitigation. The bootloader is factory-set and cannot be
 replaced in the field, so there is no upgrade path to verify, but that also means you cannot
-rebuild and compare it. Instead the device will hash its own bootloader region on demand, salted
+rebuild and compare it.
+
+Instead the device will hash its own bootloader region on demand, salted
 with a nonce you supply, so a modified device cannot replay a stored answer. Comparing that hash
 against one computed from the source is weaker than a rebuild, since it depends on the code doing
 the hashing, but it is not nothing.

@@ -2,7 +2,7 @@
 layout: post
 title:  RareSkills Solidity Interview Answers - Advanced
 date:   2024-05-06
-last_modified_at: 2024-06-10
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain blockchainBestOf ethereum solidity
@@ -248,7 +248,7 @@ Reference: [docs.soliditylang.org/function-modifiers](https://docs.soliditylang.
 
 Selfdestruct can no longer destruct/erase the contract bytecode since the Cancun upgrade, more information in [my article](https://rya-sge.github.io/access-denied/2024/03/13/EIP-6780-selfdestruct/).
 
-Before that, I guess the contract was only really destroyed at the end of the transaction.
+Before that, I believe the contract was destroyed only at the end of the transaction.
 
 References:
 
@@ -277,17 +277,19 @@ We can apply the [Two's complement](https://www.cs.cornell.edu/~tomf/notes/cps10
 
 - Add one to the resulting number.
 
-b0.....1 =>(sing inversion) b1......0 => (add one) => b1....1 => (hexa) 0xFFF....FFFF
+```
+b0.....1 => (bit inversion) b1......0 => (add one) => b1....1 => (hexa) 0xFFF....FFFF
+```
 
 The answer is **0xFFFF....FFFF**
 
 ### Call with value (payable)
 
-> What is the difference between a) payable(msg.sender).call{value: value}(””) and b) msg.sender.call{value: value}(””)?
+> What is the difference between a) `payable(msg.sender).call{value: value}("")` and b) `msg.sender.call{value: value}("")`?
 
 The keyword payable is only a requirement to send ethers with the function `send` or `transfer` because these functions are not available with a traditional address.
 
-I don't think it is really useful to use payable with`call`.
+I don't think it is useful to use `payable` with `call`.
 
 Reference: [solidity-by-example.org/payable/](https://solidity-by-example.org/payable/), [docs.soliditylang.org/en/v0.8.25/types.html#members-of-addresses](https://docs.soliditylang.org/en/v0.8.25/types.html#members-of-addresses)
 

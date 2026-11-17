@@ -2,7 +2,7 @@
 layout: post
 title: "SenderCreator in ERC-4337 — Deploying Accounts and Reading Counterfactual Addresses"
 date:   2026-07-23
-last_modified_at: 2026-07-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -128,7 +128,7 @@ The deployment branch calls `createSender` with an explicit gas ceiling taken fr
 
 - **AA13** — the returned address must be non-zero, otherwise the factory call failed or ran out of gas.
 - **AA14** — the returned address must equal the `sender` declared in the `UserOperation`, so the account cannot be deployed to an unexpected address.
-- **AA15** — the returned address must now contain code, proving the factory actually created the account.
+- **AA15** — the returned address must now contain code, proving the factory created the account.
 
 ```solidity
 address sender1 = senderCreator().createSender{
@@ -157,7 +157,7 @@ function getSenderAddress(bytes calldata initCode) external virtual {
 }
 ```
 
-The mechanism is a controlled dry run. `getSenderAddress` actually runs the factory through `createSender`, captures the address the deployment would produce, and then reverts with `SenderAddressResult(sender)`. The revert serves two purposes at once: it rolls back the deployment that just happened inside the call frame, and it carries the address back to the caller inside the error payload. A caller invokes the function with `eth_call`, so no transaction is mined and no state is committed, then decodes the address from the revert data:
+The mechanism is a controlled dry run. `getSenderAddress` executes the factory through `createSender`, captures the address the deployment would produce, and then reverts with `SenderAddressResult(sender)`. The revert serves two purposes at once: it rolls back the deployment that just happened inside the call frame, and it carries the address back to the caller inside the error payload. A caller invokes the function with `eth_call`, so no transaction is mined and no state is committed, then decodes the address from the revert data:
 
 ```solidity
 try entryPoint.getSenderAddress(initCode) {
@@ -237,7 +237,7 @@ The properties below are the ones that make a `SenderCreator`-style deployment r
 |:---:|------------|------------|
 | ☐ | The returned sender is checked non-zero (AA13) before it is trusted. | A silently failed factory call is treated as a successful deployment. |
 | ☐ | The returned sender must equal the `UserOperation.sender` (AA14). | The account is deployed to an attacker-chosen address that differs from the one validated and funded. |
-| ☐ | The deployed sender must actually contain code afterward (AA15). | An empty or self-destructing factory passes validation without creating a usable account. |
+| ☐ | The deployed sender must contain code afterward (AA15). | An empty or self-destructing factory passes validation without creating a usable account. |
 | ☐ | Deployment runs under an explicit gas ceiling derived from `verificationGasLimit`. | An unbounded factory call enables griefing or gas exhaustion of the bundle. |
 
 #### EIP-7702 handling
@@ -259,7 +259,7 @@ The zero address. `createSender` does not revert on a failed factory call; the i
 
 **Q: How does `getSenderAddress` return a value if it always reverts?**
 
-It uses the revert as a data channel. The function runs the factory through `createSender`, obtains the address the deployment would produce, then reverts with `SenderAddressResult(sender)`. The revert rolls back the deployment so nothing persists, and the address travels back inside the error payload. A caller invokes it with `eth_call` and decodes the address from the revert reason. It cannot be a `view` function because it actually performs a state-changing factory call.
+It uses the revert as a data channel: the function runs the factory through `createSender`, obtains the address the deployment would produce, then reverts with `SenderAddressResult(sender)`. The revert rolls back the deployment so nothing persists, and the address travels back inside the error payload. A caller invokes it with `eth_call` and decodes the address from the revert reason. It cannot be a `view` function because it performs a state-changing factory call.
 
 **Q: Can a third party call `SenderCreator.createSender` directly to learn an address?**
 
@@ -267,7 +267,9 @@ Not from v0.8 onward. Since v0.8, `createSender` reverts unless `msg.sender` is 
 
 **Q: Combining the version history with the EIP-7702 behaviour, why did access control become necessary precisely in v0.8?**
 
-Because v0.8 introduced `initEip7702Sender`, which calls directly into a user's account with supplied calldata. A permissionless relay is harmless when it only forwards to a factory that deploys a fresh contract, but a function that can call into an existing account must not be open to arbitrary callers. Adding the `entryPoint` immutable and the `msg.sender == entryPoint` guard in v0.8 restricted both functions to the EntryPoint at the same time the EIP-7702 path was added. Version 0.9 kept the same guard and only upgraded its string revert to the typed `NotFromEntryPoint` error.
+Because v0.8 introduced `initEip7702Sender`, which calls directly into a user's account with supplied calldata. A permissionless relay is harmless when it only forwards to a factory that deploys a fresh contract, but a function that can call into an existing account must not be open to arbitrary callers.
+
+Adding the `entryPoint` immutable and the `msg.sender == entryPoint` guard in v0.8 restricted both functions to the EntryPoint at the same time the EIP-7702 path was added. Version 0.9 kept the same guard and only upgraded its string revert to the typed `NotFromEntryPoint` error.
 
 **Q: Why does the notice say `getSenderAddress` cannot be used for EIP-7702 accounts?**
 

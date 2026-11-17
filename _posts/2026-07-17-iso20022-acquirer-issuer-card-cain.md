@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Acquirer-to-Issuer Card Transactions — The cain Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -74,7 +75,7 @@ The messages make most sense read in the order a transaction moves through them.
 
 **Authorisation.** The acquirer asks the issuer to approve a transaction with a `cain.001` **AuthorisationInitiation**, and the issuer approves or declines in a `cain.002` **AuthorisationResponse**. This is the real-time step the cardholder waits for at the terminal, and it reserves funds without yet moving them.
 
-**Clearing.** The money actually moves at clearing, carried by the `cain.003` **FinancialInitiation** and `cain.004` **FinancialResponse**. Depending on the flow, a financial message either completes a previously authorised transaction or, for some transaction types, both authorises and clears in one step.
+**Clearing.** The money moves at clearing, carried by the `cain.003` **FinancialInitiation** and `cain.004` **FinancialResponse**. Depending on the flow, a financial message either completes a previously authorised transaction or, for some transaction types, both authorises and clears in one step.
 
 **Reversal.** When an authorised or cleared transaction must be undone, for example because the terminal timed out or the amount was wrong, a `cain.005` **ReversalInitiation** and `cain.006` **ReversalResponse** reverse it.
 
@@ -84,7 +85,9 @@ The messages make most sense read in the order a transaction moves through them.
 
 ## Conclusion
 
-The `cain` business area brings the acquirer-to-issuer card conversation into ISO 20022. Its nineteen messages, almost all initiation-and-response pairs, trace the full arc of a card transaction: authorise it, clear it, reverse it if needed, and, when a cardholder disputes it, retrieve the record and charge it back. Alongside sit verification, addenda, card management, and a general amendment. Every message uses the card family's header and protects its sensitive data, because the traffic crosses networks between institutions. As the ISO 20022 successor to ISO 8583 for the interbank card legs, `cain` is where the card standard meets the payment rails that most of the world already runs on, and it completes the card picture next to the terminal area `caaa`, the ATM area `catp`, and the fraud area `cafr`.
+The `cain` business area brings the acquirer-to-issuer card conversation into ISO 20022. Its nineteen messages, almost all initiation-and-response pairs, trace the full arc of a card transaction: authorise it, clear it, reverse it if needed, and, when a cardholder disputes it, retrieve the record and charge it back. Alongside sit verification, addenda, card management, and a general amendment.
+
+Every message uses the card family's header and protects its sensitive data, because the traffic crosses networks between institutions. As the ISO 20022 successor to ISO 8583 for the interbank card legs, `cain` carries card authorisations and clearing between acquirers and issuers over the networks most card payments already use, and it completes the card picture next to the terminal area `caaa`, the ATM area `catp`, and the fraud area `cafr`.
 
 ![Mindmap summarising the ISO 20022 cain acquirer-to-issuer card transaction area]({{site.url_complet}}/assets/article/finance/iso20022-acquirer-issuer-card-cain.png)
 
@@ -99,7 +102,7 @@ The `cain` business area brings the acquirer-to-issuer card conversation into IS
 | **Acquirer** | The institution that serves the merchant or acceptor and sends transactions toward the issuer. |
 | **Issuer** | The institution that issued the card, holds the cardholder's account, and authorises or declines transactions. |
 | **Authorisation** | The real-time approval step, carried by `cain.001` and `cain.002`, that reserves funds without moving them. |
-| **Clearing (financial)** | The step that actually moves the money, carried by the `cain.003` and `cain.004` financial messages. |
+| **Clearing (financial)** | The step that moves the money, carried by the `cain.003` and `cain.004` financial messages. |
 | **Reversal** | The undoing of an authorised or cleared transaction, carried by `cain.005` and `cain.006`. |
 | **Retrieval** | The request for the record of a transaction during a dispute (`cain.021`/`cain.022`), fulfilled by `cain.014`/`cain.015`. |
 | **Chargeback** | The return of a disputed transaction from the issuer to the acquirer, carried by `cain.027` and `cain.028`. |
@@ -109,7 +112,9 @@ The `cain` business area brings the acquirer-to-issuer card conversation into IS
 
 **Q: How does cain relate to ISO 8583?**
 
-`cain` is the ISO 20022 successor to ISO 8583 for the acquirer-to-issuer legs of a card transaction. ISO 8583 has carried authorisation and financial messages between acquirers and issuers for decades using numbered bitmap fields. `cain` expresses the same interactions, authorisation, clearing, reversal, and disputes, in ISO 20022's dictionary and XML syntax, with explicitly typed, structured data in place of the older positional fields. The traffic still typically crosses a card scheme network, but the message format is the modern standard.
+`cain` is the ISO 20022 successor to ISO 8583 for the acquirer-to-issuer legs of a card transaction. ISO 8583 has carried authorisation and financial messages between acquirers and issuers for decades using numbered bitmap fields. `cain` expresses the same interactions, namely authorisation, clearing, reversal and disputes, in ISO 20022's dictionary and XML syntax, with explicitly typed, structured data in place of the older positional fields.
+
+The traffic still typically crosses a card scheme network, but the message format is the modern standard.
 
 **Q: What is the difference between an authorisation and a financial message?**
 
@@ -117,7 +122,9 @@ Authorisation reserves funds in real time; a financial (clearing) message moves 
 
 **Q: How do the dispute messages work together?**
 
-They form a retrieval-then-chargeback path. When a cardholder disputes a charge, the issuer first asks the acquirer for the transaction record with a `cain.021` RetrievalInitiation, answered by `cain.022`. The acquirer then supplies the supporting document, such as a receipt copy, through the `cain.014` RetrievalFulfilmentInitiation and its `cain.015` response. If the dispute is upheld, the issuer returns the transaction to the acquirer with a `cain.027` ChargeBackInitiation, answered by `cain.028`. The sequence lets the parties gather evidence before money is moved back, which is central to how card disputes are resolved.
+They form a retrieval-then-chargeback path. When a cardholder disputes a charge, the issuer first asks the acquirer for the transaction record with a `cain.021` RetrievalInitiation, answered by `cain.022`. The acquirer then supplies the supporting document, such as a receipt copy, through the `cain.014` RetrievalFulfilmentInitiation and its `cain.015` response.
+
+If the dispute is upheld, the issuer returns the transaction to the acquirer with a `cain.027` ChargeBackInitiation, answered by `cain.028`. The sequence lets the parties gather evidence before money is moved back, which is central to how card disputes are resolved.
 
 **Q: Why are almost all cain messages initiation-and-response pairs?**
 
@@ -125,11 +132,15 @@ Because each step of the acquirer-to-issuer conversation is a request that needs
 
 **Q: How does cain fit with the other ISO 20022 card areas?**
 
-They divide the card rails by leg and purpose. `caaa` carries the acceptor-to-acquirer leg (the merchant terminal talking to its acquirer), `catp` is the ATM protocol, and `cain` carries the acquirer-to-issuer leg between the two institutions. The fraud area `cafr` then moves fraud information about those transactions between the parties. A single card payment can therefore start as a `caaa` exchange at the terminal, travel as a `cain` authorisation and clearing between acquirer and issuer, and, if it turns out to be fraudulent, be reported later through `cafr`.
+They divide the card rails by leg and purpose. `caaa` carries the acceptor-to-acquirer leg (the merchant terminal talking to its acquirer), `catp` is the ATM protocol, and `cain` carries the acquirer-to-issuer leg between the two institutions. The fraud area `cafr` then moves fraud information about those transactions between the parties.
+
+A single card payment can therefore start as a `caaa` exchange at the terminal, travel as a `cain` authorisation and clearing between acquirer and issuer, and, if it turns out to be fraudulent, be reported later through `cafr`.
 
 **Q: What protects the sensitive data in a cain message?**
 
-The card family's data-protection model. Because `cain` messages carry the primary account number, PIN data, and track or chip data across networks between institutions, those sensitive elements are carried in encrypted form rather than in the clear, and messages are authenticated so a receiver can trust their origin. The cryptographic keys that make this work are provisioned and rotated outside the transaction messages themselves. The protection matters precisely because this is interbank traffic on an untrusted path, exactly the threat model card networks are built to withstand.
+The card family's data-protection model. Because `cain` messages carry the primary account number, PIN data, and track or chip data across networks between institutions, those sensitive elements are carried in encrypted form rather than in the clear, and messages are authenticated so a receiver can trust their origin.
+
+The cryptographic keys that make this work are provisioned and rotated outside the transaction messages themselves. The protection matters because this is interbank traffic on an untrusted path, the threat model card networks are built to withstand.
 
 ## References
 

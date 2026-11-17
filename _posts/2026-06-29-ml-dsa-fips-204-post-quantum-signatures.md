@@ -2,7 +2,7 @@
 layout: post
 title: "ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)"
 date:   2026-06-29
-last_modified_at: 2026-10-06
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -36,9 +36,12 @@ The trade-off versus today's ECDSA/Ed25519 is size: keys and signatures grow fro
 
 ## From the Quantum Threat to a Standard
 
-Public-key cryptography deployed today rests on two number-theoretic assumptions: that factoring a large integer is hard, and that computing discrete logarithms in a finite group is hard. Both assumptions fail against a cryptographically relevant quantum computer running Shor's algorithm. A signature produced by RSA or ECDSA today can be forged by an adversary who later obtains such a machine, which threatens any signature that must remain valid for a long time (firmware roots of trust, certificate authorities, long-lived legal documents).
+Public-key cryptography deployed today rests on two number-theoretic assumptions: that factoring a large integer is hard, and that computing discrete logarithms in a finite group is hard. Both assumptions fail against a cryptographically relevant quantum computer running Shor's algorithm. A signature produced by RSA or ECDSA today can be forged by an adversary who later obtains such a machine, which threatens any signature that must remain valid for a long time, such as firmware roots of trust, certificate authorities and long-lived legal documents.
 
-In 2016 NIST opened a public Post-Quantum Cryptography (PQC) standardization process. A total of 82 candidate algorithms were submitted, and after three rounds of analysis NIST selected the first set for standardization. ML-DSA is the lattice-based signature from that selection, derived from CRYSTALS-Dilithium and published as FIPS 204. Two companion standards were published the same day: [FIPS 203](https://doi.org/10.6028/NIST.FIPS.203) (ML-KEM, a key-encapsulation mechanism derived from Kyber) and [FIPS 205](https://doi.org/10.6028/NIST.FIPS.205) (SLH-DSA, a stateless hash-based signature derived from SPHINCS+).
+In 2016 NIST opened a public Post-Quantum Cryptography (PQC) standardization process. A total of 82 candidate algorithms were submitted, and after three rounds of analysis NIST selected the first set for standardization. ML-DSA is the lattice-based signature from that selection, derived from CRYSTALS-Dilithium and published as FIPS 204. Two companion standards were published the same day:
+
+- [FIPS 203](https://doi.org/10.6028/NIST.FIPS.203) specifies ML-KEM, a key-encapsulation mechanism derived from Kyber.
+- [FIPS 205](https://doi.org/10.6028/NIST.FIPS.205) specifies SLH-DSA, a stateless hash-based signature derived from SPHINCS+.
 
 ML-DSA is the recommended general-purpose post-quantum signature because it offers a balanced profile: signatures of a few kilobytes and signing and verification that are dominated by fast polynomial arithmetic. The hash-based SLH-DSA makes more conservative assumptions but produces much larger signatures, so ML-DSA is the default for most applications.
 
@@ -99,7 +102,7 @@ There is a problem the discrete-log version does not have. The response $$\mathb
 
 The fix is **rejection sampling**: the signer only releases $$\mathbf{z}$$ when every coefficient falls inside a fixed safe range $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$, and otherwise discards the attempt and restarts with a fresh mask $$\mathbf{y}$$. 
 
-Conditioned on passing the test, the distribution of $$\mathbf{z}$$ is independent of the secret. This is the **Fiat-Shamir with Aborts** paradigm: the signer may abort and retry an attempt many times before it produces a publishable signature. The expected number of iterations is small (between roughly 4 and 5 for the standardized parameters), but it is not fixed.
+Conditioned on passing the test, the distribution of $$\mathbf{z}$$ is independent of the secret. This is the **Fiat-Shamir with Aborts** paradigm: the signer may abort and retry an attempt many times before it produces a publishable signature. The expected number of iterations is small, between 3.85 and 5.1 for the standardized parameters (FIPS 204, Table 1), but it is not fixed.
 
 ![ML-DSA Fiat-Shamir with Aborts identification protocol]({{site.url_complet}}/assets/article/cryptographie/lattice/fiat-shamir-aborts-protocol.png)
 
@@ -146,7 +149,7 @@ $$
 \end{aligned}
 $$
 
-where $$M'$$ is the formatted message (the message wrapped with a domain separator and context string, described later). A per-signature private seed $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu, 64)$$ drives the mask generation, where $$rnd$$ is a 32-byte random value in the default hedged variant.
+where $$M'$$ is the formatted message: the message wrapped with a domain separator and context string, described later. A per-signature private seed $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu, 64)$$ drives the mask generation, where $$rnd$$ is a 32-byte random value in the default hedged variant.
 
 The body of the algorithm is a loop that retries until an attempt passes every validity check. Each iteration, indexed by a counter $$\kappa$$, performs the following steps:
 
@@ -254,7 +257,7 @@ The deterministic variant makes fault attacks easier to mount and should not be 
 
 ## Pre-Hash ML-DSA and Domain Separation
 
-The message that actually enters the internal signing routine is not the raw message $$M$$ but a formatted message $$M'$$ that begins with a domain separator. In "pure" ML-DSA,
+The message that enters the internal signing routine is not the raw message $$M$$ but a formatted message $$M'$$ that begins with a domain separator. In "pure" ML-DSA,
 
 $$
 \begin{aligned}
@@ -272,7 +275,7 @@ M' = \mathsf{IntegerToBytes}(1, 1) \,\|\, \mathsf{IntegerToBytes}(|ctx|, 1) \,\|
 \end{aligned}
 $$
 
-where $$\mathsf{OID}$$ is the object identifier of the pre-hash function (for example SHA-256, SHA-512, or SHAKE128) and $$\mathsf{PH}_M$$ is the digest of $$M$$. The leading domain-separator byte guarantees that a pure ML-DSA signature can never be reinterpreted as a HashML-DSA signature or vice versa. To preserve the claimed security level, the pre-hash digest must be drawn from a function offering at least $$\lambda$$ bits of collision resistance, which means a digest of at least $$2\lambda$$ bits. FIPS 204 states that the pure version is generally preferred, with HashML-DSA reserved for the cases that need it.
+where $$\mathsf{OID}$$ is the object identifier of the pre-hash function, such as SHA-256, SHA-512 or SHAKE128, and $$\mathsf{PH}_M$$ is the digest of $$M$$. The leading domain-separator byte guarantees that a pure ML-DSA signature can never be reinterpreted as a HashML-DSA signature or vice versa. To preserve the claimed security level, the pre-hash digest must be drawn from a function offering at least $$\lambda$$ bits of collision resistance, which means a digest of at least $$2\lambda$$ bits. FIPS 204 states that the pure version is generally preferred, with HashML-DSA reserved for the cases that need it.
 
 ## Conclusion
 
@@ -323,11 +326,15 @@ ML-DSA relies on two assumptions over the module ring $$R_q$$. Module-LWE (MLWE)
 
 **Q: Why does the signing algorithm need a rejection sampling loop instead of producing a signature in one pass?**
 
-The response $$\mathbf{z} = \mathbf{y} + c\mathbf{s}_1$$ is statistically biased toward the secret $$\mathbf{s}_1$$, because $$c\mathbf{s}_1$$ shifts the distribution of the mask $$\mathbf{y}$$. If the signer published every $$\mathbf{z}$$, the accumulated bias across many signatures would leak the secret. Rejection sampling discards any $$\mathbf{z}$$ whose coefficients leave the safe range $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$. Conditioned on acceptance, the published $$\mathbf{z}$$ follows a distribution independent of the secret, which is what makes the leakage vanish. The price is that signing takes a variable number of iterations (on the order of four or five on average) rather than exactly one.
+The response $$\mathbf{z} = \mathbf{y} + c\mathbf{s}_1$$ is statistically biased toward the secret $$\mathbf{s}_1$$, because $$c\mathbf{s}_1$$ shifts the distribution of the mask $$\mathbf{y}$$. If the signer published every $$\mathbf{z}$$, the accumulated bias across many signatures would leak the secret.
+
+Rejection sampling discards any $$\mathbf{z}$$ whose coefficients leave the safe range $$(-(\gamma_1 - \beta), \gamma_1 - \beta)$$. Conditioned on acceptance, the published $$\mathbf{z}$$ follows a distribution independent of the secret, which is what makes the leakage vanish. The price is that signing takes a variable number of iterations, from 3.85 to 5.1 on average depending on the parameter set, rather than exactly one.
 
 **Q: What is the hint $$\mathbf{h}$$ in the signature, and why is it necessary?**
 
-The public key stores only the high bits $$\mathbf{t}_1$$ of $$\mathbf{t}$$; the low bits $$\mathbf{t}_0$$ are dropped to shrink the key. During verification the term $$c\mathbf{t}_1 \cdot 2^d$$ is therefore only an approximation of $$c\mathbf{t}$$, and that small error can flip the high bits of the reconstructed commitment at a few coefficients. The hint $$\mathbf{h}$$ is a compact record (at most $$\omega$$ non-zero positions) of exactly where those carries occur, so the verifier can correct them with $$\mathsf{UseHint}$$ and recover the same $$\mathbf{w}_1$$ the signer hashed. Without the hint, key compression and correct verification could not coexist.
+The public key stores only the high bits $$\mathbf{t}_1$$ of $$\mathbf{t}$$; the low bits $$\mathbf{t}_0$$ are dropped to shrink the key. During verification the term $$c\mathbf{t}_1 \cdot 2^d$$ is therefore only an approximation of $$c\mathbf{t}$$, and that small error can flip the high bits of the reconstructed commitment at a few coefficients.
+
+The hint $$\mathbf{h}$$ is a compact record of exactly where those carries occur, with at most $$\omega$$ non-zero positions, so the verifier can correct them with $$\mathsf{UseHint}$$ and recover the same $$\mathbf{w}_1$$ the signer hashed. Without the hint, key compression and correct verification could not coexist.
 
 **Q: How do the three parameter sets relate to security categories, and what is the cost of choosing a higher one?**
 
@@ -335,11 +342,15 @@ ML-DSA-44, ML-DSA-65, and ML-DSA-87 target NIST categories 2, 3, and 5 respectiv
 
 **Q: Combining the construction details, why must verification recompute the message representative $$\mu$$ rather than trusting a value from the signer?**
 
-The signature contains the commitment hash $$\tilde{c}$$ but not $$\mu$$ itself. Verification recomputes $$\mu = \mathsf{H}(\mathsf{BytesToBits}(tr) \,\|\, M', 64)$$ from the public-key hash $$tr$$ and the formatted message, then derives the challenge $$c = \mathsf{SampleInBall}(\tilde{c})$$ and reconstructs $$\mathbf{w}'_1$$ from $$\mathbf{z}$$, $$\mathbf{t}_1$$, and the hint. The acceptance test $$\tilde{c} = \mathsf{H}(\mu \,\|\, \mathsf{w1Encode}(\mathbf{w}'_1), \lambda/4)$$ only succeeds if the same message, the same key, and a consistent commitment all feed the hash. If $$\mu$$ came from the signer, an adversary could decouple the challenge from the actual message and forge. Recomputing $$\mu$$ from the verifier's own inputs is what binds the signature to that exact message under that exact key.
+The signature contains the commitment hash $$\tilde{c}$$ but not $$\mu$$ itself. Verification recomputes $$\mu = \mathsf{H}(\mathsf{BytesToBits}(tr) \,\|\, M', 64)$$ from the public-key hash $$tr$$ and the formatted message, then derives the challenge $$c = \mathsf{SampleInBall}(\tilde{c})$$ and reconstructs $$\mathbf{w}'_1$$ from $$\mathbf{z}$$, $$\mathbf{t}_1$$, and the hint.
+
+The acceptance test $$\tilde{c} = \mathsf{H}(\mu \,\|\, \mathsf{w1Encode}(\mathbf{w}'_1), \lambda/4)$$ only succeeds if the same message, the same key, and a consistent commitment all feed the hash. If $$\mu$$ came from the signer, an adversary could decouple the challenge from the actual message and forge. Recomputing $$\mu$$ from the verifier's own inputs is what binds the signature to that exact message under that exact key.
 
 **Q: Why does the deterministic signing variant carry more risk than the hedged variant if both verify identically?**
 
-Both variants derive the mask from $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu, 64)$$ and produce signatures the same verifier accepts, so interoperability is unaffected. The difference is $$rnd$$: hedged signing uses fresh random bytes, deterministic signing uses zeros. With deterministic signing, every internal value is a fixed function of the key and message, so an attacker who can induce a hardware fault and observe the corrupted output can compare it against the known correct computation, which makes fault attacks and certain side-channel attacks easier. The fresh randomness in the hedged variant breaks that repeatability without weakening the mathematics, which is why FIPS 204 makes it the default and warns against deterministic signing on platforms exposed to physical attacks.
+Both variants derive the mask from $$\rho'' = \mathsf{H}(K \,\|\, rnd \,\|\, \mu, 64)$$ and produce signatures the same verifier accepts, so interoperability is unaffected. The difference is $$rnd$$: hedged signing uses fresh random bytes, deterministic signing uses zeros.
+
+With deterministic signing, every internal value is a fixed function of the key and message, so an attacker who can induce a hardware fault and observe the corrupted output can compare it against the known correct computation, which makes fault attacks and certain side-channel attacks easier. The fresh randomness in the hedged variant breaks that repeatability without weakening the mathematics, which is why FIPS 204 makes it the default and warns against deterministic signing on platforms exposed to physical attacks.
 
 ## References
 

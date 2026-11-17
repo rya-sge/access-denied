@@ -2,7 +2,7 @@
 layout: post
 title: "EIP-7702 Smart Wallet Security: Threat Model and Attack Surface Analysis"
 date: 2026-02-17
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum security solidity wallet
@@ -84,7 +84,7 @@ This is the most dangerous vulnerability specific to EIP-7702 wallets with confi
 
 ### The Problem
 
-When an EIP-7702 wallet stores mutable configuration — such as the trusted EntryPoint address — it needs an initialization step. If `initialize()` has no access control, any address can call it. There is a window between the moment the EOA delegates its code (the authorization tuple is processed) and the moment the owner calls `initialize()`. An attacker monitoring the mempool can front-run this call.
+When an EIP-7702 wallet stores mutable configuration, such as the trusted EntryPoint address, it needs an initialization step. If `initialize()` has no access control, any address can call it. There is a window between the moment the EOA delegates its code, when the authorization tuple is processed, and the moment the owner calls `initialize()`. An attacker monitoring the mempool can front-run this call.
 
 ### Attack Flow
 
@@ -166,7 +166,7 @@ This permits exactly two callers:
 1. **The trusted EntryPoint** — for ERC-4337 UserOperation execution
 2. **The EOA itself** — for direct transactions where `msg.sender == address(this)` under EIP-7702
 
-Any external address attempting to call `execute()`, `executeBatch()`, or the deployment functions receives an `Unauthorized` revert. This applies equally to ETH transfers (`execute(attacker, balance, "")`) and token transfers (`execute(token, 0, transferCalldata)`).
+Any external address attempting to call `execute()`, `executeBatch()`, or the deployment functions receives an `Unauthorized` revert. This applies equally to ETH transfers, such as `execute(attacker, balance, "")`, and to token transfers, such as `execute(token, 0, transferCalldata)`.
 
 The `validateUserOp` function is further restricted to `onlyEntryPoint` — the EOA itself cannot call it directly, which prevents any confusion between direct execution and UserOp validation paths.
 
@@ -244,7 +244,7 @@ domainSeparator = keccak256(abi.encode(
 ))
 ```
 
-A signature valid on Alice's account (where `address(this) = alice`) is invalid on Bob's account (where `address(this) = bob`), because the domain separators differ. This prevents cross-account replay — a risk that matters especially when one private key controls multiple EIP-7702 delegated accounts.
+A signature valid on Alice's account, where `address(this) = alice`, is invalid on Bob's account, where `address(this) = bob`, because the domain separators differ. This prevents cross-account replay, a risk that matters most when one private key controls multiple EIP-7702 delegated accounts.
 
 ERC-7739 also preserves the original EIP-712 type structure in the nested hash, so wallet UIs display the actual message content rather than an opaque hash. This is a meaningful improvement over simpler wrapper schemes (like Coinbase's `CoinbaseSmartWalletMessage(bytes32 hash)`) in terms of phishing resistance.
 
@@ -374,7 +374,7 @@ This means all smart account access control — `onlyEntryPoint`, `onlyEntryPoin
 
 ### Delegation Revocation During Pending UserOps
 
-If the EOA revokes delegation (sends a new type-4 transaction with a different or null implementation) while UserOperations are in the mempool, those UserOps will fail at execution time since the bytecode is no longer available at the EOA's address.
+An EOA revokes delegation by sending a new type-4 transaction with a different or null implementation. If it does so while UserOperations are in the mempool, those UserOps will fail at execution time because the bytecode is no longer available at the EOA's address.
 
 ### Storage Persistence Across Re-Delegation
 

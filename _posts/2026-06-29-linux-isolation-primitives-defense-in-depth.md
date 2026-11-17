@@ -2,7 +2,7 @@
 layout: post
 title: Linux Isolation Primitives - Defense in Depth Beyond the Castle Model
 date:   2026-06-29
-last_modified_at: 2026-11-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: linux security
@@ -71,7 +71,7 @@ By default a program can reach the entire filesystem, constrained only by the ro
 
 The essential caveat appears on the slide and deserves emphasis: **chroot is not a security primitive.** It was designed to present a restricted filesystem view, not to contain a hostile process. It is frequently misunderstood and misused as if it were a sandbox. In particular, a confined process that retains root privileges can escape the chroot jail, for instance by acquiring a file descriptor to a directory outside the new root and then walking back out with repeated `chdir("..")` followed by a second `chroot`. The jail is therefore not airtight when the process is root.
 
-Used carefully, chroot can still confine a service correctly: an SFTP-only server is a common example, where the daemon restricts each user to a subtree. It also lives alongside the heavier LSM approaches (AppArmor profiles are powerful but notoriously hard to generate for arbitrary services; SELinux is more powerful still and correspondingly more complex).
+Used carefully, chroot can still confine a service correctly: an SFTP-only server is a common example, where the daemon restricts each user to a subtree. It can also be used alongside the heavier LSM approaches. AppArmor profiles are powerful but notoriously hard to generate for arbitrary services, and SELinux is more powerful still and correspondingly more complex.
 
 **Trade-offs.** chroot lets an administrator reconstruct a minimal filesystem for a service, it is a single system call, and it is simple. Against that, it is not a security tool, it is not airtight when the process is root, and applying it requires a privileged operation.
 
@@ -81,9 +81,14 @@ Some programs expose external network services that are enabled by default, whic
 
 [Netfilter](https://www.netfilter.org/) is the in-kernel framework, introduced around 1998 to 2000, that filters network connections and performs access control (routing) over the system's network traffic. Because the decision happens in the kernel on the packet path, filtering is fast and applies uniformly regardless of which userspace program owns the socket.
 
-A broad set of userspace tools drives it: `iptables`, `ebtables`, and `arptables` for IP, Ethernet bridge, and ARP filtering respectively; the [Uncomplicated Firewall](https://wiki.ubuntu.com/UncomplicatedFirewall) (`ufw`) as an easier front end; and newer interfaces built on the in-kernel BPF machinery (`bpfilter`, `nftables`).
+A broad set of userspace tools drives it:
 
-**Trade-offs.** Netfilter is performant, offers a wide tool selection, and is relatively standard across distributions; `ufw` lowers the barrier to entry. The costs are an extra layer of packet-handling complexity inside the kernel, an interface that is easy to get wrong (rule ordering mistakes are common), and the need for a privileged operation to change rules.
+- `iptables`, `ebtables` and `arptables` for IP, Ethernet bridge and ARP filtering respectively;
+- the [Uncomplicated Firewall](https://wiki.ubuntu.com/UncomplicatedFirewall) (`ufw`) as an easier front end;
+- `nftables`, available since Linux 3.13, which replaces the `iptables` family and evaluates rules in its own small in-kernel virtual machine;
+- `bpfilter`, a project to translate `iptables` rules into BPF programs, which never became usable and whose kernel part was removed in a patch posted in December 2023.
+
+**Trade-offs.** Netfilter is performant, offers a wide tool selection, and is relatively standard across distributions; `ufw` lowers the barrier to entry. The costs are an extra layer of packet-handling complexity inside the kernel, an interface that is easy to get wrong, since rule-ordering mistakes are common, and the need for a privileged operation to change rules.
 
 ## Control Groups (cgroups): Resource Accounting and Limits
 
@@ -108,11 +113,19 @@ hugetlb         11              1               1
 pids            12              1               1
 ```
 
-Each controller governs one resource class: CPU shares and CPU sets, block-device I/O, memory ceilings, the number of processes (`pids`, a fork-bomb defense), and device access (`devices`, which doubles as an access-control lever). The listing above shows the v1 layout with one hierarchy per controller; the later v2 unified hierarchy places all controllers under a single tree. cgroups are the resource-control half of what containers later assemble.
+Each controller governs one resource class:
+
+- CPU shares and CPU sets;
+- block-device I/O;
+- memory ceilings;
+- the number of processes, through `pids`, which defends against fork bombs;
+- device access, through `devices`, which doubles as an access-control lever.
+
+The listing above shows the v1 layout with one hierarchy per controller; the later v2 unified hierarchy places all controllers under a single tree. cgroups are the resource-control half of what containers later assemble.
 
 ## Namespaces: Partitioning the Kernel's View
 
-Namespaces are the isolation half. The primitive is inspired by the namespaces of [Plan 9 from Bell Labs](https://9p.io/plan9/), the post-UNIX research system from Rob Pike, Ken Thompson, Dave Presotto, Phil Winterbottom, and Dennis Ritchie. Plan 9 had little commercial success but introduced revolutionary ideas grounded in the UNIX philosophy (every resource, including the display, is reachable through the file namespace). Many of those ideas were partially adopted by GNU/Linux, which is itself a UNIX clone; namespaces are one of them. They were integrated into Linux in 2002 and progressively improved from 2006 onward, which is when the term *container* enters the picture.
+Namespaces are the isolation half. The primitive is inspired by the namespaces of [Plan 9 from Bell Labs](https://9p.io/plan9/), the post-UNIX research system from Rob Pike, Ken Thompson, Dave Presotto, Phil Winterbottom, and Dennis Ritchie. Plan 9 had little commercial success but introduced revolutionary ideas grounded in the UNIX philosophy, such as making every resource, including the display, accessible through the file namespace. Many of those ideas were partially adopted by GNU/Linux, which is itself a UNIX clone; namespaces are one of them. They were integrated into Linux in 2002 and progressively improved from 2006 onward, which is when the term *container* enters the picture.
 
 A namespace partitions a class of kernel resources so that processes inside it see only a limited, private slice. The available namespaces can be listed:
 
@@ -144,23 +157,29 @@ Stacking the previous primitives yields a spectrum of virtualization approaches 
 
 ### Containers (Isolators)
 
-Containerization uses the security primitives just described (SECCOMP, AppArmor, SELinux, cgroups, namespaces, chroot) to isolate processes from one another. The defining property is that **the kernel is shared** by all containerized processes: a flaw in that single kernel lets an adversary controlling one container reach the others. Because the processes run natively, the speed is unmatched by any other isolation technique. The consequence of the shared kernel is that a container's operating system must be compatible with the host's. Containers can still communicate when wanted, through a virtual network or IPC. The mental model is the simulation of several machines per service over one shared kernel. Examples include `lxc`, `lxd`, `docker`, `firejail`, and `mbox`.
+Containerization uses the security primitives just described, namely SECCOMP, AppArmor, SELinux, cgroups, namespaces and chroot, to isolate processes from one another. The defining property is that **the kernel is shared** by all containerized processes: a flaw in that single kernel lets an adversary controlling one container attack the others.
+
+Because the processes run natively, the speed is unmatched by any other isolation technique. The consequence of the shared kernel is that a container's operating system must be compatible with the host's. Containers can still communicate when wanted, through a virtual network or IPC. The mental model is the simulation of several machines per service over one shared kernel. Examples include `lxc`, `lxd`, `docker`, `firejail`, and `mbox`.
 
 ### Type-2 Hypervisor (Hosted)
 
-A type-2 hypervisor runs as an application on top of a host operating system, and each virtual machine carries its own complete system (boot firmware, disks, graphics card, network card). The host CPU and memory are directly accessible to the guests, although protection mechanisms block unauthorized access. This allows running other operating systems on the same machine, and even other CPU architectures through emulation. A vulnerability in a *guest* kernel does not reach the other guests, unless the flaw is in the *host* kernel or in a module used by the virtualization layer. These programs are extremely complex and exchange many services with the host (file transfer, resource sharing, clipboard). That exchange surface is where guest-to-host attacks live: escaping a guest to climb into the hypervisor. Examples include qemu/KVM, VirtualBox, and VMware Workstation.
+A type-2 hypervisor runs as an application on top of a host operating system. Each virtual machine carries its own complete system: boot firmware, disks, graphics card and network card. The host CPU and memory are directly accessible to the guests, although protection mechanisms block unauthorized access. This allows running other operating systems on the same machine, and even other CPU architectures through emulation.
+
+A vulnerability in a *guest* kernel does not affect the other guests, unless the flaw is in the *host* kernel or in a module used by the virtualization layer. These programs are extremely complex and exchange many services with the host, such as file transfer, resource sharing and the clipboard. Guest-to-host attacks target that exchange surface: a guest to climb into the hypervisor. Examples include qemu/KVM, VirtualBox, and VMware Workstation.
 
 ### Type-1 Hypervisor (Bare Metal)
 
-A type-1 hypervisor reduces the host operating system to a strict minimum, often called *bare metal*. A simplified kernel does only what virtualization and device management require. The result is slower than containerization but faster than a type-2 hypervisor, and the security of the host improves precisely because functionality, and therefore attack surface, has been cut away. Examples include Xen, KVM, and VMware vSphere. (KVM is a Linux kernel module and is sometimes paired with qemu in a hosted configuration, so it spans both categories depending on deployment.)
+A type-1 hypervisor reduces the host operating system to a strict minimum, often called *bare metal*. A simplified kernel does only what virtualization and device management require. The result is slower than containerization but faster than a type-2 hypervisor, and the security of the host improves precisely because functionality, and therefore attack surface, has been cut away. Examples include Xen, KVM, and VMware vSphere. KVM is a Linux kernel module and is sometimes paired with qemu in a hosted configuration, so it spans both categories depending on deployment.
 
 ### Qubes OS
 
-[Qubes OS](https://www.qubes-os.org/), proposed in 2010 by Joanna Rutkowska, applies isolation and virtualization to secure a graphical desktop workstation. It builds two layers of virtualization on a type-1 hypervisor (Xen) that separate hardware concerns (network isolation, USB) from software concerns (programs, services) according to trust levels. Each program runs in a domain matching its trust level (home, work, top-secret, tmp), an arrangement that echoes the multilevel security (MLS) model of [Multics](https://multicians.org/). Each domain is isolated in its own virtual machine. Qubes provides tools to manage these application VMs (appVMs), some of which are disposable sandboxes. A colour assigned to each domain's window border gives an intuitive, always-visible indication of which trust level a window belongs to.
+[Qubes OS](https://www.qubes-os.org/), proposed in 2010 by Joanna Rutkowska, applies isolation and virtualization to secure a graphical desktop workstation. It builds two layers of virtualization on the Xen type-1 hypervisor. They separate hardware concerns, such as network isolation and USB, from software concerns, such as programs and services, according to trust levels. Each program runs in a domain matching its trust level, for example home, work, top-secret or tmp; this arrangement echoes the multilevel security (MLS) model of [Multics](https://multicians.org/). Each domain is isolated in its own virtual machine.
+
+Qubes provides tools to manage these application VMs (appVMs), some of which are disposable sandboxes. A colour assigned to each domain's window border gives an intuitive, always-visible indication of which trust level a window belongs to.
 
 ## Composition and the Cost of Complexity
 
-These primitives are designed to combine like building blocks: stack chroot, namespaces, cgroups, seccomp, and capabilities and a container emerges; place containers or guests on a hypervisor and stronger boundaries follow. Each composition produces a tool that is simpler to *use* than the primitives beneath it, but the underlying complexity grows quickly. A front end can hide a great deal of machinery:
+These primitives are designed to combine like building blocks: stack chroot, namespaces, cgroups, seccomp, and capabilities and a container emerges; place containers or guests on a hypervisor and stronger boundaries follow. Each composition produces a tool that is simpler to *use* than the primitives beneath it, but the underlying complexity grows quickly. A front end can hide a large amount of code, as the binary sizes show:
 
 ```text
 $ ls -hl /usr/bin/firejail
@@ -174,7 +193,11 @@ The set-user-ID bit on `firejail` is itself a reminder that the convenience runs
 
 ## Conclusion
 
-Linux offers a graduated set of isolation primitives, from the trivial to the intricate. Mount options and chroot operate within a single kernel and userspace and provide coarse filesystem boundaries, with the explicit caveat that chroot is a view-restriction tool rather than a containment boundary. Netfilter filters network access in the kernel. cgroups bound resource consumption, and namespaces partition the kernel's view of resources; together they are the substrate of containers. Above them sits a virtualization spectrum that trades speed for a smaller shared surface: containers share the kernel, type-2 hypervisors share the host kernel, type-1 hypervisors share only a thin layer, and Qubes OS turns that thin layer into a compartmentalized desktop. The recurring tension is that composing simple primitives yields usable tools at the cost of complexity that grows faster than the convenience it buys.
+Linux offers a graduated set of isolation primitives, from the trivial to the intricate. Mount options and chroot operate within a single kernel and userspace and provide coarse filesystem boundaries, with the explicit caveat that chroot is a view-restriction tool rather than a containment boundary. Netfilter filters network access in the kernel.
+
+cgroups bound resource consumption, and namespaces partition the kernel's view of resources; together they are the substrate of containers. Above them sits a virtualization spectrum that trades speed for a smaller shared surface: containers share the kernel, type-2 hypervisors share the host kernel, type-1 hypervisors share only a thin layer, and Qubes OS turns that thin layer into a compartmentalized desktop.
+
+The recurring tension is that composing simple primitives yields usable tools at the cost of complexity that grows faster than the convenience it buys.
 
 ![Linux isolation primitives mindmap]({{site.url_complet}}/assets/article/virtualization/linux-isolation/2026-06-29-linux-isolation-primitives-defense-in-depth.png)
 
@@ -209,11 +232,13 @@ The castle model concentrates protection at the perimeter, guarding entry points
 
 **Q: Why is chroot described as not being a security primitive?**
 
-chroot was built to present a process with a restricted filesystem view by changing its apparent root directory, not to contain a hostile process. A process that keeps root privileges inside the jail can escape it, for example by holding a file descriptor to a directory outside the new root and walking back out with repeated `chdir("..")` and a second `chroot`. It can confine a cooperative service such as an SFTP daemon, but it does not constitute an airtight boundary against a privileged adversary.
+chroot was built to present a process with a restricted filesystem view by changing its apparent root directory, not to contain a hostile process. A process that keeps root privileges inside the jail can escape it, for example by holding a file descriptor to a directory outside the new root and walking back out with repeated `chdir("..")` and a second `chroot`.
+
+It can confine a cooperative service such as an SFTP daemon, but it does not constitute an airtight boundary against a privileged adversary.
 
 **Q: What is the difference between what cgroups isolate and what namespaces isolate?**
 
-They address two different halves of isolation. cgroups perform resource accounting and limiting (CPU, memory, block I/O, process count, device access) through a hierarchical classification, which bounds how much a group of processes can consume. Namespaces partition the kernel's *view* of resources (PIDs, network stack, mount table, hostname, IPC, users) so a process sees only a private slice. A container runtime combines both: cgroups cap the resources, namespaces restrict visibility.
+They address two different halves of isolation. cgroups perform resource accounting and limiting through a hierarchical classification, which bounds how much CPU, memory, block I/O, process count and device access a group of processes can consume. Namespaces partition the kernel's *view* of resources, so a process sees only a private slice of PIDs, network stack, mount table, hostname, IPC and users. A container runtime combines both: cgroups cap the resources, namespaces restrict visibility.
 
 **Q: Which namespace makes unprivileged containers possible, and why?**
 
@@ -221,11 +246,23 @@ The user namespace. It maps user and group IDs so that a process can hold root (
 
 **Q: How does the shared kernel explain the security difference between a container and a type-1 hypervisor?**
 
-A container shares the single host kernel with every other container, so the entire kernel is part of the trusted computing base; one kernel vulnerability can become a container escape that reaches the other containers. A type-1 hypervisor shares only a thin virtualization layer with reduced functionality, so the attack surface common to all guests is much smaller, and a flaw in a guest kernel does not reach the others unless it lies in the hypervisor itself. The container is faster because its processes run natively, while the type-1 hypervisor trades some speed for a smaller shared surface.
+A container shares the single host kernel with every other container, so the entire kernel is part of the trusted computing base; one kernel vulnerability can become a container escape that compromises the other containers.
 
-**Q: Combining the primitives, how is a container actually assembled from them, and where does Qubes OS sit relative to that construction?**
+A type-1 hypervisor shares only a thin virtualization layer with reduced functionality, so the attack surface common to all guests is much smaller, and a flaw in a guest kernel does not affect the others unless it lies in the hypervisor itself.
 
-A container runtime issues `clone` or `unshare` with the new-namespace flags to give the process a private PID space, network stack, and mount table, attaches the process to a cgroup that caps CPU, memory, and process count, restructures the filesystem view with pivot_root or chroot under `nosuid`/`noexec`/`nodev` mounts, applies a seccomp filter to limit system calls, and drops capabilities before `exec`. All of this still rests on the one shared kernel. Qubes OS sits a level higher: instead of sharing a kernel, it places each trust domain in its own virtual machine on a type-1 hypervisor (Xen), so the boundary between domains is a hypervisor boundary rather than a namespace boundary, at the cost of running full guest kernels.
+The container is faster because its processes run natively, while the type-1 hypervisor trades some speed for a smaller shared surface.
+
+**Q: Combining the primitives, how is a container assembled from them, and where does Qubes OS sit relative to that construction?**
+
+A container runtime takes five steps:
+
+- it issues `clone` or `unshare` with the new-namespace flags to give the process a private PID space, network stack, and mount table;
+- it attaches the process to a cgroup that caps CPU, memory, and process count;
+- it restructures the filesystem view with pivot_root or chroot under `nosuid`/`noexec`/`nodev` mounts;
+- it applies a seccomp filter to limit system calls;
+- it drops capabilities before `exec`.
+
+All of this still rests on the one shared kernel. Qubes OS works one level higher: instead of sharing a kernel, it places each trust domain in its own virtual machine on the Xen type-1 hypervisor. The boundary between domains is therefore a hypervisor boundary rather than a namespace boundary, at the cost of running full guest kernels.
 
 ## Gaps
 
@@ -233,7 +270,6 @@ These points were not settled by the sources read, or come from general knowledg
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The Netfilter section describes `nftables` and `bpfilter` as built on BPF, but `nftables` runs rules in its own in-kernel virtual machine. | The sentence likely misattributes the mechanism, and `bpfilter`'s current status was not checked. | [What is nftables?](https://wiki.nftables.org/wiki-nftables/index.php/What_is_nftables%3F) and the kernel history of `bpfilter`. |
 | The article is based on a 2021 lecture, which is not public, and the `/proc/cgroups` listing shows the v1 layout. | cgroup v2 is now the default on most distributions, so the controller list and hierarchy differ on a current system. | The [cgroup v2 documentation](https://docs.kernel.org/admin-guide/cgroup-v2.html) and [cgroups(7)](https://man7.org/linux/man-pages/man7/cgroups.7.html). |
 | The dates (Netfilter around 1998 to 2000, namespaces in 2002 and from 2006, Qubes OS in 2010) come from the lecture and were not checked. | A wrong date would misplace the primitives in Linux history. | The [Netfilter project](https://www.netfilter.org/), [namespaces(7)](https://man7.org/linux/man-pages/man7/namespaces.7.html) and [Qubes OS](https://www.qubes-os.org/). |
 | The chroot escape is described in general terms only. | The exact conditions (which privilege, which descriptor) decide whether a given confinement can be broken. | [chroot(2)](https://man7.org/linux/man-pages/man2/chroot.2.html), whose notes state that it is not a sandbox and require `CAP_SYS_CHROOT`. |
@@ -246,6 +282,8 @@ These points were not settled by the sources read, or come from general knowledg
 - HEIG-VD - "Sécurité des systèmes d'exploitation"
 - [Netfilter / iptables project](https://www.netfilter.org/)
 - [Uncomplicated Firewall (ufw)](https://wiki.ubuntu.com/UncomplicatedFirewall)
+- [What is nftables? — nftables wiki](https://wiki.nftables.org/wiki-nftables/index.php/What_is_nftables%3F)
+- [bpfilter: remove bpfilter — netdev patch, December 2023](https://lists.openwall.net/netdev/2023/12/26/75)
 - [Plan 9 from Bell Labs](https://9p.io/plan9/)
 - [Linux namespaces — man7.org](https://man7.org/linux/man-pages/man7/namespaces.7.html)
 - [Control groups (cgroups) — man7.org](https://man7.org/linux/man-pages/man7/cgroups.7.html)

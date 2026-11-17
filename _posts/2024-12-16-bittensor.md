@@ -2,7 +2,7 @@
 layout: post
 title: Bittensor, decentralized production of artificial intelligence
 date:   2024-12-16
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ai
@@ -135,7 +135,7 @@ A node in a neural network is represented in a Bittensor subnet as either a subn
 
 See [Minimum compute requirements](https://github.com/opentensor/bittensor-subnet-template/blob/main/min_compute.yml) for compute, memory, bandwidth and storage requirements for a subnet node, i.e., for a subnet neuron.
 
-A subnet graph in Bittensor (shown on the right) mirrors the bipartite structure of a classical neural network graph (shown on the left),  i.e.
+In the figure, the Bittensor subnet graph on the right mirrors the bipartite structure of the classical neural network graph on the left, i.e.
 
 a)  In the classical neural network, a node in the input layer is connected only to a node in the next layer (hidden layer).
 
@@ -158,7 +158,7 @@ However, in a Bittensor subnet, shown on the right, a subnet miner can directly 
 Neurons exchange information by:
 
 - Encapsulating the information in a Synapse object.
-- Instantiating server (Axon) and client (dendrite) network elements and exchanging Synapse objects using this server-client (Axon-dendrite) protocol. See the below diagram.
+- Instantiating the server and client network elements, Axon and dendrite, and exchanging Synapse objects using this Axon-dendrite server-client protocol. See the below diagram.
 
 #### Summary
 
@@ -218,7 +218,7 @@ For example, when a subnet validator runs the below code fragment:
 then the subnet validator:
 
 - Has instantiated a `dendrite` client on itself.
-- Transmitted `synapse` objects to a set of `axons` (that are attached to subnet miners).
+- Transmitted `synapse` objects to a set of `axons` attached to subnet miners.
 - Waits until `timeout` expires.
 
 See [docs.bittensor.com/learn/bittensor-building-blocks#dendrite](https://docs.bittensor.com/learn/bittensor-building-blocks#dendrite)
@@ -348,7 +348,7 @@ See **2** in the above diagram.
 
 The task is a key component of any incentive mechanism, defining the work miners perform. Tasks should align with the subnet's intended use case, mimicking user interactions. Examples include responding to natural language prompts or storing encrypted files.
 
-Tasks establish the scope of miners' work and the utility provided by the subnet, which can range from specific (e.g., storage) to varied (e.g., handling diverse natural language queries).
+Tasks establish the scope of miners' work and the utility provided by the subnet, which can range from a specific task such as storage to varied ones such as handling diverse natural language queries.
 
 See [docs.bittensor.com - subnet-task](https://docs.bittensor.com/learn/anatomy-of-incentive-mechanism#subnet-task)
 
@@ -401,7 +401,7 @@ See [docs.bittensor.com/learn/anatomy-of-incentive-mechanism#distribution-of-rew
 
 ### Tempo
 
-Subnet validators can update their rank weight vectors on the blockchain at any time. However, Yuma Consensus (YC) for a subnet begins every 360 blocks (72 minutes, assuming 12 seconds per block) using the latest weight matrix available at that start time.
+Subnet validators can update their rank weight vectors on the blockchain at any time. However, Yuma Consensus (YC) for a subnet begins every 360 blocks using the latest weight matrix available at that start time. At 12 seconds per block, 360 blocks last 72 minutes.
 
 If a weight vector arrives after the start of a 360-block period, it will apply to the next YC period. At the end of each 360-block period, known as a **tempo**, the YC concludes, and rewards (TAO emissions) are distributed. While the tempo duration is consistent across user-created subnets, YC start times can vary between subnets.
 
@@ -421,11 +421,13 @@ Validators send queries to miners that are then scored for speed, and verified b
 
 #### Role of a Miner
 
-A miner is a node that is responsible for generating a output from a query, both organic and synthetic.
+A miner is a node that is responsible for generating an output from a query, both organic and synthetic.
 
 #### Role of a Validator
 
-A validator is a node that is responsible for verifying a miner's output. The validator will send an openai compliant request to a miner with. The miner will then send back a response with the output. The validator will then use the log prob values of the response to verify that each miners response is accurate. Validators will keep score of each miners response time and use their averages to assign scores each epoch. Specifically, miner scores are the sum of the average TPS per model.
+A validator is a node that is responsible for verifying a miner's output. The validator sends an OpenAI-compliant request to a miner, and the miner sends back a response with the output. The validator then uses the log prob values of the response to verify that each miner's response is accurate.
+
+Validators keep score of each miner's response time and use their averages to assign scores each epoch. Specifically, miner scores are the sum of the average TPS per model.
 
 ### S&P 500 Oracle
 

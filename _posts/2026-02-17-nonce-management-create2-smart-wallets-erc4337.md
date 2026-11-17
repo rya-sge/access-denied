@@ -2,7 +2,7 @@
 layout: post
 title: Nonce Management and CREATE2 in ERC-4337 Smart Wallets
 date:   2026-02-17
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security wallet
@@ -171,7 +171,7 @@ vm.etch(alice, address(impl).code);
 
 This copies the contract bytecode onto Alice's EOA address, but it does **not** modify Alice's EVM nonce. For a fresh address in a test, the nonce starts at 0.
 
-This leads to a subtle bug when predicting CREATE addresses. A first attempt might assume the nonce is 1 (as is conventional for deployed contracts under EIP-161):
+This leads to a subtle bug when predicting CREATE addresses. A first attempt might assume the nonce is 1, the starting value EIP-161 gives deployed contracts:
 
 ```solidity
 // INCORRECT: assumes nonce starts at 1
@@ -192,7 +192,7 @@ This pattern accounts for whatever nonce the account happens to have, regardless
 
 ### On a Real Chain with EIP-7702
 
-On a live network, the situation is different. When an EOA signs an EIP-7702 authorization tuple, its nonce is incremented (the auth tuple consumes a nonce). If Alice's EOA nonce was 5 before delegation, the first `CREATE` from her smart wallet code would use nonce 6 (or higher, depending on how many transactions were sent during initialization).
+On a live network, the situation is different. When an EOA signs an EIP-7702 authorization tuple, its nonce is incremented (the auth tuple consumes a nonce). If Alice's EOA nonce was 5 before delegation, the first `CREATE` from her smart wallet code would use nonce 6, or higher if more transactions were sent during initialization.
 
 This makes CREATE address prediction fragile in production: the nonce depends on the EOA's entire transaction history. CREATE2 avoids this entirely.
 
@@ -210,7 +210,7 @@ This makes CREATE address prediction fragile in production: the nonce depends on
 
 ### Prefer CREATE2 for Deterministic Deployments
 
-When the deployed address needs to be known ahead of time (e.g., for approvals, cross-chain coordination, or UI display), use `deployDeterministic()`. The address can be computed off-chain with:
+When the deployed address needs to be known ahead of time, for approvals, cross-chain coordination or UI display, use `deployDeterministic()`. The address can be computed off-chain with:
 
 ```solidity
 address predicted = computeCreate2Address(
@@ -222,7 +222,7 @@ address predicted = computeCreate2Address(
 
 ### Use CREATE for Simple Deployments
 
-When the address does not need to be known in advance (e.g., deploying a helper contract whose address will be stored on-chain), `deploy()` is simpler. Just do not attempt to predict the address from hardcoded nonce values.
+When the address does not need to be known in advance, for example for a helper contract whose address will be stored on-chain, `deploy()` is simpler. Just do not attempt to predict the address from hardcoded nonce values.
 
 ### EntryPoint Nonce Channels for Parallel Operations
 

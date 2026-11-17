@@ -2,7 +2,7 @@
 layout: post
 title:  Most useful commands with git
 date:   2024-04-15
-last_modified_at: 2025-05-02
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: programmation
@@ -251,7 +251,7 @@ git rebase --interactive --exec "git commit --amend --no-edit -S" HEAD~N
 
       (sign commit):
 
-     - This cryptographically signs the commit using GPG (if GPG signing is enabled in your Git config).
+     - Cryptographically signs the commit with GPG, whatever the Git config says; it needs a usable GPG key, which by default is the one matching the committer identity. Setting `commit.gpgSign` only makes signing the default for every commit. Reference: [git-scm.com/docs/git-commit](https://git-scm.com/docs/git-commit)
      - Ensures commits are verified as signed by you.
 
 3. **`HEAD~N`**

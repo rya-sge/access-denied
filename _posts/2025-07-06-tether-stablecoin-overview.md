@@ -2,7 +2,7 @@
 layout: post
 title: "Tether USDT smart contract - Overview"
 date: 2025-07-06
-last_modified_at: 2025-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ethereum defi
@@ -752,7 +752,7 @@ USDT is a centralized stablecoin as shown in the following table:
 
 ##### What was it?
 
-Early Solidity versions (before ~0.5.0) had a problem where malformed transaction payloads (i.e., too short) could be interpreted incorrectly. This was called the **short address attack**, particularly relevant to `transfer(address,uint)` functions.
+Early Solidity versions, before about 0.5.0, could misinterpret a malformed transaction payload that was too short. This was called the **short address attack**, particularly relevant to `transfer(address,uint)` functions.
 
 ##### The Fix:
 
@@ -817,7 +817,7 @@ uint256 c = a.add(b);
 
 - **Owner has sweeping power** (mint, freeze, confiscate, halt)
 - **Security mechanisms** (like short address attack prevention) are outdated
-- **Obsolete Solidity version** (v0.4.x lacks modern language features like `revert()` and `safe constructors`)
+- **Obsolete Solidity version**: v0.4.x lacks modern language features like `revert()` and `safe constructors`
 - **No use of events in critical areas like `transfer` in upgraded contract**
 - **Deprecation relies on trust** in `upgradedAddress` implementation
 

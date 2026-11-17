@@ -2,6 +2,7 @@
 layout: post
 title: "ISO 20022 for Reference Data — The reda Message Set"
 date:   2026-07-17
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: network programmation ISO20022
@@ -53,7 +54,14 @@ Most `reda` families follow the same lifecycle for a piece of reference data, bu
 
 ![Maintaining a security's reference data]({{site.url_complet}}/assets/article/finance/reda-security-lifecycle-workflow.png)
 
-Taking securities as the example: a maintainer creates the instrument with a `reda.006` **SecurityCreationRequest** and receives a `reda.008` **SecurityCreationStatusAdvice**; consumers are told of the change through a `reda.009` **SecurityActivityAdvice**; a consumer that needs the current record sends a `reda.010` **SecurityQuery** and receives a `reda.012` **SecurityReport**; and later changes are made with a `reda.007` **SecurityMaintenanceRequest** and a `reda.029` status advice, or removed with a `reda.013` deletion request. The party and account families mirror this shape with their own create, modify, delete, query, report, and activity messages, and both add **audit-trail** queries and reports (`reda.033`, `reda.036`, `reda.042`) so a full history of changes can be retrieved. This uniform create-maintain-query-report pattern is what makes a large area navigable: learn it once and it applies across the domains.
+Taking securities as the example:
+
+- a maintainer creates the instrument with a `reda.006` **SecurityCreationRequest** and receives a `reda.008` **SecurityCreationStatusAdvice**;
+- consumers are told of the change through a `reda.009` **SecurityActivityAdvice**;
+- a consumer that needs the current record sends a `reda.010` **SecurityQuery** and receives a `reda.012` **SecurityReport**;
+- later changes are made with a `reda.007` **SecurityMaintenanceRequest** and a `reda.029` status advice, or the record is removed with a `reda.013` deletion request.
+
+The party and account families mirror this shape with their own create, modify, delete, query, report, and activity messages, and both add **audit-trail** queries and reports (`reda.033`, `reda.036`, `reda.042`) so a full history of changes can be retrieved. This uniform create-maintain-query-report pattern is what makes a large area navigable: learn it once and it applies across the domains.
 
 ## Two notable families
 
@@ -61,11 +69,13 @@ Two families are worth singling out because they reach beyond the securities wor
 
 **Standing settlement instructions.** A standing settlement instruction (SSI) records, in advance, where a party wants a given kind of transaction settled: the accounts and agents for its cash and securities. The `reda.056` **StandingSettlementInstruction**, with its deletion, cancellation, and status-advice companions, is how SSIs are published and maintained, so that a counterparty always knows where to deliver without asking each time.
 
-**Request to pay enrolment.** The `reda.066` to `reda.073` messages support request-to-pay schemes, in which a payee asks a payer to authorise a payment. They handle the reference-data setup of that service: enrolling a creditor (`reda.066`) and activating a debtor (`reda.070`), with amendment, cancellation, and status messages. It is an example of reference data underpinning a payment service rather than a securities one.
+**Request to pay enrolment.** The `reda.066` to `reda.073` messages support request-to-pay schemes, in which a payee asks a payer to authorise a payment. They handle the reference-data setup of that service: enrolling a creditor with `reda.066` and activating a debtor with `reda.070`, with amendment, cancellation, and status messages. It is an example of reference data underpinning a payment service rather than a securities one.
 
 ## Conclusion
 
-The `reda` business area manages the static data that transactions rely on. Its sixty-three messages cover securities, parties, and accounts at the core, extended by collateral eligibility, CSD and account links, standing settlement instructions, prices, calendars, netting cut-offs, and request-to-pay enrolment. Most follow one create-maintain-query-report pattern, with activity advices and audit trails, so a single lifecycle applies across many domains. Because it is the source of truth the moving parts look up, `reda` is quietly foundational: a settlement instruction, a collateral movement, or a payment is only as correct as the reference data behind it. Read next to the settlement and collateral areas that consume it, `reda` is where the standard keeps its facts.
+The `reda` business area manages the static data that transactions rely on. Its sixty-three messages cover securities, parties, and accounts at the core, extended by collateral eligibility, CSD and account links, standing settlement instructions, prices, calendars, netting cut-offs, and request-to-pay enrolment. Most follow one create-maintain-query-report pattern, with activity advices and audit trails, so a single lifecycle applies across many domains.
+
+The other areas look up their facts in `reda`, so a settlement instruction, a collateral movement, or a payment is only as correct as the reference data behind it. Read next to the settlement and collateral areas that consume it, `reda` is where the standard keeps its facts.
 
 ![Mindmap summarising the ISO 20022 reda reference data area]({{site.url_complet}}/assets/article/finance/iso20022-reference-data-reda.png)
 
@@ -90,23 +100,38 @@ The `reda` business area manages the static data that transactions rely on. Its 
 
 **Q: What is reference data, and why does it need its own area?**
 
-Reference data is the static, authoritative information that transactions rely on but do not create: what a security is, who a counterparty is, which account it uses, where its cash and securities settle. A transaction looks this up rather than carrying it fresh each time. It needs its own area because keeping that data correct and shared is a distinct job from processing transactions, and because many participants must agree on the same facts. `reda` provides the messages to create, maintain, query, and distribute reference data so that everyone works from the same record.
+Reference data is the static, authoritative information that transactions rely on but do not create: what a security is, who a counterparty is, which account it uses, where its cash and securities settle. A transaction looks this up rather than carrying it fresh each time.
+
+It needs its own area because keeping that data correct and shared is a distinct job from processing transactions, and because many participants must agree on the same facts. `reda` provides the messages to create, maintain, query, and distribute reference data so that everyone works from the same record.
 
 **Q: What is the create-maintain-query-report pattern?**
 
-It is the common lifecycle most `reda` families follow for a piece of reference data. A maintainer creates the record (for a security, `reda.006`) and gets a status advice; consumers are notified through an activity advice; a consumer queries the current state (`reda.010`) and receives a report (`reda.012`); and later the record is maintained (`reda.007`) or deleted (`reda.013`). The party and account families repeat this shape with their own messages. Because the pattern is uniform, understanding it once lets you navigate the whole area rather than learning each family from scratch.
+It is the common lifecycle most `reda` families follow for a piece of reference data. For a security:
+
+- a maintainer creates the record with `reda.006` and gets a status advice;
+- consumers are notified through an activity advice;
+- a consumer queries the current state with `reda.010` and receives a report, `reda.012`;
+- later the record is maintained with `reda.007` or deleted with `reda.013`.
+
+The party and account families repeat this shape with their own messages. Because the pattern is uniform, understanding it once lets you navigate the whole area rather than learning each family from scratch.
 
 **Q: What is a standing settlement instruction, and why publish it as reference data?**
 
-A standing settlement instruction (SSI) records in advance where a party wants a given kind of transaction settled: the cash and securities accounts and agents to use. Publishing it as reference data, through `reda.056` and its companions, means a counterparty can look up where to deliver without asking each time a trade is done. This avoids errors and delays: instead of exchanging settlement details per transaction, parties rely on a maintained, authoritative SSI record. It is a good example of reference data preventing the mismatches that cause settlement fails.
+A standing settlement instruction (SSI) records in advance where a party wants a given kind of transaction settled: the cash and securities accounts and agents to use.
+
+Publishing it as reference data, through `reda.056` and its companions, means a counterparty can look up where to deliver without asking each time a trade is done. This avoids errors and delays: instead of exchanging settlement details per transaction, parties rely on a maintained, authoritative SSI record. It is a good example of reference data preventing the mismatches that cause settlement fails.
 
 **Q: Why do the party and account families include audit-trail messages?**
 
-Because changes to reference data have consequences, and who changed what, and when, must be reconstructable. The audit-trail queries and reports (such as `reda.033` for securities and `reda.042` for parties) let a participant retrieve the full history of changes to a record. This matters for control and for investigating problems: if a settlement failed because an account detail was wrong, the audit trail shows when and how that detail changed. Reference data is authoritative, so its history has to be auditable.
+Because changes to reference data have consequences, and who changed what, and when, must be reconstructable. The audit-trail queries and reports, such as `reda.033` for securities and `reda.042` for parties, let a participant retrieve the full history of changes to a record.
+
+This matters for control and for investigating problems: if a settlement failed because an account detail was wrong, the audit trail shows when and how that detail changed. Reference data is authoritative, so its history has to be auditable.
 
 **Q: Why does a reference-data area include request-to-pay enrolment?**
 
-Because a request-to-pay service, in which a payee asks a payer to approve a payment, needs its participants and their preferences set up in advance, and that setup is reference data. The `reda.066` to `reda.073` messages enrol a creditor and activate a debtor, with amendment, cancellation, and status messages. It sits in `reda` because it is about establishing the static enrolment behind the service rather than processing individual payment requests. It shows that reference data underpins payment services as much as securities ones.
+Because a request-to-pay service, in which a payee asks a payer to approve a payment, needs its participants and their preferences set up in advance, and that setup is reference data.
+
+The `reda.066` to `reda.073` messages enrol a creditor and activate a debtor, with amendment, cancellation, and status messages. It sits in `reda` because it is about establishing the static enrolment behind the service rather than processing individual payment requests. It shows that reference data underpins payment services as much as securities ones.
 
 ## References
 

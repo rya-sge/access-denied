@@ -2,7 +2,7 @@
 layout: post
 title: Soroban State Archival — Storage Semantics and Security Implications
 date: 2026-04-15
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain security
@@ -58,7 +58,7 @@ Each `Temporary` and `Persistent` entry has its own individual TTL and must be e
 
 ## TTL Mechanics
 
-Every storage entry has a `liveUntilLedger` field. The TTL is the number of ledgers remaining until `current_ledger > liveUntilLedger`. Once that condition is true, the entry either archives (`Persistent`, `Instance`) or is deleted permanently (`Temporary`).
+Every storage entry has a `liveUntilLedger` field. The TTL is the number of ledgers remaining until `current_ledger > liveUntilLedger`. Once that condition is true, a `Persistent` or `Instance` entry archives, and a `Temporary` entry is deleted permanently.
 
 TTL extension is done explicitly via `extend_ttl`:
 
@@ -158,7 +158,7 @@ A common error in security analysis of Soroban contracts is the following reason
 
 > "If a `Persistent` entry has `#[default(false)]` and its TTL expires, reading it will return `false` — allowing an attacker to bypass any check that depends on the entry being `true`."
 
-This reasoning is **incorrect**. The `#[default]` path is only reached for **absent** keys (keys that have never been written). For archived keys, the original value is preserved on restoration.
+This reasoning is **incorrect**. The `#[default]` path is only reached for **absent** keys, which have never been written. An archived key keeps its original value, and restoration brings that value back.
 
 Consider an anti-replay set implemented with persistent storage:
 
@@ -184,7 +184,7 @@ fn mark_hash_used(env: &Env, hash: &BytesN<32>) {
 
 After a hash is recorded as `true`:
 
-- TTL expires → entry archives (value `true` is preserved in ledger state)
+- TTL expires → entry archives, and the value `true` stays in ledger state
 - Attacker attempts to replay the same hash
 - Simulation detects the archived entry → restoration restores `true`
 - `used_hash()` returns `true` → replay is rejected
@@ -209,7 +209,7 @@ let used: bool = env.storage()
 // → replay succeeds: the nonce appears unused
 ```
 
-For any security-critical boolean flag or anti-replay set, `Persistent` storage must be used. `Temporary` is appropriate only for data that can be safely recreated or that has a bounded validity window by design (e.g., price oracle snapshots, short-lived session authorizations).
+For any security-critical boolean flag or anti-replay set, `Persistent` storage must be used. `Temporary` is appropriate only for data that can be safely recreated or that has a bounded validity window by design, such as a price oracle snapshot or a short-lived session authorization.
 
 ## Practical Audit Checklist
 
@@ -230,13 +230,13 @@ When auditing Soroban smart contracts for TTL-related vulnerabilities, apply the
 - [ ] Is the `#[default]` value safe to return for **absent** keys? Absent and archived are distinct states, but both trigger the default for `get()` when the key is absent.
 
 **Protocol 23 awareness:**
-- [ ] When an archived entry is accessed, the simulation transparently handles restoration. Security analysis should assume restoration occurs, not that the transaction fails silently.
+- [ ] When an archived entry is accessed, the simulation transparently handles restoration. Security analysis should assume the entry is restored and the transaction proceeds, not that the transaction reverts.
 
 ## Conclusion
 
-Soroban's state archival model is a meaningful departure from EVM storage semantics. The three-state distinction — Absent, Live, Archived — and the Protocol 23 auto-restoration mechanism together create a system where persistent data is never silently lost or reset: it is either live (accessible), archived (recoverable to original value), or absent (was never written). Only `Temporary` storage is truly ephemeral.
+Soroban's state archival model differs from EVM storage semantics. A storage entry is absent, live or archived, and with the Protocol 23 auto-restoration mechanism persistent data is never lost or reset without notice: a live entry is accessible, an archived entry can be restored to its original value, and an absent entry was never written. Only `Temporary` storage is deleted for good.
 
-For security analysts, the key takeaway is that TTL expiry of a `Persistent` entry does not cause it to return a default value — it causes restoration to its original value before the contract executes. The `#[default]` annotation only applies to genuinely absent keys. Any finding that relies on the default-after-expiry assumption for persistent storage is invalid under the current Stellar protocol.
+For security analysts, the key takeaway is that TTL expiry of a `Persistent` entry does not make it return a default value: the entry is restored to its original value before the contract executes. The `#[default]` annotation applies only to keys that were never written. Any finding that relies on the default-after-expiry assumption for persistent storage is invalid under the current Stellar protocol.
 
 ![stellar-state]({{site.url_complet}}/assets/article/blockchain/stellar/stellar-state.png)
 

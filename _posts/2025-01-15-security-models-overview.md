@@ -2,17 +2,17 @@
 layout: post
 title: Main Security Models - Overview
 date: 2025-01-15
-last_modified_at: 2025-02-10
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security tryhackme
 tags: security threat Bell-LaPadula Clark-Wilson Biba tryhackme
-description: "This article provides a comprehensive overview of three foundational security models: Bell-LaPadula, Biba, and Clark-Wilson."
+description: "Bell-LaPadula, Biba and Clark-Wilson security models: the confidentiality and integrity rules each one enforces, with examples."
 image: /assets/article/securite/security-model/security-models-bell-lapadula-model.drawio.png
 isMath: false
 ---
 
-This article provides a comprehensive overview of three foundational security models: **Bell-LaPadula**, **Biba**, and **Clark-Wilson**.
+This article presents three foundational security models: **Bell-LaPadula**, **Biba**, and **Clark-Wilson**.
 
  It explains their core principles and applications, focusing on how each model addresses different aspects of security—confidentiality, integrity, and workflow enforcement. 
 
@@ -68,7 +68,7 @@ Common in military or government systems where confidentiality and prevention of
 
 #### Conclusion and limitation
 
-The first two properties can be summarized as “write up, read down.” You can share confidential information with people of higher security clearance (write up), and you can receive confidential information from people with lower security clearance (read down).
+The first two properties can be summarized as “write up, read down.” Writing up means you can share confidential information with people of higher security clearance, and reading down means you can receive confidential information from people with lower security clearance.
 
 There are certain limitations to the Bell-LaPadula model. For example, it was not designed to handle file-sharing.
 
@@ -106,7 +106,7 @@ Biba also includes the **low-water-mark principle** and **ring policy** for addi
 
 #### Use Case
 
-Common in military, financial or healthcare systems where data accuracy and reliability are crucial.
+Common in military, financial or healthcare systems, where decisions depend on accurate and reliable data.
 
 #### Conclusion and limitation
 
@@ -144,7 +144,7 @@ Users are limited to specific roles, ensuring no single individual has unchecked
 
 3. **Access Triple (Subject, Transformation Procedure, Object):**
 
-- A subject (user) can only access an object (data) through a transformation procedure (authorized application or process).
+- A subject, such as a user, can only access an object, such as data, through a transformation procedure: an authorized application or process.
 - This prevents direct, unrestricted access to data.
 
 4. **Auditability:**

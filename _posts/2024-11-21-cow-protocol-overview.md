@@ -2,7 +2,7 @@
 layout: post
 title:  CoW Protocol - Intent & MEV protection
 date:   2024-11-21
-last_modified_at: 2024-12-05
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -15,7 +15,7 @@ isMath: true
 > This article is mainly taken from the [CoW documentation](https://docs.cow.fi/cow-protocol) with a few modification of my part.
 > Cover photo by [Patrick Baum](https://unsplash.com/@gecko81de?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/cattle-behind-fence-hB9vo06o9z8?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)      
 
-The CoW protocol is a meta-DEX aggregation protocol that  allows users to trade assets through signed messages (intents) instead of direct on-chain transaction to save gas, find optimal prices and protect orders from MEV (sandwich attacks, front-running).
+The CoW protocol is a meta-DEX aggregation protocol that allows users to trade assets through signed messages, called intents, instead of direct on-chain transactions. This saves gas, finds optimal prices and protects orders from MEV such as sandwich attacks and front-running.
 
 For that, intents are grouped into batch auctions submitted to third parties known as "[solvers](https://docs.cow.fi/cow-protocol/concepts/introduction/solvers)" to find the best execution
 
@@ -118,7 +118,7 @@ Once the winning solver executes the batch's orders on-chain, users receive thei
 
 - Best price through competition
 
-The competition between solvers in a batch auction pushes users (traders, DAOs, smart contracts and bots) towards the best available price for their trades.
+In a batch auction, the competition between solvers gives users the best available price for their trades. These users include traders, DAOs, smart contracts and bots.
 
 - Ease for users
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Multicall in Solidity: CALL vs DELEGATECALL Explained"
 date:   2025-04-03
-last_modified_at: 2025-04-24
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -316,7 +316,7 @@ Note:
 if (result.length < 68) revert();
 ```
 
-If `result.length` is less than 68, then the transaction failed silently (without a revert message)
+If `result.length` is less than 68, then the call reverted without a revert message
 
 - Slice the signature hash
 

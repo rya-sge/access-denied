@@ -2,6 +2,7 @@
 layout: post
 title: "Money as a Jar of Coins — How Cardano Tracks Who Owns What, Explained for a 10-Year-Old"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain eli10
@@ -19,11 +20,15 @@ Imagine you have some pocket money. There are two ways your family could keep tr
 
 ## Two ways to keep your money
 
-Think about a video game where you collect gold. In many games, your gold is just one number at the top of the screen. When you buy something, the number goes down. When you find treasure, the number goes up. There are no real coins anywhere. This is like a bank balance, which is one number on a list that says how much you own.
+Think about a video game where you collect gold. In many games, your gold is just one number at the top of the screen. When you buy something, the number goes down. When you find treasure, the number goes up. There are no real coins anywhere.
 
-Now think about real life. You do not have one magic number. You have actual coins and bills in your pocket. Maybe a 30 coin, a 20 coin, and a 5 coin. To pay for something, you hand over some of those real coins. This is the way Cardano works. Each coin is real and separate, and you hold it until you spend it.
+This is like a bank balance, which is one number on a list that says how much you own.
 
-The fancy name for one of these coins is a UTXO (a coin you own that has not been spent yet). Cardano's whole system is called the eUTXO model, which just means "the coin way, with a few extra features." We will get to the extra features soon.
+Now think about real life. You do not have one magic number. You have actual coins and bills in your pocket. Maybe a 30 coin, a 20 coin, and a 5 coin.
+
+To pay for something, you hand over some of those real coins. This is the way Cardano works. Each coin is real and separate, and you hold it until you spend it.
+
+The fancy name for one of these coins is a UTXO, which means a coin you own that has not been spent yet. Cardano's whole system is called the eUTXO model, which just means "the coin way, with a few extra features." We will get to the extra features soon.
 
 ![Two ways to keep money: one number on a list, or a jar of real coins]({{site.url_complet}}/assets/article/blockchain/cardano/eutxo-eli10-coin-vs-balance-concept.png)
 
@@ -54,15 +59,15 @@ But there is a catch. The guard at a Bitcoin chest is not allowed to look at muc
 
 Cardano kept the treasure chest, then added three helpful things. Think of them as upgrades to the chest.
 
-The first upgrade is a **sticky note** on the chest. Grown-ups call it a datum (a little note of extra facts that travels with the coins). The note can say something like "these coins belong to Alice" or "do not open until her birthday."
+The first upgrade is a **sticky note** on the chest. Grown-ups call it a datum: a little note of extra facts that travels with the coins. The note can say something like "these coins belong to Alice" or "do not open until her birthday."
 
-The second upgrade is a **note you write and hand over** when you want to open the chest. Grown-ups call it a redeemer (the message you give to say what you are trying to do). It is like handing the guard a slip that says "I would like to take my birthday money now."
+The second upgrade is a **note you write and hand over** when you want to open the chest. Grown-ups call it a redeemer: the message you give to say what you are trying to do. It is like handing the guard a slip that says "I would like to take my birthday money now."
 
-The third upgrade is the biggest. The Cardano guard is allowed to read the **whole shopping receipt**. Grown-ups call it the script context (the full list of everything the payment does). The guard can see every chest being opened, every new coin being made, who signed the payment, and even what time window it is allowed in.
+The third upgrade is the biggest. The Cardano guard is allowed to read the **whole shopping receipt**. Grown-ups call it the script context: the full list of everything the payment does. The guard can see every chest being opened, every new coin being made, who signed the payment, and even what time window it is allowed in.
 
 ## The guard is a referee, not a player
 
-Here is an idea that surprises grown-ups too. The guard on a Cardano chest never does anything on its own. It cannot grab coins. It cannot send money. It cannot start a payment. It is a referee, not a player.
+Here is an idea that surprises grown-ups too. The guard on a Cardano chest never does anything on its own. It cannot grab coins, send money, or start a payment. It is a referee, not a player.
 
 All the guard does is look at the payment you propose and say one word: yes or no. You bring a full plan for the payment. The guard checks your plan against the rules on the sticky note. If everything follows the rules, the guard says yes and the payment happens. If anything breaks a rule, the guard says no and nothing happens at all.
 
@@ -88,7 +93,13 @@ Grandma wants to give you birthday money, but not until your actual birthday. So
 
 Your birthday comes. You build a payment. You pick the chest as the thing you want to open. You write a little note that says "I am taking my birthday money." You also make sure the payment says "today is on or after the birthday," and that the money goes to you.
 
-Now the guard looks at your whole plan. It checks the sticky note. Is today on or after the birthday? Yes. Does the money go to the right person? Yes. Did you sign it? Yes. So the guard says yes. The old chest is used up, and a new coin worth 1000 lands in your jar. If you had tried this one day early, the guard would have said no, and nothing would have moved.
+Now the guard looks at your whole plan and checks it against the sticky note:
+
+- Is today on or after the birthday? Yes.
+- Does the money go to the right person? Yes.
+- Did you sign it? Yes.
+
+So the guard says yes. The old chest is used up, and a new coin worth 1000 lands in your jar. If you had tried this one day early, the guard would have said no, and nothing would have moved.
 
 That is the whole idea. Real coins in a jar, a sticky note with rules, a slip you hand over, and a referee who reads the full plan and only says yes or no.
 
@@ -102,15 +113,19 @@ Cardano keeps money as a jar of real, separate coins, not as one number on a lis
 
 **Q: Why bother with real coins? Isn't one number on the fridge simpler?**
 
-One number does feel simpler at first. But it has a hidden problem. When everyone shares one big list of numbers, two payments can bump into each other and change the same number at the same time, and it gets confusing about which one really happened. Real coins avoid this. Your coin is yours alone, sitting in your jar, and only you can hand it over. It is easier to be sure who owns what when you can point to a real coin instead of trusting a number that many people are editing at once.
+One number does feel simpler at first. But it has a hidden problem. When everyone shares one big list of numbers, two payments can bump into each other and change the same number at the same time, and it gets hard to tell which one counts. Real coins avoid this.
+
+Your coin is yours alone, sitting in your jar, and only you can hand it over. It is easier to be sure who owns what when you can point to a real coin instead of trusting a number that many people are editing at once.
 
 **Q: What if two people try to spend the very same coin at the same time?**
 
-Only one of them can win. A coin can be spent just once, like a movie ticket that gets torn at the door. If two payments both try to use the same coin, the first one to go through tears the ticket. The second payment then points at a coin that no longer exists, so it simply does not happen. Nobody loses money by accident. The loser just tries again with a different coin.
+Only one of them can win. A coin can be spent just once, like a movie ticket that gets torn at the door.
+
+If two payments both try to use the same coin, the first one to go through tears the ticket. The second payment then points at a coin that no longer exists, so it simply does not happen. Nobody loses money by accident. The loser just tries again with a different coin.
 
 **Q: How does this help in real life?**
 
-It makes digital money safe and predictable. Because each coin is used only once, nobody can copy money or spend it twice. Because your payment names the exact coins it uses, you can check that it will work before you send it, so you never waste a fee on a payment that was going to fail. And because a chest can hold other tokens too, the same safe system can carry game items or collectibles, not just money.
+It makes digital money safe and predictable. Because each coin is used only once, nobody can copy money or spend it twice. Because your payment names the exact coins it uses, you can check that it will work before you send it, and if the check says no, you keep it and pay nothing. And because a chest can hold other tokens too, the same safe system can carry game items or collectibles, not just money.
 
 **Q: What goes wrong if the guard could not read the whole receipt?**
 
@@ -118,7 +133,9 @@ Then the rules would have to be very simple, like Bitcoin's lock. You could say 
 
 **Q: Can you give me another example of spending a coin and getting change?**
 
-Sure. Imagine you have a 20 coin and you buy a book that costs 14. You cannot cut the coin, so you hand over the whole 20. The shop keeps 14 for the book and 1 for the helper fee, then hands you back a new 5 coin as change. Your old 20 coin is gone for good. In its place you now hold one fresh 5 coin. Count it up: 20 went in, and 19 plus a 1 fee came out. It always balances, exactly like paying with cash at a real shop.
+Sure. Imagine you have a 20 coin and you buy a book that costs 14. You cannot cut the coin, so you hand over the whole 20. The shop keeps 14 for the book and 1 for the helper fee, then hands you back a new 5 coin as change.
+
+Your old 20 coin is gone for good. In its place you now hold one fresh 5 coin. Count it up: 20 went in, and 19 plus a 1 fee came out. It always balances, exactly like paying with cash at a real shop.
 
 ## References
 

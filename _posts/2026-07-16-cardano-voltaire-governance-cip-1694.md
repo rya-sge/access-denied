@@ -2,6 +2,7 @@
 layout: post
 title: "Cardano On-Chain Governance: The Voltaire Era and CIP-1694"
 date:   2026-07-16
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -70,14 +71,14 @@ Each action type is ratified by meeting a different mix of voting thresholds acr
 | Treasury withdrawal | 2/3 | 0.67 | - |
 | Info action (non-binding) | 2/3 | 1 | 1 |
 
-Changing a **security-relevant** parameter (block and transaction sizes, fees, `utxoCostPerByte`, `govActionDeposit`, and similar) requires an extra SPO vote at 0.51, even for parameter groups SPOs do not normally vote on.
+Changing a **security-relevant** parameter requires an extra SPO vote at 0.51, even for parameter groups SPOs do not normally vote on. These parameters include block and transaction sizes, fees, `utxoCostPerByte` and `govActionDeposit`, among others.
 
 A proposed action then runs a fixed lifecycle, which is what governance tooling reads when it displays an action's status:
 
 1. **Live** for `govActionLifetime` epochs (6 on mainnet), during which the bodies vote.
 2. **Ratified** once it meets the thresholds for its type, and added to the enactment set at the epoch boundary.
 3. **Enacted** at the next epoch boundary, when the change takes effect.
-4. **Expired** if it never reaches its thresholds within its lifetime.
+4. **Expired** if it does not meet its thresholds within its lifetime.
 
 ![State diagram of the governance action lifecycle from Live through Ratified and Enacted, or to Expired]({{site.url_complet}}/assets/article/blockchain/cardano/governance-action-lifecycle-states.png)
 
@@ -133,23 +134,38 @@ For developers the model has two practical consequences. Governance-controlled p
 
 **Q: What are the three governance bodies, and what is each responsible for?**
 
-The Constitutional Committee, the Delegated Representatives (DReps), and the Stake Pool Operators (SPOs). The Constitutional Committee checks that an action complies with the Cardano Constitution, acting like a constitutional court on constitutionality rather than judging whether a proposal is a good idea. DReps are the primary voice of ADA holders; anyone can register as one, and any holder can delegate their vote to one. SPOs vote on specific action types, principally hard-fork initiations and security-relevant parameters. Different action types require different combinations of the three, which is what creates the checks and balances.
+The Constitutional Committee, the Delegated Representatives (DReps), and the Stake Pool Operators (SPOs):
+
+- **The Constitutional Committee** checks that an action complies with the Cardano Constitution, acting like a constitutional court on constitutionality rather than judging whether a proposal is a good idea.
+- **DReps** are the primary voice of ADA holders; anyone can register as one, and any holder can delegate their vote to one.
+- **SPOs** vote on specific action types, principally hard-fork initiations and security-relevant parameters.
+
+Different action types require different combinations of the three, which is what creates the checks and balances.
 
 **Q: Why can a holder delegate stake to one pool but their vote to a different DRep?**
 
-Because the two delegations are independent and both attach to the stake credential, the part of an address separate from the payment credential. Stake delegation directs block-production participation and rewards to a pool; vote delegation directs governance voting power to a DRep. They are recorded by separate certificates and can be changed independently. A holder who does not want to name a DRep can instead delegate to a built-in Abstain or No Confidence option. In the Conway era this choice is effectively required to access rewards: staking rewards accrue but cannot be withdrawn until the stake credential has delegated its vote to something.
+Because the two delegations are independent and both attach to the stake credential, the part of an address separate from the payment credential. Stake delegation directs block-production participation and rewards to a pool; vote delegation directs governance voting power to a DRep. They are recorded by separate certificates and can be changed independently.
+
+A holder who does not want to name a DRep can instead delegate to a built-in Abstain or No Confidence option. In the Conway era this choice is effectively required to access rewards: staking rewards accrue but cannot be withdrawn until the stake credential has delegated its vote to something.
 
 **Q: What is the lifecycle of a governance action from proposal to effect?**
 
-A submitted action becomes Live for `govActionLifetime` epochs (6 on mainnet), during which the bodies cast votes. If it meets the ratification thresholds for its type, it becomes Ratified and is added to the enactment set at the epoch boundary, then Enacted at the following epoch boundary, when the change takes effect. If it never reaches its thresholds within its lifetime, it Expires. In either terminal case the proposer's deposit is returned to their reward account once the action leaves the Live state.
+A submitted action becomes Live for `govActionLifetime` epochs (6 on mainnet), during which the bodies cast votes. If it meets the ratification thresholds for its type, it becomes Ratified and is added to the enactment set at the epoch boundary, then Enacted at the following epoch boundary, when the change takes effect. If it does not meet its thresholds within its lifetime, it Expires.
+
+In either terminal case the proposer's deposit is returned to their reward account once the action leaves the Live state.
 
 **Q: Why does changing a security-relevant parameter require an SPO vote even when SPOs do not normally vote on that parameter group?**
 
-Security-relevant parameters (such as block and transaction sizes, fees, `utxoCostPerByte`, and `govActionDeposit`) directly affect the operation and safety of the network that stake pool operators run. To prevent such changes from being made without the operators who bear their consequences, CIP-1694 requires an additional SPO vote at a 0.51 threshold for these parameters, even for groups that SPOs would otherwise not vote on. It is an extra check placed specifically on the changes most able to disrupt the network.
+Security-relevant parameters, such as block and transaction sizes, fees, `utxoCostPerByte` and `govActionDeposit`, directly affect the operation and safety of the network that stake pool operators run. To prevent such changes from being made without the operators who bear their consequences, CIP-1694 requires an additional SPO vote at a 0.51 threshold for these parameters, even for groups that SPOs would otherwise not vote on. It is an extra check placed specifically on the changes most able to disrupt the network.
 
 **Q: A team wants to add a "vote through our wallet" feature and later apply for treasury funding. Which parts of the governance system does that touch, and how do they connect?**
 
-Both draw on the same machinery from different angles. The wallet feature uses the participation path: vote delegation and voting are ordinary transactions built from certificates and voting procedures, and for a browser dApp, CIP-95 extends the wallet connector so the app can read the user's DRep key and registered stake keys to construct them. Applying for treasury funding uses the proposal path: a treasury-withdrawal action is one of the seven action types, submitted with a refundable `govActionDeposit` and an anchor describing the request, then voted on by the Constitutional Committee (constitutionality) and DReps to their thresholds before it can be ratified and enacted. The connection is that the team's own users, voting through the wallet feature, are part of the DRep-delegated electorate whose votes decide whether proposals like the team's funding request pass.
+Both draw on the same governance mechanisms from different angles:
+
+- **The wallet feature uses the participation path.** Vote delegation and voting are ordinary transactions built from certificates and voting procedures. For a browser dApp, CIP-95 extends the wallet connector so the app can read the user's DRep key and registered stake keys to construct them.
+- **Applying for treasury funding uses the proposal path.** A treasury-withdrawal action is one of the seven action types, submitted with a refundable `govActionDeposit` and an anchor describing the request. The Constitutional Committee, judging constitutionality, and the DReps then vote on it to their thresholds before it can be ratified and enacted.
+
+The connection is that the team's own users, voting through the wallet feature, are part of the DRep-delegated electorate whose votes decide whether proposals like the team's funding request pass.
 
 ## References
 

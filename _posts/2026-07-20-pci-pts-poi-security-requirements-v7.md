@@ -2,6 +2,7 @@
 layout: post
 title: "PCI PTS POI v7.0 — Securing the Payment Terminal at the Point of Interaction"
 date:   2026-07-20
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security
@@ -26,7 +27,7 @@ A POI device is the merchant-facing endpoint of a payment. Where an HSM sits in 
 - **PED or UPT POI devices.** Complete terminals a merchant can use as-is for PIN transactions, both attended point-of-sale devices and unattended payment terminals (UPTs) such as vending machines, automated fuel dispensers, and kiosks.
 - **Non-PIN acceptance POI devices**, evaluated only for account-data protection rather than PIN entry.
 - **Encrypting PIN pads (EPPs)** that are integrated into POS terminals or ATMs.
-- **Secure components for POS terminals**, which are integrated into a final solution: OEM PIN-entry devices, secure (encrypting) card readers (SCRs), and secure card readers with PIN (SCRPs).
+- **Secure components for POS terminals**, which are integrated into a final solution: OEM PIN-entry devices, secure encrypting card readers (SCRs), and secure card readers with PIN (SCRPs).
 
 Like its HSM sibling, the standard is deliberately modest about its own reach. It is a risk-reduction instrument, defined so the cost of an attack exceeds its benefit, and its controls are drawn from existing ISO, ANSI, NIST, FIPS, and EMV standards. Its life-cycle concern also has a hard boundary: it covers the device only up to the point of initial key loading of payment transaction keys, or up to the facility of initial deployment. After that, responsibility passes to the acquiring institution under the PCI PIN Security Requirements.
 
@@ -34,12 +35,12 @@ Like its HSM sibling, the standard is deliberately modest about its own reach. I
 
 Version 7.0 groups its requirements into four evaluation modules, and a device is assessed against the subset that matches its architecture:
 
-- **Module 1 — Physical and Logical Requirements.** Section A (physical) and Section B (logical). The core of the standard.
+- **Module 1 — Physical and Logical Requirements.** Section A covers the physical requirements and Section B the logical ones. The core of the standard.
 - **Module 2 — POS Terminal Integration.** Section C, which governs how previously approved components are combined into an integrated terminal without weakening it.
 - **Module 3 — Communications and Interfaces.** Section D, covering protocols, wireless links, and open-protocol exposure to public networks.
-- **Module 4 — Life Cycle Security.** Section E (manufacturing) and Section F (between manufacturer and initial deployment). Always applicable.
+- **Module 4 — Life Cycle Security.** Section E covers manufacturing and Section F the interval between manufacturer and initial deployment. Always applicable.
 
-Each requirement is answered Yes, No, or N/A by a test laboratory, and an N/A is acceptable only when another requirement option provides equivalent coverage or the governed characteristic is genuinely absent from the device. The modular structure exists so that a vendor can reuse the approval of an already-certified card reader or secure processor inside a new terminal, rather than re-evaluating every component from scratch.
+Each requirement is answered Yes, No, or N/A by a test laboratory, and an N/A is acceptable only when another requirement option provides equivalent coverage or the governed characteristic is absent from the device. The modular structure exists so that a vendor can reuse the approval of an already-certified card reader or secure processor inside a new terminal, rather than re-evaluating every component from scratch.
 
 ## Module 1, Section A — Physical Security
 
@@ -53,7 +54,13 @@ The difficulty of an attack is graded with an **attack-potential** score inherit
 - **A13 — card reader.** Penetrating the ICC reader to alter it requires at least **20**, floor **10**; an SCRP requires **26**, floor **13**.
 - **A15 — biometric reader.** New in v7.0, tampering with a biometric reader's hardware or software requires at least **20**, floor **10**.
 
-The remaining Section A requirements close specific attack channels. A3 requires resistance to environmental and operational manipulation such as out-of-range temperature or voltage. A5 and A7 address side channels, requiring that a PIN digit cannot be recovered by monitoring sound, electromagnetic emissions, power consumption, or timing, even with the cooperation of a sales clerk. A9 requires a means to deter visual observation ("shoulder surfing") of PIN entry. Account data gets its own chain: A10 protects magnetic-stripe and contactless data on entry to an attack potential of 16 (floor 8), A11 requires account data to be encrypted immediately on entry or entered in cleartext only into the secure controller, and A12 through A14 ensure that integrating a card reader creates no new path to the account data and that the card slot is in the cardholder's view to expose skimming bugs.
+The remaining Section A requirements close specific attack channels. A3 requires resistance to environmental and operational manipulation such as out-of-range temperature or voltage. A5 and A7 address side channels, requiring that a PIN digit cannot be recovered by monitoring sound, electromagnetic emissions, power consumption, or timing, even with the cooperation of a sales clerk. A9 requires a means to deter visual observation ("shoulder surfing") of PIN entry.
+
+Account data gets its own chain:
+
+- **A10** protects magnetic-stripe and contactless data on entry to an attack potential of 16 (floor 8).
+- **A11** requires account data to be encrypted immediately on entry or entered in cleartext only into the secure controller.
+- **A12 through A14** ensure that integrating a card reader creates no new path to the account data and that the card slot is in the cardholder's view to expose skimming bugs.
 
 ## Module 1, Section B — Logical Security
 
@@ -83,7 +90,15 @@ The diagram below shows how these controls surround the sensitive material insid
 
 Module 2 (Section C) exists because a modern terminal is assembled from separately approved parts. Its purpose is to ensure that combining previously approved components, such as a card reader, display, keypad, or secure processor, does not create a device weaker than its pieces.
 
-C1.1 requires that integrating an approved secure component does not impair the overall PIN-protection level, and C1.2 targets a physical attack specific to terminals: fitting a fraudulent overlay over the PIN pad to capture key presses. Resisting an overlay must require an attack potential of at least 18, floor 9. On the POS-terminal side, C2.1 requires that integration creates no new attack path to the PIN, C2.2 requires mechanisms against card-capture attacks such as the Lebanese Loop (a sleeve that traps the inserted card for later retrieval), and C2.3 requires clear segregation between secure and non-secure components. C2.4 requires that the terminal enforces, cryptographically, the correspondence between what the display shows the cardholder and the actual operating state of the PIN-entry device, so a compromised store controller cannot silently switch the device into PIN-harvesting mode behind a benign prompt. C2.5 requires that a PIN-accepting terminal has only one payment-card PIN-acceptance interface, with any secondary keyboard prevented from being used for PIN entry.
+C1.1 requires that integrating an approved secure component does not impair the overall PIN-protection level, and C1.2 targets a physical attack specific to terminals: fitting a fraudulent overlay over the PIN pad to capture key presses. Resisting an overlay must require an attack potential of at least 18, floor 9.
+
+On the POS-terminal side:
+
+- **C2.1** requires that integration creates no new attack path to the PIN.
+- **C2.2** requires mechanisms against card-capture attacks such as the Lebanese Loop, a sleeve that traps the inserted card for later retrieval.
+- **C2.3** requires clear segregation between secure and non-secure components.
+- **C2.4** requires that the terminal enforces, cryptographically, the correspondence between what the display shows the cardholder and the actual operating state of the PIN-entry device, so a compromised store controller cannot silently switch the device into PIN-harvesting mode behind a benign prompt.
+- **C2.5** requires that a PIN-accepting terminal has only one payment-card PIN-acceptance interface, with any secondary keyboard prevented from being used for PIN entry.
 
 The physical and logical attacks these controls address, and the requirements that counter them, are summarised below.
 
@@ -108,9 +123,27 @@ The final module protects the terminal before it reaches a merchant, on the prin
 
 ![PIN transaction flow inside a PCI POI terminal]({{site.url_complet}}/assets/article/securite/pci-poi/pci-poi-pin-transaction-workflow.png)
 
-Section E covers **manufacturing**. Change control triggers re-certification when security characteristics change (E1); firmware is inspected through an auditable process and verified free of hidden functions (E2), then protected against modification throughout manufacturing under dual control (E3). Assembly uses only certified components (E4), production software moves under dual control (E5), and a unique device secret is installed during manufacturing so the key-loading facility can authenticate the device (E7). Version 7.0 strengthens the vulnerability lifecycle: E10 requires the vendor to run an effective internal process for detecting vulnerabilities across all declared interfaces, E11 requires an actual vulnerability assessment supported by analysis, a public-domain survey, and testing, and E12 requires documented vulnerability-disclosure measures that distribute information and mitigations in a timely fashion.
+Section E covers **manufacturing**:
 
-Section F covers the interval **between the manufacturer and initial deployment**. The device is protected by tamper-detection features with authenticity-validation instructions provided to customers, or shipped under auditable controls that account for every device at every point in time, for example serialised tamper-evident packaging with physical inspection on receipt (F1). Accountability transfers formally from party to party along the shipping chain, and absent an agreement the vendor remains responsible (F2). In transit the device carries a secret that self-erases on any physical or functional alteration and can be verified by the key-loading facility but not by unauthorized personnel (F3). Each device carries a unique visible identifier, its model name and hardware version, also retrievable by query (F7), and the vendor maintains a manual recording the full life cycle of the device's security-related components, including production, whereabouts, repair, removal from operation, and loss or theft (F8).
+- **E1.** Change control triggers re-certification when security characteristics change.
+- **E2 and E3.** Firmware is inspected through an auditable process and verified free of hidden functions, then protected against modification throughout manufacturing under dual control.
+- **E4.** Assembly uses only certified components.
+- **E5.** Production software moves under dual control.
+- **E7.** A unique device secret is installed during manufacturing so the key-loading facility can authenticate the device.
+
+Version 7.0 strengthens the vulnerability lifecycle:
+
+- **E10** requires the vendor to run an effective internal process for detecting vulnerabilities across all declared interfaces.
+- **E11** requires a vulnerability assessment supported by analysis, a public-domain survey, and testing.
+- **E12** requires documented vulnerability-disclosure measures that distribute information and mitigations in a timely fashion.
+
+Section F covers the interval **between the manufacturer and initial deployment**:
+
+- **F1.** The device is protected by tamper-detection features with authenticity-validation instructions provided to customers, or shipped under auditable controls that account for every device at every point in time, for example serialised tamper-evident packaging with physical inspection on receipt.
+- **F2.** Accountability transfers formally from party to party along the shipping chain, and absent an agreement the vendor remains responsible.
+- **F3.** In transit the device carries a secret that self-erases on any physical or functional alteration and can be verified by the key-loading facility but not by unauthorized personnel.
+- **F7.** Each device carries a unique visible identifier, its model name and hardware version, also retrievable by query.
+- **F8.** The vendor maintains a manual recording the full life cycle of the device's security-related components, including production, whereabouts, repair, removal from operation, and loss or theft.
 
 ## What Changed in v7.0
 
@@ -150,7 +183,7 @@ Read alongside the PCI PTS HSM standard, the POI requirements complete the pictu
 
 ### Requirements Checklist
 
-The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its architecture, and an N/A is acceptable when a requirement's characteristic is genuinely absent or another option provides equivalent coverage. Attack-potential thresholds are shown as ≥ combined (≥ exploitation floor).
+The standard is written as a form: a laboratory marks each requirement Yes, No, or N/A. The tables below condense every requirement into a one-line checklist, grouped by section, so the catalogue can be used directly as an evaluation or procurement aid. A device is assessed only against the sections that match its architecture, and an N/A is acceptable when a requirement's characteristic is absent or another option provides equivalent coverage. Attack-potential thresholds are shown as ≥ combined (≥ exploitation floor).
 
 #### Module 1, Section A — Physical Security
 
@@ -274,27 +307,51 @@ The standard is written as a form: a laboratory marks each requirement Yes, No, 
 
 **Q: What is the difference between a POI device and an HSM in the payments chain?**
 
-They sit at opposite ends of the same transaction. The POI is the merchant-facing terminal, the PIN pad and card reader a cardholder physically touches, where a PIN and account data are first captured and encrypted. The HSM is a backend appliance in a data centre that receives the encrypted PIN block and verifies it, and that generates and manages keys. Both are tamper-resistant and both are governed by the PCI PTS family of standards, but the POI faces field attacks such as overlays, card-capture sleeves, and shoulder surfing, while the HSM faces a data-centre threat model. This article's companion on the PCI PTS HSM standard covers the backend side.
+They sit at opposite ends of the same transaction. The POI is the merchant-facing terminal, the PIN pad and card reader a cardholder physically touches, where a PIN and account data are first captured and encrypted. The HSM is a backend appliance in a data centre that receives the encrypted PIN block and verifies it, and that generates and manages keys.
+
+Both are tamper-resistant and both are governed by the PCI PTS family of standards, but the POI faces field attacks such as overlays, card-capture sleeves, and shoulder surfing, while the HSM faces a data-centre threat model. This article's companion on the PCI PTS HSM standard covers the backend side.
 
 **Q: Why does the standard forbid the terminal from ever displaying the PIN it just received?**
 
-Requirement B3 requires that the device neither displays nor otherwise indicates the value of an entered PIN digit. Any visible feedback is limited to non-significant symbols such as asterisks, and if audible tones accompany key presses, every digit must sound identical so the PIN cannot be reconstructed by ear. The reasoning is that the PIN's secrecy is the entire point of PIN verification: a terminal that echoed digits, or emitted a distinct tone per key, would leak the secret through the very interface meant to protect it, whether to a shoulder-surfer, a hidden camera, or a microphone.
+Requirement B3 requires that the device neither displays nor otherwise indicates the value of an entered PIN digit. Any visible feedback is limited to non-significant symbols such as asterisks, and if audible tones accompany key presses, every digit must sound identical so the PIN cannot be reconstructed by ear.
+
+The reasoning is that the PIN's secrecy is the entire point of PIN verification: a terminal that echoed digits, or emitted a distinct tone per key, would leak the secret through the very interface meant to protect it, whether to a shoulder-surfer, a hidden camera, or a microphone.
 
 **Q: What are the two numbers in a requirement like "attack potential of at least 35 with a minimum of 15 for initial exploitation"?**
 
-Attack potential is a score for how hard an attack is, combining time, expertise, knowledge of the device, opportunity, and equipment. The larger number is the bar for *identification plus initial exploitation*, discovering a working attack and performing it the first time. The smaller number is the floor for *initial exploitation* alone, how hard it is to repeat the attack once it is known. Requiring both prevents a device from passing on the strength of an attack that is hard to invent but trivial to replicate. In this standard the thresholds are tiered by sensitivity: 35 for extracting a PIN key (A6/A7), 26 for account-data keys or for penetrating sensitive functions, 20 for a card or biometric reader, and as low as 16 for a non-PIN PAN keypad.
+Attack potential is a score for how hard an attack is, combining time, expertise, knowledge of the device, opportunity, and equipment. The larger number is the bar for *identification plus initial exploitation*, discovering a working attack and performing it the first time. The smaller number is the floor for *initial exploitation* alone, how hard it is to repeat the attack once it is known.
+
+Requiring both prevents a device from passing on the strength of an attack that is hard to invent but trivial to replicate. In this standard the thresholds are tiered by sensitivity: 35 for extracting a PIN key (A6/A7), 26 for account-data keys or for penetrating sensitive functions, 20 for a card or biometric reader, and as low as 16 for a non-PIN PAN keypad.
 
 **Q: What is SRED, and how does it interact with third-party applications on a modern terminal?**
 
-SRED, Secure Reading and Exchange of Data, is the account-data protection function: the terminal encrypts card data on entry and, in encrypting mode, provides no mechanism to output it in cleartext (B23). The interaction with third-party code is the sharp edge introduced in v7.0. Because a modern terminal may run untrusted applications, the standard requires that cleartext account data is never made available to any execution environment that can run third-party applications, even through a whitelist (B23), and that cleartext account data is released only to applications authenticated under the firmware's signing requirements (B23.1). Third-party applications themselves must be signed and kept out of environments with cleartext access (B2.3). SRED and application isolation together ensure that adding programmability to the terminal does not open a path to the card data it protects.
+SRED, Secure Reading and Exchange of Data, is the account-data protection function: the terminal encrypts card data on entry and, in encrypting mode, provides no mechanism to output it in cleartext (B23). The rules on third-party code are new in v7.0.
+
+Because a modern terminal may run untrusted applications, the standard requires that cleartext account data is never made available to any execution environment that can run third-party applications, even through a whitelist (B23), and that cleartext account data is released only to applications authenticated under the firmware's signing requirements (B23.1). Third-party applications themselves must be signed and kept out of environments with cleartext access (B2.3).
+
+SRED and application isolation together ensure that adding programmability to the terminal does not open a path to the card data it protects.
 
 **Q: Combining the integration and communications modules, how does the standard stop an attacker who controls the store controller or network from harvesting PINs?**
 
-Several requirements interlock. On the integration side, C2.4 requires the terminal to enforce cryptographically the correspondence between the prompt shown to the cardholder and the actual operating state of the PIN-entry device, and to authenticate any command from an external device such as a store controller that would enable data entry. So a compromised controller cannot display a benign "enter PIN" prompt while silently routing the digits to itself, because switching the device into a PIN-capturing state requires an authenticated command and an honest display. On the communications side, D9 requires mutually authenticated sessions over a declared protocol with verified public keys, D8 requires message integrity by MAC or signature, and D10 requires replay detection, so an attacker on the network cannot inject, replay, or forge the messages that drive the terminal. The physical requirements (A5, A7) close the side-channel path, and B13 ensures that even if prompts are manipulated, no cleartext key or PIN can be output. The attacker is denied every individual step: honest display, authenticated commands, authenticated network peers, and a boundary that never emits the secret.
+Several requirements interlock:
+
+- **Integration.** C2.4 requires the terminal to enforce cryptographically the correspondence between the prompt shown to the cardholder and the actual operating state of the PIN-entry device, and to authenticate any command from an external device such as a store controller that would enable data entry. A compromised controller therefore cannot display a benign "enter PIN" prompt while silently routing the digits to itself, because switching the device into a PIN-capturing state requires an authenticated command and an honest display.
+- **Communications.** D9 requires mutually authenticated sessions over a declared protocol with verified public keys, D8 requires message integrity by MAC or signature, and D10 requires replay detection, so an attacker on the network cannot inject, replay, or forge the messages that drive the terminal.
+- **Side channels and output.** The physical requirements (A5, A7) close the side-channel path, and B13 ensures that even if prompts are manipulated, no cleartext key or PIN can be output.
+
+The attacker is denied every individual step: honest display, authenticated commands, authenticated network peers, and a boundary that never emits the secret.
 
 **Q: What are the most significant changes introduced in v7.0?**
 
-The headline additions reflect terminals becoming networked, programmable computers. Cryptography for device security must now provide at least 128-bit effective key strength; a new requirement (A15) covers biometric readers; a set of requirements governs third-party applications, requiring them to be signed and isolated from cleartext account data; the operating system must enforce mandatory access controls in an enforcing mode; and any device with an IP stack must support TLS 1.3 or higher. Non-invasive attack modelling was also refined to set distinct attack potentials for PIN keys and account-data keys.
+The headline additions reflect terminals becoming networked, programmable computers:
+
+- cryptography for device security must now provide at least 128-bit effective key strength;
+- a new requirement (A15) covers biometric readers;
+- a set of requirements governs third-party applications, requiring them to be signed and isolated from cleartext account data;
+- the operating system must enforce mandatory access controls in an enforcing mode;
+- any device with an IP stack must support TLS 1.3 or higher.
+
+Non-invasive attack modelling was also refined to set distinct attack potentials for PIN keys and account-data keys.
 
 ## References
 

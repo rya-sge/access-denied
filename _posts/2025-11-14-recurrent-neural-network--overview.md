@@ -2,6 +2,7 @@
 layout: post
 title: "Recurrent Neural Networks (RNNs) - Overview"
 date:   2025-11-14
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: ai
@@ -186,7 +187,7 @@ To address these limitations, specialized architectures were developed:
 - **CNN**: Primarily designed for spatial data like images. It uses convolutional layers to detect local patterns (e.g., edges in an image) and pooling layers to downsample feature maps.
 - **RNN**: Primarily designed for temporal data, where the sequence and timing of inputs are critical.
 
-While CNNs are highly effective for visual tasks, they are less natural fits for time-series or language modeling where RNNs shine. However, CNNs have been adapted for sequential data too (e.g., Temporal Convolutional Networks, or TCNs), offering competitive or even superior performance in some cases because of their ability to capture dependencies without the vanishing gradient problem.
+While CNNs are highly effective for visual tasks, they are less natural fits for time-series or language modeling where RNNs shine. However, CNNs have been adapted for sequential data too, for example Temporal Convolutional Networks (TCNs), offering competitive or even superior performance in some cases because of their ability to capture dependencies without the vanishing gradient problem.
 
 **Summary**: CNNs excel in spatial pattern recognition; RNNs excel in temporal pattern recognition.
 
