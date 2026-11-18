@@ -297,7 +297,7 @@ Two configuration details changed the exposure of a given instance. An instance 
 
 ## What nine years of advisories say about plugins
 
-The previous sections looked at core. Most issues are elsewhere. The numbers below come from the advisory files of the jenkins.io repository at commit `39e4020b`, counted with a script kept in the site's [verification directory](https://github.com/rya-sge/access-denied/tree/main/verification/jenkins-security).
+The sections above describe protections built into Jenkins core, yet most published vulnerabilities are in plugins: 1,354 of the 1,541 advisory issues counted (87.9 %) affect at least one plugin. The numbers below come from the advisory files of the jenkins.io repository at commit `39e4020b`, counted with a script kept in the site's [verification directory](https://github.com/rya-sge/access-denied/tree/main/verification/jenkins-security).
 
 **Method.** Since 2017-11-08, each advisory file starts with a YAML list of issues, each with an ID, a title, a CVE, a CVSS severity and the affected plugins with their fixed version. The script parses all 147 such files (2017-11-08 to 2026-10-28) and counts 1,541 issues. Older advisories are free text and are not counted. An issue is a "plugin issue" when it lists at least one plugin, and "core" otherwise. Vulnerability classes are assigned by keyword matching on the issue **title**; one issue can match several classes or none.
 
@@ -431,7 +431,11 @@ Read against the earlier sections:
 - **Exposure.** The UI is on a private ingress; the only public path is `/github-webhook`, on its own host name.
 - **Credentials.** Values are injected as `${VARIABLE}` from encrypted secrets and never appear in the file. Cloud credentials use the `SYSTEM` scope, which the [credentials guide](https://www.jenkins.io/doc/book/using/using-credentials/) reserves for the controller's own functions, such as agent connections, and does not extend to jobs. The GitHub App credential is restricted to the `jenkins-infra` organization's repositories, and the SSH host key of `github.com` is pinned.
 
-Three points should not be copied blindly. Job/ExtendedRead for every authenticated user exposes every job configuration to every LDAP account, which suits an open-source project and not a private one. The public `weekly.ci.jenkins.io` controller grants Overall/Read and Job/Read to `anonymous`, which during the CVE-2024-23897 window meant whole-file read for any visitor of that controller. And the `infra.ci` file disables the administrative monitor `jenkins.security.QueueItemAuthenticatorMonitor` and declares an implicitly loaded global library from `jenkins-infra/pipeline-library`. If, as the `globalLibraries` key suggests, that is a Global Trusted Pipeline Library, push rights on that repository are equivalent to administrator rights on the controller (see Gaps).
+Three settings in these files suit the Jenkins project and need a second look before they are reused on another instance:
+
+- **Job configurations visible to every account.** Job/ExtendedRead is granted to every authenticated user, so every LDAP account can read every job configuration. That suits an open-source project, not a private one.
+- **Anonymous read on a public controller.** `weekly.ci.jenkins.io` grants Overall/Read and Job/Read to `anonymous`. On a controller still vulnerable to CVE-2024-23897 (before 2.442 and LTS 2.426.3), that grant gives any visitor whole-file read. The files are a 2026 snapshot and do not show the configuration in January 2024.
+- **Build authorization and the trusted library.** The `infra.ci` file disables the administrative monitor `jenkins.security.QueueItemAuthenticatorMonitor`, whose name points to build authorization (section *Builds run as SYSTEM*), and declares an implicitly loaded global library from `jenkins-infra/pipeline-library`. If, as the `globalLibraries` key suggests, that is a Global Trusted Pipeline Library, push rights on that repository are equivalent to administrator rights on the controller (see Gaps).
 
 ## Conclusion
 

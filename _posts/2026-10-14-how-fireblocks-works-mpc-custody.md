@@ -2,7 +2,7 @@
 layout: post
 title: "How Fireblocks Works - MPC Custody, Enclaves, HSMs and Lessons from Real Hacks"
 date:   2026-10-14
-last_modified_at: 2026-11-05
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain security wallet cryptography
@@ -97,7 +97,7 @@ Fireblocks does not reconstruct the private key to sign. Each party runs a thres
 
 - **Presigning.** Most of the signing work does not depend on the message and can be precomputed. Only the final round needs the message, which is why Fireblocks markets it as "1 signing round" versus 9 for GG18; the figure describes the online phase.
 - **Proactive security.** Shares can be refreshed periodically without changing the public key or the blockchain address, so an attacker must compromise enough parties within the same refresh period.
-- **Identifiable aborts.** When a signing fails, the honest parties can identify which party misbehaved instead of retrying blindly.
+- **Identifiable aborts.** When a signing fails, the honest parties can identify which party misbehaved and exclude it. Without this property, they would retry without knowing whom to exclude, and a single malicious party could make every attempt fail.
 - **Universal composability (UC)** security against adaptive corruption, under Strong RSA, DDH and Paillier assumptions in the random oracle model.
 
 Fireblocks released MPC-CMP in May 2020 as free to use, and published its C++ implementation as [fireblocks/mpc-lib](https://github.com/fireblocks/mpc-lib) under the GPL-3.0 licence in 2023. According to the repository's `SECURITY.md`, the code was audited by NCC Group. Besides ECDSA MPC-CMP, the library contains EdDSA (including an asymmetric, offline variant for cold workspaces), MPC-BAM since August 2025, and since July 2026 FROST Schnorr signing and a `SECURITY-MODEL.md`. That security model assumes malicious adversaries with at least one honest party, and leaves storage, transport authentication and policy enforcement to the integrator.

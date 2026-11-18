@@ -117,6 +117,7 @@ layout: home
           {{ toc_html }}
         {% endif %}
         {{ post_body }}
+        {% include series-next.html %}
         <div class="c-article__footer u-clearfix">
             <div>
                 {% if site.social-twitter %}

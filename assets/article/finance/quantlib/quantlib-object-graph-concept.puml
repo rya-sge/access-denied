@@ -1,0 +1,34 @@
+@startuml
+title QuantLib object graph: market data notifies, the instrument recomputes lazily
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #2E8B67
+}
+component "SimpleQuote (spot)" as Q
+component "Handle<Quote>" as HQ
+component "FlatForward (r, q)" as YC
+component "BlackConstantVol" as VOL
+component "RelinkableHandle<BlackVolTermStructure>" as HV
+component "BlackScholesMertonProcess" as P
+component "AnalyticEuropeanEngine" as E
+component "VanillaOption (LazyObject)" as I
+component "Settings::evaluationDate" as S
+Q --> HQ : notifies
+HQ --> P : notifies
+YC --> P : via Handle
+VOL --> HV
+HV --> P : linkTo() notifies
+P --> E : notifies
+E --> I : notifies, calculated_ = false
+S ..> YC : moving reference date only
+note right of I
+  NPV() recomputes only
+  if calculated_ is false
+end note
+@enduml

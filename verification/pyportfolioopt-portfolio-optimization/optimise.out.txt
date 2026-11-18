@@ -1,0 +1,66 @@
+== versions
+pypfopt 1.6.0 cvxpy 1.9.3 numpy 2.5.5 pandas 3.1.1 scipy 1.17.1
+
+== data
+shape (7126, 20) from 1989-12-29 to 2018-04-11
+NaN share (top 4): {'BABA': 0.874, 'FB': 0.792, 'GM': 0.739, 'MA': 0.58}
+first valid BABA 2014-09-19 FB 2012-05-18
+
+== estimators
+Ledoit-Wolf shrinkage delta 0.0063
+mu min/max -0.0793 SHLD 0.3887 MA
+vol BABA sample_cov 31.8% LW 11.6%
+vol FB sample_cov 37.0% LW 17.1%
+
+== max_sharpe, rf 2%
+max_sharpe LW: return 26.9% / vol 10.3% / Sharpe 2.41
+weights ({'BABA': 0.3973, 'FB': 0.2851, 'MA': 0.228, 'PFE': 0.0428, 'GOOG': 0.0195, 'AAPL': 0.0131}, 8)
+
+== portfolio_performance with a different rf after max_sharpe(rf=0.02)
+Sharpe reported 2.41 warning: ['The risk_free_rate provided to portfolio_performance is diff']
+standalone portfolio_performance(rf=0) Sharpe 2.61
+
+== max_sharpe, default rf (0.0)
+max_sharpe LW rf0: return 26.6% / vol 10.2% / Sharpe 2.61
+
+== min_volatility
+min_vol LW: return 17.1% / vol 8.5% / Sharpe 1.77
+weights ({'BABA': 0.4324, 'GM': 0.2154, 'FB': 0.1492, 'WMT': 0.0488, 'T': 0.0459, 'XOM': 0.0348}, 9)
+
+== efficient_risk(0.20) and efficient_return(0.20)
+efficient_risk 0.20: return 37.6% / vol 20.0% / Sharpe 1.78
+efficient_return 0.20: return 20.0% / vol 8.7% / Sharpe 2.07
+
+== constraints: max 10% per name, tech <= 30%, L2 gamma 0.1
+constrained min_vol: return 18.0% / vol 12.0% / Sharpe 1.33
+holdings 17 max weight 0.1 tech 0.3
+
+== one problem per object
+InstantiationError Adding constraints to an already solved problem might have unintended 
+
+== sample_cov instead of Ledoit-Wolf (README setup), rf 0
+max_sharpe sample_cov rf0: return 29.9% / vol 21.8% / Sharpe 1.38
+
+== common window (from BABA listing)
+rows 896 from 2014-09-19
+max_sharpe common window: return 39.9% / vol 21.1% / Sharpe 1.80
+weights ({'AMZN': 0.5741, 'MA': 0.2223, 'BBY': 0.1066, 'JPM': 0.0876, 'AMD': 0.0094}, 5)
+
+== CLA (rf 0 inside CLA.max_sharpe)
+CLA max_sharpe: return 26.6% / vol 10.2% / Sharpe 2.61
+CLA min_vol: return 17.1% / vol 8.5% / Sharpe 2.00
+
+== HRP
+HRP own performance (arith. mean, sample cov): return 21.4% / vol 17.8% / Sharpe 1.08
+HRP weights under mu/LW: return 16.7% / vol 14.2% / Sharpe 1.03
+HRP holdings 20 max weight 0.1118
+order of optimize() result ['AAPL', 'AMD', 'AMZN', 'BABA'] | clean_weights ['GOOG', 'AAPL', 'FB', 'BABA']
+
+== EfficientCVaR (beta 0.95)
+min_cvar: return 17.7% / daily CVaR95 1.7%
+
+== Black-Litterman (illustrative equal market caps, one view)
+AAPL prior 9.8% view 20.0% posterior (50% confidence) 14.9%
+unrounded prior 0.09791 posterior 0.14896
+AAPL posterior at 100% confidence 20.0%
+GOOG prior 4.4% posterior (50%) 4.9%

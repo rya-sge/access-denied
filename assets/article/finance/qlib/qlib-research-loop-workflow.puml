@@ -1,0 +1,24 @@
+@startuml
+title qlib research loop, end to end
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EAF6F0
+skinparam ActivityBorderColor #2E8B67
+start
+:One CSV per symbol\n(date, symbol, OHLCV, vwap, factor);
+:dump_bin.py dump_all\n-> calendars/, instruments/, features/;
+:check_data_health.py\n(missing values, jumps > 50 %);
+:qlib.init(provider_uri, region);
+:Alpha158 handler\nfeatures + label Ref($close,-2)/Ref($close,-1)-1;
+:DatasetH segments\ntrain / valid / test;
+:model.fit(dataset) inside R.start();
+:SignalRecord -> pred.pkl, label.pkl;
+:SigAnaRecord -> IC, rank IC;
+if (IC stable out of sample?) then (no)
+  :Revise features or model\n(count every attempt);<<#FDF6E3>>
+  stop
+else (yes)
+  :PortAnaRecord\nTopkDropout backtest with costs;
+  :Report excess return\nwith cost, vs benchmark;
+endif
+stop
+@enduml

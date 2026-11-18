@@ -9,7 +9,8 @@
   flex-wrap: wrap;
   align-items: stretch;
   padding: 0 20px 0;
-  margin-left: 300px;
+  // Same value as the sidebar width (_sidebar.scss), which is imported first.
+  margin-left: $sidebar-width;
 }
 
 @media only screen and (max-width: 900px) {

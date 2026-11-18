@@ -27,15 +27,18 @@
   <!-- Theme bootstrap. This MUST stay inline and MUST stay in <head>: it has to
        run before the browser paints, otherwise a reader who chose dark mode sees
        a white flash on every page load.
-       No default is applied — absent a stored choice the site stays light, which
-       is why the OS `prefers-color-scheme` is not consulted here. -->
+       A choice stored by the toggle wins. Without one, the visitor's system
+       setting (`prefers-color-scheme`) decides, so a reader whose system is dark
+       no longer gets a white page at night (changed 2026-11-18; before, light was
+       forced). -->
   <script>
     (function () {
-      try {
-        if (localStorage.getItem('theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) { /* private mode / storage disabled: stay light */ }
+      var stored = null;
+      try { stored = localStorage.getItem('theme'); } catch (e) { /* storage disabled */ }
+      var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (stored === null && systemDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
     })();
   </script>
 </head>

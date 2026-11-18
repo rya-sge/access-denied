@@ -19,7 +19,9 @@
     pagePath:    {{ '/page/' | relative_url | jsonify }},
     i18n: {
       noResults: {{ t.search_no_results | jsonify }},
-      loading:   {{ t.loading | jsonify }}
+      loading:   {{ t.loading | jsonify }},
+      headingLink: {{ t.heading_link | jsonify }},
+      tocTitle:  {{ t.toc_title | jsonify }}
     }
   };
 </script>

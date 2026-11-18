@@ -1,0 +1,44 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* QuantLib
+** Core objects
+*** Instrument (contract)
+*** PricingEngine (model + method)
+*** arguments / results structs
+** Market data graph
+*** SimpleQuote
+*** Handle / RelinkableHandle
+*** Observer and LazyObject cache
+*** Settings evaluationDate
+** Building blocks
+*** time: Date, Calendar, DayCounter, Schedule
+*** termstructures: yield, vol, credit, inflation
+*** cashflows, indexes
+*** processes and models
+** Numerical methods
+*** closed form
+*** trees (binomial, trinomial)
+*** finite differences
+*** Monte Carlo
+left side
+** Using it
+*** Python: pip install QuantLib (1.44)
+*** C++17: link -lQuantLib
+*** 20 Examples, test-suite
+** Pitfalls
+*** unset evaluation date
+*** fixed vs moving reference date
+*** convention mismatch, no error
+*** value copied instead of Handle
+@endmindmap

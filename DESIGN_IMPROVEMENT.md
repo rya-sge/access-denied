@@ -11,6 +11,18 @@ Review of the live site (https://rya-sge.github.io/access-denied/) on 2026-11-18
 | Inline code | Wraps as a word; only an identifier longer than the line breaks. | `_sass/3-elements/_code.scss` |
 | Tables | Light 1px rules, tinted header, zebra rows, horizontal scroll when wider than the card. Each table shrinks to its content (`width: fit-content`; a block-level table otherwise drew an empty bordered area beside narrow tables such as the Jenkins Severity table), starts at the left edge of the text column and may grow to the card's right edge. Right-aligned number cells do not wrap. | `_sass/5-components/_reading.scss` |
 | Phone padding | Card padding 20px → 12px below 480px; table cells 6px 8px. On a 360px screen, tables that scroll in the Jenkins security article went from 10 to 6 of 14. | `_sass/5-components/_reading.scss` |
+| Mobile article header | Below 900px, article pages (`body.is-post`) show the sidebar as a 48px bar (avatar and name); the article title starts 78px from the top instead of a screen down. Listing pages keep the full author block. | `_layouts/default.html`, `_sass/5-components/_sidebar.scss` |
+| Sidebar width | `clamp(220px, 20vw, 300px)` instead of a fixed 300px; at 1024px the card grew from 665px to 745px and the text from 62 to 78 characters a line. | `_sass/5-components/_sidebar.scss`, `_content.scss` |
+| Card thumbnails | A post may set `cover:` (root-relative path) to show a picture on its home and category card instead of the mindmap; posts without it are unchanged. | `_includes/post-card.html`, `_includes/categories.html` |
+| Sticky TOC | When the space right of the card is at least 220px, a copy of the TOC is fixed there and the section being read is highlighted. | `js/main.js`, `_sass/5-components/_reading.scss` |
+| Reading progress | 3px bar at the top of article pages. | `js/main.js`, `_sass/5-components/_reading.scss` |
+| Heading anchors | `#` link after each h2/h3, shown on hover or focus. | `js/main.js`, `_data/i18n.yml`, `_includes/javascripts.html` |
+| Series navigation | "Previous / Next in this series" cards at the end of articles in an ordered series (`rel=prev/next`). | `_includes/series-next.html`, `_layouts/post.html`, `_sass/5-components/_series.scss`, `_data/i18n.yml` |
+| Date line | Sentence case instead of capitals. | `_sass/5-components/_article-page.scss` |
+| Claude Code note | Restyled as a small muted line (matched on its link, posts unchanged). | `_sass/5-components/_reading.scss` |
+| Dark mode | Follows the visitor's system setting when no choice is stored; a toggle click stores a choice that wins. | `_includes/head.html`, `js/main.js`, comments in `_theme.scss` and `default.html` |
+| Print | Only the article prints: sidebar, buttons, footer, related posts and comments hidden, external link targets written out, code wraps. | `_sass/5-components/_print.scss` |
+| Seccomp diagram | Shows the 8 verdicts grouped in 4 outcomes, matching the text; alt text describes the figure. | `seccomp-bpf-filter-workflow.puml` / `.png`, the seccomp post |
 | Blockquotes | Body font instead of the 18px heading serif. | `_sass/3-elements/_blockquote.scss` |
 | Table of contents | Two columns from 1100px; a section never splits from its sub-entries. | `_sass/5-components/_toc.scss` |
 | Diagrams | Article images open full size in a new tab on click. | `js/main.js` |
@@ -19,94 +31,22 @@ Review of the live site (https://rya-sge.github.io/access-denied/) on 2026-11-18
 
 ## To do
 
-Ordered by expected benefit for a reader, highest first.
+### 1. Set `cover:` images
 
-### 1. Article pages on mobile open with the sidebar, not the article
+The card supports a cover picture now, but no post sets one. Until covers are added, cards still show the mindmap. A simple option: a cropped section of the article's main diagram, or a plain title card in the site colours, at about 800 × 450.
 
-On a phone, every article starts with the avatar, name, tagline, bio line and social icons, then the title. The first screen shows almost none of the article, and the same block repeats on every page.
+### 2. Diagrams as SVG
 
-- **Change:** below 900px, on `post` pages, collapse the sidebar into a one-line bar (avatar, site name, menu or search icon), or move it below the article.
-- **Where:** `_sass/5-components/_sidebar.scss`, `_layouts/default.html` (a `page.layout == 'post'` class on `body`).
-- **Check:** the title is visible without scrolling on a 375px-wide screen.
+Image-only paragraphs already use the full card width and open full size on click. Rendering PlantUML as SVG (`plantuml -tsvg`) would keep labels sharp at any zoom. Changing `create-article` and `create-plantuml-diagram` to produce SVG, and the alt-text and `image:` conventions that assume PNG, is a separate decision.
 
-### 2. Diagram text is still small inside the column
+### 3. Move the Claude Code note
 
-Click-to-zoom solves reading a diagram on purpose, but wide PlantUML and Mermaid figures (activity diagrams, mindmaps) are scaled to the column and their labels drop to 6-8px.
+It is now a small muted line, but still sits after the introduction in 250 posts. Moving it to the footer means a front-matter flag (for example `made_with: claude-code`) rendered by `_layouts/post.html`, and removing the blockquote from each post.
 
-- **Change:**
-  - Let image-only paragraphs grow past the column, up to the card width. This is done for `p:has(> img:only-child)`, but kramdown output with a caption or a link around the image escapes it; check the common patterns in `_posts/`.
-  - In `create-article`, ask for diagrams no wider than about 900px at 1x, or for SVG output (`plantuml -tsvg`), which stays sharp when zoomed.
-- **Where:** `_sass/5-components/_reading.scss`; `~/.claude/skills/create-article/SKILL.md` (diagram section).
+### 4. Device check
 
-### 3. Mindmap thumbnails on the home page cards are unreadable
+All checks so far used Chrome with off-screen and on-page iframes. A check on a real phone (iOS Safari, Android Chrome) would cover touch scrolling of tables and the sticky elements.
 
-Each home card shows the article's mindmap as its thumbnail. At card size it is a grey tangle that tells the reader nothing, and it is the largest element of the card.
+### 5. Lighthouse and contrast
 
-- **Change:**
-  - Use a dedicated cover image when the post defines one (a new `cover:` front-matter key), and fall back to the mindmap only otherwise.
-  - Or crop the mindmap to its centre with `object-fit: cover` and a fixed height, so the card leads with the title.
-- **Where:** `_layouts/home.html` or the card include, `_sass/5-components/_index-post.scss`.
-
-### 4. Fixed 300px left sidebar on desktop
-
-From 900px up the sidebar keeps 300px whatever the screen width. At 1024-1280px it squeezes the card.
-
-- **Change:** `width: clamp(220px, 20vw, 300px)` for the sidebar, with `.c-content { margin-left }` following the same value.
-- **Where:** `_sass/5-components/_sidebar.scss`, `_sass/5-components/_content.scss`.
-
-### 5. Sticky table of contents on wide screens
-
-On a 1440px or wider screen, the right side of the card is empty beside the 80-character column. A sticky TOC there would show where the reader is in a 20-minute article.
-
-- **Change:** from about 1400px, place `.c-toc` in a right-hand column with `position: sticky; top: 20px`, and highlight the current section with an `IntersectionObserver` in `js/main.js`. Keep the inline TOC below that width.
-- **Where:** `_layouts/post.html` (TOC already captured in `toc_html`), `_sass/5-components/_toc.scss`, `js/main.js`.
-
-### 6. Reading progress bar
-
-A 2-3px bar at the top of article pages, filled as the reader scrolls. Cheap, and useful on 15-20 minute articles.
-
-- **Where:** `_layouts/post.html`, `js/main.js` (scroll listener with `requestAnimationFrame`), `_sass/5-components/_reading.scss`.
-
-### 7. Heading anchors
-
-Readers cannot copy a link to a section. Add a `#` link that appears on hover next to each `h2`/`h3` (the ids already exist from kramdown).
-
-- **Where:** `js/main.js` (insert the anchor), `_sass/5-components/_reading.scss`.
-
-### 8. Previous / next article in a series
-
-The series box lists all parts at the top, but nothing at the end of an article leads to the next part.
-
-- **Change:** add "Next in this series: …" at the end of the article, from `_data/series.yml`.
-- **Where:** `_includes/series-nav.html` (or a new `series-next.html`), `_layouts/post.html`.
-
-### 9. Header metadata in capitals
-
-The date line is uppercase ("BY RYAN S. · 2026, JUN 29 · UPDATED 2026, NOV 17 · 20 MIN READ"). Capitals slow reading for a line this long.
-
-- **Change:** sentence case, 13px, muted colour.
-- **Where:** `.c-article__date` in `_sass/5-components/_article-page.scss`.
-
-### 10. The "made with Claude Code" note
-
-The same blockquote sits at the top of most recent articles, before the first section. It is now quieter (body font), but it still comes before the content.
-
-- **Change:** move it to the article footer, or render it from a front-matter flag as a small line under the dates.
-- **Where:** `_layouts/post.html`; the posts themselves (one line each).
-
-### 11. Dark mode follows the visitor's system setting
-
-Light is forced by design (see the comment in `_sass/0-settings/_theme.scss`). A reader whose system is dark gets a white page at night until they find the toggle.
-
-- **Change, if wanted:** honour `prefers-color-scheme: dark` when no choice is stored, as the comment in `_theme.scss` already describes.
-
-### 12. Print stylesheet
-
-Printing an article also prints the sidebar, the theme toggle and the scroll-to-top button.
-
-- **Change:** an `@media print` block that hides them and removes the card background.
-- **Where:** `_sass/6-trumps/helpers.scss` or a new `_sass/5-components/_print.scss`.
-
-## Content issues seen during the review
-
-- `assets/article/securite/linux-advanced-security/seccomp-bpf-filter-workflow.puml` shows 4 seccomp verdicts, while the article text lists 8 since the 2026-11-17 fact check.
+Not measured yet: Lighthouse accessibility and performance scores, colour contrast of the muted greys (`--text-muted`, `$gray`), Core Web Vitals. See the Gaps of the `website-design-check` skill.

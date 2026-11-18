@@ -1,0 +1,41 @@
+Output of `qlibdock py -n pipeline.py` on 2026-11-18 (qlib 0.9.8 built from commit
+54355232463878d2eebb91fe0ee5fa7fa1f5976c, Python 3.12, numpy 2.5.5, pandas 2.3.3, lightgbm 4.7.0).
+Two runs gave identical numbers (LightGBM seed 0). Log lines, progress bars, timestamps and
+warnings removed; only the printed results are kept.
+
+CALENDAR 2008-01-02 2018-04-11 2587 days
+INSTRUMENTS 21 ['AAPL', 'AMD', 'AMZN', 'BABA', 'BAC', 'BBY', 'FB', 'GE', 'GM', 'GOOG', 'JPM', 'MA', 'PFE', 'RRC', 'SBUX', 'SHLD', 'SPY', 'T', 'UAA', 'WMT', 'XOM']
+
+                           $close  $close/Ref($close, 1) - 1  Ref($close, 1)/$close - 1  Mean($close, 5)  Ref($close, -2)/Ref($close, -1) - 1
+instrument datetime
+AAPL       2018-04-09  170.050003                   0.009918                  -0.009821       170.246002                            -0.004675
+           2018-04-10  173.250000                   0.018818                  -0.018470       171.218002                                  NaN
+           2018-04-11  172.440002                  -0.004675                   0.004697       171.384003                                  NaN
+
+SEGMENT train rows 24411 features 158 days 1258
+SEGMENT valid rows 7917 features 158 days 377
+SEGMENT test rows 9387 features 158 days 447
+
+SigAnaRecord: {'IC': 0.06317998306434702, 'ICIR': 0.15056257587124766, 'Rank IC': 0.02388517085114299, 'Rank ICIR': 0.09071918167435553}
+IC days 447 IC mean 0.0632 IC std 0.4196 ICIR 0.1506 t 3.18 share IC>0 0.557
+RankIC mean 0.0239 RankIC std 0.2633
+
+benchmark (SPY)  mean 0.000628  std 0.006673  annualized_return 0.149351  information_ratio 1.450666  max_drawdown -0.104349
+
+                                                  risk
+excess_return_without_cost mean               0.000546
+                           std                0.009785
+                           annualized_return  0.129941
+                           information_ratio  0.860764
+                           max_drawdown      -0.173374
+excess_return_with_cost    mean               0.000151
+                           std                0.009783
+                           annualized_return  0.035902
+                           information_ratio  0.237883
+                           max_drawdown      -0.234933
+
+BACKTEST days 446 2016-07-01 2018-04-10
+mean daily cost 0.00039512200303798775 mean daily turnover 0.3960330577342419
+sum return 0.5233786162257437 sum bench 0.2798756957054138 sum cost 0.17622441335494254
+compounded excess with cost over the period 0.047123077960300686
+LEAK IC mean 0.6845

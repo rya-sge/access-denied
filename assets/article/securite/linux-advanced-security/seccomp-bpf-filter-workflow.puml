@@ -9,23 +9,23 @@ if (seccomp filter installed?) then (no)
 else (yes)
 endif
 :Kernel runs the attached BPF program\non the syscall number/args;
-switch (filter verdict)
-case (SECCOMP_RET_ALLOW)
-  :Execute the syscall; <<#90ee90>>
+switch (filter verdict: 8 return values,\ngrouped by outcome)
+case (ALLOW, LOG)
+  :Execute the syscall\n(LOG also records it); <<#90ee90>>
   stop
-case (SECCOMP_RET_ERRNO)
-  :Skip syscall, return an error code; <<#ffd27f>>
+case (ERRNO, TRAP)
+  :Refuse the syscall:\nERRNO returns an error code,\nTRAP delivers SIGSYS; <<#ffd27f>>
   stop
-case (SECCOMP_RET_TRAP)
-  :Deliver SIGSYS to the process; <<#ffd27f>>
+case (TRACE, USER_NOTIF)
+  :Hand the decision over:\nTRACE to a ptrace tracer,\nUSER_NOTIF to a userspace supervisor; <<#add8e6>>
   stop
-case (SECCOMP_RET_KILL)
-  :Terminate the process; <<#ff9999>>
+case (KILL_THREAD, KILL_PROCESS)
+  :Kill the calling thread\nor the whole process; <<#ff9999>>
   note right
     Strict mode (mode 1) is the
     degenerate filter: only read,
     write, exit, sigreturn pass;
-    everything else is KILL.
+    everything else is killed.
   end note
   stop
 endswitch

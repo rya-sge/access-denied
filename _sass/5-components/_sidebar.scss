@@ -2,6 +2,13 @@
 	SIDEBAR
 =============== */
 
+/*
+  The sidebar used to be 300px at every desktop width, which at 1024px left the
+  article card 665px. It now takes 20% of the screen, between 220px and 300px;
+  .c-content reads the same variable for its left margin.
+*/
+$sidebar-width: unquote("clamp(220px, 20vw, 300px)");
+
 .c-sidebar {
   display: flex;
   flex-direction: column;
@@ -10,7 +17,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 300px;
+  width: $sidebar-width;
   padding: 40px 20px 20px;
   text-align: center;
   box-shadow: 1px 1px 0 var(--shadow-soft);
@@ -195,6 +202,48 @@
     }
     .c-copyright {
       @include screen-reader();
+    }
+  }
+}
+
+/*
+  On a phone, an article page opened with the avatar, name, tagline, buttons,
+  bio and social links, so the first screen held almost none of the article.
+  On article pages only, the sidebar collapses to one line: avatar and name,
+  linking home. Listing pages keep the full author block.
+*/
+@media only screen and (max-width: 900px) {
+  .is-post {
+    .c-sidebar {
+      flex-direction: row;
+      align-items: center;
+      padding: 8px 15px;
+      text-align: left;
+    }
+
+    .c-sidebar-author {
+      display: flex;
+      align-items: center;
+
+      .c-author__cover {
+        width: 32px;
+        height: 32px;
+        margin: 0 10px 0 0;
+      }
+
+      .c-author__name {
+        font-size: 16px;
+      }
+
+      .c-author__job,
+      .c-contact-menu,
+      .c-author__about {
+        display: none;
+      }
+    }
+
+    .c-sidebar-footer {
+      display: none;
     }
   }
 }

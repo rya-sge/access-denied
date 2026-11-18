@@ -43,10 +43,11 @@
 .c-article__date {
   // `time` as well as `span`: the publication date is now a machine-readable
   // <time> element (see _layouts/post.html) and would otherwise lose its style.
+  // Sentence case: the line now carries author, two dates and a reading time,
+  // and a line that long in capitals reads slowly.
   span,
   time {
     font-size: 13px;
-    text-transform: uppercase;
     color: $gray;
   }
 }

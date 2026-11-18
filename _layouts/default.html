@@ -14,16 +14,20 @@
 
 {% include head.html %}
 
-<body>
+{% comment %}
+  `is-post` lets the stylesheet treat article pages differently from listings:
+  the compact sidebar on phones and the print stylesheet only apply to articles.
+{% endcomment %}
+<body{% if page.layout == 'post' %} class="is-post"{% endif %}>
   {% if site.google-analytics %}
     {% include analytics.html %}
   {% endif %}
   <div class="o-wrapper">
     {{ content }}
   </div> <!-- /.o-wrapper -->
-  <!-- Light/dark switch. Light is the default: the OS `prefers-color-scheme` is
-       deliberately NOT followed, so a visitor only gets dark if they ask for it.
-       aria-pressed reflects the current state for screen readers. -->
+  <!-- Light/dark switch. Without a stored choice the theme follows the
+       visitor's system setting (see _includes/head.html); pressing the button
+       stores an explicit choice. aria-pressed reflects the current state. -->
   <button type="button" class="c-theme-toggle" id="js-theme-toggle"
           aria-label="{{ t.theme_toggle }}" title="{{ t.theme_toggle }}" aria-pressed="false">
     <svg class="c-theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

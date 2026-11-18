@@ -1,0 +1,74 @@
+/* ===============
+	PRINT
+=============== */
+
+/*
+  Printing an article used to print the fixed sidebar, the theme toggle, the
+  scroll-to-top button and the share footer around it. On paper only the
+  article remains, in black on white, with the target of each external link
+  written after it, since a printed link cannot be clicked.
+*/
+@media print {
+  .c-sidebar,
+  .c-header,
+  .c-theme-toggle,
+  .c-top,
+  .c-reading-progress,
+  .c-toc-rail,
+  .c-heading-anchor,
+  .c-article__footer,
+  .c-recent-post,
+  .c-series-next,
+  .article-comments {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .c-content {
+    margin-left: 0;
+    padding: 0;
+  }
+
+  .c-wrap-content {
+    padding: 0;
+    font-size: 11pt;
+
+    > * {
+      max-width: none;
+    }
+
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 9pt;
+      word-break: break-all;
+    }
+
+    // Figures and code are not split across pages.
+    pre,
+    img,
+    table,
+    blockquote {
+      page-break-inside: avoid;
+    }
+
+    h2,
+    h3 {
+      page-break-after: avoid;
+    }
+
+    // Code and tables print whole instead of scrolling.
+    pre {
+      white-space: pre-wrap;
+      overflow: visible;
+    }
+
+    table {
+      overflow: visible;
+    }
+  }
+}

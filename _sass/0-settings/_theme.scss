@@ -11,16 +11,13 @@
   variable at it — which means existing component rules pick up the theme without
   being rewritten.
 
-  LIGHT IS THE DEFAULT, deliberately: `prefers-color-scheme` is NOT honoured
-  automatically. A visitor whose OS is in dark mode still gets the light site,
-  and only sees dark if they press the toggle (the floating button defined below,
-  rendered by _layouts/default.html). The choice is stored in localStorage under
-  "theme" and re-applied by the inline script in _includes/head.html before first
-  paint, so a returning reader never gets a flash of the wrong theme.
-
-  To make the site follow the OS instead, add:
-      @media (prefers-color-scheme: dark) { :root:not([data-theme]) { ...dark... } }
-  That is intentionally absent.
+  The theme follows the visitor's system setting (`prefers-color-scheme`) until
+  they press the toggle (the floating button defined below, rendered by
+  _layouts/default.html). Their choice is then stored in localStorage under
+  "theme" and wins over the system setting. Both are applied by the inline
+  script in _includes/head.html before first paint, so no reader gets a flash
+  of the wrong theme. (Until 2026-11-18 light was forced and the system setting
+  ignored.)
 */
 
 :root {

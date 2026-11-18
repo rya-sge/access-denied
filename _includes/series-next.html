@@ -1,0 +1,41 @@
+{%- comment -%}
+  Previous / next links at the END of an article that belongs to an ordered
+  series. The series box (series-nav.html) lists every part at the top, but a
+  reader who finishes part 2 had nothing at the bottom leading to part 3.
+
+  Only ordered series get it: in an unordered series (see _data/series.yml) no
+  article comes "next".
+{%- endcomment -%}
+{% if page.series %}
+{% assign series = site.data.series[page.series] %}
+{% if series and series.ordered %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+{% assign members = site.posts | where: "series", page.series | sort: "series_order" %}
+{% assign prev_post = nil %}
+{% assign next_post = nil %}
+{% for member in members %}
+  {% if member.url == page.url %}
+    {% assign i_prev = forloop.index0 | minus: 1 %}
+    {% assign i_next = forloop.index0 | plus: 1 %}
+    {% if i_prev >= 0 %}{% assign prev_post = members[i_prev] %}{% endif %}
+    {% assign next_post = members[i_next] %}
+  {% endif %}
+{% endfor %}
+{% if prev_post or next_post %}
+<nav class="c-series-next" aria-label="{{ series.title | escape }}">
+  {% if prev_post %}
+  <a class="c-series-next__link c-series-next__link--prev" href="{{ prev_post.url | prepend: site.baseurl }}" rel="prev">
+    <span class="c-series-next__label">{{ t.series_previous }}</span>
+    <span class="c-series-next__title">{{ prev_post.title }}</span>
+  </a>
+  {% endif %}
+  {% if next_post %}
+  <a class="c-series-next__link c-series-next__link--next" href="{{ next_post.url | prepend: site.baseurl }}" rel="next">
+    <span class="c-series-next__label">{{ t.series_next }}</span>
+    <span class="c-series-next__title">{{ next_post.title }}</span>
+  </a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endif %}
+{% endif %}

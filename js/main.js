@@ -18,6 +18,8 @@ $(document).ready(function () {
   var strings = config.i18n || {};
   var textNoResults = strings.noResults || 'No results found';
   var textLoading = strings.loading || 'Loading...';
+  var textHeadingLink = strings.headingLink || 'Link to this section';
+  var textTocTitle = strings.tocTitle || 'Contents';
 
   /* =======================
   // Light / dark theme
@@ -26,8 +28,8 @@ $(document).ready(function () {
   // (before first paint, to avoid a flash). This only handles the toggle and
   // persists the choice.
   //
-  // Light is the default on purpose: no prefers-color-scheme fallback, so a
-  // visitor keeps the white site unless they explicitly ask for dark.
+  // Without a stored choice the bootstrap follows the system setting
+  // (prefers-color-scheme); a click here stores an explicit choice.
   ======================= */
 
   var $themeToggle = $('#js-theme-toggle');
@@ -176,6 +178,94 @@ $(document).ready(function () {
       $('.c-top').removeClass("c-top--active");
     };
   });
+
+  /* =======================
+  // Article reading aids
+  //
+  // Only on article pages (.c-wrap-content is rendered by _layouts/post.html).
+  // All three are progressive: without JavaScript the article reads as before.
+  ======================= */
+
+  var article = document.querySelector('.c-wrap-content');
+  if (article) {
+
+    // Heading anchors: a "#" after each section heading, so a reader can copy
+    // a link to the section. Kramdown already gives every heading an id.
+    $(article).find('h2[id], h3[id]').each(function () {
+      $('<a>', {
+        'class': 'c-heading-anchor',
+        href: '#' + this.id,
+        'aria-label': textHeadingLink,
+        title: textHeadingLink,
+        text: '#'
+      }).appendTo(this);
+    });
+
+    // Reading progress: a thin bar at the top of the window, filled as the
+    // reader moves from the start to the end of the article body.
+    var $progress = $('<div class="c-reading-progress" aria-hidden="true"><span></span></div>').appendTo('body');
+    var progressBar = $progress.children()[0];
+    var progressPending = false;
+    function updateProgress() {
+      progressPending = false;
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var done = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 1;
+      progressBar.style.transform = 'scaleX(' + done + ')';
+    }
+    $(window).on('scroll resize', function () {
+      if (!progressPending) {
+        progressPending = true;
+        window.requestAnimationFrame(updateProgress);
+      }
+    });
+    updateProgress();
+
+    // Sticky table of contents. On a wide screen the space right of the card
+    // is empty; when it is wide enough, a copy of the article's TOC is fixed
+    // there and the section being read is highlighted. The inline TOC stays
+    // in the article for narrower screens, no-JS readers and crawlers.
+    var tocList = article.querySelector('.c-toc__list');
+    if (tocList && 'IntersectionObserver' in window) {
+      var $rail = $('<nav class="c-toc-rail"></nav>').attr('aria-label', textTocTitle)
+        .append($('<p class="c-toc__title"></p>').text(textTocTitle))
+        .append($(tocList).clone().removeClass('c-toc__list').addClass('c-toc-rail__list'))
+        .appendTo('body');
+      // When the rail is hidden (narrow screen) its links leave the tab order,
+      // so keyboard users do not land on invisible links.
+      var RAIL_MIN = 220;
+      var placeRail = function () {
+        var cardRight = article.getBoundingClientRect().right;
+        var space = window.innerWidth - cardRight - 48;
+        if (space >= RAIL_MIN) {
+          $rail.css({ left: (cardRight + 24) + 'px', width: Math.min(300, space) + 'px' })
+            .addClass('is-visible').find('a').removeAttr('tabindex');
+        } else {
+          $rail.removeClass('is-visible').find('a').attr('tabindex', '-1');
+        }
+      };
+      $(window).on('resize', placeRail);
+      placeRail();
+
+      var railLinks = {};
+      $rail.find('a[href^="#"]').each(function () {
+        railLinks[decodeURIComponent(this.getAttribute('href').slice(1))] = this;
+      });
+      var headings = $(article).find('h2[id], h3[id]').toArray().filter(function (h) {
+        return railLinks[h.id];
+      });
+      var observer = new IntersectionObserver(function () {
+        // The current section is the last heading above the middle of the screen.
+        var current = null;
+        headings.forEach(function (h) {
+          if (h.getBoundingClientRect().top < window.innerHeight / 2) current = h.id;
+        });
+        $rail.find('a.is-active').removeClass('is-active');
+        if (current && railLinks[current]) railLinks[current].classList.add('is-active');
+      }, { rootMargin: '0px 0px -50% 0px' });
+      headings.forEach(function (h) { observer.observe(h); });
+    }
+  }
 
 
 });

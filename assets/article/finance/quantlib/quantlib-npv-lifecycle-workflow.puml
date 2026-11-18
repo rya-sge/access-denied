@@ -1,0 +1,27 @@
+@startuml
+title What happens when instrument.NPV() is called
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:NPV();
+:Instrument::calculate();
+if (calculated_?) then (yes)
+  :return cached NPV_;
+  stop
+endif
+if (isExpired()?) then (yes)
+  :setupExpired(): NPV_ = 0;
+  stop
+endif
+:LazyObject::calculate()\ncalculated_ = true first;
+:engine->reset();
+:setupArguments(engine->getArguments());
+:arguments->validate();
+:engine->calculate();
+:fetchResults(engine->getResults());
+:return NPV_;
+stop
+@enduml

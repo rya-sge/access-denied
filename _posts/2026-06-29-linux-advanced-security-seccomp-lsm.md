@@ -64,7 +64,7 @@ The filter is usually installed by the program itself, but filters are inherited
 
 A BPF program works as a whitelist of system calls to allow, a blacklist of calls to refuse, or a mix of both, and the kernel evaluates it on each syscall. Every rule returns one of eight verdicts: allow the call, log and then allow it, fail it with an error code, raise a `SIGSYS` signal, pass it to a `ptrace` tracer, forward it to a userspace supervisor, or kill the calling thread or the whole process.
 
-![seccomp-bpf filtering a system call]({{site.url_complet}}/assets/article/securite/linux-advanced-security/seccomp-bpf-filter-workflow.png)
+![Flowchart: a system call goes through the seccomp-bpf filter, whose eight verdicts lead to executing, refusing, handing over or killing]({{site.url_complet}}/assets/article/securite/linux-advanced-security/seccomp-bpf-filter-workflow.png)
 
 A minimal C program installs the filter before doing its real work:
 

@@ -2,6 +2,7 @@
 layout: post
 title: "SSZ vs RLP: How Ethereum Serialises Data on Each Layer"
 date:   2026-11-04
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -14,9 +15,12 @@ isMermaid: true
 
 Ethereum runs on two layers, and each one writes its data in its own format. The execution layer, which runs the EVM, uses RLP. The consensus layer, the beacon chain, uses SSZ. Some data belongs to both: a validator withdrawal is decided by the beacon chain and paid out by the execution layer, so the same facts are written twice, hashed with two different functions and committed under two different roots.
 
-For the first withdrawal of block 26,341,215, that means 35 bytes of RLP, hashed with Keccak-256 into a Merkle-Patricia trie, and 44 bytes of SSZ, merkleized with SHA-256.
+For the first withdrawal of block 26,341,215, the two encodings are:
 
-RLP asks how to write a nested value compactly. SSZ asks how to give a typed value a Merkle root in which any field can be proven and any change rehashed cheaply. This article compares them at byte level and measures size and gas on that real block. Every byte shown comes from code that first reproduced the block's hash and its beacon root, and the last section reads the fork meta EIPs to separate what is scheduled from what is only proposed.
+- **RLP (execution layer)** answers *how to write a nested value compactly*: 35 bytes, hashed with Keccak-256 into a Merkle-Patricia trie.
+- **SSZ (consensus layer)** answers *how to give a typed value a Merkle root in which any field can be proven and any change rehashed cheaply*: 44 bytes, merkleized with SHA-256.
+
+This article compares them at byte level and measures size and gas on that real block. Every byte shown comes from code that first reproduced the block's hash and its beacon root, and the last section reads the fork meta EIPs to separate what is scheduled from what is only proposed.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 

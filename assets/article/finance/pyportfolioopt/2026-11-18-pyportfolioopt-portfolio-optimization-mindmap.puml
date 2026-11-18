@@ -1,0 +1,47 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* PyPortfolioOpt 1.6.0
+** Inputs
+*** Expected returns\nmean historical, EMA, CAPM
+*** Risk models\nsample, semicovariance, exp cov
+*** Shrinkage\nLedoit-Wolf, OAS
+*** Black-Litterman\nprior + views, Idzorek
+** Architecture
+*** BaseOptimizer\nweights, clean, save
+*** BaseConvexOptimizer\ncvxpy variable, constraints
+*** EfficientFrontier\nSemivariance, CVaR, CDaR
+*** HRPOpt, CLA\nno cvxpy
+*** DiscreteAllocation\ngreedy, integer LP
+** Objectives
+*** min volatility
+*** max Sharpe\nvariable transform
+*** efficient risk / return
+*** quadratic utility
+*** bounds, sectors, L2, costs
+left side
+** Pitfalls
+*** rf default 0.0
+*** NaN zero-filled\nin Ledoit-Wolf
+*** one problem per object
+*** LP reads prices by position
+*** HRP breaks on SciPy 1.18
+** Evidence
+*** in-sample only
+*** window changes weights
+*** survivor universe
+** Security review
+*** no network, exec, pickle
+*** no install hooks
+*** Makefile curl | sh
+@endmindmap

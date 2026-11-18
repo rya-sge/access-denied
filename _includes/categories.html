@@ -8,10 +8,11 @@
       <a class="c-categories__link" href="{{ site.baseurl }}/{{ cat_dir }}/{{ category | downcase | slugify }}/">
         {% for post in site.categories[category] limit: 1 %}
         {% assign empty-figure = nil %}
-        {% if post.image %}
+        {% assign card_image = post.cover | default: post.image %}
+        {% if card_image %}
         <div class="c-categories__img">
           <figure>
-            <img src="{{ site.baseurl | append: post.image }}" alt="" loading="lazy" decoding="async">
+            <img src="{{ site.baseurl | append: card_image }}" alt="" loading="lazy" decoding="async">
           </figure>
           <span class="c-categories__more">{{ t.category_view_all }}</span>
         </div>

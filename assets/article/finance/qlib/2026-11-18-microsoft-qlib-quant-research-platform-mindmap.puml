@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Microsoft qlib\nAI quant research platform
+** Data layer
+*** Binary float32 files per field
+*** Calendar, instruments, features
+*** dump_bin.py and health check
+*** Expression engine (Ref, Mean, Corr...)
+** Dataset
+*** Alpha158 (158 factors)
+*** Alpha360 (360 raw lags)
+*** DatasetH segments
+*** Label = return t+1 to t+2
+** Models
+*** LightGBM, XGBoost, CatBoost
+*** PyTorch: LSTM, GRU, Transformer, HIST, TRA
+** Workflow
+*** Recorder on MLflow
+*** SignalRecord, SigAnaRecord
+*** PortAnaRecord, qrun YAML
+** Backtest
+*** Strategy: TopkDropout
+*** Executor: simulator, nested
+*** Exchange: costs, limits, deal price
+** Evaluation
+*** IC and rank IC
+*** Excess return with and without cost
+*** Look-ahead and leakage
+** Beyond research
+*** Online serving and rolling
+*** RL order execution
+** Security by design
+*** Configs and YAML are code
+*** Pickles and models are code
+*** Unverified dataset download
+*** MLflow logs git diff and hostname
+@endmindmap

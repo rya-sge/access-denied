@@ -1,0 +1,51 @@
+@startuml
+title qlib layers (v0.9.8)
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam package {
+  BorderColor #2E8B67
+}
+package "Data layer (qlib/data)" {
+  [Binary storage\ncalendars / instruments / features] as BIN
+  [Providers D.calendar / D.instruments / D.features] as PROV
+  [Expression engine\nops.py + AST parser] as EXPR
+  [Memory and disk cache] as CACHE
+}
+package "Dataset (qlib/data/dataset, contrib/data)" {
+  [DataHandlerLP\nAlpha158 / Alpha360] as DH
+  [Processors\nDropnaLabel, CSZScoreNorm] as PROC
+  [DatasetH\ntrain / valid / test] as DS
+}
+package "Learning (qlib/model, contrib/model)" {
+  [Model.fit / predict\nLGBModel, pytorch_*] as MODEL
+}
+package "Workflow (qlib/workflow)" {
+  [R + MLflowRecorder] as REC
+  [SignalRecord / SigAnaRecord / PortAnaRecord] as RT
+  [OnlineManager] as ONL
+}
+package "Backtest (qlib/backtest)" {
+  [Strategy\nTopkDropoutStrategy] as STRAT
+  [Executor\nSimulator / Nested] as EXEC
+  [Exchange\ncosts, limits, deal price] as EXCH
+}
+[RL (qlib/rl)\norder execution] as RL
+BIN --> PROV
+PROV --> EXPR
+EXPR --> CACHE
+EXPR --> DH
+DH --> PROC
+PROC --> DS
+DS --> MODEL
+MODEL --> RT
+RT --> REC
+RT --> STRAT
+STRAT --> EXEC
+EXEC --> EXCH
+ONL --> MODEL
+RL --> EXEC
+@enduml

@@ -128,6 +128,109 @@ $reading-measure: 44rem;
   }
 }
 
+/*
+  The "made with the help of Claude Code" note sits in 250 posts as a
+  blockquote right after the introduction. Styled as a quote it competed with
+  the article's opening; it is now a small muted line. Matching on the link
+  keeps the posts unchanged.
+*/
+.c-wrap-content > blockquote:has(a[href*="claude.com/product/claude-code"]) {
+  padding: 0;
+  border-left: 0;
+  background-color: transparent;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-dim);
+
+  p {
+    padding: 0;
+  }
+}
+
+/* Section link after each h2/h3 (js/main.js): visible on hover or focus. */
+.c-heading-anchor {
+  margin-left: .35em;
+  font-size: .8em;
+  text-decoration: none;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity .15s ease;
+
+  h2:hover > &,
+  h3:hover > &,
+  &:focus-visible {
+    opacity: 1;
+  }
+}
+
+/* Reading progress bar (js/main.js). */
+.c-reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 3px;
+  pointer-events: none;
+
+  span {
+    display: block;
+    height: 100%;
+    background-color: $primary-color;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+}
+
+/*
+  Sticky table of contents (js/main.js), fixed in the empty space right of the
+  article card when that space is at least 220px. The script sets `left` and
+  `width` and adds .is-visible.
+*/
+.c-toc-rail {
+  display: none;
+  position: fixed;
+  top: 40px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  padding: 10px 0 10px 14px;
+  border-left: 1px solid var(--border-strong);
+  font-size: 13px;
+  line-height: 1.45;
+
+  &.is-visible {
+    display: block;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  ul ul {
+    padding-left: 12px;
+  }
+
+  li {
+    margin: 0 0 6px;
+  }
+
+  a {
+    color: var(--text-dim);
+    text-decoration: none;
+
+    &:hover,
+    &.is-active {
+      color: $primary-color;
+    }
+
+    &.is-active {
+      font-weight: 600;
+    }
+  }
+}
+
 /* Estimated reading time, next to the dates in the article header. */
 .c-article__reading-time {
   white-space: nowrap;

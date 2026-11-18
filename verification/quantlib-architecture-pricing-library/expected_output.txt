@@ -1,0 +1,80 @@
+### qldock py -n -r equity_option.py
+QuantLib 1.44
+analytic      9.41340
+delta 0.59871 gamma 0.01933 vega/1% 0.38667 theta/day -0.01474 rho/1% 0.50457
+finite diff   9.41375
+monte carlo   9.4044 +/- 0.0315
+closed form   9.41340  (T = 1.0)
+put 6.45796  C - P = 2.95545  S - K e^-rT = 2.95545
+american put (CRR 1000) 6.74205 >= european put 6.45796
+implied vol from analytic price 0.200000
+after spot -> 105      12.63876
+after vol -> 25%       11.34848
+evaluation date +6M    9.41340
+after maturity         0.00000  isExpired=True
+back to today          9.41340
+up-and-out call, barrier 120  1.15537
+
+### qldock py -n -r moving_reference_date.py
+fixed  reference: today 9.41340  +6M 9.41340  curve reference date January 15th, 2025
+moving reference: today 9.41340  +6M 6.40005  curve reference date July 15th, 2025
+closed form with T = 0.504110: 6.40005
+
+### qldock py -n -r rates.py
+QuantLib 1.44; curve reference date January 17th, 2025; max helper error 2.6e-13
+   1Y discount 0.968996  zero (cont.) 3.14948%
+   5Y discount 0.845681  zero (cont.) 3.35041%
+  10Y discount 0.700382  zero (cont.) 3.55935%
+5Y swap fair rate, matching conventions: 3.40000%
+5Y swap fair rate, curve bootstrapped with Unadjusted fixed leg: 3.39981% (helpers still repriced to 2.8e-13)
+difference: 0.0188 bp
+payer 5Y at 3.30 %, notional 1,000,000: NPV 4,538.78
+bond 4% 2030: clean 102.7483 dirty 106.1237 accrued 3.3753 settlement January 17th, 2025
+  yield 3.4076%  modified duration 4.4660  convexity 25.8624
+    March 17th, 2025  4.0000
+    March 16th, 2026  4.0000
+    March 15th, 2027  4.0000
+    March 15th, 2028  4.0000
+    March 15th, 2029  4.0000
+    March 15th, 2030  4.0000
+    March 15th, 2030  100.0000
+
+### qldock cxx -n main.cpp
+QuantLib 1.45-dev
+NPV            9.41340  delta 0.59871
+spot 105       12.63876
+vol relinked   11.34848
+
+### qldock example EquityOption (shipped example, C++ master)
+
+Option type = Put
+Maturity = May 17th, 1999
+Underlying price = 36
+Strike = 40
+Risk-free interest rate = 6.000000 %
+Dividend yield = 0.000000 %
+Volatility = 20.000000 %
+
+
+Method                             European      Bermudan      American      
+Black-Scholes                      3.844308      N/A           N/A           
+Black Vasicek Model                3.818577      N/A           N/A           
+Heston semi-analytic               3.844306      N/A           N/A           
+Bates semi-analytic                3.844306      N/A           N/A           
+Barone-Adesi/Whaley                N/A           N/A           4.459628      
+Bjerksund/Stensland                N/A           N/A           4.453064      
+QD+ fixed-point (fast)             N/A           N/A           4.486617      
+QD+ fixed-point (accurate)         N/A           N/A           4.486669      
+QD+ fixed-point (high precision)   N/A           N/A           4.486674      
+Integral                           3.844309      N/A           N/A           
+Finite differences                 3.844330      4.360765      4.486113      
+Binomial Jarrow-Rudd               3.844132      4.361174      4.486552      
+Binomial Cox-Ross-Rubinstein       3.843504      4.360861      4.486415      
+Additive equiprobabilities         3.836911      4.354455      4.480097      
+Binomial Trigeorgis                3.843557      4.360909      4.486461      
+Binomial Tian                      3.844171      4.361176      4.486413      
+Binomial Leisen-Reimer             3.844308      4.360713      4.486076      
+Binomial Joshi                     3.844308      4.360713      4.486076      
+MC (crude)                         3.834522      N/A           N/A           
+QMC (Sobol)                        3.844613      N/A           N/A           
+MC (Longstaff Schwartz)            N/A           N/A           4.456935      

@@ -1,0 +1,12 @@
+greedy (fresh object): 6 lines, spent 9598.87, leftover reported 401.13, budget 10000
+lp (fresh object): 6 lines, spent 9946.59, leftover reported 53.41, budget 10000
+greedy then lp (same object): 6 lines, spent 30743.14, leftover reported 9.65, budget 10000
+HRP clean_weights -> lp: 19 lines, spent 9997.63, leftover reported 2.37, budget 10000
+HRP optimize() dict -> lp: 18 lines, spent 46218.69, leftover reported 1.25, budget 10000
+HRP optimize() dict -> greedy: 19 lines, spent 9994.33, leftover reported 5.67, budget 10000
+
+train 2014-09-19..2016-12-30 (576 rows), test 2017-01-03..2018-04-11 (320 rows)
+max_sharpe      ex-ante  35.1% / 21.5%   realised  28.5% / 17.3%
+min_volatility  ex-ante   8.5% / 12.8%   realised   3.1% / 11.6%
+HRP             ex-ante   8.8% / 13.6%   realised   8.3% / 12.0%
+equal_weight    ex-ante   9.4% / 16.4%   realised   8.6% / 14.5%
