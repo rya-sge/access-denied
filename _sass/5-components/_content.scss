@@ -2,21 +2,33 @@
 	CONTENT
 =============== */
 
+/*
+  Main column. With the left sidebar gone (2026-11-18) it is centred and
+  capped at $content-max-width, the width of the top bar's inner row.
+
+  On article pages from 1280px, the right 280px of the column is kept free:
+  js/main.js places the sticky table of contents there (.c-toc-rail), and
+  the article card keeps about 900px, wide enough for tables and diagrams.
+*/
 .c-content {
   position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
-  padding: 0 20px 0;
-  // Same value as the sidebar width (_sidebar.scss), which is imported first.
-  margin-left: $sidebar-width;
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media only screen and (min-width: 1280px) {
+  .is-post .c-content {
+    padding-right: 280px;
+  }
 }
 
 @media only screen and (max-width: 900px) {
   .c-content {
-    position: static;
-    padding: 0 15px 0;
-    margin-left: 0;
+    padding: 0 15px;
   }
 }

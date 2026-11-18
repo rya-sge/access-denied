@@ -1,0 +1,11 @@
+true optimum (long-only) Sharpe 0.4915
+equal weight true Sharpe 0.4900
+true GMV (long-only) true Sharpe 0.4463
+replications 494 (skipped 6)
+estimated max-Sharpe: in-sample Sharpe mean 1.0446, true Sharpe of same weights mean 0.4087 (5th pct 0.3333), mean largest weight 0.5744
+estimated min-vol: true Sharpe mean 0.4450
+share of runs where estimated max-Sharpe beats equal weight (true Sharpe): 0.000
+N=1: mean best in-sample annual Sharpe 0.005 (true Sharpe 0)
+N=10: mean best in-sample annual Sharpe 0.700 (true Sharpe 0)
+N=100: mean best in-sample annual Sharpe 1.159 (true Sharpe 0)
+SE of an annual Sharpe estimate over 5 years ~ 1/sqrt(5) = 0.447

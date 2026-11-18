@@ -1392,3 +1392,21 @@ _posts/2026-11-17-jenkins-security.md
   assets/article/devops/jenkins/jenkins-security-trust-boundaries-concept.puml   (concept -> .png, asset only)
   assets/article/devops/jenkins/jenkins-security-cli-file-read-workflow.puml   (workflow, CVE-2024-23897 -> .png, asset only)
   in-section diagrams: inline Mermaid in the article (entry-points flowchart, CVE-2024-23897 sequence), no .puml
+
+_posts/2026-11-18-quantlib-architecture-pricing-library.md
+  assets/article/finance/quantlib/2026-11-18-quantlib-architecture-pricing-library-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/finance/quantlib/quantlib-object-graph-concept.puml   (concept -> .png, asset only)
+  assets/article/finance/quantlib/quantlib-npv-lifecycle-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (quote/handle notification flowchart, NPV() sequence), no .puml
+
+_posts/2026-11-18-pyportfolioopt-portfolio-optimization.md
+  assets/article/finance/pyportfolioopt/2026-11-18-pyportfolioopt-portfolio-optimization-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/finance/pyportfolioopt/pyportfolioopt-class-hierarchy-concept.puml   (concept -> .png, asset only)
+  assets/article/finance/pyportfolioopt/pyportfolioopt-optimisation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (pipeline flowchart, class hierarchy flowchart), no .puml
+
+_posts/2026-11-18-microsoft-qlib-quant-research-platform.md
+  assets/article/finance/qlib/2026-11-18-microsoft-qlib-quant-research-platform-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/finance/qlib/qlib-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/finance/qlib/qlib-research-loop-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (layer flowchart, backtest step sequence), no .puml

@@ -120,6 +120,67 @@ $(document).ready(function () {
     }
   });
 
+  // The top bar's "Categories" link points to the home page with #categories,
+  // which opens that view directly (also when already on the home page).
+  function openCategoriesFromHash() {
+    if (window.location.hash === '#categories') {
+      $('.c-nav__list .c-nav__item[data-target="categories"]').trigger('click');
+    }
+  }
+  openCategoriesFromHash();
+  $(window).on('hashchange', openCategoriesFromHash);
+
+  /* =======================
+  // Top bar
+  ======================= */
+
+  var topbar = document.getElementById('js-topbar');
+  var $menuBtn = $('#js-topbar-menu-btn');
+
+  // Phone menu: the button opens and closes the panel; Escape or a click on a
+  // link closes it.
+  function setMenu(open) {
+    if (!topbar) return;
+    topbar.classList.toggle('is-open', open);
+    $menuBtn.attr('aria-expanded', open ? 'true' : 'false');
+  }
+  $menuBtn.on('click', function () {
+    setMenu(!topbar.classList.contains('is-open'));
+  });
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape' && topbar && topbar.classList.contains('is-open')) {
+      setMenu(false);
+      $menuBtn.trigger('focus');
+    }
+  });
+  $('#js-topbar-panel a').on('click', function () { setMenu(false); });
+
+  // Hide the bar while the reader scrolls down, show it again on scroll up.
+  // Never hidden near the top of the page, while the phone menu is open, or
+  // while focus (search typing, keyboard navigation) is inside the bar.
+  if (topbar) {
+    var lastY = window.pageYOffset;
+    var barPending = false;
+    var updateBar = function () {
+      barPending = false;
+      var y = window.pageYOffset;
+      var keep = y < 120 || topbar.classList.contains('is-open') || topbar.contains(document.activeElement);
+      if (keep || y < lastY - 4) {
+        topbar.classList.remove('is-hidden');
+      } else if (y > lastY + 4) {
+        topbar.classList.add('is-hidden');
+      }
+      lastY = y;
+    };
+    $(window).on('scroll', function () {
+      if (!barPending) {
+        barPending = true;
+        window.requestAnimationFrame(updateBar);
+      }
+    });
+    $(topbar).on('focusin', function () { topbar.classList.remove('is-hidden'); });
+  }
+
   /* =======================
   // Adding ajax pagination
   ======================= */
@@ -240,8 +301,10 @@ $(document).ready(function () {
         if (space >= RAIL_MIN) {
           $rail.css({ left: (cardRight + 24) + 'px', width: Math.min(300, space) + 'px' })
             .addClass('is-visible').find('a').removeAttr('tabindex');
+          document.body.classList.add('has-toc-rail');
         } else {
           $rail.removeClass('is-visible').find('a').attr('tabindex', '-1');
+          document.body.classList.remove('has-toc-rail');
         }
       };
       $(window).on('resize', placeRail);

@@ -1,0 +1,25 @@
+@startuml
+title PyPortfolioOpt - from prices to share counts
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Load adjusted close prices (DataFrame);
+:Trim to a window where every ticker has prices;<<#FDEEEE>>
+fork
+  :expected_returns.mean_historical_return;
+fork again
+  :risk_models.CovarianceShrinkage(...).ledoit_wolf();
+end fork
+:New EfficientFrontier(mu, S, weight_bounds);
+:add_constraint / add_sector_constraints / add_objective;
+:max_sharpe(risk_free_rate=rf) or another objective;
+:clean_weights();
+:portfolio_performance(risk_free_rate=rf);
+:New DiscreteAllocation per method;
+:lp_portfolio(solver=...) or greedy_portfolio();
+:Check spend <= budget and weights vs targets;<<#FDEEEE>>
+stop
+@enduml

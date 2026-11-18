@@ -1,0 +1,43 @@
+@startuml
+title PyPortfolioOpt 1.6.0 - optimiser class hierarchy
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+hide empty members
+class BaseOptimizer {
+  tickers, weights
+  clean_weights()
+  save_weights_to_file()
+}
+class BaseConvexOptimizer {
+  _w : cp.Variable
+  _constraints, _objective
+  add_constraint(), add_objective()
+}
+class EfficientFrontier {
+  min_volatility(), max_sharpe()
+  efficient_risk(), efficient_return()
+  max_quadratic_utility()
+}
+class EfficientSemivariance
+class EfficientCVaR
+class EfficientCDaR
+class HRPOpt
+class CLA
+class BlackLittermanModel
+class DiscreteAllocation {
+  greedy_portfolio()
+  lp_portfolio()
+}
+BaseOptimizer <|-- BaseConvexOptimizer
+BaseConvexOptimizer <|-- EfficientFrontier
+EfficientFrontier <|-- EfficientSemivariance
+EfficientFrontier <|-- EfficientCVaR
+EfficientFrontier <|-- EfficientCDaR
+BaseOptimizer <|-- HRPOpt
+BaseOptimizer <|-- CLA
+BaseOptimizer <|-- BlackLittermanModel
+note right of DiscreteAllocation : no base class,\nuses cvxpy integer variables
+@enduml

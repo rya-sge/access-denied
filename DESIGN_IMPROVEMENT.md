@@ -11,8 +11,10 @@ Review of the live site (https://rya-sge.github.io/access-denied/) on 2026-11-18
 | Inline code | Wraps as a word; only an identifier longer than the line breaks. | `_sass/3-elements/_code.scss` |
 | Tables | Light 1px rules, tinted header, zebra rows, horizontal scroll when wider than the card. Each table shrinks to its content (`width: fit-content`; a block-level table otherwise drew an empty bordered area beside narrow tables such as the Jenkins Severity table), starts at the left edge of the text column and may grow to the card's right edge. Right-aligned number cells do not wrap. | `_sass/5-components/_reading.scss` |
 | Phone padding | Card padding 20px → 12px below 480px; table cells 6px 8px. On a 360px screen, tables that scroll in the Jenkins security article went from 10 to 6 of 14. | `_sass/5-components/_reading.scss` |
-| Mobile article header | Below 900px, article pages (`body.is-post`) show the sidebar as a 48px bar (avatar and name); the article title starts 78px from the top instead of a screen down. Listing pages keep the full author block. | `_layouts/default.html`, `_sass/5-components/_sidebar.scss` |
-| Sidebar width | `clamp(220px, 20vw, 300px)` instead of a fixed 300px; at 1024px the card grew from 665px to 745px and the text from 62 to 78 characters a line. | `_sass/5-components/_sidebar.scss`, `_content.scss` |
+| Top bar instead of the left sidebar | The fixed sidebar (avatar, name, tagline, social, copyright) is replaced by a 56px sticky top bar: avatar and name (home), Posts, Categories (opens the home categories view through `#categories`), Tags, About, search, social icons and the theme switch. It hides on scroll down and returns on scroll up. Below 900px it shows the name, the theme switch and a menu button that opens the links, search and social. The main column is centred at 1200px; on articles from 1280px the right 280px holds the sticky TOC, and the inline TOC is hidden while that column shows. Superseded the interim compact mobile sidebar and fluid sidebar width. | `_includes/topbar.html`, `_layouts/home.html`, `_layouts/default.html`, `_sass/5-components/_topbar.scss`, `_content.scss`, `_sass/4-objects/_wrapper.scss`, `js/main.js` |
+| Author card | Author block moved from the sidebar to a card at the top of the home page (first page) and at the end of each article (replacing the "Feel free to contact me on" line). | `_includes/author-card.html`, `_sass/5-components/_author-card.scss`, `index.html`, `_layouts/post.html` |
+| Footer and shared social links | Site footer with social links and copyright; one `social-links.html` include for the bar, the card and the footer. A "Skip to content" link for keyboard users. | `_includes/social-links.html`, `_layouts/home.html`, `_layouts/default.html` |
+| One search box | The search lives in the top bar on every page; the hidden duplicates in the article, tags and 404 pages are gone (the results script binds one id). | `_includes/header.html`, `_layouts/post.html`, `tags.html`, `404.html` |
 | Card thumbnails | A post may set `cover:` (root-relative path) to show a picture on its home and category card instead of the mindmap; posts without it are unchanged. | `_includes/post-card.html`, `_includes/categories.html` |
 | Sticky TOC | When the space right of the card is at least 220px, a copy of the TOC is fixed there and the section being read is highlighted. | `js/main.js`, `_sass/5-components/_reading.scss` |
 | Reading progress | 3px bar at the top of article pages. | `js/main.js`, `_sass/5-components/_reading.scss` |
@@ -21,7 +23,7 @@ Review of the live site (https://rya-sge.github.io/access-denied/) on 2026-11-18
 | Date line | Sentence case instead of capitals. | `_sass/5-components/_article-page.scss` |
 | Claude Code note | Restyled as a small muted line (matched on its link, posts unchanged). | `_sass/5-components/_reading.scss` |
 | Dark mode | Follows the visitor's system setting when no choice is stored; a toggle click stores a choice that wins. | `_includes/head.html`, `js/main.js`, comments in `_theme.scss` and `default.html` |
-| Print | Only the article prints: sidebar, buttons, footer, related posts and comments hidden, external link targets written out, code wraps. | `_sass/5-components/_print.scss` |
+| Print | Only the article prints: top bar, author card, buttons, footer, related posts and comments hidden, external link targets written out, code wraps. | `_sass/5-components/_print.scss` |
 | Seccomp diagram | Shows the 8 verdicts grouped in 4 outcomes, matching the text; alt text describes the figure. | `seccomp-bpf-filter-workflow.puml` / `.png`, the seccomp post |
 | Blockquotes | Body font instead of the 18px heading serif. | `_sass/3-elements/_blockquote.scss` |
 | Table of contents | Two columns from 1100px; a section never splits from its sub-entries. | `_sass/5-components/_toc.scss` |
@@ -43,10 +45,14 @@ Image-only paragraphs already use the full card width and open full size on clic
 
 It is now a small muted line, but still sits after the introduction in 250 posts. Moving it to the footer means a front-matter flag (for example `made_with: claude-code`) rendered by `_layouts/post.html`, and removing the blockquote from each post.
 
-### 4. Device check
+### 4. Avatar file size
+
+`assets/1.png`, the avatar shown in the top bar and the author cards, is 1.1 MB for a 32-80px picture. A 160px WebP or JPEG (a few kB) would cut the first load of every page.
+
+### 5. Device check
 
 All checks so far used Chrome with off-screen and on-page iframes. A check on a real phone (iOS Safari, Android Chrome) would cover touch scrolling of tables and the sticky elements.
 
-### 5. Lighthouse and contrast
+### 6. Lighthouse and contrast
 
 Not measured yet: Lighthouse accessibility and performance scores, colour contrast of the muted greys (`--text-muted`, `$gray`), Core Web Vitals. See the Gaps of the `website-design-check` skill.

@@ -246,3 +246,7 @@ A detection system is typically a **classification system**. Its goal is to clas
 - Specific topic
   - [Stanford - Machine Learning - Regression](https://web.stanford.edu/class/cs102/lectureslides/RegressionSlides.pdf)
   - [scikit-learn - Linear Models, Logistic regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)
+
+### Related articles
+
+- [Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)

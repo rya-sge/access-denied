@@ -27,7 +27,7 @@ The article assumes basic programming and finance vocabulary, and uses the follo
 - **Present value and discounting.** A cash flow paid at a future date is worth less today; a discount factor between 0 and 1 converts it to today's value. Every QuantLib price (`NPV()`, net present value) is a sum of discounted cash flows or an expectation of discounted payoffs.
 - **Term structure (yield curve).** A function giving the discount factor, zero rate or forward rate for each future date. QuantLib builds one from quoted deposit and swap rates by *bootstrapping*, solving maturity by maturity so the curve reprices each quote.
 - **The Black-Scholes model.** The model behind the closed-form price of a European option, under which the underlying follows a geometric Brownian motion with constant volatility. The site's [Black-Scholes article]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/) derives it; this article uses its formula as a check.
-- **Market conventions.** A *calendar* lists business days, a *day counter* (Actual/360, 30/360, Actual/365 Fixed) turns two dates into a year fraction, and a *business-day convention* (Following, Modified Following, Unadjusted) moves a date that falls on a holiday. Two counterparties using different conventions get different numbers for the same rate.
+- **Market conventions.** A *calendar* lists business days. A *day counter* such as Actual/360, 30/360 or Actual/365 Fixed turns two dates into a year fraction, and a *business-day convention* such as Following, Modified Following or Unadjusted moves a date that falls on a holiday. Two counterparties using different conventions get different numbers for the same rate.
 - **Numerical pricing methods.** When no closed form exists, a price comes from a binomial or trinomial tree, a finite-difference solution of the pricing partial differential equation, or a Monte Carlo average over simulated paths, whose standard error shrinks as one over the square root of the number of paths.
 - **Interest-rate swap and fair rate.** A swap exchanges a fixed-rate leg for a floating-rate leg indexed on a rate such as Euribor; its fair rate is the fixed rate that makes its value zero.
 - **The Observer pattern.** A design pattern in which an object (the observable) keeps a list of observers and calls their `update()` method when it changes. QuantLib uses it to tell prices that their inputs moved.
@@ -36,7 +36,9 @@ The article assumes basic programming and finance vocabulary, and uses the follo
 
 QuantLib is maintained on GitHub at [lballabio/QuantLib](https://github.com/lballabio/QuantLib). The source analysed here is the `master` branch at commit `1c418a9` of 18 November 2026, which reports itself as version `1.45-dev`; the latest release at that date is [v1.44](https://github.com/lballabio/QuantLib/releases/tag/v1.44) (tagged 13 October 2026), and the commit is 592 commits after it. The Python examples below use the 1.44 wheel from PyPI, the C++ example uses the library built from the pinned commit.
 
-The library is written in C++17. `AGENTS.md` at the root of the repository states the two constraints a contribution has to respect: C++17 is the baseline (continuous integration also compiles under later standards up to C++26), and every new source file must be registered in three build systems (CMake, Autotools and a Visual Studio solution). Boost is needed for its headers only.
+The library is written in C++17 and needs Boost for its headers only. `AGENTS.md` at the root of the repository states the two constraints a contribution has to respect. C++17 is the baseline, while continuous integration also compiles under later standards up to C++26. Every new source file must be registered in three build systems: CMake, Autotools and a Visual Studio solution.
+
+QuantLib values given instruments under given market data. It does not search for trading signals or choose portfolio weights: those tasks belong to a research platform such as [Microsoft qlib]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/) and to an optimiser such as [PyPortfolioOpt]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/), covered in two companion articles.
 
 ### The source tree
 
@@ -56,7 +58,7 @@ All library code sits under `ql/`, in folders that follow the domain. Header cou
 | `ql/math/` | 183 | interpolation, root finding, optimisation, distributions, random numbers, statistics |
 | `ql/experimental/` | 260 | newer code whose interface may change between releases |
 
-The whole of `ql/` holds 1,463 headers. Next to it, `Examples/` contains 20 complete programs (equity options, bonds, multi-curve bootstrapping, Bermudan swaptions, CDS, CVA on swaps, among others) and `test-suite/` 191 Boost.Test source files, which double as the most reliable usage reference for any class.
+The whole of `ql/` holds 1,463 headers. Next to it, `Examples/` contains 20 complete programs, among them `EquityOption`, `Bonds`, `MulticurveBootstrapping`, `BermudanSwaption`, `CDS` and `CVAIRS`. `test-suite/` holds 191 Boost.Test source files, which double as the most reliable usage reference for any class.
 
 ## The core architecture: instrument, engine, market data
 
@@ -148,25 +150,37 @@ Two practical consequences follow. Asking for `NPV()` ten times costs one comput
 
 `Settings::instance().evaluationDate()` (`ql/settings.hpp`) is the global "today" of every calculation. It is an observable value, so changing it notifies whatever registered with it. Left unset, it returns the machine's current date (`ql/settings.cpp`), which makes results depend on the day a script runs. A library compiled with the macro `QL_REQUIRE_EXPLICIT_EVALUATION_DATE` throws instead; the macro is present in release 1.44.
 
-Term structures add a second date. `ql/termstructure.hpp` describes three ways a curve can track its reference date: fixed at a date given to the constructor, moving with the evaluation date (a number of settlement days and a calendar given instead), or taken from another structure. A Black-Scholes process measures time to expiry from the risk-free curve's reference date (`GeneralizedBlackScholesProcess::time()` in `ql/processes/blackscholesprocess.cpp`). A curve built with a fixed date therefore ignores a later change of evaluation date, as the Python example below shows.
+Term structures add a second date. `ql/termstructure.hpp` describes three ways a curve can track its reference date: fixed at a date given to the constructor, moving with the evaluation date when a number of settlement days and a calendar are given instead, or taken from another structure. A Black-Scholes process measures time to expiry from the risk-free curve's reference date (`GeneralizedBlackScholesProcess::time()` in `ql/processes/blackscholesprocess.cpp`). A curve built with a fixed date therefore ignores a later change of evaluation date, as the Python example below shows.
 
 ## The building blocks
 
 ### Dates, calendars and conventions
 
-`ql/time/` provides the date arithmetic every other folder relies on: `Date` and `Period`, calendars for countries and exchanges (`TARGET`, `UnitedStates`, `UnitedKingdom` and others, plus `JointCalendar` and `BespokeCalendar`), day counters (`Actual360`, `Actual365Fixed`, `ActualActual` in its ISDA, ISMA and AFB variants, `Thirty360` variants, `Business252`) and `Schedule`, which generates coupon dates forward or backward from a maturity with a business-day convention and an end-of-month rule. `Calendar` and `DayCounter` are value types with a swappable implementation behind them (the Bridge pattern), so they can be passed and copied freely.
+`ql/time/` provides the date arithmetic every other folder relies on:
+
+- **`Date` and `Period`** for dates and tenors such as `6M` or `5Y`.
+- **Calendars** for countries and exchanges, such as `TARGET`, `UnitedStates` and `UnitedKingdom`, plus `JointCalendar` and `BespokeCalendar` to combine or define them.
+- **Day counters**: `Actual360`, `Actual365Fixed`, `ActualActual` in its ISDA, ISMA and AFB variants, the `Thirty360` variants and `Business252`.
+- **`Schedule`**, which generates coupon dates forward or backward from a maturity with a business-day convention and an end-of-month rule.
+
+`Calendar` and `DayCounter` are value types with a swappable implementation behind them, the Bridge pattern, so they can be passed and copied freely.
 
 ### Term structures, cash flows and indexes
 
-Yield term structures range from `FlatForward` to `PiecewiseYieldCurve`, which bootstraps from *rate helpers*: `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper`, `OISRateHelper` and bond helpers. Each helper wraps a quote and knows how to reprice it from a candidate curve. Volatility (equity and FX, swaption, cap and floor, SABR), default-probability and inflation structures follow the same base classes.
+Yield term structures range from `FlatForward` to `PiecewiseYieldCurve`, which bootstraps from *rate helpers* such as `DepositRateHelper`, `SwapRateHelper` and `OISRateHelper`. Each helper wraps a quote and knows how to reprice it from a candidate curve. Volatility structures for equity, FX, swaptions and caps, as well as default-probability and inflation curves, derive from the same `TermStructure` base class.
 
 A bond or a swap leg is a `Leg`, which is a type alias for `std::vector<ext::shared_ptr<CashFlow>>`, not a class. Coupons derive from `CashFlow` and `Coupon`; a `FloatingRateCoupon` delegates its rate to a coupon pricer, which is how capped, floored or convexity-adjusted coupons are handled. `ql/cashflows/cashflows.hpp` computes NPV, basis-point sensitivity, yield, duration, convexity and z-spread for any leg. Indexes (`Euribor6M`, `Sofr`, `Estr`) produce the floating rates, and an `IndexManager` singleton stores their past fixings.
 
 ### Processes, models and numerical methods
 
-A `StochasticProcess` describes the dynamics of an underlying (Black-Scholes-Merton, Heston, Bates, Hull-White, G2). A model in `ql/models/` adds parameters that can be calibrated to market prices: short-rate models (Hull-White, Black-Karasinski, CIR, G2), equity models (Heston, Bates) and the LIBOR market model. Engines combine a process or a model with a method from `ql/methods/`: binomial and trinomial lattices, a finite-difference framework (meshers, operators, time-stepping schemes) and a Monte Carlo framework (path generators, pricers, statistics). `ql/math/` underneath provides the interpolations, one-dimensional solvers (`Brent`, `Newton`), optimisers (Levenberg-Marquardt, Simplex, differential evolution), random-number generators (Mersenne Twister, Sobol) and distributions.
+An engine combines dynamics with a numerical method, and each comes from its own folder:
 
-The shipped `EquityOption` example shows the range: it prices one put (spot 36, strike 40, rate 6 %, volatility 20 %) with European, Bermudan and American exercise, using 21 methods. Run against the pinned commit, the Black-Scholes formula gives 3.844308 for the European put. The finite-difference engine, the integral engine, Sobol quasi-Monte Carlo and six of the seven binomial trees agree with it to within 0.001; the additive-equiprobabilities tree gives 3.836911 and crude Monte Carlo 3.834522. For the American put the analytic approximations differ more: 4.453064 for Bjerksund-Stensland against 4.486674 for the high-precision QD+ fixed-point method, with the trees and finite differences between 4.480 and 4.487.
+- **Processes** (`ql/processes/`) describe the dynamics of an underlying: Black-Scholes-Merton, Heston, Bates, Hull-White, G2.
+- **Models** (`ql/models/`) add parameters calibrated to market prices: short-rate models such as Hull-White, Black-Karasinski, CIR and G2, equity models such as Heston and Bates, and the LIBOR market model.
+- **Methods** (`ql/methods/`) provide binomial and trinomial lattices, a finite-difference framework of meshers, operators and time-stepping schemes, and a Monte Carlo framework of path generators, pricers and statistics.
+- **Mathematics** (`ql/math/`) underneath provides interpolations, one-dimensional solvers such as `Brent` and `Newton`, optimisers such as Levenberg-Marquardt and Simplex, random-number generators such as Mersenne Twister and Sobol, and distributions.
+
+The shipped `EquityOption` example shows the range. It prices one put with spot 36, strike 40, a 6 % rate and 20 % volatility, with European, Bermudan and American exercise, using 21 methods. Run against the pinned commit, the Black-Scholes formula gives 3.844308 for the European put. The finite-difference engine, the integral engine, Sobol quasi-Monte Carlo and six of the seven binomial trees agree with it to within 0.001; the additive-equiprobabilities tree gives 3.836911 and crude Monte Carlo 3.834522. For the American put the analytic approximations differ more: 4.453064 for Bjerksund-Stensland against 4.486674 for the high-precision QD+ fixed-point method, with the trees and finite differences between 4.480 and 4.487.
 
 ## Using QuantLib from Python
 
@@ -228,7 +242,9 @@ $$
 
 which evaluates to 9.41340 by hand as well. The finite-difference price is 0.00035 above it, a discretisation error of the 200 × 400 grid. The Monte Carlo estimate is 0.009 below, or 0.29 standard errors, for this one seed; `errorEstimate()` returns that standard error, and a different seed gives a different estimate. The [Monte Carlo and empirical-rule article]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/) explains why the error falls as one over the square root of the path count.
 
-The analytic engine also returns the Greeks: delta 0.59871, gamma 0.01933, and vega 0.38667 per volatility point. QuantLib returns `vega()` and `rho()` per unit change (a 100 % move) and `theta()` per year, so they are divided by 100 and by 365 before being read as "per point" or "per day". The same script checks put-call parity (call 9.41340 minus put 6.45796 equals 2.95545, which is 100 − 100e<sup>−0.03</sup>), and prices the American put on a 1,000-step Cox-Ross-Rubinstein tree at 6.74205, 0.28409 above the European put, the value of early exercise.
+The analytic engine also returns the Greeks: delta 0.59871, gamma 0.01933, and vega 0.38667 per volatility point. QuantLib returns `vega()` and `rho()` per unit change (a 100 % move) and `theta()` per year, so they are divided by 100 and by 365 before being read as "per point" or "per day".
+
+The same script checks put-call parity: the call at 9.41340 minus the put at 6.45796 equals 2.95545, which is 100 − 100e<sup>−0.03</sup>. It also prices the American put on a 1,000-step Cox-Ross-Rubinstein tree at 6.74205, 0.28409 above the European put, the value of early exercise.
 
 ### Moving inputs: quotes, the evaluation date and expiry
 
@@ -261,7 +277,14 @@ print(opt.NPV())                                # 6.40005 (fixed-date curves: 9.
 
 ### A bootstrapped curve, a swap and a bond
 
-The next script builds a Euribor 6M curve from two deposits (3M at 3.0 %, 6M at 3.1 %) and three swap rates (2Y 3.2 %, 5Y 3.4 %, 10Y 3.6 %, annual 30/360 fixed leg, Modified Following):
+The next script builds a Euribor 6M curve from five quotes:
+
+| Instrument | Tenors and rates | Conventions |
+|---|---|---|
+| Deposits | 3M 3.0 %, 6M 3.1 % | Actual/360, Modified Following |
+| Swaps against Euribor 6M | 2Y 3.2 %, 5Y 3.4 %, 10Y 3.6 % | annual 30/360 fixed leg, Modified Following |
+
+
 
 ```python
 settlement = 2
@@ -347,7 +370,7 @@ int main() {
 
 Compiled with `g++ -std=c++17 main.cpp -lQuantLib` against the library built from the pinned commit, it prints 9.41340, 12.63876 and 11.34848, the same three values as the Python 1.44 release. `ql/quantlib.hpp` includes the whole library, which is convenient for a test and slow to compile; production code includes the specific headers, and each folder also has an `all.hpp`.
 
-The library itself builds with CMake (presets in `CMakePresets.json`, `QL_BUILD_EXAMPLES` and `QL_BUILD_TEST_SUITE` on by default), Autotools or Visual Studio, as `.agents/build-and-test.md` describes. Optional configure flags change behaviour that the rest of this article takes for granted: `--enable-sessions` makes singletons such as `Settings` per session instead of per process, `--enable-thread-safe-observer-pattern` protects notifications across threads, and `--enable-intraday` adds a time of day to `Date`.
+The library itself builds with CMake, Autotools or Visual Studio, as `.agents/build-and-test.md` describes. CMake presets are in `CMakePresets.json`, and the options `QL_BUILD_EXAMPLES` and `QL_BUILD_TEST_SUITE` are on by default. Optional configure flags change behaviour that the rest of this article takes for granted: `--enable-sessions` makes singletons such as `Settings` per session instead of per process, `--enable-thread-safe-observer-pattern` protects notifications across threads, and `--enable-intraday` adds a time of day to `Date`.
 
 ### Extending the library
 
@@ -485,5 +508,5 @@ The sources were read and the examples run at one commit; the following points w
 - [Monte Carlo Simulation - Roulette, the Law of Large Numbers and the Empirical Rule]({{site.url_complet}}/2026/10/26/monte-carlo-simulation-roulette-law-of-large-numbers/)
 - [Confidence Intervals and the Central Limit Theorem - MIT 6.0002 Lecture 7 in Python]({{site.url_complet}}/2026/10/26/confidence-intervals-central-limit-theorem/)
 - [Credit Default Swaps - Overview]({{site.url_complet}}/2025/05/30/credit-default-swap-overview/)
-- [PyPortfolioOpt]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/)
-- [Microsoft qlib]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)
+- [PyPortfolioOpt - How a Python Library Turns Price History into Portfolio Weights]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/)
+- [Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)

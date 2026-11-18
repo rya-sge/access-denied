@@ -1,0 +1,28 @@
+{% comment %}
+  Who writes the site, as a card. Two placements, from the same markup:
+
+  * variant="intro": at the top of the home page, for a first-time visitor.
+  * variant="article" (default): at the end of each article, where a reader who
+    liked it decides to follow or read more. Rendered by _layouts/post.html.
+
+  It replaces the author block of the old left sidebar, which sat beside every
+  page; the byline under each article title already names the author, and
+  `rel=author` links to /about/.
+{% endcomment %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+<aside class="c-author-card c-author-card--{{ include.variant | default: 'article' }}"
+       aria-label="{{ t.author_card_title }}">
+  <a class="c-author-card__avatar" href="{{ '/about/' | relative_url }}" tabindex="-1" aria-hidden="true">
+    <img src="{{ site.baseurl }}/assets/{{ site.author-image }}" alt="" width="64" height="64" loading="lazy" decoding="async">
+  </a>
+  <div class="c-author-card__body">
+    {% if include.variant != 'intro' %}<p class="c-author-card__kicker">{{ t.author_card_title }}</p>{% endif %}
+    <p class="c-author-card__name"><a href="{{ '/about/' | relative_url }}" rel="author">{{ site.author-name }}</a></p>
+    <p class="c-author-card__job">{{ site.author-job }}</p>
+    <p class="c-author-card__about">{{ site.about-author | strip_html }}</p>
+    <div class="c-author-card__links">
+      {% include social-links.html %}
+      <a class="c-author-card__more" href="{{ '/about/' | relative_url }}">{{ t.author_card_more }} &rarr;</a>
+    </div>
+  </div>
+</aside>

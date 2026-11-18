@@ -2,10 +2,12 @@
 	WPAPPER
 =============== */
 
-$base-wrapper-width: 1440px;
 $wrapper-offset: $base-spacing-unit;
 
+// No width cap here since the top bar replaced the left sidebar (2026-11-18):
+// the bar spans the full window and the main column centres itself at
+// $content-max-width (_content.scss). The former 1440px cap, anchored to the
+// left, left an empty strip on the right of wide screens.
 .o-wrapper {
-  max-width: $base-wrapper-width;
   position: relative;
 }

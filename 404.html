@@ -20,11 +20,6 @@ permalink: /404.html
 
 {% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <div class="container">
-  <header class="c-header u-hide u-no-margin-bottom">
-    <div class="c-header__box">
-      {% include search-box.html class="u-full-width" %}
-    </div>
-  </header>
   <h1>404</h1>
   <p><strong>{{ t.not_found_title }}</strong></p>
   <p>{{ t.not_found_text }}</p>

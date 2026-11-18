@@ -15,8 +15,9 @@ Reproduces the numbers in the section "What nine years of advisories say about p
 
 The `content/security/advisory/` folder of
 [jenkins-infra/jenkins.io](https://github.com/jenkins-infra/jenkins.io), commit
-`39e4020b363558216017486859a0198b8be59e79` (2026-11-17). Advisories before 2017-11-08 are
-free-form AsciiDoc without an `issues:` list and are not counted.
+`39e4020b363558216017486859a0198b8be59e79` (2026-11-17). Advisories before 2017-11-08, and five later free-text
+advisories (2017-11-16, 2017-12-05, 2017-12-06, 2017-12-11, 2017-12-14), have no `issues:` list
+and are not counted.
 
 ## Run
 

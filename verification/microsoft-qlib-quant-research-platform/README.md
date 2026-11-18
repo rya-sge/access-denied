@@ -14,13 +14,15 @@ through every layer the article describes:
 3. `pipeline.py` queries the expression engine, builds `Alpha158` on a `DatasetH` with train / valid / test
    segments, trains `LGBModel`, records the signal (`SignalRecord`), analyses it (`SigAnaRecord`: IC, rank IC),
    runs a `TopkDropoutStrategy` backtest against SPY with costs (`PortAnaRecord`), and scores a deliberately
-   leaked expression to show what look-ahead does to the IC.
+   leaked expression to show what look-ahead does to the IC. `feature_check.py` counts the Alpha158 columns that are
+   constant or empty on this data.
 
 `expected-output.txt` holds the numbers the article quotes, from a real run.
 
 **The data is synthetic.** The source files contain closing prices only, so `prep.py` sets
-open = high = low = close = vwap and a constant volume of 1,000,000. Half of Alpha158's factors (candle shape,
-volume) are therefore constant. The run tests qlib's machinery; its returns are not a strategy result.
+open = high = low = close = vwap and a constant volume of 1,000,000. `feature_check.py` shows that 48 of
+Alpha158's 158 columns are then constant or empty (candle shape, price ratios, volume statistics, price-volume
+correlations). The run tests qlib's machinery; its returns are not a strategy result.
 
 ## Article claims that depend on it
 
@@ -31,6 +33,7 @@ volume) are therefore constant. The run tests qlib's machinery; its returns are 
 - Excess return 13.0 %/yr without cost and 3.6 %/yr with cost (information ratio 0.86 and 0.24), the benchmark
   figures, the mean daily cost and turnover.
 - Leaked feature IC 0.68.
+- 48 of the 158 Alpha158 columns carry no information on this data (`feature_check.py`).
 
 ## How to run
 
@@ -44,13 +47,14 @@ Run it **outside any git repository**: qlib's MLflow recorder saves `git diff`, 
 ```bash
 W=$(mktemp -d); mkdir -p "$W/csv"; cd "$W"
 cp <PyPortfolioOpt>/tests/resources/{stock_prices,spy_prices}.csv .
-cp <this folder>/prep.py <this folder>/pipeline.py .
+cp <this folder>/*.py .
 qlibdock py -n prep.py
 qlibdock sh -n -- python /usr/src/qlib/scripts/dump_bin.py dump_all --data_path csv --qlib_dir qlib_data \
    --freq day --date_field_name date --symbol_field_name symbol \
    --include_fields open,high,low,close,volume,vwap,factor
 qlibdock sh -n -r -- python /usr/src/qlib/scripts/check_data_health.py check_data --qlib_dir /work/qlib_data
 qlibdock py -n pipeline.py
+qlibdock py -n feature_check.py
 ```
 
 `-n` runs without network. The whole pipeline takes about 15 seconds. The input CSV files come from

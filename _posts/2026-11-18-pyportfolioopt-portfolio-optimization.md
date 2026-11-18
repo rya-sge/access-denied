@@ -2,11 +2,12 @@
 layout: post
 title: "PyPortfolioOpt - How a Python Library Turns Price History into Portfolio Weights"
 date:   2026-11-18
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: finance
 tags: quantitative-finance python risk-management statistics portfolio-optimization pyportfolioopt
-description: "PyPortfolioOpt 1.6.0 read and run - estimators, cvxpy optimisers, HRP, Black-Litterman, discrete allocation, verified numbers, five pitfalls and a security review."
+description: "PyPortfolioOpt 1.6.0 read and run - estimators, cvxpy optimisers, HRP, Black-Litterman, discrete allocation, verified numbers, five pitfalls, security review."
 image: /assets/article/finance/pyportfolioopt/2026-11-18-pyportfolioopt-portfolio-optimization-mindmap.png
 isMath: true
 isMermaid: true
@@ -24,10 +25,29 @@ This article reads the source at commit `a6638d2` (release 1.6.0 plus eight comm
 
 The article assumes basic Python, pandas and the idea of a stock return. It relies on the following concepts without deriving them in full:
 
-- **Mean-variance optimisation.** Markowitz's model describes each asset by an expected return and the covariances between assets, and chooses weights that trade expected portfolio return against portfolio variance. PyPortfolioOpt's main class implements this model and its variants.
+- **Markowitz mean-variance optimisation.** Markowitz's 1952 model describes each asset by an expected return $$\mu_i$$ and the covariances $$\Sigma$$ between assets, and judges a portfolio $$w$$ by two numbers only: its expected return $$w^{\top}\mu$$ and its variance $$w^{\top}\Sigma w$$. For a target return $$r^{*}$$ it solves the quadratic programme
+
+  $$
+  \begin{aligned}
+  \min_{w}\; w^{\top}\Sigma w \quad \text{subject to} \quad w^{\top}\mu \ge r^{*},\; \textstyle\sum_i w_i = 1,
+  \end{aligned}
+  $$
+
+  plus $$w_i \ge 0$$ for a long-only portfolio, which is PyPortfolioOpt's default (`weight_bounds=(0, 1)`). Repeating it for every $$r^{*}$$ traces the efficient frontier: the portfolios with the highest expected return for their level of volatility. The minimum-volatility portfolio sits at the left end of the frontier, and the maximum-Sharpe (tangency) portfolio is the point where a line from the risk-free rate touches it.
+
+  The model treats $$\mu$$ and $$\Sigma$$ as exact, so the error in both estimates passes straight into the weights. The later methods each address part of that error: shrinkage improves $$\Sigma$$, Black-Litterman replaces the historical $$\mu$$, and HRP does without $$\mu$$ and without inverting $$\Sigma$$. `EfficientFrontier`, the library's main class, implements the model and its variants.
+- **Black-Litterman model.** Black and Litterman (1991) replace historical expected returns with a Bayesian blend of two sources. The prior is the market equilibrium: the excess returns that would make the market-capitalisation weights $$w_{mkt}$$ optimal, $$\Pi = \delta\,\Sigma\,w_{mkt}$$, where $$\delta$$ is the market's risk aversion. When a risk-free rate is given, `market_implied_prior_returns` adds it to $$\Pi$$ to return total rather than excess returns. The investor then states views as $$P\mu = Q$$ with uncertainty $$\Omega$$: each row of $$P$$ picks assets, $$Q$$ gives the expected return of that pick, and $$\Omega$$ how unsure the view is. The posterior expected returns are
+
+  $$
+  \begin{aligned}
+  E[R] = \Pi + \tau\Sigma P^{\top}\left(P\,\tau\Sigma\,P^{\top} + \Omega\right)^{-1}\left(Q - P\,\Pi\right).
+  \end{aligned}
+  $$
+
+  For a single absolute view on asset $$i$$, the posterior return moves the fraction $$\tau\sigma_i^2 / (\tau\sigma_i^2 + \omega)$$ of the gap from $$\Pi_i$$ to $$Q$$, so a more certain view (smaller $$\omega$$) pulls harder. Without views and with a zero risk-free rate, the posterior is $$\Pi$$ itself, and maximising $$w^{\top}\Pi - \frac{\delta}{2} w^{\top}\Sigma w$$ with the same $$\delta$$ and $$\Sigma$$ returns $$w_{mkt}$$ exactly. That is why the library's documentation describes Black-Litterman portfolios as more stable than those built on historical means. `BlackLittermanModel` computes this formula (`pypfopt/black_litterman.py`, `bl_returns`).
 - **Covariance matrix and positive semidefiniteness.** The $$n \times n$$ matrix $$\Sigma$$ of return covariances gives the portfolio variance $$w^{\top}\Sigma w$$. It must be positive semidefinite (no portfolio with negative variance), otherwise the quadratic problem is not convex and the solver refuses it.
 - **Sharpe ratio and the risk-free rate.** The Sharpe ratio is the excess return over a risk-free rate $$r_f$$ divided by volatility. The value of $$r_f$$ changes which portfolio maximises it, and both are expressed per year in this library.
-- **Convex optimisation and DCP.** A convex problem has a single global optimum that solvers find reliably. cvxpy accepts a problem only if it is written by the rules of disciplined convex programming (DCP), which is why custom constraints and objectives in PyPortfolioOpt must be built from cvxpy functions.
+- **Convex optimisation and DCP.** In a convex problem every local optimum is a global one, so a solver that converges has found the best solution. cvxpy accepts a problem only if it is written by the rules of disciplined convex programming (DCP), which is why custom constraints and objectives in PyPortfolioOpt must be built from cvxpy functions.
 - **Estimation error.** An expected return estimated from $$T$$ years of data has a standard error of roughly $$\sigma / \sqrt{T}$$, as explained in [Sampling and Standard Error - Estimating a Population Mean from One Random Sample]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/). For volatile stocks this error is of the same order as the return itself.
 - **In-sample and out-of-sample.** A portfolio optimised on a data window and evaluated on the same window is in-sample: its statistics describe the past fit, not a forecast. Only results on data the optimiser did not see say anything about future behaviour.
 - **Annualisation.** Daily statistics are scaled to a year with 252 trading days: returns by compounding or by multiplying the mean by 252, variances by 252, volatilities by $$\sqrt{252}$$.
@@ -99,7 +119,7 @@ flowchart TD
     BO -->|"inherits"| BL
 ```
 
-`BaseOptimizer` holds what every method shares: the list of tickers, a `weights` array, `clean_weights()` (sets weights below `1e-4` to zero and rounds to five decimals) and `save_weights_to_file()`. It knows nothing about solvers.
+`BaseOptimizer` holds what every method shares: the list of tickers, a `weights` array, `clean_weights()` and `save_weights_to_file()`. `clean_weights()` sets weights below `1e-4` to zero and rounds the rest to five decimals. The class knows nothing about solvers.
 
 `BaseConvexOptimizer` adds the cvxpy layer. Its constructor creates the decision variable `self._w = cp.Variable(n_assets)`, turns `weight_bounds` (default `(0, 1)`, long-only) into two constraints, and keeps a list `_constraints` and a list `_additional_objectives`. `add_constraint()` takes a callable such as `lambda w: w[0] <= 0.05`, calls it on `_w` and appends the resulting cvxpy expression. `_solve_cvxpy_opt_problem()` builds `cp.Problem(cp.Minimize(objective), constraints)`, solves it, and raises `OptimizationError` unless the status is `optimal` or `optimal_inaccurate`.
 
@@ -142,7 +162,7 @@ $$
 
 With `compounding=False` it returns the arithmetic mean times 252 instead. `ema_historical_return` weights recent returns more (default span 500 days), and `capm_return` computes $$r_f + \beta_i (E[R_m] - r_f)$$, using the equal-weighted average of the input assets as the market when no index is given.
 
-Historical means are the weakest input of the whole chain. On the sample data, BABA has 896 prices, about 3.6 years of returns, and an annual volatility of 31.8 %. The standard error of its annualised mean is then about $$0.318 / \sqrt{3.55} \approx 16.9$$ percentage points, so the data cannot tell a 10 % stock from a 40 % one. The optimiser treats the point estimate as exact and puts the largest weights on the assets whose estimates are highest, which are often those whose estimation error is largest.
+Historical means are the weakest input of the whole chain. On the sample data, BABA has 896 prices, about 3.6 years of returns, and an annual volatility of 31.8 %. The standard error of its annualised mean is then about $$0.318 / \sqrt{3.55} \approx 16.9$$ percentage points, so an approximate 95 % interval spans about 34 points on either side of the estimate. The optimiser treats the point estimate as exact and puts the largest weights on the assets whose estimates are highest, which are often those whose estimation error is largest.
 
 ### Risk models and shrinkage
 
@@ -150,17 +170,17 @@ Historical means are the weakest input of the whole chain. On the sample data, B
 
 $$
 \begin{aligned}
-\hat\Sigma = \delta F + (1 - \delta) S, \quad 0 \leq \delta \leq 1
+\hat\Sigma = \lambda F + (1 - \lambda) S, \quad 0 \leq \lambda \leq 1
 \end{aligned}
 $$
 
-`ledoit_wolf()` estimates the optimal $$\delta$$. Its default target, `constant_variance`, is the identity matrix times the mean sample variance and is computed by scikit-learn; `single_factor` and `constant_correlation` are implemented in PyPortfolioOpt. `oracle_approximating()` is the OAS estimator of Chen et al. Every risk model passes its result through `fix_nonpositive_semidefinite`, which sets negative eigenvalues to zero (or adds to the diagonal) and warns when it had to.
+`ledoit_wolf()` estimates the optimal shrinkage intensity $$\lambda$$. The code stores it as `delta`, but this article keeps $$\delta$$ for risk aversion. Its default target, `constant_variance`, is the identity matrix times the mean sample variance and is computed by scikit-learn; `single_factor` and `constant_correlation` are implemented in PyPortfolioOpt. `oracle_approximating()` is the OAS estimator of Chen et al. Every risk model passes its result through `fix_nonpositive_semidefinite`, which sets negative eigenvalues to zero (or adds to the diagonal) and warns when it had to.
 
 `semicovariance` keeps only returns below a benchmark (default `0.000079`, about 2 % a year in daily terms), and `exp_cov` weights recent observations more.
 
 ### The efficient frontier and its objectives
 
-`EfficientFrontier(mu, S)` exposes five objectives, all with the weights summing to 1 unless `market_neutral=True` (sum 0, requires negative lower bounds):
+`EfficientFrontier(mu, S)` exposes five objectives. The weights sum to 1; `efficient_risk`, `efficient_return` and `max_quadratic_utility` also accept `market_neutral=True`, which makes them sum to 0 and requires negative lower bounds.
 
 - **`min_volatility()`** minimises $$w^{\top}\Sigma w$$; it ignores `mu`.
 - **`max_sharpe(risk_free_rate=0.0)`** maximises $$(w^{\top}\mu - r_f) / \sqrt{w^{\top}\Sigma w}$$ by the transformation above. The default $$r_f$$ is 0.0 in 1.6.0.
@@ -177,7 +197,7 @@ Constraints are added before solving:
 - **Bounds**: `weight_bounds=(0, 0.1)` for every asset, a list of pairs for per-asset bounds, `(-1, 1)` to allow shorting.
 - **Linear constraints**: `ef.add_constraint(lambda w: w[i] >= 0.05)`, or a score constraint such as `esg_scores @ w >= 0.5` from the documentation FAQ.
 - **Group limits**: `ef.add_sector_constraints(sector_map, sector_lower, sector_upper)` adds one sum constraint per sector.
-- **Extra objective terms**: `objective_functions.L2_reg` (adds $$\gamma \lVert w \rVert^2$$ and spreads the weights over more assets), `transaction_cost` (a proportional cost $$k \lVert w - w_{\text{prev}} \rVert_1$$), and the ex-ante or ex-post tracking error against a benchmark.
+- **Extra objective terms**: `objective_functions.L2_reg` adds $$\gamma \lVert w \rVert^2$$, which spreads the weights over more assets; `transaction_cost` adds a proportional cost $$k \lVert w - w_{\text{prev}} \rVert_1$$; two functions add the ex-ante or ex-post tracking error against a benchmark.
 
 Everything must be DCP-compliant. A cardinality limit ("at most 10 assets") is not convex; the FAQ shows how to write it with boolean variables, which requires a mixed-integer solver.
 
@@ -201,9 +221,9 @@ At the optimum, $$\alpha$$ is the value-at-risk and the objective is the CVaR, t
 1. Turn correlations into distances, $$d_{ij} = \sqrt{(1 - \rho_{ij}) / 2}$$.
 2. Cluster the assets with SciPy's hierarchical `linkage` (default method `single`).
 3. Order the assets by the leaves of the tree (quasi-diagonalisation).
-4. Bisect the ordered list recursively; at each split, give the two halves weights inversely proportional to their inverse-variance cluster variance.
+4. Bisect the ordered list recursively. At each split, each half receives a share of the weight inversely proportional to its variance, where a half's variance is that of its own inverse-variance portfolio.
 
-HRP never inverts the covariance matrix, which is why it stays stable when the matrix is close to singular. It gives every asset a non-zero weight.
+HRP never inverts the covariance matrix, so it still runs when the matrix is singular or close to it. It gives every asset a non-zero weight.
 
 ### Critical Line Algorithm
 
@@ -250,8 +270,8 @@ The sample is not a clean data set. Several tickers start trading late, so their
 |---|---|---|
 | BABA | 2014-09-19 | 87.4 % |
 | FB | 2012-05-18 | 79.2 % |
-| GM | (2010 relisting) | 73.9 % |
-| MA | (2006 listing) | 58.0 % |
+| GM | 2010-11-18 | 73.9 % |
+| MA | 2006-05-25 | 58.0 % |
 
 This matters below. Every figure in this section is in-sample: it describes how the optimiser fitted 1990 to 2018 for 20 stocks chosen in 2018, not what the portfolio would earn.
 
@@ -263,7 +283,7 @@ from pypfopt import EfficientFrontier, expected_returns, risk_models
 
 prices = pd.read_csv("stock_prices.csv", parse_dates=True, index_col="date")
 mu = expected_returns.mean_historical_return(prices)        # CAGR per asset
-S = risk_models.CovarianceShrinkage(prices).ledoit_wolf()  # delta = 0.0063 here
+S = risk_models.CovarianceShrinkage(prices).ledoit_wolf()  # shrinkage intensity (.delta) = 0.0063 here
 
 ef = EfficientFrontier(mu, S)
 ef.max_sharpe(risk_free_rate=0.02)
@@ -344,14 +364,16 @@ On a budget of 10,000 US dollars, the integer program buys six lines for 9,946.5
 
 ### The Ledoit-Wolf matrix fills missing returns with zeros
 
-`CovarianceShrinkage.ledoit_wolf()` with its default target passes `np.nan_to_num(self.X.values)` to scikit-learn. Every missing return becomes a return of 0. A stock that is NaN on 87.4 % of the rows is then treated as flat for 26 years, and its variance shrinks by roughly the share of real observations. `sample_cov` does not have this problem, because pandas computes covariances pairwise over the available rows.
+`CovarianceShrinkage.ledoit_wolf()` with its default target passes `np.nan_to_num(self.X.values)` to scikit-learn. Every missing return becomes a return of 0. A stock that is NaN on 87.4 % of the rows is then treated as flat for almost 25 years, and its variance shrinks by roughly the share of real observations. `sample_cov` does not have this problem, because pandas computes covariances pairwise over the available rows.
 
 | Volatility | `sample_cov` | `ledoit_wolf()` | $$\sigma_{\text{sample}} \sqrt{1 - \text{NaN share}}$$ |
 |---|---|---|---|
 | BABA | 31.8 % | 11.6 % | 11.3 % |
 | FB | 37.0 % | 17.1 % | 16.9 % |
 
-The last column is a back-of-envelope check: scaling the sample volatility by the square root of the observed share reproduces the Ledoit-Wolf value to within a few tenths of a point (the remainder is the shrinkage itself). The maximum-Sharpe portfolio puts 39.7 % in BABA and 28.5 % in FB because they look like low-risk, high-return assets, and its 10.3 % volatility is an artefact of the zero-filling. With `sample_cov` the same code gives 29.9 % return, 21.8 % volatility and a Sharpe ratio of 1.38, the figures printed in the project README.
+The last column is a back-of-envelope check: scaling the sample volatility by the square root of the observed share reproduces the Ledoit-Wolf value to within a few tenths of a point, and the remainder is the shrinkage itself.
+
+The maximum-Sharpe portfolio puts 39.7 % in BABA and 28.5 % in FB because they look like low-risk, high-return assets, and its 10.3 % volatility is an artefact of the zero-filling. With `sample_cov` the same code gives 29.9 % return, 21.8 % volatility and a Sharpe ratio of 1.38, the figures printed in the project README.
 
 The fix is to trim the data to a window in which every column has prices, or to drop the late listings, before estimating anything.
 
@@ -361,7 +383,7 @@ Restricting the data to the 896 days from BABA's listing on 2014-09-19, where ev
 
 ### One out-of-sample split
 
-To see how in-sample figures compare with later returns, the optimisers were fitted on 2014-09-19 to 2016-12-30 (576 days) and the resulting weights were held from 2017-01-03 to 2018-04-11 (320 days, about 1.3 years):
+To see how in-sample figures compare with later returns, the optimisers were fitted on the 576 days from 2014-09-19 to 2016-12-30, and the resulting weights were held over the next 320 days, from 2017-01-03 to 2018-04-11:
 
 | Portfolio | Ex-ante return / volatility | Realised return / volatility |
 |---|---|---|
@@ -370,18 +392,20 @@ To see how in-sample figures compare with later returns, the optimisers were fit
 | HRP | 8.8 % / 13.6 % | 8.3 % / 12.0 % |
 | Equal weight | 9.4 % / 16.4 % | 8.6 % / 14.5 % |
 
-This is one split of 15 months in a rising market, so it supports no ranking of the methods. It shows two things that hold more generally: the ex-ante return of the maximum-Sharpe portfolio overstated the realised one (by 6.6 points here), and the volatility forecasts were closer to the outcome than the return forecasts. The universe itself carries survivor bias: the 20 tickers were chosen in 2018, when all of them still traded, so any backtest on this file starts from companies that are known to have survived. Monte Carlo resampling of the inputs, as in [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/), is a better way to see how much the weights move with estimation error.
+This is one split of 15 months in a rising market, so it supports no ranking of the methods. For the two optimised portfolios, the return forecast missed by more than the volatility forecast: 6.6 against 4.2 points for maximum Sharpe, 5.4 against 1.2 points for minimum volatility. That fits the usual observation that means are harder to estimate than variances, but one split does not establish it.
+
+The universe itself carries survivor bias: the 20 tickers were chosen in 2018, when all of them still traded, so any backtest on this file starts from companies that are known to have survived. Monte Carlo resampling of the inputs, as in [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/), is a better way to see how much the weights move with estimation error.
 
 ## Pitfalls found in the code
 
-Five behaviours in 1.6.0 change a result without an exception. Each was reproduced in the verification scripts.
+Five behaviours in 1.6.0 can surprise a caller. Four of them change a result without an exception, and the fifth breaks HRP on a current SciPy. Each was reproduced in the verification scripts.
 
-- **The risk-free rate defaults to 0.0.** `max_sharpe()` and `portfolio_performance()` both default to `risk_free_rate=0.0`, where older tutorials used 0.02. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone `portfolio_performance(weights, mu, S)` has no such memory and returns 2.61 for the same weights. Pass the rate explicitly everywhere.
+- **The risk-free rate defaults to 0.0.** `max_sharpe()` and `portfolio_performance()` both default to `risk_free_rate=0.0`. The default was 0.02 until commit `388acf6` of 2024-12-01 ([issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594)), so older tutorials and results assume 2 %. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone `portfolio_performance(weights, mu, S)` has no such memory and returns 2.61 for the same weights. Pass the rate explicitly everywhere.
 - **Missing prices become zero returns in Ledoit-Wolf.** Shown above. `mean_historical_return` uses each asset's own observations, so the means and the shrunk covariance of the same DataFrame cover different periods.
 - **`lp_portfolio()` reads prices by position.** It builds the price vector as `self.latest_prices.values` and the weight vector from the order of the weights dictionary, and pairs them by index. Two ways to break the pairing were reproduced:
   - `greedy_portfolio()` sorts `self.weights` in place (`discrete_allocation.py:177`), so `lp_portfolio()` on the same object afterwards spends 30,743.14 on a 10,000 budget while reporting 9.65 left over.
   - `HRPOpt.optimize()` returns its weights sorted by ticker, while `get_latest_prices()` keeps the column order. Passing that dictionary to `lp_portfolio()` spends 46,218.69 on the same budget. `hrp.clean_weights()`, which keeps the column order, gives 9,997.63. `greedy_portfolio()` looks prices up by ticker and is not affected.
-- **HRP fails on SciPy 1.18.** `HRPOpt.optimize()` checks the linkage method against `scipy.cluster.hierarchy._LINKAGE_METHODS` (`hierarchical_portfolio.py:179`), a private name. `pyproject.toml` requires only `scipy>=1.3.0`, so a fresh install picks up 1.18, where the attribute is gone and `optimize()` raises `AttributeError`. Pinning `scipy<1.18` avoids it until the library changes.
+- **HRP fails on SciPy 1.18.** `HRPOpt.optimize()` checks the linkage method against `scipy.cluster.hierarchy._LINKAGE_METHODS` (`hierarchical_portfolio.py:179`), a private name. `pyproject.toml` requires only `scipy>=1.3.0`, so a fresh install picks up 1.18, where the attribute is gone: with SciPy 1.18.1, `optimize()` raises `AttributeError: module 'scipy.cluster.hierarchy' has no attribute '_LINKAGE_METHODS'`. Pinning `scipy<1.18` avoids it until the library changes.
 - **Performance figures are not always comparable.** `HRPOpt.portfolio_performance()` uses arithmetic means and the sample covariance, `EfficientCVaR.portfolio_performance()` returns a daily CVaR next to an annual return, and `CLA.max_sharpe()` ignores the risk-free rate. Compare portfolios with one function and one set of inputs, for example the standalone `portfolio_performance(weights, mu, S, risk_free_rate=...)`.
 
 Two smaller ones: `efficient_return(1)` raises `ValueError` because the target must be a `float`, and adding `L2_reg` before `max_sharpe` triggers the warning about unscaled objectives.
@@ -390,19 +414,21 @@ Two smaller ones: `efficient_return(1)` raises `ValueError` because the target m
 
 The library is a candidate dependency of anything that manages money, so the package was reviewed before it was run. The review covered the `pypfopt/` package and the packaging at commit `a6638d2`, read-only, on 2026-11-18; key claims were re-checked with `grep` for this article.
 
-- **Imports.** The package imports numpy, pandas, scipy, cvxpy, scikit-learn, scikit-base and standard-library modules (`collections`, `copy`, `json`, `warnings`, `typing`, `sys`). matplotlib and plotly are imported only inside `plotting.py`, and only if present.
+- **Imports.** The package imports numpy, pandas, scipy, cvxpy, scikit-learn, scikit-base and standard-library modules (`collections`, `copy`, `json`, `warnings`, `typing`, `sys`). matplotlib and plotly are imported inside helper functions of `plotting.py`, only when a plot is requested.
 - **No network, no dynamic code.** No `eval`, `exec`, `pickle`, `subprocess`, `os.system`, socket or HTTP call, `base64` or environment-variable read appears in `pypfopt/`. The only `open()` calls are the two in `save_weights_to_file()`, which write to a file name the caller chooses.
 - **Packaging.** `pyproject.toml` uses the plain `setuptools.build_meta` backend, there is no `setup.py`, no install hook and no console entry point. The runtime dependencies are the six well-known packages listed above.
 - **No binaries.** The repository holds Python, reStructuredText, Markdown, CSV, YAML, notebooks and PNG images.
 - **Outside the package.** The `Makefile` installs the `uv` tool with `curl -LsSf https://astral.sh/uv/install.sh | ... sh`, and the `cookbook/` notebooks run `pip install`, clone repositories and download prices from Yahoo Finance. None of this runs on `pip install`, but running `make install` or the notebooks executes code from the network.
 
-The verdict is that the package at this commit is safe to use. What it does not cover: the wheels published on PyPI were not compared with the source, the dependencies (cvxpy and its native solvers, scikit-learn) were not reviewed, and a later commit needs its own review. Installing from a reviewed source tree and pinning dependency versions closes the first and last gaps.
+The verdict is that the package at this commit is safe to use. What it does not cover: the wheels published on PyPI were not compared with the source, the dependencies (cvxpy and its native solvers, scikit-learn) were not reviewed, and a later commit needs its own review. Installing from the reviewed source tree at the pinned commit closes the first and the last of these gaps; pinning dependency versions limits the second without closing it.
 
 The larger risk is not malicious code but silent numerical error. The pitfalls above produce plausible weights and a plausible spend with no exception, which is the failure mode that reaches an order ticket. A check that the share counts times the prices stay within the budget, and that inputs have no NaN-heavy columns, catches the cases found here.
 
 ## Where it fits
 
-PyPortfolioOpt starts after the research question is settled: it takes return and risk estimates for a fixed list of assets and returns weights. Producing the estimates (signals, factor models, backtests) is the job of a research platform such as Microsoft's qlib, covered in [QLIB_TITLE]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/). Pricing an individual instrument, a bond or an option, is the job of a pricing library such as QuantLib, covered in [QUANTLIB_TITLE]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/). Regulated portfolios add hard limits of their own, as in [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/); in PyPortfolioOpt such limits become bounds and `add_constraint` calls.
+PyPortfolioOpt starts after the research question is settled: it takes return and risk estimates for a fixed list of assets and returns weights. Producing the estimates, from signals, factor models and backtests, is the job of a research platform such as Microsoft's qlib, covered in [Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/).
+
+Pricing an individual instrument, a bond or an option, is the job of a pricing library such as QuantLib, covered in [QuantLib - Architecture of the Open-Source Quantitative Finance Library, with Python and C++ Examples]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/). Regulated portfolios add hard limits of their own, as in [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/); in PyPortfolioOpt such limits become bounds and `add_constraint` calls.
 
 ## Conclusion
 
@@ -412,7 +438,7 @@ PyPortfolioOpt turns a DataFrame of prices into weights through four separable s
 - **Estimators.** Expected returns come from historical CAGR, an exponential average or CAPM; covariances from the sample matrix, shrinkage or downside measures. Black-Litterman blends a market prior with views, and for one absolute view the Idzorek confidence is the fraction of the gap the posterior closes.
 - **Results.** On the sample data the cvxpy and CLA solvers agree, and the constraint API works as documented. The headline figures (26.9 % return, 10.3 % volatility, Sharpe 2.41) are in-sample and depend on the Ledoit-Wolf matrix treating missing prices as zero returns; the common-window run and the README's sample-covariance run give very different portfolios.
 - **Pitfalls.** The default risk-free rate is 0.0, `lp_portfolio()` pairs weights and prices by position, HRP depends on a private SciPy name, and the performance functions of different optimisers use different estimators.
-- **Security.** The package has no network access, no dynamic code execution and no install hooks; the `Makefile` and notebooks do fetch code and data and should not be run blindly.
+- **Security.** The package has no network access, no dynamic code execution and no install hooks. The `Makefile` pipes an installer from the network into a shell and the notebooks download packages and prices; both are outside the reviewed package.
 
 The library computes what it is asked to compute. The work left to the user is the input data and the check that the output respects the budget.
 
@@ -434,7 +460,7 @@ The library computes what it is asked to compute. The work left to the user is t
 | **Quadratic utility** | The objective $$w^{\top}\mu - \frac{\delta}{2} w^{\top}\Sigma w$$, where $$\delta$$ is the risk aversion. |
 | **DCP** | Disciplined convex programming, the rule set cvxpy uses to accept only problems it can prove convex. |
 | **Shrinkage** | Replacing the sample covariance by a weighted average with a structured target to reduce estimation error. |
-| **Ledoit-Wolf** | A method that estimates the optimal shrinkage weight $$\delta$$ from the data. |
+| **Ledoit-Wolf** | A method that estimates the optimal shrinkage weight $$\lambda$$ from the data. |
 | **Semivariance** | The variance of returns below a benchmark, a measure of downside risk only. |
 | **CVaR** | Conditional value-at-risk, the mean loss on the worst $$1-\beta$$ share of days; minimised as a linear program. |
 | **CDaR** | Conditional drawdown-at-risk, the same construction applied to drawdowns instead of daily losses. |
@@ -464,7 +490,14 @@ The library computes what it is asked to compute. The work left to the user is t
 
 **Q: What are the four building blocks of PyPortfolioOpt, and which module holds each?**
 
-Expected returns (`expected_returns.py`), risk models (`risk_models.py`), objective functions (`objective_functions.py`) and optimisers (`efficient_frontier/`, `hierarchical_portfolio.py`, `cla.py`, `black_litterman.py`). Post-processing into share counts is in `discrete_allocation.py`. Each block can be replaced by the user's own estimate.
+The four blocks and their modules:
+
+- **Expected returns**: `expected_returns.py`.
+- **Risk models**: `risk_models.py`.
+- **Objective functions**: `objective_functions.py`.
+- **Optimisers**: `efficient_frontier/`, `hierarchical_portfolio.py`, `cla.py` and `black_litterman.py`.
+
+Post-processing into share counts is in `discrete_allocation.py`. Each block can be replaced by the user's own estimate.
 
 **Q: Why do HRPOpt and CLA inherit from BaseOptimizer but not from BaseConvexOptimizer?**
 
@@ -489,7 +522,9 @@ For one absolute view, the posterior return is $$\Pi_i + c\,(Q_i - \Pi_i)$$: at 
 
 **Q: A script calls greedy_portfolio() and then lp_portfolio() on the same DiscreteAllocation object to compare them. What goes wrong, and what is the general rule?**
 
-`greedy_portfolio()` sorts the stored weights by size, in place. `lp_portfolio()` then pairs the sorted weights with the prices in their original order, so each asset is bought at another asset's price; on the sample it spent 30,743.14 of a 10,000 budget while reporting money left over. The general rule is that `lp_portfolio()` needs the weights in the same order as the price series, which is also why the sorted dictionary returned by `HRPOpt.optimize()` breaks it. Use one new object per method and check the spend against the budget.
+`greedy_portfolio()` sorts the stored weights by size, in place. `lp_portfolio()` then pairs the sorted weights with the prices in their original order, so each asset is bought at another asset's price. On the sample it spent 30,743.14 of a 10,000 budget while reporting money left over.
+
+The general rule is that `lp_portfolio()` needs the weights in the same order as the price series, which is also why the sorted dictionary returned by `HRPOpt.optimize()` breaks it. Use one new object per method and check the spend against the budget.
 
 **Q: What did the security review cover, and what remains outside it?**
 
@@ -501,19 +536,20 @@ These points were not settled by the source and the runs; check them before rely
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The SciPy 1.18 failure of `HRPOpt.optimize()` was reproduced when the local tooling was built, not re-run for this article, whose container has SciPy 1.17.1. | The pitfall is stated from that earlier test and from the code at `hierarchical_portfolio.py:179`. | [SciPy release notes](https://docs.scipy.org/doc/scipy/release.html) for 1.18 and a run of `HRPOpt.optimize()` with SciPy 1.18. |
 | Whether the NaN zero-filling in `ledoit_wolf()` and the positional pairing in `lp_portfolio()` are already reported upstream was not checked. | Others may meet them silently, and a fix may already exist after `a6638d2`. | [PyPortfolioOpt issues](https://github.com/pyportfolio/pyportfolioopt/issues) and the commits after the pinned one. |
-| The Black-Litterman example uses equal market caps and $$\delta = 2.5$$, not real data. | Real priors depend on capitalisations and on the index used for $$\delta$$. | `cookbook/4-Black-Litterman-Allocation.ipynb` in the repository. |
-| `bl_weights()` falls back on `np.linalg.lstsq(self._A, b)` when the matrix is singular, where `self._A` is the $$K \times K$$ view matrix, not the $$n \times n$$ matrix being solved. | A singular case would likely raise a shape error instead of returning weights; this is a reading of the code, not a run. | `black_litterman.py`, method `bl_weights`, at the pinned commit. |
+| The Black-Litterman example uses equal market caps and $$\delta = 2.5$$, not real data. | Real priors depend on capitalisations and on the index used for $$\delta$$. | [`cookbook/4-Black-Litterman-Allocation.ipynb`](https://github.com/PyPortfolio/PyPortfolioOpt/blob/a6638d2e06dae6f444fd022cfd4b3c528902a85b/cookbook/4-Black-Litterman-Allocation.ipynb) at the pinned commit. |
+| `bl_weights()` falls back on `np.linalg.lstsq(self._A, b)` when the matrix is singular, where `self._A` is the $$K \times K$$ view matrix, not the $$n \times n$$ matrix being solved. | A singular case would likely raise a shape error instead of returning weights; this is a reading of the code, not a run. | [`pypfopt/black_litterman.py`](https://github.com/PyPortfolio/PyPortfolioOpt/blob/a6638d2e06dae6f444fd022cfd4b3c528902a85b/pypfopt/black_litterman.py), method `bl_weights`. |
 | The equivalence between quadratic utility and mean-variance for exponential utility with normal returns is stated from general knowledge. | It justifies the reading of `max_quadratic_utility` as utility maximisation. | A portfolio-theory textbook chapter on mean-variance and expected utility. |
 | The PyPI wheels and the dependencies were not part of the security review. | A different artifact or a compromised dependency is outside the verdict. | [PyPortfolioOpt on PyPI](https://pypi.org/project/pyportfolioopt/) file hashes against a build of the pinned source. |
+| Which PyPI release first shipped the 0.0 risk-free-rate default (commit `388acf6`, 2024-12-01) was not checked; the local clone has only the v1.4.1 and v1.6.0 tags. | A reader comparing with a 1.5.x result needs to know which default it used. | The [PyPortfolioOpt releases](https://github.com/PyPortfolio/PyPortfolioOpt/releases) page and [issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594). |
+| That means are harder to estimate than variances, and that mean-variance optimisers overweight the assets with the largest estimation errors, are stated from general knowledge. | The article uses both to read the out-of-sample table and the BABA weight. | Literature on estimation error in mean-variance optimisation, for example the shrinkage papers in the References and their citations. |
 | The out-of-sample table is one split of 15 months. | It cannot rank methods; a rolling or resampled test would be needed. | A walk-forward test over several windows, or Monte Carlo resampling of `mu` and `S`. |
 
 ## References
 
 ### Analyzed source
 
-- [PyPortfolio/PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) (formerly `robertmartin8/PyPortfolioOpt`) — analyzed at commit [`a6638d2e06dae6f444fd022cfd4b3c528902a85b`](https://github.com/PyPortfolio/PyPortfolioOpt/tree/a6638d2e06dae6f444fd022cfd4b3c528902a85b), eight commits after [v1.6.0](https://github.com/PyPortfolio/PyPortfolioOpt/releases), 2026-11-18
+- [PyPortfolio/PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) (formerly `robertmartin8/PyPortfolioOpt`) — analyzed at commit [`a6638d2e06dae6f444fd022cfd4b3c528902a85b`](https://github.com/PyPortfolio/PyPortfolioOpt/tree/a6638d2e06dae6f444fd022cfd4b3c528902a85b), eight commits after release [v1.6.0](https://github.com/PyPortfolio/PyPortfolioOpt/releases/tag/v1.6.0), 2026-11-18
 - [Verification scripts and outputs for this article](https://github.com/rya-sge/access-denied/tree/main/verification/pyportfolioopt-portfolio-optimization)
 - [PyPortfolioOpt documentation](https://pyportfolioopt.readthedocs.io/en/latest/)
 - Martin, R. A. (2021), [PyPortfolioOpt: portfolio optimization in Python](https://doi.org/10.21105/joss.03066), Journal of Open Source Software 6(61), 3066
@@ -521,25 +557,26 @@ These points were not settled by the source and the runs; check them before rely
 ### Papers
 
 - Markowitz, H. (1952), [Portfolio Selection](https://doi.org/10.1111/j.1540-6261.1952.tb01525.x), The Journal of Finance 7(1)
+- Black, F. and Litterman, R. (1991), Combining investor views with market equilibrium, The Journal of Fixed Income. Cited by the library's `docs/BlackLitterman.rst`
 - Ledoit, O. and Wolf, M. (2004), [Honey, I Shrunk the Sample Covariance Matrix](https://doi.org/10.3905/jpm.2004.110), The Journal of Portfolio Management 30(4)
 - Chen, Y. et al. (2010), [Shrinkage Algorithms for MMSE Covariance Estimation](https://arxiv.org/pdf/0907.4698.pdf), IEEE Transactions on Signal Processing 58(10)
 - López de Prado, M. (2016), [Building Diversified Portfolios that Outperform Out of Sample](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678), The Journal of Portfolio Management 42(4)
 - Bailey, D. and López de Prado, M. (2013), [An Open-Source Implementation of the Critical-Line Algorithm for Portfolio Optimization](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2197616)
-- Rockafellar, R. T. and Uryasev, S. (2000), [Optimization of conditional value-at-risk](https://www.ise.ufl.edu/uryasev/files/2011/11/CVaR1_JOR.pdf), Journal of Risk 2(3)
+- Rockafellar, R. T. and Uryasev, S. (2000), *Optimization of conditional value-at-risk*, Journal of Risk 2(3); the PDF link in the library documentation returned 404 on 2026-11-18
 - Idzorek, T. (2005), [A step-by-step guide to the Black-Litterman model](https://faculty.fuqua.duke.edu/~charvey/Teaching/BA453_2006/Idzorek_onBL.pdf)
-- Cornuéjols, G. and Tütüncü, R. (2006), [Optimization Methods in Finance](http://web.math.ku.dk/~rolf/CT_FinOpt.pdf), lecture notes cited by `max_sharpe`
+- Cornuéjols, G. and Tütüncü, R. (2006), *Optimization Methods in Finance*, cited in the `max_sharpe` docstring; the docstring's PDF link did not respond on 2026-11-18
 
-### Tools
+### Related articles
+
+- [QuantLib - Architecture of the Open-Source Quantitative Finance Library, with Python and C++ Examples]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/)
+- [Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)
+- [Sampling and Standard Error - Estimating a Population Mean from One Random Sample]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/)
+- [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)
+- [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/)
+
+### Tooling
 
 - [cvxpy](https://www.cvxpy.org/)
 - [scikit-learn covariance estimators](https://scikit-learn.org/stable/modules/covariance.html)
 - [SciPy hierarchical clustering, `linkage`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html)
 - [Claude Code](https://claude.com/product/claude-code)
-
-### Related articles
-
-- [QUANTLIB_TITLE]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/)
-- [QLIB_TITLE]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)
-- [Sampling and Standard Error - Estimating a Population Mean from One Random Sample]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/)
-- [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)
-- [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/)

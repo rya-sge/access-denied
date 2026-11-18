@@ -9,6 +9,8 @@ Scripts that produce every number quoted in
 |---|---|
 | `optimise.py` | data shape and NaN shares; Ledoit-Wolf shrinkage constant; BABA and FB volatility under `sample_cov` and under `CovarianceShrinkage.ledoit_wolf()` (zero-filled NaNs); max Sharpe (rf 2 % and 0 %), min volatility, `efficient_risk(0.20)`, `efficient_return(0.20)`; sector, bound and L2 constraints; `InstantiationError` on a reused object; the README `sample_cov` result (29.9 % / 21.8 % / 1.38); the common-window result; CLA; HRP (own estimators and under mu/LW); the order of the dict returned by `HRPOpt.optimize()`; min CVaR; the Black-Litterman single-view example (equal market caps, illustrative only). |
 | `allocation.py` | greedy and LP allocations on fresh objects; greedy then LP on the same object (overspend); HRP `optimize()` dict passed to `lp_portfolio()` (overspend); one train/test split (fit 2014-09-19..2016-12-30, measure 2017-01-03..2018-04-11). |
+| `black_litterman_prior.py` | "What you need to know first": the Black-Litterman posterior formula reproduces `bl_returns()` (toy 3-asset example, one view), and with no views an unconstrained optimiser at the same risk aversion returns the market weights 0.5 / 0.3 / 0.2. |
+| `hrp_scipy118.py` | `HRPOpt.optimize()` raises `AttributeError` on SciPy 1.18.1 (`_LINKAGE_METHODS` removed). Needs network once for `pip install`. |
 | `dump_for_check.py` | writes `w.json`, `alloc.json` and `alloc_bad.json` for the PyPortfolioOpt skill's `check_portfolio.py`. |
 
 `optimise.out.txt` and `allocation.out.txt` are the outputs of the run used for the article
@@ -31,6 +33,7 @@ cp <PyPortfolioOpt>/tests/resources/stock_prices.csv .
 pip install "pyportfolioopt==1.6.0" "scipy<1.18"   # or install the pinned commit from source
 python3 optimise.py
 python3 allocation.py
+python3 black_litterman_prior.py
 ```
 
 Numbers are in-sample estimates on historical data. They are not forecasts and not investment advice.

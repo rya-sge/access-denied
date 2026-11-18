@@ -55,7 +55,7 @@ The work itself runs on **nodes**:
 - **The built-in node** is a node inside the controller process itself. It was called the "master node" before Jenkins 2.307 and 2.319.1. A build that runs there has the same file-system access as the Jenkins process, including `JENKINS_HOME`.
 - **Clouds** are configurations that create agents on demand, such as the Kubernetes, Amazon EC2 or Azure VM Agents plugins, and remove them when idle.
 
-Each node has a number of **executors**, slots that each run one task at a time. The executor count is the node's concurrency: four executors means four builds can run there at once. The documentation's sizing advice is that one executor per node is the safest configuration, and one per CPU core can work if the tasks are small. The built-in node should have **zero** executors: the controller then only serves HTTP, holds state and schedules, and no build can touch the controller's files.
+Each node has a number of **executors**, slots that each run one task at a time. The executor count is the node's concurrency: four executors means four builds can run there at once. The documentation's sizing advice is that one executor per node is the safest configuration, and one per CPU core can work if the tasks are small. The built-in node should have **zero** executors: the controller then only serves HTTP, holds state and schedules, and no build process runs with the controller's file-system access. The agent-to-controller channel and the Pipeline Groovy that runs in the controller remain boundaries, covered in the security article.
 
 Nodes carry **labels**, free-text tags such as `linux`, `docker` or `arm64`. A job restricts where it runs with a label expression, and a node can be set either to take any job or only jobs whose label expression matches it. When no free executor matches, tasks wait in the queue, a situation the documentation calls executor starvation.
 
@@ -94,11 +94,11 @@ What differs between setups is who opens the connection. The documentation's sec
 | SSH launcher | Controller connects to the agent host | SSH, using Jenkins' built-in SSH client; the controller's public key is in the agent's `authorized_keys` | Static Linux or Windows agents the controller can reach; the scaling guide calls it "the preferred and the most stable way" |
 | Inbound agent, TCP | Agent connects to the controller | Dedicated TCP port, protocol `JNLP4-connect`; `jenkins.model.Jenkins.slaveAgentPort` is `-1` (disabled) by default since Jenkins 2.0 | Agents behind NAT or a firewall, older setups |
 | Inbound agent, WebSocket | Agent connects to the controller | The controller's normal HTTP(S) port, since Jenkins 2.217; only implemented on the Jetty container | Containers and cloud agents; no extra port to open |
-| Cloud plugin | Plugin creates the machine, which then connects inbound | Usually WebSocket or TCP | Kubernetes pods, EC2 or Azure VMs created per build |
+| Cloud plugin | Plugin creates the machine; a pod connects inbound, while many VM clouds are reached by the controller over SSH | WebSocket or TCP for pods; SSH for VMs such as Azure VM Agents | Kubernetes pods, EC2 or Azure VMs created per build |
 
 An inbound agent is started with `java -jar agent.jar` and the controller URL, a per-agent secret and its name; the JAR can be downloaded from the controller at `/jnlpJars/agent.jar`. The old name "JNLP agent" comes from Java Web Start, which the inbound mechanism originally used; parts of the scaling guide still use that wording, and its own comments mark it as outdated.
 
-Cloud provisioning has two timing properties worth knowing when agents seem slow to appear. `hudson.slaves.NodeProvisioner.initialDelay` waits about 100 seconds after startup before provisioning from clouds, so that static agents can connect and take the load first, and the provisioner then re-evaluates demand periodically.
+One timing property is worth knowing when cloud agents seem slow to appear: `hudson.slaves.NodeProvisioner.initialDelay` waits about 100 seconds after startup before provisioning from clouds, so that static agents can connect and take the load first, and the provisioner then re-evaluates demand periodically.
 
 The Remoting channel is also a security boundary: an agent can send requests back to the controller, and Jenkins filters them. That filtering is a subject of the [security article]({{site.url_complet}}/2026/11/17/jenkins-security/).
 
@@ -138,7 +138,7 @@ The steps in prose:
 4. **Provisioning.** If nothing matches, the `NodeProvisioner` asks the configured clouds for a new node with that label.
 5. **Execution and release.** The executor runs the task, then becomes free again; a cloud agent that stays idle is removed.
 
-For a Pipeline, step 3 happens inside the run. The Pipeline documentation says a `node` block "schedules the steps contained within it to run by adding an item to the Jenkins queue. As soon as an executor is free on a node, the steps will run", and it allocates a workspace there. A Pipeline with three `node` blocks therefore enters the queue three times.
+For a Pipeline, step 3 happens inside the run. The Pipeline documentation says a `node` block "schedules the steps contained within it to run by adding an item to the Jenkins queue. As soon as an executor is free on a node, the steps will run", and it allocates a workspace there. A Pipeline with three `node` blocks therefore enters the queue once when it is triggered, then once more for each of the three blocks.
 
 The queue survives a restart. Its content is written to disk when it changes, with a maximum delay controlled by `hudson.model.Queue.Saver.DELAY_SECONDS` (60 seconds by default since Jenkins 2.109), a trade-off the documentation describes as queue consistency after a crash against I/O load.
 
@@ -215,10 +215,10 @@ JENKINS_HOME
  +- userContent/        files served under /userContent/
  +- fingerprints/       artifact fingerprint records
  +- plugins/            <name>.jpi plus the unpacked <name>/ directory
+ +- workspace/<ITEM_FULL_NAME>/  workspaces of builds on the built-in node (default since 2.119)
  +- jobs/
      +- <JOB>/
          +- config.xml  job configuration
-         +- workspace/  only for builds on the built-in node
          +- builds/<BUILD_ID>/  build.xml, log, changelog.xml, archived artifacts
      +- <FOLDER>/
          +- config.xml
@@ -289,7 +289,7 @@ node('linux') {
 
 ### Where the code runs
 
-The best-practices page states that "for a Pipeline, Groovy code *always* executes on controller", using controller memory and CPU. Only steps that start processes, such as `sh`, `bat` or `powershell`, run on the agent, inside the workspace that the enclosing `node` or `agent` block allocated.
+The best-practices page states that "for a Pipeline, Groovy code *always* executes on controller", using controller memory and CPU. Work on the workspace happens on the agent, in the workspace that the enclosing `node` or `agent` block allocated: process steps such as `sh`, `bat` or `powershell`, and file steps such as `writeFile` or `junit`.
 
 The consequence is a set of anti-patterns the documentation names: parsing a large JSON file with `JsonSlurper` and `readFile`, making HTTP calls with `httpRequest`, or looping over many small steps. Each of these loads the controller, so the advice is to do the work in a single `sh` step on the agent and send back only the result.
 
@@ -300,7 +300,7 @@ Pipeline scripts are not run by the normal Groovy runtime. The `workflow-cps` pl
 Resumability has a price:
 
 - Local variables must be serializable, because they are written to `program.dat`.
-- Methods annotated `@NonCPS` run as ordinary Groovy, which is faster and supports every language construct, but they cannot call Pipeline steps and cannot be paused.
+- Methods annotated `@NonCPS` run as ordinary Groovy, which is faster and supports every language construct, but they must not call Pipeline steps and cannot be paused. The documentation warns that a step called from such a method is unsafe and does not always raise an error.
 - Calling CPS-transformed code from non-CPS code fails in counterintuitive ways. Typical cases are a closure passed to `toSorted`, an overridden `toString`, a closure inside a GString and a constructor. The documentation lists these as "CPS method mismatches", and the runtime detects the most common one.
 
 Shell steps come from a separate plugin, Pipeline: Nodes and Processes (`workflow-durable-task-step`), which runs them as processes on the agent. Together with `program.dat`, this is what lets the Pipeline overview state that Pipelines "can survive both planned and unplanned restarts of the Jenkins controller".
@@ -329,7 +329,7 @@ Where the library is declared changes what it can do. A library configured under
 
 ### Multibranch Pipelines and organization folders
 
-A **Multibranch Pipeline** is a folder that Jenkins fills itself. Jenkins scans a repository, on a schedule or when a webhook arrives, and creates one child Pipeline job for each branch or pull request that contains a `Jenkinsfile`; it removes children when their branch disappears, according to an orphaned-item strategy. Each child gets `BRANCH_NAME` and `checkout scm` checks out the exact commit that triggered it. An **Organization Folder** goes one level up: it scans a whole GitHub organization or Bitbucket team and creates a multibranch project for every repository that has a `Jenkinsfile`.
+A **Multibranch Pipeline** is a folder that Jenkins fills itself. Jenkins scans a repository, on a schedule or when a webhook arrives, and creates one child Pipeline job for each branch or pull request that contains a `Jenkinsfile`; it removes children when their branch disappears, according to an orphaned-item strategy (see Gaps). Each child gets `BRANCH_NAME` and `checkout scm` checks out the exact commit that triggered it. An **Organization Folder** goes one level up: it scans a whole GitHub, GitLab or Gitea organization, or a Bitbucket team or project and creates a multibranch project for every repository that has a `Jenkinsfile`.
 
 ## CLI and REST API
 
@@ -343,16 +343,16 @@ The **Script Console** at `/script` runs arbitrary Groovy inside the controller 
 
 ## Configuration as Code
 
-The `configuration-as-code` plugin (JCasC) configures a controller from YAML instead of from the web UI. By default it reads `$JENKINS_HOME/jenkins.yaml`; the `CASC_JENKINS_CONFIG` environment variable can point to other files, directories or URLs, which are combined and must not overwrite each other's values (a conflict raises a `ConfiguratorException`). The file has four sections:
+The `configuration-as-code` plugin (JCasC) configures a controller from YAML instead of from the web UI. By default it reads `$JENKINS_HOME/jenkins.yaml`; the `CASC_JENKINS_CONFIG` environment variable can point to other files, directories or URLs, which are combined and must not overwrite each other's values (a conflict raises a `ConfiguratorException`). The default exported file has four sections:
 
 - **`jenkins`** for the root object: system settings, nodes and clouds.
 - **`tool`** for build tool installations.
 - **`unclassified`** for every other global and plugin configuration.
 - **`credentials`** for stored credentials.
 
-JCasC does not have its own model. It walks the same `Describable` classes and `@DataBoundSetter` properties the UI uses, which is why the plugin can export the current configuration as YAML from the UI. Changes can be applied without a restart with *Reload existing configuration*.
+JCasC does not have its own model. It walks the same `Describable` classes and `@DataBoundSetter` properties the UI uses (see Gaps), which is why the plugin can export the current configuration as YAML from the UI. Changes can be applied without a restart with *Reload existing configuration*.
 
-The documentation's rule is to configure a controller "either with CasC or with the UI, but not by both": the UI still allows editing values that came from YAML, but those edits are overwritten at the next restart. Jobs are usually created separately, for example with a Job DSL seed job. The older alternative to JCasC is Groovy hook scripts in `init.groovy.d/`, which run at the end of startup with few safety checks.
+The documentation's rule is to configure a controller "either with CasC or with the UI, but not by both": the UI still allows editing values that came from YAML, but those edits are overwritten at the next restart. Jobs are usually created separately, for example with a Job DSL seed job. The older alternative to JCasC is Groovy hook scripts in `init.groovy.d/`, which run at the end of startup with full access to Jenkins classes.
 
 ## Scaling
 
@@ -366,7 +366,7 @@ executors   = number of jobs * 0.03
 jobs        = number of developers * 3.333
 ```
 
-For 1,500 jobs this gives 3 controllers and 45 executors. The guide presents these as a starting point to adjust to the types of builds and tests an organization runs, not as measured capacity limits. When an organization needs several controllers, it suggests splitting them by product line rather than by environment or by team.
+For 1,500 jobs this gives 3 controllers and 45 executors. The guide presents these as a starting point to adjust to the types of builds and tests an organization runs, not as measured capacity limits. When an organization needs several controllers, it lists three ways to split them, by environment, by org chart or by product line, and asks readers to weigh their trade-offs.
 
 Other levers in the documentation:
 
@@ -379,7 +379,7 @@ Other levers in the documentation:
 
 The Jenkins infrastructure team publishes the configuration of its own controllers. Three repositories, read at the commits pinned in the references, show how the pieces above fit together in production. The figures below are those of 2026-11-17; the team's automation updates them weekly.
 
-**The controller image is core plus a pinned plugin list.** `jenkins-infra/docker-jenkins-lts` contains a four-instruction Dockerfile:
+**The controller image is core plus a pinned plugin list.** release.ci.jenkins.io runs the image built from `jenkins-infra/docker-jenkins-lts`, a four-instruction Dockerfile (infra.ci.jenkins.io runs a separate image, `jenkinsciinfra/jenkins-infraci`, on weekly core 2.591):
 
 ```dockerfile
 FROM jenkins/jenkins:2.580.2-jdk25
@@ -397,7 +397,7 @@ A `cst.yml` container-structure test checks that the image contains key plugins 
 
 **Controllers are Helm releases.** In `jenkins-infra/kubernetes-management`, each cluster has a helmfile (`clusters/<cluster>.yaml`). On the `privatek8s-sponsored` cluster, `infra-ci-jenkins-io` and `release-ci-jenkins-io` are releases of the official `jenkins/jenkins` chart, version 5.13.3, each in its own namespace and each with a persistent volume claim holding `JENKINS_HOME`. Their values files live under `config/privatek8s-sponsored/`.
 
-**Plugins come only from the image.** The values set `installPlugins: false`, so the chart installs nothing at startup, and `overwritePlugins: true`, which the file's own comment explains: it "deletes the content of `$JENKINS_HOME/plugins` on each pod restart to ensure only container image plugins are used". A plugin installed by hand from the UI disappears at the next restart, and upgrading a plugin means building and deploying a new image.
+**Plugins come only from the image.** The values set `installPlugins: false`, so the chart installs nothing at startup, and `overwritePlugins: true`, which the file's own comment explains: it deletes the content of `$JENKINS_HOME/plugins` on each pod restart, so only the plugins in the container image are used. A plugin installed by hand from the UI disappears at the next restart, and upgrading a plugin means building and deploying a new image.
 
 **Everything else is JCasC.** `controller.JCasC.defaultConfig: false` discards the chart's default YAML, and `configScripts` provides the configuration in named blocks:
 
@@ -407,9 +407,9 @@ A `cst.yml` container-structure test checks that the image contains key plugins 
 - the Jenkins URL and a separate resource root URL (`assets.<host>`) for serving build artifacts;
 - on infra.ci.jenkins.io, a global shared library named `pipeline-library`, loaded implicitly.
 
-**The network is split.** infra.ci.jenkins.io serves its UI on a private ingress, and a second ingress on a public host exposes only the `/github-webhook` path so GitHub can reach it. The values enable the chart's Kubernetes network policy and run the controller pod as a non-root user (UID 1000).
+**The network is split.** infra.ci.jenkins.io serves its UI on a private ingress, and a second ingress on a public host exposes only the `/github-webhook` path so GitHub can reach it. Its values enable the chart's Kubernetes network policy and run the controller pod as a non-root user (UID 1000); release.ci.jenkins.io disables the network policy, which its file explains by a lack of support on Windows nodes.
 
-Read against the architecture, the setup applies most of the documentation's advice at once: the built-in node runs nothing, agents are disposable pods, the plugin set is versioned and tested like code, and the controller's configuration can be rebuilt from Git plus the encrypted secrets. What remains on the persistent volume is mostly job and build history.
+Read against the architecture, the setup applies most of the documentation's advice at once: the built-in node runs nothing, agents are disposable pods or single-use Azure VMs, the plugin set is versioned and tested like code, and the controller's configuration can be rebuilt from Git plus the encrypted secrets. What remains on the persistent volume is mostly job and build history.
 
 ## Where security fits
 
@@ -430,8 +430,8 @@ Jenkins is a Java web application whose controller holds all state and schedules
 - **Queue.** Every build, and every `node` block of a Pipeline, enters the queue, waits out a quiet period, and is matched to a free executor or causes a cloud to provision one.
 - **Model and plugins.** A single `Jenkins` root object holds items, runs, actions and Describable/Descriptor pairs. Plugins add `@Extension` implementations found through a compile-time index, each with its own class loader.
 - **Storage and web.** `JENKINS_HOME` is a tree of XStream XML files with no database, and Stapler maps URLs onto the same object graph, which is also where `/api/json` comes from.
-- **Pipeline.** The Groovy script runs on the controller under a CPS interpreter that writes `program.dat` so it can resume after a restart; only process steps run on agents.
-- **Operations.** JCasC rebuilds global configuration from YAML; the Jenkins project's own controllers combine an image with pinned plugins, a Helm chart, JCasC and agent pods over WebSocket.
+- **Pipeline.** The Groovy script runs on the controller under a CPS interpreter that writes `program.dat` so it can resume after a restart; work in the workspace (processes and file steps) happens on agents.
+- **Operations.** JCasC rebuilds global configuration from YAML; the Jenkins project's own controllers combine an image with pinned plugins, a Helm chart, JCasC and ephemeral agents: pods over WebSocket, plus Azure VMs over SSH on infra.ci.
 
 ![Mindmap of how Jenkins works covering its purpose, nodes and executors, Remoting, the queue, the object model, plugins, JENKINS_HOME, Stapler, Pipeline and operations]({{site.url_complet}}/assets/article/devops/jenkins/2026-11-17-jenkins-architecture-mindmap.png)
 
@@ -470,10 +470,10 @@ Jenkins is a Java web application whose controller holds all state and schedules
 
 | Invariant | Enforced by | Breaks if |
 |-----------|-------------|-----------|
-| Pipeline Groovy code runs in the controller JVM; only process steps run on agents. | The workflow-cps interpreter, which executes the script on the controller and delegates `sh`/`bat` to the node of the enclosing block. | Never; heavy parsing in Groovy therefore always loads the controller. |
-| A build can only start on an executor of a node whose labels match the task's label expression. | The queue's scheduler and the NodeProvisioner. | No node or cloud offers the label, and the task waits indefinitely (executor starvation). |
+| Pipeline Groovy code runs in the controller JVM; workspace work (processes, file steps) runs on agents. | The workflow-cps interpreter, which executes the script on the controller and delegates `sh`/`bat` to the node of the enclosing block. | Never; heavy parsing in Groovy therefore always loads the controller. |
+| A freestyle build, or a `node` / `agent` block of a Pipeline, only gets an executor on a node whose labels match its label expression (the Pipeline run itself is not bound to a labelled executor). | The queue's scheduler and the NodeProvisioner. | No node or cloud offers the label, and the task waits indefinitely (executor starvation). |
 | Every persisted object is reachable under `JENKINS_HOME` in a path that mirrors the object model. | XStream persistence through `XmlFile`, one file per object. | A plugin stores data elsewhere (external storage plugins do so on purpose), or `buildsDir` moves build records. |
-| A running Pipeline can resume after a controller restart. | `program.dat` written by CPS, and shell steps run by the Pipeline: Nodes and Processes plugin on the agent. | The durability setting is `PERFORMANCE_OPTIMIZED` and the controller stops uncleanly. |
+| A running Pipeline can resume after a controller restart. | `program.dat` written by CPS, and shell steps run by the Pipeline: Nodes and Processes plugin on the agent. | The durability setting is `PERFORMANCE_OPTIMIZED` and the controller stops uncleanly; rarely, any mode other than maximum durability when the operating system fails before buffered writes reach disk. |
 | Each plugin sees core and its declared dependencies, not unrelated plugins. | The per-plugin class loader delegation. | Code uses `UberClassLoader` or the thread context loader to reach other plugins. |
 | Configuration set by JCasC is the configuration after a restart. | The plugin re-applying `jenkins.yaml` at startup. | Values are only edited in the UI, which are then lost at the next restart. |
 
@@ -506,7 +506,7 @@ Because Pipeline Groovy always executes on the controller, inside the CPS interp
 
 The workflow-cps plugin transforms the script into continuation-passing style, so its execution state is an object that it writes to `program.dat` in the build directory. Shell steps run as processes on the agent through the Pipeline: Nodes and Processes plugin. After the restart, the Pipeline is loaded from `program.dat` and continues.
 
-It may not resume if the durability setting is `PERFORMANCE_OPTIMIZED` and the controller stopped uncleanly (SIGKILL, out-of-memory killer), because state was not written at every step. A graceful shutdown persists state in every mode.
+It may not resume if the durability setting is `PERFORMANCE_OPTIMIZED` and the controller stopped uncleanly (SIGKILL, out-of-memory killer), because state was not written at every step. In every mode except maximum durability, an operating-system failure can also lose buffered writes and, in rare cases, leave a build that cannot be loaded. A graceful shutdown persists state in every mode.
 
 **Q: How does a request to `/job/foo/1/api/json` reach Java code?**
 
@@ -518,7 +518,7 @@ Each one closes a different way for the running controller to drift from its def
 
 - `installPlugins: false` stops the Helm chart from downloading plugins at startup, so the plugin set comes only from the image built from `plugins.txt`.
 - `overwritePlugins: true` deletes `JENKINS_HOME/plugins` at each pod restart, so a plugin added by hand from the UI does not survive.
-- `numExecutors: 0` removes the built-in node's executors, so every build runs in an agent pod rather than in the controller's process.
+- `numExecutors: 0` removes the built-in node's executors, so every build runs on an agent rather than in the controller's process: a pod, or on infra.ci a single-use Azure VM.
 
 Together with JCasC, the controller can be rebuilt from Git, the image and the encrypted secrets.
 
@@ -538,6 +538,7 @@ Several internals are not documented on jenkins.io, or only as stubs, and some f
 | The encrypted values (`secrets/`, sops), the `jenkins-infra/helm-charts` and `pipeline-library` repositories were not read. | Agent pod templates and shared-library code are part of the real setup. | [jenkins-infra/helm-charts](https://github.com/jenkins-infra/helm-charts) and [jenkins-infra/pipeline-library](https://github.com/jenkins-infra/pipeline-library). |
 | Version-dependent facts (WebSocket agents since 2.217, CLI WebSocket default since 2.391, built-in node rename in 2.307, image and plugin versions) were read on 2026-11-17. | They change with each release, and the infra repositories change weekly through updatecli. | `content/doc/book/managing/system-properties.adoc`, the changelogs in the jenkins.io repository, and the pinned commits below. |
 | The agent size quoted from the node documentation ("a small (170KB single jar)") may be out of date; it is a documentation figure, not a measurement. | The number gives a reader a sense of how light an agent is. | The size of `agent.jar` served at `/jnlpJars/agent.jar` by a current controller, and `content/doc/book/managing/nodes.adoc` in the jenkins.io repository. |
+| Four statements come from general knowledge, not from the local documentation: the remote API's `tree=` parameter, the multibranch orphaned-item strategy, JCasC binding through `@DataBoundSetter`, and Oracle's acquisition of Sun as the background of the Hudson dispute. | They are widely documented but were not checked against a source read for this article. | The `/api/` help page of a running controller, the Branch API plugin documentation, the `configuration-as-code` plugin's developer documentation, and the 2011 project blog posts. |
 | The scaling equations come from the scaling guide without the data they were derived from. | They are rules of thumb, not measured limits. | [Architecting for Scale](https://www.jenkins.io/doc/book/scaling/architecting-for-scale/) and a load test on the actual workload. |
 
 ## References

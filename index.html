@@ -11,6 +11,7 @@ layout: home
 {% endif %}
 
 {% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+{% if currentPage == 1 %}{% include author-card.html variant="intro" %}{% endif %}
 {% include header.html %}
 <div class="c-posts o-opacity" data-page="{{ currentPage }}" data-totalPages="{{ paginator.total_pages }}">
   {% for post in site.posts limit:site.paginate offset:offset %}

@@ -35,10 +35,11 @@ $reading-measure: 44rem;
 
   // An anchor jump from the TOC no longer puts the heading flush with the top
   // edge, and sections get a visible break before them.
+  // The top bar may be visible when the jump ends (it shows on scroll up).
   h2,
   h3,
   h4 {
-    scroll-margin-top: 20px;
+    scroll-margin-top: $topbar-height + 16px;
   }
 
   > h2 {
@@ -190,8 +191,8 @@ $reading-measure: 44rem;
 .c-toc-rail {
   display: none;
   position: fixed;
-  top: 40px;
-  max-height: calc(100vh - 80px);
+  top: $topbar-height + 16px;
+  max-height: calc(100vh - #{$topbar-height + 48px});
   overflow-y: auto;
   padding: 10px 0 10px 14px;
   border-left: 1px solid var(--border-strong);
@@ -201,6 +202,16 @@ $reading-measure: 44rem;
   &.is-visible {
     display: block;
   }
+}
+
+// While the rail shows the TOC, the inline copy in the article is not drawn a
+// second time. It stays in the HTML for crawlers, readers without JavaScript
+// and narrower screens.
+.has-toc-rail .c-wrap-content .c-toc {
+  display: none;
+}
+
+.c-toc-rail {
 
   ul {
     list-style: none;

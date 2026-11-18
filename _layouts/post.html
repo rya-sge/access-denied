@@ -4,11 +4,6 @@ layout: home
 {% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <article class="c-article">
     <div class="c-article__content">
-        <header class="c-header u-hide u-no-margin-top">
-            <div class="c-header__box">
-                {% include search-box.html class="u-full-width" %}
-            </div>
-        </header>
         {% if page.imagePost %}
         {% comment %}
           Dead code today: no post sets `imagePost`, so this hero never renders.
@@ -118,17 +113,12 @@ layout: home
         {% endif %}
         {{ post_body }}
         {% include series-next.html %}
+        {% include author-card.html %}
         <div class="c-article__footer u-clearfix">
-            <div>
-                {% if site.social-twitter %}
-                {{ t.contact_intro }}
-                <a href="https://twitter.com/intent/user?screen_name={{ site.social-twitter }}"
-                 rel="nofollow" target="_blank">
-                 <div data-icon='ei-sc-twitter' data-size='s'></div>
-                </a>
-                {% else %}
-                {% endif %}
-            </div>
+            {%- comment -%}
+              The "Feel free to contact me on Twitter" line that stood here is
+              covered by the author card above (social links and About page).
+            {%- endcomment -%}
             <div class="c-article__tag">
                 {% for tag in page.tags %}
                 <a href="{{site.baseurl}}/tags#{{tag}}">&#35; {{ tag }}</a>

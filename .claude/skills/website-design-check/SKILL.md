@@ -75,7 +75,17 @@ returns one object per width. It works when Chrome refuses `resize_window`, whic
 | `tablesScrolling` | `0` from 768px; on phones, only tables with 4 or more columns | report the count per width |
 | `codeBlocksScrolling` | any on phones; `0` from 1280px except deliberately long lines | code scrolls instead of wrapping, by design |
 | `imagesWiderThanCard` | `0` | |
-| `tocColumns` | `"2"` from 1100px, `"auto"` below | |
+| `tocColumns` | `"2"` from 1100px, `"auto"` below | the inline TOC; from 1280px it is hidden (`body.has-toc-rail`) because the sticky TOC shows in the right column |
+
+### Site frame (since 2026-11-18)
+
+The left sidebar was replaced by a sticky top bar (`_includes/topbar.html`, `_sass/5-components/_topbar.scss`). Check on each sampled page:
+
+- the bar spans the window and its inner row lines up with the main column (both 1200px max);
+- below 900px: name, theme switch and menu button only; the menu opens and closes (`aria-expanded`), Escape closes it;
+- the bar hides on scroll down and returns on scroll up. Test with real wheel scrolling (`computer` → `scroll`) on the page itself: inside an iframe Chrome throttles scroll events and the check gives false failures;
+- from 1280px on articles, `body` has `has-toc-rail` and the TOC sits right of a 900px card;
+- exactly one `#js-search-input` per page, and a search returns results.
 
 ### What to look at
 

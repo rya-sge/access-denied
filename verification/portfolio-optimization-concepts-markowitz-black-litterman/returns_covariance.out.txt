@@ -1,0 +1,29 @@
+simple returns: [ 0.5        -0.33333333] arithmetic mean: 0.08333333333333331
+geometric mean: 0.0
+log returns: [ 0.40546511 -0.40546511] sum: -5.551115123125783e-17
+pypfopt mean_historical_return (CAGR, frequency=2): 0.0
+pypfopt mean_historical_return compounding=False (frequency=2): 0.16666666666666663
+annualised mean 0.1008, annualised vol 0.1587
+compounded daily mean (1+mu_d)^252-1 = 0.1060
+approx geometric for arithmetic 0.08, vol 0.2: 0.0600
+estimated beta 1.1886 (true 1.2)
+CAPM with beta 1.2, rf 3%, premium 5%: 0.0900
+realised market CAGR in this sample -0.0383 (drift 0.0003/day would suggest ~0.0785)
+pypfopt capm_return (rf 3%, market given, compounding): -0.0516
+plain mean x252 0.1176; EMA(span=500) x252 0.1845; last-year mean x252 0.2520
+n=50, T=40: rank of sample cov = 39, smallest eigenvalue -6.46e-16
+n=100, T=200: mean min eigenvalue 0.094, mean max 2.833 (true: all 1)
+Marchenko-Pastur edges (1-sqrt q)^2=0.086, (1+sqrt q)^2=2.914
+condition number of sample cov ~ 30.1 (true 1)
+n=30, T=60: mean LW delta 0.168; Frobenius error LW / sample = 0.950
+n=30, T=250: mean LW delta 0.044; Frobenius error LW / sample = 0.987
+n=30, T=1000: mean LW delta 0.011; Frobenius error LW / sample = 0.997
+T=60: true vol of estimated GMV: sample 0.0901, LW identity 0.0800, LW const-corr 0.0658; true optimum 0.0640
+T=250: true vol of estimated GMV: sample 0.0681, LW identity 0.0679, LW const-corr 0.0645; true optimum 0.0640
+vol observed only 0.3309; zero-filled 0.1657; ratio 0.501 (sqrt(0.25) = 0.5)
+semicovariance pypfopt:
+ [[1.e-04 4.e-05]
+ [4.e-05 1.e-04]]
+by hand drops' drops / T:
+ [[1.e-04 4.e-05]
+ [4.e-05 1.e-04]]

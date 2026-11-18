@@ -9,7 +9,10 @@
   written after it, since a printed link cannot be clicked.
 */
 @media print {
-  .c-sidebar,
+  .c-topbar,
+  .c-skip-link,
+  .c-site-footer,
+  .c-author-card,
   .c-header,
   .c-theme-toggle,
   .c-top,
@@ -30,7 +33,7 @@
   }
 
   .c-content {
-    margin-left: 0;
+    max-width: none;
     padding: 0;
   }
 

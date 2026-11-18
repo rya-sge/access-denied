@@ -1,0 +1,53 @@
+{% comment %}
+  Site top bar, on every page (rendered by _layouts/home.html).
+
+  It replaces the fixed 300px left sidebar (2026-11-18): the sidebar held the
+  avatar, name, tagline and social links at every desktop width, space a reader
+  looks at once and the article then lacked. The bar keeps the identity (avatar
+  and name, linking home) and adds what a reader needs next on any page:
+  articles, categories, tags, about, search and the theme switch.
+
+  * Desktop: one row. Phone (below 900px): brand, theme switch and a menu
+    button; the menu opens a panel with the links, the search and the social
+    links. js/main.js handles the button (aria-expanded) and hides the bar while
+    scrolling down, showing it again on scroll up.
+  * The search box exists once per page here: js/main.js binds the
+    SimpleJekyllSearch results to the id inside search-box.html.
+{% endcomment %}
+{% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
+<header class="c-topbar" id="js-topbar">
+  <div class="c-topbar__inner">
+    <a class="c-topbar__brand" href="{{ site.baseurl }}/">
+      <img class="c-topbar__avatar" src="{{ site.baseurl }}/assets/{{ site.author-image }}" alt="" width="32" height="32">
+      <span class="c-topbar__name">{{ site.author-name }}</span>
+      <span class="c-topbar__site">{{ site.title }}</span>
+    </a>
+
+    <button type="button" class="c-topbar__menu-btn" id="js-topbar-menu-btn"
+            aria-expanded="false" aria-controls="js-topbar-panel">
+      <span class="c-topbar__menu-icon" aria-hidden="true"></span>
+      <span class="u-screen-reader-text">{{ t.menu_toggle }}</span>
+    </button>
+
+    <div class="c-topbar__panel" id="js-topbar-panel">
+      <nav class="c-topbar__nav" aria-label="{{ t.nav_label }}">
+        <a href="{{ site.baseurl }}/"{% if page.url == '/' %} aria-current="page"{% endif %}>{{ t.nav_posts }}</a>
+        <a href="{{ site.baseurl }}/#categories">{{ t.nav_categories }}</a>
+        <a href="{{ '/tags/' | relative_url }}"{% if page.url == '/tags/' %} aria-current="page"{% endif %}>{{ t.nav_tags }}</a>
+        <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>{{ t.nav_about }}</a>
+      </nav>
+      {% include search-box.html class="c-topbar__search" %}
+      {% include social-links.html class="c-topbar__social" %}
+    </div>
+
+    <button type="button" class="c-theme-toggle" id="js-theme-toggle"
+            aria-label="{{ t.theme_toggle }}" title="{{ t.theme_toggle }}" aria-pressed="false">
+      <svg class="c-theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="c-theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zM4.2 5.6a1 1 0 0 1-.7-.3L2.1 3.9a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1-.7 1.7zm15.4 15.4a1 1 0 0 1-.7-.3l-1.4-1.4a1 1 0 0 1 1.4-1.4l1.4 1.4a1 1 0 0 1-.7 1.7zM3 13H1a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zm20 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zM2.8 21a1 1 0 0 1-.7-1.7l1.4-1.4a1 1 0 0 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-.7.3zM18.2 5.6a1 1 0 0 1-.7-1.7l1.4-1.4a1 1 0 1 1 1.4 1.4l-1.4 1.4a1 1 0 0 1-.7.3z"/>
+      </svg>
+    </button>
+  </div>
+</header> <!-- /.c-topbar -->

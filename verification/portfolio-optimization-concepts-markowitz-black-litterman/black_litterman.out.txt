@@ -1,0 +1,22 @@
+delta for 7% premium, 16% vol: 2.7344
+Pi = delta Sigma w_mkt: [0.03937 0.05625 0.07875]
+pypfopt market_implied_prior_returns: [0.03938 0.05625 0.07875]
+reverse check (delta Sigma)^-1 Pi: [0.5 0.3 0.2]
+abs view C=10%, c=0.25: by hand [0.03991 0.05802 0.08406], pypfopt [0.03991 0.05802 0.08406], fraction of gap closed on C 0.2500
+abs view C=10%, c=0.5: by hand [0.04044 0.05979 0.08938], pypfopt [0.04044 0.05979 0.08938], fraction of gap closed on C 0.5000
+abs view C=10%, c=1.0: by hand [0.0415  0.06333 0.1    ], pypfopt [0.0415  0.06333 0.1    ], fraction of gap closed on C 1.0000
+relative view B-A=3%, He-Litterman Omega, tau=0.025: posterior [0.03738 0.06082 0.08185], view portfolio 0.02344 (prior 0.01688)
+relative view B-A=3%, He-Litterman Omega, tau=0.05: posterior [0.03738 0.06082 0.08185], view portfolio 0.02344 (prior 0.01688)
+relative view B-A=3%, He-Litterman Omega, tau=0.5: posterior [0.03738 0.06082 0.08185], view portfolio 0.02344 (prior 0.01688)
+pypfopt default omega, relative view: [0.03738 0.06082 0.08185]
+pypfopt posterior covariance:
+ [[0.02352 0.00969 0.00961]
+ [0.00969 0.04146 0.03113]
+ [0.00961 0.03113 0.09425]]
+by hand Sigma + M:
+ [[0.02352 0.00969 0.00961]
+ [0.00969 0.04146 0.03113]
+ [0.00961 0.03113 0.09425]]
+posterior vol / prior vol: [1.02247 1.01809 1.02335]
+two views A=10%, C=10% at 50%: posterior [0.06992 0.06982 0.09539]; fractions A 0.5038, C 0.7831
+stock_prices.csv AAPL prior 0.09791, posterior at 50% 0.14896, prior + 0.5 (0.20 - prior) = 0.14896

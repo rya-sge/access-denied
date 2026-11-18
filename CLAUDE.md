@@ -66,16 +66,23 @@ access-denied/
 
 ## Commit Messages
 
-**After each batch of modifications performed, provide a suggested GitHub commit message** so the work can be committed in coherent units. Do this for every batch (do not run `git commit` unless explicitly asked; just propose the message).
+**After each batch of modifications performed, provide the full, ready-to-paste commit command** so the work can be committed in coherent units. Do this for every batch. Do not run `git add` or `git commit` yourself unless explicitly asked; just propose the command.
+
+The command is a signed commit (`-S`) with the message inline:
+
+```bash
+git commit -S -m "Add traditional vs. perpetual futures article with mindmap"
+```
+
+When the working tree also holds unrelated changes, put the `git add` of this batch's files in front, so the commit contains only them:
+
+```bash
+git add _posts/2025-12-29-traditional-vs-perpetual-futures.md assets/article/finance/futures/ && git commit -S -m "Add traditional vs. perpetual futures article with mindmap"
+```
 
 Guidelines for the message:
 
 - **The commit message must be one line** (a single subject line, no body and no trailer).
 - Use the imperative mood (e.g. "Add", "Fix", "Update", "Rename"), capped at ~72 characters.
-- One commit per logical batch: keep unrelated changes in separate messages.
-
-Example:
-
-```
-Add traditional vs. perpetual futures article with mindmap
-```
+- Wrap it in double quotes; avoid a `"`, `` ` `` or `$` inside it, which the shell would interpret.
+- One commit per logical batch: keep unrelated changes in separate commands.

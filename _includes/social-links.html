@@ -1,0 +1,26 @@
+{% comment %}
+  The author's social profiles, as a list of icon links. Used by the top bar,
+  the author card at the end of each article and the site footer, so the list
+  of networks is defined once (the handles come from _config.yml).
+
+  Usage:
+    {% include social-links.html %}
+    {% include social-links.html class="c-social-links--small" %}
+{% endcomment %}
+<ul class="c-social-links u-lists-reset{% if include.class %} {{ include.class }}{% endif %}">
+  {% if site.social-twitter %}
+  <li><a href="https://x.com/{{ site.social-twitter }}" target="_blank" rel="noopener me"><div data-icon='ei-sc-twitter' data-size='s'></div><span class="u-screen-reader-text">X (Twitter)</span></a></li>
+  {% endif %}
+  {% if site.social-github %}
+  <li><a href="https://github.com/{{ site.social-github }}" target="_blank" rel="noopener me"><div data-icon='ei-sc-github' data-size='s'></div><span class="u-screen-reader-text">GitHub</span></a></li>
+  {% endif %}
+  {% if site.social-linkedin %}
+  <li><a href="https://www.linkedin.com/in/{{ site.social-linkedin }}" target="_blank" rel="noopener me"><div data-icon='ei-sc-linkedin' data-size='s'></div><span class="u-screen-reader-text">LinkedIn</span></a></li>
+  {% endif %}
+  {% if site.social-bluesky %}
+  <li><a href="https://bsky.app/profile/{{ site.social-bluesky }}" target="_blank" rel="noopener me" class="c-social-links__text">bsky<span class="u-screen-reader-text"> (Bluesky)</span></a></li>
+  {% endif %}
+  {% if site.social-youtube %}
+  <li><a href="https://youtube.com/{{ site.social-youtube }}" target="_blank" rel="noopener me"><div data-icon='ei-sc-youtube' data-size='s'></div><span class="u-screen-reader-text">YouTube</span></a></li>
+  {% endif %}
+</ul>

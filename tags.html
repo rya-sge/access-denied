@@ -14,11 +14,6 @@ permalink: /tags/
 {% endcomment %}
 {% assign sorted_tags = site.tags | sort %}
 
-<header class="c-header u-hide u-no-margin-bottom">
-  <div class="c-header__box">
-    {% include search-box.html class="u-full-width" %}
-  </div>
-</header>
 {% assign t = site.data.i18n[page.lang] | default: site.data.i18n.en %}
 <section class="c-blog-tags o-opacity">
   <h1>{{ t.tags_title }}</h1>

@@ -1,0 +1,44 @@
+Sigma =
+ [[0.0225 0.009  0.009 ]
+ [0.009  0.04   0.03  ]
+ [0.009  0.03   0.09  ]]
+eigenvalues of Sigma: [0.0184 0.0284 0.1058]
+A=54.7386 B=5.1389 C=0.5408 D=3.1963
+GMV closed form: w=[0.6866 0.2687 0.0448] return=0.0939 vol=0.1352 sharpe(rf=3%)=0.4726
+GMV return B/A=0.0939, variance 1/A=0.018269, vol=0.1352
+Tangency closed form: w=[0.3925 0.3981 0.2093] return=0.1106 vol=0.1518 sharpe(rf=3%)=0.5308
+max Sharpe sqrt(ex' Si ex) = 0.5308
+Frontier portfolio at m=0.12: w=[0.2266 0.4712 0.3022] return=0.1200 vol=0.1731 sharpe(rf=3%)=0.5200
+formula vol at m=0.12: 0.1731
+Second fund Si mu / B: w=[0.4865 0.3568 0.1568] return=0.1052 vol=0.1431 sharpe(rf=3%)=0.5258
+two-fund weight on GMV a=-1.2987; max |a*gmv + (1-a)*mu_fund - w_m| = 2.78e-16
+utility delta=3.0, no budget: w=[0.8333 0.6111 0.2685], sum=1.7130
+utility delta=3.0, budget: w=[0.3438 0.4196 0.2366] return=0.1133 vol=0.1573 sharpe(rf=3%)=0.5297
+pypfopt min_volatility: w=[0.6866 0.2687 0.0448] return=0.0939 vol=0.1352 sharpe(rf=3%)=0.4726
+pypfopt max_sharpe(rf=0.03): w=[0.3925 0.3981 0.2093] return=0.1106 vol=0.1518 sharpe(rf=3%)=0.5308
+pypfopt efficient_return(0.12): w=[0.2266 0.4712 0.3022] return=0.1200 vol=0.1731 sharpe(rf=3%)=0.5200
+pypfopt max_quadratic_utility(3.0): w=[0.3438 0.4196 0.2366] return=0.1133 vol=0.1573 sharpe(rf=3%)=0.5297
+pypfopt CLA max_sharpe (rf=0): w=[0.4865 0.3568 0.1568] return=0.1052 vol=0.1431 sharpe(rf=3%)=0.5258
+pypfopt EF max_sharpe(rf=0): w=[0.4865 0.3568 0.1568] return=0.1052 vol=0.1431 sharpe(rf=3%)=0.5258
+pypfopt CLA min_volatility: w=[0.6866 0.2687 0.0448] return=0.0939 vol=0.1352 sharpe(rf=3%)=0.4726
+CLA turning points (corner portfolios), long-only:
+  w=[0. 0. 1.] return=0.1500 vol=0.3000
+  w=[0. 0. 1.] return=0.1500 vol=0.3000
+  w=[0.    0.571 0.429] return=0.1329 vol=0.2105
+  w=[0.6866 0.2687 0.0448] return=0.0939 vol=0.1352
+raw Sharpe objective: DCPError Problem does not follow DCP rules. Specifically:
+variable-change QP, long-only: w=[0.3925 0.3981 0.2093] return=0.1106 vol=0.1518 sharpe(rf=3%)=0.5308
+is DCP: True
+mu_B 0.12->0.13: tangency w=[0.3498 0.4789 0.1713]  (change in w_B +0.0808)
+mu_B 0.12->0.11: tangency w=[0.439  0.3102 0.2507]  (change in w_B -0.0879)
+SE of annual mean, sigma=0.2, T=10y: 0.0632
+SE of annual mean, sigma=0.2, T=40y: 0.0316
+years for SE of 1 point at sigma 20%: 400
+frontier at m=0.10: w=[0.5788 0.3161 0.1051]; = 0.6335 GMV + 0.3665 tangency; max diff 2.78e-16
+mu_B = 0.1832: tangency unconstrained [0.17   0.8187 0.0113], long-only [0.17   0.8187 0.0113]
+mu_B = 0.0568: tangency unconstrained [ 0.7763 -0.3273  0.5509], long-only [0.6032 0.     0.3968]
+corner: [0. 0. 1.] return 0.150000 vol 0.300000
+corner: [0.         0.57096774 0.42903226] return 0.132871 vol 0.210486
+corner: [0.68656716 0.26865672 0.04477612] return 0.093881 vol 0.135162
+m=0.1: efficient_return [0.57881 0.3161  0.10508], corner mix [0.57881 0.3161  0.10508], max diff 4.4e-16
+m=0.14: efficient_return [0.      0.33333 0.66667], corner mix [0.      0.33333 0.66667], max diff 1.3e-15

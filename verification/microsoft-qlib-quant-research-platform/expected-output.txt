@@ -39,3 +39,10 @@ mean daily cost 0.00039512200303798775 mean daily turnover 0.3960330577342419
 sum return 0.5233786162257437 sum bench 0.2798756957054138 sum cost 0.17622441335494254
 compounded excess with cost over the period 0.047123077960300686
 LEAK IC mean 0.6845
+
+Output of `qlibdock py -n feature_check.py` (train period 2010-01-01 to 2014-12-31):
+
+columns 158
+all NaN 10 ['CORR5', 'CORR10', 'CORR20', 'CORR30', 'CORR60', 'CORD5', 'CORD10', 'CORD20', 'CORD30', 'CORD60']
+constant 38 ['KMID', 'KLEN', 'KMID2', 'KUP', 'KUP2', 'KLOW', 'KLOW2', 'KSFT', 'KSFT2', 'OPEN0', 'HIGH0', 'LOW0', 'VWAP0', 'VMA5', 'VMA10', 'VMA20', 'VMA30', 'VMA60', 'VSTD5', 'VSTD10', 'VSTD20', 'VSTD30', 'VSTD60', 'VSUMP5', 'VSUMP10', 'VSUMP20', 'VSUMP30', 'VSUMP60', 'VSUMN5', 'VSUMN10', 'VSUMN20', 'VSUMN30', 'VSUMN60', 'VSUMD5', 'VSUMD10', 'VSUMD20', 'VSUMD30', 'VSUMD60']
+uninformative 48
