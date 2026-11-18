@@ -1,0 +1,65 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(0) {
+    BackgroundColor #1F6B4F
+    FontColor white
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Portfolio optimisation concepts
+** Returns
+*** Simple vs log returns
+*** Arithmetic mean vs CAGR, drag ~ sigma^2/2
+*** Annualise: x252, x sqrt(252)
+** Expected returns
+*** SE = sigma / sqrt(T years)
+*** EMA, CAPM beta
+*** Errors feed the optimiser
+** Risk models
+*** Covariance, PSD
+*** Sample matrix: T vs n, eigenvalue spread
+*** Ledoit-Wolf shrinkage, target matters
+*** Semicovariance, exponential
+** Markowitz
+*** QP, efficient frontier
+*** GMV, two-fund theorem
+*** Tangency, Sharpe, CML
+*** Quadratic utility, delta
+*** Error maximiser (Michaud)
+** Convex optimisation
+*** LP, QP, SOCP
+*** DCP rules, max-Sharpe variable change
+*** Bounds, sectors, L2, turnover
+*** CLA corner portfolios
+left side
+** Black-Litterman
+*** Prior Pi = delta Sigma w_mkt
+*** Views P, Q, Omega, tau
+*** He-Litterman: tau cancels
+*** Idzorek: confidence = gap closed
+** Downside risk
+*** Semivariance
+*** VaR, CVaR as an LP
+*** Drawdown, CDaR
+** HRP
+*** Correlation distance, linkage
+*** Quasi-diagonal order
+*** Bisection by inverse variance
+** Discrete allocation
+*** Greedy vs integer LP
+*** Rounding error, ties
+** Evaluation
+*** In-sample overstates (x2.6 here)
+*** Backtest overfitting, best of N
+*** Survivorship, look-ahead
+*** Same inputs, same rf, out of sample
+@endmindmap

@@ -1,0 +1,23 @@
+@startuml
+title From prices to an evaluated portfolio
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+:Clean prices, choose window\n(missing data, survivorship);
+:Compute returns, annualise\n(252, sqrt 252);
+:Estimate expected returns\n(SE = sigma / sqrt T);
+:Estimate risk model\n(shrinkage, keep PSD);
+if (Trust the expected returns?) then (no)
+  :Black-Litterman prior + views\nor minimum variance / HRP;
+else (yes)
+  :Mean-variance objective\n(max Sharpe, utility, target);
+endif
+:Add constraints\n(bounds, sectors, L2, costs);
+:Solve the convex problem\n(QP / LP / SOCP, or CLA);
+:Round to whole shares\n(greedy or integer LP);
+:Evaluate out of sample\n(same inputs, same rf, several windows);
+stop
+@enduml

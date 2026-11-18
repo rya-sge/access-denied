@@ -1410,3 +1410,10 @@ _posts/2026-11-18-microsoft-qlib-quant-research-platform.md
   assets/article/finance/qlib/qlib-architecture-concept.puml   (concept -> .png, asset only)
   assets/article/finance/qlib/qlib-research-loop-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article (layer flowchart, backtest step sequence), no .puml
+
+_posts/2026-11-18-portfolio-optimization-concepts-markowitz-black-litterman.md
+  assets/article/finance/portfolio-optimization-concepts/2026-11-18-portfolio-optimization-concepts-markowitz-black-litterman-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/finance/portfolio-optimization-concepts/portfolio-optimization-concepts-concept.puml   (concept -> .png, asset only)
+  assets/article/finance/portfolio-optimization-concepts/portfolio-optimization-concepts-workflow.puml   (workflow -> .png, asset only)
+  assets/article/finance/portfolio-optimization-concepts/efficient-frontier-three-assets.py   (in-section figure -> .svg, embedded in "Mean-variance optimisation (Markowitz 1952)"; matplotlib, create-plot)
+  in-section diagrams: inline Mermaid in the article (concept map, Black-Litterman flow, HRP steps), no .puml

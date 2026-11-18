@@ -1,0 +1,37 @@
+@startuml
+title Portfolio optimisation concepts and the inputs they need
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam packageBorderColor #2E8B67
+package "Estimators" {
+  [Expected returns\nmean, EMA, CAPM] as MU
+  [Risk model\nsample, shrinkage, semicov] as SIG
+  [Return scenarios] as SCN
+}
+package "Models" {
+  [Mean-variance QP\nGMV, tangency, utility] as MV
+  [CLA\ncorner portfolios] as CLA
+  [Black-Litterman\nprior + views] as BL
+  [CVaR / CDaR LPs] as DR
+  [HRP\nclustering + bisection] as HRP
+}
+[Discrete allocation\ninteger programme] as DA
+[Evaluation\nout of sample] as EV
+MU --> MV
+SIG --> MV
+MU --> CLA
+SIG --> CLA
+SIG --> BL
+BL --> MV : posterior mu, Sigma
+SCN --> DR
+SIG --> HRP
+MV --> DA
+CLA --> DA
+DR --> DA
+HRP --> DA
+DA --> EV
+@enduml
