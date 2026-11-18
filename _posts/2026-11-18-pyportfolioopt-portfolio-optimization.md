@@ -127,26 +127,58 @@ flowchart TD
 
 ### One problem per object
 
-A solved `BaseConvexOptimizer` keeps its `cp.Problem`. On a second solve it compares the objective and constraint IDs with those of the first solve and raises `InstantiationError` if they differ; `add_constraint()` and `add_objective()` refuse to run after a solve. The run below shows the message:
+An `EfficientFrontier` object builds one cvxpy problem and keeps it after the first solve. Changing that problem afterwards is refused:
 
-```text
-InstantiationError Adding constraints to an already solved problem might have unintended
+- `add_constraint()` and `add_objective()` raise `InstantiationError` once the object has been solved;
+- a second solve compares the objective and the constraints with those of the first one, and raises the same error if they differ.
+
+For example, adding a constraint after `min_volatility()`:
+
+```python
+ef = EfficientFrontier(mu, S)
+ef.min_volatility()
+ef.add_constraint(lambda w: w[0] >= 0.1)   # raises
 ```
 
-The exception is a re-solve with a new target. `efficient_risk`, `efficient_return` and `max_quadratic_utility` store their target as a named `cp.Parameter`, so calling the same method again with another target only updates the parameter value and re-solves. Switching from `min_volatility` to `max_sharpe` on the same object is not supported: create a new `EfficientFrontier` for each objective.
+raises, in the library's own words (`pypfopt/base/_base_optimizer.py`):
+
+```text
+pypfopt.exceptions.InstantiationError: Adding constraints to an already solved
+problem might have unintended consequences. A new instance should be created
+for the new set of constraints.
+```
+
+Re-solving the same method with a new target is allowed. `efficient_risk`, `efficient_return` and `max_quadratic_utility` keep their target in a named `cp.Parameter`, so calling the method again with another target only changes that value. Switching objective, for example from `min_volatility` to `max_sharpe`, is not: create a new `EfficientFrontier` for each objective.
 
 ### How max_sharpe stays convex
 
-The Sharpe ratio is a ratio of a linear and a square-root function, which is not a convex objective. `max_sharpe` uses the change of variables from Cornuéjols and Tütüncü, cited in its docstring. With $$y = k w$$ and $$k \geq 0$$, maximising the Sharpe ratio is equivalent to:
+**The problem.** The Sharpe ratio of a portfolio with weights $$w$$ (summing to 1) is
+
+$$
+\begin{aligned}
+\text{Sharpe}(w) = \frac{(\mu - r_f \mathbf 1)^{\top} w}{\sqrt{w^{\top}\Sigma w}}
+\end{aligned}
+$$
+
+where $$\mu$$ is the vector of expected returns, $$\Sigma$$ the covariance matrix, $$r_f$$ the risk-free rate and $$\mathbf 1$$ a vector of ones. The numerator is the expected excess return, the denominator the volatility. A ratio like this is not convex, and cvxpy only accepts convex problems, so `max_sharpe` cannot hand it over as it is.
+
+**The trick.** Multiplying every weight by the same positive number $$k$$ multiplies the excess return by $$k$$ and the volatility by $$k$$ too, so the ratio does not change. Only the direction of $$w$$ matters, not its size. The size can therefore be chosen freely, and `max_sharpe` chooses it so that the excess return equals exactly 1. With the rescaled weights $$y = k w$$, maximising the ratio becomes "among the portfolios whose excess return is 1, find the one with the lowest variance":
 
 $$
 \begin{aligned}
 \min_{y,\,k} \quad & y^{\top}\Sigma y \\
-\text{subject to} \quad & (\mu - r_f \mathbf 1)^{\top} y = 1, \quad \mathbf 1^{\top} y = k, \quad k \geq 0
+\text{subject to} \quad & (\mu - r_f \mathbf 1)^{\top} y = 1 \\
+& \mathbf 1^{\top} y = k, \quad k \geq 0
 \end{aligned}
 $$
 
-and the weights are recovered as $$w = y / k$$. The code rebuilds every existing constraint so that it scales with $$k$$: `w <= ub` becomes `y <= ub * k`. Additional objectives such as `L2_reg` are not scaled, and the method warns that they "may not work as expected" with `max_sharpe`.
+This is a quadratic program, which cvxpy solves exactly. The second line keeps track of the scale: since the original weights summed to 1, the rescaled ones sum to $$k$$. The weights are then recovered as $$w = y / k$$.
+
+The method is the one of Cornuéjols and Tütüncü, cited in the docstring. Three consequences follow from it:
+
+- At least one asset must have an expected return above $$r_f$$, otherwise no portfolio has an excess return of 1, and `max_sharpe` raises a `ValueError` before solving.
+- Every constraint is rewritten for the rescaled weights by multiplying its bound by $$k$$: `w <= ub` becomes `y <= ub * k`.
+- Extra objectives such as `L2_reg` are not rewritten, so they act on $$y$$ rather than $$w$$. The method warns that they "may not work as expected" with `max_sharpe`.
 
 ## Core concepts
 
@@ -166,7 +198,11 @@ Historical means are the weakest input of the whole chain. On the sample data, B
 
 ### Risk models and shrinkage
 
-`sample_cov` is the annualised sample covariance. When the number of assets is not small relative to the number of observations, the sample matrix is noisy and ill-conditioned, and the optimiser exploits its smallest eigenvalues. `CovarianceShrinkage` replaces it with a weighted average of the sample matrix $$S$$ and a structured target $$F$$:
+The optimiser needs the covariance matrix $$\Sigma$$: the volatility of each asset and how each pair moves together. `sample_cov` estimates it from the price history (annualised), and that estimate is noisy. With the 20 assets of the sample data, the matrix holds 210 distinct numbers, all estimated from the same few years of returns.
+
+The noise matters because the optimiser looks for exactly what noise produces: combinations of assets that appear to move against each other and so look almost riskless. In linear-algebra terms these are the directions with the smallest eigenvalues of the matrix. The optimiser puts large weights on them, and they rarely hold out of sample.
+
+**Shrinkage** pulls the noisy estimate towards a simple, stable matrix $$F$$ (the *target*) with the same overall scale:
 
 $$
 \begin{aligned}
@@ -174,9 +210,20 @@ $$
 \end{aligned}
 $$
 
-`ledoit_wolf()` estimates the optimal shrinkage intensity $$\lambda$$. The code stores it as `delta`, but this article keeps $$\delta$$ for risk aversion. Its default target, `constant_variance`, is the identity matrix times the mean sample variance and is computed by scikit-learn; `single_factor` and `constant_correlation` are implemented in PyPortfolioOpt. `oracle_approximating()` is the OAS estimator of Chen et al. Every risk model passes its result through `fix_nonpositive_semidefinite`, which sets negative eigenvalues to zero (or adds to the diagonal) and warns when it had to.
+$$S$$ is the sample matrix and $$\lambda$$ the *shrinkage intensity*: $$\lambda = 0$$ keeps the sample matrix, $$\lambda = 1$$ replaces it with the target. `CovarianceShrinkage.ledoit_wolf()` estimates the $$\lambda$$ that minimises the expected estimation error, from the data itself. On the sample data it is 0.0063. The code calls it `delta`; this article keeps $$\delta$$ for risk aversion.
 
-`semicovariance` keeps only returns below a benchmark (default `0.000079`, about 2 % a year in daily terms), and `exp_cov` weights recent observations more.
+The available targets:
+
+| Method | Target $$F$$ | Assumes | Computed by |
+|---|---|---|---|
+| `ledoit_wolf()` (default, `constant_variance`) | identity matrix times the average variance | every asset equally volatile, no correlation | scikit-learn |
+| `ledoit_wolf("single_factor")` | covariance implied by one market factor, the equal-weighted average of the assets | assets move together only through that factor | PyPortfolioOpt |
+| `ledoit_wolf("constant_correlation")` | sample variances, one average correlation for every pair | the same correlation between all pairs | PyPortfolioOpt |
+| `oracle_approximating()` | as `constant_variance`, with the OAS estimator of $$\lambda$$ (Chen et al.) | as `constant_variance` | scikit-learn |
+
+Two other estimators change what is measured rather than how it is smoothed. `semicovariance` counts only returns below a benchmark (default `0.000079` a day, about 2 % a year), so only losses count as risk. `exp_cov` gives recent observations more weight.
+
+Every risk model ends with `fix_nonpositive_semidefinite`. A covariance matrix must never give a negative variance to any portfolio, a property called positive semidefinite. When rounding or missing data break that, the function sets the negative eigenvalues to zero, or adds a small value to the diagonal, and warns that it did.
 
 ### The efficient frontier and its objectives
 
