@@ -2,14 +2,18 @@
 	BLOCKQUOTE
 =============== */
 
+/*
+  Quotations (EIP abstracts, paper excerpts, the "made with Claude Code" note)
+  are set in the body font. The serif at 18px made every quote read like a
+  heading, louder than the text around it.
+*/
 blockquote {
-  padding-left: $base-spacing-unit;
+  padding: 4px 0 4px $base-spacing-unit;
   border-left: 3px solid $primary-color;
-  font-family: 'Volkhov', 'Times New Roman', Times, serif;
   font-style: normal;
-  font-size: 18px;
+  color: var(--text-dim);
   background-color: rgba(220, 235, 245, 0.2);
   p {
-    padding: 10px;
+    padding: 6px 10px;
   }
 }

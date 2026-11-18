@@ -21,6 +21,19 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-07-
 
 [TOC]
 
+## What you need to know first
+
+The findings below rely on a few token standards and Solidity patterns that the article uses without explaining them.
+
+- **ERC-1155 multi-token standard**: a single ERC-1155 contract manages many token IDs and keeps a balance per address and per ID, so the same contract can hold fungible and unique tokens. `FestivalPass` uses IDs 1 to 3 for the three pass tiers and encodes a collection ID and an item ID into one token ID for each memorabilia NFT; see [Ethereum NFT Standards]({{site.url_complet}}/2025/01/14/ethereum-nft-standard/).
+- **Receiver hook `onERC1155Received`**: when ERC-1155 tokens are minted or safely transferred to a contract, the token contract calls `onERC1155Received` on the recipient, which must return a magic value for the transfer to succeed. This hook hands control to the buyer's contract in the middle of `buyPass`, which is the entry point of the reentrancy finding.
+- **Reentrancy and Checks-Effects-Interactions**: reentrancy happens when an external call lets the callee call back into the contract before its state is updated. The Checks-Effects-Interactions pattern performs the checks, then the state updates, then the external calls, which is the mitigation proposed for `buyPass`; see [Transient Storage in Practice]({{site.url_complet}}/2026/11/04/transient-storage-solidity-reentrancy-locks/) for reentrancy locks.
+- **Point-in-time balance checks**: a check such as `balanceOf(user, id) > 0` only says who holds a token at the moment of the call, and ERC-1155 tokens can be transferred freely between calls. H-01 exploits this by passing one pass from user to user so each of them claims the attendance reward.
+- **ERC-20 minting and decimals**: `BeatToken` is an ERC-20 token that the festival contract mints as rewards, and amounts are written with 18 decimals, so `5e18` means 5 BEAT. Minting more than intended inflates the supply, which is the impact of H-01.
+- **Token metadata URI**: the ERC-1155 `uri(id)` function returns the location of a token's metadata (here an IPFS path), which wallets and marketplaces read to display the token. L-02 is about this function answering for items that were never minted.
+- **`Ownable2Step`**: an OpenZeppelin access-control contract with a single owner, where a transfer of ownership only takes effect once the new owner accepts it. `FestivalPass` inherits it, and the owner role in the actors list comes from it.
+- **Foundry cheatcodes**: the proof-of-concept tests use Foundry's `vm.prank` and `vm.startPrank` to send calls from a chosen address, such as the organizer or a user.
+
 ## About the project
 
 A festival NFT ecosystem on Ethereum where users purchase tiered passes (ERC1155). They attend performances, virtual or not, to earn BEAT tokens (ERC20), and spend BEAT tokens to redeem unique memorabilia NFTs held in the same ERC1155 contract.
@@ -60,16 +73,6 @@ L-02. FestivalPass.sol - URI Function Returns Metadata for Non-Existent Items[Se
 ### H-01. Pass Lending Reward Multiplication Enables Unlimited Performance Rewards
 
 [Selected submission](https://codehawks.cyfrin.io/c/2025-07-beatland-festival/s/cmd7kbg9g0005l4048f2fmz85) by [nomadic_bear](https://profiles.cyfrin.io/u/nomadic_bear)
-
-
-
-## Description
-
-
-
-## Missed submissions
-
-### H-01. Pass Lending Reward Multiplication Enables Unlimited Performance Rewards
 
 #### Root + Impact
 
@@ -169,6 +172,8 @@ contract FestivalPass is ERC1155, Ownable2Step, IFestivalPass {
 }
 ```
 
+Note: ERC-1155 passes of the same tier share one token id (`GENERAL_PASS`, `VIP_PASS` or `BACKSTAGE_PASS`), so `passUsedForPerformance[performanceId][userPassId]` records a pass type, not an individual pass. With this mitigation, the first VIP holder who attends a performance blocks every other VIP holder from attending it. A working fix needs a per-holder condition instead, for example locking transfers of a pass for the duration of the performance once its holder has attended.
+
 ### Function `FestivalPass:buyPass` Lacks Defense Against Reentrancy Attacks, Leading to Exceeding the Maximum NFT Pass Supply
 
 #### Description
@@ -208,6 +213,7 @@ contract FestivalPass is ERC1155, Ownable2Step, IFestivalPass {
 
 #### POC
 
+```solidity
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
@@ -224,8 +230,6 @@ contract AttackBuyPass{
 	uint256 immutable configPassPrice;
 	uint256 immutable configPassMaxSupply;
 	
-
-```solidity
 uint256 hackMintCount = 0;
 
 constructor(FestivalPassTest _festivalPassTest, FestivalPass _festivalPass, uint256 _collectionId, uint256 _configPassPrice, uint256 _configPassMaxSupply) payable {
@@ -418,6 +422,27 @@ Add validation to ensure the requested item exists within the collection:
 ```
 
 This ensures that URI calls will fail for non-existent items, providing consistent behavior with the rest of the contract and preventing confusion for external integrators.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **ERC-1155** | A multi-token standard in which one contract tracks balances for many token IDs, used here for both the festival passes and the memorabilia NFTs. |
+| **ERC-20** | The fungible token standard that `BeatToken` follows; BEAT is minted as attendance rewards and pass bonuses. |
+| **Pass tier** | One of the three pass types (General, VIP, Backstage), each an ERC-1155 token ID with its own price, maximum supply and reward multiplier. |
+| **Memorabilia NFT** | A unique item redeemed with BEAT, whose token ID encodes its collection ID and item ID. |
+| **Reward multiplier** | The factor applied to a performance's base reward according to the attendee's pass tier. |
+| **Pass lending** | Transferring one pass between several users so that each of them attends the same performance and receives the reward, the root of H-01. |
+| **Reentrancy** | A call back into a contract from an external call before the first execution has updated its state. |
+| **Checks-Effects-Interactions** | The ordering rule that performs checks, then state updates, then external calls, so that a reentrant call sees the updated state. |
+| **`onERC1155Received`** | The hook an ERC-1155 contract calls on a recipient contract when tokens are minted or safely transferred to it, used by the attacker to reenter `buyPass`. |
+| **Maximum supply** | The cap `passMaxSupply` on the number of passes of a tier, which the reentrancy finding bypasses. |
+| **Off-by-one error** | A boundary check that is wrong by one unit, which in M-03 prevents the last memorabilia item from being redeemed. |
+| **Token URI** | The metadata location returned by `uri(id)`, which L-02 shows is returned even for items that were never minted. |
+| **Cooldown** | The minimum delay between two check-ins by the same user, which pass lending sidesteps by spreading check-ins across users. |
+| **`Ownable2Step`** | OpenZeppelin's single-owner contract in which a new owner must accept the transfer before it takes effect. |
 
 ## Mindmap
 

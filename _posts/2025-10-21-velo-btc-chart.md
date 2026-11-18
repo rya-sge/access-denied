@@ -16,6 +16,17 @@ Here is the list of data related to BTC price available here: [Velo - Futures - 
 
 [TOC]
 
+## What you need to know first
+
+The metrics below assume a few derivatives notions that the article names without explaining:
+
+- **Long and short positions.** A long position gains when the price rises and a short position gains when it falls. Funding rates, liquidations and CVD are all read as a balance between the two sides.
+- **Futures and perpetual futures.** A futures contract fixes today a price for a trade at a later expiry date, which is why a 3-month future can trade at a premium (the basis) over spot. A perpetual future has no expiry and uses periodic funding payments between longs and shorts to stay close to the spot price; [Traditional Futures vs. Perpetual Futures]({{site.url_complet}}/2025/12/29/traditional-vs-perpetual-futures/) compares the two.
+- **Leverage, margin and liquidation.** A leveraged position is larger than the collateral (margin) posted for it. When losses shrink the margin below the exchange's maintenance level, the exchange closes the position by force, which is what the liquidation chart counts.
+- **Options: calls, puts, strike and expiry.** A call gives the right, not the obligation, to buy the underlying at the strike price until or at expiry, and a put gives the right to sell. An option is at the money when its strike is close to the current price.
+- **Implied volatility.** It is the volatility value that, entered into an option pricing model such as [Black-Scholes]({{site.url_complet}}/2026/07/18/black-scholes-option-pricing-model/), reproduces the option's market price. The option charts of the article (term structure, ATM IV, skew) all compare implied volatilities across strikes or expiries.
+- **Delta.** Delta measures how much an option's price moves for a one-unit move in the underlying, between 0 and 1 for a call and between 0 and -1 for a put. A 25-delta option is out of the money, so the 25-delta skew compares the implied volatility of upside calls with that of downside puts.
+
 ## Futures
 
 - BTC 24h Volume

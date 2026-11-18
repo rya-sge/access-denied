@@ -11,6 +11,10 @@ $base-font-family: 'Open Sans', Helvetica Neue, Helvetica, Arial, sans-serif;
 $base-line-height: 28px;
 
 
+// Code: the system monospace of each platform, instead of Courier.
+$code-font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+
+
 // Headings
 $heading-font-weight: 400;
 $heading-font-family: 'Volkhov', 'Times New Roman', Times, serif;

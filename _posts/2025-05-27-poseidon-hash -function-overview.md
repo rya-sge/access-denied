@@ -26,9 +26,16 @@ This article is mainly based on the update version.
 
 [TOC]
 
+## What you need to know first
 
+Poseidon is a hash function built for proof systems, so the article relies on a few notions from zero-knowledge proofs and symmetric cryptography that it does not develop.
 
-## Introduction
+- **Arithmetic circuits and constraints**: a zk-SNARK or STARK proves a computation by expressing it as additions and multiplications over a finite field, and the prover's cost grows with the number of constraints (for example R1CS constraints). Poseidon is designed to need few of them, which is the point of the "ZK-friendliness" goal. See [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/).
+- **Prime field $$\mathbb{F}_p$$**: the integers modulo a prime $$p$$, where every non-zero element has an inverse. Poseidon's state, inputs and output are elements of this field, and the power map $$x \mapsto x^\alpha$$ is a permutation of $$\mathbb{F}_p$$ exactly when $$\gcd(\alpha, p-1) = 1$$, which is why the article states that condition for the S-box.
+- **Sponge construction**: a mode that turns a fixed permutation into a hash function by keeping a state split into a *rate* part, where input chunks are absorbed and output is squeezed, and a hidden *capacity* part that carries the security. SHA-3 uses the same mode with the Keccak permutation; see [The SHA-3 Standard (FIPS 202)]({{site.url_complet}}/2026/08/24/sha3-standard-fips-202/).
+- **Scalar field of a pairing-friendly curve**: proof systems built on curves such as BLS12-381 or BN254 do their arithmetic in the curve's scalar field, a prime field of about 255 or 254 bits. The article picks Poseidon's field and S-box exponent from that field.
+- **Statistical and algebraic attacks**: statistical attacks, such as differential and linear cryptanalysis, follow how input differences or linear relations propagate through the rounds. Algebraic attacks, such as interpolation or Gröbner basis attacks, write the permutation as a system of polynomial equations and try to solve it. The HADES strategy uses full rounds against the first family and partial rounds to raise the polynomial degree against the second.
+- **Pedersen hash**: an older hash used in circuits, built from elliptic-curve point multiplications, which the article uses as the baseline when it compares constraint counts. See [Pedersen Hash Function Overview]({{site.url_complet}}/2024/05/07/pedersen-hash-function/).
 
 ## Historic remark
 
@@ -338,7 +345,7 @@ Verifiable encryption with POSEIDON within Integrated Encryption Scheme : Put PO
 
 In order to determine the right version of Poseidon for your scenario, you need to know the following:
 
-- The *field* F, over which the arithmetic statements that use Poseidon are defined. It is often determined by the ZK proof system.  Most likely, it is a prime-order subgroup of the group of points of an elliptic curve,  where the curve is BLS12-381, BN254, or Ed25519.  
+- The *field* F, over which the arithmetic statements that use Poseidon are defined. It is often determined by the ZK proof system.  Most likely, it is the scalar field of an elliptic curve, that is a prime field whose size is the order of a prime-order subgroup of the curve's group of points, where the curve is BLS12-381, BN254, or Ed25519.  
 
 Poseidon maps sequences of `F` elements to a fixed length sequence of `F`elements.
 
@@ -481,6 +488,31 @@ Neptune is a Rust implementation of the [Poseidon hash function](https://www.pos
 ## Mindmap
 
 ![poseidon-hash-function-minmap]({{site.url_complet}}/assets/article/cryptographie/hash/poseidon-hash-function-minmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Zero-knowledge proof system** | A protocol (SNARK, STARK) in which a prover convinces a verifier that a statement is true without revealing the secret inputs; Poseidon is designed to be hashed cheaply inside such proofs. |
+| **Arithmetic circuit** | The representation of a computation as additions and multiplications over a finite field that a proof system works on; its size drives the proving cost. |
+| **R1CS constraint** | A rank-1 constraint, the unit in which many SNARKs count circuit cost; Poseidon aims at a low number of constraints per hashed element. |
+| **Prime field $$\mathbb{F}_p$$** | The integers modulo a prime $$p$$; Poseidon's state, inputs and outputs are elements of this field. |
+| **Sponge construction** | A hash mode that absorbs input chunks into a state, applies a permutation after each chunk, and then squeezes output elements from the state. |
+| **Rate and capacity** | The two parts of the sponge state: the rate `r` receives the input and produces the output, while the capacity `c` is never exposed and sets the security level. |
+| **Width `t`** | The number of field elements in Poseidon's internal state, equal to rate plus capacity. |
+| **Permutation** | The fixed invertible function that the sponge applies to its state; in Poseidon it is a sequence of rounds following the HADES strategy. |
+| **S-box** | The non-linear layer of a round; in Poseidon it is the power map $$x \mapsto x^\alpha$$, with $$\alpha = 5$$ for the common ZK fields. |
+| **Full round** | A round in which the S-box is applied to every element of the state; $$R_F$$ such rounds are split between the start and the end of the permutation. |
+| **Partial round** | A round in which the S-box is applied to a single state element and the others pass through unchanged, which lowers the cost of the $$R_P$$ middle rounds. |
+| **HADES design strategy** | The structure that places full rounds at the beginning and the end and partial rounds in the middle, to resist statistical and algebraic attacks at a lower cost. |
+| **MDS matrix** | A Maximum Distance Separable matrix that linearly mixes the state in each round so that a change in one element affects all of them. |
+| **Round constants (ARC)** | Precomputed field elements added to the state in each round to break symmetries between rounds. |
+| **Statistical attack** | Cryptanalysis such as differential or linear attacks that tracks how differences or relations propagate through the rounds; countered by the full rounds. |
+| **Algebraic attack** | Cryptanalysis that models the permutation as polynomial equations, for example with Gröbner bases; countered by raising the degree through the partial rounds. |
+| **Merkle tree arity** | The number of children per node of a Merkle tree; the paper recommends arity 4, which uses a Poseidon width of 5. |
+| **Pedersen hash** | An elliptic-curve based hash used in circuits, which Poseidon outperforms with up to 8x fewer constraints per message bit according to the paper. |
 
 ## Reference
 

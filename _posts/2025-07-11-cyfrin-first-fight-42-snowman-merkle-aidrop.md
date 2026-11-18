@@ -25,7 +25,16 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-06-
 
 [TOC]
 
+## What you need to know first
 
+The findings below rely on a few Solidity mechanisms and vulnerability classes that the article uses without developing them:
+
+- **Access control and modifiers.** A function marked `external` can be called by any address unless a check restricts the caller, usually a modifier that compares `msg.sender` with an authorized address and reverts otherwise. The first finding is a mint function with no such check; [Solidity Modifier Patterns]({{site.url_complet}}/2026/02/18/solidity-modifier-patterns-gas-bytecode-security/) covers how modifiers are written.
+- **EIP-712 typed signatures.** EIP-712 defines how to hash structured data before signing it: a type hash, the `keccak256` of a type string such as `SnowmanClaim(address receiver,uint256 amount)`, is combined with the struct's values and a domain separator into the digest that the user signs. Any change to the type string or to a signed value produces a different digest, which is why the typo finding and the live-balance finding break signature verification.
+- **ECDSA signatures and delegated calls.** An Ethereum signature is the triple `v`, `r`, `s`, from which the contract recovers the signer's address and compares it with the expected one. This lets a third party submit a claim on behalf of the receiver, as `satoshi` does in the tests.
+- **Merkle proofs for airdrops.** The project commits to the list of eligible `(address, amount)` pairs with a single Merkle root stored in the contract, and each claimant supplies the sibling hashes (the proof) that link their leaf to that root. The leaf must be rebuilt on-chain from exactly the values used when the tree was built, otherwise the proof fails.
+- **ERC-20 allowances and `safeTransferFrom`.** A contract can move a user's tokens only up to the allowance the user granted with `approve`, and OpenZeppelin's `SafeERC20` wrappers revert when the transfer fails. The `buySnow` WETH fallback and the claim's token transfer both rely on a prior approval.
+- **Foundry cheatcodes.** The proofs of concept are Foundry tests: `vm.prank` makes the next call come from a chosen address, `vm.sign` signs a digest with a test private key and `vm.deal` sets an address's ETH balance.
 
 ## Description
 
@@ -167,11 +176,13 @@ Other name: Inconsistent MESSAGE_TYPEHASH with standard EIP-712 declaration
 
 #### Description
 
-The `claimSnowman` function relies on an EIP-712 signature to verify that the receiver is authorized to claim their Snowman NFTs. The signature hash is constructed using a `MESSAGE_TYPEHASH` constant intended to represent the typed data struct `SnowmanClaim(address receiver, uint256 amount)`.
+The `claimSnowman` function relies on an EIP-712 signature to verify that the receiver is authorized to claim their Snowman NFTs. The signature hash is constructed using a `MESSAGE_TYPEHASH` constant intended to represent the typed data struct `SnowmanClaim(address receiver,uint256 amount)`.
 
 
 
 However, the declared `MESSAGE_TYPEHASH` uses a malformed type string with a typo (`addres` instead of `address`), causing the resulting signature hash to be invalid if not taking into account and **ensuring that such signed message will ever verify correctly**.
+
+The string also has a space after the comma. EIP-712 `encodeType` joins the members with a bare `,` (for example `Mail(address from,address to,string contents)`), so a wallet that builds the type hash from the struct definition gets a different hash; the mitigation below removes both differences.
 
 ```solidity
 // Root cause in the codebase with @> marks to highlight the relevant section
@@ -201,7 +212,7 @@ No PoC
 ```solidity
 \- bytes32 private constant MESSAGE_TYPEHASH = keccak256("SnowmanClaim(addres receiver, uint256 amount)");
 
-\+ bytes32 private constant MESSAGE_TYPEHASH = keccak256("SnowmanClaim(address receiver, uint256 amount)");
+\+ bytes32 private constant MESSAGE_TYPEHASH = keccak256("SnowmanClaim(address receiver,uint256 amount)");
 
 
 ```
@@ -681,7 +692,7 @@ Ensures clear and intentional user behavior, removes ambiguity, and prevents uni
 
 \+     uint256 cost = s_buyFee * amount;
 
-\+     if (msg.value !!= cost) revert InvalidETHAmount();
+\+     if (msg.value != cost) revert InvalidETHAmount();
 
 \+     _mint(msg.sender, amount);
 
@@ -827,6 +838,28 @@ constructor(...) {
     s_lastClaimTime[address(0)] = block.timestamp;
 }
 ```
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **ERC-20** | The fungible token standard; `Snow` is an ERC-20 token that can be earned once a week or bought with ETH or WETH. |
+| **ERC-721** | The non-fungible token standard; `Snowman` is an ERC-721 contract whose metadata is stored on-chain with Base64 encoding. |
+| **WETH** | Wrapped ETH, an ERC-20 version of ether; `buySnow` takes it through `safeTransferFrom` when `msg.value` does not match the fee. |
+| **Access control** | The checks that restrict who may call a function; `mintSnowman` lacks any, so every address can mint Snowman NFTs. |
+| **Modifier** | A reusable Solidity check attached to a function, such as the `onlyAirdrop` modifier proposed to restrict minting to the airdrop contract. |
+| **Merkle root** | The single hash stored in `SnowmanAirdrop` that commits to the whole list of eligible receivers and amounts. |
+| **Merkle proof** | The list of sibling hashes a claimant passes to `claimSnowman` so that `MerkleProof.verify` can link their leaf to the Merkle root. |
+| **Leaf** | The hash of a `(receiver, amount)` pair; `claimSnowman` rebuilds it from the receiver's current balance instead of the amount fixed in the tree. |
+| **Snapshot** | The moment the eligible balances were fixed to build the Merkle tree; a balance that changes after it no longer matches the leaf. |
+| **EIP-712** | The standard for hashing and signing typed structured data, used here to let a receiver authorize a claim with a signature. |
+| **Type hash** | The `keccak256` of the struct's type string (`MESSAGE_TYPEHASH`); the typo `addres` makes it differ from the declared struct. |
+| **Digest** | The final hash the receiver signs, returned by `getMessageHash` through `_hashTypedDataV4`; it depends on the live `Snow` balance. |
+| **v, r, s** | The three components of an ECDSA signature, passed to `claimSnowman` so that anyone can claim on behalf of the signing receiver. |
+| **Live balance** | The value read from `balanceOf` at call time, which an attacker can change by sending tokens to the receiver before the claim. |
+| **Denial of service** | A flaw that blocks a feature for legitimate users, such as the global `s_earnTimer` reset that stops free `earnSnow` claims for everyone. |
 
 ## Mindmap
 

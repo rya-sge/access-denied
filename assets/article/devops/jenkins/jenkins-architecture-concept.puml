@@ -1,0 +1,67 @@
+@startuml
+title Jenkins architecture - controller layers, storage and agents
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam package {
+  BorderColor #335061
+}
+skinparam database {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam node {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+actor "Browser" as user
+actor "Script / curl" as script
+node "SCM host" as scm
+
+package "Controller (one JVM, jenkins.war on Jetty/Winstone)" {
+  package "Access layer" {
+    component "Web UI\n(Jelly / Groovy views)" as ui
+    component "REST API\n(/api/json, /api/xml)" as api
+    component "CLI\n(WebSocket, HTTP, SSH)" as cli
+    component "Remoting endpoint\n(inbound TCP / WebSocket)" as rem
+  }
+  component "Stapler\nrouting, request processing" as stapler
+  package "Business layer" {
+    component "Jenkins root object\nitems, nodes, config" as root
+    component "Build queue\n+ scheduler" as queue
+    component "NodeProvisioner\n+ Cloud plugins" as prov
+    component "Pipeline engine\n(workflow-cps)" as cps
+    component "Plugins\n(@Extension implementations)" as plugins
+    component "Built-in node\n(0 executors)" as builtin
+  }
+}
+database "JENKINS_HOME\nconfig.xml, jobs/, builds/,\nplugins/, secrets/" as home
+
+node "Static agent\n(SSH launched)" as a1
+node "Inbound agent\n(agent.jar)" as a2
+node "Cloud agent\n(Kubernetes pod, VM)" as a3
+
+user --> ui
+script --> api
+script --> cli
+scm --> stapler : webhook
+ui --> stapler
+api --> stapler
+cli --> stapler
+stapler --> root
+root --> queue
+queue --> prov
+plugins ..> root : extend
+cps ..> queue : node {} requests
+root --> home : XStream XML
+prov --> a3 : provision
+queue --> a1 : assign executor
+queue --> a2 : assign executor
+a1 <--> rem : Remoting channel
+a2 <--> rem : Remoting channel
+a3 <--> rem : Remoting channel
+@enduml

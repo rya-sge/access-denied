@@ -57,6 +57,13 @@ layout: home
                     </time>
                 </span>
                 {% endif %}
+                {%- comment -%}
+                  Estimated reading time at 220 words a minute, a usual figure
+                  for technical prose. Code and formulas are counted as words,
+                  which keeps the estimate on the generous side.
+                {%- endcomment -%}
+                {% assign reading_minutes = content | number_of_words | divided_by: 220 | plus: 1 %}
+                <span class="c-article__reading-time">&middot; {{ reading_minutes }} {{ t.reading_time }}</span>
             </div>
         </header>
         {% include series-nav.html %}

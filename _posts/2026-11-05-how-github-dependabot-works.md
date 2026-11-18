@@ -524,3 +524,4 @@ The points below were not settled by the code and documentation read for this ar
 - [Firmware Supply Chain - Reproducible Builds and Code Signing]({{site.url_complet}}/2026/07/31/firmware-reproducible-builds-code-signing/)
 - [Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/)
 - [Docker en bref]({{site.url_complet}}/2021/05/11/docker-en-bref/)
+- [How Jenkins Works - Controller, Agents, Plugins, Pipeline and JENKINS_HOME]({{site.url_complet}}/2026/11/17/jenkins-architecture/)

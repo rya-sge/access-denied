@@ -280,7 +280,7 @@ Several facts above come from secondary coverage or from general knowledge rathe
 - [ML-KEM — The Module-Lattice Key-Encapsulation Standard (FIPS 203)]({{site.url_complet}}/2026/06/29/ml-kem-fips-203-post-quantum-key-encapsulation/)
 - [ML-DSA — The Module-Lattice Digital Signature Standard (FIPS 204)]({{site.url_complet}}/2026/06/29/ml-dsa-fips-204-post-quantum-signatures/)
 - [SLH-DSA — The Stateless Hash-Based Signature Standard (FIPS 205)]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/)
-- [Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem]({{site.url_complet}}/2025/04/24/short-integer-solution/)
+- [Lattice-Based Cryptography - The Short Integer Solution (SIS) Problem]({{site.url_complet}}/2025/04/23/short-integer-solution/)
 - [Winternitz One-Time Signature(OTS)]({{site.url_complet}}/2024/05/30/winternitz-signature-scheme/)
 - [Post-Quantum Cryptography on Blockchains — Where Bitcoin, Ethereum, Solana and Others Stand in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-blockchains/)
 - [Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography]({{site.url_complet}}/2026/11/06/grover-algorithm-quantum-search/)

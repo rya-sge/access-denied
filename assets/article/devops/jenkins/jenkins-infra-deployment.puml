@@ -1,0 +1,39 @@
+@startuml
+title How the Jenkins project deploys its own controllers (jenkins-infra, 2026-11-17)
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam node {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam artifact {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+artifact "docker-jenkins-lts\nFROM jenkins/jenkins:2.580.2-jdk25\nplugins.txt (121 plugins)\njenkins-plugin-cli" as img
+artifact "kubernetes-management\nhelmfile clusters/*.yaml\nvalues config/*/*.yaml" as helm
+node "Kubernetes cluster privatek8s-sponsored" {
+  component "release.ci.jenkins.io\nchart jenkins/jenkins 5.13.3\nimage jenkinsciinfra/jenkins-lts" as ctrl
+  component "JCasC configScripts\nnumExecutors: 0, kubernetes cloud\nwebSocket: true, LDAP, globalMatrix" as casc
+  component "Persistent volume\nJENKINS_HOME" as pv
+}
+node "Agent namespace / cluster" {
+  component "Agent pods\n(pod templates)" as pods
+}
+img --> ctrl : image tag 2.3.124-2.580.2
+helm --> ctrl : helm release
+helm --> casc
+casc --> ctrl : applied at startup
+ctrl --> pv
+ctrl --> pods : provision per build
+pods --> ctrl : WebSocket Remoting
+note right of ctrl
+  installPlugins: false
+  overwritePlugins: true
+  -> only the image's plugins run
+end note
+@enduml

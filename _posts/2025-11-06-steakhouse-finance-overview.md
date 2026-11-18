@@ -5,7 +5,7 @@ date:   2025-11-06
 last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
-categories: blockchain ethereum ZKP
+categories: blockchain ethereum defi
 tags: steakhouse-finance defi blockchain
 description: Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosystem, Steakhouse has gone on to become a curator and DeFi advisory firm working with some of the largest protocols, including Lido, Morpho, Ethena, ENS, Arbitrum, and more.
 image: /assets/article/blockchain/defi/2025-11-06-steakhouse-finance-overview-mindmap.png
@@ -17,6 +17,17 @@ Initially established as core contributors to the Sky (f.k.a. MakerDAO) ecosyste
 Reference used: [steakhouse.financial](https://www.steakhouse.financial) / [hackmd.io/@SteakhouseFi](https://hackmd.io/@SteakhouseFi) / [Aribtrum forum](https://forum.arbitrum.foundation/t/steakhouse-financial-step-program-manager/23829) / [ENS discussion](https://discuss.ens.domains/t/ens-financial-reporting-by-steakhouse/16601/21).
 
 [TOC]
+
+## What you need to know first
+
+The vault descriptions below use a few DeFi lending notions without explaining them.
+
+- **Over-collateralized lending**: a borrower deposits collateral worth more than the loan, and the position is liquidated if the collateral value falls too far. Every vault in this article earns its yield by lending a stablecoin or ETH to such borrowers; see [How Morpho Blue Works]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/).
+- **Curated lending vaults**: depositors put one asset into a vault, and a curator chooses which lending markets receive it and up to which cap. Steakhouse plays this role on Morpho and Kamino; see [How Morpho Vault V1 (MetaMorpho) Works, and What Vault V2 Changes]({{site.url_complet}}/2026/10/10/morpho-vault-v1-metamorpho/).
+- **Timelock and guardian**: on a MetaMorpho vault, sensitive changes such as raising a market cap wait for a delay before taking effect, and a guardian can cancel them in the meantime. The Smokehouse vaults rely on a 3-day timelock and an Aragon DAO acting as guardian.
+- **Real-world assets (RWA)**: tokens that represent off-chain assets such as Treasury bills or loan portfolios, issued by a regulated entity that holds the underlying. Several vaults accept them as collateral, and Grove allocates Sky's reserves into them.
+- **Price oracles**: contracts that publish an asset's market price on-chain, which a lending market reads to decide when a position can be liquidated; see [How to build a blockchain oracle]({{site.url_complet}}/2024/04/16/build-blockchain-oracle/). Steakhouse runs a validator for the Chronicle oracle network.
+- **Sky (formerly MakerDAO)**: the protocol that issues the DAI and USDS stablecoins against collateral and invests part of its reserves; see [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/). Steakhouse started as a contributor to it.
 
 ## Kamino Finance
 
@@ -99,7 +110,7 @@ Proposal date: November 9, 2023
 
 The inaugural USDC vault curated by Steakhouse Financial will initially lend against tokenized T-bills, namely Backed Finance’s bIB01. bIB01 is an ERC-20 token backed by IB01 ([Blackrock’s iShares 0-1 yr US Treasury ETF](https://www.ishares.com/uk/individual/en/products/307243/ishares-treasury-bond-0-1yr-ucits-etf)). Suppliers to the vault can earn a passive yield by lending their USDC to over-collateralized borrowers, who in turn provide bIB01 as collateral for their loans.
 
-Reference:  [Steakhouse Financial: RWA-backed Flagship USDC MetaMorpho Vault Whitlisting](https://forum.morpho.org/t/steakhouse-financial-rwa-backed-flagship-usdc-metamorpho-vault-whitlisting/375)https://forum.morpho.org/t/steakhouse-financial-rwa-backed-flagship-usdc-metamorpho-vault-whitlisting/375)
+Reference:  [Steakhouse Financial: RWA-backed Flagship USDC MetaMorpho Vault Whitlisting](https://forum.morpho.org/t/steakhouse-financial-rwa-backed-flagship-usdc-metamorpho-vault-whitlisting/375)
 
 
 
@@ -181,6 +192,27 @@ See [Lido - research](https://research.lido.fi/t/lido-dao-finance-workstream-pro
 The mindmap below summarizes the article.
 
 ![Steakhouse Financial overview mindmap]({{site.url_complet}}/assets/article/blockchain/defi/2025-11-06-steakhouse-finance-overview-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Vault curator** | The entity that selects the markets and collateral a lending vault may use and sets its caps; Steakhouse acts as one on Morpho and as a risk contributor on Kamino. |
+| **Lending vault** | A contract that pools deposits of one asset and lends them across several lending markets to earn yield for its depositors. |
+| **MetaMorpho vault** | Morpho's vault design, through which Steakhouse launched its first RWA-backed USDC vault in 2023. |
+| **Over-collateralized loan** | A loan backed by collateral worth more than the borrowed amount, as with the bIB01-backed USDC loans of the first Steakhouse vault. |
+| **Blue-chip collateral** | Large, liquid crypto assets accepted as collateral in the Prime vaults, as opposed to the wider range of the High Yield vaults. |
+| **Real-world asset (RWA)** | A token representing an off-chain asset, such as a tokenized Treasury bill or a loan portfolio, used as collateral or as an investment. |
+| **Tokenized T-bill** | A token backed by short-term US government debt, such as Backed Finance's bIB01, backed by the iShares 0-1 year US Treasury ETF. |
+| **Dual engine** | Steakhouse's name for a vault that lends against both blue-chip crypto and RWA collateral, shifting between them with market conditions. |
+| **Timelock** | A delay imposed before a significant curator action takes effect, so depositors can exit if they disagree with it. |
+| **Guardian** | An on-chain role, held by an Aragon DAO for the Smokehouse vaults, that can veto significant curator actions during the timelock. |
+| **Reallocation** | Moving a vault's funds between its lending markets, which Steakhouse performs through a programmatic system. |
+| **Grove** | The credit protocol built by Steakhouse for Sky, whose Grove Allocator deploys USDS into tokenized on-chain and off-chain assets. |
+| **Collateralized loan obligation (CLO)** | A pooled portfolio of loans split into tranches; the Janus Henderson Anemoy AAA CLO Strategy is an on-chain version that received a $1 billion Sky allocation through Grove. |
+| **Oracle validator** | A participant that signs price data for an oracle network; Steakhouse holds this role for Chronicle Protocol. |
 
 ## Related articles
 

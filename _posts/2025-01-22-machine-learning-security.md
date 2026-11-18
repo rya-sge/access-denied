@@ -33,6 +33,16 @@ Then:
 
 [TOC]
 
+## What you need to know first
+
+The four sections assume that the reader knows what an LLM and a prompt are; a few notions one level below are used without being explained.
+
+- **Training and fine-tuning**: a model learns its behaviour from a large training corpus, and fine-tuning continues that training on a smaller dataset to specialise it. Corpus poisoning targets this stage, since whatever is in the data shapes the answers the model later gives.
+- **Instructions and data in the same input**: an LLM receives its developer's instructions (often a system prompt) and the user's or a document's text as one sequence of tokens, with no hard boundary between them. Prompt injection exploits this: text supplied as data can be read by the model as a new instruction. The site's [Claude Code security]({{site.url_complet}}/2026/01/13/claude-code-security/) article shows how an agent limits the damage with permissions and sandboxing.
+- **Adversarial attacks on machine learning**: these attacks target the model's data or inputs rather than the software around it, to make the model behave as the attacker wants. Data poisoning and prompt injection, both discussed here, are two examples.
+- **Principle of least privilege**: each user, process or tool receives only the access it needs for its task. The Shadow AI section applies it to the access granted to AI systems, so that a misused or compromised tool reaches as little data as possible.
+- **Social engineering**: an attack that manipulates a person into acting against their interest, for example by impersonating someone they trust. Deepfakes make it more convincing by faking a known voice or face, and the article reuses the term for a chatbot talked into a bad deal.
+
 ## How Chatbots Could Be 'Hacked' by Corpus Poisoning
 
 > **Corpus poisoning** is a method of corrupting or manipulating the data used to train or fine-tune machine learning models, particularly those that rely on large language models (LLMs) or generative AI systems. By introducing malicious, biased, or deceptive content into the training dataset—known as the **corpus**—attackers can influence the behavior and outputs of the AI system.
@@ -198,6 +208,26 @@ If technology alone can’t solve the problem, what can we do?
 #### Conclusion
 
 Deepfakes represent a new tools in the hand of malicious actors to perform their attacks whether for financial fraud, phishing or more political with disinformation.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Large language model (LLM)** | A generative AI model trained on large amounts of text, which produces answers from input prompts and powers the chatbots discussed here. |
+| **Corpus** | The body of data used to train or fine-tune a model, which serves as the chatbot's knowledge base. |
+| **Corpus poisoning** | Inserting malicious, biased or deceptive content into a model's corpus to influence its outputs, for example to make it recommend a toxic mix or vulnerable code. |
+| **Data poisoning** | An adversarial attack that corrupts the data a model learns from; corpus poisoning is a form of it. |
+| **Shadow AI** | AI tools or models used inside an organisation without the approval, knowledge or oversight of its IT or security teams. |
+| **Discovery** | The first step against Shadow AI: finding the models, the training and tuning data and the applications that use them, often in cloud environments. |
+| **AI security posture management** | Ongoing visibility and control over an organisation's AI systems, so that they are secured against data exfiltration, access mismanagement and adversarial attacks. |
+| **Prompt injection** | An attack in which malicious instructions placed in the input change the AI's behaviour, such as the dealership chatbot agreeing to sell an SUV for $1. |
+| **Jailbreaking** | A form of prompt injection that coerces a model into operating outside its ethical and security constraints. |
+| **Human in the loop** | Keeping a person in the decision path to review the AI's actions, one of the defences against prompt injection. |
+| **Deepfake** | Synthetic audio, video or images created with deep learning to replicate a person's likeness, voice or mannerisms realistically. |
+| **Out-of-band verification** | Confirming a request through an independent channel, such as calling back a trusted number, instead of trusting the channel it arrived on. |
+| **Pre-shared code word** | A secret phrase agreed in advance by a family or organisation to authenticate sensitive communications against deepfake impersonation. |
 
 ## References
 

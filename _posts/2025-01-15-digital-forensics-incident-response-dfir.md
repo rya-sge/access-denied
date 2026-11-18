@@ -2,7 +2,7 @@
 layout: post
 title: Digital Forensics and Incident Response (DFIR) - Introduction
 date:   2025-01-15
-last_modified_at: 2025-01-22
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: security tryhackme
@@ -27,6 +27,17 @@ This field helps Security Professionals identify:
 > This article is based on the room [DFIR: An Introduction](https://tryhackme.com/r/room/introductoryroomdfirmodule) by TryHackMe
 
 [TOC]
+
+## What you need to know first
+
+This introduction names several notions of security operations and forensics in passing, without defining them.
+
+- **Forensic artifact**: a trace of activity left on a system, such as a log entry, a registry key, a file timestamp or a process in memory. DFIR collects and interprets these artifacts to reconstruct what an attacker did, and the tools listed below each extract a family of them.
+- **Indicators of compromise (IoCs)**: observable signs that a system has been attacked, such as a malicious file hash, an IP address or a domain. The Identification step starts from such indicators; the site's [Pyramid of Pain]({{site.url_complet}}/2024/11/28/pyramid-of-pain/) article classifies them by how hard they are for an attacker to change.
+- **False positive**: an alert raised for activity that turns out to be benign. Sifting false alarms from real incidents is one of the reasons for DFIR given below, and it happens during Identification.
+- **Disk image and memory capture**: investigators work on copies of the evidence, a bit-for-bit image of a disk or a dump of a machine's RAM, rather than on the live system. Autopsy analyses the first and Volatility the second; the [disk image (dd) article]({{site.url_complet}}/2022/09/16/forensic-image-disk-dd/) shows how such an image is analysed.
+- **Windows registry**: the hierarchical database in which Windows stores system and user configuration, and which also records traces of user and program activity. Eric Zimmerman's tools parse it alongside the file system.
+- **Timeline analysis**: ordering the timestamps found in many artifacts into one chronology of events. KAPE and Zimmerman's tools help build such a timeline to establish the extent and timeframe of a breach.
 
 
 
@@ -64,12 +75,14 @@ Different organizations have published standardized methods to perform Incident 
 
 ### NIST SP-800-61
 
-NIST has defined a process in their [SP-800-61 Incident Handling guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r2.pdf), which has the following steps:
+NIST has defined a process in their [SP-800-61 Rev. 2 Incident Handling guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r2.pdf), which has the following steps:
 
 1. Preparation
 2. Detection and Analysis
 3. Containment, Eradication, and Recovery
 4. Post-incident Activity
+
+This four-step lifecycle comes from Revision 2 (2012). [SP 800-61 Rev. 3](https://csrc.nist.gov/pubs/sp/800/61/r3/final), published in April 2025, supersedes it and places incident response within the NIST Cybersecurity Framework (CSF) 2.0. The SANS comparison below uses the Rev. 2 steps.
 
 ### SANS - Incident Handler's handbook (PICERL)
 
@@ -149,7 +162,27 @@ You can learn more about Redline in the [Redline room](https://tryhackme.com/roo
 
 Velociraptor is an advanced endpoint-monitoring, forensics, and response platform. It is open-source but very powerful.
 
-You can learn more about Redline in the [Velociraptor room](https://tryhackme.com/room/velociraptorhp).
+You can learn more about Velociraptor in the [Velociraptor room](https://tryhackme.com/room/velociraptorhp).
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **DFIR** | Digital Forensics and Incident Response, the field that collects forensic artifacts from digital devices to investigate a security incident. |
+| **Digital forensics** | The discipline of identifying forensic artifacts or evidence of human activity on digital devices. |
+| **Incident response (IR)** | The process of handling a security incident, which uses forensic information to identify the activity of interest and remove the attacker. |
+| **Forensic artifact** | A trace of activity on a computer, media device or smartphone that an investigator collects as evidence. |
+| **NIST SP 800-61** | The NIST incident handling guide; Rev. 2 (2012), superseded by Rev. 3 in April 2025, defines four steps: Preparation, Detection and Analysis, Containment, Eradication and Recovery, and Post-incident Activity. |
+| **PICERL** | The acronym of the six steps of the SANS Incident Handler's handbook: Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned. |
+| **Containment** | The step that limits the effects of an incident with short-term and long-term fixes based on forensic analysis. |
+| **Eradication** | The step that removes the threat from the network, after making sure its entry point is closed so the attacker cannot regain a foothold. |
+| **Lessons Learned** | The final step, a review and documentation of the incident so the team is better prepared for the next one; NIST calls it Post-incident Activity. |
+| **KAPE** | Kroll Artifact Parser and Extractor, a tool by Eric Zimmerman that automates the collection and parsing of forensic artifacts and helps build a timeline. |
+| **Autopsy** | An open-source forensics platform that analyses data from media such as hard drives, mobile devices and removable drives, extended by plugins. |
+| **Volatility** | A memory analysis tool for memory captures of Windows and Linux systems. |
+| **Velociraptor** | An open-source endpoint-monitoring, forensics and response platform. |
 
 ## FAQ
 

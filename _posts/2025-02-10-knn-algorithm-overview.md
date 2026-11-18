@@ -18,6 +18,17 @@ isMath: true
 
 [TOC]
 
+## What you need to know first
+
+The article uses a few machine learning notions without developing them:
+
+- **Supervised learning.** The training data is a set of examples whose correct answer (the label) is known, and the algorithm must predict that answer for new examples. KNN is a supervised method: the labels of the stored training points are what the neighbors vote with.
+- **Classification and regression.** Classification predicts a category, such as a class among several, while regression predicts a numerical value. KNN handles both, by majority vote for the first and by averaging for the second.
+- **Feature vectors.** Each example is described by a fixed list of numerical attributes (features), so it can be treated as a point with one coordinate per feature. The distance formulas of the article operate on these coordinates, written $$x_i$$ and $$y_i$$.
+- **Overfitting and decision boundaries.** A classifier splits the feature space into regions, one per predicted class, separated by decision boundaries. A model overfits when those boundaries follow the noise of the training data instead of the general pattern, and then predicts poorly on new data; the choice of $$K$$ trades between this and overly smooth boundaries.
+- **Cross-validation.** The data is split into several parts, the model is trained on all but one and evaluated on the held-out part, and the scores are averaged over the possible splits. The article uses it to choose $$K$$ and the Minkowski parameter $$p$$.
+- **Normalization and standardization.** Normalization rescales each feature to a fixed range such as $$[0, 1]$$, and standardization transforms it to zero mean and unit variance. Either keeps a feature with large values from dominating the distance, which is why the article lists scaling as a requirement for KNN.
+
 ------
 
 ## How KNN Works

@@ -1,0 +1,48 @@
+@startuml
+title Lifecycle of a Pipeline build in Jenkins
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam swimlane {
+  BorderColor #335061
+}
+|Trigger|
+start
+:SCM webhook, cron, upstream job,
+REST POST /job/X/build or CLI;
+|Controller|
+:Queue item created;
+:Quiet period elapses
+(close triggers merge into one build);
+:Pipeline run starts,
+Groovy script runs in the controller JVM
+(CPS-transformed);
+:node / agent block reached:
+request an executor matching the label;
+if (Free executor on a matching node?) then (yes)
+  :Assign executor, allocate workspace;
+else (no)
+  :NodeProvisioner asks a Cloud
+  for a new agent;
+  |Agent|
+  :Agent pod or VM starts,
+  agent.jar connects back
+  (inbound WebSocket or TCP);
+  |Controller|
+  :Assign executor on the new agent;
+endif
+|Agent|
+:Run sh / bat steps in the workspace;
+:Stream log back over Remoting;
+|Controller|
+:Write state to program.dat and
+build directory under JENKINS_HOME;
+:Archive artifacts, record tests,
+run post conditions;
+:Release executor
+(cloud agent may be removed when idle);
+stop
+@enduml

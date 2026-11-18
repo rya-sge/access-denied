@@ -90,3 +90,7 @@ mit-6-0002:
 dependabot:
   title: "Dependabot and Dependency Security"
   ordered: false
+
+jenkins:
+  title: "Jenkins Architecture and Security"
+  ordered: false

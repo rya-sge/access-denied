@@ -1379,3 +1379,16 @@ _posts/2026-11-16-tranched-stablecoins-loss-waterfall.md
   assets/article/blockchain/defi/tranched-stablecoins/tranched-stablecoins-waterfalls-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/defi/tranched-stablecoins/infinifi-pending-loss-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article, no .puml
+
+_posts/2026-11-17-jenkins-architecture.md
+  assets/article/devops/jenkins/2026-11-17-jenkins-architecture-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/devops/jenkins/jenkins-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/devops/jenkins/jenkins-build-lifecycle-workflow.puml   (workflow -> .png, asset only)
+  assets/article/devops/jenkins/jenkins-infra-deployment.puml   (concept, deployment -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (controller/agents flowchart, build queue sequence), no .puml
+
+_posts/2026-11-17-jenkins-security.md
+  assets/article/devops/jenkins/jenkins-security-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/devops/jenkins/jenkins-security-trust-boundaries-concept.puml   (concept -> .png, asset only)
+  assets/article/devops/jenkins/jenkins-security-cli-file-read-workflow.puml   (workflow, CVE-2024-23897 -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (entry-points flowchart, CVE-2024-23897 sequence), no .puml

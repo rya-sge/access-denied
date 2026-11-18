@@ -2,6 +2,7 @@
 layout: post
 title: "Bio's Voter Stake Registry - Vote-Escrow Governance on Solana with spl-governance"
 date:   2026-09-18
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solana defi
@@ -309,4 +310,4 @@ Both grant time-weighted governance power for locking `BIO`, but `veBIO` weights
 - [Introduction to Solana Anchor — Core Concepts and Testing]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/)
 - [Solana Core Concept]({{site.url_complet}}/2024/09/19/solana-core-concept/)
 - [Solana Programs - Basic Security with Anchor]({{site.url_complet}}/2024/08/20/solana-smart-contract-basic-security/)
-- [Solana Staking - Overview]({{site.url_complet}}/2025/11/07/solana-staking-overview/)
+- [Solana Staking - Overview]({{site.url_complet}}/2025/11/09/solana-staking-overview/)

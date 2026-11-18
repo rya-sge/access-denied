@@ -16,9 +16,21 @@ This article presents the different standards to represent cross-chain token on 
 
 [TOC]
 
+## What you need to know first
+
+The three standards below assume a few bridge and EVM mechanisms that the article uses without explaining them.
+
+- **Lock-and-mint and burn-and-mint bridges**: a lock-and-mint bridge locks the original tokens on the source chain and mints a representation on the destination chain. A burn-and-mint bridge destroys the tokens on the source chain and mints the same amount on the destination chain, which is the model all three standards expose through their `mint`/`burn` functions; see [Cross-Chain Bridge Threat Model - Assets, Trust Boundaries, STRIDE and Threat Register]({{site.url_complet}}/2026/07/31/cross-chain-bridge-threat-model/).
+- **Bridged token fragmentation**: when each bridge issues its own wrapped version of a token, the destination chain ends up with several representations that are not interchangeable. This is the fungibility problem that ERC-7281 sets out to fix.
+- **Mint and burn access control**: a token that lets outside contracts call `mint` and `burn` must restrict who may call them. Here the token issuer keeps an allowlist of bridges, and a compromised bridge can only mint up to the limit it was given.
+- **Rate limit**: a cap on how much can be minted or burned over time. In ERC-7281 the current limit of a bridge refills at `ratePerSecond` up to its `maxLimit`, so a burst of minting drains it and waiting restores it.
+- **ERC-165 interface detection**: a contract implementing ERC-165 exposes `supportsInterface(bytes4)`, which tells callers whether it implements a given interface. `IERC7802` extends `IERC165`, so a bridge can check that a token supports `crosschainMint` and `crosschainBurn` before calling them.
+- **OP Stack predeploys and the Superchain**: the Superchain is the set of chains built on Optimism's OP Stack. Predeploys are system contracts placed at fixed addresses starting with `0x4200...` on every OP Stack chain, which is why `SuperchainTokenBridge` has the same address everywhere.
+- **Same-address deployment**: `CREATE2` computes a contract address from the deployer, a salt and the hash of the init code, so the same deployment gives the same address on every EVM chain. SuperchainERC20 relies on this, because its bridge mints on the destination chain at the token's own address; see [Nonce Management and CREATE2 in ERC-4337 Smart Wallets]({{site.url_complet}}/2026/02/17/nonce-management-create2-smart-wallets-erc4337/).
+
 ## ERC-7281 (xERC20): Sovereign Bridged Tokens
 
-> [ERC specification](https://eips.ethereum.org/EIPS/eip-7802), [Pull Request](https://github.com/ethereum/ERCs/pull/89)
+> [ERC specification (draft in the closed pull request)](https://github.com/ethereum/ERCs/blob/052a0c89d98d6042617874caef323f415327f1ee/ERCS/erc-7281.md), [Pull Request](https://github.com/ethereum/ERCs/pull/89)
 >
 > Status: Draft
 >
@@ -272,6 +284,26 @@ interface IERC7905 {
 The three standards address cross-chain token representation at different levels of scope. ERC-7281 (xERC20) gives the token issuer sovereignty over which bridges can mint or burn, with per-bridge rate limits and an optional Lockbox to wrap an existing ERC-20. ERC-7802 reduces the surface to a minimal `crosschainMint` / `crosschainBurn` interface intended as a common entry point for bridge logic, and is the basis for Optimism's `SuperchainERC20`. ERC-7905 keeps the xERC20 limit model but drops the Lockbox and configuration functions for a smaller footprint. All three are still at Draft status.
 
 ![Cross-chain token standards mindmap]({{site.url_complet}}/assets/article/blockchain/ethereum/cross-chain-token/2025-05-07-cross-chain-token-overview-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Cross-chain token** | A token whose supply can move between several chains while staying one asset for its holders. |
+| **Bridge** | The contract that carries a token transfer from one chain to another, here by burning on the source chain and minting on the destination chain. |
+| **Token sovereignty** | The issuer's control over which bridges may mint and burn its token, instead of each bridge deciding on its own representation. |
+| **xERC20** | The name of the ERC-7281 token: an ERC-20 extended with a mint/burn interface for allowlisted bridges and per-bridge limits. |
+| **Lockbox** | The ERC-7281 wrapper contract that holds the home-chain liquidity of an existing ERC-20 and issues the xERC20 against it. |
+| **Home chain** | The chain where the original ERC-20 lives and where the Lockbox holds its liquidity. |
+| **Minting limit / burning limit** | The amount a given bridge may mint or burn, set by the issuer with `setLimits` and read with `mintingMaxLimitOf` and `burningMaxLimitOf`. |
+| **Current limit** | The amount a bridge can still mint or burn at a given moment, which refills over time at `ratePerSecond` up to the max limit. |
+| **ERC-7802** | A minimal interface with only `crosschainMint`, `crosschainBurn` and their two events, as standard entry points for authorized bridges. |
+| **`CrosschainMint` / `CrosschainBurn`** | The ERC-7802 events that record the target address, the amount and the caller, so off-chain indexers can follow cross-chain supply. |
+| **SuperchainERC20** | Optimism's ERC-20 implementation of ERC-7802 for token transfers between Superchain chains. |
+| **SuperchainTokenBridge** | The Optimism bridge at `0x4200000000000000000000000000000000000028` that must be allowed to call `crosschainMint` and `crosschainBurn`. |
+| **ERC-7905** | A minimal xERC20 that keeps only `mint`, `burn` and the limit views, and drops the Lockbox and configuration functions of ERC-7281. |
 
 ## Frequently Asked Questions
 

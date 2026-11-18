@@ -7,7 +7,7 @@ locale: en-GB
 lang: en
 categories: defi blockchain
 tags: defi futures perpetual derivatives funding-rate trading
-description: A technical comparison of traditional futures and crypto perpetual futures, covering no-arbitrage pricing, mark-to-market settlement, the funding rate mechanism, and liquidation.
+description: "Traditional futures versus crypto perpetual futures: no-arbitrage pricing, mark-to-market settlement, the funding rate mechanism and liquidation."
 isMath: true
 image: /assets/article/blockchain/defi/perpetual-futures/2025-12-29-traditional-vs-perpetual-futures-mindmap.png
 ---
@@ -19,6 +19,18 @@ This article compares the two instruments. The pricing theory for the traditiona
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## What you need to know first
+
+The article defines arbitrage and long and short positions itself, but it relies on a few finance and trading notions that it uses without introducing them.
+
+- **Continuous compounding and discounting**: at a constant rate $$r$$ compounded continuously, an amount $$A$$ borrowed today grows to $$A e^{rT}$$ after $$T$$ years, and an amount due at $$T$$ is worth $$e^{-rT}$$ times that amount today. The forward price $$S(0)e^{rT}$$ and the discount factor in the expected-value attempt both use this convention.
+- **Expected value of a random price**: the terminal spot price $$S(T)$$ is treated as a random variable, and $$\mathbb{E}[S(T)]$$ is its average under an assumed probability distribution. The article uses it only to show why a price that depends on such an assumption is a poor choice.
+- **Leverage and margin**: a leveraged position controls a notional larger than the collateral posted. The initial margin is what must be deposited to open the position, and the maintenance margin is the smaller amount that must remain to keep it open; see [Understanding Hyperliquid - The Vocabulary, from Beginner to Advanced]({{site.url_complet}}/2026/09/09/hyperliquid-glossary/).
+- **Position notional**: the market value of a position, its size multiplied by the price. Funding payments and the ADL ranking formulas are both expressed as a fraction of it.
+- **Realised and unrealised profit and loss**: the unrealised PnL is the gain or loss of an open position at the current price, and it becomes realised when the position is closed or settled. Liquidation triggers and the Binance ranking compare collateral with the unrealised part.
+- **Index price**: perpetual venues do not compare the contract with a single trade but with a reference spot price, usually aggregated from several spot exchanges. The article's $$S_t$$ in the funding mechanism stands for this spot or index price.
+- **Insurance fund**: a reserve kept by a derivatives venue to cover the shortfall when a liquidated position's collateral does not cover its loss. Auto-deleveraging only starts once this fund cannot absorb the losses.
 
 ## Foundations: No-Arbitrage and Positions
 
@@ -231,7 +243,7 @@ Traditional futures are favoured in regulated venues such as CME and ICE for ris
 
 Suppose Bitcoin trades at $60,000$ on the spot market.
 
-- A **quarterly traditional future** might trade at $61,200$, a premium of roughly 2% (annualised) that reflects the cost of carry. As the quarterly expiry approaches, this premium decays and the futures price converges to spot.
+- A **quarterly traditional future** might trade at $61,200$, a premium of 2% over the quarter (roughly 8% annualised) that reflects the cost of carry. As the quarterly expiry approaches, this premium decays and the futures price converges to spot.
 - A **perpetual future** might oscillate between $59,950$ and $60,050$, staying close to spot because funding-rate arbitrage continuously corrects deviations.
 
 If the perpetual premium persists above spot, the funding rate turns positive, say $$f = 0.01\%$$ every 8 hours, and longs pay shorts to restore balance. The longer the gap persists, the more it costs to hold the rich side.
@@ -254,6 +266,31 @@ Traditional futures and perpetual futures share the core properties of a derivat
 The perpetual model provides continuous liquidity and avoids contract rollovers, which suits crypto markets, at the cost of funding-rate volatility and continuous liquidation risk. As perpetual contracts extend beyond digital assets, the distinction between time-based convergence and funding-based anchoring is the structural detail that traders and risk managers need to track.
 
 ![Traditional vs perpetual futures mindmap]({{site.url_complet}}/assets/article/blockchain/defi/perpetual-futures/2025-12-29-traditional-vs-perpetual-futures-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Arbitrage** | A guaranteed risk-free profit from a trade or a series of trades; the pricing results assume no such opportunity exists. |
+| **Spot price $$S(t)$$** | The price of the underlying asset for immediate delivery at time $$t$$. |
+| **Long and short position** | A long position gains when the price of the asset rises; a short position, often opened by short selling, gains when it falls. |
+| **Forward contract** | A private over-the-counter agreement to buy or sell an asset at a fixed delivery time $$T$$ for a price agreed in advance, settled once at maturity. |
+| **Forward price $$F(t,T)$$** | The delivery price that makes a forward worth zero at inception; without income or holding costs it is $$S(t)e^{r(T-t)}$$. |
+| **Counterparty risk** | The risk that the party owing money on a contract defaults before settlement, which a forward carries until delivery. |
+| **Futures contract** | A standardised, exchange-traded agreement for delivery at a specified date, guaranteed by a clearing house and marked to market daily. |
+| **Clearing house** | The central entity that guarantees exchange-traded futures, so that neither party is exposed to the other's default. |
+| **Mark-to-market** | Settling the change in a position's value as a cash flow at each step, daily for traditional futures, instead of letting it accumulate until maturity. |
+| **Cost-of-carry model** | The generalised forward price $$S_t e^{(r + c - y)(T - t)}$$, where $$c$$ is the storage or carrying cost and $$y$$ the convenience yield. |
+| **Basis** | The gap $$F(t,T) - S(t)$$ between the futures and the spot price, which converges to zero as $$t$$ approaches $$T$$. |
+| **Perpetual future** | A futures contract with no expiration date, held as long as margin requirements are met and anchored to spot by a funding rate; also called a perpetual swap. |
+| **Funding rate** | The periodic payment rate between longs and shorts of a perpetual; positive when the perpetual trades above spot, so that longs pay shorts, and negative otherwise. |
+| **Funding payment** | The amount exchanged at each funding interval, equal to the position notional times the funding rate. |
+| **Liquidation** | The forced closure of a position by the platform once the loss approaches the collateral securing it. |
+| **Margin call** | The request, on a traditional futures account, to add funds when the account equity falls below the maintenance requirement. |
+| **Auto-deleveraging (ADL)** | The reduction of profitable or highly leveraged positions on the opposite side of a liquidation, in ranking order, when the insurance fund cannot cover the losses. |
+| **Effective leverage** | In the Binance ADL ranking, the absolute position notional divided by the wallet balance plus the unrealised profit. |
 
 ## Frequently Asked Questions
 

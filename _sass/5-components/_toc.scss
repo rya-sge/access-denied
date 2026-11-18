@@ -36,6 +36,22 @@
   }
 }
 
+/*
+  A long article has a 20 to 40 entry TOC, which as one column pushed the first
+  section a full screen down. On wide screens it is set in two columns; a
+  section and its sub-entries never split across them.
+*/
+@media only screen and (min-width: 1100px) {
+  .c-toc__list {
+    columns: 2;
+    column-gap: 40px;
+
+    > li {
+      break-inside: avoid;
+    }
+  }
+}
+
 @media only screen and (max-width: 480px) {
   .c-toc {
     padding: 12px 15px;

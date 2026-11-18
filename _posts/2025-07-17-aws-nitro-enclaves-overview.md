@@ -7,7 +7,7 @@ lang: en
 locale: en-GB
 categories: security
 tags: amazon enclave nitro secure-environement
-description: AWS Nitro Enclaves, a feature of Amazon EC2,  aims to offer highly isolated and secure execution environments.
+description: "AWS Nitro Enclaves, an Amazon EC2 feature that creates isolated virtual machines for sensitive data: architecture, attestation, KMS and supported instances."
 image: /assets/article/virtualization/amazon/nitro_enclaves_eks.png
 isMath: false
 ---
@@ -17,6 +17,17 @@ Cloud workloads are routinely encrypted at rest and in transit, but data being p
 **AWS Nitro Enclaves**, a feature of Amazon EC2,  aims to offer highly isolated and secure execution environments. These enclaves provide a trusted runtime for workloads such as cryptographic operations, personally identifiable information (PII) processing, and sensitive machine learning inference.
 
 [TOC]
+
+## What you need to know first
+
+The overview below assumes a few virtualization and cloud-security concepts that it uses without explaining.
+
+- **Virtual machines and hypervisors**: a hypervisor divides a physical host's CPUs and memory between virtual machines and keeps each one from reading the others' memory. A Nitro Enclave is such a virtual machine, carved out of the vCPUs and memory of its parent EC2 instance.
+- **Trusted execution environments**: a trusted execution environment (TEE) runs code in an area that the rest of the system, including its administrators, cannot inspect or modify. Nitro Enclaves are AWS's VM-based form of a TEE, and the site's article on the [Zama KMS]({{site.url_complet}}/2026/09/18/zama-kms-threshold-key-management-architecture-and-operation/) shows one deployed in production.
+- **Measurements**: a measurement is a cryptographic hash of a piece of code or configuration taken before it runs. An enclave's PCRs hold such hashes, so a verifier can compare them with the values it expects; PCR0, for instance, is the hash of the enclave image file.
+- **Remote attestation**: in remote attestation, a component outside the TEE receives a document signed by the platform that lists the measurements, checks the signature up to a trusted root, and only then trusts the code. An enclave can also place a public key in its attestation document so that the reply is encrypted to the enclave alone.
+- **AWS KMS key policies**: AWS Key Management Service keeps keys inside the service and decides who may use them through key policies and IAM permissions. Those policies can carry conditions on attestation values, which is how a key is released only to an enclave whose measurements match.
+- **Kubernetes device plugins and EKS nodes**: a device plugin advertises a node's special hardware to the kubelet so that pods can request it as a resource. On Amazon EKS, the nodes are EC2 instances started from a launch template, which is where enclave support has to be switched on.
 
 ------
 
@@ -36,7 +47,7 @@ Reference: [AWS - What is Nitro Enclaves?](https://docs.aws.amazon.com/enclaves/
 
 ## Key Architectural Components
 
-Nitro Enclaves are built on the **AWS Nitro System**, the same hypervisor that powers EC2, ensuring performance, security, and hardware-level isolation. Here's how the architecture works:
+Nitro Enclaves are built on the **AWS Nitro System**, the combination of dedicated hardware (Nitro Cards, Nitro Security Chip) and the lightweight Nitro Hypervisor on which modern EC2 instances run. An enclave uses the same Nitro Hypervisor that isolates EC2 instances from one another to isolate its vCPUs and memory from the parent instance. Here's how the architecture works:
 
 ### Parent Instance
 
@@ -92,7 +103,7 @@ Nitro Enclaves are **processor-agnostic** and work on most **Intel, AMD, and AWS
 - **Graviton**: At least **2 vCPUs**
 - **Linux-only** enclaves, although the parent instance can run Linux or Windows
 
-Some instance types (e.g., `t3`, `g5g`, `u-*`) are excluded. Also, Nitro Enclaves are not supported on **Outposts**, **Local Zones**, or **Wavelength Zones**.
+Only the instance families listed in the AWS user guide are supported, without the smallest size and most `.metal` sizes of each family. Burstable types such as `t3`, some accelerated types such as `g5g` and the High Memory `u-*` instances are not supported at all. Also, Nitro Enclaves are not supported on **Outposts**, **Local Zones**, or **Wavelength Zones**.
 
 ------
 
@@ -171,9 +182,32 @@ See [What is Nitro Enclaves? - pricing](https://docs.aws.amazon.com/enclaves/lat
 
 For workloads that involve confidential data and demand strong security boundaries, Nitro Enclaves can be a suitable option within an overall cloud security strategy.
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Data in use** | Data being processed in memory, the third state alongside data at rest and data in transit, which Nitro Enclaves aim to protect. |
+| **AWS Nitro System** | The AWS virtualization platform that EC2 runs on and on which Nitro Enclaves are built, providing hardware-level isolation. |
+| **Nitro Enclave** | An isolated, hardened virtual machine with its own kernel, vCPUs and memory, created from a parent EC2 instance and with no persistent storage, network access or interactive access. |
+| **Parent instance** | The Nitro-based EC2 instance that allocates vCPUs and memory to an enclave, is the only entity that can talk to it, and whose lifecycle the enclave follows. |
+| **Enclave Image File (EIF)** | The `.eif` file from which an enclave is launched, containing its operating system, libraries and application. |
+| **vsock** | The local virtual socket that is the only communication channel between the parent instance and its enclaves. |
+| **Nitro CLI** | The command-line tool used to create, manage and terminate enclaves. |
+| **Nitro Enclaves SDK** | The developer toolkit for writing enclave-aware applications and calling services such as AWS KMS with attestation. |
+| **Cryptographic attestation** | The process by which an enclave proves its identity and integrity to another party, such as KMS, using an attestation document. |
+| **Attestation document** | A document generated by the Nitro Hypervisor that contains the enclave's measurements, including its PCRs, and other metadata. |
+| **Platform Configuration Register (PCR)** | A cryptographic hash in the attestation document that lets a verifier check that the enclave's code and environment have not changed. |
+| **AWS Key Management Service (KMS)** | The AWS service that performs key operations such as decryption or key generation for an enclave only when its attestation matches an approved configuration. |
+| **KMS proxy** | A component on the parent instance that forwards the enclave's requests to KMS, since the enclave has no network access of its own. |
+| **Nitro Enclaves Kubernetes device plugin** | The plugin installed on enclave-enabled EKS nodes that lets pods on that node create and manage enclaves. |
+| **Confidential computing** | Processing sensitive data in an isolated, attested environment so that it stays protected while in use, the class of workloads Nitro Enclaves target. |
+
 ## Reference
 
 - [docs.aws.amazon.com - What is Nitro Enclaves?](https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html)
+- [aws.amazon.com - AWS Nitro System](https://aws.amazon.com/ec2/nitro/)
 - ChatGPT to summarize the documentation
 
 ### Related articles

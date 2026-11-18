@@ -20,6 +20,18 @@ This article is a summary of the following video [AWS re:Invent 2024 - Blockchai
 
 [TOC]
 
+## What you need to know first
+
+The article summarises a talk on wallet infrastructure and relies on a few security and wallet concepts that it names without explaining.
+
+- **Hardware Security Module (HSM)**: a tamper-resistant device that generates and stores cryptographic keys and performs signing inside the hardware, so the private key is not exported in clear. The article uses AWS CloudHSM as the base of a cold wallet; see [PCI PTS HSM v4.0 — How Payment Hardware Security Modules Are Evaluated]({{site.url_complet}}/2026/07/20/pci-pts-hsm-security-requirements-v4/) for how such devices are evaluated.
+- **Hot and cold wallets**: a hot wallet keeps its signing key reachable by an online service so it can sign transactions automatically, while a cold wallet keeps the key in an environment with no network access. The article maps the first to Lambda and KMS and the second to CloudHSM; [Crypto Wallets Explained - Types, Risks, and How to select it]({{site.url_complet}}/2024/10/08/crypto-wallet-introduction/) covers the distinction.
+- **Confidential computing**: protecting data while it is being processed, not only at rest or in transit, by running the code in an isolated environment that the host operator cannot inspect. Nitro Enclaves are AWS's offer in this category; see [AWS Nitro Enclaves: Secure and Isolated Compute for Sensitive Data]({{site.url_complet}}/2025/07/17/aws-nitro-enclaves-overview/).
+- **Attestation**: a signed statement produced by the isolated environment that describes the code it runs, which a remote party checks before trusting it. In the Fireblocks co-signer, KMS releases the decryption key only to an enclave whose attestation matches the expected code.
+- **Multi-party computation (MPC) signing**: several parties each hold a share of a key and run a protocol that produces a valid signature without ever reconstructing the full key in one place. Circle and Fireblocks both rely on it; see [Overview, security and applications of Multi-Party Computation (MPC)]({{site.url_complet}}/2024/10/21/mpc-protocol-overview/).
+- **Smart contract accounts and ERC-4337**: an account whose rules are code rather than a single private key, with ERC-4337 routing its operations through an `EntryPoint` contract instead of the protocol itself. The ERC-6900 modular wallets mentioned for Circle build on this model; see [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/).
+
+
 
 
 ## Building Blocks of Blockchain Wallets
@@ -80,7 +92,7 @@ Nitro Enclaves support cryptographic attestation, allowing enclaves to verify th
 1. **Hot Wallets**
    Hot wallets can be implemented with `AWS Lambda` and `KMS` for serverless operation. Transactions are processed via API Gateway, with KMS providing signature services.
 2. **Cold Wallets (AWS CloudHSM)**
-   Cold wallets utilize `AWS CloudHSM` within a private subnet, ensuring complete offline functionality. These wallets are highly secure and suited for institutional custody solutions.
+   Cold wallets utilize `AWS CloudHSM` within a private subnet, which has no route to the internet. The HSM is still online inside the VPC: clients reach it over the network through an elastic network interface, so this design isolates the key on the network rather than keeping it offline (air-gapped). These wallets are highly secure and suited for institutional custody solutions.
 
 ---
 
@@ -151,6 +163,29 @@ The policy engine, serialization and signing all run inside confidential computi
 A blockchain wallet holds the keys that move funds, so its implementation is where the security of the whole application concentrates. 
 
 The AWS services covered here, Nitro Enclaves in particular, give a framework for building wallets that keep signing keys isolated even from the operator running them. 
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Hardware Security Module (HSM)** | A tamper-resistant device that stores keys and performs cryptographic operations inside the hardware, the basis of AWS CloudHSM. |
+| **AWS KMS** | AWS's managed key service, used to create and control keys that encrypt or sign data, and in the hot-wallet design to provide the signature. |
+| **AWS CloudHSM** | Single-tenant, FIPS-validated HSM instances running in the customer's own VPC, used in the article as the base of a cold wallet. |
+| **AWS Nitro Enclave** | An isolated, constrained virtual machine inside an EC2 instance, with no external networking, no administrator access and memory-only storage. |
+| **Cryptographic attestation** | Proof produced by an enclave about the code it runs, which KMS policies check so that only trusted enclaves can access sensitive keys. |
+| **Hot wallet** | A wallet whose key is reachable by an online service, implemented here with Lambda, API Gateway and KMS for serverless signing. |
+| **Cold wallet** | A wallet whose key is kept away from internet-facing systems, implemented here with CloudHSM in a private subnet (network isolation, not air-gapped) and suited to institutional custody. |
+| **Multi-party computation (MPC)** | A technique where several parties jointly sign with shares of a key, so the complete private key never exists in a single location. |
+| **Key share (shard)** | One party's piece of an MPC key, held by Fireblocks' co-signers or by the customer's device or co-signer server. |
+| **API Co-Signer** | The Fireblocks component that holds a customer's MPC signing key shares and configuration keys and can run inside a Nitro Enclave. |
+| **Policy engine** | The Fireblocks component that enforces user-defined rules on a transaction before it is serialised and signed. |
+| **ERC-6900 modular account** | A smart contract account standard with pluggable modules, called either from the ERC-4337 `EntryPoint` or directly by EOAs and other contracts. |
+
+## References
+
+- [AWS CloudHSM cluster architecture](https://docs.aws.amazon.com/cloudhsm/latest/userguide/cluster-architecture.html)
 
 ## Related articles
 

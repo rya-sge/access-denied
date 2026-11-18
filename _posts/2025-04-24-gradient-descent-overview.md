@@ -16,6 +16,16 @@ Gradient descent is one of the most important algorithms in machine learning and
 
 > This article comes primarily from ChatGPT with some modifications on my part. I hope to make it more personal in the future
 
+## What you need to know first
+
+The article uses a few notions from calculus and machine learning without explaining them.
+
+- **Derivatives and partial derivatives**: the derivative of a function gives its slope at a point, and a partial derivative gives the slope along one variable when the others are held fixed. The gradient $$\nabla J(\theta)$$ in the update rule collects the partial derivatives of the cost with respect to each parameter.
+- **Supervised learning**: the model is trained on examples whose correct output $$y_{\text{true}}$$ is known, and its prediction $$y_{\text{pred}}$$ is compared with it. The loss and cost functions below measure that gap.
+- **Neural network weights**: a neural network computes its output through layers of weighted connections, and those weights are the parameters $$\theta$$ that training adjusts; see [Convolutional Neural Networks (CNNs) - Overview]({{site.url_complet}}/2024/11/19/convolutional-neural-networks-overview/).
+- **Backpropagation and the chain rule**: the chain rule gives the derivative of a composition of functions as the product of the derivatives of its parts. Backpropagation applies it layer by layer, from the output back to the input, to obtain the gradient for every weight, which gradient descent then uses.
+- **Transformers**: the neural network architecture behind models such as BERT and GPT, built on the attention mechanism; see [Transformers - Attention is All You Need]({{site.url_complet}}/2025/01/13/transformers/). The article uses them as the example of large-scale training with the Adam optimizer.
+
 ## What is Gradient Descent?
 
 Gradient descent is an **optimization algorithm**. It’s used to find the **minimum of a function**—typically a *cost function* or *loss function* in machine learning. The goal is to adjust the model's parameters (like `weights`in a neural network) so that the predictions get closer to the actual values. This adjustment is performed through the `update rule`.
@@ -77,10 +87,10 @@ Here’s a simplified breakdown:
 
 ### The Update Rule
 
-For a parameter θ, the update rule looks like this:
+For the parameter vector θ, the update rule looks like this:
 $$
 \begin{aligned}
-\theta_i = \theta_i - \alpha \cdot \nabla J(\theta)
+\theta \leftarrow \theta - \alpha \cdot \nabla J(\theta)
 \end{aligned}
 $$
 
@@ -193,9 +203,9 @@ Three places this can happen:
 ### Saddle Point
 
 - The cost function looks like a **saddle**:
-  - Going one direction: slope goes **up** (a local maximum).
-  - Going the other direction: slope goes **down** (a local minimum).
-- Gradient ≈ 0 at the saddle’s center → **confuses gradient descent into thinking it’s stuck.**
+  - Along one direction, the center is a **minimum**: the cost goes **up** on both sides.
+  - Along another direction, the center is a **maximum**: the cost goes **down** on both sides.
+- Gradient ≈ 0 at the saddle’s center → the updates become tiny, so **gradient descent can stall there although it is not a minimum.**
 
 From [Wikipedia - Saddle_point](https://en.wikipedia.org/wiki/Saddle_point)
 

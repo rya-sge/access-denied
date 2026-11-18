@@ -20,6 +20,18 @@ Acknowledge: I discovered several standards, thanks to [Sandesh B Suvarna](https
 
 [TOC]
 
+## What you need to know first
+
+The standards below are presented mostly through their interfaces, and those interfaces assume a few Solidity and EVM mechanisms that the article does not explain.
+
+- **ERC-165 interface detection**: a contract exposes `supportsInterface(bytes4)` and answers true for each interface it implements, where an interface ID is the XOR of its function selectors. This is the "ERC-165 ID" column of the summary table, and the way an extension such as ERC-5192 or ERC-6551's execution interface signals that it is present.
+- **Approvals and operators**: an ERC-721 owner can call `approve` to authorise one address for a single token, or `setApprovalForAll` to authorise an operator for all its tokens. Marketplaces rely on the operator role to move tokens on sale, and ERC-6909 reworks this permission system; [ERC-721 (NFT) Overview: Implementation, Security, and Best Practices]({{site.url_complet}}/2025/03/03/erc721-overview/) covers the ERC-721 functions in detail.
+- **Safe transfers and receiver callbacks**: `safeTransferFrom` calls `onERC721Received` on a recipient contract and reverts unless it returns the expected value, so tokens are not locked in a contract that cannot handle them. ERC-1155 uses the same pattern, and ERC-6909 removes these callbacks to save gas and code size.
+- **Events**: an event is a log entry recorded with the transaction, which contracts cannot read but indexers, wallets and marketplaces use to follow state changes. ERC-2309 and ERC-4906 are both standards about which event to emit: `ConsecutiveTransfer` reports a whole range of minted tokens, since one `Transfer` per token costs gas in proportion to the number of tokens, and `MetadataUpdate` tells marketplaces to refresh a token.
+- **Custom errors**: since Solidity 0.8.4 a contract can revert with a named error and typed parameters instead of a revert string, which is cheaper and easier for tools to decode. ERC-6093 standardises those errors for ERC-20, ERC-721 and ERC-1155.
+- **Contract accounts, `DELEGATECALL` and `CREATE2`**: a smart contract can hold tokens and act as an account, `DELEGATECALL` runs another contract's code in the caller's storage, and `CREATE2` deploys a contract at an address computed in advance from the deployer, a salt and the code. ERC-6551 combines them to give each NFT a deterministic account that can execute these operations; see [Programming proxy contracts with OpenZeppelin \| Summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/) for `DELEGATECALL`.
+
+
 ----
 
 ## Summary: Ethereum NFT Standards
@@ -43,7 +55,7 @@ Here a list of use case and their corresponding standards:
 **ERC-721 extensions or compatible**:
 
 - Semi-Fungible tokens: [ERC-3525](https://eips.ethereum.org/EIPS/eip-3525): 
-- Royalty payment: [ERC-2771](https://eips.ethereum.org/EIPS/eip-2771)
+- Royalty payment: [ERC-2981](https://eips.ethereum.org/EIPS/eip-2981)
 - Extendable NFT metadata protocol: [ERC-3664](https://github.com/DRepublic-io/EIPs/blob/master/EIPS/eip-3664.md)
 - Rentable NFTs: [ERC-4907](https://eips.ethereum.org/EIPS/eip-4907)
 - Non-transferable NFT: [ERC-5192](https://eips.ethereum.org/EIPS/eip-5192)
@@ -121,7 +133,7 @@ For more details, you can read my article [ERC-721 (NFT) Overview: Implementatio
 
 - **Uniqueness:** Each token is unique and distinguishable by its ID.
 - **Transferability:** Tokens can be transferred between accounts.
-- **Ownership Tracking:** Ownership history is immutably recorded on-chain.
+- **Ownership Tracking:** The contract stores the current owner of each token (`ownerOf`); past owners are not kept in storage, but the history can be rebuilt from the `Transfer` events recorded on-chain.
 - **Interoperability:** main interface to represent NFT, supported by many wallets, NFT marketplaces, and exchanges.
 - Additional information (symbol, name, URI) can be linkted to the NFT through the optional metadata extension
 
@@ -263,7 +275,7 @@ interface IERC4906 is IERC165, IERC721 {
 
 ##### ERC-6093: Custom errors for commonly-used tokens
 
-> [EIP reference](https://eips.ethereum.org/EIPS/eip-4906)
+> [EIP reference](https://eips.ethereum.org/EIPS/eip-6093)
 >
 > Status: last call
 >
@@ -1674,7 +1686,7 @@ Accounts implementing this interface MUST accept the following operation paramet
 - 0 = CALL
 - 1 = DELEGATECALL
 - 2 = CREATE
-- 3 = CREAT2
+- 3 = CREATE2
 
 ```solidity
 // @dev Executes a low-level operation if the caller is a valid signer on the account.
@@ -1960,7 +1972,7 @@ ERC-721A is an extension of the ERC-721 standard designed for gas efficiency whe
 
 The code is available on the [Chiru Labs GitHub](https://github.com/chiru-labs/ERC721A).
 
-They implement also several other ERC related to NFT, such as [ERC-4097](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/extensions/ERC4907A.sol) or [ERC-2309](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/ERC721A.sol#L884)
+They implement also several other ERC related to NFT, such as [ERC-4907](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/extensions/ERC4907A.sol) or [ERC-2309](https://github.com/chiru-labs/ERC721A/blob/6f8a82a7b2833ad8b2fc7b54349281143a731fdd/contracts/ERC721A.sol#L884)
 
 **Key Features:**
 
@@ -1983,5 +1995,34 @@ See also [ERC-721a](https://www.erc721a.org)
 >
 > Reference implementation: [0xacme](https://github.com/0xacme/ERC404), [Pandora-Labs-Org - erc404](https://github.com/Pandora-Labs-Org/erc404)
 
-ERC404 is an experimental, mixed ERC20 / ERC721 implementation with native liquidity and fractionalization. While these two standards are not designed to be mixed, this implementation strives to do so in as robust a manner as possible while minimizing tradeoffs.https://hacken.io/discover/erc-404/
+ERC404 is an experimental, mixed ERC20 / ERC721 implementation with native liquidity and fractionalization. While these two standards are not designed to be mixed, this implementation strives to do so in as robust a manner as possible while minimizing tradeoffs. See also [Hacken - ERC-404](https://hacken.io/discover/erc-404/).
 
+
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Non-fungible token (NFT)** | A token that represents a unique item, distinguished from every other token of its contract by its ID. |
+| **Token ID** | The `uint256` identifier of an NFT inside its contract; ERC-721 and ERC-3525 make it unique, while an ERC-1155 ID can carry a balance of identical items. |
+| **ERC-165 interface ID** | The identifier a contract reports through `supportsInterface` to signal that it implements a standard, listed for each standard in the summary table. |
+| **Metadata extension** | The optional ERC-721 interface exposing `name`, `symbol` and `tokenURI`, the URI that may point to a JSON file describing the asset. |
+| **Operator** | An address authorised with `setApprovalForAll` to manage all the NFTs of an owner, as opposed to the approved address of a single token. |
+| **safeTransferFrom** | The ERC-721 transfer function that checks the recipient can handle ERC-721 tokens before completing the transfer. |
+| **Multi-token standard (ERC-1155)** | A standard where one contract manages fungible, semi-fungible and non-fungible tokens, with batch transfers to lower gas costs. |
+| **Semi-fungible token (ERC-3525)** | A token modelled as an `<ID, SLOT, VALUE>` triple, where value can move between tokens of the same slot; a value of 10 is one item with a face value of 10. |
+| **ERC-6909** | A minimal multi-token interface, simpler than ERC-1155, without callbacks or batching and with a hybrid operator-approval scheme. |
+| **ConsecutiveTransfer (ERC-2309)** | An event reporting the creation or transfer of a range of consecutive token IDs, instead of one `Transfer` event per token. |
+| **MetadataUpdate (ERC-4906)** | Events signalling that the metadata of one token or a range of tokens changed, so marketplaces can refresh it. |
+| **ERC-6093 custom errors** | A standard set of errors for ERC-20, ERC-721 and ERC-1155 tokens, such as `ERC721NonexistentToken`, implemented by OpenZeppelin. |
+| **Royalty (ERC-2981)** | Royalty information a token exposes through `royaltyInfo` so marketplaces can pay creators on secondary sales; the standard does not force payment. |
+| **Consumer role (ERC-4400)** | A role, distinct from the owner, granted permission to use or consume a given NFT, for example while the NFT is staked. |
+| **User and expires (ERC-4907)** | The rental role of ERC-4907: an address granted usage rights over an NFT until an expiry time, after which the role is revoked automatically. |
+| **Soulbound token** | A non-transferable NFT bound to an account or another NFT, standardised minimally by ERC-5192 and with agreed burn authorisation by ERC-5484. |
+| **Nestable NFT (ERC-6059)** | An NFT whose owner can be another NFT, forming parent-child relationships in which a parent can own several children. |
+| **Equippable parts and Catalog (ERC-6220)** | An extension where NFTs equip fixed or slot parts listed in a Catalog, adding components to render without minting a new token. |
+| **Token bound account (ERC-6551)** | A smart contract account assigned to an NFT by a singleton registry at a deterministic address, controlled by the holder of that NFT. |
+| **Dual nature token pair (ERC-7631)** | An ERC-20 contract and an ERC-721 contract linked so that transfers on one are reflected on the other, implemented by DN-404. |
+| **ERC-721A** | Azuki's gas-optimised ERC-721 implementation, where minting several NFTs in one transaction costs almost as much as minting one. |

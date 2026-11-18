@@ -7,7 +7,7 @@ lang: en
 locale: en-GB
 categories: solidity blockchain ethereum
 tags: solidity ethereum openzeppelin data
-description: This article explores data structures in OpenZeppelin Contracts v5, including EnumerableSet, DoubleEndedQueue, CircularBuffer, Checkpoints, Heap, and MerkleTree.
+description: "Data structures in OpenZeppelin Contracts v5: BitMaps, EnumerableMap, EnumerableSet, DoubleEndedQueue, CircularBuffer, Checkpoints, Heap and MerkleTree."
 image: /assets/article/blockchain/solidity/2025-07-29-openzeppelin-data-structure-mindmap.png
 isMath: 
 ---
@@ -15,6 +15,7 @@ isMath:
 OpenZeppelin Contracts v5 is a robust and widely used smart contract library for Solidity developers. Among its many features, it includes a suite of **custom data structures** that simplify common patterns in decentralized applications. This article explores the following data structures:
 
 - `BitMaps`
+- `EnumerableMap`
 - `EnumerableSet`
 - `DoubleEndedQueue`
 - `CircularBuffer`
@@ -29,6 +30,17 @@ See [OpenZeppelin V5 - data structure](https://docs.openzeppelin.com/contracts/5
 > This article comes primarily from OpenZeppelin and ChatGPT. I hope to make it more personal in the future.
 
 [TOC]
+
+## What you need to know first
+
+The data structures below are built on a few Solidity and EVM mechanisms that the article uses without developing them:
+
+- **Storage slots.** A contract's persistent state is stored in 32-byte slots. Writing a slot from zero to a non-zero value is the most expensive storage write, which is why `BitMaps` packs 256 booleans into one slot.
+- **Warm and cold access.** Since [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929), the first access to a storage slot in a transaction is "cold" and costs more gas than later "warm" accesses to the same slot. `BitMaps` benefits from it when sequential indices share a slot.
+- **Solidity mappings are not enumerable.** A `mapping` has no length and no list of its keys, so a contract cannot iterate over it. `EnumerableSet` and `EnumerableMap` add that ability on top of a mapping.
+- **Libraries and `using for`.** A Solidity library is reusable code attached to a type with `using Library for Type;`, so that `whitelist.add(user)` calls the library function with `whitelist` as its first argument. Every structure in this article is used this way.
+- **Merkle trees and proofs.** A Merkle tree hashes leaves pairwise up to a single root, and a Merkle proof is the list of sibling hashes that shows a leaf belongs to the tree. See [Cyfrin First Fight 42 - Snowman Merkle Airdrop]({{site.url_complet}}/2025/07/11/cyfrin-first-fight-42-snowman-merkle-aidrop/) for an airdrop that relies on them.
+- **Vote snapshots in governance.** Token governance reads each voter's balance at a past point in time rather than the current one, so tokens moved after a proposal starts cannot be counted twice. `Checkpoints` stores the history that makes such lookups possible.
 
 ## BitMaps
 
@@ -129,21 +141,25 @@ function dequeue() external returns (address) {
 
 `CircularBuffer` is a **fixed-size buffer** that overwrites older elements when full, ideal for **bounded history** or **limited event storage** scenarios.
 
+It is available since v5.1 with a single `Bytes32CircularBuffer` type, so other types are cast to and from `bytes32`.
+
 ### Example:
 
 ```solidity
-CircularBuffer.Uint32Buffer private buffer;
+using CircularBuffer for CircularBuffer.Bytes32CircularBuffer;
+
+CircularBuffer.Bytes32CircularBuffer private buffer;
 
 constructor() {
-    buffer = CircularBuffer.newUint32Buffer(5); // buffer of size 5
+    buffer.setup(5); // buffer of size 5
 }
 
 function addNumber(uint32 n) external {
-    buffer.push(n); // Overwrites oldest if full
+    buffer.push(bytes32(uint256(n))); // Overwrites oldest if full
 }
 
 function getLatest() external view returns (uint32) {
-    return buffer.at(buffer.length() - 1);
+    return uint32(uint256(buffer.last(0))); // last(0) is the most recent value
 }
 ```
 
@@ -190,7 +206,7 @@ The structure is designed to perform the following operations with the correspon
 
 ### Description:
 
-`MerkleTree` helps you construct and verify **Merkle proofs** on-chain. It’s useful in **airdrop verification**, **allowlists**, or **zero-knowledge applications**.
+`MerkleTree` helps you build a Merkle tree on-chain by inserting leaves and updating its root; the proofs against that root are verified with the separate `MerkleProof` library. It’s useful in **airdrop verification**, **allowlists**, or **zero-knowledge applications**.
 
 Each tree is a complete binary tree with the ability to sequentially insert leaves, changing them from a zero to a non-zero value and updating its root. 
 
@@ -210,7 +226,27 @@ OpenZeppelin’s data structures offer powerful building blocks for secure, effi
 
 OpenZeppelin Contracts v5 provides a data structure for each of these uses: `EnumerableSet` for whitelists, `Checkpoints` for tracking history, `CircularBuffer` and `Deque` for handling events, and `MerkleTree` for airdrops.
 
+## Annex
 
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **OpenZeppelin Contracts v5** | A widely used Solidity smart contract library whose `utils/structs` folder provides the data structures covered here. |
+| **Library (`using for`)** | Solidity code attached to a type, so that a structure's functions are called as methods, as in `whitelist.add(user)`. |
+| **Storage slot** | A 32-byte unit of a contract's persistent storage; a regular `bool` occupies a whole slot for one value. |
+| **Warm slot** | A storage slot already accessed in the current transaction, which is cheaper to access again. |
+| **BitMaps** | A library that maps `uint256` keys to booleans by packing 256 sequential values into the bits of a single slot. |
+| **EnumerableMap** | An enumerable variant of Solidity's `mapping`, with O(1) add, remove and lookup, and O(n) enumeration in no guaranteed order. |
+| **EnumerableSet** | A set of `address`, `uint256` or `bytes32` values with O(1) add, remove and membership checks, which can also be enumerated. |
+| **DoubleEndedQueue (deque)** | A queue that allows inserting and removing elements at both ends, for task queues, buffers or event logs. |
+| **CircularBuffer** | A fixed-size buffer that overwrites its oldest element when full, suited to bounded history. |
+| **Checkpoints** | A library that records how a value changes over time and looks up past values, used by governance `Votes`. |
+| **Trace** | The `Checkpoints.Trace*` struct that stores the history of checkpoints for one value. |
+| **Heap** | A priority queue stored as a tree in an array, where the root at index 0 holds the highest-priority value, with O(1) peek and O(log n) insert and pop. |
+| **Merkle tree** | A complete binary tree of hashes whose root commits to all its leaves; OpenZeppelin's `MerkleTree` inserts leaves sequentially and updates the root. |
+| **Merkle proof** | The data that shows a leaf belongs to a tree whose root is known, verified with OpenZeppelin's `MerkleProof`. |
+| **Zero value** | The value that represents an empty leaf in a `MerkleTree`, so that regular zero values are kept out of the tree. |
 
 ## Reference
 

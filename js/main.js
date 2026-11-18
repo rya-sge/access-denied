@@ -77,6 +77,23 @@ $(document).ready(function () {
     'customSelector': ['iframe[src*="ted.com"]']
   });
 
+  /* =======================
+  // Open diagrams full size
+  ======================= */
+
+  // Mindmaps and PlantUML diagrams are scaled down to the column, which makes
+  // their labels hard to read. Each article image that is not already a link
+  // now opens the full-size file in a new tab.
+  $('.c-wrap-content img').each(function () {
+    if ($(this).closest('a').length) return;
+    $(this).wrap($('<a>', {
+      href: this.currentSrc || this.src,
+      target: '_blank',
+      rel: 'noopener',
+      'class': 'c-zoomable'
+    }));
+  });
+
   /* =======================================
   // Switching between posts and categories
   ======================================= */

@@ -1,0 +1,52 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #335061
+  }
+  :depth(0) {
+    BackgroundColor #335061
+    FontColor white
+  }
+  :depth(1) {
+    BackgroundColor #335061
+    FontColor white
+  }
+}
+</style>
+* Jenkins security
+** Threat model
+*** Credentials of every target system
+*** Code execution on controller and agents
+*** Supply chain: artifacts it builds and signs
+** Security model
+*** Realm = who you are
+*** Authorization strategy = what you may do
+*** Overall/Administer = full compromise
+*** Builds run as SYSTEM by default
+** Isolation
+*** 0 executors on the built-in node
+*** Agent-to-controller access control
+*** Ephemeral agents for untrusted builds
+** Groovy
+*** Script Console = RCE by design
+*** Sandbox and script approval
+*** Trusted libraries run unsandboxed
+** Secrets
+*** secrets/master.key unencrypted on disk
+*** Masking stops accidents only
+*** Single quotes, not GStrings
+** Web and network
+*** CSRF crumbs, CSP, resource root URL
+*** CLI and API tokens
+*** CVE-2024-23897 file read to RCE
+** Advisories 2017-2026
+*** 1,541 issues, 88% in plugins
+*** Permission checks, secrets, CSRF, XSS
+*** 38% of plugin issues unfixed at publication
+** Hardening
+*** Patch core and plugins
+*** Least privilege, folder credentials
+*** jenkins.io infra as a reference
+@endmindmap

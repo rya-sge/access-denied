@@ -4,7 +4,7 @@ Index of all articles under `_posts/`. One row per article: filename (the slug u
 
 This file is maintained as the lookup table for the `update-article` skill: when asked to update an article, match the request against the **Title** / **Description** / **Filename** columns here to identify the target `_posts/<filename>` before editing.
 
-**Total: 226 articles.** Regenerate with the scanner described at the bottom of this file after adding or renaming posts.
+**Total: 229 articles.** Regenerate with the scanner described at the bottom of this file after adding or renaming posts.
 
 | Filename | Title | Categories | Description |
 |----------|-------|------------|-------------|
@@ -235,6 +235,8 @@ This file is maintained as the lookup table for the `update-article` skill: when
 | `2026-11-16-morpho-blue-vault-v2.md` | How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2 | blockchain defi ethereum | Morpho from its code: isolated Blue markets, shares, the AdaptiveCurveIRM, liquidations and bad debt, the Chainlink oracle, Vault V1 and V2, depositor risks. |
 | `2026-11-16-pendle-v2-pt-yt-amm.md` | How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral | blockchain defi ethereum | Pendle V2 from its code: SY wrappers, the PT/YT split, the logit rate AMM with a worked trade, PT prices to expiry, TWAP and linear oracles, PT as collateral. |
 | `2026-11-16-tranched-stablecoins-loss-waterfall.md` | Who Absorbs the Loss? Tranched Stablecoins Compared - infiniFi, f(x) Protocol and Liquity | blockchain defi ethereum | Who pays first in infiniFi (buffer, liUSD, siUSD, iUSD price), f(x) Protocol (rebalance, reserve, debtIndex) and Liquity's stability pool, read from the code. |
+| `2026-11-17-jenkins-architecture.md` | How Jenkins Works - Controller, Agents, Plugins, Pipeline and JENKINS_HOME | programmation | Jenkins from its docs: controller and agents, Remoting, the build queue, plugins, JENKINS_HOME, Stapler, Pipeline CPS, JCasC, how jenkins.io runs its own CI. |
+| `2026-11-17-jenkins-security.md` | Jenkins Security - Threat Model, Permissions, Groovy, Credentials and Nine Years of Advisories | security programmation | Why a Jenkins controller is worth attacking, what Overall/Administer and the Groovy sandbox allow, and what 1,541 advisory issues say about plugins. |
 
 ---
 

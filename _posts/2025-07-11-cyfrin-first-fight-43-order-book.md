@@ -1,14 +1,14 @@
 ---
 layout: post
-title: "Cyfrin First Fight 39 - Order Book"
+title: "Cyfrin First Fight 43 - Order Book"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 series: cyfrin-first-fight
-description: First Fight 43 - Order Book.
+description: "Cyfrin First Fight 43, Order Book: an on-chain order book selling ERC-20 tokens for USDC, with the reported findings on front-running and fee rounding."
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-43-order-book-mindmap.png
 isMath: false
 ---
@@ -21,7 +21,18 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-07-
 
 [TOC]
 
+## What you need to know first
 
+The findings below rely on the following mechanisms without developing them:
+
+- **Mempool and transaction ordering.** A signed transaction waits in a public pool of pending transactions before a validator includes it in a block. Anyone can read that pool, and a transaction offering a higher gas price is usually included first, which is the basis of both front-running findings.
+- **Front-running and MEV.** Front-running means placing a transaction before a pending one to profit from it; MEV (maximal extractable value) is the value that can be extracted by reordering, inserting or delaying transactions. See [CoW Protocol - Intent & MEV protection]({{site.url_complet}}/2024/11/21/cow-protocol-overview/) for one protocol built against it.
+- **Slippage protection.** A function that acts on mutable state lets the caller pass the values they expect (a minimum output, a maximum price) and reverts if the state no longer matches. H-01 proposes exactly this for `buyOrder`.
+- **ERC-20 allowance and `transferFrom`.** A holder first calls `approve` to let a contract spend their tokens, and the contract then pulls them with `transferFrom`. The order book uses this to lock the seller's tokens and to collect the buyer's USDC.
+- **`SafeERC20`.** An OpenZeppelin library whose `safeTransfer` and `safeTransferFrom` revert when a token call fails or returns `false`, including for tokens that return no value. See the [ERC-20 library comparison]({{site.url_complet}}/2026/02/13/erc20-library-comparison-openzeppelin-solady-solarity/).
+- **Integer division and token decimals.** Solidity integer division truncates the remainder, so a small numerator divided by a larger constant gives zero. USDC uses 6 decimals, so prices are stored in its smallest unit (the low-severity finding calls it "wei"), and that is the unit in which the fee rounds down.
+- **Time-lock and commit-reveal.** A time-lock forces a delay between requesting an action and executing it; commit-reveal first publishes a hash of an action and only later the action itself. Both are proposed as defences against front-running in the missed submission.
+- **Foundry tests.** The proofs of concept are [Foundry](https://getfoundry.sh/) tests in Solidity, where cheatcodes such as `vm.prank` and `vm.startPrank` make the next calls come from a chosen address and `makeAddr` derives a labelled test address.
 
 ## Description
 
@@ -612,9 +623,32 @@ The standard industry practice to prevent such rounding issues is to increase th
 ```
 
 **Impact of the Fix:**
-With this change, the fee calculation becomes significantly more precise. While a price of 33 wei would still result in a zero fee (`(33 * 300) / 10000 = 0`), the threshold for earning a fee is much lower. For a more realistic low-value transaction of **1 USDC (1,000,000 wei)**, the fee would be:
-`(1,000,000 * 300) / 10000 = 30,000 wei` (or 0.03 USDC).
-This ensures that fees are collected fairly and consistently across almost all non-trivial trades, patching the revenue leak.
+This change alone does not move the threshold: `(x * 300) / 10000` equals `(x * 3) / 100` for every `x`, so a price of 33 base units of USDC or less (`(33 * 300) / 10000 = 0`) still pays no fee, exactly as before. For a transaction of **1 USDC (1,000,000 base units)**, both formulas give the same fee:
+`(1,000,000 * 300) / 10000 = 30,000` base units (or 0.03 USDC).
+To close the leak, the fee must be rounded up (for example with OpenZeppelin `Math.mulDiv(price, FEE, PRECISION, Math.Rounding.Ceil)`) or the contract must enforce a minimum order price, so that every non-zero trade pays a non-zero fee.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Order book** | A list of open buy and sell orders for an asset; here, an on-chain contract where sellers list ERC-20 tokens at a fixed USDC price and buyers fill them directly. |
+| **Sell order** | An `Order` struct holding the seller, the token and amount to sell, the price in USDC, a deadline and an `isActive` flag, identified by a unique `orderId`. |
+| **Mempool** | The public set of pending transactions waiting to be included in a block, readable by anyone, including bots and the seller. |
+| **Front-running** | Getting a transaction executed before a pending one that was observed in the mempool, for example by paying a higher gas price. |
+| **MEV (maximal extractable value)** | The value that can be captured by ordering, inserting or delaying transactions; automated MEV bots make the front-running finding likely. |
+| **Slippage** | The difference between the terms a user saw when signing a transaction and the terms applied when it executes; here, a changed `amountToSell` or `priceInUSDC`. |
+| **Slippage protection** | Extra parameters such as `expectedAmountToSell` and `expectedPriceInUSDC` that make `buyOrder` revert when the order no longer matches what the buyer saw. |
+| **`amendSellOrder`** | The function that lets a seller change the amount, price or deadline of an active order, which a seller can call while a buyer's transaction is pending. |
+| **`SafeERC20`** | OpenZeppelin's wrapper around ERC-20 calls that reverts on a failed transfer; the contract uses it for every token movement. |
+| **Allowance** | The amount a holder lets a contract spend through `approve`; buyers approve the order book before `buyOrder` pulls their USDC. |
+| **Protocol fee** | The 3% cut taken in `buyOrder`, computed as `(priceInUSDC * FEE) / PRECISION` and added to `totalFees`. |
+| **Precision loss** | The truncation of Solidity integer division, which makes the fee zero for any price from 1 to 33 units of USDC. |
+| **Basis point (bp)** | One hundredth of a percent (0.01%); the proposed fix expresses the fee as 300 bps over a precision of 10,000. |
+| **Time-lock** | A mandatory delay between requesting an amendment and applying it, proposed in the missed submission through a `PendingAmendment` struct. |
+| **Commit-reveal** | A two-step scheme that publishes a commitment to an action first and the action itself later, cited as a missing defence against front-running. |
+| **Proof of Concept (PoC)** | A runnable test that demonstrates a finding; here, Foundry tests that show a trade at 33 units of USDC collecting zero fee. |
 
 ## Mindmap
 

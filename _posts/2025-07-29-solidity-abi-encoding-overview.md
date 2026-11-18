@@ -34,6 +34,17 @@ Each serves a specific purpose, and choosing the right one is important—not ju
 
 [TOC]
 
+## What you need to know first
+
+The comparison below assumes a few Solidity and EVM mechanisms that it uses without explaining.
+
+- **Calldata and function selectors**: a call to a contract carries calldata whose first 4 bytes, the function selector, are the first 4 bytes of `keccak256` of the canonical signature such as `"transfer(address,uint256)"`. The ABI-encoded arguments follow, which is exactly what `abi.encodeWithSignature` and `abi.encodeWithSelector` build.
+- **Static and dynamic types in the standard ABI**: a static value such as `uint256`, `address` or `bytes32` fills one 32-byte word. A dynamic value such as `bytes`, `string` or `T[]` is replaced in place by an offset, and its length and content are written further on; that length prefix is what `abi.encodePacked` drops.
+- **Hashing an encoding**: contracts hash encoded data with `keccak256` to build identifiers, mapping keys and signed messages. A collision in this article does not break `keccak256` itself: two different argument lists produce the same bytes before hashing, so they get the same hash.
+- **Signed messages and `ecrecover`**: a contract that checks an [ECDSA]({{site.url_complet}}/2024/10/23/ecdsa-overview/) signature recomputes the hash of the signed fields and recovers the signer from it. If two different sets of fields encode to the same bytes, one signature is accepted for both.
+- **EIP-712 typed data**: [EIP-712](https://eips.ethereum.org/EIPS/eip-712) defines how to hash structured data for off-chain signing, combining a domain separator with a struct hash. The struct hash is built with `abi.encode` over the type hash and the fields, with dynamic fields hashed first, which avoids the packed-mode ambiguity.
+- **Low-level `call`**: `address.call(data)` sends raw calldata and returns `(bool success, bytes memory returnData)` instead of reverting on failure. A call to an address with no code also returns `success = true`, so the caller has to check the result and, where it matters, that the target is a contract.
+
 
 
 ## `abi.encode(...)`
@@ -47,7 +58,7 @@ Each argument gets padded to a fixed 32-byte size, reducing the risk of ambiguit
 ### Characteristics:
 
 - **Returns**: Dynamic `bytes` array
-- **Includes**: Padding of each parameter to 32 bytes, data type info
+- **Includes**: Padding of each parameter to 32 bytes, plus offsets and lengths for dynamic types. The encoding carries no type information, so the decoder must already know the types
 - **Use Case**: When interacting with other contracts or building calldata manually
 
 ### Example:
@@ -76,7 +87,7 @@ Furthermore, structs as well as nested arrays are not supported.
 
 ### What It Does:
 
-`abi.encodePacked(...)` creates a **tightly packed** version of the encoded data. It strips out padding and data type info, resulting in a smaller byte array.
+`abi.encodePacked(...)` creates a **tightly packed** version of the encoded data. It drops most of the padding and the offsets and lengths of dynamic types, resulting in a smaller byte array.
 
 ### Characteristics:
 
@@ -107,7 +118,7 @@ Here a list of dynamic types:
 1. **`bytes`** (dynamically sized byte array)
 2. **`string`** (UTF-8 encoded, dynamically sized)
 3. **`T[]` dynamic arrays** (for any type `T`, including nested dynamic arrays like `uint[][]`)
-4. **`mapping`** (conceptually dynamic, but cannot be directly encoded)
+4. **`mapping`** is not an ABI type at all: it can only live in storage and cannot be passed to `abi.encode` or `abi.encodePacked`, so it is listed here only to rule it out
 5. **`structs` containing any of the above dynamic types**
 
 *Note: `bytes1`…`bytes32` and fixed-size arrays are **static types** and do not pose this specific risk.*
@@ -137,7 +148,9 @@ This becomes dangerous if you're using such hashes as **unique identifiers**, **
 
 #### Known exploit
 
-```solidity
+The snippet below is Rust, not Solidity, and does not call `abi.encodePacked`: it concatenates the fields with `format!` before hashing them, which has the same ambiguity because nothing separates one field from the next.
+
+```rust
 fn permit (& mut self, public_key: String, signature: String,
 owner: Key, spender: Key, value: U256, deadline: u64,) {
 //..
@@ -270,6 +283,29 @@ abi.encodeWithSelector(bytes4(keccak256("transfer(address,uint256)")), recipient
 Solidity's encoding functions are powerful tools for interacting with smart contracts, hashing data, and building secure systems. Understanding their differences—and the subtle risks involved—is essential for safe and effective smart contract development.
 
 If you’re building anything with signature verification, unique identifiers, or low-level contract calls, **choose your encoding method carefully**. The wrong choice could lead to **critical security vulnerabilities**.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **ABI (Application Binary Interface)** | The standard that defines how function calls, arguments and return values are encoded as bytes when contracts are called or return data. |
+| **Calldata** | The byte payload sent with a call to a contract: the function selector followed by the ABI-encoded arguments. |
+| **Function signature** | The function name and its argument types without spaces, such as `transfer(address,uint256)`, from which the selector is derived. |
+| **Function selector** | The first 4 bytes of `keccak256` of the function signature, which tells the called contract which function to run. |
+| **Padding** | Filling each encoded value up to 32 bytes, which `abi.encode` does and `abi.encodePacked` skips for types shorter than 32 bytes. |
+| **Static type** | A type with a fixed encoded size, such as `uint256`, `address` or `bytes1` to `bytes32`, which does not create the packed-mode collision risk. |
+| **Dynamic type** | A type whose size is known only at run time, such as `bytes`, `string` or `T[]`, whose length the standard ABI writes and packed mode omits. |
+| **`abi.encode`** | The Solidity function that encodes its arguments in the standard ABI format, with 32-byte padding, and so gives an unambiguous result. |
+| **`abi.encodePacked`** | The Solidity function for the non-standard packed mode, which concatenates values without padding or length fields and does not support structs or nested arrays. |
+| **`abi.encodeWithSignature`** | The Solidity function that prepends the selector of a given signature string to the ABI-encoded arguments, producing calldata for a low-level call. |
+| **`abi.encodeWithSelector`** | The equivalent of `abi.encodeWithSignature` that takes the 4-byte selector directly instead of the signature string. |
+| **Hash collision (packed encoding)** | Two different argument lists that `abi.encodePacked` turns into the same bytes, so `keccak256` returns the same hash, as with `("a", "bc")` and `("ab", "c")`. |
+| **EIP-712** | The Ethereum standard for hashing and signing typed structured data, recommended over packed encoding for off-chain signatures. |
+| **Low-level call** | A call made with `address.call(data)`, which sends raw calldata, does not check that the target has the function and returns a success flag to validate. |
+| **Slither** | A static analyser for Solidity whose `abi-encodePacked-collision` detector flags `abi.encodePacked` calls with more than one dynamic argument. |
+| **Aderyn** | A static analyser for Solidity from Cyfrin with a detector for `encodePacked` calls taking more than one `string`, `bytes` or array argument. |
 
 ## Reference 
 

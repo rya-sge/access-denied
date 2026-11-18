@@ -1,0 +1,38 @@
+@startuml
+title CVE-2024-23897 - from a CLI argument to code execution
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam ArrowColor #335061
+start
+:Attacker sends a CLI command
+with an argument "@/path/to/file";
+:args4j expandAtFiles replaces
+"@file" with the file's lines
+(Jenkins <= 2.441, LTS <= 2.426.2);
+if (Attacker has Overall/Read?) then (yes)
+  :Attacker reads
+  the whole file;
+else (no)
+  :Attacker reads the first
+  lines only (3 in core);
+endif
+:Read secrets/ keys and config files
+(binary keys partly readable);
+if (Binary secrets recovered?) then (yes)
+  :Forge a resource root URL,
+  a remember-me cookie
+  or a CSRF crumb;<<#EEF5FF>>
+  :Script Console as an admin,
+  which is remote code execution;
+else (no)
+  :Read any text file:
+  config.xml, job files, users;
+endif
+:Fix: 2.442 / LTS 2.426.3 disables @file
+(escape hatch hudson.cli.CLICommand.allowAtSyntax);
+stop
+@enduml

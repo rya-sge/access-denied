@@ -28,6 +28,18 @@ Zero-Knowledge  Proof are widely used in blockchain technology to enhance privac
 
 [TOC]
 
+## What you need to know first
+
+The article assumes the following notions, which it uses without developing them.
+
+- **Zero-knowledge proof vocabulary**: a *prover* convinces a *verifier* that a public *statement* is true, using a secret *witness*. A proof system is *complete* when an honest prover always convinces, *sound* when a false statement is rejected except with negligible probability, and *zero-knowledge* when the proof reveals nothing beyond validity; see [Main Concept Behind Zero-Knowledge Proof]({{site.url_complet}}/2024/06/17/zero-knowledge-proof-main-concepts/). The NARK and SNARK definitions below are phrased in these terms.
+- **Finite fields**: the set $$\{0, \dots, p-1\}$$ with addition and multiplication modulo a prime $$p$$. Every wire of an arithmetic circuit carries a field element, so "computation" in this article means field arithmetic.
+- **NP statements and witnesses**: a claim is in NP when a short witness lets anyone check it quickly. A SNARK proves that the prover knows a witness $$w$$ such that the circuit accepts the pair $$(x, w)$$, where $$x$$ is the public statement.
+- **Asymptotic notation**: $$O(1)$$, $$O(\log n)$$ and *sublinear* describe how proof size and verification time grow with the circuit or witness size. The succinctness definitions and the comparison table rely on it.
+- **Elliptic-curve groups and the discrete logarithm**: the points of an elliptic curve form a group in which recovering $$a$$ from $$aP$$ is believed hard for classical computers; see [Le Logarithme Discret sur courbe elliptique avec SageMath]({{site.url_complet}}/2021/07/30/logarithme-discret-courbe-elliptique/). Pairing-based SNARKs rest on this assumption, which Shor's algorithm breaks on a large quantum computer.
+- **Polynomial commitments**: a scheme to commit to a polynomial and later prove its value at a chosen point without revealing the polynomial. PLONK is built on one, the KZG (Kate) commitment; see [KZG Polynomial Commitments]({{site.url_complet}}/2026/09/09/kzg-polynomial-commitments-glossary/).
+- **Rollups**: a layer-2 design in which an off-chain operator executes a batch of transactions and posts the result to the layer-1 chain. In a zkRollup, the layer-1 chain checks a succinct proof that the batch was processed correctly.
+
 
 
 ![zk-snark.drawio]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/zk-snark/zk-snark.drawio.png)
@@ -213,7 +225,7 @@ Reference: [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.b
 
 ### Snark and zk-snark difference
 
-SNARK: a NARC (complete and knowledge sound) that is succinct 
+SNARK: a NARK (complete and knowledge sound) that is succinct 
 
 zk-SNARK: a SNARK that is also zero knowledge
 
@@ -221,17 +233,18 @@ zk-SNARK: a SNARK that is also zero knowledge
 
  These express the circuit's constraints, which must be satisfied to verify the proof.
 
-A QAP encodes the correctness of the circuit into polynomial form. For a valid computation, the polynomials P(x), Q(x), and Z(x) must satisfy:
+A QAP encodes the correctness of the circuit into polynomial form. For a valid computation, the polynomials $$A(x)$$, $$B(x)$$, $$C(x)$$ and $$Z(x)$$ must satisfy:
 $$
 \begin{aligned}
-P(x) \cdot Q(x) = h(x) \cdot Z(x)
+A(x) \cdot B(x) - C(x) = h(x) \cdot Z(x)
 \end{aligned}
 $$
 Where:
 
-- P(x), Q(x): Encoded left and right input polynomials.
-- Z(x): Target polynomial (vanishing polynomial).
-- h(x): Witness polynomial, the proof that the computation is correct.
+- $$A(x)$$, $$B(x)$$: Encoded left and right input polynomials.
+- $$C(x)$$: Encoded output polynomial.
+- $$Z(x)$$: Target polynomial (vanishing polynomial).
+- $$h(x)$$: Quotient polynomial; it exists only if $$Z(x)$$ divides $$A(x) \cdot B(x) - C(x)$$, that is if every constraint is satisfied.
 
 ### Pairing-Based Cryptography
 
@@ -299,7 +312,7 @@ Reference: [Learn zcash - WHAT ARE ZK-SNARKS?](https://z.cash/learn/what-are-zk-
 
 Mina Protocol is a layer 1 zk-blockchain which uses a type of zk-SNARKs called [Pickles](https://minaprotocol.com/blog/meet-pickles-snark-enabling-smart-contracts-on-coda-protocol).
 
-Pickles supports concept of recursion — that a proof can refer to itself — and doing this doesn’t increase the size of the proof, no matter how many times we refer to the initial one. That recursion, or picture of a picture, is what allows Mina to stay small.
+Pickles supports recursion: a proof can verify a previous proof, which itself verified an earlier one, and doing this doesn’t increase the size of the proof, no matter how many times we refer to the initial one. That recursion, or picture of a picture, is what allows Mina to stay small.
 
 Reference: [Mina Protocol - What are zk-SNARKs?](https://minaprotocol.com/blog/what-are-zk-snarks), [Mina Protocol - A Guide to zk-SNARKs](https://minaprotocol.com/blog/a-guide-to-zk-snarks)
 
@@ -319,8 +332,8 @@ Enables proving identity attributes (e.g., age or citizenship) without revealing
 
 | **Feature**            | **zk-SNARK**                         | **zk-STARK**                      | **Bulletproofs**                  |
 | ---------------------- | ------------------------------------ | --------------------------------- | --------------------------------- |
-| **Proof Size**         | Very small O(1)                      | Larger than zk-SNARK<br />O(logn) | Larger than zk-SNARK<br />O(logn) |
-| **Verification Speed** | Extremely fast O(1)                  | Slower than zk-SNARK<br />O(logn) | Comparable<br />Slower O(n)       |
+| **Proof Size**         | Very small O(1)                      | Larger than zk-SNARK<br />O(log²n) | Larger than zk-SNARK<br />O(logn) |
+| **Verification Speed** | Extremely fast O(1)                  | Slower than zk-SNARK<br />O(log²n), polylogarithmic | Comparable<br />Slower O(n)       |
 | **Trusted Setup**      | Required                             | Not required                      | Not required                      |
 | **Scalability**        | High                                 | Very high                         | Moderate                          |
 | **Quantum Resistance** | ❌<br />Vulnerable to quantum attacks | ✅Resistant                        | ⚠️Partially resistant              |
@@ -348,12 +361,12 @@ It exists several different proving schemes. Here a quick list:
 | Scheme                                      | Curves                                   | Setup                   | Post-quantum |
 | ------------------------------------------- | ---------------------------------------- | ----------------------- | ------------ |
 | [G16](https://eprint.iacr.org/2016/260)     | ALTBN_128, BLS12_381                     | trusted per circuit     | no           |
-| [GM17](https://eprint.iacr.org/2017/540)    | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | No universal            | ?            |
+| [GM17](https://eprint.iacr.org/2017/540)    | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | No universal            | no           |
 | [Marlin](https://eprint.iacr.org/2019/1047) | ALTBN_128, BLS12_381, BLS12_377, BW6_761 | universal trusted setup | no           |
 | Bulletproofs                                |                                          | Transparent             | no           |
 | STARK                                       |                                          | Transparent             | Yes          |
 
-- All schemes have a circuit-specific setup phase called `setup`. 
+- In ZoKrates, all schemes (G16, GM17, Marlin) have a circuit-specific setup phase called `setup`. Bulletproofs and STARKs are transparent and have no such trusted phase. 
 - Universal schemes also feature a preliminary, circuit-agnostic step called `universal-setup`. The advantage of universal schemes is that only the `universal-setup` step requires trust, so that it can be run a single time and reused trustlessly for many programs.
 
 Reference: [zokrates.github.io - proving_schemes.html](https://zokrates.github.io/toolbox/proving_schemes.html), [Schemes](https://zokrates.github.io/toolbox/proving_schemes.html#schemes), [rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf](https://rdi.berkeley.edu/zk-learning/assets/Lecture2-2023.pdf), page 29
@@ -409,6 +422,33 @@ See my article for more details: [Overview of Zero-Knowledge development framewo
 | [rapidsnark](https://github.com/iden3/rapidsnark))  | iden3        | C++      | Rapidsnark is a fast zkSNARK prover, that generates proofs for circuits created with circom and snarkjs. |
 | [Nova](https://github.com/microsoft/Nova)           | Microsoft    | Rust     | Nova is a high-speed recursive SNARK , and a recursive SNARK enables producing proofs that prove statements about prior proofs). |
 | [Plonky2](https://github.com/0xPolygonZero/plonky2) | Polygon Zero | Rust     | SNARK implementation based on techniques from PLONK and FRI. |
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Prover** | The party that holds the secret witness and produces the proof. |
+| **Verifier** | The party that checks the proof against the public statement and accepts or rejects it. |
+| **Statement (public input)** | The public value $$x$$ about which the claim is made, known to both prover and verifier. |
+| **Witness** | The secret input $$w$$ that makes the statement true; the proof shows the prover knows it without revealing it. |
+| **Finite field** | The set $$\{0, \dots, p-1\}$$ for a prime $$p$$, with arithmetic modulo $$p$$; the values on which circuits operate. |
+| **Arithmetic circuit** | A directed acyclic graph of addition and multiplication gates over a finite field, used to represent the computation being proven. |
+| **Structured circuit** | A circuit made of the same step $$M$$ repeated, like one step of a virtual machine; some SNARK techniques only apply to this form. |
+| **Preprocessing NARK** | A triple $$(S, P, V)$$: a setup $$S$$ that produces parameters from the circuit, a prover $$P$$ that outputs a proof, and a verifier $$V$$ that accepts or rejects. |
+| **Succinct** | The proof is sublinear in the witness size and verification is sublinear in the circuit size; *strongly succinct* tightens both to logarithmic in the circuit size. |
+| **Knowledge soundness** | The property that a prover who convinces the verifier must know a valid witness, which is stronger than the existence of one. |
+| **zk-SNARK** | A SNARK that is also zero-knowledge: the proof is short, non-interactive, and reveals nothing beyond the validity of the statement. |
+| **Trusted setup** | A setup that uses secret randomness ("toxic waste"); anyone who learns it can prove false statements, so it is usually run as a multi-party ceremony. |
+| **Universal (updatable) setup** | A trusted setup whose secrets do not depend on the circuit, so one ceremony serves every circuit up to a maximum size and new participants can be added over time. |
+| **Transparent setup** | A setup that uses no secret data, as in zk-STARKs and Bulletproofs. |
+| **Quadratic Arithmetic Program (QAP)** | An encoding of the circuit's constraints as a polynomial identity that holds only for a valid computation. |
+| **Vanishing polynomial** | The target polynomial $$Z(x)$$ of a QAP; the constraint polynomial is a multiple of it exactly when every constraint is satisfied. |
+| **Bilinear pairing** | A map $$e: G_1 \times G_2 \to G_T$$ with $$e(aP, bQ) = e(P, Q)^{ab}$$, used to check polynomial relations on hidden values. |
+| **Polynomial commitment** | A commitment to a polynomial that can later be opened at chosen points; PLONK uses KZG (Kate) commitments and can swap in FRI or DARK. |
+| **zk-STARK** | A transparent proof system based on hash functions, believed resistant to quantum attacks, with larger proofs than zk-SNARKs. |
+| **Recursive SNARK** | A SNARK that proves statements about earlier proofs, as in Mina's Pickles or Microsoft's Nova, so the final proof stays small. |
 
 ## Reference
 

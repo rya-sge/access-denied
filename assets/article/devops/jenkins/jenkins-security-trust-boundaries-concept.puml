@@ -1,0 +1,56 @@
+@startuml
+title Jenkins security - trust zones and the assets an attacker wants
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam rectangle {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam database {
+  BackgroundColor #EEF5FF
+  BorderColor #335061
+}
+skinparam ArrowColor #335061
+
+rectangle "Internet / untrusted" as U {
+  component "Anonymous visitor" as ANON
+  component "Fork pull request author" as PR
+  component "Webhook sender" as WH
+}
+rectangle "Users with accounts" as A {
+  component "Overall/Read user" as RD
+  component "Job/Configure user" as CFG
+  component "Administrator\n(Overall/Administer)" as ADM
+}
+rectangle "Controller (trusted zone)" as C {
+  component "Web UI, REST API, CLI\n(Stapler routing)" as WEB
+  component "Script Console,\nPipeline Groovy" as GROOVY
+  component "Plugins\n(2,000+ distributed)" as PLG
+  database "JENKINS_HOME\nsecrets/master.key\ncredentials.xml" as HOME
+}
+rectangle "Agents (less trusted)" as AG {
+  component "Build workspace\nJenkinsfile, tests, scripts" as WS
+  component "Remoting channel\n(agent.jar)" as REM
+}
+rectangle "Systems Jenkins can reach" as T {
+  component "SCM, registries,\ncloud accounts, prod" as TGT
+}
+
+ANON --> WEB : "unprotected root actions,\nCLI (CVE-2024-23897)"
+WH --> WEB : "/github-webhook"
+PR --> WS : "code that runs in the build"
+RD --> WEB : "doCheck / doFill endpoints"
+CFG --> WS : "pipeline script, Replay"
+ADM --> GROOVY : "RCE by design"
+WEB --> PLG
+GROOVY --> HOME : "decrypt every credential"
+WS --> REM
+REM --> HOME : "agent-to-controller\naccess control"
+HOME --> TGT : "stored credentials"
+WS --> TGT : "withCredentials"
+@enduml

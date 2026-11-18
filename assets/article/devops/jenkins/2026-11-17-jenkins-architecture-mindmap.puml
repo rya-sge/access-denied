@@ -1,0 +1,61 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #335061
+  }
+  :depth(0) {
+    BackgroundColor #335061
+    FontColor white
+  }
+  :depth(1) {
+    BackgroundColor #335061
+    FontColor white
+  }
+}
+</style>
+* How Jenkins works
+** Purpose
+*** Automation server for build, test, deploy
+*** Hudson (2006) renamed Jenkins (January 2011)
+*** jenkins.war core + 2300+ plugins
+** Nodes
+*** Controller: state, HTTP, scheduling
+*** Built-in node: 0 executors
+*** Agents and executors, labels
+*** Clouds provision agents on demand
+** Remoting
+*** SSH launcher (controller connects)
+*** Inbound TCP port (disabled by default)
+*** Inbound WebSocket (since 2.217)
+** Queue
+*** Triggers and quiet period
+*** Label match, free executor
+*** NodeProvisioner, persisted queue
+** Core model
+*** Jenkins root object
+*** Item, Job, Run, Action
+*** Describable and Descriptor
+*** @Extension and ExtensionList
+** Plugins
+*** .hpi / .jpi, one class loader each
+*** Update Center, dependencies
+** JENKINS_HOME
+*** XML via XStream, no database
+*** jobs/, builds/, plugins/, secrets/
+** Web layer
+*** Stapler: object graph = URL tree
+*** Jelly / Groovy views
+*** /api/json, CLI over WebSocket
+** Pipeline
+*** Jenkinsfile, Declarative vs Scripted
+*** CPS: program.dat, survives restart
+*** Groovy on controller, sh on agent
+*** Shared libraries, multibranch
+** Operations
+*** JCasC: jenkins.yaml
+*** Scaling: agents, more controllers
+*** Jenkins infra: Helm chart, baked plugins
+*** Security: separate article
+@endmindmap

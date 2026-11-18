@@ -481,4 +481,4 @@ This section contains the main references
 ### Related articles
 
 - [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/)
-- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash -function-overview/)
+- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash-function-overview/)

@@ -6,15 +6,15 @@ last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography security post-quantum
-tags: ipfs merkle-tree merkle-dag dag graph git
-description: Short integer solution (SIS)is an average-case problems used in lattice-based cryptography constructions. SIS is one of the problems believed to be hard even for quantum computers.
+tags: lattice sis post-quantum cryptography
+description: The Short Integer Solution (SIS) problem, an average-case lattice problem with a worst-case hardness reduction, believed hard even for quantum computers.
 image: /assets/article/cryptographie/lattice/SIS-average-case.png
 isMath: true
 ---
 
-**Short integer solution (SIS)** is an average-case problems used in [lattice-based cryptography](https://en.wikipedia.org/wiki/Lattice-based_cryptography) constructions.  SIS is one of the problems believed to be hard even for quantum computers. 
+**Short integer solution (SIS)** is an average-case problem used in [lattice-based cryptography](https://en.wikipedia.org/wiki/Lattice-based_cryptography) constructions.  SIS is one of the problems believed to be hard even for quantum computers. 
 
-SIS was introduced by Ajtain in 1996 who presented a family of one-way functions based on the SIS problem. 
+SIS was introduced by Ajtai in 1996 who presented a family of one-way functions based on the SIS problem. 
 
  SIS underpins a wide range of cryptographic protocols, from digital signatures, hash function, to post-quantum encryption schemes.
 
@@ -22,7 +22,17 @@ SIS was introduced by Ajtain in 1996 who presented a family of one-way functions
 
 [TOC]
 
+## What you need to know first
 
+The article relies on the following notions without developing them:
+
+- **Modular arithmetic and $$\mathbb{Z}_q$$.** $$\mathbb{Z}_q$$ is the set of integers $$\{0, \dots, q-1\}$$ with addition and multiplication taken modulo $$q$$. SIS works with a matrix whose entries are in $$\mathbb{Z}_q$$ and asks for a combination of its columns that is zero modulo $$q$$.
+- **Lattice.** The set of all integer combinations of a few linearly independent vectors (a basis), which forms a regular grid of points in $$n$$-dimensional space. SIS solutions are short vectors of such a lattice.
+- **Vector norm.** A measure of a vector's length: the Euclidean norm is the usual length, and the infinity norm $$\lVert \mathbf{x} \rVert_\infty$$ is the largest absolute value of its coefficients. "Short" in SIS means a small norm.
+- **Hardness assumption and reduction.** A scheme is secure under an assumption when breaking it would solve a problem believed to be hard. A reduction from problem P to problem Q shows that an algorithm for Q yields an algorithm for P, so Q is at least as hard as P; the worst-case to average-case result below is such a reduction.
+- **CDH, DDH and factoring.** The computational and decisional Diffie-Hellman problems (computing or recognising $$g^{ab}$$ from $$g^a$$ and $$g^b$$) and integer factoring are the classic hardness assumptions of pre-quantum public-key cryptography. The article uses them as examples of average-case problems.
+- **Security parameter and polynomial bounds.** The security parameter ($$n$$ or $$\lambda$$) sets the size of an instance, and $$\mathrm{poly}(n)$$ means a quantity bounded by a polynomial in $$n$$. Parameters such as $$q = \mathrm{poly}(n)$$ grow with it while the problem stays hard.
+- **Quantum threat.** Shor's algorithm would let a large quantum computer factor integers and compute discrete logarithms efficiently, breaking RSA and elliptic-curve cryptography. No such algorithm is known for lattice problems, which is why SIS is used in post-quantum schemes; see [Post-Quantum Cryptography in 2026]({{site.url_complet}}/2026/10/29/post-quantum-cryptography-algorithms-overview/).
 
 ## Average VS worst-case problem
 
@@ -76,19 +86,19 @@ Let `n, m, q, B` ∈ `N` be positive integers.
 Given a matrix A, **find** a non-zero integer vector X such that:
 $$
 \begin{aligned}
-A \in \mathbb{Z}_q^{m \times n}
+A \in \mathbb{Z}_q^{n \times m}
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
-\mathbf{x} \in \mathbb{Z}^n \
+\mathbf{x} \in \mathbb{Z}^m \
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
-A \cdot \mathbf{x} \equiv \mathbf{0} \pmod{q} \quad \text{and} \quad \|\mathbf{x}\|_∞ \leq \beta
+A \cdot \mathbf{x} \equiv \mathbf{0} \pmod{q} \quad \text{and} \quad \|\mathbf{x}\|_∞ \leq B
 \end{aligned}
 $$
 
@@ -120,7 +130,7 @@ Reference: [crypto.stanford - Lecture 9: Lattice Cryptography and the SIS Proble
 
 SIS is a generalization of well-known hard problems in lattice theory, especially the **Shortest Vector Problem (SVP)**. The difficulty of SIS depends on the parameters \( n \), \( m \), \( q \), and B. For appropriately chosen values, SIS is believed to be computationally infeasible — even for quantum adversaries.
 
-The hardness of SIS has been rigorously related to worst-case lattice problems, meaning that a solution to a single average-case instance of SIS can imply a solution to the hardest instances of lattice problems. This connection makes SIS a powerful foundation for cryptographic applications.
+The hardness of SIS has been rigorously related to worst-case lattice problems, meaning that an algorithm that solves random SIS instances with non-negligible probability can be turned into an algorithm that solves approximate lattice problems such as SIVP on their hardest instances. This connection makes SIS a powerful foundation for cryptographic applications.
 
 ## SIS in Cryptography
 
@@ -161,8 +171,8 @@ Mindmap made with the help of ChatGPT
 | **Average-case problem** | A problem that must be hard on randomly chosen instances; an adversary breaks it by solving some random instance, as with CDH, DDH or factoring. |
 | **Worst-case problem** | A problem that must be hard on its hardest instances; breaking it requires solving every instance. |
 | **Worst-case to average-case reduction** | Ajtai's 1996 result that solving random SIS instances would solve worst-case lattice problems, so SIS is hard on average if those are hard in the worst case. |
-| **Short Integer Solution (SIS)** | Given a random matrix $$A$$ over $$\mathbb Z_q$$, finding a non-zero integer vector $$\mathbf x$$ with $$A \cdot \mathbf x \equiv \mathbf 0 \pmod q$$ and $$\lVert \mathbf x \rVert_\infty \leq \beta$$. |
-| **SIS parameters** | The dimensions $$n$$ (the security parameter) and $$m$$ (generally much larger than $$n$$), the modulus $$q$$, typically polynomial in $$n$$, and the norm bound $$\beta$$, much smaller than $$q$$. |
+| **Short Integer Solution (SIS)** | Given a random $$n \times m$$ matrix $$A$$ over $$\mathbb Z_q$$, finding a non-zero integer vector $$\mathbf x$$ with $$A \cdot \mathbf x \equiv \mathbf 0 \pmod q$$ and $$\lVert \mathbf x \rVert_\infty \leq B$$. |
+| **SIS parameters** | The dimensions $$n$$ (the security parameter) and $$m$$ (generally much larger than $$n$$), the modulus $$q$$, typically polynomial in $$n$$, and the norm bound $$B$$, much smaller than $$q$$. |
 | **Infinity norm** | The largest absolute value among a vector's coefficients; SIS bounds the solution in this norm, which is what makes it short. |
 | **Learning With Errors (LWE)** | Regev's companion average-case problem, recovering a secret from noisy linear equations, which yields public-key and fully homomorphic encryption. |
 | **One-way function** | A function easy to compute and hard to invert; Ajtai built the first SIS-based family. |

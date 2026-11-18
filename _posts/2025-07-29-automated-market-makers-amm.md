@@ -7,7 +7,7 @@ lang: en
 locale: en-GB
 categories: defi blockchain ethereum
 tags: automated-market-maker amm defi
-description: Automated Market Makers (AMMs) are an essential piece of decentralized finance (DeFi). This article covers the most commonly used formulas in AMM design, their benefits, and their limitations.
+description: "Automated Market Makers (AMMs) in DeFi: their history, the constant product and constant sum formulas, Bancor smart tokens, and their benefits and limits."
 image: /assets/article/blockchain/defi/curve/curve-formula.png
 isMath: true
 ---
@@ -22,15 +22,25 @@ This article covers the most commonly used formulas in AMM design, their benefit
 
 [TOC]
 
+## What you need to know first
 
+The formulas below rely on a few market mechanisms that the article uses without developing them:
+
+- **Order book and market maker.** A classic exchange matches buy and sell orders from an order book, and market makers keep quotes on both sides, earning the spread between the best bid and the best ask. The history section explains why this was expensive on-chain; see [Hyperliquid's Onchain Order Book]({{site.url_complet}}/2026/09/02/hyperliquid-order-book-matching-engine/) for an order book that runs on its own chain.
+- **Liquidity pool and liquidity provider.** A liquidity pool is a contract holding reserves of two or more tokens that traders swap against. Liquidity providers deposit those reserves and earn the swap fees; every formula in this article describes how such a pool prices a trade.
+- **Swap fee.** A pool keeps a fraction of each trade's input for its liquidity providers. In Uniswap V2 it is 0.3%, which is why the `swap` check uses balances "adjusted" for that fee.
+- **Invariant.** A quantity that a trade must not decrease, such as $$x \cdot y$$ in a constant product pool. The contract accepts a swap only if the invariant computed on the new balances is at least the old one.
+- **Slippage and price impact.** Price impact is the move in the pool's price caused by the trade itself; slippage is the gap between the price a trader expected and the price received. Each formula is compared on how much slippage it produces.
+- **Arbitrage.** Buying an asset where it is cheap and selling it where it is expensive. Arbitrageurs bring a pool's price back to the market price, and a pool whose formula never moves its price can be drained by them.
+- **Impermanent loss.** The shortfall of a liquidity position compared with simply holding the deposited tokens, caused by a change in their relative price. It is listed as the main limitation of the constant product model.
 
 ## Brief history
 
-The original AMMs based on `constant product market makers` were envisioned in 2017 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread, often 10% or higher, of the trading platforms available at that moment, such as the MKR market and EtherDelta. 
+The original AMMs based on `constant product market makers` were envisioned in October 2016 by Ethereum founder Vitalik Buterin on a [reddit post](https://www.reddit.com/r/ethereum/comments/55m04x/lets_run_onchain_decentralized_exchanges_the_way/) to reduce the high spread, often 10% or higher, of the trading platforms available at that moment, such as the MKR market and EtherDelta. 
 
 The spreads were high because market making is very expensive, as creating an order and removing an order both take gas fees, even if the orders are never "finalized". 
 
-State channel-based solutions could theoretically resolve this, but are far from being implemented in 2017. Vitalik proposed to use instead a style of "on-chain automated market maker" 
+State channel-based solutions could theoretically resolve this, but were far from being implemented in 2016. Vitalik proposed to use instead a style of "on-chain automated market maker" 
 
 Its proposition was based  on concepts already used in prediction markets and also a first proposable by [Nick Johnson's proposal here](https://www.reddit.com/r/ethereum/comments/54l32y/euler_the_simplest_exchange_and_currency/)
 
@@ -91,7 +101,7 @@ See also [Uniswap - How Uniswap works](https://docs.uniswap.org/contracts/v2/con
 
 #### How It Works:
 
-- Traders interact with the pool by adding or removing liquidity, causing `x` or `y` to adjust.
+- Traders interact with the pool by swapping one token for the other, causing `x` and `y` to adjust (liquidity providers, not traders, add or remove liquidity).
 - The product of the two reserves (`k`) remains constant during a trade.
 
 #### Advantages:
@@ -182,7 +192,7 @@ Bancor uses the term of CRR to design K: `Constant Reserve Ratio`.
 
 This constant was set by the smart token creator, for each reserve token and uses in price calcalation.
 $$
-Price = Balance / Supply * CRR
+Price = \frac{Balance}{Supply \times CRR}
 $$
 
 - When smarts token are purchased, the payment is added to the reserve balance.
@@ -359,6 +369,31 @@ Here is a summary of the different formula
 The choice of formula for an AMM depends on the use case and on the characteristics of the assets. The constant product formula remains the default, while StableSwap and custom weightings target narrower cases, and further hybridization of these models can be expected.
 
 Knowing which formula a pool uses tells you where its slippage and its arbitrage exposure come from.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Automated Market Maker (AMM)** | An exchange that prices assets with a mathematical formula over a pool's reserves instead of matching orders from an order book. |
+| **Liquidity pool** | A contract holding reserves of two or more tokens against which traders swap. |
+| **Liquidity provider (LP)** | A user who deposits tokens into a pool and earns rewards from the trades made against it. |
+| **Reserves** | The quantities of each token held by a pool, such as `x` and `y`; in a constant product pool the price is their ratio. |
+| **Spread** | The gap between buy and sell prices on an exchange; the high spreads of 2016 platforms motivated the first on-chain AMMs. |
+| **Invariant** | The quantity a pool's formula keeps fixed during a trade, such as `k` in $$x \cdot y = k$$. |
+| **Constant Product Market Maker (CPMM)** | The model $$x \cdot y = k$$ used by Uniswap V2 and Bancor, whose curve is a hyperbola that always offers liquidity at increasingly higher prices. |
+| **Constant Sum Market Maker (CSMM)** | The model $$x + y = k$$, which gives no slippage until the pool is depleted but can be drained by arbitrage when prices deviate. |
+| **Constant Mean Market Maker (CMMM)** | Balancer's generalisation, $$\prod_i r_i^{w_i} = k$$, which allows more than two assets with custom weights. |
+| **StableSwap** | Curve's invariant that behaves like a constant sum near the equilibrium price and like a constant product for larger deviations, for assets near a 1:1 exchange rate. |
+| **Amplification coefficient** | The StableSwap parameter `A` that sets how close the invariant is to a constant sum; the lower it is, the closer to a constant product. |
+| **Slippage** | The difference between the expected price of a trade and the price obtained, which grows with trade size in a constant product pool. |
+| **Price impact** | The change in the pool's price caused by a trade, which makes large trades expensive in a CPMM. |
+| **Impermanent loss** | The loss a liquidity provider can suffer compared with simply holding the deposited assets. |
+| **Arbitrage** | Trading on a price difference between a pool and the market, which keeps pool prices aligned with the market and can drain a constant sum pool. |
+| **Smart token** | Bancor's ERC-20 token that holds a balance of at least one reserve token, issued when purchased and destroyed when liquidated. |
+| **Constant Reserve Ratio (CRR)** | The ratio set by a Bancor smart token's creator for each reserve token and used in its price calculation. |
+| **Concentrated liquidity** | A hybrid mechanism, used by Uniswap v3, that lets liquidity providers place their funds within a chosen price range. |
 
 ## References
 

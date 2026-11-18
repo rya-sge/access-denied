@@ -2,7 +2,7 @@
 layout: post
 title: Solana SPL token - Command
 date:   2025-10-13
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain solana
@@ -23,11 +23,21 @@ This article contains the list of available command with the Solana CLI.
 
 [TOC]
 
+## What you need to know first
 
+The command reference below assumes a few Solana mechanisms that it uses without explaining them.
+
+- **Solana account model**: all state lives in accounts, and each account has an owner program that alone can modify its data. Mint accounts and token accounts are owned by the Token Program; see [Solana Core Concept]({{site.url_complet}}/2024/09/19/solana-core-concept/).
+- **Keypair and CLI configuration**: the CLI signs transactions with a keypair file named in its configuration file (`-C`). Options such as `-u` choose the cluster (`mainnet-beta`, `devnet`, ...) and `--fee-payer` chooses which keypair pays the transaction fee.
+- **Lamports and rent exemption**: one SOL is 1,000,000,000 lamports, and an account must hold a minimum lamport balance proportional to its size to stay on chain. `close` returns these lamports when an account is no longer needed, and `withdraw-excess-lamports` recovers lamports held above that minimum.
+- **Wrapped SOL**: native SOL is not an SPL token, so it is held in a token account of the native mint to be used like one. `wrap`, `unwrap` and `sync-native` move SOL into and out of such an account.
+- **Token-2022 and extensions**: Token-2022 is a second token program, with its own program id (`--program-id`), that adds optional extensions to mints and token accounts. Transfer fees, transfer hooks, metadata, groups, confidential transfers and interest-bearing tokens are all extensions, and most mint extensions have to be enabled when the mint is created, which is why they appear as `create-token` flags.
+- **Cross-program invocation (CPI)**: a call from one on-chain program to an instruction of another. The CPI Guard extension restricts what can be done with a token account when the request comes through such a call instead of a transaction signed by the owner.
+- **Durable nonce**: a transaction normally references a recent blockhash and expires after about 150 slots. A nonce account (`--nonce`) replaces that blockhash, so a transaction can be signed long before it is submitted, for example by several offline signers.
 
 ## Solana concept - Reminder
 
-- Tokens on Soana are digital assets that represent ownership over diverse categories of assets.
+- Tokens on Solana are digital assets that represent ownership over diverse categories of assets.
 - Tokens on Solana are referred to as SPL ([Solana Program Library](https://github.com/solana-program)) Tokens.
 
 ### Type of account
@@ -405,6 +415,30 @@ Command Reference
 
 
 
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **SPL Token** | The Solana Program Library token standard, which defines how fungible and non-fungible tokens are created, transferred and managed. |
+| **Token Program** | The on-chain program that holds all the instruction logic for tokens and owns every mint and token account. |
+| **Token-2022** | The newer token program that adds optional extensions (transfer fee, transfer hook, metadata, confidential transfer, ...) on top of the original token instructions. |
+| **Mint account** | The account that identifies a token and stores its supply, decimals, mint authority and freeze authority. |
+| **Token account** | The account that records how many units of one mint a given owner holds, with an optional delegate and close authority. |
+| **Associated Token Account** | A token account whose address is derived from the owner and mint addresses. |
+| **Mint authority** | The account allowed to mint new units; a mint without one has a fixed supply. |
+| **Freeze authority** | The account allowed to freeze a token account, which then cannot transfer or burn, and to thaw it again. |
+| **Delegate** | An account approved by the owner (`approve`) to move up to a delegated amount from a token account, until `revoke` removes it. |
+| **Permanent delegate** | A Token-2022 option (`--enable-permanent-delegate`) that lets the mint authority act as a delegate on every token account of the mint. |
+| **Multisig** | An account created with `create-multisig` that describes an M-of-N set of signers and can be used as an authority. |
+| **Transfer fee** | A Token-2022 extension that withholds a fee in basis points, up to a maximum, on each transfer; `withdraw-withheld-tokens` collects it. |
+| **Transfer hook** | A Token-2022 extension that names a program to be called on every transfer of the token. |
+| **Confidential transfer** | A Token-2022 extension for transfers whose amounts are kept confidential, with a pending and an available balance that `apply-pending-balance` reconciles. |
+| **Default account state** | A mint setting that makes new token accounts start `initialized` or `frozen`. |
+| **Non-transferable token** | A token created with `--enable-non-transferable`, whose units can never be transferred but can still be burned. |
+| **Wrapped SOL** | Native SOL held in a token account so that it can be used like an SPL token. |
 
 ## References
 

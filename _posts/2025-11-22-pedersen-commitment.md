@@ -2,7 +2,7 @@
 layout: post
 title: The Pedersen Commitment - Overview
 date: 2025-11-22
-last_modified_at: 2026-06-28
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: cryptography
@@ -12,12 +12,22 @@ image: /assets/article/cryptographie/pedersen/2025-11-22-pedersen-commitment-min
 isMath: true
 ---
 
-The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“[Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.](https://eprint.iacr.org/2004/201.pdf)”*
+The **Pedersen commitment** is a cryptographic primitive introduced by **Torben Pryds Pedersen** in 1991 in his paper *“[Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing.](https://link.springer.com/chapter/10.1007/3-540-46766-1_9)”* (CRYPTO '91)
  It provides a way to *commit* to a secret value while keeping it hidden, and ensures the value cannot be changed later.
 
 > This article has been written with the help of ChatGPT
 
 [TOC]
+
+## What you need to know first
+
+The construction relies on a few notions from group-based cryptography that the article uses without defining them.
+
+- **Cyclic group of prime order**: a group $$G$$ of prime order $$q$$ in which every element other than the identity is a generator, meaning its successive powers produce the whole group. The commitment $$c = g^s \cdot h^t$$ is computed in such a group, from two generators $$g$$ and $$h$$.
+- **Integers modulo $$q$$**: $$\mathbb{Z}_q$$ is the set $$\{0, \dots, q-1\}$$ with addition and multiplication taken modulo $$q$$. Exponents in $$G$$ behave as elements of $$\mathbb{Z}_q$$, which is why the secret $$s$$ and the blinding factor $$t$$ are taken from it.
+- **Discrete logarithm problem**: given $$g$$ and $$h = g^a$$, finding $$a$$ is assumed to be computationally infeasible in a well-chosen group. The binding property rests on this assumption; see [Le Logarithme Discret sur courbe elliptique avec SageMath]({{site.url_complet}}/2021/07/30/logarithme-discret-courbe-elliptique/) for the elliptic-curve version.
+- **Information-theoretic versus computational security**: a property is information-theoretic when it holds even against an attacker with unlimited computing power, and computational when it only holds as long as some problem stays hard to solve. The article uses this distinction to compare hiding and binding.
+- **Range proofs**: a zero-knowledge proof that a committed value lies in a given interval, for example that an amount is non-negative, without revealing it. Monero pairs its commitments with range proofs such as Bulletproofs; see [Zero Knowledge Proofs with Bulletproof]({{site.url_complet}}/2024/08/13/bulletproof-zero-knowledge-proof/).
 
 ## Core Idea
 
@@ -162,7 +172,7 @@ Pedersen commitments are also standard building blocks in:
 ## Limitations and Considerations
 
 - The generators **g** and **h** must be chosen so that no one knows the relation between them (i.e., no **a** where **h = g^a**).
-   If this relation is known, the commitment loses its hiding property.
+   If this relation is known, the commitment loses its binding property: the committer can open the same commitment to another value. Hiding is not affected, since $$h^t$$ still masks the value perfectly.
 - **Hiding** is information-theoretic (depends on random **t**).
    **Binding** is computational — it relies on the discrete log problem being hard.
 - If discrete logs become easy (e.g., via quantum computing), the scheme’s binding property breaks.
@@ -184,9 +194,28 @@ The **Pedersen commitment** is a powerful and elegant cryptographic primitive th
 
 ![Pedersen commitment mindmap]({{site.url_complet}}/assets/article/cryptographie/pedersen/2025-11-22-pedersen-commitment-mindmap.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Commitment scheme** | A primitive that lets a party lock in a value without revealing it, then open it later in a way that cannot be changed. |
+| **Generator** | An element of the group whose powers produce the whole group; the scheme uses two generators $$g$$ and $$h$$. |
+| **Discrete logarithm assumption** | The assumption that, given $$g$$ and $$h = g^a$$, no efficient algorithm can find $$a$$. |
+| **Blinding factor** | The random value $$t$$ from $$\mathbb{Z}_q$$ that makes the commitment hide the secret $$s$$. |
+| **Commitment** | The group element $$c = g^s \cdot h^t$$ that represents the secret $$s$$. |
+| **Opening** | Revealing $$(s, t)$$ so that anyone can recompute $$g^s \cdot h^t$$ and compare it with $$c$$. |
+| **Hiding** | The property that $$c$$ reveals nothing about $$s$$; for Pedersen commitments it is information-theoretic. |
+| **Binding** | The property that the committer cannot open $$c$$ to a different value; for Pedersen commitments it is computational and relies on the discrete logarithm problem. |
+| **Additive homomorphism** | The property that the product of two commitments is a commitment to the sum of their values, with the sum of their blinding factors. |
+| **Range proof** | A zero-knowledge proof that a committed value lies in a valid range, such as a non-negative amount. |
+| **RingCT** | Monero's Ring Confidential Transactions protocol, which hides amounts with Pedersen commitments while letting validators check that inputs equal outputs plus fees. |
+| **Bulletproofs** | A range-proof system used with Pedersen commitments, for example in Monero. |
+
 ## Reference
 
-- [eprint - Non-Interactive and Information-Theoretic Secure Publicly Verifiable Secret Sharing](https://eprint.iacr.org/2004/201.pdf)
+- [Springer - Pedersen, Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing (CRYPTO '91)](https://link.springer.com/chapter/10.1007/3-540-46766-1_9)
 - [RareSkills - What are Pedersen Commitments and How They Work](https://rareskills.io/post/pedersen-commitment)
 - [crypto.stackexchange.com - What is a Pedersen commitment?](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment)
 - [https://dl.acm.org/doi/10.5555/646756.705507](https://dl.acm.org/doi/10.5555/646756.705507)

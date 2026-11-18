@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Security of Cryptocurrency Exchanges - Overview"
+title: "Security of Cryptocurrency Exchanges - Overview"
 date:   2025-11-06
 last_modified_at: 2026-11-17
 lang: en
@@ -14,6 +14,18 @@ isMath:
 
 Cryptocurrency exchanges are the platforms where users on-ramp, trade, store and convert cryptocurrencies. As central nodes in a highly valuable and rapidly evolving industry, these exchanges are frequent targets for cyberattacks and financial fraud. 
 
+## What you need to know first
+
+The incidents below are easier to follow with a few custody notions in mind.
+
+- **Custodial exchanges and private keys**: whoever holds the private key of an address can spend its funds, and on a centralized exchange the platform holds the keys for its users. Stealing those keys, or losing them, is the root cause of most failures listed in this article.
+- **Hot, warm and cold wallets**: a hot wallet keeps its keys on an internet-connected system so that withdrawals can be processed automatically, a cold wallet keeps them offline, and a warm wallet sits in between; see [Crypto Wallets Explained - Types, Risks, and How to select it]({{site.url_complet}}/2024/10/08/crypto-wallet-introduction/). The incident table records which of these the attackers reached.
+- **Multi-signature wallets**: a wallet that requires several independent keys, for example 2 of 3, to approve a transaction, so that one stolen key is not enough; see [How to create a multisig wallet with Gnosis Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/). Its absence appears in several of the incidents, and the Bitfinex attack went through one.
+- **API keys and two-factor authentication**: exchanges let users and trading bots act on an account through API keys, and protect logins with a second factor such as a one-time code; see [HOTP, the HMAC-based one-time password algorithm]({{site.url_complet}}/2026/07/20/hotp-hmac-one-time-password-rfc4226/). The 2019 Binance breach combined phishing, stolen API keys and a bypass of two-factor authentication.
+- **Decentralized exchanges**: exchanges run by smart contracts, where users keep their own keys and trade against on-chain liquidity; see [Automated Market Makers]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/). The article mentions them as an alternative that removes custodial theft but adds smart contract risk.
+
+## Security Landscape
+
 ### Threat Landscape and Attack Vectors
 
 The security risks facing cryptocurrency exchanges can be broadly categorized into external attacks, internal threats, and operational vulnerabilities.
@@ -24,7 +36,7 @@ The security risks facing cryptocurrency exchanges can be broadly categorized in
    - **Distributed Denial of Service (DDoS)**: Attackers can overwhelm an exchange’s infrastructure, disrupting trading and withdrawal services. Although these do not typically result in financial loss directly, they can undermine trust and disrupt markets.
 2. **Internal Threats**
    - **Insider Attacks and Mismanagement**: Employees or founders may misuse privileged access or mishandle customer assets.
-     - *Example*: The 2019 collapse of Canadian exchange QuadrigaCX revealed that the founder had sole control of the private keys and allegedly misappropriated funds, leading to a loss of around $190 million in customer assets.
+     - *Example*: The 2019 collapse of Canadian exchange QuadrigaCX revealed that the founder had sole control of the private keys and misappropriated funds: the platform owed about CAD 215 million to clients, and clients lost at least CAD 169 million.
 3. **Operational and Technical Failures**
    - **Code Vulnerabilities**: Poorly written smart contracts or platform code can be exploited.
    - **Lack of Cold Storage Management**: Best practices recommend storing the majority of funds in offline (cold) wallets, with limited exposure to online wallets.
@@ -71,16 +83,16 @@ These cases highlight that both technical security and governance are essential 
 
 | **Exchange**        | **Year** | **Loss**                            | **Cause**                                                    | Reference                                                    |
 | ------------------- | -------- | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| **Mt. Gox**         | 2014     | ~~850,000 BTC (~~$450M at the time) | Hot wallet compromise due to poor security and lack of internal controls | - [justice.gov - Russian Nationals Charged With Hacking One - -- Cryptocurrency Exchange and Illicitly Operating Another](https://www.justice.gov/archives/opa/pr/russian-nationals-charged-hacking-one-cryptocurrency-exchange-and-illicitly-operating-another)<br />- [darknetdiarie - EP 9: THE RISE AND FALL OF MT. GOX](https://darknetdiaries.com/transcript/9/) |
-| **Bitfinex**        | 2016     | ~~120,000 BTC (~~$72M at the time)  | Exploited vulnerability in multi-signature system provided by BitGo | - [bitfinex - 2016 Security Breach Bitcoin Recovery](ttps://support.bitfinex.com/hc/en-us/articles/4417401349657-2016-Security-Breach-Bitcoin-Recovery-Frequently-Asked-Questions-FAQ)<br /> - [ice.gov - Bitfinex Hacker Sentenced in Money Laundering Conspiracy Involving Billions in Stolen Cryptocurrency](https://www.ice.gov/news/releases/bitfinex-hacker-sentenced-money-laundering-conspiracy-involving-billions-stole), [www.justice.gov - 2016 Bitfinex Hack](https://www.justice.gov/usao-dc/2016-bitfinex-hack) |
+| **Mt. Gox**         | 2014     | ~850,000 BTC (~$450M at the time) | Hot wallet compromise due to poor security and lack of internal controls | - [justice.gov - Russian Nationals Charged With Hacking One - -- Cryptocurrency Exchange and Illicitly Operating Another](https://www.justice.gov/archives/opa/pr/russian-nationals-charged-hacking-one-cryptocurrency-exchange-and-illicitly-operating-another)<br />- [darknetdiarie - EP 9: THE RISE AND FALL OF MT. GOX](https://darknetdiaries.com/transcript/9/) |
+| **Bitfinex**        | 2016     | ~120,000 BTC (~$72M at the time)  | Exploited vulnerability in multi-signature system provided by BitGo | - [bitfinex - 2016 Security Breach Bitcoin Recovery](https://support.bitfinex.com/hc/en-us/articles/4417401349657-2016-Security-Breach-Bitcoin-Recovery-Frequently-Asked-Questions-FAQ)<br /> - [ice.gov - Bitfinex Hacker Sentenced in Money Laundering Conspiracy Involving Billions in Stolen Cryptocurrency](https://www.ice.gov/news/releases/bitfinex-hacker-sentenced-money-laundering-conspiracy-involving-billions-stole), [www.justice.gov - 2016 Bitfinex Hack](https://www.justice.gov/usao-dc/2016-bitfinex-hack) |
 | **Coincheck**       | 2018     | ~$530M in NEM                       | Private keys for hot wallet stolen; lacked multi-signature and cold storage | - [science - How cryptocurrency is laundered: Case study of Coincheck hacking incident](https://www.sciencedirect.com/science/article/pii/S2665910721000724)<br />- [Taurus - How (Not) To Store Digital Assets: Lessons From 5 Crypto Custody Disasters](https://www.taurushq.com/blog/how-not-to-store-digital-assets-lessons-from-5-crypto-custody-disasters/) |
-| **QuadrigaCX**      | 2019     | ~$190M                              | Alleged misappropriation; sole control of wallets by deceased founder | - [osc.ca - Downfall of Quadriga](https://www.osc.ca/quadrigacxreport/downfall-of-quadriga.html) |
-| **Binance**         | 2019     | ~~7,000 BTC (~~$40M at the time)    | Phishing and API key compromise; hackers bypassed 2FA        | [Binance Security Breach Update](https://www.binance.com/en/support/announcement/detail/360028031711) |
-| **KuCoin**          | 2020     | ~$275M                              | Private key compromise of hot wallets                        | - [Chainalysis - The KuCoin Hack: What We Know So Far and How the Hackers are Using DeFi Protocols to Launder Stolen Fund](https://www.chainalysis.com/blog/kucoin-hack-2020-defi-uniswap/<)<br />- [Kucoin - The Latest Updates About the KuCoin Security Incident——Continually Updated](https://www.kucoin.com/announcement/en-the-latest-updates-about-the-kucoin-security-incident)<br />- [BBC - The real victims of mass crypto-hacks that keep happening](https://www.bbc.com/news/technology-58331959) |
+| **QuadrigaCX**      | 2019     | ~CAD 215M owed to clients, at least CAD 169M lost | Fraud by the founder, who had sole control of the wallets | - [osc.ca - Downfall of Quadriga](https://www.osc.ca/quadrigacxreport/downfall-of-quadriga.html)<br />- [osc.ca - QuadrigaCX: A Review by Staff of the Ontario Securities Commission](https://www.osc.ca/quadrigacxreport/) |
+| **Binance**         | 2019     | ~7,000 BTC (~$40M at the time)    | Phishing and API key compromise; hackers bypassed 2FA        | [Binance Security Breach Update](https://www.binance.com/en/support/announcement/detail/360028031711) |
+| **KuCoin**          | 2020     | ~$275M                              | Private key compromise of hot wallets                        | - [Chainalysis - The KuCoin Hack: What We Know So Far and How the Hackers are Using DeFi Protocols to Launder Stolen Fund](https://www.chainalysis.com/blog/kucoin-hack-2020-defi-uniswap/)<br />- [Kucoin - The Latest Updates About the KuCoin Security Incident——Continually Updated](https://www.kucoin.com/announcement/en-the-latest-updates-about-the-kucoin-security-incident)<br />- [BBC - The real victims of mass crypto-hacks that keep happening](https://www.bbc.com/news/technology-58331959) |
 | **Liquid Exchange** | 2021     | ~$90M                               | Compromise of warm wallets through unauthorized access       | - [Fireblocks - Revisiting the Liquid exchange hack: Lessons for organizations working with MPC](https://fireblocks.com/blog/revisiting-the-liquid-exchange-hack-3-lessons-for-organizations-working-with-mpc/)<br />- [TRM Labs - Liquid Hack: The Second Time Around](https://www.trmlabs.com/resources/blog/liquid-hack-the-second-time-around)<br />[Wired - Security News This Week: Hackers Stole Over $90M From Japan's Liquid Crypto Exchange](https://www.wired.com/story/liquid-crypto-hack-census-breach-apple-leaks-security-news/) |
-| **Bitmart**         | 2021     | ~$200M                              | Stolen private keys leading to hot wallet breach             | - [Bitmart - Bitmart Post-Incident Forensics Bounty Hunt ](https://hackenproof.com/companies/bitmart-exchange)<br />- [bbc - BitMart: Crypto-exchange loses $150m to hackers](https://www.bbc.com/news/technology-59549606) |
+| **Bitmart**         | 2021     | ~$150M per BitMart, ~$200M per the first security firm to report it | Stolen private keys leading to hot wallet breach             | - [Bitmart - Bitmart Post-Incident Forensics Bounty Hunt ](https://hackenproof.com/companies/bitmart-exchange)<br />- [bbc - BitMart: Crypto-exchange loses $150m to hackers](https://www.bbc.com/news/technology-59549606) |
 | **FTX**             | 2022     | ~$8B shortfall in assets            | Misuse of customer funds; accounting fraud; internal mismanagement |                                                              |
-| **Atomic Wallet**   | 2023     | ~$100M                              | Unclear vector; suspected private key compromise             | - [Atomic Wallet - June 3rd Event Statement](https://atomicwallet.io/blog/articles/june-3rd-event-statement) |
+| **Atomic Wallet** (non-custodial wallet, not an exchange) | 2023     | ~$100M                              | Unclear vector; suspected private key compromise             | - [Atomic Wallet - June 3rd Event Statement](https://atomicwallet.io/blog/articles/june-3rd-event-statement) |
 | **CoinEx**          | 2023     | ~$70M                               | Hot wallet breach, suspected to be by [Lazarus Group](https://coingeek.com/coinex-55m-attack-reveals-north-korea-lazarus-group-cyber-espionage/) (state-linked) | - [SlowMist](https://x.com/SlowMist_Team/status/1701919426009035190)<br />[TRM Labs - Inside North Korea's Crypto Heists: $200M in Crypto Stolen in 2023; Over $2B in the Last Five Years](https://www.trmlabs.com/resources/blog/inside-north-koreas-crypto-heists) |
 | **Huobi**           | 2023     | $7.9 million                        | Hot wallet breached                                          | -[Halborn - EXPLAINED: THE HUOBI EXCHANGE HACK (SEPTEMBER 2023)](https://www.halborn.com/blog/post/explained-the-huobi-exchange-hack-september-2023) |
 | **Lykke**           | 2024     | ~US$22.8 million                    | Hot wallet breach                                            | - [twentyessex.com - Out of Lykke – successful appointment of provisional liquidators and liquidators of UK cryptocurrency exchange](https://www.twentyessex.com/out-of-lykke-successful-appointment-of-provisional-liquidators-and-winding-up-of-a-uk-cryptocurrency-exchange/)<br />- [twentyessex.com - Out of Lykke – successful appointment of provisional liquidators and liquidators of UK cryptocurrency exchange](https://www.twentyessex.com/out-of-lykke-successful-appointment-of-provisional-liquidators-and-winding-up-of-a-uk-cryptocurrency-exchange/) |
@@ -116,7 +128,7 @@ Reference:
 
 #### Quadriga CX
 
-Quadriga later gained international attention when, on January 14, 2019, it announced its founder Gerald Cotten had died in India in December 2018, leaving Quadriga owing 76,000 clients a combined $215 million.3
+Quadriga later gained international attention when, on January 14, 2019, it announced its founder Gerald Cotten had died in India in December 2018, leaving Quadriga owing 76,000 clients a combined $215 million (Canadian dollars).
 
 Most news reported that the founder of Quadriga had died without sharing the passwords to the cold storage of virtual assets held by Quadriga, which meant that the client assets recorded in that storage were inaccessible
 
@@ -146,6 +158,29 @@ Exchanges face multiple types of threats, including external attacks, insider mi
 The mindmap below summarizes the article.
 
 ![Crypto exchange security mindmap]({{site.url_complet}}/assets/article/blockchain/2025-11-06-crypto-exchange-security-overview-mindmap.png)
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Private key** | The secret that authorizes spending from a cryptocurrency address; whoever holds it controls the funds. |
+| **Custodial exchange** | A centralized platform that holds its users' private keys and assets on their behalf. |
+| **Hot wallet** | A wallet whose keys sit on an internet-connected system, convenient for withdrawals and the most frequent target of exchange hacks. |
+| **Warm wallet** | An intermediate wallet between hot and cold storage, such as the wallets compromised in the 2021 Liquid hack. |
+| **Cold storage** | Keeping keys offline, disconnected from the internet; exchanges often keep 90% or more of their assets this way. |
+| **Multi-signature wallet** | A wallet that requires several keys to authorize a transaction, removing a single point of failure. |
+| **API key** | A credential that lets a program act on an exchange account; its compromise was part of the 2019 Binance breach. |
+| **Two-factor authentication (2FA)** | A login check that requires a second factor besides the password; the Binance attackers bypassed it. |
+| **Phishing** | A social engineering attack that tricks employees or users into revealing credentials. |
+| **Insider threat** | An employee, contractor or founder who misuses privileged access, as in the QuadrigaCX collapse. |
+| **Supply chain compromise** | A vulnerability introduced through a third-party service, software update or hardware component. |
+| **Distributed denial of service (DDoS)** | Flooding an exchange's infrastructure to disrupt trading and withdrawals, usually without direct financial loss. |
+| **KYC / AML** | Know Your Customer and Anti-Money Laundering practices, which identify clients and trace funds to reduce fraud. |
+| **Decentralized exchange (DEX)** | An exchange without central custody of assets, which removes custodial theft but exposes users to smart contract exploits. |
+| **Ponzi scheme** | A fraud that pays earlier clients with new deposits; the Ontario Securities Commission found that QuadrigaCX operated this way. |
+| **Wallet encryption (`wallet.dat`)** | Passphrase protection of the Bitcoin client's key file, introduced in version 0.4.0 in August 2011, after the start of the Mt. Gox incident. |
 
 ## Related articles
 

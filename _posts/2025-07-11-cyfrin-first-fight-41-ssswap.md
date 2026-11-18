@@ -2,13 +2,13 @@
 layout: post
 title: "Cyfrin First Fight 41 - SSSwap"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
 tags: ctf cyfrin first-fight
 series: cyfrin-first-fight
-description: First Fight 41 - SSSwap is aimed to be a minimalistic AMM on Solana.
+description: "Cyfrin First Fight 41, SSSwap: a minimal AMM on Solana built with Anchor, with my submission on vault reloads and the high-severity findings I missed."
 image: /assets/article/blockchain/audit/2025-07-11-cyfrin-first-fight-41-ssswap-mindmap.png
 isMath: false
 ---
@@ -19,7 +19,17 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-05-
 
 [TOC]
 
+## What you need to know first
 
+The findings below rely on a few AMM and Solana mechanisms that the submissions use without explaining.
+
+- **Constant-product AMM and LP tokens**: an [automated market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/) holds two token reserves and prices swaps from their ratio. Liquidity providers receive LP tokens for their share; in the Uniswap V2 design, the first deposit mints `sqrt(amountA × amountB)` and later deposits mint in proportion to the existing LP supply, which is the rule H-01 says SSSwap breaks.
+- **Solana accounts and SPL token accounts**: on [Solana]({{site.url_complet}}/2024/09/19/solana-core-concept/), programs hold no state of their own; data and balances live in separate accounts passed to each instruction. The pool's `vault_a` and `vault_b` are SPL token accounts, and their `amount` field is the reserve every calculation reads.
+- **Anchor account deserialization and `.reload()`**: in [Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/), an `Account<'info, T>` is deserialized into memory when the instruction starts. If a cross-program invocation later changes the account's data, the in-memory copy keeps the old values until the program calls `.reload()`, which is the subject of the H4 submission.
+- **CPIs and PDA signers**: token transfers and LP mints are cross-program invocations (CPIs) to the SPL Token program. When the authority is the pool's program-derived address (PDA), the program signs for it by passing the PDA seeds to `CpiContext::new_with_signer`, as in the H-05 mitigation.
+- **Slippage and front-running**: the state of a pool can change between the moment a user signs a transaction and the moment it executes, for instance when an attacker's swap lands first. Swap instructions bound this with `min_out` or `max_in`; H-02 points out that `provide_liquidity` has no such bound on `amount_b`.
+- **Checked integer arithmetic in Rust**: amounts are `u64` integers, and `checked_mul` or `checked_div` return `None` on overflow or division by zero instead of producing a wrapped value. The code widens to `u128` before multiplying so that the product of two `u64` amounts fits.
+- **Token decimals**: an SPL mint stores a `decimals` field, and every balance is an integer count of the smallest unit. A pool that pairs tokens with very different decimals compares raw integers of very different scales, which H-03 flags.
 
 ## Description
 
@@ -42,6 +52,8 @@ The audit is supposed to focus on the code validation of what is written and inv
 ## My submissions
 
 ### H4-provide_liquidity does not reload vault value
+
+> **Note added after the contest:** the root cause described in this submission does not hold. Anchor deserializes `vault_a` and `vault_b` when the instruction starts, so any transfer made before `provide_liquidity` runs, including one in an earlier instruction of the same transaction, is already reflected in the values read by `calculate_token_b_provision_with_a_given`. `.reload()` is only needed when a cross-program invocation inside the same instruction changes an account after it was deserialized, and here the calculation happens before the transfers. The submission is kept below as it was sent.
 
 #### Root + Impact
 
@@ -377,6 +389,28 @@ H-05. No Minimum Liquidity Lock in the `liquidity_operations::remove_liquidity` 
         Ok(())
     }
 ```
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Automated Market Maker (AMM)** | A program that holds two token reserves and lets users swap between them at a price derived from the reserves, with no order book. |
+| **Liquidity pool** | The pair of token vaults, together with the pool account, that an AMM trades against and that liquidity providers fund. |
+| **Vault** | A token account owned by the pool (here `vault_a` and `vault_b`) whose balance is the reserve used in every pricing and LP calculation. |
+| **Liquidity provider (LP)** | A user who deposits both tokens into the pool in the current ratio and receives LP tokens in exchange. |
+| **LP token** | A token minted to liquidity providers that represents their share of the pool and is redeemed through `remove_liquidity` for that share of the reserves. |
+| **Initial LP mint** | The `sqrt(amountA × amountB)` formula used when no LP tokens exist yet; H-01 shows SSSwap reuses it for every later deposit. |
+| **Proportional LP mint** | The rule for later deposits, `min(amountA × totalSupply / reserveA, amountB × totalSupply / reserveB)`, which keeps each provider's share fair. |
+| **Slippage protection** | A bound set by the user, such as `min_out`, `max_in` or the proposed `max_amount_b`, that makes the instruction fail if the pool moves too far before execution. |
+| **Front-running** | An attacker getting a transaction, such as a large swap, executed before the victim's so that the victim's instruction runs against a changed pool ratio. |
+| **Minimum liquidity lock** | A small amount of LP tokens minted to an account that can never spend them, so that the pool can never be fully drained to zero reserves. |
+| **Token decimals** | The `decimals` field of an SPL mint, which sets how many smallest units make one token; SSSwap accepts any value when a pool is created. |
+| **Cross-program invocation (CPI)** | A call from one Solana program to another, used here to transfer tokens and mint LP tokens through the SPL Token program. |
+| **Program-derived address (PDA)** | An address owned by a program rather than a key pair, for which the program signs a CPI by providing the seeds, as the pool does for LP mints. |
+| **`.reload()`** | The Anchor method that re-reads an account's data from the runtime, replacing a copy deserialized earlier in the instruction. |
+| **Checked arithmetic** | Rust methods such as `checked_mul` and `checked_div` that return an error value on overflow or division by zero, which the code maps to `AmmError` variants. |
 
 ## Mindmap
 

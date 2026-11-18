@@ -7,7 +7,7 @@ lang: en
 locale: en-GB
 categories: ai
 tags: neural-network-architecture transformer cnn rnn
-description: Overview of Recurrent Neural Networks (RNNs), including their mathematical foundations, activation and loss functions, and a comparative analysis with Perceptrons, Convolutional Neural Networks, and Transformer architectures.
+description: "Overview of Recurrent Neural Networks (RNNs): mathematical foundations, activation and loss functions, and a comparison with perceptrons, CNNs and Transformers."
 image: /assets/article/mlg/RNN-variant.drawio.png
 isMath: true
 ---
@@ -18,7 +18,15 @@ This article provides a technical overview of RNNs, explains their internal mech
 
 [TOC]
 
+## What you need to know first
 
+The article assumes the reader knows what a neural network and its training data are, and uses a few mechanisms one level below without explaining them.
+
+- **Feedforward layer**: a layer computes $$f(Wx + b)$$, a weight matrix $$W$$ applied to the input vector $$x$$, plus a bias $$b$$, followed by a non-linear activation $$f$$. The RNN hidden-state update is this computation with a second input, the previous hidden state; see [Perceptron - a simple, binary neural network architecture]({{site.url_complet}}/2024/11/25/perceptron-introduction/).
+- **Training by gradient descent**: a network learns by computing the gradient of a loss function with respect to each weight, through backpropagation, and moving the weights a small step against it. The article's loss and gradient discussions all refer to this loop; see [Gradient Descent in Machine Learning - Overview]({{site.url_complet}}/2025/04/09/gradient-descent-overview/).
+- **Backpropagation through time**: an RNN is trained by unrolling it over the $$T$$ steps of a sequence and backpropagating through the unrolled copies, which share the same weights. The gradient that reaches an early step is a product of one factor per step, so it tends to shrink towards zero or grow without bound as the sequence gets longer, which is the vanishing and exploding gradient problem the article refers to.
+- **tanh and sigmoid**: two classic activation functions, which map any real number into $$(-1, 1)$$ and $$(0, 1)$$ respectively. Both flatten out for large inputs, so their derivative becomes small there, which feeds the vanishing gradient problem and is why the article mentions ReLU as an alternative.
+- **One-hot encoding**: a class label among $$K$$ is represented as a vector of length $$K$$ with a 1 at the position of the correct class and 0 elsewhere. The cross-entropy formula uses this vector as the true label $$y_i$$, so only the term for the correct class remains.
 
 ## What is an RNN?
 
@@ -138,7 +146,7 @@ To address these limitations, specialized architectures were developed:
 - **Long Short-Term Memory (LSTM)**: Introduces gates (input, forget, output) to control information flow.
 - **Gated Recurrent Unit (GRU)**: Simplifies LSTM structure while retaining similar performance.
 
-- Bidirectional recurrent neural networks (BRRNs)
+- Bidirectional recurrent neural networks (BRNNs)
 - Encoder-decoder RNN
 
 | **Type**                          | **Description**                                              | **Strengths**                                                | **Weaknesses**                                               |
@@ -232,6 +240,28 @@ They remain effective in certain real-time systems and embedded applications, su
 ![rnn-mindmap]({{site.url_complet}}/assets/article/mlg/rnn-mindmap.png)
 
 
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Recurrent Neural Network (RNN)** | A neural network with loops in its architecture that processes a sequence step by step and carries information from previous inputs to the next step. |
+| **Time step** | One position $$t$$ in the input sequence, at which the RNN reads $$x_t$$ and updates its hidden state. |
+| **Hidden state** | The vector $$h_t$$ that acts as the network's memory, computed from the current input and the previous hidden state. |
+| **Parameter sharing** | The reuse of the same weight matrices $$W_{xh}$$, $$W_{hh}$$ and $$W_{hy}$$ at every time step. |
+| **Activation function** | The non-linear function applied after the weighted sum, such as tanh, sigmoid or ReLU, which lets the network learn complex patterns. |
+| **ReLU** | The Rectified Linear Unit, which outputs zero for negative inputs and passes positive inputs unchanged. |
+| **Logits** | The raw output scores $$y_t$$ produced by the output layer before they are turned into probabilities. |
+| **Softmax** | The function that turns a vector of logits into a probability distribution, each value between 0 and 1 and summing to 1. |
+| **Cross-entropy loss** | The loss that compares the predicted probabilities with the true one-hot labels and penalises confident wrong predictions more heavily. |
+| **Vanishing and exploding gradients** | The tendency of gradients to shrink or grow too much during training of a standard RNN, which makes long-term dependencies hard to learn. |
+| **Long Short-Term Memory (LSTM)** | An RNN variant with input, forget and output gates that control the flow of information and handle long-term dependencies. |
+| **Gated Recurrent Unit (GRU)** | A simplified version of LSTM with only update and reset gates, with fewer parameters and faster training. |
+| **Bidirectional RNN (BRNN)** | An RNN that processes the sequence forwards and backwards and combines both directions, at about twice the computational cost. |
+| **Encoder-decoder RNN** | A two-part architecture in which an encoder summarises the input into a fixed vector and a decoder generates the output from it, as in translation. |
+| **Self-attention** | The mechanism used by Transformers instead of recurrence, which looks at all positions of a sequence at once and allows parallel training. |
 
 ## Reference
 

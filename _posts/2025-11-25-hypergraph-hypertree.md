@@ -29,7 +29,17 @@ Examples:
 A **hypertree** is a *tree-like hypergraph*.
 
 - It is a hypergraph that can be arranged on an underlying tree so that each hyperedge forms a connected subtree.
-- Hypertrees represent the “acyclic” hypergraphs—those without complex cycle structures—and are the structural backbone of efficient algorithms in CSPs and databases.
+- Hypertrees are the duals of the “acyclic” (α-acyclic) hypergraphs: swapping the roles of vertices and hyperedges turns a hypertree into an α-acyclic hypergraph, and back. The α-acyclic hypergraphs, which admit a join tree, are the structural backbone of efficient algorithms in CSPs and databases.
+
+## What you need to know first
+
+The article assumes ordinary graph vocabulary (vertex, edge, path) and uses a few further notions from graph theory and its applications without defining them.
+
+- **Trees and subtrees**: a tree is a connected graph with no cycle, and the subgraph induced by a set of vertices keeps exactly the edges between those vertices. The host-tree definition of a hypertree asks that each hyperedge induce a connected subtree, written $$T[e]$$; [Graph-Theoretic Models — Depth-First and Breadth-First Search (MIT 6.0002, Lecture 3)]({{site.url_complet}}/2026/10/26/graph-theoretic-models-dfs-bfs/) recalls the basic graph notions.
+- **Chordal graph**: a graph in which every cycle of length four or more has a chord, an edge joining two non-consecutive vertices of the cycle. It appears in the characterisation of hypertrees as Helly hypergraphs with a chordal line graph.
+- **Line graph of a hypergraph**: the graph whose vertices are the hyperedges, with two of them adjacent when the hyperedges intersect. The article uses it, together with the Helly property, to characterise hypertrees.
+- **Graham reduction**: a procedure that repeatedly deletes a vertex belonging to only one hyperedge and deletes a hyperedge contained in another one. The article defines α-acyclicity as the case where this procedure removes every hyperedge.
+- **Constraint satisfaction problems and join trees**: in a CSP or a database query, each constraint or relation involves a subset of the variables, so the problem forms a hypergraph. A join tree arranges the hyperedges in a tree so that, for every vertex, the hyperedges containing it form a connected subtree; the efficient algorithms for acyclic instances that the introduction mentions rely on this structure.
 
 ## Hypergraphs: Definitions and Constructions
 
@@ -92,7 +102,7 @@ Reference: Complexity Aspects of the Helly Property: Graphs and Hypergraphs, pag
 
 ### Host-tree definition
 
-A hypergraph H=(V,E) is a **hypertree** if there exists a tree `T` with vertex set containing `V` such that every hyperedge `e∈E` induces a **connected** subtree of T:
+A hypergraph H=(V,E) is a **hypertree** if there exists a tree `T` with vertex set `V` such that every hyperedge `e∈E` induces a **connected** subtree of T:
 
 $$
 \forall e\in E,\quad T[e]\ \text{is connected}.
@@ -100,9 +110,9 @@ $$
 
 ### Helly property
 
-A hypergraph has the Helly property if each intersecting family has a non-empty intersection 
+A hypergraph has the Helly property if each pairwise intersecting family of hyperedges has a non-empty intersection.
 
-- It an hypergraph contains a triangle it has not the Helly property. 
+- By Berge's criterion, a hypergraph has the Helly property if and only if, for every three vertices, the hyperedges containing at least two of them have a common vertex. For example, the hyperedges $$\{a,b\}, \{b,c\}, \{a,c\}$$ intersect pairwise but share no vertex, so a hypergraph containing them is not Helly.
 - A hypergraph having the Helly property will be called Helly hypergraph.
 
 Hypertrees satisfy the **Helly property**:
@@ -236,6 +246,27 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 
 ![Hypergraph and hypertree mindmap]({{site.url_complet}}/assets/article/programmation/hypergraph/2025-11-25-hypergraph-hypertree-mindmap.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Hypergraph** | A pair $$H = (V, E)$$ where $$V$$ is a finite set of vertices and each element of $$E$$ is a subset of $$V$$, so an edge may join any number of vertices. |
+| **Hyperedge** | An element of $$E$$, that is a subset of the vertices; an ordinary graph is the case where every hyperedge has size 2. |
+| **k-uniform hypergraph** | A hypergraph in which every hyperedge has exactly $$k$$ vertices, such as the Fano plane for $$k = 3$$. |
+| **Linear hypergraph** | A hypergraph in which any two hyperedges intersect in at most one vertex. |
+| **Regular hypergraph** | A hypergraph in which every vertex belongs to the same number of hyperedges, three in the case of the Fano plane. |
+| **Graham reduction** | The reduction used to test α-acyclicity, applied repeatedly until no hyperedge remains or the process gets stuck. |
+| **α-acyclic hypergraph** | A hypergraph that the Graham reduction reduces to no hyperedge; otherwise it is α-cyclic. |
+| **Hypertree** | A hypergraph that can be represented by a host tree, also called an arboreal hypergraph. |
+| **Host tree** | A tree $$T$$ on the vertices such that every hyperedge induces a connected subtree of $$T$$. |
+| **Helly property** | The property that any family of pairwise intersecting hyperedges has a non-empty common intersection; hypertrees satisfy it. |
+| **Line graph** | The graph whose vertices are the hyperedges, two being adjacent when they intersect; a hypertree is a Helly hypergraph whose line graph is chordal. |
+| **Join tree** | A tree arrangement of the hyperedges that acyclic hypergraphs admit and that the Fano plane lacks. |
+| **Fano plane** | The smallest finite projective plane, with 7 points and 7 lines of 3 points, each pair of points lying on exactly one line. |
+| **Steiner system S(2,3,7)** | A set of 7 points with blocks of size 3 such that every pair of points lies in exactly one block, which is what the Fano plane is. |
+
 ## Reference
 
 - [Wikipedia - Hypergraph](https://en.wikipedia.org/wiki/Hypergraph)
@@ -245,6 +276,8 @@ The Fano plane is **strongly cyclic** as a hypergraph.
 - [Alain Bretto - Hypergraph Theory](https://www.math.ucdavis.edu/~saito/data/tensor/bretto_hypergraph-theory.pdf)
 
 - [Wikipedia - Hypertree — Wikipedia](https://en.wikipedia.org/wiki/Hypertree)
+  
+- [Dourado, Protti, Szwarcfiter - Complexity Aspects of the Helly Property: Graphs and Hypergraphs (Electronic Journal of Combinatorics, DS17)](https://www.combinatorics.org/ojs/index.php/eljc/article/view/DS17)
   
 - [Arxiv - Di Fonzo (2025) - Hypertrees and their host trees: a survey](https://arxiv.org/pdf/2504.15570)
   

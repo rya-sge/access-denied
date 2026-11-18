@@ -16,13 +16,13 @@ start
 
 if (Needs native DEX, path payments,\nanchors, trustline semantics?) then (yes)
   if (Needs custom admin logic:\nroles, rate limits, timelocks?) then (yes)
-    #D6EAD6:**Path 3**\nClassic asset + SAC,\nSAC admin transferred to an\nOpenZeppelin SAC-admin contract;
+    :**Path 3**\nClassic asset + SAC,\nSAC admin transferred to an\nOpenZeppelin SAC-admin contract; <<#D6EAD6>>
     note right
       sac_admin_wrapper (explicit entry points)
       or sac_admin_generic (__check_auth)
     end note
   else (no)
-    #D6EAD6:**Path 1**\nClassic asset + its\nStellar Asset Contract (SAC);
+    :**Path 1**\nClassic asset + its\nStellar Asset Contract (SAC); <<#D6EAD6>>
     note right
       No Rust, no Wasm.
       stellar contract asset deploy
@@ -30,7 +30,7 @@ if (Needs native DEX, path payments,\nanchors, trustline semantics?) then (yes)
     end note
   endif
 else (no)
-  #D6EAD6:**Path 2**\nCustom Soroban token on\nstellar-tokens::fungible;
+  :**Path 2**\nCustom Soroban token on\nstellar-tokens::fungible; <<#D6EAD6>>
   note right
       Full control of transfer logic.
       Extensions: Burnable, Capped,

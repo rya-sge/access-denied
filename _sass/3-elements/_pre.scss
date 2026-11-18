@@ -2,12 +2,20 @@
 	PRE
 =============== */
 
+/*
+  Code blocks keep their indentation on one line and scroll sideways instead of
+  wrapping at any character (`break-all` used to split identifiers in two).
+  The line height is set here because the body's 28px made 14px code read as
+  double-spaced.
+*/
 pre {
-  overflow: auto;
-  padding: 25px;
+  overflow-x: auto;
+  padding: 16px 20px;
   font-size: 14px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: break-all;
-  font-family: Courier, monospace;
+  line-height: 1.55;
+  white-space: pre;
+  word-wrap: normal;
+  word-break: normal;
+  font-family: $code-font-family;
+  tab-size: 4;
 }

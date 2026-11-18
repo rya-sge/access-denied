@@ -14,8 +14,6 @@ isMath: false
 
 RAILGUN is a privacy system built on Ethereum and other EVM-compatible blockchains. It introduces a suite of smart contracts that shield user activity — making **sender**, **recipient**, **token type**, and **amount** completely private — without sacrificing composability or smart contract functionality.
 
-RAILGUN is a privacy system built on Ethereum and other EVM-compatible blockchains. It introduces a suite of smart contracts that shield user activity — making sender, recipient, token type, and amount completely private — without sacrificing composability or smart contract functionality.
-
 Unlike mixers or simple transaction obfuscation tools, RAILGUN enables users to interact privately with decentralized finance (DeFi) protocols while maintaining compatibility with existing ERC-20, ERC-721, and ERC-1155 tokens.
  This is achieved through a combination of **zk-SNARK cryptography**, **Merkle Tree–based state management**, and **community broadcasters** that mask on-chain identities.
 
@@ -23,7 +21,16 @@ Unlike mixers or simple transaction obfuscation tools, RAILGUN enables users to 
 
 [TOC]
 
+## What you need to know first
 
+RAILGUN combines several building blocks that the article names without explaining them.
+
+- **UTXO model and notes**: in a UTXO model, a balance is a set of discrete outputs that are consumed whole by a transaction and replaced by new outputs. RAILGUN applies this model inside its contracts, where each private output is an encrypted note; see [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/).
+- **Merkle inclusion proof**: a Merkle tree summarises all its leaves in one root, and a path of sibling hashes proves that a leaf belongs to the tree. A zk-SNARK can check that path without revealing the leaf, which is how a spend proves that a note exists; the same mechanism is detailed in [Tornado Cash Circuits - Overview]({{site.url_complet}}/2025/11/19/tornado-cash-overview/).
+- **Pairing precompiles**: verifying a Groth16 proof requires a pairing check on the BN254 (alt_bn128) curve. Ethereum exposes this curve through precompiled contracts, EIP-196 for point addition and scalar multiplication and EIP-197 for the pairing, which makes on-chain verification affordable.
+- **Baby Jubjub**: a twisted Edwards elliptic curve defined over the scalar field of BN254, so that its operations can be expressed cheaply inside a SNARK circuit. RAILGUN's spending key lives on this curve.
+- **ZK-friendly hash function**: inside a circuit, a hash costs as many constraints as its operations require. Poseidon is designed from field arithmetic and needs far fewer constraints than SHA-256 or Keccak, which is why RAILGUN uses it for its commitments and Merkle tree.
+- **Meta-transaction**: a transaction that the user signs but a third party submits and pays gas for, being reimbursed in another way. RAILGUN's Broadcasters use this pattern so that the user can pay the fee in any token.
 
 ------
 
@@ -61,7 +68,7 @@ These allow a prover (user) to demonstrate ownership of tokens and permission to
 RAILGUN employs elliptic curve cryptography (ECC) to reduce key size and improve proof efficiency.
  It uses the **Groth16** zk-SNARK protocol — the same proving system that powered Zcash’s early shielded transactions.
 
-The circuits operate on elliptic curve pairings (EIP-197 and EIP-198) allowing proofs to be verified by Ethereum smart contracts directly.
+The circuits operate on elliptic curve pairings (EIP-196 and EIP-197) allowing proofs to be verified by Ethereum smart contracts directly.
 
 ------
 
@@ -93,7 +100,7 @@ The circuit framework provides composability across protocols — enabling, for 
 ### Trusted Setup Ceremony (Groth16)
 
 RAILGUN’s zk-SNARK proofs use the **Groth16** proving system, known for compact proofs and efficient on-chain verification.
-Each circuit requires a **trusted setup ceremony** to generate a *Common Reference String (CRS)* )**, generated via the **Perpetual Powers of Tau ceremony, used for both proof generation and verification.
+Each circuit requires a **trusted setup ceremony** to generate a *Common Reference String (CRS)*, built on the output of the **Perpetual Powers of Tau** ceremony and used for both proof generation and verification.
 
 #### The Perpetual Powers of Tau
 
@@ -216,7 +223,31 @@ Viewing keys can be scoped by block range, allowing for transparent yet privacy-
 
 RAILGUN is a privacy protocol that applies zero-knowledge cryptography to decentralized finance (DeFi) workflows. By combining **zk-SNARK** circuits, meta-transaction gas abstraction, and private smart contract composability, it offers a framework for conducting transactions and interactions on-chain with enhanced confidentiality.
 
-While earlier privacy systems such as Zcash and Monero focus primarily on shielding payment data, RAILGUN extends similar principles to a broader range of **DeFi** activities — including token swaps, lending, liquidity provision, and NFT management — while operating directly on Layer 1 networks.
+While earlier privacy systems such as Zcash and Monero focus primarily on shielding payment data, RAILGUN extends similar principles to a broader range of **DeFi** activities — including token swaps, lending, liquidity provision, and NFT management — while running directly on-chain on Ethereum, BSC, Polygon and the Arbitrum Layer 2.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **zk-SNARK** | A succinct, non-interactive zero-knowledge proof that RAILGUN uses to prove ownership of tokens and the right to spend them without revealing identifying details. |
+| **Groth16** | The zk-SNARK proving system used by RAILGUN, known for compact proofs and efficient on-chain verification, which needs a trusted setup per circuit. |
+| **Trusted setup ceremony** | The procedure that generates the Common Reference String used to create and verify proofs; it stays secure as long as one participant destroys their randomness. |
+| **Perpetual Powers of Tau** | The open multi-party ceremony in which RAILGUN took part, where anyone can contribute entropy. |
+| **Toxic waste** | The private randomness of a setup participant, which must be destroyed for the ceremony to be secure. |
+| **Circuit** | One of RAILGUN's 54 zk-SNARK circuits, each fixed by its number of UTXO inputs and outputs, such as 1 → 2 or 7 → 2. |
+| **UTXO** | Unspent Transaction Output: a discrete piece of value; RAILGUN keeps encrypted UTXOs as leaves of an internal Merkle tree. |
+| **Merkle tree root** | The single hash that summarises all of RAILGUN's UTXOs and is updated by every transaction. |
+| **Nullifier** | A hash derived from the spending key that marks a UTXO as spent, preventing double-spends without linking back to the user. |
+| **Privacy set** | The pool of shielded assets in which any transaction could have come from any participant; it grows with users, TVL and volume. |
+| **Privacy amplification** | The effect by which each new transaction adds noise to the privacy set and so improves the privacy of all participants. |
+| **Shielding / unshielding** | Moving tokens from a public 0x address into a private 0zk address in the pool, and back; both steps are visible on-chain. |
+| **0zk address** | The private address of a RAILGUN wallet, used for shielded transactions alongside its public 0x address. |
+| **Broadcaster** | An independent node that submits a private transaction and pays its gas, so the transaction appears to come from the Broadcaster. |
+| **Waku** | The decentralized messaging protocol over which clients and Broadcasters communicate. |
+| **Spending key** | The key on the Baby Jubjub curve that generates proofs and authorizes private transactions. |
+| **Viewing key** | A read-only key on the Ed25519 curve that can be scoped by block range for auditing, compliance or tax reporting. |
 
 ## Reference
 
@@ -227,6 +258,6 @@ While earlier privacy systems such as Zcash and Monero focus primarily on shield
 
 - [Partial Notes on Aztec — Deferred Completion and Private DeFi Composability]({{site.url_complet}}/2026/09/09/aztec-partial-notes-private-defi-composability/)
 - [Tornado Cash Circuits - Overview]({{site.url_complet}}/2025/11/19/tornado-cash-overview/)
-- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash -function-overview/)
+- [Poseidon Hash Function - Overview]({{site.url_complet}}/2025/05/27/poseidon-hash-function-overview/)
 - [Aztec: A Privacy-First Layer 2 for Ethereum]({{site.url_complet}}/2025/10/29/aztec-architecture-overview/)
 - [How Aztec Works — Private Execution, Notes and Nullifiers, and a Comparison with Zama FHE, Zcash, Canton and Railgun]({{site.url_complet}}/2026/09/08/how-aztec-works-private-execution-model/)

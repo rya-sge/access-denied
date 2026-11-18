@@ -2,7 +2,7 @@
 layout: post
 title: Rust for Solana - Basic knowledge
 date: 2025-02-10
-last_modified_at: 2025-02-11
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solana
@@ -16,9 +16,20 @@ If you want to understandard Solana programs, it will be easier if you already k
 
 During a code4Arena context ([Pump Science](https://github.com/code-423n4/2025-01-pump-science)), I have regrouped the main Rust point that I found relevant to understand the codebase. I used ChatGPT and the [rust documentation](https://doc.rust-lang.org/stable/book/title-page.html) to get a definition for each of them.
 
-This article explores the following points, grouped into topics for clarity: `as_ref()`, `Some()` and `is_Some()`, `self` and `&self`, `unwrap`, `Ok(())`, `&mut` and `&`, and the `ctx` parameter.
+This article explores the following points, grouped into topics for clarity: `as_ref()`, `Some()` and `is_some()`, `self` and `&self`, `unwrap`, `Ok(())`, `&mut` and `&`, and the `ctx` parameter.
 
 [TOC]
+
+## What you need to know first
+
+The article explains the Rust syntax itself, but its Solana examples rely on a few concepts of the Solana runtime and of Anchor.
+
+- **Solana account model**: on Solana, programs hold no state of their own; data lives in separate accounts that each instruction must list explicitly. This is why every handler receives a set of accounts through `ctx.accounts`. The site's [Solana core concept]({{site.url_complet}}/2024/09/19/solana-core-concept/) article covers the model.
+- **Anchor framework**: Anchor is a Rust framework for Solana programs that validates and deserializes the accounts of an instruction from a struct annotated with `#[derive(Accounts)]`. The `Context` type and the `ctx` parameter in the last section come from it; see the [Introduction to Solana Anchor]({{site.url_complet}}/2026/03/13/solana-anchor-introduction/).
+- **Program Derived Address (PDA) and bump**: a PDA is an account address derived from seeds and a program ID, which has no private key, so only the program can sign for it. The bump is the extra seed byte that makes the derivation valid, which is what `ctx.bumps.bonding_curve` passes to the locker in the `?` operator example.
+- **Mint authority and token accounts**: an SPL token mint has a mint authority allowed to create new tokens, and balances are held in token accounts, often an associated token account (ATA) derived from the owner and the mint. The Pump Science calls `revoke_mint_authority()` and `lock_ata()` act on these accounts; the [spl-token introduction]({{site.url_complet}}/2022/08/06/solana-spl-token/) shows them from the command line.
+- **Lifetimes**: a Rust lifetime such as `'info` names how long a borrowed reference stays valid, so the compiler can check that the reference does not outlive its data. The Anchor structs in the examples carry `'info` because they borrow the account data passed to the instruction.
+- **Generics**: a type parameter such as `T` in `Result<T, E>` or `Context<T>` lets one definition work with many concrete types. The article uses them in the `Result` enum and in Anchor's `Context` struct.
 
 ------
 
@@ -97,14 +108,14 @@ impl Post {
 
 ### Option and Result Types
 
-#### `Some()` and `is_Some()`
+#### `Some()` and `is_some()`
 
 - `Some(value)`: Represents the presence of a value in an `Option`.
-- `is_Some()`: A method to check if an `Option` contains a value. Example:
+- `is_some()`: A method to check if an `Option` contains a value. Example:
 
 ```rust
 let opt = Some(10);
-if opt.is_Some() {
+if opt.is_some() {
     println!("Option has a value.");
 }
 ```
@@ -292,7 +303,7 @@ See [pump science - create_bonding_curve.rs#L86](https://github.com/code-423n4/2
 Commonly seen in Solana programs, `ctx` often refers to a context structure containing accounts and program-specific information. This is part of the [Anchor framework](https://www.anchor-lang.com/), simplifying Solana smart contract development.
 
 ```rust
-process(ctx: Context<MyAccounts>) -> ProgramResult {
+pub fn process(ctx: Context<MyAccounts>) -> Result<()> {
     // Use ctx.accounts for access
     Ok(())
 }
@@ -327,6 +338,26 @@ pub struct Context<'a, 'b, 'c, 'info, T: Bumps> {
 ```
 
 
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Ownership** | The Rust rule that each value has a single owner; a method taking `self` consumes the instance and the caller gives up ownership. |
+| **Borrowing** | Accessing a value through a reference without taking ownership, with `&self` or `&` for read-only access. |
+| **Immutable reference (`&`)** | A read-only reference to a value; several can coexist, and modifying through one is a compiler error. |
+| **Mutable reference (`&mut`)** | A reference that allows modification; only one can exist at a time for a given value. |
+| **`Option`** | The Rust type that holds either `Some(value)` or nothing (`None`). |
+| **`Result`** | The Rust enum with the variants `Ok(T)` for success and `Err(E)` for failure, used for recoverable errors. |
+| **`unwrap()`** | A method that extracts the value of an `Option` or `Result` and panics on `None` or `Err`. |
+| **`?` operator** | An operator that unwraps a successful `Result` or `Option` and otherwise returns early from the function with the error. |
+| **`impl`** | The block that defines methods and associated functions for a struct or enum, or implements a trait for it. |
+| **Trait** | A set of method signatures defining a behaviour, which a type implements with `impl Trait for Type`. |
+| **Associated function** | A function defined in an `impl` block that does not take `self`, called with `Type::function()`, such as a `new` constructor. |
+| **Anchor `Context`** | The struct passed to an Anchor instruction as `ctx`, holding the program ID, the validated accounts, the remaining accounts and the PDA bumps. |
+| **PDA** | A Program Derived Address, an account address derived from seeds and a program ID; its bump seeds are exposed in `ctx.bumps`. |
 
 ## PlantUML Mindmap
 

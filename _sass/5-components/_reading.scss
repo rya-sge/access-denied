@@ -1,0 +1,134 @@
+/* ===============
+	READING COMFORT (article body)
+=============== */
+
+/*
+  The article body used to run the full width of the white card: about 1045px
+  of 15px text on a 1440px screen, roughly 140 characters a line, twice the
+  60-80 that long technical reading tolerates. The body is now one centred
+  column of about 75 characters at 17px, and the elements that need room
+  (tables, code, diagrams) may use the whole card.
+
+  Everything here is scoped to .c-wrap-content, which only the post layout
+  renders, so index pages, category pages and the sidebar are unchanged.
+*/
+
+$reading-measure: 44rem;
+
+.c-wrap-content {
+  font-size: 17px;
+  line-height: 1.7;
+
+  > * {
+    max-width: $reading-measure;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  // Wide content keeps the full card width.
+  > .highlighter-rouge,
+  > pre,
+  > p:has(> img:only-child),
+  > p:has(> a:only-child > img) {
+    max-width: 100%;
+  }
+
+  // An anchor jump from the TOC no longer puts the heading flush with the top
+  // edge, and sections get a visible break before them.
+  h2,
+  h3,
+  h4 {
+    scroll-margin-top: 20px;
+  }
+
+  > h2 {
+    margin-top: 2.2em;
+  }
+
+  > h3 {
+    margin-top: 1.6em;
+  }
+
+  // Diagrams are opened full size on click (js/main.js), which matters for the
+  // PlantUML and Mermaid figures whose labels are small at column width.
+  a.c-zoomable {
+    cursor: zoom-in;
+  }
+}
+
+/*
+  Tables: the old rule drew a 2px black grid, which on a 20-row Key Terms table
+  reads as a spreadsheet. Lighter rules, a tinted header and a horizontal scroll
+  for tables wider than the screen (kramdown emits no wrapper, so the table
+  itself becomes the scroll box).
+*/
+.c-wrap-content table {
+  // `display: block` alone makes the box as wide as the card while the rows keep
+  // their natural width, so a narrow table (three short columns) showed its rows
+  // on the left and an empty bordered area on the right. `fit-content` shrinks
+  // the box to the table, and a wide table still wraps and scrolls at 100%.
+  //
+  // A table starts at the left edge of the text column, like the heading above
+  // it, and may grow to the right edge of the card. Centring it in the card put
+  // a small table visibly off the column. $table-offset is the column's left
+  // margin inside the card (0 when the card is narrower than the column).
+  $table-offset: unquote("max(0px, (100% - #{$reading-measure}) / 2)");
+  display: block;
+  width: fit-content;
+  max-width: calc(100% - #{$table-offset});
+  margin-left: $table-offset;
+  margin-right: 0;
+  overflow-x: auto;
+  margin-bottom: 1.5em;
+  font-size: 15px;
+  line-height: 1.5;
+  border: 1px solid var(--line);
+
+  th,
+  td {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  // Right-aligned columns hold numbers ("23.9 %", "1,541"); on a phone they
+  // broke between the figure and its unit.
+  td[style*="right"] {
+    white-space: nowrap;
+  }
+
+  th {
+    text-align: left;
+    background-color: var(--alt-bg);
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: var(--alt-bg);
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  // On a phone every pixel of the card goes to the text: 20px of padding on
+  // each side left 311px of a 360px screen.
+  .c-wrap-content {
+    font-size: 16px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .c-wrap-content table {
+    font-size: 14px;
+
+    th,
+    td {
+      padding: 6px 8px;
+    }
+  }
+}
+
+/* Estimated reading time, next to the dates in the article header. */
+.c-article__reading-time {
+  white-space: nowrap;
+}

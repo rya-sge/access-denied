@@ -26,7 +26,19 @@ Reference: [Merkle-DAGs meet CRDTs](https://hector.link/presentations/merkle-crd
 
 [TOC]
 
+## What you need to know first
+
+The article explains Merkle trees and DAGs itself, but it relies on a few neighbouring concepts that it uses without defining them.
+
+- **Collision resistance**: a cryptographic hash function is collision resistant when nobody can find two different inputs with the same hash. Content addressing depends on this property, since one hash must stand for one content only. Git still uses SHA-1 by default, whose collision resistance was broken in 2017, and has added a SHA-256 object format.
+- **Git object model**: Git stores everything as objects named by their hash. Blobs hold file contents, trees list blobs and subtrees, and a commit points to one root tree, to its parent commits and to metadata such as the author and the message; see [Most useful commands with git]({{site.url_complet}}/2024/04/15/git-cheatsheet/) for the everyday commands.
+- **UNIX directory entries and inodes**: in a UNIX filesystem, an inode stores a file's data and attributes, and a directory is a list of entries mapping names to inodes. The article uses this as the analogy for Git's trees and blobs.
+- **Location addressing and content addressing**: a URL names where data is stored, so the same data on two servers has two names. Content addressing names data by its hash instead, so any peer holding it can serve it and the receiver can check it, which is the model IPFS builds on.
+- **CRDT (Conflict-free Replicated Data Type)**: a data type replicated on several nodes that can be updated independently and always converges to the same state when the replicas merge. The IPFS section mentions Merkle-CRDTs, which use a Merkle DAG to sync such replicas.
+
 ------
+
+## Merkle DAG Concepts
 
 ### Understanding Merkle DAGs
 
@@ -141,7 +153,7 @@ Reference:
 
 ### IPFS
 
-A Merkle DAG in IPFS is a DAG where each node has an identifier called a CID, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA-226. 
+A Merkle DAG in IPFS is a DAG where each node has an identifier called a CID, and this is the result of hashing the node's contents — any opaque payload carried by the node and the list of identifiers of its children — using a cryptographic hash function like SHA-256. 
 
 - Merkle DAGs can only be constructed from the leaves, that is, from nodes without children. 
 - Parents are added after children because the children's identifiers must be computed in advance to be able to link them.
@@ -189,7 +201,27 @@ See also [IPFS - Lesson: Turn a File into a Tree of Hashes](https://dweb-primer.
 While Merkle DAGs are powerful, they are not without challenges:
 
 1. **Complexity**: The implementation and management of Merkle DAGs can be more complex compared to simpler data structures or a traditional Merkle Tree.
-2. **Storage Overhead**: Storing hash values alongside data adds overhead compared to a traditional Merkle Tree.
+2. **Storage Overhead**: Storing a hash (CID) for every node and every link adds overhead compared to storing the raw data alone; a classic Merkle tree pays a similar cost for its node hashes.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Cryptographic hash** | A function that maps data to a fixed-size digest, so that any modification of the data gives a different hash. |
+| **Merkle tree** | A tree in which every leaf holds the hash of a data block and every non-leaf node holds the hash of its children. |
+| **Root hash** | The hash at the top of a Merkle tree or DAG, a compact representation of the whole structure. |
+| **DAG** | Directed Acyclic Graph: a graph with directed edges and no cycles, in which a node can have several parents. |
+| **Merkle DAG** | A DAG whose nodes are data blocks linked by hashes, with no balance requirement and a payload allowed on every node. |
+| **Content addressing** | Identifying a node by the hash of its content, so identical content always gets the same identifier. |
+| **CID** | Content Identifier: the IPFS identifier of a node, obtained by hashing its payload and the list of its children's identifiers. |
+| **Deduplication** | Storing identical data only once, because content-addressed nodes with the same content are the same node. |
+| **Blob** | The Git object that holds a file's contents, roughly equivalent to an inode. |
+| **Tree object** | The Git object that lists blobs and subtrees by hash, together with their mode, type and filename. |
+| **Commit** | A Git node in the history DAG, whose links to earlier commits record how the changes relate. |
+| **Merkle-CRDT** | A replicated data type synced through a Merkle DAG, where equal CIDs let two replicas skip the parts they already share. |
+| **IPFS** | The InterPlanetary File System, a peer-to-peer content delivery network that splits files into chunks linked in a Merkle DAG. |
 
 ## Reference
 

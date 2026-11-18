@@ -2,7 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 40 - Weather Witness"
 date: 2025-07-11
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
@@ -21,7 +21,16 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-05-
 
 [TOC]
 
+## What you need to know first
 
+The findings below rely on a few Chainlink services and Solidity mechanisms that the article uses without developing them:
+
+- **Oracles.** A smart contract cannot call a web API such as OpenWeather by itself, so it relies on an oracle network that fetches off-chain data and writes it on-chain. [How to build a blockchain oracle]({{site.url_complet}}/2024/04/16/build-blockchain-oracle/) explains the general design; this project uses Chainlink's services for the weather data.
+- **Chainlink Functions.** A contract sends a request containing JavaScript source code (here `GetWeather.js`) to a Chainlink decentralized oracle network, which runs it and calls the contract back with a response and an error field. The mint flow is therefore split in two steps: `requestMintWeatherNFT` sends the request and `fulfillMintRequest` mints once the answer has arrived.
+- **Chainlink Automation (keepers).** An upkeep is a registration, funded with LINK, that asks Chainlink nodes to call a contract on a schedule or condition. The nodes evaluate `checkUpkeep` off-chain and send an on-chain `performUpkeep` transaction only when it returns true; since `performUpkeep` is an ordinary external function, anyone can also call it directly, which is the basis of the first finding.
+- **Dynamic NFTs.** An [ERC-721]({{site.url_complet}}/2025/03/03/erc721-overview/) token whose metadata, here the image URI tied to a weather state, is updated after minting instead of being fixed once.
+- **Payable functions and locked ether.** A `payable` function accepts ether, which stays in the contract's balance; if no function ever sends it out, for example a `withdraw` restricted to the owner, that ether is locked for good. The second finding applies this to the mint price.
+- **Explicit integer downcasting.** In Solidity 0.8, arithmetic overflow reverts, but an explicit conversion such as `uint96(x)` silently drops the high-order bits when `x` does not fit. The invalid finding about `initLinkDeposit` relies on this, and was rejected because the LINK supply always fits in a `uint96`.
 
 ## Description
 
@@ -155,9 +164,12 @@ Call checkUpKeep inside performUpkeep
 
 function performUpkeep(bytes calldata performData) external override {
 
-bool res = checkUpkeep(performData)
+// checkUpkeep is external: call it through this and keep the first return value
+(bool upkeepNeeded, ) = this.checkUpkeep(performData);
 
-require(res, "Invalid update")
+require(upkeepNeeded, "Invalid update");
+
+// ... existing logic
 
 }
 ```
@@ -331,6 +343,26 @@ Use an uint96 for the function parameter in requestMintWeather NFT and in the co
         string isoCode;
     }
 ```
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **ERC-721** | The non-fungible token standard on which the Weather NFT is built. |
+| **Dynamic NFT** | An NFT whose metadata changes after minting; here the image URI follows the current weather state of the linked location. |
+| **Oracle** | A service that brings off-chain data, such as the weather returned by the OpenWeather API, to a smart contract. |
+| **Chainlink Functions** | The Chainlink service that runs the `GetWeather.js` request off-chain and returns the weather data to the contract through a callback. |
+| **Chainlink Automation** | The Chainlink service, also called keepers, that calls `checkUpkeep` and `performUpkeep` to refresh each NFT at regular intervals. |
+| **Upkeep** | A Chainlink Automation registration; the project creates one per NFT, with the `tokenId` as `checkData` and the user's LINK deposit as funding. |
+| **`checkUpkeep`** | The function the keepers evaluate to decide whether an update is due, here whether the heartbeat interval has passed. |
+| **`performUpkeep`** | The function that sends a new Chainlink Functions request and updates the NFT; it does not re-check the heartbeat, so anyone can trigger an early update. |
+| **Heartbeat** | The interval chosen by the user between two weather updates of an NFT. |
+| **LINK** | Chainlink's ERC-20 token, with 18 decimals and a maximum supply of one billion, used to fund the upkeep of each NFT. |
+| **Payable function** | A function that accepts ether with the call; `requestMintWeatherNFT` requires `msg.value` to equal the current mint price. |
+| **Locked ether** | Ether held by a contract that has no function to send it out, as with the mint payments in `WeatherNft`. |
+| **Downcasting** | An explicit conversion to a smaller integer type, such as `uint96(_userMintRequest.initLinkDeposit)`, which truncates a value that does not fit. |
 
 ## Mindmap
 

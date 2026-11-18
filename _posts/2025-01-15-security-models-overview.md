@@ -30,9 +30,19 @@ There are many additional security models if you want to explore more. Examples 
 
 [TOC]
 
+## What you need to know first
 
+The three models are formal access-control policies, and the article describes their rules with a vocabulary from access-control theory that it does not introduce.
+
+- **Subjects and objects**: a subject is an active entity that requests access, such as a user or a process, and an object is a passive resource it accesses, such as a file or a record. Every rule in the article is a condition on whether a given subject may read or write a given object.
+- **Security and integrity levels**: each subject and object carries a label taken from an ordered set, for example Unclassified < Confidential < Secret < Top Secret. A subject's label is its clearance and an object's label is its classification, and Bell-LaPadula and Biba decide access by comparing the two.
+- **Mandatory and discretionary access control**: under mandatory access control, a system-wide policy decides access and the owner of an object cannot override it. Under discretionary access control, the owner grants permissions as they choose. The no-read-up and no-write-down rules are mandatory, while the discretionary property of Bell-LaPadula adds a discretionary layer on top; see [Advanced GNU/Linux Security - SECCOMP and Linux Security Modules (LSM)]({{site.url_complet}}/2026/06/29/linux-advanced-security-seccomp-lsm/).
+- **Information flow**: reading moves information from an object to a subject, and writing moves it from a subject to an object. The models restrict the direction of these flows between levels: Bell-LaPadula stops secrets flowing down, Biba stops untrusted data flowing up.
+- **State machine model**: Bell-LaPadula describes the system as a set of states and proves that every allowed transition keeps the system in a secure state. Clark-Wilson's "well-formed transactions" rely on the same idea of moving only from one valid state to another.
 
 ------
+
+## The Three Models
 
 ### Bell-LaPadula Model (Confidentiality)
 
@@ -88,7 +98,7 @@ The Biba model emphasizes **data integrity**, ensuring that information is not i
 
 **Simple Integrity Property (no read-down):**
 
-This principle prohibits people from reading information below their clearance level.
+This principle prohibits subjects from reading information below their own integrity level.
 
 - A subject cannot read data at a lower integrity level.
 
@@ -185,6 +195,31 @@ Each model addresses different security needs and is tailored to specific types 
 
 ![security-models-mindmap]({{site.url_complet}}/assets/article/securite/security-model/security-models-mindmap.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Subject** | An active entity, such as a user or a process, that requests access to data. |
+| **Object** | A passive resource, such as a file or a data item, that a subject reads or writes. |
+| **Security level** | The label assigned to subjects and objects, a clearance or a classification, that the models compare to decide whether an access is allowed. |
+| **Bell-LaPadula model (BLP)** | A model focused on confidentiality, used in military and government systems, that prevents classified information from leaking to lower levels. |
+| **Simple Security Property** | The Bell-LaPadula rule "no read-up": a subject cannot read data at a higher security level than its own. |
+| **\*-Security Property** | The Bell-LaPadula rule "no write-down": a subject at a higher level cannot write data to a lower level. |
+| **Discretionary Security Property** | The Bell-LaPadula rule that adds an access matrix of allowed read and write operations on top of the two level-based properties. |
+| **Access matrix** | A table with one row per subject and one column per object, whose cells list the operations each subject may perform on each object. |
+| **Biba integrity model** | A model focused on integrity that prevents data from being improperly modified, summarised as "read up, write down". |
+| **Simple Integrity Property** | The Biba rule "no read-down": a subject cannot read data at a lower integrity level, which could be incorrect. |
+| **Integrity \*-Property** | The Biba rule "no write-up": a subject cannot write data to a higher integrity level. |
+| **Clark-Wilson model** | An integrity model for commercial systems that enforces well-formed transactions, separation of duties and auditability. |
+| **Constrained Data Item (CDI)** | In Clark-Wilson, data whose integrity the system must preserve. |
+| **Unconstrained Data Item (UDI)** | In Clark-Wilson, any data outside the CDIs, such as user and system input. |
+| **Transformation Procedure (TP)** | In Clark-Wilson, a programmed operation that is the only allowed way to modify CDIs and must maintain their integrity. |
+| **Integrity Verification Procedure (IVP)** | In Clark-Wilson, a procedure that checks that the CDIs are valid. |
+| **Access triple** | The Clark-Wilson rule that a subject reaches an object only through an authorised transformation procedure, written (subject, TP, object). |
+| **Separation of duties** | The principle that restricts users to specific roles so that no single individual has unchecked control over sensitive data. |
+
 ## References
 
 - ChatGPT with the inputs: *Explain these different models: Bell-LaPadula Model The Biba Integrity Model The Clark-Wilson Model*,  "Create a plantuml mindmap to summarize it"
@@ -193,5 +228,3 @@ Each model addresses different security needs and is tailored to specific types 
 
   - [CertMike Explains the Biba Integrity Model](https://www.youtube.com/watch?v=nfmwSGtyzV0)
   - [The Bell LaPadula Model](https://www.youtube.com/watch?v=G1FWTfJsK6k)
-
-  ### 

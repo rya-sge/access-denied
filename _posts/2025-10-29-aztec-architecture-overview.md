@@ -2,7 +2,7 @@
 layout: post
 title: "Aztec: A Privacy-First Layer 2 for Ethereum"
 date:   2025-10-29
-last_modified_at: 2026-09-08
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain ethereum ZKP aztec
@@ -23,6 +23,17 @@ This is the short version. The long one covers the key hierarchy, note delivery 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
 [TOC]
+
+## What you need to know first
+
+Aztec combines several building blocks that this overview names without explaining.
+
+- **zk-rollup**: a layer 2 that executes transactions off-chain, batches them, and posts a validity proof that a contract on Ethereum verifies. Aztec is a zk-rollup that adds private execution on top of this model.
+- **zk-SNARK**: a short zero-knowledge proof that a computation was done correctly, cheap to verify and revealing nothing about the private inputs; see [Understanding zk-SNARK]({{site.url_complet}}/2025/07/29/zk-snark-overview/). The PXE produces such proofs for private functions, and the rollup circuits aggregate them.
+- **UTXO model**: state is a set of discrete outputs that are created once and spent once, rather than account balances updated in place; see [The Extended UTXO Model, and How It Differs from Bitcoin]({{site.url_complet}}/2026/07/16/eutxo-vs-bitcoin-utxo/). Aztec's private notes follow this model.
+- **Merkle tree**: a tree of hashes whose root commits to every leaf, so that membership of one leaf can be proven with a short path of hashes. Aztec stores note hashes, nullifiers and public state in such trees and proves membership inside circuits.
+- **Commitment**: a value that binds to some data without revealing it, typically a hash of the data and some randomness; see [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/). A note hash is a commitment to a note, which is why the chain can record a note without learning its content.
+- **Account abstraction**: making each account a smart contract with its own authentication logic, as ERC-4337 does on Ethereum without a protocol change; see [ERC-4337: Account Abstraction Using Alt Mempool]({{site.url_complet}}/2025/05/02/erc-4337-overview/). On Aztec it is built into the protocol.
 
 ## Aztec Architecture Overview
 
@@ -148,13 +159,14 @@ These circuits ensure:
 Every Aztec account is a **smart contract**.  
 This enforces **account abstraction (AA)** natively—authentication logic, fee models, and nonce schemes are all programmable.
 
-Each account has **three key pairs**:
+Each account has several protocol key pairs, of which two are in active use:
 
 | Key Type                 | Purpose                              |
 | ------------------------ | ------------------------------------ |
 | **Nullifier Key**        | Generates nullifiers for spent notes |
 | **Incoming Viewing Key** | Decrypts notes received              |
-| **Outgoing Viewing Key** | Decrypts notes sent                  |
+
+The outgoing viewing, tagging, message-signing and fallback key pairs are also part of the account but are reserved and not currently used. Transaction authorization relies on a separate **signing key**, which the account contract defines and can rotate.
 
 Developers can implement arbitrary signature verification schemes (e.g., Schnorr, BLS, multisig) directly in account contracts, allowing wallets to define unique security and UX models.
 
@@ -234,9 +246,34 @@ Wallets also manage:
 
 ![Mindmap of the Aztec privacy-first Layer 2 covering its architecture, execution model, state model, core components, accounts and keys, wallet architecture, privacy enforcement and developer considerations]({{site.url_complet}}/assets/article/blockchain/aztec/aztec-mindmap.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Layer 2 (L2)** | A network that runs on top of Ethereum and settles to it, here by posting rollup proofs that an L1 contract verifies. |
+| **Zero-knowledge proof (ZKP)** | A proof that a statement is true which reveals nothing beyond its validity; Aztec uses it to verify private execution without seeing its inputs. |
+| **PXE (Private Execution Environment)** | The user's local runtime that executes private functions, generates their proofs, and manages keys and notes. |
+| **AVM (Aztec Virtual Machine)** | The network-side virtual machine that executes public functions, modelled on the EVM with proof-friendly opcodes. |
+| **Private execution** | Contract logic run client-side in the PXE, whose result reaches the network only as a proof; it always precedes public execution. |
+| **Public execution** | Contract logic run by the network in the AVM, with state changes visible to everyone; private functions can enqueue public calls, not the reverse. |
+| **Note** | A unit of private state in UTXO form, encrypted so that only its recipient can read it. |
+| **Note hash tree** | The append-only Merkle tree holding the commitments of all private notes. |
+| **Nullifier** | A value published when a note is spent, which prevents double-spending without revealing which note was consumed. |
+| **Public state tree** | The Merkle tree holding public contract state, updated directly by the AVM. |
+| **Noir** | Aztec's domain-specific language for writing zero-knowledge circuits and private contract logic. |
+| **Kernel circuit** | The protocol circuit that validates an individual transaction and its private function calls. |
+| **Rollup circuit** | The circuit that batches multiple kernel proofs into one rollup proof. |
+| **Nullifier key** | The account key used to derive the nullifiers of the notes it spends. |
+| **Incoming viewing key** | The account key used to decrypt the notes it receives. |
+| **Authwit (authorization witness)** | A permission an account grants so that another contract can act on its behalf. |
+| **Paymaster** | A contract that sponsors or abstracts a transaction's fees for the user. |
+
 ## References
 
 - [Aztec Developer Docs](https://docs.aztec.network/)
+- [Aztec Docs - Keys](https://docs.aztec.network/developers/docs/foundational-topics/accounts/keys)
 - [Noir Language Docs](https://noir-lang.org/)
 - [Aztec Protocol GitHub](https://github.com/AztecProtocol)
 - [Aztec.js SDK Reference](https://docs.aztec.network/developers/docs/aztec-js)

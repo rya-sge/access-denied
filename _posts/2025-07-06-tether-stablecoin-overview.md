@@ -31,6 +31,17 @@ USDT operates across multiple chains (Ethereum, Tron, Solana, and others), but t
 
 [TOC]
 
+## What you need to know first
+
+The analysis below reads a 2017 Solidity contract, so a few mechanisms of the EVM and of older Solidity versions help to follow it.
+
+- **ERC-20 allowance flow**: besides `transfer`, an ERC-20 token lets a holder `approve` a spender, which can then move tokens on the holder's behalf with `transferFrom` up to the `allowance`. USDT overrides these three functions to add fees, the pause check, the blacklist check and the forwarding to an upgraded contract. The site's [ERC-20 implementation comparison]({{site.url_complet}}/2026/02/13/erc20-library-comparison-openzeppelin-solady-solarity/) describes the standard functions.
+- **Function modifiers and owner-based access control**: a Solidity modifier such as `onlyOwner` or `whenNotPaused` wraps a function body with a check that runs first and reverts when it fails. Every administrative function of USDT (pause, blacklist, mint, upgrade, fees) is protected by `onlyOwner`, a single address.
+- **ABI calldata layout**: a call to a function carries a 4-byte selector followed by its arguments, each padded to 32 bytes. The short address attack and the `onlyPayloadSize` check discussed in the Protection section depend on this layout; the site's [ABI encoding overview]({{site.url_complet}}/2025/07/29/solidity-abi-encoding-overview/) covers it.
+- **Integer overflow before Solidity 0.8**: before version 0.8.0, arithmetic on `uint` wrapped around silently instead of reverting. This is why the contract routes its arithmetic through the `SafeMath` library, and the [Solidity version article]({{site.url_complet}}/2022/10/29/solidity-version/) explains how the `pragma` line pins the compiler version.
+- **Contract upgradeability**: deployed bytecode cannot be changed, so an upgradeable token needs an indirection that sends calls to newer logic. USDT uses its own forwarding scheme (`deprecate()` and `upgradedAddress`) rather than the proxy pattern that is common today, described in the site's [proxy contracts summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/).
+- **Fiat-backed issuance**: the tokens represent dollars held off-chain by the issuer, so the on-chain contract only records supply changes that the issuer decides. This is why `issue()` and `redeem()` are owner-only functions with no on-chain collateral check.
+
 
 
 ## Overview
@@ -256,7 +267,7 @@ A contract which defined the main functions to implement an upgradeability syste
 
 **Purpose**: Interface for upgraded token contract.
 
-**Usage**: Allows the original contract to delegate calls to a newer version via upgrade path.
+**Usage**: Allows the original contract to forward calls to a newer version via upgrade path. The forwarding uses ordinary external calls (`transferByLegacy`, `transferFromByLegacy`, `approveByLegacy`, `balanceOf`), not `delegatecall`, so the new contract executes with its own storage and receives the original sender as an argument.
 
 **Functions**: Proxy equivalents of `transfer`, `transferFrom`, `approve` for legacy compatibility.
 
@@ -817,7 +828,7 @@ uint256 c = a.add(b);
 
 - **Owner has sweeping power** (mint, freeze, confiscate, halt)
 - **Security mechanisms** (like short address attack prevention) are outdated
-- **Obsolete Solidity version**: v0.4.x lacks modern language features like `revert()` and `safe constructors`
+- **Obsolete Solidity version**: v0.4.x lacks modern language features. The contract predates the `constructor` keyword, added in Solidity 0.4.22, so it declares its constructors as functions named after the contract, such as `Ownable()` and `TetherToken(...)`. Custom errors only arrived in 0.8.4. `revert()` itself is available since 0.4.10.
 - **No use of events in critical areas like `transfer` in upgraded contract**
 - **Deprecation relies on trust** in `upgradedAddress` implementation
 
@@ -834,8 +845,28 @@ This is a **classic example of a custodial/centralized stablecoin** with:
 
 - Solidity code presents a reasonable structure for 2017, but not aligned with modern solidity code
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **ERC-20** | The Ethereum fungible token standard; USDT implements its interface (`transfer`, `approve`, `transferFrom`, `allowance`, `balanceOf`, `totalSupply`) with custom extensions. |
+| **Allowance** | The amount a holder has authorised a spender to move on its behalf through `transferFrom`, set with `approve`. |
+| **Modifier** | A Solidity construct that adds a check before a function body, such as `onlyOwner`, `whenNotPaused` or `onlyPayloadSize`. |
+| **Ownable** | The base contract that stores a single `owner` address and restricts sensitive functions to it with `onlyOwner`. |
+| **Pausable** | The base contract that lets the owner call `pause()` and `unpause()`, disabling `transfer` and `transferFrom` while paused. |
+| **Blacklist** | The list of addresses kept by the `BlackList` contract; a blacklisted address cannot send tokens, and the owner can wipe its balance with `destroyBlackFunds`. |
+| **Basis point** | One hundredth of a percent (0.01%), the unit of the transfer fee `basisPointsRate`, capped together with `maximumFee` in `setParams`. |
+| **Issue / redeem** | The owner-only functions that mint new tokens to the owner and burn tokens from the owner's balance, adjusting `_totalSupply` to match off-chain actions. |
+| **Deprecation** | The USDT upgrade path: once `deprecate()` sets `deprecated` and `upgradedAddress`, ERC-20 calls are forwarded to the `UpgradedStandardToken` contract. |
+| **SafeMath** | A library that checks arithmetic for overflow and underflow, needed before Solidity 0.8.0 introduced native checks. |
+| **Short address attack** | An attack on old Solidity versions where a too-short calldata payload was misread, countered in USDT by the `onlyPayloadSize` modifier. |
+| **Centralization risk** | The dependence of users on the owner, who can mint, pause, blacklist, confiscate and redirect the contract's logic. |
+
 ## Reference
 
+- [Solidity Changelog](https://github.com/ethereum/solidity/blob/develop/Changelog.md)
 - USDT mainet contract address: [0xdac17f958d2ee523a2206206994597c13d831ec7](https://etherscan.io/address/0xdac17f958d2ee523a2206206994597c13d831ec7)
 - ChatGPT for the analyse
 

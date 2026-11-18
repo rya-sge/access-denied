@@ -38,6 +38,7 @@ en:
 
   # Post
   updated_on: "Updated"
+  reading_time: "min read"
   byline_by: "By"
   toc_title: "Contents"
   series_kicker: "Series"
@@ -88,6 +89,7 @@ fr:
 
   # Article
   updated_on: "Mis à jour le"
+  reading_time: "min de lecture"
   byline_by: "Par"
   toc_title: "Sommaire"
   series_kicker: "Série"

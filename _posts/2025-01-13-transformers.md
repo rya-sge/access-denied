@@ -22,6 +22,18 @@ Transformers are at the foundation of Bert and Chat GPT models
 
 [TOC]
 
+## What you need to know first
+
+The article assumes a reader who knows what a neural network is, and uses a few mechanisms one level below that without explaining them.
+
+- **Tokens and embeddings**: text is split into tokens (words or word pieces), and each token is mapped to a dense vector of numbers called an embedding. Everything the transformer computes, from positional encodings to attention, operates on these vectors.
+- **Fully connected layer and activation function**: a fully connected (linear) layer multiplies its input by a weight matrix and adds a bias, and a non-linear activation such as ReLU, $$\max(0, x)$$, is applied between layers. The feed-forward block of each transformer layer is two such layers with a ReLU in between; [Perceptron - a simple, binary neural network architecture]({{site.url_complet}}/2024/11/25/perceptron-introduction/) covers the single-neuron case.
+- **Training by gradient descent**: the network's weights are adjusted step by step in the direction that reduces a loss, using gradients propagated backwards through the layers. The vanishing and exploding gradient problems the article attributes to RNNs come from this process over long chains of steps; see [Gradient Descent in Machine Learning - Overview]({{site.url_complet}}/2025/04/09/gradient-descent-overview/).
+- **Dot product as a similarity score**: the dot product of two vectors is large when they point in similar directions, which is why attention uses $$QK^T$$ to score how relevant each token is to another.
+- **Sequence-to-sequence tasks**: tasks such as translation that turn one sequence into another of possibly different length, traditionally handled by an encoder that reads the input and a decoder that produces the output. The transformer keeps this encoder-decoder split and replaces the recurrent layers inside it.
+- **Recurrent and convolutional networks**: the two earlier architectures the article compares against. A recurrent network processes a sequence step by step through a hidden state, and a convolutional network looks at fixed local windows of its input; the site covers both in [Recurrent Neural Networks (RNNs) - Overview]({{site.url_complet}}/2025/11/14/recurrent-neural-network--overview/) and [Convolutional Neural Networks (CNNs) - Overview]({{site.url_complet}}/2024/11/19/convolutional-neural-networks-overview/).
+
+
 
 
 ------
@@ -119,13 +131,13 @@ The decoder takes the encoder's output and applies cross-attention to integrate 
 
 According to the paper: 
 
-- he queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models
+- The queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models
 - The encoder contains self-attention layers. In a self-attention layer all of the keys, values and queries come from the same place, in this case, the output of the previous layer in the encoder. Each position in the encoder can attend to all positions in the previous layer of the encoder. 
 - Similarly, self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. 
 
 ### Output Generation
 
-The decoder generates the target sequence step by step, using previously generated tokens as input during training.
+At inference, the decoder generates the target sequence step by step, feeding each generated token back as input for the next step. During training, it receives the true target sequence shifted right by one position (teacher forcing), and the masked self-attention prevents each position from seeing the tokens that follow it, so all positions are trained in parallel.
 
 ------
 
@@ -199,6 +211,29 @@ Transformers represent a paradigm shift in machine learning, offering unparallel
 Transformer is the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention.
 
 Compared to perceptrons, RNNs, and CNNs, transformers provide superior performance in capturing global context, modeling long-term dependencies, and enabling efficient parallel processing.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Token** | A unit of the input sequence, such as a word or word piece, produced by tokenizing the input before it is embedded. |
+| **Embedding** | The dense vector that represents a token, to which the positional encoding is added at the bottom of the encoder and decoder stacks. |
+| **Sequence transduction** | Turning an input sequence into an output sequence, the task family the transformer was introduced for with an encoder-decoder structure. |
+| **Softmax** | A function that turns a vector of scores into a probability distribution, with values between 0 and 1 that sum to 1, used to produce the attention weights. |
+| **Vanishing or exploding gradient** | The tendency of gradients to shrink towards zero or grow without bound over long chains of steps, which limits how well RNNs learn long-term dependencies. |
+| **Self-attention** | A mechanism that scores each token against every other token of the same sequence, so the model captures relationships across the whole sequence at once. |
+| **Query, Key, Value** | Three matrices derived from the embeddings: queries stand for the token being processed, keys for the other tokens, values for the information to aggregate. |
+| **Scaled dot-product attention** | Attention computed as $$\text{softmax}(QK^T/\sqrt{d_k})V$$, where the division by $$\sqrt{d_k}$$ is the only difference from plain dot-product attention. |
+| **Additive attention** | An alternative attention function that computes the compatibility score with a feed-forward network with a single hidden layer, slower in practice than dot-product attention. |
+| **Multi-head attention** | Several attention heads run in parallel, each capturing different relationships, with their outputs concatenated and passed through a linear layer. |
+| **Positional encoding** | A vector of the same dimension as the embedding, added to it to inject the token's position, since attention alone does not preserve order. |
+| **Feed-forward network (FFN)** | Two linear transformations with a ReLU between them, applied to each position separately and identically, with different parameters in each layer. |
+| **Encoder** | The stack that processes the input sequence through self-attention and feed-forward layers; BERT uses only this part. |
+| **Decoder** | The stack that generates the output sequence, attending to positions up to and including the current one; GPT uses only this part. |
+| **Cross-attention** | Encoder-decoder attention in which queries come from the previous decoder layer and keys and values come from the encoder output. |
+| **Vision transformer (ViT)** | A transformer applied to image processing, which the article cites as able to outperform CNNs by capturing long-range dependencies. |
 
 ## References
 

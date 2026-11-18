@@ -34,7 +34,7 @@ Supervised learning can be categorized into two main tasks:
 
 ### Classification
 
-> Predicting discrete labels, such as categorizing emails or identifying whether a tumor is malignant or benign. Common algorithms include decision trees, random forests, and support vector machines (SVMs).
+> Predicting discrete labels, such as categorizing emails or identifying whether a tumor is malignant or benign. Common algorithms include logistic regression, decision trees, random forests, and support vector machines (SVMs).
 
 It is similar to regression except output values are labels or categories
 
@@ -46,7 +46,7 @@ Output value: buyer, non-buyer
 
 ### Regression
 
-> Predicting continuous values, like forecasting house prices or stock trends. Popular methods include linear and logistic regression.
+> Predicting continuous values, like forecasting house prices or stock trends. Popular methods include linear and polynomial regression. Despite its name, logistic regression predicts class probabilities and is used for classification.
 
 Training data, each example: 
 
@@ -121,6 +121,28 @@ The choice comes down to what your dataset contains and what you want to extract
 Other families exist as well, from reinforcement learning to hybrid models. 
 
 ----
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Label** | The known output attached to a data point, such as "spam" or "not spam", that a supervised algorithm learns to predict. |
+| **Training set** | The labeled dataset a supervised algorithm learns from, where each data point comes with its associated output. |
+| **Test set** | Data kept apart from the training set and used to measure how well the model generalizes to unseen data. |
+| **Predictor (independent variable)** | An input value of an example, such as age or income, from which the model computes its output. |
+| **Output (dependent variable)** | The value the model predicts from the predictors: a category in classification, a number in regression. |
+| **Hypothesis $$h(x)$$** | The model function that maps an input $$x$$ to a prediction $$\hat{y}$$, the hat marking an estimate as opposed to the true value $$y$$. |
+| **Supervised learning** | Training an algorithm on labeled data so that it learns to predict the output for new inputs. |
+| **Classification** | A supervised task that predicts a discrete label or category, such as spam detection or buyer versus non-buyer. |
+| **Regression** | A supervised task that predicts a continuous numeric value, such as a house price or a person's height. |
+| **Unsupervised learning** | Learning from unlabeled data by finding patterns, groups or relationships without predefined outputs. |
+| **Clustering** | An unsupervised task that groups data points by similarity, for example customer segmentation or grouping news articles. |
+| **Association** | An unsupervised task that finds relationships between variables, such as items often purchased together. |
+| **Dimensionality reduction** | An unsupervised technique that simplifies a dataset while keeping its essential information, often as preprocessing. |
+| **Semi-supervised learning** | An approach for datasets where only part of the data is labeled, using the labeled subset to guide learning on the rest. |
+| **Overfitting** | A model fitting patterns specific to the data it was trained on, which makes its measured performance look better than its real-world performance. |
 
 ## FAQ
 
@@ -223,3 +245,4 @@ A detection system is typically a **classification system**. Its goal is to clas
 - IBM video: [Supervised VS. Unsupervise Learning](https://www.youtube.com/watch?v=W01tIRP_Rqs)
 - Specific topic
   - [Stanford - Machine Learning - Regression](https://web.stanford.edu/class/cs102/lectureslides/RegressionSlides.pdf)
+  - [scikit-learn - Linear Models, Logistic regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)

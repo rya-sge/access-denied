@@ -18,7 +18,7 @@ By aggregating several calls in the same transaction, this pattern offers severa
 
 **On-chain perspective:**
 
-- Lower gas costs since the base fee is paid only once
+- Lower gas costs since the 21,000 gas intrinsic cost of a transaction is paid only once
 - All transactions are performed in the same block, mitigating frontrunning in certain cases.
 - Allowing custom logic in the function call
 
@@ -28,6 +28,17 @@ By aggregating several calls in the same transaction, this pattern offers severa
 - Faster loading of front-end, because multiple information get fetched in one on-chain read call.
 
 [TOC]
+
+## What you need to know first
+
+The article compares several multicall designs, and their differences come from a few EVM and Solidity mechanisms it uses without introducing them.
+
+- **Calldata and ABI encoding**: a call to a contract carries its input as `calldata`, made of a 4-byte function selector followed by the ABI-encoded arguments. A multicall takes an array of such encoded calls (`bytes[] data`) and replays each one; see [Solidity ABI Encoding – Overview]({{site.url_complet}}/2025/07/29/solidity-abi-encoding-overview/).
+- **Transaction atomicity and revert**: when a call reverts and the revert is not caught, every state change made earlier in the same transaction is undone. This is what makes a batch "all or nothing" in the implementations that revert as soon as one call fails.
+- **Revert data**: a failing call returns bytes that the caller can read. A `revert("reason")` returns the `Error(string)` selector (4 bytes) followed by the ABI-encoded string, at least 68 bytes in total, which is why the Uniswap code checks `result.length < 68` and skips the first 4 bytes before decoding.
+- **Read calls through JSON-RPC**: a front-end reads contract state with an `eth_call` request to a node, which executes the call locally without sending a transaction. Multicall3 groups many of these reads into a single request.
+- **ERC-2771 meta-transactions**: a trusted forwarder contract relays a user's signed request and appends the user's address to the end of the calldata. The receiving contract's `_msgSender()` returns those last 20 bytes when `msg.sender` is the forwarder, and this convention is what the OpenZeppelin multicall vulnerability abuses.
+- **Contract wallets**: a wallet implemented as a smart contract, such as a Safe multisig, can execute `delegatecall` where an EOA cannot. The article relies on this to explain why calling Multicall3 by `delegatecall` preserves the wallet as `msg.sender`; see [How to create a multisig wallet with Gnosis Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/).
 
 ## Base concept
 
@@ -196,7 +207,7 @@ Reference: [Arbitrary Address Spoofing Attack: ERC2771Context Multicall Public D
 
 > Initial project by MakerDAO (archive): [makerdao/multicall](https://github.com/makerdao/multicall)
 >
-> Multicall3 (and multicall 1 & 2) [mds1/multicall3](mds1/multicall3/tree/main)
+> Multicall3 (and multicall 1 & 2) [mds1/multicall3](https://github.com/mds1/multicall3/tree/main)
 
 Multicall3 is a fork from the library `multicall`, a project initiated by MakerDAO.
 
@@ -309,7 +320,7 @@ abstract contract Multicall is IMulticall {
 Note:
 
 - This code has been written before the introduction of `custom error`(0.8.0). so I am not sure if it sill correct.
-- This code must not be combined with ERC-2271 forwarder since it does not patch the vulnerability contrary to OpenZeppelin multicall
+- This code must not be combined with ERC-2771 forwarder since it does not patch the vulnerability contrary to OpenZeppelin multicall
 - Check result length
 
 ```solidity
@@ -368,7 +379,7 @@ abstract contract Multicall is IMulticall {
     function multicall(bytes[] calldata data) external virtual returns (bytes[] memory results) {
         results = new bytes[](data.length);
         for (uint256 i = 0; i < data.length; i++) {
-            (bool success, bytes memory returndata) = address(this).delegatecall(data);
+            (bool success, bytes memory returndata) = address(this).delegatecall(data[i]);
             require(success);
             results[i] = returndata;
         }
@@ -380,6 +391,28 @@ abstract contract Multicall is IMulticall {
 
 
 
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Externally Owned Account (EOA)** | An Ethereum account controlled by a private key; it can send transactions and `call` a contract, but cannot `delegatecall`. |
+| **Contract account** | An account controlled by code; it can issue `call`, `staticcall` and `delegatecall` to other contracts. |
+| **`msg.sender`** | The address of the immediate caller of the current execution; it is the value a multicall design must preserve when the target checks who is calling. |
+| **`msg.value`** | The amount of Ether sent with the current call; it is not changed by a `delegatecall`, so a multicall that relies on it in each subcall must be written with care. |
+| **Execution context** | The storage, `msg.sender` and `msg.value` that code runs with; `call` switches to the target's context, `delegatecall` keeps the caller's. |
+| **`CALL`** | The opcode that executes another contract's code in that contract's context, with the caller as the new `msg.sender`. |
+| **`STATICCALL`** | A variant of `call` that reverts if the called code tries to modify state. |
+| **`DELEGATECALL`** | The opcode that runs another contract's code in the caller's context, keeping its storage, `msg.sender` and `msg.value`. |
+| **Multicall** | A pattern that bundles several function calls into one transaction or one read request and returns all results together. |
+| **OpenZeppelin `Multicall`** | An abstract contract that a contract inherits to expose a `multicall` function, which `delegatecall`s the contract itself for each encoded call so that `msg.sender` stays the original caller. |
+| **Multicall3** | A standalone contract, descended from MakerDAO's multicall, that aggregates reads and state-changing calls to any contract using `call`. |
+| **ERC-2771 trusted forwarder** | A relay contract that forwards a user's request and appends the user's address to the calldata, which `_msgSender()` then reads back. |
+| **`_msgSender()`** | OpenZeppelin's `Context` function that returns the logical sender, either `msg.sender` or the address appended by a trusted forwarder. |
+| **Address spoofing** | The attack on contracts combining `Multicall` and `ERC2771Context`, where crafted subcall data makes `_msgSender()` return an address chosen by the attacker. |
+| **ERC-6357** | A proposed standard interface for a single-contract `multicall` based on `delegatecall`, with an optional `multicallPayable` variant. |
 
 ## Reference
 

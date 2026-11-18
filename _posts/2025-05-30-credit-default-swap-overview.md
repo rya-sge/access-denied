@@ -18,6 +18,18 @@ Since their inception in the early 1990s, CDS contracts have been used in credit
 
 [TOC]
 
+## What you need to know first
+
+The article assumes a few notions from fixed income and derivatives markets that it uses without defining them.
+
+- **Face value and recovery rate**: a bond's face value is the amount the issuer promises to repay at maturity, and the recovery rate is the share of that amount a creditor still gets back after a default. The CDS payout is the face value of the bonds, and the recovery rate $$R$$ enters the default-probability estimate.
+- **Basis points**: one basis point (bp) is one hundredth of a percent, so 240 bps per year is 2.4% per year. CDS spreads are quoted in basis points per year of the notional principal.
+- **Credit spread**: the extra yield an investor demands to hold a risky debt instead of a risk-free one, as compensation for the risk of default. The article reads the CDS spread as a credit spread and derives a probability of default from it.
+- **Payment in arrears**: a payment made at the end of the period it covers rather than at its start. Because CDS premiums are paid quarterly in arrears, a default between two payment dates leaves an accrued premium that the buyer still owes.
+- **Short selling**: borrowing an asset, selling it and buying it back later, which gains when the price falls; see [Traditional Futures vs. Perpetual Futures]({{site.url_complet}}/2025/12/29/traditional-vs-perpetual-futures/). The article compares a naked CDS to a short position on the bond.
+- **OTC trading and central clearing**: an over-the-counter contract is negotiated privately between two parties, while a centrally cleared one is novated to a central counterparty that stands between buyer and seller. The regulatory sections describe the post-2008 move of standardized CDS from bilateral OTC trading to central clearing.
+- **Collateral and margin calls**: a party to a derivative may have to post collateral, cash or securities, that the counterparty keeps if it defaults, and must post more when its position loses value. The AIG case is a failure to meet such collateral calls.
+
 
 
 ------
@@ -93,12 +105,12 @@ $$
 Suppose that, for the same reference entity, the 3-year CDS spread is 50 bps while the 5-year CDS spread is 60 bps with a recovery rate of 60%.
 
 - The average PD over 3 year is 0.005 / (1-0.6) = 0.0125
-- The average PD over 5 years is 0.006 / (1-06) = 0.015
+- The average PD over 5 years is 0.006 / (1-0.6) = 0.015
 
 The average PD between year 3 and year 5 is:
 $$
 \begin{aligned}
-\frac {5 * 0.0125 - 3 * 0.015}2 = 0.01875 = 1.875%
+\frac {5 * 0.015 - 3 * 0.0125}2 = 0.01875 = 1.875%
 \end{aligned}
 $$
 
@@ -125,14 +137,14 @@ On June 20, 2014, tow parties agree to enter into a 5-year CDS with respect to a
 
 In case of no default, that is no credit event, the buyer receives no payout, while s/he pays the seller about $225k on September 20, December 20, March 20 and June 20 in 2014, 2015, 2016, 2017, 2018, 2019.
 
-90 bps of 100'000'00 is 900'000. 
+90 bps of 100'000'000 is 900'000. 
 Then 900'000 / 4 = 225'000
 
 #### Default
 
 Now image that there is a credit event, i.e a default.
 
-This default happens in moth 5 of year 3, that is around November 20 2017.
+This default happens in month 5 of year 3, that is around November 20 2016.
 
 In that case, the buyer stops paying the seller and claims the notional principal.
 
@@ -140,7 +152,7 @@ The seller is obliged to pay the notional principal (or any other arrangement) t
 
 Since the buyer's payments are in arrears, and the default event happens in November, a final accrual payment is requires.
 
-In particular, the buyer must pay his/her insurance for October and November 2017, until the credit event. That is:
+In particular, the buyer must pay his/her insurance for October and November 2016, until the credit event. That is:
 
 900'000 / 12 * 2 = 150'000
 
@@ -239,7 +251,7 @@ There **are key differences** between how **Credit Default Swaps (CDS)** operate
 
 #### United States (US)*
 
-- **Regulated primarily by the Commodity Futures Trading Commission (CFTC)** under the Dodd-Frank Act (passed after the 2008 crisis).
+- **Regulated by two agencies** under Title VII of the Dodd-Frank Act, passed after the 2008 crisis. The **Securities and Exchange Commission** (SEC) oversees single-name CDS and CDS on narrow-based indices, which are security-based swaps. The **Commodity Futures Trading Commission** (CFTC) oversees CDS on broad-based indices, which are swaps.
 - Dodd-Frank mandates:
   - Central clearing of standardized CDS through clearinghouses.
   - Trade reporting to swap data repositories (SDRs).
@@ -288,7 +300,7 @@ Both regions use the **ISDA (International Swaps and Derivatives Association)** 
 
 | Aspect                 | United States                                                | European Union                               |
 | ---------------------- | ------------------------------------------------------------ | -------------------------------------------- |
-| Regulatory Body        | CFTC ([Dodd-Frank](https://www.cftc.gov/LawRegulation/DoddFrankAct/index.htm) / [CFTC Issues Clearing Determination for Certain Credit Default Swaps and Interest Rate Swaps](https://www.cftc.gov/PressRoom/PressReleases/6429-12)) | ESMA, local regulators (EMIR, MiFID II, SSR) |
+| Regulatory Body        | SEC for single-name CDS, CFTC for broad-based index CDS ([Dodd-Frank](https://www.cftc.gov/LawRegulation/DoddFrankAct/index.htm) / [CFTC Issues Clearing Determination for Certain Credit Default Swaps and Interest Rate Swaps](https://www.cftc.gov/PressRoom/PressReleases/6429-12)) | ESMA, local regulators (EMIR, MiFID II, SSR) |
 | Central Clearing       | Mandatory for standardized CDS                               | Mandatory for standardized CDS               |
 | Naked Sovereign CDS    | Allowed                                                      | **Prohibited**                               |
 | Governing Law          | Usually New York law                                         | Often English law                            |
@@ -317,6 +329,28 @@ Made with the help of ChatGPT
 
 
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Credit Default Swap (CDS)** | A derivative in which a protection buyer pays periodic premiums to a protection seller, who compensates the buyer if the reference entity suffers a credit event. |
+| **Protection buyer** | The party that pays the premiums and, after a credit event, can sell the reference entity's bonds to the seller for their face value. |
+| **Protection seller** | The party that receives the premiums and must buy the bonds at face value, or pay an equivalent amount, when a credit event occurs. |
+| **Reference entity** | The company or government whose default the CDS covers. |
+| **Credit event** | The event that triggers the CDS payout, such as a default, a bankruptcy or a restructuring of the reference entity. |
+| **Notional principal** | The total face value of the bonds covered by the CDS, on which the premiums are computed. |
+| **CDS spread** | The yearly premium paid by the buyer, expressed as a percentage or in basis points of the notional principal. |
+| **Recovery rate** | The share of face value a creditor recovers after a default, written $$R$$ in the estimate $$PD = CS / (1 - R)$$. |
+| **Probability of default (PD)** | The average yearly likelihood that the reference entity defaults, conditional on no earlier default, estimated here from the CDS spread. |
+| **Covered CDS** | A CDS bought by an investor who also holds the underlying bond, used as insurance against its default. |
+| **Naked CDS** | A CDS bought without holding the underlying bond, which gains when the issuer's credit risk rises and works like a short position on the bond. |
+| **Counterparty risk** | The risk that the protection seller itself defaults and cannot pay, as AIG nearly did in 2008. |
+| **Central clearing** | The settlement of a contract through a central counterparty, required for standardized CDS in both the US and the EU. |
+| **ISDA** | The International Swaps and Derivatives Association, whose framework defines credit events in US and EU CDS contracts. |
+| **Short Selling Regulation (SSR)** | The EU regulation that prohibits naked positions in sovereign CDS. |
+
 ## Reference
 
 - ChatGPT with the input "Write me an article about credit default swap. Talk also about the risk and if it is possible to put it on the blockchain"
@@ -326,6 +360,7 @@ Made with the help of ChatGPT
 - [Credit default swaps 2 - Finance & Capital Markets - Khan Academy](https://www.youtube.com/watch?v=neAFEvNsiqw)
 - [Wikipedia - Credit default swap](https://en.wikipedia.org/wiki/Credit_default_swap)
 - [CFI - Naked Credit Default Swaps](https://corporatefinanceinstitute.com/resources/derivatives/naked-credit-default-swaps/)
+- [SEC - SEC Adopts Rule Defining Swaps-Related Terms for Regulating Derivatives, Fact Sheet (2012)](https://www.sec.gov/opa/press-release-2012-67-related-materials)
 
 
 ### Related articles

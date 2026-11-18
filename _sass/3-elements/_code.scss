@@ -3,17 +3,30 @@
 =============== */
 
 code {
-  overflow: auto;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: break-all;
-  font-family: Courier, monospace;
-  font-size: 14px;
+  font-family: $code-font-family;
+  font-size: .88em;
   background-color: var(--code-bg);
   color: var(--code-text);
 }
 
+/*
+  Inline code wraps like a word: only an identifier longer than the line is
+  allowed to break, and then at any point rather than overflowing the column.
+*/
 p code,
-li code {
-  padding: 3px 5px;
+li code,
+td code,
+th code {
+  padding: 2px 5px;
+  border-radius: 3px;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+// Code inside a block takes the block's size and wrapping, not the inline rules.
+pre code {
+  font-size: inherit;
+  white-space: inherit;
+  background-color: transparent;
 }

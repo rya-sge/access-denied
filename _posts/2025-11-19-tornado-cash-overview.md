@@ -22,7 +22,17 @@ This article summarizes how those circuits work, the underlying cryptographic co
 
 [TOC]
 
+## What you need to know first
 
+The circuits below rely on a few zero-knowledge and data-structure concepts that the article names without explaining them.
+
+- **zk-SNARK**: a short, non-interactive proof that a statement is true which reveals nothing beyond that fact. Tornado Cash uses one to prove ownership of a deposit without saying which one; see [Understanding zk-SNARK: A Deep Dive into Zero-Knowledge Proofs]({{site.url_complet}}/2025/07/29/zk-snark-overview/).
+- **Arithmetic circuit and Circom signals**: a circuit is a set of additions and multiplications over the elements of a large prime field, and every Circom `signal` holds one such element. In the code, `<==` assigns a value and adds a constraint, while `===` only adds a constraint.
+- **Trusted setup**: Groth16 needs a one-time setup per circuit that produces the proving key and the verifying key. The random values used during that setup must be destroyed, otherwise whoever keeps them could forge proofs.
+- **Commitment scheme**: a value that binds its author to some hidden data without revealing it, and that can be opened later. The first property is called binding, the second hiding. Each Tornado Cash deposit is such a commitment; see [The Pedersen Commitment - Overview]({{site.url_complet}}/2025/11/22/pedersen-commitment/).
+- **Merkle tree and Merkle proof**: a tree of hashes whose root summarises all the leaves. A Merkle proof is the list of sibling hashes from one leaf up to the root, and the withdrawal circuit checks such a proof without revealing the leaf; the tree structure is recalled in [Merkle DAGs(IPFS, GIT) - Overview]({{site.url_complet}}/2025/04/09/merkle-dag/).
+- **ZK-friendly hash function**: inside a circuit, the cost of a hash is its number of constraints. SHA-256 works on bits and needs many constraints, while MiMC and Pedersen are built from field operations and stay cheap to prove; see [Pedersen Hash Function Overview]({{site.url_complet}}/2024/05/07/pedersen-hash-function/).
+- **Relayer**: a third party that submits the withdrawal transaction and pays its gas, in exchange for a fee taken from the withdrawn amount. It lets a fresh recipient address withdraw without first receiving ETH from a linkable address.
 
 ------
 
@@ -64,7 +74,7 @@ Circom compiles circuits into an **R1CS (Rank-1 Constraint System)** — a set o
 
 ### QAP: Polynomial transformation
 
-The R1CS is converted into a **Quadratic Arithmetic Program**, allowing all constraints to be checked simultaneously using polynomial commitments.
+The R1CS is converted into a **Quadratic Arithmetic Program**, allowing all constraints to be checked simultaneously as one polynomial divisibility check. Groth16 performs that check with pairings at a secret point fixed during the trusted setup, not with a polynomial commitment scheme.
 
 ### Witness generation
 
@@ -370,7 +380,7 @@ Here’s a compact summary table of all **signals and variables** in the Circom 
 | --------------------- | --------- | ---------------- | ---------------------------------------------------- |
 | `nullifier`           | input     | CommitmentHasher | User’s secret nullifier for deposit note             |
 | `secret`              | input     | CommitmentHasher | User’s secret for deposit note                       |
-| `commitment`          | output    | CommitmentHasher | Pedersen hash of nullifier                           |
+| `commitment`          | output    | CommitmentHasher | Pedersen hash of nullifier and secret                |
 | `nullifierHash`       | output    | CommitmentHasher | Pedersen hash of nullifier; prevents double-spending |
 | `commitmentHasher`    | component | CommitmentHasher | Pedersen hash component for full commitment          |
 | `nullifierHasher`     | component | CommitmentHasher | Pedersen hash component for nullifier only           |
@@ -431,12 +441,12 @@ Ensures the relayer fee, recipient, and other parameters cannot be tampered with
 ### Proof Generation and Verification
 
 After computing the witness, the prover generates a SNARK proof.
- The contract’s Groth16 verifier then checks:
+ The `withdraw` function of the Tornado contract then checks:
 
-- Root is valid
-- Nullifier hasn’t been spent
-- Proof matches the public inputs
-- Relayer fee is within bounds
+- Relayer fee is within bounds (`_fee <= denomination`)
+- Nullifier hasn’t been spent (`nullifierHashes` mapping)
+- Root is one of the recent known roots (`isKnownRoot`)
+- Proof matches the public inputs, which is the only check done by the Groth16 verifier contract (`verifier.verifyProof`)
 
 If all checks pass, the withdrawal succeeds.
 
@@ -451,7 +461,7 @@ Tornado Cash’s circuits enable:
 
 - **Double-spend protection:** Nullifiers prevent reuse
 - **Efficiency:** Groth16 proofs remain small and cheap to verify
-- **On-chain privacy without trust:** No mixers, no custodians, no intermediaries
+- **On-chain privacy without trust:** a non-custodial mixer, with no operator who holds the funds or can link deposits to withdrawals
 
 This combination makes Tornado Cash a foundational example of privacy engineering on Ethereum.
 
@@ -469,9 +479,37 @@ Here is a summary from the documentation:
 
 ![tornado_cash_diagram]({{site.url_complet}}/assets/article/cryptographie/zero-knowledge-proof/tornado_cash/tornado_cash_diagram.png)
 
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Zero-knowledge proof** | A proof that a statement is true which reveals nothing else, here used to show that a deposit exists without saying which one. |
+| **zk-SNARK** | A succinct, non-interactive zero-knowledge proof; Tornado Cash generates one at withdrawal time, never at deposit time. |
+| **Groth16** | The SNARK proving system used by Tornado Cash, chosen for its very small proofs and fast on-chain verification, at the cost of a trusted setup. |
+| **Trusted setup** | The one-time ceremony that produces the Groth16 proving and verifying keys for a given circuit. |
+| **Circom** | A domain-specific language that compiles circuit logic into R1CS constraints and a witness generator. |
+| **snarkjs** | The toolkit Tornado Cash uses for the trusted setup, proof generation and proof verification. |
+| **R1CS** | Rank-1 Constraint System: the set of equations produced by Circom that every valid witness must satisfy. |
+| **QAP** | Quadratic Arithmetic Program: the polynomial form of the R1CS, which lets all constraints be checked at once. |
+| **Witness** | The full set of values computed by the circuit from the public and private inputs, of which only the public part is revealed. |
+| **Signal** | A Circom variable holding one field element, declared as an input, an output or an intermediate value of a template. |
+| **Commitment** | The Pedersen hash of the nullifier and the secret, inserted as a leaf of the deposit Merkle tree. |
+| **Baby Jubjub** | The elliptic curve on which the Pedersen hash is computed, chosen because it is efficient inside SNARK circuits. |
+| **MiMC** | The ZK-friendly hash used for the nodes of the deposit Merkle tree, here as a sponge with a zero key. |
+| **Merkle path** | The sibling nodes (`pathElements`) and the left/right selectors (`pathIndices`) that link a leaf to the root. |
+| **DualMux** | The circuit template that swaps two inputs when its selector bit is 1, so each level is hashed in the right order. |
+| **Root history** | The rolling list of the 100 most recent Merkle roots kept by the contract, any of which a withdrawal proof may use. |
+| **Nullifier** | One of the two secret values of a deposit note, whose hash is revealed at withdrawal to prevent a second withdrawal. |
+| **Nullifier hash** | The public Pedersen hash of the nullifier; the contract rejects a withdrawal whose nullifier hash was already spent. |
+| **Relayer** | The party that submits a withdrawal for the user; its address, fee and refund are public inputs bound to the proof. |
+| **Anonymity mining** | An extension of the circuits that proves how many blocks a note stayed deposited, to reward users who keep funds locked longer. |
+
 ## Reference
 
 - [Tornado cash github](https://github.com/tornadocash/tornado-core/)
+- [github.com/tornadocash - Tornado.sol](https://github.com/tornadocash/tornado-core/blob/master/contracts/Tornado.sol)
 - [Tornado Cash - Circuit](https://github.com/tornadocash/docs/blob/en/circuits/core-deposit-circuit.md)
 - [Tornado Cash Whitepaper](https://berkeley-defi.github.io/assets/material/Tornado%20Cash%20Whitepaper.pdf)
 - [RareSkills - How Tornado Cash Works (Line by Line for Devs)](https://rareskills.io/post/how-does-tornado-cash-work)

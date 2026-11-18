@@ -29,6 +29,17 @@ The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-05-
 
 [TOC]
 
+## What you need to know first
+
+The findings below rely on a few Solidity mechanisms of upgradeable contracts that the article uses without explaining them.
+
+- **Proxy pattern**: an upgradeable contract is split into a proxy, which holds the storage and the funds, and an implementation contract, which holds the code; the proxy forwards every call to the implementation with `delegatecall`, so the code runs against the proxy's storage. Upgrading means changing the implementation address stored in the proxy. The site's [proxy contracts summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/) describes the OpenZeppelin variants.
+- **UUPS (ERC-1822)**: in the Universal Upgradeable Proxy Standard, the upgrade function lives in the implementation rather than in the proxy. OpenZeppelin's `UUPSUpgradeable` exposes `upgradeToAndCall` and requires the contract to override the internal `_authorizeUpgrade` hook to restrict who can upgrade; H-02 is about a contract whose own upgrade function never calls `upgradeToAndCall`, so the implementation address is never changed.
+- **Storage layout and slot ordering**: Solidity assigns state variables to storage slots in declaration order, and a mapping or a dynamic array takes one slot of its own. A new implementation must keep the previous variables in the same order, otherwise its variables read and write the slots of different old ones, which is the storage collision of M-03. [ERC-7201](https://eips.ethereum.org/EIPS/eip-7201) namespaced storage is one way to avoid it.
+- **Fixed-point percentages**: Solidity has no decimals, so a percentage is stored as an integer scaled by a `PRECISION` constant and applied as `amount * RATE / PRECISION`. The wage split (5% for the principal, 35% for the teachers) is computed this way, and H-01 is an error in that formula.
+- **Specification invariants**: the contest lists invariants, properties the code must always respect, such as "remaining 60% should reflect in the bursary after upgrade". M-04 and M-02 are findings where the code breaks one of these stated invariants rather than a generic vulnerability class.
+- **Foundry cheatcodes**: the proof of concept uses Foundry's `vm.startPrank` and `vm.stopPrank` to send the enclosed calls from a chosen address, here the principal adding teachers.
+
 
 
 ## Description
@@ -171,7 +182,7 @@ uint256 payPerTeacher = (bursary * TEACHER_WAGE) / (PRECISION * numberOfTeachers
 
 In level two, it misses two storage variable `reviewCount`and `lastReviewTime`
 
-As a result, the two following variable `istOfStudents `and `listOfTeachers`will use their variable slots.
+As a result, the two following variables `listOfStudents` and `listOfTeachers` will use their variable slots.
 
 ```solidity
  mapping(address => bool) public isTeacher;
@@ -188,7 +199,7 @@ As a result, the two following variable `istOfStudents `and `listOfTeachers`will
 
 #### Vulnerability Details
 
-`istOfStudents `and `listOfTeachers` will overwrite the slots used by `reviewCount` and `lastReviewTime`, which hold the location where their data is stored
+`listOfStudents` and `listOfTeachers` will take the slots used by `reviewCount` and `lastReviewTime` in LevelOne. The base slot of a mapping stays empty (its entries live at `keccak256(key . slot)`), while the base slot of a dynamic array holds its length. In LevelTwo, the two arrays therefore read their length from the empty mapping slots and appear empty, and the student and teacher lists written by LevelOne, whose lengths sit two slots further, are no longer reachable. See [Solidity docs - Layout of State Variables in Storage](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html).
 
 #### Impact
 
@@ -255,6 +266,25 @@ Add the same check as for `enroll`
 > }
 
 ## Missed submissions
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Proxy** | The contract that holds storage and funds and forwards calls with `delegatecall` to an implementation contract whose address it stores. |
+| **Implementation** | The contract that holds the logic executed by the proxy; here `LevelOne` is the first implementation and `LevelTwo` its upgrade. |
+| **UUPS** | The Universal Upgradeable Proxy Standard, in which the upgrade function lives in the implementation; the contest uses OpenZeppelin's `UUPSUpgradeable`. |
+| **`upgradeToAndCall`** | The OpenZeppelin UUPS function that changes the implementation address stored in the proxy, after checking `_authorizeUpgrade`. |
+| **`_authorizeUpgrade`** | The internal hook that a UUPS contract overrides to apply access control on upgrades; it does not change the implementation address itself. |
+| **Storage slot** | A 32-byte location in contract storage; state variables are assigned to slots in declaration order. |
+| **Storage collision** | Two versions of a contract using the same slot for different variables, as when `LevelTwo` omits `reviewCount` and `lastReviewTime`. |
+| **ERC-7201** | A standard for namespaced storage layouts, proposed in M-03 to manage the storage variables of upgradeable contracts. |
+| **Bursary** | The `bursary` variable that accumulates the school fees paid by students and funds the principal's and teachers' wages. |
+| **`graduateAndUpgrade`** | The principal's function meant to pay wages and move the system to the next level at the end of the session. |
+| **Cut-off score** | The `cutOffScore` a student must reach to be upgraded to the next level. |
+| **Invariant** | A property stated in the contest specification that the code must always respect, such as the 5% / 35% / 60% split of the bursary. |
 
 ## Mindmap
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Cyfrin First Fight 38 - Rock Paper Scissors"
 date: 2025-05-07
-last_modified_at: 2026-07-30
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: solidity blockchain
@@ -20,6 +20,19 @@ This article describes the [First Fight 38](https://codehawks.cyfrin.io/c/2025-0
 The code is available on [GitHub](https://github.com/CodeHawks-Contests/2025-04-rock-paper-scissors).
 
 [TOC]
+
+## What you need to know first
+
+The findings below rely on a few Solidity mechanisms and vulnerability classes that the article uses without explaining them.
+
+- **Commit-reveal scheme**: a player first publishes a hash of their move combined with a secret salt, then reveals the move and the salt in a second transaction so the contract can check them against the hash. The game uses it so that neither player sees the other's move before committing, and several findings (H-04, H-05, M-03) break the ordering or the binding of these two phases.
+- **ERC-20 `approve` and `transferFrom`**: a holder first allows a spender to move part of their balance with `approve`, and the spender then pulls the tokens with `transferFrom`. The token games use this to move one Winning Token from each player into the contract; see [Fungible Tokens across blockchains]({{site.url_complet}}/2024/07/12/fungible-tokens-blockchains/).
+- **Low-level `call` and `receive()`**: `address.call{value: x}("")` sends ETH and returns a success flag instead of reverting, and when the recipient is a contract its `receive()` function runs and may revert. The H-03 denial of service comes from a winner contract whose `receive()` always reverts; [The 2,300 Gas Stipend in Ethereum]({{site.url_complet}}/2026/10/23/ethereum-2300-gas-stipend/) covers the ways of sending ETH.
+- **Push versus pull payments**: a push payment sends funds to the recipient inside the function that settles the game, so a recipient that refuses the transfer blocks the whole function. In a pull payment (withdrawal pattern), the contract only records the amount owed and the recipient withdraws it in a separate call, which is the mitigation proposed for H-03.
+- **Denial of service (DoS)**: in a smart contract, a DoS is a state in which a function can no longer complete, so the game cannot move to its next state and the funds it holds stay locked. H-03 and M-02 are both DoS findings.
+- **Integer division in Solidity**: dividing two integers truncates the result toward zero, so splitting an amount can leave a remainder that no one receives. L-02 is a rounding error of this kind in the tie refund.
+- **`Ownable` and ERC-173**: OpenZeppelin's `Ownable` contract gives a contract a single owner with standard functions to transfer that ownership and an `OwnershipTransferred` event, as specified by [ERC-173](https://eips.ethereum.org/EIPS/eip-173); `AccessControl` instead manages several named roles. The invalid submission compares the game's custom admin system with these libraries.
+- **Foundry cheatcodes**: the proof-of-concept tests use Foundry's `vm.startPrank` to send the following calls from a chosen address and `vm.expectEmit` to assert that an event is emitted.
 
 
 
@@ -257,7 +270,7 @@ See [https://docs.openzeppelin.com/contracts/5.x/api/access#Ownable](https://doc
 Using this library brings several advantage:
 
 - Battle tested and audited contract
-- Implements [ERC-173](https://eips.ethereum.org/EIPS/eip-173):
+- Implements ERC-173:
   - Standardized functions to manage ownership
   - Standardized functions emitted when there is a transferred of ownership.
     For example, the custom function `setAdmin`does not emit an event while the OpenZeppelin implementation will emit the event: `emit OwnershipTransferred(oldOwner, newOwner);`
@@ -357,6 +370,10 @@ This results in:
 - A test contract called RPS_DoS.t.sol has been created for the proof of concept.
 - To run the test, simply execute:
 
+```bash
+forge test --match-path test/RPS_DoS.t.sol -vvv
+```
+
 #### Recommended mitigation
 
 ```solidity
@@ -451,6 +468,27 @@ This prevents ETH from being sent directly to the contract, making the contract 
 **Option 2: Add a withdrawal mechanism for all contract balance**
 
 Either approach would prevent ETH from being permanently locked in the contract.
+
+## Annex
+
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Commit-reveal** | A two-phase scheme in which a player first submits a hash of their move and a salt, then reveals both so the contract can verify them against the hash. |
+| **Salt** | A secret random value hashed together with the move so that an opponent cannot recover the move by hashing the three possible choices. |
+| **Front-running** | Reading a pending transaction and acting on its content before it is executed; the commit phase exists to stop a player from seeing the opponent's move first. |
+| **Winning Token** | The game's ERC-20 token, used as the bet in token games and minted to winners as a reward. |
+| **`transferFrom`** | The ERC-20 function that lets an approved spender move tokens from a holder's balance, used here to move each player's Winning Token into the game contract. |
+| **Mint** | Creating new tokens and adding them to the total supply; the game mints prizes instead of transferring the tokens it holds, which leaves those tokens locked. |
+| **Low-level call** | `address.call{value: x}("")`, which sends ETH and returns a success flag; the game reverts when that flag is false. |
+| **`receive()`** | The function a contract runs when it receives ETH with empty calldata; a reverting `receive()` lets a winner block the payout. |
+| **Denial of service (DoS)** | A state in which a contract function can no longer complete, leaving the game stuck and its funds locked. |
+| **Pull payment** | A pattern in which the contract records what each address is owed and lets the recipient withdraw it, so one failing recipient cannot block settlement. |
+| **Timeout** | The deadline after which a game can be cancelled or settled when a player stops committing or revealing. |
+| **Rounding error** | The amount lost when Solidity's integer division truncates a result, as in the tie refund of L-02. |
+| **`Ownable`** | OpenZeppelin's single-owner access-control contract, which implements the ERC-173 ownership interface. |
+| **Foundry** | The Solidity testing framework used for the proofs of concept, with cheatcodes such as `vm.startPrank` to impersonate an address. |
 
 ## Mindmap
 

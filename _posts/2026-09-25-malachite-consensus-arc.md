@@ -2,6 +2,7 @@
 layout: post
 title: "Malachite Consensus on Arc — How Circle's L1 Finalises a Block, Compared with CometBFT, HotStuff and Gasper"
 date:   2026-09-25
+last_modified_at: 2026-11-17
 lang: en
 locale: en-GB
 categories: blockchain
@@ -304,6 +305,6 @@ No. Malachite detects double votes and double proposals, and Arc stores them and
 - [The Hyperliquid Protocol - HyperCore, HyperEVM and Onchain Perpetual Mechanics]({{site.url_complet}}/2026/09/02/hyperliquid-protocol-architecture/)
 - [Ouroboros: How Cardano Reaches Consensus with Proof of Stake]({{site.url_complet}}/2026/07/16/ouroboros-proof-of-stake/)
 - [Canton Network — Architecture, Privacy Model, and Comparison with Ethereum, Railgun, Zcash, Zama fhEVM, and Besu]({{site.url_complet}}/2026/05/12/canton-network-architecture/)
-- [Solana Staking - Overview]({{site.url_complet}}/2025/11/07/solana-staking-overview/)
+- [Solana Staking - Overview]({{site.url_complet}}/2025/11/09/solana-staking-overview/)
 - [HotStuff — Linear and Responsive BFT Consensus, from Basic HotStuff to the Event-Driven Pacemaker]({{site.url_complet}}/2026/10/01/hotstuff-bft-consensus/)
 - [Tendermint — BFT Consensus over Gossip, Locks and the validValue Termination Mechanism]({{site.url_complet}}/2026/10/01/tendermint-bft-consensus/)
