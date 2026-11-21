@@ -2,6 +2,7 @@
 layout: post
 title: "How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral"
 date:   2026-11-16
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -101,7 +102,7 @@ With 1,000 YT and an index going from 1.200 to 1.212 (a 1 % rise), the holder ac
 
 ### Expiry and the treasury's share
 
-At expiry, YT stops earning and is worth zero. The first interaction after expiry freezes the index as `firstPYIndex`. From then on, PT redeems alone, without YT, for $$\text{PT} / \text{pyIndexCurrent}$$ SY. The difference between what `firstPYIndex` would have paid and what the current index pays goes to `totalSyInterestForTreasury` (`_calcSyRedeemableFromPY`). In other words, **a PT held after expiry does not earn yield**: it is a fixed amount of asset, and the yield on the SY behind it belongs to Pendle's treasury until the holder redeems.
+At expiry, YT stops accruing new yield and is worth zero, but the cut-off is the first interaction after expiry, which freezes the index as `firstPYIndex`: index growth between the expiry timestamp and that call still accrues to YT. From then on, PT redeems alone, without YT, for $$\text{PT} / \text{pyIndexCurrent}$$ SY. The difference between what `firstPYIndex` would have paid and what the current index pays goes to `totalSyInterestForTreasury` (`_calcSyRedeemableFromPY`). In other words, **a PT held after expiry does not earn yield**: it is a fixed amount of asset, and the yield on the SY behind it belongs to Pendle's treasury until the holder redeems.
 
 ### Negative yield
 
@@ -139,7 +140,7 @@ $$
 
 Three things in these formulas carry the design:
 
-- **The logit term $$\ln\frac{p}{1-p}$$.** It is zero at an even pool and grows without bound as PT fills the pool. Liquidity is concentrated around the anchor; `scalarRoot` sets how concentrated. The docs describe a large `scalarRoot` as a tighter, more capital-efficient market with a narrower range of tradeable rates.
+- **The logit term $$\ln\frac{p}{1-p}$$.** It is zero at an even pool and grows without bound as PT fills the pool. Liquidity is concentrated around the anchor; `scalarRoot` sets how concentrated. The docs describe a large `scalarRoot` as a tighter, more capital-efficient market with a narrower range of tradeable rates. Pendle's [AMM whitepaper](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/whitepapers/AMM.pdf) treats $$p$$ between 0.1 and 0.9 as the reasonable trading range and derives the rate scalar at the pool's start from an expected and a maximum rate, so that this range covers implied rates from 0 % up to the maximum.
 - **The rate scalar grows as expiry nears.** $$s$$ is `scalarRoot × 365 days / timeToExpiry`, so the same trade moves $$E$$ less and less. Combined with the next point, this is what pulls the price to 1.
 - **The anchor is re-solved before every trade.** `_getRateAnchor` picks $$a$$ so that the pool's current proportion $$p_0$$ reproduces the last implied rate at today's $$\tau$$:
 
@@ -218,7 +219,7 @@ If nobody trades, the anchor keeps the implied rate fixed and the PT price follo
 
 ![Left, the PT price over the last 365 days before expiry at a constant 10 % implied APY, two linear-discount oracle lines at 10 % and 18 %, and the market price after a jump to 20 % at 182.5 days; right, after expiry an unredeemed PT stays at 1 asset while PT redeemed into SY keeps earning]({{site.url_complet}}/assets/article/blockchain/defi/pendle/pendle-pt-price-expiry.svg)
 
-The left panel shows the three prices at the 182.5-day mark: 0.9535 for the market at 10 %, 0.9500 for a linear oracle at 10 %, and 0.9129 for the market after the rate jump, which a 10 % linear oracle would not see. The right panel shows the cost of not redeeming: at 8 % a year of SY yield (illustrative), 180 days after expiry the redeemed position is worth about 1.040 asset while the unredeemed PT is still worth 1.
+The left panel shows the three prices at the 182.5-day mark: 0.9535 for the market at 10 %, 0.9500 for a linear oracle at 10 %, and 0.9129 for the market after the rate jump, which a 10 % linear oracle would not see. The right panel shows the cost of not redeeming: at 8 % a year of SY yield, continuously compounded (illustrative), 180 days after expiry the redeemed position is worth about 1.040 asset while the unredeemed PT is still worth 1.
 
 The phases, with what each one does to a PT holder:
 
@@ -248,10 +249,10 @@ $$
 
 Practical points from the integration guide and the code:
 
-- **Cardinality starts at 1.** A window older than the oldest observation reverts with `OracleTargetTooOld`. Anyone can call `increaseObservationsCardinalityNext(n)`, and the integrator then waits `D` seconds. `getOracleState(market, duration)` reports readiness; the required cardinality is $$\lceil D \times 1000 / \text{blockCycleNumerator} \rceil + 1$$, with 11000 given as the Ethereum value in the code comments (83 slots for 900 s).
+- **Cardinality starts at 1.** A window older than the oldest observation reverts with `OracleTargetTooOld`. Anyone can call `increaseObservationsCardinalityNext(n)`, and the integrator then waits `D` seconds. `getOracleState(market, duration)` reports readiness; the required cardinality is $$\lceil D \times 1000 / \text{blockCycleNumerator} \rceil + 1$$, with 11000 given as the Ethereum value in the code comments (83 slots for 900 s; the integration guide's table gives 85).
 - **Recommended windows** are 900 s or 1800 s. A window of 0 returns the spot `lastLnImpliedRate`, which is manipulable within a block and should not price collateral.
 - **Price to SY, not to asset.** Pendle guarantees PT to SY; SY to asset (sUSDe to USDe, ezETH to ETH) happens outside Pendle and may trade at a discount. The docs advise `getPtToSyRate` times the yield token's price over `getPtToAssetRate` times the asset's price.
-- **`PendleChainlinkOracle`**, the wrapper with Chainlink's interface, reports `updatedAt = block.timestamp` and `roundId = 0`, so a staleness check on it tests nothing, and the answer's real precision is $$18 + \text{out} - \text{in}$$ decimals even though `decimals()` returns 18.
+- **`PendleChainlinkOracle`**, the wrapper with Chainlink's interface, reports `updatedAt = block.timestamp` and `roundId = 0`, so a staleness check on it tests nothing. `_descalePrice` multiplies the raw rate by $$10^{\text{in}}/10^{\text{out}}$$, so the answer is in 18-decimal natural units: one natural unit of the input token is worth answer / 1e18 natural units of the output token. Pendle's FAQ says the answer has $$18 + \text{out}$$ decimals, which contradicts the formula it gives just above.
 
 ### The linear-discount oracle
 
@@ -265,7 +266,9 @@ $$
 
 It reads only `block.timestamp`, so it has no liveness or manipulation surface, and it reaches 1 at maturity. It is a discount factor in the PT's asset, not a USD price, and it sees neither a market move nor an SY depeg. Because $$1 - d\tau \le e^{-d\tau}$$, a discount equal to the market rate already prices slightly below the market: 0.9500 against 0.9535 at 10 % and six months.
 
-Pendle's parameter guide advises choosing $$d$$ so that the oracle stays under the **lowest** price of the market's yield range until maturity, with 18 % as the example for PT-USDe-25SEP2025. If the market rate rises above $$d$$, through a stress, a depeg or LPs leaving, the oracle **overprices** the PT: in the jump to 20 % above, a 10 % oracle reads 0.9500 while the market pays 0.9129, 4.07 % less. Positions are then not liquidated while the collateral's sale value falls, and the liquidation bonus is spent on the gap. That is the cost of the liveness the design buys.
+Pendle's parameter guide advises keeping the oracle below the market price until maturity; setting $$d$$ so that the oracle stays under the **lowest** price of the market's yield range guarantees this. Its example for PT-USDe-25SEP2025 is 18 %.
+
+If the market rate rises far enough above $$d$$, through a stress, a depeg or LPs leaving, the oracle **overprices** the PT. For $$d$$ = 10 % six months out, the break-even is an implied APY of 10.80 %, since $$0.95^{-2} - 1 = 0.1080$$. In the jump to 20 % above, a 10 % oracle reads 0.9500 while the market pays 0.9129, 3.91 % less. Positions are then not liquidated while the collateral's sale value falls, and the liquidation bonus is spent on the gap. That is the cost of the liveness the design buys.
 
 [Pricing Yield Collateral on Morpho - Huma's PST Exchange Rate and Ojo's Pendle PT Feed]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/) looks at a third design, Ojo's feed, which takes the minimum of the TWAP and a linear discount.
 
@@ -280,13 +283,13 @@ Pendle's parameter guide advises choosing $$d$$ so that the oracle stays under t
 | Liquidity | `addLiquiditySingleToken`, `removeLiquiditySingleToken` and dual variants |
 | Mint and redeem | `mintPyFromToken`, `redeemPyToToken`, `exitPreExpToToken`, `exitPostExpToToken`, `exitPostExpToSy` |
 
-`TokenInput` and `TokenOutput` carry a KyberSwap route for tokens the SY does not take directly, and `LimitOrderData` for fills from Pendle's off-chain limit-order book. Pendle recommends generating calldata with its hosted SDK (`POST /v3/sdk/{chainId}/convert`), whose aggregator quotes expire.
+`TokenInput` and `TokenOutput` carry a `SwapData` route through an external aggregator, one of those in the `SwapType` enum such as KyberSwap, ODOS or 1inch, for tokens the SY does not take directly, and `LimitOrderData` for fills from Pendle's off-chain limit-order book. Pendle recommends generating calldata with its hosted SDK (`POST /v3/sdk/{chainId}/convert`), and its [API overview](https://docs.pendle.finance/pendle-v2-dev/Backend/ApiOverview) warns that the transaction data is tied to current market conditions and must be generated again right before sending.
 
 ## PT as lending collateral
 
 Pendle's own collateral guide lists three uses: leveraging the spread between the PT's fixed rate and the borrow rate, leveraging a short-yield view, and a leveraged long on the asset with fixed carry on top. Its example of the first: PT-stETH yields 5 %, ETH borrows at 3 %, and a collateral factor of 0.80 allows up to 5x, for at most $$5 \times (5 - 3) = 10$$ %.
 
-On Morpho Blue, a PT market's oracle is a `MorphoChainlinkOracleV2` whose base feed is either the linear-discount oracle or the TWAP behind a `PendleChainlinkOracle`; Morpho's documentation lists a community adapter and factory for both. How that price enters a Morpho market's health check is covered in [Morpho Blue and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/). Aave's PT price adapter is not in the sources read for this article.
+On Morpho Blue, a PT market's oracle can be a `MorphoChainlinkOracleV2` whose base feed is the linear-discount oracle or the TWAP behind a Chainlink-shaped adapter, for which Morpho's documentation lists a community adapter and factory; third-party feeds such as Ojo's min(TWAP, linear) feed are also used. How that price enters a Morpho market's health check is covered in [Morpho Blue and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/). Aave's PT price adapter is not in the sources read for this article.
 
 The liquidator's side is short in code and long in consequences. `BoringPtSeller` branches on expiry:
 
@@ -314,7 +317,7 @@ Pendle V2 turns a yield-bearing token into a fixed-maturity bond and a yield str
 - **PT and YT** are minted against SY at a PY index that never decreases. YT accrues $$B(I_1 - I_0)/(I_0 I_1)$$ SY; after expiry the yield on unredeemed PT goes to the treasury.
 - **The market** prices PT on the logit of the PT proportion, with a rate scalar that grows toward expiry and an anchor re-solved before each trade so that the implied rate persists. Fees are on the rate, and the pool refuses trades past 96 % PT or below a zero rate.
 - **The worked trade** of 10,000 PT moved the implied APY from 10.00 % to 9.83 % and cost 0.23 % above spot, of which about 0.15 points was fee.
-- **The two oracles** trade accuracy for liveness: the TWAP follows the market and can be moved by it, while the linear discount ignores the market and overprices PT when rates rise above its discount.
+- **The two oracles** trade accuracy for liveness: the TWAP follows the market and can be moved by it, while the linear discount ignores the market and overprices PT when rates rise far enough above its discount.
 - **As collateral**, a PT depends on the pool's depth before expiry, the SY's exit after it, the solvency of the yield token, and Pendle's and the SY's admin keys.
 
 ![Mindmap of Pendle V2 covering the SY wrapper, the PT and YT split, the market AMM, the PT price, the oracles, the router and PT as collateral]({{site.url_complet}}/assets/article/blockchain/defi/pendle/2026-11-16-pendle-v2-pt-yt-amm-mindmap.png)
@@ -331,7 +334,7 @@ Pendle V2 turns a yield-bearing token into a fixed-maturity bond and a yield str
 | **PT (principal token)** | A claim to 1 asset at expiry, minted together with YT; before expiry it trades at a discount on the market. |
 | **YT (yield token)** | A claim to the interest and rewards of 1 asset of principal until expiry; worth zero after. |
 | **PY index** | `max(SY.exchangeRate(), pyIndexStored)`, the never-decreasing index at which PT and YT are minted and redeemed. |
-| **Expiry (maturity)** | The timestamp after which swaps and mints revert, YT stops earning and PT redeems alone. |
+| **Expiry (maturity)** | The timestamp after which swaps and mints revert and PT redeems alone; YT stops earning at the first interaction after it. |
 | **Implied rate** | The fixed rate at which the market prices PT; stored as `lnImpliedRate` = ln(1 + APY). |
 | **Exchange rate (market)** | $$E$$, the number of PT per asset on the curve; its inverse is the PT price. |
 | **Rate scalar** | `scalarRoot × 365 days / timeToExpiry`, the factor that flattens the logit curve and grows toward expiry. |
@@ -361,7 +364,8 @@ Pendle V2 turns a yield-bearing token into a fixed-maturity bond and a yield str
 | Behaviour | What an integrator should do |
 |-----------|------------------------------|
 | `PendleChainlinkOracle.updatedAt` is always `block.timestamp`. | Do not treat it as freshness; check readiness with `getOracleState`. |
-| The answer of a Chainlink-shaped Pendle feed has $$18 + \text{out} - \text{in}$$ real decimals. | Read the PT, SY and asset decimals before scaling the price. |
+| The answer of `PendleChainlinkOracle` is in 18-decimal natural units after rescaling by the token decimals; Pendle's FAQ states $$18 + \text{out}$$ decimals. | Test the scaling against a known rate on a pair with different decimals before relying on either reading. |
+| `PendleSparkLinearDiscountOracle.latestRoundData` returns `updatedAt = 0`. | A Chainlink-style staleness check rejects it; the answer depends only on `block.timestamp`, so exempt this feed from that check rather than disabling it for the whole oracle. |
 | A TWAP window older than the oldest observation reverts. | Raise cardinality first and wait the window length before reading. |
 | `getPtToAssetRate` assumes the yield token redeems at its exchange rate. | Price to SY and multiply by the yield token's own price where possible. |
 | Market swaps revert after expiry; `redeemPY` does not need YT then. | Branch the liquidation path on `PT.isExpired()`, as `BoringPtSeller` does. |
@@ -374,7 +378,7 @@ The risks below are those a PT holder or a lender against PT carries. They start
 
 #### Smart contracts and transparency
 
-- **Pendle core.** The core repository lists audits by Ackee, CMichel, Dedaub, Dingbats, 0xleastwood, WatchPug, ChainSecurity and Spearbit, and separate reviews of markets V6 and V7 and of the oracles. Pendle's collateral guide, written in 2023, reports no incident in Pendle contracts since June 2021. The audit PDFs were not read for this article.
+- **Pendle core.** The core repository lists audits by Ackee, CMichel, Dedaub, Dingbats, 0xleastwood, WatchPug, ChainSecurity and Spearbit, and separate reviews of markets V6 and V7 and of the oracles. Pendle's collateral guide states that there have been no incidents in Pendle contracts since June 2021; the page is undated, and only its sizing example carries a date, June 2023. The audit PDFs were not read for this article.
 - **Each SY separately.** Every PT sits on its own SY implementation, audited separately in `Pendle-SY-Public`. The SY is the part that is upgradeable and pausable, so its code and its admin matter as much as the core's.
 - **Upgradeability, both sides.** Markets are immutable, so a market's maths cannot change under an LP or a lender, and a bug in it cannot be patched either. Newer SYs and the router are upgradeable: they can be fixed, and the proxy admin can replace their logic.
 
@@ -382,7 +386,7 @@ The risks below are those a PT holder or a lender against PT carries. They start
 
 - **The yield token's issuer.** A PT is as good as the protocol behind its SY: Ethena for sUSDe, Lido for wstETH. A loss there reaches the PT through the SY rate.
 - **The oracle composition.** A money market prices PT through Pendle's TWAP or a linear discount, and usually multiplies it by an external price for the asset or yield token, which brings that feed's own risks.
-- **Aggregators.** Router routes through KyberSwap and the limit-order book are off-chain components; they affect execution, not the market's maths.
+- **Aggregators.** Router routes through external aggregators such as KyberSwap and the limit-order book are off-chain components; they affect execution, not the market's maths.
 
 #### Depeg
 
@@ -393,7 +397,7 @@ The risks below are those a PT holder or a lender against PT carries. They start
 
 - **Rate risk scales with time to expiry.** A rate jump from 10 % to 20 % six months out moves the price 4.26 % (*derived*, from the worked figures). A lender's margin must cover the rate range, not only the asset's volatility.
 - **Pool-driven moves.** Buying YT sells PT into the pool. A TWAP lags such a move and then follows it, which is what liquidated PT-reUSD loans on Morpho in August 2026.
-- **Linear oracle gap.** With the rate above $$d$$, the oracle overprices the PT, and liquidations come late or not at all while the sale value falls.
+- **Linear oracle gap.** With the rate far enough above $$d$$, past 10.80 % implied APY for $$d$$ = 10 % six months out, the oracle overprices the PT, and liquidations come late or not at all while the sale value falls.
 
 #### Liquidity
 
@@ -422,7 +426,7 @@ The risks below are those a PT holder or a lender against PT carries. They start
 |------|---------------------|-------------------------------|--------------|
 | SY insolvency | The yield token's issuer | The oracle library scales the price down when the SY rate is below the index | PT holders take the full loss |
 | Rate jump | Market trading, YT buying | TWAP smooths over its window | The price still falls; a long window delays liquidations |
-| Linear oracle gap | Rate above the discount $$d$$ | None, by design | Late liquidations, bonus eaten by the gap |
+| Linear oracle gap | Rate far enough above the discount $$d$$ | None, by design | Late liquidations, bonus eaten by the gap |
 | Pool depth | One PT/SY pool, LPs leaving near expiry | Concentrated liquidity curve | Cascades, out-of-range sells revert |
 | Post-expiry exit | No AMM after expiry | `redeemPY` without YT | Narrow SY output set, yield token exit |
 | Pause and upgrade | SY owner, proxy admin | Timelocked proxy admin listed in deployments | Owner thresholds not verified here |
@@ -453,7 +457,7 @@ The total is 9,556.52 asset, 0.955652 per PT against a spot price of 0.953463.
 
 **Q: A lending market prices PT-sUSDe with a linear-discount oracle at 10 % six months before expiry. The implied rate jumps to 20 %. What happens to the market's borrowers and lenders?**
 
-The oracle still reads 0.9500 asset, while the PT now sells for 0.9129, 4.07 % less.
+The oracle still reads 0.9500 asset, while the PT now sells for 0.9129, 3.91 % less.
 
 Borrowers near their threshold are not liquidated, because the oracle does not see the fall. If one is liquidated, the liquidator receives PT valued at 0.95 but sells it for 0.913, so the bonus must cover the gap before the liquidation is profitable. If it does not, liquidations stop and the lenders carry the difference as possible bad debt. A TWAP oracle would have moved toward 0.9129 within its window.
 
@@ -467,12 +471,11 @@ The points below were not settled by the sources read for this article.
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The AMM whitepaper was not read; the curve is described from `MarketMathCore.sol` only. | The interpretation of `scalarRoot` and the yield range rests on code and doc prose. | The V2 AMM whitepaper linked from `Contracts/PendleMarket.md`. |
 | The worked trade uses illustrative `scalarRoot`, fee and reserve values, not a deployed market's. | Real markets may have very different price impact for the same size. | `readState(router)` on a live market, or the API's market data. |
-| The Ethereum `blockCycleNumerator` of `PendlePYLpOracle` was not read on-chain; 11000 comes from a code comment. | A different value changes the cardinality a TWAP window needs. | `blockCycleNumerator()` at `0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2`. |
+| The Ethereum `blockCycleNumerator` of `PendlePYLpOracle` was not read on-chain; 11000 comes from a code comment, and gives 83 slots for 900 s where the integration guide's table gives 85. | A different value changes the cardinality a TWAP window needs. | `blockCycleNumerator()` at `0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2`. |
 | Owners, thresholds and delays of the proxy admin, timelock and SY owners were not read on-chain. | They decide who can pause or upgrade what a PT depends on. | `owner()` and `getMinDelay()` on the addresses in `deployments/1-core.json`. |
 | Aave's PT price adapter is not covered by the sources. | An Aave PT listing may price differently from both oracles described here. | Aave governance proposals for PT listings. |
-| Only the sUSDe and ERC-4626 SY implementations were read. | Output sets, caps and pause hooks differ per SY. | The specific SY under `Pendle-SY-Public/.../implementations/`. |
+| Only the sUSDe, wstETH and ERC-4626 SY implementations were read. | Output sets, caps and pause hooks differ per SY. | The specific SY under `Pendle-SY-Public/.../implementations/`. |
 | The audit reports were listed, not read. | Known findings on markets V6/V7 and the oracles are not summarised. | `pendle-core-v2-public/audits/`. |
 | The documentation's wstETH example gives 0.8928 wstETH per PT at a rate of 1.2, which would give 0.8333. | One of the two figures in the doc is wrong; the article quotes neither as fact. | `HighLevelArchitecture.md`, PT section. |
 
@@ -490,7 +493,8 @@ The points below were not settled by the sources read for this article.
 - [PT as Collateral in a Money Market](https://docs.pendle.finance/pendle-v2-dev/Oracles/PTAsCollateral)
 - [Linear Discount Oracle](https://docs.pendle.finance/pendle-v2-dev/Oracles/DeterministicOracles/LinearDiscountOracle) and [Choosing Linear Discount Parameters](https://docs.pendle.finance/pendle-v2-dev/Oracles/DeterministicOracles/ChoosingLinearDiscountParams)
 - [How to Integrate PT and LP Oracle](https://docs.pendle.finance/pendle-v2-dev/Oracles/HowToIntegratePtAndLpOracle)
-- [Pendle V2 AMM Whitepaper](https://github.com/pendle-finance/pendle-v2-resources/blob/main/whitepapers/V2_AMM.pdf) (cited, not read)
+- [Vu Nguyen, A study on AMMs for trading fixed yield and Pendle V2's Principal Token AMM](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/whitepapers/AMM.pdf), 14 October 2022 (`whitepapers/AMM.pdf` in the analyzed repository), read 2026-11-18
+- [Pendle API Overview](https://docs.pendle.finance/pendle-v2-dev/Backend/ApiOverview) and [Router Types and Utility Functions](https://docs.pendle.finance/pendle-v2-dev/Contracts/PendleRouter/ApiReference/Types)
 - [Spark forum, June 26 2025 proposed changes to Spark](https://forum.sky.money/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663) (linear discount rates for PT listings; cited by Pendle, not read)
 - [Uniswap V3 oracle concepts](https://docs.uniswap.org/concepts/protocol/oracle)
 - [ERC-4626: Tokenized Vaults](https://eips.ethereum.org/EIPS/eip-4626)

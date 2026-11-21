@@ -273,3 +273,4 @@ The following points were not settled by the sources used for this article:
 - [Ethereum Gas — How Transaction Cost and the Per-Transaction Limit Are Computed (Fusaka and Glamsterdam)]({{site.url_complet}}/2026/10/23/ethereum-gas-cost-transaction-limit-fusaka-glamsterdam/)
 - [Ethereum's Hidden Contracts: The System Contracts Behind Every Block]({{site.url_complet}}/2026/11/04/ethereum-system-contracts/)
 - [When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/)
+- [EIP-7251: Increasing the Maximum Effective Balance to 2,048 ETH]({{site.url_complet}}/2026/11/20/eip-7251-max-effective-balance-consolidation/)

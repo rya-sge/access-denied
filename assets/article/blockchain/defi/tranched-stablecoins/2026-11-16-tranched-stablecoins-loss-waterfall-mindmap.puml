@@ -23,11 +23,11 @@ mindmapDiagram {
 *** Loss = unaccruedYield < 0
 *** 0. Safety buffer (all or nothing)
 *** 1. liUSD lockers, pro rata
-*** 2. siUSD rewards, then principal
+*** 2. siUSD principal (vesting rewards sit in escrow)
 *** 3. iUSD price for every holder
 *** Pending loss until accrue()
-**** siUSD exits blocked
-**** iUSD redeems at old price
+**** every gateway exit blocked
+**** entries open at the old price
 left side
 ** f(x) Protocol
 *** Rebalance zone: partial deleverage

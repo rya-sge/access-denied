@@ -10,13 +10,16 @@ participant "Farm" as F
 participant "YieldSharingV3" as YS
 participant "siUSD holder" as S
 participant "iUSD holder" as I
+participant "New entrant" as N
 participant "Keeper (ACCRUE_YIELD)" as K
 F -> YS : assets() falls, unaccruedYield() < 0
 note over YS : pending loss, applied to nobody
 S -> YS : unstake through the gateway
-YS --> S : revert PendingLossesUnapplied
-I -> YS : redeem iUSD
-YS --> I : paid at the old oracle price
+YS --> S : revert (maxRedeem returns 0)
+I -> YS : redeem iUSD through the gateway
+YS --> I : revert (unaccrued losses)
+N -> YS : mint or stake
+YS --> N : accepted at the old price
 K -> YS : accrue()
 alt safety buffer >= loss
   YS -> YS : burn buffer iUSD

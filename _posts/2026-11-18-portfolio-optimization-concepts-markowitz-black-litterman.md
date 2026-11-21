@@ -14,7 +14,7 @@ isMermaid: true
 
 Portfolio optimisation chooses how much money to put in each asset from estimates of their returns and of how they move together. A library such as [PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) turns those estimates into weights in a few lines, and the companion article [PyPortfolioOpt - How a Python Library Turns Price History into Portfolio Weights]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/) shows how its modules work and where they surprise a caller. This article covers what the library assumes the user already knows: the statistics of returns, the estimation of a covariance matrix, the optimisation models from Markowitz's 1952 mean-variance model to Hierarchical Risk Parity, published in 2016, and the evaluation of the result.
 
-Each concept is presented the same way: the intuition, the formula, a small worked example, what goes wrong in practice and where the concept sits in the chain from prices to an order ticket. The examples use two to ten assets with made-up or simulated inputs, so every number can be recomputed; the scripts that produce them are kept with the article. The tool appears only as a pointer, in sentences of the form "PyPortfolioOpt implements this as ...".
+Each concept is presented the same way: the intuition, the formula, a small worked example, what goes wrong in practice and where the concept sits in the chain from prices to an order ticket. Most examples use two to ten assets with made-up inputs, the covariance simulations use 30 to 100 simulated assets, and one Black-Litterman check re-uses the 20-stock sample data of the companion article, so every number can be recomputed; the scripts that produce them are kept with the article. The tool appears only as a pointer, in sentences of the form "PyPortfolioOpt implements this as ...".
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -35,7 +35,7 @@ The article builds most of its concepts from the ground up. It assumes the follo
 The concepts form a chain. Prices become returns; estimators turn returns into an expected-return vector and a risk model; a model or optimiser turns those into weights; the weights become share counts; and only an evaluation on data the optimiser did not see says whether any of it worked.
 
 ```mermaid
-flowchart LR
+flowchart TD
     D["Prices<br/>adjusted closes"] --> R["Returns<br/>simple or log, annualised"]
     R --> MU["Expected returns<br/>historical, EMA, CAPM"]
     R --> COV["Risk model<br/>sample, shrinkage,<br/>semicovariance"]
@@ -100,7 +100,7 @@ The two means answer different questions. The arithmetic mean is the expected on
 
 ### Annualisation
 
-Daily statistics are scaled to a year with the number of trading days, conventionally 252. If daily returns are independent and identically distributed, the mean scales with time and the variance too, so the volatility scales with the square root of time:
+Daily statistics are scaled to a year with the number of trading days, conventionally 252. The mean scales with time by linearity of expectation. The variance also scales with time if daily returns are uncorrelated with a constant variance, so the volatility then scales with the square root of time:
 
 $$
 \begin{aligned}
@@ -132,7 +132,7 @@ A stock with 20 % volatility observed for 10 years has a standard error of 6.3 p
 
 An exponentially weighted moving average (EMA) gives recent returns more weight, with a decay set by a span $$s$$ through the weight factor $$\alpha = 2/(s+1)$$. It reacts faster to a change in the mean, at the price of using fewer effective observations and so a larger error.
 
-On a series whose daily mean steps from 0.02 % for 500 days to 0.10 % for 250 days, the plain mean annualises (times 252, without compounding) to 11.8 %, a 500-day EMA to 18.5 % and the last year alone to 25.2 %. Which one is "right" depends on whether the step is a change in the true mean or noise. PyPortfolioOpt implements this as `ema_historical_return(prices, span=500)`.
+On a series whose daily mean steps from 0.02 % for 500 days to 0.10 % for 250 days, the plain mean annualises (times 252, without compounding) to 11.8 %, a 500-day EMA to 18.5 % and the last year alone to 25.2 %. Which one is "right" depends on whether the step is a change in the true mean or noise. PyPortfolioOpt implements this as `ema_historical_return(prices, span=500)`, which compounds by default; `compounding=False` gives the figures above.
 
 ### CAPM expected returns
 
@@ -146,7 +146,7 @@ $$
 
 With $$\beta = 1.2$$, a 3 % risk-free rate and a 5 % market risk premium, the expected return is $$3\% + 1.2 \times 5\% = 9\%$$. Betas are estimated far more precisely than means, because they come from covariances: on 10 years of simulated daily data with a true beta of 1.2, the estimate was 1.19.
 
-CAPM does not remove the estimation problem; it concentrates it in one number, the market premium. If that premium is itself a historical average, it carries the same $$\sigma/\sqrt T$$ error. In one draw of the simulation above, the market had a true drift of about 7.9 % a year but realised -3.8 % over its ten years, and PyPortfolioOpt's `capm_return`, which uses the realised market mean, returned -5.2 % for the asset. A premium taken from long-run studies or from Black-Litterman's reverse optimisation, below, avoids that.
+CAPM does not remove the estimation problem; it concentrates it in one number, the market premium. If that premium is itself a historical average, it carries the same $$\sigma/\sqrt T$$ error. In one draw of the simulation above, the market had a true arithmetic drift of 7.6 % a year, an expected growth rate of about 6.5 % after volatility drag, but realised a growth rate of -3.8 % over its ten years, and PyPortfolioOpt's `capm_return`, which uses the realised market mean, returned -5.2 % for the asset. A premium taken from long-run studies or from Black-Litterman's reverse optimisation, below, avoids that.
 
 **What goes wrong.** The optimiser treats $$\hat\mu$$ as exact. Assets whose estimates are high by chance get the largest weights, which is the "error maximiser" effect of the Markowitz section. **Where it sits.** Input of every return-seeking objective (max Sharpe, efficient return, utility); the minimum-variance portfolio and HRP do not use it.
 
@@ -174,7 +174,7 @@ The sample covariance $$S = \frac{1}{T-1}\sum_t (r_t - \bar r)(r_t - \bar r)^{\t
 
 - **Singularity when $$T \leq n$$.** The matrix has rank at most $$T-1$$. With 50 assets and 40 observations the sample matrix had rank 39 and a smallest eigenvalue of zero up to rounding, so the optimiser finds combinations of assets that appear riskless.
 - **Spread eigenvalues.** Even when $$T \gt n$$, sampling noise pushes the small eigenvalues down and the large ones up. With 100 uncorrelated assets of unit variance and 200 observations, the sample eigenvalues ranged on average from 0.094 to 2.83 instead of all being 1, close to the Marchenko-Pastur limits $$(1 \pm \sqrt{n/T})^2 = 0.086$$ and $$2.914$$. The condition number, the ratio of the largest to the smallest eigenvalue, was about 30 for a true value of 1. The optimiser loads on the directions with the smallest estimated variance, which are those whose variance is most underestimated.
-- **Missing data.** Assets listed at different dates leave holes. Computing each covariance on its own overlapping window keeps the data but can break positive semidefiniteness; filling holes with zero returns keeps the matrix PSD but makes the asset look calm. A stock observed on only the last 25 % of a window, with a true volatility of 33 %, shows 16 % once the missing returns are set to zero: the volatility is multiplied by the square root of the observed share. The PyPortfolioOpt article measured this effect on real data, where `CovarianceShrinkage.ledoit_wolf()` zero-fills.
+- **Missing data.** Assets listed at different dates leave holes. Computing each covariance on its own overlapping window keeps the data but can break positive semidefiniteness; filling holes with zero returns keeps the matrix PSD but makes the asset look calm. A simulated stock observed on only the last 25 % of a window, with a true volatility of 31.7 % (33.1 % measured on the observed quarter), shows 16.6 % once the missing returns are set to zero: the volatility is multiplied by the square root of the observed share. The PyPortfolioOpt article measured this effect on real data, where `CovarianceShrinkage.ledoit_wolf()` zero-fills.
 
 ### Shrinkage and Ledoit-Wolf
 
@@ -305,7 +305,7 @@ $$
 \end{aligned}
 $$
 
-where $$\delta \gt 0$$ is the risk aversion. This is the expected utility of an investor with quadratic utility, and also of one with exponential utility when returns are normal: two standard cases in which ranking portfolios by mean and variance agrees with expected-utility maximisation. Without a budget constraint the solution is $$w = \Sigma^{-1}\mu/\delta$$: in the example with $$\delta = 3$$ that is $$(0.8333, 0.6111, 0.2685)$$, which sums to 1.71: the extra 0.71 is borrowed, implicitly at a zero rate since $$\mu$$ is not measured in excess of $$r_f$$.
+where $$\delta \gt 0$$ is the risk aversion. With exponential utility and normal returns, this objective is the certainty equivalent of the investor's wealth, so maximising it maximises expected utility. With quadratic utility the expected utility is a different function of mean and variance, but it ranks portfolios on the efficient frontier the same way. These are the two standard justifications of mean-variance analysis. Without a budget constraint the solution is $$w = \Sigma^{-1}\mu/\delta$$: in the example with $$\delta = 3$$ that is $$(0.8333, 0.6111, 0.2685)$$, which sums to 1.71: the extra 0.71 is borrowed, implicitly at a zero rate since $$\mu$$ is not measured in excess of $$r_f$$.
 
 With $$\mathbf 1^{\top}w = 1$$, $$w = \Sigma^{-1}(\mu - \eta\mathbf 1)/\delta$$ with $$\eta = (B - \delta)/A$$, which gives the last row of the table. As $$\delta$$ grows, the portfolio moves down the frontier to the GMV portfolio. PyPortfolioOpt implements this as `max_quadratic_utility(risk_aversion=...)`; the same $$\delta$$ reappears in Black-Litterman.
 
@@ -391,7 +391,7 @@ For the long-only three-asset example there are three corners:
 
 A cvxpy solve of `efficient_return(0.14)` gives $$(0, 0.3333, 0.6667)$$, the mix of corners 1 and 2 with return 14 %, and `efficient_return(0.10)` gives the mix of corners 2 and 3; both agree with the interpolation to $$10^{-15}$$.
 
-CLA is exact, needs no general-purpose solver, and returns the whole frontier at once. The common implementations handle only the budget, bounds on each weight and the variance objective. [Bailey and López de Prado (2013)](https://doi.org/10.3390/a6010169) published an open-source Python implementation, which PyPortfolioOpt ships as `CLA`; its `max_sharpe()` searches between corners and uses $$r_f = 0$$.
+CLA is exact, needs no general-purpose solver, and returns the whole frontier at once. The Bailey-López de Prado implementation, and so PyPortfolioOpt's `CLA`, handles only the budget, bounds on each weight and the variance objective. [Bailey and López de Prado (2013)](https://doi.org/10.3390/a6010169) published an open-source Python implementation, which PyPortfolioOpt ships as `CLA`; its `max_sharpe()` searches between corners and uses $$r_f = 0$$.
 
 ## Black-Litterman
 
@@ -416,7 +416,7 @@ The investor states $$K$$ views as linear statements on returns:
 - **Absolute**: "C will return 10 %" is a row of $$P$$ with a 1 in C's column and $$Q = 0.10$$.
 - **Relative**: "B will outperform A by 3 %" is a row $$(-1, 1, 0)$$ and $$Q = 0.03$$.
 
-$$P$$ is the $$K \times n$$ picking matrix, $$Q$$ the vector of view returns and $$\Omega$$ the $$K \times K$$ covariance of the views' errors, diagonal when views are independent. A scalar $$\tau$$ scales the uncertainty of the prior: the model assumes $$\mu \sim N(\Pi, \tau\Sigma)$$, and a small $$\tau$$, commonly between 0.025 and 0.05, says the prior mean is much more precise than a single return.
+$$P$$ is the $$K \times n$$ picking matrix, $$Q$$ the vector of view returns and $$\Omega$$ the $$K \times K$$ covariance of the views' errors, diagonal when views are independent. A scalar $$\tau$$ scales the uncertainty of the prior: the model assumes $$\mu \sim N(\Pi, \tau\Sigma)$$, and a small $$\tau$$ says the prior mean is much more precise than a single return. PyPortfolioOpt's default is 0.05; its documentation cites a paper by Walters devoted to choosing $$\tau$$.
 
 ### The posterior
 
@@ -430,7 +430,7 @@ $$
 \end{aligned}
 $$
 
-The first line is a precision-weighted average of prior and views. The second line, which PyPortfolioOpt computes by solving a $$K \times K$$ system, reads as "prior plus a correction": the correction is proportional to the surprise $$Q - P\Pi$$, and $$\Sigma P^{\top}$$ propagates it to assets without a view through their covariances. The posterior covariance adds the parameter uncertainty to $$\Sigma$$; in the relative-view example below it raises the volatilities by about 2 %.
+The first line is a precision-weighted average of prior and views. The second line, which PyPortfolioOpt computes by solving a $$K \times K$$ system, reads as "prior plus a correction": the correction is proportional to the surprise $$Q - P\Pi$$, and $$\Sigma P^{\top}$$ propagates it to assets without a view through their covariances. The posterior covariance adds the parameter uncertainty to $$\Sigma$$; in the relative-view example below, at $$\tau = 0.05$$, it multiplies the volatilities by about 1.02.
 
 ```mermaid
 flowchart LR
@@ -466,7 +466,7 @@ since $$1/(1+\alpha) = c$$. The confidence is the fraction of the gap between pr
 | 50 % | 4.04 % / 5.98 % / 8.94 % | 0.50 |
 | 100 % | 4.15 % / 6.33 % / 10.00 % | 1.00 |
 
-A and B rise without a view of their own, through their correlation with C. The same rule holds on the 20-stock sample data of the PyPortfolioOpt article: an AAPL prior of 0.09791 and a 20 % view at 50 % confidence give 0.14896, and $$0.09791 + 0.5 \times (0.20 - 0.09791) = 0.148955$$.
+A and B rise without a view of their own, through their correlation with C. The same rule holds on the 20-stock sample data of the PyPortfolioOpt article, with equal market caps as a check of the mechanics only: an AAPL prior of 0.09791 and a 20 % view at 50 % confidence give 0.14896, and $$0.09791 + 0.5 \times (0.20 - 0.09791) = 0.148955$$.
 
 The rule is exact for one view. With two absolute views at 50 % each, on A at 10 % and on C at 10 %, the posterior closes 50.4 % of A's gap and 78.3 % of C's, because each view also moves the other asset through the covariance.
 
@@ -563,7 +563,7 @@ The weights are A 52.8 %, B 23.5 %, C 14.5 % and D 9.3 %, identical to PyPortfol
 | Inverse variance | 0.539 / 0.240 / 0.135 / 0.086 | 10.24 % |
 | Minimum variance, unconstrained | 1.139 / -0.311 / 0.228 / -0.057 | 8.85 % |
 
-The minimum-variance portfolio has the lowest volatility on this known matrix, but only by shorting B against A. Its weights come from $$\Sigma^{-1}$$, so they lean on the direction of smallest variance, here the A-minus-B spread that the 0.8 correlation makes look cheap; with an estimated matrix that direction is the least reliable. HRP keeps every weight positive.
+The minimum-variance portfolio has the lowest volatility on this known matrix, but mainly by shorting B against A, and D slightly. Its weights come from $$\Sigma^{-1}$$, so they lean on the direction of smallest variance, here the A-minus-B spread that the 0.8 correlation makes look cheap; with an estimated matrix that direction is the least reliable. HRP keeps every weight positive.
 
 ### What HRP gains and gives up
 
@@ -575,12 +575,14 @@ In exchange, HRP does not use expected returns, does not optimise any stated obj
 
 Weights are fractions; a broker needs whole shares. Given a budget $$V$$, prices $$p_i$$ and target weights $$w_i$$, the problem is to choose integers $$x_i \geq 0$$ with $$p^{\top}x \leq V$$ that track $$wV$$. Rounding each $$w_iV/p_i$$ down is feasible but leaves cash and drifts from the targets.
 
-Take $$V = 1{,}000$$, weights 50 / 30 / 20 % and prices 330, 95 and 41. Rounding down buys 1, 3 and 4 shares for 779, leaving 221.
+Take $$V = 1{,}000$$ and three assets X, Y and Z with weights 50 / 30 / 20 % and prices 330, 95 and 41. Rounding down buys 1, 3 and 4 shares for 779, leaving 221.
 
-- **Greedy.** PyPortfolioOpt's greedy method then buys one share at a time of the asset furthest below its target, among those it can afford. Asset X is the only one below target, and at 330 it is unaffordable with 221 left, so the greedy method stops at 779 invested.
+- **Greedy.** PyPortfolioOpt's greedy method then buys one share at a time of the asset whose share of the money already invested is furthest below its target weight, among those it can afford. X holds 42.4 % of the 779 against a 50 % target, while Y at 36.6 % and Z at 21.1 % are above theirs; X costs 330 and only 221 is left, so the greedy method stops at 779 invested.
 - **Integer programme.** The LP method minimises $$\sum_i u_i + r$$ subject to $$\lvert w_iV - x_ip_i\rvert \leq u_i$$ and $$r = V - p^{\top}x \geq 0$$: the sum of absolute deviations in currency units plus the leftover cash. The rounded-down allocation scores $$221 + 221 = 442$$. The solver returned 1, 4 and 6 shares, 956 invested and 44 left, with a score of $$296 + 44 = 340$$.
 
-An exhaustive search over all affordable share counts confirms that 340 is the minimum and shows three optimal allocations: (1, 4, 5), (1, 4, 6) and (1, 4, 7). Once every asset except X is at or above target, one more share of B or C adds its price to the deviation and removes it from the cash, so the objective cannot separate them. The realised weights of the LP solution are 34.5 / 39.7 / 25.7 %, far from 50 / 30 / 20 %. With few shares, rounding error dominates the optimisation: a budget large relative to the prices, or fractional shares, makes the earlier sections matter again.
+An exhaustive search over all affordable share counts confirms that 340 is the minimum and shows three optimal allocations: (1, 4, 5), (1, 4, 6) and (1, 4, 7). Once Y and Z hold at least their target amounts in currency, 300 and 200, one more share of Y or Z adds its price to the deviation and removes it from the cash, so the objective cannot separate them.
+
+The realised weights of the LP solution are 34.5 / 39.7 / 25.7 %, far from 50 / 30 / 20 %. With few shares, rounding error dominates the optimisation: a budget large relative to the prices, or fractional shares, makes the earlier sections matter again.
 
 ## Evaluating a portfolio
 
@@ -624,7 +626,7 @@ The PyPortfolioOpt article applies this to one split of real data and finds that
 
 Portfolio optimisers turn two estimates, expected returns and a covariance matrix, into weights by solving a convex problem exactly; most of what decides the result happens before and after the solve.
 
-- **Returns.** Simple returns aggregate across assets and log returns across time; the arithmetic mean is the one-period input and exceeds the geometric growth rate by about $$\sigma^2/2$$. Annualising by 252 and $$\sqrt{252}$$ assumes independent returns.
+- **Returns.** Simple returns aggregate across assets and log returns across time; the arithmetic mean is the one-period input and exceeds the geometric growth rate by about $$\sigma^2/2$$. Annualising the volatility by $$\sqrt{252}$$ assumes uncorrelated returns with a constant variance.
 - **Expected returns.** The standard error of a mean is $$\sigma/\sqrt T$$ in years, 6.3 points for 10 years at 20 % volatility, whatever the sampling frequency. An EMA trades responsiveness for a larger error, and CAPM moves the error into one number, the market premium.
 - **Covariance.** The sample matrix needs many more observations than assets; its eigenvalues spread and it becomes singular when $$T \leq n$$. Shrinkage toward a structured target helps most when the target matches the true structure.
 - **Markowitz.** Without inequality constraints the frontier, the minimum-variance and the tangency portfolios have closed forms in $$\Sigma^{-1}$$; with bounds, the frontier is a chain of corner portfolios, which CLA computes. The weights move by tens of points within one standard error of the inputs.
@@ -694,13 +696,13 @@ For one view, the posterior covers the confidence fraction of the gap: $$7.875\%
 
 No. With ten equally likely scenarios and a tail of two, the Rockafellar-Uryasev objective is flat for every $$\alpha$$ between 1.4 % and 2.1 %, the third and second worst losses, and equals the CVaR of 2.55 % on that whole interval. Any point in it is optimal, and the solver returned one. VaR is not unique on a discrete sample; CVaR is.
 
-**Q: An analyst compares an HRP portfolio, whose library reports a 21 % return, with a max-Sharpe portfolio reported at 27 % and a Sharpe ratio of 2.4, both on the same 20 years of data. Which concepts say the comparison is not yet meaningful?**
+**Q: An analyst compares an HRP portfolio, whose library reports a 21 % return, with a max-Sharpe portfolio reported at 27 % and a Sharpe ratio of 2.4, both on the same 28 years of data. Which concepts say the comparison is not yet meaningful?**
 
 Several, each from a different section:
 
 - **Same inputs.** The two figures may come from different estimators of $$\mu$$ and $$\Sigma$$; both portfolios must be measured with one $$\mu$$, one $$\Sigma$$ and one risk-free rate.
 - **In-sample bias.** The max-Sharpe weights were chosen on that data, so their reported Sharpe ratio overstates the true one; in the Monte Carlo experiment by a factor of 2.6.
-- **Estimation error.** The return figures carry standard errors of several points, larger than the gap between them.
+- **Estimation error.** With the reported volatilities of 17.8 % and 10.3 %, the two returns carry standard errors of about 3.4 and 1.9 points over 28 years, so the 6-point gap is about 1.5 standard errors of the difference if the two were uncorrelated. That is not a ranking, and the 10.3 % volatility may itself be understated.
 - **Survivorship and selection.** A universe chosen at the end of the period, and any windows or parameters tried before this one, inflate both.
 
 Only an out-of-sample test over several windows, with costs, can rank the two.
@@ -711,7 +713,8 @@ The following points were not settled by the sources and runs behind this articl
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The attribution of the Critical Line Algorithm to Markowitz's 1956 paper, and the 1990 Goldman Sachs origin of Black-Litterman, are stated from general knowledge. | The history sentences in those sections rest on them. | Markowitz (1956), "The optimization of a quadratic function subject to linear constraints", *Naval Research Logistics Quarterly* 3 (no link checked); [Black and Litterman (1992)](https://doi.org/10.2469/faj.v48.n5.28) and its references. |
+| The attribution of the Critical Line Algorithm to Markowitz's 1956 paper is stated from general knowledge, and the earlier Black-Litterman paper of 1991 in *The Journal of Fixed Income*, cited by the PyPortfolioOpt docs, was not read. | The history sentences in those sections rest on them. | Markowitz (1956), "The optimization of a quadratic function subject to linear constraints", *Naval Research Logistics Quarterly* 3 (no link checked); [Black and Litterman (1992)](https://doi.org/10.2469/faj.v48.n5.28) and its references. |
+| The paraphrases of Merton (1980), Tobin (1958), Sharpe (1966), Michaud (1989) and Bailey et al. (2014) are from general knowledge; the papers were not re-read. | The attributions in the estimation, Markowitz and evaluation sections rest on them. | [Merton (1980)](https://doi.org/10.1016/0304-405X(80)90007-0), [Tobin (1958)](https://doi.org/10.2307/2296205), [Sharpe (1966)](https://doi.org/10.1086/294846), [Michaud (1989)](https://doi.org/10.2469/faj.v45.n1.31), [Bailey et al. (2014)](https://doi.org/10.1090/noti1105). |
 | The Marchenko-Pastur limits are quoted from general knowledge; only the simulation was run. | The covariance section compares the simulated eigenvalues with them. | A random-matrix reference; the simulation in [`returns_covariance.py`](https://github.com/rya-sge/access-denied/tree/main/verification/portfolio-optimization-concepts-markowitz-black-litterman). |
 | The equivalence of quadratic utility and mean-variance under exponential utility with normal returns, and the volatility-drag approximation $$g \approx a - \sigma^2/2$$, are standard results not derived here. | The utility and returns sections use them. | A portfolio-theory textbook chapter on expected utility; [Tobin (1958)](https://doi.org/10.2307/2296205). |
 | PyPortfolioOpt's documentation cites the drawdown paper as Chekhlov, Rockafellar and Uryasev (2005), while Crossref lists Chekhlov, Uryasev and Zabarankin. | The article follows Crossref; the library's docs may mislead a reader. | [Chekhlov, Uryasev and Zabarankin (2005)](https://doi.org/10.1142/S0219024905002767); `docs/GeneralEfficientFrontier.rst` at the [pinned commit](https://github.com/PyPortfolio/PyPortfolioOpt/blob/a6638d2e06dae6f444fd022cfd4b3c528902a85b/docs/GeneralEfficientFrontier.rst). |
@@ -747,9 +750,12 @@ The following points were not settled by the sources and runs behind this articl
 - Black, F. and Litterman, R. (1992), [Global Portfolio Optimization](https://doi.org/10.2469/faj.v48.n5.28), Financial Analysts Journal 48(5), 28-43
 - He, G. and Litterman, R. (1999), [The Intuition Behind Black-Litterman Model Portfolios](https://doi.org/10.2139/ssrn.334304), Goldman Sachs Investment Management Research
 - Idzorek, T. (2005), [A Step-by-Step Guide to the Black-Litterman Model](https://people.duke.edu/~charvey/Teaching/BA453_2006/Idzorek_onBL.pdf)
+- Walters, J. (2014), *The Black-Litterman Model in Detail*, SSRN working paper, source of the closed form for Idzorek's method used by PyPortfolioOpt; not read
 
 ### Downside risk, CLA and HRP
 
+- Estrada, J. (2007), [Mean-Semivariance Optimization: A Heuristic Approach](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1028206), cited by the PyPortfolioOpt docs; not read
+- Markowitz, H., Starer, D., Fram, H. and Gerber, S. (2019), *Avoiding the Downside*, the semivariance formulation cited by the PyPortfolioOpt docs; not read, and the PDF link in the docs redirected to an HTML page on 2026-11-18
 - Rockafellar, R. T. and Uryasev, S. (2000), [Optimization of Conditional Value-at-Risk](https://doi.org/10.21314/JOR.2000.038), Journal of Risk 2(3), 21-41
 - Chekhlov, A., Uryasev, S. and Zabarankin, M. (2005), [Drawdown Measure in Portfolio Optimization](https://doi.org/10.1142/S0219024905002767), International Journal of Theoretical and Applied Finance 8(1), 13-58
 - Bailey, D. H. and López de Prado, M. (2013), [An Open-Source Implementation of the Critical-Line Algorithm for Portfolio Optimization](https://doi.org/10.3390/a6010169), Algorithms 6(1), 169-196
@@ -772,6 +778,7 @@ The following points were not settled by the sources and runs behind this articl
 ### Tooling
 
 - [cvxpy](https://www.cvxpy.org/) and its [DCP rules](https://www.cvxpy.org/tutorial/dcp/index.html)
+- Cornuéjols, G. and Tütüncü, R. (2006), *Optimization Methods in Finance*, Cambridge University Press, cited in the `max_sharpe` docstring for the variable change
 - Boyd, S. and Vandenberghe, L. (2004), [Convex Optimization](https://web.stanford.edu/~boyd/cvxbook/), Cambridge University Press
 - [scikit-learn covariance estimators](https://scikit-learn.org/stable/modules/covariance.html)
 - [SciPy hierarchical clustering, `linkage`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html)

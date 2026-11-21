@@ -1,0 +1,28 @@
+No files changed, compilation skipped
+
+Ran 14 tests for test/BeaconProof.t.sol:BeaconProofTest
+[PASS] testBalanceProof48() (gas: 1347735)
+[PASS] testDenebAndElectraGindices() (gas: 45486)
+[PASS] testForkFullFlow() (gas: 5673)
+Logs:
+  FORK_URL not set: fork test skipped
+
+[PASS] testGloasProgressiveGindices() (gas: 74552)
+[PASS] testRealProofVerifies() (gas: 181060)
+Logs:
+  gas, external verify of the 53-sibling proof (incl. call overhead): 164227
+  header slot: 15687296
+  block root: 0xc30d802739c5d591bc692cf467806b3c305cb962df911616c1d4695245c0aa91
+
+[PASS] testRevertWhen_DenebGindexOnFuluProof() (gas: 173002)
+[PASS] testRevertWhen_DenebGindexWith52Siblings() (gas: 184975)
+[PASS] testRevertWhen_EmptyProofLeafEqualsRoot() (gas: 15135)
+[PASS] testRevertWhen_Extended54() (gas: 189601)
+[PASS] testRevertWhen_FieldTooLarge() (gas: 10752)
+[PASS] testRevertWhen_IndexTooLarge() (gas: 10726)
+[PASS] testRevertWhen_Truncated52() (gas: 184992)
+[PASS] testRevertWhen_WrongLeaf() (gas: 173873)
+[PASS] testSlotProofAtGindex8() (gas: 1198765)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 9.62ms (15.70ms CPU time)
+
+Ran 1 test suite in 15.07ms (9.62ms CPU time): 14 tests passed, 0 failed, 0 skipped (14 total tests)

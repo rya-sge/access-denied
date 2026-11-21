@@ -2,6 +2,7 @@
 layout: post
 title: "Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography"
 date:   2026-11-06
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -160,7 +161,7 @@ with a failure probability of at most $$M/N$$. The figure shows the consequence 
 
 Two behaviours appear in the figure that have no classical counterpart.
 
-- **Overshooting.** The solid curve peaks at 25 iterations and returns to zero near 50. A classical search only improves with more work. For $$N = 2^{20}$$, BBHT's numbers, which the script reproduces, are 804 iterations for a failure probability of $$2.4 \times 10^{-7}$$ and under 9.5% success at Grover's upper bound of $$\sqrt{2N} = 1448$$ iterations. The 50% mark is reached at 402 iterations, about $$(\pi/8)\sqrt N$$, so the paper's bound is loose by a factor of 3.6.
+- **Overshooting.** The solid curve peaks at 25 iterations and returns to zero near 50. A classical search only improves with more work. For $$N = 2^{20}$$, BBHT give 804 iterations with a failure probability of at most $$1/N$$ (the script computes $$2.4 \times 10^{-7}$$), and under 9.5% success at Grover's upper bound of $$\sqrt{2N}$$ iterations, which is 1448 here. The 50% mark is reached at 402 iterations, about $$(\pi/8)\sqrt N$$, so the paper's bound is loose by a factor of 3.6.
 - **Dependence on $$M$$.** The count must match the number of solutions. The dashed curve has four solutions: 25 iterations give $$P = 0.0023$$, close to the worst possible choice. With $$N = 2^{20}$$, running the 804 iterations meant for one solution on a table with four gives less than one chance in a million.
 
 ### When the number of solutions is unknown
@@ -190,7 +191,7 @@ The constant was settled afterwards. BBHT refined the bound, and [Zalka](https:/
 
 ## Amplitude amplification
 
-Grover's loop is a special case of a more general procedure. [Brassard, Høyer, Mosca and Tapp](https://arxiv.org/abs/quant-ph/0005055) show that for any quantum algorithm $$\mathcal A$$ that produces a good result with probability $$a$$, a good result can be found after about $$1/\sqrt a$$ applications of $$\mathcal A$$, where classical repetition takes about $$1/a$$. Grover search is the case where $$\mathcal A = W$$ and $$a = M/N$$.
+Grover's loop is a special case of a more general procedure. [Brassard, Høyer, Mosca and Tapp](https://arxiv.org/abs/quant-ph/0005055) show that for any quantum algorithm $$\mathcal A$$ that produces a good result with probability $$a$$, a good result can be found after about $$1/\sqrt a$$ applications of $$\mathcal A$$ and its inverse, provided $$\mathcal A$$ makes no measurements, where classical repetition takes about $$1/a$$. Grover search is the case where $$\mathcal A = W$$ and $$a = M/N$$.
 
 This is the form in which the idea reappears as a component: it improves any search that has a good heuristic, and combined with Fourier techniques it gives amplitude estimation and approximate counting of $$M$$. Section 8 of Grover's paper anticipates this kind of combination, citing the Dürr-Høyer minimum-finding work and his own median estimation.
 
@@ -206,7 +207,7 @@ $$
 \end{aligned}
 $$
 
-With 10112 Toffoli depth for the best SHA-256 circuit it cites and 509 for each multi-controlled NOT, one iteration has Toffoli depth $$2 \cdot 10112 + 509 + 509 = 21242 \approx 2^{14.4}$$. A preimage search on a 128-bit truncation then takes about $$2^{14} \cdot 2^{64} = 2^{78}$$ Toffoli depth, on a circuit using about 938 qubits, before any error correction.
+With 10112 Toffoli depth for the best SHA-256 circuit it cites and 509 for each multi-controlled NOT, one iteration has Toffoli depth $$2 \cdot 10112 + 509 + 509 = 21242 \approx 2^{14.4}$$. A preimage search on a 128-bit truncation then takes about $$2^{14} \cdot 2^{64} = 2^{78}$$ Toffoli depth, before any error correction. Kudinov and Nick give a width of about 938 qubits for the SHA-256 circuits with Toffoli depth around $$10^5$$.
 
 Fault tolerance sits on top of that count. [Babbush et al.](https://arxiv.org/abs/2603.28846) argue that the quadratic speedup is all but consumed by the overheads of quantum error correction, and cite a separate analysis on why quadratic speedups are a weak target for error-corrected machines.
 
@@ -233,8 +234,8 @@ The site's [post-quantum overview]({{site.url_complet}}/2026/10/29/post-quantum-
 | Target | Classical generic cost | Grover-based cost | What it means |
 |---|---|---|---|
 | $$k$$-bit symmetric key | $$2^k$$ | about $$2^{k/2}$$ iterations, each a reversible cipher circuit | The relevant case; see the NIST figures below |
-| $$n$$-bit hash preimage | $$2^n$$ | about $$2^{n/2}$$ iterations | Same bound, and the basis for hash-based signature parameters |
-| $$n$$-bit hash collision | $$2^{n/2}$$ | $$2^{n/3}$$ queries with BHT, using $$2^{n/3}$$ memory | Query gain only; [Bernstein](https://cr.yp.to/hash/collisioncost-20090823.pdf) argues the total cost is worse than classical circuits |
+| $$n$$-bit hash preimage | $$2^n$$ | about $$2^{n/2}$$ iterations | Same bound; hash-based signature parameters are matched to AES key search |
+| $$n$$-bit hash collision | $$2^{n/2}$$ | $$2^{n/3}$$ queries with BHT, using $$2^{n/3}$$ memory | Query gain only; [Bernstein](https://cr.yp.to/hash/collisioncost-20090823.pdf) argues its price-performance is worse than the classical van Oorschot-Wiener circuits |
 | Proof-of-work mining | Massive parallel hardware | Grover per machine | Babbush et al. call it not practically relevant |
 | RSA, ECDSA, ECDH | Sub-exponential or $$2^{128}$$ for a 256-bit curve | Not the relevant attack | [Shor's algorithm](https://arxiv.org/abs/quant-ph/9508027) breaks them in polynomial time |
 
@@ -250,7 +251,7 @@ NIST defines its five categories by reference attacks and gives gate estimates b
 | SHA3-384 collision | 4 | not given | $$2^{210}$$ |
 | AES-256 key search | 5 | $$2^{298}$$ / MAXDEPTH | $$2^{272}$$ |
 
-NIST gives three plausible MAXDEPTH values, each with its rationale:
+NIST gives a plausible range for MAXDEPTH, with three reference points and their rationale:
 
 | MAXDEPTH | Rationale | AES-128 quantum gates |
 |---:|---|---:|
@@ -258,11 +259,11 @@ NIST gives three plausible MAXDEPTH values, each with its rationale:
 | $$2^{64}$$ | what current classical architectures can perform serially in a decade | $$2^{106}$$ |
 | $$2^{96}$$ | what atomic-scale qubits at the speed of light could perform in a millennium | $$2^{74}$$ |
 
-These gate counts do not compare directly with the classical column. NIST states that a quantum gate could cost billions or trillions of times a classical gate under envisioned architectures, while advising that for the top categories this gap may narrow or disappear. Hence the practical reading: at a depth limit of $$2^{64}$$ the gate count of AES-128 falls by 37 bits, from $$2^{143}$$ to $$2^{106}$$, and not by 64, and those quantum gates are the expensive kind. 256-bit keys remain the conservative choice when a margin against future hardware is wanted.
+These gate counts do not compare directly with the classical column. NIST states that a quantum gate could cost billions or trillions of times a classical gate under envisioned architectures, while advising that for the top categories this gap may narrow or disappear. Hence the practical reading: at a depth limit of $$2^{64}$$, AES-128 needs $$2^{106}$$ quantum gates against $$2^{143}$$ classical gates, a nominal gap of 37 bits rather than 64, and the quantum gates are the expensive kind. 256-bit keys remain the conservative choice when a margin against future hardware is wanted.
 
 ### Consequences in deployed designs
 
-Grover is the attack that sets hash lengths in hash-based signatures. [FIPS 205](https://csrc.nist.gov/pubs/fips/205/final), [SLH-DSA]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/), claims category 1 for its parameter sets with $$n = 16$$ bytes, which is to say 128-bit hash outputs, category 3 for 24 bytes and category 5 for 32. Kudinov and Nick argue that level 1 is sufficient for Bitcoin, on the cost figures above.
+Hash lengths in hash-based signatures are set so that generic preimage search, classical or Grover, costs as much as AES key search of the same category. [FIPS 205](https://csrc.nist.gov/pubs/fips/205/final), [SLH-DSA]({{site.url_complet}}/2026/06/29/slh-dsa-fips-205-hash-based-signatures/), claims category 1 for its parameter sets with $$n = 16$$ bytes, which is to say 128-bit hash outputs, category 3 for 24 bytes and category 5 for 32. Kudinov and Nick argue that level 1 is sufficient for Bitcoin, on the cost figures above.
 
 Blockchains are affected in the same way. Babbush et al. describe a hashed public key as protected against Shor's algorithm at rest, because recovering the key from the hash would need Grover, which they do not consider a credible threat. On mining they give an upper estimate: even if a quantum computer could compute SHA-256 in a single 1 µs error-correction cycle, it would reach 0.25 TH/s, against 110 TH/s for an S19 Pro ASIC. These are the authors' own figures and assumptions.
 
@@ -272,14 +273,14 @@ Reading the arXiv version (v3, 1996) against later sources turned up a few detai
 
 - **Step reference.** Section 4 says the inversion about average is the diffusion transform "as used in step (ii)(a)". The diffusion is step (ii)(b).
 - **[DH96] arXiv number.** The reference gives quant-ph/9602016, which is the number of the Beckman et al. factoring paper [BCDP96]. The [Dürr-Høyer paper](https://arxiv.org/abs/quant-ph/9607014) is quant-ph/9607014.
-- **[DJ92] citation.** The reference gives Proc. R. Soc. London A400, pp. 73-90, which is close to the Deutsch 1985 entry. The [Deutsch-Jozsa paper](https://doi.org/10.1098/rspa.1992.0167) is A439, pp. 553-558.
-- **"Within a few percent".** Section 6 reports that BBHT show the algorithm within a few percent of optimal. The abstract of the BBHT preprint says "nearly within a factor 2" in table probes, while Zalka summarises BBHT as "a few percent" for 50% success. The two statements appear to count different things, and Zalka's exact optimality replaces both.
-
+- **[DJ92] citation.** The reference gives Proc. R. Soc. London A400, pp. 73-90, which reuses the volume number (A400) of the Deutsch 1985 entry. The [Deutsch-Jozsa paper](https://doi.org/10.1098/rspa.1992.0167) is A439, pp. 553-558.
 None of these affects the algorithm or its proofs, and the script below confirms Theorems 1 and 3 numerically.
+
+One statement in section 6 looks like an error and is not. It says BBHT show the algorithm within a few percent of optimal, while the BBHT abstract says "nearly within a factor 2". Section 7 of BBHT explains the difference: their lower bound on table lookups is a few percent below Grover's iteration count, and each iteration needs two lookups (one to fetch the entry, one to erase it), so in lookups the algorithm is within a factor of about 2. Zalka's exact optimality later settled the constant.
 
 ### Verification of the numbers
 
-Every derived value in this article comes from [`verify_grover.py`](https://github.com/rya-sge/access-denied/tree/main/verification/grover-algorithm-quantum-search). It builds $$W$$, $$R$$ and $$D$$ explicitly and checks $$D = WRW$$, runs the Theorem 2 recurrence up to $$N = 2^{20}$$, and compares a full state-vector simulation with the closed form for $$N$$ up to 1024 and several values of $$M$$. It also reproduces the BBHT figures for $$N = 2^{20}$$ and Lemma 2.
+Most derived values in this article come from [`verify_grover.py`](https://github.com/rya-sge/access-denied/tree/main/verification/grover-algorithm-quantum-search). It builds $$W$$, $$R$$ and $$D$$ explicitly and checks $$D = WRW$$, runs the Theorem 2 recurrence up to $$N = 2^{20}$$, and compares a full state-vector simulation with the closed form for $$N$$ up to 1024 and several values of $$M$$. It also reproduces the BBHT figures for $$N = 2^{20}$$ and Lemma 2. The values for $$N = 1024$$ in the figure (25 and 12 iterations, $$P = 0.0023$$) come from the figure's own script, `grover-success-probability.py`.
 
 ## Conclusion
 
@@ -333,7 +334,7 @@ The success probability is $$\sin^2((2j+1)\theta)$$, a periodic function of $$j$
 
 Not in any practical sense. The figure of about $$2^{64}$$ counts iterations, and three things separate it from a 64-bit classical attack:
 
-- Each iteration holds two reversible AES evaluations, plus multi-controlled gates.
+- Each iteration evaluates AES reversibly on several plaintext-ciphertext pairs (three for AES-128 in Grassl et al.) and then uncomputes them, plus multi-controlled gates.
 - The run cannot be divided efficiently: $$S$$ machines give a speedup of only $$\sqrt S$$.
 - Each logical gate needs error correction, and quantum gates cost far more than classical ones.
 
@@ -364,12 +365,11 @@ These points were not settled by the sources read, or rest on inference, and sho
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
 | The revised AES estimates of [Jaques et al.](https://eprint.iacr.org/2019/1146) (Eurocrypt 2020, ePrint 2019/1146) were not read; only the page note was seen. | They give lower costs than [Grassl et al.](https://arxiv.org/abs/1512.04965), so the NIST column may overstate the attack. | The tables in the revised version of [ePrint 2019/1146](https://eprint.iacr.org/2019/1146). |
-| The [NIST page](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)) was read through a fetched summary, and it does not cite Jaques et al. | Later NIST documents may update the figures quoted here. | The [NIST page](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)) directly, and [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final) (final, 27 October 2026). |
+| The figures were checked against the full text of the [NIST page](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)), which does not cite Jaques et al. The day of the final [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final) was not confirmed; its page gives October 2026. | Later NIST documents may update the figures quoted here. | [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final). |
 | Only the abstract of Bernstein's collision paper was read. | The table row on collisions relies on its conclusion and not on its cost model. | The full text of [Bernstein, *Cost analysis of hash collisions*](https://cr.yp.to/hash/collisioncost-20090823.pdf). |
 | The BBBV paper was read only as quoted by Grover. | The lower-bound summary is second-hand. | Bennett et al., *Strengths and weaknesses of quantum computing*, SIAM J. Comput., 1997 (no link: the paper's URL was not checked). |
-| The explanation of "few percent" versus "factor 2" is an inference. | The article says only that the two statements appear to count different things. | The lower-bound section of [BBHT](https://arxiv.org/abs/quant-ph/9605034) and the introduction of [Zalka](https://arxiv.org/abs/quant-ph/9711070). |
 | The phase-kickback and reflection-pair descriptions come from general knowledge, not from the paper. | They are standard, but the sources read do not state them in this form. | Nielsen and Chuang, *Quantum Computation and Quantum Information*, chapter 6. |
-| The relation $$S \cdot T \approx (\pi/4)^2 N/T$$ and its link to the NIST formula are derived here. | NIST does not present its estimate that way in the text read. | [Grassl et al.](https://arxiv.org/abs/1512.04965), and section 4 of [Zalka](https://arxiv.org/abs/quant-ph/9711070). |
+| The relation $$S \cdot T \approx (\pi/4)^2 N/T$$ and its link to the NIST formula are derived here. | NIST does not present its estimate that way; it only notes that parallel runs make the speedup less dramatic and cites Zalka (footnote 6). | [Grassl et al.](https://arxiv.org/abs/1512.04965), and section 4 of [Zalka](https://arxiv.org/abs/quant-ph/9711070). |
 | The Babbush et al. hardware figures were not recomputed. | They depend on assumptions those authors chose. | Section III D of [Babbush et al.](https://arxiv.org/abs/2603.28846) |
 | Kudinov and Nick give one iteration a Toffoli depth of 21242, then say the circuits reach "around $$10^5$$". | The $$2^{78}$$ figure uses the first value, and the second would raise it by about 2 bits. | Section 12.2 of [Kudinov and Nick](https://eprint.iacr.org/2025/2203) and its reference [27], section 6.3. |
 | The Shor reference is cited for a known result and was not read for this article. | The table row depends on it. | [Shor, arXiv:quant-ph/9508027](https://arxiv.org/abs/quant-ph/9508027) |

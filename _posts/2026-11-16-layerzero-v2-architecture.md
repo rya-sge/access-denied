@@ -2,6 +2,7 @@
 layout: post
 title: "How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson"
 date:   2026-11-16
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -35,7 +36,7 @@ The article assumes the reader knows smart contracts, ERC-20 tokens and what a b
 
 LayerZero V2 rests on three choices, each visible in the code:
 
-- **The endpoint is immutable and minimal.** `EndpointV2` is a plain, non-proxied contract holding nonces, payload hashes, the library registry and the compose queue. Its owner can register new libraries, which is append-only since there is no unregister function, set *default* libraries and configurations, set the LZ token and recover stray tokens (`EndpointV2.sol`, `MessageLibManager.sol`). It cannot change a library or a configuration an application has pinned.
+- **The endpoint is immutable and minimal.** `EndpointV2` is a plain, non-proxied contract holding nonces, payload hashes, the library registry and the compose queue. Its owner can register new libraries, which is append-only since there is no unregister function, set the *default* libraries per pathway, set the LZ token and recover stray tokens (`EndpointV2.sol`, `MessageLibManager.sol`). The default DVN, confirmation and executor configurations are set by the owner of each message library, not by the endpoint (`UlnBase.setDefaultUlnConfigs`, `SendLibBase.setDefaultExecutorConfigs`). Neither owner can change a library or a configuration an application has pinned.
 - **Security is set per application and per pathway.** Which library verifies, which verifiers must sign, how many confirmations they wait and which executor delivers are all set per `(oapp, remote eid)`. A broken stack on one application leaves the others' configurations untouched.
 - **Verification is separate from execution.** Verifiers attest to a packet's hash. Once enough of them have, anyone commits that to the endpoint, and then anyone (normally the executor) delivers the message. An executor can delay a message but not forge one; a quorum of verifiers can forge one but cannot run it twice or skip a nonce silently.
 
@@ -53,7 +54,7 @@ Each chain runs one endpoint, identified by an **`eid`** (endpoint ID, a `uint32
 | **OApp** | The application: `OAppCore` (endpoint, `peers`, delegate), `OAppSender`, `OAppReceiver`, `OAppOptionsType3` (enforced options). | `devtools/packages/oapp-evm/contracts/oapp/` |
 | **Delegate** | The address an OApp registers with `setDelegate`. It, or the OApp itself, may call every per-OApp setter on the endpoint: libraries, `setConfig`, `skip`, `clear`, `nilify`, `burn`. | `EndpointV2.setDelegate` |
 
-The delegate is not the OApp's `owner`. The owner sets peers and enforced options on the OApp contract; the delegate configures the OApp's security on the endpoint. A review of an integration checks both addresses.
+The delegate is not the OApp's `owner`. The owner sets peers and enforced options on the OApp contract; the delegate configures the OApp's security on the endpoint. The owner also appoints the delegate (`OAppCore.setDelegate` is `onlyOwner`), so a compromised owner key can take over the delegate role. A review of an integration checks both addresses.
 
 ## The security stack
 
@@ -70,7 +71,7 @@ struct UlnConfig {
 }
 ```
 
-A packet verifies when **every** required DVN and `optionalDVNThreshold` of the optional DVNs have attested with at least `confirmations` blocks (`ReceiveUlnBase._checkVerifiable`). LayerZero calls this "X of Y of N": X required verifiers, a threshold Y over a set of N optional ones. Each list holds at most 127 addresses, so that the two together fit in a `uint8`, and at least one DVN must result after merging with the defaults.
+A packet verifies when **every** required DVN and `optionalDVNThreshold` of the optional DVNs have attested with at least `confirmations` blocks (`ReceiveUlnBase._checkVerifiable`). This is often written "X of Y of N": X required verifiers, a threshold Y over a set of N optional ones. Each list holds at most 127 addresses, so that the two together fit in a `uint8`, and at least one DVN must result after merging with the defaults.
 
 ```mermaid
 flowchart TD
@@ -86,7 +87,7 @@ flowchart TD
 Two features of this configuration matter in practice:
 
 - **Both sides must agree.** The send-side config decides which DVNs are assigned and paid; the receive-side config decides whose attestations count. If they differ, the paid DVNs sign but their attestations are ignored, and the message never verifies. That is a liveness failure, not a forgery.
-- **Zero means "inherit".** A count of `0` takes the endpoint's default for that field, field by field. Only the reserved value `255` (`NIL_DVN_COUNT`, and `type(uint64).max` for confirmations) means "explicitly none". Setting the required DVNs while leaving `optionalDVNCount` at 0 therefore still merges in the default optional set.
+- **Zero means "inherit".** A count of `0` takes the library's default for that field, field by field. Only the reserved value `255` (`NIL_DVN_COUNT`, and `type(uint64).max` for confirmations) means "explicitly none". Setting the required DVNs while leaving `optionalDVNCount` at 0 therefore still merges in the default optional set.
 
 The executor is configured the same way, as an `ExecutorConfig { maxMessageSize, executor }` (config type 1) on the send library only.
 
@@ -98,7 +99,7 @@ The sequence below follows one message from a user on chain A to the receiving a
 
 Step by step:
 
-1. **Quote.** `OApp._quote` calls `EndpointV2.quote`, which builds the same packet with the next nonce and asks the send library for a price. `SendUln302` adds the DVN fees, the executor fee (which also checks `maxMessageSize`) and the treasury fee. The quote can go stale before the send: underpaying reverts with `LZ_InsufficientFee`, overpaying is refunded.
+1. **Quote.** `OApp._quote` calls `EndpointV2.quote`, which builds the same packet with the next nonce and asks the send library for a price. `SendUln302` adds the DVN fees, checks the message size against `ExecutorConfig.maxMessageSize`, then adds the executor fee and the treasury fee. The quote can go stale before the send: underpaying reverts with `LZ_InsufficientFee`, overpaying is refunded.
 2. **Send.** `EndpointV2.send` increments `outboundNonce[sender][dstEid][receiver]`, computes the GUID as `keccak256(nonce, srcEid, sender, dstEid, receiver)` (`libs/GUID.sol`), calls the send library and emits `PacketSent`, the event the workers listen to. The encoded packet is an 81-byte header (version, nonce, source eid, sender, destination eid, receiver) followed by the payload `guid ‖ message`.
 3. **Assign and pay.** The send library pays the executor, then calls `assignJob` on every required and optional DVN of the *send-side* config. Fees are credited inside the library (`fees[worker]`) and each worker withdraws them later.
 4. **Attest.** Each DVN waits its confirmations on chain A, then calls `ReceiveUln302.verify(header, payloadHash, confirmations)` on chain B. The call is open to anyone, but only entries written by DVN addresses of the *receive-side* config are counted.
@@ -117,7 +118,9 @@ Nonces run per `(sender, dstEid, receiver)` on the way out, and the endpoint tra
 - **`lazyInboundNonce`** moves only on execution, `skip` or `clear`.
 - **`inboundNonce()`** is the end of the longest gapless run of stored hashes after the lazy nonce. With hashes at nonces 1, 2, 3, 4, 6 and 7, it returns 4.
 
-Verification can arrive in any order, and once nonces 1 to n are all verified they can be executed in any order. What cannot happen is execution past a gap: an unverified nonce blocks everything after it. That is the censorship-resistance property of the design, since no message can be dropped silently. Strict ordering is opt-in at the application level: the OApp overrides `nextNonce` and the sender adds the executor option `ORDERED_EXECUTION`, after which the executor delivers in nonce order. The endpoint itself does not enforce it.
+Verification can arrive in any order, and once nonces 1 to n are all verified they can be executed in any order. What cannot happen is execution past a gap: an unverified nonce blocks everything after it. That is the censorship-resistance property of the design, since no message can be dropped silently. Strict ordering is opt-in at the application level. The OApp overrides `nextNonce` and checks the nonce in its own receive logic, since the `OAppReceiver` comment says ordering "is also enforced by the OApp"; the sender adds the executor option `ORDERED_EXECUTION`.
+
+The executor is then expected to deliver in nonce order. That is off-chain behaviour, not in the repositories (see Gaps), and the endpoint itself does not enforce it.
 
 ### The four recovery functions
 
@@ -162,7 +165,7 @@ A send pays three parties: every assigned DVN, the executor and the treasury.
 
 - **In native.** `OAppSender._payNative` requires `msg.value` to equal the quoted native fee; the endpoint pays the library and refunds the excess to the refund address.
 - **In the LZ token.** With `payInLzToken`, the OApp transfers the token to the endpoint before `send`. It pays only the treasury part; workers are still paid in native. The option is unavailable while `lzToken` is unset.
-- **Treasury bounds.** The treasury's native fee is capped by the code, and a treasury call that reverts or returns malformed data charges nothing (`SendLibBase._parseTreasuryResult`), so the endpoint owner cannot block sends through the treasury.
+- **Treasury bounds.** The treasury's native fee is capped by the code, and a treasury call that reverts or returns malformed data charges nothing in `SendLibBase._parseTreasuryResult`. The send library's owner, who sets the treasury with `SendLibBaseE2.setTreasury`, therefore cannot block sends through it. The cap is the larger of the other fees and `treasuryNativeFeeCap`, a value the owner can only lower.
 
 The executor's fee scales with the gas and value requested (`ExecutorFeeLib.sol`), which is why options and fees are quoted together.
 
@@ -178,16 +181,16 @@ Every setting of the security stack is set through the endpoint, by the OApp or 
 | `UlnConfig` (type 2), send and receive libraries | `setConfig(oapp, lib, params)` | the library's default config for that eid, field by field |
 | `ExecutorConfig` (type 1), send library | `setConfig(...)` | default executor and message size |
 
-When an OApp moves its receive library, the old one keeps verifying until `block.number + gracePeriod`, so packets already in flight under the old library still land. The grace period is counted in blocks.
+When an OApp moves between two pinned receive libraries with a non-zero `gracePeriod`, the old one keeps verifying until `block.number + gracePeriod`, so packets already in flight under the old library still land. The grace period is counted in blocks. `MessageLibManager.setReceiveLibrary` rejects a grace period with `LZ_OnlyNonDefaultLib` when the old or the new library is the default. An OApp leaving the default library passes 0 and then sets the old library's expiry with `setReceiveLibraryTimeout`, or packets in flight under it stop verifying.
 
-The defaults belong to the endpoint owner, the LayerZero Labs multisig. An OApp that leaves any field at 0, or any library unpinned, follows whatever the owner sets for that pathway, now and in the future. LayerZero's own [May 2026 update](https://layerzero.network/blog/an-overdue-apology) states that an application pointing at the defaults is "fully reliant on the LayerZero Labs multisig" and that the defaults are "intended to be for testing only". Its recommendations, in the same post:
+The endpoint owner sets the default libraries, and each message library's owner sets the default DVN, confirmation and executor configs. LayerZero's May 2026 update names the LayerZero Labs multisig as the party that "sets defaults for all pathways" and "sets the default DVNs". An OApp that leaves any field at 0, or any library unpinned, follows whatever these owners set for that pathway, now and in the future. LayerZero's own [May 2026 update](https://layerzero.network/blog/an-overdue-apology) states that an application pointing at the defaults is "fully reliant on the LayerZero Labs multisig" and that the defaults are "intended to be for testing only". Its recommendations, in the same post:
 
 - pin every configuration, so nothing depends on defaults controlled by LayerZero Labs;
 - set block confirmations per chain at a depth where a reorganisation is nearly impossible;
 - configure at least two DVNs, with three to five described as better;
 - consider running one's own DVN and setting it as required.
 
-The field-by-field merge is the trap in the first point. Pinning the required DVNs while leaving the optional count at 0 still imports the default optional set, which then changes when the owner changes it.
+The field-by-field merge is the trap in the first point. Pinning the required DVNs while leaving the optional count at 0 still imports the default optional set, which then changes when the library's owner changes it.
 
 ## OApp and OFT
 
@@ -197,7 +200,7 @@ The field-by-field merge is the trap in the first point. Pinning the required DV
 
 ### The Omnichain Fungible Token
 
-The OFT is an OApp that moves a token (`oft-evm/contracts/`). A send debits the sender, builds the message `to (32 bytes) ‖ amountSD (8 bytes)`, plus a compose part when one is attached, and calls `_lzSend`. The receiving side credits the recipient, or the dead address when `to` is zero, and optionally queues a compose.
+The OFT is an OApp that moves a token (`oft-evm/contracts/`). A send debits the sender, builds the message `to (32 bytes) ‖ amountSD (8 bytes)`, plus a compose part when one is attached, and calls `_lzSend`. The receiving side credits the recipient and optionally queues a compose. The `OFT` variant mints to the dead address when `to` is zero; `OFTAdapter` transfers to `to` as given.
 
 **Shared decimals.** Amounts cross chains as a `uint64` in `sharedDecimals()`, 6 by default, so that chains with different local decimals agree. The conversion rate is `10^(localDecimals − 6)`, 10^12 for an 18-decimal token. `_removeDust` rounds the amount down to a multiple of that rate before debiting, so the remainder never leaves the sender's wallet. For example, sending 1,234,567,891,234,567,891 base units of an 18-decimal token debits 1,234,567,000,000,000,000 and leaves 891,234,567,891 base units of dust with the sender. The `uint64` caps one transfer at about 1.8 × 10^13 tokens (`AmountSDOverflowed`), and `minAmountLD` is the slippage check.
 
@@ -235,11 +238,11 @@ LayerZero changed its own policy afterwards. Its [May 2026 update](https://layer
 
 LayerZero V2 keeps its core small and immutable and moves every security decision into a per-application configuration. What an integrator gets is therefore whatever that configuration says, no more.
 
-- **EndpointV2** holds nonces, payload hashes and the library registry; its owner can add libraries and set defaults but cannot change a pinned configuration.
+- **EndpointV2** holds nonces, payload hashes and the library registry; its owner can add libraries and set the default libraries but cannot change a pinned configuration.
 - **The security stack** is a receive library, a `UlnConfig` (X required DVNs, Y of N optional, block confirmations) and an executor, set per OApp and per pathway by the delegate.
 - **A message** is quoted and sent on the source, attested by DVNs, committed to the endpoint by anyone, and executed by anyone; the executor delivers but cannot forge.
 - **Nonces** allow out-of-order execution but no gaps; `skip`, `clear`, `nilify` and `burn` are the delegate's tools for stuck or unwanted messages.
-- **Defaults** belong to the endpoint owner and are merged field by field; LayerZero's own guidance is to pin everything.
+- **Defaults** come from two owners, the endpoint's for libraries and each message library's for DVN and executor configs, and are merged field by field; LayerZero's own guidance is to pin everything.
 - **The OFT** moves amounts in 6 shared decimals; its adapter variant holds all backing in one contract.
 - **The Kelp DAO incident** shows a 1-of-1 DVN stack failing through its data sources, not its code. The main risk of a LayerZero integration is its configuration: the DVN set, the delegate key and the defaults it still inherits.
 
@@ -277,7 +280,7 @@ LayerZero V2 keeps its core small and immutable and moves every security decisio
 | Invariant | Enforced by | Breaks if |
 |-----------|-------------|-----------|
 | A message executes at most once. | `_clearPayload` deletes the payload hash before calling the OApp. | The hash were deleted after the external call, opening reentrancy. |
-| No nonce is passed silently. | `_clearPayload` requires a stored hash for every nonce up to the one executed; only the delegate can `skip`. | The delegate key is compromised. |
+| No nonce is passed silently. | `_clearPayload` requires a stored hash for every nonce up to the one executed; only the OApp or its delegate can `skip`. | The delegate key is compromised. |
 | Only the receive library (or the grace library) can store a payload hash. | `isValidReceiveLibrary` in `EndpointV2.verify`. | The OApp pins a malicious library, or leaves it at a default the owner changes. |
 | A packet verifies only with all required DVNs and the optional threshold. | `ReceiveUlnBase._checkVerifiable`. | The config has a single DVN, or inherits a weak default. |
 | A path starts only from the configured peer. | `allowInitializePath` and the `OnlyPeer` check in `OAppReceiver`. | The owner sets a wrong peer. |
@@ -293,7 +296,7 @@ LayerZero V2 keeps its core small and immutable and moves every security decisio
 | `sendCompose` is callable by anyone for their own `from`. | In a composer, check `msg.sender == endpoint` and `from` equals the trusted OApp. |
 | OFT amounts lose dust below the shared-decimal precision. | Quote with `quoteOFT` and set `minAmountLD`; do not assume the full amount crosses. |
 | The owner and the delegate are different roles. | Review and secure both addresses, ideally behind a multisig and timelock. |
-| Ordering is not enforced by the endpoint. | If the application needs strict order, override `nextNonce` and use the `ORDERED_EXECUTION` option. |
+| Ordering is not enforced by the endpoint. | If the application needs strict order, override `nextNonce`, check the nonce in `_lzReceive` and request the `ORDERED_EXECUTION` option; executor ordering is off-chain behaviour (see Gaps). |
 
 ### Risks
 
@@ -325,7 +328,7 @@ LayerZero is infrastructure: the risks below fall on an application that integra
 
 #### Centralisation and governance
 
-- **Endpoint owner.** The LayerZero Labs multisig registers libraries and sets defaults. An OApp on defaults is fully reliant on it, by LayerZero's own statement.
+- **Endpoint and library owners.** The endpoint owner registers libraries and sets the default libraries; each message library's owner sets the default DVN, confirmation and executor configs and the treasury. LayerZero names the LayerZero Labs multisig as the party that sets these defaults, and an OApp on defaults is fully reliant on it, by LayerZero's own statement.
 - **OApp owner and delegate.** They set peers, DVNs and libraries, and can `skip`, `clear`, `nilify` or `burn` messages. The deployed owner and delegate of a given OApp were not read on chain for this article.
 
 #### Loss sharing
@@ -341,7 +344,7 @@ LayerZero is infrastructure: the risks below fall on an application that integra
 | Risk | Where it comes from | What the design does about it | What remains |
 |---|---|---|---|
 | Forged message | DVN compromise, including its RPC sources | X-of-Y-of-N threshold chosen per OApp | Nothing enforces more than one DVN |
-| Silent reliance on defaults | Unset config fields | Field-by-field defaults set by the endpoint owner | The owner can change them for any OApp on defaults |
+| Silent reliance on defaults | Unset config fields | Field-by-field defaults set by the endpoint owner (libraries) and the library owners (configs) | These owners can change them for any OApp on defaults |
 | Delegate misuse | Delegate key | Only the OApp or its delegate can configure or recover | A compromised delegate can swap the DVN set |
 | Adapter drain | Lock-and-unlock with all backing in one contract | Optional rate limiter | Not part of the default OFT |
 | Liveness | Executor, mismatched configs, gaps | Permissionless delivery and retries | A misconfiguration blocks the pathway |
@@ -350,11 +353,13 @@ LayerZero is infrastructure: the risks below fall on an application that integra
 
 **Q: What can the owner of EndpointV2 change, and what can it not?**
 
-It can register new message libraries (append-only), set the default libraries and configurations for each pathway, set the LZ token and recover tokens sent to the endpoint by mistake. It cannot modify or remove a registered library, and it cannot change a library or configuration that an OApp has pinned. An OApp that relies on defaults, however, follows every change the owner makes to them.
+It can register new message libraries (append-only), set the default send and receive libraries and the default receive-library timeout for each pathway, set the LZ token and recover tokens sent to the endpoint by mistake.
+
+The default DVN, confirmation and executor configurations are not set on the endpoint: each message library's owner sets them with `UlnBase.setDefaultUlnConfigs` and `SendLibBase.setDefaultExecutorConfigs`. Neither owner can modify or remove a registered library, or change a library or configuration that an OApp has pinned. An OApp that relies on defaults, however, follows every change these owners make to them.
 
 **Q: What does "X of Y of N" mean in a DVN configuration?**
 
-X is the number of required DVNs, all of which must attest. N is the set of optional DVNs and Y the threshold among them. A packet verifies when all X required DVNs and at least Y of the N optional DVNs have attested with enough block confirmations. Kelp DAO's rsETH pathway was effectively 1 of 0 of 0: one required DVN and no optional set.
+X is the number of required DVNs, all of which must attest. N is the set of optional DVNs and Y the threshold among them. A packet verifies when all X required DVNs and at least Y of the N optional DVNs have attested with enough block confirmations. Kelp DAO's rsETH pathway was a 1-of-1 stack: a single DVN, listed either as required or as a 1-of-1 optional set. The incident sources do not say which.
 
 **Q: Why can the executor delay a message but not forge one?**
 
@@ -362,7 +367,9 @@ The executor only calls `lzReceive` with a message. The endpoint hashes `guid �
 
 **Q: A forged packet has been verified on the destination but not executed. What can the application do?**
 
-Its OApp or delegate can call `clear` to consume the payload without calling the OApp, `nilify` to replace the hash with a value that cannot execute until verified again, or `burn` once the nonce is at or below the lazy nonce. `skip` does not apply, since it only passes the next *unverified* nonce. All of these depend on noticing the packet before someone calls `lzReceive`, which is permissionless.
+Its OApp or delegate can call `clear` to consume the payload without calling the OApp, `nilify` to replace the hash with a value that cannot execute until verified again, or `burn` once the nonce is at or below the lazy nonce. `skip` does not apply, since it only passes the next *unverified* nonce.
+
+After `nilify`, the same DVNs can re-verify the forged hash, so the DVN config must be changed as well. All of these depend on noticing the packet before someone calls `lzReceive`, which is permissionless.
 
 **Q: Why does an OFT transfer sometimes deliver slightly less than the amount entered?**
 
@@ -387,7 +394,7 @@ The protocol description comes from the pinned EVM sources and the incident post
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| Deployed addresses, eids, current default DVN sets and confirmations per pathway were not read on chain. | The defaults section describes the mechanism, not today's values. | `getConfig` on each endpoint for the pathways of interest, and LayerZero Scan (not opened for this article, so not linked). |
+| Deployed addresses, eids, current default DVN sets and confirmations per pathway were not read on chain, nor the owners of the deployed endpoint, `SendUln302` and `ReceiveUln302`. | The defaults section describes the mechanism, not today's values or whether the endpoint and library owners are the same multisig. | `getConfig` on each endpoint for the pathways of interest, `owner()` on the endpoint and on each library, and LayerZero Scan (not opened for this article, so not linked). |
 | The owner and delegate of specific OApps, such as Kelp's rsETH adapter, were not read with `cast call`. | The centralisation risk of a given token depends on who holds those roles. | `owner()` and the endpoint's `delegates(oapp)` on the deployed contracts. |
 | The executor's ordered-execution behaviour and the DVN off-chain client are not in the repositories. | The claim that ordering is enforced by the executor rests on `nextNonce` and the option constant only. | The "Message Ordering" page of the LayerZero documentation (URL not checked). |
 | The post-incident policy (no 1/1 for the LayerZero Labs DVN, 5/5 or 3/3 defaults) is off-chain and dated May to July 2026. | It can change without any code change. | [Ongoing Security Updates 7/10](https://layerzero.network/blog/ongoing-security-updates-july-10) and later posts on the LayerZero blog. |

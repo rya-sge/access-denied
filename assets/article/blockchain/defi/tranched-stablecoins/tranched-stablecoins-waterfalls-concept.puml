@@ -15,7 +15,7 @@ rectangle "Liquity" as LQ {
 rectangle "infiniFi" as IF {
   rectangle "0. Safety buffer, only if it covers the whole loss" as I0
   rectangle "1. liUSD lockers and unwinding" as I1
-  rectangle "2. siUSD rewards, then principal" as I2
+  rectangle "2. siUSD principal" as I2
   rectangle "3. iUSD price, every holder" as I3
 }
 rectangle "f(x) Protocol" as FX {

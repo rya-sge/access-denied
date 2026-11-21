@@ -2,6 +2,7 @@
 layout: post
 title: "How Ethereum Finalises Blocks: LMD GHOST and Casper FFG"
 date:   2026-11-04
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -136,7 +137,7 @@ def get_head(store: Store) -> ForkChoiceNode:
 
 Two things differ from a textbook GHOST. The walk starts at the justified root rather than at genesis, and it visits only nodes that passed `filter_node_tree`.
 
-`get_weight` adds two terms. `get_attestation_score` sums the effective balances, in the justified checkpoint's state, of active unslashed validators whose latest vote descends from the node and who are not in `equivocating_indices`. `get_proposer_score` adds the boost if the node is an ancestor of `store.proposer_boost_root`.
+`get_weight` adds two terms. `get_attestation_score` sums the effective balances, in the justified checkpoint's state, of active unslashed validators whose latest vote descends from the node and who are not in `equivocating_indices`. The second is the boost: if the node is an ancestor of `store.proposer_boost_root`, `get_weight` adds `get_proposer_score`, which computes the boost from the justified checkpoint's state.
 
 The book shows these as one function on a block root. At the pinned commit they are split, and the arguments are `ForkChoiceNode` objects. That abstraction exists because Gloas adds a payload status to each node.
 
@@ -152,12 +153,14 @@ According to the book, the first implementation in November 2021 used 70, then 3
 
 ### Honest reorgs of late blocks
 
-A second use of the boost is defensive. `get_proposer_head` lets an honest proposer build on the parent of a late, weak block rather than on the block itself. The helpers are marked optional in the spec. The main conditions are:
+A second use of the boost is defensive. `get_proposer_head` lets an honest proposer build on the parent of a late, weak block rather than on the block itself. The helpers are marked optional in the spec. The main path reorgs when all of these hold:
 
 - `is_head_late`: the block missed the attestation deadline;
 - `is_head_weak`: its weight is below `REORG_HEAD_WEIGHT_THRESHOLD` = 20 % of a committee;
 - `is_parent_strong`: the parent has more than `REORG_PARENT_WEIGHT_THRESHOLD` = 160 % of a committee;
 - `is_ffg_competitive`, `is_finalization_ok` (at most `REORG_MAX_EPOCHS_SINCE_FINALIZATION` = 2 epochs since finality), `is_proposing_on_time` and a single-slot reorg.
+
+A second path skips most of these checks. If `is_proposer_equivocation` reports that the head block's proposer produced two blocks for its slot, `is_head_weak` and proposing in the slot right after the head's slot are enough.
 
 Fulu removed the `shuffling_stable` condition, because the proposer lookahead fixes proposers before the epoch boundary, so this reorg is now allowed at epoch boundaries. The book describes the behaviour as a Lighthouse feature that might be adopted; at the pin it is in the spec, as an optional helper.
 
@@ -292,7 +295,7 @@ The book quotes a longer `correct_justified` built on `is_previous_epoch_justifi
 
 ### Unrealised justification
 
-Block states update justification only at the epoch boundary, while the votes that cause it accumulate through the epoch. Before Capella, this gap was exploitable. The filter compared a tip's post-state with the store. As a result a block in the first slot of a new epoch, which has crossed the boundary, could pass while the previous head, with the same votes behind it, could not.
+Block states update justification only at the epoch boundary, while the votes that cause it accumulate through the epoch. Before the fix, this gap was exploitable. According to the book, clients shipped the fix quietly before Capella and the spec text changed at Capella. The old filter compared a tip's post-state with the store. As a result a block in the first slot of a new epoch, which has crossed the boundary, could pass while the previous head, with the same votes behind it, could not.
 
 The [unrealised justification reorg](https://notes.ethereum.org/@adiasg/unrealized-justification) used this to remove the last blocks of an epoch, and the [justification withholding attack](https://hackmd.io/o9tGPQL2Q4iH3Mg7Mma9wQ) used a similar path. [PR 3290](https://github.com/ethereum/consensus-specs/pull/3290) answered with the mechanism below.
 
@@ -354,7 +357,7 @@ Justification reads effective balances, so they decide when the leak ends. They 
 
 The code is in [`verification/ethereum-finality-lmd-ghost-casper-ffg`](https://github.com/rya-sge/access-denied/tree/main/verification/ethereum-finality-lmd-ghost-casper-ffg). `extract_spec.py` copies 92 definitions verbatim from the pinned Markdown, taking for each one the newest fork up to Fulu that defines it, and `sim.py` executes them with `exec`. So `get_head`, `on_block`, `on_attestation`, `filter_node_tree`, `weigh_justification_and_finalization` and the inactivity functions are the spec's own code and were not re-implemented.
 
-**It is a model.** SSZ, BLS, shuffling, blob availability, deposits, exits and proposer rewards are stubbed or absent, and scenarios use 64 validators of 32 ETH with `SLOTS_PER_EPOCH` = 8, the value of the spec's minimal preset. A committee is the 8 validators with a given index modulo 8, and every slot has a block unless stated. Other constants are the mainnet values. The output quoted below comes from a run of that code and is stored next to it as `run_output.txt`.
+**It is a model.** SSZ, BLS, shuffling, blob availability, deposits, exits and proposer rewards are stubbed or absent, and scenarios A to G use 64 validators of 32 ETH (the leak run uses 300 and 30) with `SLOTS_PER_EPOCH` = 8, the value of the spec's minimal preset. A committee is the 8 validators with a given index modulo 8, and every slot has a block unless stated. Other constants are the mainnet values. The output quoted below comes from a run of that code and is stored next to it as `run_output.txt`.
 
 `cross_check.py` replays cases from the spec's own test suite: the four finalisation rules with sufficient and insufficient support, three `test_get_head.py` scenarios and `test_ex_ante_vanilla`. All 21 checks pass. The pyspec harness itself was not run, because it needs dependencies this environment does not have, so these are restatements of the tests against the verbatim functions.
 
@@ -479,7 +482,7 @@ This run is state-only: it calls the verbatim epoch functions on a state and set
 
 The first row can be checked by hand. Losing 0.25 ETH from 32 ETH at the leak's rate takes $$t \approx 512$$ epochs, since $$32 \cdot t^2 / (2 \cdot 2^{24}) = 0.25$$ gives $$t^2 = 2^{18}$$. The run adds the epochs before the leak starts and those needed to justify and finalise. That is about 2.3 days for a failure just beyond one third, as an upper bound, because attestation penalties shorten it.
 
-The third row is the extreme where half the stake is gone: 4,690 epochs is about 20.8 days. The book's own simulation of an offline validator, included in `sim.py` and re-run, gives 4,686 epochs, which agrees once the epochs before the leak are counted.
+The third row is the extreme where half the stake is gone: 4,690 epochs is about 20.8 days. The book's own simulation of an offline validator, included in `sim.py` and re-run, gives 4,686 epochs. It measures something else: the time from the start of the leak until the validator is ejected at an effective balance of 16 ETH. Here finality returns when the offline validators reach that same effective balance, so the two figures agree once the four epochs between the failure and the leak are counted.
 
 The second row should not be read as a mainnet estimate. Base rewards scale with the inverse square root of total balance, so a 300-validator set has far larger attestation penalties than mainnet. On mainnet the result should lie between the first two rows. That last statement is a reasoned expectation, not a measurement. The runs also exclude churn: at 16 ETH a validator is ejected, and the third row does not model the exit queue.
 
@@ -520,7 +523,7 @@ The finality gadget does not change. `process_justification_and_finalization`, `
 - **Weight.** `get_weight` returns 0 for an empty or full variant of a block from the previous slot, so `get_payload_status_tiebreaker` decides, not votes.
 - **Boost.** `should_apply_proposer_boost` withholds the boost when the parent is weak, from the previous slot, and its proposer equivocated early.
 - **Head.** `get_head` returns the justified root's `EMPTY` node if the filter leaves nothing viable.
-- **Timing.** `get_attestation_due_ms` uses `ATTESTATION_DUE_BPS_GLOAS` = 2500, so 3,000 ms. `PAYLOAD_DUE_BPS` is 5000 and `PAYLOAD_ATTESTATION_DUE_BPS` is 7500, for a payload timeliness committee of `PTC_SIZE` = 512 with a threshold of 256.
+- **Timing.** `get_attestation_due_ms` uses `ATTESTATION_DUE_BPS_GLOAS` = 2500, so 3,000 ms. `PAYLOAD_DUE_BPS` is 5000 and `PAYLOAD_ATTESTATION_DUE_BPS` is 7500, for a payload timeliness committee of `PTC_SIZE` = 512 which needs more than 256 of 512 votes (`PAYLOAD_TIMELY_THRESHOLD` = 256).
 - **What the head flag requires.** `get_attestation_participation_flag_indices` makes `TIMELY_HEAD` depend on matching payload availability.
 - **Finalised hash.** `notify_forkchoice_updated` must pass `finalized_block_bid.parent_block_hash` as the finalised hash, and the safe hash follows the same logic, so a finalised beacon block now vouches for its parent's payload.
 
@@ -530,7 +533,7 @@ The finality gadget does not change. `process_justification_and_finalization`, `
 
 The rule is a separate algorithm that a node runs over its `Store`, with no change to consensus. Under a synchrony assumption stated in the spec, that honest attestations are received by the end of their slot, it decides whether a block will stay canonical. The [paper](https://arxiv.org/abs/2405.00549) gives a best case of one 12-second slot. The spec warns that if the assumption fails, "confirmed blocks can be reorged without any adversarial behavior and without slashing".
 
-`is_one_confirmed` tests LMD support against `compute_safety_threshold`. At the pin, the threshold is half of the sum of the committee weight since the block's parent and the proposer score, less a discount, plus an adversarial term. It assumes `CONFIRMATION_BYZANTINE_THRESHOLD` = 25 %, a config whose maximum value is also 25. On the FFG side `will_current_target_be_justified` and `will_no_conflicting_checkpoint_be_justified` check that the confirmed block will not be reverted through the justification rules.
+`is_one_confirmed` tests LMD support against `compute_safety_threshold`. At the pin, the threshold is $$(W + P - D) / 2 + A$$. Here $$W$$ is the committee weight since the block's parent, $$P$$ the proposer score, $$D$$ a discount and $$A$$ an adversarial term. It assumes `CONFIRMATION_BYZANTINE_THRESHOLD` = 25 %, a config whose maximum value is also 25. On the FFG side `will_current_target_be_justified` and `will_no_conflicting_checkpoint_be_justified` check that the confirmed block will not be reverted through the justification rules.
 
 The Bellatrix document says `safe_block_hash` "MUST be set to return value of `get_safe_execution_block_hash(fcr_store)`", and Beacon API has a `fast_confirmation` event. Several client repositories show work on the rule (Lighthouse, Prysm, Lodestar and Nimbus), but I did not establish which releases enable it by default on mainnet.
 
@@ -674,7 +677,7 @@ These points were not settled by the sources or were not checked.
 
 ### Analyzed source
 
-- [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs) — analyzed at commit [`065bcd5c6ad96186cd2c0ac1c435f620a0b25373`](https://github.com/ethereum/consensus-specs/tree/065bcd5c6ad96186cd2c0ac1c435f620a0b25373), 2026-11-04 (after v1.7.0-beta.4, not a release)
+- [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs) — analyzed at commit [`065bcd5c6ad96186cd2c0ac1c435f620a0b25373`](https://github.com/ethereum/consensus-specs/tree/065bcd5c6ad96186cd2c0ac1c435f620a0b25373), commit dated 2026-10-23, read 2026-11-04 (after v1.7.0-beta.4, not a release)
 - [ethereum/EIPs](https://github.com/ethereum/EIPs) — analyzed at commit [`41a838decba33325d01bd99b1cd6072c51214fac`](https://github.com/ethereum/EIPs/tree/41a838decba33325d01bd99b1cd6072c51214fac), 2026-11-04; statuses re-read from upstream `master` the same day
 - [benjaminion/upgrading-ethereum-book](https://github.com/benjaminion/upgrading-ethereum-book) — analyzed at commit [`e013f03c85a050f4fec6a3fa352672ddbdb197ce`](https://github.com/benjaminion/upgrading-ethereum-book/tree/e013f03c85a050f4fec6a3fa352672ddbdb197ce), 2026-11-04 (Capella edition)
 - [ethereum/beacon-APIs](https://github.com/ethereum/beacon-APIs) — analyzed at commit [`79b9b05e354da4f80d8f18879871af6f0068108d`](https://github.com/ethereum/beacon-APIs/tree/79b9b05e354da4f80d8f18879871af6f0068108d), 2026-11-04

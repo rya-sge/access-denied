@@ -2,7 +2,7 @@
 
 Scripts that produce every number quoted in
 `_posts/2026-11-18-portfolio-optimization-concepts-markowitz-black-litterman.md`.
-All inputs are small toy examples (two to ten assets, simulated or hand-written returns), except
+All inputs are toy examples (two to ten assets with hand-written inputs, 30 to 100 simulated assets in the covariance simulations), except
 the Black-Litterman re-run on the PyPortfolioOpt sample prices.
 
 ## What is tested

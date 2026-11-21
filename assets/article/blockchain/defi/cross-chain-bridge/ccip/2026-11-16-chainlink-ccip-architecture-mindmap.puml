@@ -18,7 +18,7 @@ mindmapDiagram {
 *** FeeQuoter: prices, gas caps
 *** RMN: curse switch
 *** TokenAdminRegistry: token -> pool
-** v1.5 - v1.6
+** v1.6 (v1.5: per-lane ramps + CommitStore)
 *** Role DON, two OCR plugins
 *** Commit: merkle roots on OffRamp
 *** Execute: merkle proofs

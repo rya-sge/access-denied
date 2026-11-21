@@ -1,0 +1,38 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* EIP-7251\nMaxEB 2,048 ETH
+** 0x02 compounding credential
+*** Cap 2,048 ETH, floor 32 ETH
+*** Rewards raise the effective balance
+*** No sweep below 2,048 ETH
+** Consolidation request contract
+*** 0x0000BBdD...7251
+*** 96 bytes: source + target pubkey
+*** Fee: fake_exponential(1, excess, 17)
+*** Target 1, max 2 per block
+** Consensus-layer processing
+*** source == target: switch to 0x02
+*** Source authenticated, target must be 0x02
+*** Source exits, balance moves to target
+*** Queue limit 262,144
+** Churn by balance
+*** Activations, exits: 256 ETH/epoch each
+*** Consolidation: the surplus
+*** Pending deposits for top-ups
+** Partial withdrawals (EIP-7002)
+*** 0x02 only, down to 32 ETH
+** Slashing
+*** Initial penalty 1/4,096
+*** Correlation penalty unchanged
+@endmindmap

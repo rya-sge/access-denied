@@ -2,6 +2,7 @@
 layout: post
 title: "What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs"
 date:   2026-11-04
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -85,7 +86,7 @@ A disassembler does not know where the code ends. `cast disassemble` prints the 
 
 ### Reading the length suffix
 
-The [metadata documentation](https://docs.soliditylang.org/en/latest/metadata.html) gives the parsing rule: the last two bytes are the big-endian length of the CBOR data, and the data should be read with a real decoder. It warns against relying on a `0xa264` or `0xa2 0x64 'i' 'p' 'f' 's'` prefix, because the map can hold other keys. Four builds of `Counter` show why:
+The [metadata documentation](https://docs.soliditylang.org/en/latest/metadata.html) gives the parsing rule: the last two bytes hold the length of the CBOR data, and the data should be read with a real decoder. The documentation does not name the byte order; the builds below store it big-endian (`0033` is 51). It warns against relying on a `0xa264` or `0xa2 0x64 'i' 'p' 'f' 's'` prefix, because the map can hold other keys. Four builds of `Counter` show why:
 
 | Flag | Map starts with | Keys | CBOR length | Suffix | Runtime bytes |
 |------|-----------------|------|-------------|--------|---------------|
@@ -228,8 +229,8 @@ on-chain  0000beef8156
 
 Sourcify's [Exact Match vs Match](https://docs.sourcify.dev/docs/exact-match-vs-match/) page defines the two levels:
 
-- **Exact match**, also called perfect match. The on-chain code is byte-for-byte the recompiled output, "excluding libraries and immutables", and the metadata hashes agree. The page states that this guarantees the source file contents are exactly the same.
-- **Match**, also called partial match. The bytes agree "except the metadata hash". The page says this allows "differences in source code comments, variable names, or other metadata fields such as source paths".
+- **Exact match**, formerly called perfect match. The on-chain code is byte-for-byte the recompiled output, "excluding libraries and immutables", and the metadata hashes agree. The page states that this guarantees the source file contents are exactly the same.
+- **Match**, formerly called partial match. The bytes agree "except the metadata hash". The page says this allows "differences in source code comments, variable names, or other metadata fields such as source paths".
 
 The `Counter` experiment above is that second case: the original and the NatSpec variant have equal code and different digests, so one would be a match for the other and not an exact match. The practical reading (*derived*) is that a match proves the logic and says nothing about the comments or NatSpec that sit beside it, so a reader of partially matched source should treat those comments as unverified. Sourcify's page does not discuss contracts built with no metadata hash, and this article did not test how a verifier classifies one; explorers other than Sourcify use their own terms, which `## Gaps` records.
 
@@ -285,7 +286,7 @@ contract Parent {
 }
 ```
 
-Its 412-byte creation code holds two trailers, at offsets 208 and 359. The one at 359, which the length suffix points to, is `Child`'s. `Parent`'s own trailer is the one at 208, inside the embedded runtime. This held under both pipelines, so reading the end of such creation code gives the child's hash, and stripping it removes the wrong trailer.
+Built with legacy `--optimize`, its 412-byte creation code holds two trailers, at offsets 208 and 359. The one at 359, which the length suffix points to, is `Child`'s. `Parent`'s own trailer is the one at 208, inside the embedded runtime. The same layout held under `--via-ir --optimize` (415 bytes, trailers at 219 and 362), so reading the end of such creation code gives the child's hash, and stripping it removes the wrong trailer.
 
 ### The reliable method: `--metadata-hash none`
 
@@ -330,14 +331,14 @@ The same hash method has two spellings, and each interface rejects the other's:
 
 The versions compared are 0.8.33, 0.8.34, 0.8.36 and 0.8.38. A difference across compilers proves nothing alone, since any release can change the output, as the last row shows for a contract this small. Identical bytes are the conclusive result. For a compiler older than 0.8.18, the option does not exist, so the version bytes would have to be masked at each trailer (*derived, not run*).
 
-In Foundry the same controls are `bytecode_hash` and `cbor_metadata`. On forge 1.5.0 the `Counter` runtime was 197 bytes by default, 156 with `bytecode_hash = "none"`, and 143 with `cbor_metadata = false` added.
+In Foundry the same controls are `bytecode_hash` and `cbor_metadata`. On forge 1.5.0 with `optimizer = true`, the `Counter` runtime was 197 bytes, 156 with `bytecode_hash = "none"`, and 143 with `cbor_metadata = false` added. forge's default is `optimizer = false`, which gives 303, 262 and 249 bytes.
 
 | Task | Method |
 |------|--------|
 | Same compiler, did the logic change? | Rebuild both with `--metadata-hash none` or `bytecode_hash = "none"` |
 | Different compilers, is the code equal? | Rebuild both with `--no-cbor-metadata` or `cbor_metadata = false` |
 | Deployed code against a reviewed commit | Rebuild with the recorded settings, mask immutables and libraries, compare, then read the trailer for an exact or partial result |
-| Single contract, no rebuild possible, no `new` | Read the length suffix and strip the tail, runtime code only |
+| Single contract, no rebuild possible, no `new` | Read the length suffix and strip the tail, runtime code only; mask immutables and libraries first when the code comes from the chain |
 
 ## Does a known compiler bug affect this contract?
 
@@ -577,8 +578,8 @@ Deployed Solidity bytecode is executable code plus a data trailer, and each of t
 | **Normalised settings** | The effective settings as metadata records them, which can differ from the input text. |
 | **CID v0** | An IPFS identifier: `0x1220` plus the SHA-256 of a dag-pb node wrapping the file. |
 | **`bzzr1`** | The CBOR key of the Swarm hash; the CLI selects it as `swarm`. |
-| **Exact match** | Sourcify's level where code and metadata hash agree, excluding libraries and immutables; also called perfect match. |
-| **Match** | Sourcify's level where code agrees except for the metadata hash; also called partial match. |
+| **Exact match** | Sourcify's level where code and metadata hash agree, excluding libraries and immutables; formerly called perfect match. |
+| **Match** | Sourcify's level where code agrees except for the metadata hash; formerly called partial match. |
 | **Immutable reference** | A byte range in runtime code that the constructor fills, reported by `immutableReferences`. |
 | **`bugs.json`** | The Solidity repository's array of known security-relevant compiler bugs. |
 | **`bugs_by_version.json`** | The map from each compiler version to bug names, built from version ranges alone. |
@@ -670,7 +671,6 @@ These points were not settled by the sources or the runs.
 | `bzzr0` trailers were not decoded, because the oldest local compiler, 0.5.17, is after 0.5.11. | Older verified contracts carry them. | Compile with a release before 0.5.11. |
 | Explorer terms other than Sourcify's were not read. | "Partial match" can mean something else on another service. | Read Etherscan's verification documentation. |
 | How a verifier classifies a contract built with no hash was not tested. | Such a contract has no hash to agree on. | Submit one to Sourcify and read the result. |
-| The advisory says "compilation unit" where `bugs.json` says "same piece of bytecode". | The wording changes the scope. | The runs here support `bugs.json`: `SplitCode` was not affected, but no contract with both clears in unrelated contracts was run. |
 | Selector order as the cause of "which location wins" is an inference from four contracts and `IRGenerator.cpp`. | The body marks it as derived. | Read `IRGenerationContext` and its function queue. |
 | `--optimize --no-optimize-yul` was not run on 0.8.21, 0.8.31, 0.8.32 or 0.8.35, which were not available locally, or on 0.8.39. | The observed range rests on 13 binaries. | Run those releases, and search the `argotorg/solidity` issues. |
 | Comments and paths were shown not to change code on small contracts with one file. | A large project with imports or via-IR could behave differently. | Run the same experiment on a project's test suite. |
@@ -681,7 +681,7 @@ These points were not settled by the sources or the runs.
 
 ### Analyzed source
 
-- [argotorg/solidity](https://github.com/argotorg/solidity) — analyzed at commit [`3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6`](https://github.com/argotorg/solidity/tree/3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6), 2026-11-04. This commit is 11 commits after [v0.8.38](https://github.com/argotorg/solidity/releases/tag/v0.8.38). Files read: `docs/metadata.rst`, `docs/bugs.rst`, `docs/bugs.json`, `docs/bugs_by_version.json`, `Changelog.md`, `libsolidity/interface/CompilerStack.cpp`, `libsolidity/codegen/ir/IRGenerator.cpp`.
+- [argotorg/solidity](https://github.com/argotorg/solidity) — analyzed at commit [`3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6`](https://github.com/argotorg/solidity/tree/3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6) (committed 2026-10-22), read on 2026-11-04. This commit is 11 commits after [v0.8.38](https://github.com/argotorg/solidity/releases/tag/v0.8.38). Files read: `docs/metadata.rst`, `docs/bugs.rst`, `docs/bugs.json`, `docs/bugs_by_version.json`, `Changelog.md`, `libsolidity/interface/CompilerStack.cpp`, `libsolidity/codegen/ir/IRGenerator.cpp`.
 
 ### Solidity documentation
 

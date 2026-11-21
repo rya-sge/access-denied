@@ -2,6 +2,7 @@
 layout: post
 title: "Inside the GitHub Advisory Database: What the Data Says and What It Does Not"
 date:   2026-11-05
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: security
@@ -57,7 +58,7 @@ The difference between the two trees decides what the data can be used for.
 
 GitHub's documentation describes reviewed advisories as mapped to packages in supported ecosystems, and unreviewed ones as published automatically. The counts show how complete that split is: an unreviewed advisory is essentially a CVE with no package attached, so it cannot be matched to a dependency.
 
-One category is missing from both trees. The documentation also describes malware advisories, for malicious packages, but the word `malware` does not appear as a field value in any file of this snapshot. A project cannot use this repository to look for them.
+Malicious packages are only partly covered. The documentation also describes malware advisories, but the word `malware` does not appear as a field value in any file of this snapshot, so the advisories GitHub lists as `type:malware` are not exported as a separate type. Some malicious packages are still in the reviewed tree. An additional check run on 2026-11-18 at the same commit found 423 live reviewed advisories with [CWE-506](https://cwe.mitre.org/data/definitions/506.html) (embedded malicious code), 328 of them published in 2020 and 27 in 2026. The repository is a partial source for malicious packages, and CWE-506 is the way to find what it holds.
 
 ## Anatomy of an advisory
 
@@ -130,7 +131,7 @@ GHSA-xxjr-mmjv-4gpg  MODERATE  introduced=4.0.0   fixed=4.17.23
 GHSA-f23m-r3pf-42rh  MODERATE  introduced=4.17.23 fixed=4.18.1
 ```
 
-Version 4.17.23 closes the first and is the start of the second. Choosing the lowest fix for one advisory is correct only if every advisory on that package is then checked again. This is what Dependabot's filter does, since it tests each candidate against all of them.
+Version 4.17.23 closes the first and is the start of the second. Choosing the lowest fix for one advisory is correct only if every advisory on that package is then checked again. Dependabot does this: as described in [How GitHub Dependabot Works]({{site.url_complet}}/2026/11/05/how-github-dependabot-works/), its `filter_vulnerable_versions` step tests each candidate version against every advisory on the package.
 
 ## Two clocks: published and reviewed
 
@@ -165,12 +166,18 @@ Separating advisories by origin explains most of it. A reference of the form `gi
 |--------------|-----|--------------------------------|------------|
 | 2025, full year | 3,569 | 1,945 (54.5%) | 1,624 |
 | 2026, to 4 November | 11,618 | 9,880 (85.0%) | 1,738 |
+| 2025, January to June | 1,639 | 866 (52.8%) | 773 |
+| 2026, January to June | 7,487 | 5,942 (79.4%) | 1,545 |
 
-Almost all of the increase is in the linked column. Advisories arriving by other routes barely changed, even though 2026 is not complete. The number of distinct repositories publishing also rose, from 878 to 1,986. So this is not one project: the largest, `openclaw/openclaw`, has 598 advisories, or 5.1% of the year.
+Most of the increase is in the linked column, but the not-linked figure for 2026 is a snapshot. The January to June rows and the figures below come from an additional check run on 2026-11-18 at the same commit. Not-linked advisories wait longer for review, and a reviewed file keeps its original `published` date. For those published in 2026, the median time from publication to review is 7 days and the 90th percentile 65 days, against 0 days for linked advisories and for both groups in 2025.
+
+Only 193 not-linked advisories are dated July to October 2026, against 618 for the same months of 2025, while the unreviewed tree grew from 4,325 files dated January 2026 to 17,744 dated October. Many recent not-linked advisories are probably still waiting for review, so 1,738 is a lower bound and the 85.0% share is likely to fall. Over January to June, where the backlog matters less, linked advisories rose 6.9 times, from 866 to 5,942, and not-linked ones doubled, from 773 to 1,545. The other routes grew too, but much less.
+
+The number of distinct repositories publishing also rose, from 878 to 1,986. So this is not one project: the largest, `openclaw/openclaw`, has 598 advisories, or 5.1% of the year.
 
 These other measures moved in the same period:
 
-- **Less NVD involvement:** 34.8% of 2026 advisories have no NVD date, against 12.6% in 2025.
+- **Fewer NVD dates so far:** 34.8% of 2026 advisories have no NVD date yet, against 12.6% in 2025. The field can be filled in later, and the missing dates are concentrated from June 2026 onwards, so part of the gap may be NVD processing lag rather than less NVD involvement.
 - **A higher share of severe labels:** `HIGH` and `CRITICAL` together went from 41.0% to 50.3%.
 - **A different weakness mix:** [server-side request forgery](https://cwe.mitre.org/data/definitions/918.html) and [missing authorization](https://cwe.mitre.org/data/definitions/862.html) entered the top six for 2026, where 2025 had [CWE-502](https://cwe.mitre.org/data/definitions/502.html) and [CWE-770](https://cwe.mitre.org/data/definitions/770.html).
 
@@ -180,7 +187,7 @@ The data establishes where the rise happened, not why. More maintainers using Gi
 
 A withdrawn advisory stays in the tree with a `withdrawn` timestamp. Of the 1,256 reviewed ones, 955 (76.0%) have a summary that begins with "Duplicate Advisory". Another reason seen in the sample is scope: `GHSA-q2hg-643c-gw8h` was withdrawn because it only affected example code, not an Apache Airflow release.
 
-Withdrawals are concentrated in the recent past, with 735 (58.5%) in 2026. They are also a reminder that the database is edited after the fact: a count taken today can differ from one taken on the same date range last year. Any aggregate should state whether withdrawn records are excluded. Here they are, except where the text says otherwise.
+Withdrawals are concentrated in the recent past, with 735 (58.5%) in 2026. They are also a reminder that the database is edited after the fact: a count taken today can differ from one taken on the same date range last year. Any aggregate should state whether withdrawn records are excluded. In this article they are excluded, except in the file counts of the first table and where the text says otherwise.
 
 ## What severity and CWE can tell you
 
@@ -243,7 +250,7 @@ The GitHub Advisory Database is a curated record of reported vulnerabilities, an
 - **A range is a list of events.** 13.5% of live advisories have no `fixed` event, and a fix can open another advisory.
 - **Names and dates are part of the meaning.** Go major versions are separate packages, and `published` is not the date a vulnerability appeared.
 - **The 2022 spike is a dating effect.** 95.8% of May 2022 advisories have older CVE identifiers, and most were reviewed later.
-- **The 2026 rise is concentrated in repository advisories.** The share linked to one went from 54.5% to 85.0%, across 1,986 repositories. The data does not show the cause.
+- **The 2026 rise is concentrated in repository advisories.** The share linked to one went from 54.5% to 85.0%, across 1,986 repositories, a share inflated by not-linked advisories still awaiting review. The data does not show the cause.
 - **Counts measure reporting.** Without a denominator, they do not rank ecosystems or years by security.
 
 ![Mindmap of the GitHub Advisory Database covering its sources, advisory anatomy, version ranges, dating effects, the 2026 rise, and limits of counts]({{site.url_complet}}/assets/article/outil-securite/dependabot/2026-11-05-github-advisory-database-mindmap.png)
@@ -300,11 +307,11 @@ May 2022 holds 4,968 advisories by published date, but 95.8% of them have CVE id
 
 **Q: Does the 2026 rise mean that open-source software became less secure?**
 
-No such conclusion follows. The rise is concentrated in advisories linked to repository security advisories, which moved from 54.5% to 85.0% of the total, while the others stayed near 1,700. That shows a change in reporting through one channel. The cause is not visible in this data, and there is no denominator such as the amount of code or the number of researchers.
+No such conclusion follows. The rise is concentrated in advisories linked to repository security advisories, which moved from 54.5% to 85.0% of the total. The others grew much less, and their 2026 count is incomplete while recent ones await review. That shows a change in reporting through one channel, with a cause this data does not show, and there is no denominator such as the amount of code or the number of researchers.
 
 **Q: A version is not in any listed range. Is it safe?**
 
-No. It means no advisory lists it at that date. There could be an unreviewed advisory with no package data, a vulnerability never reported, or a range still to be corrected. If the version is past a `last_known_affected_version_range` bound but still in the range, its status is also unclear.
+No. It means no advisory lists it at that date. There could be an unreviewed advisory with no package data, a vulnerability never reported, or a range still to be corrected. If the version is past a `last_known_affected_version_range` bound but still in the range, its status may also be unclear, if the reading of that field given above is right.
 
 **Q: A team compares ecosystems by counting advisories and finds npm first. Combining the points above, what is wrong with the conclusion?**
 
@@ -328,7 +335,8 @@ The points below remain open after this analysis.
 | The repository-advisory link is a proxy based on reference URLs. | Some advisories may have the link without having originated there, or the reverse. | A sample compared against repository advisory pages. |
 | The May 2022 event is inferred to be a bulk import. | The data fits, but no source was found that describes it. | The repository's git history around 2022-05 and GitHub's changelog. |
 | The meaning of `last_known_affected_version_range` is inferred from samples. | The reading of ranges next to that bound rests on it. | The OSV schema and GitHub's contribution documentation. |
-| Malware advisories are absent from this repository, but the reason was not checked. | Consumers could assume the repository is complete. | GitHub's documentation on malware advisories and the `type:malware` listing. |
+| Advisories of type `type:malware` are not exported, and the 423 CWE-506 advisories may cover only part of them. The reason was not checked. | Consumers could assume the repository lists every known malicious package. | GitHub's documentation on malware advisories, and the `type:malware` listing compared with the CWE-506 files. |
+| The 2026 figures were taken while review and NVD dates were still catching up. | The not-linked count of 1,738 is a lower bound, the 85.0% share is likely to fall, and the missing NVD dates may be filled in later. | A rerun of the analysis at a later commit, comparing advisories of the same age. |
 | The reasons for withdrawal were sampled, apart from the "Duplicate Advisory" count. | The 24% of other withdrawals may have other patterns. | The `details` field of all withdrawn files. |
 | The definitions of CVE, CWE and CVSS come from general knowledge. | They frame the prerequisites section. | The linked official pages. |
 
@@ -336,7 +344,7 @@ The points below remain open after this analysis.
 
 ### Analyzed source
 
-- [github/advisory-database](https://github.com/github/advisory-database) — analyzed at commit [`b6d0ec57e5561f66c3121af72e24871d1d7f2902`](https://github.com/github/advisory-database/tree/b6d0ec57e5561f66c3121af72e24871d1d7f2902), 2026-11-05
+- [github/advisory-database](https://github.com/github/advisory-database) — analyzed at commit [`b6d0ec57e5561f66c3121af72e24871d1d7f2902`](https://github.com/github/advisory-database/tree/b6d0ec57e5561f66c3121af72e24871d1d7f2902) of 2026-11-04, read 2026-11-05
 - [Analysis script and results](https://github.com/rya-sge/access-denied/tree/main/verification/github-advisory-database-what-the-data-says)
 
 ### Specifications and documentation
@@ -351,4 +359,5 @@ The points below remain open after this analysis.
 
 ### Related articles
 
+- [How GitHub Dependabot Works: From an Update Job to a Pull Request]({{site.url_complet}}/2026/11/05/how-github-dependabot-works/)
 - [Crypto Hacks of 2026 So Far - January to September, from Truebit to Bitget]({{site.url_complet}}/2026/10/07/crypto-hacks-2026-year-to-date/)

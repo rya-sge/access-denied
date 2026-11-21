@@ -2,6 +2,7 @@
 layout: post
 title: "Transient Storage in Practice: Reentrancy Locks, Solidity's `transient` and Two Real Failures"
 date:   2026-11-04
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -42,7 +43,7 @@ The references below are to `src/ethereum/forks/cancun/` in [execution-specs](ht
 | Key | `(address, key)`, so one space per contract, separate from storage | `state_tracker.py:84` |
 | Empty slot | Reads as zero | `state_tracker.py:258` |
 | Scope | The whole transaction, across all frames | `state_tracker.py:714` clears it once the transaction is merged into the block |
-| Reverted frame | Snapshot taken on entry, restored on failure | `state_tracker.py:655,677`, `vm/interpreter.py:158,197` |
+| Reverted frame | Snapshot taken on entry, restored on failure | `state_tracker.py:655,677`, `vm/interpreter.py:242,280` (calls) and `158,197` (creation) |
 | Successful return | Nothing happens to the value | No clearing code exists at frame level |
 | `DELEGATECALL` | Uses `current_target`, so the caller's space | `storage.py:151,179` |
 | Static context | `TSTORE` raises `WriteInStaticContext`, `TLOAD` works | `storage.py:175-176` |
@@ -93,7 +94,7 @@ flowchart TD
 
 ### Version history
 
-The history below comes from `Changelog.md`, and each row was checked by compiling with that release. The matrix is in `compile/matrix.py`.
+The history below comes from `Changelog.md`. Rows 0.8.24, 0.8.27 and 0.8.28 were also checked by compiling with that release (`compile/matrix.py`); the others rest on `Changelog.md` alone.
 
 | Release | Date | What changed |
 |---------|------|--------------|
@@ -136,11 +137,11 @@ On 0.8.38, with both pipelines:
 | State variable of a library | `TypeError 9957` |
 | Initializer at declaration (`= 1`) | `DeclarationError 9825` |
 | `constant` or `immutable` | `DeclarationError 2197` |
-| Target below `cancun` | `DeclarationError 7985` for the keyword, `TypeError 6243` for assembly |
+| Target below `cancun` (legacy pipeline only) | `DeclarationError 7985` for the keyword, `TypeError 6243` for assembly |
 
 All value types compiled, including `address`, an enum, a user-defined value type, `bytes32`, a contract type and an external function type. `uint256 transient;` still declares a storage variable named `transient`, and 0.8.38 answers with warning 6335.
 
-Upstream issue [#15007](https://github.com/argotorg/solidity/issues/15007) tracks reference types and mappings as open tasks. A comment of July 2026 in that issue points to a proof of concept for value types in Core Solidity, with arrays and structs not ready. Mappings keyed by caller therefore still need assembly with a hashed slot, which is how [ERC-7674](https://eips.ethereum.org/EIPS/eip-7674) temporary approvals are built. The same issue records that automatic clearing was left out on purpose: the tendency was to expose the EVM behaviour directly and consider opt-in clearing separately.
+Upstream issue [#15007](https://github.com/argotorg/solidity/issues/15007) tracks reference types and mappings as open tasks. A comment of July 2026 in that issue points to a proof of concept for value types in Core Solidity, with arrays and structs not ready. Mappings keyed by caller therefore still need assembly with a hashed slot, which is the construction [ERC-7674](https://eips.ethereum.org/EIPS/eip-7674) suggests for temporary approvals. The same issue records that automatic clearing was left out on purpose: the tendency was to expose the EVM behaviour directly and consider opt-in clearing separately.
 
 ### `delete`
 
@@ -167,7 +168,7 @@ modifier nonReentrant() {
 
 No constructor is needed, because the slot starts at zero, which removes the initialisation problem of a proxy. And on a revert the lock releases itself through the rollback.
 
-OpenZeppelin's `ReentrancyGuardTransient` exists from v5.1, and the local copies in the hack corpus are v5.1.0, the version measured here. The current release, v5.7.0, adds `nonReentrantView` and an overridable slot, and its `ReentrancyGuard` carries the note "Deprecated. This storage-based reentrancy guard will be removed and replaced by the {ReentrancyGuardTransient} variant in v6.0." The [modifier patterns article]({{site.url_complet}}/2026/02/18/solidity-modifier-patterns-gas-bytecode-security/) shows that code and gives estimates; the numbers here are receipts.
+OpenZeppelin's `ReentrancyGuardTransient` exists from v5.1, and the local copies in the hack corpus are v5.1.0, the version measured here. Since v5.5.0, `ReentrancyGuardTransient` has `nonReentrantView` and an overridable slot, and `ReentrancyGuard` carries the note "Deprecated. This storage-based reentrancy guard will be removed and replaced by the {ReentrancyGuardTransient} variant in v6.0." Both are still the case in v5.7.0, the current release. The [modifier patterns article]({{site.url_complet}}/2026/02/18/solidity-modifier-patterns-gas-bytecode-security/) shows that code and gives estimates; the numbers here are receipts.
 
 ### Gas, measured from receipts
 
@@ -333,7 +334,7 @@ Its `SECURITY.md` names the issue a "Stale transient initialization flag", and s
 
 The Startale implementation was compiled with 0.8.30, and its verified source still has the `view` version. Nothing in the sources links the attack to the Nexus disclosure, and whether Startale has patched its contracts is not known. An audit of a fork should compare `SECURITY.md` and recent fixes in the upstream project, not only the diff at the fork point.
 
-The registry also records [SIR.trading](https://github.com/sanbir/evm-hack-registry) (March 2025, about $353.8K), where a transient slot left set after a mint was the only authorisation of a callback. That entry was read but not reproduced for this article.
+The registry also records [SIR.trading](https://github.com/sanbir/evm-hack-registry) (March 2025, about $353.8K), where a transient slot that the mint overwrote with an attacker-controlled amount, and never cleared, was the only authorisation of a callback. That entry was read but not reproduced for this article.
 
 ## Failure 2: `TransientStorageClearingHelperCollision`
 

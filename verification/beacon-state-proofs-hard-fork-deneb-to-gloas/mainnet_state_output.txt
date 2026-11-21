@@ -1,0 +1,41 @@
+# first run, 2026-11-19 (downloads the state: 340,047,725 bytes from attestant in 584 s):
+downloading finalized state from attestant ...
+state slot 15687296 size 340047725 version fulu
+PASS state is fulu (fulu)
+# second run on the same downloaded state (adds the stale deep-path depths):
+reusing DATA_DIR/state.ssz
+state slot 15687296 size 340047725 version fulu
+PASS state is fulu (fulu)
+PASS header root recomputed == API root (0xc30d802739c5d591bc692cf467806b3c305cb962df911616c1d4695245c0aa91)
+PASS header slot == state slot
+hash_tree_root(state) = 0xa09951c3a1961d94507de4ee639b17d63c0db793adfd0aaf6abad52ee878ad74 (77 s)
+PASS hash_tree_root(state) == header.state_root
+PASS gindex == 12,578,413,029,757,441
+PASS branch has 53 siblings
+PASS 53-sibling branch verifies against the block root (is_valid_merkle_branch)
+PASS 52-sibling truncation rejected
+PASS balance chunk branch (48 siblings) verifies
+PASS balance lane 0 == balances[1_000_000] in the SSZ
+PASS walk node 50 == state root, node 53 == block root
+PASS sibling 44 is the length 2411196 as uint256 LE
+PASS empty-subtree siblings in the list data = 40 - 22 (18)
+PASS header slot proof at gindex 8 (3 siblings) verifies
+PASS stale Deneb gindex 34 (slot) verifies at depth 5 (0xb6c0179f...)
+PASS stale Deneb gindex 43 (validators) verifies at depth 5 (0x49f5361f...)
+PASS stale Deneb gindex 44 (balances) verifies at depth 5 (0x14b6f6ba...)
+PASS stale Deneb gindex 52 (finalized_checkpoint) verifies at depth 5 (0xf5a5fd42...)
+PASS stale Deneb gindex 54 (current_sync_committee) verifies at depth 5 (0xf5a5fd42...)
+PASS stale Deneb gindex 59 (historical_summaries) verifies at depth 5 (0xf5a5fd42...)
+PASS gindices 52, 54, 59 give the zero hash of depth 1
+PASS stale deneb_withdrawal_credentials path (52 levels) stops at a leaf at depth 20, 32 levels missing: first chunk of current_sync_committee.pubkeys[0]
+PASS stale deneb_balance path (47 levels) stops at a leaf at depth 14, 33 levels missing: latest_execution_payload_header.parent_hash
+PASS gindex 105 (pre-Electra FINALIZED_ROOT_GINDEX) is a zero leaf with a valid 6-sibling branch
+PASS gindex 169 == finalized_checkpoint.root
+PASS gindex 2,829 from the block root is fork.current_version 0x06000000
+PASS empty proof with leaf == root verifies in is_valid_merkle_branch(depth 0)
+PASS child timestamp == genesis + 12 * child slot
+PASS execution block 26447488 parentBeaconBlockRoot == block root
+PASS EIP-4788 eth_call returns the block root ({'result': '0xc30d802739c5d591bc692cf467806b3c305cb962df911616c1d4695245c0aa91'})
+PASS EIP-4788 eth_call with timestamp + 1 reverts
+wrote snapshot.json
+31 PASS, 0 FAIL

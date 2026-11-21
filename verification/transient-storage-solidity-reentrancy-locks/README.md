@@ -31,7 +31,7 @@ solc --evm-version cancun --storage-layout --transient-storage-layout compile/la
 | Leaky lock, assembly `return`, open flash-loan flag, residue across a bundle | `test/Failures.t.sol` |
 | Startale model: drained in the deploying transaction, safe later, stopped by consuming the flag | `test/InitFlag.t.sol` |
 | `TransientStorageClearingHelperCollision` in both directions | `bug/`, profiles `bug-*`. On `bug-0833-ir*` four tests fail by design: they assert correct behaviour. `testAssignmentAvoidsTheBug` passes everywhere |
-| Version history, unsupported forms, warning 2394 | `compile/matrix.py` |
+| Version history (releases 0.8.23, 0.8.24, 0.8.26, 0.8.27, 0.8.28, 0.8.33, 0.8.34, 0.8.36, 0.8.38; the 0.8.25, 0.8.29 and 0.8.35 rows come from `Changelog.md` only), unsupported forms (below-`cancun` cases on the legacy pipeline only), warning 2394 | `compile/matrix.py` |
 | Layout | `compile/layout.sol` |
 
 `src/vendor/oz-v5.1.0/` holds three unmodified OpenZeppelin Contracts v5.1.0 files (MIT).

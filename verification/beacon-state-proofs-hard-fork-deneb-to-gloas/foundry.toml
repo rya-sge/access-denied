@@ -1,0 +1,19 @@
+# Pinned compiler and EVM. Run from this directory. See README.md.
+# solc 0.8.28 and 200 optimizer runs are the settings the article gives for its gas figures.
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+cache_path = "cache"
+libs = []
+solc_version = "0.8.28"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+offline = true
+fs_permissions = [{ access = "read", path = "./snapshot.json" }]
+
+[lint]
+# forge-lint notes (plain imports, cheatcodes, `1 << d` flagged as an incorrect shift) are noise here.
+lint_on_build = false

@@ -1417,3 +1417,9 @@ _posts/2026-11-18-portfolio-optimization-concepts-markowitz-black-litterman.md
   assets/article/finance/portfolio-optimization-concepts/portfolio-optimization-concepts-workflow.puml   (workflow -> .png, asset only)
   assets/article/finance/portfolio-optimization-concepts/efficient-frontier-three-assets.py   (in-section figure -> .svg, embedded in "Mean-variance optimisation (Markowitz 1952)"; matplotlib, create-plot)
   in-section diagrams: inline Mermaid in the article (concept map, Black-Litterman flow, HRP steps), no .puml
+
+_posts/2026-11-20-eip-7251-max-effective-balance-consolidation.md
+  assets/article/blockchain/ethereum/staking/2026-11-20-eip-7251-max-effective-balance-consolidation-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/blockchain/ethereum/staking/eip-7251-consolidation-concept.puml   (concept -> .png, asset only)
+  assets/article/blockchain/ethereum/staking/eip-7251-consolidation-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (request processing flowchart, request-to-completion sequence), no .puml

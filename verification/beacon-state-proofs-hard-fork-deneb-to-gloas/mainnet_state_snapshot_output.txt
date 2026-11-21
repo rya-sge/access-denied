@@ -1,0 +1,16 @@
+PASS header root recomputed == recorded block root (0xc30d802739c5d591bc692cf467806b3c305cb962df911616c1d4695245c0aa91)
+PASS recorded state hash_tree_root == header.state_root
+PASS gindex == concat(11, 75, 2, 2**40 + 1e6, 9)
+PASS 53-sibling branch verifies
+PASS 52-sibling truncation rejected
+PASS node after 50 siblings == state_root
+PASS balance branch (48) verifies
+PASS slot branch (3) verifies
+PASS stale gindex 34 (slot) verifies at depth 5
+PASS stale gindex 43 (validators) verifies at depth 5
+PASS stale gindex 44 (balances) verifies at depth 5
+PASS stale gindex 52 (finalized_checkpoint) verifies at depth 5
+PASS stale gindex 54 (current_sync_committee) verifies at depth 5
+PASS stale gindex 59 (historical_summaries) verifies at depth 5
+PASS recorded EIP-4788 result == block root
+15 PASS, 0 FAIL

@@ -23,7 +23,7 @@ This article reads the source at commit `a6638d2` (release 1.6.0 plus eight comm
 
 ## What you need to know first
 
-The article assumes basic Python, pandas and the idea of a stock return. It relies on the following concepts without deriving them in full:
+The article assumes basic Python, pandas and the idea of a stock return. It relies on the following concepts without deriving them in full. The companion article [Portfolio Optimisation Concepts - From Returns and Covariance to Markowitz, Black-Litterman and HRP]({{site.url_complet}}/2026/11/18/portfolio-optimization-concepts-markowitz-black-litterman/) develops each of them with formulas and worked examples.
 
 - **Markowitz mean-variance optimisation.** Markowitz's 1952 model describes each asset by an expected return $$\mu_i$$ and the covariances $$\Sigma$$ between assets, and judges a portfolio $$w$$ by two numbers only: its expected return $$w^{\top}\mu$$ and its variance $$w^{\top}\Sigma w$$. For a target return $$r^{*}$$ it solves the quadratic programme
 
@@ -615,6 +615,7 @@ These points were not settled by the source and the runs; check them before rely
 
 ### Related articles
 
+- [Portfolio Optimisation Concepts - From Returns and Covariance to Markowitz, Black-Litterman and HRP]({{site.url_complet}}/2026/11/18/portfolio-optimization-concepts-markowitz-black-litterman/)
 - [QuantLib - Architecture of the Open-Source Quantitative Finance Library, with Python and C++ Examples]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/)
 - [Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review]({{site.url_complet}}/2026/11/18/microsoft-qlib-quant-research-platform/)
 - [Sampling and Standard Error - Estimating a Population Mean from One Random Sample]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/)

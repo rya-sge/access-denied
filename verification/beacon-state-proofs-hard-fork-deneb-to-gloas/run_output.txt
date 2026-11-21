@@ -1,0 +1,152 @@
+== Forks (configs/mainnet.yaml, specs/*/beacon-chain.md)
+PASS  deneb epoch: 269568
+PASS  deneb first slot: 8626176
+PASS  deneb timestamp: 1710338135
+PASS  deneb timestamp equals the config comment date: 1710338135
+PASS  deneb BeaconState fields: 28
+PASS  deneb BeaconState depth: 5
+PASS  electra epoch: 364032
+PASS  electra first slot: 11649024
+PASS  electra timestamp: 1746612311
+PASS  electra timestamp equals the config comment date: 1746612311
+PASS  electra BeaconState fields: 37
+PASS  electra BeaconState depth: 6
+PASS  fulu epoch: 411392
+PASS  fulu first slot: 13164544
+PASS  fulu timestamp: 1764798551
+PASS  fulu timestamp equals the config comment date: 1764798551
+PASS  fulu BeaconState fields: 38
+PASS  fulu BeaconState depth: 6
+PASS  gloas BeaconState fields: 46
+PASS  gloas is a ProgressiveContainer: True
+PASS  heze BeaconState fields: 42
+PASS  heze is a ProgressiveContainer: True
+
+== BeaconBlockHeader and Validator field gindices
+PASS  BeaconBlockHeader.slot: 8
+PASS  BeaconBlockHeader.proposer_index: 9
+PASS  BeaconBlockHeader.parent_root: 10
+PASS  BeaconBlockHeader.state_root: 11
+PASS  BeaconBlockHeader.body_root: 12
+PASS  Validator.pubkey: 8
+PASS  Validator.withdrawal_credentials: 9
+PASS  Validator.effective_balance: 10
+PASS  Validator.slashed: 11
+PASS  Validator.activation_eligibility_epoch: 12
+PASS  Validator.activation_epoch: 13
+PASS  Validator.exit_epoch: 14
+PASS  Validator.withdrawable_epoch: 15
+
+== Light client FINALIZED_ROOT_GINDEX (specs/*/light-client/sync-protocol.md)
+PASS  FINALIZED_ROOT_GINDEX computed: 105
+PASS  FINALIZED_ROOT_GINDEX equals the spec value: 105
+PASS  FINALIZED_ROOT_GINDEX_ELECTRA computed: 169
+PASS  FINALIZED_ROOT_GINDEX_ELECTRA equals the spec value: 169
+PASS  FINALIZED_ROOT_GINDEX_GLOAS computed: 735
+PASS  FINALIZED_ROOT_GINDEX_GLOAS equals the spec value: 735
+
+== State field gindices (state / from block root)
+PASS  deneb slot: (34, 354)
+PASS  electra slot: (66, 706)
+PASS  gloas slot: (41, 361)
+PASS  deneb validators: (43, 363)
+PASS  electra validators: (75, 715)
+PASS  gloas validators: (358, 2918)
+PASS  deneb balances: (44, 364)
+PASS  electra balances: (76, 716)
+PASS  gloas balances: (359, 2919)
+PASS  deneb finalized_checkpoint: (52, 372)
+PASS  electra finalized_checkpoint: (84, 724)
+PASS  gloas finalized_checkpoint: (367, 2927)
+PASS  deneb current_sync_committee: (54, 374)
+PASS  electra current_sync_committee: (86, 726)
+PASS  gloas current_sync_committee: (2945, 23425)
+PASS  deneb latest_execution_payload_header: (56, 376)
+PASS  electra latest_execution_payload_header: (88, 728)
+PASS  gloas latest_execution_payload_header: None
+PASS  deneb historical_summaries: (59, 379)
+PASS  electra historical_summaries: (91, 731)
+PASS  gloas historical_summaries: (2950, 23430)
+PASS  deneb earliest_exit_epoch: None
+PASS  electra earliest_exit_epoch: (95, 735)
+PASS  gloas earliest_exit_epoch: (2954, 23434)
+PASS  deneb pending_deposits: None
+PASS  electra pending_deposits: (98, 738)
+PASS  gloas pending_deposits: (2957, 23437)
+PASS  deneb pending_partial_withdrawals: None
+PASS  electra pending_partial_withdrawals: (99, 739)
+PASS  gloas pending_partial_withdrawals: (2958, 23438)
+PASS  deneb pending_consolidations: None
+PASS  electra pending_consolidations: (100, 740)
+PASS  gloas pending_consolidations: (2959, 23439)
+PASS  deneb proposer_lookahead: None
+PASS  electra proposer_lookahead: None
+PASS  gloas proposer_lookahead: (2960, 23440)
+PASS  fulu proposer_lookahead (Fulu only): (101, 741)
+PASS  electra and fulu share every Electra gindex: True
+PASS  heze keeps every Gloas gindex: True
+PASS  heze gaps: [8, 9, 10, 28]
+PASS  gloas latest_block_hash position: 24
+
+== Worked example (Electra, validator 1,000,000)
+PASS  state_root in the header: 11
+PASS  validators in a depth-6 state: 75
+PASS  concat(11, 75): 715
+PASS  concat(715, 2): 1430
+PASS  concat(1430, 2**40 + 1000000): 1572301628719680
+PASS  concat(..., 9): 12578413029757441
+PASS  proof length of the worked gindex: 53
+
+== Validator and balance leaves (gindex, proof length)
+PASS  deneb validator field proof length: 52
+PASS  electra validator field proof length: 53
+PASS  deneb balance chunk proof length: 47
+PASS  electra balance chunk proof length: 48
+PASS  deneb withdrawal_credentials of validator 0: 6385963534123009
+PASS  electra withdrawal_credentials of validator 0: 12578413021757441
+PASS  gloas withdrawal_credentials of validator 0 (gindex, length): (93377, 16)
+PASS  deneb withdrawal_credentials of validator 1,000,000: 6385963542123009
+PASS  electra withdrawal_credentials of validator 1,000,000: 12578413029757441
+PASS  gloas withdrawal_credentials of validator 1,000,000 (gindex, length): (100278884853593, 46)
+PASS  deneb balance chunk of validator 1,000,000: 200111116505232
+PASS  electra balance chunk of validator 1,000,000: 393625162993808
+PASS  gloas balance chunk of validator 1,000,000 (gindex, length): (1567394265915, 40)
+PASS  gloas validator 2,398,407 field proof length: 49
+
+== ProgressiveList subtrees: index range, k, length in list data, field proof length
+PASS  siblings around a validator field outside the list data (3 + 8 + 1 + 3): 15
+PASS  k=0: indices, list-data length, field proof: (0, 0, 1, 16)
+PASS  k=0: last index has the same length: 1
+PASS  k=1: indices, list-data length, field proof: (1, 4, 4, 19)
+PASS  k=1: last index has the same length: 4
+PASS  k=2: indices, list-data length, field proof: (5, 20, 7, 22)
+PASS  k=2: last index has the same length: 7
+PASS  k=9: indices, list-data length, field proof: (87381, 349524, 28, 43)
+PASS  k=9: last index has the same length: 28
+PASS  k=10: indices, list-data length, field proof: (349525, 1398100, 31, 46)
+PASS  k=10: last index has the same length: 31
+PASS  k=11: indices, list-data length, field proof: (1398101, 5592404, 34, 49)
+PASS  k=11: last index has the same length: 34
+
+== Deneb gindices read in the depth-6 Fulu state
+PASS  hash of two zero chunks: 0xf5a5fd42
+PASS  deneb slot (gindex 34) in the Fulu tree: ('latest_block_header', 'block_roots')
+PASS  deneb validators (gindex 43) in the Fulu tree: ('current_sync_committee', 'next_sync_committee')
+PASS  deneb balances (gindex 44) in the Fulu tree: ('latest_execution_payload_header', 'next_withdrawal_index')
+PASS  deneb finalized_checkpoint (gindex 52) in the Fulu tree: padding
+PASS  deneb current_sync_committee (gindex 54) in the Fulu tree: padding
+PASS  deneb historical_summaries (gindex 59) in the Fulu tree: padding
+
+== Fulu gindices read in the Gloas tree (fixed depth 6)
+PASS  fulu slot (gindex 66) in the Gloas tree: reverts: below the genesis_time leaf
+PASS  fulu validators (gindex 75) in the Gloas tree: reverts: below the genesis_time leaf
+PASS  fulu balances (gindex 76) in the Gloas tree: reverts: below the genesis_time leaf
+PASS  fulu finalized_checkpoint (gindex 84) in the Gloas tree: verifies a hash: left node of fork
+PASS  fulu current_sync_committee (gindex 86) in the Gloas tree: verifies a hash: left node of latest_block_header
+PASS  fulu latest_execution_payload_header (gindex 88) in the Gloas tree: verifies a hash: node over positions 5 to 8
+PASS  fulu historical_summaries (gindex 91) in the Gloas tree: verifies a hash: node over positions 17 to 20
+PASS  fulu pending_deposits (gindex 98) in the Gloas tree: reverts: below the active_fields leaf
+PASS  fulu proposer_lookahead (gindex 101) in the Gloas tree: reverts: below the active_fields leaf
+PASS  electra FINALIZED_ROOT_GINDEX 169 in the Gloas state: verifies: fork.current_version
+
+133 checks, 133 PASS, 0 FAIL

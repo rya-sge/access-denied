@@ -1,0 +1,71 @@
+{
+ "collected_utc": "2026-11-19T07:29:59Z",
+ "article_header": {
+  "slot_requested": 15580064,
+  "served": true,
+  "endpoint": "publicnode",
+  "api_root": "0xa544aac2197593cc74205def3af75bdb35bdc6e9da212a79bea40eb5919e36b3",
+  "canonical": true,
+  "finalized": true,
+  "header": {
+   "slot": 15580064,
+   "proposer_index": 565555,
+   "parent_root": "0x116de581204505677f8c485372a33de5ea8deab2e43aaceb2d08670616d9cb1f",
+   "state_root": "0x966c88c1842b8420d9fa5dccf0a9db86ae933ef238229a49d71ce4e953ece72a",
+   "body_root": "0xd9018c50072dba31d63a3f31d39ee0e4fffe0fde81fbf082143415fe0872a9b9"
+  }
+ },
+ "article_exec_block": {
+  "number": 26340577,
+  "served": true,
+  "endpoint": "publicnode",
+  "hash": "0x74dc69d89066b7d073bafb9628f7bfec24699fcce3d176d9810853bdf7972d59",
+  "timestamp": 1793784803,
+  "parentBeaconBlockRoot": "0xa544aac2197593cc74205def3af75bdb35bdc6e9da212a79bea40eb5919e36b3"
+ },
+ "electra_exec_block": {
+  "number": 22431084,
+  "served": true,
+  "endpoint": "publicnode",
+  "hash": "0x50c8cab760b2948349c590461b166773c45d8f4858cccf5a43025ab2960152e8",
+  "timestamp": 1746612311,
+  "parentBeaconBlockRoot": "0x947d22746be643f1428031a9ab7c58776ca54e461903bb5e4ba8a73448552967"
+ },
+ "pre_electra_header": {
+  "slot_requested": 11649023,
+  "served": true,
+  "endpoint": "publicnode",
+  "api_root": "0x947d22746be643f1428031a9ab7c58776ca54e461903bb5e4ba8a73448552967",
+  "canonical": true,
+  "finalized": true,
+  "header": {
+   "slot": 11649023,
+   "proposer_index": 752525,
+   "parent_root": "0xc979d8191d9bfacc9a167a16c770424e00202206ff928615b9f66fe7b19bb11c",
+   "state_root": "0xf0782ba6837101153a55b41a305cbf1e98868c9f2a76c0d47361a7ab373aeb64",
+   "body_root": "0x5b68aaa59ba6c581b81a4531678f3e5ed8d9b183618d7801ebe763ccb57c1555"
+  }
+ },
+ "requests": [
+  {
+   "path": "/eth/v1/beacon/headers/15580064",
+   "endpoint": "publicnode",
+   "ok": true
+  },
+  {
+   "method": "eth_getBlockByNumber",
+   "endpoint": "publicnode",
+   "ok": true
+  },
+  {
+   "method": "eth_getBlockByNumber",
+   "endpoint": "publicnode",
+   "ok": true
+  },
+  {
+   "path": "/eth/v1/beacon/headers/11649023",
+   "endpoint": "publicnode",
+   "ok": true
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+No files changed, compilation skipped
+
+Ran 14 tests for test/BeaconProof.t.sol:BeaconProofTest
+[PASS] testBalanceProof48() (gas: 1347735)
+[PASS] testDenebAndElectraGindices() (gas: 67986)
+[PASS] testForkFullFlow() (gas: 5673)
+[PASS] testGloasProgressiveGindices() (gas: 88052)
+[PASS] testRealProofVerifies() (gas: 191560)
+[PASS] testRevertWhen_DenebGindexOnFuluProof() (gas: 173002)
+[PASS] testRevertWhen_DenebGindexWith52Siblings() (gas: 184975)
+[PASS] testRevertWhen_EmptyProofLeafEqualsRoot() (gas: 33135)
+[PASS] testRevertWhen_Extended54() (gas: 189601)
+[PASS] testRevertWhen_FieldTooLarge() (gas: 10752)
+[PASS] testRevertWhen_IndexTooLarge() (gas: 10726)
+[PASS] testRevertWhen_Truncated52() (gas: 184992)
+[PASS] testRevertWhen_WrongLeaf() (gas: 173873)
+[PASS] testSlotProofAtGindex8() (gas: 1201265)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 13.95ms (21.88ms CPU time)
+
+╭-----------------------------------------+-----------------+-------+--------+-------+---------╮
+| test/BeaconProof.t.sol:Harness Contract |                 |       |        |       |         |
++==============================================================================================+
+| Deployment Cost                         | Deployment Size |       |        |       |         |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| 492103                                  | 2058            |       |        |       |         |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+|                                         |                 |       |        |       |         |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| Function Name                           | Min             | Avg   | Median | Max   | # Calls |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| le64                                    | 3094            | 3094  | 3094   | 3094  | 1       |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| progressiveGindex                       | 827             | 3549  | 4275   | 4820  | 4       |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| validatorFieldGindex                    | 464             | 562   | 583    | 593   | 9       |
+|-----------------------------------------+-----------------+-------+--------+-------+---------|
+| verify                                  | 679             | 27563 | 42649  | 43485 | 11      |
+╰-----------------------------------------+-----------------+-------+--------+-------+---------╯
+
+
+Ran 1 test suite in 17.16ms (13.95ms CPU time): 14 tests passed, 0 failed, 0 skipped (14 total tests)
+
+# Isolated: forge test --gas-report --offline --match-test <test>, one verify call each
+## testRealProofVerifies
+| Function Name                           | Min             | Avg   | Median | Max   | # Calls |
+| verify                                  | 43483           | 43483 | 43483  | 43483 | 1       |
+## testBalanceProof48
+| Function Name                           | Min             | Avg   | Median | Max   | # Calls |
+| verify                                  | 39454           | 39454 | 39454  | 39454 | 1       |
+## testSlotProofAtGindex8
+| Function Name                           | Min             | Avg  | Median | Max  | # Calls |
+| le64                                    | 3094            | 3094 | 3094   | 3094 | 1       |
+| verify                                  | 3184            | 3184 | 3184   | 3184 | 1       |

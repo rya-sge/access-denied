@@ -2,6 +2,7 @@
 layout: post
 title: "Chainlink CCIP — from DONs to Cross-Chain Verifiers"
 date:   2026-11-16
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -12,9 +13,9 @@ isMath: false
 isMermaid: true
 ---
 
-[Chainlink CCIP](https://docs.chain.link/ccip) (Cross-Chain Interoperability Protocol) is Chainlink's protocol for sending arbitrary messages, tokens, or both in one message, from a contract on one chain to a contract on another. A sender calls a fixed Router contract, Chainlink-operated nodes attest that the message was emitted on the source chain, and the message is delivered on the destination chain to the receiver's `ccipReceive` function, with tokens moved by issuer-owned token pools. What stands behind "Chainlink nodes attest" is the part that changed: the contracts of release 2.0 replace the single oracle network of v1.5 and v1.6 with pluggable Cross-Chain Verifiers and let anyone execute a verified message.
+[Chainlink CCIP](https://docs.chain.link/ccip) (Cross-Chain Interoperability Protocol) is Chainlink's protocol for sending arbitrary messages, tokens, or both in one message, from a contract on one chain to a contract on another. A sender calls a fixed Router contract, Chainlink-operated nodes attest that the message was emitted on the source chain, and the message is delivered on the destination chain to the receiver's `ccipReceive` function, with tokens moved by issuer-owned token pools. What stands behind "Chainlink nodes attest" is the part that changed: the contracts of release 2.0 replace the single Role DON of v1.6 with pluggable Cross-Chain Verifiers and let anyone execute a verified message.
 
-This article describes both generations and labels each statement with the version it applies to: the onchain components, the commit and execution DON of v1.6, the CCVs and permissionless executors of 2.0, the message lifecycle, `extraArgs`, finality, token pools and the TokenAdminRegistry, the rate limiter, fees, and what a receiver and a token issuer have to get right. The contract facts come from `smartcontractkit/chainlink-ccip` at contracts 2.0.0 and the v1.5-v1.6 facts from the Chainlink documentation, both pinned under References.
+This article describes both generations and labels each statement with the version it applies to: the onchain components, the commit and execution DON of v1.6, the CCVs and permissionless executors of 2.0, the message lifecycle, `extraArgs`, finality, token pools and the TokenAdminRegistry, the rate limiter, fees, and what a receiver and a token issuer have to get right. The contract facts come from `smartcontractkit/chainlink-ccip` at contracts 2.0.0 and the v1.6 facts from the Chainlink documentation, both pinned under References.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -35,7 +36,7 @@ The article assumes the reader knows what a bridge, an ERC-20 and an oracle are.
 
 The two sources describe different protocol generations, and an integration has to know which one it is talking to. Every CCIP contract reports its version through `typeAndVersion()`.
 
-| | v1.5 - v1.6 (Chainlink documentation, API reference v1.5.0 to v1.6.3) | 2.0 (`chainlink-ccip` repository, `@chainlink/contracts-ccip` 2.0.0) |
+| | v1.6 (Chainlink documentation, API reference v1.6.0 to v1.6.3) | 2.0 (`chainlink-ccip` repository, `@chainlink/contracts-ccip` 2.0.0) |
 |---|---|---|
 | Entry point | `Router 1.2.0` | the same `Router 1.2.0`, kept across versions |
 | Verification | One Role DON: the commit OCR plugin posts Merkle roots to `OffRamp.commit()` | Cross-Chain Verifiers (CCVs); the former DON becomes the default `CommitteeVerifier`; no Merkle roots onchain |
@@ -46,6 +47,8 @@ The two sources describe different protocol generations, and an integration has 
 | Pools | `IPoolV1` (`lockOrBurn`, `releaseOrMint`); lock/release pools hold the liquidity | `IPoolV2` adds finality, token arguments, `getRequiredCCVs` and pool fees; liquidity sits in an `ERC20LockBox` (introduced in 1.6.4) |
 | RMN | Offchain Risk Management Network blessed roots (v1.6); the docs now say that role "is no longer active", the onchain curse remains | `RMN 2.1.0` is curse-only; `isBlessed()` is a `pure` function kept for compatibility |
 | Rate-limit reconfiguration | The bucket refills at the normal rate after a change | The bucket is set full on any configuration change |
+
+Releases up to v1.5 used a third design, not described in this article: one `EVM2EVMOnRamp` and one `EVM2EVMOffRamp` per lane, with commit reports posted to a separate `CommitStore`. The repository's 1.6.0 changelog lists "Merged the CommitStore with the OffRamp", "A single OnRamp and OffRamp contract per chain instead of one per lane" and offchain RMN blessing among the v1.6 changes, and its v1.6.0 bindings are the first to include a `NonceManager`.
 
 On Ethereum mainnet, read on 2026-11-16 at block 26,428,742, the two generations coexist. The Router at `0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D` reports `Router 1.2.0`, its OnRamp towards Arbitrum (chain selector `4949039107694359620`) reports `OnRamp 2.0.0`, and the Router lists four OffRamps for messages coming from Arbitrum: `EVM2EVMOffRamp 1.2.0`, `EVM2EVMOffRamp 1.5.0`, `OffRamp 1.6.0` and `OffRamp 2.0.0`. Older OffRamps stay registered so that messages sent under an older version can still be executed. Which lanes run which version beyond this one pair was not checked.
 
@@ -83,9 +86,9 @@ flowchart LR
 
 A curse makes `Router.ccipSend`, `Router.routeMessage`, `OnRamp.forwardFromRouter`, `OffRamp.execute` and the validation step of every pool revert. In-flight messages are not lost, though: they stay `UNTOUCHED` or `FAILURE` and become executable again after the uncurse. The documentation describes the curse as a manual action of the CCIP owner. On Ethereum, the Router's `getArmProxy()` points to an `ARMProxy 1.0.0` whose target reports `RMN 2.1.0`, not cursed at the block read above.
 
-In v1.6 the RMN also had an automated offchain role: its nodes checked commit reports and the commit plugin included their signatures ("pre-blessed roots", in the repository's protocol notes). The documentation copy states that this role "is no longer active in current CCIP deployments, but is expected to be offered as an optional validation layer in future releases". `RMN 2.1.0` matches that: `isBlessed()` returns `true` unconditionally.
+In v1.6 the RMN also had an automated offchain role: its nodes checked commit reports and the commit plugin included their signatures ("pre-blessed roots", in the 1.6.0 changelog). The documentation copy states that this role "is no longer active in current CCIP deployments, but is expected to be offered as an optional validation layer in future releases". `RMN 2.1.0` matches that: `isBlessed()` returns `true` unconditionally.
 
-## The v1.5 - v1.6 design: one Role DON, two plugins
+## The v1.6 design: one Role DON, two plugins
 
 In v1.6, one DON of Chainlink node operators runs two OCR plugins. The documentation calls the nodes running them the Committing DON and the Executing DON, and notes that they are "not separate oracle networks" but subsets of one Role DON. Subcommittees of the DON read from each source chain and write to each destination chain.
 
@@ -121,7 +124,11 @@ The OffRamp builds the set of CCVs a message must pass from three sources and re
 - **The token pool**, through `getRequiredCCVs`, which can depend on the amount through the `AdvancedPoolHooks` thresholds.
 - **The lane**, through `laneMandatedCCVs` in the OffRamp's source-chain configuration.
 
-`address(0)` in any of these lists means "the default CCVs". Two rules matter for security. A pool that returns no CCVs, or a v1 pool, falls back to the default CCVs; the code explains why: otherwise "any arbitrary CCV [could] mint infinite tokens by fabricating messages. Since CCVs are permissionless, this would mean anyone would be able to mint." And a token-only transfer skips the receiver's CCVs, because only the token issuer bears the risk; USDC token-only transfers can therefore rely on `CCTPVerifier` alone.
+`address(0)` in any of these lists means "the default CCVs", and a receiver or pool that returns an empty list is treated as if it had returned `address(0)`. Three rules matter for security:
+
+- **Empty pool list.** A pool that returns no CCVs, or a v1 pool, falls back to the default CCVs; the code explains why: otherwise "any arbitrary CCV [could] mint infinite tokens by fabricating messages. Since CCVs are permissionless, this would mean anyone would be able to mint."
+- **Non-empty list.** A receiver or pool that returns its own list replaces the defaults instead of adding to them. The OffRamp appends the default CCVs only when one of the merged lists contains `address(0)` ("Add defaults if any address(0) was found"), so a receiver that wants its CCVs on top of the committee has to include `address(0)` in its required list.
+- **Token-only transfer.** It skips the receiver's CCVs, because only the token issuer bears the risk; USDC token-only transfers can therefore rely on `CCTPVerifier` alone.
 
 `CommitteeVerifier` has no built-in domain separation: two instances must use distinct signer sets, and signatures must be sorted by signer address (`SignatureQuorumValidator.sol`).
 
@@ -192,9 +199,9 @@ The rules attached to each step, with the code that enforces them:
 
 - **Fee.** With `feeToken == address(0)`, `Router.ccipSend` wraps `msg.value` and keeps all of it; the code comment reads "we take the whole msg.value regardless if its larger". Overpayment is not refunded. With an ERC-20 fee token, any `msg.value` reverts with `InvalidMsgValue`.
 - **Tokens move before the OnRamp runs.** The Router transfers them from the sender to the pool named in the TokenAdminRegistry, and the OnRamp then calls `lockOrBurn`. Mainnet allows one token per message; the 2.0 OnRamp enforces it with `CanOnlySendOneTokenPerMessage`.
-- **Atomic delivery.** Token release and `ccipReceive` run together inside a self-call wrapped in `try/catch`. If the receiver reverts, the token transfer reverts with it and the message is `FAILURE`.
+- **Atomic delivery.** Token release and `ccipReceive` run together inside a low-level self-call to `executeSingleMessage` whose failure is caught. If the receiver reverts, the token transfer reverts with it and the message is `FAILURE`.
 - **When the receiver is called.** It is not called if the data is empty and the gas limit is 0, if the receiver has no code, or if it does not report `IAny2EVMMessageReceiver` through ERC-165. In those cases the tokens are only transferred.
-- **Amount delivered (2.0).** The OffRamp reads the receiver's `balanceOf` before and after the release and passes the difference in `destTokenAmounts`.
+- **Amount delivered (2.0).** The OffRamp reads the `balanceOf` of the token receiver before and after the release and passes the difference in `destTokenAmounts`. In 2.0 the token receiver is set separately in `GenericExtraArgsV3` and can differ from the message receiver; when it is the local pool itself, the OffRamp uses the amount the pool returns.
 - **Return data.** The Router caps what it copies from `ccipReceive` at `MAX_RET_BYTES = 4 + 4 * 32`, 132 bytes.
 - **Retry.** Only `UNTOUCHED` or `FAILURE` messages can be executed; `IN_PROGRESS` and `SUCCESS` revert with `SkippedAlreadyExecutedMessage`. In 2.0 the gas override must be 0 or at least the message's `ccipReceiveGasLimit`.
 
@@ -270,7 +277,7 @@ A token's pools on each chain determine how it moves:
 | Burn and Unlock | burn/mint | lock/release | The return trip of Lock and Mint |
 | Lock and Unlock | lock/release | lock/release | Tokens such as WETH; liquidity needed on every chain |
 
-Specialised pools exist for specific tokens: `SiloedLockReleaseTokenPool` keeps one LockBox per remote chain, `USDCTokenPoolProxy` routes USDC to CCTP V1, CCTP V2 or lock/release depending on the destination, and Lombard has its own pool. Since 1.6.4, lock/release pools keep their tokens in an `ERC20LockBox`, so a pool can be upgraded by allowlisting the new pool on the LockBox instead of moving the liquidity.
+Specialised pools exist for specific tokens: `SiloedLockReleaseTokenPool` can give a remote chain its own LockBox or share one LockBox among several chains, `USDCTokenPoolProxy` routes USDC to CCTP V1, CCTP V2 or lock/release depending on the destination, and Lombard has its own pool. Since 1.6.4, lock/release pools keep their tokens in an `ERC20LockBox`, so a pool can be upgraded by allowlisting the new pool on the LockBox instead of moving the liquidity.
 
 A burn/mint token must expose `mint(address,uint256)`, `burn(uint256)` or `burnFrom`, `decimals()` and `balanceOf()`, and let its owner grant the mint and burn roles to the pool. A lock/release token only needs `decimals()` and `balanceOf()`.
 
@@ -289,7 +296,7 @@ A token can have different decimals on different chains. The source pool sends i
 
 Worked example: 1.0000005 tokens sent from an 18-decimal chain to a 6-decimal chain is 1,000,000,500,000,000,000 units at the source. Dividing by 10^12 and rounding down gives 1,000,000 units, 1.000000 tokens, at the destination; the 500,000,000,000 source units (0.0000005 tokens) are dust.
 
-Pool versions matter here. According to the token-pools page, v1.5.0 pools do not support different decimals, v1.5.1 pools support them but compute inbound rate limits wrongly when decimals differ, and v1.6.0 pools are correct.
+Pool versions matter here. According to the token-pools page, v1.5.0 pools do not support different decimals, v1.5.1 pools support them but compute inbound rate limits wrongly when decimals differ, and v1.6.0 pools are correct. The repository changelog places the switch of inbound rate limiting to the local denomination in 1.6.1, so the two sources disagree on the exact release.
 
 ### TokenAdminRegistry and the CCT self-serve flow
 
@@ -323,14 +330,14 @@ Four behaviours an issuer should plan for:
 - **Reconfiguration refills in 2.0.** Every call to `_setTokenBucketConfig` sets `tokens = capacity`. An administrator who changes the configuration therefore grants a full bucket at once. In earlier versions the bucket refilled at the normal rate after a change.
 - **Who can change it.** The pool `owner` or its `rateLimitAdmin`. Delegating `rateLimitAdmin` avoids sharing ownership with the team that tunes limits.
 
-v1.6 also had an aggregate USD rate limiter per lane; 2.0 caps the fee of a single message with `maxUSDCentsPerMessage`.
+The repository also carries a v1.6.0 binding for `MultiAggregateRateLimiter`, an optional USD rate-limiter contract whose deployment was not checked for this article; 2.0 caps the fee of a single message with `maxUSDCentsPerMessage`.
 
 ## Fees
 
 The v1.6 billing page defines `fee = blockchain fee + network fee`:
 
 - **Blockchain fee** = execution cost + data availability cost, where execution cost = destination gas price × gas usage × gas multiplier, and gas usage = gas limit + destination overhead + gas per payload byte + gas for token transfers. Data availability cost applies to L2 destinations.
-- **Network fee.** A percentage of the transferred value for Lock and Unlock; a static USD amount for the other token mechanisms and for data-only messages. A Solana destination adds 0.10 USD for associated-token-account creation. The fee values themselves are in a table component not present in the local documentation copy.
+- **Network fee.** A percentage of the transferred value for Lock and Unlock; a static USD amount for the other token mechanisms and for data-only messages. For token transfers to a Solana destination, 0.10 USD is added for associated-token-account creation. The fee values themselves are in a table component not present in the local documentation copy.
 - **Payment.** In LINK, native or wrapped native. The fee is fixed at send time, so a later gas spike on the destination is CCIP's cost, not the sender's.
 
 In 2.0 the OnRamp records one receipt per party that charges: each CCV in order, the token pool if a token moves, the executor, and the network fee kept by the OnRamp. An `IPoolV2` pool can charge basis points on the amount. Because third-party `getFee` results can change between the quote and the send, the OnRamp re-checks the total against what the Router collected and reverts with `InsufficientFeeTokenAmount` if it falls short.
@@ -346,7 +353,7 @@ The best-practices page, the `CCIPReceiver` and `DefensiveExample` contracts and
 5. **Implement ERC-165 correctly.** If `supportsInterface` does not report the receiver interface, tokens arrive and `ccipReceive` is silently skipped.
 6. **Use `destTokenAmounts`**, the destination addresses and, in 2.0, the measured balance change, never the source token list.
 7. **Be idempotent on `messageId`** if the application's own retry path can deliver a message twice.
-8. **In 2.0, implement `getCCVsAndFinalityConfig` deliberately**: require extra CCVs for high-value flows and return `WAIT_FOR_FINALITY_FLAG` unless FTF was chosen on purpose.
+8. **In 2.0, implement `getCCVsAndFinalityConfig` deliberately**: include `address(0)` in the required list when adding CCVs for high-value flows, so the default committee still applies, and return `WAIT_FOR_FINALITY_FLAG` unless FTF was chosen on purpose.
 9. **Monitor** `ExecutionStateChanged` with `FAILURE`, the rate-limit headroom, the LockBox balance and the administrative events of the pool and registry.
 
 A sketch of rules 1 to 3, written for this article on top of `CCIPReceiver` (not taken from the repository):
@@ -380,14 +387,14 @@ The revert on an unknown sender follows the documentation's defensive sample, wh
 
 CCIP keeps one stable interface, the `Router 1.2.0` and the `Client.sol` message structures, while what decides that a message is genuine has changed under it.
 
-- **v1.5 - v1.6** rely on one Role DON: its commit plugin posts Merkle roots to the OffRamp, its execution plugin submits proofs, a `NonceManager` can enforce order, and a failed message goes to manual execution in the CCIP Explorer.
+- **v1.6** relies on one Role DON: its commit plugin posts Merkle roots to the OffRamp, its execution plugin submits proofs, a `NonceManager` can enforce order, and a failed message goes to manual execution in the CCIP Explorer.
 - **2.0** turns that DON into the default `CommitteeVerifier` among other Cross-Chain Verifiers, merges the CCVs required by the receiver, the token pool and the lane, and lets anyone execute a verified message. Merkle roots, the `NonceManager` and RMN blessing are gone; the RMN is a curse switch.
 - **Both generations run on Ethereum today**: the Router read on 2026-11-16 forwards to an `OnRamp 2.0.0` towards Arbitrum and still lists OffRamps from 1.2.0 to 2.0.0 for the reverse direction.
 - **Tokens** move through issuer-owned pools, registered in the TokenAdminRegistry, with per-lane token buckets; decimals conversion rounds down, and 2.0 refills a bucket in full on every reconfiguration.
 - **For integrators**, the defects that cost money are on their side of the interface: a receiver that reverts, an allowlist that checks the sender without the chain, a gas limit sized for the common path, hardcoded `extraArgs`, or an FTF setting the receiver does not accept.
 - **The main risks** are the trust placed in the verifier set a message ends up with (by default, Chainlink's committee), the issuer's control of pools, mint roles and rate limits, and the CCIP owner's ability to curse lanes and replace ramps.
 
-![Mindmap of Chainlink CCIP covering the onchain components, the v1.5-v1.6 Role DON design, the 2.0 verifiers and executors, messages, tokens and integrator rules]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/ccip/2026-11-16-chainlink-ccip-architecture-mindmap.png)
+![Mindmap of Chainlink CCIP covering the onchain components, the v1.6 Role DON design, the 2.0 verifiers and executors, messages, tokens and integrator rules]({{site.url_complet}}/assets/article/blockchain/defi/cross-chain-bridge/ccip/2026-11-16-chainlink-ccip-architecture-mindmap.png)
 
 ## Annex
 
@@ -423,7 +430,7 @@ CCIP keeps one stable interface, the `Router 1.2.0` and the `Client.sol` message
 | Only the Router delivers a message to a receiver. | `CCIPReceiver.onlyRouter`; `Router.routeMessage` callable only by registered OffRamps | A receiver omits the check or stores a wrong Router address. |
 | A message is executed successfully at most once. | OffRamp execution state per message ID; only `UNTOUCHED` and `FAILURE` are executable | An application adds its own delivery path without `messageId` idempotency. |
 | A mint or release on the destination matches a burn or lock by a configured remote pool. | `isRemotePool(remote, sourcePoolAddress)` in `_validateReleaseOrMint`, plus the verification of the message | A custom pool skips `_validateReleaseOrMint`, or a wrong remote pool is configured. |
-| A 2.0 message carrying a token passes at least the default CCVs. | `OffRamp._getCCVsFromPool` falls back to the defaults when a pool returns none | A lane or the default CCV list is misconfigured, or a pool requires only a weak CCV. |
+| A 2.0 message carrying a token passes the CCVs its pool requires, and the default CCVs when the pool requires none. | `OffRamp._getCCVsFromPool` returns `address(0)`, the defaults marker, when a pool returns an empty list or is a v1 pool | A lane or the default CCV list is misconfigured, or the pool's own list names only a weak CCV (a non-empty pool list replaces the defaults). |
 | A pool never releases more than its bucket allows per window. | `RateLimiter._consume` on both directions | Limits are disabled, or an admin reconfigures repeatedly (2.0 refills on each change). |
 | Decimal conversion never increases the amount. | Division with rounding down in the destination pool's local-amount conversion | A custom pool overrides the conversion. |
 | Nothing moves on a cursed lane. | `isCursed` checks in Router, OnRamp, OffRamp and pools | A pool overrides the validation functions. |
@@ -454,7 +461,7 @@ CCIP's own documentation sets out the split of responsibilities on its service-r
 
 #### External dependencies
 
-- **Default verifier.** Unless a receiver, pool or lane asks for more, a 2.0 message is verified by Chainlink's `CommitteeVerifier`, a signature quorum; the trust in CCIP is then the trust in that committee's signer set.
+- **Default verifier.** Unless a receiver or pool returns its own CCV list, or the lane mandates one, a 2.0 message is verified by Chainlink's `CommitteeVerifier`, a signature quorum; the trust in CCIP is then the trust in that committee's signer set. A receiver or pool list without `address(0)` replaces the committee rather than adding to it.
 - **Finality of the source chain.** Lanes from chains whose finality is a block depth (Polygon PoS, Linea, ZKsync in the latency table) accept the residual risk of a deeper reorganisation; FTF adds that risk deliberately.
 - **Token developer attestations.** USDC token-only transfers can rely on `CCTPVerifier` alone, so their security is Circle's CCTP attestation rather than Chainlink's committee.
 
@@ -486,7 +493,7 @@ CCIP's own documentation sets out the split of responsibilities on its service-r
 
 | Risk | Where it comes from | What the design does about it | What remains |
 |---|---|---|---|
-| Forged message | Verifier set compromised | Default CCVs as floor; pools and receivers can require more | Trust in the committee and in each resolver's owner |
+| Forged message | Verifier set compromised | Default CCVs when a party sets none; pools and receivers can add CCVs (keeping the defaults with `address(0)`) or replace them | Trust in the committee and in each resolver's owner |
 | Unbacked mint | Pool, minter or LockBox misused | Remote-pool check, rate limits | Issuer key management; other minters |
 | Reorganisation | Source chain finality | Finality by default; FTF must be allowed by every party | Block-depth chains; deliberate FTF |
 | Stuck message | Receiver revert, FTF mismatch, gas too low | Retry by anyone; manual execution in v1.6 | Non-upgradeable receivers with bugs |
@@ -540,7 +547,7 @@ The points below were not settled by the sources read on 2026-11-16.
 |---|---|---|
 | The offchain services of 2.0 (CommitteeVerifier nodes, proof publication, the Executor service) are not in the repository read, whose Go code is the v1.6 commit and execute plugins. | Liveness, proof availability and the "honest attempt" claim of the executor rest on code not read. | The upstream service repository, not identified locally; `chains/evm/contracts/docs/v1.7-overview.png` in [chainlink-ccip at f560834](https://github.com/smartcontractkit/chainlink-ccip/tree/f560834e0bb4ca24428d637b0f98e76f26443008). |
 | Only the Ethereum-Arbitrum pair was read on chain; which other lanes run 2.0 contracts is unknown. | Ordering, manual execution and verification differ by version. | `typeAndVersion()` on each lane's ramps, and the [CCIP Directory](https://docs.chain.link/ccip/directory/mainnet). |
-| The v1.6 OffRamp commit and proof code and the `NonceManager` were read only through the documentation, not in Solidity. | The v1.6 lifecycle in this article comes from prose. | Tag `contracts-ccip-v1.6.3` of [chainlink-ccip](https://github.com/smartcontractkit/chainlink-ccip), `OffRamp.sol` and `NonceManager.sol` (tag name not verified). |
+| The v1.6 OffRamp commit and proof code and the `NonceManager` were read only through the documentation, not in Solidity; the v1.5 design (`CommitStore`, per-lane ramps) is not described. | The v1.6 lifecycle in this article comes from prose. | Tag `contracts-ccip-v1.6.3` of [chainlink-ccip](https://github.com/smartcontractkit/chainlink-ccip), `OffRamp.sol` and `NonceManager.sol` (tag name not verified). |
 | The 200,000 default gas limit comes from a code comment and the documentation; the real value is `FeeQuoter.defaultTxGasLimit` per destination. | A receiver sized to 200,000 may get another default. | `FeeQuoter.getDestChainConfig(dest)` on the target chain. |
 | Finality times, service limits and the 8-hour Smart Execution window are dated 2025 in the documentation copy; network fee values are not in it at all. | They change per lane and over time. | The live [execution latency page](https://docs.chain.link/ccip/ccip-execution-latency) and [billing page](https://docs.chain.link/ccip/billing). |
 | Manual execution and the Smart Execution window under 2.0 are not documented locally. | The retry path users are told to follow may differ for 2.0 messages. | Chainlink documentation published after the 2.0 release. |

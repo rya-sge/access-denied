@@ -1,0 +1,19 @@
+PASS slot 15,580,064 header served (publicnode)
+PASS state_root = 0x966c88c1...e72a (0x966c88c1842b8420d9fa5dccf0a9db86ae933ef238229a49d71ce4e953ece72a)
+PASS hash_tree_root(header) recomputed == API root (0xa544aac2197593cc74205def3af75bdb35bdc6e9da212a79bea40eb5919e36b3)
+PASS block root = 0xa544aac2...36b3
+PASS block root == the full value the article's cast call printed
+PASS empty proof 'slot' = first 8 bytes of the root = 14,741,254,758,814,336,165
+PASS one-sibling proof (leaf gindex 2) 'slot' = 11,533,380,310,597,772,962 (11533380310597772962)
+PASS three siblings (gindex 8) return the true slot 15,580,064
+PASS execution block 26,340,577 timestamp 1793784803 = genesis + 15,580,065 * 12
+PASS execution block 26,340,577 parentBeaconBlockRoot == 0xa544aac2...
+PASS ring index 1793784803 % 8191 = 4949, root slot 13,140
+PASS execution block 22,431,084 timestamp == 1746612311
+PASS Electra timestamp = genesis + 11,649,024 * 12
+PASS parentBeaconBlockRoot = 0x947d2274...552967 (0x947d22746be643f1428031a9ab7c58776ca54e461903bb5e4ba8a73448552967)
+PASS slot 11,649,023 header served (publicnode)
+PASS hash_tree_root(header 11,649,023) recomputed == API root
+PASS header 11,649,023 root == parentBeaconBlockRoot of block 22,431,084
+PASS slot 11,649,023 < Electra fork slot 11,649,024 (Deneb layout, gindex 363)
+18 PASS, 0 FAIL

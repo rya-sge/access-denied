@@ -2,6 +2,7 @@
 layout: post
 title: "Ethereum's Hidden Contracts: The System Contracts Behind Every Block"
 date:   2026-11-04
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -12,7 +13,7 @@ isMath: true
 isMermaid: true
 ---
 
-For two years, the repository that holds the assembly source of Ethereum's system contracts, [`ethereum/sys-asm`](https://github.com/ethereum/sys-asm), built a `bytecode/beacon_root/main.hex` of 93 bytes. A mainnet node returns 97 bytes for the [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) address, with a different code hash. The logic was the same, and the gap was closed upstream on 2026-10-29; the first section explains the four extra bytes. The check takes one command, because the contract in question is an ordinary account with ordinary bytecode.
+For two years, the assembly source of the EIP-4788 contract in [`ethereum/sys-asm`](https://github.com/ethereum/sys-asm), the repository that holds Ethereum's system contracts, assembled to 93 bytes, and since June 2026 the repository has committed that output as `bytecode/beacon_root/main.hex`. A mainnet node returns 97 bytes for the [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) address, with a different code hash. The logic was the same, and the gap was closed upstream on 2026-10-29; the first section explains the four extra bytes. The check takes one command, because the contract in question is an ordinary account with ordinary bytecode.
 
 Since Cancun (2024-03-13) and Prague (2025-05-07), an execution client calls such contracts at every block from a reserved address. Part of what used to be protocol logic now lives in programs of a few hundred bytes that anyone can read: EIP-4788 beacon roots, [EIP-2935](https://eips.ethereum.org/EIPS/eip-2935) block hashes, and the [EIP-7002](https://eips.ethereum.org/EIPS/eip-7002) and [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251) request queues. This article walks through how the client calls them, what each one stores, what happens to a block when a call fails, and what a Solidity developer has to check before integrating with them.
 
@@ -117,7 +118,7 @@ The difference follows what each call carries (*derived*). Beacon roots and bloc
 
 ## Reading the past: two ring buffers
 
-The two read-oriented contracts each keep the chain's recent commitments in exactly 8191 positions, so their storage never grows. With 12-second slots, 8191 blocks is 98,292 seconds, about 27.3 hours.
+The two read-oriented contracts each keep the chain's recent commitments in exactly 8191 positions, so their storage never grows. With 12-second slots (`SLOT_DURATION_MS: 12000` in the mainnet config of `consensus-specs`), 8191 blocks is 98,292 seconds, about 27.3 hours.
 
 ### EIP-4788: beacon roots by timestamp
 
@@ -176,7 +177,7 @@ EIP-7251 record, 116 bytes
 +----------------+-----------------+-----------------+
 ```
 
-The amount changes endianness on the way through, and `source_addr` is not supplied by the user: the contract stores `CALLER`. Authorisation rests on that one field. An `amount` of 0 means a full exit, and in EIP-7251 a request whose source equals its target asks to switch the validator to compounding credentials.
+The amount changes endianness on the way through, and `source_addr` is not supplied by the user: the contract stores `CALLER`. Authorisation rests on that one field. An `amount` of 0 means a full exit, and in EIP-7251 a request whose source equals its target asks to switch the validator to compounding credentials. The records above are what the system call returns. The log emitted on the write path carries `CALLER` followed by the input as received, so its amount is still big-endian.
 
 A public call takes one of these paths:
 
@@ -244,9 +245,11 @@ The contract computes the second line with integer arithmetic, in the Taylor loo
 | 700 | 763,291,859,702,149,480 | 0.76 ETH | 112 |
 | 705 | 1,024,319,536,763,752,658 | first value above 1 ETH | 113 |
 
-![Two log-scale panels: the fee rises as a straight line from 1 wei to above 1 ETH at excess 705, then decays back to 1 wei in 353 blocks for EIP-7002 and 705 for EIP-7251]({{site.url_complet}}/assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-fee-curve.svg)
+![Two log-scale panels: the fee rises as a straight line from 1 wei to above 1 ETH at excess 705, then decays back to 1 wei in 347 blocks for EIP-7002 and 693 for EIP-7251]({{site.url_complet}}/assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-fee-curve.svg)
 
-The left panel is a straight line because the axis is logarithmic: 17 extra requests multiply the fee by about $$e$$. The right panel shows the recovery. With no new requests, a spike to excess 705 decays by the target per block, so it takes 353 blocks (about 71 minutes) on the withdrawal queue and 705 blocks (141 minutes) on the consolidation queue to return to 1 wei. Excess 705 is an illustration, not an observed value.
+The left panel is a straight line because the axis is logarithmic: 17 extra requests multiply the fee by about $$e$$.
+
+The right panel shows the recovery. With no new requests, a spike to excess 705 decays by the target per block, and the fee is 1 wei again once excess is 12 or less, since excess 13 already gives 2 wei. That takes 347 blocks, about 69 minutes, on the withdrawal queue and 693 blocks, about 139 minutes, on the consolidation queue. `excess` itself reaches 0 a few blocks later, after 353 and 705 blocks. Excess 705 is an illustration, not an observed value.
 
 Three properties follow from the code:
 
@@ -343,6 +346,8 @@ On 2026-11-04 (block 26,340,668), mainnet already held bytecode at both addresse
 
 ### A spec sentence the code does not follow
 
+> **Update 2026-11-18.** EIP-8282 was revised on 2026-11-11 (EIPs commit [`253f6bd`](https://github.com/ethereum/EIPs/commit/253f6bd20d1b1b600228c0d696775a90720ba5f1), "Sync specification with sys-asm@83f9801"), after this article was published. The "permanently disabled" sentence is gone. The system call now runs five steps in order: it dequeues up to the per-block maximum whatever the calldata, stores the inhibitor when calldata is non-empty, clears it on the next call with empty calldata, resets `count` and returns the records. A new paragraph states that the deposit contract starts with zero storage, so "pre-fork deposits are accepted", while the exit contract starts inhibited. The fee formula now reads `effective_excess = stored_excess + max(0, count - TARGET_REQUESTS_PER_BLOCK)`, which matches the per-request rise described above. The reference implementation now points to `sys-asm` commit `83f9801`, whose builder sources are identical to the `f808a29` analysed here. The mismatch described below is therefore resolved in the current text; the analysis is kept because it documents the EIP as it stood at the cited commit `41a838d`.
+
 EIP-8282's section on the system call says: "If any calldata is included, the queue is permanently disabled via an inhibitor. If no calldata is included, it MUST dequeue up to its per-block maximum of records". The code does something else on both counts. In `update_excess`, non-empty calldata stores the inhibitor, and the next call without calldata clears it:
 
 ```text
@@ -375,13 +380,15 @@ In practice, a future fork that wanted the queue off would have to send input on
 
 ### The deposit queue is already open
 
-The two constructors differ, on purpose. `builder_exits/ctor.eas` stores the inhibitor "to avoid requests being queued before the fork", and `builder_deposits/ctor.eas` stores nothing. During review of the [pull request that added both contracts](https://github.com/ethereum/sys-asm/pull/43#discussion_r3468418015), a contributor wrote: "We want builders to queue before the fork begins. So long as the excess updates with each call, it won't be a DDOS issue." Another [questioned the benefit](https://github.com/ethereum/sys-asm/pull/43#discussion_r3468811102). The merged EIP text does not mention pre-fork requests yet, and [EIPs PR #12120](https://github.com/ethereum/EIPs/pull/12120), still open, adds that "pre-fork deposits are accepted".
+The two constructors differ, on purpose. `builder_exits/ctor.eas` stores the inhibitor "to avoid requests being queued before the fork", and `builder_deposits/ctor.eas` stores nothing. During review of the [pull request that added both contracts](https://github.com/ethereum/sys-asm/pull/43#discussion_r3468418015), a contributor wrote: "We want builders to queue before the fork begins. So long as the excess updates with each call, it won't be a DDOS issue." Another [questioned the benefit](https://github.com/ethereum/sys-asm/pull/43#discussion_r3468811102).
+
+The merged EIP text did not mention pre-fork requests yet, and [EIPs PR #12120](https://github.com/ethereum/EIPs/pull/12120), still open on 2026-11-04, added that "pre-fork deposits are accepted". The EIP has stated it since 2026-11-11 (see the [update above](#a-spec-sentence-the-code-does-not-follow)).
 
 On mainnet, slot 0 of the exit contract holds `0xff…ff`, and its fee getter reverts. Slot 0 of the deposit contract holds 0, and its getter returns 1 wei. A read-only `eth_call` of a 184-byte request with 1 ETH plus 1 wei succeeded, and the same call with 1 ETH alone reverted.
 
-So a deposit sent today is accepted, and its stake stays in the contract until Amsterdam activates. The `count` slot is reset only by the system call, so before activation the fee rises with every request past the eighth, however many blocks pass.
+So a deposit sent today is accepted, and the request waits in the queue until Amsterdam activates. The ETH, as with the deposit contract, never leaves the contract, since the bytecode has no opcode that sends value. The `count` slot is reset only by the system call, so before activation the fee rises with every request past the eighth, however many blocks pass.
 
-On the deployed bytecode in a local test, the fee reached 1 ETH at the 713th request, after about 16.9 ETH of fees and 713 ETH of stake. A backlog of 635 requests drained in 10 blocks at activation, and the fee was back to 1 wei 68 blocks later. PR #12120 lists this accumulation as an open question. At block 26,340,668 the queue was empty and the balance was 0. Neither builder contract has an entry in `checksums.txt`, unlike the other contracts of `sys-asm`.
+On the deployed bytecode in a local test, after 713 requests, which paid about 16.9 ETH of fees on 713 ETH of stake, the fee quoted for the next one passed 1 ETH. A backlog of 635 requests drained in 10 blocks at activation, and the fee was back to 1 wei 68 blocks later. PR #12120 lists this accumulation as an open question. At block 26,340,668 the queue was empty and the balance was 0. Neither builder contract has an entry in `checksums.txt`, unlike the other contracts of `sys-asm`.
 
 The contract checks neither the signature nor the credentials, so a mistake surfaces only on the consensus layer. `process_builder_deposit_request` in `specs/gloas/beacon-chain.md` returns immediately when the credentials do not start with `0xB0`, even for a top-up, and that stake stays locked in the contract for good. The merged EIP says the credentials of a top-up are ignored; [EIPs PR #12572](https://github.com/ethereum/EIPs/pull/12572), open at the time of writing, corrects this.
 
@@ -391,7 +398,7 @@ EIP-7997 is a requirement rather than a new contract. It makes the existing keyl
 
 ### EIP-8272: recent roots
 
-EIP-8272 is a Draft that depends on [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) frame transactions and on [EIP-7843](https://eips.ethereum.org/EIPS/eip-7843) `SLOTNUM`, and no code exists at its address on mainnet. It also has no `SYSTEM_ADDRESS` path: anyone writes to it. A 64-byte call stores a root under `keccak256(caller ‖ salt)` and `SLOTNUM % 8192`. A call of `n * 72` bytes, with `n` from 1 to 16, validates tuples `(source_id, slot, root)` and reverts if any is wrong or older than 8191 slots. Its purpose is to let a public-mempool validation frame check recent application state without reading another account's storage.
+EIP-8272 is a Draft that depends on [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) frame transactions and on [EIP-7843](https://eips.ethereum.org/EIPS/eip-7843) `SLOTNUM`, and no code exists at its address on mainnet. It also has no `SYSTEM_ADDRESS` path: anyone writes to it. A 64-byte call stores a hash committing to the root and the slot, under a key derived from `keccak256(caller ‖ salt)` and `SLOTNUM % 8192`. A call of `n * 72` bytes, with `n` from 1 to 16, validates tuples `(source_id, slot, root)` and reverts if any is wrong or older than 8191 slots. Its purpose is to let a public-mempool validation frame check recent application state without reading another account's storage.
 
 ## What a Solidity integrator must watch for
 
@@ -444,7 +451,7 @@ A few hundred bytes of assembly at fixed addresses now carry part of Ethereum's 
 - **Ring buffers.** Both keep 8191 entries. Beacon roots are keyed by exact timestamp and return the parent's root. Block hashes are keyed by number and extend the 256 blocks of `BLOCKHASH`.
 - **Queues.** They accept 56 or 96 bytes, charge an exponential fee on `excess`, keep any overpayment, and hand records to the CL through `requests_hash`. The CL can then drop a request with no signal to the EL.
 - **Deposits.** The deposit contract is an ordinary Solidity contract, and EIP-6110 reads its logs from receipts rather than calling it.
-- **Amsterdam.** It is unscheduled in `execution-specs`. The EIP-8282 contracts are already deployed but not yet called. The EIP's "permanently disabled" does not match code that re-enables the queue on the next call without input. By design, the deposit queue accepts requests today while the exit queue does not; open pull requests bring the EIP text in line.
+- **Amsterdam.** It is unscheduled in `execution-specs`. The EIP-8282 contracts are already deployed but not yet called. The EIP's "permanently disabled", in the text cited here, did not match code that re-enables the queue on the next call without input; the revision of 2026-11-11 now specifies the reversible inhibitor, the drain on a disabling call and pre-fork deposits (see the [update](#a-spec-sentence-the-code-does-not-follow)). By design, the deposit queue accepts requests today while the exit queue does not.
 
 ![Mindmap of Ethereum system contracts covering the system call, ring buffers, request queues, the deposit contract, the in-development Amsterdam contracts and integrator checks]({{site.url_complet}}/assets/article/blockchain/ethereum/system-contracts/2026-11-04-ethereum-system-contracts-mindmap.png)
 
@@ -540,9 +547,9 @@ A malformed log makes the block invalid. The CL appends the deposit to `pending_
 
 **Q: Does the EIP-8282 inhibitor permanently disable the queue?**
 
-The EIP says so, and the code does not behave that way. A system call with input stores the inhibitor, and the next system call without input resets `excess` to 0, which re-enables the queue. `testSystemCallWithInput` asserts this.
+No. A system call with input stores the inhibitor, and the next system call without input resets `excess` to 0, which re-enables the queue. `testSystemCallWithInput` asserts this. The EIP text cited in this article, at commit `41a838d`, said "permanently disabled". Since its [revision of 2026-11-11](#a-spec-sentence-the-code-does-not-follow) it describes the reversible behaviour of the code.
 
-It is a mismatch in a specification still under review, and not a vulnerability: only `SYSTEM_ADDRESS` can enter the branch, `execution-specs` always passes empty data, and the reversible behaviour is intended, as sys-asm PR #49 states.
+The old wording was a mismatch in a specification under review, and not a vulnerability: only `SYSTEM_ADDRESS` can enter the branch, `execution-specs` always passes empty data, and the reversible behaviour is intended, as sys-asm PR #49 states.
 
 **Q: Why was the sys-asm bytecode for EIP-4788 four bytes shorter than the deployed one?**
 
@@ -555,11 +562,11 @@ These points were not settled by the sources read, or rest on inference, and sho
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
 | No document says why the original source used `push3`; the commit only says "all: tidy up". | The article explains the difference, not the original intent. | The earlier etk source, and commit `75e602a` of `sys-asm`. |
-| The EIP copy was read at its 2026-10-19 commit, and EIP-8282 and EIP-7997 show a Last Call deadline of 2026-11-01, already past. | Their status or text may have changed. | The live pages on eips.ethereum.org. |
+| The EIP copy was read at its 2026-10-19 commit, and EIP-8282 and EIP-7997 show a Last Call deadline of 2026-11-01, already past. | Their status or text may change. EIP-8282's text did change on 2026-11-11 (see the [update](#a-spec-sentence-the-code-does-not-follow)); its status was still Last Call at EIPs commit `8194528` (2026-11-16). | The live pages on eips.ethereum.org. |
 | The deployment transactions and salts of the EIP-8282 contracts were not identified; the EIP does not print the salt. | The bytes were compared, not the provenance. | An archive node or explorer for both addresses. |
 | The balances of 0.1568 ETH and 2.796 ETH were not split into fees, overpayments and direct transfers. | The article cannot say how much users overpaid. | Historical traces of both addresses. |
 | No client (Geth, Reth, Nethermind and others) was read; the article describes `execution-specs`. | Client code may differ in structure, though it must agree on results. | The system-call code of each client. |
-| That nobody holds a key for `SYSTEM_ADDRESS`, the 12-second slot and the fork-name pairs come from general knowledge rather than the analysed files. | The 27.3-hour figure assumes no missed slots, and the access control assumes the address cannot sign. | `SECONDS_PER_SLOT` in consensus-specs, and the EIP-4788 discussion of the address. |
+| That nobody holds a key for `SYSTEM_ADDRESS` and the fork-name pairs come from general knowledge rather than the analysed files. The 27.3-hour figure assumes no missed slots. | The access control assumes the address cannot sign. | The EIP-4788 discussion of the address. |
 | The 7702 note in the annex is an inference from `CALLER` semantics, not a tested case. EIP-7002 itself still says an EOA always overpays. | An EOA delegated to code might pay the exact fee. | A fork test with a 7702-delegated EOA. |
 
 ## References
@@ -573,7 +580,7 @@ These points were not settled by the sources read, or rest on inference, and sho
 - [ethereum/solidity-deposit-contract](https://github.com/ethereum/solidity-deposit-contract) — analyzed at commit [`5bf2741b50c58b844225f89018041c5d54726f8e`](https://github.com/ethereum/solidity-deposit-contract/tree/5bf2741b50c58b844225f89018041c5d54726f8e), 2026-11-04
 - [ethereum/execution-specs](https://github.com/ethereum/execution-specs) — analyzed at commit [`aaae5abd382b6c0612add96bd8400d6fa4eb0617`](https://github.com/ethereum/execution-specs/tree/aaae5abd382b6c0612add96bd8400d6fa4eb0617), 2026-11-04
 - [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs) — analyzed at commit [`065bcd5c6ad96186cd2c0ac1c435f620a0b25373`](https://github.com/ethereum/consensus-specs/tree/065bcd5c6ad96186cd2c0ac1c435f620a0b25373), 2026-11-04
-- [ethereum/EIPs](https://github.com/ethereum/EIPs) — analyzed at commit [`41a838decba33325d01bd99b1cd6072c51214fac`](https://github.com/ethereum/EIPs/tree/41a838decba33325d01bd99b1cd6072c51214fac), 2026-11-04
+- [ethereum/EIPs](https://github.com/ethereum/EIPs) — analyzed at commit [`41a838decba33325d01bd99b1cd6072c51214fac`](https://github.com/ethereum/EIPs/tree/41a838decba33325d01bd99b1cd6072c51214fac), 2026-11-04; EIP-8282 revision read on 2026-11-18 at commit [`253f6bd`](https://github.com/ethereum/EIPs/commit/253f6bd20d1b1b600228c0d696775a90720ba5f1)
 - On-chain values read from Ethereum mainnet on 2026-11-04 through the public [PublicNode](https://www.publicnode.com/) RPC, blocks 26,340,639 to 26,340,668
 
 ### Specifications
@@ -601,3 +608,4 @@ These points were not settled by the sources read, or rest on inference, and sho
 - [EIP-7702: Set Code for EOAs - Overview]({{site.url_complet}}/2025/05/09/eip-7702-overview/)
 - [When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/)
 - [SSZ vs RLP: How Ethereum Serialises Data on Each Layer]({{site.url_complet}}/2026/11/04/ssz-vs-rlp-ethereum-serialization/)
+- [EIP-7251: Increasing the Maximum Effective Balance to 2,048 ETH]({{site.url_complet}}/2026/11/20/eip-7251-max-effective-balance-consolidation/)

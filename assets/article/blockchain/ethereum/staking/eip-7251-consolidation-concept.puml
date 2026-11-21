@@ -1,0 +1,24 @@
+@startuml
+title EIP-7251 - components of a consolidation
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component { 
+  BackgroundColor #EEF5FF
+  BorderColor #4A78B5
+}
+package "Execution layer" {
+  [Withdrawal address\n(EOA or staking contract)] as W
+  [Consolidation request contract\n0x0000BBdD...7251] as C
+}
+package "Consensus layer (Electra)" {
+  [process_consolidation_request] as P
+  [pending_consolidations\n(max 262,144)] as Q
+  [Consolidation churn\nbalance churn - 256 ETH] as CH
+  [process_pending_consolidations] as PP
+}
+W --> C : 96 bytes + fee
+C --> P : EIP-7685 request type 0x02\n(source_address, source_pubkey, target_pubkey)
+P --> CH : source exit_epoch
+P --> Q : PendingConsolidation
+Q --> PP : at source withdrawable_epoch
+@enduml

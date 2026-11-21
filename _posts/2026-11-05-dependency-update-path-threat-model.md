@@ -2,6 +2,7 @@
 layout: post
 title: "A Threat Model of the Dependency Update Path: What Dependabot Protects and What It Exposes"
 date:   2026-11-05
+last_modified_at: 2026-11-18
 lang: en
 locale: en-GB
 categories: security
@@ -17,7 +18,7 @@ Automated dependency updates close a real gap: a project that never updates keep
 
 That path is an attack surface of its own. This article builds a threat model of it from the point of view of a project using Dependabot, and tests the model against public incidents. The earlier articles in this series cover [how a job runs]({{site.url_complet}}/2026/11/05/how-github-dependabot-works/) and [how the credential proxy isolates it]({{site.url_complet}}/2026/11/05/dependabot-credential-proxy-isolation/), so this one concentrates on what happens around the job.
 
-The model follows the four questions of the [OWASP threat modeling process](https://community.owasp.org/Threat_Modeling_Process): what are we working on, what can go wrong, what do we do about it, and did we do a good job. It stays at the level of design and defence, and contains no attack instructions. Likelihood and impact ratings are my own judgement.
+The model follows the four questions listed in the [OWASP Threat Modeling Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html): what are we working on, what can go wrong, what do we do about it, and did we do a good job. It stays at the level of design and defence, and contains no attack instructions. Likelihood and impact ratings are my own judgement.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -33,7 +34,7 @@ The article relies on a few concepts from package ecosystems and GitHub Actions.
 - **`github.actor`.** The account that triggered the latest workflow event. It is not necessarily the author of the pull request.
 - **Confused deputy.** A privileged component is tricked into using its authority on behalf of someone who lacks it, classified as [CWE-441](https://cwe.mitre.org/data/definitions/441.html).
 - **Provenance attestation.** A signed statement of how and where a package was built.
-- **STRIDE.** A mnemonic for threat categories: spoofing, tampering, repudiation, information disclosure, denial of service and elevation of privilege.
+- **STRIDE.** A mnemonic for threat categories: spoofing, tampering, repudiation, information disclosure, denial of service and elevation of privilege, defined on OWASP's [Threat Modeling Process](https://community.owasp.org/Threat_Modeling_Process) page.
 
 ## What are we working on
 
@@ -75,13 +76,13 @@ The table lists the main threats, with STRIDE categories in the second column. T
 | T6 | Commits are forged to look like Dependabot's | Spoofing | Medium | High |
 | T7 | A security update ships a malicious release, with no cooldown | Tampering | Low | High |
 | T8 | Third-party text in the pull request misleads a reader or a tool | Spoofing | Medium | Medium |
-| T9 | Volume wears down review | Repudiation | High | Medium |
+| T9 | Volume wears down review | None (amplifier of T1, T2, T6, T8) | High | Medium |
 
 ### T1: A short-lived malicious release
 
-The most common pattern is an account takeover followed by a malicious version that lives for hours. GitHub's [case for a cooldown](https://github.blog/security/supply-chain-security/the-case-for-a-cooldown-why-dependabot-now-waits-before-issuing-version-updates/) cites compromised npm packages, including `chalk` and `debug`, that are downloaded more than 2 billion times a week. Their poisoned versions were live for roughly two hours.
+The most common pattern is an account takeover followed by a malicious version that lives for hours. GitHub's [case for a cooldown](https://github.blog/security/supply-chain-security/the-case-for-a-cooldown-why-dependabot-now-waits-before-issuing-version-updates/) cites the September 2025 compromise of `chalk`, `debug` and about a dozen other npm packages, together downloaded more than 2 billion times a week. Their poisoned versions were live for roughly two hours.
 
-The [Shai-Hulud worm](https://www.wiz.io/blog/shai-hulud-npm-supply-chain-attack) of September 2025 showed the next step: a post-install script harvested sensitive data, and npm tokens found in the environment were used to publish malicious versions of other packages. Reported package counts vary by source, from about 180 to over 500.
+The [Shai-Hulud worm](https://www.wiz.io/blog/shai-hulud-npm-supply-chain-attack) of September 2025 showed the next step: a post-install script harvested sensitive data, and npm tokens found in the environment were used to publish malicious versions of other packages. GitHub tokens it found were used to push a workflow that sent each reachable repository's secrets to the attacker. Wiz first counted more than 100 affected packages and added more to its list as the attack spread.
 
 An update bot that reacts within minutes can deliver such a release before it is removed, which is why the cooldown exists. It is on by default [since July 2026](https://github.blog/changelog/2026-07-14-dependabot-version-updates-introduce-default-package-cooldown/): version updates wait three days, and the code confirms this with `DEFAULT_COOLDOWN_DAYS = 3`.
 
@@ -93,7 +94,7 @@ The same blog post states the limit: a cooldown "does little against attacks tha
 
 A dependency pull request runs the project's tests, and that means installing the new version. So a malicious package can reach the CI runner before anyone reviews the change.
 
-GitHub reduces this. Its documentation says Dependabot-triggered runs are treated like fork pull requests: they get a read-only `GITHUB_TOKEN`, and the only secrets available are Dependabot secrets. That limit is real, but it depends on what the project stores there. A publishing token added as a Dependabot secret to make a job pass is exposed to the code being tested.
+GitHub reduces this. Its [documentation](https://docs.github.com/en/code-security/dependabot/troubleshooting-dependabot/troubleshooting-dependabot-on-github-actions) says that, by default, runs triggered by Dependabot from `push` and `pull_request`-type events are treated like fork pull requests: they get a read-only `GITHUB_TOKEN`, and the only secrets available are Dependabot secrets. A workflow's `permissions` key can widen the token, and `pull_request_target` does not have these limits. Where the default applies, it is real, but it depends on what the project stores in Dependabot secrets. A publishing token added as a Dependabot secret to make a job pass is exposed to the code being tested.
 
 ### T4: Mutable references
 
@@ -110,7 +111,7 @@ Kong's [post-mortem](https://konghq.com/blog/product-releases/december-2024-unau
 - The pull request targeted an old branch that still had the vulnerable workflow, because an earlier fix had missed unused branches.
 - Dependabot had been allowlisted for privileged workflows, so its name opened the door.
 
-GitHub [removed several comment commands](https://github.blog/changelog/2026-01-27-changes-to-github-dependabot-pull-request-comment-commands/) in January 2026, including `merge`, which closed one of the techniques the article describes. Boost Security notes that the other remains valid.
+GitHub [removed several comment commands](https://github.blog/changelog/2026-01-27-changes-to-github-dependabot-pull-request-comment-commands/) in January 2026, including `merge`. This closed one of Boost Security's two branch-name injection techniques. The other, and the basic actor confusion through `@dependabot recreate`, still work.
 
 ### T6: Forged Dependabot commits
 
@@ -153,7 +154,7 @@ The controls below map to the threats. Several already exist in Dependabot, and 
 
 ### Cooldown: what to expect
 
-The evidence for a cooldown is good for what it covers. GitHub says a review of 21 incidents from 2018 to 2026 found that a cooldown could have filtered out the majority of short-lived publishes. William Woodruff's [November 2025 analysis](https://blog.yossarian.net/2025/11/21/We-should-all-be-using-dependency-cooldowns) found that 8 of 10 attacks had windows of opportunity of less than a week. The two exceptions were xz-utils, at about five weeks, and Kong Ingress Controller, at about ten days, so a three-day wait would not have covered those.
+The evidence for a cooldown is good for what it covers. GitHub says a review of 21 incidents from 2018 to 2026 found that a cooldown could have filtered out the majority of short-lived publishes. William Woodruff's [November 2025 analysis](https://blog.yossarian.net/2025/11/21/We-should-all-be-using-dependency-cooldowns) found that 8 of 10 attacks had windows of opportunity of less than a week. The two exceptions were xz-utils, at about five weeks, and Kong Ingress Controller, at about ten days, so a three-day wait would not have covered those. Its list puts tj-actions at three days, which the default only just covers.
 
 Two caveats apply. The first is that incident lists contain the attacks that were detected, which favours ones that were found quickly. The second is that a cooldown works because somebody else installs the release first, or a scanner sees it. If everyone waits, detection has to come from scanners.
 
@@ -163,7 +164,7 @@ Keep the default unless there is a reason to change it. For sensitive repositori
 
 Auto-merge is the point where most of these threats turn into incidents, because it removes the last human check. If it is used:
 
-- Trigger on `pull_request`, not `pull_request_target`, wherever possible.
+- Trigger on `pull_request`, not `pull_request_target`, wherever possible. GitHub's documentation says `pull_request` runs triggered by Dependabot get a read-only token by default, and Boost Security notes that an outsider cannot use Dependabot to trigger them from a fork.
 - Check who wrote the pull request, as in `github.event.pull_request.user.login`, not `github.actor`. Boost Security also warns against other contexts that can be confused, such as `github.triggering_actor`.
 - Use `dependabot/fetch-metadata` over custom parsing, and pin it to a SHA.
 - Limit it to patch updates of development dependencies, where a mistake is cheapest.
@@ -178,7 +179,7 @@ if: github.actor == 'dependabot[bot]'
 if: github.event.pull_request.user.login == 'dependabot[bot]'
 ```
 
-The check on the author is necessary, not sufficient. Boost Security also advises avoiding `synchronize` events where possible, and protecting `dependabot/**` branches if Dependabot has bypass privileges.
+The check on the author is necessary, not sufficient. Boost Security notes that under `synchronize` several identity contexts can be confused, and treats `github.event.pull_request.user.login` as safe only outside `synchronize`. It also advises protecting `dependabot/**` branches if Dependabot has bypass privileges.
 
 ### Signals that already exist
 
@@ -196,7 +197,7 @@ The npm attestation check is a good example of a useful signal: it warns when a 
 
 Smart-contract projects need a separate note, because their dependencies can control funds directly. Dependabot's public code has no ecosystem for Foundry. Foundry's `lib/` folders are ordinarily git submodules, so the `git_submodules` ecosystem can propose updates, and npm-based projects use `npm_and_yarn`.
 
-A submodule bump is a commit range, not a package version, and no cooldown history or attestation applies in the same way. For contract libraries, an update changes code that gets deployed and is hard to undo, so automated merging is the wrong default at any patch level. Also, the code running in CI and on developer machines handles deployment keys, which makes T3 more serious here.
+A submodule bump is a commit range, not a package version, and no cooldown history or attestation applies in the same way. For contract libraries, an update changes code that gets deployed and is hard to undo, so automated merging is the wrong default at any patch level. Also, the code running in CI and on developer machines often handles deployment keys, which makes T3 more serious here.
 
 ## Did we do a good job
 
@@ -204,7 +205,7 @@ The incidents confirm most of the model, and they expose where it is weakest.
 
 | Incident | Threat | Which control would have helped |
 |----------|--------|--------------------------------|
-| npm `chalk` and `debug` | T1 | Cooldown |
+| npm `chalk` and `debug`, September 2025 | T1 | Cooldown |
 | Shai-Hulud, September 2025 | T1, T3 | Cooldown, scripts disabled in CI, fewer secrets |
 | tj-actions/changed-files, March 2025 | T4 | SHA pinning |
 | Kong Ingress Controller, December 2024 | T5 | Author check, no allowlisting, all branches fixed |
@@ -212,9 +213,9 @@ The incidents confirm most of the model, and they expose where it is weakest.
 
 The right-hand column is hindsight, and it is my assessment rather than the finding of any report. Four observations follow.
 
-**Dependabot was seldom the compromised component.** Across these cases, the job itself was not breached. The failures were in workflows built around it, in tokens, or in trust placed in its name.
+**Dependabot was not the compromised component in any of these cases.** The job itself was not breached, and three of the five incidents did not involve Dependabot at all. The failures were in workflows built around it, in tokens, or in trust placed in its name.
 
-**Most controls are the project's responsibility.** The defaults have improved, with the cooldown and read-only tokens. But Kong's incident came from a workflow the project itself had written.
+**Most controls are the project's responsibility.** The defaults help: a read-only token, and since July 2026 a cooldown. But Kong's incident came from a workflow the project itself had written.
 
 **T7 and T8 have no incident behind them.** They are reasoned from the design. They could be wrong, or simply not yet seen.
 
@@ -230,7 +231,7 @@ An update bot delivers third-party code on a schedule, under a trusted name. Its
 - **Mutable references bypass update tools.** tj-actions changed under an unchanged version number, and SHA pinning addresses it.
 - **Workflows around Dependabot are part of the attack surface.** Kong's incident came from an actor confusion in a `pull_request_target` workflow, left on an old branch.
 - **A bot's name is not authentication.** Forged commits and confused auto-merge both exploit it.
-- **Dependabot-triggered runs have reduced rights**, and Dependabot secrets decide how much that is worth.
+- **Dependabot-triggered runs have reduced rights by default**, and Dependabot secrets decide how much that is worth.
 - **Auto-merge removes the last check.** It should be narrow, use the pull request author and stop on maintainer, script or attestation changes.
 - **Review still matters.** No control here replaces reading a bump to an important dependency, and volume works against that.
 
@@ -320,7 +321,7 @@ The attackers moved existing version tags to a malicious commit. A workflow that
 
 **Q: Are Dependabot pull requests safe to run in CI?**
 
-They run with reduced rights, since GitHub gives them a read-only token and only Dependabot secrets. They are not free of risk: new dependency code executes on the runner, so the risk depends on what those secrets can do.
+By default they run with reduced rights, since GitHub gives `push` and `pull_request` runs a read-only token and only Dependabot secrets. A `permissions` key or a `pull_request_target` workflow removes that protection. They are not free of risk: new dependency code executes on the runner, so the risk depends on what those secrets can do.
 
 **Q: A team enables auto-merge for all Dependabot security updates, with an actor check. Combining the threats above, what is wrong?**
 
@@ -344,10 +345,10 @@ The points below remain open.
 | The "right-hand column" assessment of incidents is hindsight. | A control may not have stopped a real attacker. | Each incident's full report. |
 | The study of 21 incidents is cited through GitHub's post. | Its method was not read. | The research linked from GitHub's blog post. |
 | Whether Shai-Hulud spread through any Dependabot pull request was not established. | The table assigns T1 by pattern, not by a documented case. | The vendors' incident reports. |
-| Package counts for Shai-Hulud vary across sources. | The article gives the range only. | GitHub's own statement on the removal. |
+| The final package count for Shai-Hulud was not established. | The article gives only Wiz's early count of more than 100. | Later vendor reports and GitHub's own statement on the removal. |
 | The behaviour of `pin_to_sha?` in the `github_actions` ecosystem was only skimmed. | The article says only that SHA pins are handled. | `github_actions/lib/dependabot/github_actions/update_checker.rb`. |
 | Foundry support is inferred from the absence of an ecosystem and from how `lib/` is usually set up. | A project may manage dependencies differently. | `dependabot-core` and the project's `foundry.toml`. |
-| The workflow rules on `pull_request` come from one research article. | GitHub's own guidance was not fully read. | GitHub's page on automating Dependabot with GitHub Actions. |
+| The advice on `pull_request` rests on GitHub's troubleshooting page and Boost Security's article. | GitHub's dedicated guidance was not read. | GitHub's page on automating Dependabot with GitHub Actions. |
 
 ## References
 
@@ -373,8 +374,9 @@ The points below remain open.
 
 ### Methods
 
+- OWASP, [Threat Modeling Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html)
 - OWASP, [Threat Modeling Process (Historical)](https://community.owasp.org/Threat_Modeling_Process)
-- MITRE, [CWE-441: Confused Deputy](https://cwe.mitre.org/data/definitions/441.html)
+- MITRE, [CWE-441: Unintended Proxy or Intermediary ('Confused Deputy')](https://cwe.mitre.org/data/definitions/441.html)
 
 ### Related articles
 

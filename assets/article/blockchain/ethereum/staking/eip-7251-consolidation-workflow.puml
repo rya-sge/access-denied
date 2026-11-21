@@ -1,0 +1,25 @@
+@startuml
+title EIP-7251 - processing a consolidation request
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EEF5FF
+skinparam ActivityBorderColor #4A78B5
+start
+:Request (source_address, source_pubkey, target_pubkey);
+if (source == target and valid switch?) then (yes)
+  :Rewrite 0x01 to 0x02, queue balance above 32 ETH;
+  stop
+endif
+if (source == target, queue full, or consolidation churn <= 32 ETH?) then (yes)
+  :Ignore (fee not refunded);
+  stop
+endif
+if (source address, 0x02 target, active, not exiting,\n256 epochs, no pending partial?) then (no)
+  :Ignore (fee not refunded);
+  stop
+endif
+:Source exit_epoch from consolidation churn;
+:withdrawable_epoch = exit_epoch + 256;
+:Append PendingConsolidation;
+:At withdrawable_epoch, move min(balance, effective balance) to target;
+stop
+@enduml

@@ -30,7 +30,7 @@ This article compares them at byte level and measures size and gas on that real 
 
 The article assumes familiarity with Ethereum and Solidity, and relies on these mechanisms without developing them:
 
-- **Execution and consensus layers.** The execution layer runs the EVM and holds accounts, the consensus layer (the beacon chain) holds validators and finality. Each beacon block carries one execution payload.
+- **Execution and consensus layers.** The execution layer runs the EVM and holds accounts, the consensus layer (the beacon chain) holds validators and finality. Up to Fulu, each beacon block carries one execution payload; in Gloas the block carries a builder's bid and the payload follows in a separate envelope.
 - **Merkle-Patricia trie (MPT).** The authenticated key-value trie of the execution layer. Its nodes are RLP-encoded and hashed with Keccak-256, and the keys of the per-block tries are RLP-encoded indices. [Merkle Patricia Forestry on Cardano — How It Differs From Other Merkle Trees]({{site.url_complet}}/2026/08/28/merkle-patricia-forestry-cardano/) explains its structure.
 - **Merkle branch.** To prove a leaf of a binary hash tree, a prover gives one sibling per level. This article only counts siblings: [When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/) derives generalized indices and proof verification.
 - **Typed transaction envelope.** [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) writes a transaction as one type byte followed by a payload, RLP in all current types. Legacy transactions have no type byte.
@@ -68,7 +68,7 @@ flowchart TD
 | Deposit data on the execution side | SSZ root computed in Solidity by the deposit contract | `deposit_data_root` |
 | Execution requests ([EIP-7685](https://eips.ethereum.org/EIPS/eip-7685)) | One type byte followed by SSZ bytes | SHA-256 based `requests_hash` |
 
-The execution rows can be read in `execution-specs`, for example `fork.py` and `blocks.py` under `forks/osaka`. The consensus side treats a transaction as bytes it does not parse: `Transaction` is a `ByteList` in the Fulu types, which is why the same bytes appear unchanged on both sides.
+The execution rows can be read in `execution-specs`, for example `fork.py` and `blocks.py` under `forks/osaka`. The consensus side treats a transaction as bytes it does not parse: `Transaction` is a `ByteList`, defined in Bellatrix and unchanged in Fulu, which is why the same bytes appear unchanged on both sides.
 
 ## RLP
 
@@ -199,7 +199,7 @@ Vector[List[Uint8,3],4]([1,2],[3,4,5],[],[6])
 10000000 12000000 15000000 15000000 0102 030405 06
 ```
 
-The limit N of a list never appears in the bytes. It is enforced on decoding, and it sets the depth of the Merkle tree. Offsets also bound the format: `check_composite_size` in the specification refuses an encoding of 4 GiB or more, where RLP lengths go up to 8 bytes.
+The limit N of a list never appears in the bytes. It is enforced on decoding, and it sets the depth of the Merkle tree. Offsets also bound the format: `check_composite_size`, added to the specification after `v0.1.0`, refuses an encoding of 4 GiB or more, where RLP lengths go up to 8 bytes.
 
 ### Bitfields
 
@@ -248,7 +248,7 @@ Without a type, however, the bytes mean nothing. `0100020003000400` is `Vector[U
 - **Containers and vectors of composites.** One chunk per element, its own `hash_tree_root`, merkleized.
 - **Lists and bitlists.** The tree width comes from the limit, not the length, then the length is mixed in: `sha256(root ‖ uint256_le(length))`.
 
-The tree is padded with zero chunks up to a power of two. An implementation does not build that tree: the roots of all-zero subtrees are precomputed, so an empty `List` with a limit of `2^40` costs no real work. Without the mix-in, a list ending in zeros would share its root with the shorter list.
+The tree is padded with zero chunks up to a power of two. An implementation need not build that tree: the roots of all-zero subtrees are precomputed, so an empty `List` with a limit of `2^40` costs no real work. Without the mix-in, a list ending in zeros would share its root with the shorter list.
 
 For the real withdrawal, four fields give four chunks and three hashes:
 
@@ -271,16 +271,16 @@ Tree hashing costs more the first time and much less afterwards. The block itsel
 | Object | Flat SHA-256 | `hash_tree_root` |
 |--------|--------------|------------------|
 | Real `BeaconBlock`, 172,218 bytes | 2,692 compressions | 11,790 hashes, 23,580 compressions |
-| `List[Uint64, 2^40]`, 2,000,000 synthetic values, 16,000,000 bytes | 250,001 compressions | 500,027 hashes |
-| One value changes in that list | 250,001 again | 39 hashes |
+| `List[Uint64, 2^40]`, 2,000,000 synthetic values, 16,000,000 bytes | 250,001 compressions | 500,027 hashes, 1,000,054 compressions |
+| One value changes in that list | 250,001 compressions again | 39 hashes, 78 compressions |
 
-The compression figure assumes two per 64-byte hash, without an implementation that precomputes the padding block. In the first computation the tree is about four times the work of a flat hash on the list. After that, one update walks 38 levels and one mix-in, and the code checks that the incremental root equals a full recomputation. This is what makes a monolithic beacon state practical: only the path of each changed value is rehashed.
+The compression figure assumes two per 64-byte hash, without an implementation that precomputes the padding block. In the first computation the tree is about four times the work of a flat hash on the list, and about nine times on the real block. After that, one update walks 38 levels and one mix-in, and the code checks that the incremental root equals a full recomputation. This is what makes a monolithic beacon state practical: only the path of each changed value is rehashed.
 
 The other property is summaries. Any subtree can be replaced by its root without changing the result. On the real block, the 112-byte `BeaconBlockHeader`, whose `body_root` replaces a body, has the same root as the 172,218-byte `BeaconBlock`: `0xe74a493e…542a`.
 
 ### Two limits worth knowing
 
-**The root is not bound to the type.** The same run shows that `Vector[Uint16,4](1,2,3,4)` and `Vector[Uint8,8](1,0,2,0,3,0,4,0)` have equal bytes and an equal root, since both fit one chunk. `List[Uint16,4]` and `List[Uint16,8]` also share a root for the same values, as both limits round to one chunk, while `List[Uint16,64]` differs. Consensus signatures add a domain for this reason, and a contract that compares roots needs to know the type on its own.
+**The root is not bound to the type.** The same run shows that `Vector[Uint16,4](1,2,3,4)` and `Vector[Uint8,8](1,0,2,0,3,0,4,0)` have equal bytes and an equal root, since both fit one chunk. `List[Uint16,4]` and `List[Uint16,8]` also share a root for the same values, as both limits round to one chunk, while `List[Uint16,64]` differs. Consensus signatures also mix in a domain, which separates message kinds, forks and chains, and a contract that compares roots needs to know the type on its own.
 
 **The limit is part of the commitment.** Changing a limit can change every root of that type. This is the weakness that progressive lists address, and [the beacon state proofs article]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/) follows its effect on proofs across forks.
 
@@ -326,14 +326,19 @@ Some objects are similar in size overall, without being field-for-field equal: t
 
 ### Proof size
 
-Counting only, on the same block. For a transaction, the median MPT proof is 1,354 bytes including the transaction, and the largest 18,765, driven by a large transaction in the final node. An SSZ branch to an element of `Transactions` is 21 siblings, 672 bytes, whatever the size of the element. For a withdrawal, a median of 621 bytes compares with 5 siblings, 160 bytes.
+Counting only, on the same block:
+
+- **Transaction.** The median MPT proof is 1,354 bytes including the transaction, and the largest 18,765, driven by a large transaction in the final node. An SSZ branch to an element of `Transactions` is 21 siblings, 672 bytes, whatever the size of the element. The verifier also needs the transaction itself (a median of 180 bytes for the 229 type-2 transactions), which the MPT figure already contains.
+- **Withdrawal.** A median of 621 bytes, leaf included, compares with 5 siblings, 160 bytes, plus the 44-byte withdrawal.
+
+These depths follow the Fulu limits (`2^20` transactions, 16 withdrawals); Gloas turns `Transactions` and `Withdrawals` into `ProgressiveList` types, which changes both branches.
 
 ## Decoding in Solidity
 
 Neither format has EVM support, so a contract needs its own reader. The project reads calldata with a strict RLP reader and a small SSZ reader, compiled with solc 0.8.30, optimizer 200 runs, EVM version `osaka`.
 
 - **RLP reader.** It must parse each header, check canonical form, and walk through earlier items, since an item's position depends on the lengths before it.
-- **SSZ reader.** It checks the total length, reads at a constant offset, and swaps endianness. `uint64` needs a byte swap, as the [deposit contract's](https://github.com/ethereum/solidity-deposit-contract) `to_little_endian_64` does in the other direction.
+- **SSZ reader.** For a withdrawal it checks the total length, reads at a constant offset, and swaps endianness. For a transaction it checks only the first offset and the union selector before reading at a constant offset, while the RLP reader also requires the outer list to end with the input and checks every header it skips, so part of the gap in the two transaction rows comes from less validation. `uint64` needs a byte swap, as the [deposit contract's](https://github.com/ethereum/solidity-deposit-contract) `to_little_endian_64` does in the other direction.
 
 Gas is the cost of the function minus that of a no-op with the same calldata, both already warm, so it excludes intrinsic calldata cost:
 
@@ -352,10 +357,10 @@ Gas is the cost of the function minus that of a no-op with the same calldata, bo
 
 RLP grows by about 693 gas per element skipped, and SSZ does not depend on position. The ratios (about 14 for one field) depend on the implementation, because this RLP reader favours clarity and an assembly version would be cheaper. The linear growth and the flat line do not depend on it.
 
-- **Size of the skipped data is not the cost.** Reading `value` costs almost the same in a 180-byte and a 17,527-byte transaction: RLP reads a length and jumps. The cost follows the number of items passed, not the number of bytes.
+- **Size of the skipped data is not the cost.** Reading `value` costs almost the same in a 180-byte and a 17,527-byte transaction, but `value` is field 6 and comes before `data`, so this only shows that total size does not matter. Reading field 8, the access list, in the large transaction does skip its 17 KB `data`: it costs 8,049 gas, 695 more than field 7, the same step of about 680 gas as between earlier fields (`results/forge.txt`, `rlpTxField big`). RLP reads a length and jumps, so the cost follows the number of items passed, not the number of bytes.
 - **The last two rows include different work.** Each hashes one element of its own length, so the SSZ figure varies with the transaction rather than with its position.
 
-For comparison, reading `amount` from an ABI-encoded struct argument costs 871 gas gross, including the call, against 979 gross for the no-op that takes 44 bytes as `bytes`. The ABI form takes 132 bytes of calldata.
+For comparison, reading `amount` from an ABI-encoded struct argument costs 871 gas gross, including the call. That is less than the 979 gross of the no-op that only receives the 44 SSZ bytes as `bytes`, so less than the 1,275 of the SSZ read (979 plus 296). Both calls carry 132 bytes of calldata, since `bytes` adds an offset, a length and padding.
 
 ### Committing costs more than reading
 
@@ -390,7 +395,7 @@ The status below was read from the local EIPs checkout and compared with the ups
 
 A `ProgressiveList` removes the limit from the tree. Instead of one tree of fixed depth, it uses a spine of subtrees of 1, 4, 16, 64 chunks and so on, and appending never moves an existing element. A `ProgressiveContainer` declares `active_fields`, a bit per position, so a field that is removed leaves a gap and the others keep their place. Both serialise like their ordinary counterparts; only the tree differs. The code checks this against the `ssz-specs` vectors, 117 in all with those types among them.
 
-So the consensus layer changes its Merkle tree layouts in Glamsterdam, and its encoding does not change. In the Gloas specification `Validators`, `Balances`, `Attestations` and many others become `ProgressiveList`, and `ExecutionPayloadBid` a `ProgressiveContainer`. A related point from this reading (*derived*, not stated in the EIPs): progressive containers stabilise Merkle positions, not serialised offsets, so a contract that reads SSZ bytes at a constant offset still breaks when a field is added.
+So the consensus layer changes its Merkle tree layouts in Glamsterdam, and its serialisation rules do not change; the contents of some containers do, with [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732), also scheduled in EIP-7773. In the Gloas specification `Validators`, `Balances`, `Attestations` and many others become `ProgressiveList`, and `ExecutionPayloadBid` a `ProgressiveContainer`. A related point from this reading (*derived*, not stated in the EIPs): progressive containers stabilise Merkle positions, not serialised offsets, so a contract that reads SSZ bytes at a constant offset still breaks when a field is added.
 
 Glamsterdam has no mainnet date: the activation table of EIP-7773 is empty for mainnet, and `GLOAS_FORK_EPOCH` is `2**64-1` at `consensus-specs` head. The upstream table has Sepolia at 2026-10-06 and Hoodi at 2026-10-26, and the local pin has only Sepolia.
 
@@ -413,7 +418,7 @@ RLP and SSZ answer different questions, and Ethereum's blocks use both, one insi
 - **RLP** is compact and untyped. The schema lives in the clients, and a commitment covers the bytes as one unit.
 - **SSZ** is typed and positional. Fixed fields sit at known offsets, variable ones behind 4-byte offsets, and limits set the depth of the tree.
 - **Both decoders are strict.** Each accepted input has one encoding, and RLP integers need one additional typed check.
-- **`hash_tree_root` is a tree over the type.** It costs about four times a flat hash at first and 39 hashes per update on the measured list, and bytes alone do not determine the type.
+- **`hash_tree_root` is a tree over the type.** It cost about four times a flat hash at first on the 16 MB list (about nine times on the real block) and 39 hashes per update, and bytes alone do not determine the type.
 - **Measured on one block**, SSZ was 20 to 26% larger, cheaper as calldata for withdrawals, dearer for transactions, and close to RLP after zlib.
 - **In Solidity**, reading a field cost 296 gas against 4,102, and committing cost 2,732 against 177.
 - **What is scheduled:** EIP-7688 for Glamsterdam, which requires the progressive types. SSZ transactions and receipts are in no fork, and EIP-7807 was declined for Hegotá.
@@ -504,7 +509,7 @@ Alone, they serialise identically. They differ in two ways:
 
 **Q: Why is `hash_tree_root` more expensive than one SHA-256, and why is it used anyway?**
 
-It hashes every level of a tree, and on the 16,000,000-byte list that took about four times the compressions of a flat hash. After that an update costs one branch: 39 hashes, against 250,001 compressions for rehashing flat. It also allows a proof of one field, and a subtree can stand in for its root.
+It hashes every level of a tree, and on the 16,000,000-byte list that took about four times the compressions of a flat hash. After that an update costs one branch: 39 hashes or 78 compressions, against 250,001 compressions for rehashing flat. It also allows a proof of one field, and a subtree can stand in for its root.
 
 **Q: Two types give the same SSZ bytes and root. How can that be safe?**
 
@@ -566,6 +571,7 @@ The points below were not settled by the sources or by the runs.
 - [EIP-7685: General purpose execution layer requests](https://eips.ethereum.org/EIPS/eip-7685)
 - [EIP-7688: Forward compatible consensus data structures](https://eips.ethereum.org/EIPS/eip-7688)
 - [EIP-7702: Set Code for EOAs](https://eips.ethereum.org/EIPS/eip-7702)
+- [EIP-7732: Enshrined Proposer-Builder Separation](https://eips.ethereum.org/EIPS/eip-7732)
 - [EIP-7773: Hardfork Meta - Glamsterdam](https://eips.ethereum.org/EIPS/eip-7773)
 - [EIP-7807: SSZ execution blocks](https://eips.ethereum.org/EIPS/eip-7807)
 - [EIP-7916: SSZ ProgressiveList](https://eips.ethereum.org/EIPS/eip-7916)
