@@ -27,7 +27,7 @@ The vault descriptions below use a few DeFi lending notions without explaining t
 - **Timelock and guardian**: on a MetaMorpho vault, sensitive changes such as raising a market cap wait for a delay before taking effect, and a guardian can cancel them in the meantime. The Smokehouse vaults rely on a 3-day timelock and an Aragon DAO acting as guardian.
 - **Real-world assets (RWA)**: tokens that represent off-chain assets such as Treasury bills or loan portfolios, issued by a regulated entity that holds the underlying. Several vaults accept them as collateral, and Grove allocates Sky's reserves into them.
 - **Price oracles**: contracts that publish an asset's market price on-chain, which a lending market reads to decide when a position can be liquidated; see [How to build a blockchain oracle]({{site.url_complet}}/2024/04/16/build-blockchain-oracle/). Steakhouse runs a validator for the Chronicle oracle network.
-- **Sky (formerly MakerDAO)**: the protocol that issues the DAI and USDS stablecoins against collateral and invests part of its reserves; see [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/). Steakhouse started as a contributor to it.
+- **Sky (formerly MakerDAO)**: the protocol that issues the DAI and USDS stablecoins against collateral and invests part of its reserves; see [Introduction to MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/). Steakhouse started as a contributor to it.
 
 ## Kamino Finance
 

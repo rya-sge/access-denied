@@ -373,7 +373,7 @@ EBA therefore classifies it as significant under Article 56 and supervision of t
 
 - [Tether USDT smart contract - Overview]({{site.url_complet}}/2025/07/06/tether-stablecoin-overview/)
 - [USD₮0 - Omnichain Fungible Token]({{site.url_complet}}/2025/11/07/usdt0-Omnichain-fungible-token/)
-- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/)
+- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/)
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)
 - [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
 - [The EU Money Market Fund Regulation (EU) 2017/1131 — Fund Types, Portfolio Rules, Valuation and Liquidity Tools]({{site.url_complet}}/2026/10/01/eu-money-market-fund-regulation-2017-1131/)

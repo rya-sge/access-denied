@@ -25,7 +25,7 @@ This article explains the system from three sources. The first is the public doc
 
 The article assumes familiarity with DeFi and Ethereum, and uses the following more specific mechanisms without re-deriving them.
 
-- **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/) vaults. Below a minimum collateral ratio the position can be liquidated, and a system can also track the ratio of all collateral to all debt to restrict operations under stress, which is what Polaris's Defensive and Recovery modes do.
+- **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/) vaults. Below a minimum collateral ratio the position can be liquidated, and a system can also track the ratio of all collateral to all debt to restrict operations under stress, which is what Polaris's Defensive and Recovery modes do.
 - **Peg arbitrage, stability pool and redistribution.** [Liquity](https://www.liquity.org/) keeps its stablecoin near one dollar by letting anyone redeem it for collateral at face value, and liquidates without auctions: a pool of stablecoin depositors absorbs bad debt first, and leftover debt is shared among all other positions. Polaris keeps both liquidation stages and applies peg arbitrage on both sides of the peg.
 - **Power law.** A function of the form $$y = a \cdot x^{k}$$, where the variable is raised to a fixed exponent. Multiplying $$x$$ by any factor $$c$$ multiplies $$y$$ by $$c^{k}$$ wherever the curve starts, so a power law has no preferred scale. The pETH price is a power law of the supply with exponent $$\beta$$; [a separate article]({{site.url_complet}}/2026/10/22/power-law-curves/) covers power-law curves in detail.
 - **Marginal price and price impact.** When price depends on the quantity traded, as in an [automated market maker]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/), the quoted price applies only to an infinitesimal trade, and a real trade pays the average over the range it moves through. On a bonding curve that cost is the area under the price curve, which is why integrals appear below.
@@ -708,7 +708,7 @@ The sources leave the following points open. They should be checked, or the arti
 - [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
 - [How Liquity V1 Works - LUSD, Troves, the Stability Pool, Redemptions and Recovery Mode]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/)
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)
-- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/)
+- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/)
 - [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)
 - [How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/)
 - [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
