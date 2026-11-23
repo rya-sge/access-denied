@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* LI.FI bridge and DEX aggregator
+** Execution model
+*** API li.quest/v1 builds calldata
+*** LiFiDiamond (EIP-2535) executes
+*** 44 facets, helpers, libraries
+*** Periphery: Executor, Receivers, Permit2Proxy
+** Flows
+*** BridgeData + SwapData[]
+*** swap, then bridge the real output
+*** validateBridgeData modifiers
+*** NON_EVM_ADDRESS for non-EVM receivers
+*** Receiver -> Executor destination calls
+** Allow-list
+*** contract + selector pairs
+*** 0xffffffff approveTo-only marker
+*** enforced in SwapperV2, not LibSwap
+** Governance
+*** Safe 3 of 6 -> timelock (3 h) -> diamondCut
+*** EOA pauser: pause or remove a facet
+*** unpause without delay
+** Deployments
+*** 0x1231DEB6... on 21 networks
+*** TRON fork: USDT transfer bypass
+*** CREATE3Factory: same addresses
+left side
+** Exploits
+*** 2022-03: unvalidated SwapData, ~$5.7M
+*** 2024-07: GasZip helper skipped allow-list, ~$10M
+*** root cause: diamond holds standing approvals
+** Audit bug classes
+*** real receiver vs bridgeData.receiver
+*** non-EVM receiver encoding
+*** refunds to msg.sender (lead)
+*** opaque calldata vs runtime amounts
+*** chain ID tables
+** Risks
+*** backend-trusted parameters
+*** upgradeable logic, 3 h delay
+*** bridge and DEX dependencies
+@endmindmap

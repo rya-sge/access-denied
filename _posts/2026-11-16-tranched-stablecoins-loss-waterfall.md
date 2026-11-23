@@ -467,6 +467,7 @@ The points below were not settled by the sources read for this article.
 - [How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral]({{site.url_complet}}/2026/11/16/pendle-v2-pt-yt-amm/)
 - [Risk of Ethena's USDe and sUSDe - Backing Venues, Depeg Priors and a Leveraged PT Position]({{site.url_complet}}/2026/10/11/ethena-usde-risk-backing-venues-leveraged-positions/)
 - [How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/)
+- [How Frankencoin Works - an Oracle-Free Swiss Franc Stablecoin with Veto Governance and Challenge Auctions]({{site.url_complet}}/2026/11/23/frankencoin-oracle-free-stablecoin/)
 
 ### Tooling
 

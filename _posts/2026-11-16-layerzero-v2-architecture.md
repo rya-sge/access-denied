@@ -433,3 +433,4 @@ The protocol description comes from the pinned EVM sources and the incident post
 - [Chainlink CCIP — from DONs to Cross-Chain Verifiers]({{site.url_complet}}/2026/11/16/chainlink-ccip-architecture/)
 - [Centrifuge Cross-Chain Messaging — Per-Pool Adapter Quorums, Batching and Failure Recovery]({{site.url_complet}}/2026/08/18/centrifuge-cross-chain-messaging/)
 - [Cross-chain tokens Standard (ERC-7281, xERC20) - Overview]({{site.url_complet}}/2025/05/07/cross-chain-token-overview/)
+- [Across Protocol - How an Intent Bridge Settles Through UMA]({{site.url_complet}}/2026/11/23/across-protocol-intent-bridge/)

@@ -25,7 +25,7 @@ Two mechanisms make the low ratio possible. Liquidations need no auction: a pool
 
 The article assumes familiarity with DeFi and stablecoins, and uses the following more specific mechanisms without re-deriving them.
 
-- **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/) vaults. Below a minimum collateral ratio the position is liquidated. Liquity calls such a position a *trove*.
+- **Collateralized debt position (CDP).** A user locks collateral and mints a debt token against it, as in [MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/) vaults. Below a minimum collateral ratio the position is liquidated. Liquity calls such a position a *trove*.
 - **Peg arbitrage.** If a token can always be exchanged for 1 USD of some asset, buying it below 1 USD and exchanging it is a profit, and that buying pushes the price back up. Liquity's redemptions are such an exchange.
 - **Push oracle.** A [Chainlink](https://chain.link/) price feed writes a new price on-chain when the price moves past a deviation threshold or a heartbeat expires. Between updates the contract reads a stale price, which matters for liquidations and redemptions.
 - **Accumulator-based reward accounting.** Instead of updating every depositor on each event, a contract keeps a running sum per unit of stake and stores a snapshot of it with each deposit. A depositor's reward is the difference between the current sum and the snapshot. The Stability Pool and the redistribution mechanism both use this pattern.
@@ -433,8 +433,9 @@ The sources leave a few points open, listed here for verification before relying
 ### Related articles
 
 - [10 Key Differences Between MakerDAO and Liquity]({{site.url_complet}}/2024/12/16/10-Key-Differences-Between-MakerDAO-and-Liquity/)
-- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/20/makerdao/)
+- [Introduction to MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/)
 - [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/)
 - [How Polaris Works - pETH, the Power-Law Bonding Curve, Reserve Loans and pAsset Markets]({{site.url_complet}}/2026/10/21/polaris-peth-bonding-curve-passets/)
 - [The Technical Concepts Behind the 2024 Crypto Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2024-technical-concepts/)
 - [Pricing a Lending Position During an Incident - What the Oracle Reads, When, and Who Bears the Gap]({{site.url_complet}}/2026/10/11/oracle-kinds-pricing-lending-position-incident/)
+- [How Frankencoin Works - an Oracle-Free Swiss Franc Stablecoin with Veto Governance and Challenge Auctions]({{site.url_complet}}/2026/11/23/frankencoin-oracle-free-stablecoin/)

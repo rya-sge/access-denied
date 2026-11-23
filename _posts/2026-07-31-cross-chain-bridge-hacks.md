@@ -523,6 +523,8 @@ No on-chain mechanism produced any of these outcomes. A threat model that assume
 - [Crypto Hacks of 2022 - Ronin, Wormhole, Nomad and the Year of Bridge Hacks]({{site.url_complet}}/2026/10/07/crypto-hacks-2022/)
 - [Crypto Hacks of September 2026 - Bitget, Liquid Network and 50 Smaller Incidents]({{site.url_complet}}/2026/10/06/crypto-hacks-september-2026/)
 - [Three Launchpad Bugs from the Bio Protocol EVM Audits - Units, Donations and Partial Claims]({{site.url_complet}}/2026/09/22/bio-launchpad-evm-audit-findings/)
+- [Across Protocol - How an Intent Bridge Settles Through UMA]({{site.url_complet}}/2026/11/23/across-protocol-intent-bridge/)
+- [How LI.FI Works - The Bridge Aggregator Diamond, Its Allow-List and Two Approval Drains]({{site.url_complet}}/2026/11/23/lifi-bridge-aggregator-diamond/)
 
 ### Tooling
 

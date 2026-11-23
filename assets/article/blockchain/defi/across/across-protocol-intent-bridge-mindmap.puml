@@ -1,0 +1,53 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EEF5FF
+    LineColor #4A78B5
+  }
+  :depth(1) {
+    BackgroundColor #4A78B5
+    FontColor white
+  }
+}
+</style>
+* Across Protocol\nintent bridge
+** Origin chain
+*** deposit() on SpokePool
+*** FundsDeposited event
+*** quoteTimestamp, fillDeadline
+*** exclusivity parameter
+** Destination chain
+*** fillRelay() from relayer capital
+*** relay hash and fillStatuses
+*** message callback
+*** speed-up (EIP-712)
+*** slow fill request
+** HubPool on Ethereum
+*** three Merkle roots per bundle
+*** bond and liveness
+*** UMA dispute
+*** adapters by delegatecall
+*** LP liquidity and fees
+** Refunds
+*** relayer refund leaves
+*** deferred refunds
+*** expiry refund to depositor
+left side
+** Fees and versions
+*** fee = input minus output
+*** suggested-fees API
+*** V1 to V5
+** Other chains
+*** Solana svm_spoke
+*** Tron and Universal (Helios)
+** Tracing funds
+*** topic0 of FundsDeposited
+*** topic0 of FilledRelay
+*** indexer deposit status
+** Security
+*** five OpenZeppelin reports
+*** cross-chain replay of roots
+*** refund DoS
+*** HubPool owner: Safe (3-of-5 or oSnap)
+@endmindmap

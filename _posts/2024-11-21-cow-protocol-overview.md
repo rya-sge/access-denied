@@ -180,3 +180,4 @@ CoW Swap works with many popular wallets, including [Rabby](https://rabby.io/), 
 
 - [Automated Market Makers (AMMs) - Overview]({{site.url_complet}}/2025/07/29/automated-market-makers-amm/)
 - [Market Abuse and Enforcement Under MiCA — Insider Dealing, Manipulation, Penalties and Supervision (Titles VI and VII)]({{site.url_complet}}/2026/09/17/mica-market-abuse-enforcement-supervision/)
+- [Across Protocol - How an Intent Bridge Settles Through UMA]({{site.url_complet}}/2026/11/23/across-protocol-intent-bridge/)

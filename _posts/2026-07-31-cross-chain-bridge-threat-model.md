@@ -447,6 +447,8 @@ Given that the observed losses came from integrity failures and not from livenes
 - [Zero-Knowledge Proof Failures in Cross-Chain Bridges](https://rya-sge.github.io/access-denied/2026/06/19/zkp-cross-chain-bridge-hacks/)
 - [How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson](https://rya-sge.github.io/access-denied/2026/11/16/layerzero-v2-architecture/)
 - [Chainlink CCIP — from DONs to Cross-Chain Verifiers](https://rya-sge.github.io/access-denied/2026/11/16/chainlink-ccip-architecture/)
+- [Across Protocol - How an Intent Bridge Settles Through UMA]({{site.url_complet}}/2026/11/23/across-protocol-intent-bridge/)
+- [How LI.FI Works - The Bridge Aggregator Diamond, Its Allow-List and Two Approval Drains]({{site.url_complet}}/2026/11/23/lifi-bridge-aggregator-diamond/)
 
 ### Tooling
 

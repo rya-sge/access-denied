@@ -504,3 +504,4 @@ An upgrade review checks the storage layout and values, calls the initialiser, a
 - [Multicall in Solidity: CALL vs DELEGATECALL Explained]({{site.url_complet}}/2025/04/03/solidity-multicall/)
 - [How to create a multisig wallet with Gnosis Safe]({{site.url_complet}}/2022/08/12/multisig-wallet-gnosis/)
 - [Security of Cryptocurrency Exchanges - Overview]({{site.url_complet}}/2025/11/06/crypto-exchange-security-overview/)
+- [How LI.FI Works - The Bridge Aggregator Diamond, Its Allow-List and Two Approval Drains]({{site.url_complet}}/2026/11/23/lifi-bridge-aggregator-diamond/)

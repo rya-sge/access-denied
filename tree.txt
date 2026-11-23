@@ -1423,3 +1423,15 @@ _posts/2026-11-20-eip-7251-max-effective-balance-consolidation.md
   assets/article/blockchain/ethereum/staking/eip-7251-consolidation-concept.puml   (concept -> .png, asset only)
   assets/article/blockchain/ethereum/staking/eip-7251-consolidation-workflow.puml   (workflow -> .png, asset only)
   in-section diagrams: inline Mermaid in the article (request processing flowchart, request-to-completion sequence), no .puml
+
+_posts/2026-11-23-frankencoin-oracle-free-stablecoin.md
+  assets/article/blockchain/defi/frankencoin/frankencoin-oracle-free-stablecoin-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article (architecture flowchart, challenge sequence, position lifecycle state diagram), no .puml
+
+_posts/2026-11-23-across-protocol-intent-bridge.md
+  assets/article/blockchain/defi/across/across-protocol-intent-bridge-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article (4 diagrams), no .puml
+
+_posts/2026-11-23-lifi-bridge-aggregator-diamond.md
+  assets/article/blockchain/defi/lifi/lifi-bridge-aggregator-diamond-mindmap.puml   (mindmap -> .png, cover image)
+  in-section diagrams: inline Mermaid in the article (API-to-Executor sequence, swap-then-bridge flowchart, governance flowchart), no .puml

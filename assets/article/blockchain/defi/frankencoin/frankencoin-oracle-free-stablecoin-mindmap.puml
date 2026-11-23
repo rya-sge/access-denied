@@ -1,0 +1,46 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #FDF1EE
+    LineColor #B5523A
+  }
+  :depth(1) {
+    BackgroundColor #B5523A
+    FontColor white
+  }
+}
+</style>
+* Frankencoin (ZCHF)\noracle-free CHF stablecoin
+** Minters and veto governance
+*** Anyone proposes, fee 1,000 ZCHF
+*** Application period, 14 days deployed
+*** Veto quorum: at least 2% FPS1, over 1% FCS
+*** Approved minters: unlimited allowance
+** Positions (MintingHub)
+*** Self-declared liquidation price
+*** Reserve contribution, upfront interest
+*** Clones share the family limit
+*** Price raise: max 3x, 3-day cooldown
+** Challenges and auctions
+*** Challenger posts own collateral
+*** Avert phase at liquidation price
+*** Dutch auction to zero
+*** 2% of bid to challenger
+*** Expired positions: forced sale from 10x
+** Reserve and equity
+*** FPS: price = 3 x equity / supply
+*** coverLoss: reserve first, then mint
+*** FCS: ERC-4626 wrapper, binding at 2/3
+*** Redemption discount, 7-day recovery
+** Peripheral modules
+*** Leadrate and savings
+*** StablecoinBridge 1:1, 52 weeks
+*** Uniswap / Curve amplifiers
+*** CCIP bridged ZCHF and votes
+** Audits and risks
+*** 7 sources, 5 Critical findings
+*** Competing liquidation paths
+*** Unbounded parameters, hook tokens
+*** Minter trust, CCIP, collateral liquidity
+@endmindmap
