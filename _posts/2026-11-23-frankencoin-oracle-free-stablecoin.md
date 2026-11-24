@@ -65,44 +65,61 @@ flowchart LR
     CH["Challengers and bidders"] -->|"challenge / bid"| HUB
 ```
 
-Two points of the design matter for everything that follows. First, ZCHF is not upgradable, but it accepts new minting modules at any time; the contract comment calls this "flexible but conservative governance" (`Frankencoin.sol:10-16`). Second, loss absorption is layered: a position's own reserve contribution first, then the equity of the FPS holders, then the reserves of other minters (`gitbook/reserve.md`, `gitbook/risks.md`).
+Two points of the design matter for everything that follows. First, ZCHF is not upgradable, but it accepts new minting modules at any time; the contract comment calls this "flexible but conservative governance". Second, loss absorption is layered: a position's own reserve contribution first, then the equity of the FPS holders, then the reserves of other minters.
+
+*Implementation:* `Frankencoin.sol`, contract comment (lines 10-16). *Source:* `gitbook/reserve.md` and `gitbook/risks.md`.
 
 ## Minters and veto governance
 
 ### Proposing a minter
 
-Any address can propose a new minter with `suggestMinter(minter, period, fee, message)` (`Frankencoin.sol:100-112`). The call fails unless the application period is at least `MIN_APPLICATION_PERIOD`, an immutable set to 1,209,600 seconds (14 days) at deployment, and the fee is at least `MIN_FEE` of 1,000 ZCHF. The fee is transferred to the reserve as profit, and the minter becomes active at `block.timestamp + period`. `isMinter` simply checks that this timestamp is set and has passed (`:344-346`).
+Any address can propose a new minter. The proposal names the minter contract, an application period, a fee and a message. It fails unless the period is at least 14 days, an immutable `MIN_APPLICATION_PERIOD` set to 1,209,600 seconds at deployment, and the fee at least `MIN_FEE` of 1,000 ZCHF. The fee is transferred to the reserve as profit. The minter becomes active once the application period has passed from the time of the proposal; `isMinter` only checks that this activation time is set and lies in the past.
 
-During the application period, a qualified holder calls `denyMinter` (`:167-172`), which deletes the entry and emits `MinterDenied`. There is no other way to remove a minter: once active, a minter cannot be paused or removed, a property the team accepted when Code4rena raised it in 2023 (finding M-13).
+During the application period, a qualified holder can veto the proposal with `denyMinter`, which deletes the entry and emits `MinterDenied`. There is no other way to remove a minter: once active, a minter cannot be paused or removed, a property the team accepted when Code4rena raised it in 2023 (finding M-13).
 
-The FCS governance layer added a second route. `MinterGovernance.suggestMinter` requires 60 days and 1,200 ZCHF (`equity/shares/MinterGovernance.sol:16-19`) and records an announcement. Anyone may call `denyUnannouncedMinter` against a minter that was proposed directly on ZCHF without such an announcement; the call uses the FCS contract's own voting power to deny it and pays the caller 10% of a reward pool funded by the announcement fees (`:93-99`). The direct ZCHF route still exists with its 14 days, but as long as the FCS contract is itself qualified in FPS1, a minter that skips the announcement can be vetoed by anyone.
+*Implementation:* `Frankencoin.sol`, `suggestMinter()`, `denyMinter()` and `isMinter()` (lines 100-112, 167-172 and 344-346).
+
+The FCS governance layer added a second route. A proposal through the FCS minter governance module requires an application period of 60 days and a fee of 1,200 ZCHF, and records an announcement. Anyone may call `denyUnannouncedMinter` against a minter that was proposed directly on ZCHF without such an announcement. The call denies that minter with the FCS contract's own voting power and pays the caller 10% of a reward pool funded by the announcement fees. The direct ZCHF route still exists with its 14 days, but as long as the FCS contract is itself qualified in FPS1, a minter that skips the announcement can be vetoed by anyone.
+
+*Implementation:* `MinterGovernance.sol`, `MIN_APPLICATION_FEE`, `MIN_APPLICATION_PERIOD` and `denyUnannouncedMinter()` (lines 16-19 and 93-99).
 
 One exception remains: an address that was announced once keeps its announcement after a direct veto on ZCHF, so it can be re-proposed directly with 14 days and `denyUnannouncedMinter` then reverts (FPS2 #028, risk accepted); it is left to qualified holders.
 
 ### Vetoes, quorum and time-weighted votes
 
-A veto needs a *qualified* caller. `Governance.checkQualified` adds the caller's votes to those of the helpers who delegated to it, and reverts unless they exceed the quorum (`equity/Governance.sol:78-82`):
+A veto needs a *qualified* caller. The check adds the caller's votes to those of the helpers who delegated to it, and reverts unless the sum exceeds the quorum:
 
 ```solidity
+// equity/Governance.sol, checkQualified() (lines 78-82)
 if (_votes * 10000 <= QUORUM * totalVotes()) revert NotQualified();
 ```
 
 The quorum depends on which contract is asked:
 
-- **FPS1, the deployed Equity contract** (`0x1bA2…41B2`), requires **at least 2%** of all votes. The mainnet deployment artifact `scripts/deployment/deployments/mainnet/Frankencoin.json`, which embeds the source compiled for ZCHF and the Equity contract it creates, has `QUORUM = 200` and the check `if (_votes * 10000 < QUORUM * totalVotes()) revert NotQualified();`; with a strict `<`, exactly 2% qualifies. `FCS.sol:16` describes the change as "Reduce the veto power threshold from 2% in FPS1 to 1% in FCS", and ChainSecurity's FPS2 report states "a qualifying quorum of 1% of total FPS2 voting power, compared to the 2% threshold in FPS1" (p. 9).
-- **FCS and the current source** use `QUORUM = 100`, that is more than **1%**; the comment says it "used to be 200 in earlier versions, most notably in FPS1" (`Governance.sol:12-17`). Exactly 1% is not enough: the comparison was switched to `<=` with FCS (`Governance.sol:80-81`).
+- **FPS1, the deployed Equity contract** (`0x1bA2…41B2`), requires **at least 2%** of all votes. The source compiled for ZCHF and the Equity contract it creates, as embedded in the mainnet deployment artifact, sets `QUORUM = 200` and compares with a strict `<`, so exactly 2% qualifies. The FCS source describes the change as "Reduce the veto power threshold from 2% in FPS1 to 1% in FCS", and ChainSecurity's FPS2 report states "a qualifying quorum of 1% of total FPS2 voting power, compared to the 2% threshold in FPS1" (p. 9).
 
-The project documentation says otherwise for direct FPS1 actions. Lines 17, 64 and 93 of `gitbook/governance.md` and line 37 of `gitbook/fps-reference.md` state that the same 1% applies. That is true of the current `Equity.sol` source, which inherits the new `Governance.sol`, but not of the deployed FPS1, whose code is immutable and was compiled with `QUORUM = 200`.
+  *Source:* `scripts/deployment/deployments/mainnet/Frankencoin.json`, with the check `if (_votes * 10000 < QUORUM * totalVotes()) revert NotQualified();`, and `FCS.sol` (line 16).
+- **FCS and the current source** use `QUORUM = 100`, that is more than **1%**; the source comment says the value "used to be 200 in earlier versions, most notably in FPS1". Exactly 1% is not enough, because the comparison was switched to `<=` with FCS.
+
+  *Implementation:* `Governance.sol`, `QUORUM` and `checkQualified()` (lines 12-17 and 80-81).
+
+The project documentation says otherwise for direct FPS1 actions: its governance and FPS reference pages state that the same 1% applies. That is true of the current Equity source, which inherits the new governance contract, but not of the deployed FPS1, whose code is immutable and was compiled with `QUORUM = 200`.
+
+*Source:* lines 17, 64 and 93 of `gitbook/governance.md` and line 37 of `gitbook/fps-reference.md`.
 
 An FCS holder acts through the FCS contract, which must itself be qualified in FPS1. The audit notes the consequence: once FCS holds the FPS1 quorum, the effective minimum to act is "as low as 1% of 2%" of FPS1 votes, about 0.02% (pp. 6, 31).
 
-Votes are not balances. FPS stores, for each holder, an anchor time; votes equal balance multiplied by the time since the anchor, with 20 extra bits of sub-second resolution, and receiving tokens moves the recipient's anchor forward in proportion (`Equity.sol:101-151`, `:171-187`). Buying a large block of FPS the day before a vote therefore gives almost no votes. Delegation is transitive and does not remove the delegator's own right to veto.
+Votes are not balances. FPS stores, for each holder, an anchor time; votes equal balance multiplied by the time since the anchor, with 20 extra bits of sub-second resolution, and receiving tokens moves the recipient's anchor forward in proportion. Buying a large block of FPS the day before a vote therefore gives almost no votes. Delegation is transitive and does not remove the delegator's own right to veto.
 
-Two tools destroy votes. `kamikaze` (`:200-220`) lets a holder remove someone else's votes by giving up the same amount of its own. FCS's `shoot`, described below, builds on it.
+Two tools destroy votes. `kamikaze` lets a holder remove someone else's votes by giving up the same amount of its own. FCS's `shoot`, described below, builds on it.
+
+*Implementation:* `Equity.sol`, vote anchors, `votes()` and `kamikaze()` (lines 101-151, 171-187 and 200-220).
 
 ### What an approved minter can do
 
-The trust placed in a minter is total. `_allowance` returns an infinite allowance whenever the spender is a minter, a position registered by a minter, or the reserve, and the holder has not set an explicit allowance (`Frankencoin.sol:119-128`). A minter can also `mint`, `burnFrom` any holder, and call `coverLoss`. The contract comment is explicit: "We trust minters and the positions they have created to mint and burn as they please".
+The trust placed in a minter is total. When the spender is a minter, a position registered by a minter, or the reserve, and the holder has not set an explicit allowance, ZCHF reports an infinite allowance. A minter can also mint, burn from any holder, and call `coverLoss`. The contract comment is explicit: "We trust minters and the positions they have created to mint and burn as they please".
+
+*Implementation:* `Frankencoin.sol`, `_allowance()` (lines 119-128).
 
 A hostile minter that survives its application period can therefore drain every balance. The veto window, and people who read proposals during it, are the whole defence.
 
@@ -110,7 +127,9 @@ A hostile minter that survives its application period can therefore drain every 
 
 ### Opening a position
 
-`MintingHub.openPosition` (`minting/MintingHub.sol:100-147`) takes ten parameters and deploys a full `Position` contract through `PositionFactory`. The hub registers it with ZCHF, charges an opening fee of 1,000 ZCHF and pulls the initial collateral.
+Opening a position deploys a full `Position` contract through `PositionFactory`. The hub's `openPosition` takes the ten parameters listed below, registers the new position with ZCHF, charges an opening fee of 1,000 ZCHF and pulls the initial collateral.
+
+*Implementation:* `minting/MintingHub.sol`, `openPosition()` (lines 100-147).
 
 | Parameter | Meaning | Checked in code |
 |---|---|---|
@@ -125,15 +144,21 @@ A hostile minter that survives its application period can therefore drain every 
 | `liqPrice` | Self-declared liquidation price | `price * minCollateral <= limit * 1e18` |
 | `reservePPM` | Share of each mint kept in the reserve | between 2% and 100% |
 
-The collateral check is a probe: the hub tries to transfer `totalSupply() + 1` tokens to a dummy address and expects the call to revert; a token that returns `false` instead is rejected as `IncompatibleCollateral` (`MintingHub.sol:116-122`). The liquidation price is stored with `36 - decimals` decimals, so that multiplying it by a raw collateral amount always gives 36 decimals (`:95-96`).
+The collateral check is a probe: the hub tries to transfer `totalSupply() + 1` tokens to a dummy address and expects the call to revert. A token that returns `false` instead is rejected as `IncompatibleCollateral`. The liquidation price is stored with `36 - decimals` decimals, so that multiplying it by a raw collateral amount always gives 36 decimals.
 
-The init period is the veto window for this position. Until `start`, a qualified holder can call `Position.deny`, which closes the position for good (`Position.sol:246-251`). Proposing a position is thus governed exactly like proposing a minter, with a shorter minimum delay.
+*Implementation:* `MintingHub.sol` (lines 95-96 and 116-122).
+
+The init period is the veto window for this position. Until the start time, a qualified holder can deny the position, which closes it for good. Proposing a position is thus governed exactly like proposing a minter, with a shorter minimum delay.
+
+*Implementation:* `Position.sol`, `deny()` (lines 246-251).
 
 ### Minting: reserve contribution and upfront interest
 
-`Position.mint` checks that there is no open challenge, no cooldown, that the position is not expired, and that the amount fits in the family limit, then calls `ZCHF.mintWithReserve` (`Position.sol:381-387`). That function splits the gross amount three ways (`Frankencoin.sol:178-189`): the reserve contribution and the interest fee go to the Equity contract, the rest to the borrower, and `minterReserveE6` records the reserve owed back to the borrower on repayment.
+A position refuses to mint while a challenge is open, during a cooldown, after expiry, or when the amount exceeds the family limit. Otherwise it asks ZCHF to mint with a reserve, and ZCHF splits the gross amount three ways: the reserve contribution and the interest fee go to the Equity contract, the rest to the borrower. ZCHF also records in `minterReserveE6` the reserve owed back to the borrower on repayment.
 
-Interest is charged once, at mint time, for the whole remaining term. The annual rate is the global leadrate plus the position's risk premium, and the fee fraction is (`Position.sol:366-379`):
+*Implementation:* `Position.sol`, `mint()` (lines 381-387). `Frankencoin.sol`, `mintWithReserve()` (lines 178-189).
+
+Interest is charged once, at mint time, for the whole remaining term. The annual rate is the global leadrate plus the position's risk premium, and the fee fraction is:
 
 $$
 \begin{aligned}
@@ -142,9 +167,11 @@ w &= m \cdot (1 - f - \rho)
 \end{aligned}
 $$
 
-where $$m$$ is the gross amount minted, $$t$$ the current time, $$T_{start}$$ and $$T_{exp}$$ the position's start and expiration, $$r_{lead}$$ and $$r_{risk}$$ the two annual rates, $$\rho$$ the reserve contribution and $$w$$ what reaches the borrower's wallet. The documentation's example (`gitbook/positions/open.md`): a leadrate of 2% and a risk premium of 1% over 365 days give $$f = 3\%$$; a gross mint of 10,000 ZCHF with $$\rho = 10\%$$ sends 1,000 ZCHF to the reserve, 300 ZCHF to equity as interest and 8,700 ZCHF to the borrower. The debt is still 10,000 ZCHF, of which 1,000 ZCHF comes back from the reserve on repayment. Repaying early does not refund the interest.
+where $$m$$ is the gross amount minted, $$t$$ the current time, $$T_{start}$$ and $$T_{exp}$$ the position's start and expiration, $$r_{lead}$$ and $$r_{risk}$$ the two annual rates, $$\rho$$ the reserve contribution and $$w$$ what reaches the borrower's wallet. In the documentation's example, a leadrate of 2% and a risk premium of 1% over 365 days give $$f = 3\%$$; a gross mint of 10,000 ZCHF with $$\rho = 10\%$$ sends 1,000 ZCHF to the reserve, 300 ZCHF to equity as interest and 8,700 ZCHF to the borrower. The debt is still 10,000 ZCHF, of which 1,000 ZCHF comes back from the reserve on repayment. Repaying early does not refund the interest.
 
-The collateral condition checked after every adverse change is (`Position.sol:513-516`):
+*Implementation:* `Position.sol`, upfront fee calculation (lines 366-379). *Source:* `gitbook/positions/open.md` for the example.
+
+The collateral condition checked after every adverse change is:
 
 $$
 \begin{aligned}
@@ -154,25 +181,33 @@ $$
 
 where $$c$$ is the collateral balance, counted as zero below `minimumCollateral`, $$P$$ the liquidation price and $$m_{out}$$ the debt outstanding. The liquidation price is thus the price at which the collateral exactly covers the gross debt, reserve included.
 
+*Implementation:* `Position.sol`, `_checkCollateral()` (lines 513-516).
+
 ### Cloning and the family limit
 
-A borrower can also copy an existing position instead of proposing a new one. The hub's `clone` function, at `MintingHub.sol:157-169`, creates an [EIP-1167](https://eips.ethereum.org/EIPS/eip-1167) minimal proxy of the original position. `Position.initialize` then copies the parent's price and requires an expiration no later than the original's (`Position.sol:189-195`).
+A borrower can also copy an existing position instead of proposing a new one. The hub creates an [EIP-1167](https://eips.ethereum.org/EIPS/eip-1167) minimal proxy of the original position, and the clone's initialisation copies the parent's price and requires an expiration no later than the original's.
 
-A clone skips the 1,000 ZCHF opening fee and the init period, because the parameters it inherits were already exposed to a veto. The parent must not be challenged, cooling down or expired (`:200`). The original and all its clones share one `limit`, tracked on the original (`:219-241`).
+A clone skips the 1,000 ZCHF opening fee and the init period, because the parameters it inherits were already exposed to a veto. The parent must not be challenged, cooling down or expired. The original and all its clones share one `limit`, tracked on the original.
+
+*Implementation:* `MintingHub.sol`, `clone()` (lines 157-169). `Position.sol`, `initialize()` and the shared limit (lines 189-195, 200 and 219-241).
 
 ### Adjusting the price and cooldowns
 
-An owner can lower the liquidation price at once if the collateral still covers the debt. Raising it is restricted in the current source: at most three times the current price, and only outside a cooldown, after which minting and withdrawals are blocked for 3 days (`Position.sol:321-333`). Other events also set a cooldown: one day after an averted challenge and three days after a successful one (`:537-543`, `:568`). Price changes are impossible while a challenge is open or after expiry.
+An owner can lower the liquidation price at once if the collateral still covers the debt. Raising it is restricted in the current source: at most three times the current price, and only outside a cooldown, after which minting and withdrawals are blocked for 3 days. Other events also set a cooldown: one day after an averted challenge and three days after a successful one. Price changes are impossible while a challenge is open or after expiry.
 
 The 3-day delay after a price increase is the window for challengers. A borrower who raises the price to mint more must wait three days, during which anyone who disagrees can challenge.
+
+*Implementation:* `Position.sol`, price adjustment and cooldowns (lines 321-333, 537-543 and 568).
 
 ## Challenges: replacing the oracle with an auction
 
 ### Starting a challenge
 
-`challenge(position, collateralAmount, minimumPrice)` (`MintingHub.sol:178-194`) pulls the challenger's **own** collateral, of the same token as the position, into the hub. The `minimumPrice` argument protects the challenger: if the owner lowered the price in a front-running transaction, the call reverts with `UnexpectedPrice`. The challenge size must be at least `minimumCollateral`, unless it covers what is left of a partly challenged position (`Position.sol:527-532`).
+A challenger starts by transferring its **own** collateral, of the same token as the position, into the hub. It also passes a minimum price, which protects it against the owner: if the owner lowered the price in a front-running transaction, the call reverts with `UnexpectedPrice`. The challenge size must be at least `minimumCollateral`, unless it covers what is left of a partly challenged position.
 
-A challenge then runs in two phases of `challengePeriod` seconds each, which `bid(number, size, postpone)` (`MintingHub.sol:207-220`) dispatches by timestamp.
+A challenge then runs in two phases of `challengePeriod` seconds each. Bids in both phases go through the same `bid` function, which dispatches them by timestamp.
+
+*Implementation:* `MintingHub.sol`, `challenge()` and `bid()` (lines 178-194 and 207-220). `Position.sol`, `notifyChallengeStarted()` (lines 527-532).
 
 ```mermaid
 sequenceDiagram
@@ -198,13 +233,15 @@ sequenceDiagram
 
 ### Avert phase
 
-Until `start + challengePeriod`, a bid **averts** the challenge (`MintingHub.sol:254-269`). The bidder pays the challenger `size * liqPrice` in ZCHF and receives the challenger's collateral; the position is untouched apart from a one-day cooldown. The challenger may cancel by bidding on its own challenge without paying. A bid in the same block as the challenge is rejected (`require(block.timestamp != _challenge.start)`), a fix for ChainSecurity finding CS-ZCHF-037.
+Until `start + challengePeriod`, a bid **averts** the challenge. The bidder pays the challenger `size * liqPrice` in ZCHF and receives the challenger's collateral; the position is untouched apart from a one-day cooldown. The challenger may cancel by bidding on its own challenge without paying. A bid in the same block as the challenge is rejected, a fix for ChainSecurity finding CS-ZCHF-037.
+
+*Implementation:* `MintingHub.sol`, `_avertChallenge()` with the guard `require(block.timestamp != _challenge.start)` (lines 254-269).
 
 An avert is a sale at the liquidation price. If someone buys the challenger's collateral at that price, the market has confirmed that the collateral is worth at least the declared price, and the position is considered sound. The challenger, who bet the opposite, has sold its collateral at the liquidation price, which it thought too high.
 
 ### Auction phase and settlement
 
-If the challenge is still open after the first phase, the auction price falls linearly from the liquidation price $$P$$ at $$t_0 + \tau$$ to zero at $$t_0 + 2\tau$$, where $$t_0$$ is the challenge start and $$\tau$$ the challenge period (`_calculatePrice`, `MintingHub.sol:295-305`):
+If the challenge is still open after the first phase, the auction price falls linearly from the liquidation price $$P$$ at $$t_0 + \tau$$ to zero at $$t_0 + 2\tau$$, where $$t_0$$ is the challenge start and $$\tau$$ the challenge period:
 
 $$
 \begin{aligned}
@@ -212,13 +249,17 @@ p(t) = P \cdot \frac{t_0 + 2\tau - t}{\tau}, \qquad t_0 + \tau \lt t \lt t_0 + 2
 \end{aligned}
 $$
 
-A bid in this phase buys the **position's** collateral at $$p(t)$$, and settlement in `_finishChallenge` (`MintingHub.sol:222-251`) proceeds as follows:
+*Implementation:* `MintingHub.sol`, `_calculatePrice()` (lines 295-305).
+
+A bid in this phase buys the **position's** collateral at $$p(t)$$, and settlement proceeds as follows:
 
 1. The challenger gets its own collateral back. The bidder may instead ask for the return to be postponed into `pendingReturns`, which the challenger claims later; the option exists for tokens whose transfer to the challenger would fail, such as a blacklisted address.
 2. The bidder pays the offer $$p(t) \cdot \text{size}$$; 2% of the offer goes to the challenger as a reward (`CHALLENGER_REWARD = 20000` ppm).
-3. The position repays $$m_{out} \cdot \text{size} / c$$, the share of the debt matching the collateral sold (`Position.sol:563`), and its minting is blocked for 3 days.
+3. The position repays $$m_{out} \cdot \text{size} / c$$, the share of the debt matching the collateral sold, and its minting is blocked for 3 days.
 4. If the remaining proceeds exceed that repayment, the excess is split: the reserve contribution ratio of it goes to equity, the rest to the owner. If they are smaller, `coverLoss` takes the difference from the reserve.
 5. `burnWithoutReserve` burns the repayment and releases the position's reserve contribution to equity.
+
+*Implementation:* `MintingHub.sol`, `_finishChallenge()` (lines 222-251). `Position.sol`, repayment share (line 563).
 
 The documentation gives a numeric case in `gitbook/reserve.md`. A debt of 5,000 ZCHF is fully liquidated; the position's reserve contribution was 20%, or 1,000 ZCHF; the winning bid is 4,500 ZCHF. The challenger receives 90 ZCHF, 4,410 ZCHF remain against the 5,000 ZCHF burnt, and the 590 ZCHF shortfall comes out of the reserve. The 1,000 ZCHF reserve liability is released at the same time, so equity ends 410 ZCHF higher. The borrower's reserve contribution has absorbed the loss and more.
 
@@ -226,11 +267,13 @@ The documentation gives a numeric case in `gitbook/reserve.md`. A debt of 5,000 
 
 The auction does two jobs, price discovery and liquidation. An owner who declares too high a price can be challenged by anyone holding the same collateral; defending the price in the avert phase means buying the challenger's tokens at that price, which costs real money if the price is wrong. Nothing in the protocol needs to know the market price; it learns, through bids, whether the market agrees with the declared one.
 
-The argument has conditions, which the documentation states (`gitbook/positions/auctions.md`): challengers must be able to obtain the collateral, and "a collateral asset wholly controlled by the position owner cannot support that mechanism". Auctions also take time. When the challenge period is set to several days, the protocol reacts to a crash days later than an oracle-triggered liquidation would, and the reserve contribution has to cover the price move over that time. The collateral framework sizes it accordingly: retained reserve at least the 99% value-at-risk over twice the auction duration plus 2%, rounded up to 5 percentage points (`frankencoin-collateral-assessments/framework/collateral-risk-framework.md`).
+The argument has conditions, which the documentation states: challengers must be able to obtain the collateral, and "a collateral asset wholly controlled by the position owner cannot support that mechanism". Auctions also take time. When the challenge period is set to several days, the protocol reacts to a crash days later than an oracle-triggered liquidation would, and the reserve contribution has to cover the price move over that time. The collateral framework sizes it accordingly: retained reserve at least the 99% value-at-risk over twice the auction duration plus 2%, rounded up to 5 percentage points.
+
+*Source:* `gitbook/positions/auctions.md` and `frankencoin-collateral-assessments/framework/collateral-risk-framework.md`.
 
 ### Expired positions and forced sale
 
-A position that reaches its expiration with debt outstanding is not liquidated by challenge but sold. `buyExpiredCollateral(pos, upTo)` (`MintingHub.sol:348-383`) prices the collateral at ten times the liquidation price at expiry, falling linearly to one times over one challenge period, then to zero over a second one:
+A position that reaches its expiration with debt outstanding is not liquidated by challenge but sold. Anyone can buy the collateral through `buyExpiredCollateral`, which prices it at ten times the liquidation price at expiry, falling linearly to one times over one challenge period, then to zero over a second one:
 
 $$
 \begin{aligned}
@@ -238,7 +281,9 @@ p_{exp}(t) = \begin{cases} P + 9P \cdot \dfrac{\tau - \Delta}{\tau} & 0 \leq \De
 \end{aligned}
 $$
 
-with $$\Delta$$ the time since expiration. `Position.forceSale` repays the debt from the proceeds and the position's assigned reserve, sends any surplus to the owner, and books a loss through `coverLoss` when the collateral is exhausted and the debt is not covered (`Position.sol:433-464`). It is blocked while a challenge is open (`noChallenge`), so that an owner cannot pre-empt a challenge near expiry by forcing a sale on themselves. Both rules are fixes from ChainSecurity's v2024 audit (CS-ZCHF2-001 and -002). The first generation of contracts (`minting/v1/`) had no forced sale at all.
+with $$\Delta$$ the time since expiration. The sale repays the debt from the proceeds and the position's assigned reserve, sends any surplus to the owner, and books a loss through `coverLoss` when the collateral is exhausted and the debt is not covered. The sale is blocked while a challenge is open, so that an owner cannot pre-empt a challenge near expiry by forcing a sale on themselves. Both rules are fixes from ChainSecurity's v2024 audit (CS-ZCHF2-001 and -002). The first generation of contracts (`minting/v1/`) had no forced sale at all.
+
+*Implementation:* `MintingHub.sol`, `buyExpiredCollateral()` (lines 348-383). `Position.sol`, `forceSale()` with the `noChallenge` modifier (lines 433-464).
 
 ### Position lifecycle
 
@@ -261,13 +306,17 @@ stateDiagram-v2
 
 ### Minter reserve and equity
 
-The Equity contract holds one ZCHF balance that serves two purposes. `minterReserve()` is the sum of the reserve contributions still owed back to borrowers; `equity()` is the rest of the balance, the capital of the FPS holders (`Frankencoin.sol:131-161`). Opening fees, minter application fees, interest and liquidation surpluses add to equity; savings interest and liquidation shortfalls are paid from it by `coverLoss`.
+The Equity contract holds one ZCHF balance that serves two purposes. The minter reserve is the sum of the reserve contributions still owed back to borrowers; equity is the rest of the balance, the capital of the FPS holders. Opening fees, minter application fees, interest and liquidation surpluses add to equity; savings interest and liquidation shortfalls are paid from it by `coverLoss`.
 
-`coverLoss` (`Frankencoin.sol:321-330`) transfers the amount from the reserve; if the reserve balance is too small, it transfers what there is and **mints** the rest. Losses never make it revert. Once equity is exhausted, the reserve balance falls below `minterReserve()`, and the functions that return reserves to repaying borrowers scale them down in proportion (`calculateAssignedReserve`, `calculateFreedAmount`, `:284-310`). That is how the third layer of loss absorption, other minters' reserves, takes effect: each repaying borrower recovers less of their contribution.
+*Implementation:* `Frankencoin.sol`, `minterReserve()` and `equity()` (lines 131-161).
+
+`coverLoss` transfers the amount from the reserve; if the reserve balance is too small, it transfers what there is and **mints** the rest. Losses never make it revert. Once equity is exhausted, the reserve balance falls below the minter reserve, and the reserve returned to each repaying borrower is scaled down in proportion. That is how the third layer of loss absorption, other minters' reserves, takes effect: each repaying borrower recovers less of their contribution.
+
+*Implementation:* `Frankencoin.sol`, `calculateAssignedReserve()`, `calculateFreedAmount()` and `coverLoss()` (lines 284-310 and 321-330).
 
 ### The FPS bonding curve
 
-FPS holders own that equity. The share price is set to three times equity per share (`Equity.sol:36`, `:92-99`):
+FPS holders own that equity. The share price is set to three times equity per share:
 
 $$
 \begin{aligned}
@@ -275,7 +324,7 @@ $$
 \end{aligned}
 $$
 
-where $$E$$ is equity in ZCHF and $$S$$ the FPS supply, so the market capitalisation is always three times the equity. Both directions use the same curve and charge a 0.3% fee. Investing $$a$$ ZCHF mints $$\Delta S$$ new shares, and redeeming $$q$$ shares pays out the proceeds, as computed at `Equity.sol:257-265` and `:316-323`:
+where $$E$$ is equity in ZCHF and $$S$$ the FPS supply, so the market capitalisation is always three times the equity. Both directions use the same curve and charge a 0.3% fee. Investing $$a$$ ZCHF mints $$\Delta S$$ new shares, and redeeming $$q$$ shares pays out the proceeds:
 
 $$
 \begin{aligned}
@@ -286,22 +335,28 @@ $$
 
 Supply grows with the cube root of equity; the contract's comment gives the table: 1,000 ZCHF of equity for 1,000 FPS at a price of 3, one million for 10,000 FPS at a price of 300. Profits and losses move the price with the supply unchanged.
 
+*Implementation:* `Equity.sol`, share price and bonding curve (lines 36, 92-99, 257-265 and 316-323).
+
 Three rules restrict the use of FPS:
 
-- **Holding period.** Redemption requires an average holding duration of at least 90 days (`MIN_HOLDING_DURATION`, `:51`, `:117-119`), computed from the same anchor as the votes.
-- **Minimum equity.** Investing requires at least 1,000 ZCHF of equity, and at least one share must remain after a redemption (`:232-235`, `:318`).
-- **Recapitalisation.** When equity falls below 1,000 ZCHF, a qualified holder may call `restructureCapTable` and burn the FPS of any listed addresses without paying them (`:338-345`), which is the path for recapitalising the system after its equity has been wiped out.
+- **Holding period.** Redemption requires an average holding duration of at least 90 days (`MIN_HOLDING_DURATION`), computed from the same anchor as the votes.
+- **Minimum equity.** Investing requires at least 1,000 ZCHF of equity, and at least one share must remain after a redemption.
+- **Recapitalisation.** When equity falls below 1,000 ZCHF, a qualified holder may call `restructureCapTable` and burn the FPS of any listed addresses without paying them, which is the path for recapitalising the system after its equity has been wiped out.
+
+*Implementation:* `Equity.sol` (lines 51, 117-119, 232-235, 318 and 338-345).
 
 ### FCS: the share wrapper
 
-FCS, for Frankencoin Shares, is defined in `equity/shares/FCS.sol`. The documentation now calls it the "canonical governance and share token" (`gitbook/README.md`). It was audited by ChainSecurity under the name FPS2 and renamed afterwards. FCS holds FPS one to one and exposes it as an ERC-4626 vault with ZCHF as the asset:
+FCS, for Frankencoin Shares, is defined in `equity/shares/FCS.sol`. The documentation now calls it the "canonical governance and share token". It was audited by ChainSecurity under the name FPS2 and renamed afterwards. FCS holds FPS one to one and exposes it as an ERC-4626 vault with ZCHF as the asset:
 
-- **Entry.** `wrap` exchanges FPS for FCS and credits the votes the holder lost in FPS1 (`FCS.sol:52-61`); `deposit` and `mint` invest ZCHF into FPS1 through the vault interface.
-- **Binding.** FCS is *binding* when it holds more than two thirds of all FPS1 votes (`isBinding`, `:77-79`). Only then are redemptions through FCS open, and only if FCS's own FPS1 holding satisfies the 90-day rule (`:68-70`).
-- **`shoot`.** While binding, anyone can call `shoot(target)`; the function has no caller check beyond `isBinding()` and a guard against shooting FCS itself. It destroys the target's FPS1 votes through `kamikaze`, paid for with an equal amount of the FCS contract's own FPS1 votes (`:89-97`). Above two thirds, each shot raises FCS's share of the votes, which pushes FPS1 holders to migrate.
-- **Exit.** `unwrap` is allowed only to holders whose holding duration is at or above the FCS average (`:110-115`), which prevents gas-only wrap and unwrap loops that would drain FCS's votes.
+- **Entry.** `wrap` exchanges FPS for FCS and credits the votes the holder lost in FPS1; `deposit` and `mint` invest ZCHF into FPS1 through the vault interface.
+- **Binding.** FCS is *binding* when it holds more than two thirds of all FPS1 votes. Only then are redemptions through FCS open, and only if FCS's own FPS1 holding satisfies the 90-day rule.
+- **`shoot`.** While binding, anyone can call `shoot(target)`. The function does not check the caller: it only requires FCS to be binding and refuses FCS itself as a target. It destroys the target's FPS1 votes through `kamikaze`, paid for with an equal amount of the FCS contract's own FPS1 votes. Above two thirds, each shot raises FCS's share of the votes, which pushes FPS1 holders to migrate.
+- **Exit.** `unwrap` is allowed only to holders whose holding duration is at or above the FCS average, which prevents gas-only wrap and unwrap loops that would drain FCS's votes.
 
-Redemptions through FCS pay the FPS1 proceeds multiplied by a discount factor (`FCSMintRedeem.sol:343-348`):
+*Implementation:* `FCS.sol`, `wrap()`, `redemptionsEnabled()`, `isBinding()`, `shoot()` and `unwrap()` (lines 52-61, 68-70, 77-79, 89-97 and 110-115). *Source:* `gitbook/README.md` for the "canonical" designation.
+
+Redemptions through FCS pay the FPS1 proceeds multiplied by a discount factor:
 
 $$
 \begin{aligned}
@@ -309,33 +364,55 @@ d = \left( \frac{S - q/2}{S + R} \right)^4
 \end{aligned}
 $$
 
-where $$S$$ is the FCS supply, $$q$$ the shares being redeemed and $$R$$ the recent redemptions, which decay linearly to zero over a 7-day `RECOVERY_PERIOD`. The withheld ZCHF stays in equity. With no recent redemptions, redeeming 10% of supply at once gives $$d = 0.95^4 \approx 0.81$$, so about a fifth of the proceeds stays behind; a small redemption gets close to the full price. `withdraw` is capped at 10% of supply per call, and the contract comments recommend spreading large exits over days or weeks (`:201-262`).
+where $$S$$ is the FCS supply, $$q$$ the shares being redeemed and $$R$$ the recent redemptions, which decay linearly to zero over a 7-day `RECOVERY_PERIOD`. The withheld ZCHF stays in equity. With no recent redemptions, redeeming 10% of supply at once gives $$d = 0.95^4 \approx 0.81$$, so about a fifth of the proceeds stays behind; a small redemption gets close to the full price. `withdraw` is capped at 10% of supply per call, and the contract comments recommend spreading large exits over days or weeks.
+
+*Implementation:* `FCSMintRedeem.sol`, withdrawal cap and discount factor (lines 201-262 and 343-348).
 
 ## Leadrate and savings
 
-The leadrate is the base interest rate. A qualified holder proposes a new rate with `Leadrate.proposeChange`, and anyone applies it after 7 days (`rate/Leadrate.sol:40-55`). Positions read it at every mint through the hub's `rate()`; it is the $$r_{lead}$$ of the fee formula above. Under FCS, `InterestGovernance` exposes separate proposals for the borrowing and the savings rate.
+The leadrate is the base interest rate. A qualified holder proposes a new rate, and anyone applies it after 7 days. Positions read it at every mint through the hub's `rate()`; it is the $$r_{lead}$$ of the fee formula above. Under FCS, `InterestGovernance` exposes separate proposals for the borrowing and the savings rate.
 
-The savings module in `savings/AbstractSavings.sol` pays the savings leadrate to deposited ZCHF as simple interest. Interest accrues in "ticks", a rate in ppm multiplied by seconds. A deposit starts earning after a 3-day delay, an optional referrer may take up to 25% of the interest, and interest is paid on refresh by `ZCHF.coverLoss` (`:30`, `:82`, `:218`). Savings are thus a cost to equity, and, like any loss, they are minted once the reserve balance is empty. The legacy `SavingsV2` contract still deployed for the V2 hub differs: it locks withdrawals while interest ticks lie in the future and has no referral (`minting/v2/SavingsV2.sol`).
+*Implementation:* `rate/Leadrate.sol`, `proposeChange()` and `applyChange()` (lines 40-55).
+
+The savings module pays the savings leadrate to deposited ZCHF as simple interest. Interest accrues in "ticks", a rate in ppm multiplied by seconds. A deposit starts earning after a 3-day delay, an optional referrer may take up to 25% of the interest, and interest is paid on refresh through `coverLoss`. Savings are thus a cost to equity, and, like any loss, they are minted once the reserve balance is empty. The legacy `SavingsV2` contract still deployed for the V2 hub differs: it locks withdrawals while interest ticks lie in the future and has no referral.
+
+*Implementation:* `savings/AbstractSavings.sol` (lines 30, 82 and 218). `minting/v2/SavingsV2.sol` for the legacy module.
 
 ## Bridges, amplifiers and other minters
 
 Positions are one kind of minter among several. Each of the following was or must be approved through the same veto process:
 
-- **`StablecoinBridge`** mints ZCHF one to one against another Swiss franc stablecoin, up to an immutable `limit`, and stops minting 52 weeks after deployment (`swap/StablecoinBridge.sol:49-78`). Mainnet bridges exist for XCHF, VCHF and CHFAU. The bridge has no loss write-off: if the other coin fails, the ZCHF minted against it stays in circulation.
-- **`UniswapAmplifier`** lends the ZCHF side of a Uniswap V3 ZCHF/USD liquidity position, with the dollar side provided by the owner. The range is limited to about -14%/+10% around a price anchor fixed at deployment, and the owner must provide dollars worth at least four fifths of the borrowed ZCHF at the anchor (`swap/UniswapAmplifier.sol:16-29`, `:47-48`, `:162`). Its own comment warns that the amplifier "becomes exploitable as soon as the market price falls more than about 41% below the anchor price".
-- **`CurveAmplifier`** applies the same idea to a Curve pool, requiring the pool's oracle price to stay within 20% of the anchor recorded at deployment (`swap/CurveAmplifier.sol:18`, `:95`).
-- **`PositionRoller`** is a minter so that it can flash-mint: `roll` mints the repayment amount to itself, repays the old position, withdraws the collateral, mints from or clones the target position, and burns the flash amount from the caller (`minting/PositionRoller.sol:112-132`). Borrowers use it to extend a maturing loan.
-- **`TransferWithAuthorization`** is an [EIP-3009](https://eips.ethereum.org/EIPS/eip-3009) sidecar. Its deployment steps are to propose it as a minter, only to obtain the infinite allowance, which it then uses to execute signed transfers on behalf of holders (`transfer/TransferWithAuthorization.sol:14-21`). Whether it is an active minter today was not checked on chain.
+- **`StablecoinBridge`** mints ZCHF one to one against another Swiss franc stablecoin, up to an immutable limit, and stops minting 52 weeks after deployment. Mainnet bridges exist for XCHF, VCHF and CHFAU. The bridge has no loss write-off: if the other coin fails, the ZCHF minted against it stays in circulation.
+
+  *Implementation:* `swap/StablecoinBridge.sol` (lines 49-78).
+- **`UniswapAmplifier`** lends the ZCHF side of a Uniswap V3 ZCHF/USD liquidity position, with the dollar side provided by the owner. The range is limited to about -14%/+10% around a price anchor fixed at deployment, and the owner must provide dollars worth at least four fifths of the borrowed ZCHF at the anchor. Its own comment warns that the amplifier "becomes exploitable as soon as the market price falls more than about 41% below the anchor price".
+
+  *Implementation:* `swap/UniswapAmplifier.sol` (lines 16-29, 47-48 and 162).
+- **`CurveAmplifier`** applies the same idea to a Curve pool, requiring the pool's oracle price to stay within 20% of the anchor recorded at deployment.
+
+  *Implementation:* `swap/CurveAmplifier.sol` (lines 18 and 95).
+- **`PositionRoller`** is a minter so that it can flash-mint. Its `roll` function mints the repayment amount to itself, repays the old position, withdraws the collateral, mints from or clones the target position, and burns the flash amount from the caller. Borrowers use it to extend a maturing loan.
+
+  *Implementation:* `minting/PositionRoller.sol`, `roll()` (lines 112-132).
+- **`TransferWithAuthorization`** is an [EIP-3009](https://eips.ethereum.org/EIPS/eip-3009) sidecar. Its deployment steps are to propose it as a minter, only to obtain the infinite allowance, which it then uses to execute signed transfers on behalf of holders. Whether it is an active minter today was not checked on chain.
+
+  *Implementation:* `transfer/TransferWithAuthorization.sol` (lines 14-21).
 
 The last item shows how the minter model can be used beyond minting: the infinite allowance makes any approved contract a fully trusted spender.
 
 ## Cross-chain deployment
 
-ZCHF exists on Polygon, Arbitrum, Optimism, Base, Avalanche, Gnosis and Sonic as `BridgedFrankencoin`, at the same address on each, with the same minter and veto model (`exports/address.config.ts`). The CCIP token pool on each chain is a minter. Accounting flows back to mainnet:
+ZCHF exists on Polygon, Arbitrum, Optimism, Base, Avalanche, Gnosis and Sonic as `BridgedFrankencoin`, at the same address on each, with the same minter and veto model; the addresses are listed in `exports/address.config.ts`. The CCIP token pool on each chain is a minter. Accounting flows back to mainnet:
 
-- **Profits and losses.** On an L2, `coverLoss` mints any shortfall and books it as `accruedLoss`; later profits burn it down. `synchronizeAccounting()` sends the net result to the mainnet `BridgeAccounting`, which collects profits into the reserve or covers the loss (`stablecoin/BridgedFrankencoin.sol:206-257`, `equity/BridgeAccounting.sol:27-69`).
-- **Votes.** Governance on an L2 needs mainnet voting power. `GovernanceSender.pushVotes` and `MainnetVotes.pushFCSVotes` send snapshots of selected holders' votes over CCIP to `BridgedGovernance` and `BridgedVotes`. Snapshots cross, tokens do not, and a sync overwrites local delegations (`gitbook/governance.md`).
-- **Bridge administration.** `CCIPAdmin` manages the token pool. Adding a remote pool or a chain is a proposal with a 7-day veto window, transferring the admin role takes 21 days, and setting rate limits is immediate for a qualified holder (`bridge/CCIPAdmin.sol:103-212`).
+- **Profits and losses.** On an L2, `coverLoss` mints any shortfall and books it as `accruedLoss`; later profits burn it down. A synchronisation call sends the net result to the accounting contract on mainnet, which collects profits into the reserve or covers the loss.
+
+  *Implementation:* `stablecoin/BridgedFrankencoin.sol`, `coverLoss()` and `synchronizeAccounting()` (lines 206-257). `equity/BridgeAccounting.sol` (lines 27-69).
+- **Votes.** Governance on an L2 needs mainnet voting power. Two sender contracts on mainnet push snapshots of selected holders' votes over CCIP to the bridged governance contracts of each chain. Snapshots cross, tokens do not, and a sync overwrites local delegations.
+
+  *Implementation:* `GovernanceSender.pushVotes()` and `MainnetVotes.pushFCSVotes()`, received by `BridgedGovernance` and `BridgedVotes`. *Source:* `gitbook/governance.md`.
+- **Bridge administration.** `CCIPAdmin` manages the token pool. Adding a remote pool or a chain is a proposal with a 7-day veto window, transferring the admin role takes 21 days, and setting rate limits is immediate for a qualified holder.
+
+  *Implementation:* `bridge/CCIPAdmin.sol` (lines 103-212).
 
 ChainSecurity's trust model for FCS states the dependency plainly: "If CCIP can relay incorrect values, Governance on that chain is fully compromised, which can lead to minting unlimited ZCHF on that chain" (FPS2 report, p. 9).
 
@@ -379,7 +456,20 @@ The findings cluster around the features that make Frankencoin unusual. The "tod
 | Savings | Decurity 5.4 and 5.5: reward cursor advanced without payment, deposits on behalf of someone else blocked their withdrawal | 5.4 acknowledged, 5.5 fixed with the griefing risk accepted, both for `SavingsV2`; `AbstractSavings` has no withdrawal lock |
 | Chain portability | Code4rena M-04: `block.number` used as a clock; FPS2 #006: old CCIP vote snapshots can be replayed | Timestamps now; stale snapshots accepted as a risk |
 
-Code4rena's H-05 shows why an oracle-free design has its own attack surface. The owner sets the price that the liquidation arithmetic multiplies, so an extreme price is a denial of service on the one mechanism that replaces the oracle. The fix bounds the input in two ways: a raise is limited to 3x per step, and `_setPrice` checks `price * minimumCollateral <= limit * 1e18` (`Position.sol:335-338`).
+Code4rena's H-05 shows why an oracle-free design has its own attack surface. The owner sets the price that the liquidation arithmetic multiplies, so an extreme price is a denial of service on the one mechanism that replaces the oracle. The fix bounds the input in two ways: a raise is limited to 3x per step, and every price change checks that the price times the minimum collateral stays within the position's limit.
+
+```solidity
+// minting/Position.sol, _preparePriceIncrease() and _setPrice() (lines 330-338)
+function _preparePriceIncrease(uint256 newPrice) internal noCooldown {
+    if (newPrice > 3*price) revert PriceIncreaseTooHigh(3*price, newPrice);
+    _restrictMinting(3 days);
+}
+
+function _setPrice(uint256 newPrice, uint256 bounds) internal {
+    require(newPrice * minimumCollateral <= bounds * ONE_DEC18); // very important sanity check, see github.com/Frankencoin-ZCHF/FrankenCoin/issues/52
+    price = newPrice;
+}
+```
 
 ### What is accepted rather than fixed
 
@@ -394,7 +484,7 @@ Several items stay in the code by design or by an accepted risk. They are part o
 - The stablecoin bridge has no write-off path (CS-ZCHF-002); its limit and expiry cap the exposure.
 - FPS2 #006 and #025: stale cross-chain vote snapshots can be applied, and CCIP rate-limit changes take effect at once.
 
-No audit among the stored sources covers `CurveAmplifier`, the bridged leadrate or the EIP-3009 sidecar. The team's own reviews of `CurveAmplifier` and the sidecar are design notes in `reports/`; nothing there covers the bridged leadrate. The FPS2 report had `AbstractLeadrate` and `BridgedFrankencoin` in scope, and it refers to a separate "CCIP Bridge code assessment" (p. 9) that is not among the stored sources.
+No audit among the stored sources covers `CurveAmplifier`, the bridged leadrate or the EIP-3009 sidecar. The team's own reviews of the Curve amplifier and the sidecar are design notes in `reports/`; nothing there covers the bridged leadrate. The FPS2 report had `AbstractLeadrate` and `BridgedFrankencoin` in scope, and it refers to a separate "CCIP Bridge code assessment" (p. 9) that is not among the stored sources.
 
 ## Conclusion
 
@@ -456,7 +546,7 @@ The risks below combine the protocol's own disclosure page (`gitbook/risks.md`),
 
 #### Smart contracts and transparency
 
-- **Immutable core, many audits.** ZCHF and Equity have no owner, no pause and no upgrade path (`Frankencoin.sol`, `Equity.sol`); the rules cannot change under a holder, and bugs cannot be patched in place. Fixes ship as new hubs, positions or modules proposed through the veto process, so several generations (V1, V2, current source) run side by side with different rules.
+- **Immutable core, many audits.** ZCHF and Equity have no owner, no pause and no upgrade path; the rules cannot change under a holder, and bugs cannot be patched in place. Fixes ship as new hubs, positions or modules proposed through the veto process, so several generations (V1, V2, current source) run side by side with different rules.
 - **Source versus deployment.** This article describes the source at `8b4c4ab`. Which hub, if any, runs the current `minting/` code is not recorded in the repository's deployment exports; the deployed V2 hub lacks, for example, the 3x price-raise cap.
 - **Modules without a stored audit.** `CurveAmplifier`, the bridged leadrate and the EIP-3009 sidecar have no external audit among the stored reports; a ChainSecurity CCIP Bridge assessment cited by the FPS2 report was not read and may cover part of the bridged code.
 
@@ -468,21 +558,27 @@ The risks below combine the protocol's own disclosure page (`gitbook/risks.md`),
 
 #### Depeg
 
-- **What holds the peg.** The documentation says ZCHF "has no fixed redemption promise for Swiss francs" and that collateral, reserves, borrowing costs and market activity support its exchange rate (`gitbook/README.md`). In more detail (*derived*), the peg rests on borrowers needing ZCHF to repay, on positions being liquidated before their collateral falls below the debt, and on the bridges' one-to-one minting while they are open.
+- **What holds the peg.** The documentation says ZCHF "has no fixed redemption promise for Swiss francs" and that collateral, reserves, borrowing costs and market activity support its exchange rate. In more detail (*derived*), the peg rests on borrowers needing ZCHF to repay, on positions being liquidated before their collateral falls below the debt, and on the bridges' one-to-one minting while they are open.
+
+  *Source:* `gitbook/README.md`.
 - **Downward.** A collateral fall faster than an auction can run, or collateral nobody can bid for, leaves bad debt. Once equity and the minter reserves are exhausted, `coverLoss` mints the shortfall, and ZCHF becomes partly unbacked; the documentation warns that aggregate collateral above supply does not rule out a shortfall, because one position's collateral does not cover another's debt.
 - **Upward.** Repayment demand near maturities can push ZCHF above parity, the "short squeeze" in `gitbook/risks.md`.
 
 #### Collateral and market risk
 
 - **Reaction time.** When challenge periods last days, the reserve contribution must cover the price move over two auction phases; the collateral framework sizes it with a 99% value-at-risk over twice the auction duration plus 2%.
-- **Challenger access.** Challenges need challengers who hold or can borrow the collateral. A thinly traded or owner-controlled token defeats the mechanism (`gitbook/positions/auctions.md`).
+- **Challenger access.** Challenges need challengers who hold or can borrow the collateral. A thinly traded or owner-controlled token defeats the mechanism.
+
+  *Source:* `gitbook/positions/auctions.md`.
 - **Token behaviour.** Pausable, blacklistable or hook-enabled tokens can block settlement or reopen the reentrancy ordering in `bid`; only the veto review keeps them out.
 
 #### Liquidity
 
 - **ZCHF holders** exit through market liquidity; selling into a thin pool costs a spread (the documentation's example: 100,000 ZCHF at an average 0.98).
 - **FPS holders** cannot redeem before a 90-day average holding period; **FCS holders** redeem only while FCS is binding, at a discount that grows with the size of recent redemptions, with `withdraw` capped at 10% of supply per call.
-- **Savers** using `SavingsV2` find withdrawals locked while their interest ticks lie in the future. This is by design: `withdraw` reverts with `FundsLocked` at `minting/v2/SavingsV2.sol:145-148`. A third party can extend the lock by depositing on someone's behalf, a griefing risk the team accepted (Decurity 5.5).
+- **Savers** using `SavingsV2` find withdrawals locked while their interest ticks lie in the future. This is by design: a withdrawal reverts with `FundsLocked` until the ticks are reached. A third party can extend the lock by depositing on someone's behalf, a griefing risk the team accepted (Decurity 5.5).
+
+  *Implementation:* `minting/v2/SavingsV2.sol`, `withdraw()` (lines 145-148).
 
 #### Centralisation and governance
 
@@ -494,7 +590,9 @@ The risks below combine the protocol's own disclosure page (`gitbook/risks.md`),
 #### Loss sharing
 
 - **First loss:** the liquidated position's reserve contribution. **Second:** FPS/FCS equity, including through savings interest. **Third:** the reserve contributions of every other borrower, who recover less on repayment. **Last:** ZCHF holders, through minting of unbacked ZCHF by `coverLoss`.
-- Borrowers in sound positions can therefore lose part of their reserve without having been liquidated (`gitbook/risks.md`, "Third Line Bailout").
+- Borrowers in sound positions can therefore lose part of their reserve without having been liquidated.
+
+  *Source:* `gitbook/risks.md`, section "Third Line Bailout".
 
 #### Regulatory
 
@@ -527,7 +625,7 @@ In the auction phase, the bidder buys the *position's* collateral at a price fal
 
 **Q: Why is the quorum given as 2% in some places and 1% in others?**
 
-The deployed FPS1 Equity contract was compiled with `QUORUM = 200` (2%), as its mainnet deployment artifact shows, while the current `Governance.sol` and the FCS wrapper use 1%; `FCS.sol:16` and ChainSecurity's FPS2 report (p. 9) say the same. The documentation pages that give 1% for direct FPS1 actions describe the current source, not the deployed contract.
+The deployed FPS1 Equity contract was compiled with `QUORUM = 200` (2%), as its mainnet deployment artifact shows, while the current governance source and the FCS wrapper use 1%; the comment at line 16 of `FCS.sol` and ChainSecurity's FPS2 report (p. 9) say the same. The documentation pages that give 1% for direct FPS1 actions describe the current source, not the deployed contract.
 
 A direct veto on FPS1 needs at least 2% of FPS1 votes; because the comparison is strict, exactly 2% qualifies. A veto through FCS needs more than 1% of FCS votes, and the FCS contract itself must be above the FPS1 quorum, so the effective share of FPS1 votes can be as low as 1% of 2%, about 0.02%.
 

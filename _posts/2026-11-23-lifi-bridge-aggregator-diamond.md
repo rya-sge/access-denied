@@ -25,7 +25,7 @@ This article reads the LI.FI contracts at a pinned commit of `lifinance/contract
 The article assumes the reader knows smart contracts, ERC-20 tokens, DEX swaps and what a bridge does. A few mechanisms one level below are used without being derived:
 
 - **Allowance and `transferFrom`.** An [ERC-20](https://eips.ethereum.org/EIPS/eip-20) holder calls `approve(spender, amount)`, after which the spender can call `transferFrom(holder, to, amount)` at any later time. Wallets and aggregators often ask for an unlimited allowance, so the approval outlives the transaction it was given for; both LI.FI exploits spent such standing allowances.
-- **`call` versus `delegatecall`.** A `call` runs the target's code in the target's context, with the caller as `msg.sender`. A `delegatecall` runs the target's code in the caller's own storage and balance, keeping the original `msg.sender`. A proxy forwards every call by `delegatecall` to a logic contract; the site's [proxy summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/) covers the single-implementation case.
+- **`call` versus `delegatecall`.** A plain call runs the target's code in the target's context, with the caller as `msg.sender`. A delegate call runs the target's code in the caller's own storage and balance, and keeps the original sender. A proxy forwards every call to a logic contract by delegate call; the site's [proxy summary]({{site.url_complet}}/2022/10/31/proxy-contract-summary/) covers the single-implementation case.
 - **Function selector.** The first four bytes of calldata, the truncated Keccak-256 hash of the function signature (`transferFrom(address,address,uint256)` is `0x23b872dd`). Any contract can expose any selector, so a selector alone does not identify what a call does.
 - **Diamond proxy ([EIP-2535](https://eips.ethereum.org/EIPS/eip-2535)).** A proxy with many logic contracts, called facets. The proxy keeps a table from selector to facet and `delegatecall`s the facet registered for the incoming selector; `diamondCut` adds, replaces or removes table entries.
 - **Signature-based approvals.** [EIP-2612](https://eips.ethereum.org/EIPS/eip-2612) `permit` lets a holder grant an allowance with an off-chain signature instead of an `approve` transaction. Uniswap's [Permit2](https://github.com/Uniswap/permit2) generalises this to any ERC-20 through one shared contract, and its "witness" variant binds extra [EIP-712](https://eips.ethereum.org/EIPS/eip-712) typed data to the signature.
@@ -34,11 +34,14 @@ The article assumes the reader knows smart contracts, ERC-20 tokens, DEX swaps a
 
 ## The execution model: the API builds, the diamond executes
 
-LI.FI is split in two. The off-chain API at `https://li.quest/v1` computes quotes and routes; for each step it also returns a ready transaction whose `to` is the `LiFiDiamond` and whose calldata selects one facet entry point. The TypeScript SDK defaults its `apiUrl` to that address and refuses to build a client without an `integrator` name (`sdk/packages/sdk/src/client/createClient.ts:21-26`, `:61`). The diamond then pulls the user's tokens, runs the source swaps through allow-listed DEX calls and hands the funds to the bridge.
+LI.FI is split in two. The off-chain API at `https://li.quest/v1` computes quotes and routes; for each step it also returns a ready transaction addressed to the `LiFiDiamond`, whose calldata selects one facet entry point. The TypeScript SDK uses that API address by default and refuses to build a client without an integrator name. The diamond then pulls the user's tokens, runs the source swaps through allow-listed DEX calls and hands the funds to the bridge.
 
-The split puts a large part of the correctness in the backend. The contracts check the shape of a request: a non-zero receiver and amount, a destination chain other than the current one, and whitelisted swap targets. They do not check every value inside it. `AcrossFacetV4` states it plainly when it rescales the Across output amount after a source swap (`src/Facets/AcrossFacetV4.sol:142-143`):
+*Implementation:* `sdk/packages/sdk/src/client/createClient.ts`, default `apiUrl` and `integrator` check (lines 21-26 and 61).
+
+The split puts a large part of the correctness in the backend. The contracts check the shape of a request: a non-zero receiver and amount, a destination chain other than the current one, and whitelisted swap targets. They do not check every value inside it. `AcrossFacetV4` states it plainly when it rescales the Across output amount after a source swap:
 
 ```solidity
+// src/Facets/AcrossFacetV4.sol, lines 142-143
 // NOTE: please note that we intentionally do not verify the outputAmount any further. Only use LI.FI backend-
 //       generated calldata to avoid potential loss of funds.
 ```
@@ -74,9 +77,10 @@ A route without a destination call stops at the bridge: the bridge pays the user
 
 ### The diamond proxy
 
-`LiFiDiamond` is a small contract (`src/LiFiDiamond.sol`, `@custom:version 1.0.0`). Its constructor sets the owner and installs a single selector, `diamondCut`, pointing at the `DiamondCutFacet` (`:14-27`). Every other function arrives through the fallback, which looks the selector up in diamond storage and `delegatecall`s the facet:
+`LiFiDiamond` is a small contract, tagged version 1.0.0 in its NatSpec. Its constructor sets the owner and installs a single selector, `diamondCut`, which points at the `DiamondCutFacet`. Every other function arrives through the fallback, which looks the selector up in diamond storage and `delegatecall`s the facet:
 
 ```solidity
+// src/LiFiDiamond.sol, lines 32-67, comments removed; the constructor is at lines 14-27
 fallback() external payable {
     LibDiamond.DiamondStorage storage ds;
     bytes32 position = LibDiamond.DIAMOND_STORAGE_POSITION;
@@ -98,11 +102,11 @@ fallback() external payable {
 }
 ```
 
-(Comments removed; `src/LiFiDiamond.sol:32-67`.) Because of the `delegatecall`, every facet runs with the diamond's storage, the diamond's token balances and, most importantly, as the address users approved. A call that a facet makes to a token contract arrives there with `msg.sender` equal to the diamond.
+Because of the `delegatecall`, every facet runs with the diamond's storage, the diamond's token balances and, most importantly, as the address users approved. A call that a facet makes to a token contract arrives there with `msg.sender` equal to the diamond.
 
 ### Four layers
 
-The repository's architecture rules (`.agents/rules/002-architecture.md`) name four directories: facets, periphery, helpers and security, which holds the timelock. They also tell developers to delegate complex logic to the libraries. Grouped here by how the code is deployed:
+The repository's architecture rules name four directories: facets, periphery, helpers and security, which holds the timelock. They also tell developers to delegate complex logic to the libraries. Grouped here by how the code is deployed:
 
 | Layer | Deployed? | Examples | Role |
 |---|---|---|---|
@@ -112,7 +116,11 @@ The repository's architecture rules (`.agents/rules/002-architecture.md`) name f
 | Periphery | Yes, standalone | `Executor`, `Receiver*`, `Permit2Proxy`, `FeeCollector`, `FeeForwarder` | Contracts upgraded independently of the diamond |
 | Security | Yes, standalone | `LiFiTimelockController` | Governance: owns the diamond on production networks |
 
-Each library keeps its state at a fixed hashed slot, for example `keccak256("com.lifi.library.allow.list")` for the allow-list (`src/Libraries/LibAllowList.sol:28-29`) and `keccak256("com.lifi.reentrancyguard")` for the single reentrancy lock that all facets share (`src/Helpers/ReentrancyGuard.sol:11`). That is how forty-odd facets can share one storage space without stepping on each other.
+*Source:* `.agents/rules/002-architecture.md`.
+
+Each library keeps its state at a fixed hashed slot. The allow-list, for example, lives at `keccak256("com.lifi.library.allow.list")`, and the single reentrancy lock that all facets share lives at `keccak256("com.lifi.reentrancyguard")`. That is how forty-odd facets can share one storage space without stepping on each other.
+
+*Implementation:* `src/Libraries/LibAllowList.sol` (lines 28-29). `src/Helpers/ReentrancyGuard.sol` (line 11).
 
 ### The facet catalogue
 
@@ -131,13 +139,16 @@ The commit read here has 44 facets in `src/Facets/`. Grouped by purpose:
 | Same chain and tools | `GenericSwapFacetV3`, `CalldataVerificationFacet` (read-only decoding of LI.FI calldata) |
 | Admin | `DiamondCutFacet`, `DiamondLoupeFacet`, `OwnershipFacet`, `AccessManagerFacet`, `WhitelistManagerFacet`, `PeripheryRegistryFacet`, `WithdrawFacet`, `EmergencyPauseFacet` |
 
-Almost every bridge facet exposes the same pair of entry points, `startBridgeTokensVia<X>` and `swapAndStartBridgeTokensVia<X>`. The exceptions are `AcrossFacetPackedV4`, which has four packed `startBridgeTokensVia…` variants and no swap entry, and `AttestedBridgeFacet`, whose entry is `startBridgeAttested`. Bridge-specific constructor parameters (a SpokePool, a router) are in `config/<bridge>.json`, and `docs/AddingANewBridge.md` describes the template a new facet starts from.
+Almost every bridge facet exposes the same pair of entry points: `startBridgeTokensVia<X>` for a bridge-only transfer and `swapAndStartBridgeTokensVia<X>` for a swap followed by a bridge. Two facets differ. The packed Across facet has four packed bridge-only variants and no swap entry, and the attestation facet has the single entry `startBridgeAttested`. Bridge-specific constructor parameters, such as a SpokePool or a router, sit in one JSON file per bridge, and a developer guide describes the template a new facet starts from.
+
+*Source:* `config/<bridge>.json` and `docs/AddingANewBridge.md`.
 
 ## The two data structures
 
-Two structures carry almost every request. `ILiFi.BridgeData` describes the transfer (`src/Interfaces/ILiFi.sol:10-21`):
+Two structures carry almost every request. The first, `ILiFi.BridgeData`, describes the transfer:
 
 ```solidity
+// src/Interfaces/ILiFi.sol, lines 10-21
 struct BridgeData {
     bytes32 transactionId;
     string bridge;
@@ -152,11 +163,14 @@ struct BridgeData {
 }
 ```
 
-`transactionId` ties together the source event `LiFiTransferStarted`, the `AssetSwapped` events of the source swaps and the `LiFiTransferCompleted` or `LiFiTransferRecovered` event on the destination chain. `sendingAssetId` uses `address(0)` for the native asset.
+The `transactionId` links every event of one transfer: the start event on the source chain, one swap event per source swap, and the completion or recovery event on the destination chain. The native asset is encoded as `address(0)` in `sendingAssetId`.
 
-`LibSwap.SwapData` describes one step of the swap phase (`src/Libraries/LibSwap.sol:23-31`):
+*Implementation:* events `LiFiTransferStarted`, `LiFiTransferCompleted` and `LiFiTransferRecovered` in `src/Interfaces/ILiFi.sol`, and `AssetSwapped` in `src/Libraries/LibSwap.sol`.
+
+The second, `LibSwap.SwapData`, describes one step of the swap phase:
 
 ```solidity
+// src/Libraries/LibSwap.sol, lines 23-31
 struct SwapData {
     address callTo;
     address approveTo;
@@ -168,13 +182,19 @@ struct SwapData {
 }
 ```
 
-The library's own NatSpec says a step is "mostly swaps but also other calls such as fee collection, token wrapping/unwrapping or sending gas to destination chain" (`:11-13`). A `SwapData` is therefore a generic external call with token bookkeeping around it, and `callTo` plus `callData` decide what the diamond does.
+The library's own NatSpec says a step is "mostly swaps but also other calls such as fee collection, token wrapping/unwrapping or sending gas to destination chain". A `SwapData` is therefore a generic external call with token bookkeeping around it, and `callTo` plus `callData` decide what the diamond does.
+
+*Implementation:* `src/Libraries/LibSwap.sol`, library NatSpec (lines 11-13).
 
 ## The swap-then-bridge flow
 
 ### Bridge only
 
-`startBridgeTokensViaAcrossV4` is a typical bridge-only entry point (`src/Facets/AcrossFacetV4.sol:96-112`). It runs four modifiers in order: `nonReentrant`, `refundExcessNative(payable(msg.sender))`, `validateBridgeData` and `doesNotContainSourceSwaps`. The body calls `LibAsset.depositAsset`, which does `safeTransferFrom(msg.sender, diamond, minAmount)` for an ERC-20 and only checks `msg.value >= minAmount` for the native asset, then `_startBridge`. `_startBridge` checks that a non-empty Across message matches `hasDestinationCall`, validates the receiver, approves the SpokePool, calls `SPOKEPOOL.deposit(...)` and emits `LiFiTransferStarted` as its last action (`:157-246`).
+`startBridgeTokensViaAcrossV4` is a typical bridge-only entry point. Four modifiers run first, in this order: a reentrancy lock, a refund of excess native value to the caller, the bridge-data validation, and a check that the request declares no source swaps. The body then takes the input. For an ERC-20 it pulls `minAmount` from the caller with a safe transfer; for the native asset it only checks that `msg.value` covers that amount.
+
+The internal `_startBridge` then checks that a non-empty Across message matches the destination-call flag, validates the receiver, approves the SpokePool, calls its `deposit` function and emits `LiFiTransferStarted` as its last action.
+
+*Implementation:* `src/Facets/AcrossFacetV4.sol`, `startBridgeTokensViaAcrossV4()` and `_startBridge()` (lines 96-112 and 157-246). The modifiers are `nonReentrant`, `refundExcessNative(payable(msg.sender))`, `validateBridgeData` and `doesNotContainSourceSwaps`; the deposit is `LibAsset.depositAsset()`.
 
 The validation modifiers come from `src/Helpers/Validatable.sol`:
 
@@ -190,9 +210,10 @@ The validation modifiers come from `src/Helpers/Validatable.sol`:
 
 ### Swap, then bridge
 
-`swapAndStartBridgeTokensViaAcrossV4` replaces the deposit with a swap phase and overwrites the amount with the real output (`src/Facets/AcrossFacetV4.sol:118-150`):
+`swapAndStartBridgeTokensViaAcrossV4` replaces the deposit with a swap phase and overwrites the amount with the real output:
 
 ```solidity
+// src/Facets/AcrossFacetV4.sol, in the function at lines 118-150
 _bridgeData.minAmount = _depositAndSwap(
     _bridgeData.transactionId,
     _bridgeData.minAmount,
@@ -203,15 +224,17 @@ _bridgeData.minAmount = _depositAndSwap(
 
 The bridge therefore receives what the swaps produced, not the amount quoted. For Across the facet then rescales the expected output as `minAmount * outputAmountMultiplier / 1e18`, the step the comment above says is not verified further.
 
-`SwapperV2._depositAndSwap` (`src/Helpers/SwapperV2.sol:89-127`) runs these steps:
+The swap phase, `_depositAndSwap` in `SwapperV2`, runs these steps:
 
-1. It reverts `NoSwapDataProvided` on an empty array and records the diamond's balance of the last step's `receivingAssetId`, minus `msg.value` when that asset is native (`:97-106`).
-2. It records the pre-swap balance of every step's `receivingAssetId` (`_fetchBalances`).
-3. `LibAsset.depositAssets` pulls `fromAmount` from the caller for each step with `requiresDeposit == true`.
-4. `_executeSwaps` loops over the steps, checks each one against the allow-list (next section) and calls `LibSwap.swap`.
-5. `LibSwap.swap` requires `callTo` to have code and `fromAmount != 0`, max-approves `approveTo` for an ERC-20 input, forwards `fromAmount` as value for a native input, performs the low-level call and emits `AssetSwapped` (`src/Libraries/LibSwap.sol:51-108`). A former check of the input balance was removed on purpose, for fee-on-transfer and rebasing tokens (`:78-82`).
-6. The `noLeftovers` modifier on `_executeSwaps` sends intermediate outputs and unused inputs, never the final asset, to the leftover receiver, which the facets set to `msg.sender` (`:34-41`).
-7. It reverts `CumulativeSlippageTooHigh(minAmount, received)` if the final balance increase is below `minAmount` (`:122-124`).
+1. It reverts with `NoSwapDataProvided` on an empty array, then records the diamond's balance of the last step's `receivingAssetId`, minus `msg.value` when that asset is native.
+2. It records the pre-swap balance of every step's output asset.
+3. It pulls `fromAmount` from the caller for each step flagged `requiresDeposit`.
+4. It loops over the steps, checks each one against the allow-list (next section) and executes it through `LibSwap.swap`.
+5. `LibSwap.swap` requires the target to have code and a non-zero `fromAmount`. It max-approves the spender for an ERC-20 input, or forwards the amount as value for a native input, then performs the low-level call and emits `AssetSwapped`. A former check of the input balance was removed on purpose, for fee-on-transfer and rebasing tokens.
+6. The `noLeftovers` modifier on the swap loop sends intermediate outputs and unused inputs, never the final asset, to the leftover receiver, which the facets set to `msg.sender`.
+7. It reverts `CumulativeSlippageTooHigh(minAmount, received)` if the final balance increase is below `minAmount`.
+
+*Implementation:* `src/Helpers/SwapperV2.sol`, `_depositAndSwap()` (lines 89-127, balance snapshot at 97-106, slippage check at 122-124). It calls `_fetchBalances()`, `LibAsset.depositAssets()` and `_executeSwaps()`, whose `noLeftovers` modifier is at lines 34-41. `LibSwap.swap()` is in `src/Libraries/LibSwap.sol` (lines 51-108, removed balance check at 78-82).
 
 ```mermaid
 flowchart TD
@@ -228,13 +251,16 @@ flowchart TD
     C -->|"yes"| BR["bridgeData.minAmount = actual output, then _startBridge"]
 ```
 
-Same-chain swaps use `GenericSwapFacetV3`, with gas-optimised entry points such as `swapTokensSingleV3ERC20ToERC20` and `swapTokensMultipleV3ERC20ToNative`. They apply the same pair check, send the whole output to the receiver, check `minAmountOut` and emit `LiFiGenericSwapCompleted` (`src/Facets/GenericSwapFacetV3.sol:43-90`, `:162-168`).
+Same-chain swaps use `GenericSwapFacetV3`, whose gas-optimised entry points include `swapTokensSingleV3ERC20ToERC20` and `swapTokensMultipleV3ERC20ToNative`. They apply the same pair check, send the whole output to the receiver, check the minimum output and emit `LiFiGenericSwapCompleted`.
+
+*Implementation:* `src/Facets/GenericSwapFacetV3.sol`, entry points and `minAmountOut` check (lines 43-90). The pair check is at lines 162-168.
 
 ## The allow-list: contract and selector pairs
 
-The allow-list is the main guard between a caller's `SwapData` and the users' approvals. The check in `SwapperV2._executeSwaps` reads (`src/Helpers/SwapperV2.sol:204-217`):
+The allow-list is the main guard between a caller's `SwapData` and the users' approvals. The check in `SwapperV2._executeSwaps` reads:
 
 ```solidity
+// src/Helpers/SwapperV2.sol, lines 204-217
 if (
     !LibAllowList.contractSelectorIsAllowed(
         callTo,
@@ -253,75 +279,100 @@ LibSwap.swap(_transactionId, currentSwap);
 
 Three properties of this check matter:
 
-- **The key is the pair.** `contractSelectorIsAllowed` reads `contractSelectorAllowList[contract][selector]` (`src/Libraries/LibAllowList.sol:140-145`). A DEX router whitelisted for `swapExactTokensForTokens` cannot be called with any other selector, and whitelisting the selector on that router does not authorise it on any other contract.
-- **`approveTo` has its own entry.** Some DEXs take the approval on one contract and the call on another. The library reserves the selector `0xffffffff` (`APPROVE_TO_ONLY_SELECTOR`) for such spenders: it marks the contract as known without authorising any call to it (`:16-23`). Without that rule, a caller could direct the diamond's max approval to any address.
-- **The check lives in the caller, not in `LibSwap.swap`.** `LibSwap.swap` only checks that `callTo` has code and that `fromAmount` is non-zero. Any code path that reaches it without going through a pair check makes an arbitrary call from the diamond. At this commit, `LibSwap.swap` is called from `SwapperV2` (two loops, both checked) and from the periphery `Executor`; `GenericSwapFacetV3` does its own pair check before its own call.
+- **The key is the pair.** The library stores one entry per contract and selector. A DEX router whitelisted for `swapExactTokensForTokens` cannot be called with any other selector, and whitelisting the selector on that router does not authorise it on any other contract.
+- **`approveTo` has its own entry.** Some DEXs take the approval on one contract and the call on another. The library reserves the selector `0xffffffff`, named `APPROVE_TO_ONLY_SELECTOR`, for such spenders: it marks the contract as known without authorising any call to it. Without that rule, a caller could direct the diamond's max approval to any address.
+- **The check lives in the caller, not in `LibSwap.swap`.** The swap function itself only checks that the target has code and that the amount is non-zero. Any code path that reaches it without going through a pair check makes an arbitrary call from the diamond. At this commit it is called from the two swap loops of `SwapperV2`, both checked, and from the periphery `Executor`; `GenericSwapFacetV3` does its own pair check before its own call.
 
-The allow-list is managed by `WhitelistManagerFacet`. `setContractSelectorWhitelist` and `batchSetContractSelectorWhitelist` can be called by the owner or, without the timelock, by any address the owner granted that selector through `LibAccess.enforceAccessControl`, which keeps one `execAccess` entry per selector (`src/Facets/WhitelistManagerFacet.sol:24`, `:36`); whitelisting the diamond itself reverts `CannotAuthoriseSelf`, and each change emits `ContractSelectorWhitelistChanged` (`src/Facets/WhitelistManagerFacet.sol:18-45`, `:99-101`). The intended list is kept in `config/whitelist.json`.
+*Implementation:* `src/Libraries/LibAllowList.sol`, `contractSelectorIsAllowed()` reading `contractSelectorAllowList[contract][selector]` (lines 140-145). The approve-only selector is documented at lines 16-23.
+
+The allow-list is managed by `WhitelistManagerFacet`. Its two setters, for one pair or a batch, can be called by the owner or, without the timelock, by any address the owner granted that selector through the method-level access control, which keeps one entry per selector. Whitelisting the diamond itself reverts with `CannotAuthoriseSelf`, and each change emits `ContractSelectorWhitelistChanged`. The intended list is kept in `config/whitelist.json`.
+
+*Implementation:* `src/Facets/WhitelistManagerFacet.sol`, `setContractSelectorWhitelist()` and `batchSetContractSelectorWhitelist()` (lines 18-45). The `LibAccess.enforceAccessControl()` calls, which read `execAccess`, are at lines 24 and 36; the `CannotAuthoriseSelf` guard is at lines 99-101.
 
 The pair keys are recent, and they only bind code built from the current library. Until the 2025 migration, contracts and selectors were whitelisted in two independent mappings, so every whitelisted selector was callable on every whitelisted contract.
 
-Finding L-1 of Burra Security's November 2025 review showed why that matters: a DEX entry point whose selector happens to equal `transferFrom`'s `0x23b872dd`, combined with a whitelisted token contract (the report names one on Base), would have reopened the approval drain through the allow-list itself. LI.FI acknowledged the finding rather than fixing it for deployed contracts, answering that it can accept any combination of whitelisted contract and selector for contracts already deployed. The old mappings are still maintained by reference counting so that facets compiled against the old library keep working (`src/Libraries/LibAllowList.sol:31-60`).
+Finding L-1 of Burra Security's November 2025 review showed why that matters: a DEX entry point whose selector happens to equal `transferFrom`'s `0x23b872dd`, combined with a whitelisted token contract (the report names one on Base), would have reopened the approval drain through the allow-list itself. LI.FI acknowledged the finding rather than fixing it for deployed contracts, answering that it can accept any combination of whitelisted contract and selector for contracts already deployed. The old mappings are still maintained by reference counting so that facets compiled against the old library keep working.
 
-The current source checks pairs (`src/Helpers/SwapperV2.sol:204-215`), but `deployments/mainnet.diamond.json` lists some facets at versions older than the source: ChainflipFacet 1.0.0 against 1.0.1, GasZipFacet 2.0.4 against 2.0.5, and DeBridgeDlnFacet 1.0.1. Whether those deployed facets embed the old separate check was not inspected for this article.
+*Implementation:* `src/Libraries/LibAllowList.sol`, legacy mappings in `AllowListStorage` (lines 31-60).
+
+The current source checks pairs, as the excerpt above shows, but `deployments/mainnet.diamond.json` lists some facets at versions older than the source: ChainflipFacet 1.0.0 against 1.0.1, GasZipFacet 2.0.4 against 2.0.5, and DeBridgeDlnFacet 1.0.1. Whether those deployed facets embed the old separate check was not inspected for this article.
 
 ## Non-EVM destinations
 
-`BridgeData.receiver` is an EVM `address`, which cannot hold a Solana public key or a Bitcoin address. LI.FI uses a marker instead (`src/Helpers/LiFiData.sol:9-10`):
+`BridgeData.receiver` is an EVM `address`, which cannot hold a Solana public key or a Bitcoin address. LI.FI uses a marker instead:
 
 ```solidity
+// src/Helpers/LiFiData.sol, lines 9-10
 address internal constant NON_EVM_ADDRESS =
     0x11f111f111f111F111f111f111F111f111f111F1;
 ```
 
-A route to a non-EVM chain sets `bridgeData.receiver` to this marker and carries the real receiver in the facet's own data, usually as `bytes32` or `bytes`. The same file lists LI.FI's own chain IDs for those chains, which the comment calls "made up by the LI.FI team": Bitcoin `20000000000001`, Solana `1151111081099710`, TRON `1885080386571452`, Sui `9270000000000000`, Stellar, Aptos, Litecoin, Dogecoin, Bitcoin Cash and HyperCore (`:12-22`).
+A route to a non-EVM chain puts this marker in the receiver field and carries the real receiver in the facet's own data, usually as `bytes32` or `bytes`. The same file lists LI.FI's own chain IDs for those chains, which the comment calls "made up by the LI.FI team": Bitcoin 20000000000001, Solana 1151111081099710, TRON 1885080386571452, Sui 9270000000000000, Stellar, Aptos, Litecoin, Dogecoin, Bitcoin Cash and HyperCore.
 
-`AcrossFacetV4._startBridge` shows the two branches (`src/Facets/AcrossFacetV4.sol:172-199`):
+*Implementation:* `src/Helpers/LiFiData.sol`, the `LIFI_CHAIN_ID_*` constants (lines 12-22).
+
+The Across facet's `_startBridge` shows the two branches:
 
 - **Non-EVM destination.** It requires `receiverAddress != bytes32(0)`, says in a comment that it "cannot validate further", and emits `BridgeToNonEVMChainBytes32(transactionId, destinationChainId, receiverAddress)`.
 - **EVM destination.** Without a destination call, the Across receiver must equal `bridgeData.receiver` converted to `bytes32`. With a destination call, the Across receiver is LI.FI's Receiver contract, so the equality is not required.
+
+*Implementation:* `src/Facets/AcrossFacetV4.sol`, `_startBridge()` (lines 172-199).
 
 Other facets emit the `bytes` variant `BridgeToNonEVMChain` (Chainflip, DeBridgeDln, Eco). The marker is a convention that each facet must enforce: it should be accepted only for a non-EVM destination, and the non-EVM receiver should be encoded the way that destination expects. Both conditions have failed in audited facets (see the bug classes below).
 
 ## Destination calls: Receivers and the Executor
 
-When `hasDestinationCall` is true, the bridge delivers to a LI.FI Receiver on the destination chain rather than to the user. `ReceiverAcrossV4.handleV3AcrossMessage` is the Across version (`src/Periphery/ReceiverAcrossV4.sol:57-125`):
+When `hasDestinationCall` is true, the bridge delivers to a LI.FI Receiver on the destination chain rather than to the user. The Across version, `ReceiverAcrossV4`, handles the bridge message as follows:
 
 - it can only be called by the SpokePool (`onlySpokepool`);
 - it decodes `(transactionId, SwapData[], receiver)` from the message;
 - it approves the `Executor` for the bridged amount and `try`s `EXECUTOR.swapAndCompleteBridgeTokens`;
 - if that call fails, it sends the unswapped bridged tokens to the receiver and emits `LiFiTransferRecovered`;
-- it resets the Executor approval to zero at the end (`:121`).
+- it resets the Executor approval to zero at the end.
+
+*Implementation:* `src/Periphery/ReceiverAcrossV4.sol`, `handleV3AcrossMessage()` (lines 57-125, approval reset at line 121).
 
 The other receivers follow the same pattern: `ReceiverChainflip.cfReceive`, `ReceiverStargateV2.lzCompose`, `ReceiverOIF.outputFilled` and `ReceiverAcrossV3`.
 
-The `Executor` runs the destination swaps, sends the leftover bridged asset and the final asset to the receiver, and emits `LiFiTransferCompleted` (`src/Periphery/Executor.sol:138-211`). Unlike the diamond, it has no allow-list: its `_executeSwaps` only forbids `callTo == erc20Proxy` before calling `LibSwap.swap` (`:217-234`).
+The `Executor` runs the destination swaps, sends the leftover bridged asset and the final asset to the receiver, and emits `LiFiTransferCompleted`. Unlike the diamond, it has no allow-list: before each call to `LibSwap.swap`, its swap loop only refuses a step that targets its own token proxy.
 
-The missing allow-list is safe only because of where the Executor's funds come from. It holds no standing user approvals; it receives a one-call approval from the Receiver, which is reset afterwards. Its other entry point, `swapAndExecute`, pulls tokens through a separate `ERC20Proxy` that only accepts authorised callers (`src/Periphery/ERC20Proxy.sol:53-59`), which is why a step targeting that proxy is the one call the Executor refuses. A user who approved the Executor directly would lose that protection.
+*Implementation:* `src/Periphery/Executor.sol`, `_processSwaps()` (lines 138-211). The `callTo == erc20Proxy` check is in `_executeSwaps()` at lines 217-234.
+
+The missing allow-list is safe only because of where the Executor's funds come from. It holds no standing user approvals; it receives a one-call approval from the Receiver, which is reset afterwards. Its other entry point, `swapAndExecute`, pulls tokens through a separate `ERC20Proxy` that only accepts authorised callers, which is why a step targeting that proxy is the one call the Executor refuses. A user who approved the Executor directly would lose that protection.
+
+*Implementation:* `src/Periphery/ERC20Proxy.sol`, `transferFrom()` with the `authorizedCallers` check (lines 53-59).
 
 ## Signature entry: Permit2Proxy
 
-`Permit2Proxy` (`src/Periphery/Permit2Proxy.sol`, version 1.0.4) lets a user enter with a signature instead of an approval to the diamond. It takes the tokens, max-approves the diamond and forwards the calldata with `LIFI_DIAMOND.call{value: msg.value}(diamondCalldata)` (`:288-300`). It has three entry points:
+`Permit2Proxy`, version 1.0.4, lets a user enter with a signature instead of an approval to the diamond. It takes the tokens, max-approves the diamond and forwards the calldata to it in a plain call that carries `msg.value`. It has three entry points:
 
-- **`callDiamondWithEIP2612Signature`** calls the token's `permit` with `msg.sender` as owner, then pulls the tokens (`:77-127`).
-- **`callDiamondWithPermit2`** uses Permit2's `permitTransferFrom`, again with `msg.sender` as owner (`:136-160`).
-- **`callDiamondWithPermit2Witness`** lets a third party submit for a signer. The witness `LiFiCall(address diamondAddress,bytes32 diamondCalldataHash)` binds the signature to the exact diamond address and calldata (`:22-28`, `:168-200`).
+- **`callDiamondWithEIP2612Signature`** calls the token's `permit` with `msg.sender` as owner, then pulls the tokens.
+- **`callDiamondWithPermit2`** uses Permit2's `permitTransferFrom`, again with `msg.sender` as owner.
+- **`callDiamondWithPermit2Witness`** lets a third party submit for a signer. The witness `LiFiCall(address diamondAddress,bytes32 diamondCalldataHash)` binds the signature to the exact diamond address and calldata.
+
+*Implementation:* `src/Periphery/Permit2Proxy.sol`, the three entry points in the order above (lines 77-127, 136-160 and 168-200). The witness type is at lines 22-28, and the forwarding call `LIFI_DIAMOND.call{value: msg.value}(diamondCalldata)` at lines 288-300.
 
 The binding is the lesson of the proxy's first audit. In version 1.0.0, the EIP-2612 signature covered only the token approval, not `diamondAddress` or `diamondCalldata`; anyone who saw the permit in the mempool could submit it with their own diamond calldata. Sujith Somraaj's November 2024 report rated it High as finding 6.1.1, "Frontrunning callDiamondWithEIP2612Signature leads to permanent loss of user funds". The fix requires the signer to be the caller, or binds the calldata through the witness.
 
 The same report raised two Low findings that bear on refunds:
 
-- **Native refunds.** The proxy could not receive the native refunds that facets send to `msg.sender`. The fix added a `receive()` function, now at `:387-388` with the comment "required to be able to receive native token refunds from the diamond".
+- **Native refunds.** The proxy could not receive the native refunds that facets send to `msg.sender`. The fix added a `receive()` function with the comment "required to be able to receive native token refunds from the diamond".
 - **Unused tokens.** Tokens not fully used by the diamond stay in the proxy, where the next caller can take them. This one was acknowledged, not fixed.
 
-`Permit2Proxy` inherits `WithdrawablePeriphery`, so native or tokens left in it can be recovered by the proxy owner through `withdrawToken` (`src/Helpers/WithdrawablePeriphery.sol:18-28`), not automatically by the user.
+*Implementation:* `src/Periphery/Permit2Proxy.sol`, `receive()` (lines 387-388).
+
+`Permit2Proxy` inherits `WithdrawablePeriphery`, so native value or tokens left in it can be recovered by the proxy owner through `withdrawToken`, not automatically by the user.
+
+*Implementation:* `src/Helpers/WithdrawablePeriphery.sol`, `withdrawToken()` (lines 18-28).
 
 ## Fees
 
-Fees are not taken by the facets. They are inserted as one more `SwapData` step that calls a fee contract (`docs/FeeCollector.md`):
+Fees are not taken by the facets. They are inserted as one more `SwapData` step that calls a fee contract:
 
-- **`FeeCollector`** credits internal balances with `collectTokenFees(token, integratorFee, lifiFee, integrator)` or `collectNativeFees`, and emits `FeesCollected`. Integrators withdraw their share with `withdrawIntegratorFees`; the owner withdraws LI.FI's share with `withdrawLifiFees` (`src/Periphery/FeeCollector.sol:54-136`).
-- **`FeeForwarder`** pushes fees straight to their recipients and emits `FeesForwarded` (`src/Periphery/FeeForwarder.sol:71-197`). It takes amounts in `forwardERC20Fees` and `forwardNativeFees`, or shares over `1e18` in `forwardERC20FeesShares`. Its documentation warns that when the diamond calls it, the diamond must handle the remaining funds, "otherwise funds will remain in the diamond contract and could get stolen" (`docs/FeeForwarder.md`).
+- **`FeeCollector`** credits internal balances, one share for the integrator and one for LI.FI, and emits `FeesCollected`. Integrators withdraw their share themselves; the owner withdraws LI.FI's share.
+- **`FeeForwarder`** pushes fees straight to their recipients and emits `FeesForwarded`. It takes either amounts or shares over `1e18`. Its documentation warns that when the diamond calls it, the diamond must handle the remaining funds, "otherwise funds will remain in the diamond contract and could get stolen".
+
+*Implementation:* `src/Periphery/FeeCollector.sol`, `collectTokenFees(token, integratorFee, lifiFee, integrator)`, `collectNativeFees()`, `withdrawIntegratorFees()` and `withdrawLifiFees()` (lines 54-136). `src/Periphery/FeeForwarder.sol`, `forwardERC20Fees()`, `forwardNativeFees()` and `forwardERC20FeesShares()` (lines 71-197). Documentation: `docs/FeeCollector.md` and `docs/FeeForwarder.md`.
 
 The fee amounts themselves are chosen by the API when it builds the step; no on-chain rule bounds them.
 
@@ -329,11 +380,15 @@ The fee amounts themselves are chosen by the API when it builds the step; no on-
 
 The diamond has three levels of privilege.
 
-- **Owner.** `LibDiamond.enforceIsContractOwner` guards `diamondCut`, `registerPeripheryContract`, `setCanExecute` and `unpauseDiamond`. Ownership moves in two steps: `transferOwnership`, then `confirmOwnershipTransfer` by the pending owner (`src/Facets/OwnershipFacet.sol:43-71`).
-- **Method-level access.** `LibAccess.enforceAccessControl` checks `execAccess[msg.sig][msg.sender]`, which the owner sets with `setCanExecute`. `WithdrawFacet` and `WhitelistManagerFacet` use it for non-owners (`src/Libraries/LibAccess.sol:60-64`). A holder of `execAccess` on the whitelist selectors can therefore change the allow-list without going through the timelock; which addresses hold it on mainnet was not read.
-- **Pauser.** `EmergencyPauseFacet` accepts calls from an immutable `pauserWallet` or the owner (`src/Facets/EmergencyPauseFacet.sol:43-48`). The NatSpec describes the pauser as "non-multisig for fast response time".
+- **Owner.** Only the owner can cut the diamond, register periphery contracts, grant method-level access and unpause. Ownership moves in two steps: the owner names a new owner, who must then confirm the transfer.
+- **Method-level access.** The owner can let an address call one selector, recorded as `execAccess[msg.sig][msg.sender]`. `WithdrawFacet` and `WhitelistManagerFacet` use it for non-owners. A holder of `execAccess` on the whitelist selectors can therefore change the allow-list without going through the timelock; which addresses hold it on mainnet was not read.
+- **Pauser.** `EmergencyPauseFacet` accepts calls from an immutable `pauserWallet` or the owner. The NatSpec describes the pauser as "non-multisig for fast response time".
 
-The repository treats timelock ownership as a health-check invariant of every production mainnet diamond, named "Diamond is owned by the timelock (mainnet)". `docs/MultisigSigningProcess.md` states that every active mainnet network has its own Safe and timelock, and describes a bring-up state in which a new network is still owned directly. The Ethereum read below shows the invariant holding there. The timelock is an OpenZeppelin `TimelockController` with an extra `CANCELLER_ROLE` wallet; the configured `minDelay` is 10800 seconds, three hours (`config/timelockController.json`).
+*Implementation:* `LibDiamond.enforceIsContractOwner()` guards `diamondCut()`, `registerPeripheryContract()`, `setCanExecute()` and `unpauseDiamond()`. The transfer is `transferOwnership()` then `confirmOwnershipTransfer()` in `src/Facets/OwnershipFacet.sol` (lines 43-71). Method-level access is `LibAccess.enforceAccessControl()` in `src/Libraries/LibAccess.sol` (lines 60-64). The pauser check is the `OnlyPauserWalletOrOwner` modifier in `src/Facets/EmergencyPauseFacet.sol` (lines 43-48).
+
+The repository treats timelock ownership as a health-check invariant of every production mainnet diamond, named "Diamond is owned by the timelock (mainnet)". The multisig signing guide states that every active mainnet network has its own Safe and timelock, and describes a bring-up state in which a new network is still owned directly. The Ethereum read below shows the invariant holding there. The timelock is an OpenZeppelin `TimelockController` with an extra canceller wallet; the configured minimum delay is 10800 seconds, three hours.
+
+*Source:* `docs/MultisigSigningProcess.md`, and `CANCELLER_ROLE` and `minDelay` in `config/timelockController.json`.
 
 A read of Ethereum mainnet on 2026-11-23 (block 26,477,304) matched the repository:
 
@@ -355,17 +410,26 @@ flowchart LR
     P["pauserWallet (EOA)"] -->|"pauseDiamond() or removeFacet(facet)"| D
 ```
 
-The pause facet has two levers. `removeFacet(addr)` removes one facet's selectors, but refuses the pause facet itself and the `DiamondCutFacet` (`:63-87`). `pauseDiamond()` points every selector at the pause facet, so every call reverts with `DiamondIsPaused`, and stores the facet list for later restoration (`:98-127`). Unpausing needs the owner. Because the owner is the timelock, `LiFiTimelockController.unpauseDiamond(blacklist)` lets the timelock admin unpause without the three-hour delay, on the reasoning that unpausing "can only remove existing facets (blacklist), not add new code" (`src/Security/LiFiTimelockController.sol:70-82`).
+The pause facet has two levers. `removeFacet(addr)` removes one facet's selectors, but refuses the pause facet itself and the cut facet. `pauseDiamond()` points every selector at the pause facet, so every call reverts with `DiamondIsPaused`, and stores the facet list for later restoration. Unpausing needs the owner. Because the owner is the timelock, the timelock's own `unpauseDiamond` lets the timelock admin unpause without the three-hour delay, on the reasoning that unpausing "can only remove existing facets (blacklist), not add new code".
+
+*Implementation:* `src/Facets/EmergencyPauseFacet.sol`, `removeFacet()` and `pauseDiamond()` (lines 63-87 and 98-127). `src/Security/LiFiTimelockController.sol`, `unpauseDiamond(blacklist)` (lines 70-82).
 
 The resulting asymmetry is intended: a single key can stop the diamond at once, a 3-of-6 Safe can restart it at once, and changing the code takes a Safe proposal plus three hours. Allow-list changes are the exception to that rule, since `execAccess` holders can make them directly.
 
 ## Deployments: EVM chains, TRON and CREATE3
 
-Deployed addresses are recorded per network in `deployments/<network>.json`, the facets installed on each diamond in `deployments/<network>.diamond.json`, and the history in `deployments/_deployments_log_file.json`. The production diamond on Ethereum is `0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE` (`deployments/mainnet.json:7`), logged as version 1.0.0 deployed on 2023-07-27. The same address is recorded on 21 networks, including Arbitrum, Base, BSC, Optimism and Polygon; other chains use other addresses, zkSync for instance `0x341e94069f53234fE6DabeF707aD424830525715`. On mainnet the `Executor` is `0xd9B2…0E88`, the `FeeCollector` `0x3Ef2…1d6F` and the `Permit2Proxy` `0x8eEd…CC1c`.
+The repository keeps two records per network, one with the deployed addresses and one with the facets installed on the diamond, plus a shared log of every deployment. The production diamond on Ethereum is `0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE`, logged as version 1.0.0 deployed on 2023-07-27. The same address is recorded on 21 networks, including Arbitrum, Base, BSC, Optimism and Polygon; other chains use other addresses, zkSync for instance `0x341e94069f53234fE6DabeF707aD424830525715`. On mainnet the main periphery contracts are:
 
-**TRON** runs from the dedicated `contracts-tron` fork. The reason is one token: TRON's canonical USDT declares `transfer` as returning `bool` but never executes `return true`, so the call returns 32 zero bytes, which the decoder reads as `false`, and Solady's `safeTransfer` reverts (`src/Libraries/LibAsset.sol:30-33`). The fork adds a bypass that applies only on TRON's EVM chain ID `728126428` and only for that token address (`src/Libraries/LibAsset.sol:28-35`, `:95-104`):
+- `Executor`: `0xd9B2…0E88`
+- `FeeCollector`: `0x3Ef2…1d6F`
+- `Permit2Proxy`: `0x8eEd…CC1c`
+
+*Source:* `deployments/<network>.json`, `deployments/<network>.diamond.json` and `deployments/_deployments_log_file.json`; the mainnet diamond is at line 7 of `deployments/mainnet.json`.
+
+**TRON** runs from the dedicated `contracts-tron` fork. The reason is one token: TRON's canonical USDT declares `transfer` as returning a boolean but never executes its return statement, so the call returns 32 zero bytes, which the decoder reads as false, and Solady's `safeTransfer` reverts. The fork adds a bypass that applies only on TRON's EVM chain ID `728126428` and only for that token address:
 
 ```solidity
+// src/Libraries/LibAsset.sol, lines 95-104; constants at lines 28-35, rationale at 30-33
 if (
     block.chainid == TRON_CHAIN_ID &&
     assetId == TRON_USDT
@@ -375,11 +439,14 @@ if (
 }
 ```
 
-Everything else is synchronised weekly from upstream `lifinance/contracts` (`docs/TronFork.md`, Part 1), and TRON deployments use TronWeb scripts in `script/deploy/tron/` instead of Foundry broadcasts. The TRON diamond is `TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt` (`deployments/tron.json:9`). Note that TRON has two identifiers in the code: the EVM chain ID `728126428` used by `block.chainid`, and LI.FI's API ID `1885080386571452`.
+Everything else is synchronised weekly from upstream `lifinance/contracts`, and TRON deployments use TronWeb scripts instead of Foundry broadcasts. The TRON diamond is `TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt`. Note that TRON has two identifiers in the code: the EVM chain ID `728126428` that the chain reports at runtime, and LI.FI's API ID `1885080386571452`.
 
-**CREATE3Factory** is how facets and periphery contracts get identical addresses across chains. LI.FI's fork of zeframlou's factory hashes the caller into the salt before deploying (`create3-factory/src/CREATE3Factory.sol:14-23`):
+*Source:* `docs/TronFork.md`, Part 1; the scripts in `script/deploy/tron/`; the diamond at line 9 of `deployments/tron.json`.
+
+**CREATE3Factory** is how facets and periphery contracts get identical addresses across chains. LI.FI's fork of zeframlou's factory hashes the caller into the salt before deploying:
 
 ```solidity
+// create3-factory/src/CREATE3Factory.sol, lines 14-23
 function deploy(bytes32 salt, bytes memory creationCode)
     external
     payable
@@ -398,11 +465,13 @@ The resulting address depends on the factory, the deployer and the salt, not on 
 
 The contracts are one part of a larger stack:
 
-- **SDK.** `@lifi/sdk` exposes `getQuote`, `getRoutes`, `getContractCallsQuote`, `getStatus` and route execution (`executeRoute`, `resumeRoute`), with providers for EVM, Solana, Bitcoin, Sui, TRON, Stellar and Zcash (`sdk/packages/`). The Bitcoin provider builds on LI.FI's `bigmi` library.
-- **Status API.** `GET /status?txHash=…` returns one of `PENDING`, `DONE`, `FAILED`, `CANCELLED`, `NOT_FOUND` or `INVALID`, with the sending and receiving transaction hashes. Combined with the `transactionId` carried by every LI.FI event, it is the way to follow a transfer across chains. The id is indexed in `LiFiTransferCompleted`, `LiFiTransferRecovered` and the non-EVM events, but not in `LiFiTransferStarted` or `AssetSwapped`.
-- **Solana tracking program.** `lifi-solana-program-1` is a native Rust program with no custody and one instruction, `TrackV1 { transaction_id: [u8; 8] }`. It validates a clock sysvar and an epoch PDA and logs `LI.FI TX: 0x<id>` (`program/src/instructions/track_v1.rs`), which makes LI.FI-built Solana transactions findable.
+- **SDK.** `@lifi/sdk` requests quotes, routes and contract-call quotes, queries the status of a transfer, and executes or resumes a route. It has providers for EVM, Solana, Bitcoin, Sui, TRON, Stellar and Zcash; the Bitcoin provider builds on LI.FI's `bigmi` library.
+- **Status API.** A status request by transaction hash returns the state of the transfer, from pending to done, failed or cancelled, with the sending and receiving transaction hashes. Combined with the `transactionId` carried by every LI.FI event, it is the way to follow a transfer across chains. The id is indexed in the completion, recovery and non-EVM events, but not in `LiFiTransferStarted` or `AssetSwapped`.
+- **Solana tracking program.** `lifi-solana-program-1` is a native Rust program with no custody and one instruction, `TrackV1 { transaction_id: [u8; 8] }`. It validates a clock sysvar and an epoch PDA and logs `LI.FI TX: 0x<id>`, which makes LI.FI-built Solana transactions findable.
 - **Token list.** `customized-token-list` feeds the API's token endpoint, including a per-chain `denyTokens/` block list and an `approvalResetTokens/` list of USDT-style tokens that need an approval reset to zero before a new approval.
 - **Catapultar.** A separate smart account built on [ERC-7821](https://eips.ethereum.org/EIPS/eip-7821) batch execution, with validators that enforce a minimum outcome for intent fills. It has its own seven audit reports and is outside the diamond.
+
+*Source:* SDK `getQuote()`, `getRoutes()`, `getContractCallsQuote()`, `getStatus()`, `executeRoute()` and `resumeRoute()` in `sdk/packages/`. The API status endpoint `GET /status?txHash=…` returns the states `PENDING`, `DONE`, `FAILED`, `CANCELLED`, `NOT_FOUND` and `INVALID`. Solana tracking instruction in `program/src/instructions/track_v1.rs`.
 
 ## Two exploits from one root cause
 
@@ -413,14 +482,14 @@ Both LI.FI incidents spent allowances that users had given to the diamond. Neith
 The first diamond, `0x5A9Fd7c39a6C488E715437D7b1f3C823d5596eD1`, exposed `swapAndStartBridgeTokensViaCBridge(LiFiData, SwapData[], CBridgeData)`. For each swap step it pulled the input from the caller, approved `approveTo` and ran `callTo.call(callData)`, with no list of permitted targets. The DeFiHackLabs reconstruction, which does not bundle the facet's source and rebuilds its logic from the trace, replays one attacker call at block 14,420,686 with 38 swap steps:
 
 - **Step 0 was a real swap.** 50 USDT (50,000,000 base units) went through the 0x Exchange Proxy and returned 49,863,998 base units of USDC, which satisfied the facet's check on the bridged asset.
-- **Steps 1 to 37 were not swaps.** Each set `callTo` to a token contract (USDT, USDC, DAI, LINK, AAVE and others), `sendingAssetId` to `address(0)`, `fromAmount` to 0 and `callData` to `transferFrom(victim, attacker, amount)`. The facet pulled and approved nothing for them and executed the call; since the diamond was the approved spender, each `transferFrom` succeeded.
+- **Steps 1 to 37 were not swaps.** Each pointed the call at a token contract (USDT, USDC, DAI, LINK, AAVE and others), declared the native sentinel `address(0)` as input with an amount of 0, and carried `transferFrom(victim, attacker, amount)` as calldata. The facet pulled and approved nothing for these steps and executed the call; since the diamond was the approved spender, each `transferFrom` succeeded.
 - **The bridge step was real.** The facet sent the 49.86 USDC through cBridge to Arbitrum, to the attacker's address.
 
 The whole incident is reported at about $5.7M. The check on the bridged asset saw nothing wrong because the 37 drain steps did not touch it.
 
 ### July 2024: a public helper that skipped `SwapperV2`
 
-The second incident hit the current diamond, `0x1231DEB6…4EaE`, through a facet added shortly before: `GasZipFacet` at `0xf28A352377663cA134bd27B582b1a9A4dad7e534`. Its bridge entry points went through `_depositAndSwap` and the allow-list. A helper meant to be used as a `SwapData` step did not. The verified source of the deployed facet reads:
+The second incident hit the current diamond, `0x1231DEB6…4EaE`, through a facet added shortly before: `GasZipFacet` at `0xf28A352377663cA134bd27B582b1a9A4dad7e534`. Its bridge entry points went through the swap phase and its allow-list. A helper meant to be used as a `SwapData` step did not. The verified source of the deployed facet reads:
 
 ```solidity
 function depositToGasZipERC20(
@@ -446,7 +515,9 @@ function depositToGasZipERC20(
 }
 ```
 
-The function is `public`, has no modifier, and passes caller data straight to `LibSwap.swap`, whose guards in that version were "`callTo` has code", "`fromAmount` is not zero" and "the diamond holds at least `fromAmount` of `sendingAssetId`" (`InsufficientBalance`). The attacker set `callTo` to USDT and `callData` to `transferFrom(victim, attacker, balance)`. To get past those checks, it used a fake token contract as `sendingAssetId` that reports a balance of 1 and accepts `approve`, with `fromAmount = 1`. In the reproduced transaction (`0xd82fe84e…3873`, block 20,318,962), one victim with an unlimited USDT allowance to the diamond lost 2,276,295.880553 USDT. The incident as a whole is reported at about $10M.
+The function is public, has no modifier, and passes caller data straight to `LibSwap.swap`. In that version the swap function checked three things only: that the target had code, that the amount was not zero, and that the diamond held at least that amount of the input asset, reverting with `InsufficientBalance` otherwise. The attacker pointed the call at USDT with `transferFrom(victim, attacker, balance)` as calldata. To pass the bookkeeping checks, it declared as input a fake token contract that reports a balance of 1 and accepts approvals, with an amount of 1.
+
+In the reproduced transaction (`0xd82fe84e…3873`, block 20,318,962), one victim with an unlimited USDT allowance to the diamond lost 2,276,295.880553 USDT. The incident as a whole is reported at about $10M.
 
 ### What changed since
 
@@ -458,7 +529,9 @@ The function is `public`, has no modifier, and passes caller data straight to `L
 | Drain call | `token.transferFrom(victim, attacker, x)` as a swap step | the same, through one `SwapData` | needs a whitelisted `(token, 0x23b872dd)` pair, a selector collision on a facet using the old separate check, or a new bypass |
 | Attacker trick | zero-amount steps with native sentinel | fake token reporting a balance of 1 | |
 
-`depositToGasZipERC20` no longer exists in `GasZipFacet`. It now lives in a separate `GasZipPeriphery` contract, which checks the contract-selector pair through the diamond's `isContractSelectorWhitelisted` before calling (`src/Periphery/GasZipPeriphery.sol:54-82`). Being a separate contract, its calls do not carry the allowances users gave to the diamond (*derived*). Since before 2024, `LibSwap.swap` reverts on `fromAmount == 0`, which would have rejected the 2022 drain steps as crafted (*derived*), but the 2024 attack shows that such bookkeeping checks are cheap to satisfy and are not a substitute for the allow-list.
+The helper no longer exists in `GasZipFacet`. It now lives in a separate `GasZipPeriphery` contract, which asks the diamond whether the contract-selector pair is whitelisted before calling. Being a separate contract, its calls do not carry the allowances users gave to the diamond (*derived*). Since before 2024, `LibSwap.swap` reverts on a zero amount, which would have rejected the 2022 drain steps as crafted (*derived*), but the 2024 attack shows that such bookkeeping checks are cheap to satisfy and are not a substitute for the allow-list.
+
+*Implementation:* `src/Periphery/GasZipPeriphery.sol`, `depositToGasZipERC20()` with the `isContractSelectorWhitelisted()` check (lines 54-82).
 
 The structural point has not changed: `LibSwap.swap` is still an unrestricted call primitive, and the allow-list is a property of its callers. The first check worth running on any new facet is therefore a search for every path to `LibSwap.swap` or a raw `.call` that does not pass a pair check (*derived*).
 
@@ -491,7 +564,9 @@ Beyond the Highs, the same classes recur from facet to facet:
 
 One item is still open as a lead rather than a finding.
 
-At this commit, 20 facets pass `payable(msg.sender)` to `refundExcessNative`, and the swap variants pass it as the leftover receiver of `_depositAndSwap`. AcrossFacetV4, StargateFacetV2, DeBridgeDln, Chainflip, Garden, Squid, ThorSwap and Unit are among them. When the call comes through `Permit2Proxy`, that `msg.sender` is the proxy; the proxy has a `receive()` "required to be able to receive native token refunds from the diamond", and no forwarding of such refunds to the user was found in its source; only the proxy owner can recover them, through `withdrawToken`. The audits raised this pattern, but whether a leftover can arise on those paths through the proxy has not been verified for this article.
+At this commit, 20 facets send excess native value back to `msg.sender`, and their swap variants also send it the swap leftovers. AcrossFacetV4, StargateFacetV2, DeBridgeDln, Chainflip, Garden, Squid, ThorSwap and Unit are among them. When the call comes through `Permit2Proxy`, that sender is the proxy. The proxy's `receive()` function is commented "required to be able to receive native token refunds from the diamond", but no forwarding of such refunds to the user was found in its source; only the proxy owner can recover them, through `withdrawToken`. The audits raised this pattern, but whether a leftover can arise on those paths through the proxy has not been verified.
+
+*Implementation:* each facet's `refundExcessNative(payable(msg.sender))` modifier and the leftover receiver it passes to `_depositAndSwap()`.
 
 ## Conclusion
 
@@ -654,11 +729,11 @@ Because the bridge must receive what the swaps produced, not the amount the quot
 
 **Q: How does a transfer to Solana fit into a structure whose receiver is an EVM address?**
 
-`bridgeData.receiver` is set to the marker `0x11f1…11F1`, `destinationChainId` to LI.FI's Solana ID `1151111081099710`, and the real receiver travels in the facet's own data, typically as `bytes32`. The facet checks that this field is non-zero and emits `BridgeToNonEVMChainBytes32` or `BridgeToNonEVMChain` with it. It cannot check the address further, so the encoding is the backend's responsibility.
+The receiver field holds the marker `0x11f1…11F1`, the destination chain is LI.FI's Solana ID `1151111081099710`, and the real receiver travels in the facet's own data, typically as `bytes32`. The facet checks that this field is non-zero and emits a non-EVM bridge event with it. It cannot check the address further, so the encoding is the backend's responsibility.
 
 **Q: The 2024 attacker had to get past `LibSwap.swap`'s bookkeeping. How, and why did the allow-list not stop it?**
 
-In the 2024 version, `LibSwap.swap` required a non-zero `fromAmount`, approved `approveTo` for `sendingAssetId`, and reverted `InsufficientBalance` if the diamond held less than `fromAmount` of `sendingAssetId`. That balance check is why the fake token had to report a balance. The attacker used a fake token as `sendingAssetId` that reported a balance of 1 and accepted `approve`, with `fromAmount = 1`, while `callTo` was USDT and `callData` was `transferFrom(victim, attacker, balance)`.
+In the 2024 version, `LibSwap.swap` required a non-zero amount, approved the spender for the input asset, and reverted with `InsufficientBalance` if the diamond held less than that amount of the input asset. That balance check is why the fake token had to report a balance. The attacker declared as input a fake token that reported a balance of 1 and accepted approvals, with an amount of 1, while the call went to USDT with `transferFrom(victim, attacker, balance)` as calldata.
 
 The allow-list did not run because `depositToGasZipERC20` called `LibSwap.swap` directly instead of going through `SwapperV2._executeSwaps`, where the check lives. The fix moved that helper into a periphery contract with its own pair check.
 
@@ -672,7 +747,7 @@ Users who approved the diamond stay exposed if the facet is ever restored. `remo
 
 **Q: Why does LI.FI need a separate repository for TRON?**
 
-TRON's canonical USDT declares `transfer` as returning `bool` but never executes `return true`, so it returns 32 zero bytes that decode as `false`, and the safe-transfer library reverts. The fork adds a bypass limited to TRON's chain ID `728126428` and that one token address, reroutes `WithdrawablePeriphery`, and uses TronWeb deployment scripts. The rest of the code is synchronised weekly from the main contracts repository.
+TRON's canonical USDT declares `transfer` as returning a boolean but never executes its return statement, so it returns 32 zero bytes that decode as false, and the safe-transfer library reverts. The fork adds a bypass limited to TRON's chain ID `728126428` and that one token address, reroutes `WithdrawablePeriphery`, and uses TronWeb deployment scripts. The rest of the code is synchronised weekly from the main contracts repository.
 
 ## Gaps
 
