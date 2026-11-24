@@ -2,7 +2,7 @@
 layout: post
 title: "ML-DSA in Rust — Inside the Quantus qp-rusty-crystals Implementation"
 date:   2026-08-25
-last_modified_at: 2026-11-05
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: cryptography blockchain post-quantum
@@ -33,9 +33,13 @@ The crate implements the three FIPS 204 algorithms (`ML-DSA.KeyGen`, `ML-DSA.Sig
 | Arithmetic | `poly.rs`, `polyvec.rs`, `ntt.rs`, `rounding.rs`, `reduce.rs`, `fips202.rs` | Ring arithmetic, rounding, hashing, sampling |
 | Parameters | `params.rs` | FIPS 204 Table 1 and Table 2, plus `const fn` size arithmetic |
 
-`poly.rs` is by far the largest file at 2,287 lines, and `sign.rs` follows at 1,282. That distribution is characteristic: the algorithms themselves are short, and most of the code is in the polynomial layer where the bit-level codecs, the samplers, and the bounds contracts live.
+The polynomial module is by far the largest file at 2,287 lines, and the signing module follows at 1,282. That distribution is characteristic: the algorithms themselves are short, and most of the code is in the polynomial layer where the bit-level codecs, the samplers, and the bounds contracts live.
 
-`lib.rs` keeps the arithmetic modules public (`poly`, `polyvec`, `packing`, `params`, `rounding`, `fips202`) while sealing `sign`, `frontend`, `ntt`, and `reduce` behind `pub(crate)`. That split is what lets the sibling threshold-signing crate build on the same ring arithmetic without reaching into the signature algorithms.
+*Implementation:* `poly.rs` and `sign.rs`.
+
+The crate root keeps the arithmetic modules for polynomials, polynomial vectors, packing, parameters, rounding and hashing public, while sealing the signature algorithms, the frontend, the NTT and the reduction primitives behind `pub(crate)`. That split is what lets the sibling threshold-signing crate build on the same ring arithmetic without reaching into the signature algorithms.
+
+*Implementation:* `lib.rs`, public modules `poly`, `polyvec`, `packing`, `params`, `rounding` and `fips202`; `pub(crate)` modules `sign`, `frontend`, `ntt` and `reduce`.
 
 ## One Code Path, Three Parameter Sets
 
@@ -96,9 +100,10 @@ const fn assert_sign_params<
 }
 ```
 
-The helpers it calls are `const fn` in `params.rs`, and they are total only over the values FIPS 204 defines:
+The size helpers it calls are `const fn`, and they are total only over the values FIPS 204 defines:
 
 ```rust
+// params.rs
 pub const fn polyz_packedbytes(gamma1: usize) -> usize {
 	match gamma1 {
 		0x20000 => 18 * N as usize / 8, // 18 bits per coefficient (ML-DSA-44)
@@ -122,9 +127,10 @@ R_q = \mathbb Z_q[X]/(X^{256}+1), \qquad q = 2^{23} - 2^{13} + 1 = 8380417
 \end{aligned}
 $$
 
-Three modular primitives live in `reduce.rs`, and each carries an explicitly documented input domain. `montgomery_reduce` is the interesting one, because its domain is half-open:
+Three modular primitives make up the reduction module, and each carries an explicitly documented input domain. Montgomery reduction is the interesting one, because its domain is half-open:
 
 ```rust
+// reduce.rs
 /// For integer a with -2^{31} * Q <= a < 2^31 * Q,
 /// compute r \equiv 2^{-32} * a (mod Q) such that -Q < r < Q.
 pub fn montgomery_reduce(a: i64) -> i32 {
@@ -174,7 +180,9 @@ pub fn invntt_tomont(a: &mut Poly) {
 
 ## Rounding, Hints, and Exhaustive Verification
 
-`rounding.rs` holds `Power2Round`, `Decompose`, `MakeHint`, and `UseHint`. Two implementation choices stand out.
+One module implements the four FIPS 204 rounding and hint routines: `Power2Round`, `Decompose`, `MakeHint`, and `UseHint`. Two implementation choices stand out.
+
+*Implementation:* `rounding.rs`.
 
 The first is that `Decompose` extracts high bits with fixed-point reciprocals rather than division, and the constants differ per parameter set: `(1025, >> 22)` for $\gamma_2 = (q-1)/32$, and `(11275, >> 24)` for $\gamma_2 = (q-1)/88$. Because 44 is not a power of two, the wrap of the top high-bits value cannot be a mask, so it is written as branchless arithmetic:
 
@@ -254,7 +262,9 @@ The fields are private, which protects the squeeze loop. It relies on `pos <= R`
 
 ### Sampling and the shape of the rejection loops
 
-Four samplers sit on top of the sponge. `poly::uniform` is one element of `ExpandA`, `uniform_eta` is `ExpandS`, `uniform_gamma1` is `ExpandMask`, and `challenge` is `SampleInBall`.
+Four samplers sit on top of the sponge, one per FIPS 204 expansion function: one matrix element for `ExpandA`, the short secret polynomials for `ExpandS`, the mask for `ExpandMask`, and the challenge polynomial for `SampleInBall`.
+
+*Implementation:* `poly::uniform`, `uniform_eta`, `uniform_gamma1` and `challenge`, in that order.
 
 `ExpandS` is the one that departs most visibly from the reference structure. Rather than squeezing blocks until 256 coefficients have been accepted, it squeezes a fixed number of blocks and takes the first 256 of whatever the pass produced:
 
@@ -321,7 +331,9 @@ A `stack-check.sh` script outside the crate builds for `thumbv7em-none-eabihf` w
 
 ## The Signing Loop as Implemented
 
-`signature_var` decomposes into named helpers rather than one long function: `unpack_secret_key_for_signing`, `prepare_signing_context`, `derive_message_hash`, `derive_mask_seed`, `generate_masking_vector_and_commitment`, `generate_challenge_polynomial`, and four `compute_and_check_*` predicates.
+The signing core decomposes into named helpers rather than one long function: one unpacks the secret key, one prepares the signing context, two derive the message hash and the mask seed, one generates the masking vector and its commitment, one generates the challenge polynomial, and four predicates check the rejection bounds.
+
+*Implementation:* `signature_var()`, with `unpack_secret_key_for_signing()`, `prepare_signing_context()`, `derive_message_hash()`, `derive_mask_seed()`, `generate_masking_vector_and_commitment()`, `generate_challenge_polynomial()` and the four `compute_and_check_*` predicates.
 
 The message hash absorbs its inputs as separate slices rather than concatenating them:
 
@@ -401,7 +413,9 @@ The helper it protects is `pub(crate)`, and its documentation states the require
 	}
 ```
 
-Honest key generation never produces that key, so the check costs nothing on the legitimate path. `PublicKey::from_bytes` applies it at import as well, and `public_key_from_secret_var` refuses to import a secret key that derives it.
+Honest key generation never produces that key, so the check costs nothing on the legitimate path. Public-key import applies the same check, and secret-key import refuses a secret key that derives it.
+
+*Implementation:* `PublicKey::from_bytes()` and `public_key_from_secret_var()`.
 
 Beyond that, the verifier recomputes $\mu$ from its own $\mathsf{SHAKE256}(pk)$ rather than trusting anything supplied with the signature, checks $\lVert \mathbf z \rVert_\infty < \gamma_1 - \beta$ before doing any lattice arithmetic, and requires the hint section to be canonically encoded. That last check is what `unpack_sig` returns, and the flag is marked `#[must_use]` with a `compile_fail` doctest proving that a caller cannot discard it:
 
@@ -449,13 +463,17 @@ Inside the signing path the same reasoning produces an out-parameter style. The 
 	fn zeroed() -> Self {
 ```
 
-The same shape appears in `Keypair::generate`, which builds the struct in tail position rather than binding it to a named local first, and in `Keypair::from_bytes`, which validates a borrowed buffer instead of passing a `SecretKey` by value.
+The same shape appears in key generation, which builds the keypair in tail position rather than binding it to a named local first, and in keypair import, which validates a borrowed buffer instead of passing a `SecretKey` by value.
+
+*Implementation:* `Keypair::generate()` and `Keypair::from_bytes()`.
 
 None of this is verifiable by reading the source, because it is a claim about codegen. The crate therefore tests it from the outside. Three integration test files paint a stack region with a sentinel byte, run the operation on it through `psm::on_stack`, and scan the region afterwards for 32-byte windows of known secret material. They are compiled only for optimised builds, since unoptimised codegen materialises move temporaries that no source-level fix can wipe. A fourth test attacks the same problem from the heap side, installing a global allocator that scans every freed block for the key-generation seed.
 
 ## Validated Key Import
 
-Where the reference implementation parses a secret key, this crate validates one. `SecretKey::from_bytes`, `Keypair::from_bytes`, and `Keypair::from_parts` all re-derive the public key from the secret material and check the packed key's internal invariants.
+Where the reference implementation parses a secret key, this crate validates one. All three import paths re-derive the public key from the secret material and check the packed key's internal invariants.
+
+*Implementation:* `SecretKey::from_bytes()`, `Keypair::from_bytes()` and `Keypair::from_parts()`.
 
 ![Activity diagram of secret-key import showing the coefficient-range pre-check, public key re-derivation, and the stored t0, tr and non-zero t1 comparisons, each rejecting on mismatch]({{site.url_complet}}/assets/article/cryptographie/lattice/qp-rusty-crystals-key-import-validation.png)
 
@@ -498,7 +516,9 @@ The correspondence invariant is then held by the type system. `Keypair`'s fields
 
 The test strategy is layered to match the code.
 
-- **NIST ACVP known-answer tests.** `src/acvp.rs` runs keyGen, sigGen (deterministic and hedged), and sigVer for all three parameter sets against vectors vendored unmodified from `usnistgov/ACVP-Server`, restricted to the `signatureInterface == "internal"` groups that correspond to `Sign_internal` and `Verify_internal`. This is the self-service half of the [NIST CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program) pipeline.
+- **NIST ACVP known-answer tests.** A dedicated test module runs keyGen, sigGen (deterministic and hedged), and sigVer for all three parameter sets against vectors vendored unmodified from the NIST ACVP-Server repository, restricted to the internal-interface groups that correspond to `Sign_internal` and `Verify_internal`. This is the self-service half of the [NIST CAVP](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program) pipeline.
+
+  *Implementation:* `src/acvp.rs`, vectors from `usnistgov/ACVP-Server` filtered on `signatureInterface == "internal"`.
 - **SHAKE256 known-answer tests** over the NIST short-message and long-message response files.
 - **Exhaustive verification** of `Decompose` and `UseHint` against transcribed FIPS 204 definitions over all of $[0, q)$, for both $\gamma_2$ values.
 - **Adversarial import tests**, stamped per parameter set because the defenses are parameter-dependent, covering spliced keypairs, corrupted $tr$ and $\mathbf t_0$ regions, and out-of-range packed coefficients.
@@ -566,7 +586,9 @@ The parts that are documented as deliberate exceptions are as informative as the
 
 The first seven are the FIPS 204 parameters themselves. The other seven are sizes derived from them, such as the packed length of one $\mathbf z$ polynomial and the total signature length. Stable Rust cannot compute one const-generic array length from another inside a generic function signature, so the derived sizes must be supplied by the caller.
 
-That creates a mismatch hazard, which the crate answers with `assert_sign_params` in a `const` block: every derived size is recomputed from the base parameters by the `const fn` helpers in `params.rs` and compared. A wrong combination is a compile error, not a runtime mis-parse.
+That creates a mismatch hazard, which the crate answers with a compile-time check: every derived size is recomputed from the base parameters by `const fn` helpers and compared. A wrong combination is a compile error, not a runtime mis-parse.
+
+*Implementation:* `assert_sign_params()` in a `const` block, calling the size helpers in `params.rs`.
 
 **Q: What does streaming the matrix cost, and what does it buy?**
 
@@ -601,7 +623,9 @@ The gap matters because $K$ is exactly the input that makes deterministic signin
 
 Because a move in Rust is a copy. Returning a secret-bearing struct by value copies it into the caller's frame and leaves the source copy in the callee's frame, dead but never dropped, so `ZeroizeOnDrop` never runs on it. Whether the compiler elides that copy is an optimisation decision, not a guarantee.
 
-The crate's response is to place secrets in the caller's frame and fill them through `&mut`, as `UnpackedSecretKey::zeroed` plus `unpack_secret_key_for_signing` do, and to build values in tail position rather than binding them to a named local first. Since none of that is checkable by reading the source, three release-only integration tests paint a stack region, run the operation on it, and scan for secret patterns afterwards.
+The crate's response is to place secrets in the caller's frame and fill them through `&mut`, and to build values in tail position rather than binding them to a named local first. Since none of that is checkable by reading the source, three release-only integration tests paint a stack region, run the operation on it, and scan for secret patterns afterwards.
+
+*Implementation:* `UnpackedSecretKey::zeroed()` and `unpack_secret_key_for_signing()`.
 
 ## References
 

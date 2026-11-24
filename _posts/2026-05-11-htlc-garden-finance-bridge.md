@@ -2,7 +2,7 @@
 layout: post
 title: "Hash Time-Locked Contracts — From First Principles to Garden Finance's Cross-Chain Bridge"
 date: 2026-05-11
-last_modified_at: 2026-11-17
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -170,7 +170,9 @@ The relayer then submits the transaction. `SignatureChecker.isValidSignatureNow`
 
 ### Unique Deposit Addresses (UDA)
 
-The UDA pattern solves a UX problem: users interacting with native wallet interfaces may not be able to call smart contract functions directly before sending tokens. A UDA provides a deterministic address computed via CREATE2 to which the user pre-deposits tokens. When the swap is initiated, `HTLCRegistry.createERC20SwapAddress()` deploys a clone of `UniqueDepositAddress` at exactly that address and immediately calls `initiateOnBehalf()` on the HTLC. The swap parameters are baked into the clone's immutable bytecode at deploy time.
+The UDA pattern solves a UX problem: users interacting with native wallet interfaces may not be able to call smart contract functions directly before sending tokens. A UDA provides a deterministic address computed via CREATE2 to which the user pre-deposits tokens. When the swap is initiated, the registry deploys a clone of the UDA contract at exactly that address, and the clone immediately opens the order on the HTLC on behalf of the user. The swap parameters are baked into the clone's immutable bytecode at deploy time.
+
+*Implementation:* `HTLCRegistry.createERC20SwapAddress()`, `UniqueDepositAddress` and `HTLC.initiateOnBehalf()`.
 
 ```
 User                 HTLCRegistry              UDA Clone              HTLC
@@ -215,11 +217,10 @@ This section presents the findings from the official Code4rena audit of Garden F
 
 #### M-01 — Unchecked `approve()` Return Causes Permanent Fund Loss in `UDA.sol`
 
-**File:** `swap/UDA.sol` — line 38
-
-The `UniqueDepositAddress.initialize()` function calls `HTLC(_addressHTLC).token().approve(_addressHTLC, amount)` without checking the return value:
+When a UDA clone is initialised, it approves the HTLC to pull the deposited amount and then opens the order, but it ignores the boolean returned by `approve()`:
 
 ```solidity
+// swap/UDA.sol, UniqueDepositAddress.initialize() (approve() call at line 38)
 function initialize() public initializer {
     // ... parameter extraction ...
     HTLC(_addressHTLC).token().approve(_addressHTLC, amount); // return value ignored
@@ -241,13 +242,9 @@ IERC20(HTLC(_addressHTLC).token()).safeApprove(_addressHTLC, amount);
 
 #### L-01 — Missing `redeemer != refundee` Validation Enables Same-Party Orders and Instant Self-Refunds
 
-**Files:**
-- `solana-native-swaps/src/lib.rs::initiate` — L20–L64
-- `solana-native-swaps/src/lib.rs::instant_refund` — L130–L153
-- `solana-spl-swaps/src/lib.rs::initiate` — L22–L80
-- `solana-spl-swaps/src/lib.rs::instant_refund` — L188–L23
-
 The `initiate` instruction in both Solana HTLC implementations (native SOL and SPL token) does not enforce `redeemer != refundee`. Orders can be created where the redeemer and refundee are the same address, despite the HTLC's intended separation of redeem and refund roles.
+
+*Implementation:* `initiate` at L20–L64 and `instant_refund` at L130–L153 in `solana-native-swaps/src/lib.rs`; `initiate` at L22–L80 and `instant_refund` at L188–L23 in `solana-spl-swaps/src/lib.rs`.
 
 Because `instant_refund` requires the redeemer's consent but no secret or timelock, the same address can immediately refund to itself without revealing the secret. The same address also becomes the beneficiary of both redeem and refund flows, breaking the "counterparty provides secret to redeem; initiator receives refund after expiry" invariant. Events and on-chain audit trails no longer distinguish counterparty roles, complicating monitoring and downstream integrations.
 
@@ -263,12 +260,23 @@ Several spelling mistakes exist across the EVM and Starknet codebases. EVM error
 
 **Code locations:**
 
-- `NativeHTLC__IncorrectFundsRecieved` (should be `Received`) — `swap/NativeHTLC.sol` L82, L91
-- `ArbNativeHTLC__IncorrectFundsRecieved` (should be `Received`) — `swap/ArbNativeHTLC.sol` L88, L97
-- Variable name `intiate` (should be `initiate`) — `htlc.cairo` L249, L257
-- Identifier `INTIATE_TYPE` (should be `INITIATE_TYPE`) — `HTLC.test.ts` L449, L477, L514, L551, L587, L623, L1305, L1374, L1503
+- The native-ETH HTLC error `NativeHTLC__IncorrectFundsRecieved` misspells `Received`.
 
-**Recommendation.** Rename `NativeHTLC__IncorrectFundsRecieved` → `NativeHTLC__IncorrectFundsReceived` and `ArbNativeHTLC__IncorrectFundsRecieved` → `ArbNativeHTLC__IncorrectFundsReceived` and update all call sites. Rename `intiate` → `initiate` in `htlc.cairo` and standardize `INTIATE_TYPE` → `INITIATE_TYPE` across the Starknet test suite.
+  *Implementation:* `swap/NativeHTLC.sol` (L82, L91).
+
+- The Arbitrum native-ETH HTLC error `ArbNativeHTLC__IncorrectFundsRecieved` carries the same misspelling.
+
+  *Implementation:* `swap/ArbNativeHTLC.sol` (L88, L97).
+
+- The Starknet contract names a variable `intiate` instead of `initiate`.
+
+  *Implementation:* `htlc.cairo` (L249, L257).
+
+- The Starknet test suite uses the identifier `INTIATE_TYPE` instead of `INITIATE_TYPE`.
+
+  *Implementation:* `HTLC.test.ts` (L449, L477, L514, L551, L587, L623, L1305, L1374, L1503).
+
+**Recommendation.** Rename the two EVM errors to `NativeHTLC__IncorrectFundsReceived` and `ArbNativeHTLC__IncorrectFundsReceived` and update all call sites. In the Starknet code, rename the Cairo variable to `initiate` and use `INITIATE_TYPE` consistently across the test suite.
 
 ---
 

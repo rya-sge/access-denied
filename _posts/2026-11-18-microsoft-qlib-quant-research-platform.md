@@ -2,6 +2,7 @@
 layout: post
 title: "Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review"
 date:   2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: finance ai security
@@ -56,7 +57,9 @@ flowchart TD
     RL["RL framework<br/>order execution"] --> BT
 ```
 
-The companion articles on [QuantLib]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/) and [PyPortfolioOpt]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/) cover two other tasks of a quant library: pricing a derivative, and turning expected returns into portfolio weights. qlib prices no derivatives, and its portfolio construction (`TopkDropoutStrategy`, an enhanced-indexing optimiser in `qlib/contrib/strategy/optimizer/`) is built around its own signals; its main output is the expected-return signal that an optimiser such as PyPortfolioOpt can consume.
+The companion articles on [QuantLib]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/) and [PyPortfolioOpt]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/) cover two other tasks of a quant library: pricing a derivative, and turning expected returns into portfolio weights. qlib prices no derivatives, and its portfolio construction (a top-k selection strategy and an enhanced-indexing optimiser) is built around its own signals; its main output is the expected-return signal that an optimiser such as PyPortfolioOpt can consume.
+
+*Implementation:* `qlib/contrib/strategy/`, `TopkDropoutStrategy` and the optimiser in `optimizer/`.
 
 ## Architecture, layer by layer
 
@@ -68,27 +71,53 @@ qlib does not read CSV or a database during research. It reads a directory with 
 - **`instruments/all.txt`**: one line per symbol, `SYMBOL<TAB>start<TAB>end`. Other files in the folder define sub-universes such as `csi300`.
 - **`features/<symbol>/<field>.day.bin`**: one file per symbol and field (`close`, `open`, `volume`, ...), in lowercase.
 
-Each `.bin` file is a flat array of little-endian 32-bit floats. The first float is the calendar index of the series' first value, and the values follow (`qlib/data/storage/file_storage.py`, `FileFeatureStorage`). Reading day `i` is a seek to byte `4·(i − start) + 4` and a 4-byte read, so a feature window is a single contiguous read with no parsing. The cost is that the format carries no metadata, no checksum and no timestamps of publication: a value is assumed to have been known on the day it is stored under.
+Each `.bin` file is a flat array of little-endian 32-bit floats. The first float is the calendar index of the series' first value, and the values follow. Reading day `i` is a seek to byte `4·(i − start) + 4` and a 4-byte read, so a feature window is a single contiguous read with no parsing. The cost is that the format carries no metadata, no checksum and no timestamps of publication: a value is assumed to have been known on the day it is stored under.
 
-The data is read through providers exposed as `D` (`qlib/data/data.py`): `D.calendar()`, `D.instruments()`, `D.list_instruments()` and `D.features()`. `qlib.init(provider_uri=..., region=...)` selects a local folder, or a client to a remote qlib-server, and sets market rules. `REG_CN` sets a trade unit of 100 shares and a ±9.5 % price-limit threshold, `REG_US` a trade unit of 1 and no limit (`qlib/config.py`). Expression results are cached in memory and optionally on disk (`qlib/data/cache.py`). A separate point-in-time provider (`LocalPITProvider`) stores financial-statement data by publication date, which is the only part of the data layer that records when a value became known.
+*Implementation:* `qlib/data/storage/file_storage.py`, `FileFeatureStorage` (line 285).
 
-Two scripts in `scripts/` build and check the folder. `dump_bin.py dump_all` converts one CSV per symbol into the layout above. `check_data_health.py` reports missing values, missing OHLCV columns, a missing `factor` (the price-adjustment factor the exchange uses to round orders to whole lots) and day-to-day jumps above 50 % in price or 300 % in volume. A third script, `get_data.py`, downloads a ready-made dataset; the security section explains why the worked example does not use it.
+Research code reads this folder through providers grouped under the object `D`, which return the trading calendar, the instrument lists and the feature values. `qlib.init()` selects a local folder or a client to a remote qlib-server, and a region that sets the market rules. The Chinese region sets a trade unit of 100 shares and a ±9.5 % price-limit threshold; the US region sets a trade unit of 1 and no limit.
+
+Expression results are cached in memory and optionally on disk. A separate point-in-time provider stores financial-statement data by publication date, which is the only part of the data layer that records when a value became known.
+
+*Implementation:* `qlib/data/data.py`, `D.calendar()`, `D.instruments()`, `D.list_instruments()`, `D.features()` and `LocalPITProvider` at line 746; `qlib.init(provider_uri=..., region=...)`, with the `REG_CN` and `REG_US` rules in `qlib/config.py` at lines 317-326; the cache in `qlib/data/cache.py`.
+
+Two scripts build and check the folder. The first converts one CSV per symbol into the layout above. The second reports missing values, missing OHLCV columns, a missing `factor` (the price-adjustment factor the exchange uses to round orders to whole lots) and day-to-day jumps above 50 % in price or 300 % in volume. A third script downloads a ready-made dataset; the security section explains why the worked example does not use it.
+
+*Implementation:* `scripts/dump_bin.py` (command `dump_all`), `scripts/check_data_health.py` and `scripts/get_data.py`.
 
 ### The expression engine
 
-A feature is a string such as `Mean($close, 5)`. `$field` loads a stored field, and the operators in `qlib/data/ops.py` combine fields in three families:
+A feature is a string such as `Mean($close, 5)`. `$field` loads a stored field, and qlib's operators combine fields in three families:
 
 - **Element-wise**: `Abs`, `Log`, `Sign`.
 - **Arithmetic and comparison**: `Add`, `Greater`, `If`.
 - **Rolling over a window of days**: `Ref`, `Mean`, `Std`, `Max`, `Rank`, `Slope`, `EMA`, `Corr` and others.
 
-`parse_field` in `qlib/utils/__init__.py` rewrites the string into Python syntax: `$close` becomes `Feature("close")` and `Mean(` becomes `Operators.Mean(`. `qlib/data/expression_parser.py` then evaluates the result by walking its abstract syntax tree against a whitelist of node types and operators. The parent commit still ran `eval(parse_field(field))` (`qlib/data/data.py`, line 397 before the change); the whitelist, added in [pull request #2340](https://github.com/microsoft/qlib/pull/2340) on 8 October 2026, means an expression can no longer call arbitrary Python.
+*Implementation:* `qlib/data/ops.py`.
 
-`Ref(x, N)` is the operator that decides whether a feature looks into the future. Its docstring and code (`ops.py`, class `Ref`) give three cases:
+Before evaluation, a helper rewrites the string into Python syntax: `$close` becomes `Feature("close")` and `Mean(` becomes `Operators.Mean(`. A dedicated parser then evaluates the result by walking its abstract syntax tree against a whitelist of node types and operators. The parent commit still passed the rewritten string to Python's `eval`; the whitelist, added in [pull request #2340](https://github.com/microsoft/qlib/pull/2340) on 8 October 2026, means an expression can no longer call arbitrary Python.
+
+*Implementation:* `qlib/utils/__init__.py`, `parse_field()` (line 291), and `qlib/data/expression_parser.py`; before the change, `eval(parse_field(field))` in `qlib/data/data.py`, line 397.
+
+`Ref(x, N)` is the operator that decides whether a feature looks into the future. Its docstring and code give three cases:
 
 - **`N > 0`** shifts the series back in time: `Ref($close, 1)` is yesterday's close.
 - **`N < 0`** shifts it forward: `Ref($close, -1)` is tomorrow's close, which is legitimate in a label and a leak in a feature.
 - **`N = 0`** does not mean "today". It returns the first value of the loaded series, repeated on every date, and qlib logs a warning that the window cannot be computed accurately.
+
+```python
+# qlib/data/ops.py, class Ref, lines 800-809
+    def _load_internal(self, instrument, start_index, end_index, *args):
+        series = self.feature.load(instrument, start_index, end_index, *args)
+        # N = 0, return first day
+        if series.empty:
+            return series  # Pandas bug, see: https://github.com/pandas-dev/pandas/issues/21049
+        elif self.N == 0:
+            series = pd.Series(series.iloc[0], index=series.index)
+        else:
+            series = series.shift(self.N)  # copy
+        return series
+```
 
 The direction of a ratio matters as much as the sign of `N`. The worked example queried AAPL around 10 April 2018:
 
@@ -103,12 +132,16 @@ AAPL  2018-04-09   170.050003                    0.009918                   -0.0
 
 ### Data handlers: Alpha158 and Alpha360
 
-A data handler (`qlib/data/dataset/handler.py`) loads a list of feature expressions and a label expression over a date range and a universe, then applies processors. `DataHandlerLP` keeps three copies of the data: raw, processed for inference, and processed for learning, because some processors (dropping rows without a label, normalising the label) only make sense during training.
+A data handler loads a list of feature expressions and a label expression over a date range and a universe, then applies processors. `DataHandlerLP` keeps three copies of the data: raw, processed for inference, and processed for learning, because some processors (dropping rows without a label, normalising the label) only make sense during training.
 
-qlib ships two handlers in `qlib/contrib/data/handler.py`, with their expressions in `qlib/contrib/data/loader.py`:
+*Implementation:* `qlib/data/dataset/handler.py`, `DataHandlerLP` (line 382).
 
-- **`Alpha158`** computes 158 hand-designed factors: 9 candlestick-shape features such as `KMID` and `KLEN`, the ratios of open, high, low and VWAP to the close, and 29 rolling operators such as `ROC`, `MA`, `STD`, `BETA` and `CORR`, each over windows of 5, 10, 20, 30 and 60 days. That gives 9 + 4 + 29 × 5 = 158. It suits tree models. Its default inference processors are empty, so features are not normalised.
+qlib ships two ready-made handlers:
+
+- **`Alpha158`** computes 158 hand-designed factors: 9 candlestick-shape features such as `KMID` and `KLEN`, the ratios of open, high, low and VWAP to the close, and 29 rolling operators such as the rate of change `ROC`, a moving average, a standard deviation, a slope and a price-volume correlation, each over windows of 5, 10, 20, 30 and 60 days. That gives 9 + 4 + 29 × 5 = 158. It suits tree models. Its default inference processors are empty, so features are not normalised.
 - **`Alpha360`** gives a model the raw history instead: the close, open, high, low, VWAP and volume of each of the last 60 days, divided by today's close (or today's volume), so 6 × 60 = 360 columns. It suits sequence models (LSTM, GRU, Transformer) that learn their own features, and applies `ProcessInf`, `ZScoreNorm` and `Fillna` before inference.
+
+*Implementation:* `qlib/contrib/data/handler.py`, `Alpha360` at line 48 and `Alpha158` at line 98; the expressions, including `MA`, `STD`, `BETA` and `CORR`, in `qlib/contrib/data/loader.py`.
 
 Both use the same label, `Ref($close, -2)/Ref($close, -1) - 1`: the return from the close of day t+1 to the close of day t+2, for a prediction made with data up to the close of day t. The one-day gap is there because a signal computed after day t's close can be traded at day t+1 at the earliest. The default learning processors are `DropnaLabel` and `CSZScoreNorm` on the label, which replaces each day's labels by their cross-sectional z-score, so the model learns relative rather than absolute returns.
 
@@ -116,37 +149,53 @@ Processors that are fitted, such as `ZScoreNorm`, learn their statistics between
 
 ### DatasetH and its segments
 
-`DatasetH`, in `qlib/data/dataset/__init__.py`, wraps a handler and splits its dates into named segments, usually `train`, `valid` and `test`; the validation segment drives early stopping. `dataset.prepare("train", col_set=["feature", "label"])` returns a pandas frame indexed by `(datetime, instrument)`. `TSDatasetH` returns rolling windows of rows instead, for sequence models.
+`DatasetH` wraps a handler and splits its dates into named segments, usually `train`, `valid` and `test`; the validation segment drives early stopping. Preparing a segment with the feature and label column sets returns a pandas frame indexed by date and instrument. `TSDatasetH` returns rolling windows of rows instead, for sequence models.
+
+*Implementation:* `qlib/data/dataset/__init__.py`, `DatasetH` at line 72, `TSDatasetH` at line 642 and `dataset.prepare("train", col_set=["feature", "label"])`, which returns a frame indexed by `(datetime, instrument)`.
 
 The segments are plain date ranges, and qlib does not insert a gap between them, so with the default label the last two training days carry labels computed from prices inside the validation period. With daily data and thousands of training days the effect is small, but it is the same mechanism as a larger leak, and a purged gap removes it.
 
 ### Models
 
-`qlib/model/base.py` defines `Model.fit(dataset)` and `Model.predict(dataset, segment)`, and `ModelFT` adds fine-tuning. `qlib/contrib/model/` holds the implementations. LightGBM is the class `LGBModel` in `gbdt.py`; XGBoost, CatBoost, a linear model and `DoubleEnsemble` sit next to it. 26 PyTorch model files cover 19 architectures, among them LSTM, GRU, Transformer, TabNet, HIST and TRA, several in two variants for `DatasetH` and `TSDatasetH`.
+Every model implements the same interface: it is fitted on a dataset and predicts a named segment of it, and a sub-class adds fine-tuning. LightGBM is the default implementation; XGBoost, CatBoost, a linear model and `DoubleEnsemble` sit next to it. 26 PyTorch model files cover 19 architectures, among them LSTM, GRU, Transformer, TabNet, HIST and TRA, several in two variants for `DatasetH` and `TSDatasetH`.
+
+*Implementation:* `qlib/model/base.py`, `Model.fit(dataset)`, `Model.predict(dataset, segment)` and `ModelFT`; `qlib/contrib/model/gbdt.py`, `LGBModel` (line 16); the other models in `qlib/contrib/model/`.
 
 The PyTorch, XGBoost and CatBoost models are imported only if their libraries are installed; the image used here contains LightGBM only, and qlib logs that the others are skipped. `examples/benchmarks/` holds one directory per model with YAML configurations and published results on the Chinese CSI 300 and CSI 500 universes.
 
 ### Workflow: R, recorders and MLflow
 
-`qlib.workflow.R` is a global experiment manager. `with R.start(experiment_name=...)` opens an MLflow run, `R.get_recorder()` returns it, and record templates in `qlib/workflow/record_temp.py` write artifacts into it:
+qlib wraps MLflow in a global experiment manager, `R`. Starting an experiment opens an MLflow run, the run is then returned as a recorder, and record templates write artifacts into it:
 
 - **`SignalRecord`** saves the model's test-segment predictions as `pred.pkl` and the matching labels as `label.pkl`.
 - **`SigAnaRecord`** computes the daily IC and rank IC series (`sig_analysis/ic.pkl`, `ric.pkl`) and logs their mean and IR as metrics.
 - **`PortAnaRecord`** runs a backtest from a strategy and exchange configuration and saves the daily report, the positions and `port_analysis_1day.pkl`, the risk analysis of the excess return with and without cost.
 
-The default tracking URI is a local `mlruns` folder. `MLflowRecorder` also stores the output of `git diff`, `git status` and `git diff --cached` of the current directory as artifacts; the method is `_log_uncommitted_code` in `recorder.py`. qlib's task trainer in `qlib/model/trainer.py` tags each run with the host name.
+*Implementation:* `qlib.workflow.R`, `R.start(experiment_name=...)` and `R.get_recorder()`; the record templates in `qlib/workflow/record_temp.py`.
 
-`qrun config.yaml`, implemented in `qlib/cli/run.py`, runs the same chain from YAML: a `qlib_init` block, then `task.model`, `task.dataset` and `task.record`. Each is a `class`/`module_path`/`kwargs` dictionary that `init_instance_by_config` in `qlib/utils/mod.py` instantiates. The YAML is first rendered as a Jinja template with environment variables as context.
+The default tracking URI is a local `mlruns` folder. The MLflow recorder also stores, as artifacts, the output of three git commands run in the current directory, which captures uncommitted changes, and qlib's task trainer tags each run with the host name.
+
+*Implementation:* `qlib/workflow/recorder.py`, `MLflowRecorder._log_uncommitted_code()` runs `git diff`, `git status` and `git diff --cached` at lines 372-387; `qlib/model/trainer.py` sets the host-name tag at line 47.
+
+The `qrun` command runs the same chain from a YAML file: a `qlib_init` block, then the model, the dataset and the record templates under `task`. Each entry is a dictionary naming a class, its module and its arguments, which one helper, `init_instance_by_config`, instantiates. The YAML is first rendered as a Jinja template with environment variables as context.
+
+*Implementation:* `qlib/cli/run.py`, Jinja rendering at lines 69-77; `task.model`, `task.dataset` and `task.record` are `class`/`module_path`/`kwargs` dictionaries passed to `init_instance_by_config` in `qlib/utils/mod.py`.
 
 ### Backtest: strategy, executor and exchange
 
 The backtest in `qlib/backtest/` separates three roles:
 
-- **The strategy** decides what to trade. `TopkDropoutStrategy` (`qlib/contrib/strategy/signal_strategy.py`) is described in the next section; `WeightStrategyBase` and `EnhancedIndexingStrategy` produce target weights instead.
-- **The executor** decides when and how the decisions are executed. `SimulatorExecutor` fills orders once per step. `NestedExecutor` runs an inner strategy and executor at a finer frequency inside each outer step, for example a daily portfolio decision executed by an intraday order-splitting strategy.
-- **The exchange**, in `exchange.py`, knows prices and rules: the `deal_price` field used for fills, `open_cost` and `close_cost` as fractions of the traded value with defaults of 0.15 % and 0.25 %, a `min_cost` per order of 5 currency units by default, `impact_cost`, the price-limit threshold and the trade unit from the region.
+- **The strategy** decides what to trade. `TopkDropoutStrategy` is described in the next section; `WeightStrategyBase` and `EnhancedIndexingStrategy` produce target weights instead.
 
-The sequence below shows one daily step. The strategy for day t asks the signal for the prediction of the previous step (`get_step_time(trade_step, shift=1)` in `generate_trade_decision`), so the decision uses a score computed from data up to the close of day t−1.
+  *Implementation:* `qlib/contrib/strategy/signal_strategy.py`, `TopkDropoutStrategy` (line 74).
+- **The executor** decides when and how the decisions are executed. `SimulatorExecutor` fills orders once per step. `NestedExecutor` runs an inner strategy and executor at a finer frequency inside each outer step, for example a daily portfolio decision executed by an intraday order-splitting strategy.
+- **The exchange** knows prices and rules: the price field used for fills, the opening and closing costs as fractions of the traded value with defaults of 0.15 % and 0.25 %, a minimum cost per order of 5 currency units by default, a market-impact cost, the price-limit threshold and the trade unit from the region.
+
+  *Implementation:* `qlib/backtest/exchange.py`, parameters `deal_price`, `open_cost`, `close_cost`, `min_cost` and `impact_cost` (defaults at lines 48-50).
+
+The sequence below shows one daily step. The strategy for day t asks the signal for the prediction of the previous step, so the decision uses a score computed from data up to the close of day t−1.
+
+*Implementation:* `qlib/contrib/strategy/signal_strategy.py`, `generate_trade_decision()` calls `get_step_time(trade_step, shift=1)` (line 141).
 
 ```mermaid
 sequenceDiagram
@@ -167,15 +216,21 @@ sequenceDiagram
     AC-->>EX: daily return, turnover, cost
 ```
 
-The backtest needs a benchmark instrument that exists in the data. The default is `SH000300` (`qlib/backtest/__init__.py`), the CSI 300 index, whatever the region, so a run on US data asks for an instrument that is not in the data unless `benchmark` is set.
+The backtest needs a benchmark instrument that exists in the data. The default is `SH000300`, the CSI 300 index, whatever the region, so a run on US data asks for an instrument that is not in the data unless `benchmark` is set.
+
+*Implementation:* `qlib/backtest/__init__.py`, default `benchmark` (lines 182, 222 and 284).
 
 ### Online serving and rolling retraining
 
-`qlib/workflow/online/` turns research into a scheduled process. `OnlineManager` holds one or more `OnlineStrategy` objects; `RollingStrategy` retrains a model on a moving window at a fixed interval and marks which trained models are online on each date, and `PredUpdater` and `LabelUpdater` extend stored predictions and labels as new data arrives. `simulate()` replays that process over history, so that a rolling backtest uses, on each date, only the models that would have existed then. This part was read but not run for this article.
+The online module turns research into a scheduled process. A manager holds one or more online strategies; the rolling strategy retrains a model on a moving window at a fixed interval and marks which trained models are online on each date, and two updaters extend stored predictions and labels as new data arrives. A simulation method replays that process over history, so that a rolling backtest uses, on each date, only the models that would have existed then. This part was read but not run for this article.
+
+*Implementation:* `qlib/workflow/online/`, `OnlineManager` with `simulate()` (line 302 of `manager.py`), `OnlineStrategy`, `RollingStrategy`, `PredUpdater` and `LabelUpdater`.
 
 ### Reinforcement learning
 
-`qlib/rl/` is a framework for sequential decisions, used in the examples for order execution: splitting a large parent order into child orders over a day. Its building blocks are a `Simulator` that holds the state transitions, state and action interpreters that translate between the simulator and a neural network, a `Reward`, and `PPO` and `DQN` policies built on the [Tianshou](https://github.com/thu-ml/tianshou) library. Single-asset order-execution simulators are in `qlib/rl/order_execution/`. `pyproject.toml` lists `torch` and `tianshou<=0.4.10` for it. It was read but not run here.
+qlib's reinforcement-learning module is a framework for sequential decisions, used in the examples for order execution: splitting a large parent order into child orders over a day. Its building blocks are a simulator that holds the state transitions, state and action interpreters that translate between the simulator and a neural network, a reward, and PPO and DQN policies built on the [Tianshou](https://github.com/thu-ml/tianshou) library. Single-asset order-execution simulators come with it, and the project lists `torch` and `tianshou<=0.4.10` as its dependencies. It was read but not run here.
+
+*Implementation:* `qlib/rl/`, `Simulator`, `Reward`, `PPO` and `DQN`; the simulators in `qlib/rl/order_execution/`; the dependencies in `pyproject.toml`.
 
 ## Concepts for judging a signal
 
@@ -185,7 +240,7 @@ An alpha factor is a number computed for each stock and day that is expected to 
 
 ### IC and rank IC
 
-`calc_ic` in `qlib/contrib/eva/alpha.py` groups predictions and labels by date and correlates them across instruments. For day t, with $$s_{i,t}$$ the score and $$y_{i,t}$$ the label of instrument $$i$$:
+qlib groups predictions and labels by date and correlates them across instruments. For day t, with $$s_{i,t}$$ the score and $$y_{i,t}$$ the label of instrument $$i$$:
 
 $$
 \begin{aligned}
@@ -196,6 +251,8 @@ ICIR &= \frac{\overline{IC}}{\sigma_{IC}}
 $$
 
 where $$\rho$$ is the Pearson correlation across the $$n$$ instruments of the day, $$\overline{IC}$$ the mean of the daily values and $$\sigma_{IC}$$ their standard deviation.
+
+*Implementation:* `qlib/contrib/eva/alpha.py`, `calc_ic()` (line 160).
 
 `SigAnaRecord` reports the mean IC, the ICIR, and the same pair for the rank IC. Daily ICs are noisy, so the mean alone says little: with $$T$$ days, $$ICIR \cdot \sqrt{T}$$ is the t-statistic of the mean IC under the assumption that daily ICs are independent, and it shows whether the mean differs from zero by more than chance. [Sampling and Standard Error]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/) derives the standard error behind it. A large gap between IC and rank IC means a few extreme scores or returns drive the Pearson value.
 
@@ -211,7 +268,7 @@ where $$\rho$$ is the Pearson correlation across the $$n$$ instruments of the da
 
 ### Excess return with and without cost
 
-`PortAnaRecord` computes two daily series from the backtest report, $$e_t^{\text{gross}} = r_t - b_t$$ and $$e_t^{\text{net}} = r_t - b_t - c_t$$, where $$r_t$$ is the portfolio return, $$b_t$$ the benchmark return and $$c_t$$ the cost as a fraction of portfolio value. `risk_analysis` in `qlib/contrib/evaluate.py` then reports, by default:
+`PortAnaRecord` computes two daily series from the backtest report, $$e_t^{\text{gross}} = r_t - b_t$$ and $$e_t^{\text{net}} = r_t - b_t - c_t$$, where $$r_t$$ is the portfolio return, $$b_t$$ the benchmark return and $$c_t$$ the cost as a fraction of portfolio value. qlib's risk analysis then reports, by default:
 
 $$
 \begin{aligned}
@@ -223,7 +280,9 @@ $$
 
 where $$\bar e$$ and $$\sigma_e$$ are the mean and the sample standard deviation of the daily series.
 
-Two conventions differ from what a reader may expect. The default mode is `"sum"`: returns are added, not compounded, which the code comments justify as avoiding an exponentially skewed curve; a `"product"` mode exists. And the daily scaler is fixed at 238 in `cal_risk_analysis_scaler`, not the 252 commonly used for US markets, even with `region=REG_US`. Both change the annualised figure, not the ranking of two strategies evaluated the same way.
+Two conventions differ from what a reader may expect. The default mode is `"sum"`: returns are added, not compounded, which the code comments justify as avoiding an exponentially skewed curve; a `"product"` mode exists. And the daily scaler is fixed at 238, not the 252 commonly used for US markets, even with `region=REG_US`. Both change the annualised figure, not the ranking of two strategies evaluated the same way.
+
+*Implementation:* `qlib/contrib/evaluate.py`, `risk_analysis()` and `cal_risk_analysis_scaler()`, whose daily value is 238 (lines 26-52).
 
 A daily-rebalanced strategy pays costs on every swap, so the gap between the two series is the price of its turnover. In the worked example below that gap is larger than the net result.
 
@@ -242,7 +301,7 @@ qlib prevents some leaks by construction: the strategy reads the previous step's
 
 The full sequence, as run for this article, has six steps. The verification folder linked in the references holds the exact scripts.
 
-1. **Build the data.** Write one CSV per symbol with `date`, `symbol`, `open`, `high`, `low`, `close`, `volume`, `vwap` and `factor` (1.0 for adjusted prices), then convert and check it:
+1. **Build the data.** Write one CSV per symbol with a date and a symbol column, the open, high, low and close prices, the volume, the VWAP and the adjustment factor (1.0 for adjusted prices), then convert and check it; the column names appear in the command:
 
    ```bash
    python scripts/dump_bin.py dump_all --data_path csv --qlib_dir qlib_data \
@@ -298,7 +357,9 @@ The full sequence, as run for this article, has six steps. The verification fold
        PortAnaRecord(rec, port, "day").generate()
    ```
 
-6. **Or run it from YAML.** `examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml` encodes the same chain for `qrun`. The shipped configurations target the Chinese `cn_data` dataset and `csi300`, so `provider_uri`, `region`, `market`, `benchmark` and the dates have to be changed for other data.
+6. **Or run it from YAML.** The shipped LightGBM configuration on Alpha158 encodes the same chain for `qrun`. The shipped configurations target the Chinese `cn_data` dataset and the `csi300` universe, so the data path, the region, the market, the benchmark and the dates have to be changed for other data.
+
+   *Source:* `examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml`, keys `provider_uri`, `region`, `market` and `benchmark`.
 
 ## Worked example on synthetic data
 
@@ -361,11 +422,15 @@ Checked against the statistical sins listed in [MIT 6.0002, lectures 14 and 15](
 
 To show the size of a look-ahead error, the example scored a single expression that peeks into the label window, `Ref($close, -2)/$close - 1`, with no model at all. Its mean daily IC against the label on the test days is **0.68**, about eleven times the trained model's 0.063. A feature list that contains one such expression produces a model with an excellent IC and a backtest that cannot be reproduced in trading.
 
-qlib's own benchmark table in `examples/benchmarks/README.md` reports mean ICs between 0.0099 and 0.0522 for its models on the CSI 300 universe; an IC far above that range is a reason to look for a negative `Ref` before looking for a better model.
+qlib's own benchmark table reports mean ICs between 0.0099 and 0.0522 for its models on the CSI 300 universe; an IC far above that range is a reason to look for a negative `Ref` before looking for a better model.
+
+*Source:* `examples/benchmarks/README.md`.
 
 ## Security review: risks by design
 
-The review covered the source at commit `5435523` (`qlib/`, `scripts/`, `setup.py`, `pyproject.toml`), read-only, with every line reference below re-checked. It found no backdoor, no telemetry and no network access when qlib is imported or initialised. `setup.py` compiles two Cython extensions (`qlib/data/_libs/rolling.pyx` and `expanding.pyx`) and does nothing else. Recent commits harden the code: the expression parser replaced `eval`, loading a configuration class from a `.py` file path now requires `trusted: true`, and recorder artifacts are loaded through a restricted unpickler that accepts a list of safe classes (`qlib/utils/pickle_utils.py`).
+The review covered the package source, the scripts and the build files at commit `5435523`, read-only, with every line reference below re-checked. It found no backdoor, no telemetry and no network access when qlib is imported or initialised. The build script compiles two Cython extensions and does nothing else. Recent commits harden the code: the expression parser replaced `eval`, loading a configuration class from a Python file path now requires `trusted: true`, and recorder artifacts are loaded through a restricted unpickler that accepts a list of safe classes.
+
+*Implementation:* reviewed paths `qlib/`, `scripts/`, `setup.py` and `pyproject.toml`; the extensions `qlib/data/_libs/rolling.pyx` and `expanding.pyx`; the unpickler in `qlib/utils/pickle_utils.py`.
 
 The remaining risks come from the design: qlib is a research tool in which configurations, saved models and datasets are inputs that run code or are trusted as given. Each row names the location and the rule that follows from it.
 
@@ -472,7 +537,7 @@ The 3.6 % does not show an edge. Its information ratio of 0.24 over 446 days giv
 
 **Q: Why is a qlib YAML file treated as code in the security review?**
 
-For two reasons. `qrun` renders the file as a Jinja template with environment variables as context, so the template can read any variable it names. And every `class`/`module_path` pair in it is passed to `init_instance_by_config`, which imports and instantiates any installed class, such as `subprocess.Popen`, with the arguments the file gives. The `trusted` flag added in recent versions only applies to loading a `.py` file by path.
+For two reasons. `qrun` renders the file as a Jinja template with environment variables as context, so the template can read any variable it names. And every class and module pair in it is passed to `init_instance_by_config`, which imports and instantiates any installed class, such as `subprocess.Popen`, with the arguments the file gives. The `trusted` flag added in recent versions only applies to loading a Python file by path.
 
 ## Gaps
 

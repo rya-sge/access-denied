@@ -2,7 +2,7 @@
 layout: post
 title: "PyPortfolioOpt - How a Python Library Turns Price History into Portfolio Weights"
 date:   2026-11-18
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: finance
@@ -44,7 +44,9 @@ The article assumes basic Python, pandas and the idea of a stock return. It reli
   \end{aligned}
   $$
 
-  For a single absolute view on asset $$i$$, the posterior return moves the fraction $$\tau\sigma_i^2 / (\tau\sigma_i^2 + \omega)$$ of the gap from $$\Pi_i$$ to $$Q$$, so a more certain view (smaller $$\omega$$) pulls harder. Without views and with a zero risk-free rate, the posterior is $$\Pi$$ itself, and maximising $$w^{\top}\Pi - \frac{\delta}{2} w^{\top}\Sigma w$$ with the same $$\delta$$ and $$\Sigma$$ returns $$w_{mkt}$$ exactly. That is why the library's documentation describes Black-Litterman portfolios as more stable than those built on historical means. `BlackLittermanModel` computes this formula (`pypfopt/black_litterman.py`, `bl_returns`).
+  For a single absolute view on asset $$i$$, the posterior return moves the fraction $$\tau\sigma_i^2 / (\tau\sigma_i^2 + \omega)$$ of the gap from $$\Pi_i$$ to $$Q$$, so a more certain view (smaller $$\omega$$) pulls harder. Without views and with a zero risk-free rate, the posterior is $$\Pi$$ itself, and maximising $$w^{\top}\Pi - \frac{\delta}{2} w^{\top}\Sigma w$$ with the same $$\delta$$ and $$\Sigma$$ returns $$w_{mkt}$$ exactly. That is why the library's documentation describes Black-Litterman portfolios as more stable than those built on historical means. `BlackLittermanModel` computes this formula.
+
+  *Implementation:* `pypfopt/black_litterman.py`, `BlackLittermanModel.bl_returns()` (lines 417-443).
 - **Covariance matrix and positive semidefiniteness.** The $$n \times n$$ matrix $$\Sigma$$ of return covariances gives the portfolio variance $$w^{\top}\Sigma w$$. It must be positive semidefinite (no portfolio with negative variance), otherwise the quadratic problem is not convex and the solver refuses it.
 - **Sharpe ratio and the risk-free rate.** The Sharpe ratio is the excess return over a risk-free rate $$r_f$$ divided by volatility. The value of $$r_f$$ changes which portfolio maximises it, and both are expressed per year in this library.
 - **Convex optimisation and DCP.** In a convex problem every local optimum is a global one, so a solver that converges has found the best solution. cvxpy accepts a problem only if it is written by the rules of disciplined convex programming (DCP), which is why custom constraints and objectives in PyPortfolioOpt must be built from cvxpy functions.
@@ -121,9 +123,13 @@ flowchart TD
 
 `BaseOptimizer` holds what every method shares: the list of tickers, a `weights` array, `clean_weights()` and `save_weights_to_file()`. `clean_weights()` sets weights below `1e-4` to zero and rounds the rest to five decimals. The class knows nothing about solvers.
 
-`BaseConvexOptimizer` adds the cvxpy layer. Its constructor creates the decision variable `self._w = cp.Variable(n_assets)`, turns `weight_bounds` (default `(0, 1)`, long-only) into two constraints, and keeps a list `_constraints` and a list `_additional_objectives`. `add_constraint()` takes a callable such as `lambda w: w[0] <= 0.05`, calls it on `_w` and appends the resulting cvxpy expression. `_solve_cvxpy_opt_problem()` builds `cp.Problem(cp.Minimize(objective), constraints)`, solves it, and raises `OptimizationError` unless the status is `optimal` or `optimal_inaccurate`.
+`BaseConvexOptimizer` adds the cvxpy layer. Its constructor creates one cvxpy variable for the weight vector, turns the weight bounds (by default 0 to 1, long-only) into two constraints, and keeps one list of constraints and one of additional objectives. `add_constraint()` takes a callable such as `lambda w: w[0] <= 0.05`, applies it to the weight variable and appends the resulting cvxpy expression. The solve step builds a cvxpy problem that minimises the objective under these constraints, solves it, and raises `OptimizationError` unless the solver status is `optimal` or `optimal_inaccurate`.
 
-`EfficientFrontier` adds the named objectives. The three subclasses replace the variance with another risk measure and disable the methods that do not apply by raising `NotImplementedError` (for example `EfficientCVaR.max_sharpe`). `HRPOpt`, `CLA` and `BlackLittermanModel` inherit only `BaseOptimizer`, because they do not use cvxpy at all. `DiscreteAllocation` has no base class; it uses cvxpy directly for its integer program.
+*Implementation:* `pypfopt/base/_base_optimizer.py`, `BaseConvexOptimizer.__init__()`, `_solve_cvxpy_opt_problem()` and `add_constraint()` (lines 169-205, 307-345 and 371-396).
+
+`EfficientFrontier` adds the named objectives. The three subclasses replace the variance with another risk measure and disable the methods that do not apply: calling one raises `NotImplementedError`, as `max_sharpe()` does on the CVaR optimiser. The HRP, Critical Line Algorithm and Black-Litterman classes inherit only `BaseOptimizer`, because they do not use cvxpy at all. `DiscreteAllocation` has no base class; it uses cvxpy directly for its integer program.
+
+*Implementation:* `pypfopt/efficient_frontier/efficient_cvar.py`, `EfficientCVaR.max_sharpe()` (lines 117-118).
 
 ### One problem per object
 
@@ -140,7 +146,7 @@ ef.min_volatility()
 ef.add_constraint(lambda w: w[0] >= 0.1)   # raises
 ```
 
-raises, in the library's own words (`pypfopt/base/_base_optimizer.py`):
+raises, in the library's own words:
 
 ```text
 pypfopt.exceptions.InstantiationError: Adding constraints to an already solved
@@ -148,7 +154,11 @@ problem might have unintended consequences. A new instance should be created
 for the new set of constraints.
 ```
 
-Re-solving the same method with a new target is allowed. `efficient_risk`, `efficient_return` and `max_quadratic_utility` keep their target in a named `cp.Parameter`, so calling the method again with another target only changes that value. Switching objective, for example from `min_volatility` to `max_sharpe`, is not: create a new `EfficientFrontier` for each objective.
+*Implementation:* `pypfopt/base/_base_optimizer.py`, `add_constraint()` (lines 392-395).
+
+Re-solving the same method with a new target is allowed. The three methods that take a target (a volatility, a return or a risk aversion) keep it in a named cvxpy parameter, so calling the method again with another target only changes that value. Switching objective, for example from minimum volatility to maximum Sharpe, is not: create a new `EfficientFrontier` for each objective.
+
+*Implementation:* `pypfopt/efficient_frontier/efficient_frontier.py`, `max_quadratic_utility()`, `efficient_risk()` and `efficient_return()` (lines 317-469).
 
 ### How max_sharpe stays convex
 
@@ -447,12 +457,26 @@ The universe itself carries survivor bias: the 20 tickers were chosen in 2018, w
 
 Five behaviours in 1.6.0 can surprise a caller. Four of them change a result without an exception, and the fifth breaks HRP on a current SciPy. Each was reproduced in the verification scripts.
 
-- **The risk-free rate defaults to 0.0.** `max_sharpe()` and `portfolio_performance()` both default to `risk_free_rate=0.0`. The default was 0.02 until commit `388acf6` of 2024-12-01 ([issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594)), so older tutorials and results assume 2 %. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone `portfolio_performance(weights, mu, S)` has no such memory and returns 2.61 for the same weights. Pass the rate explicitly everywhere.
+- **The risk-free rate defaults to 0.0.** The maximum-Sharpe optimiser and the performance report both default to `risk_free_rate=0.0`. The default was 0.02 until commit `388acf6` of 2024-12-01 ([issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594)), so older tutorials and results assume 2 %. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone function of the same name, called with only the weights, `mu` and `S`, has no such memory and returns 2.61 for the same weights. Pass the rate explicitly everywhere.
+
+  *Implementation:* `pypfopt/efficient_frontier/efficient_frontier.py`, `max_sharpe()` and `portfolio_performance()` (lines 238 and 472). The standalone `portfolio_performance()` is in `pypfopt/base/_base_optimizer.py` (lines 561-562).
 - **Missing prices become zero returns in Ledoit-Wolf.** Shown above. `mean_historical_return` uses each asset's own observations, so the means and the shrunk covariance of the same DataFrame cover different periods.
 - **`lp_portfolio()` reads prices by position.** It builds the price vector as `self.latest_prices.values` and the weight vector from the order of the weights dictionary, and pairs them by index. Two ways to break the pairing were reproduced:
-  - `greedy_portfolio()` sorts `self.weights` in place (`discrete_allocation.py:177`), so `lp_portfolio()` on the same object afterwards spends 30,743.14 on a 10,000 budget while reporting 9.65 left over.
+  - `greedy_portfolio()` sorts the stored weights in place, by descending weight, so `lp_portfolio()` on the same object afterwards spends 30,743.14 on a 10,000 budget while reporting 9.65 left over.
+
+    *Implementation:* `pypfopt/discrete_allocation.py`, `greedy_portfolio()` and `lp_portfolio()` (lines 177 and 359).
   - `HRPOpt.optimize()` returns its weights sorted by ticker, while `get_latest_prices()` keeps the column order. Passing that dictionary to `lp_portfolio()` spends 46,218.69 on the same budget. `hrp.clean_weights()`, which keeps the column order, gives 9,997.63. `greedy_portfolio()` looks prices up by ticker and is not affected.
-- **HRP fails on SciPy 1.18.** `HRPOpt.optimize()` checks the linkage method against `scipy.cluster.hierarchy._LINKAGE_METHODS` (`hierarchical_portfolio.py:179`), a private name. `pyproject.toml` requires only `scipy>=1.3.0`, so a fresh install picks up 1.18, where the attribute is gone: with SciPy 1.18.1, `optimize()` raises `AttributeError: module 'scipy.cluster.hierarchy' has no attribute '_LINKAGE_METHODS'`. Pinning `scipy<1.18` avoids it until the library changes.
+- **HRP fails on SciPy 1.18.** `HRPOpt.optimize()` checks the linkage method against a list that SciPy's hierarchy module keeps under a private name:
+
+  ```python
+  # pypfopt/hierarchical_portfolio.py, lines 179-180
+  if linkage_method not in sch._LINKAGE_METHODS:
+      raise ValueError("linkage_method must be one recognised by scipy")
+  ```
+
+  The package requires only `scipy>=1.3.0`, so a fresh install picks up 1.18, where the attribute is gone: with SciPy 1.18.1, `optimize()` raises `AttributeError: module 'scipy.cluster.hierarchy' has no attribute '_LINKAGE_METHODS'`. Pinning `scipy<1.18` avoids it until the library changes.
+
+  *Implementation:* `pyproject.toml`, the SciPy requirement (line 41).
 - **Performance figures are not always comparable.** `HRPOpt.portfolio_performance()` uses arithmetic means and the sample covariance, `EfficientCVaR.portfolio_performance()` returns a daily CVaR next to an annual return, and `CLA.max_sharpe()` ignores the risk-free rate. Compare portfolios with one function and one set of inputs, for example the standalone `portfolio_performance(weights, mu, S, risk_free_rate=...)`.
 
 Two smaller ones: `efficient_return(1)` raises `ValueError` because the target must be a `float`, and adding `L2_reg` before `max_sharpe` triggers the warning about unscaled objectives.
@@ -461,11 +485,17 @@ Two smaller ones: `efficient_return(1)` raises `ValueError` because the target m
 
 The library is a candidate dependency of anything that manages money, so the package was reviewed before it was run. The review covered the `pypfopt/` package and the packaging at commit `a6638d2`, read-only, on 2026-11-18; key claims were re-checked with `grep` for this article.
 
-- **Imports.** The package imports numpy, pandas, scipy, cvxpy, scikit-learn, scikit-base and standard-library modules (`collections`, `copy`, `json`, `warnings`, `typing`, `sys`). matplotlib and plotly are imported inside helper functions of `plotting.py`, only when a plot is requested.
-- **No network, no dynamic code.** No `eval`, `exec`, `pickle`, `subprocess`, `os.system`, socket or HTTP call, `base64` or environment-variable read appears in `pypfopt/`. The only `open()` calls are the two in `save_weights_to_file()`, which write to a file name the caller chooses.
-- **Packaging.** `pyproject.toml` uses the plain `setuptools.build_meta` backend, there is no `setup.py`, no install hook and no console entry point. The runtime dependencies are the six well-known packages listed above.
+- **Imports.** The package imports numpy, pandas, scipy, cvxpy, scikit-learn, scikit-base and six standard-library modules: collections, copy, json, warnings, typing and sys. matplotlib and plotly are imported inside helper functions of `plotting.py`, only when a plot is requested.
+- **No network, no dynamic code.** No `eval` or `exec`, no `pickle`, no `subprocess` or `os.system`, no socket or HTTP call, no base64 decoding and no environment-variable read appears in the package. The only two calls that open a file are in the weight-export method, and they write to a file name the caller chooses.
+
+  *Implementation:* `pypfopt/base/_base_optimizer.py`, `save_weights_to_file()` (lines 132 and 135).
+- **Packaging.** The build uses the plain setuptools backend (`setuptools.build_meta`), there is no `setup.py`, no install hook and no console entry point. The runtime dependencies are the six well-known packages listed above.
+
+  *Implementation:* `pyproject.toml`, the build backend (line 88).
 - **No binaries.** The repository holds Python, reStructuredText, Markdown, CSV, YAML, notebooks and PNG images.
-- **Outside the package.** The `Makefile` installs the `uv` tool with `curl -LsSf https://astral.sh/uv/install.sh | ... sh`, and the `cookbook/` notebooks run `pip install`, clone repositories and download prices from Yahoo Finance. None of this runs on `pip install`, but running `make install` or the notebooks executes code from the network.
+- **Outside the package.** The Makefile installs the uv tool by piping the installer script downloaded from astral.sh into a shell, and the cookbook notebooks run `pip install`, clone repositories and download prices from Yahoo Finance. None of this runs on `pip install`, but running `make install` or the notebooks executes code from the network.
+
+  *Implementation:* `Makefile`, `curl -LsSf https://astral.sh/uv/install.sh | ... sh` (line 33).
 
 The verdict is that the package at this commit is safe to use. What it does not cover: the wheels published on PyPI were not compared with the source, the dependencies (cvxpy and its native solvers, scikit-learn) were not reviewed, and a later commit needs its own review. Installing from the reviewed source tree at the pinned commit closes the first and the last of these gaps; pinning dependency versions limits the second without closing it.
 

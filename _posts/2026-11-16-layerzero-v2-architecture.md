@@ -2,7 +2,7 @@
 layout: post
 title: "How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson"
 date:   2026-11-16
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -36,7 +36,9 @@ The article assumes the reader knows smart contracts, ERC-20 tokens and what a b
 
 LayerZero V2 rests on three choices, each visible in the code:
 
-- **The endpoint is immutable and minimal.** `EndpointV2` is a plain, non-proxied contract holding nonces, payload hashes, the library registry and the compose queue. Its owner can register new libraries, which is append-only since there is no unregister function, set the *default* libraries per pathway, set the LZ token and recover stray tokens (`EndpointV2.sol`, `MessageLibManager.sol`). The default DVN, confirmation and executor configurations are set by the owner of each message library, not by the endpoint (`UlnBase.setDefaultUlnConfigs`, `SendLibBase.setDefaultExecutorConfigs`). Neither owner can change a library or a configuration an application has pinned.
+- **The endpoint is immutable and minimal.** `EndpointV2` is a plain, non-proxied contract holding nonces, payload hashes, the library registry and the compose queue. Its owner can register new libraries, which is append-only since there is no unregister function, set the *default* libraries per pathway, set the LZ token and recover stray tokens. The default DVN, confirmation and executor configurations are set by the owner of each message library, not by the endpoint. Neither owner can change a library or a configuration an application has pinned.
+
+  *Implementation:* `EndpointV2.sol` and `MessageLibManager.sol` for the endpoint owner's setters. Library defaults: `UlnBase.sol`, `setDefaultUlnConfigs()` (lines 55-70). `SendLibBase.sol`, `setDefaultExecutorConfigs()` (lines 67-77).
 - **Security is set per application and per pathway.** Which library verifies, which verifiers must sign, how many confirmations they wait and which executor delivers are all set per `(oapp, remote eid)`. A broken stack on one application leaves the others' configurations untouched.
 - **Verification is separate from execution.** Verifiers attest to a packet's hash. Once enough of them have, anyone commits that to the endpoint, and then anyone (normally the executor) delivers the message. An executor can delay a message but not forge one; a quorum of verifiers can forge one but cannot run it twice or skip a nonce silently.
 
@@ -54,7 +56,9 @@ Each chain runs one endpoint, identified by an **`eid`** (endpoint ID, a `uint32
 | **OApp** | The application: `OAppCore` (endpoint, `peers`, delegate), `OAppSender`, `OAppReceiver`, `OAppOptionsType3` (enforced options). | `devtools/packages/oapp-evm/contracts/oapp/` |
 | **Delegate** | The address an OApp registers with `setDelegate`. It, or the OApp itself, may call every per-OApp setter on the endpoint: libraries, `setConfig`, `skip`, `clear`, `nilify`, `burn`. | `EndpointV2.setDelegate` |
 
-The delegate is not the OApp's `owner`. The owner sets peers and enforced options on the OApp contract; the delegate configures the OApp's security on the endpoint. The owner also appoints the delegate (`OAppCore.setDelegate` is `onlyOwner`), so a compromised owner key can take over the delegate role. A review of an integration checks both addresses.
+The delegate is not the OApp's `owner`. The owner sets peers and enforced options on the OApp contract; the delegate configures the OApp's security on the endpoint. The owner also appoints the delegate, so a compromised owner key can take over the delegate role. A review of an integration checks both addresses.
+
+*Implementation:* `OAppCore.sol`, `setDelegate()`, restricted with `onlyOwner` (lines 80-82).
 
 ## The security stack
 
@@ -71,7 +75,9 @@ struct UlnConfig {
 }
 ```
 
-A packet verifies when **every** required DVN and `optionalDVNThreshold` of the optional DVNs have attested with at least `confirmations` blocks (`ReceiveUlnBase._checkVerifiable`). This is often written "X of Y of N": X required verifiers, a threshold Y over a set of N optional ones. Each list holds at most 127 addresses, so that the two together fit in a `uint8`, and at least one DVN must result after merging with the defaults.
+A packet verifies when **every** required DVN and `optionalDVNThreshold` of the optional DVNs have attested with at least `confirmations` blocks. This is often written "X of Y of N": X required verifiers, a threshold Y over a set of N optional ones. Each list holds at most 127 addresses, so that the two together fit in a `uint8`, and at least one DVN must result after merging with the defaults.
+
+*Implementation:* `ReceiveUlnBase.sol`, `_checkVerifiable()` (lines 90-124). The 127-address limit is `MAX_COUNT` in `UlnBase.sol`, line 32.
 
 ```mermaid
 flowchart TD
@@ -99,13 +105,23 @@ The sequence below follows one message from a user on chain A to the receiving a
 
 Step by step:
 
-1. **Quote.** `OApp._quote` calls `EndpointV2.quote`, which builds the same packet with the next nonce and asks the send library for a price. `SendUln302` adds the DVN fees, checks the message size against `ExecutorConfig.maxMessageSize`, then adds the executor fee and the treasury fee. The quote can go stale before the send: underpaying reverts with `LZ_InsufficientFee`, overpaying is refunded.
-2. **Send.** `EndpointV2.send` increments `outboundNonce[sender][dstEid][receiver]`, computes the GUID as `keccak256(nonce, srcEid, sender, dstEid, receiver)` (`libs/GUID.sol`), calls the send library and emits `PacketSent`, the event the workers listen to. The encoded packet is an 81-byte header (version, nonce, source eid, sender, destination eid, receiver) followed by the payload `guid ‖ message`.
+1. **Quote.** The OApp asks the endpoint for a price. The endpoint builds the same packet it would send, with the next nonce, and passes it to the send library. `SendUln302` adds the DVN fees, checks the message size against the `maxMessageSize` of the executor config, then adds the executor fee and the treasury fee. The quote can go stale before the send: underpaying reverts with `LZ_InsufficientFee`, overpaying is refunded.
+
+   *Implementation:* `OAppSender.sol`, `_quote()` (lines 47-58). `EndpointV2.sol`, `quote()` (lines 55-78).
+2. **Send.** The endpoint increments the outbound nonce of the `(sender, dstEid, receiver)` channel, derives the message's GUID by hashing the nonce, source eid, sender, destination eid and receiver, calls the send library and emits `PacketSent`, the event the workers listen to. The encoded packet is an 81-byte header (version, nonce, source eid, sender, destination eid, receiver) followed by the payload `guid ‖ message`.
+
+   *Implementation:* `EndpointV2.sol`, `send()` and `_send()` (lines 83-144). `MessagingChannel.sol`, `_outbound()`, increments `outboundNonce[sender][dstEid][receiver]` at line 30. `libs/GUID.sol`, `generate()`, returns `keccak256(nonce, srcEid, sender, dstEid, receiver)` at line 17.
 3. **Assign and pay.** The send library pays the executor, then calls `assignJob` on every required and optional DVN of the *send-side* config. Fees are credited inside the library (`fees[worker]`) and each worker withdraws them later.
 4. **Attest.** Each DVN waits its confirmations on chain A, then calls `ReceiveUln302.verify(header, payloadHash, confirmations)` on chain B. The call is open to anyone, but only entries written by DVN addresses of the *receive-side* config are counted.
-5. **Commit.** `ReceiveUln302.commitVerification` is permissionless. It checks the header (length, version, `dstEid` equal to the local eid), loads the receiver's config, runs the threshold check above, deletes the DVN entries and calls `EndpointV2.verify`.
+5. **Commit.** Committing the verification on the receive library is permissionless. The library checks the header (length, version, destination eid equal to the local eid), loads the receiver's config, runs the threshold check above, deletes the DVN entries and calls the endpoint's `verify`.
+
+   *Implementation:* `ReceiveUln302.sol`, `commitVerification()` (lines 48-61).
 6. **Endpoint verify.** The endpoint checks that the caller is the receiver's receive library (or the previous one within its grace period), that the path is **initializable** through the OApp's `allowInitializePath`, and that the nonce is still verifiable. It then stores `inboundPayloadHash[receiver][srcEid][sender][nonce]`. `OAppReceiver` implements `allowInitializePath` as "the sender is my peer for that eid".
-7. **Execute.** `EndpointV2.lzReceive` is permissionless too. `_clearPayload` requires that every nonce from `lazyInboundNonce + 1` up to this one holds a hash, advances the lazy nonce, checks `keccak256(guid ‖ message)` against the stored hash and deletes it **before** calling the OApp. The OApp's `lzReceive` must check that `msg.sender` is the endpoint and that `origin.sender` is its peer, then runs `_lzReceive`.
+
+   *Implementation:* `EndpointV2.sol`, `verify()` (lines 151-161). `OAppReceiver.sol`, `allowInitializePath()` (lines 63-65).
+7. **Execute.** Delivery through the endpoint's `lzReceive` is permissionless too. The endpoint first requires that every nonce after the lazy inbound nonce, up to this one, holds a stored hash. It then advances the lazy nonce, checks the hash of `guid ‖ message` against the stored hash and deletes it **before** calling the OApp. The OApp's `lzReceive` must check that the caller is the endpoint and that the origin's sender is its peer, then runs `_lzReceive`.
+
+   *Implementation:* `EndpointV2.sol`, `lzReceive()` (lines 172-183). `MessagingChannel.sol`, `_clearPayload()` (lines 126-151). `OAppReceiver.sol`, `lzReceive()` (lines 95-110).
 
 The executor's role in steps 5 and 7 is a service, not a privilege. If it does not deliver, the user or anyone else can pay the gas and call the same functions.
 
@@ -124,7 +140,7 @@ The executor is then expected to deliver in nonce order. That is off-chain behav
 
 ### The four recovery functions
 
-When a message is stuck or must not run, only the OApp or its delegate can intervene, through four endpoint functions (`MessagingChannel.sol`, `EndpointV2.sol`):
+When a message is stuck or must not run, only the OApp or its delegate can intervene, through four endpoint functions:
 
 | Function | Applies to | Effect |
 |---|---|---|
@@ -133,13 +149,17 @@ When a message is stuck or must not run, only the OApp or its delegate can inter
 | `nilify(oapp, srcEid, sender, nonce, payloadHash)` | a verified or a future nonce | Writes `NIL_PAYLOAD_HASH` (`bytes32` all ones). The slot counts as filled for the gapless check but cannot execute until it is verified again. |
 | `burn(oapp, srcEid, sender, nonce, payloadHash)` | a verified nonce at or below `lazyInboundNonce` | Deletes the hash. The nonce can never be executed or verified again. |
 
+*Implementation:* `MessagingChannel.sol`, `skip()`, `nilify()` and `burn()` (lines 82-121). `EndpointV2.sol`, `clear()` (lines 211-217).
+
 `skip` takes the nonce as an argument rather than "the next one" so that a race, where the nonce is consumed first, does not skip an unintended message. The same functions are what a delegate would use to stop a forged packet that has been verified but not yet executed, which is why the delegate key is as sensitive as the DVN set.
 
 ## lzCompose
 
 Composition splits one delivery into two transactions, so that a failure in the second does not undo the first. The OFT uses it to credit tokens and then call a contract with them, for example to swap.
 
-Inside `_lzReceive`, the OApp calls `endpoint.sendCompose(to, guid, index, message)`, which stores `keccak256(message)` in `composeQueue[from][to][guid][index]` (`MessagingComposer.sol`). The executor, paid through the `LZCOMPOSE` option, later calls `endpoint.lzCompose`. The endpoint checks the hash, marks the slot as received and calls `lzCompose(from, guid, message, executor, extraData)` on the composer. The slot is marked rather than deleted, so the same compose cannot be queued again.
+Inside its receive logic, the OApp asks the endpoint to queue a compose message, and the endpoint stores the message's hash under the sending OApp, the composer, the GUID and an index. The executor, paid through the `LZCOMPOSE` option, later asks the endpoint to deliver it. The endpoint checks the hash, marks the slot as received and calls `lzCompose` on the composer with the sending OApp, the GUID, the message, the executor and extra data. The slot is marked rather than deleted, so the same compose cannot be queued again.
+
+*Implementation:* `MessagingComposer.sol`, `sendCompose()` and `lzCompose()` (lines 23-28 and 39-59); `sendCompose()` stores `keccak256(message)` in `composeQueue[from][to][guid][index]`.
 
 Anyone can call `sendCompose` with themselves as `from`. A composer must therefore check both that `msg.sender` is the endpoint and that `from` is the OApp it trusts; the first check alone accepts compose messages queued by any contract.
 
@@ -157,17 +177,25 @@ Options are bytes passed with every send and parsed by the send library. Types 1
 | Executor | `ORDERED_EXECUTION` = 4 | none | deliver in nonce order |
 | DVN (id 2) | `PRECRIME` = 1 | DVN index | ask that DVN to run PreCrime |
 
-**Enforced options** (`OAppOptionsType3.sol`) let the OApp owner store options per `(eid, msgType)`; `combineOptions` concatenates them with what the caller passes. This is how an application guarantees a minimum destination gas whatever the user supplies. A gas limit that is too low does not lose the message: it stays verified and fails on execution, and anyone can retry it with more gas.
+**Enforced options** let the OApp owner store options per `(eid, msgType)`; on every send they are concatenated with what the caller passes. This is how an application guarantees a minimum destination gas whatever the user supplies. A gas limit that is too low does not lose the message: it stays verified and fails on execution, and anyone can retry it with more gas.
+
+*Implementation:* `OAppOptionsType3.sol`, `setEnforcedOptions()` and `combineOptions()` (lines 28-30 and 63-85).
 
 ### Fees
 
 A send pays three parties: every assigned DVN, the executor and the treasury.
 
-- **In native.** `OAppSender._payNative` requires `msg.value` to equal the quoted native fee; the endpoint pays the library and refunds the excess to the refund address.
-- **In the LZ token.** With `payInLzToken`, the OApp transfers the token to the endpoint before `send`. It pays only the treasury part; workers are still paid in native. The option is unavailable while `lzToken` is unset.
-- **Treasury bounds.** The treasury's native fee is capped by the code, and a treasury call that reverts or returns malformed data charges nothing in `SendLibBase._parseTreasuryResult`. The send library's owner, who sets the treasury with `SendLibBaseE2.setTreasury`, therefore cannot block sends through it. The cap is the larger of the other fees and `treasuryNativeFeeCap`, a value the owner can only lower.
+- **In native.** The OApp requires `msg.value` to equal the quoted native fee; the endpoint pays the library and refunds the excess to the refund address.
 
-The executor's fee scales with the gas and value requested (`ExecutorFeeLib.sol`), which is why options and fees are quoted together.
+  *Implementation:* `OAppSender.sol`, `_payNative()` (lines 104-107).
+- **In the LZ token.** With `payInLzToken`, the OApp transfers the token to the endpoint before `send`. It pays only the treasury part; workers are still paid in native. The option is unavailable while `lzToken` is unset.
+- **Treasury bounds.** The treasury's native fee is capped by the code, and a treasury call that reverts or returns malformed data charges nothing. The send library's owner, who sets the treasury, therefore cannot block sends through it. The cap is the larger of the other fees and `treasuryNativeFeeCap`, a value the owner can only lower.
+
+  *Implementation:* `SendLibBase.sol`, `_parseTreasuryResult()` (lines 200-225). `SendLibBaseE2.sol`, `setTreasury()` (lines 60-62).
+
+The executor's fee scales with the gas and value requested, which is why options and fees are quoted together.
+
+*Implementation:* `ExecutorFeeLib.sol`.
 
 ## Configuration, and why defaults are dangerous
 
@@ -181,7 +209,9 @@ Every setting of the security stack is set through the endpoint, by the OApp or 
 | `UlnConfig` (type 2), send and receive libraries | `setConfig(oapp, lib, params)` | the library's default config for that eid, field by field |
 | `ExecutorConfig` (type 1), send library | `setConfig(...)` | default executor and message size |
 
-When an OApp moves between two pinned receive libraries with a non-zero `gracePeriod`, the old one keeps verifying until `block.number + gracePeriod`, so packets already in flight under the old library still land. The grace period is counted in blocks. `MessageLibManager.setReceiveLibrary` rejects a grace period with `LZ_OnlyNonDefaultLib` when the old or the new library is the default. An OApp leaving the default library passes 0 and then sets the old library's expiry with `setReceiveLibraryTimeout`, or packets in flight under it stop verifying.
+When an OApp moves between two pinned receive libraries with a non-zero `gracePeriod`, the old one keeps verifying until `block.number + gracePeriod`, so packets already in flight under the old library still land. The grace period is counted in blocks. The endpoint rejects a grace period with `LZ_OnlyNonDefaultLib` when the old or the new library is the default. An OApp leaving the default library passes 0 and then sets the old library's expiry with `setReceiveLibraryTimeout`, or packets in flight under it stop verifying.
+
+*Implementation:* `MessageLibManager.sol`, `setReceiveLibrary()` and `setReceiveLibraryTimeout()` (lines 245-273 and 279-302). The grace-period check is at line 263.
 
 The endpoint owner sets the default libraries, and each message library's owner sets the default DVN, confirmation and executor configs. LayerZero's May 2026 update names the LayerZero Labs multisig as the party that "sets defaults for all pathways" and "sets the default DVNs". An OApp that leaves any field at 0, or any library unpinned, follows whatever these owners set for that pathway, now and in the future. LayerZero's own [May 2026 update](https://layerzero.network/blog/an-overdue-apology) states that an application pointing at the defaults is "fully reliant on the LayerZero Labs multisig" and that the defaults are "intended to be for testing only". Its recommendations, in the same post:
 
@@ -196,13 +226,19 @@ The field-by-field merge is the trap in the first point. Pinning the required DV
 
 ### Peers
 
-`peers[eid]` is a `bytes32` (so a non-EVM address fits) naming the only remote contract the OApp talks to on that chain. `_lzSend` reverts with `NoPeer` when it is unset; `lzReceive` reverts with `OnlyPeer` when `origin.sender` differs; `allowInitializePath` only lets a path start from the peer. `setPeer` is restricted to the owner, and setting a peer to zero closes the pathway on that side.
+`peers[eid]` is a `bytes32` (so a non-EVM address fits) naming the only remote contract the OApp talks to on that chain. A send reverts with `NoPeer` when it is unset, a delivery reverts with `OnlyPeer` when the origin's sender differs, and a path can only start from the peer. Only the owner can set a peer, and setting a peer to zero closes the pathway on that side.
+
+*Implementation:* `OAppCore.sol`, `setPeer()` and `_getPeerOrRevert()` (lines 43-45 and 67-71). `OAppReceiver.sol`, `allowInitializePath()` and `lzReceive()` (lines 63-65 and 95-110), with the `OnlyPeer` check at line 106.
 
 ### The Omnichain Fungible Token
 
-The OFT is an OApp that moves a token (`oft-evm/contracts/`). A send debits the sender, builds the message `to (32 bytes) ‖ amountSD (8 bytes)`, plus a compose part when one is attached, and calls `_lzSend`. The receiving side credits the recipient and optionally queues a compose. The `OFT` variant mints to the dead address when `to` is zero; `OFTAdapter` transfers to `to` as given.
+The OFT is an OApp that moves a token. A send debits the sender, builds the message `to (32 bytes) ‖ amountSD (8 bytes)`, plus a compose part when one is attached, and passes it to the OApp's send path. The receiving side credits the recipient and optionally queues a compose. The `OFT` variant mints to the dead address when the recipient is zero; `OFTAdapter` transfers to the recipient as given.
 
-**Shared decimals.** Amounts cross chains as a `uint64` in `sharedDecimals()`, 6 by default, so that chains with different local decimals agree. The conversion rate is `10^(localDecimals − 6)`, 10^12 for an 18-decimal token. `_removeDust` rounds the amount down to a multiple of that rate before debiting, so the remainder never leaves the sender's wallet. For example, sending 1,234,567,891,234,567,891 base units of an 18-decimal token debits 1,234,567,000,000,000,000 and leaves 891,234,567,891 base units of dust with the sender. The `uint64` caps one transfer at about 1.8 × 10^13 tokens (`AmountSDOverflowed`), and `minAmountLD` is the slippage check.
+*Implementation:* `oft-evm/contracts/OFTCore.sol`, `send()`, `_buildMsgAndOptions()` and `_lzReceive()` (lines 175-181, 231-253 and 266-297). `OFT.sol` and `OFTAdapter.sol`, `_credit()` (lines 78-88 and 96-105).
+
+**Shared decimals.** Amounts cross chains as a `uint64` in shared decimals, 6 by default, so that chains with different local decimals agree. The conversion rate is `10^(localDecimals − 6)`, 10^12 for an 18-decimal token. Before debiting, the OFT rounds the amount down to a multiple of that rate, so the remainder never leaves the sender's wallet. For example, sending 1,234,567,891,234,567,891 base units of an 18-decimal token debits 1,234,567,000,000,000,000 and leaves 891,234,567,891 base units of dust with the sender. The `uint64` caps one transfer at about 1.8 × 10^13 tokens, above which the conversion reverts with `AmountSDOverflowed`, and `minAmountLD` is the slippage check.
+
+*Implementation:* `OFTCore.sol`, `sharedDecimals()`, `_removeDust()` and `_toSD()` (lines 85-87, 343-345 and 364-368).
 
 **Burn and mint, or lock and unlock.** The variants differ in where the backing lives:
 
@@ -210,7 +246,9 @@ The OFT is an OApp that moves a token (`oft-evm/contracts/`). A send debits the 
 - **`OFTAdapter`** wraps an existing ERC-20: it **locks** tokens on debit and **unlocks** them on credit. There must be one adapter per mesh, with an `OFT` on every other chain. It assumes lossless transfers (no fee-on-transfer) and needs an approval.
 - **`MintBurnOFTAdapter`** uses an existing token's mint and burn roles; **`NativeOFTAdapter`** locks the native gas token.
 
-The adapter's invariant is that the OFT supply on all other chains equals what it holds. That makes the adapter the single pot a forged inbound message empties, as the Kelp DAO incident showed. Rate limiting exists as an optional add-on (`oapp/utils/RateLimiter.sol`) and is not part of the default OFT. The [USD₮0 article]({{site.url_complet}}/2025/11/07/usdt0-Omnichain-fungible-token/) describes a production deployment of this pattern, with an adapter locking USDT on Ethereum.
+The adapter's invariant is that the OFT supply on all other chains equals what it holds. That makes the adapter the single pot a forged inbound message empties, as the Kelp DAO incident showed. Rate limiting exists as an optional add-on and is not part of the default OFT. The [USD₮0 article]({{site.url_complet}}/2025/11/07/usdt0-Omnichain-fungible-token/) describes a production deployment of this pattern, with an adapter locking USDT on Ethereum.
+
+*Implementation:* `oapp/utils/RateLimiter.sol` (rate limiter).
 
 ## lzRead
 
@@ -355,7 +393,9 @@ LayerZero is infrastructure: the risks below fall on an application that integra
 
 It can register new message libraries (append-only), set the default send and receive libraries and the default receive-library timeout for each pathway, set the LZ token and recover tokens sent to the endpoint by mistake.
 
-The default DVN, confirmation and executor configurations are not set on the endpoint: each message library's owner sets them with `UlnBase.setDefaultUlnConfigs` and `SendLibBase.setDefaultExecutorConfigs`. Neither owner can modify or remove a registered library, or change a library or configuration that an OApp has pinned. An OApp that relies on defaults, however, follows every change these owners make to them.
+The default DVN, confirmation and executor configurations are not set on the endpoint: each message library's owner sets them on the library. Neither owner can modify or remove a registered library, or change a library or configuration that an OApp has pinned. An OApp that relies on defaults, however, follows every change these owners make to them.
+
+*Implementation:* `UlnBase.sol`, `setDefaultUlnConfigs()` (lines 55-70). `SendLibBase.sol`, `setDefaultExecutorConfigs()` (lines 67-77).
 
 **Q: What does "X of Y of N" mean in a DVN configuration?**
 

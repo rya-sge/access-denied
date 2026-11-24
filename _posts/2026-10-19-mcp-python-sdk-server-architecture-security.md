@@ -2,7 +2,7 @@
 layout: post
 title: "How the MCP Python SDK Server Works: Architecture, Request Lifecycle and Security"
 date:   2026-10-19
-last_modified_at: 2026-11-05
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: ai security programmation
@@ -38,7 +38,9 @@ The SDK at the analyzed commit supports two generations of the protocol:
 | Handshake | 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25 | `initialize` request, then `notifications/initialized`; capabilities negotiated once per connection; the server may send requests to the client (sampling, elicitation, roots) |
 | Modern | 2026-07-28 | no handshake; each request carries its protocol version, client info and capabilities in a `_meta` envelope; `server/discover` replaces `initialize`; the server cannot initiate requests |
 
-The versions are declared in `src/mcp-types/mcp_types/version.py` as `HANDSHAKE_PROTOCOL_VERSIONS` and `MODERN_PROTOCOL_VERSIONS`. One server instance answers both eras, deciding per connection.
+Both version lists are constants of the `mcp-types` package. One server instance answers both eras, deciding per connection.
+
+*Implementation:* `src/mcp-types/mcp_types/version.py`, `HANDSHAKE_PROTOCOL_VERSIONS` and `MODERN_PROTOCOL_VERSIONS` (lines 33-41).
 
 ## A minimal server
 
@@ -100,6 +102,7 @@ The protocol types live in a separate package, `mcp-types` (`src/mcp-types/mcp_t
 `MCPServer` does not subclass `Server`; it composes one. Its constructor builds a low-level `Server` and passes its own bound methods as handlers:
 
 ```python
+# src/mcp/server/mcpserver/server.py, MCPServer.__init__(), lines 212-233 (abridged)
 self._lowlevel_server = Server(
     name=name or "mcp-server",
     ...
@@ -109,11 +112,15 @@ self._lowlevel_server = Server(
 )
 ```
 
-Each primitive has a manager: `ToolManager` (`mcpserver/tools/tool_manager.py`), `ResourceManager` (`mcpserver/resources/resource_manager.py`) and `PromptManager` (`mcpserver/prompts/manager.py`). The decorators `@mcp.tool()`, `@mcp.resource(uri)`, `@mcp.prompt()` and `@mcp.completion()` register into them. `@mcp.custom_route(path, methods)` adds a plain Starlette route next to the MCP endpoint, outside any authentication.
+Each primitive has a manager that holds what has been registered: one for tools, one for resources and templates, one for prompts. The decorators `@mcp.tool()`, `@mcp.resource(uri)`, `@mcp.prompt()` and `@mcp.completion()` register into them. `@mcp.custom_route(path, methods)` adds a plain Starlette route next to the MCP endpoint, outside any authentication.
+
+*Implementation:* `mcpserver/tools/tool_manager.py`, `mcpserver/resources/resource_manager.py` and `mcpserver/prompts/manager.py`, classes `ToolManager`, `ResourceManager` and `PromptManager`. `mcpserver/server.py`, `MCPServer.custom_route()` (line 1031).
 
 ### The low-level Server
 
-`Server` is the registry the runner dispatches into. Handlers are passed to the constructor as `on_*` keyword arguments (`on_list_tools`, `on_call_tool`, `on_read_resource`, `on_get_prompt`, `on_completion`, and so on) and stored in a dictionary keyed by method name, each entry paired with the Pydantic type of its parameters. Every handler has the same shape: it receives a `ServerRequestContext` and the typed parameters, and returns a result model.
+`Server` is the registry the runner dispatches into. Handlers are passed to the constructor as keyword arguments, one per method: `on_call_tool` serves `tools/call`, `on_read_resource` serves `resources/read`, and so on. They are stored in a dictionary keyed by method name, each entry paired with the Pydantic type of its parameters. Every handler has the same shape: it receives a request context and the typed parameters, and returns a result model, as in the example below.
+
+*Implementation:* `src/mcp/server/lowlevel/server.py`, `Server.__init__()`.
 
 ```python
 async def list_tools(ctx: ServerRequestContext, params: PaginatedRequestParams | None) -> ListToolsResult:
@@ -136,12 +143,14 @@ The low-level API is the escape hatch for what `MCPServer` does not do: paginati
 
 ## From a Python function to a tool
 
-Registering a tool is mostly schema generation. `Tool.from_function` (`mcpserver/tools/base.py`) does four things:
+Registering a tool is mostly schema generation. Building a `Tool` from a function takes four steps:
 
 1. It finds the parameter annotated as `Context`, whatever its name, and the parameters marked `Annotated[T, Resolve(fn)]`, and removes them from the public signature.
-2. `func_metadata` (`mcpserver/utilities/func_metadata.py`) builds a dynamic Pydantic model from the remaining parameters, named `<function>Arguments`. A parameter without annotation becomes a string, and a name starting with `_` is refused.
+2. `func_metadata` builds a dynamic Pydantic model from the remaining parameters, named `<function>Arguments`. A parameter without annotation becomes a string, and a name starting with `_` is refused.
 3. The input schema advertised in `tools/list` is that model's `model_json_schema()`.
 4. If the function has a return annotation, an output model is built for **structured output**.
+
+*Implementation:* `mcpserver/tools/base.py`, `Tool.from_function()` (lines 65-130). `mcpserver/utilities/func_metadata.py`, `func_metadata()` (lines 275-477).
 
 The structured-output rules follow the return type. A Pydantic model, a `TypedDict` or a `dict[str, T]` is used directly as the output schema. Primitives, lists and unions are wrapped in an object with a single `result` field, which is why the README's client prints `{'result': 3}` for the `add` tool. Images, audio and raw content blocks stay unstructured. The schema is generated in a strict mode, so a return type that cannot be serialised fails when the tool is registered rather than at the first call.
 
@@ -200,6 +209,7 @@ sequenceDiagram
 `ServerRunner` is described in its docstring as "the per-connection handler kernel". For each request it builds a `ServerRequestContext`, which includes a fresh `ServerSession`. In version 2 that session is a small per-request proxy for sending notifications and requests back to the client. The runner then wraps the call in the middleware chain and runs a fixed sequence:
 
 ```python
+# src/mcp/server/runner.py, ServerRunner._on_request(), lines 208-217 (comments removed)
 entry = self.server.get_request_handler(method)
 if entry is None:
     raise MCPError(code=METHOD_NOT_FOUND, message="Method not found", data=method)
@@ -217,7 +227,9 @@ Middleware has the signature `(ctx, call_next) -> result`. The default chain con
 
 ### Two eras on one server
 
-`Server.run()` enters the lifespan and calls `serve_dual_era_loop`, which looks at the first request on the connection. If it carries the `io.modelcontextprotocol/protocolVersion` key in `_meta`, the connection is modern; otherwise it is a handshake connection. Mixing afterwards is refused: `initialize` on a modern connection gets `UNSUPPORTED_PROTOCOL_VERSION`, and an enveloped request on a handshake connection gets `INVALID_REQUEST`.
+When the server runs, it enters the lifespan and then classifies the connection by its first request. If that request carries the `io.modelcontextprotocol/protocolVersion` key in `_meta`, the connection is modern; otherwise it is a handshake connection. Mixing afterwards is refused: `initialize` on a modern connection gets `UNSUPPORTED_PROTOCOL_VERSION`, and an enveloped request on a handshake connection gets `INVALID_REQUEST`.
+
+*Implementation:* `src/mcp/server/lowlevel/server.py`, `Server.run()` (lines 703-730). `src/mcp/server/runner.py`, `serve_dual_era_loop()` (lines 602-646).
 
 On a modern connection each request is self-contained: the runner builds a `Connection` from the envelope and serves that one request. The dispatch context refuses outbound requests, so any attempt to call the client raises `NoBackChannelError`. Interactions that needed a server-to-client request in the handshake era (asking the user a question, requesting a model completion) become **multi-round-trip requests**: the tool returns an `InputRequiredResult` listing what it needs, the client answers in a follow-up call, and the server resumes. The high-level API hides this behind resolver markers such as `Elicit[T]` and `Sample`, which are batched into an `InputRequiredResult` on 2026-07-28 and sent as live requests on older versions.
 
@@ -256,7 +268,9 @@ Over Streamable HTTP, version 2 enters the lifespan once when the session manage
 
 `MCPServer.run(transport=...)` selects one of three transports.
 
-**stdio.** `stdio_server()` (`src/mcp/server/stdio.py`) reads newline-delimited JSON-RPC from standard input and writes to standard output. While it serves, it points file descriptor 0 at the null device and file descriptor 1 at standard error, so a stray `print()` in a handler or a child process cannot write into the protocol stream. Logging goes to standard error.
+**stdio.** The stdio transport reads newline-delimited JSON-RPC from standard input and writes to standard output. While it serves, it points file descriptor 0 at the null device and file descriptor 1 at standard error, so a stray `print()` in a handler or a child process cannot write into the protocol stream. Logging goes to standard error.
+
+*Implementation:* `src/mcp/server/stdio.py`, `stdio_server()` (lines 162-217).
 
 **SSE.** The older HTTP transport, with a long-lived Server-Sent Events stream for server messages and a separate POST endpoint for client messages. The SDK keeps it for legacy clients; the protocol replaced it with Streamable HTTP in the 2025-03-26 revision.
 
@@ -324,9 +338,10 @@ Two further points apply:
 
 ### HTTP hardening: DNS rebinding, body size, content type
 
-A server listening on `127.0.0.1` looks unreachable from the internet, but a web page in the user's browser can rebind its own domain to `127.0.0.1` and send requests to it. The defence is to check the `Host` and `Origin` headers, which `TransportSecurityMiddleware` (`src/mcp/server/transport_security.py`) does. Its default depends on how the server is built:
+A server listening on `127.0.0.1` looks unreachable from the internet, but a web page in the user's browser can rebind its own domain to `127.0.0.1` and send requests to it. The defence is to check the `Host` and `Origin` headers, which the SDK's transport security middleware does. Its default depends on how the server is built:
 
 ```python
+# src/mcp/server/lowlevel/server.py, Server.streamable_http_app(), lines 752-758
 # Auto-enable DNS rebinding protection for localhost (IPv4 and IPv6)
 if transport_security is None and host in ("127.0.0.1", "localhost", "::1"):
     transport_security = TransportSecuritySettings(
@@ -341,7 +356,9 @@ Since `host` defaults to `127.0.0.1`, a server started with defaults is protecte
 - passing any other `host` (`0.0.0.0`, a public name) without `transport_security=` leaves the check off, and the deployment guide warns that this "leaves every Host and Origin accepted";
 - building a `StreamableHTTPSessionManager` or `SseServerTransport` directly without settings falls back to `TransportSecuritySettings(enable_dns_rebinding_protection=False)`, a default kept for backwards compatibility.
 
-When the check is on, a disallowed `Host` gets `421` and a disallowed `Origin` gets `403`. A missing `Origin` is accepted, since only browsers send it. Allowlist entries are exact strings, with a `:*` suffix meaning any port. Independently of that setting, a POST whose `Content-Type` is not JSON is rejected with `400`, and every HTTP entry point (Streamable HTTP, the SSE POST endpoint and the OAuth endpoints) caps the request body at 4 MiB through `RequestBodyLimitMiddleware`, which counts streamed chunks as well as the declared `Content-Length`.
+When the check is on, a disallowed Host header gets `421` and a disallowed Origin header gets `403`. A missing Origin header is accepted, since only browsers send it. Allowlist entries are exact strings, with a `:*` suffix meaning any port. Independently of that setting, a POST whose content type is not JSON is rejected with `400`, and every HTTP entry point (Streamable HTTP, the SSE POST endpoint and the OAuth endpoints) caps the request body at 4 MiB with a middleware that counts streamed chunks as well as the declared `Content-Length`.
+
+*Implementation:* `src/mcp/server/transport_security.py`, `TransportSecurityMiddleware` and `RequestBodyLimitMiddleware` (lines 43-183).
 
 ### Sessions
 
@@ -358,6 +375,7 @@ The binding has one limit: on a server without authentication, every caller is t
 The SDK implements the MCP authorization model, in which the MCP server is an OAuth 2.1 **resource server**: it validates access tokens issued by a separate authorization server and never signs anyone in. The configuration is an `AuthSettings` object plus a `TokenVerifier`, a protocol with a single method:
 
 ```python
+# src/mcp/server/auth/provider.py, lines 124-127 (docstrings removed)
 class TokenVerifier(Protocol):
     async def verify_token(self, token: str) -> AccessToken | None: ...
 ```
@@ -368,9 +386,13 @@ The verifier is where the cryptography happens: checking a JWT signature, or cal
 - `RequireAuthMiddleware` answers `401 invalid_token` for an unauthenticated request and `403 insufficient_scope` when any of `required_scopes` is missing, with a `WWW-Authenticate` header pointing to the metadata document;
 - when `resource_server_url` is set, the server publishes **Protected Resource Metadata** ([RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728)) at `/.well-known/oauth-protected-resource`, which tells the client which authorization server to use.
 
-The audience check deserves attention. A token issued for another service should not be accepted by this one, which is what the `resource` indicator of [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) is for. The SDK can compare the token's `resource` with `resource_server_url` itself, but only if `AuthSettings.validate_token_resource=True`. Left unset, it behaves as `False` and emits a deprecation warning saying it will default to `True` in version 3. Until then, either the setting is turned on or the `TokenVerifier` must check the audience itself.
+The audience check deserves attention. A token issued for another service should not be accepted by this one, which is what the `resource` indicator of [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) is for. The SDK can compare the token's resource with the server's own `resource_server_url` itself, but only when `validate_token_resource` is set to `True`. Left unset, it behaves as `False` and emits a deprecation warning saying it will default to `True` in version 3. Until then, either the setting is turned on or the token verifier must check the audience itself.
 
-The SDK also contains an **embedded authorization server** (`auth_server_provider=`), with `/authorize`, `/token`, optional `/register` ([RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591) dynamic client registration) and optional `/revoke` ([RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009)). The documentation describes it as predating the separation of roles and recommends against it for new servers. Its handlers enforce [PKCE](https://datatracker.ietf.org/doc/html/rfc7636) with `S256` only, exact redirect URI matching, client secrets compared with `hmac.compare_digest`, codes bound to their client and expiry, and refresh-token scopes restricted to a subset of the original grant. Generating codes and tokens, and their entropy, is the provider's job.
+*Implementation:* `src/mcp/server/auth/settings.py`, `AuthSettings.validate_token_resource` and `_check_validate_token_resource()` (lines 48-70).
+
+The SDK also contains an **embedded authorization server** (`auth_server_provider=`), with `/authorize`, `/token`, optional `/register` ([RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591) dynamic client registration) and optional `/revoke` ([RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009)). The documentation describes it as predating the separation of roles and recommends against it for new servers. Its handlers enforce [PKCE](https://datatracker.ietf.org/doc/html/rfc7636) with `S256` only, exact redirect URI matching, client secrets compared in constant time, codes bound to their client and expiry, and refresh-token scopes restricted to a subset of the original grant. Generating codes and tokens, and their entropy, is the provider's job.
+
+*Implementation:* `src/mcp/server/auth/handlers/authorize.py` and `token.py`; the client secret comparison uses `hmac.compare_digest()` in `src/mcp/server/auth/middleware/client_auth.py` (line 113).
 
 ### Input validation and error disclosure
 
@@ -379,6 +401,7 @@ With `MCPServer`, tool arguments are validated by the Pydantic model generated f
 The error path is designed not to leak server internals to the model:
 
 ```python
+# src/mcp/server/mcpserver/tools/base.py, Tool.run(), lines 211-213
 except Exception as exc:
     # A crash: the exception's own text stays on the server.
     raise UnexpectedToolError(f"Error executing tool {self.name}") from exc
@@ -390,13 +413,19 @@ The low-level `Server` does none of this. A tool registered there receives the r
 
 ### Resource templates and path traversal
 
-Resource templates are a classic traversal surface: `file://{path}` with `path` set to `../../etc/passwd`. Every template parameter goes through `ResourceSecurity` (`mcpserver/resources/templates.py`), whose defaults reject path traversal segments, absolute paths (including Windows drive forms) and null bytes. The checks run on the percent-decoded value, so `..%2F` and `%2E%2E` are caught. A rejection stops the search through templates instead of falling through to a later, more permissive one, and the client receives `Unknown resource`.
+Resource templates are a classic traversal surface: `file://{path}` with `path` set to `../../etc/passwd`. Every template parameter goes through a security policy whose defaults reject path traversal segments, absolute paths (including Windows drive forms) and null bytes. The checks run on the percent-decoded value, so `..%2F` and `%2E%2E` are caught. A rejection stops the search through templates instead of falling through to a later, more permissive one, and the client receives `Unknown resource`.
 
-The documentation calls these checks a "heuristic pre-filter". For filesystem access the containment boundary is `safe_join(base, *parts)` in `src/mcp/shared/path_security.py`, which resolves the final path and requires it to remain under `base`. Its docstring notes that the symlink check is point-in-time, so a symlink swapped between the check and the open is not covered.
+*Implementation:* `mcpserver/resources/templates.py`, `ResourceSecurity` (lines 29-83).
+
+The documentation calls these checks a "heuristic pre-filter". For filesystem access the containment boundary is a separate helper, `safe_join(base, *parts)`, which resolves the final path and requires it to remain under `base`. Its docstring notes that the symlink check is point-in-time, so a symlink swapped between the check and the open is not covered.
+
+*Implementation:* `src/mcp/shared/path_security.py`, `safe_join()` (lines 121-176).
 
 ### Sealed request state
 
-In a multi-round-trip request, the server hands the client an opaque `requestState` and the client echoes it in the next call. The specification requires the server to treat that echoed value as attacker-controlled. `RequestStateBoundary` (`src/mcp/server/request_state.py`) seals it with AES-256-GCM under an HKDF-derived key, binds it to the authenticated principal and to the server's name as audience, and expires it after 600 seconds. Every verification failure produces the same `Invalid or expired requestState` error, so a failure does not reveal which check rejected it.
+In a multi-round-trip request, the server hands the client an opaque `requestState` and the client echoes it in the next call. The specification requires the server to treat that echoed value as attacker-controlled. A middleware, `RequestStateBoundary`, seals it with AES-256-GCM under an HKDF-derived key, binds it to the authenticated principal and to the server's name as audience, and expires it after 600 seconds. Every verification failure produces the same `Invalid or expired requestState` error, so a failure does not reveal which check rejected it.
+
+*Implementation:* `src/mcp/server/request_state.py`, `RequestStateBoundary` (lines 327-454).
 
 The default key is `os.urandom(32)` generated at start-up. That is safe, but it means state sealed by one worker cannot be opened by another, or by the same worker after a restart. A deployment with several instances must pass a shared key ring.
 
@@ -413,6 +442,9 @@ Several MCP risks sit above the transport and are not something a server library
 A few smaller points surfaced while reading the code at the analyzed commit, none of which is exploitable on its own:
 
 - the PKCE verifier hash is compared with `!=` rather than in constant time; the value compared is derived from a one-time code and is hashed first, so this is a hygiene point rather than a practical leak;
+
+  *Implementation:* `src/mcp/server/auth/handlers/token.py` (line 189).
+
 - the embedded authorization server's `/token` handler parses the `resource` parameter but leaves the comparison with the authorization code's `resource` to the provider;
 - dynamic client registration, when enabled, is unauthenticated and has no rate limiting in the SDK.
 
@@ -499,7 +531,9 @@ The client receives a normal `CallToolResult` with `is_error=True` and the text 
 
 **Q: Why does a server started with `mcp.run(transport="streamable-http", host="0.0.0.0")` accept requests with any `Host` header?**
 
-DNS rebinding protection is armed automatically only when no `transport_security` is passed and the host is `127.0.0.1`, `localhost` or `::1`. Any other host skips that default, and the middleware then falls back to settings with protection disabled. Passing a non-local host does not add it to an allowlist. The fix is to pass `TransportSecuritySettings` with the expected `Host` and `Origin` values.
+DNS rebinding protection is armed automatically only when no transport security settings are passed and the host is `127.0.0.1`, `localhost` or `::1`. Any other host skips that default, and the middleware then falls back to settings with protection disabled. Passing a non-local host does not add it to an allowlist. The fix is to pass `TransportSecuritySettings` with the expected Host and Origin values.
+
+*Implementation:* `src/mcp/server/lowlevel/server.py`, `Server.streamable_http_app()` (lines 752-758). `src/mcp/server/transport_security.py`, `TransportSecurityMiddleware.__init__()` (line 48).
 
 **Q: How do the two protocol eras differ for a tool that needs to ask the user a question?**
 

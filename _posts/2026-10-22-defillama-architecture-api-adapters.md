@@ -2,7 +2,7 @@
 layout: post
 title: "How DefiLlama Works - Data Model, Free and Pro API, and Adapters"
 date:   2026-10-22
-last_modified_at: 2026-11-05
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain defi
@@ -42,7 +42,10 @@ The article relies on a few DeFi accounting and on-chain data concepts:
 DefiLlama separates three things: **collecting** a metric, **pricing** it, and **serving** it.
 
 - **Collecting** is done by adapters. An adapter answers one narrow question for one protocol, such as "which tokens, in which amounts, do this protocol's contracts hold on Arbitrum at block N?" or "which fees did this protocol collect between two timestamps?". It returns raw token balances keyed by token address, not USD values.
-- **Pricing** is done by the coins service (`coins.llama.fi`), which maps a token identifier and a timestamp to a USD price. The local TVL test runner (`DefiLlama-Adapters/test.js`) sends the balances an adapter returns to that service to convert them to USD, and the chain library `@defillama/sdk` queries the same host.
+- **Pricing** is done by the coins service (`coins.llama.fi`), which maps a token identifier and a timestamp to a USD price. The local TVL test runner sends the balances an adapter returns to that service to convert them to USD, and the chain library `@defillama/sdk` queries the same host.
+
+  *Implementation:* `DefiLlama-Adapters/test.js`, `buildPricesGetQueries()` (lines 571-589), and `defillama-sdk/src/util/coins.ts`.
+
 - **Serving** is done by the public API hosts and the website, which read the stored, priced results.
 
 This separation explains a property of every DefiLlama figure: two protocols holding the same token are valued with the same price at the same time, because neither adapter computes a price. It also explains a common failure: a token the coins service does not know is reported by the test runner as *unknown* and contributes nothing to TVL.
@@ -176,7 +179,9 @@ The free endpoints live on four hosts, by data family:
 | Stablecoins | `https://stablecoins.llama.fi` | `/stablecoins`, `/stablecoin/1` |
 | Yields | `https://yields.llama.fi` | `/pools`, `/chart/{pool}` |
 
-The file `llms-free.txt` in the `api-docs` repository, written for language-model agents, states that every free endpoint uses `api.llama.fi`. That is wrong for prices, stablecoins and yields: `https://api.llama.fi/prices/current/coingecko:ethereum` returned HTTP 404 on 2026-10-22, while the same path on `coins.llama.fi` answered. The OpenAPI file `defillama-openapi-free.json` and the `BASE_URLS` constant of the official client both carry the correct host per path.
+The summary of the free API written for language-model agents, in the `api-docs` repository, states that every free endpoint uses `api.llama.fi`. That is wrong for prices, stablecoins and yields: `https://api.llama.fi/prices/current/coingecko:ethereum` returned HTTP 404 on 2026-10-22, while the same path on `coins.llama.fi` answered. The free OpenAPI specification carries the correct host for each path; the host table of the official client has the hosts for prices and stablecoins but no entry for yields.
+
+*Source:* `api-docs/llms-free.txt`, line 3; `api-docs/defillama-openapi-free.json`; `api-sdk/src/client.ts`, constant `BASE_URLS` (lines 27-34).
 
 ### Main free endpoints
 
@@ -233,7 +238,10 @@ A beta financial-statement endpoint returns a protocol's income statement by yea
 
 The status codes carry more information than usual:
 
-- **402** with the body `Upgrade to the paid API plan at https://defillama.com/subscription` means the endpoint is Pro-only. It does not mean a subscription expired. On 2026-10-22 it was returned without a key by `/emissions`, `/oracles`, `/categories`, `/raises`, `/treasuries`, `/overview/derivatives`, `yields.llama.fi/poolsBorrow` and `bridges.llama.fi/bridges`.
+- **402** with the body `Upgrade to the paid API plan at https://defillama.com/subscription` means the endpoint is Pro-only. It does not mean a subscription expired. On 2026-10-22 eight endpoints returned it to a request without a key: unlocks, oracles, categories, raises, treasuries, derivatives volume, borrow rates and bridges.
+
+  *Source:* requests without a key on 2026-10-22 to `/emissions`, `/oracles`, `/categories`, `/raises`, `/treasuries`, `/overview/derivatives`, `yields.llama.fi/poolsBorrow` and `bridges.llama.fi/bridges`.
+
 - **404** usually means the wrong host (a price path on `api.llama.fi`) or an unknown slug.
 - **200 from a free endpoint** proves nothing about a key, since the free endpoint needs none.
 
@@ -258,7 +266,11 @@ A Python client is published as `defillama-sdk` on PyPI (repository `DefiLlama/p
 
 ### Practical constraints
 
-Several free responses are large: `/protocols`, `/pools` (about 15,500 pools on 2026-10-22) and the `overview` endpoints weigh several megabytes. The `overview` endpoints take `excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true` to drop the chart arrays. Chain names follow two conventions: TVL and stablecoin paths use display names (`Ethereum`, `Arbitrum`), while price and block paths use lowercase identifiers (`ethereum`, `bsc`, `avax`). The free tier's rate limit is not documented, so batch scripts should call sequentially, cache large answers and back off on HTTP 429.
+Several free responses are large: `/protocols`, `/pools` (about 15,500 pools on 2026-10-22) and the `overview` endpoints weigh several megabytes. The `overview` endpoints take `excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true` to drop the chart arrays.
+
+Chain names follow two conventions: TVL and stablecoin paths use display names (`Ethereum`, `Arbitrum`), while price and block paths use lowercase identifiers (`ethereum`, `bsc`, `avax`).
+
+The free tier's rate limit is not documented, so batch scripts should call sequentially, cache large answers and back off on HTTP 429.
 
 ## Adapters
 
@@ -266,9 +278,10 @@ Several free responses are large: `/protocols`, `/pools` (about 15,500 pools on 
 
 A TVL adapter is a CommonJS module in `DefiLlama-Adapters/projects/<slug>/`. The folder name is the protocol slug used by the API. The module exports one object per chain, each with one async function per bucket. The function receives a `ChainApi` object (`api`) bound to the chain, block and timestamp being computed, and either returns balances or adds them to `api`.
 
-The adapter of the Lighter order book on Arbitrum shows the whole pattern in fifteen lines:
+The adapter of the Lighter order book on Arbitrum shows the whole pattern in nineteen lines:
 
 ```javascript
+// DefiLlama-Adapters/projects/lighter/index.js, lines 1-19
 const { sumTokens2 } = require('../helper/unwrapLPs')
 const { getLogs } = require('../helper/cache/getLogs')
 
@@ -290,14 +303,23 @@ module.exports = {
 }
 ```
 
-The adapter discovers every order book from the factory's `OrderBookCreated` events, then asks `sumTokens2` for the balance of each book's two tokens. `sumTokens2`, in `projects/helper/unwrapLPs.js`, is the generic balance reader of the repository: given owners and tokens, it reads the balances by multicall and, on request, unwraps LP tokens, Uniswap V3 positions (`resolveUniV3`) and other wrappers into their underlying assets. The adapter never touches a price.
+The adapter discovers every order book from the factory's `OrderBookCreated` events, then asks `sumTokens2` for the balance of each book's two tokens. That helper is the generic balance reader of the repository: given owners and tokens, it reads the balances by multicall and, on request, unwraps LP tokens, Uniswap V3 positions and other wrappers into their underlying assets. The adapter never touches a price.
+
+*Implementation:* `projects/helper/unwrapLPs.js`, `sumTokens2()` and its `resolveUniV3` option (lines 983-1003).
 
 Most protocols are forks or instances of a known design, and the repository has two levels of reuse for them:
 
-- **Helpers** in `projects/helper/`: `aave.js`, `compound.js`, `compoundV3.js`, `masterchef.js`, `erc4626.js`, `staking.js`, `pool2.js`, `unknownTokens.js`, `cex.js` (exchange wallet lists), and `coreAssets.json`, the canonical token addresses per chain.
-- **Registries** in `registries/`: data-only listings for patterns such as `uniswapV2.js`, `uniswapV3.js`, `compound.js`, `aaveV3.js`, `erc4626.js`, `liquity.js` and `stakingOnly.js`. A plain ERC-4626 vault, for instance, is listed by adding its address to `registries/erc4626.js`, with no adapter file at all.
+- **Helpers** are shared functions for the common designs: Aave and Compound (V2 and V3) lending markets, MasterChef farms, ERC-4626 vaults, staking and pool2 buckets, tokens without a market price, and exchange wallet lists. A data file next to them holds the canonical token addresses per chain.
 
-The allowed export keys are fixed in `projects/helper/whitelistedExportKeys.json`: `tvl`, `staking`, `pool2`, `borrowed`, `ownTokens`, `vesting`, `methodology`, `doublecounted`, `misrepresentedTokens`, `timetravel`, `start`, `hallmarks`, `deadFrom`, `isHeavyProtocol`, `meta` and `moduleFilePath`. The test runner rejects anything else and rejects a bucket exported at the root of the module instead of under a chain.
+  *Implementation:* `projects/helper/`, `aave.js`, `compound.js`, `compoundV3.js`, `masterchef.js`, `erc4626.js`, `staking.js`, `pool2.js`, `unknownTokens.js`, `cex.js` and `coreAssets.json`.
+
+- **Registries** are data-only listings for the most common patterns: Uniswap V2 and V3 pools, Compound and Aave V3 markets, ERC-4626 vaults, Liquity forks and staking-only protocols. A plain ERC-4626 vault, for instance, is listed by adding its address to the ERC-4626 registry, with no adapter file at all.
+
+  *Implementation:* `registries/`, `uniswapV2.js`, `uniswapV3.js`, `compound.js`, `aaveV3.js`, `erc4626.js`, `liquity.js` and `stakingOnly.js`.
+
+The allowed export keys are fixed in one list of sixteen: the six buckets described above, the two qualifying flags, and eight metadata and control keys such as the methodology, the start date and the hallmarks. The test runner rejects anything else and rejects a bucket exported at the root of the module instead of under a chain.
+
+*Implementation:* `projects/helper/whitelistedExportKeys.json`, which lists `tvl`, `staking`, `pool2`, `borrowed`, `ownTokens`, `vesting`, `methodology`, `doublecounted`, `misrepresentedTokens`, `timetravel`, `start`, `hallmarks`, `deadFrom`, `isHeavyProtocol`, `meta` and `moduleFilePath`; `test.js`, `checkExportKeys()` (lines 321-410).
 
 An adapter is tested locally, optionally at a past date:
 
@@ -310,11 +332,14 @@ The runner computes each bucket, prices the balances through the coins service, 
 
 ### Dimension adapters
 
-Dimension adapters measure flows over a time window, in TypeScript, in `dimension-adapters/<metric>/`, with one folder per metric: `fees`, `dexs`, `aggregators`, `derivatives`, `aggregator-derivatives`, `options`, `bridge-aggregators`, `open-interest`, `liquidations`, `active-users`, `new-users`, `normalized-volume` and `incentives`.
+Dimension adapters measure flows over a time window. They are written in TypeScript and grouped in `dimension-adapters/<metric>/`, one folder per metric: fees, DEX volume, aggregators, derivatives aggregators, options, options aggregators, bridge aggregators, open interest, liquidations, active users, new users, normalised volume and incentives.
+
+*Implementation:* `dimension-adapters/`, folders `fees`, `dexs`, `aggregators`, `aggregator-derivatives`, `options`, `aggregator-options`, `bridge-aggregators`, `open-interest`, `liquidations`, `active-users`, `new-users`, `normalized-volume` and `incentives`.
 
 The adapter of sDAI on Gnosis Chain counts the interest the bridge receives from the Maker DSR:
 
 ```typescript
+// dimension-adapters/fees/sdai.ts, lines 1-43
 import { FetchOptions, SimpleAdapter } from "../adapters/types";
 import { CHAIN } from "../helpers/chains";
 
@@ -360,7 +385,9 @@ const adapter: SimpleAdapter = {
 export default adapter;
 ```
 
-The `fetch` function receives a `FetchOptions` object that carries the chain, the window (`startTimestamp`, `endTimestamp`, `getFromBlock()`, `getToBlock()`), a `getLogs` bound to that window, and `createBalances()`. It returns balances per income-statement field, here all fees attributed to the supply side and no revenue, and `methodology` explains each field in prose.
+The `fetch` function receives an options object bound to one chain and one time window: it carries the chain, the start and end of the window as timestamps and as blocks, a log reader restricted to that window, and a factory for empty balances. It returns balances per income-statement field, here all fees attributed to the supply side and no revenue, and `methodology` explains each field in prose.
+
+*Implementation:* `dimension-adapters/adapters/types.ts`, type `FetchOptions` (lines 25-58), fields `chain`, `startTimestamp`, `endTimestamp`, `getFromBlock()`, `getToBlock()`, `getLogs` and `createBalances()`.
 
 The repository's `AGENTS.md` sets the rules a reviewer applies:
 
@@ -398,8 +425,13 @@ sequenceDiagram
 
 The two remaining families are simpler:
 
-- **Yield adaptors** (`yield-server/src/adaptors/<slug>/index.js`) return an array of pools, each with a unique `pool` identifier (`${address}-${chain}` in lowercase), `chain`, `project` (the TVL slug), `symbol`, `tvlUsd`, `apyBase`, `apyReward`, `rewardTokens` and `underlyingTokens`. The methodology asks for the minimum attainable yield: unboosted rates, no pre-mined, locked or non-tradable rewards, and fee APY over 24 hours. Pools under 10,000 USD of TVL are not displayed.
-- **Stablecoin adapters** (`peggedassets-server/src/adapters/peggedAssets/<coingecko-id>/index.ts`) export, per chain, `minted` (issued natively there), `unreleased` (held in reserve and never circulated) and optional `bridgedFrom<Chain>` functions, each returning an amount keyed by peg type (`peggedUSD`, `peggedEUR`, `peggedVAR`). Circulating supply on a chain is derived from these three quantities: minted, less unreleased, plus what was bridged in. A helper, `addChainExports`, builds the adapter from a list of issuer and reserve addresses.
+- **Yield adaptors** return an array of pools. Each pool carries a unique identifier (`${address}-${chain}` in lowercase), its chain, the protocol's TVL slug, a symbol, the TVL in USD, the base and reward APY, and the reward and underlying tokens. The methodology asks for the minimum attainable yield: unboosted rates, no pre-mined, locked or non-tradable rewards, and fee APY over 24 hours. Pools under 10,000 USD of TVL are not displayed.
+
+  *Source:* `yield-server/README.md`, lines 17-27 for the APY methodology, lines 90-100 for the pool fields `pool`, `chain`, `project`, `symbol`, `tvlUsd`, `apyBase`, `apyReward`, `rewardTokens` and `underlyingTokens`, and line 118 for the display threshold; adaptors live in `yield-server/src/adaptors/<slug>/index.js`.
+
+- **Stablecoin adapters** export, per chain, a `minted` function for the amount issued natively there, an `unreleased` function for the amount held in reserve and never circulated, and optional `bridgedFrom<Chain>` functions for the amounts bridged in from other chains. Each returns an amount keyed by peg type: `peggedUSD`, `peggedEUR` or `peggedVAR`. Circulating supply on a chain is derived from these three quantities: minted, less unreleased, plus what was bridged in. A helper builds the adapter from a list of issuer and reserve addresses.
+
+  *Implementation:* `peggedassets-server/src/adapters/peggedAssets/<coingecko-id>/index.ts`, adapter format in `README.md`, lines 17-38; helper `addChainExports()` in `helper/getSupply.ts`, line 257.
 
 ## Conclusion
 

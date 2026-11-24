@@ -24,16 +24,24 @@ This article follows that design through the `across-protocol/contracts` reposit
 
 The article assumes the reader knows smart contracts, ERC-20 tokens and what a cross-chain bridge does. A few mechanisms one level below are used without being derived:
 
-- **Optimistic verification.** A claim is accepted unless someone challenges it within a fixed window, and the challenger and the proposer both post a bond. Safety then rests on one honest observer being online during the window rather than on a quorum of signers. The Across documentation describes UMA's version as a "one-step escalation game", in `user-docs/how-across-works/security.md`. The HubPool's dispute comments add that a disputed bundle is judged by the voters of UMA's Data Verification Mechanism (DVM).
+- **Optimistic verification.** A claim is accepted unless someone challenges it within a fixed window, and the challenger and the proposer both post a bond. Safety then rests on one honest observer being online during the window rather than on a quorum of signers. The Across documentation describes UMA's version as a "one-step escalation game", and the HubPool's dispute comments add that a disputed bundle is judged by the voters of UMA's Data Verification Mechanism (DVM).
+
+  *Source:* `user-docs/how-across-works/security.md`; `HubPool.sol`, dispute comments.
 - **Merkle roots and inclusion proofs.** A Merkle root commits to a list of leaves; anyone holding a leaf and its proof can show it is in the list without the contract storing the list. Across publishes three roots per settlement period and pays out leaf by leaf.
-- **Canonical bridges and L1-to-L2 messaging.** Each rollup or sidechain has its own official bridge for messages and tokens, with its own function names, delays and fee rules. The Across documentation notes that optimistic-rollup bridges can hold funds for up to seven days on the way back to Ethereum (`user-docs/how-across-works/speed.md`).
+- **Canonical bridges and L1-to-L2 messaging.** Each rollup or sidechain has its own official bridge for messages and tokens, with its own function names, delays and fee rules. The Across documentation notes that optimistic-rollup bridges can hold funds for up to seven days on the way back to Ethereum.
+
+  *Source:* `user-docs/how-across-works/speed.md`.
 - **Finality and reorganisations.** A transaction included in a block can disappear if the chain reorganises. A relayer that pays on the destination before the origin deposit is final takes that risk, which the documentation names *finality risk*.
 - **Typed signatures.** [EIP-712](https://eips.ethereum.org/EIPS/eip-712) defines a structured-data hash that a wallet can sign, and [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271) lets a contract account answer "is this signature valid for me?". Across uses both for deposit speed-ups. The site's [ERC-1271 comparison]({{site.url_complet}}/2026/02/13/erc1271-erc7913-signature-verification-comparison/) covers the second one in depth.
-- **UUPS proxies.** In the [UUPS pattern](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/cbb66aca87521f818d9c1769c69d5dcc1004977a/contracts/proxy/utils/UUPSUpgradeable.sol), the proxy's address stays fixed and the implementation contract itself contains the upgrade function, guarded by an authorisation hook. The contracts README states that every Across SpokePool is a UUPS proxy (`contracts/README.md`, "Understanding Upgradeability").
+- **UUPS proxies.** In the [UUPS pattern](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/cbb66aca87521f818d9c1769c69d5dcc1004977a/contracts/proxy/utils/UUPSUpgradeable.sol), the proxy's address stays fixed and the implementation contract itself contains the upgrade function, guarded by an authorisation hook. The contracts README states that every Across SpokePool is a UUPS proxy.
+
+  *Source:* `contracts/README.md`, "Understanding Upgradeability".
 
 ## Architecture and roles
 
-Across separates two problems that a lock-and-release bridge solves at once. Paying the user is done by a relayer, immediately and at the relayer's own risk. Deciding who owes what to whom is done later, in batches, on Ethereum. The repository's own summary puts it as a hub and spokes: one `HubPool` on Ethereum, one `SpokePool` on every supported chain, and chain adapters between them (`contracts/CLAUDE.md`, "Intents System").
+Across separates two problems that a lock-and-release bridge solves at once. Paying the user is done by a relayer, immediately and at the relayer's own risk. Deciding who owes what to whom is done later, in batches, on Ethereum. The repository's own summary puts it as a hub and spokes: one `HubPool` on Ethereum, one `SpokePool` on every supported chain, and chain adapters between them.
+
+*Source:* `contracts/CLAUDE.md`, "Intents System".
 
 ```mermaid
 flowchart LR
@@ -61,16 +69,24 @@ The roles and where the code defines them:
 | Liquidity provider | Deposits tokens in the HubPool and earns an LP fee on each transfer. | `HubPool.addLiquidity()` |
 | HubPool owner | Pauses, sets bond, liveness, routes and adapters, relays admin calls to every SpokePool. | `HubPool.sol` admin section |
 
-The rules a valid bundle must follow are not in Solidity. The documentation points to [UMIP-157](https://github.com/UMAprotocol/UMIPs/blob/master/UMIPs/umip-157.md), an UMA improvement proposal, and to the dataworker's reference implementation (`user-docs/how-across-works/overview.md`). The contracts check proofs and timing; whether a leaf *should* exist is decided off-chain and enforced by the threat of a dispute.
+The rules a valid bundle must follow are not in Solidity. The documentation points to [UMIP-157](https://github.com/UMAprotocol/UMIPs/blob/master/UMIPs/umip-157.md), an UMA improvement proposal, and to the dataworker's reference implementation. The contracts check proofs and timing; whether a leaf *should* exist is decided off-chain and enforced by the threat of a dispute.
+
+*Source:* `user-docs/how-across-works/overview.md`.
 
 The main contracts:
 
-- **`HubPool`** (Ethereum only) is `Ownable` and is **not** a proxy (`HubPool.sol:41`). It holds LP liquidity, the current root bundle proposal and the dispute logic, and calls chain adapters by `delegatecall`.
-- **`SpokePool`** is an abstract UUPS contract; `_authorizeUpgrade` is gated by `onlyAdmin` (`SpokePool.sol:325`). Each chain variant (`Arbitrum_SpokePool`, `Ovm_SpokePool`, `Polygon_SpokePool`, `ZkSync_SpokePool`, `Universal_SpokePool` and others) implements `_requireAdminSender()` with that chain's way of authenticating a message from Ethereum: address aliasing on Arbitrum, the cross-domain messenger on OP Stack chains, the FxChild tunnel on Polygon.
+- **`HubPool`** (Ethereum only) holds LP liquidity, the current root bundle proposal and the dispute logic, and calls chain adapters by `delegatecall`. It is `Ownable` and is **not** a proxy.
+
+  *Implementation:* `HubPool.sol`, contract declaration (line 41).
+- **`SpokePool`** is an abstract UUPS contract whose upgrade hook only the cross-chain admin can pass. Each chain variant authenticates a message from Ethereum in that chain's own way: address aliasing on Arbitrum, the cross-domain messenger on OP Stack chains, the FxChild tunnel on Polygon.
+
+  *Implementation:* `SpokePool.sol`, `_authorizeUpgrade()` gated by `onlyAdmin` at line 325; `_requireAdminSender()` in `Arbitrum_SpokePool`, `Ovm_SpokePool`, `Polygon_SpokePool`, `ZkSync_SpokePool`, `Universal_SpokePool` and the other variants.
 - **Chain adapters** (`contracts/chain-adapters/`) wrap each canonical bridge, plus CCTP and LayerZero OFT paths. The repository's `AGENTS.md` also names Wormhole, but the pinned commit contains no Wormhole adapter. Adapters are stateless and run in the HubPool's context.
 - **Periphery**: `SpokePoolVerifier` wraps native-token deposits, `SpokePoolPeriphery` adds swap-and-bridge and gasless (permit, Permit2, authorisation) deposits, and `MulticallHandler` executes a list of calls on the destination when a fill carries a message.
 
-On chain, the Ethereum SpokePool proxy `0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5` reports the HubPool `0xc186fA914353c44b2E33eBE05f21846F1048bEda` as its `owner()`, which is the cross-chain ownership the repository's README describes for every spoke (`contracts/README.md`, "Understanding Upgradeability").
+On chain, the Ethereum SpokePool proxy `0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5` reports the HubPool `0xc186fA914353c44b2E33eBE05f21846F1048bEda` as its `owner()`, which is the cross-chain ownership the repository's README describes for every spoke.
+
+*Source:* `contracts/README.md`, "Understanding Upgradeability".
 
 ## The deposit on the origin chain
 
@@ -93,23 +109,33 @@ function deposit(
 ) public payable override nonReentrant unpausedDeposits
 ```
 
-The deposit id is the SpokePool's counter `numberOfDeposits++`, so it is unique per origin SpokePool (`SpokePool.sol:557`). The internal `_depositV3` then applies the checks (`SpokePool.sol:1383-1462`):
+The deposit id comes from a counter that the SpokePool increments on every deposit, so it is unique per origin SpokePool. The internal deposit function then applies the checks:
 
 - **`depositor`** must be a valid EVM address packed in `bytes32`, but it is a free parameter: it is not forced to `msg.sender`. Whoever is named there receives the expiry refund and is the only one able to sign a speed-up.
 - **`outputToken`** must be non-zero.
-- **`quoteTimestamp`** must lie in `[now - depositQuoteTimeBuffer, now]`. The LP fee is computed from HubPool utilisation at that timestamp, so a stale one would let a depositor pick an old, cheaper rate. Both buffers are `immutable`, set when the implementation is deployed (`SpokePool.sol:149`, `:153`).
+- **`quoteTimestamp`** must lie in `[now - depositQuoteTimeBuffer, now]`. The LP fee is computed from HubPool utilisation at that timestamp, so a stale one would let a depositor pick an old, cheaper rate. Both buffers are `immutable`, set when the implementation is deployed.
+
+  *Implementation:* `SpokePool.sol`, `depositQuoteTimeBuffer` and `fillDeadlineBuffer` (lines 149 and 153).
 - **`fillDeadline`** must not exceed `now + fillDeadlineBuffer`. The comment states the purpose: to bound how far back relayers and dataworkers have to look for open deposits.
 - **`exclusivityParameter`** is read three ways. Zero means no exclusivity. A value up to `MAX_EXCLUSIVITY_PERIOD_SECONDS` (31,536,000 s, one year) is an offset added to the deposit's `block.timestamp`, which means the filler takes re-org risk on that timestamp. A larger value is an absolute timestamp. Any non-zero value requires a non-zero `exclusiveRelayer`.
 - **Native token.** With `msg.value > 0` and `inputToken` equal to the wrapped native token, `msg.value` must equal `inputAmount` and is wrapped; otherwise `msg.value` must be zero and the token is pulled with `safeTransferFrom`.
+
+*Implementation:* `SpokePool.sol`, `numberOfDeposits++` at line 557 and `_depositV3()` at lines 1383-1462.
 
 The function then emits `FundsDeposited` with the destination chain id, the deposit id and the depositor as indexed topics. No tokens leave the origin chain at this point; the deposit stays in the SpokePool and becomes part of that chain's balance, which later bundles use to repay relayers or send back to the HubPool.
 
 Two other entry points matter in practice:
 
-- **`depositNow`** sets `quoteTimestamp` to the current time and takes a `fillDeadlineOffset` instead of an absolute deadline (`SpokePool.sol:744-771`).
-- **`unsafeDeposit`** takes a caller-chosen `depositNonce` and derives the id as `uint256(keccak256(abi.encodePacked(msg.sender, depositor, depositNonce)))` (`getUnsafeDepositId`). It lets an integrator compute the relay hash before the deposit is mined. The NatSpec explains the name. The id is not guaranteed unique, and a collision makes the deposit unfillable, so it ends in a refund after the deadline. Worse, "a speed up signature can be re-used for any deposits with the same deposit ID" (`SpokePool.sol:646-653`).
+- **`depositNow`** sets the quote timestamp to the current time and takes a deadline offset instead of an absolute deadline.
 
-`SpokePoolVerifier` is a pass-through to `deposit()` meant for native-token deposits, deployed with CREATE2 at the same address on every chain so that a transaction sent to the wrong chain reverts instead of losing its ETH. It checks that the target SpokePool has code, requires `msg.value == inputAmount` and sets `depositor = msg.sender` (`SpokePoolVerifier.sol:45-76`). `SpokePoolPeriphery` passes whatever depositor its caller signed or supplied.
+  *Implementation:* `SpokePool.sol`, `depositNow()` (lines 744-771).
+- **`unsafeDeposit`** takes a caller-chosen nonce and derives the id from a hash of the caller, the depositor and that nonce, `uint256(keccak256(abi.encodePacked(msg.sender, depositor, depositNonce)))`. It lets an integrator compute the relay hash before the deposit is mined. The NatSpec explains the name. The id is not guaranteed unique, and a collision makes the deposit unfillable, so it ends in a refund after the deadline. Worse, "a speed up signature can be re-used for any deposits with the same deposit ID".
+
+  *Implementation:* `SpokePool.sol`, `unsafeDeposit()` and `getUnsafeDepositId()`, NatSpec at lines 646-653.
+
+`SpokePoolVerifier` is a pass-through to `deposit()` meant for native-token deposits, deployed with CREATE2 at the same address on every chain so that a transaction sent to the wrong chain reverts instead of losing its ETH. It checks that the target SpokePool has code, requires the value sent to equal the input amount and sets the depositor to the caller. `SpokePoolPeriphery` passes whatever depositor its caller signed or supplied.
+
+*Implementation:* `SpokePoolVerifier.sol`, `deposit()` with `msg.value == inputAmount` and `depositor = msg.sender` (lines 45-76).
 
 ## The fill on the destination chain
 
@@ -156,17 +182,39 @@ sequenceDiagram
 A fill runs these checks in this order:
 
 1. `fillRelay` itself calls `_requireExclusiveFiller`, which reverts if `exclusivityDeadline >= now` and the caller is not the exclusive relayer. The deadline is inclusive.
-2. The internal `_fillRelay` (`SpokePool.sol:1707-1744`) reverts if `fillDeadline < now`. The comparison uses the destination chain's clock, while the deposit-time buffer check used the origin's.
+2. The internal fill function reverts if `fillDeadline < now`. The comparison uses the destination chain's clock, while the deposit-time buffer check used the origin's.
+
+   *Implementation:* `SpokePool.sol`, `_fillRelay()` (lines 1707-1744).
 3. Read `fillStatuses[relayHash]`. A value of `Filled` reverts. A value of `RequestedSlowFill` makes this a `ReplacedSlowFill`, which tells the dataworker that reserves set aside for a slow fill can return to the HubPool.
 4. Set the status to `Filled` and emit `FilledRelay`, then move the tokens.
 
-There are no partial fills: the comment at `SpokePool.sol:1733` says so, and the status slot only knows three values: 0 for Unfilled, 1 for RequestedSlowFill and 2 for Filled.
+There are no partial fills, as a code comment in the fill function states, and the status slot only knows three values: 0 for Unfilled, 1 for RequestedSlowFill and 2 for Filled.
 
-The current documentation still describes "1 wei" partial fills used to signal a slow fill (`user-docs/how-across-works/speed.md`, at the pinned commit of December 2025); the code at `08df779` has no partial fills and uses `requestSlowFill` for that purpose.
+*Implementation:* `SpokePool.sol`, comment in `_fillRelay()` (line 1733).
 
-**Native output.** When `outputToken` is the wrapped native token, the SpokePool pulls WETH from the relayer, unwraps it and sends native ETH to an EOA or to an [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) delegated account, but sends WETH to any other contract (`_unwrapwrappedNativeTokenTo`, `SpokePool.sol:1630-1637`). A tracer therefore sees, on a fast fill, a WETH transfer from the relayer to the SpokePool followed by an internal ETH transfer from the SpokePool to the recipient, or a WETH transfer to the recipient when it is a contract without EIP-7702 delegation.
+The current documentation, at the pinned commit of December 2025, still describes "1 wei" partial fills used to signal a slow fill; the code at `08df779` has no partial fills and uses `requestSlowFill` for that purpose.
 
-**Message callback.** If the (possibly updated) message is non-empty and the recipient has code, the SpokePool calls `handleV3AcrossMessage(tokenSent, amount, relayer, message)` on it after the transfer. A revert there reverts the whole fill, so a broken recipient contract makes the deposit unfillable and it ends in an expiry refund. A message sent to an EOA is ignored. The `MulticallHandler` decodes the message as a list of calls plus a `fallbackRecipient` (`MulticallHandler.sol:25-48`, `:71-86`). With a zero `fallbackRecipient`, a failed call reverts, so the whole fill reverts. With a non-zero one, a failed batch emits `CallsFailed`, and any tokens left in the handler go to the fallback address, after a failed or a successful batch.
+*Source:* `user-docs/how-across-works/speed.md`.
+
+**Native output.** When `outputToken` is the wrapped native token, the SpokePool pulls WETH from the relayer, unwraps it and sends native ETH to an EOA or to an [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) delegated account, but sends WETH to any other contract:
+
+```solidity
+// SpokePool.sol, lines 1630-1637
+function _unwrapwrappedNativeTokenTo(address payable to, uint256 amount) internal {
+    if (!AddressLibUpgradeable.isContract(address(to)) || _is7702DelegatedWallet(to)) {
+        wrappedNativeToken.withdraw(amount);
+        AddressLibUpgradeable.sendValue(to, amount);
+    } else {
+        _safeTransfer(address(wrappedNativeToken), to, amount);
+    }
+}
+```
+
+A tracer therefore sees, on a fast fill, a WETH transfer from the relayer to the SpokePool followed by an internal ETH transfer from the SpokePool to the recipient, or a WETH transfer to the recipient when it is a contract without EIP-7702 delegation.
+
+**Message callback.** If the message, possibly updated by a speed-up, is non-empty and the recipient has code, the SpokePool calls `handleV3AcrossMessage(tokenSent, amount, relayer, message)` on it after the transfer. A revert there reverts the whole fill, so a broken recipient contract makes the deposit unfillable and it ends in an expiry refund. A message sent to an EOA is ignored. The `MulticallHandler` decodes the message as a list of calls plus a fallback recipient. With a zero fallback recipient, a failed call reverts, so the whole fill reverts. With a non-zero one, a failed batch emits `CallsFailed`, and any tokens left in the handler go to the fallback address, after a failed or a successful batch.
+
+*Implementation:* `MulticallHandler.sol`, `Instructions` with `fallbackRecipient` at lines 25-48 and `handleV3AcrossMessage()` at lines 71-86.
 
 ## Speed-ups, slow fills and expiry
 
@@ -189,17 +237,25 @@ stateDiagram-v2
 
 ### Speed-up
 
-A depositor who set too low an output amount, or who wants to change the recipient or message, signs an EIP-712 `UpdateDepositDetails(uint256 depositId, uint256 originChainId, uint256 updatedOutputAmount, bytes32 updatedRecipient, bytes updatedMessage)` under the domain `"ACROSS-V2"`, version `"1.0.0"`. `speedUpDeposit` on the origin chain checks the signature and only emits `RequestedSpeedUpDeposit` (`SpokePool.sol:853-883`); nothing is stored. A relayer then calls `fillRelayWithUpdatedDeposit` on the destination with the original relay data, the new values and the signature, and the destination SpokePool verifies it again (`SpokePool.sol:1108-1150`).
+A depositor who set too low an output amount, or who wants to change the recipient or message, signs an EIP-712 `UpdateDepositDetails(uint256 depositId, uint256 originChainId, uint256 updatedOutputAmount, bytes32 updatedRecipient, bytes updatedMessage)` under the domain `"ACROSS-V2"`, version `"1.0.0"`. On the origin chain, `speedUpDeposit` checks the signature and only emits an event; nothing is stored. A relayer then calls `fillRelayWithUpdatedDeposit` on the destination with the original relay data, the new values and the signature, and the destination SpokePool verifies it again.
 
-The relay hash is still the hash of the original data, so a sped-up deposit keeps its identity and cannot be filled twice. The signature is checked with OpenZeppelin's `SignatureChecker.isValidSignatureNow`, which accepts ERC-1271 contract signatures. The comment above it states the consequence: "a signature valid now, may not be valid later and vice-versa", and the depositor contract must exist at the same address on the destination chain (`SpokePool.sol:1593-1607`). `pauseDeposits` does not stop `speedUpDeposit`, so open deposits can still be adjusted while new ones are blocked.
+*Implementation:* `SpokePool.sol`, `speedUpDeposit()` emitting `RequestedSpeedUpDeposit` at lines 853-883 and `fillRelayWithUpdatedDeposit()` at lines 1108-1150.
+
+The relay hash is still the hash of the original data, so a sped-up deposit keeps its identity and cannot be filled twice. The signature is checked with OpenZeppelin's `SignatureChecker.isValidSignatureNow`, which accepts ERC-1271 contract signatures. The comment above it states the consequence: "a signature valid now, may not be valid later and vice-versa", and the depositor contract must exist at the same address on the destination chain. `pauseDeposits` does not stop `speedUpDeposit`, so open deposits can still be adjusted while new ones are blocked.
+
+*Implementation:* `SpokePool.sol`, `_verifyDepositorSignature()` (lines 1593-1607).
 
 ### Slow fill
 
-When no relayer fills, anyone may call `requestSlowFill(relayData)` on the destination. It is refused during exclusivity and after the deadline, and only for an `Unfilled` hash (`SpokePool.sol:1157-1188`). The next bundle includes a slow-fill leaf for it; once that bundle passes liveness and its roots reach the SpokePool, anyone calls `executeSlowRelayLeaf`, which pays the recipient from the SpokePool's own balance and credits no relayer (`EMPTY_RELAYER`).
+When no relayer fills, anyone may call `requestSlowFill(relayData)` on the destination. It is refused during exclusivity and after the deadline, and accepted only for an `Unfilled` hash. The next bundle includes a slow-fill leaf for it; once that bundle passes liveness and its roots reach the SpokePool, anyone calls `executeSlowRelayLeaf`, which pays the recipient from the SpokePool's own balance and credits no relayer (`EMPTY_RELAYER`).
+
+*Implementation:* `SpokePool.sol`, `requestSlowFill()` (lines 1157-1188).
 
 The leaf is rebuilt with `chainId: chainId()` before the proof is checked (`_verifyV3SlowFill`), so a slow-fill leaf for one chain cannot be executed on another. That check exists because of the only Critical finding in the five OpenZeppelin reports read for this article (see below). A NatSpec note adds that slow fills need input and output tokens that map to the same L1 token.
 
-The documentation describes slow fills as fills made with LP capital, and adds that "the depositor gets refunded the relayer fee in this case" (`user-docs/how-across-works/speed.md`). The amount paid is the leaf's `updatedOutputAmount`, which the dataworker computes; the contract does not show how.
+The documentation describes slow fills as fills made with LP capital, and adds that "the depositor gets refunded the relayer fee in this case". The amount paid is the leaf's `updatedOutputAmount`, which the dataworker computes; the contract does not show how.
+
+*Source:* `user-docs/how-across-works/speed.md`.
 
 ### Expiry
 
@@ -209,7 +265,11 @@ There is no function a depositor calls to get money back. After `fillDeadline`, 
 
 ### The root bundle
 
-Settlement runs in bundles. Each bundle covers a block range per chain, and the proposal carries the end block of every range; the start is the previous bundle's end plus one (`user-docs/how-across-works/overview.md`). It commits to three Merkle roots:
+Settlement runs in bundles. Each bundle covers a block range per chain, and the proposal carries the end block of every range; the start is the previous bundle's end plus one.
+
+*Source:* `user-docs/how-across-works/overview.md`.
+
+A bundle commits to three Merkle roots:
 
 - **Pool rebalance root**: one leaf per chain and group, with per-token `netSendAmounts` (tokens the HubPool must send to that SpokePool), `bundleLpFees` and `runningBalances`.
 - **Relayer refund root**: per chain and token, the list of `refundAddresses` and `refundAmounts`, plus an `amountToReturn` that the SpokePool sends back to the HubPool.
@@ -225,15 +285,23 @@ function proposeRootBundle(
 ) public override nonReentrant noActiveRequests unpaused
 ```
 
-`proposeRootBundle` (`HubPool.sol:560-594`) requires at least one leaf, sets `challengePeriodEndTimestamp = now + liveness`, stores the roots and the proposer, and pulls `bondAmount` of `bondToken` from the proposer. The `noActiveRequests` modifier refuses a new proposal while the current one still has unexecuted pool-rebalance leaves, so only one bundle is in flight at any time. The block numbers are only emitted in `ProposeRootBundle`, not stored: anyone checking the bundle, including UMA voters in a dispute, reads them from the event.
+A proposal must contain at least one leaf. The HubPool opens a challenge window of `liveness` seconds from the current time, stores the roots and the proposer, and pulls the bond from the proposer. The `noActiveRequests` modifier refuses a new proposal while the current one still has unexecuted pool-rebalance leaves, so only one bundle is in flight at any time. The block numbers are only emitted in the `ProposeRootBundle` event, not stored: anyone checking the bundle, including UMA voters in a dispute, reads them from the event.
+
+*Implementation:* `HubPool.sol`, `proposeRootBundle()` (lines 560-594), which sets `challengePeriodEndTimestamp = now + liveness` and pulls `bondAmount` of `bondToken`.
 
 ### Bond, liveness and the bond token
 
 Three parameters set the cost of lying and the time to catch it:
 
-- **`liveness`** defaults to 7,200 s in the code (2 hours, "like the rest of the UMA ecosystem", `HubPool.sol:83-85`), and the documentation repeats the two-hour figure. The owner can change it with `setLiveness`, which only requires more than ten minutes. On 23 November 2026 (Ethereum block 26,477,298), `liveness()` on the deployed HubPool returned **1,800 s, 30 minutes**.
-- **`bondAmount`** is set by `setBond` as the chosen amount **plus** UMA's final fee for the bond token, and `setBond` refuses a zero amount so that the bond cannot equal the final fee (`HubPool.sol:277-297`). The same read returned `bondAmount() = 0.45` of the bond token.
-- **`bondToken`** returned `0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea`, whose `name()` is "Across Bond Token" (ABT). `BondToken.sol` describes ABT as a WETH9-style token issued one for one against deposited Ether, whose `transferFrom` into the HubPool reverts when the sender is the current proposer and is not in the owner-managed `proposers` mapping. Proposing therefore needs the owner's approval, while the transfer a disputer makes is not restricted. This matches the documentation's "Whitelisted dataworkers are in charge of proposing". The ABT contract's `owner()` is the same Safe that owns the HubPool.
+- **`liveness`** defaults to 7,200 s in the code, 2 hours "like the rest of the UMA ecosystem", and the documentation repeats the two-hour figure. The owner can change it with `setLiveness`, which only requires more than ten minutes. On 23 November 2026 (Ethereum block 26,477,298), `liveness()` on the deployed HubPool returned **1,800 s, 30 minutes**.
+
+  *Implementation:* `HubPool.sol`, `liveness` declaration and comment (lines 83-85).
+- **`bondAmount`** is set by the owner as the chosen amount **plus** UMA's final fee for the bond token, and a zero amount is refused so that the bond cannot equal the final fee. The same read returned `bondAmount() = 0.45` of the bond token.
+
+  *Implementation:* `HubPool.sol`, `setBond()` (lines 277-297).
+- **`bondToken`** returned `0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea`, whose `name()` is "Across Bond Token" (ABT). The ABT contract describes it as a WETH9-style token issued one for one against deposited Ether. A transfer of ABT into the HubPool reverts when the sender is the current proposer and is not on the owner-managed list of proposers. Proposing therefore needs the owner's approval, while the transfer a disputer makes is not restricted. This matches the documentation's "Whitelisted dataworkers are in charge of proposing". The ABT contract's `owner()` is the same Safe that owns the HubPool.
+
+  *Implementation:* `BondToken.sol`, `transferFrom()` and the `proposers` mapping.
 
 ### Dispute
 
@@ -258,15 +326,19 @@ sequenceDiagram
     end
 ```
 
-`disputeRootBundle` (`HubPool.sol:715-796`) only works while `now <= challengePeriodEndTimestamp`. It does not ask UMA a fresh question; it makes the HubPool request a price on the identifier `"ACROSS-V2"`, immediately proposes the value 1e18, meaning "the bundle is valid", **on behalf of the original proposer**, and then disputes that proposal on behalf of the disputer. The bundle is deleted at once, so a new proposal can follow without waiting for the vote.
+A dispute is only accepted while the challenge window is open (`now <= challengePeriodEndTimestamp`). It does not ask UMA a fresh question; it makes the HubPool request a price on the identifier `"ACROSS-V2"`, immediately proposes the value 1e18, meaning "the bundle is valid", **on behalf of the original proposer**, and then disputes that proposal on behalf of the disputer. The bundle is deleted at once, so a new proposal can follow without waiting for the vote.
+
+*Implementation:* `HubPool.sol`, `disputeRootBundle()` (lines 715-796).
 
 Two edge cases cancel instead of escalating: if UMA's final fee has risen to at least `bondAmount`, or if the oracle call reverts, the HubPool calls `_cancelBundle()` and returns. The 2022 audit flagged the case of a bond equal to the final fee, and the fix was partial: `setBond` enforces the margin when the bond is set, but a later rise of the final fee is only handled by cancelling.
 
-The HubPool owner can also remove a proposal with `emergencyDeleteProposal`, which returns the proposer's bond when leaves remain. Its comment says it exists for "an unexecutable bundle" that passed liveness through a non-malicious bug (`HubPool.sol:223-240`).
+The HubPool owner can also remove a proposal with `emergencyDeleteProposal`, which returns the proposer's bond when leaves remain. Its comment says it exists for "an unexecutable bundle" that passed liveness through a non-malicious bug.
+
+*Implementation:* `HubPool.sol`, `emergencyDeleteProposal()` (lines 223-240).
 
 ### Execution and adapters
 
-After the challenge window, anyone calls `executeRootBundle` with one pool-rebalance leaf and its proof (`HubPool.sol:612-707`). The function:
+After the challenge window, anyone calls `executeRootBundle` with one pool-rebalance leaf and its proof. The function:
 
 1. checks `now > challengePeriodEndTimestamp` and that the leaf was not already claimed;
 2. verifies the proof against `poolRebalanceRoot`;
@@ -274,15 +346,19 @@ After the challenge window, anyone calls `executeRootBundle` with one pool-rebal
 4. if `groupIndex == 0`, `delegatecall`s the chain's adapter with `relayMessage(spokePool, relayRootBundle(relayerRefundRoot, slowRelayRoot))`;
 5. returns the proposer's bond once the last leaf is executed, which the comment presents as the incentive to execute every leaf.
 
+*Implementation:* `HubPool.sol`, `executeRootBundle()` (lines 612-707).
+
 Because adapters run by `delegatecall`, they execute with the HubPool's storage and balance. The owner sets them per chain with `setCrossChainContracts`, which deliberately accepts invalid or zero addresses so that the owner can block a chain in an emergency.
 
 ### Refunds on the SpokePools
 
-When the roots arrive, a SpokePool stores them as a new `rootBundleId` and emits `RelayedRootBundle`. Anyone then calls `executeRelayerRefundLeaf(rootBundleId, leaf, proof)` (`SpokePool.sol:1276-1316`). The leaf must name this chain (`chainId()`), the proof must verify, and the leaf is marked claimed. `_distributeRelayerRefunds` then loops over the refund addresses:
+When the roots arrive, a SpokePool stores them as a new `rootBundleId` and emits `RelayedRootBundle`. Anyone then calls `executeRelayerRefundLeaf(rootBundleId, leaf, proof)`. The leaf must name this chain (`chainId()`), the proof must verify, and the leaf is marked claimed. `_distributeRelayerRefunds` then loops over the refund addresses:
 
 - it reverts if the running total exceeds the SpokePool's balance at the start, which keeps a leaf all-or-nothing;
 - each transfer goes through `_noRevertTransfer`; if it fails (a USDC-blacklisted address, for example), the amount is booked in `relayerRefund[token][address]` and the event carries `deferredRefunds = true`. The owner of that address claims it later with `claimRelayerRefund`, to an address of their choice;
 - if `amountToReturn > 0`, the SpokePool bridges that amount back to the HubPool through the chain's canonical route and emits `TokensBridged`.
+
+*Implementation:* `SpokePool.sol`, `executeRelayerRefundLeaf()` (lines 1276-1316) and `_distributeRelayerRefunds()`.
 
 The deferred path is the fix for a 2024 audit finding, where one blacklisted recipient reverted the whole leaf. `executeRelayerRefundLeaf` and `executeSlowRelayLeaf` carry no pause modifier, so already-proven payouts can still be executed while fills are paused.
 
@@ -290,15 +366,25 @@ The deferred path is the fix for a 2024 audit finding, where one blacklisted rec
 
 LPs deposit an L1 token into the HubPool with `addLiquidity` and receive an LP token whose redemption value grows as fees accrue. Fees do not arrive at once: the HubPool releases pending LP fees at `lpFeeRatePerSecond`, set to 1.5e12 in the code and on chain, a rate of 1.5e-6 per second. The comment says this pays out the full amount "in ~ 7.72 days assuming no contract interactions", which is the inverse of that rate. A share `protocolFeeCapturePct` of LP fees can go to the protocol; it was 0 on 23 November 2026.
 
-LP capital is what repays relayers on the chain they chose and what funds slow fills. The documentation names the consequence for LPs: under heavy volume, so much capital may be sitting on SpokePools or in canonical bridges that not every LP who wants to withdraw can do so at once (`user-docs/how-across-works/overview.md`). The owner function `haircutReserves` writes a loss into the pool's reserves "in the event of an irrecoverable loss of funds on one of the L2s", spreading it pro rata over LPs (`HubPool.sol:418-431`).
+LP capital is what repays relayers on the chain they chose and what funds slow fills. The documentation names the consequence for LPs: under heavy volume, so much capital may be sitting on SpokePools or in canonical bridges that not every LP who wants to withdraw can do so at once.
+
+*Source:* `user-docs/how-across-works/overview.md`.
+
+The owner function `haircutReserves` writes a loss into the pool's reserves "in the event of an irrecoverable loss of funds on one of the L2s", spreading it pro rata over LPs.
+
+*Implementation:* `HubPool.sol`, `haircutReserves()` (lines 418-431).
 
 ## Fees and quotes
 
 There is no fee field in a deposit. The fee is the spread: the depositor locks `inputAmount` of `inputToken` and asks for `outputAmount` of `outputToken`, and the difference, once both are valued in one unit, pays three things. The NatSpec of `deposit` lists them as the relayer's gas on the destination, the relayer's "opportunity cost of capital while they wait to be refunded following an optimistic challenge window", and the system fee "that they'll be charged". The `fillRelay` NatSpec says the relayer "will receive inputAmount of the equivalent token" on its repayment chain; how the system fee is deducted from that is a bundle rule, not visible in the contract.
 
-The Across API computes a quote. The SDK calls `GET https://app.across.to/api/suggested-fees` with origin and destination chain, input and output token and amount, and optional recipient and message; the response schema in `toolkit/packages/sdk/src/api/suggested-fees.ts` has `totalRelayFee`, `relayerCapitalFee`, `relayerGasFee` and `lpFee`, each with an amount and a percentage, plus the `outputAmount`, `exclusiveRelayer`, `exclusivityDeadline`, `fillDeadline` and a `timestamp` that the SDK's `getQuote` passes on as `quoteTimestamp`.
+The Across API computes a quote. The SDK sends the origin and destination chain, the input and output token, the amount, and an optional recipient and message to the suggested-fees endpoint. The response gives the total relay fee and its three parts, the relayer's capital fee, the relayer's gas fee and the LP fee, each with an amount and a percentage. It adds the output amount, the exclusive relayer, the exclusivity deadline, the fill deadline and a `timestamp` that the SDK's `getQuote` passes on as `quoteTimestamp`.
 
-A deposit built from such a quote can therefore name an exclusive relayer chosen by the API. The documentation describes relayer competition as an auction and says that when it "expires without a clearing price", the system falls back to LP capital, that is, to a slow fill (`user-docs/how-across-works/fees.md`).
+*Implementation:* `toolkit/packages/sdk/src/api/suggested-fees.ts`, `GET https://app.across.to/api/suggested-fees`, response fields `totalRelayFee`, `relayerCapitalFee`, `relayerGasFee`, `lpFee`, `outputAmount`, `exclusiveRelayer`, `exclusivityDeadline` and `fillDeadline`.
+
+A deposit built from such a quote can therefore name an exclusive relayer chosen by the API. The documentation describes relayer competition as an auction and says that when it "expires without a clearing price", the system falls back to LP capital, that is, to a slow fill.
+
+*Source:* `user-docs/how-across-works/fees.md`.
 
 A relayer may ask to be repaid on any chain, which the documentation calls unique to Across "because of the LP pool". The fees page adds that V3 introduced "a fee optimization" that encourages relayers to accept repayment on a chain other than the destination chain; it does not give the formula.
 
@@ -312,21 +398,33 @@ A relayer may ask to be repaid on any chain, which the documentation calls uniqu
 | "V3.5" (SDK name) | `bytes32` addresses and `uint256` deposit ids; `FundsDeposited` and `FilledRelay` replace the V3 events. | Current events; the legacy ones are declared but never emitted |
 | V5 | Deposits whose message starts with `V5_MAGIC_PREFIX = keccak256("AcrossV5MessagePrefix.V1")` can only be filled through `executeAcrossV5` (called by the V5 Gateway) or `adapterExecuteAcrossV5` (called by the live Gateway step's executor). | `V5SpokePoolInterface.sol`, `nonV5Fill` modifier on the other fill paths |
 
-[ERC-7683](https://eips.ethereum.org/EIPS/eip-7683), the cross-chain intents standard, also appears: the SpokePool still has an ERC-7683 `fill()`, marked deprecated (`SpokePool.sol:1190-1197`).
+[ERC-7683](https://eips.ethereum.org/EIPS/eip-7683), the cross-chain intents standard, also appears: the SpokePool still has an ERC-7683 `fill()`, marked deprecated.
 
-The V5 Gateway contracts are not in the repository; only the interface and the SpokePool side are. In executor mode, through `executeAcrossV5`, the output tokens are pulled from `gateway.currentSubmitter()`. In adapter mode, through `adapterExecuteAcrossV5` at `SpokePool.sol:1072-1087`, the caller must be `gateway.currentExecutor()` and the tokens are pulled from that caller, never from a standing submitter allowance. Exclusivity is checked against the submitter in both modes. The deployed Ethereum SpokePool already answers `gateway()` with `0x998d7c178A1F9607b47eA3A8e22426451b3ce707`.
+*Implementation:* `SpokePool.sol`, `fill()` (lines 1190-1197).
+
+The V5 Gateway contracts are not in the repository; only the interface and the SpokePool side are. In executor mode, the output tokens are pulled from the Gateway's current submitter. In adapter mode, the caller must be the Gateway's current executor and the tokens are pulled from that caller, never from a standing submitter allowance. Exclusivity is checked against the submitter in both modes. The deployed Ethereum SpokePool already answers `gateway()` with `0x998d7c178A1F9607b47eA3A8e22426451b3ce707`.
+
+*Implementation:* `SpokePool.sol`, `executeAcrossV5()` with `gateway.currentSubmitter()`, and `adapterExecuteAcrossV5()` with `gateway.currentExecutor()` (lines 1072-1087).
 
 ## Solana, Tron and chains without a native bridge
 
-**Solana.** The `svm_spoke` Anchor program (`DLv3NggMiSaef97YCkew5xKUHDh13tVGZ7tydt3ZeAru` on mainnet, `Anchor.toml`) mirrors the EVM instructions: `deposit`, `deposit_now`, `unsafe_deposit`, `fill_relay`, `request_slow_fill`, `execute_slow_relay_leaf`, `execute_relayer_refund_leaf` and a `_deferred` variant, `claim_relayer_refund`, `bridge_tokens_to_hub_pool` and `handle_receive_message`. Its events are emitted with `emit_cpi!`, a self-call whose data sits in inner-instruction data rather than in logs with topics (`instructions/deposit.rs:129`, `instructions/fill.rs:155`). Because a transaction is size-limited, large fill parameters can be written to an `instruction_params` account in fragments first (`lib.rs:575-609`). Across uses chain id 34268394551451 for Solana, and the documentation lists only USDC as supported there. The README's deployment procedure sets the program's upgrade authority to a Squads multisig vault.
+**Solana.** The `svm_spoke` Anchor program (`DLv3NggMiSaef97YCkew5xKUHDh13tVGZ7tydt3ZeAru` on mainnet) mirrors the EVM instructions: the three deposit variants, fills, slow-fill requests and their execution, relayer-refund execution with a deferred variant, refund claims, bridging tokens back to the HubPool, and receiving messages from Ethereum. Its events are emitted with `emit_cpi!`, a self-call whose data sits in inner-instruction data rather than in logs with topics. Because a transaction is size-limited, large fill parameters can be written to an `instruction_params` account in fragments first. Across uses chain id 34268394551451 for Solana, and the documentation lists only USDC as supported there. The README's deployment procedure sets the program's upgrade authority to a Squads multisig vault.
 
-**Tron.** `Tron_SpokePool` extends `Universal_SpokePool`. Tron USDT's `transfer` returns `false` on success, so the contract replaces the return-value checks with a balance-delta check; its header warns that this assumes Tether's `basisPointsRate` fee stays at zero, and that a non-zero fee would make every USDT transfer look failed and "wedge" the routes (`Tron_SpokePool.sol:10-20`).
+*Implementation:* `programs/svm-spoke/src/`, instructions `deposit`, `deposit_now`, `unsafe_deposit`, `fill_relay`, `request_slow_fill`, `execute_slow_relay_leaf`, `execute_relayer_refund_leaf` and a `_deferred` variant, `claim_relayer_refund`, `bridge_tokens_to_hub_pool` and `handle_receive_message`; `emit_cpi!` in `instructions/deposit.rs` at line 129 and `instructions/fill.rs` at line 155; `instruction_params` in `lib.rs` at lines 575-609; program id in `Anchor.toml`.
 
-**Universal SpokePool.** For chains without a canonical bridge from Ethereum, admin messages are stored on Ethereum in `HubPoolStore` and proven on the spoke with a storage proof against an SP1 Helios light client (`executeMessage`). The owner has a fallback, `adminExecuteMessage`, usable only if the light client has not been updated for `ADMIN_UPDATE_BUFFER` (`Universal_SpokePool.sol:126-175`).
+**Tron.** `Tron_SpokePool` extends `Universal_SpokePool`. Tron USDT's `transfer` returns `false` on success, so the contract replaces the return-value checks with a balance-delta check; its header warns that this assumes Tether's `basisPointsRate` fee stays at zero, and that a non-zero fee would make every USDT transfer look failed and "wedge" the routes.
+
+*Implementation:* `Tron_SpokePool.sol`, contract header (lines 10-20).
+
+**Universal SpokePool.** For chains without a canonical bridge from Ethereum, admin messages are stored on Ethereum in `HubPoolStore` and proven on the spoke with a storage proof against an SP1 Helios light client. The owner has a fallback, usable only if the light client has not been updated for `ADMIN_UPDATE_BUFFER`.
+
+*Implementation:* `Universal_SpokePool.sol`, `executeMessage()` and `adminExecuteMessage()` (lines 126-175).
 
 ## Tracing funds through Across
 
-Across events are emitted by the SpokePool proxy on each chain, with addresses left-padded to 32 bytes. The ones that link a deposit to its fill and refund are below; topic0 values are the Keccak-256 of the canonical signatures in `V3SpokePoolInterface.sol` and `SpokePool.sol`, computed with `cast keccak`.
+Across events are emitted by the SpokePool proxy on each chain, with addresses left-padded to 32 bytes. The ones that link a deposit to its fill and refund are below; topic0 values are the Keccak-256 of the canonical event signatures, computed with `cast keccak`.
+
+*Implementation:* `V3SpokePoolInterface.sol` and `SpokePool.sol`, event declarations.
 
 | Event | topic0 | Indexed topics |
 |---|---|---|
@@ -341,7 +439,9 @@ Across events are emitted by the SpokePool proxy on each chain, with addresses l
 **From a deposit to its fill.**
 
 1. In the deposit transaction, take the `FundsDeposited` log: topic1 is the destination chain, topic2 the deposit id, topic3 the depositor. In the data (32-byte words counted from 0), word 1 is `outputToken`, word 3 `outputAmount`, word 5 `fillDeadline` and word 7 the recipient. A deposit made through `SpokePoolVerifier` or `SpokePoolPeriphery` is still logged by the SpokePool.
-2. Ask the indexer: the SDK calls `GET https://indexer.api.across.to/deposit/status` with `depositId` and `originChainId`, and reads `status`, `fillTx` and `actionsSucceeded` (`actions/getFillByDepositTx.ts`). The host is the indexer, not `app.across.to/api`.
+2. Ask the indexer: the SDK queries the deposit-status endpoint with the deposit id and the origin chain id, and reads the status, the fill transaction and whether the destination actions succeeded. The host is the indexer, not `app.across.to/api`.
+
+   *Implementation:* `actions/getFillByDepositTx.ts` in the SDK, `GET https://indexer.api.across.to/deposit/status` with `depositId` and `originChainId`, reading `status`, `fillTx` and `actionsSucceeded`.
 3. Without the API, filter `FilledRelay` logs on the destination SpokePool by topic1 = origin chain id and topic2 = deposit id, and also `FilledV3Relay` for older fills. The SDK does exactly this.
 4. In the fill, word 8 is the depositor, word 9 the recipient, word 11 the recipient who received the tokens (it differs from word 9 only after a speed-up) and word 14 the fill type. This layout does not apply to the legacy `FilledV3Relay`, whose data contains dynamic fields. If the output was WETH, look for the internal ETH transfer from the SpokePool; if there was a message, look for `CallsFailed` from the `MulticallHandler`.
 
@@ -478,8 +578,12 @@ This section looks at what can go wrong for each party: the depositor, the relay
 
 #### Depeg
 
-- Across moves canonical tokens; the documentation states it never mints representative assets (`user-docs/how-across-works/security.md`). The bridge holds no peg of its own. A user receiving USDC, WETH or USDT receives the token the destination chain already uses, and inherits that token's issuer and bridge risk (*derived*).
-- On Tron, the USDT routes depend on Tether's transfer fee staying at zero; if it changes, transfers are read as failed and the routes stop (`Tron_SpokePool.sol` header).
+- Across moves canonical tokens; the documentation states it never mints representative assets. The bridge holds no peg of its own. A user receiving USDC, WETH or USDT receives the token the destination chain already uses, and inherits that token's issuer and bridge risk (*derived*).
+
+  *Source:* `user-docs/how-across-works/security.md`.
+- On Tron, the USDT routes depend on Tether's transfer fee staying at zero; if it changes, transfers are read as failed and the routes stop.
+
+  *Implementation:* `Tron_SpokePool.sol`, contract header (lines 10-20).
 
 #### Collateral and market risk
 
@@ -494,7 +598,9 @@ This section looks at what can go wrong for each party: the depositor, the relay
 #### Centralisation and governance
 
 - **HubPool owner.** `owner()` of `0xc186…bEda` returned `0xB524735356985D2f267FA010D681f061DfF03715`, a Safe (version 1.3.0) with a threshold of 3 out of 5 owners, on 23 November 2026. The same Safe owns the bond token. No timelock is visible in the HubPool: owner calls take effect in the transaction that executes them. Who controls the five signer keys was not determined.
-- **DAO path through a Safe module.** The Safe's `getModulesPaginated` returned one enabled module, `0x8692B776d1Ff0664177c90465038056Dc64f8991`, read on 23 November 2026. Its `avatar()` and `target()` are the Safe, and its interface is that of UMA's Optimistic Governor, known as oSnap. Its `rules()` accept proposals approved on Snapshot at `acrossprotocol.eth` with a minimum quorum of 6,000,000 and a 72-hour voting period, `liveness()` is 172,800 s (48 hours) and `bondAmount()` is 2 WETH. An enabled module executes transactions on the Safe without the signers, so the HubPool owner can act either through 3 of its 5 signers or through a Snapshot vote that survives a 48-hour UMA challenge.
+- **DAO path through a Safe module.** On 23 November 2026, the Safe had one enabled module, `0x8692B776d1Ff0664177c90465038056Dc64f8991`. The module's avatar and target are both the Safe, and its interface is that of UMA's Optimistic Governor, known as oSnap. Its rules accept proposals approved on Snapshot at `acrossprotocol.eth` with a minimum quorum of 6,000,000 and a 72-hour voting period; its challenge window is 172,800 s (48 hours) and its bond is 2 WETH. An enabled module executes transactions on the Safe without the signers, so the HubPool owner can act either through 3 of its 5 signers or through a Snapshot vote that survives a 48-hour UMA challenge.
+
+  *Source:* on-chain reads of the Safe's `getModulesPaginated()` and of the module's `avatar()`, `target()`, `rules()`, `liveness()` and `bondAmount()`.
 - **What the owner can do.** Pause the HubPool, change liveness (above ten minutes) and bond, replace adapters, delete the active proposal, haircut LP reserves, and relay any admin call (upgrade, pause, external call) to every EVM SpokePool. Two exceptions: the Solana program is upgraded by its own Squads multisig, and the Universal and Tron spokes also have a local `owner` that can run any admin call through `adminExecuteMessage` once the Helios light client is stale for `ADMIN_UPDATE_BUFFER`.
 - **Proposers.** The bond token restricts who can propose; the documentation describes the dataworkers as whitelisted. Anyone can dispute.
 - **Off-chain components.** Quotes, the indexer, relayer software and the dataworker are run by Across or third parties; the validity rules live in UMIP-157, outside the contracts.
