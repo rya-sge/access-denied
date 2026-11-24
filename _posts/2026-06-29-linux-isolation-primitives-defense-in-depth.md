@@ -297,3 +297,4 @@ These points were not settled by the sources read, or come from general knowledg
 - [System Calls, Binary Images and Processes - How a Program Reaches the Kernel]({{site.url_complet}}/2026/09/16/system-calls-binary-image-process/)
 - [The Process Control Block, fork/exec/waitpid/exit and the Context Switch]({{site.url_complet}}/2026/09/16/process-control-block-fork-exec-context-switch/)
 - [AppArmor on Ubuntu, User Namespace Restrictions, and Why sol2uml Cannot Export a PNG]({{site.url_complet}}/2026/10/15/apparmor-ubuntu-user-namespaces-sol2uml/)
+- [Linux Swap Explained - Memory Reclaim, swappiness, zram, the OOM Killer and Security]({{site.url_complet}}/2026/11/24/linux-swap-memory-reclaim/)

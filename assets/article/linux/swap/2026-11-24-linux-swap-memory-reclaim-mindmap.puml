@@ -1,0 +1,50 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* Linux swap
+** What swap is
+*** Backing store for anonymous pages
+*** Swap-out and swap-in (major fault)
+*** tmpfs and shared memory need it
+*** mkswap, swapon, /proc/swaps
+** Reclaim
+*** Watermarks: min, low, high
+*** kswapd and direct reclaim
+*** Anonymous and file LRU lists
+*** swappiness: relative I/O cost, 0 to 200
+*** page-cluster readahead
+** Swap areas
+*** Partition or file
+*** File: no holes, no copy-on-write
+*** Btrfs: mkswapfile
+*** Priorities and round-robin
+left side
+** Compressed swap
+*** zram: compressed block device in RAM
+*** zswap: compressed cache before disk swap
+** Out of memory
+*** Thrashing
+*** PSI: some and full
+*** Kernel OOM killer, oom_score_adj
+*** systemd-oomd and earlyoom
+*** cgroup memory.max, memory.swap.max
+** Security
+*** Encrypt the swap area
+*** Swap file mode 0600, root
+*** mlock() for secrets
+*** Hibernation writes all RAM
+** Configuration
+*** Safe swap file procedure
+*** Verify with swapon --show
+*** Size by purpose
+@endmindmap
