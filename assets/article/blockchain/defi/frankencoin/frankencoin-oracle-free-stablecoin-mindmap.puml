@@ -28,6 +28,13 @@ mindmapDiagram {
 *** Dutch auction to zero
 *** 2% of bid to challenger
 *** Expired positions: forced sale from 10x
+** Worked example and incentives
+*** WETH: 20% reserve, 24 h phases
+*** 10,000 ZCHF gross, 7,700 to wallet
+*** Bid at 2,250: equity +820 ZCHF
+*** Break-even 18.4% below liq. price
+*** Challengers, bidders, vetoes need capital
+*** Nobody challenges: forced sale at expiry
 ** Reserve and equity
 *** FPS: price = 3 x equity / supply
 *** coverLoss: reserve first, then mint

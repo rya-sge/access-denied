@@ -2,6 +2,7 @@
 layout: post
 title: "Across Protocol - How an Intent Bridge Settles Through UMA"
 date:   2026-11-23
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -293,7 +294,11 @@ A proposal must contain at least one leaf. The HubPool opens a challenge window 
 
 Three parameters set the cost of lying and the time to catch it:
 
-- **`liveness`** defaults to 7,200 s in the code, 2 hours "like the rest of the UMA ecosystem", and the documentation repeats the two-hour figure. The owner can change it with `setLiveness`, which only requires more than ten minutes. On 23 November 2026 (Ethereum block 26,477,298), `liveness()` on the deployed HubPool returned **1,800 s, 30 minutes**.
+- **`liveness`** defaults to 7,200 s in the code, 2 hours "like the rest of the UMA ecosystem", and the documentation repeats the two-hour figure. The owner can change it with `setLiveness`, which only requires more than ten minutes. On 23 November 2026 (Ethereum block 26,477,298), `liveness()` on the deployed HubPool returned **1,800 s, 30 minutes**. The HubPool's `LivenessSet` events show three reductions from the 7,200 s default:
+
+  - 5,400 s on 19 September 2023, block [18,170,873](https://etherscan.io/block/18170873);
+  - 3,600 s on 21 April 2024, block [19,704,562](https://etherscan.io/block/19704562);
+  - 1,800 s on 3 November 2025, block [23,718,591](https://etherscan.io/block/23718591).
 
   *Implementation:* `HubPool.sol`, `liveness` declaration and comment (lines 83-85).
 - **`bondAmount`** is set by the owner as the chosen amount **plus** UMA's final fee for the bond token, and a zero amount is refused so that the bond cannot equal the final fee. The same read returned `bondAmount() = 0.45` of the bond token.
@@ -302,6 +307,10 @@ Three parameters set the cost of lying and the time to catch it:
 - **`bondToken`** returned `0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea`, whose `name()` is "Across Bond Token" (ABT). The ABT contract describes it as a WETH9-style token issued one for one against deposited Ether. A transfer of ABT into the HubPool reverts when the sender is the current proposer and is not on the owner-managed list of proposers. Proposing therefore needs the owner's approval, while the transfer a disputer makes is not restricted. This matches the documentation's "Whitelisted dataworkers are in charge of proposing". The ABT contract's `owner()` is the same Safe that owns the HubPool.
 
   *Implementation:* `BondToken.sol`, `transferFrom()` and the `proposers` mapping.
+
+  The owner has enabled one proposer since deployment, on 28 August 2023 at block [18,012,106](https://etherscan.io/block/18012106). On 24 November 2026 at 15:10 UTC (Ethereum block [26,485,825](https://etherscan.io/block/26485825)), that address was still enabled, so a single address could propose bundles.
+
+  *Source:* the bond token's only `ProposerModified` event, which enables `0xf7ba…997c`, and its `proposers()` getter.
 
 ### Dispute
 
@@ -598,9 +607,9 @@ This section looks at what can go wrong for each party: the depositor, the relay
 #### Centralisation and governance
 
 - **HubPool owner.** `owner()` of `0xc186…bEda` returned `0xB524735356985D2f267FA010D681f061DfF03715`, a Safe (version 1.3.0) with a threshold of 3 out of 5 owners, on 23 November 2026. The same Safe owns the bond token. No timelock is visible in the HubPool: owner calls take effect in the transaction that executes them. Who controls the five signer keys was not determined.
-- **DAO path through a Safe module.** On 23 November 2026, the Safe had one enabled module, `0x8692B776d1Ff0664177c90465038056Dc64f8991`. The module's avatar and target are both the Safe, and its interface is that of UMA's Optimistic Governor, known as oSnap. Its rules accept proposals approved on Snapshot at `acrossprotocol.eth` with a minimum quorum of 6,000,000 and a 72-hour voting period; its challenge window is 172,800 s (48 hours) and its bond is 2 WETH. An enabled module executes transactions on the Safe without the signers, so the HubPool owner can act either through 3 of its 5 signers or through a Snapshot vote that survives a 48-hour UMA challenge.
+- **DAO path through a Safe module.** On 23 November 2026, the Safe had one enabled module, `0x8692B776d1Ff0664177c90465038056Dc64f8991`. The module's avatar and target are both the Safe, and it is an EIP-1167 clone of `0x28CeBFE94a03DbCA9d17143e9d2Bd1155DC26D5d`, the `OptimisticGovernor` address in UMA's published mainnet deployment list, whose verified source on Etherscan carries the same contract name. This contract is UMA's Optimistic Governor, known as oSnap. Its rules accept proposals approved on Snapshot at `acrossprotocol.eth` with a minimum quorum of 6,000,000 and a 72-hour voting period; its challenge window is 172,800 s (48 hours) and its bond is 2 WETH. An enabled module executes transactions on the Safe without the signers, so the HubPool owner can act either through 3 of its 5 signers or through a Snapshot vote that survives a 48-hour UMA challenge.
 
-  *Source:* on-chain reads of the Safe's `getModulesPaginated()` and of the module's `avatar()`, `target()`, `rules()`, `liveness()` and `bondAmount()`.
+  *Source:* on-chain reads of the Safe's `getModulesPaginated()` and of the module's `avatar()`, `target()`, `rules()`, `liveness()` and `bondAmount()`; the module's bytecode (`cast code`) for the clone target, and [UMA's `networks/1.json`](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/1.json).
 - **What the owner can do.** Pause the HubPool, change liveness (above ten minutes) and bond, replace adapters, delete the active proposal, haircut LP reserves, and relay any admin call (upgrade, pause, external call) to every EVM SpokePool. Two exceptions: the Solana program is upgraded by its own Squads multisig, and the Universal and Tron spokes also have a local `owner` that can run any admin call through `adminExecuteMessage` once the Helios light client is stale for `ADMIN_UPDATE_BUFFER`.
 - **Proposers.** The bond token restricts who can propose; the documentation describes the dataworkers as whitelisted. Anyone can dispute.
 - **Off-chain components.** Quotes, the indexer, relayer software and the dataworker are run by Across or third parties; the validity rules live in UMIP-157, outside the contracts.
@@ -675,9 +684,9 @@ These points were not settled by the sources read for this article:
 |-----|----------------|------------------------|
 | The deployed SpokePool implementations were not compared with commit `08df779`; the Ethereum proxy's implementation slot pointed to `0x456ac26e5ec083ee9889eba0d1a0a582502b8e84`. | Event layouts, V5 paths and the deposit checks described here may differ on chain. | The verified source of that implementation on Etherscan, and the implementation slot of each spoke. |
 | UMIP-157, which defines valid bundles, expiry refunds, slow-fill amounts and invalid repayment chains, was not read. | Every statement on what the dataworker must include rests on code comments and the docs. | [UMIP-157](https://github.com/UMAprotocol/UMIPs/blob/master/UMIPs/umip-157.md) and the dataworker in `across-protocol/relayer`. |
-| The documentation says two hours of liveness; the HubPool returned 1,800 s on 23 November 2026, and the date and reason of the change were not found. | The disputer's window is four times shorter than the documentation states. | `LivenessSet` events of the HubPool `0xc186fA914353c44b2E33eBE05f21846F1048bEda` on Etherscan. |
-| The identity of the five Safe signers, whether the oSnap path has ever been used, and whether the module `0x8692…8991` (an EIP-1167 clone) points at UMA's published Optimistic Governor implementation were not checked. | The admin-power assessment depends on who holds those keys and on the module being the genuine UMA contract. | The Safe `0xB524735356985D2f267FA010D681f061DfF03715` transaction history, [Snapshot space acrossprotocol.eth](https://snapshot.org/#/acrossprotocol.eth) and UMA's deployment list. |
-| The list of addresses currently allowed to propose (the ABT `proposers` mapping) was not read from chain. | Who can propose bundles is part of the liveness and censorship assumption. | `ProposerModified` events of the bond token `0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea` on Etherscan. |
+| The documentation says two hours of liveness; the HubPool's events show the value lowered in three steps to 1,800 s by 3 November 2025, and the reason for the change was not found. | The disputer's window is four times shorter than the documentation states. | The governance proposals around those dates in the [Snapshot space acrossprotocol.eth](https://snapshot.org/#/acrossprotocol.eth) and the Safe transactions that called `setLiveness`. |
+| The identity of the five Safe signers and whether the oSnap path has ever been used were not checked; the module was confirmed as a clone of UMA's published Optimistic Governor. | The admin-power assessment depends on who holds those keys. | The Safe `0xB524735356985D2f267FA010D681f061DfF03715` transaction history and the [Snapshot space acrossprotocol.eth](https://snapshot.org/#/acrossprotocol.eth). |
+| The single allowed proposer `0xf7ba…997c` was not identified (a team-run dataworker or another operator). | Who can propose bundles is part of the liveness and censorship assumption. | The address's transactions on [Etherscan](https://etherscan.io/address/0xf7bac63fc7ceacf0589f25454ecf5c2ce904997c) and the dataworker setup in `across-protocol/relayer`. |
 | The V5 Gateway contracts are not in the repository. | The V5 trust model (who triggers `executeAcrossV5`, whose approvals it spends) cannot be reviewed. | Across repositories implementing `IGateway`. |
 | OpenZeppelin audits after July 2024, and UMA's own audits of the optimistic oracle, were not read. | Solana, Tron, periphery and V5 may have been audited; oracle bugs would apply to bundle disputes. | [Across audits page](https://docs.across.to/introduction/audits). |
 | That the documentation's "1 wei" partial fills describe an earlier version is an inference from the code, not stated in the sources. | A reader relying on the documentation may expect partial fills. | The [Across V3 Incremental Audit](https://www.openzeppelin.com/news/across-v3-incremental-audit) and the V2 `SpokePool.sol` in `across-protocol/contracts` history. |
@@ -691,6 +700,8 @@ These points were not settled by the sources read for this article:
 - [across-protocol/toolkit](https://github.com/across-protocol/toolkit) — analyzed at commit [`2edb9f61335071bc5b1d9778306f815e9354bd3d`](https://github.com/across-protocol/toolkit/tree/2edb9f61335071bc5b1d9778306f815e9354bd3d) (2026-06-10, `@across-protocol/app-sdk@0.6.1`), read 2026-11-23; `packages/sdk/src/{constants/index.ts,api/suggested-fees.ts,actions/getFillByDepositTx.ts}`
 - [across-protocol/contracts-v1](https://github.com/across-protocol/contracts-v1) — commit [`3db515871632b5e470351e5c6e7c2adead10f967`](https://github.com/across-protocol/contracts-v1/tree/3db515871632b5e470351e5c6e7c2adead10f967) (2022-02-08), listed for the V1 history only
 - On-chain reads with Foundry `cast` on Ethereum block 26,477,298 (2026-11-23): HubPool `owner()`, `liveness()`, `bondAmount()`, `bondToken()`, `paused()`, `protocolFeeCapturePct()`, `lpFeeRatePerSecond()`; Safe `getThreshold()`, `getOwners()`, `VERSION()`; bond token `name()`, `symbol()`, `owner()`; Ethereum SpokePool `owner()` and implementation slot
+- Etherscan API V2, 24 November 2026: the three `LivenessSet` events of the [HubPool](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events), the only `ProposerModified` event of the [bond token](https://etherscan.io/address/0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea#events), and the verified source of the oSnap clone target `0x28CeBFE9…26D5d`
+- Foundry `cast` through PublicNode on Ethereum block [26,485,825](https://etherscan.io/block/26485825), 24 November 2026 at 15:10 UTC: bond token `proposers()`, HubPool `liveness()` and the oSnap module's code
 
 ### Audit reports
 
