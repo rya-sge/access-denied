@@ -2,7 +2,7 @@
 layout: post
 title: "How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral"
 date:   2026-11-16
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -15,7 +15,7 @@ isMermaid: true
 
 [Pendle](https://docs.pendle.finance/) is a yield-trading protocol on Ethereum and other EVM chains. It takes a yield-bearing token, such as Ethena's sUSDe or Lido's wstETH, and splits it into two tokens with a fixed maturity: a principal token (PT) that redeems for one unit of the underlying asset at expiry, and a yield token (YT) that collects all the yield until then. A PT bought below 1 is therefore a fixed-rate position, close to a zero-coupon bond, and that property is what made PTs common collateral on lending markets such as Morpho and Aave.
 
-This article follows Pendle V2 through its contracts: the SY wrapper, the PT and YT split and its index, the PT/SY market and its logit curve with a worked numeric trade, the PT price before and after expiry, the two oracle designs, the router, and what a lender takes on when it accepts PT as collateral. The code is `pendle-core-v2-public` at v6.11.0, pinned under References.
+This article follows Pendle V2 through its contracts: the SY wrapper, the PT and YT split and its index, the PT/SY market and its logit curve with a worked numeric trade, the PT price before and after expiry, the two oracle designs, the router, and what a lender takes on when it accepts PT as collateral. The code is `pendle-core-v2-public` at v6.11.0, pinned under References. The dated events behind it, from the SY standard to the 2026 timelock, are in the timeline in the annex.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -481,6 +481,23 @@ The risks below are those a PT holder or a lender against PT carries. They start
 | Pause and upgrade | SY owner, proxy admin | Timelocked proxy admin listed in deployments | Owner thresholds not verified here |
 | Contract bugs | Core and SY code | Multiple audits, immutable markets | Each SY needs its own review |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 30 May 2022 | Vu Nguyen, Long Vuong and Anton Buenavista created EIP-5115, the SY Token interface for wrapped yield-bearing tokens, which is still a Draft. | The SY wrapper that every PT and YT sits on follows this interface. | [ERC-5115: SY Token](https://eips.ethereum.org/EIPS/eip-5115) |
+| 23 November 2022 | The first Pendle V2 market factory was deployed on Ethereum in block [16032059](https://etherscan.io/block/16032059). | It marks the start of the PT/SY markets and logit curve described in the article. | [Market factory creation transaction](https://etherscan.io/tx/0xf281802ac6e2b68c38cf170c2a47433d1a0e1d26ebad023fd0c60f3b4752d1ff) |
+| 26 May 2023 | WatchPug's PT oracle audit reported a high-severity issue for the case where `SY.exchangeRate()` falls below `YT.pyIndexCurrent()`. | This is the negative-yield case that the oracle library now handles by scaling the PT price down. | [WatchPug, Pendle PT Oracle Audit Report](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/audits/LpPtoracle/WatchPug-PtOracle.pdf) |
+| 3 September 2024 | An attacker exploited Penpie, a yield protocol built on Pendle, through a market it had created on Pendle, in block [20671878](https://etherscan.io/block/20671878), and Pendle paused its contracts in response. | Market creation is permissionless, so a market is only as safe as its SY, and the pause shows who can stop the core contracts. | [Pendle, Post Mortem (on X)](https://x.com/pendle_fi/status/1831168623634993402) |
+| 11 April 2025 | Aave's ARFC to onboard PT-sUSDE-31JUL2025 to the Aave V3 Core instance passed its Snapshot vote, with PTs to be priced by a dynamic linear discount mechanism. | It brings PT collateral to Aave, whose price adapter this article does not cover. | [Aave governance, ARFC Onboard Pendle PT tokens to Aave V3 Core Instance](https://governance.aave.com/t/arfc-onboard-pendle-pt-tokens-to-aave-v3-core-instance/20541) |
+| 16 April 2025 | The `sparkLinearDiscountOracleFactory` listed in Pendle's Ethereum deployments was created in block [22280882](https://etherscan.io/block/22280882). | It deploys the linear-discount oracle that the article compares with the TWAP oracle. | [Factory creation transaction](https://etherscan.io/tx/0x2f15874562f57d4e8fa3321baa692dd742bc6d9eb3dc8344c880f2e217ab4869) |
+| 13 June 2025 | Phoenix Labs proposed PT-syrupUSDC and PT-USDe collateral for the Spark DAI Morpho Vault at a 91.5 % LLTV, priced by the Pendle linear discount oracle at a 15 % discount rate. | It is a live example of the linear-discount oracle on Morpho and of the discount rate a lender chooses. | [Sky forum, June 26 2025 proposed changes to Spark](https://forum.skyeco.com/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663) |
+| 23 October 2025 | The `marketFactoryV6` of the Ethereum deployments was created in block [23638439](https://etherscan.io/block/23638439), on the date of WatchPug's MarketV6 audit report. | Markets created by this factory carry the market code that preceded `PendleMarketV7`. | [WatchPug, Pendle MarketV6 Audit Report](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/audits/marketV6/WatchPug.pdf) |
+| 20 January 2026 | Commit "Deprecate voting escrow" renamed `PendleMarketV6` to `PendleMarketV7`, removed the vePENDLE voting contracts and added `StakedPendle` (sPENDLE). | `PendleMarketV7` is the market contract the article analyses. | [pendle-core-v2-public commit 7bde3ec](https://github.com/pendle-finance/pendle-core-v2-public/commit/7bde3ecbec38082b5c00f73a4ef142ed0f71cdb8) |
+| 7 July 2026 | Pendle deployed a `timelockController` and a `timelockedProxyAdmin` on Ethereum in blocks [25481956](https://etherscan.io/block/25481956) and [25481966](https://etherscan.io/block/25481966). | A timelocked admin puts a delay on upgrades, which changes the pause and upgrade risk discussed above; the delay itself was not read on-chain. | [Timelock creation transaction](https://etherscan.io/tx/0x23567ad03ed62f53656c9241f88cd0c59d05ef5cc12a99731a970f73d79f4427) |
+
 ## Frequently Asked Questions
 
 **Q: Why is a PT worth 1 asset at expiry and not 1 SY?**
@@ -529,6 +546,7 @@ The points below were not settled by the sources read for this article.
 | Only the sUSDe, wstETH and ERC-4626 SY implementations were read. | Output sets, caps and pause hooks differ per SY. | The specific SY under `Pendle-SY-Public/.../implementations/`. |
 | The audit reports were listed, not read. | Known findings on markets V6/V7 and the oracles are not summarised. | `pendle-core-v2-public/audits/`. |
 | The documentation's wstETH example gives 0.8928 wstETH per PT at a rate of 1.2, which would give 0.8333. | One of the two figures in the doc is wrong; the article uses the computed 0.8333. | `HighLevelArchitecture.md`, PT section. |
+| No Ethereum deployment of `PendleMarketFactoryV7Upg` was found in `deployments/1-core.json`, so the timeline dates `PendleMarketV7` by its commit, not by a deployment. | Markets created before the V7 code still run older market contracts. | The factory addresses in [`deployments/1-core.json`](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/deployments/1-core.json) and their implementation slots. |
 
 ## References
 
@@ -546,10 +564,21 @@ The points below were not settled by the sources read for this article.
 - [How to Integrate PT and LP Oracle](https://docs.pendle.finance/pendle-v2-dev/Oracles/HowToIntegratePtAndLpOracle)
 - [Vu Nguyen, A study on AMMs for trading fixed yield and Pendle V2's Principal Token AMM](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/whitepapers/AMM.pdf), 14 October 2022 (`whitepapers/AMM.pdf` in the analyzed repository), read 2026-11-18
 - [Pendle API Overview](https://docs.pendle.finance/pendle-v2-dev/Backend/ApiOverview) and [Router Types and Utility Functions](https://docs.pendle.finance/pendle-v2-dev/Contracts/PendleRouter/ApiReference/Types)
-- [Spark forum, June 26 2025 proposed changes to Spark](https://forum.sky.money/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663) (linear discount rates for PT listings; cited by Pendle, not read)
+- [Spark forum, June 26 2025 proposed changes to Spark](https://forum.sky.money/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663) (linear discount rates for PT listings), cited by Pendle and read 2026-11-25 for the timeline
 - [Uniswap V3 oracle concepts](https://docs.uniswap.org/concepts/protocol/oracle)
 - [ERC-4626: Tokenized Vaults](https://eips.ethereum.org/EIPS/eip-4626)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- [ERC-5115: SY Token](https://eips.ethereum.org/EIPS/eip-5115), Vu Nguyen, Long Vuong and Anton Buenavista, created 30 May 2022, read 2026-11-25
+- [WatchPug, Pendle PT Oracle Audit Report](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/audits/LpPtoracle/WatchPug-PtOracle.pdf), 26 May 2023, read 2026-11-25
+- [WatchPug, Pendle MarketV6 Audit Report](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/audits/marketV6/WatchPug.pdf), 23 October 2025, read 2026-11-25
+- [Pendle, Post Mortem](https://x.com/pendle_fi/status/1831168623634993402) (on X), Penpie incident, 4 September 2024, read 2026-11-25
+- [Aave governance, ARFC Onboard Pendle PT tokens to Aave V3 Core Instance](https://governance.aave.com/t/arfc-onboard-pendle-pt-tokens-to-aave-v3-core-instance/20541), ACI, 7 January 2025 (Snapshot result 11 April 2025), read 2026-11-25
+- [Sky forum, June 26 2025 proposed changes to Spark](https://forum.skyeco.com/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663), Phoenix Labs, 13 June 2025, read 2026-11-25
+- [pendle-core-v2-public commit 7bde3ec, Deprecate voting escrow](https://github.com/pendle-finance/pendle-core-v2-public/commit/7bde3ecbec38082b5c00f73a4ef142ed0f71cdb8), Pendle, 20 January 2026, read 2026-11-25
+- Contract creation blocks and transactions for the market factories, the linear-discount oracle factory and the timelock, read from Ethereum on 2026-11-25. Powered by [Etherscan.io APIs](https://etherscan.io)
 
 ### Related articles
 

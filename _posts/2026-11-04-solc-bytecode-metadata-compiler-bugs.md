@@ -2,7 +2,7 @@
 layout: post
 title: "What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs"
 date:   2026-11-04
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -41,6 +41,8 @@ Every output below comes from a scratch directory, with these tools:
 - **Foundry:** version 1.5.0, with a local anvil node on the `osaka` hardfork.
 
 The repository files cited by name, such as `metadata.rst` or `Changelog.md`, come from the `argotorg/solidity` repository at the pinned commit `3bd40f0`, 11 commits after v0.8.38, listed under References. A statement marked (*derived*) is a conclusion drawn from the runs or the code, neither tested directly nor stated in a source.
+
+The [timeline](#timeline) in the annex dates the compiler releases that shaped the trailer and the worked bug.
 
 ## The structure of runtime bytecode
 
@@ -645,6 +647,22 @@ Each row was observed on the versions named in the body.
 | forge 1.5.0 defaults to `prague`, solc 0.8.38 to `osaka`. | Set `evm_version` explicitly before comparing with a `solc` build. |
 | `--optimize --no-optimize-yul` stops with an internal compiler error from 0.8.23. | Add `--no-cbor-metadata` or use Standard JSON `details: {yul: false}`. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 15 December 2016 | solc 0.4.7 started injecting the Swarm hash of the metadata file into the bytecode. | This is the origin of the trailer that the article decodes. | [solc v0.4.7 release notes](https://github.com/argotorg/solidity/releases/tag/v0.4.7) |
+| 28 May 2019 | solc 0.5.9 began encoding the compiler version in the deployed bytecode and added IPFS hashes of source files to the metadata. | The `solc` key is the one that `--metadata-hash none` keeps, which blocks comparisons across compilers. | [solc v0.5.9 release notes](https://github.com/argotorg/solidity/releases/tag/v0.5.9) |
+| 12 August 2019 | solc 0.5.11 updated the Swarm hash to the current specification, replacing `bzzr0` with `bzzr1`. | A decoder of older verified contracts meets `bzzr0`, which this article could not test. | [solc v0.5.11 release notes](https://github.com/argotorg/solidity/releases/tag/v0.5.11) |
+| 17 December 2019 | solc 0.6.0 added a CLI and Standard JSON option to disable the metadata hash or choose between IPFS and Swarm. | `--metadata-hash none` is the reliable method for comparing two builds of one compiler. | [solc v0.6.0 release notes](https://github.com/argotorg/solidity/releases/tag/v0.6.0) |
+| 1 February 2023 | solc 0.8.18 added `--no-cbor-metadata` and the Standard JSON field `settings.metadata.appendCBOR`. | Comparing builds across compiler versions needs this option, so it sets the lower bound of that method. | [solc v0.8.18 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.18) |
+| 9 October 2024 | solc 0.8.28 fully supported transient storage state variables of value types. | `bugs.json` lists 0.8.28 as the first version with `TransientStorageClearingHelperCollision`. | [solc v0.8.28 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.28) |
+| 11 February 2026 | Hexens reported the transient storage clearing helper collision to the Solidity team. | This is the bug reproduced in the worked case. | [Solidity team advisory](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/) |
+| 18 February 2026 | solc 0.8.34 fixed the collision, and the Solidity team published its advisory for versions 0.8.28 to 0.8.33 under via-IR. | 0.8.34 is the fixed compiler used as the reference in every bytecode comparison of the worked case. | [solc v0.8.34 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.34), [Solidity team advisory](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/) |
+| 29 April 2026 | solc 0.8.35 introduced the `--experimental` flag and stored the experimental mode state in the JSON and CBOR metadata. | This is why a trailer can carry the third `experimental` key shown in the length-suffix table. | [solc v0.8.35 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.35) |
+
 ## Frequently Asked Questions
 
 **Q: How does a tool find the CBOR data in runtime bytecode?**
@@ -728,6 +746,17 @@ These points were not settled by the sources or the runs.
 - [Metadata Playground](https://playground.sourcify.dev/), Sourcify
 - [EIP-1153: Transient storage opcodes](https://eips.ethereum.org/EIPS/eip-1153)
 - [RFC 7049: Concise Binary Object Representation](https://datatracker.ietf.org/doc/html/rfc7049), the version the Solidity documentation links
+
+### Timeline sources
+
+- [solc v0.4.7 release notes](https://github.com/argotorg/solidity/releases/tag/v0.4.7), Solidity team, 2016-12-15
+- [solc v0.5.9 release notes](https://github.com/argotorg/solidity/releases/tag/v0.5.9), Solidity team, 2019-05-28
+- [solc v0.5.11 release notes](https://github.com/argotorg/solidity/releases/tag/v0.5.11), Solidity team, 2019-08-12
+- [solc v0.6.0 release notes](https://github.com/argotorg/solidity/releases/tag/v0.6.0), Solidity team, 2019-12-17
+- [solc v0.8.18 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.18), Solidity team, 2023-02-01
+- [solc v0.8.28 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.28), Solidity team, 2024-10-09
+- [solc v0.8.34 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.34), Solidity team, 2026-02-18
+- [solc v0.8.35 release notes](https://github.com/argotorg/solidity/releases/tag/v0.8.35), Solidity team, 2026-04-29
 
 ### Related articles
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Microsoft qlib - Architecture, Alpha Research Workflow, Backtesting and Security Review"
 date:   2026-11-18
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: finance ai security
@@ -40,7 +40,7 @@ qlib was presented in [Yang et al., *Qlib: An AI-oriented Quantitative Investmen
 
 The version read here is the `v0.9.8` tag on GitHub. The Python package on PyPI, `pyqlib`, stopped at 0.9.7 at the time of writing, so the worked example below builds qlib from the tagged source. The README also warns that recent source changes (a restricted expression parser, an explicit `trusted` flag for loading Python files) change how existing configurations behave; the security section comes back to them.
 
-Those changes came after version 0.9.7, so the PyPI package most likely still evaluates expressions with Python's `eval` and has no `trusted` gate. That package was not inspected for this article, and the Gaps section lists the point.
+Those changes came after version 0.9.7, so the PyPI package most likely still evaluates expressions with Python's `eval` and has no `trusted` gate. That package was not inspected for this article, and the Gaps section lists the point. The timeline in the annex dates the releases and security changes that led to v0.9.8.
 
 The components are loosely coupled: each layer can be used alone, and each is configured as a dictionary naming a class and its arguments. The diagram shows the layers and what flows between them.
 
@@ -532,6 +532,22 @@ qlib turns stock-selection research into a reproducible machine-learning pipelin
 | `MLflowRecorder` stores `git diff` of the working directory. | Run experiments outside repositories that hold secrets, and keep the tracking URI local. |
 | A configuration may name any importable class. | Read every `class` and `module_path` before running a configuration or YAML you did not write. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 22 September 2020 | Xiao Yang, Weiqing Liu, Dong Zhou, Jiang Bian and Tie-Yan Liu submitted the paper describing qlib to arXiv. | It is the reference description of the platform cited in the introduction. | [arXiv:2009.11189](https://arxiv.org/abs/2009.11189) |
+| 24 September 2020 | Microsoft published v0.5.0 on GitHub under the title "First release of Qlib". | It is the first tagged version of the code that this article reads at v0.9.8. | [qlib release v0.5.0](https://github.com/microsoft/qlib/releases/tag/v0.5.0) |
+| 15 February 2021 | NVD published CVE-2021-23338, an unsafe YAML load in the workflow function of qlib's command-line runner, which GitHub's advisory marks as fixed in `pyqlib` 0.7.0. | It is an early case of the risk the security review describes, a qlib YAML file that runs code. | [GHSA-hjr4-fhgp-23g9](https://github.com/advisories/GHSA-hjr4-fhgp-23g9) |
+| 17 May 2021 | Pull request #290 merged the first version of online serving and rolling retraining, with an online manager and task generation, collection and update components. | It is the origin of the `OnlineManager` and rolling strategy described in the online serving section. | [qlib pull request #290](https://github.com/microsoft/qlib/pull/290) |
+| 30 September 2021 | Pull request #438 merged high-frequency backtesting with model, rule and RL strategies, together with the `nested_decision_execution` example. | It brought the nested decision execution that the backtest section describes with `NestedExecutor`. | [qlib pull request #438](https://github.com/microsoft/qlib/pull/438) |
+| 10 March 2022 | Pull request #343 merged point-in-time data support, with period operators, a PIT data reader, a collector and `dump_pit.py`. | It added the point-in-time provider, the only part of the data layer that records when a value became known. | [qlib pull request #343](https://github.com/microsoft/qlib/pull/343) |
+| 9 December 2022 | Microsoft released v0.9.0, whose notes list the RL framework trainer, the RL backtest with a simulator and the `qlib.rl` documentation. | It shipped the reinforcement-learning module that the article read but did not run. | [qlib release v0.9.0](https://github.com/microsoft/qlib/releases/tag/v0.9.0) |
+| 15 August 2025 | Microsoft released v0.9.7 on GitHub and PyPI, with Parquet data support, a unified data handler interface and a pull request titled "Fixing Security Vulnerabilities". | It is still the latest `pyqlib` on PyPI, so a `pip install` gives a version older than the hardening read here. | [qlib release v0.9.7](https://github.com/microsoft/qlib/releases/tag/v0.9.7), [pyqlib on PyPI](https://pypi.org/project/pyqlib/#history) |
+| 8 October 2026 | Microsoft merged pull requests #2339 and #2340 and published v0.9.8 as source archives only, a release of "security hardening requested by Microsoft" that gates artifact loading and local `.py` imports behind `trusted` and replaces expression evaluation with a restricted parser. | It is commit `5435523`, the version this article reads, and the origin of the parser and `trusted` flags in the security review. | [qlib release v0.9.8](https://github.com/microsoft/qlib/releases/tag/v0.9.8), [pull request #2339](https://github.com/microsoft/qlib/pull/2339), [pull request #2340](https://github.com/microsoft/qlib/pull/2340) |
+
 ## Frequently Asked Questions
 
 **Q: Where does qlib store a stock's closing prices, and how does it find the value for a given day?**
@@ -583,6 +599,7 @@ The following points were not settled by the sources read for this article and s
 | The two hardening commits ([#2339](https://github.com/microsoft/qlib/pull/2339) and [#2340](https://github.com/microsoft/qlib/pull/2340)) come 35 commits after `v0.9.7` and carry the `v0.9.8` tag, while the README still calls them unreleased and PyPI stops at 0.9.7. | A user installing `pyqlib` from PyPI probably runs code that still evaluates expressions with `eval` and has no `trusted` gate; the PyPI package itself was not inspected. | The [qlib releases page](https://github.com/microsoft/qlib/releases) and the `pyqlib` history on PyPI (URL not checked for this article). |
 | The 192 packages that `pip freeze` lists in the image besides qlib were not reviewed and are not pinned. | A compromised dependency would not be caught by the source review. | `pip freeze` in the image, then an audit with a tool such as `pip-audit`. |
 | The `SunsetWolf/qlib_dataset` archive was not downloaded or inspected. | Its contents, date range and integrity are unknown. | The releases of the repository named in `qlib/tests/data.py`, downloaded into an isolated folder. |
+| The fix for CVE-2021-23338 was not confirmed in the code: the timeline takes the fixed version, 0.7.0, from the advisory, and the likely fix, [pull request #273 "safe yaml loader"](https://github.com/microsoft/qlib/pull/273) merged on 18 February 2021 and listed in the [v0.7.0 release notes](https://github.com/microsoft/qlib/releases/tag/v0.7.0), does not name the CVE. | The YAML loader used by `qrun` before that version was not read. | The diff of pull request #273 and the huntr pull request listed in [GHSA-hjr4-fhgp-23g9](https://github.com/advisories/GHSA-hjr4-fhgp-23g9) (not opened for this article). |
 
 ## References
 
@@ -605,6 +622,20 @@ The following points were not settled by the sources read for this article and s
 - [Tianshou](https://github.com/thu-ml/tianshou)
 - MIT OpenCourseWare, [*6.0002 Introduction to Computational Thinking and Data Science*, Fall 2016](https://ocw.mit.edu/courses/6-0002-introduction-to-computational-thinking-and-data-science-fall-2016/), lectures 14 and 15 on statistical sins
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- Microsoft, [qlib release v0.5.0, *First release of Qlib*](https://github.com/microsoft/qlib/releases/tag/v0.5.0), 24 September 2020
+- GitHub Advisory Database, [*GHSA-hjr4-fhgp-23g9: qlib Deserialization of Untrusted Data vulnerability* (CVE-2021-23338)](https://github.com/advisories/GHSA-hjr4-fhgp-23g9), published by NVD 15 February 2021, last updated 14 October 2024
+- Microsoft, [qlib pull request #290, *init version of online serving and rolling*](https://github.com/microsoft/qlib/pull/290), merged 17 May 2021
+- Microsoft, [qlib pull request #438, *Support Highfreq Backtest with the Model/Rule/RL Strategy*](https://github.com/microsoft/qlib/pull/438), merged 30 September 2021
+- Microsoft, [qlib pull request #343, *Support Point-in-time Data Operation*](https://github.com/microsoft/qlib/pull/343), merged 10 March 2022
+- Microsoft, [qlib release v0.9.0](https://github.com/microsoft/qlib/releases/tag/v0.9.0), 9 December 2022
+- Microsoft, [qlib release v0.9.7](https://github.com/microsoft/qlib/releases/tag/v0.9.7), 15 August 2025
+- Python Package Index, [*pyqlib* release history](https://pypi.org/project/pyqlib/#history), read 25 November 2026
+- Microsoft, [qlib pull request #2339, *fix(security)!: harden artifact serialization and loading*](https://github.com/microsoft/qlib/pull/2339), merged 8 October 2026
+- Microsoft, [qlib pull request #2340, *fix(security): constrain config-driven code execution*](https://github.com/microsoft/qlib/pull/2340), merged 8 October 2026
+- Microsoft, [qlib release v0.9.8](https://github.com/microsoft/qlib/releases/tag/v0.9.8), 8 October 2026
 
 ### Related articles
 

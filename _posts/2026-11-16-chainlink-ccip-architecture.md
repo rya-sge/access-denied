@@ -2,7 +2,7 @@
 layout: post
 title: "Chainlink CCIP — from DONs to Cross-Chain Verifiers"
 date:   2026-11-16
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -52,7 +52,7 @@ The table below is a map of the differences. Most of its terms are explained lat
 | RMN | Offchain Risk Management Network blessed roots (v1.6); the docs now say that role "is no longer active", the onchain curse remains | `RMN 2.1.0` is curse-only; `isBlessed()` is a `pure` function kept for compatibility |
 | Rate-limit reconfiguration | The bucket refills at the normal rate after a change | The bucket is set full on any configuration change |
 
-Releases up to v1.5 used a third design, not described in this article: one `EVM2EVMOnRamp` and one `EVM2EVMOffRamp` per lane, with commit reports posted to a separate `CommitStore`. The repository's 1.6.0 changelog lists "Merged the CommitStore with the OffRamp", "A single OnRamp and OffRamp contract per chain instead of one per lane" and offchain RMN blessing among the v1.6 changes, and its v1.6.0 bindings are the first to include a `NonceManager`.
+Releases up to v1.5 used a third design, not described in this article: one `EVM2EVMOnRamp` and one `EVM2EVMOffRamp` per lane, with commit reports posted to a separate `CommitStore`. The repository's 1.6.0 changelog lists "Merged the CommitStore with the OffRamp", "A single OnRamp and OffRamp contract per chain instead of one per lane" and offchain RMN blessing among the v1.6 changes, and its v1.6.0 bindings are the first to include a `NonceManager`. The timeline in the annex dates these releases and the Ethereum-Arbitrum lane's switches between them.
 
 On Ethereum mainnet, read on 2026-11-16 (block and addresses under References), the two generations coexist. The Router reports version 1.2.0, its OnRamp towards Arbitrum reports 2.0.0, and the Router lists four OffRamps for messages coming from Arbitrum: `EVM2EVMOffRamp 1.2.0`, `EVM2EVMOffRamp 1.5.0`, `OffRamp 1.6.0` and `OffRamp 2.0.0`. Older OffRamps stay registered so that messages sent under an older version can still be executed.
 
@@ -551,6 +551,23 @@ CCIP's own documentation sets out the split of responsibilities on its service-r
 | Delayed exit | Rate limits, LockBox liquidity | Inbound failures retryable | Waits of hours at full use |
 | Admin change | Router owner, pool owner | 3-hour delay observed on the Router owner | Pool-level controls depend on each issuer |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 17 July 2023 | CCIP entered Mainnet Early Access on Avalanche, Ethereum, Optimism and Polygon, with the Risk Management Network presented as a separate network monitoring the main one. | It is the start of the per-lane design and of the RMN role that the 2.0 contracts reduce to a curse switch. | [Chainlink blog, CCIP Officially Launches on Mainnet](https://chain.link/blog/ccip-mainnet-early-access) |
+| 7 December 2023 | The Ethereum Router `0x80226fc0…6f7D` set its OnRamp towards Arbitrum to an `EVM2EVMOnRamp 1.2.0` ([block 18,736,819](https://etherscan.io/tx/0x257652a7f8442b718ee15c18703ad74729e60ffd896a37b9de8c13e510ecf50b)). | It is the first `OnRampSet` event of this Router for the Arbitrum lane, the Router the article reads on chain. | [Ethereum, Router `OnRampSet` log](https://etherscan.io/tx/0x257652a7f8442b718ee15c18703ad74729e60ffd896a37b9de8c13e510ecf50b) |
+| 24 April 2024 | CCIP entered general availability on nine mainnets: Arbitrum, Avalanche, Base, BNB Chain, Ethereum, Kroma, Optimism, Polygon and WEMIX. | Access to the Router became open to every developer, without the early-access review. | [Chainlink blog, Announcing General Availability for CCIP](https://chain.link/blog/ccip-general-availability) |
+| 30 October 2024 | Chainlink announced CCIP v1.5 with the Cross-Chain Token standard, self-serve token pools with rate limits and the Token Manager; the post, updated on 15 January 2025, states that v1.5 is live on all supported mainnets. | It introduced the TokenAdminRegistry flow and the per-pool token buckets described in "Token transfers". | [Chainlink blog, CCIP 1.5 Officially Launches on Mainnet](https://chain.link/blog/ccip-v-1-5-upgrade) |
+| 1 November 2024 | A Code4rena audit contest on the v1.5 to v1.6 upgrade ran until 25 November 2024, covering the OnRamp, OffRamp, FeeQuoter, NonceManager, RMNRemote and related contracts, with token pools out of scope. | It is the only public audit of the v1.6 ramps found for this article; no audit of 2.0.0 was read (see Gaps). | [Code4rena, 2024-11 Chainlink](https://code4rena.com/audits/2024-11-chainlink) and [contest repository](https://github.com/code-423n4/2024-11-chainlink) |
+| 19 May 2025 | Chainlink announced that CCIP v1.6 was live on mainnet, with Solana as its first non-EVM chain and a move from lane-based to chain-based deployments. | It is the v1.6 design of one OnRamp and one OffRamp per chain that the article contrasts with 2.0. | [Chainlink blog, CCIP v1.6 Is Now Live](https://chain.link/blog/ccip-v1-6-is-now-live) |
+| 7 May 2026 | The Ethereum Router switched its OnRamp towards Arbitrum from `EVM2EVMOnRamp 1.5.0` to `OnRamp 1.6.0` ([block 25,044,079](https://etherscan.io/tx/0x27c7e76d4077c9a60555843e642e7f0c8bf9b1fd1cdf9fbe46bf4e7ef79f3a06)). | This lane moved to v1.6 almost a year after the v1.6 announcement, so the version of a lane has to be read on chain. | [Ethereum, Router `OnRampSet` log](https://etherscan.io/tx/0x27c7e76d4077c9a60555843e642e7f0c8bf9b1fd1cdf9fbe46bf4e7ef79f3a06) |
+| 18 June 2026 | Version 2.0.0 of the `@chainlink/contracts-ccip` package was published on npm. | It is the contract release this article analyses, with CCVs, permissionless execution and FTF. | [npm registry, @chainlink/contracts-ccip](https://registry.npmjs.org/@chainlink%2Fcontracts-ccip) |
+| 31 August 2026 | The Ethereum Router set its OnRamp towards Arbitrum to `OnRamp 2.0.0` `0xc3423F3F…50b7` ([block 25,877,081](https://etherscan.io/tx/0x054f34516505dd55a7d3828a63eddc4fab18f8e69fc5d31d9c9d14cc3354d2a4)). | It is the OnRamp the article read on 2026-11-16, active on this lane four weeks before the public 2.0 launch. | [Ethereum, Router `OnRampSet` log](https://etherscan.io/tx/0x054f34516505dd55a7d3828a63eddc4fab18f8e69fc5d31d9c9d14cc3354d2a4) |
+| 28 September 2026 | Chainlink announced that CCIP 2.0 was live, with a default Committee Verifier of 16 node operators, issuer-chosen CCVs and optional faster-than-finality transfers. | It is the public launch of the Cross-Chain Verifier design described in "The 2.0 design". | [Chainlink blog, Introducing CCIP 2.0](https://chain.link/blog/introducing-ccip-2-0) |
+
 ## Frequently Asked Questions
 
 **Q: Which CCIP contract should an application hardcode, and why only that one?**
@@ -606,6 +623,7 @@ The points below were not settled by the sources read on 2026-11-16.
 | The Router owner on Ethereum (`0x44835bBBA9D40DEDa9b64858095EcFB2693c9449`) was identified only by `getMinDelay() = 10800`; its type, proposers and executors were not read. | The 3-hour delay is the only observed check on ramp replacement. | Its verified source on Etherscan and its role members. |
 | The comparison with LayerZero DVNs is this article's own reading of the two references. | A difference in details (defaults, thresholds) would change the comparison. | The [LayerZero V2 article]({{site.url_complet}}/2026/11/16/layerzero-v2-architecture/) and the LayerZero `ReceiveUln302` source. |
 | No audit report of contracts 2.0.0 was read. | Known issues may already be documented. | Chainlink's audit list on the [CCIP documentation](https://docs.chain.link/ccip). |
+| The date on which the RMN's offchain blessing role was switched off is not in any source found for the timeline, nor is the date of the in-order execution deprecation. | Messages committed before and after that change were executed under different checks. | The [offchain architecture overview](https://docs.chain.link/ccip/concepts/architecture/offchain/overview) and the RMN contract events on each chain. |
 | The Solana, Aptos, Sui, TON and Canton flows are left out. | Their pools, `extraArgs` and manual execution differ. | The non-EVM pages under `concepts/architecture/onchain/` of the [Chainlink documentation](https://github.com/smartcontractkit/documentation/tree/4cd1d61a0a6a8cd195222900f23abaeeb1771f40/src/content/ccip). |
 
 ## References
@@ -628,6 +646,17 @@ The points below were not settled by the sources read on 2026-11-16.
 - [Execution latency](https://docs.chain.link/ccip/ccip-execution-latency)
 - [Service limits, EVM](https://docs.chain.link/ccip/service-limits/evm)
 - [Service responsibility](https://docs.chain.link/ccip/service-responsibility)
+
+### Timeline sources
+
+- [CCIP Officially Launches on Mainnet](https://chain.link/blog/ccip-mainnet-early-access), Chainlink, 17 July 2023
+- [Announcing General Availability for CCIP](https://chain.link/blog/ccip-general-availability), Chainlink, 24 April 2024
+- [CCIP 1.5 Officially Launches on Mainnet](https://chain.link/blog/ccip-v-1-5-upgrade), Chainlink, 30 October 2024, updated 15 January 2025
+- [2024-11 Chainlink audit contest](https://code4rena.com/audits/2024-11-chainlink), Code4rena, 1 to 25 November 2024, and its [contest repository](https://github.com/code-423n4/2024-11-chainlink)
+- [CCIP v1.6 Is Now Live: Unlocking Solana Support, Scaling Chain Integrations, and Reducing User Costs](https://chain.link/blog/ccip-v1-6-is-now-live), Chainlink, 19 May 2025
+- [@chainlink/contracts-ccip package metadata](https://registry.npmjs.org/@chainlink%2Fcontracts-ccip), npm registry, read 25 November 2026
+- [Chainlink Introduces CCIP 2.0](https://chain.link/blog/introducing-ccip-2-0), Chainlink, 28 September 2026
+- `OnRampSet` events of the Ethereum Router `0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D` for the Arbitrum selector, read through the Routescan API on 25 November 2026: [block 18,736,819](https://etherscan.io/tx/0x257652a7f8442b718ee15c18703ad74729e60ffd896a37b9de8c13e510ecf50b), [block 25,044,079](https://etherscan.io/tx/0x27c7e76d4077c9a60555843e642e7f0c8bf9b1fd1cdf9fbe46bf4e7ef79f3a06), [block 25,877,081](https://etherscan.io/tx/0x054f34516505dd55a7d3828a63eddc4fab18f8e69fc5d31d9c9d14cc3354d2a4)
 
 ### Standards
 

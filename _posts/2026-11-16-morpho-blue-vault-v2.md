@@ -2,7 +2,7 @@
 layout: post
 title: "How Morpho Works - Blue Markets, Liquidations, Oracles and Vault V2"
 date:   2026-11-16
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -16,7 +16,7 @@ isMermaid: true
 
 [Morpho](https://morpho.org) is a lending protocol on Ethereum and other EVM chains, built in two layers. At the bottom, Morpho Blue is a single immutable contract that holds many small lending markets, each with one loan asset, one collateral asset and one oracle, so a failure in one market does not touch the others. On top, vaults take deposits of one asset and spread them over several of those markets, under rules that a curator sets and that depositors can read on-chain.
 
-This article walks through the whole stack once, from the code: how a Blue market is defined and accounted, how the AdaptiveCurveIRM sets the rate, how a liquidation and a bad-debt write-off work, what the standard Chainlink-based oracle computes, how Vault V1 (MetaMorpho) and Vault V2 differ, what the public allocator does, and which risks a vault depositor carries. The Morpho series on this site has one deep dive per layer; this article is the map that connects them.
+This article walks through the whole stack once, from the code: how a Blue market is defined and accounted, how the AdaptiveCurveIRM sets the rate, how a liquidation and a bad-debt write-off work, what the standard Chainlink-based oracle computes, how Vault V1 (MetaMorpho) and Vault V2 differ, what the public allocator does, and which risks a vault depositor carries. The Morpho series on this site has one deep dive per layer; this article is the map that connects them, and the [timeline](#timeline) in the annex dates its deployments and audits and one oracle incident.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -63,7 +63,13 @@ Three properties hold across the stack, and the rest of the article comes back t
 
 Every market lives inside one contract, `Morpho.sol`, and is defined by a `MarketParams` struct of five fields: the loan token, the collateral token, the oracle, the interest-rate model (IRM) and the LLTV. The market id is the hash of those five values, `keccak256(abi.encode(marketParams))`, so two markets that differ in any one of them (the same pair with another oracle, say) are two separate markets with separate liquidity.
 
-`createMarket` is permissionless, with two checks: the IRM and the LLTV must have been enabled by the Morpho owner, which is governance. The [market page of the Morpho documentation](https://docs.morpho.org/learn/concepts/market/) lists nine governance-approved LLTVs, 0 % and the eight values of the LIF table below, and the AdaptiveCurveIRM as the only approved IRM. Once created, nothing about a market can change: its oracle, its LLTV and its IRM are fixed for life. The owner's remaining powers over a live market are limited to a protocol fee on interest, capped at 25 % by `MAX_FEE`, and the address that receives it.
+`createMarket` is permissionless, with two checks: the IRM and the LLTV must have been enabled by the Morpho owner, which is governance. The [market page of the Morpho documentation](https://docs.morpho.org/learn/concepts/market/) lists nine governance-approved LLTVs, 0 % and the eight values of the LIF table below, and the AdaptiveCurveIRM as the only approved IRM.
+
+The on-chain record agrees, with one addition. On Ethereum, the `EnableLltv` and `EnableIrm` events of 28 December 2023 confirm the nine LLTVs and show a second enabled IRM, the zero address. A market created with it charges no interest, because interest accrual skips the rate call when the IRM is the zero address.
+
+*Implementation:* `Morpho.sol`, `_accrueInterest`.
+
+Once created, nothing about a market can change: its oracle, its LLTV and its IRM are fixed for life. The owner's remaining powers over a live market are limited to a protocol fee on interest, capped at 25 % by `MAX_FEE`, and the address that receives it.
 
 The five operations are the familiar ones: `supply` and `withdraw` for lenders, `supplyCollateral`, `borrow`, `repay` and `withdrawCollateral` for borrowers, and `liquidate` for anyone. Collateral is never lent out, which is what keeps the market's accounting small: the loan token pool is the only pool. [How Morpho Blue Works - Isolated Lending Markets, Shares, Liquidations and Bad Debt]({{site.url_complet}}/2026/10/10/morpho-blue-lending-markets/) follows each of these functions through the source.
 
@@ -368,7 +374,7 @@ Morpho separates a lending protocol into an immutable market engine and a curati
 | **LIF** | Liquidation incentive factor: the multiplier on repaid debt that sets the collateral a liquidator receives, from 1.15 down to about 1.006. |
 | **Bad debt** | Debt left on a position whose collateral is exhausted; Blue erases it and subtracts it from the market's supply assets. |
 | **Virtual shares** | The offset of $$10^6$$ shares and 1 asset in every conversion, which makes share-price inflation on an empty market costly. |
-| **AdaptiveCurveIRM** | The only enabled interest-rate model: a curve around 90 % utilisation whose level adapts over time. |
+| **AdaptiveCurveIRM** | The only enabled interest-rate contract (the zero address is also enabled, for markets that charge no interest): a curve around 90 % utilisation whose level adapts over time. |
 | **Rate at target** | The borrow rate the IRM charges at exactly 90 % utilisation; it drifts up or down with the utilisation error. |
 | **`price()`** | The oracle function Blue calls: loan-token units per collateral unit, in raw units, scaled by $$10^{36}$$. |
 | **MorphoChainlinkOracleV2** | Morpho's standard oracle: up to two ERC-4626 conversions and four feeds, multiplied and scaled by an immutable factor. |
@@ -453,6 +459,23 @@ The risks below are those of a depositor in a Morpho vault, and of a lender supp
 | Loss timing | Accrual-based loss recognition | Losses realised in Blue at liquidation; V2 share price follows at accrual | Early exits shift a pending loss to the remaining depositors |
 | Gates | Optional gate contracts | Unset gates restrict nothing | A malicious or broken gate can block exits |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 11 October 2023 | Morpho Labs published the Morpho Blue whitepaper and released its code. | It is the first public description of the isolated-market design this article reads from the code. | [Morpho blog, Morpho Blue and how it enables our vision for DeFi lending](https://morpho.org/blog/morpho-blue-and-how-it-enables-our-vision-for-defi-lending/) |
+| 24 October 2023 | Morpho announced MetaMorpho, a protocol for permissionless ERC-4626 lending vaults on top of Morpho Blue. | MetaMorpho is the Vault V1 layer that Vault V2 later replaces and can still reach through `MorphoVaultV1Adapter`. | [Morpho blog, Introducing MetaMorpho](https://morpho.org/blog/introducing-metamorpho-permissionless-lending-vaults-on-morpho-blue/) |
+| 28 December 2023 | Morpho Blue was deployed on Ethereum at block [18,883,124](https://etherscan.io/block/18883124), and the AdaptiveCurveIRM, the zero address (interest-free markets) and the nine LLTVs from 0 % to 98 % were enabled within the next ten blocks. | These `EnableIrm` and `EnableLltv` events are the on-chain source of the enabled IRMs and of the LLTVs behind the LIF table. | [Etherscan, Morpho Blue creation transaction](https://etherscan.io/tx/0xba6a2e752ff5caee49cd4f69825ca00e47abc827ae51e7bda5c3ad56eae053b3) |
+| 6 January 2024 | Ownership of Morpho Blue on Ethereum passed to the Safe `0xcBa2…9AFa` at block [18,949,595](https://etherscan.io/block/18949595); on 25 November 2026 at 09:05 UTC (block [26,491,186](https://etherscan.io/block/26491186)) it was still the owner, with a threshold of 6 of 10. | This Safe holds the governance powers listed in the risks, and the contract had emitted no `SetFee` event by that date, so no market on Ethereum paid a protocol fee. | [Etherscan, `setOwner` transaction](https://etherscan.io/tx/0xc86a635fe546d78029608bee34eb45174b020a3e5be7211d022d50096495b0b3) |
+| 13 October 2024 | A PAXG/USDC market (LLTV 91.5 %) whose `MorphoChainlinkOracleV2` was deployed with a wrong scale let one borrower take about 230,000 USDC against a small PAXG deposit at block [20,956,052](https://etherscan.io/block/20956052). | It shows the oracle section's point in practice: Blue accepts whatever `price()` returns, and the damage was limited to that market and the vaults that supplied it. | [Etherscan, borrow transaction](https://etherscan.io/tx/0x256979ae169abb7fbbbbc14188742f4b9debf48b48ad5b5207cadcc99ccb493b); [LeadBlock, Retrospective: PAXG/USDC market oracle configuration](https://forum.morpho.org/t/retrospective-paxg-usdc-market-oracle-configuration/891) |
+| 19 December 2024 | The MetaMorpho Factory V1.1 was deployed on Ethereum at block [21,439,510](https://etherscan.io/block/21439510). | Vault V1 vaults created from this factory keep bad debt in `lostAssets` instead of lowering the share price. | [Etherscan, factory creation transaction](https://etherscan.io/tx/0x4c19401df000d3bbc3fe364049c93913e0aa350e0cbb7d01dd9f27aaa2c512e9) |
+| 16 September 2025 | The `VaultV2Factory` was deployed on Ethereum at block [23,375,073](https://etherscan.io/block/23375073), the date of ChainSecurity's Vault V2 audit report. | The roles, caps and gates described above apply to vaults created by this factory, under the trust model of that report. | [Etherscan, factory creation transaction](https://etherscan.io/tx/0xf3c7a7c3bda8c818c2e1e8d93a67bd0eda88309fcae551c9af68e36ac9685fcc); [ChainSecurity, Vault V2 audit](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2025-09-15-chainsecurity.pdf) |
+| 29 September 2025 | Morpho announced that Vaults V2 were live on Ethereum, allocating at first only to Morpho V1 markets and vaults. | It marks the move from market-by-market queues to adapters and caps by id. | [Morpho blog, Morpho Vaults V2: A new standard for asset curation](https://morpho.org/blog/morpho-vaults-v2-a-new-standard-for-asset-curation) |
+| 10 December 2025 | The `MorphoMarketV1AdapterV2` factory was deployed on Ethereum at block [23,981,459](https://etherscan.io/block/23981459), after reviews by Blackthorn, Certora and Spearbit filed on 4 December 2025. | This is the adapter whose three ids (adapter, collateral token, market) carry the caps explained in this article. | [Etherscan, factory creation transaction](https://etherscan.io/tx/0x1b302e0cff54f952fc724ecc30d6b96a3cb5a4919db62cc728fbb61f16d39538); [Blackthorn, MarketV1AdapterV2 audit](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2025-12-04-market-v1-adapter-v2-blackthorn.pdf) |
+| 16 August 2026 | `BluePublicAllocator` was deployed on Ethereum at block [25,770,408](https://etherscan.io/block/25770408), after Blackthorn's review of 30 July to 2 August 2026. | It is the public allocator whose penalties and caps this article describes for Vault V2. | [Etherscan, creation transaction](https://etherscan.io/tx/0x053543c7e4a19e46b90c434537659a1500867536658aae58c4fc1a2d299c150a); [Blackthorn, Blue Public Allocator audit](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2026-08-13-blue-public-allocator-blackthorn.pdf) |
+
 ## Frequently Asked Questions
 
 **Q: What are the five parameters of a Morpho Blue market, and which of them can change after creation?**
@@ -500,14 +523,15 @@ These points were not settled by the repositories at the commits listed in Refer
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The list of enabled LLTVs and IRMs comes from the [market page of the Morpho documentation](https://docs.morpho.org/learn/concepts/market/), not from an on-chain read of `isLltvEnabled` and `isIrmEnabled`. | The LIF table and the claim that AdaptiveCurveIRM is the only IRM depend on it. | Call the two getters on the [Morpho Blue deployment](https://docs.morpho.org/developers/contracts/addresses) on each chain. |
+| The enabled LLTVs and IRMs were read on chain for Ethereum only (`EnableLltv` and `EnableIrm` events up to 25 November 2026), not on the other chains where Morpho Blue is deployed. | The LIF table and the list of IRMs may not hold on another chain. | Call `isLltvEnabled` and `isIrmEnabled`, or read the same events, on each [Morpho Blue deployment](https://docs.morpho.org/developers/contracts/addresses). |
 | The learn docs (Vault V2 and Curator concept pages) say the curator can set `maxRate`, while `VaultV2.sol` at the commit listed in References restricts `setMaxRate` to allocators. | The article follows the code; a later revision may differ. | `setMaxRate` in [`VaultV2.sol`](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/src/VaultV2.sol). |
 | The MetaMorpho-era public allocator (a separate contract for Vault V1) is not in the repositories read for this article; only `BluePublicAllocator` for Vault V2 was read. | V1 vaults may expose liquidity through a different contract with other rules. | The [public allocator page of the Morpho learn docs](https://docs.morpho.org/learn/concepts/public-allocator/), not read here. |
 | The `PreLiquidation` contract is described from secondary notes, not from its source. | Its parameters and its oracle choice affect when a borrower is partially liquidated. | The [morpho-org/pre-liquidation](https://github.com/morpho-org/pre-liquidation) repository, not read for this article. |
 | No particular vault's roles, timelocks, gates or caps were read on-chain. | The risk section describes what the design allows, not what a given vault does. | `curator()`, `owner()`, `timelock(selector)`, `abdicated(selector)` and the gate getters on the vault in question. |
 | Of the audit reports, only ChainSecurity's (the trust model and the "Users Can Escape Losses" finding) was read for this article; the other findings are not summarised here. | Other reports may record issues relevant to depositors. | The other reports in the [`vault-v2` audits folder](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e/audits). |
-| The [governance page of the Morpho documentation](https://docs.morpho.org/learn/governance/organization/) describes a 5-of-9 multisig, while an on-chain read made for this series on 2026-10-22 recorded 6 of 10 owners; neither was re-read for this article. | It sets who can enable LLTVs and set fees. | `getThreshold()` and `getOwners()` on the Morpho owner address. |
+| The [governance page of the Morpho documentation](https://docs.morpho.org/learn/governance/organization/) describes a 5-of-9 multisig, while the owner Safe had a threshold of 6 of 10 owners on 25 November 2026 at 09:05 UTC (block [26,491,186](https://etherscan.io/block/26491186)). | A reader who relies on the documentation gets the wrong signer set for the powers to enable LLTVs and set fees. | Check whether the governance page has been updated, and read `getThreshold()` and `getOwners()` again before relying on the signer set. |
 | Neither the MetaMorpho v1.1 sources nor the documentation state why v1.1 stopped realising bad debt in the share price. | The trade-off between a stable share price and last-out losses is presented without its stated rationale. | The [metamorpho-v1.1](https://github.com/morpho-org/metamorpho-v1.1) audits and release notes. |
+| The timeline dates Morpho Blue and Vault V2 from Ethereum deployments and blog posts; no Morpho page giving the public mainnet opening of Blue, nor the dates of Vault V2 deployments on other chains, was found. | The launch row and the Vault V2 rows may not match the dates Morpho itself gives, and the timeline covers Ethereum only. | The [Morpho blog](https://morpho.org/blog) archive for early 2024 and the per-chain factories on the [addresses page of the Morpho documentation](https://docs.morpho.org/developers/contracts/addresses). |
 
 ## References
 
@@ -529,6 +553,21 @@ These points were not settled by the repositories at the commits listed in Refer
 - [OpenZeppelin, ERC-4626 inflation attack](https://docs.openzeppelin.com/contracts/4.x/erc4626#inflation-attack) (cited by `SharesMathLib`)
 - [ChainSecurity, Morpho Vault V2 audit, September 2025](https://github.com/morpho-org/vault-v2/tree/d992cb8438b8630b3fee4649311d78d649264a5e/audits) (`2025-09-15-chainsecurity.pdf`)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- [Morpho Blue and how it enables our vision for DeFi lending](https://morpho.org/blog/morpho-blue-and-how-it-enables-our-vision-for-defi-lending/), Paul Frambot, Morpho blog, 11 October 2023
+- [Introducing MetaMorpho: Permissionless lending vaults on Morpho Blue](https://morpho.org/blog/introducing-metamorpho-permissionless-lending-vaults-on-morpho-blue/), Paul Frambot, Morpho blog, 24 October 2023
+- [Retrospective: PAXG/USDC market oracle configuration](https://forum.morpho.org/t/retrospective-paxg-usdc-market-oracle-configuration/891), LeadBlock, Morpho governance forum, 15 October 2024
+- [Morpho Vaults V2: A new standard for asset curation](https://morpho.org/blog/morpho-vaults-v2-a-new-standard-for-asset-curation), Morpho blog, 29 September 2025
+- [Code Assessment of the Morpho Vault V2 Smart Contracts](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2025-09-15-chainsecurity.pdf), ChainSecurity, 16 September 2025
+- [MorphoMarketV1AdapterV2 audit](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2025-12-04-market-v1-adapter-v2-blackthorn.pdf), Blackthorn, filed 4 December 2025
+- [BluePublicAllocator audit](https://github.com/morpho-org/vault-v2/blob/d992cb8438b8630b3fee4649311d78d649264a5e/audits/2026-08-13-blue-public-allocator-blackthorn.pdf), Blackthorn, audited 30 July to 2 August 2026
+
+### On-chain reads
+
+- Ethereum, Etherscan API V2 (contract creations, `logs getLogs`, transaction receipts), read on 25 November 2026: creation of [Morpho Blue](https://etherscan.io/address/0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb), the [AdaptiveCurveIRM](https://etherscan.io/address/0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC), the [MetaMorpho Factory V1.1](https://etherscan.io/address/0x1897A8997241C1cD4bD0698647e4EB7213535c24), the [VaultV2Factory](https://etherscan.io/address/0xA1D94F746dEfa1928926b84fB2596c06926C0405), the [MorphoMarketV1AdapterV2 factory](https://etherscan.io/address/0x32BB1c0D48D8b1B3363e86eeB9A0300BAd61ccc1) and [BluePublicAllocator](https://etherscan.io/address/0x00b8e1509398ED692C3F326CbAf1694F9A881e27); Morpho Blue's `EnableIrm`, `EnableLltv`, `SetOwner`, `SetFee` and `SetFeeRecipient` events; the receipt of the PAXG/USDC borrow transaction. Powered by [Etherscan.io](https://etherscan.io) APIs.
+- Ethereum, PublicNode RPC, block [26,491,186](https://etherscan.io/block/26491186) (25 November 2026, 09:05 UTC): `owner()` on Morpho Blue, `getThreshold()` and `getOwners()` on the [owner Safe](https://etherscan.io/address/0xcBa28b38103307Ec8dA98377ffF9816C164f9AFa).
 
 ### Related articles
 

@@ -2,7 +2,7 @@
 layout: post
 title: "PyPortfolioOpt - How a Python Library Turns Price History into Portfolio Weights"
 date:   2026-11-18
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: finance
@@ -15,7 +15,7 @@ isMermaid: true
 
 [PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) is an open-source Python library, under the MIT licence, that computes portfolio weights from historical prices. It implements the classical mean-variance model of Markowitz together with later methods (shrinkage covariance, Black-Litterman, Hierarchical Risk Parity, CVaR) and hands each optimisation problem to the convex solver library [cvxpy](https://www.cvxpy.org/). The property this article keeps returning to follows from that design: the library solves the problem it is given exactly, so the weights are only as good as the return and risk estimates fed into it.
 
-This article reads the source at commit `a6638d2` (release 1.6.0 plus eight commits), explains how the modules and the class hierarchy fit together, and runs every example offline on the library's own sample data. Each number quoted below comes from a script kept with the article. The runs exposed five behaviours that can surprise a caller, four of which change the result without raising an error, the most consequential being the zero-filling of missing prices in the default covariance estimator and the positional pairing of weights and prices in the share allocation. The article ends with a security review of the package.
+This article reads the source at commit `a6638d2` (release 1.6.0 plus eight commits), explains how the modules and the class hierarchy fit together, and runs every example offline on the library's own sample data. Each number quoted below comes from a script kept with the article. The runs exposed five behaviours that can surprise a caller, four of which change the result without raising an error, the most consequential being the zero-filling of missing prices in the default covariance estimator and the positional pairing of weights and prices in the share allocation. The article ends with a security review of the package, and the [timeline](#timeline) in the annex lists the releases that built this design.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -575,6 +575,23 @@ The descriptive statements of "Class hierarchy" and "One problem per object" res
 | A subclass disables a method that does not apply | `pypfopt/efficient_frontier/efficient_cvar.py` | `EfficientCVaR.max_sharpe()` (lines 117-118) |
 | A target kept in a named cvxpy parameter, so a new target re-solves the same problem | `pypfopt/efficient_frontier/efficient_frontier.py` | `max_quadratic_utility()`, `efficient_risk()` and `efficient_return()` (lines 317-469) |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 11 June 2018 | Version 0.1.0, the initial release, shipped the efficient frontier (maximum Sharpe, minimum variance, target risk and return), L2 regularisation, discrete allocation and the sample covariance. | The four-step design of [How PyPortfolioOpt works](#how-pyportfolioopt-works) dates from this first release. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 23 September 2018 | Version 0.2.0 added Hierarchical Risk Parity, the semicovariance and exponential covariance matrices, and made every optimiser inherit from a `BaseOptimizer`. | `HRPOpt` and the shared base class of the [class hierarchy](#class-hierarchy) both start here. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 12 December 2019 | Version 0.5.0 added the Black-Litterman model, per-asset bounds and the method that writes weights to a text file. | The `BlackLittermanModel` class and the `save_weights_to_file()` method covered in the security review both start here. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 18 March 2020 | Version 1.0.0 moved the backend from scipy to cvxpy, replaced `BaseScipyOptimizer` with `BaseConvexOptimizer` and removed CVaR optimisation for the time being. | The cvxpy layer and the DCP rule that custom constraints must follow come from this release. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 28 April 2020 | Version 1.2.0 added Idzorek's method for setting `omega` from percentage confidences, and grouped sector constraints. | The `omega="idzorek"` example and `add_sector_constraints` used in the worked examples come from this release. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 13 February 2021 | Version 1.4.0 brought CVaR optimisation back, from an initial draft by Nicolas Knudde. | `EfficientCVaR`, whose daily CVaR the pitfalls section warns about, dates from this release. | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 19 October 2021 | Version 1.5.0 redesigned the backend around cvxpy parameters, so a problem can be re-solved with a new risk or return target. | This is why an `EfficientFrontier` object accepts a new target but refuses a new constraint, as described in [One problem per object](#one-problem-per-object). | [Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 1 December 2024 | Version 1.5.6 changed the default risk-free rate of `max_sharpe()` and `portfolio_performance()` from 0.02 to 0.0, closing issue #594. | Results computed with 1.5.5 or earlier assume 2 % when the rate is not passed, the first pitfall of this article. | [Issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594), [PyPI](https://pypi.org/pypi/pyportfolioopt/json) |
+| 8 November 2025 | The repository moved to the PyPortfolio organisation on GitHub, and a maintenance pull request updated every URL and `main` branch reference. | The analysed source lives at `PyPortfolio/PyPortfolioOpt`, while older links point to `robertmartin8/PyPortfolioOpt`. | [Pull request #641](https://github.com/PyPortfolio/PyPortfolioOpt/pull/641) |
+| 26 February 2026 | Version 1.6.0 added Python 3.14 and pandas 3.0 support, dropped Python 3.8 and 3.9, and moved former dependencies to an optional `all_extras` set. | The commit analysed here is this release plus eight commits. | [v1.6.0 release notes](https://github.com/PyPortfolio/PyPortfolioOpt/releases/tag/v1.6.0) |
+
 ## Frequently Asked Questions
 
 **Q: What are the four building blocks of PyPortfolioOpt, and which module holds each?**
@@ -630,7 +647,6 @@ These points were not settled by the source and the runs; check them before rely
 | `bl_weights()` falls back on `np.linalg.lstsq(self._A, b)` when the matrix is singular, where `self._A` is the $$K \times K$$ view matrix, not the $$n \times n$$ matrix being solved. | A singular case would likely raise a shape error instead of returning weights; this is a reading of the code, not a run. | [`pypfopt/black_litterman.py`](https://github.com/PyPortfolio/PyPortfolioOpt/blob/a6638d2e06dae6f444fd022cfd4b3c528902a85b/pypfopt/black_litterman.py), method `bl_weights`. |
 | The equivalence between quadratic utility and mean-variance for exponential utility with normal returns is stated from general knowledge. | It justifies the reading of `max_quadratic_utility` as utility maximisation. | A portfolio-theory textbook chapter on mean-variance and expected utility. |
 | The PyPI wheels and the dependencies were not part of the security review. | A different artifact or a compromised dependency is outside the verdict. | [PyPortfolioOpt on PyPI](https://pypi.org/project/pyportfolioopt/) file hashes against a build of the pinned source. |
-| Which PyPI release first shipped the 0.0 risk-free-rate default (commit `388acf6`, 2024-12-01) was not checked; the local clone has only the v1.4.1 and v1.6.0 tags. | A reader comparing with a 1.5.x result needs to know which default it used. | The [PyPortfolioOpt releases](https://github.com/PyPortfolio/PyPortfolioOpt/releases) page and [issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594). |
 | That means are harder to estimate than variances, and that mean-variance optimisers overweight the assets with the largest estimation errors, are stated from general knowledge. | The article uses both to read the out-of-sample table and the BABA weight. | Literature on estimation error in mean-variance optimisation, for example the shrinkage papers in the References and their citations. |
 | The verification run records that `lp_portfolio()` and `greedy_portfolio()` buy six lines from the eight-holding maximum-Sharpe portfolio, but not which two holdings get no shares or why. | A reader may assume the two smallest weights round to zero shares, which the run does not show. | [`verification/pyportfolioopt-portfolio-optimization/allocation.py`](https://github.com/rya-sge/access-denied/tree/main/verification/pyportfolioopt-portfolio-optimization), extended to print the allocation dictionaries and the latest prices. |
 | The out-of-sample table is one split of 15 months. | It cannot rank methods; a rolling or resampled test would be needed. | A walk-forward test over several windows, or Monte Carlo resampling of `mu` and `S`. |
@@ -664,6 +680,13 @@ These points were not settled by the source and the runs; check them before rely
 - [Sampling and Standard Error - Estimating a Population Mean from One Random Sample]({{site.url_complet}}/2026/10/26/sampling-standard-error-mean/)
 - [Monte Carlo Simulation for DeFi Risk Analysis - From Random Sampling to a Stay-or-Exit Decision]({{site.url_complet}}/2026/10/10/monte-carlo-defi-risk-analysis/)
 - [Building a Compliant EU Money Market Fund Portfolio — Eligible Assets, Diversification Limits, Credit Assessment and WAM/WAL]({{site.url_complet}}/2026/10/01/eu-money-market-fund-portfolio-construction-limits/)
+
+### Timeline sources
+
+- PyPortfolioOpt, [Roadmap and Changelog](https://pyportfolioopt.readthedocs.io/en/latest/Roadmap.html), project documentation, consulted 2026-11-25
+- Python Package Index, [pyportfolioopt release metadata (JSON API)](https://pypi.org/pypi/pyportfolioopt/json), upload dates of every release, consulted 2026-11-25
+- Beliavsky (2024), [Use of 0.02 default risk-free rate can surprise users](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594), PyPortfolioOpt issue #594, closed 2024-12-01
+- fkiraly (2025), [[MNT] fix all URLs and main branch references after move to new org](https://github.com/PyPortfolio/PyPortfolioOpt/pull/641), PyPortfolioOpt pull request #641, merged 2025-11-08
 
 ### Tooling
 

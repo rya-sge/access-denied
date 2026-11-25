@@ -2,7 +2,7 @@
 layout: post
 title: "Transient Storage in Practice: Reentrancy Locks, Solidity's `transient` and Two Real Failures"
 date:   2026-11-04
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -105,6 +105,8 @@ The history below comes from `Changelog.md`. Rows 0.8.24, 0.8.27 and 0.8.28 were
 | 0.8.29 | 2025-03-12 | A storage-size check stops counting transient variables. |
 | 0.8.34 | 2026-02-18 | Fix of the helper collision covered below. |
 | 0.8.35 | 2026-04-29 | Warning that `transient` will become a keyword. `tload` and `tstore` are listed for promotion to Yul keywords. |
+
+The [timeline in the annex](#timeline) places these releases next to the mainnet fork, the library guard and the incidents.
 
 ### Declaration and layout
 
@@ -444,6 +446,23 @@ Transient storage has a simple rule: writes follow frame reverts, and the value 
 | ☐ | The target chain has Cancun, and the `evm_version` is set for it. | `TLOAD` and `TSTORE` are invalid opcodes on a chain without EIP-1153. |
 | ☐ | A fork is compared with upstream security advisories and fixes, not only with the code at the fork point. | A fix published upstream is missing from the fork. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 15 June 2018 | EIP-1153, transient storage opcodes, is created, with Alexey Akhunov and Moody Salem named as authors. | It defines the `TLOAD` and `TSTORE` semantics and the missing stipend check that this article tests. | [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) |
+| 10 November 2023 | ChainSecurity publishes the low-gas reentrancy vector created by `TSTORE` having no stipend check. | It is the first public warning cited here that `transfer` and `send` do not stop writes to transient state. | [ChainSecurity blog](https://www.chainsecurity.com/blog/tstore-low-gas-reentrancy) |
+| 25 January 2024 | Solidity 0.8.24 adds the Yul builtins `tload()` and `tstore()`. | Assembly locks, such as the cheapest one measured here, can be compiled before mainnet supports the opcodes. | [Solidity v0.8.24 release](https://github.com/argotorg/solidity/releases/tag/v0.8.24) |
+| 13 March 2024 | Cancun activates on Ethereum mainnet at epoch 269,568, first block [19,426,587](https://etherscan.io/block/19426587), with EIP-1153 in the Dencun upgrade. | From this block, transient storage exists on mainnet and every behaviour in the article applies there. | [EIP-7569: Hardfork Meta - Dencun](https://eips.ethereum.org/EIPS/eip-7569) |
+| 9 October 2024 | Solidity 0.8.28 fully supports `transient` state variables of value types. | The `uint256 transient` and `bool transient` locks become possible, and so does the helper collision introduced in this release. | [Solidity v0.8.28 release](https://github.com/argotorg/solidity/releases/tag/v0.8.28) |
+| 23 October 2024 | OpenZeppelin Contracts v5.1.0 adds `ReentrancyGuardTransient`. | It is the library transient guard measured against the storage `ReentrancyGuard` in the gas table. | [OpenZeppelin v5.1.0 release notes](https://github.com/OpenZeppelin/openzeppelin-contracts/releases/tag/v5.1.0) |
+| 30 March 2025 | SIR.trading's vault is drained in block [22,157,900](https://etherscan.io/block/22157900) through a callback authorised only by a transient slot that was never cleared. | It is an earlier loss from a transient value outliving its intended scope, the class of error behind Startale. | [evm-hack-registry, `2025-03-LeverageSIR_exp`](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217/2025-03-LeverageSIR_exp) |
+| 18 February 2026 | Solidity 0.8.34 fixes `TransientStorageClearingHelperCollision`, reported by Hexens on 11 February, and the Solidity team publishes the advisory. | It closes the via-IR bug that can turn `delete lock` into a write to persistent slot 0. | [Solidity advisory](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/) |
+| 7 August 2026 | Biconomy merges Nexus PR #302, which consumes the transient init flag in `requireInitializable()`. | It is the upstream one-opcode fix that the Startale fork did not carry. | [Nexus PR #302](https://github.com/bcnmy/nexus/pull/302) |
+| 16 September 2026 | Startale ERC-7579 accounts are drained through the stale constructor flag, including the example transaction in block [25,987,506](https://etherscan.io/block/25987506). | It is Failure 1 of this article, reproduced from the registry PoC. | [evm-hack-registry, `2026-09-Startale_exp`](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217/2026-09-Startale_exp) |
+
 ## Frequently Asked Questions
 
 **Q: What are the gas costs of `TLOAD` and `TSTORE`, and do they vary?**
@@ -542,6 +561,18 @@ These points remain open, and the article states them as limits rather than as s
 - [ExVul alert on Startale](https://x.com/exvulsec/status/2100111910524072258)
 - [TSTORE Low Gas Reentrancy](https://www.chainsecurity.com/blog/tstore-low-gas-reentrancy), ChainSecurity, 2023-11-10
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- [EIP-7569: Hardfork Meta - Dencun](https://eips.ethereum.org/EIPS/eip-7569), Tim Beiko, 2023-12-01
+- [Solidity v0.8.24 release](https://github.com/argotorg/solidity/releases/tag/v0.8.24), Solidity team, 2024-01-25
+- [Solidity v0.8.28 release](https://github.com/argotorg/solidity/releases/tag/v0.8.28), Solidity team, 2024-10-09
+- [OpenZeppelin Contracts v5.1.0 release notes](https://github.com/OpenZeppelin/openzeppelin-contracts/releases/tag/v5.1.0), OpenZeppelin, 2024-10-23
+- [evm-hack-registry entry `2025-03-LeverageSIR_exp`](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217/2025-03-LeverageSIR_exp), sanbir, read at commit `52d0b80`
+- [evm-hack-registry entry `2026-09-Startale_exp`](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217/2026-09-Startale_exp), sanbir, read at commit `52d0b80`
+- [Ethereum block 19,426,587](https://etherscan.io/block/19426587), first Cancun block, Etherscan
+- [Ethereum block 22,157,900](https://etherscan.io/block/22157900), SIR.trading attack block, Etherscan
+- [Ethereum block 25,987,506](https://etherscan.io/block/25987506), Startale example transaction block, Etherscan
 
 ### Related articles
 

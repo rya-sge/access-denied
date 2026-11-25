@@ -2,7 +2,7 @@
 layout: post
 title: "Ethereum's Hidden Contracts: The System Contracts Behind Every Block"
 date:   2026-11-04
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -15,7 +15,7 @@ isMermaid: true
 
 Since the Cancun fork of 2024-03-13 and the Prague fork of 2025-05-07, an execution client calls a few small contracts at every block from a reserved address. Part of what used to be protocol logic now lives in programs of a few hundred bytes that anyone can read: [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) beacon roots, [EIP-2935](https://eips.ethereum.org/EIPS/eip-2935) block hashes, and the [EIP-7002](https://eips.ethereum.org/EIPS/eip-7002) and [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251) request queues. This article walks through how the client calls them, what each one stores, what happens to a block when a call fails, and what a Solidity developer has to check before integrating with them.
 
-These contracts are ordinary accounts with ordinary bytecode, so the code on mainnet can be compared with its source in [`ethereum/sys-asm`](https://github.com/ethereum/sys-asm), the repository that holds them. For EIP-4788 the two differed by four bytes: a 2024 tidy-up made the source assemble to 93 bytes instead of the 97 on mainnet, the repository committed that 93-byte output in June 2026, and upstream restored the original on 2026-10-29. The first section lists the four contracts with their mainnet hashes.
+These contracts are ordinary accounts with ordinary bytecode, so the code on mainnet can be compared with its source in [`ethereum/sys-asm`](https://github.com/ethereum/sys-asm), the repository that holds them. For EIP-4788 the two differed by four bytes: a 2024 tidy-up made the source assemble to 93 bytes instead of the 97 on mainnet, the repository committed that 93-byte output in June 2026, and upstream restored the original on 2026-10-29. The first section lists the four contracts with their mainnet hashes, and the [timeline](#timeline) in the annex dates the forks and the source changes.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -553,6 +553,23 @@ jumpi @zero_excess     ; [added_count, excess, count]
 
 There was a second, smaller gap: the EIP text at `41a838d` placed the dequeue under the no-calldata case, whereas the code drains on the disabling call too, and the test asserts that its return data contains the record.
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 14 October 2020 | The staking deposit contract is deployed at `0x00000000219ab540356cBB839Cbe05303d7705Fa` in block [11,052,984](https://etherscan.io/block/11052984). | Its `DepositEvent` logs are what EIP-6110 reads from the receipts since Prague. | [Upgrading Ethereum, "The Deposit Contract"](https://eth2book.info/latest/part2/deposits-withdrawals/contract/) |
+| 26 September 2023 | After an audit, EIP-4788 shrinks its ring buffer from 98,304 to 8,191 entries, adds a revert on a zero timestamp and moves the contract to `0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02`. | It fixes the prime modulus, the zero check and the address described in the beacon-roots section. | [EIPs commit `761df834`, "post audit tweaks"](https://github.com/ethereum/EIPs/commit/761df83432837603da12879885c8b19381fa0c1d) |
+| 13 March 2024 | Cancun activates on mainnet at 13:55:35 UTC in block [19,426,587](https://etherscan.io/block/19426587), and the client starts calling the EIP-4788 contract before each block's transactions. | It is the first unchecked system call on mainnet. | [execution-specs, Cancun upgrade schedule](https://github.com/ethereum/execution-specs/blob/aaae5abd382b6c0612add96bd8400d6fa4eb0617/src/ethereum/forks/cancun/__init__.py) |
+| 27 October 2024 | `sys-asm` commit `bf907ca` ("all: tidy up") replaces `push3 BUFLEN` with `push BUFLEN` in the EIP-4788 source. | This edit made the repository build 93 bytes instead of the 97 on mainnet. | [sys-asm commit `bf907ca`](https://github.com/ethereum/sys-asm/commit/bf907ca02c2f46ce685b0e0371f6f238b94972a1) |
+| 18 November 2024 | `sys-asm` merges PR #35, which applies the fixes from "the first Prague audit" to the request queues and the EIP-2935 contract. | The Prague contracts described here are the audited versions, though the audit report itself was not found (see [Gaps](#gaps)). | [sys-asm PR #35, "all: prague audit fixes"](https://github.com/ethereum/sys-asm/pull/35) |
+| 7 May 2025 | Prague activates on mainnet at 10:05:11 UTC in block [22,431,084](https://etherscan.io/block/22431084), adding the EIP-2935 call, the EIP-7002 and EIP-7251 queue drains and the EIP-6110 deposit path. | From this block the four system contracts of the article are all called, two of them as checked calls. | [execution-specs, Prague upgrade schedule](https://github.com/ethereum/execution-specs/blob/aaae5abd382b6c0612add96bd8400d6fa4eb0617/src/ethereum/forks/prague/__init__.py) |
+| 27 June 2026 | `sys-asm` merges PR #43, which adds the EIP-8282 builder deposit and exit contracts. | It is the source of the two Amsterdam queues and of the choice to let the deposit queue accept requests before the fork. | [sys-asm PR #43](https://github.com/ethereum/sys-asm/pull/43) |
+| 6 July 2026 | `sys-asm` merges PR #49, which lets a system call with input disable the builder deposit queue until a later call without input. | It introduced the reversible inhibitor that the EIP text first called permanent. | [sys-asm PR #49](https://github.com/ethereum/sys-asm/pull/49) |
+| 29 October 2026 | `sys-asm` commit `d9ade46` restores `push3`, so the repository again builds the 97-byte EIP-4788 code deployed on mainnet. | It ends the bytecode difference described in the first section. | [sys-asm commit `d9ade46`](https://github.com/ethereum/sys-asm/commit/d9ade46ea44c81a0035068ef799a628af6d9d036) |
+| 11 November 2026 | EIPs commit `253f6bd` syncs EIP-8282 with `sys-asm` `83f9801`: a reversible inhibitor, pre-fork deposits accepted and a fee that rises per request. | It closes the gap between the specification and the code analysed in the EIP-8282 section. | [EIPs commit `253f6bd`](https://github.com/ethereum/EIPs/commit/253f6bd20d1b1b600228c0d696775a90720ba5f1) |
+
 ## Frequently Asked Questions
 
 **Q: What separates a system call from a transaction?**
@@ -613,6 +630,7 @@ These points were not settled by the sources read, or rest on inference, and sho
 | No client (Geth, Reth, Nethermind and others) was read; the article describes `execution-specs`. | Client code may differ in structure, though it must agree on results. | The system-call code of each client. |
 | That nobody holds a key for `SYSTEM_ADDRESS` and the fork-name pairs come from general knowledge rather than the analysed files. The 27.3-hour figure assumes no missed slots. | The access control assumes the address cannot sign. | The EIP-4788 discussion of the address. |
 | The 7702 note in the annex is an inference from `CALLER` semantics, not a tested case. EIP-7002 itself still says an EOA always overpays. | An EOA delegated to code might pay the exact fee. | A fork test with a 7702-delegated EOA. |
+| No audit report on the system contracts was read: neither the audit behind the EIP-4788 changes of 26 September 2023 nor "the first Prague audit" fixed in `sys-asm` PR #35 is named in those commits. | The timeline cannot give the auditor, date or scope of any review. | [EIPs commit `761df834`](https://github.com/ethereum/EIPs/commit/761df83432837603da12879885c8b19381fa0c1d), [sys-asm PR #35](https://github.com/ethereum/sys-asm/pull/35), and the Ethereum Foundation's published audit list, whose address is not known here. |
 
 ## References
 
@@ -643,6 +661,14 @@ These points were not settled by the sources read, or rest on inference, and sho
 - [EIP-8141: Frame Transaction](https://eips.ethereum.org/EIPS/eip-8141)
 - [EIP-8272: Recent Roots for Frame Transactions](https://eips.ethereum.org/EIPS/eip-8272)
 - [EIP-8282: Builder Execution Requests](https://eips.ethereum.org/EIPS/eip-8282)
+
+### Timeline sources
+
+- [Upgrading Ethereum, "2.7.2 The Deposit Contract"](https://eth2book.info/latest/part2/deposits-withdrawals/contract/), Ben Edgington, read 25 November 2026
+- [EIPs commit `761df834`, "Update EIP-4788: post audit tweaks"](https://github.com/ethereum/EIPs/commit/761df83432837603da12879885c8b19381fa0c1d), ethereum/EIPs, 26 September 2023
+- [execution-specs, Cancun fork module](https://github.com/ethereum/execution-specs/blob/aaae5abd382b6c0612add96bd8400d6fa4eb0617/src/ethereum/forks/cancun/__init__.py) and [Prague fork module](https://github.com/ethereum/execution-specs/blob/aaae5abd382b6c0612add96bd8400d6fa4eb0617/src/ethereum/forks/prague/__init__.py), ethereum/execution-specs, at commit `aaae5ab`
+- [sys-asm PR #35, "all: prague audit fixes"](https://github.com/ethereum/sys-asm/pull/35), ethereum/sys-asm, merged 18 November 2024
+- Block timestamps of blocks 11,052,984, 19,426,587 and 22,431,084, and the deposit contract's creation transaction, read on 25 November 2026 through the public [PublicNode](https://www.publicnode.com/) RPC
 
 ### Related articles
 

@@ -2,7 +2,7 @@
 layout: post
 title: "Inside the GitHub Advisory Database: What the Data Says and What It Does Not"
 date:   2026-11-05
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: security
@@ -18,7 +18,7 @@ The [GitHub Advisory Database](https://github.com/advisories) is a public catalo
 
 It records how vulnerabilities get reported and reviewed, more than how many exist. This article reads every file in one snapshot to show what an advisory contains and how to interpret its version ranges. It then looks at two features that a yearly count would misread: a spike in 2022 that disappears when the data is dated differently, and a rise in 2026 that does not.
 
-All counts come from commit `b6d0ec57e55` of 2026-11-04, and they will differ on any other date. A few figures come from a second check run on 2026-11-18 at the same commit, and the text marks them "check of 2026-11-18". The script that produces them is linked in the references.
+All counts come from commit `b6d0ec57e55` of 2026-11-04, and they will differ on any other date. A few figures come from a second check run on 2026-11-18 at the same commit, and the text marks them "check of 2026-11-18". The script that produces them is linked in the references, and the changes to the database itself are dated in the [timeline](#timeline) in the annex.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -318,6 +318,23 @@ The GitHub Advisory Database is a curated record of reported vulnerabilities, an
 | `published` can be an import date. | Choose the date field for the question being asked. |
 | Files change after publication. | Read `modified`, and pin the commit used. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 14 November 2019 | GitHub launched the GitHub Advisory Database, built from advisories created on GitHub and data mapped to packages in its dependency graph. | Repository security advisories were part of the database from the start, long before they drove the 2026 rise. | [Announcing GitHub Security Lab](https://github.blog/2019-11-14-announcing-github-security-lab-securing-the-worlds-code-together/) |
+| 16 December 2021 | GitHub added a separate section of unreviewed advisories, published automatically from the NVD feed, and kept Dependabot alerts for reviewed advisories only. | This is the origin of the split between the `unreviewed` and `github-reviewed` trees. | [GitHub changelog, unreviewed advisories section](https://github.blog/changelog/2021-12-16-advisory-database-now-includes-an-unreviewed-advisories-section/) |
+| 22 February 2022 | GitHub published the full database to the public `github/advisory-database` repository in OSV format and opened it to community contributions. | It is the repository and the file format this article analyses. | [GitHub Advisory Database now open to community contributions](https://github.blog/2022-02-22-github-advisory-database-now-open-to-community-contributions/) |
+| 8 June 2022 | GitHub announced that it had backfilled all historical NVD advisories, bringing the database to over 160,000 advisories. | It fits the 175,311 unreviewed files dated 2022 and the old CVE identifiers behind the May 2022 spike. | [GitHub changelog, historical NVD advisories](https://github.blog/changelog/2022-06-08-all-historical-nvd-advisories-are-now-listed-on-github/) |
+| 15 June 2022 | GitHub began publishing malware advisories, created after a malicious package is removed. | These are the malware advisories that the repository's files do not export as a separate type. | [GitHub now publishes malware advisories](https://github.blog/2022-06-15-github-now-publishes-malware-advisories-in-the-github-advisory-database/) |
+| 19 April 2023 | Private vulnerability reporting became generally available for public repositories. | It is one of the reporting paths behind the repository-advisory channel that carries most of the 2026 rise. | [Private vulnerability reporting now generally available](https://github.blog/2023-04-19-private-vulnerability-reporting-now-generally-available) |
+| 13 September 2024 | Repository security advisories gained CVSS 4.0 scoring, shown on the published global advisory and through the API. | It explains why the severity data mixes v3 and v4 vectors. | [GitHub changelog, CVSS 4.0](https://github.blog/changelog/2024-09-13-github-security-advisories-support-cvss-4-0) |
+| 29 June 2026 | GitHub reported 1,560 reviewed advisories published in May 2026, the highest monthly figure in the database's history, with review taking weeks for part of the queue. | It is GitHub's own account of the 2026 rise and of the review delay that makes the not-linked count a lower bound. | [Inside the Advisory Database](https://github.blog/security/supply-chain-security/inside-the-advisory-database-and-what-happens-when-vulnerability-volume-breaks-records) |
+| 28 July 2026 | The database began ingesting malware advisories from the OpenSSF malicious-packages repository, for npm, PyPI and other ecosystems. | These advisories are listed under `type:malware`, a value absent from the repository files of 4 November 2026. | [GitHub changelog, malicious packages](https://github.blog/changelog/2026-07-28-dependabot-alerts-on-malicious-packages-across-more-ecosystems) |
+| 2 October 2026 | The GraphQL `SecurityAdvisory` object gained fields including `githubReviewedAt`, `nvdPublishedAt` and `repositoryAdvisoryUrl`. | The API now exposes the review clock, the NVD date and the repository-advisory link that this article reads from the files. | [GitHub changelog, SecurityAdvisory GraphQL fields](https://github.blog/changelog/2026-10-02-new-fields-for-securityadvisory-graphql-api) |
+
 ## Frequently Asked Questions
 
 **Q: What separates a reviewed advisory from an unreviewed one?**
@@ -358,9 +375,9 @@ The points below remain open after this analysis.
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| The cause of the 2026 rise is unknown. | The article reports where it occurred, not why. | A sample of 2026 advisories, per-repository reporter data, and GitHub's own statements. |
+| The cause of the 2026 rise is unknown. | The article reports where it occurred, not why, and [GitHub's post of 29 June 2026](https://github.blog/security/supply-chain-security/inside-the-advisory-database-and-what-happens-when-vulnerability-volume-breaks-records) reports more private reports and repository advisories without naming a cause beyond a "structural change" in disclosure. | A sample of 2026 advisories and per-repository reporter data. |
 | The repository-advisory link is a proxy based on reference URLs. | Some advisories may have the link without having originated there, or the reverse. | A sample compared against repository advisory pages. |
-| The May 2022 event is inferred to be a bulk import. | The data fits, but no source was found that describes it. | The repository's git history around 2022-05 and GitHub's changelog. |
+| The May 2022 event is inferred to be a bulk import. | The data fits, and [GitHub's changelog of 8 June 2022](https://github.blog/changelog/2022-06-08-all-historical-nvd-advisories-are-now-listed-on-github/) describes a backfill of historical NVD advisories into the unreviewed section, but no source describes the reviewed files dated May 2022. | The repository's git history around 2022-05, which holds 53,603 commits dated that month. |
 | The meaning of `last_known_affected_version_range` is inferred from samples. | The reading of ranges next to that bound rests on it. | The OSV schema and GitHub's contribution documentation. |
 | Advisories of type `type:malware` are not exported, and the 423 CWE-506 advisories may cover only part of them. The reason was not checked. | Consumers could assume the repository lists every known malicious package. | GitHub's documentation on malware advisories, and the `type:malware` listing compared with the CWE-506 files. |
 | The 2026 figures were taken while review and NVD dates were still catching up. | The not-linked count of 1,738 is a lower bound, the 85.0% share is likely to fall, and the missing NVD dates may be filled in later. | A rerun of the analysis at a later commit, comparing advisories of the same age. |
@@ -384,6 +401,19 @@ The points below remain open after this analysis.
 - [Common Vulnerability Scoring System](https://www.first.org/cvss/)
 - [Common Weakness Enumeration](https://cwe.mitre.org/)
 - [National Vulnerability Database](https://nvd.nist.gov/)
+
+### Timeline sources
+
+- [Announcing GitHub Security Lab: securing the world's code, together](https://github.blog/2019-11-14-announcing-github-security-lab-securing-the-worlds-code-together/), Jamie Cool, GitHub, 14 November 2019
+- [Advisory Database now includes an unreviewed advisories section](https://github.blog/changelog/2021-12-16-advisory-database-now-includes-an-unreviewed-advisories-section/), GitHub changelog, 16 December 2021
+- [GitHub Advisory Database now open to community contributions](https://github.blog/2022-02-22-github-advisory-database-now-open-to-community-contributions/), Kate Catlin, GitHub, 22 February 2022
+- [All historical NVD advisories are now listed on GitHub](https://github.blog/changelog/2022-06-08-all-historical-nvd-advisories-are-now-listed-on-github/), GitHub changelog, 8 June 2022
+- [GitHub now publishes malware advisories in the GitHub Advisory Database](https://github.blog/2022-06-15-github-now-publishes-malware-advisories-in-the-github-advisory-database/), Brittany O'Shea and Kate Catlin, GitHub, 15 June 2022
+- [Private vulnerability reporting now generally available](https://github.blog/2023-04-19-private-vulnerability-reporting-now-generally-available), Eric Tooley and Kate Catlin, GitHub, 19 April 2023
+- [GitHub security advisories support CVSS 4.0](https://github.blog/changelog/2024-09-13-github-security-advisories-support-cvss-4-0), GitHub changelog, 13 September 2024
+- [Inside the Advisory Database and what happens when vulnerability volume breaks records](https://github.blog/security/supply-chain-security/inside-the-advisory-database-and-what-happens-when-vulnerability-volume-breaks-records), Madison Ficorilli, GitHub, 29 June 2026
+- [Dependabot alerts on malicious packages across more ecosystems](https://github.blog/changelog/2026-07-28-dependabot-alerts-on-malicious-packages-across-more-ecosystems), GitHub changelog, 28 July 2026
+- [New fields for SecurityAdvisory GraphQL API](https://github.blog/changelog/2026-10-02-new-fields-for-securityadvisory-graphql-api), GitHub changelog, 2 October 2026
 
 ### Related articles
 

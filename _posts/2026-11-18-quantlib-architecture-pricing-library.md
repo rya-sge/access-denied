@@ -2,7 +2,7 @@
 layout: post
 title: "QuantLib - Architecture of the Open-Source Quantitative Finance Library, with Python and C++ Examples"
 date:   2026-11-18
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: finance programmation
@@ -35,7 +35,7 @@ The article assumes basic programming and finance vocabulary, and uses the follo
 
 ## What QuantLib is
 
-QuantLib is maintained on GitHub at [lballabio/QuantLib](https://github.com/lballabio/QuantLib). The source analysed here is the `master` branch at commit `1c418a9` of 18 November 2026, which reports itself as version `1.45-dev`; the latest release at that date is [v1.44](https://github.com/lballabio/QuantLib/releases/tag/v1.44) (tagged 13 October 2026), and the commit is 592 commits after it. The Python examples below use the 1.44 wheel from PyPI, the C++ example uses the library built from the pinned commit.
+QuantLib is maintained on GitHub at [lballabio/QuantLib](https://github.com/lballabio/QuantLib). The source analysed here is the `master` branch at commit `1c418a9` of 18 November 2026, which reports itself as version `1.45-dev`; the latest release at that date is [v1.44](https://github.com/lballabio/QuantLib/releases/tag/v1.44) (tagged 13 October 2026), and the commit is 592 commits after it. The Python examples below use the 1.44 wheel from PyPI, the C++ example uses the library built from the pinned commit. The releases that shaped the library's current form are dated in the [timeline](#timeline) in the annex.
 
 The library is written in C++17 and needs Boost for its headers only. The rules for contributing code are covered under [Extending the library](#extending-the-library).
 
@@ -526,6 +526,22 @@ QuantLib separates the contract from its valuation and connects both to market d
 | Monte Carlo engines depend on the seed and the number of paths. | Pass a seed for reproducibility and report `errorEstimate()` with the price. |
 | Classes in `ql/experimental/` may change interface between releases. | Pin the QuantLib version in production and read `News.md` before upgrading. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 20 October 2000 | Luigi Ballabio committed the initial revision of QuantLib, 81 files and 6,840 lines. | It is the start of the history behind the copyright notices from 2000 mentioned in the introduction. | [Initial revision, commit `cb6a067`](https://github.com/lballabio/QuantLib/commit/cb6a067a2412c1c3e8eba61e6c5803e72d3ba3dc) |
+| 24 February 2010 | QuantLib 1.0 was tagged. | It opens the 1.x series to which every version used in this article (1.44 and `1.45-dev`) belongs. | [QuantLib-v1.0 release page](https://github.com/lballabio/QuantLib/releases/tag/QuantLib-v1.0) |
+| 30 August 2019 | Version 1.16.1, the oldest release listed for the `QuantLib` package on PyPI, was uploaded as prebuilt wheels. | The Python examples install the library from this package with `pip install QuantLib==1.44`. | [QuantLib release history on PyPI](https://pypi.org/project/QuantLib/#history) |
+| 16 January 2023 | Release 1.29 replaced the internal use of `boost::thread` with `std::thread`, removing the last dependency on Boost binaries. | Since this release, QuantLib can be built against a header-only Boost installation, as the article states. | [QuantLib 1.29 release notes](https://github.com/lballabio/QuantLib/releases/tag/QuantLib-v1.29) |
+| 17 July 2023 | Release 1.31 added an option, `alwaysForwardNotifications()` or the `QL_FASTER_LAZY_OBJECTS` switch, so that `LazyObject` forwards every notification instead of only the first one after a recalculation. | It changes the notification path described in the LazyObject section, which by default still forwards only one notification. | [QuantLib 1.31 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.31) |
+| 19 October 2023 | Release 1.32 made all cash flows lazy objects. | Coupons now take part in the same cache-and-notify mechanism as instruments and curves. | [QuantLib 1.32 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.32) |
+| 13 October 2024 | Release 1.36 made a C++17 compiler a requirement and dropped Visual C++ 2015, g++ up to 6.x and clang up to 4. | It is the release from which the library is written in C++17, the standard the C++ example is compiled with. | [QuantLib 1.36 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.36) |
+| 21 July 2025 | Release 1.39 switched the default of `ext::any` and `ext::optional` from the Boost implementation to the standard one. | It moved the library further from Boost and towards the C++17 standard library. | [QuantLib 1.39 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.39) |
+| 13 October 2026 | Release 1.44 removed the Boost implementation of `any` and `optional` and added the `QL_REQUIRE_EXPLICIT_EVALUATION_DATE` switch (pull request #2644). | It is the release used by the Python examples, and the switch is the one recommended in the evaluation-date section and the Integration Notes. | [QuantLib 1.44 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.44) |
+
 ## Frequently Asked Questions
 
 **Q: What is the difference between an instrument and a pricing engine in QuantLib?**
@@ -586,6 +602,7 @@ The sources were read and the examples run at one commit; the following points w
 | How the Python bindings keep a `SimpleQuote` or a curve alive once the Python variable that created it goes out of scope was not checked. | A handle that outlives its target would make the notification chain fail. | The QuantLib-SWIG `*.i` files and the `registerAsObserver` warning in `ql/handle.hpp`. |
 | Only a business-day-convention mismatch (0.019 bp) was measured between a curve and a swap; a day-counter or calendar mismatch was not run. | The size of the silent error in practice depends on which convention differs. | Rerun `rates.py` in the verification directory with a different fixed-leg day counter in the helpers. |
 | L. Ballabio's book on the library's design was not read for this article. | It explains design choices the source only implies. | [*Implementing QuantLib*](https://leanpub.com/implementingquantlib) (Leanpub). |
+| The release dates of the 0.x series, between the initial revision of October 2000 and release 1.0 of February 2010, were not found in the repository, whose tags start at 1.0. | The timeline jumps ten years and does not date the first public release. | The project's download history on SourceForge (not opened for this article) and the `News.txt` file at the [QuantLib-v1.0 tag](https://github.com/lballabio/QuantLib/releases/tag/QuantLib-v1.0). |
 
 ## References
 
@@ -601,6 +618,18 @@ The sources were read and the examples run at one commit; the following points w
 - L. Ballabio, [*Implementing QuantLib*](https://leanpub.com/implementingquantlib), Leanpub
 - [Black, Fischer, and Myron Scholes. "The Pricing of Options and Corporate Liabilities." *Journal of Political Economy* 81, no. 3 (1973): 637-654.](https://www.jstor.org/stable/1831029)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- [Initial revision, commit `cb6a067`](https://github.com/lballabio/QuantLib/commit/cb6a067a2412c1c3e8eba61e6c5803e72d3ba3dc) — L. Ballabio, lballabio/QuantLib on GitHub, 2000-10-20.
+- [QuantLib-v1.0 release page](https://github.com/lballabio/QuantLib/releases/tag/QuantLib-v1.0) — QuantLib project, GitHub, tag of 2010-02-24.
+- [QuantLib release history](https://pypi.org/project/QuantLib/#history) — QuantLib Team, PyPI, oldest release 2019-08-30.
+- [QuantLib 1.29 release notes](https://github.com/lballabio/QuantLib/releases/tag/QuantLib-v1.29) — QuantLib project, GitHub, 2023-01-16.
+- [QuantLib 1.31 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.31) — QuantLib project, GitHub, 2023-07-17.
+- [QuantLib 1.32 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.32) — QuantLib project, GitHub, 2023-10-19.
+- [QuantLib 1.36 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.36) — QuantLib project, GitHub, 2024-10-13.
+- [QuantLib 1.39 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.39) — QuantLib project, GitHub, 2025-07-21.
+- [QuantLib 1.44 release notes](https://github.com/lballabio/QuantLib/releases/tag/v1.44) — QuantLib project, GitHub, 2026-10-13.
 
 ### Related articles
 

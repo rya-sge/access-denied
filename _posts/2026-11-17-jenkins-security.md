@@ -2,7 +2,7 @@
 layout: post
 title: "Jenkins Security - Threat Model, Permissions, Groovy, Credentials and Nine Years of Advisories"
 date:   2026-11-17
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: security programmation
@@ -253,7 +253,7 @@ The CLI has been the entry point of several critical issues. In [2017-04-26](htt
 
 ## Notable advisories
 
-The table lists core advisories referred to in this article, plus other notable core issues, read from the advisory files. Severities are the Jenkins security team's. SECURITY-4125 is a code execution rated High rather than Critical because the attacker needs Overall/Read and either a user account or a permission to submit `config.xml`.
+The table lists core advisories referred to in this article, plus other notable core issues, read from the advisory files. Severities are the Jenkins security team's. SECURITY-4125 is a code execution rated High rather than Critical because the attacker needs Overall/Read and either a user account or a permission to submit `config.xml`. The timeline in the annex places the main advisories next to the security-model changes made in core releases.
 
 | Date | Issue | CVE | Severity | What happened |
 |---|---|---|---|---|
@@ -572,6 +572,23 @@ The checklist is derived from the Jenkins documentation read for this article. E
 | ☐ | Scripted clients use API tokens passed by file or environment, and tokens are revoked when an account is offboarded. | Passwords in scripts, or tokens that outlive a locked directory account. |
 | ☐ | `hudson.cli.CLICommand.allowAtSyntax` and other security escape-hatch system properties are not set. | Fixed vulnerabilities, including CVE-2024-23897, are re-enabled. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 26 April 2017 | The Jenkins project published SECURITY-429 (CVE-2017-1000353), an unauthenticated remote code execution through deserialization in the Remoting-based CLI. | It is the first of the CLI issues in the section on exposed services, and the advisory asked administrators to stop using the Remoting CLI. | [Jenkins Security Advisory 2017-04-26](https://www.jenkins.io/security/advisory/2017-04-26/) |
+| 14 January 2018 | Jenkins 2.102 replaced the Remoting and XStream class denylist with an allowlist (JEP-200). | This allowlist is the JEP-200 class filter that the agent boundary section counts among the three controls on the Remoting channel. | [Jenkins 2.102 changelog](https://www.jenkins.io/changelog/2.102/) |
+| 5 December 2018 | The project published SECURITY-595 (CVE-2018-1000861), code execution through crafted URLs that reached methods Stapler routing was never meant to expose. | It shows why every public `do*` method and getter is treated as an endpoint that needs its own permission check. | [Jenkins Security Advisory 2018-12-05](https://www.jenkins.io/security/advisory/2018-12-05/) |
+| 17 February 2019 | Jenkins 2.165 removed the Remoting mode of the CLI from the server and from the bundled `jenkins-cli.jar`. | Since then the CLI runs only over HTTP, WebSocket or SSH, the modes the exposed services section describes. | [Remoting-based CLI removed from Jenkins](https://www.jenkins.io/blog/2019/02/17/remoting-cli-removed/) |
+| 4 November 2021 | Jenkins 2.319 and LTS 2.303.3 fixed SECURITY-2455, a set of path-filtering bypasses in agent-to-controller access control with eleven CVE IDs, and limited agents to the build directories of their own running builds. | It is the first of the three Critical agent boundary failures listed in this article, and the fix that ended an agent's write access to every other build's directory (SECURITY-2428). | [Jenkins Security Advisory 2021-11-04](https://www.jenkins.io/security/advisory/2021-11-04/) |
+| 20 December 2021 | Jenkins 2.326 made the agent-to-controller security subsystem always enabled and removed its admin-customizable allowlists. | From this version an administrator can no longer switch off the protection the agent boundary section depends on. | [Jenkins 2.326 changelog](https://www.jenkins.io/changelog/2.326/) |
+| 24 January 2024 | The project published SECURITY-3314 (CVE-2024-23897), an arbitrary file read through the CLI's `@file` argument expansion, fixed in Jenkins 2.442, LTS 2.426.3 and LTS 2.440.1. | It is the case the article follows from a file read to code execution, and the advisory that raised file-read scoring to high on all three CVSS impacts. | [Jenkins Security Advisory 2024-01-24](https://www.jenkins.io/security/advisory/2024-01-24/) |
+| 7 August 2024 | The project published SECURITY-3430 (CVE-2024-43044), an arbitrary file read on the controller through `ClassLoaderProxy#fetchJar` from agent connections, fixed in Jenkins 2.471, LTS 2.452.4 and LTS 2.462.1. | It is the second Critical break of the agent boundary, and a reason to give builds of untrusted code agents that hold nothing else. | [Jenkins Security Advisory 2024-08-07](https://www.jenkins.io/security/advisory/2024-08-07/) |
+| 25 November 2025 | Jenkins 2.539 added a configurable Content-Security-Policy for the Jenkins UI and an API for plugins to relax or tighten its rules. | This is the UI CSP that the browser-side section describes and that `infra.ci.jenkins.io` enforces. | [Jenkins 2.539 changelog](https://www.jenkins.io/changelog/2.539/) |
+| 5 August 2026 | The project published SECURITY-3911 (CVE-2026-70426), a bypass of the JEP-200 class filter through a fallback path of Remoting deserialization, fixed in Jenkins 2.576 and LTS 2.568.2. | It is the third Critical agent boundary failure, and it hit the same class filter introduced in 2018. | [Jenkins Security Advisory 2026-08-05](https://www.jenkins.io/security/advisory/2026-08-05/) |
+
 ## Frequently Asked Questions
 
 **Q: Why is Overall/Administer treated as equivalent to a full compromise of the instance?**
@@ -691,6 +708,13 @@ The points below were not settled by the sources read for this article.
 - [Jenkins Security Advisory 2026-09-16](https://www.jenkins.io/security/advisory/2026-09-16/) (Script Security sandbox bypasses)
 - [Jenkins Security Advisory 2026-10-28](https://www.jenkins.io/security/advisory/2026-10-28/) (SECURITY-4122, SECURITY-4125)
 - [Jenkins Security Advisories index](https://www.jenkins.io/security/advisories/)
+
+### Timeline sources
+
+- [Changelog for 2.102](https://www.jenkins.io/changelog/2.102/), Jenkins project, 14 January 2018 (JEP-200 allowlist)
+- [Remoting-based CLI removed from Jenkins](https://www.jenkins.io/blog/2019/02/17/remoting-cli-removed/), Jenkins blog, 17 February 2019
+- [Changelog for 2.326](https://www.jenkins.io/changelog/2.326/), Jenkins project, 20 December 2021 (agent-to-controller security always enabled)
+- [Changelog for 2.539](https://www.jenkins.io/changelog/2.539/), Jenkins project, 25 November 2025 (Content-Security-Policy for the Jenkins UI)
 
 ### Standards and frameworks
 

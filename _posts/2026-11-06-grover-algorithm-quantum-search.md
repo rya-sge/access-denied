@@ -2,7 +2,7 @@
 layout: post
 title: "Grover's Algorithm: Quantum Search and Its Real Cost for Symmetric Cryptography"
 date:   2026-11-06
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: cryptography post-quantum
@@ -38,7 +38,7 @@ The paper abstracts the task as follows. A system has $$N = 2^n$$ states $$S_1, 
 
 Nothing about $$C$$ may be used except its answers. A classical algorithm can only try candidates, and it needs $$N/2$$ evaluations to reach a success probability of $$1/2$$. Grover's phone-directory image, a directory in random order searched by number, has made "database search" the common name, and that name misleads. The practical use is searching the inputs of a *function*, such as "does this key decrypt this block?". Section 7 of the paper makes this point itself: computing the function at each point avoids storing the data in quantum memory.
 
-A few slips in the paper's step labels and references, none affecting the proofs, are listed in the [Annex](#corrections-to-the-paper).
+A few slips in the paper's step labels and references, none affecting the proofs, are listed in the [Annex](#corrections-to-the-paper), and the [timeline](#timeline) in the same annex dates the later bounds, the first experiments and the NIST guidance.
 
 ## The algorithm
 
@@ -357,6 +357,23 @@ One statement in section 6 looks like an error and is not. It says BBHT show the
 
 Most derived values in this article come from [`verify_grover.py`](https://github.com/rya-sge/access-denied/tree/main/verification/grover-algorithm-quantum-search). It builds $$W$$, $$R$$ and $$D$$ explicitly and checks $$D = WRW$$, runs the Theorem 2 recurrence up to $$N = 2^{20}$$, and compares a full state-vector simulation with the closed form for $$N$$ up to 1024 and several values of $$M$$. It also reproduces the BBHT figures for $$N = 2^{20}$$ and their Lemma 2, the averaged success probability $$P_m$$ of a uniformly random iteration count. The values for $$N = 1024$$ in the figure (25 and 12 iterations, $$P = 0.0023$$) come from the figure's own script, `grover-success-probability.py`.
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 23 May 1996 | Boyer, Brassard, Høyer and Tapp post *Tight bounds on quantum searching*, with the closed form of the success probability and a search for an unknown number of solutions. | It gives the exact iteration count and the randomised schedule used in [How many iterations](#how-many-iterations). | [arXiv:quant-ph/9605034](https://arxiv.org/abs/quant-ph/9605034) |
+| May 1996 | Grover presents *A fast quantum mechanical algorithm for database search* at STOC 1996 and posts it on arXiv on 29 May, with the revised v3 on 19 November. | This is the paper the article follows. | [arXiv:quant-ph/9605043](https://arxiv.org/abs/quant-ph/9605043) |
+| 1 January 1997 | Bennett, Bernstein, Brassard and Vazirani post *Strengths and weaknesses of quantum computing*, published in SIAM Journal on Computing the same year. | It is the BBBV lower bound that Grover's paper quotes for optimality up to a constant. | [arXiv:quant-ph/9701001](https://arxiv.org/abs/quant-ph/9701001) |
+| 26 November 1997 | Zalka posts *Grover's quantum searching algorithm is optimal*, which also shows that search parallelises no better than splitting the space. | It settles the constant and is the source of the $$\sqrt S$$ limit on parallel machines. | [arXiv:quant-ph/9711070](https://arxiv.org/abs/quant-ph/9711070) |
+| 13 April 1998 | Chuang, Gershenfeld and Kubinec publish an NMR implementation of Grover search over four states in Physical Review Letters. | The authors present it as the first complete experiment that runs a search in fewer steps than a classical one, here on two qubits. | [Physical Review Letters 80, 3408](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.80.3408) |
+| 15 December 2015 | Grassl, Langenberg, Roetteler and Steinwandt post quantum circuits and resource estimates for Grover key search on AES-128, AES-192 and AES-256. | Their gate counts are the basis of the NIST figures in this article. | [arXiv:1512.04965](https://arxiv.org/abs/1512.04965) |
+| 20 December 2016 | NIST opens its post-quantum call for proposals, defining security categories by AES key search and SHA collision search, with Grover limited by MAXDEPTH. | It is where the $$2^{170}$$/MAXDEPTH estimate for AES-128 and the parallelism argument first appear as NIST guidance. | [NIST CSRC announcement](https://csrc.nist.gov/news/2016/public-key-post-quantum-cryptographic-algorithms) and [call for proposals](https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-Cryptography/documents/call-for-proposals-final-dec-2016.pdf) |
+| 30 March 2017 | Figgatt et al. post a complete three-qubit Grover search on a programmable trapped-ion computer, later published in Nature Communications. | It tests every single-solution and two-solution oracle on eight states, the case of the worked $$N = 8$$ example. | [arXiv:1703.10535](https://arxiv.org/abs/1703.10535) |
+| 13 August 2024 | NIST publishes FIPS 205, whose SLH-DSA parameter sets with 16, 24 and 32-byte hashes are claimed in categories 1, 3 and 5. | It shows hash lengths sized against generic search at the AES reference levels. | [FIPS 205](https://csrc.nist.gov/pubs/fips/205/final) |
+| 27 October 2026 | NIST publishes the final IR 8547, which states that approved symmetric primitives with at least 128 bits of classical security meet at least category 1 and that NIST does not expect to transition away from them. | It places AES-128 in category 1, the reading the cost analysis above supports. | [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final) |
+
 ## Frequently Asked Questions
 
 **Q: What does one Grover iteration do to the amplitudes?**
@@ -402,9 +419,9 @@ These points were not settled by the sources read, or rest on inference, and sho
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
 | The revised AES estimates of [Jaques et al.](https://eprint.iacr.org/2019/1146) (Eurocrypt 2020, ePrint 2019/1146) were not read; only the page note was seen. | They give lower costs than [Grassl et al.](https://arxiv.org/abs/1512.04965), so the NIST column may overstate the attack. | The tables in the revised version of [ePrint 2019/1146](https://eprint.iacr.org/2019/1146). |
-| The figures were checked against the full text of the [NIST page](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)), which does not cite Jaques et al. The day of the final [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final) was not confirmed; its page gives October 2026. | Later NIST documents may update the figures quoted here. | [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final). |
+| The figures were checked against the full text of the [NIST page](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)), which does not cite Jaques et al. The final [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final) of 27 October 2026 was read only for its symmetric-cryptography section. | Later NIST documents may update the figures quoted here. | [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final). |
 | Only the abstract of Bernstein's collision paper was read. | The table row on collisions relies on its conclusion and not on its cost model. | The full text of [Bernstein, *Cost analysis of hash collisions*](https://cr.yp.to/hash/collisioncost-20090823.pdf). |
-| The BBBV paper was read only as quoted by Grover. | The lower-bound summary is second-hand. | Bennett et al., *Strengths and weaknesses of quantum computing*, SIAM J. Comput., 1997 (no link: the paper's URL was not checked). |
+| The BBBV paper was read only as quoted by Grover; only its arXiv abstract page was opened for the timeline. | The lower-bound summary is second-hand. | [Bennett et al., *Strengths and weaknesses of quantum computing*, arXiv:quant-ph/9701001](https://arxiv.org/abs/quant-ph/9701001), SIAM J. Comput., 1997. |
 | The phase-kickback and reflection-pair descriptions come from general knowledge, not from the paper. | They are standard, but the sources read do not state them in this form. | Nielsen and Chuang, *Quantum Computation and Quantum Information*, chapter 6. |
 | The relation $$S \cdot T \approx (\pi/4)^2 N/T$$ and its link to the NIST formula are derived here. | NIST does not present its estimate that way; it only notes that parallel runs make the speedup less dramatic and cites Zalka (footnote 6). | [Grassl et al.](https://arxiv.org/abs/1512.04965), and section 4 of [Zalka](https://arxiv.org/abs/quant-ph/9711070). |
 | The Babbush et al. hardware figures were not recomputed. | They depend on assumptions those authors chose. | Section III D of [Babbush et al.](https://arxiv.org/abs/2603.28846) |
@@ -413,6 +430,7 @@ These points were not settled by the sources read, or rest on inference, and sho
 | The number of plaintext-ciphertext pairs a key search needs (three for AES-128 in Grassl et al.) is quoted without the reason or the counts for AES-192 and AES-256. | The likely reason, not checked here, is to make the key unique so that $$M = 1$$, and each pair adds a reversible AES evaluation to the oracle. | The key-search section of [Grassl et al.](https://arxiv.org/abs/1512.04965). |
 | The Shor reference is cited for a known result and was not read for this article. | The table row depends on it. | [Shor, arXiv:quant-ph/9508027](https://arxiv.org/abs/quant-ph/9508027) |
 | Grover applied inside lattice sieving, or to the symmetric parts of ML-KEM and ML-DSA, is not covered. | These affect post-quantum parameter estimates. | The security sections of [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) and [FIPS 204](https://csrc.nist.gov/pubs/fips/204/final), and the lattice cryptanalysis literature. |
+| The timeline stops at the three-qubit trapped-ion run of 2017 for experiments. | Later demonstrations on more qubits or on superconducting hardware may change the picture of what has been run. | A survey of Grover implementations since [Figgatt et al., arXiv:1703.10535](https://arxiv.org/abs/1703.10535), not done for this article. |
 
 ## References
 
@@ -428,7 +446,7 @@ These points were not settled by the sources read, or rest on inference, and sho
 
 - M. Boyer, G. Brassard, P. Høyer, A. Tapp, [*Tight bounds on quantum searching*](https://arxiv.org/abs/quant-ph/9605034), Fortschritte der Physik 46, 1998, pp. 493-506.
 - C. Zalka, [*Grover's quantum searching algorithm is optimal*](https://arxiv.org/abs/quant-ph/9711070), Physical Review A 60, 1999, pp. 2746-2751.
-- C. H. Bennett, E. Bernstein, G. Brassard, U. Vazirani, *Strengths and weaknesses of quantum computing*, cited as [BBBV96] in the paper.
+- C. H. Bennett, E. Bernstein, G. Brassard, U. Vazirani, [*Strengths and weaknesses of quantum computing*](https://arxiv.org/abs/quant-ph/9701001), arXiv:quant-ph/9701001, 1 January 1997; SIAM J. Comput. 26(5), 1997, pp. 1510-1523; cited as [BBBV96] in the paper.
 - G. Brassard, P. Høyer, M. Mosca, A. Tapp, [*Quantum Amplitude Amplification and Estimation*](https://arxiv.org/abs/quant-ph/0005055), AMS Contemporary Mathematics 305, 2002, pp. 53-74.
 - C. Dürr, P. Høyer, [*A Quantum Algorithm for Finding the Minimum*](https://arxiv.org/abs/quant-ph/9607014), 1996.
 - D. Deutsch, R. Jozsa, [*Rapid solution of problems by quantum computation*](https://doi.org/10.1098/rspa.1992.0167), Proc. R. Soc. Lond. A 439, 1992, pp. 553-558.
@@ -445,6 +463,14 @@ These points were not settled by the sources read, or rest on inference, and sho
 - D. J. Bernstein, [*Cost analysis of hash collisions: will quantum computers make SHARCS obsolete?*](https://cr.yp.to/hash/collisioncost-20090823.pdf), 2009.
 - M. Kudinov, J. Nick, [*Hash-based Signature Schemes for Bitcoin*](https://eprint.iacr.org/2025/2203), revision 2025-12-05, section 12.
 - R. Babbush et al., [*Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities: Resource Estimates and Mitigations*](https://arxiv.org/abs/2603.28846), arXiv:2603.28846v2, 15 April 2026.
+
+### Timeline sources
+
+- I. L. Chuang, N. Gershenfeld, M. Kubinec, [*Experimental Implementation of Fast Quantum Searching*](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.80.3408), Physical Review Letters 80, 3408, 13 April 1998.
+- C. Figgatt, D. Maslov, K. A. Landsman, N. M. Linke, S. Debnath, C. Monroe, [*Complete 3-Qubit Grover Search on a Programmable Quantum Computer*](https://arxiv.org/abs/1703.10535), arXiv:1703.10535, 30 March 2017; Nature Communications 8, 1918, 2017.
+- NIST, [*Announcing Request for Nominations for Public-Key Post-Quantum Cryptographic Algorithms*](https://csrc.nist.gov/news/2016/public-key-post-quantum-cryptographic-algorithms), 20 December 2016.
+- NIST, [*Submission Requirements and Evaluation Criteria for the Post-Quantum Cryptography Standardization Process*](https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-Cryptography/documents/call-for-proposals-final-dec-2016.pdf), December 2016, section 4.A.5.
+- NIST, D. Moody et al., [NIST IR 8547, *Transition to Post-Quantum Cryptography Standards*](https://csrc.nist.gov/pubs/ir/8547/final), final, 27 October 2026, section 4.1.3.
 
 ### Related articles
 

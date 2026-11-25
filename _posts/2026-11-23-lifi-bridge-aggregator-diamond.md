@@ -2,7 +2,7 @@
 layout: post
 title: "How LI.FI Works - The Bridge Aggregator Diamond, Its Allow-List and Two Approval Drains"
 date:   2026-11-23
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -478,7 +478,7 @@ The resulting asymmetry is intended: a single key can stop the diamond at once, 
 
 ## Deployments: EVM chains, TRON and CREATE3
 
-The repository keeps two records per network, one with the deployed addresses and one with the facets installed on the diamond, plus a shared log of every deployment. The production diamond on Ethereum is `0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE`, logged as version 1.0.0 deployed on 2023-07-27. The same address is recorded on 21 networks, including Arbitrum, Base, BSC, Optimism and Polygon; other chains use other addresses, zkSync for instance `0x341e94069f53234fE6DabeF707aD424830525715`. On mainnet the main periphery contracts are:
+The repository keeps two records per network, one with the deployed addresses and one with the facets installed on the diamond, plus a shared log of every deployment. The production diamond on Ethereum is `0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE`, logged as version 1.0.0 with a 2023-07-27 timestamp, although the chain shows it was created on 20 October 2022 (block [15,788,692](https://etherscan.io/block/15788692)). The same address is recorded on 21 networks, including Arbitrum, Base, BSC, Optimism and Polygon; other chains use other addresses, zkSync for instance `0x341e94069f53234fE6DabeF707aD424830525715`. On mainnet the main periphery contracts are:
 
 - `Executor`: `0xd9B2…0E88`
 - `FeeCollector`: `0x3Ef2…1d6F`
@@ -539,7 +539,7 @@ The contracts are one part of a larger stack:
 
 ## Two exploits from one root cause
 
-Both LI.FI incidents spent allowances that users had given to the diamond. Neither broke a bridge.
+Both LI.FI incidents spent allowances that users had given to the diamond. Neither broke a bridge. The [timeline](#timeline) in the annex dates them, with the ownership and facet changes around them.
 
 ### March 2022: unvalidated `SwapData` in the CBridge swap path
 
@@ -549,7 +549,7 @@ The first diamond, `0x5A9Fd7c39a6C488E715437D7b1f3C823d5596eD1`, exposed `swapAn
 - **Steps 1 to 37 were not swaps.** Each pointed the call at a token contract (USDT, USDC, DAI, LINK, AAVE and others), declared the native sentinel `address(0)` as input with an amount of 0, and carried `transferFrom(victim, attacker, amount)` as calldata. The facet pulled and approved nothing for these steps and executed the call; since the diamond was the approved spender, each `transferFrom` succeeded.
 - **The bridge step was real.** The facet sent the 49.86 USDC through cBridge to Arbitrum, to the attacker's address.
 
-The whole incident is reported at about $5.7M. The check on the bridged asset saw nothing wrong because the 37 drain steps did not touch it.
+LI.FI put the whole incident at about $600K, taken from 29 wallets. The check on the bridged asset saw nothing wrong because the 37 drain steps did not touch it.
 
 ### July 2024: a public helper that skipped `SwapperV2`
 
@@ -585,7 +585,7 @@ Because the facet was registered in the diamond, the fallback routed its selecto
 
 In that version the swap function checked three things only: that the target had code, that the amount was not zero, and that the diamond held at least that amount of the input asset, reverting with `InsufficientBalance` otherwise. The attacker pointed the call at USDT with `transferFrom(victim, attacker, balance)` as calldata. To pass the bookkeeping checks, it declared as input a fake token contract that reports a balance of 1 and accepts approvals, with an amount of 1.
 
-In the reproduced transaction (`0xd82fe84e…3873`, block 20,318,962), one victim with an unlimited USDT allowance to the diamond lost 2,276,295.880553 USDT. The incident as a whole is reported at about $10M.
+The reconstruction forks the chain at block 20,318,962 and replays the attack transaction `0xd82fe84e…3873`, mined in block 20,318,963. In it, one victim with an unlimited USDT allowance to the diamond lost 2,276,295.880553 USDT. LI.FI's incident report puts the whole incident at about $11.6M, taken from 153 wallets on Ethereum and Arbitrum.
 
 ### What changed since
 
@@ -644,7 +644,7 @@ LI.FI is two systems that must agree: an API that decides what to do and builds 
 
 - **Architecture.** `LiFiDiamond` is a minimal EIP-2535 proxy over 44 facets; helpers and libraries are inlined, and periphery contracts (Executor, Receivers, Permit2Proxy, fee contracts) are upgraded separately.
 - **Flow.** A swap-then-bridge call pulls the input, runs each `SwapData` step through a contract-selector allow-list, refunds intermediate tokens, checks the output against `minAmount` and bridges the actual output.
-- **The allow-list is the security boundary.** It lives in the callers of `LibSwap.swap`, not in `LibSwap.swap` itself. Both exploits (about $5.7M in 2022, about $10M in 2024) were calls from the diamond that no allow-list stopped, and the 2025 move to pair keys closes a third route through the allow-list itself for facets built after the migration.
+- **The allow-list is the security boundary.** It lives in the callers of `LibSwap.swap`, not in `LibSwap.swap` itself. Both exploits (about $600K in 2022, about $11.6M in 2024) were calls from the diamond that no allow-list stopped, and the 2025 move to pair keys closes a third route through the allow-list itself for facets built after the migration.
 - **Receivers.** `NON_EVM_ADDRESS` marks non-EVM destinations, and each facet must check that the receiver the bridge pays is the one the user signed for. Most audit findings are variations on that check.
 - **Governance.** On Ethereum the diamond is owned by a timelock with a three-hour delay, proposed by a 3-of-6 Safe; a single EOA can pause it or remove a facet at once, and the Safe can unpause without delay.
 - **Risks.** The main ones are backend-trusted parameters, upgradeable logic behind a short delay, standing approvals to the diamond, and the bridges and DEXs a route depends on (see the Risks annex).
@@ -778,6 +778,25 @@ LI.FI does not hold user deposits between transactions, issue a token or lend; i
 | Single-key pause | EOA pauser | Cannot add code or remove the cut and pause facets | Can halt all routes |
 | Bridge or DEX failure | Third-party protocols on each route | Recovery event on failed destination swaps | Funds held by the failing protocol |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 20 March 2022 | At 02:51 UTC an attacker used unvalidated swap steps in `swapAndStartBridgeTokensViaCBridge` on the first diamond `0x5A9F…6eD1` to drain about $600K from 29 wallets, in block [14,420,687](https://etherscan.io/block/14420687). | It is the first allowance drain, described in [March 2022](#march-2022-unvalidated-swapdata-in-the-cbridge-swap-path). | [LI.FI post (on X)](https://x.com/lifiprotocol/status/1505738407938387971), [attack transaction](https://etherscan.io/tx/0x4b4143cbe7f5475029cf23d6dcbb56856366d91794426f2e33819b9b1aac4e96) |
+| 20 October 2022 | The current diamond `0x1231DEB6…4EaE` was created on Ethereum through a factory contract, in block [15,788,692](https://etherscan.io/block/15788692). | It is the address users approve today; the repository's deployment log gives it a later timestamp, 27 July 2023. | [Creation transaction](https://etherscan.io/tx/0x016d94901938295e09d54e0c83782d298b1ad1f08352c0a229a2029ee4407151) |
+| 9 November 2023 | Ownership of the diamond moved from the deployer `0x11f1…ce44` to the Safe `0x3734…f51e`, in block [18,534,446](https://etherscan.io/block/18534446). | From then on a multisig, not a single key, held the owner role that cuts the diamond. | [Ownership transfer transaction](https://etherscan.io/tx/0x1e6d8f495e7eb2b16a0b6df635d18dbffa554848a5f62a45b411d6a309ef5776) |
+| 16 July 2024 | An attacker drained about $11.6M from 153 wallets on Ethereum and Arbitrum through `GasZipFacet.depositToGasZipERC20`, about two hours after the facet was added in block [20,318,349](https://etherscan.io/block/20318349) (attack transaction in block [20,318,963](https://etherscan.io/block/20318963)). | It is the second drain, described in [July 2024](#july-2024-a-public-helper-that-skipped-swapperv2). | [LI.FI incident report](https://li.fi/knowledge-hub/incident-report-16th-july), [facet added](https://etherscan.io/tx/0xee96ca692ef8f6bdff087e0669d11950e71302896f3af5320b2504540f5d4f26), [attack transaction](https://etherscan.io/tx/0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873) |
+| 16 July 2024 | The facet's five selectors were removed from the diamond at 12:52 UTC, in block [20,319,191](https://etherscan.io/block/20319191). | The stop was a `diamondCut` by the owner, since the emergency pause facet did not exist yet. | [Removal transaction](https://etherscan.io/tx/0x725c82476ece58c7bbbc2334f90cac99ee46c58cbd2a363ba19540b5c63f63de) |
+| 18 October 2024 | `EmergencyPauseFacet`, reviewed by Sujith Somraaj on 13 September 2024, was added to the diamond in block [20,991,172](https://etherscan.io/block/20991172). | It gave the pauser the power to stop every route or remove one facet at once, as described in [Ownership](#ownership-governance-and-the-emergency-pause). | [Diamond cut transaction](https://etherscan.io/tx/0x800ce9560e7a8a41578328c5a5e8af6e35e0b00cb392562a9fb657da204b85c5), [audit report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2024.09.13_EmergencyPauseFacet.pdf) |
+| 8 May 2025 | Cantina completed its competition on the LI.FI contracts, as dated in `audit/auditLog.json`. | It is one of the three Cantina reports counted in [What the audits keep finding](#what-the-audits-keep-finding). | [Cantina competition report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2025.05.08_Cantina_Comp.pdf) |
+| 16 July 2025 | Ownership of the diamond moved from the Safe to `LiFiTimelockController` `0x5511…faEe`, in block [22,930,527](https://etherscan.io/block/22930527). | Since then every diamond cut waits the three-hour delay read in the governance section. | [Ownership transfer transaction](https://etherscan.io/tx/0xccb29c20982ef6ae5c480549cc08ca6b59759dbe7a4e536ea1eef588672a4346) |
+| 4 August 2025 | The TRON diamond `TU3y…CHLt` was logged as deployed from the `contracts-tron` fork. | It is the deployment that the [TRON USDT bypass](#deployments-evm-chains-tron-and-create3) exists for. | [Deployment log](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/deployments/_deployments_log_file.json) |
+| 20 November 2025 | `WhitelistManagerFacet` 1.0.0, reviewed by Burra Security on 4 November 2025, was added to the diamond with a call to an unverified initialisation contract, in block [23,843,569](https://etherscan.io/block/23843569). | It is the facet that edits the pair-keyed allow-list, and the Burra review holds finding L-1 on facets built before the migration. | [Diamond cut transaction](https://etherscan.io/tx/0xe36a7d0447b1cd7afe9acf432dd45ba7d1ebd564fe1e7c26081589f5a0a1543e), [audit report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2025.11.04_WhitelistManagerFacet%28v1.0.0%29.pdf) |
+
+Times are UTC, from the block timestamps.
+
 ## Frequently Asked Questions
 
 **Q: Why does a call made by a facet carry the users' token allowances?**
@@ -830,9 +849,9 @@ The points below were not settled by the sources used for this article.
 | Only AcrossFacetV4, GenericSwapFacetV3, the admin facets, `SwapperV2`, `LibSwap`, `LibAllowList`, `Permit2Proxy` and `GasZipPeriphery` were read line by line; other facets are described from their NatSpec and the audit digests. | Receiver checks and refund paths differ per facet. | The facet's source in [src/Facets](https://github.com/lifinance/contracts-tron/tree/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/src/Facets) and its page in `docs/`. |
 | The analysed code is the TRON fork; EVM-chain bytecode is built from upstream `lifinance/contracts`, assumed identical except for the delta in `docs/TronFork.md`. | A difference would make a code claim wrong for EVM chains. | A diff of `src/` against [lifinance/contracts](https://github.com/lifinance/contracts) at the matching sync commit. |
 | On-chain reads covered Ethereum mainnet only (owner, timelock delay and roles, Safe threshold, pauser code); other chains' owners and the TRON addresses come from repository JSON. | Governance can differ on a chain whose bring-up was not finished. | `owner()` and `getMinDelay()` on each chain's diamond and timelock listed in `deployments/<network>.json`. |
-| Both exploit descriptions come from DeFiHackLabs-style reconstructions; the 2022 facet source is not bundled with the reconstruction and its logic was rebuilt from the trace, and that write-up labels the 50 USDT input as "50M". | Amount and code details of the 2022 incident are secondary. | The trace in [DeFiHackLabs](https://github.com/SunWeb3Sec/DeFiHackLabs) and LI.FI's own 2022 post-mortem, whose address is not in the sources. |
-| The incident totals (about $5.7M and about $10M) are the write-ups' rounded figures, and LI.FI's July 2024 report was not read for this article. | Loss figures and victim counts may differ from LI.FI's own. | [LI.FI incident report, 16 July 2024](https://li.fi/knowledge-hub/incident-report-16th-july), linked from the site's 2024 recap. |
-| Whether users were compensated after either incident is not stated in the sources. | The Loss sharing row says "none found" for the contracts only. | LI.FI's incident reports. |
+| Both exploit descriptions come from DeFiHackLabs-style reconstructions; the 2022 facet source is not bundled with the reconstruction and its logic was rebuilt from the trace, and that write-up labels the 50 USDT input as "50M". | Amount and code details of the 2022 incident are secondary. | The trace in [DeFiHackLabs](https://github.com/SunWeb3Sec/DeFiHackLabs) and LI.FI's own 2022 post-mortem on Medium (`blog.li.fi/20th-march-the-exploit-e9e1c5c03eb9`, linked from the DeFiHackLabs index), which refused automated access; only LI.FI's summary post on X was read. |
+| The incident totals now follow LI.FI (about $600K from 29 wallets in 2022, about $11.6M from 153 wallets in 2024). The local 2022 reconstruction gives about $5.7M and the DeFiHackLabs index $570K; the 2024 reconstruction gives about $10M. Neither total was summed from the chain here. | Third-party figures for the same incident differ by a factor of ten. | The drain transactions of each incident summed on chain, starting from the [2022 attack transaction](https://etherscan.io/tx/0x4b4143cbe7f5475029cf23d6dcbb56856366d91794426f2e33819b9b1aac4e96). |
+| Whether users were compensated is not settled. LI.FI's July 2024 report says only that it was evaluating options to compensate affected users, and its March 2022 post on X says users did not have to do anything. | The Loss sharing row says "none found" for the contracts only. | A later LI.FI announcement on compensation, and the full 2022 post-mortem. |
 | Whether the older facets deployed on mainnet (`deployments/mainnet.diamond.json`: ChainflipFacet 1.0.0, DeBridgeDlnFacet 1.0.1, GasZipFacet 2.0.4) embed the pre-migration separate contract and selector check was not inspected. | Burra L-1 was acknowledged for deployed contracts, so a selector collision could still apply to them. | Their verified source or bytecode on Etherscan, compared with [LibAllowList.sol](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/src/Libraries/LibAllowList.sol). |
 | Which addresses hold `execAccess` on the whitelist and withdraw selectors on each chain was not read. | They can change the allow-list or withdraw without the timelock. | `AccessManagerFacet` events and `addressCanExecuteMethod` on each diamond. |
 | Audit reports before February 2024 (if any) are not in the repository's audit folder. | The history before the 2024 incident is thin. | LI.FI's security page and documentation. |
@@ -862,7 +881,8 @@ The points below were not settled by the sources used for this article.
 - [2022 diamond 0x5A9F…6eD1 on Etherscan](https://etherscan.io/address/0x5A9Fd7c39a6C488E715437D7b1f3C823d5596eD1)
 - [GasZipFacet 0xf28A…e534 (verified source)](https://etherscan.io/address/0xf28A352377663cA134bd27B582b1a9A4dad7e534#code)
 - [July 2024 attack transaction 0xd82fe84e…3873 (BlockSec explorer)](https://app.blocksec.com/explorer/tx/eth/0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873)
-- [LI.FI incident report, 16 July 2024](https://li.fi/knowledge-hub/incident-report-16th-july) (not read for this article)
+- [LI.FI incident report, 16 July 2024](https://li.fi/knowledge-hub/incident-report-16th-july), LI.FI, 18 July 2024
+- [LI.FI post on the March 2022 exploit (on X)](https://x.com/lifiprotocol/status/1505738407938387971), LI.FI, 21 March 2022
 
 ### Standards and libraries
 
@@ -875,6 +895,16 @@ The points below were not settled by the sources used for this article.
 - [zeframlou/create3-factory](https://github.com/zeframlou/create3-factory), the upstream of LI.FI's CREATE3 factory
 - [LI.FI](https://li.fi) and [LI.FI documentation](https://docs.li.fi)
 - [Claude Code](https://claude.com/product/claude-code)
+
+### Timeline sources
+
+- On-chain reads: Ethereum mainnet, 25 November 2026. Powered by [Etherscan.io](https://etherscan.io) APIs.
+  - Etherscan V2 API: `getcontractcreation`, then `getLogs` for the `OwnershipTransferred` and `DiamondCut` events of the [LiFiDiamond](https://etherscan.io/address/0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE).
+  - PublicNode: block timestamps, the blocks of the two attack transactions, and `getThreshold()` and `getOwners()` on the [2023 Safe](https://etherscan.io/address/0x37347dd595c49212c5fc2d95ea10d1085896f51e).
+- [Deployment log](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/deployments/_deployments_log_file.json), LI.FI, `contracts-tron` at `a1a449b`
+- [EmergencyPauseFacet audit report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2024.09.13_EmergencyPauseFacet.pdf), Sujith Somraaj, 13 September 2024
+- [Cantina competition report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2025.05.08_Cantina_Comp.pdf), Cantina, 8 May 2025
+- [WhitelistManagerFacet v1.0.0 audit report](https://github.com/lifinance/contracts-tron/blob/a1a449ba1a100122bafa3e0d39aba3e6b3304eab/audit/reports/2025.11.04_WhitelistManagerFacet%28v1.0.0%29.pdf), Burra Security, 4 November 2025
 
 ### Related articles
 

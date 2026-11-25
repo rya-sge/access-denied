@@ -2,7 +2,7 @@
 layout: post
 title: "How Jenkins Works - Controller, Agents, Plugins, Pipeline and JENKINS_HOME"
 date:   2026-11-17
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: programmation
@@ -44,7 +44,7 @@ The problem it solves is coordination. A team pushes changes many times a day; e
 
 The project started as **Hudson**, which Kohsuke Kawaguchi created while working at Sun Microsystems. The project's own Google Season of Docs applications give 2006 as its founding year. After Oracle acquired Sun, the community and Oracle disagreed over control of the Hudson name. A community vote closed in January 2011 with 214 eligible votes to rename and 14 for the status quo, and the project continued as Jenkins, moving its mailing lists, GitHub organisation (`jenkinsci`) and infrastructure under the new name.
 
-Two release lines exist today. A **weekly** release ships new features and fixes; every 12 weeks one weekly release is chosen as a **Long-Term Support** (LTS) baseline, which then receives backported fixes every 4 weeks. A weekly version number has two parts, such as 2.591, and an LTS version number three, such as 2.580.2. When a change reached both lines, the article gives both versions, for example weekly 2.307 and LTS 2.319.1.
+Two release lines exist today. A **weekly** release ships new features and fixes; every 12 weeks one weekly release is chosen as a **Long-Term Support** (LTS) baseline, which then receives backported fixes every 4 weeks. A weekly version number has two parts, such as 2.591, and an LTS version number three, such as 2.580.2. When a change reached both lines, the article gives both versions, for example weekly 2.307 and LTS 2.319.1. The [timeline](#timeline) in the annex lists the releases that changed this architecture.
 
 ## The controller, nodes, agents and executors
 
@@ -528,6 +528,23 @@ Jenkins is a Java web application whose controller holds all state and schedules
 | The inbound TCP port is disabled by default. | Use WebSocket for inbound agents unless a dedicated port is required, and expose `/jnlpJars/agent.jar` through the same URL. |
 | In a container with `overwritePlugins: true`, plugins installed from the UI vanish on restart. | Change `plugins.txt` and rebuild the image instead. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 29 January 2011 | The Hudson community vote closed with 214 eligible votes to rename the project Jenkins and 14 for the status quo. | It is the start of the Jenkins name, the `jenkinsci` GitHub organisation and the infrastructure described in the history section. | [Jenkins!](https://www.jenkins.io/blog/2011/01/29/jenkins/) (jenkins.io blog) |
+| 16 June 2011 | Jenkins 1.409.1 shipped as the first Long-Term Support release, branched from weekly 1.409 and limited to backported fixes. | It created the weekly and LTS release lines that the article's version numbers refer to. | [Jenkins Long-Term Support Release](https://www.jenkins.io/blog/2011/06/16/jenkins-long-term-support-release/) (jenkins.io blog) |
+| 3 December 2014 | The Workflow plugin, a Groovy DSL whose runs can be suspended and resumed across a controller restart, reached version 1.0. | Workflow became Pipeline, whose plugin IDs such as `workflow-cps` keep the old name, and its resumable execution is what the CPS section describes. | [Workflow plugin is 1.0](https://www.jenkins.io/blog/2014/12/03/workflow-plugin-is-1-0/) (jenkins.io blog) |
+| 26 April 2016 | Jenkins 2.0 was released with Pipeline built in and a setup wizard that installs a suggested set of plugins. | It put Pipeline into the default installation and replaced the plugins bundled with the core by a suggested set chosen in a setup wizard. | [Jenkins 2.0 is here!](https://www.jenkins.io/blog/2016/04/26/jenkins-20-is-here/) (jenkins.io blog) |
+| 3 February 2017 | Declarative Pipeline syntax 1.0 was released as part of Jenkins Pipeline. | It added the Declarative form that the Pipeline section compares with Scripted Pipeline. | [Declarative Pipeline Syntax 1.0 is now available](https://www.jenkins.io/blog/2017/02/03/declarative-pipeline-ga/) (jenkins.io blog) |
+| 23 January 2020 | Weekly 2.217 added experimental WebSocket support for inbound agents and the CLI (JEP-222). | Inbound agents could from then on connect over the controller's HTTP(S) port instead of a dedicated TCP port. | [Changelog for 2.217](https://www.jenkins.io/changelog/2.217/), [WebSocket](https://www.jenkins.io/blog/2020/02/02/web-socket/) (jenkins.io blog) |
+| 17 August 2021 | Weekly 2.307 replaced "master" with "controller" or "built-in node" and added a migration for the built-in node's name and label. | It introduced the controller and built-in node terms used throughout the article, and the `built-in` label. | [Changelog for 2.307](https://www.jenkins.io/changelog/2.307/) |
+| 18 June 2024 | Weekly 2.463 began requiring Java 17 or newer on the controller and on agents. | The Java requirement applies to both ends of the Remoting channel, not to the JDK used to build projects. | [Jenkins requires Java 17 or newer](https://www.jenkins.io/blog/2024/06/11/require-java-17/) (jenkins.io blog) |
+| 4 September 2024 | Weekly 2.475 moved the core from Java EE 8 to Jakarta EE 9 and from Spring Security 5.8 to 6.3. | Plugins see the core's libraries first, so several of them and every third-party servlet container had to move to EE 9 in step with the core. | [Changelog for 2.475](https://www.jenkins.io/changelog/2.475/) |
+| 6 January 2026 | Weekly 2.545 began requiring Java 21 or newer, a change that reached the LTS line in 2.555.1 on 15 April 2026. | Controllers and agents of current releases, including the container images in the last section, run on Java 21 or later. | [Changelog for 2.545](https://www.jenkins.io/changelog/2.545/), [Changelog for 2.555.1](https://www.jenkins.io/changelog-stable/2.555.1/) |
+
 ## Frequently Asked Questions
 
 **Q: What is the difference between the controller, the built-in node and an agent?**
@@ -625,6 +642,20 @@ Several internals are not documented on jenkins.io, or only as stubs, and some f
 
 - [Hudson's future](https://www.jenkins.io/blog/2011/01/11/hudsons-future/), jenkins.io blog, 11 January 2011
 - [Jenkins!](https://www.jenkins.io/blog/2011/01/29/jenkins/), jenkins.io blog, 29 January 2011
+
+### Timeline sources
+
+- [Jenkins Long-Term Support Release](https://www.jenkins.io/blog/2011/06/16/jenkins-long-term-support-release/), jenkins.io blog, 16 June 2011
+- [Workflow plugin is 1.0](https://www.jenkins.io/blog/2014/12/03/workflow-plugin-is-1-0/), jenkins.io blog, 3 December 2014
+- [Jenkins 2.0 is here!](https://www.jenkins.io/blog/2016/04/26/jenkins-20-is-here/), jenkins.io blog, 26 April 2016
+- [Declarative Pipeline Syntax 1.0 is now available](https://www.jenkins.io/blog/2017/02/03/declarative-pipeline-ga/), jenkins.io blog, 3 February 2017
+- [WebSocket](https://www.jenkins.io/blog/2020/02/02/web-socket/), jenkins.io blog, 2 February 2020
+- [Jenkins requires Java 17 or newer](https://www.jenkins.io/blog/2024/06/11/require-java-17/), jenkins.io blog, 11 June 2024
+- [Changelog for 2.217](https://www.jenkins.io/changelog/2.217/), Jenkins project, 23 January 2020
+- [Changelog for 2.307](https://www.jenkins.io/changelog/2.307/), Jenkins project, 17 August 2021
+- [Changelog for 2.475](https://www.jenkins.io/changelog/2.475/), Jenkins project, 4 September 2024
+- [Changelog for 2.545](https://www.jenkins.io/changelog/2.545/), Jenkins project, 6 January 2026
+- [Changelog for 2.555.1 (LTS)](https://www.jenkins.io/changelog-stable/2.555.1/), Jenkins project, 15 April 2026
 
 ### Related articles
 

@@ -2,7 +2,7 @@
 layout: post
 title: "EIP-7251: Increasing the Maximum Effective Balance to 2,048 ETH"
 date:   2026-11-20
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -17,7 +17,7 @@ Before the Pectra upgrade of May 2025, a validator on the Ethereum beacon chain 
 
 [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251), *Increase the MAX_EFFECTIVE_BALANCE*, raises that ceiling to 2,048 ETH for validators that opt in with a new `0x02` withdrawal credential, while keeping 32 ETH as the minimum to activate. To make the change usable by operators who already run thousands of validators, it adds an in-protocol *consolidation* that merges one validator into another without passing through the exit and deposit queues, a system contract on the execution layer through which those merges are requested, and a much smaller initial slashing penalty.
 
-This article walks through the specification on both layers: the constants, the consolidation request contract and its fee, the consensus-layer processing of a request, the move from count-based to balance-based churn, and the security arguments the EIP gives for why a few large validators are not a weaker validator set than many small ones.
+This article walks through the specification on both layers: the constants, the consolidation request contract and its fee, the consensus-layer processing of a request, the move from count-based to balance-based churn, and the security arguments the EIP gives for why a few large validators are not a weaker validator set than many small ones. The timeline in the annex dates the steps from the 2023 proposal to mainnet activation.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -382,6 +382,23 @@ The trade-offs are explicit in the specification: only the source is authenticat
 | A `0x02` validator below 2,048 ETH receives no automatic partial withdrawal. | Plan explicit EIP-7002 partial withdrawals (paid and churn-limited) to take rewards out. |
 | Top-up deposits are no longer credited immediately. | Account for the finality wait and the pending deposit queue when computing a validator's balance after a deposit. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 6 June 2023 | Mike Neuder, Francesco d'Amato, Aditya Asgaonkar and Justin Drake post "Increase the MAX_EFFECTIVE_BALANCE – a modest proposal" on ethresear.ch, keeping the 32 ETH minimum. | It is the research proposal behind the EIP and already separates the activation floor from the cap. | [ethresear.ch post](https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801) |
+| 3 October 2023 | EIP-7251 is merged into the EIPs repository as a Draft, with a `created` date of 28 June 2023. | It is the first version of the specification this article walks through. | [ethereum/EIPs commit `be77ddf`](https://github.com/ethereum/EIPs/commit/be77ddfa7778fc4b82262cedce563b33933614a0) |
+| 21 March 2024 | EIP-7251 is added to the included EIPs of the Pectra meta EIP-7600. | It fixes the fork in which the 2,048 ETH cap and consolidations ship. | [ethereum/EIPs commit `810c347`](https://github.com/ethereum/EIPs/commit/810c347a48052ab36a53a6aa684737ce386f6093) |
+| 11 June 2024 | The EIP adds consolidations triggered from the execution layer, with the request contract and its fee. | Before this change there was no execution-layer contract, so the section on the consolidation request contract describes this later design. | [ethereum/EIPs commit `5984342`](https://github.com/ethereum/EIPs/commit/59843422c15649a521863d16fede003eeb35a356) |
+| 13 December 2024 | Dedaub publishes its audit of the EIP-7251 system contract in `sys-asm` at commit `1d67916`, with one medium finding (the excess is updated once per block, so one block filled with cheap requests keeps the fee high for hours) and three advisories. | The finding concerns the end-of-block fee update described in *The fee*, which the deployed contract keeps. | [Dedaub, EIP 7251 security assessment](https://dedaub.com/audits/ethereum-foundation/ef-eip7251-december-13-2024/) |
+| 19 February 2025 | The consolidation request contract is deployed on mainnet at `0x0000BBdD…7251` by the Nick's-method transaction given in the EIP, in block [21,881,391](https://eth.blockscout.com/block/21881391). | The contract had code before the fork, which the EIP requires for every post-fork block to be valid. | [Blockscout, deployment transaction](https://eth.blockscout.com/tx/0x379269d571beff3ed1d8eba3abb24076a7267b0eaf0cc66d728fb0544f5a690d) |
+| 24 February 2025 | Pectra activates on the Holešky testnet at epoch 115,968, its first public testnet. | Consolidations and `0x02` credentials could be tested on a public network before mainnet. | [EIP-7600, activation table](https://eips.ethereum.org/EIPS/eip-7600) |
+| 7 May 2025 | Pectra activates on mainnet at epoch 364,032 (10:05:11 UTC); the first Electra execution block is [22,431,084](https://eth.blockscout.com/block/22431084). | From this block the constants, the churn split and the slashing quotients of this article apply on mainnet. | [Pectra Mainnet Announcement, Ethereum Foundation](https://blog.ethereum.org/2025/04/23/pectra-mainnet) |
+| 15 May 2025 | EIP-7251 moves to Final. | The text read for this article is the Final version, with later editorial changes only. | [ethereum/EIPs commit `dd45f09`](https://github.com/ethereum/EIPs/commit/dd45f0948d0e55654dea1f841072d37c4a739f58) |
+| 4 August 2026 | EIP-8061, which changes the exit and consolidation churn, is scheduled for inclusion in Glamsterdam. | It would replace the consolidation churn described in *Churn by balance* once Glamsterdam activates. | [ethereum/EIPs commit `7b761e3`](https://github.com/ethereum/EIPs/commit/7b761e3d176730c488bfc4f1e3b261e3d93898b8) |
+
 ## Frequently Asked Questions
 
 **Q: Does EIP-7251 change the minimum stake to run a validator?**
@@ -449,6 +466,7 @@ These points were not settled by the sources read for this article, or rest on r
 | `process_pending_consolidations` does not re-check that the target is still active when the balance moves. | If the target has exited in the meantime, the moved stake would follow the target's exit path; the article does not analyse that case. | Trace a target exit during a pending consolidation in [`specs/electra/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/electra/beacon-chain.md) and the consensus-spec tests. |
 | The churn rules described are those of Electra; the in-development Gloas fork changes them ([EIP-8061](https://eips.ethereum.org/EIPS/eip-8061)) with one quotient of 2^15 shared by activations and exits and a dedicated consolidation quotient of 2^16. | The 256 ETH cap would remain for activations only, exits would be uncapped, and consolidation churn would no longer be the surplus above the cap. | [`specs/gloas/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/gloas/beacon-chain.md) and EIP-8061. |
 | The article gives no adoption figures (number of `0x02` validators, consolidations completed since May 2025). | The practical effect on validator count is not shown. | A beacon-chain explorer or the beacon API validator list. |
+| The timeline cites only Dedaub's report among the system contract audits; the Ethereum Foundation's [Pectra audit results](https://blog.ethereum.org/2025/02/28/pectra-audit-results) also list Blackthorn, PlainShift and Sigma Prime reviews, not read here. | Whether Dedaub's open medium finding on the once-per-block fee update was accepted or fixed is not settled by the sources read. | The [Sigma Prime report](https://security.ethereum.org/audits/Pectra_System_Contracts_Bytecode_Audit_Report_Sigma_Prime.pdf), the [PlainShift report](https://security.ethereum.org/audits/Pectra_System_Contracts_Bytecode_Audit_Report_Plainshift.pdf) and the Blackthorn report linked from the Foundation's post. |
 | The EIP links the Electra specification at an older commit (`834e406`) than the one read here (`065bcd5`). | A function quoted here could differ from the version the EIP was finalised against. | Diff `specs/electra/beacon-chain.md` between the two commits. |
 
 ## References
@@ -468,6 +486,20 @@ These points were not settled by the sources read for this article, or rest on r
 - [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs), `specs/electra/beacon-chain.md` and `presets/mainnet/electra.yaml`, analyzed at commit [`065bcd5c6ad96186cd2c0ac1c435f620a0b25373`](https://github.com/ethereum/consensus-specs/tree/065bcd5c6ad96186cd2c0ac1c435f620a0b25373), 2026-11-20
 - [ethereum/sys-asm](https://github.com/ethereum/sys-asm), `src/consolidations/main.eas`, analyzed at commit [`f808a29f280f0b844d83fec592d3e1c592d1c92a`](https://github.com/ethereum/sys-asm/tree/f808a29f280f0b844d83fec592d3e1c592d1c92a), 2026-11-20
 - Number checks: [verification/eip-7251-max-effective-balance-consolidation](https://github.com/rya-sge/access-denied/tree/main/verification/eip-7251-max-effective-balance-consolidation)
+
+### Timeline sources
+
+- [Increase the MAX_EFFECTIVE_BALANCE – a modest proposal](https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801), Mike Neuder, Francesco d'Amato, Aditya Asgaonkar and Justin Drake, ethresear.ch, 6 June 2023
+- [Add EIP: Increase the MAX_EFFECTIVE_BALANCE](https://github.com/ethereum/EIPs/commit/be77ddfa7778fc4b82262cedce563b33933614a0), ethereum/EIPs, 3 October 2023
+- [Update EIP-7600: Add MaxEB + ILs](https://github.com/ethereum/EIPs/commit/810c347a48052ab36a53a6aa684737ce386f6093), ethereum/EIPs, 21 March 2024
+- [Update EIP-7251: Add EL triggered consolidations](https://github.com/ethereum/EIPs/commit/59843422c15649a521863d16fede003eeb35a356), ethereum/EIPs, 11 June 2024
+- [EIP 7251 Smart Contract Security Assessment](https://dedaub.com/audits/ethereum-foundation/ef-eip7251-december-13-2024/), Dedaub for the Ethereum Foundation, 13 December 2024
+- [Audit Results for the Pectra System Contracts](https://blog.ethereum.org/2025/02/28/pectra-audit-results), Ethereum Foundation Protocol Security Research Team, 28 February 2025
+- [Consolidation request contract deployment transaction](https://eth.blockscout.com/tx/0x379269d571beff3ed1d8eba3abb24076a7267b0eaf0cc66d728fb0544f5a690d), Blockscout, block 21,881,391, 19 February 2025
+- [EIP-7600: Hardfork Meta - Pectra](https://eips.ethereum.org/EIPS/eip-7600), activation table
+- [Pectra Mainnet Announcement](https://blog.ethereum.org/2025/04/23/pectra-mainnet), Ethereum Foundation Protocol Support Team, 23 April 2025
+- [Update EIP-7251: Move to Final](https://github.com/ethereum/EIPs/commit/dd45f0948d0e55654dea1f841072d37c4a739f58), ethereum/EIPs, 15 May 2025
+- [Update EIP-7773: Promote CFI to SFI](https://github.com/ethereum/EIPs/commit/7b761e3d176730c488bfc4f1e3b261e3d93898b8), ethereum/EIPs, 4 August 2026
 
 ### Related articles
 

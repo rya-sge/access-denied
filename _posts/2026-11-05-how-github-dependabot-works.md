@@ -2,7 +2,7 @@
 layout: post
 title: "How GitHub Dependabot Works: From an Update Job to a Pull Request"
 date:   2026-11-05
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: security
@@ -18,7 +18,7 @@ isMermaid: true
 
 This article follows one update job through the public code: how the updater fetches and parses a repository, how it picks a target version, how a security advisory reaches it, and how it gets a pull request opened without holding registry credentials or pushing anything itself. It also answers a narrower question: whether Dependabot checks that vulnerable code is called. The update path does not. It compares version numbers, and it does not use [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck).
 
-Everything about the update path was read in `dependabot/dependabot-core` and `dependabot/cli` at the commits pinned in the references. Statements about GitHub's hosted service come from its documentation, because that code is not public.
+Everything about the update path was read in `dependabot/dependabot-core` and `dependabot/cli` at the commits pinned in the references. Statements about GitHub's hosted service come from its documentation, because that code is not public. The timeline in the annex dates the main changes to the service since 2017.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -488,6 +488,23 @@ Dependabot is a job system. A private service decides what to do, and an open-so
 | The CLI produces diffs, not pull requests. | Use `dependabot/example-cli-usage` as a base for self-hosting. |
 | Security jobs in the CLI do nothing without advisories in the job, and at commit `6a43f5c18` a security job without `dependencies` selects no operation, so the updater raises `NotImplemented`. | Supply `security-advisories` from your own source, and list the affected packages in `dependencies`. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 18 April 2017 | `dependabot-core` v0.1.0 is released as an extraction of the core logic of GoCardless's `bump` project. | The Ruby gems read in this article start as that library, before GitHub owned it. | [dependabot-core changelog 2017–2018](https://github.com/dependabot/dependabot-core/blob/6a43f5c18a7120386064c4afabb6a3e803d63d90/CHANGELOG_ARCHIVE_2017_TO_2018.md) |
+| 23 May 2019 | GitHub announces that it has acquired Dependabot and will open pull requests that move vulnerable dependencies to the minimum required version. | This is the origin of the security-update goal of the lowest fixed version, still visible in `fetch_lowest_security_fix_version`. | [Introducing new ways to keep your code secure](https://github.blog/2019-05-23-introducing-new-ways-to-keep-your-code-secure) |
+| 14 November 2019 | Automated security updates become generally available in all public repositories. | Security updates become a GitHub feature, separate from alerts, as in the feature table above. | [Automated security updates, now generally available](https://github.blog/changelog/2019-11-14-automated-updates/) |
+| 1 June 2020 | GitHub-native version updates enter public beta, configured only through a `dependabot.yml` file. | Version updates get the configuration file that the feature table lists as required. | [Keep all your packages up to date with Dependabot](https://github.blog/2020-06-01-keep-all-your-packages-up-to-date-with-dependabot/) |
+| 12 April 2023 | `dependabot-core` v0.216.0 introduces the `Updater::Operations` pattern, with `UpdateAllVersions` as its first class, and a first grouped-updates experiment. | The operation classes described in "Choosing an operation" date from this release. | [dependabot-core changelog 2019–2023](https://github.com/dependabot/dependabot-core/blob/6a43f5c18a7120386064c4afabb6a3e803d63d90/CHANGELOG_ARCHIVE_2019_TO_SWITCH_TO_GITHUB_RELEASES.md) |
+| 24 August 2023 | Grouped version updates become generally available, without grouping for security updates. | Groups are what `GroupUpdateAllVersions` runs before the one-by-one pass. | [Grouped version updates for Dependabot are generally available](https://github.blog/changelog/2023-08-24-grouped-version-updates-for-dependabot-are-generally-available) |
+| 2 May 2024 | Dependabot update jobs can run as GitHub Actions workflows on hosted or self-hosted runners, and GitHub plans to move every job to Actions. | Self-hosted runners put the updater and proxy containers on the user's own machines and networks. | [Dependabot on GitHub Actions and self-hosted runners is now generally available](https://github.blog/news-insights/product-news/dependabot-on-github-actions-and-self-hosted-runners-is-now-generally-available) |
+| 1 July 2025 | A `cooldown` option in `dependabot.yml` sets a minimum age for a release before a version update proposes it. | This is the filter applied by `filter_by_cooldown` in the version-update finder. | [Dependabot supports configuration of a minimum package age](https://github.blog/changelog/2025-07-01-dependabot-supports-configuration-of-a-minimum-package-age/) |
+| 1 July 2025 | Multi-ecosystem grouped updates, one pull request across several package managers, become generally available. | These are the jobs flagged `multi-ecosystem-update` that skip the one-by-one pass. | [Single pull request for Dependabot (multi-ecosystem support)](https://github.blog/changelog/2025-07-01-single-pull-request-for-dependabot-multi-ecosystem-support/) |
+| 14 July 2026 | Version updates get a default cooldown of three days, and security updates stay exempt. | It matches the `DEFAULT_COOLDOWN_DAYS` value of 3 and the security checker built without a cooldown. | [Dependabot version updates introduce default package cooldown](https://github.blog/changelog/2026-07-14-dependabot-version-updates-introduce-default-package-cooldown/) |
+
 ## Frequently Asked Questions
 
 **Q: What is the difference between a Dependabot alert and a security update?**
@@ -542,6 +559,7 @@ The points below were not settled by the code and documentation read for this ar
 | Whether withdrawn reviewed advisories, 1,256 in the snapshot, still reach jobs or keep alerts open was not checked. | A withdrawn advisory that still reached jobs would produce pull requests for a retracted finding. | The `withdrawn` field in [`github/advisory-database`](https://github.com/github/advisory-database) and the [Dependabot alerts documentation](https://docs.github.com/en/code-security/dependabot/dependabot-alerts/about-dependabot-alerts). |
 | Which ecosystems can pick a pre-release as a security target was not checked. | The shared finder does not filter pre-releases for security updates, and only Go was seen to filter on its own. | `fetch_lowest_security_fix_version` and `filter_prerelease_versions` in each ecosystem's `UpdateChecker`. |
 | GitHub's documentation pages carry no date, and the schedule and repository settings in the feature table come from general knowledge. | The feature table may change, particularly the preview. | The pages listed in the references, and the `dependabot.yml` options reference. |
+| The timeline has no row for the launch of the hosted Dependabot service, for the publication of `dependabot/cli` in 2022, or for the move of the updater into `dependabot-core`. | No primary page giving those dates was found, and the timeline gives the history of the public code only through the changelogs. | The creation dates of the `dependabot/cli` repository and of `updater/` in `dependabot-core`, and Dependabot's own announcements from 2017. |
 
 ## References
 
@@ -567,6 +585,19 @@ The points below were not settled by the code and documentation read for this ar
 - [Go vulnerability database](https://vuln.go.dev/)
 - [Open Source Vulnerability schema](https://ossf.github.io/osv-schema/)
 - [dependabot/example-cli-usage](https://github.com/dependabot/example-cli-usage)
+
+### Timeline sources
+
+- [Introducing new ways to keep your code secure](https://github.blog/2019-05-23-introducing-new-ways-to-keep-your-code-secure), GitHub Blog, Justin Hutchings, 23 May 2019
+- [Automated security updates, now generally available](https://github.blog/changelog/2019-11-14-automated-updates/), GitHub Changelog, 14 November 2019
+- [Keep all your packages up to date with Dependabot](https://github.blog/2020-06-01-keep-all-your-packages-up-to-date-with-dependabot/), GitHub Blog, Alex Mullans, 1 June 2020
+- [Grouped version updates for Dependabot are generally available](https://github.blog/changelog/2023-08-24-grouped-version-updates-for-dependabot-are-generally-available), GitHub Changelog, 24 August 2023
+- [Dependabot on GitHub Actions and self-hosted runners is now generally available](https://github.blog/news-insights/product-news/dependabot-on-github-actions-and-self-hosted-runners-is-now-generally-available), GitHub Blog, Carlin Cherry, 2 May 2024
+- [Dependabot supports configuration of a minimum package age](https://github.blog/changelog/2025-07-01-dependabot-supports-configuration-of-a-minimum-package-age/), GitHub Changelog, 1 July 2025
+- [Single pull request for Dependabot (multi-ecosystem support)](https://github.blog/changelog/2025-07-01-single-pull-request-for-dependabot-multi-ecosystem-support/), GitHub Changelog, 1 July 2025
+- [Dependabot version updates introduce default package cooldown](https://github.blog/changelog/2026-07-14-dependabot-version-updates-introduce-default-package-cooldown/), GitHub Changelog, 14 July 2026
+- [dependabot-core changelog, 2017 to 2018](https://github.com/dependabot/dependabot-core/blob/6a43f5c18a7120386064c4afabb6a3e803d63d90/CHANGELOG_ARCHIVE_2017_TO_2018.md), Dependabot, at the analyzed commit
+- [dependabot-core changelog, 2019 to April 2023](https://github.com/dependabot/dependabot-core/blob/6a43f5c18a7120386064c4afabb6a3e803d63d90/CHANGELOG_ARCHIVE_2019_TO_SWITCH_TO_GITHUB_RELEASES.md), Dependabot, at the analyzed commit
 
 ### Related articles
 

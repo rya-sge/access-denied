@@ -2,7 +2,7 @@
 layout: post
 title: "How LayerZero V2 Works - Endpoint, DVNs, Executors, OFT and the Kelp DAO Lesson"
 date:   2026-11-16
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain security defi
@@ -354,7 +354,7 @@ Every contract behaved as written. The receive-side config asked for one attesta
 - **A second, independent required DVN would have refused the packet** *(derived)*, provided it read the source chain through infrastructure the attacker did not control.
 - **The adapter concentrates the loss.** With lock-and-unlock, one forged message can drain all backing for every other chain at once.
 
-LayerZero changed its own policy afterwards. Its [May 2026 update](https://layerzero.network/blog/an-overdue-apology) says the LayerZero Labs DVN "no longer services 1/1 DVN configurations" and that default pathways are being migrated to 5/5 where possible and no less than 3/3. The [July 2026 update](https://layerzero.network/blog/ongoing-security-updates-july-10) reports the 3/3 minimum in place on Endpoint V2 pathways, with about 0.5 % still to be updated. These are operational policies: nothing in the contracts enforces a minimum number of DVNs.
+LayerZero changed its own policy afterwards. Its [May 2026 update](https://layerzero.network/blog/an-overdue-apology) says the LayerZero Labs DVN "no longer services 1/1 DVN configurations" and that default pathways are being migrated to 5/5 where possible and no less than 3/3. The [July 2026 update](https://layerzero.network/blog/ongoing-security-updates-july-10) reports the 3/3 minimum in place on Endpoint V2 pathways, with about 0.5 % still to be updated. These are operational policies: nothing in the contracts enforces a minimum number of DVNs. The [timeline](#timeline) in the annex dates these steps next to the releases and audits.
 
 ## Conclusion
 
@@ -475,6 +475,21 @@ LayerZero is infrastructure: the risks below fall on an application that integra
 | Adapter drain | Lock-and-unlock with all backing in one contract | Optional rate limiter | Not part of the default OFT |
 | Liveness | Executor, mismatched configs, gaps | Permissionless delivery and retries | A misconfiguration blocks the pathway |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| December 2023 | Seven security reviews of the EVM Endpoint V2 and message libraries, by Zellic, OtterSec, Paladin, Certora, Blockian, CMichel and Windhustler, are dated 13 to 15 December 2023. | They cover the endpoint and ULN code this article reads; Zellic's report alone lists one critical, two medium and seven low findings before fixes. | [LayerZero-Labs/Audits, Endpoint V2 - EVM](https://github.com/LayerZero-Labs/Audits/tree/main/audits/Endpoint%20V2%20-%20EVM/EndpointV2) |
+| 26 January 2024 | `EndpointV2` is deployed on Ethereum at `0x1a44076050125825900e736c501f859c50fE728c` in block [19,093,715](https://etherscan.io/block/19093715), at 22:21 UTC, as a verified non-proxy contract. | The immutable endpoint described in "The design in three ideas" has run unchanged at this address since that block. | [EndpointV2 on Etherscan](https://etherscan.io/address/0x1a44076050125825900e736c501f859c50fE728c) |
+| 14 November 2024 | LayerZero introduces lzRead, with BCW, Nethermind, LayerZero Labs, Animoca/Blockdaemon and Nocturnal as its first DVNs. | It adds the `ReadLib1002` library and read channels described in the lzRead section; Zellic, Paladin and Sec3 reviewed it in October and November 2024. | [LayerZero, lzRead: Power Your App with Omnichain Data](https://layerzero.network/blog/lzread-power-your-app-with-omnichain-data) |
+| 5 November 2025 | Code4rena publishes its report on the Sui Endpoint V2 contest of 17 to 30 September 2025, with no high or medium finding. | It is the one audit report read for this article, and it covers a non-EVM port of the same endpoint model. | [Code4rena, LayerZero Endpoint V2 - Sui](https://code4rena.com/reports/2025-09-layerzero-endpoint-v2-sui) |
+| 18 April 2026 | Kelp DAO's rsETH pathway, verified by the LayerZero Labs DVN alone, releases about $290M of rsETH for a forged packet. | It is the 1-of-1 stack failure analysed in the Kelp DAO section. | [LayerZero, KelpDAO Incident Statement](https://layerzero.network/blog/kelpdao-incident-statement) |
+| 8 May 2026 | LayerZero states that its Labs DVN no longer services 1/1 configurations and that default pathways are being migrated to 5/5 where possible, with 3/3 as the minimum. | The change applies to the library defaults that an unpinned OApp inherits, as explained in the configuration section. | [LayerZero, LayerZero Update](https://layerzero.network/blog/an-overdue-apology) |
+| 20 May 2026 | LayerZero publishes its incident report: two internal RPC nodes were patched to feed the DVN false data, and a denial-of-service attack on the external RPC provider made the DVN depend on them. | It shows that a DVN's data sources belong to the trust base, the first lesson drawn in the Kelp DAO section. | [LayerZero, LayerZero Labs KelpDAO Incident Report](https://layerzero.network/blog/layerzero-labs-kelpdao-incident-report) |
+| 10 July 2026 | LayerZero reports that the Endpoint V2 default DVN configurations that needed it now require at least 3-of-3, with about 0.5 % of pathways still to update. | The minimum is an operational policy on the defaults, not a check in the contracts. | [LayerZero, Ongoing Security Updates 7/10](https://layerzero.network/blog/ongoing-security-updates-july-10) |
+
 ## Frequently Asked Questions
 
 **Q: What can the owner of EndpointV2 change, and what can it not?**
@@ -532,6 +547,7 @@ The protocol description comes from the pinned EVM sources and the incident post
 | The audit reports in the [LayerZero-Labs/Audits](https://github.com/LayerZero-Labs/Audits) collection were not read, apart from the Code4rena Sui report. | Findings could refine the endpoint, ULN, OFT and lzRead descriptions. | The `EndpointV2`, `DVN`, OApp/OFT and lzRead reports in that repository. |
 | `devtools` was read from a shallow clone; its OApp contracts differ slightly from the copy in `layerzero-v2/evm/oapp`. | An older deployed OApp may follow the other copy. | A diff of the two `OAppCore.sol` and `OFTCore.sol`. |
 | Non-EVM implementations (Solana, Aptos, Sui, TON, Initia, IOTA) were not read. | Their nonce, fee and compose details may differ from the EVM ones. | `layerzero-v2/packages/layerzero-v2/<vm>/`. |
+| The timeline gives the Ethereum deployment block of `EndpointV2`, not the date LayerZero announced the V2 mainnet launch. | The public launch date and the number of chains at launch are not sourced here. | LayerZero's "LayerZero V2 is Live" post on its Medium blog (January 2024; the page refused automated access, so it is not linked). |
 
 ## References
 
@@ -553,6 +569,15 @@ The protocol description comes from the pinned EVM sources and the incident post
 
 - Code4rena, [LayerZero Endpoint V2 - Sui Findings & Analysis Report](https://code4rena.com/reports/2025-09-layerzero-endpoint-v2-sui), 2025-11-05
 - [LayerZero-Labs/Audits](https://github.com/LayerZero-Labs/Audits), audit collection (not read)
+- LayerZero Labs, [Endpoint V2 - EVM audit folder](https://github.com/LayerZero-Labs/Audits/tree/main/audits/Endpoint%20V2%20-%20EVM/EndpointV2) (December 2023 Endpoint V2 and MessageLib reports), listed 2026-11-25
+
+### Timeline sources
+
+- LayerZero, [lzRead: Power Your App with Omnichain Data](https://layerzero.network/blog/lzread-power-your-app-with-omnichain-data), 2024-11-14
+
+### On-chain reads
+
+- Ethereum, read on 25 November 2026 through the Routescan API with `contract getcontractcreation`, `contract getsourcecode`, `proxy eth_getTransactionReceipt` and `proxy eth_getBlockByNumber`: [EndpointV2](https://etherscan.io/address/0x1a44076050125825900e736c501f859c50fE728c), creation transaction in block [19,093,715](https://etherscan.io/block/19093715) (26 January 2024, 22:21 UTC), contract name `EndpointV2`, not a proxy.
 
 ### Related articles
 

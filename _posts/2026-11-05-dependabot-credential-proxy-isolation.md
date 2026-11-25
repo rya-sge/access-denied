@@ -2,7 +2,7 @@
 layout: post
 title: "Isolating Untrusted Build Tools: How Dependabot's Credential Proxy Works"
 date:   2026-11-05
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: security
@@ -210,7 +210,7 @@ There are three states:
 
 A *job experiment* is a named feature flag in the `experiments` map of a job definition, the document that describes one Dependabot run. For a hosted job, GitHub's service writes that definition, so the service decides which experiments are on. With the CLI, the person running it supplies the job file, but the flags reach the proxy only through the proxy's own configuration. The CLI's proxy configuration has only `all_credentials` and `ca`, with no `experiments` field, so a job run with the CLI at the analysed commits has no egress filtering.
 
-*Source:* `dependabot/cli`, `internal/model/job.go` (the `Experiments` field). Whether GitHub's hosted jobs enforce it is not visible from public code. The handler reports each observed host for "allowlist discovery", which suggests a rollout in progress, but that is an inference.
+*Source:* `dependabot/cli`, `internal/model/job.go` (the `Experiments` field). The public code does not show which flags GitHub's hosted jobs set. GitHub's [changelog of 12 October 2026](https://github.blog/changelog/2026-10-12-anonymous-organization-level-registries-for-dependabot) does state that on github.com, update jobs can reach only hosts on the egress allowlist and the configured private registries, so jobs there enforce it (see the timeline in the annex). The handler also reports each observed host for "allowlist discovery".
 
 ### How the list is built
 
@@ -286,7 +286,7 @@ Dependabot's proxy separates having a credential from being able to use it freel
 - **Registry and git credentials attach to reads.** Registry handlers require `GET` or `HEAD`, and the git handler refuses to authenticate anything that is not a fetch. The Dependabot API handler attaches the job token whatever the method, by design, and the Azure DevOps API handler is the one exception left open (see Gaps).
 - **The proxy declines to authenticate a push; it does not ban it.** This is enough while the updater has no credential of its own.
 - **The metadata service is blocked at the socket** when the proxy connects directly, which resists DNS rebinding. With an upstream proxy set, the socket check sees that proxy's address. Other private ranges are not covered by this check.
-- **Egress filtering is off by default.** It depends on job experiments, the CLI does not set them, and its state on GitHub's hosted service is not public.
+- **Egress filtering is off by default.** It depends on job experiments and the CLI does not set them, while GitHub states that jobs on github.com enforce it.
 - **Host allowlists have documented limits.** `storage.googleapis.com` and the NuGet CDN are accepted exposures.
 - **No network control protects the content of a pull request.** Review remains the last check.
 
@@ -363,6 +363,23 @@ The rows below derive from the design described above, for anyone building a sim
 | ☐ | Writes go through a separate service, away from the worker. | A compromised worker acts with write privileges. |
 | ☐ | Worker output is treated as untrusted and reviewed. | A compromised run proposes malicious code that is merged automatically. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 23 September 2022 | The first commit of `dependabot/cli` creates two Docker networks per job, one of them `internal` with no route out. | It sets up the topology in which the updater can reach only the proxy. | [dependabot/cli, initial commit](https://github.com/dependabot/cli/commit/f436cf3edc2f8ff2e0df27d9172b68143149e470) |
+| 2 January 2024 | The CLI adds `key` and `auth-key` to the secret fields it removes from the credential metadata given to the updater. | These are two of the five fields the article lists as stripped from the updater's copy. | [dependabot/cli, commit a104d64](https://github.com/dependabot/cli/commit/a104d64862ea3f48d39485c80206fe60f14d858e) |
+| 29 January 2026 | The proxy's source is published as `dependabot/proxy`, already with the `GET`/`HEAD` gate in the registry handlers, the metadata host block and the safe dialer. | The core controls read in this article were present in the first public version. | [dependabot/proxy, initial open source commit](https://github.com/dependabot/proxy/commit/dd760113d8edd581443a6aaafe80d4e4025251ab) |
+| 3 February 2026 | GitHub announces that the Dependabot Proxy is open source under the MIT licence. | A public source is what lets the article check the design instead of relying on the core README. | [GitHub Changelog](https://github.blog/changelog/2026-02-03-the-dependabot-proxy-is-now-open-source-with-an-mit-license) |
+| 24 August 2026 | The git handler gains a refusal to authenticate non-read-only requests, behind the `proxy_read_only_git_credentials` experiment. | This is the rule described in "Git: reads only", at first limited to jobs with the flag. | [dependabot/proxy, commit f3800df](https://github.com/dependabot/proxy/commit/f3800dfe80b17e2db4a9d5bb9e39f9dc004882cd) |
+| 3 September 2026 | The experiment flag is removed and git write protection applies to every job. | The read-only git rule stopped depending on a job setting, unlike the egress allowlist. | [dependabot/proxy, commit 49c2109](https://github.com/dependabot/proxy/commit/49c2109c399fca91188c8725da5b4ce0b5056641) |
+| 10 September 2026 | The proxy adds the egress allowlist, with one experiment to log unlisted hosts and one to block them, in a change titled to prevent source code exfiltration. | The allowlist and its off-by-default flags described in the egress section date from this change. | [dependabot/proxy, commit a72f522](https://github.com/dependabot/proxy/commit/a72f5228de257ec7e9f7cd9880e48b204980c501) |
+| 7 October 2026 | The CLI runs the updater as a non-root user with all Linux capabilities dropped, `no-new-privileges` and Docker's default seccomp profile. | It hardens the side of the boundary that the article assumes runs hostile code. | [dependabot/cli, commit e166a3e](https://github.com/dependabot/cli/commit/e166a3ed59c7d96aca1f4e12c64478ff72beb224) |
+| 12 October 2026 | GitHub states that on github.com, Dependabot update jobs can reach only hosts on the egress allowlist and the configured private registries. | It shows that hosted jobs on github.com enforce the allowlist, which the code alone does not reveal. | [GitHub Changelog](https://github.blog/changelog/2026-10-12-anonymous-organization-level-registries-for-dependabot) |
+| 26 October 2026 | The proxy starts allowing redirect targets from credentialed private registries, and rejects plain-text sources before it does. | This is the redirect learning described in "How the list is built". | [dependabot/proxy, commit bdec1ee](https://github.com/dependabot/proxy/commit/bdec1ee45f1d627314b1533503ff111312152a29) |
+
 ## Frequently Asked Questions
 
 **Q: Why not give the package manager the credential and sandbox it?**
@@ -401,7 +418,8 @@ The points below remain open after reading the source.
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| Whether GitHub's hosted jobs set `proxy-egress-enforce` is not public. | The exfiltration row of the threat model depends on it. | GitHub's documentation or a statement from the project. |
+| GitHub states that github.com jobs enforce the egress allowlist, but not since when, nor whether GitHub Enterprise Server jobs set `proxy-egress-enforce`. | The exfiltration row of the threat model depends on it outside github.com. | GitHub's changelog and the GitHub Enterprise Server release notes. |
+| The proxy's history before its open-source commit of 29 January 2026 is not public. | The timeline cannot date when the read-only gate and the metadata block were first deployed. | A statement from GitHub on the earlier, closed-source proxy. |
 | The topology was read in the CLI, not in GitHub's production setup. | Hosted runners may differ. | `internal/infra/run.go` against any published description of hosted runs. |
 | The threat table is my own analysis, and no attack was tested. | Its entries come from reading the code. | The proxy's handler tests, such as `egress_allowlist_test.go`, and a dedicated review. |
 | The proxy's tests were read by name, not run. | The behaviours described rest on source reading. | Run `go test ./...` in `dependabot/proxy` with the Go version it requires. |
@@ -426,6 +444,19 @@ The points below remain open after reading the source.
 - [elazarl/goproxy](https://github.com/elazarl/goproxy), the proxy library
 - [Git HTTP protocol](https://git-scm.com/docs/http-protocol)
 - [Dependabot documentation](https://docs.github.com/en/code-security/dependabot)
+
+### Timeline sources
+
+- [The Dependabot Proxy is now open source with an MIT license](https://github.blog/changelog/2026-02-03-the-dependabot-proxy-is-now-open-source-with-an-mit-license), GitHub Changelog, 3 February 2026
+- [Anonymous organization-level registries for Dependabot](https://github.blog/changelog/2026-10-12-anonymous-organization-level-registries-for-dependabot), GitHub Changelog, 12 October 2026
+- [Initial commit](https://github.com/dependabot/cli/commit/f436cf3edc2f8ff2e0df27d9172b68143149e470), dependabot/cli, 23 September 2022
+- [Hide more credentials from the updater (#216)](https://github.com/dependabot/cli/commit/a104d64862ea3f48d39485c80206fe60f14d858e), dependabot/cli, 2 January 2024
+- [Harden updater container isolation (#667)](https://github.com/dependabot/cli/commit/e166a3ed59c7d96aca1f4e12c64478ff72beb224), dependabot/cli, 7 October 2026
+- [Initial open source commit for Dependabot Proxy](https://github.com/dependabot/proxy/commit/dd760113d8edd581443a6aaafe80d4e4025251ab), dependabot/proxy, 29 January 2026
+- [Prevent write actions in the Git handler (#220)](https://github.com/dependabot/proxy/commit/f3800dfe80b17e2db4a9d5bb9e39f9dc004882cd), dependabot/proxy, 24 August 2026
+- [Enable git write protection by default (#231)](https://github.com/dependabot/proxy/commit/49c2109c399fca91188c8725da5b4ce0b5056641), dependabot/proxy, 3 September 2026
+- [Add egress control through allowlist to prevent source code exfiltration (#230)](https://github.com/dependabot/proxy/commit/a72f5228de257ec7e9f7cd9880e48b204980c501), dependabot/proxy, 10 September 2026
+- [Allowlist registry redirect targets for private registries (#341)](https://github.com/dependabot/proxy/commit/bdec1ee45f1d627314b1533503ff111312152a29), dependabot/proxy, 26 October 2026
 
 ### Related articles
 

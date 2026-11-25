@@ -2,7 +2,7 @@
 layout: post
 title: "How Ethereum Finalises Blocks: LMD GHOST and Casper FFG"
 date:   2026-11-04
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -566,6 +566,8 @@ According to the book, on 25 May 2022 mainnet had a [seven-block reorganisation]
 
 The book also notes the first mainnet inactivity leak, nine epochs of delayed finality from epoch 200,750 on 12 May 2023.
 
+The [timeline](#timeline) in the annex dates these events with the spec changes around them.
+
 ## What Gloas, the Fast Confirmation Rule and later proposals change
 
 Status below was checked on 2026-11-04 against the upstream repositories, not only the local pin.
@@ -695,6 +697,23 @@ The book describes the Capella specification. These are the places where the pin
 | The filter | `filter_block_tree` and `get_filtered_block_tree`. | Renamed `filter_node_tree` and `get_filtered_node_tree` by [PR 5509](https://github.com/ethereum/consensus-specs/pull/5509), working on `ForkChoiceNode` objects. |
 | `correct_justified` | A longer expression built on `is_previous_epoch_justified`. | The shorter test shown in [The filter](#the-filter); the helper no longer exists. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 25 October 2017 | Vitalik Buterin and Virgil Griffith posted the first version of the Casper FFG paper on arXiv. | It defines the checkpoints, supermajority links and two slashing conditions that the [Casper FFG](#casper-ffg) section reads from the spec. | [arXiv 1710.09437](https://arxiv.org/abs/1710.09437) |
+| 6 March 2020 | The first version of "Combining GHOST and Casper", the Gasper paper, appeared on arXiv. | It is the paper that joins LMD GHOST to Casper FFG, the combination this article follows through the spec. | [arXiv 2003.03052](https://arxiv.org/abs/2003.03052) |
+| 1 December 2020 | The Beacon Chain started producing blocks at 12:00:23 UTC, from slot 0. | Both layers have run on mainnet since that slot. | [ethereum.org, Ethereum forks](https://ethereum.org/en/ethereum-forks/) |
+| 23 November 2021 | PR 2730, "Proposer LMD Score Boosting", was merged into the consensus specifications. | It added the [proposer boost](#proposer-boost) as the defence against the balancing attack. | [consensus-specs PR 2730](https://github.com/ethereum/consensus-specs/pull/2730) |
+| 25 May 2022 | A seven-block reorganisation occurred on the Beacon Chain at 08:55 UTC. | The write-up traces it to proposer boost being active on only part of the validators, since a fork-choice change ships without a hard fork. | [Barnabé Monnot, Visualising the 7-block reorg](https://barnabe.substack.com/p/pos-ethereum-reorg) |
+| 15 March 2023 | PR 3290, "Fork choice upgrade", was merged into the consensus specifications. | It added the pull-up logic and `get_voting_source` described in [Unrealised justification](#unrealised-justification). | [consensus-specs PR 3290](https://github.com/ethereum/consensus-specs/pull/3290) |
+| 11 and 12 May 2023 | Mainnet stopped finalising twice, from block [17,239,384](https://etherscan.io/block/17239384) on 11 May and from block [17,245,574](https://etherscan.io/block/17245574) (epoch 200,750) on 12 May, while Prysm and Teku nodes struggled with old attestations. | The finalised prefix fell behind the available chain as the two-layer design allows, and the book counts the 12 May episode as the first mainnet [inactivity leak](#the-inactivity-leak). | [Thomas Thiery, Cascading Network Effects on Ethereum's Finality](https://ethresear.ch/t/cascading-network-effects-on-ethereums-finality/15871) |
+| 13 March 2024 | Deneb activated at block [19,426,587](https://etherscan.io/block/19426587), epoch 269,568, with EIP-7045 among its changes. | EIP-7045 removed the 32-slot limit on the `TIMELY_TARGET` flag that Casper FFG counts. | [ethereum.org, Ethereum forks](https://ethereum.org/en/ethereum-forks/) |
+| 7 May 2025 | Electra activated at block [22,431,084](https://etherscan.io/block/22431084), epoch 364,032, with EIP-7251 and EIP-7549. | EIP-7251 lowered the initial slashing penalty to 1/4,096 and EIP-7549 freed the committee index that Gloas reuses for payload votes. | [ethereum.org, Ethereum forks](https://ethereum.org/en/ethereum-forks/) |
+| 16 April 2026 | PR 4747 added the Fast Confirmation Rule to the phase 0 specifications. | It gives the faster, weaker guarantee described in [Fast Confirmation Rule](#fast-confirmation-rule), without a consensus change. | [consensus-specs PR 4747](https://github.com/ethereum/consensus-specs/pull/4747) |
+
 ## Frequently Asked Questions
 
 **Q: Why does Ethereum need a finality gadget if LMD GHOST already picks a chain?**
@@ -752,6 +771,7 @@ These points were not settled by the sources or were not checked.
 | The mainnet leak time between 348 and 517 epochs is a reasoned bound, and it ignores exits and any proposer income. | The article gives no direct mainnet figure. | A run with a mainnet-sized validator set. |
 | The single-slot finality status comes from a roadmap page with text dated 2023, and a search of the local EIPs. | Research work outside these repositories was not surveyed. | ethresear.ch and the Ethereum Foundation research pages. |
 | The overview of CAP, safety and liveness in the prerequisites comes from general knowledge, as does the partition FAQ's derivation. | These are stated without a direct citation. | The book's Preliminaries section and [Ebb-and-Flow Protocols](https://arxiv.org/abs/2009.04987). |
+| The May 2023 finality incidents in the timeline are dated from Thomas Thiery's analysis, and the Prysm and Teku post-mortems were not read (the Prysm post-mortems page returned 404 on 25 November 2026). | The client-side root cause and the fixed releases rest on one analysis rather than on the clients' own reports. | The client post-mortems linked from [Cascading Network Effects on Ethereum's Finality](https://ethresear.ch/t/cascading-network-effects-on-ethereums-finality/15871), and the Teku 23.5.0 and Prysm v4.0.4 release notes. |
 
 ## References
 
@@ -810,6 +830,12 @@ These points were not settled by the sources or were not checked.
 - [Justification withholding attack](https://hackmd.io/o9tGPQL2Q4iH3Mg7Mma9wQ), HackMD
 - [Post-mortem of the seven-block reorganisation](https://barnabe.substack.com/p/pos-ethereum-reorg), Barnabé Monnot
 - [Single slot finality](https://ethereum.org/en/roadmap/single-slot-finality/), ethereum.org
+
+### Timeline sources
+
+- [Ethereum forks](https://ethereum.org/en/ethereum-forks/), ethereum.org, read 2026-11-25 (Beacon Chain genesis, Deneb and Electra activation blocks)
+- [Cascading Network Effects on Ethereum's Finality](https://ethresear.ch/t/cascading-network-effects-on-ethereums-finality/15871), Thomas Thiery, ethresear.ch, 13 June 2023
+- Merge dates of PR 2730, PR 3290 and PR 4747 (listed under Specification history), read from the GitHub API on 2026-11-25
 
 ### Related articles
 

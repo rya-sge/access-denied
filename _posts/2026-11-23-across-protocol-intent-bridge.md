@@ -2,7 +2,7 @@
 layout: post
 title: "Across Protocol - How an Intent Bridge Settles Through UMA"
 date:   2026-11-23
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain defi security
@@ -449,6 +449,8 @@ The relayer ends with 999.50 USDC repaid for 999.00 paid, a margin of 0.50 USDC 
 | "V3.5" (SDK name) | `bytes32` addresses and `uint256` deposit ids; `FundsDeposited` and `FilledRelay` replace the V3 events. | Current events; the legacy ones are declared but never emitted |
 | V5 | Deposits whose message starts with `V5_MAGIC_PREFIX = keccak256("AcrossV5MessagePrefix.V1")` are consumed by a V5 Gateway execution and can only be filled through the two V5 entry points described below. | `V5SpokePoolInterface.sol`, `nonV5Fill` modifier on the other fill paths |
 
+The Timeline in the Annex dates these launches, the Solana deployment and the liveness changes.
+
 [ERC-7683](https://eips.ethereum.org/EIPS/eip-7683), the cross-chain intents standard, also appears: the SpokePool still has an ERC-7683 `fill()`, marked deprecated.
 
 *Implementation:* `SpokePool.sol`, `fill()` (lines 1190-1197).
@@ -712,6 +714,23 @@ This section looks at what can go wrong for each party: the depositor, the relay
 | Unaudited code paths | Solana, Tron, Universal, periphery, V5 | Continuous audits stated by Across | Not in the five reports read here |
 | Cross-chain signature mismatch | ERC-1271 speed-ups, reused `unsafeDeposit` ids | Documented in code comments | Integrator must avoid both |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 8 November 2021 | Across V1 went live on Ethereum mainnet, moving USDC, ETH and UMA from Arbitrum to Ethereum only. | This is the one-direction `BridgePool` design that the Versions table lists as V1. | [Across Protocol is live and you can be a Co-Founder](https://across.to/blog/Across-Protocol-is-live-and-you-can-be-a-Co-Founder) |
+| 24 May 2022 | Across V2 launched, three days after the HubPool was deployed at block [14,819,537](https://etherscan.io/block/14819537) on 21 May. | The HubPool, the SpokePools and UMA-settled root bundles described in this article date from this release. | [Summing Up AcrossV2 Launch](https://across.to/blog/Summing-Up-AcrossV2-Launch); [deployed-addresses.json](https://github.com/across-protocol/contracts/blob/08df779bcedc4a7b867494cb3e6e50ba5c57995c/broadcast/deployed-addresses.json) |
+| 24 August 2022 | iosiro reported a bug in the off-chain relayer client that let a sped-up deposit be filled twice, and the relayers were paused and fixed. | The client compared fills with the updated deposit data while the on-chain hash still used the original, the split that the speed-up section relies on. | [High Risk Bug Disclosure: Across Bridge Double-Spend](https://iosiro.com/blog/high-risk-bug-disclosure-across-bridge-double-spend) |
+| 28 August 2023 | The owner enabled the only proposer ever allowed on the Across Bond Token, at block [18,012,106](https://etherscan.io/block/18012106), five days after the token was deployed at block [17,980,554](https://etherscan.io/block/17980554). | From then on a single address could propose root bundles, as the bond-token section explains. | [Bond token `ProposerModified` event](https://etherscan.io/address/0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea#events) |
+| 19 September 2023 | The HubPool owner lowered `liveness` from 7,200 s to 5,400 s, block [18,170,873](https://etherscan.io/block/18170873). | It is the first step away from the two-hour window that the code and the documentation still give. | [HubPool `LivenessSet` events](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events) |
+| 21 February 2024 | Across announced V3, with an intent order structure and Across Settlement. | V3 is where the `outputToken`/`outputAmount` deposits and the fill paths read in this article begin. | [Across V3: Introducing the First Intents-Based Interoperability Protocol](https://across.to/blog/Across-V3-Introducing-the-First-Intents-Based-Interoperability-Protocol) |
+| 21 April 2024 | The HubPool owner lowered `liveness` to 3,600 s, block [19,704,562](https://etherscan.io/block/19704562). | A disputer then had one hour to check each bundle. | [HubPool `LivenessSet` events](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events) |
+| 19 August 2025 | Across went live on Solana, with USDC as the only supported token. | The `svm_spoke` program and its `emit_cpi!` events described in the Solana section serve this route. | [Across Is Live on Solana](https://across.to/blog/solana) |
+| 3 November 2025 | The HubPool owner lowered `liveness` to 1,800 s, block [23,718,591](https://etherscan.io/block/23718591). | This is the 30-minute window still read on chain on 23 November 2026, on which the settlement risks rest. | [HubPool `LivenessSet` events](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events) |
+| 17 September 2026 | Across opened an ACX buyout and stated that ACX will have no governance function after 8 January 2027, the protocol having been transferred to Across, Inc. | The documentation describes ACX governance as Snapshot plus oSnap, the module that can act for the HubPool owner Safe. | [The Across Token Buyout Portal is Now Live](https://across.to/blog/completing-the-bridge-across-sunsetting-acx) |
+
 ## Frequently Asked Questions
 
 **Q: Why does a user not have to wait for the challenge window when bridging with Across?**
@@ -765,6 +784,8 @@ These points were not settled by the sources read for this article:
 | OpenZeppelin audits after July 2024, and UMA's own audits of the optimistic oracle, were not read. | Solana, Tron, periphery and V5 may have been audited; oracle bugs would apply to bundle disputes. | [Across audits page](https://docs.across.to/introduction/audits). |
 | The V3 "fee optimization" that rewards relayers for taking repayment on a chain other than the destination is named in the fees page without a formula or a contract. | A relayer's margin, and the worked example's repayment amount, depend on it. | The [fees page](https://github.com/across-protocol/user-docs/blob/f7a8e7ab5a68916703ad1cfcb5708f83bd48054f/how-across-works/fees.md) and the repayment rules in [UMIP-157](https://github.com/UMAprotocol/UMIPs/blob/master/UMIPs/umip-157.md). |
 | That the documentation's "1 wei" partial fills describe an earlier version is an inference from the code, not stated in the sources. | A reader relying on the documentation may expect partial fills. | The [Across V3 Incremental Audit](https://www.openzeppelin.com/news/across-v3-incremental-audit) and the V2 `SpokePool.sol` in `across-protocol/contracts` history. |
+| Press reports describe an attack on 17 July 2026 against Across's Solana route, with losses borne by the Risk Labs relayer. Across's post-mortem is an X article of 24 July 2026 whose body the official oEmbed endpoint does not return, so the incident is not in the Timeline. | It is the only reported incident on a deployment this article covers, and it concerns Solana deposits, whose events sit in inner-instruction data. | The post-mortem [on X](https://x.com/AcrossProtocol/status/2080722320814121237), read in full. |
+| The ACX buyout post says ACX loses its governance function after 8 January 2027, but does not say what happens to the oSnap module enabled on the HubPool owner Safe. | The DAO path to the owner powers may stop working or pass to another voting base. | The forum post "The Bridge Across" linked from the [buyout post](https://across.to/blog/completing-the-bridge-across-sunsetting-acx), and the Safe's modules after that date. |
 
 ## References
 
@@ -775,8 +796,19 @@ These points were not settled by the sources read for this article:
 - [across-protocol/toolkit](https://github.com/across-protocol/toolkit) — analyzed at commit [`2edb9f61335071bc5b1d9778306f815e9354bd3d`](https://github.com/across-protocol/toolkit/tree/2edb9f61335071bc5b1d9778306f815e9354bd3d) (2026-06-10, `@across-protocol/app-sdk@0.6.1`), read 2026-11-23; `packages/sdk/src/{constants/index.ts,api/suggested-fees.ts,actions/getFillByDepositTx.ts}`
 - [across-protocol/contracts-v1](https://github.com/across-protocol/contracts-v1) — commit [`3db515871632b5e470351e5c6e7c2adead10f967`](https://github.com/across-protocol/contracts-v1/tree/3db515871632b5e470351e5c6e7c2adead10f967) (2022-02-08), listed for the V1 history only
 - On-chain reads with Foundry `cast` on Ethereum block 26,477,298 (2026-11-23): HubPool `owner()`, `liveness()`, `bondAmount()`, `bondToken()`, `paused()`, `protocolFeeCapturePct()`, `lpFeeRatePerSecond()`; Safe `getThreshold()`, `getOwners()`, `VERSION()`; bond token `name()`, `symbol()`, `owner()`; Ethereum SpokePool `owner()` and implementation slot
-- Etherscan API V2, 24 November 2026: the three `LivenessSet` events of the [HubPool](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events), the only `ProposerModified` event of the [bond token](https://etherscan.io/address/0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea#events), and the verified source of the oSnap clone target `0x28CeBFE9…26D5d`
+- Etherscan API V2, 24 November 2026: the three `LivenessSet` events of the [HubPool](https://etherscan.io/address/0xc186fA914353c44b2E33eBE05f21846F1048bEda#events), the only `ProposerModified` event of the [bond token](https://etherscan.io/address/0xee1DC6BCF1Ee967a350e9aC6CaaAA236109002ea#events), and the verified source of the oSnap clone target `0x28CeBFE9…26D5d`. Powered by [Etherscan.io](https://etherscan.io) APIs.
 - Foundry `cast` through PublicNode on Ethereum block [26,485,825](https://etherscan.io/block/26485825), 24 November 2026 at 15:10 UTC: bond token `proposers()`, HubPool `liveness()` and the oSnap module's code
+- Foundry `cast block` through PublicNode, 25 November 2026: timestamps of the HubPool deployment block [14,819,537](https://etherscan.io/block/14819537), 21 May 2022 at 21:18 UTC, and of the bond token deployment block 17,980,554, 23 August 2023 at 23:00 UTC. Both block numbers come from [`broadcast/deployed-addresses.json`](https://github.com/across-protocol/contracts/blob/08df779bcedc4a7b867494cb3e6e50ba5c57995c/broadcast/deployed-addresses.json) at `08df779`.
+
+### Timeline sources
+
+- Across, [Across Protocol is live and you can be a Co-Founder](https://across.to/blog/Across-Protocol-is-live-and-you-can-be-a-Co-Founder), 2021-11-08
+- Across, [Summing Up AcrossV2 Launch](https://across.to/blog/Summing-Up-AcrossV2-Launch), 2022-06-07
+- iosiro, [High Risk Bug Disclosure: Across Bridge Double-Spend](https://iosiro.com/blog/high-risk-bug-disclosure-across-bridge-double-spend), 2022-10-12
+- Across, [Across V3: Introducing the First Intents-Based Interoperability Protocol](https://across.to/blog/Across-V3-Introducing-the-First-Intents-Based-Interoperability-Protocol), 2024-02-21
+- Across, [Across Is Live on Solana: Fast, Cheap, and Secure EVM Bridging](https://across.to/blog/solana), 2025-08-19
+- Across, @AcrossProtocol, [relayer incident post-mortem](https://x.com/AcrossProtocol/status/2080722320814121237) (on X), 2026-07-24, cited in Gaps only
+- Across, [The Across Token Buyout Portal is Now Live](https://across.to/blog/completing-the-bridge-across-sunsetting-acx), 2026-09-17
 
 ### Audit reports
 

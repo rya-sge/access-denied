@@ -2,7 +2,7 @@
 layout: post
 title: "When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas"
 date:   2026-11-04
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain ethereum security
@@ -238,7 +238,7 @@ The table includes Heze, the draft consensus fork after Gloas. Its spec removes 
 | Gloas | $$2^{64}-1$$ (no epoch set) | n/a | n/a | 46 | `ProgressiveContainer` | per field |
 | Heze | $$2^{64}-1$$ (no epoch set) | n/a | n/a | 42 | `ProgressiveContainer` | per field |
 
-Gloas and Heze are in development: every value in their columns is taken from the pinned commit and may change. The two forks have no activation epoch yet: the configuration holds the placeholder $$2^{64}-1$$. The change itself is planned: EIP-7688 has status Review, and is listed as Scheduled for Inclusion in Glamsterdam, the upgrade that pairs Gloas with Amsterdam, by [EIP-7773](https://eips.ethereum.org/EIPS/eip-7773) at the pinned EIPs commit.
+Gloas and Heze are in development: every value in their columns is taken from the pinned commit and may change. The two forks have no activation epoch yet: the configuration holds the placeholder $$2^{64}-1$$. The change itself is planned: EIP-7688 has status Review, and is listed as Scheduled for Inclusion in Glamsterdam, the upgrade that pairs Gloas with Amsterdam, by [EIP-7773](https://eips.ethereum.org/EIPS/eip-7773) at the pinned EIPs commit. The timeline in the annex dates each fork and each step of EIP-7688.
 
 ### State field gindices
 
@@ -727,6 +727,23 @@ These properties apply to any contract that verifies beacon data, in the wording
 | ☐ | Replay keys are built from proven values, whose proofs have exact lengths. | A forged key bypasses the replay guard. |
 | ☐ | All proofs in one checkpoint use one root. | Mixed snapshots double count or hide a slashed validator. |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|------|-------|---------------------|--------|
+| 10 February 2022 | EIP-4788, "Beacon block root in the EVM", is created by Alex Stokes, Ansgar Dietrichs, Danny Ryan, Martin Holst Swende and lightclient. | It defines the ring buffer that every proof chain in this article starts from. | [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) |
+| 6 July 2023 | Code4rena publishes its EigenLayer contest report, with H-01 on missing slot and block number proof checks. | It is the empty-proof finding analysed in Two real findings. | [Code4rena report](https://code4rena.com/reports/2023-04-eigenlayer) |
+| 13 March 2024 | Dencun activates on mainnet at epoch 269,568, and block [19,426,587](https://etherscan.io/block/19426587) is the first to carry a `parentBeaconBlockRoot`. | From this block contracts can read beacon roots without an oracle, under the 28-field Deneb layout. | [Dencun Mainnet Announcement](https://blog.ethereum.org/2024/02/27/dencun-mainnet-announcement) |
+| 5 April 2024 | Cantina publishes the EigenLayer competition report, whose only high-severity finding is the `>` comparison on `mostRecentWithdrawalTimestamp`. | It is the boundary finding analysed in Two real findings. | [Cantina report](https://cdn.cantina.xyz/reports/cantina_competition_eigenlayer_mar2024.pdf) |
+| 15 April 2024 | EIP-7688, "Forward compatible consensus data structures", is created by Etan Kissling and Cayman. | It is the change that moves `BeaconState` to a `ProgressiveContainer` in Gloas. | [EIP-7688](https://eips.ethereum.org/EIPS/eip-7688) |
+| 7 May 2025 | Pectra activates on mainnet at epoch 364,032, with block [22,431,084](https://etherscan.io/block/22431084) as the first Electra block. | Electra's 37 fields took the state tree to depth 6, and this block stores the root of a Deneb parent. | [Pectra Mainnet Announcement](https://blog.ethereum.org/2025/04/23/pectra-mainnet) |
+| 3 December 2025 | Fusaka activates on mainnet at epoch 411,392, the slot at the fork timestamp is missed, and block [23,935,694](https://etherscan.io/block/23935694), 12 seconds later, is the first Fulu block. | Fulu added `proposer_lookahead` without a depth change, and the missed slot is the case in which a timestamp margin of one block picks the wrong layout. | [Fusaka Mainnet Announcement](https://blog.ethereum.org/2025/11/06/fusaka-mainnet-announcement) |
+| 5 January 2026 | EIP-7688 is listed as Considered for Inclusion in the Glamsterdam meta EIP. | Progressive containers become a candidate for the fork after Fulu. | [EIPs commit 1708a6c](https://github.com/ethereum/EIPs/commit/1708a6cb84d683e9baa7ff9b5afc118e51b8415b) |
+| 4 August 2026 | The Glamsterdam meta EIP promotes its Considered for Inclusion list, EIP-7688 included, to Scheduled for Inclusion. | From this commit the Gloas gindices of this article are planned, though still a draft. | [EIPs commit 7b761e3](https://github.com/ethereum/EIPs/commit/7b761e3d176730c488bfc4f1e3b261e3d93898b8) |
+| 6 October 2026 | Glamsterdam activates on the Sepolia testnet at epoch 353,024, with EIP-7688 in its specification, and the Sepolia beacon node reports fork version `0x90000076` from that epoch. | Sepolia is the first public network with a Gloas state, where the progressive gindices can be checked on real data. | [Glamsterdam Testnet Announcement](https://blog.ethereum.org/2026/09/17/glamsterdam-testnet-announcement) |
+
 ## Frequently Asked Questions
 
 **Q: What does the EIP-4788 contract return, and why is one more proof step always needed?**
@@ -778,6 +795,7 @@ The points below are open, and should be checked before relying on the correspon
 | No deployed verifier was surveyed, so the article does not know of any contract that accepted a stale proof on mainnet. | The accepted-value outcomes are shown on real data, but their impact on any specific protocol is not. | Verifiers that read state-level fields with fixed-depth constants. |
 | The proofs of concept for both findings in `evm-hack-registry` are synthetic reductions, and they were not re-run for this article. | The quotations come from the reports, and only the Cantina reduction records a passing run. | The two findings' folders in [sanbir/evm-hack-registry](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217) at the pinned commit. |
 | The Gloas proofs use real `Validator` roots inside a synthetic state and header. The "reverts" and "verifies" outcomes for a Gloas tree are deduced from positions. | They test the arithmetic, not a real Gloas state, and ePBS semantics of `state_root` were not studied. | Re-run on a Gloas devnet state, with `specs/gloas/beacon-chain.md` and EIP-7732. |
+| Glamsterdam has run on Sepolia since 6 October 2026 (epoch 353,024), and its Hoodi activation was postponed on 22 October 2026 with no new date. No Sepolia Gloas state was hashed for this article. | A real Gloas state now exists, so the progressive gindices and the "reverts" and "verifies" outcomes can be checked on it rather than on a synthetic state. | `mainnet_state.py` run against a finalized Sepolia state, and the [Glamsterdam on Hoodi Postponed](https://blog.ethereum.org/2026/10/22/glamsterdam-hoodi-delay) post for the mainnet schedule. |
 | The 2026-11-04 state (slot 15,580,064) is not archived, and public checkpoint sync serves only the current state. The headers at slots 15,580,064 and 11,649,023 and execution blocks 26,340,577 and 22,431,084 are re-fetched and checked by `mainnet_history.py`, but the state size, the validator count, the walk nodes and the stale values of the tables cannot be recomputed. | The 4788 root of that block left the buffer after about 27.3 hours, so the original `eth_call` cannot be repeated. | `mainnet_state.py` reproduces the method on any recent finalized state while its root is in the buffer (done for slot 15,687,296, `snapshot.json`). |
 | The verification code is published (`gindex.py`, `ssz_state.py`, `mainnet_history.py`, `mainnet_state.py`, the Foundry tests and gas report), but the harness behind the first gas figures (43,417 and 55,659) was not. | The published harness measures 43,483 and 56,837 on a newer state, so the gas figures are close but not identical. | `gas_report.txt` and `forge_fork_output.txt` in the verification directory. |
 | Gas figures come from a readable reference implementation, in a Foundry gas report with EVM version `cancun` (the same `verify` costs 51,592 with `shanghai`, which has no `MCOPY` instruction). | An assembly verifier costs less, and calldata costs are excluded. | Re-measure on the implementation under review. |
@@ -821,6 +839,25 @@ The points below are open, and should be checked before relying on the correspon
 - [EigenLayer Contest, Findings & Analysis Report](https://code4rena.com/reports/2023-04-eigenlayer), Code4rena, 2023-07-06
 - [Eigenlayer contracts Competition](https://cdn.cantina.xyz/reports/cantina_competition_eigenlayer_mar2024.pdf), Cantina, April 5, 2024
 - [AuditVault finding 40684](https://github.com/Auditware/AuditVault/blob/main/findings/40684-beacon-chain-withdrawals-that-occur-at-lastwithdrawaltimesta.md)
+
+### Timeline sources
+
+- [Dencun Mainnet Announcement](https://blog.ethereum.org/2024/02/27/dencun-mainnet-announcement), Ethereum Foundation Protocol Support Team, 2024-02-27
+- [Pectra Mainnet Announcement](https://blog.ethereum.org/2025/04/23/pectra-mainnet), Ethereum Foundation Protocol Support Team, 2025-04-23
+- [Fusaka Mainnet Announcement](https://blog.ethereum.org/2025/11/06/fusaka-mainnet-announcement), Ethereum Foundation Protocol Coordination Team, 2025-11-06
+- [Glamsterdam Testnet Announcement](https://blog.ethereum.org/2026/09/17/glamsterdam-testnet-announcement), Ethereum Foundation, 2026-09-28
+- [Glamsterdam on Hoodi Postponed](https://blog.ethereum.org/2026/10/22/glamsterdam-hoodi-delay), Ethereum Foundation Protocol Cluster, 2026-10-22
+- [Update EIP-7773: update EIP status for glamsterdam](https://github.com/ethereum/EIPs/commit/1708a6cb84d683e9baa7ff9b5afc118e51b8415b), ethereum/EIPs, 2026-01-05
+- [Update EIP-7773: Promote CFI to SFI](https://github.com/ethereum/EIPs/commit/7b761e3d176730c488bfc4f1e3b261e3d93898b8), ethereum/EIPs, 2026-08-04
+
+### On-chain reads
+
+- Ethereum mainnet, read on 25 November 2026 at 09:03 UTC, at head block [26,491,176](https://etherscan.io/block/26491176):
+  - endpoints: PublicNode JSON-RPC and beacon API, and Etherscan V2 `block getblocknobytime` (Powered by [Etherscan.io](https://etherscan.io) APIs);
+  - Dencun: timestamps and `parentBeaconBlockRoot` of blocks [19,426,586](https://etherscan.io/block/19426586), which has no root, and [19,426,587](https://etherscan.io/block/19426587);
+  - Electra: blocks [22,431,083](https://etherscan.io/block/22431083) and [22,431,084](https://etherscan.io/block/22431084);
+  - Fulu: blocks [23,935,693](https://etherscan.io/block/23935693) and [23,935,694](https://etherscan.io/block/23935694), and beacon headers at slot 13,164,544, not found since the slot was missed, and slot 13,164,545.
+- Sepolia, read on 25 November 2026 at 09:03 UTC through the PublicNode beacon API: `states/head/fork` returned `current_version` `0x90000076` from epoch 353,024.
 
 ### Related articles
 

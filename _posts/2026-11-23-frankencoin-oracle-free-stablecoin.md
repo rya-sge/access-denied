@@ -2,7 +2,7 @@
 layout: post
 title: "How Frankencoin Works - an Oracle-Free Swiss Franc Stablecoin with Veto Governance and Challenge Auctions"
 date:   2026-11-23
-last_modified_at: 2026-11-24
+last_modified_at: 2026-11-25
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -550,7 +550,7 @@ The main consequence of the cross-chain deployment is that supply and governance
 
 ### The reports
 
-The repository and the auditors' sites hold seven stored reports, covering three generations of the code. A separate ChainSecurity CCIP Bridge assessment, cited by the FPS2 report, is not among them.
+The repository and the auditors' sites hold seven stored reports, covering three generations of the code. A separate ChainSecurity CCIP Bridge assessment, cited by the FPS2 report, is not among them. The [timeline](#timeline) in the annex places the reports among the deployments.
 
 | Report | Date | Scope | Findings as rated |
 |---|---|---|---|
@@ -761,6 +761,23 @@ The risks below combine the protocol's own disclosure page (`gitbook/risks.md`),
 | FCS exit cost | Design | Discount on large redemptions | 7-day recovery, 10% withdraw cap | Holders who must exit fast take the discount |
 | Version spread | Implementation | Old hubs and savings stay deployed | New modules through the veto | V1/V2 positions keep their own rules and known issues |
 
+### Timeline
+
+Events up to 25 November 2026.
+
+| Date | Event | Why it matters here | Source |
+|---|---|---|---|
+| 12 April 2023 | Code4rena ran a public audit contest on the V1 core from 12 to 19 April 2023 and published its report on 9 June 2023. | It produced the H-05 price overflow and most of the V1 findings grouped in [Bug classes](#bug-classes). | [Code4rena, Frankencoin report](https://code4rena.com/reports/2023-04-frankencoin) |
+| 28 October 2023 | ZCHF was deployed on Ethereum in block [18,451,518](https://etherscan.io/block/18451518), and the V1 Minting Hub was registered as a minter with no application period 19 blocks later, in block [18,451,537](https://etherscan.io/block/18451537). | Every later minter went through a veto window of at least 14 days; only the initial hub and the XCHF bridge were added at deployment. | [ZCHF creation transaction on Etherscan](https://etherscan.io/tx/0xdc09f425cfb64bbb93a07bf22ea7e7922e24874971b6d17ce1f91750ad92ef62) |
+| 30 October 2023 | ChainSecurity issued its report on the V1 core and the stablecoin bridge. | It holds CS-ZCHF-034, the first of the five Critical findings, and the bridge's missing write-off path. | [ChainSecurity, Code Assessment of the Frankencoin Smart Contracts](https://github.com/Frankencoin-ZCHF/Frankencoin/blob/8b4c4ab67bb361b91d58c474b87f4608fc4c0566/audits/V1/ChainSecurity-audit.pdf) |
+| 27 November 2024 | Minting Hub V2 was proposed as a minter in block [21,281,110](https://etherscan.io/block/21281110), minutes after the `SavingsV2` module and the position roller. | V2 is one of the two hubs that run every live position today, with forced sale and the leadrate. | [`MinterApplied` transaction on Etherscan](https://etherscan.io/tx/0x1903230e1983883ea422619e929dbe51b42eb7db0ac56b508945bbce48251139) |
+| 28 November 2024 | ChainSecurity issued its report on the V2 contracts. | Its CS-ZCHF2-001 and -002 findings led to the `noChallenge` guard and the bad-debt booking in `forceSale`. | [ChainSecurity, Code Assessment of the Frankencoin v2024 Smart Contracts](https://github.com/Frankencoin-ZCHF/Frankencoin/blob/8b4c4ab67bb361b91d58c474b87f4608fc4c0566/audits/V2/ChainSecurity_Frankencoin_Frankencoin_v2024.pdf) |
+| 24 June 2025 | The CCIP token pool was proposed as a minter in block [22,775,408](https://etherscan.io/block/22775408), with the bridge accounting contract in the next block. | These two minters carry ZCHF and its profits and losses to the other chains, which then depend on CCIP. | [`MinterApplied` transaction on Etherscan](https://etherscan.io/tx/0xcecb867417f3bc34ed8a2f2bfed8fcb876210d5722f92c1c7cb7900b5e98bdac) |
+| 30 April 2026 | The AllUnity CHFAU stablecoin bridge was proposed as a minter in block [24,993,997](https://etherscan.io/block/24993997). | It is the only one of the three bridges still able to mint, until 8 April 2027. | [`MinterApplied` transaction on Etherscan](https://etherscan.io/tx/0xa1b5112f07a7f8b10fd183ad6819c486339874ddd6c5d7ceed92ecf04c64ed39) |
+| 29 May 2026 | A minter named after the CHFAU bridge with an added asterisk, at a lookalike address, was proposed in block [25,199,256](https://etherscan.io/block/25199256) and denied 54 blocks later, in block [25,199,310](https://etherscan.io/block/25199310). | It is the clearest case of the veto stopping a proposal that imitated an approved minter. | [`MinterDenied` transaction on Etherscan](https://etherscan.io/tx/0xf64bc6b2c5032d3fff8caf8c57f1c5afdafd24cfdf6b79706be1ff03dee7f750) |
+| 14 July 2026 | ChainSecurity issued its FPS2 report on the share wrapper, the governance modules and the CCIP admin. | Its Critical finding on `shoot` led to the two-thirds binding threshold of the current source. | [ChainSecurity, Code Assessment of the FPS2 Smart Contracts](https://reports.chainsecurity.com/Frankencoin/ChainSecurity_Frankencoin_FPS2_Audit.pdf) |
+| 28 August 2026 | FCS and its minter, interest and CCIP governance modules were deployed on Ethereum in block [25,852,506](https://etherscan.io/block/25852506). | From this block, minters can be proposed with the 60-day announcement and vetoed through FCS at its 1% quorum. | [FCS creation transaction on Etherscan](https://etherscan.io/tx/0x5b7df19db201535b1a10f3e30a9d343cf2f78fcc645d059b6f5f3b84aeee70ec) |
+
 ## Frequently Asked Questions
 
 **Q: How does Frankencoin decide that a position should be liquidated without a price oracle?**
@@ -848,6 +865,7 @@ These points are not settled by the sources read for this article and should be 
 | No external audit among the stored sources covers `CurveAmplifier`, the bridged leadrate or the EIP-3009 sidecar; the FPS2 report (p. 9) refers to a separate CCIP Bridge code assessment that was not read. | These modules have no review history in this article. | ChainSecurity's public report site (the [FPS2 report](https://reports.chainsecurity.com/Frankencoin/ChainSecurity_Frankencoin_FPS2_Audit.pdf) is hosted there) for the CCIP Bridge assessment and newer Frankencoin reports, and the team's design notes on `CurveAmplifier` and the sidecar in `reports/` of the [pinned repository](https://github.com/Frankencoin-ZCHF/Frankencoin/tree/8b4c4ab67bb361b91d58c474b87f4608fc4c0566/reports). |
 | Finding counts come from per-report digests; the Blockbite and Decurity PDFs were not re-read for this article. | Totals in the audit table could be off by a few. | `audits/V1/blockbite-audit.pdf` and `audits/V2/frankencoin-audit-report-2024-1.1.pdf` in the [pinned repository](https://github.com/Frankencoin-ZCHF/Frankencoin/tree/8b4c4ab67bb361b91d58c474b87f4608fc4c0566/audits). |
 | The regulatory remark (no issuer promising redemption at par, unlike e-money tokens) is the article's inference. | It is not a legal assessment. | The project's [compliance page](https://www.frankencoin.com/compliance#compliance-summary) and the MiCA texts. |
+| The timeline has no leadrate, fee or quorum changes: the `RateProposed` and `RateChanged` events of the leadrate contracts were not read, and the minter events are the only governance history queried. | Rate changes alter every new position's upfront fee and the savings cost to equity. | The events of [`SavingsV2` on Etherscan](https://etherscan.io/address/0x3BF301B0e2003E75A3e86AB82bD1EFF6A9dFB2aE#events) and of the [`SavingsReferral` module](https://etherscan.io/address/0x27d9AD987BdE08a0d083ef7e0e4043C857A17B38#events). |
 | The definitions of CDP, Dutch auction, bonding curve and optimistic governance in the prerequisites come from general knowledge. | They frame the reading but are not from the Frankencoin sources. | Compare with the site's [MakerDAO]({{site.url_complet}}/2023/11/21/makerdao/) and [Liquity V1]({{site.url_complet}}/2026/10/22/liquity-v1-lusd-troves-stability-pool/) articles, and with the [Frankencoin documentation](https://docs.frankencoin.com) for the protocol-specific use. |
 
 ## References
@@ -862,7 +880,13 @@ These points are not settled by the sources read for this article and should be 
 ### On-chain reads
 
 - Ethereum mainnet, block [26,485,804](https://etherscan.io/block/26485804), 24 November 2026 at 15:06 UTC, through the PublicNode RPC endpoint with Foundry `cast`: [ZCHF](https://etherscan.io/address/0xB58E61C3098d85632Df34EecfB899A1Ed80921cB) `totalSupply()`, `minterReserve()`, `equity()`, `MIN_FEE()`, `MIN_APPLICATION_PERIOD()` and `isMinter()` for the addresses in `exports/address.config.ts`; [Equity](https://etherscan.io/address/0x1bA26788dfDe592fec8bcB0Eaff472a42BE341B2) `price()` and `totalSupply()`; [MintingHub V2](https://etherscan.io/address/0xDe12B620A8a714476A97EfD14E6F7180Ca653557) `rate()`, `CHALLENGER_REWARD()` and `OPENING_FEE()`; [SavingsV2](https://etherscan.io/address/0x3BF301B0e2003E75A3e86AB82bD1EFF6A9dFB2aE) `currentRatePPM()` and `nextRatePPM()`; the [XCHF](https://etherscan.io/address/0x7bbe8F18040aF0032f4C2435E7a76db6F1E346DF), [VCHF](https://etherscan.io/address/0x3b71ba73299f925a837836160c3e1fec74340403) and [CHFAU](https://etherscan.io/address/0x3e445ff4ddDf0ff8aE7458c9746eD80bD664F6C1) bridges `horizon()`, `minted()` and `limit()`
-- Etherscan API V2, 24 November 2026, up to block 26,485,804: the [verified source of Equity](https://etherscan.io/address/0x1bA26788dfDe592fec8bcB0Eaff472a42BE341B2#code), and every `MinterApplied` and `MinterDenied` event of ZCHF since its deployment (17 and 5)
+- Etherscan API V2, 24 November 2026, up to block 26,485,804: the [verified source of Equity](https://etherscan.io/address/0x1bA26788dfDe592fec8bcB0Eaff472a42BE341B2#code), and every `MinterApplied` and `MinterDenied` event of ZCHF since its deployment (17 and 5). Powered by [Etherscan.io](https://etherscan.io) APIs.
+
+### Timeline sources
+
+- ZCHF contract creation, Ethereum block [18,451,518](https://etherscan.io/block/18451518), 28 October 2023, and FCS contract creation, block [25,852,506](https://etherscan.io/block/25852506), 28 August 2026, read with Etherscan API V2 `contract getcontractcreation` on 25 November 2026
+- `MinterApplied` and `MinterDenied` events of [ZCHF](https://etherscan.io/address/0xB58E61C3098d85632Df34EecfB899A1Ed80921cB#events), Etherscan API V2, read on 24 November 2026 (the batch listed under On-chain reads)
+- Frankencoin-ZCHF, `exports/blocknumber.config.ts`, FCS start blocks, at commit [`8b4c4ab`](https://github.com/Frankencoin-ZCHF/Frankencoin/blob/8b4c4ab67bb361b91d58c474b87f4608fc4c0566/exports/blocknumber.config.ts)
 
 ### Audit reports
 
