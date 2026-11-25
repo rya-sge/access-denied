@@ -2,7 +2,7 @@
 layout: post
 title: "What's Really in Your Bytecode? solc Metadata, Comparing Builds, and Known Compiler Bugs"
 date:   2026-11-04
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity security
@@ -33,7 +33,14 @@ The article assumes Solidity and the EVM, and relies on the following mechanisms
 - **IPFS CID v0.** An IPFS content identifier here is a multihash: the prefix `0x1220` (sha2-256, 32 bytes) followed by a digest. The familiar `Qm...` string is its base58 form. The digest covers a small protobuf wrapper around the file, not the raw file.
 - **Transient storage.** The `TSTORE` and `TLOAD` opcodes of [EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) give a contract a storage area that is cleared at the end of the transaction. The [Dencun overview]({{site.url_complet}}/2026/10/23/ethereum-dencun-upgrade-overview/) covers the opcodes.
 
-Every output below comes from a scratch directory, run with solc `0.8.38+commit.1835d247` unless a version is named, `0.8.33+commit.64118f21`, `0.8.34+commit.80d5c536`, and Foundry 1.5.0 with a local anvil node on the `osaka` hardfork.
+Every output below comes from a scratch directory, with these tools:
+
+- **Default compiler:** solc `0.8.38+commit.1835d247`, used wherever no version is named.
+- **Bug reproduction:** solc `0.8.33+commit.64118f21` and `0.8.34+commit.80d5c536`.
+- **Other compilers:** releases from 0.5.17 to 0.8.36, each named where it is used.
+- **Foundry:** version 1.5.0, with a local anvil node on the `osaka` hardfork.
+
+The repository files cited by name, such as `metadata.rst` or `Changelog.md`, come from the `argotorg/solidity` repository at the pinned commit `3bd40f0`, 11 commits after v0.8.38, listed under References. A statement marked (*derived*) is a conclusion drawn from the runs or the code, neither tested directly nor stated in a source.
 
 ## The structure of runtime bytecode
 
@@ -57,7 +64,7 @@ contract Counter {
 solc --optimize --bin-runtime --metadata -o out --overwrite Counter.sol
 ```
 
-The runtime code is 197 bytes. Its first 144 bytes are executable: the free memory pointer setup (`6080604052`), the callvalue check, the selector dispatch, the function bodies and a final `fe`, the `INVALID` opcode. Everything after that `fe` is data. The compiler's own assembly output names it `auxdata`:
+The runtime code is 197 bytes. Its first 144 bytes are the code: the free memory pointer setup (`6080604052`), the callvalue check, the selector dispatch, the function bodies and a final `fe`, the `INVALID` opcode, which the table below shows on its own line. Everything after that `fe` is data. The compiler's own assembly output names it `auxdata`:
 
 ```text
 auxdata: 0xa2646970667358221220e0a903a063d549d9d242376e14ae378a984b9873cfb262ae8a698d26e938416d64736f6c63430008260033
@@ -97,7 +104,9 @@ The [metadata documentation](https://docs.soliditylang.org/en/latest/metadata.ht
 
 The code part is the same 144 bytes in all four. Only `--no-cbor-metadata` removes the data entirely, giving 143 bytes: the final `fe` goes too.
 
-On a release build `solc` holds three bytes, one each for major, minor and patch. `metadata.rst` states that a pre-release build stores a full version string instead, so a decoder must not assume a fixed length. `bzzr0` is the key used by older compilers: `Changelog.md` moves to `bzzr1` in 0.5.11.
+The `experimental` key appears when experimental mode is enabled, through `--experimental` or the Standard JSON `settings.experimental` option; `metadata.rst` notes that the mode does not imply any experimental feature was used.
+
+On a release build the value under the `solc` key is three bytes, one each for major, minor and patch. `metadata.rst` states that a pre-release build stores a full version string instead, so a decoder must not assume a fixed length. `bzzr0` is the key used by older compilers: `Changelog.md` moves to `bzzr1` in 0.5.11.
 
 ## What the metadata JSON holds
 
@@ -126,6 +135,10 @@ The trailer holds a hash, and the hash commits to a separate file. For `Counter`
 | `libraries: {"Counter.sol": {"L": "0x11..."}}` | `libraries: {"Counter.sol:L": "0x11..."}` |
 | `appendCBOR: false` | `appendCBOR: false` with `bytecodeHash: "ipfs"`, although the bytecode holds no hash |
 
+The optimizer rows follow one rule. Metadata does not copy the `enabled` flag from the input: it compares the effective optimizer components, ignoring the run count, with two presets. When they equal the minimal preset it writes "disabled", when they equal the standard preset it writes "enabled", and otherwise it writes the full component list. Every component switched on is the standard preset, whatever the input flag said, while a Yul optimizer switched off matches neither preset.
+
+*Implementation:* `libsolidity/interface/CompilerStack.cpp`, `createMetadata()`, the comparison with `OptimiserSettings::minimal()` and `OptimiserSettings::standard()`.
+
 As the third row shows, an `enabled: true` in metadata does not prove the project's configuration said so. Metadata records the effective settings, so an auditor should compare effects rather than the text of two configuration files.
 
 The normalised form is still sufficient for a rebuild. Feeding `metadata.settings` back as Standard JSON input, with `compilationTarget` removed, reproduced byte-identical code and byte-identical metadata in the four cases tested: `enabled: false` with full `details`, `yul: false`, plain `enabled: true`, and `runs: 1`. None of those four cases used libraries, whose format would need converting back.
@@ -152,12 +165,14 @@ def field(tag, payload):
 
 def cid_v0(content):
     """CID v0 of a file that fits one chunk: a dag-pb node wrapping a UnixFS File."""
-    unixfs = b"\x08\x02" + field(0x12, content) + b"\x18" + varint(len(content))
-    node = field(0x0a, unixfs)
+    unixfs = (b"\x08\x02"                   # UnixFS Type: File
+              + field(0x12, content)        # UnixFS Data: the file bytes
+              + b"\x18" + varint(len(content)))  # UnixFS filesize
+    node = field(0x0a, unixfs)              # dag-pb node, Data field
     return b"\x12\x20" + hashlib.sha256(node).digest()
 ```
 
-Run against the 918-byte metadata file and compared with the decoded trailer, with the raw hex line left out:
+The field comments follow `libsolutil/IpfsHash.cpp`, which builds the same bytes. The output below comes from a script that also decodes the trailer and then calls `cid_v0`; only `cid_v0` is shown. Run against the 918-byte metadata file, with the raw hex line left out:
 
 ```text
 total bytes   : 197
@@ -214,7 +229,7 @@ Four variants were built with the optimizer on: the original, a changed NatSpec 
 
 ### Deployment changes the bytes again
 
-The compiler's runtime output is not always what ends up on-chain. A one-variable contract with `uint256 public immutable x`, deployed on anvil with the argument `48879`, shows the effect. Standard JSON reports `immutableReferences: {"3": [{"length": 32, "start": 46}]}`, and `cast code` then differs from the compiler output in two bytes only, 76 and 77:
+The compiler's runtime output is not always what ends up on-chain. A one-variable contract with `uint256 public immutable x`, deployed on anvil with the argument `48879`, shows the effect. Standard JSON reports `immutableReferences: {"3": [{"length": 32, "start": 46}]}`, keyed by the AST id of the immutable, and `cast code` then differs from the compiler output in two bytes only, 76 and 77:
 
 ```text
 compiler  000000008156
@@ -232,7 +247,7 @@ Sourcify's [Exact Match vs Match](https://docs.sourcify.dev/docs/exact-match-vs-
 - **Exact match**, formerly called perfect match. The on-chain code is byte-for-byte the recompiled output, "excluding libraries and immutables", and the metadata hashes agree. The page states that this guarantees the source file contents are exactly the same.
 - **Match**, formerly called partial match. The bytes agree "except the metadata hash". The page says this allows "differences in source code comments, variable names, or other metadata fields such as source paths".
 
-The `Counter` experiment above is that second case: the original and the NatSpec variant have equal code and different digests, so one would be a match for the other and not an exact match. The practical reading (*derived*) is that a match proves the logic and says nothing about the comments or NatSpec that sit beside it, so a reader of partially matched source should treat those comments as unverified. Sourcify's page does not discuss contracts built with no metadata hash, and this article did not test how a verifier classifies one; explorers other than Sourcify use their own terms, which `## Gaps` records.
+The `Counter` experiment above is that second case: the original and the NatSpec variant have equal code and different digests, so one would be a match for the other and not an exact match. The practical reading (*derived*) is that a match proves the logic and says nothing about the comments or NatSpec that sit beside it, so a reader of partially matched source should treat those comments as unverified. Sourcify's page does not discuss contracts built with no metadata hash, and this article did not test how a verifier classifies one; explorers other than Sourcify use their own terms, which the [Gaps](#gaps) section records.
 
 ## Comparing two builds
 
@@ -272,7 +287,7 @@ The last-two-bytes rule finds only the outer trailer at offset 342. The inner on
 
 ### Creation code has two more problems
 
-Two builds with one hash method and no embedded child do strip cleanly in creation code as well. Between hash methods they do not: creation code pushes the runtime length, so the method changes one byte of the code. For `Counter`, stripped creation code under `ipfs` and `swarm` differs at offset 17 only, `0xc5` against `0xc4`, and under `none` the same byte is `0x9c`.
+Two builds with one hash method and no embedded child do strip cleanly in creation code as well. Between hash methods they do not: creation code pushes the runtime length, so the method changes one byte of the code. For `Counter`, stripped creation code under the IPFS and Swarm methods differs at offset 17 only, `0xc5` against `0xc4`, and with no hash the same byte is `0x9c`: 197, 196 and 156, the runtime lengths from the earlier table.
 
 `metadata.rst` says the hash goes at the end of the runtime bytecode, "not necessarily the creation bytecode". A parent that deploys its child in the constructor shows why:
 
@@ -286,7 +301,17 @@ contract Parent {
 }
 ```
 
-Built with legacy `--optimize`, its 412-byte creation code holds two trailers, at offsets 208 and 359. The one at 359, which the length suffix points to, is `Child`'s. `Parent`'s own trailer is the one at 208, inside the embedded runtime. The same layout held under `--via-ir --optimize` (415 bytes, trailers at 219 and 362), so reading the end of such creation code gives the child's hash, and stripping it removes the wrong trailer.
+Built with legacy `--optimize`, its 412-byte creation code holds two trailers, at offsets 208 and 359. The one at 359, which the length suffix points to, is `Child`'s. `Parent`'s own trailer is the one at 208, inside the embedded runtime. Each trailer takes 53 bytes (51 of CBOR and the 2-byte suffix), which gives this layout:
+
+```text
+offset     content
+0-207      Parent's constructor, then Parent's runtime code
+208-260    Parent's trailer, the end of the embedded runtime
+261-358    data after the runtime: Child's creation code, up to its trailer
+359-411    Child's trailer, ending Child's code and the whole object
+```
+
+Only the constructor runs `new Child()`, so `Child`'s creation code is part of the creation object and not of the runtime that `Parent` returns; it sits after that runtime and therefore ends the whole object (*derived*). The same layout held under `--via-ir --optimize` (415 bytes, trailers at 219 and 362), so reading the end of such creation code gives the child's hash, and stripping it removes the wrong trailer.
 
 ### The reliable method: `--metadata-hash none`
 
@@ -337,7 +362,7 @@ In Foundry the same controls are `bytecode_hash` and `cbor_metadata`. On forge 1
 |------|--------|
 | Same compiler, did the logic change? | Rebuild both with `--metadata-hash none` or `bytecode_hash = "none"` |
 | Different compilers, is the code equal? | Rebuild both with `--no-cbor-metadata` or `cbor_metadata = false` |
-| Deployed code against a reviewed commit | Rebuild with the recorded settings, mask immutables and libraries, compare, then read the trailer for an exact or partial result |
+| Deployed code against a reviewed commit | Rebuild with the recorded settings, mask immutables and libraries, compare, then read the trailer for an exact match or a match |
 | Single contract, no rebuild possible, no `new` | Read the length suffix and strip the tail, runtime code only; mask immutables and libraries first when the code comes from the chain |
 
 ## Does a known compiler bug affect this contract?
@@ -373,7 +398,7 @@ The version file uses version ranges only and carries no conditions, so its seve
 
 `conditions` can hold `optimizer`, `yulOptimizer`, `ABIEncoderV2`, `viaIR` and `evmVersion`, and 29 of the 67 entries set at least one. `bugs.rst` separates the two optimizers: `optimizer` means the opcode-based optimizer and "says nothing about the Yul optimizer". It also states that with no conditions, one should "assume that the bug is present".
 
-For 0.8.33 unoptimized, via-IR leaves five of the seven names, and legacy leaves two: the `viaIR: false` entry and the unconditional one. The automated `check` field is of little help, as only 3 entries have one, and they were all fixed by 0.4.25.
+For 0.8.33 unoptimized with a target of `cancun` or later, via-IR leaves five of the seven names: the four `viaIR: true` entries and the unconditional one. Legacy leaves two: the `viaIR: false` entry and the unconditional one. The automated `check` field is of little help, as only 3 entries have one, and they were all fixed by 0.4.25.
 
 ### A listing is not a finding
 
@@ -471,7 +496,9 @@ solc 0.8.34
     call: storage_set_to_zero_t_uint256(0x00, 0)
 ```
 
-Listing the storage-writing opcodes of the optimized runtime code of `TransientFirst` with `cast disassemble`, built with `--no-cbor-metadata`:
+This is the check the [advisory](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/) recommends for deployed projects: compare the unoptimized `--ir` output against 0.8.34 and look for calls that became `transient_storage_set_to_zero_`.
+
+The same collision shows at the bytecode level. Listing the storage-writing opcodes of the optimized runtime code of `TransientFirst` with `cast disassemble`, built with `--no-cbor-metadata`:
 
 ```text
 0.8.33 (116 bytes)        0.8.34 (115 bytes)
@@ -480,7 +507,7 @@ Listing the storage-writing opcodes of the optimized runtime code of `TransientF
 00000047: TSTORE          00000047: SSTORE
 ```
 
-The 0.8.33 build has no `SSTORE` anywhere in its runtime code, although the source contains `delete s`. This is the check the [advisory](https://www.soliditylang.org/blog/2026/02/18/transient-storage-clearing-helper-collision-bug/) recommends for deployed projects: compare the unoptimized `--ir` output against 0.8.34 and look for calls that became `transient_storage_set_to_zero_`.
+The 0.8.33 build has no `SSTORE` anywhere in its runtime code, although the source contains `delete s`.
 
 ### When the wrong location is persistent
 
@@ -505,16 +532,19 @@ On 0.8.33 via-IR, with and without the optimizer, one call to `revoke` took `own
 
 ### Which location wins
 
-`bugs.json` says the outcome "depended on the order in which the code generator processed the input". With both clears in separate external functions, that order is not the source order:
+`bugs.json` says the outcome "depended on the order in which the code generator processed the input". Two cases have to be kept apart:
 
-| Contract | Functions, in source order | Selector order | Result on 0.8.33 via-IR |
-|----------|---------------------------|----------------|--------------------------|
-| A | `clearPersistent`, `clearTransient` | transient first | `t` cleared, `s` not cleared |
-| B | `clearTransient`, `clearPersistent` | transient first | `t` cleared, `s` not cleared |
-| C | `aClearTransient`, `zClearPersistent` | transient first | `t` cleared, `s` not cleared |
-| D | `bClearPersistent_x`, `aClearTransient_y` | persistent first | `t` left set, `s` zeroed by `delete t` |
+- **Both clears in one function.** The first `delete` in source order decides, as `PersistentFirst` and `TransientFirst` showed in the reproduction.
+- **Each clear in its own external function.** The order follows the function selectors, not the source order, as the four contracts below show.
 
-Swapping the source order (A and B) changed nothing, while a pair with persistent lower in selector value (D) flipped the outcome. The likely reason (*derived*): `IRGenerator.cpp` walks `interfaceFunctions()`, a `std::map` keyed by the 4-byte selector. So reading the source cannot tell an auditor which way a contract fails, and any test has to check both locations.
+| Contract | Functions, in source order | Selectors | Selector order | Result on 0.8.33 via-IR |
+|----------|---------------------------|-----------|----------------|--------------------------|
+| A | `clearPersistent`, `clearTransient` | `0x79ee6a80`, `0x389f46f9` | transient first | `t` cleared, `s` not cleared |
+| B | `clearTransient`, `clearPersistent` | `0x389f46f9`, `0x79ee6a80` | transient first | `t` cleared, `s` not cleared |
+| C | `aClearTransient`, `zClearPersistent` | `0x0090b34d`, `0x0c0a8172` | transient first | `t` cleared, `s` not cleared |
+| D | `bClearPersistent_x`, `aClearTransient_y` | `0xc2e1f518`, `0xcf6f9155` | persistent first | `t` left set, `s` zeroed by `delete t` |
+
+The selectors are those of the no-argument signatures, computed with `cast sig`. The names separate three possible orders: A and B differ in source order only, C puts transient first both alphabetically and by selector, and D keeps transient first alphabetically but puts persistent first by selector. Swapping the source order between A and B changed nothing, while D, the pair with persistent lower in selector value, flipped the outcome. The likely reason (*derived*): `IRGenerator.cpp` walks `interfaceFunctions()`, a `std::map` keyed by the 4-byte selector. So reading the source cannot tell an auditor which way a contract fails, and any test has to check both locations.
 
 ### Why the listing alone was not enough
 
@@ -527,9 +557,9 @@ Other contracts built with the same 0.8.33 via-IR settings carry the same listin
 | `SplitCode` | `delete` of persistent state in the constructor, `delete t` at runtime | Correct | Yes | Yes |
 | `TransientFirst` | Both clears in `run()` | Wrong | No | No |
 | `PersistentFirst` | Both clears in `run()` | Wrong | No | No |
-| `SplitFunctions` | Both clears, in two functions | Wrong | No | No |
+| `SplitFunctions` | Both clears, each in its own external function, as in the "Which location wins" contracts | Wrong | No | No |
 
-`ZeroAssign` is the advisory's interim workaround, and `SplitCode` confirms the `description`'s statement that one operation in creation code and the other in deployed code does not trigger the bug. The identical-bytes test needed `--no-cbor-metadata`: with `--metadata-hash none` the version bytes would have made every row differ.
+`ZeroAssign` is the advisory's interim workaround: it clears the transient variable by assigning zero instead of using `delete`, which does not call the helper. `SplitCode` confirms the `description`'s statement that one operation in creation code and the other in deployed code does not trigger the bug. The identical-bytes test needed `--no-cbor-metadata`: with `--metadata-hash none` the version bytes would have made every row differ.
 
 ## A build that stops: `--optimize --no-optimize-yul`
 
@@ -542,9 +572,11 @@ Dynamic exception type: boost::wrapexcept<solidity::langutil::InternalCompilerEr
 std::exception::what: Solidity assertion failed
 ```
 
-Line 1715 of the pinned source is `solAssert(m_optimiserSettings.optimizeStackAllocation == false);`, inside metadata generation. On 0.8.38, `--abi` alone, `--no-cbor-metadata`, and Standard JSON with `details: {yul: false}` all completed, while `--metadata-hash none` and `--metadata` stopped with the same error.
+Line 1715 of the pinned source is `solAssert(m_optimiserSettings.optimizeStackAllocation == false);`, inside metadata generation.
 
-The compilation stops, so no bytecode comes out and it cannot produce wrong bytecode. It is absent from `bugs.json`, which is expected for that reason: the list covers "known security-relevant bugs", and an observation on 13 binaries is all this section claims.
+That assertion sits in the branch that records the optimizer components when the Yul optimizer is off, and it requires stack allocation to be off as well. The crash therefore means that this CLI combination leaves stack allocation on. Why the CLI path does so was not analysed. On 0.8.38, `--abi` alone, `--no-cbor-metadata`, and Standard JSON with `details: {yul: false}` all completed, while `--metadata-hash none` and `--metadata` stopped with the same error.
+
+The compilation stops, so no bytecode comes out and it cannot produce wrong bytecode. It is absent from `bugs.json`, which is expected for that reason: the list covers "known security-relevant bugs", and an observation on 13 binaries is all this section claims. Those are the releases from 0.8.23 to 0.8.38 except 0.8.31, 0.8.32 and 0.8.35, which the Gaps section lists as not run.
 
 ## Conclusion
 
@@ -653,7 +685,7 @@ Then rate the impact in that contract. The `high` in `bugs.json` describes the b
 
 **Q: Why can reading the source not tell which location the bug clears?**
 
-The location depends on which clear the code generator processes first. With clears in two external functions, swapping their source order changed nothing, while a pair of functions with a different selector order flipped the outcome.
+The location depends on which clear the code generator processes first. Within one function, the first `delete` in source order decides, so swapping two statements flipped the outcome. With clears in two external functions, swapping their source order changed nothing, while a pair of functions with a different selector order flipped the outcome.
 
 **Q: Is the `--optimize --no-optimize-yul` crash a security problem?**
 
@@ -675,13 +707,13 @@ These points were not settled by the sources or the runs.
 | `--optimize --no-optimize-yul` was not run on 0.8.21, 0.8.31, 0.8.32 or 0.8.35, which were not available locally, or on 0.8.39. | The observed range rests on 13 binaries. | Run those releases, and search the `argotorg/solidity` issues. |
 | Comments and paths were shown not to change code on small contracts with one file. | A large project with imports or via-IR could behave differently. | Run the same experiment on a project's test suite. |
 | The Foundry and solc runs used local anvil only, with no mainnet deployment. | Real deployments can use custom flows. | Decode a real contract with `cast code` and compare. |
-| Two prerequisite statements come from general knowledge: that Foundry and Hardhat use Standard JSON, and the protobuf field meanings behind the CID code. | The second is backed by the recomputation only, not by a cited specification. | Read the Foundry and Hardhat compiler integrations and the IPFS UnixFS specification. |
+| Two prerequisite statements are not backed by a cited specification: that Foundry and Hardhat use Standard JSON, and the protobuf field meanings behind the CID code. | The field names come from the comments in `libsolutil/IpfsHash.cpp` and the recomputation, not from the IPFS specification. | Read the Foundry and Hardhat compiler integrations and the IPFS UnixFS specification. |
 
 ## References
 
 ### Analyzed source
 
-- [argotorg/solidity](https://github.com/argotorg/solidity) — analyzed at commit [`3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6`](https://github.com/argotorg/solidity/tree/3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6) (committed 2026-10-22), read on 2026-11-04. This commit is 11 commits after [v0.8.38](https://github.com/argotorg/solidity/releases/tag/v0.8.38). Files read: `docs/metadata.rst`, `docs/bugs.rst`, `docs/bugs.json`, `docs/bugs_by_version.json`, `Changelog.md`, `libsolidity/interface/CompilerStack.cpp`, `libsolidity/codegen/ir/IRGenerator.cpp`.
+- [argotorg/solidity](https://github.com/argotorg/solidity) — analyzed at commit [`3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6`](https://github.com/argotorg/solidity/tree/3bd40f0a7c58b69bcf3d7fa7ead53479cb1632c6) (committed 2026-10-22), read on 2026-11-04. This commit is 11 commits after [v0.8.38](https://github.com/argotorg/solidity/releases/tag/v0.8.38). Files read: `docs/metadata.rst`, `docs/bugs.rst`, `docs/bugs.json`, `docs/bugs_by_version.json`, `Changelog.md`, `libsolidity/interface/CompilerStack.cpp`, `libsolidity/codegen/ir/IRGenerator.cpp`, `libsolutil/IpfsHash.cpp`, `docs/using-the-compiler.rst`.
 
 ### Solidity documentation
 

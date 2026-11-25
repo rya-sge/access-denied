@@ -2,7 +2,7 @@
 layout: post
 title: "How Ethereum Finalises Blocks: LMD GHOST and Casper FFG"
 date:   2026-11-04
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -15,9 +15,15 @@ isMermaid: true
 
 Ethereum answers two different questions about its chain. Which block should a validator build on and vote for right now? Which blocks can no longer be reverted unless a third of the stake pays for it? LMD GHOST answers the first in every slot, and [Casper FFG](https://arxiv.org/abs/1710.09437) answers the second about every 6.4 minutes.
 
-The combination is called [Gasper](https://arxiv.org/abs/2003.03052), and most of its subtle rules are the places where the fork choice depends on finality. The fork choice starts from the latest justified checkpoint, a filter removes branches that would force honest validators to get slashed, and justification reached inside an epoch is tracked before the state transition has recorded it. This article reads those rules from the current [consensus specifications](https://github.com/ethereum/consensus-specs), at a pinned commit and in the newest fork that redefines each function. A simulation that executes the spec's own functions produces every number in the worked example.
+The combination is called [Gasper](https://arxiv.org/abs/2003.03052), and most of its subtle rules are the places where the fork choice depends on finality. Three of them come back through the article, each in its own section:
 
-The reference book on the subject, Ben Edgington's [Upgrading Ethereum](https://eth2book.info/), describes Capella, and the specification has moved on since. Where a function was renamed or rewritten, this article says so.
+- the fork choice starts from the latest justified checkpoint, not from genesis ([`get_weight` and `get_head`](#get_weight-and-get_head));
+- a filter removes branches that would force honest validators to get slashed ([The filter](#the-filter));
+- justification that a block's votes already imply is tracked before the epoch boundary records it ([Unrealised justification](#unrealised-justification)).
+
+This article reads those rules from the current [consensus specifications](https://github.com/ethereum/consensus-specs), at a pinned commit and in the newest fork that redefines each function. A simulation that executes the spec's own functions produces every number in the worked example.
+
+The reference book on the subject, Ben Edgington's [Upgrading Ethereum](https://eth2book.info/), describes Capella, and the specification has moved on since. Where a function was renamed or rewritten, the [annex](#differences-from-upgrading-ethereum-capella) lists the difference.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -71,17 +77,19 @@ flowchart TB
 
 A slot lasts `SLOT_DURATION_MS` = 12,000 ms and an epoch `SLOTS_PER_EPOCH` = 32 slots, so 384 seconds or 6.4 minutes. Each slot has one proposer, and each active validator attests once per epoch.
 
-Inside a slot, deadlines are basis points of the slot duration. `ATTESTATION_DUE_BPS` is 3333, so at the pinned commit `get_attestation_due_ms()` returns 3,999 ms with floor division. Upstream [PR 5756](https://github.com/ethereum/consensus-specs/pull/5756), merged after the pin, rounds to the nearest millisecond and makes it 4,000 ms.
+Inside a slot, deadlines are basis points of the slot duration. `ATTESTATION_DUE_BPS` is 3333, so attestations are due about 4 seconds into the slot. At the pin the floor division gives 3,999 ms, and the [Gaps](#gaps) table notes the upstream change. Blocks that arrive after this deadline count as late, which matters for [proposer boost](#proposer-boost) and for [honest reorgs](#honest-reorgs-of-late-blocks).
 
 ### Committees
 
-`get_beacon_committee` splits the active validators into `committees_per_slot × SLOTS_PER_EPOCH` shuffled groups. `get_committee_count_per_slot` aims for `TARGET_COMMITTEE_SIZE` = 128 validators per committee, with at most `MAX_COMMITTEES_PER_SLOT` = 64 committees per slot, and `MAX_VALIDATORS_PER_COMMITTEE` is 2,048. Since [EIP-7549](https://eips.ethereum.org/EIPS/eip-7549) (Electra), `AttestationData.index` is 0 on chain: an aggregate covers several committees of a slot through `committee_bits`, which `process_attestation` checks with `assert data.index == 0`.
+`get_beacon_committee` splits the active validators into `committees_per_slot × SLOTS_PER_EPOCH` shuffled groups. `get_committee_count_per_slot` aims for `TARGET_COMMITTEE_SIZE` = 128 validators per committee, with at most `MAX_COMMITTEES_PER_SLOT` = 64 committees per slot, and `MAX_VALIDATORS_PER_COMMITTEE` is 2,048.
 
 A validator casts one vote per epoch, but its one message serves both protocols.
 
 ### The three votes in an attestation
 
-`AttestationData` has `slot`, `index`, `beacon_block_root`, `source` and `target`. The honest rules in `specs/phase0/validator.md` set them from `head_state`, the state of the head advanced to the current slot:
+`AttestationData` holds a slot, a committee index, a head block root, a source and a target. The honest rules in `specs/phase0/validator.md` set them from `head_state`, the state of the head advanced to the current slot.
+
+The last column of the table needs a definition. Since Altair, the beacon state keeps a byte of **participation flags** per validator and per epoch, one bit per duty done on time. A flag is set when a block *includes* the attestation, by `process_attestation`, and not when a node receives it. Casper FFG therefore counts only votes already included on chain, while the fork choice counts every vote a node has seen; the [worked example](#full-participation) shows the gap this leaves at each boundary.
 
 | Field | Value | Consumed by | Participation flag |
 |---|---|---|---|
@@ -89,13 +97,19 @@ A validator casts one vote per epoch, but its one message serves both protocols.
 | `source` | `head_state.current_justified_checkpoint` | Casper FFG | `TIMELY_SOURCE`, included within $$\lfloor\sqrt{32}\rfloor = 5$$ slots |
 | `target` | The checkpoint of the current epoch on the head's chain | Casper FFG | `TIMELY_TARGET`, no limit beyond the attestation's validity window |
 
-The flag logic is `get_attestation_participation_flag_indices`, last modified in Deneb by [EIP-7045](https://eips.ethereum.org/EIPS/eip-7045), which removed the target's 32-slot limit. EIP-7045 gives LMD GHOST security and the confirmation rule as its motivation. An attestation is valid only for the current or previous epoch, by the assert at the top of `process_attestation`. Casper FFG reads only the `TIMELY_TARGET` flag: justification counts validators who got it, in `process_justification_and_finalization`.
+The flag logic is `get_attestation_participation_flag_indices`, last modified in Deneb by [EIP-7045](https://eips.ethereum.org/EIPS/eip-7045), which removed the target's 32-slot limit. Its motivation states that the longer window is needed by the security proofs of LMD GHOST and by a new confirmation rule, now the [Fast Confirmation Rule](#fast-confirmation-rule), without giving the argument. An attestation is valid only for the current or previous epoch, by the assert at the top of `process_attestation`. Casper FFG reads only the `TIMELY_TARGET` flag: justification counts validators who got it, in `process_justification_and_finalization`.
 
 The flag requires a matching source, and the `get_attestation_participation_flag_indices` code goes further with `assert is_matching_source`, so an attestation with a wrong source is simply invalid for inclusion on that chain.
 
 ## LMD GHOST in the spec
 
 LMD GHOST means Latest Message Driven Greedy Heaviest-Observed Sub-Tree: each validator counts once, through its latest vote, and a vote for a block supports all the block's ancestors. The handlers below keep a `Store` up to date, and `get_head` reads it.
+
+The fork choice uses three Casper FFG terms that the [next section](#casper-ffg) defines in full:
+
+- a **checkpoint** is an epoch and the block at its first slot, or the latest block before it ([definition](#checkpoints-and-supermajority-links));
+- a checkpoint is **justified** once at least 2/3 of the stake has voted for it as a target, from an already justified source ([Justification](#justification));
+- a justified checkpoint becomes **finalised**, in the simplest case, when a supermajority vote links it to the checkpoint of the next epoch ([Finalisation](#finalisation-four-rules)).
 
 ### `on_attestation`: recording votes
 
@@ -115,8 +129,8 @@ The current definition is in `specs/fulu/fork-choice.md`; Bellatrix, Capella, De
 1. Reject a block from the future, one not later than the finalised slot, or one that does not descend from `store.finalized_checkpoint`. This is the line that makes finality binding for a node.
 2. Run `state_transition` on a copy of the parent's state, and store the block and post-state.
 3. Call `record_block_timeliness`: the block is timely if it is from the current slot and arrived before the attestation deadline.
-4. Call `update_proposer_boost_root`.
-5. Call `update_checkpoints` with the post-state's checkpoints, then `compute_pulled_up_tip`, discussed under [unrealised justification](#unrealised-justification).
+4. Call `update_proposer_boost_root`, which gives a timely block extra weight (see [Proposer boost](#proposer-boost)).
+5. Call `update_checkpoints` with the post-state's checkpoints, then `compute_pulled_up_tip`, which computes what the block would justify at the next boundary (see [unrealised justification](#unrealised-justification)).
 
 ### `get_weight` and `get_head`
 
@@ -139,38 +153,48 @@ Two things differ from a textbook GHOST. The walk starts at the justified root r
 
 `get_weight` adds two terms. `get_attestation_score` sums the effective balances, in the justified checkpoint's state, of active unslashed validators whose latest vote descends from the node and who are not in `equivocating_indices`. The second is the boost: if the node is an ancestor of `store.proposer_boost_root`, `get_weight` adds `get_proposer_score`, which computes the boost from the justified checkpoint's state.
 
-The book shows these as one function on a block root. At the pinned commit they are split, and the arguments are `ForkChoiceNode` objects. That abstraction exists because Gloas adds a payload status to each node.
+The arguments are `ForkChoiceNode` objects rather than block roots, because Gloas adds a payload status to each node.
 
 ### Proposer boost
 
-A vote-weighted fork choice has a timing weakness: an attacker can release a block or votes late, so that honest committees see different things. The [balancing attack](https://ethresear.ch/t/a-balancing-attack-on-gasper-the-current-candidate-for-eth2s-beacon-chain/8079) and ex-ante reorgs both use that. [Proposer boost](https://notes.ethereum.org/@vbuterin/lmd_ghost_mitigation) answers it by giving a timely block temporary weight, so that the proposer can impose its view for the rest of the slot.
+A vote-weighted fork choice has a timing weakness: an attacker can release a block or votes late, so that honest committees see different things. Two kinds of reorganisation (reorg) are at stake, as the book defines them:
+
+- an **ex-ante reorg** is one where a proposer arranges to orphan the *next* block by publishing its own proposal late;
+- an **ex-post reorg** is one where a proposer orphans the block of the *previous* slot by building on an ancestor.
+
+The [balancing attack](https://ethresear.ch/t/a-balancing-attack-on-gasper-the-current-candidate-for-eth2s-beacon-chain/8079) and ex-ante reorgs both use the timing weakness (see [Attacks that shaped the rules](#attacks-that-shaped-the-rules)). [Proposer boost](https://notes.ethereum.org/@vbuterin/lmd_ghost_mitigation) answers it by giving a timely block temporary weight, so that the proposer can impose its view for the rest of the slot.
 
 - **Amount.** `PROPOSER_SCORE_BOOST` is 40, a percentage of one slot's committee weight: `calculate_committee_fraction` computes `total_balance // SLOTS_PER_EPOCH * 40 // 100`.
-- **Condition.** `update_proposer_boost_root` sets the root only if the block is timely, is the first such block in the slot, and has the same shuffling dependent root as the head.
+- **Condition.** `update_proposer_boost_root` sets the root only if the block is timely, is the first such block in the slot, and has the same shuffling dependent root as the head. That root is the ancestor at the slot that fixed the epoch's committee shuffling (`get_shuffling_dependent_root`), so equal roots mean that the block and the head agree on who attests in this epoch.
 - **Lifetime.** `on_tick_per_slot` resets `proposer_boost_root` to `Root()` when a new slot starts.
 
-According to the book, the first implementation in November 2021 used 70, then 33 in May 2022, then 40 eleven days later after an off-by-one was found in the analysis ([PR 2730](https://github.com/ethereum/consensus-specs/pull/2730), [PR 2888](https://github.com/ethereum/consensus-specs/pull/2888), [PR 2895](https://github.com/ethereum/consensus-specs/pull/2895)). The trade-off is between ex-ante reorgs, which a small boost fails to stop, and ex-post reorgs, which a large boost makes easier.
+According to the book, the first implementation in November 2021 used 70, then 33 in May 2022, then 40 eleven days later after an off-by-one was found in the analysis ([PR 2730](https://github.com/ethereum/consensus-specs/pull/2730), [PR 2888](https://github.com/ethereum/consensus-specs/pull/2888), [PR 2895](https://github.com/ethereum/consensus-specs/pull/2895)). The trade-off is between the two kinds defined above: a small boost fails to stop ex-ante reorgs, and a large boost makes ex-post reorgs easier.
 
 ### Honest reorgs of late blocks
 
 A second use of the boost is defensive. `get_proposer_head` lets an honest proposer build on the parent of a late, weak block rather than on the block itself. The helpers are marked optional in the spec. The main path reorgs when all of these hold:
 
-- `is_head_late`: the block missed the attestation deadline;
-- `is_head_weak`: its weight is below `REORG_HEAD_WEIGHT_THRESHOLD` = 20 % of a committee;
-- `is_parent_strong`: the parent has more than `REORG_PARENT_WEIGHT_THRESHOLD` = 160 % of a committee;
-- `is_ffg_competitive`, `is_finalization_ok` (at most `REORG_MAX_EPOCHS_SINCE_FINALIZATION` = 2 epochs since finality), `is_proposing_on_time` and a single-slot reorg.
+| Condition | Meaning |
+|---|---|
+| `is_head_late` | The block missed the attestation deadline. |
+| `is_head_weak` | Its weight is below `REORG_HEAD_WEIGHT_THRESHOLD` = 20 % of a committee. |
+| `is_parent_strong` | The parent has more than `REORG_PARENT_WEIGHT_THRESHOLD` = 160 % of a committee. |
+| `is_ffg_competitive` | The block and its parent would justify the same checkpoint (equal unrealised justification), so the new head's FFG information is competitive with the current head's. |
+| `is_finalization_ok` | At most `REORG_MAX_EPOCHS_SINCE_FINALIZATION` = 2 epochs have passed since finality. |
+| `is_proposing_on_time` | The proposer is still early in its slot, before the reorg cutoff of `PROPOSER_REORG_CUTOFF_BPS` = 1667, which is 2,000 ms. |
+| Single-slot reorg | The parent is from the slot just before the block, and the block from the slot just before the proposal. |
 
 A second path skips most of these checks. If `is_proposer_equivocation` reports that the head block's proposer produced two blocks for its slot, `is_head_weak` and proposing in the slot right after the head's slot are enough.
 
-Fulu removed the `shuffling_stable` condition, because the proposer lookahead fixes proposers before the epoch boundary, so this reorg is now allowed at epoch boundaries. The book describes the behaviour as a Lighthouse feature that might be adopted; at the pin it is in the spec, as an optional helper.
+Before Fulu a further condition, `shuffling_stable`, forbade this reorg in the first slot of an epoch, where the proposer shuffling could change. Fulu removed it: its proposer lookahead fixes the proposer assignments before the epoch boundary, so reorging a late block at the end of the previous epoch cannot change the current slot's proposer.
 
 ### Equivocation
 
-The stored vote for a validator is its latest one per epoch. A validator that signs two conflicting votes can therefore show different votes to different nodes, and keep doing so. That is the [LMD balancing attack](https://ethresear.ch/t/balancing-attack-lmd-edition/11853), described formally in [Two Attacks On Proof-of-Stake GHOST/Ethereum](https://arxiv.org/abs/2203.01315).
+The stored vote for a validator is the one with the highest target epoch. `update_latest_messages` replaces a stored vote only for a strictly higher target epoch, so of two votes with the same target epoch, each node keeps the one it saw first. A validator that signs two conflicting votes can therefore show different votes to different nodes, and keep doing so. That is the [LMD balancing attack](https://ethresear.ch/t/balancing-attack-lmd-edition/11853), described formally in [Two Attacks On Proof-of-Stake GHOST/Ethereum](https://arxiv.org/abs/2203.01315).
 
 The defence is `on_attester_slashing`, added in [PR 2845](https://github.com/ethereum/consensus-specs/pull/2845). It checks the evidence with `is_slashable_attestation_data` and adds the common indices to `store.equivocating_indices`. From then on `get_attestation_score` ignores their stored votes and `update_latest_messages` ignores new ones. The evidence is any slashable pair, so a surround vote also removes a validator from the fork choice, not only a double vote.
 
-The spec requires clients to keep this set from at least the latest finalised checkpoint.
+The spec requires clients to keep this set from at least the latest finalised checkpoint. The [attack table](#attacks-that-shaped-the-rules) summarises this attack next to the others.
 
 ## Casper FFG
 
@@ -192,14 +216,22 @@ The cross-check in the verification code confirms that exactly two thirds passes
 
 A checkpoint is justified if it is the target of a supermajority link from a justified checkpoint. On chain this happens at the epoch boundary. `process_justification_and_finalization` (Altair definition) computes two balances from the `TIMELY_TARGET` flag, one for the previous and one for the current epoch, and passes them to `weigh_justification_and_finalization`. Epochs 0 and 1 are skipped: the function returns if `get_current_epoch(state) <= GENESIS_EPOCH + 1`.
 
-The state keeps a four-bit history in `justification_bits`, where index 0 is the current epoch. Two details of the code are easy to miss:
+The state keeps a four-bit history in `justification_bits`, where index 0 is the current epoch. At each boundary the window slides by one: `weigh_justification_and_finalization` shifts every bit to the next index, drops the oldest one, clears bit 0, and then sets bit 1 or bit 0 if the previous or the current epoch reaches the threshold. With $$e$$ the epoch being processed:
+
+| Index in the code | 0 | 1 | 2 | 3 |
+|---|---|---|---|---|
+| Epoch it records | $$e$$ | $$e - 1$$ | $$e - 2$$ | $$e - 3$$ |
+| Position in the rule names (1-based) | 1 | 2 | 3 | 4 |
+| At the next boundary, it moves to index | 1 | 2 | 3 | dropped |
+
+Two details of the code are easy to miss:
 
 - It tests the previous epoch as well as the current one. Votes for epoch $$e - 1$$ can still arrive during epoch $$e$$, so a checkpoint that missed the threshold at its own boundary can be justified one epoch later.
 - It does not check that the attestations' source is the justified checkpoint. That was enforced earlier, because the `TIMELY_TARGET` flag requires a matching source.
 
 ### Finalisation: four rules
 
-In the Casper paper, a justified checkpoint is finalised when a supermajority link connects it to its direct child. The specification also accepts a link that skips one justified checkpoint, the generalisation the book calls k-finality. With $$e$$ the epoch being processed, the code has four cases, and the test suite names them after the bit positions:
+In the Casper paper, a justified checkpoint is finalised when a supermajority link connects it to its direct child. The specification also accepts a link that skips one justified checkpoint, the generalisation the book calls k-finality. With $$e$$ the epoch being processed, the code has four cases, and the test suite names them after the bit positions. The names count from 1, as the spec's own comments do ("the 1st/2nd most recent epochs"), while the code slices from 0, so rule 12 reads `bits[0:2]`, the bits of $$e$$ and $$e - 1$$:
 
 | Name | Condition | Link | Finalises | Typical cause |
 |---|---|---|---|---|
@@ -208,7 +240,7 @@ In the Casper paper, a justified checkpoint is finalised when a supermajority li
 | 23 | `all(bits[1:3])`, `old_previous.epoch + 2 == e` | $$e - 2 \rightarrow e - 1$$ | $$e - 2$$ | Votes for $$e - 1$$ counted late, $$e$$ not yet justified |
 | 234 | `all(bits[1:4])`, `old_previous.epoch + 3 == e` | $$e - 3 \rightarrow e - 1$$ | $$e - 3$$ | A sustained run of late justification |
 
-`old_previous` and `old_current` are the values before this boundary, so the source of the link is identified. The checks run in the order 234, 23, 123, 12, and each assignment overwrites the previous one.
+`old_previous` and `old_current` are the values before this boundary, so the source of the link is identified. The checks run in the order 234, 23, 123, 12, and each assignment overwrites the previous one. When several rules match, the last one in that order decides: rule 12 wins over 123, which wins over 23 and 234. Rules 12 and 123 finalise the old current justified checkpoint, which is never older than the old previous one, so the newest candidate is finalised. The [end-of-6 row](#every-finalisation-rule) of the worked example shows two rules matching at once.
 
 ### How long finality takes
 
@@ -232,11 +264,11 @@ def is_slashable_attestation_data(data_1: AttestationData, data_2: AttestationDa
     )
 ```
 
-Three consequences follow from the code, and an auditor should keep them in mind:
+Three consequences follow from the code:
 
-- **A different head vote is a double vote.** Two attestations with the same source and target and different heads have `data_1 != data_2`, so the single rule also covers LMD equivocation within an epoch. There is no separate slashing condition for head votes. The run below prints `True` for this case.
+- **A different head vote is a double vote.** Two attestations with the same source and target and different heads have `data_1 != data_2`, so the single rule also covers LMD equivocation within an epoch. There is no separate slashing condition for head votes. The verification run (scenario G in `run_output.txt`) prints `True` for this case.
 - **The surround test is not symmetric.** `attestation_1` must be the outer one. With the arguments swapped the function returns `False`, and `process_attester_slashing` asserts the result, so evidence submitted in the wrong order is rejected.
-- **Only pairs are tested.** Adjacent links and links with a shared source are allowed; the run prints `False` for both.
+- **Only pairs are tested.** Adjacent links and links with a shared source are allowed; scenario G prints `False` for both, and `False` for the surround pair in reversed order.
 
 ### Accountable safety
 
@@ -252,8 +284,16 @@ The Casper paper's argument, reproduced in the book, shows that if conflicting c
 
 Its price comes from two penalties in `slash_validator` and `process_slashings`:
 
-- **Initial.** `effective_balance // MIN_SLASHING_PENALTY_QUOTIENT_ELECTRA`, with a quotient of 4,096 since Electra, so 0.0078125 ETH for 32 ETH. The book's figure of 1/32 predates EIP-7251.
-- **Correlated.** Applied halfway through the `EPOCHS_PER_SLASHINGS_VECTOR` = 8,192 epoch window. The sum of recent slashed balances, multiplied by `PROPORTIONAL_SLASHING_MULTIPLIER_BELLATRIX` = 3, is taken as a share of total balance and capped at the whole of it.
+- **Initial.** `effective_balance // MIN_SLASHING_PENALTY_QUOTIENT_ELECTRA`, with a quotient of 4,096 since Electra, so 0.0078125 ETH for 32 ETH.
+- **Correlated.** Applied halfway through the `EPOCHS_PER_SLASHINGS_VECTOR` = 8,192 epoch window, by the formula below.
+
+$$
+\begin{aligned}
+p_i = B_i \cdot \frac{\min(3S, T)}{T}
+\end{aligned}
+$$
+
+Here $$p_i$$ is the correlated penalty of slashed validator $$i$$, $$B_i$$ its effective balance, $$S$$ the sum of the effective balances slashed within the window (`state.slashings`), $$T$$ the total active balance, and 3 is `PROPORTIONAL_SLASHING_MULTIPLIER_BELLATRIX`. The code computes it per 1 ETH increment of effective balance, with integer division.
 
 With a third of the stake slashed, the multiplied sum hits the cap and the offenders lose their entire effective balance. With isolated slashings the correlated term rounds to little or nothing.
 
@@ -261,9 +301,14 @@ With a third of the stake slashed, the multiplied sum hits the cap and the offen
 
 ### The filter
 
-Every path through the fork choice has to respect finality, and it also has to keep honest validators from being trapped. If the head's voting source were older than a source a validator has already used, voting for it could be a surround vote. `filter_node_tree` removes such leaves. The book calls this function `filter_block_tree`: [PR 5509](https://github.com/ethereum/consensus-specs/pull/5509) renamed it, along with `get_filtered_node_tree`, and it now works on `ForkChoiceNode` objects.
+Every path through the fork choice has to respect finality, and it also has to keep honest validators from being trapped. If the head's voting source were older than a source a validator has already used, voting for it could be a surround vote. `filter_node_tree` removes such leaves.
 
-It walks the tree from the justified root and keeps a branch only if some leaf passes both tests:
+It walks the tree from the justified root and keeps a branch only if some leaf passes two tests, one on justification and one on finality. The first test needs the leaf's voting source, which `get_voting_source` returns: the source that attesters would use on that block.
+
+- For a block from the current epoch, this is its post-state's `current_justified_checkpoint`.
+- For a block from an earlier epoch, it is the stored unrealised value, because the state would be pulled up at the boundary (see [Unrealised justification](#unrealised-justification)).
+
+The two tests, inside `filter_node_tree`, for a leaf node:
 
 ```python
     current_epoch = get_current_store_epoch(store)
@@ -289,15 +334,23 @@ It walks the tree from the justified root and keeps a branch only if some leaf p
     )
 ```
 
-The book quotes a longer `correct_justified` built on `is_previous_epoch_justified`; that helper no longer exists. According to the book, the `+ 2` clause is safe: an honest target is the current epoch, so with a source at most two epochs back, the link spans at most two epochs, which is too short to surround an earlier vote.
-
-`get_voting_source` returns the source that attesters would use on that block. For a block from the current epoch this is its post-state's `current_justified_checkpoint`. For a block from an earlier epoch, it is the stored unrealised value, because the state would be pulled up at the boundary.
+According to the book, the `+ 2` clause is safe: an honest target is the current epoch, so with a source at most two epochs back, the link spans at most two epochs, which is too short to surround an earlier vote.
 
 ### Unrealised justification
 
 Block states update justification only at the epoch boundary, while the votes that cause it accumulate through the epoch. Before the fix, this gap was exploitable. According to the book, clients shipped the fix quietly before Capella and the spec text changed at Capella. The old filter compared a tip's post-state with the store. As a result a block in the first slot of a new epoch, which has crossed the boundary, could pass while the previous head, with the same votes behind it, could not.
 
-The [unrealised justification reorg](https://notes.ethereum.org/@adiasg/unrealized-justification) used this to remove the last blocks of an epoch, and the [justification withholding attack](https://hackmd.io/o9tGPQL2Q4iH3Mg7Mma9wQ) used a similar path. [PR 3290](https://github.com/ethereum/consensus-specs/pull/3290) answered with the mechanism below.
+A small case shows it. Block W, late in epoch 3, carries enough votes to justify epoch 3, and X is its child in the last slot of the epoch. At the first slot of epoch 4 the store has already been pulled up to "epoch 3 justified", but X's post-state, which has not crossed the boundary, still says epoch 2. An attacker's block Z, built on W in that first slot, has crossed it and says epoch 3.
+
+```mermaid
+flowchart LR
+    W["W: slot 30<br/>votes justify epoch 3"] --> X["X: slot 31, honest head<br/>post-state says 2"]
+    W --> Z["Z: slot 32, attacker<br/>post-state says 3"]
+```
+
+The old test removed X, the branch with the votes, and kept only Z. The [worked example](#realised-and-unrealised-justification) runs this case with the spec's code.
+
+The [unrealised justification reorg](https://notes.ethereum.org/@adiasg/unrealized-justification) used this to remove the last blocks of an epoch, and the [justification withholding attack](https://hackmd.io/o9tGPQL2Q4iH3Mg7Mma9wQ) used a similar path. [PR 3290](https://github.com/ethereum/consensus-specs/pull/3290) answered with the mechanism below. Both attacks appear in the [attack table](#attacks-that-shaped-the-rules).
 
 `compute_pulled_up_tip` runs on every block:
 
@@ -319,7 +372,10 @@ def compute_pulled_up_tip(store: Store, block_root: Root) -> None:
         update_checkpoints(store, state.current_justified_checkpoint, state.finalized_checkpoint)
 ```
 
-It runs the epoch-boundary justification code on a throwaway copy, so the store knows what each block would justify. `on_tick_per_slot` then applies the unrealised values at the first slot of each epoch. Together with `get_voting_source`, this means a node treats a tip as if it had crossed the boundary.
+It runs the epoch-boundary justification code on a throwaway copy, so the store knows what each block would justify. Two mechanisms then move these values into `store.justified_checkpoint` and `store.finalized_checkpoint`:
+
+- **For a block from an earlier epoch**, the boundary its votes would cross has already passed on the store's clock. The pulled-up values are therefore already "realised" from the current epoch's point of view, which is what the code comment means, and `compute_pulled_up_tip` applies them at once.
+- **For a block from the current epoch**, they wait in the unrealised fields, and `on_tick_per_slot` applies them at the first slot of the next epoch. Together with `get_voting_source`, this means a node treats a tip as if it had crossed the boundary.
 
 The store therefore has four checkpoints, and the state three:
 
@@ -337,7 +393,7 @@ Casper FFG cannot finalise if more than a third of the stake is offline, and LMD
 
 `is_in_inactivity_leak` returns true when `get_finality_delay(state) > MIN_EPOCHS_TO_INACTIVITY_PENALTY`, which is 4. The delay is the previous epoch minus the finalised epoch. Three behaviours change or apply:
 
-- **Scores.** `process_inactivity_updates` adds `INACTIVITY_SCORE_BIAS` = 4 for a missed target and subtracts 1 for a correct one. Outside a leak every eligible validator also loses `INACTIVITY_SCORE_RECOVERY_RATE` = 16.
+- **Scores.** `process_inactivity_updates` adds `INACTIVITY_SCORE_BIAS` = 4 for a missed target and subtracts 1 for a correct one. Outside a leak every eligible validator also has its score reduced by `INACTIVITY_SCORE_RECOVERY_RATE` = 16 points.
 - **Penalties.** `get_inactivity_penalty_deltas` (Bellatrix definition) charges every validator without a correct target, based on its score, as in the formula below.
 - **Rewards.** `get_flag_index_deltas` pays no attestation rewards during a leak, and penalties for missing source and target continue.
 
@@ -346,6 +402,8 @@ $$
 p_i = \frac{s_i B_i}{4 \cdot 2^{24}}
 \end{aligned}
 $$
+
+Here $$p_i$$ is the penalty for one epoch, $$s_i$$ the validator's inactivity score, $$B_i$$ its effective balance, 4 is `INACTIVITY_SCORE_BIAS` and $$2^{24}$$ is `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX`.
 
 For a validator fully offline $$t$$ epochs into a leak, $$s_i = 4t$$, so the penalty grows linearly per epoch and the cumulative loss is quadratic in time. The score, not the global finality delay, sets the size of the penalty. The charge applies only in epochs without a correct target, so a validator that returns pays nothing from its first correct vote, whatever its score. Its score then falls by 1 per epoch during the leak, and a validator online throughout pays nothing.
 
@@ -357,13 +415,13 @@ Justification reads effective balances, so they decide when the leak ends. They 
 
 The code is in [`verification/ethereum-finality-lmd-ghost-casper-ffg`](https://github.com/rya-sge/access-denied/tree/main/verification/ethereum-finality-lmd-ghost-casper-ffg). `extract_spec.py` copies 92 definitions verbatim from the pinned Markdown, taking for each one the newest fork up to Fulu that defines it, and `sim.py` executes them with `exec`. So `get_head`, `on_block`, `on_attestation`, `filter_node_tree`, `weigh_justification_and_finalization` and the inactivity functions are the spec's own code and were not re-implemented.
 
-**It is a model.** SSZ, BLS, shuffling, blob availability, deposits, exits and proposer rewards are stubbed or absent, and scenarios A to G use 64 validators of 32 ETH (the leak run uses 300 and 30) with `SLOTS_PER_EPOCH` = 8, the value of the spec's minimal preset. A committee is the 8 validators with a given index modulo 8, and every slot has a block unless stated. Other constants are the mainnet values. The output quoted below comes from a run of that code and is stored next to it as `run_output.txt`.
+**It is a model.** SSZ, BLS, shuffling, blob availability, deposits, exits and proposer rewards are stubbed or absent, and scenarios A to G use 64 validators of 32 ETH (scenario H, the leak, uses 300 and 30) with `SLOTS_PER_EPOCH` = 8, the value of the spec's minimal preset. A committee is the 8 validators with a given index modulo 8, and every slot has a block unless stated. Other constants are the mainnet values. The output quoted below comes from a run of that code and is stored next to it as `run_output.txt`, where each scenario has the letter given in the subsections below.
 
 `cross_check.py` replays cases from the spec's own test suite: the four finalisation rules with sufficient and insufficient support, three `test_get_head.py` scenarios and `test_ex_ante_vanilla`. All 21 checks pass. The pyspec harness itself was not run, because it needs dependencies this environment does not have, so these are restatements of the tests against the verbatim functions.
 
 ### Full participation
 
-Each row is the state after the boundary at the end of that epoch. The target columns are read from the last block before the boundary.
+Scenario A. Each row is the state after the boundary at the end of that epoch. The target columns are read from the last block before the boundary.
 
 | Epoch ended | Previous target | Current target | `bits[0..3]` | Current justified | Finalised | Rule |
 |---|---|---|---|---|---|---|
@@ -376,11 +434,13 @@ Each row is the state after the boundary at the end of that epoch. The target co
 
 The current share stays below 100 %, even with everyone voting. The last committee of an epoch is included in the first block of the next one, and by then the boundary has passed: 7 of 8 committees is 87.5 %. On mainnet that share is 31/32. Justification needs only 2/3, so it is unaffected, and the late committee counts in the next epoch's "previous" balance.
 
+Epoch 0 starts lower because the model builds its first block at slot 1, so the committee of slot 0 never votes. Six committees, those of slots 1 to 6, are included before the first boundary, which is 75 %. Seven are included in total, so epoch 1's "previous" column shows 87.5 % rather than 100 %.
+
 Nothing happens in epochs 0 and 1 because of the genesis guard. The first finalisation is at the end of epoch 3, not 2, because the end of epoch 1 left no bit set.
 
 ### Every finalisation rule
 
-The second run keeps all validators honest but delays the inclusion of votes. In epochs 5 and 7 to 11, the votes of committees 3 to 7 are included in blocks only in the next epoch, although they arrive at the fork choice on time. So 37.5 % is counted at the boundary. In epochs 13 and 14, committees 5 to 7 are absent, leaving 62.5 %, just under the threshold. Epochs 0 to 3 match the previous table and are omitted.
+Scenario B keeps all validators honest but delays the inclusion of votes. In epochs 5 and 7 to 11, the votes of committees 3 to 7 are included in blocks only in the next epoch, although they arrive at the fork choice on time. So 37.5 % is counted at the boundary. In epochs 13 and 14, committees 5 to 7 are absent, leaving 62.5 %, just under the threshold. Epochs 0 to 3 match the previous table and are omitted.
 
 | Epoch ended | Previous target | Current target | `bits[0..3]` | Previous justified | Current justified | Finalised | Rule |
 |---|---|---|---|---|---|---|---|
@@ -410,7 +470,7 @@ During the stall, the finalised checkpoint stayed at 10 from the end of epoch 12
 
 ### Realised and unrealised justification
 
-The third run prints the store during epoch 3 of a full-participation chain:
+Scenario C prints the store during epoch 3 of a full-participation chain:
 
 | Slot | Position | Block-state justified | `store.justified` | `store.unrealized_justified` | `store.finalized` | `store.unrealized_finalized` |
 |---|---|---|---|---|---|---|
@@ -421,7 +481,7 @@ The third run prints the store during epoch 3 of a full-participation chain:
 
 The block at slot 30 carries votes from six committees, which is 75 %, so the threshold is crossed there. Five committees would be 62.5 %. Scaled to mainnet, the same crossing happens with 22 of 32 committees, about the last third of the epoch, which matches the book's description of when justification becomes unrealised.
 
-The next run reproduces the setup of the reorg from the previous section. W is the block at slot 30 and X its child at slot 31, with the votes of slot 31 behind it. At slot 32 an attacker publishes Z on W, in time to receive the boost.
+Scenario E reproduces the setup of the reorg from the [unrealised justification](#unrealised-justification) section. W is the block at slot 30 and X its child at slot 31, with the votes of slot 31 behind it. At slot 32 an attacker publishes Z on W, in time to receive the boost.
 
 | Leaf | `get_voting_source` epoch | Viable under `filter_node_tree` | Passes the pre-Capella test | Weight |
 |---|---|---|---|---|
@@ -432,7 +492,7 @@ The head stays X. With the old comparison of a tip's post-state against the stor
 
 ### The fork choice in one slot
 
-The fourth run isolates a late block. It starts at genesis, with a committee weight of 2,048 / 8 = 256 ETH.
+Scenario D isolates a late block. It starts at genesis, with a committee weight of 2,048 / 8 = 256 ETH.
 
 ```mermaid
 flowchart LR
@@ -460,11 +520,11 @@ So the proposer of slot 3 builds C on A, skipping B. The boost is 40 % of 256 ET
 | Slot 4: boost expired, slot 3 committee counted | 32 ETH | 256 ETH | C |
 | Then `on_attester_slashing` for 5 of the 8 C voters | 32 ETH | 96 ETH | C |
 
-In the last row, the five validators' stored votes stop counting at once, 160 ETH disappears from C, and a later vote by one of them does not change its stored message.
+To show the equivocation defence, the run then builds a conflicting vote for B by 5 of the 8 validators that voted for C, and submits the pair as slashing evidence. The conflicting vote serves only as evidence and is not given to `on_attestation`. In the last row, the five validators' stored votes stop counting at once, 160 ETH disappears from C, and a later vote by one of them does not change its stored message.
 
 ### Conflicting finality
 
-The fifth run builds the case accountable safety talks about. It runs two isolated nodes from the same genesis, with 22 validators signing on both sides and 21 on each side only. Each side sees 43 of 64 validators, which is 67.19 %, above 2/3.
+Scenario F builds the case accountable safety talks about. It runs two isolated nodes from the same genesis, with 22 validators signing on both sides and 21 on each side only. Each side sees 43 of 64 validators, which is 67.19 %, above 2/3.
 
 Both sides finalise epoch 5 with different roots. For each of the 22 double signers, `is_slashable_attestation_data` returns `True` on its last votes from the two sides, so 704 of 2,048 ETH is provably slashable, or 34.375 %.
 
@@ -472,7 +532,7 @@ The count follows from the integers: two sets of 43 in 64 overlap by at least 22
 
 ### The leak
 
-This run is state-only: it calls the verbatim epoch functions on a state and sets participation directly. Validators go offline at epoch 8. `is_in_inactivity_leak` first returns true after epoch 11 in all three cases.
+Scenario H is state-only: it calls the verbatim epoch functions on a state and sets participation directly. Validators go offline at epoch 8. `is_in_inactivity_leak` first returns true after epoch 11 in all three cases.
 
 | Validators | Offline | Attestation penalties | Finality back after | Offline balance then | Effective balance | Online share |
 |---|---|---|---|---|---|---|
@@ -480,9 +540,14 @@ This run is state-only: it calls the verbatim epoch functions on a state and set
 | 300 | 34 % | Included | 348 epochs | 31.7469 ETH | 31 ETH | 66.71 % |
 | 30 | 50 % | Excluded | 4,690 epochs | 16.7407 ETH | 16 ETH | 66.67 % |
 
+The columns need two definitions:
+
+- **Attestation penalties** are the source, target and head penalties of `get_flag_index_deltas`. "Excluded" means the run replaces that function with zeros, to isolate the inactivity penalty; "Included" means it runs as specified.
+- **Finality back after** counts from the failure at epoch 8, not from the start of the leak.
+
 The first row can be checked by hand. Losing 0.25 ETH from 32 ETH at the leak's rate takes $$t \approx 512$$ epochs, since $$32 \cdot t^2 / (2 \cdot 2^{24}) = 0.25$$ gives $$t^2 = 2^{18}$$. The run adds the epochs before the leak starts and those needed to justify and finalise. That is about 2.3 days for a failure just beyond one third, as an upper bound, because attestation penalties shorten it.
 
-The third row is the extreme where half the stake is gone: 4,690 epochs is about 20.8 days. The book's own simulation of an offline validator, included in `sim.py` and re-run, gives 4,686 epochs. It measures something else: the time from the start of the leak until the validator is ejected at an effective balance of 16 ETH. Here finality returns when the offline validators reach that same effective balance, so the two figures agree once the four epochs between the failure and the leak are counted.
+The third row is the extreme where half the stake is gone: 4,690 epochs is about 20.8 days. The book's own simulation of an offline validator, included in `sim.py` and re-run, gives 4,686 epochs, measured from the start of the leak to ejection at 16 ETH. Finality returns here when the offline validators reach that same 16 ETH, and adding the four epochs before the leak gives the same figure.
 
 The second row should not be read as a mainnet estimate. Base rewards scale with the inverse square root of total balance, so a 300-validator set has far larger attestation penalties than mainnet. On mainnet the result should lie between the first two rows. That last statement is a reasoned expectation, not a measurement. The runs also exclude churn: at 16 ETH a validator is ejected, and the third row does not model the exit queue.
 
@@ -490,7 +555,7 @@ The second row should not be read as a mainnet estimate. Base rewards scale with
 
 | Attack | Source | What it exploits | Rule it shaped |
 |---|---|---|---|
-| Balancing attack | [Neu, Tas, Tse, 2020](https://arxiv.org/abs/2009.04987) | Splitting honest committees between two branches, so finality stalls | Proposer boost, [PR 2730](https://github.com/ethereum/consensus-specs/pull/2730) |
+| Balancing attack | [Ebb-and-Flow Protocols](https://arxiv.org/abs/2009.04987) (Neu, Tas, Tse, 2020), the paper the book cites for the attack, and its [ethresear.ch post](https://ethresear.ch/t/a-balancing-attack-on-gasper-the-current-candidate-for-eth2s-beacon-chain/8079) | Splitting honest committees between two branches, so finality stalls | Proposer boost, [PR 2730](https://github.com/ethereum/consensus-specs/pull/2730) |
 | Refined reorg and balancing attacks | [Three Attacks on Proof-of-Stake Ethereum](https://arxiv.org/abs/2110.10086) | Short-range reorganisations for profit; relaxed stake and timing assumptions | Boost tuning; the book describes the ex-ante versus ex-post trade-off |
 | Ex-ante reorg | Book, Part 3; `test_ex_ante.py` in the spec tests | A proposer withholds its block and votes, so the next honest block loses | Boost size: `test_ex_ante_vanilla` confirms a single vote cannot beat a boosted block |
 | LMD equivocation balancing | [Two Attacks On Proof-of-Stake GHOST/Ethereum](https://arxiv.org/abs/2203.01315) | Slashable votes shown selectively, which boost does not stop | `on_attester_slashing`, [PR 2845](https://github.com/ethereum/consensus-specs/pull/2845) |
@@ -510,16 +575,18 @@ Status below was checked on 2026-11-04 against the upstream repositories, not on
 | Glamsterdam (Gloas + Amsterdam) | Sepolia 2026-10-06, Hoodi listed for 2026-10-26, mainnet blank | [EIP-7773](https://eips.ethereum.org/EIPS/eip-7773), status Review; the Hoodi row is upstream of the local EIP pin |
 | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) ePBS | Scheduled for Glamsterdam, status Last Call | `specs/gloas/`; `GLOAS_FORK_EPOCH` is the far-future value in `configs/mainnet.yaml` |
 | Fast Confirmation Rule | Specified, no EIP, no hard fork needed | `specs/phase0/fast-confirmation.md`, added by [PR 4747](https://github.com/ethereum/consensus-specs/pull/4747) |
-| [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) FOCIL | Scheduled for Hegotá, status Draft | `specs/heze/`; [EIP-8081](https://eips.ethereum.org/EIPS/eip-8081) is itself a Draft |
+| [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) FOCIL | Scheduled for Hegotá (Heze + Bogotá), status Draft | `specs/heze/`; [EIP-8081](https://eips.ethereum.org/EIPS/eip-8081) is itself a Draft |
 | [EIP-8198](https://eips.ethereum.org/EIPS/eip-8198) Quick Slots | Considered for Hegotá, status Draft | `specs/_features/eip8198/`; [PR 5743](https://github.com/ethereum/consensus-specs/pull/5743) to move it into Heze is open |
 | Single-slot finality | Research; no EIP or spec file found | [ethereum.org roadmap page](https://ethereum.org/en/roadmap/single-slot-finality/) |
 
 ### Gloas
 
-The finality gadget does not change. `process_justification_and_finalization`, `weigh_justification_and_finalization`, `is_slashable_attestation_data`, `filter_node_tree` and `get_voting_source` have no new definition in `specs/gloas/`. The fork choice changes considerably, because under [enshrined proposer-builder separation]({{site.url_complet}}/2026/10/23/ethereum-glamsterdam-upgrade-overview/) a beacon block no longer contains its payload:
+The finality gadget does not change. `process_justification_and_finalization`, `weigh_justification_and_finalization`, `is_slashable_attestation_data`, `filter_node_tree` and `get_voting_source` have no new definition in `specs/gloas/`. The fork choice changes considerably, because under [enshrined proposer-builder separation]({{site.url_complet}}/2026/10/23/ethereum-glamsterdam-upgrade-overview/) a beacon block no longer contains its payload.
+
+The idea behind the changes below is that a fork-choice node now carries a decision about the payload as well as a block. Whether the payload arrived in time is voted on later, by a separate payload timeliness committee (PTC), so for the most recent block the attesters' votes cannot settle that decision and a tie-break does. Most bullets follow from that:
 
 - **Tree nodes.** `ForkChoiceNode` gains `payload_status`: `PENDING`, `EMPTY` or `FULL`. A block now branches into an empty and a full variant in `get_node_children`, so the head is a block plus a statement about its payload.
-- **Votes.** `LatestMessage` tracks `slot` rather than `epoch`, and adds `payload_present`, which comes from `attestation.data.index` (0 or 1). `update_latest_messages` compares slots.
+- **Votes.** `LatestMessage` tracks `slot` rather than `epoch`, and adds `payload_present`, which comes from `attestation.data.index` (0 or 1). That field is free to reuse: since [EIP-7549](https://eips.ethereum.org/EIPS/eip-7549) (Electra), an aggregate names the committees it covers in a separate bit field, and the block-processing code requires the committee index to be 0 on chain. `update_latest_messages` compares slots.
 - **Weight.** `get_weight` returns 0 for an empty or full variant of a block from the previous slot, so `get_payload_status_tiebreaker` decides, not votes.
 - **Boost.** `should_apply_proposer_boost` withholds the boost when the parent is weak, from the previous slot, and its proposer equivocated early.
 - **Head.** `get_head` returns the justified root's `EMPTY` node if the filter leaves nothing viable.
@@ -533,9 +600,9 @@ The finality gadget does not change. `process_justification_and_finalization`, `
 
 The rule is a separate algorithm that a node runs over its `Store`, with no change to consensus. Under a synchrony assumption stated in the spec, that honest attestations are received by the end of their slot, it decides whether a block will stay canonical. The [paper](https://arxiv.org/abs/2405.00549) gives a best case of one 12-second slot. The spec warns that if the assumption fails, "confirmed blocks can be reorged without any adversarial behavior and without slashing".
 
-`is_one_confirmed` tests LMD support against `compute_safety_threshold`. At the pin, the threshold is $$(W + P - D) / 2 + A$$. Here $$W$$ is the committee weight since the block's parent, $$P$$ the proposer score, $$D$$ a discount and $$A$$ an adversarial term. It assumes `CONFIRMATION_BYZANTINE_THRESHOLD` = 25 %, a config whose maximum value is also 25. On the FFG side `will_current_target_be_justified` and `will_no_conflicting_checkpoint_be_justified` check that the confirmed block will not be reverted through the justification rules.
+`is_one_confirmed` tests LMD support against `compute_safety_threshold`. At the pin, the threshold is $$(W + P - D) / 2 + A$$. Here $$W$$ is the committee weight since the block's parent, $$P$$ the proposer score, $$D$$ the support the parent already received from committees of empty slots before the block, and $$A$$ the largest weight an adversary could hold in the committees since the block (25 % of it, minus validators already caught equivocating). It assumes `CONFIRMATION_BYZANTINE_THRESHOLD` = 25 %, a config whose maximum value is also 25. On the FFG side `will_current_target_be_justified` and `will_no_conflicting_checkpoint_be_justified` check that the confirmed block will not be reverted through the justification rules.
 
-The Bellatrix document says `safe_block_hash` "MUST be set to return value of `get_safe_execution_block_hash(fcr_store)`", and Beacon API has a `fast_confirmation` event. Several client repositories show work on the rule (Lighthouse, Prysm, Lodestar and Nimbus), but I did not establish which releases enable it by default on mainnet.
+The Bellatrix document says `safe_block_hash` "MUST be set to return value of `get_safe_execution_block_hash(fcr_store)`", and Beacon API has a `fast_confirmation` event. Several client repositories show work on the rule (Lighthouse, Prysm, Lodestar and Nimbus). Which releases enable it by default on mainnet was not established (see [Gaps](#gaps)).
 
 After the pin, [PR 5670](https://github.com/ethereum/consensus-specs/pull/5670) replaced the committee-weight estimate with an exact computation and removed `COMMITTEE_WEIGHT_ESTIMATION_ADJUSTMENT_FACTOR`, and the open PR 5789 changes the discount. Treat the description of the threshold above as true at the pin only.
 
@@ -616,6 +683,18 @@ Gasper is two protocols that take one message. An attestation's head vote feeds 
 | `is_slashable_attestation_data` is asymmetric for surround votes. | A slasher or test harness must try both orders of a pair. |
 | The justification check allows equality, and uses effective balances. | Compute participation from effective balance, with `>=`, when monitoring. |
 
+### Differences from Upgrading Ethereum (Capella)
+
+The book describes the Capella specification. These are the places where the pinned specification differs from what it shows:
+
+| Topic | In the book | At the pinned commit |
+|---|---|---|
+| `get_weight` | One function on a block root. | Split into `get_weight`, `get_attestation_score` and `get_proposer_score`, taking `ForkChoiceNode` objects. |
+| Late-block reorgs | A Lighthouse feature that might be adopted. | In the spec as optional helpers (`get_proposer_head`), without the `shuffling_stable` condition since Fulu. |
+| Initial slashing penalty | 1/32 of the effective balance. | 1/4,096 since Electra, because of [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251). |
+| The filter | `filter_block_tree` and `get_filtered_block_tree`. | Renamed `filter_node_tree` and `get_filtered_node_tree` by [PR 5509](https://github.com/ethereum/consensus-specs/pull/5509), working on `ForkChoiceNode` objects. |
+| `correct_justified` | A longer expression built on `is_previous_epoch_justified`. | The shorter test shown in [The filter](#the-filter); the helper no longer exists. |
+
 ## Frequently Asked Questions
 
 **Q: Why does Ethereum need a finality gadget if LMD GHOST already picks a chain?**
@@ -662,12 +741,13 @@ These points were not settled by the sources or were not checked.
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| Upstream is 19 commits past the pinned consensus-specs commit, at `204fb4a19774eabb7a2e91505365deed6b8afef8` on 2026-11-04. | The FCR threshold and the 3,999 ms deadline differ upstream; the finality and fork-choice functions quoted here do not. | `git diff` between the two commits for `specs/phase0/fast-confirmation.md` and `specs/phase0/fork-choice.md`. |
+| Upstream is 19 commits past the pinned consensus-specs commit, at `204fb4a19774eabb7a2e91505365deed6b8afef8` on 2026-11-04. | The FCR threshold and the 3,999 ms deadline differ upstream ([PR 5756](https://github.com/ethereum/consensus-specs/pull/5756) rounds it to 4,000 ms); the finality and fork-choice functions quoted here do not. | `git diff` between the two commits for `specs/phase0/fast-confirmation.md` and `specs/phase0/fork-choice.md`. |
 | Which client releases enable the Fast Confirmation Rule by default on mainnet was not established. | The practical meaning of the `safe` tag depends on it. | Release notes of each consensus client, and Lighthouse issue 10389 for current work. |
 | The Hoodi activation comes from the upstream EIP-7773 table, and no check was made that the network forked or is finalising. | The status table repeats a planned value. | The EIP-7773 activation table and a Hoodi explorer. |
 | Papers were read at abstract level, and the proofs through the book's account. | The Gasper paper proves properties of an idealised protocol, which lacks proposer boost and the current filter; those results are not claimed for the spec here. | [Gasper](https://arxiv.org/abs/2003.03052), [Casper FFG](https://arxiv.org/abs/1710.09437). |
 | The book's Gasper and ex-ante sections in Part 2 are empty (TODO), and its Part 3 describes Capella. | The rationale for the filter and the attack history rest on it, while code claims were re-read at the pin. | `src/book.md` sections "Issues and Fixes" and the annotated fork choice. |
 | The simulation stubs SSZ, BLS, shuffling, blobs, exits and proposer rewards, and uses 8-slot epochs. | Numbers show rule behaviour, not mainnet durations, except where scaled in the text. | `verification/ethereum-finality-lmd-ghost-casper-ffg/README.md`. |
+| Why `get_weight` and `get_proposer_score` take balances from the justified checkpoint's state rather than the head's state is not explained in the spec or in the book, which only states that the state at the last justified checkpoint is used for validator balances. | A reader auditing the fork choice will ask what property this choice protects, and the article cannot answer from its sources. | The rationale in [Gasper](https://arxiv.org/abs/2003.03052) and in the history of `specs/phase0/fork-choice.md` in [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs). |
 | The official test harness was not run; test cases were restated. | A restatement can miss setup details. | `tests/core/pyspec/eth_consensus_specs/test/phase0/` with a built pyspec. |
 | The mainnet leak time between 348 and 517 epochs is a reasoned bound, and it ignores exits and any proposer income. | The article gives no direct mainnet figure. | A run with a mainnet-sized validator set. |
 | The single-slot finality status comes from a roadmap page with text dated 2023, and a search of the local EIPs. | Research work outside these repositories was not surveyed. | ethresear.ch and the Ethereum Foundation research pages. |

@@ -2,7 +2,7 @@
 layout: post
 title: "Isolating Untrusted Build Tools: How Dependabot's Credential Proxy Works"
 date:   2026-11-05
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: security
@@ -14,7 +14,7 @@ isMath: false
 isMermaid: true
 ---
 
-Updating a dependency means running the project's own tooling, and tools such as `setup.py` and `.gemspec` can execute arbitrary code. [Dependabot](https://docs.github.com/en/code-security/dependabot) still has to reach private registries while it does this, so it needs credentials in a process that may be running hostile code.
+Updating a dependency means running the project's own tooling, and manifest files such as `setup.py` and `.gemspec` are code that the package manager executes. [Dependabot](https://docs.github.com/en/code-security/dependabot) still has to reach private registries while it does this, so it needs credentials in a process that may be running hostile code.
 
 Its answer is a separate proxy that holds the secrets. The worker has no route to the internet and no credentials, and the proxy adds them to outbound requests. [An earlier article]({{site.url_complet}}/2026/11/05/how-github-dependabot-works/) describes how a Dependabot job runs; this one reads the source of `dependabot/proxy` to see which guarantees the design provides, and which it does not.
 
@@ -48,13 +48,41 @@ The design moves the secret out of the process instead:
 | **Updater** | Repository code, credential metadata, the CA certificate | The proxy only, over an internal network |
 | **Proxy** | Credentials, job token, the CA private key | The internal network and the internet |
 
-The CLI shows both halves. `NewNetworks` creates one network with `Internal: true` and one without, the updater joins only the first, and the proxy joins both. `NewProxy` writes `all_credentials` and the CA into the proxy's configuration, and `putUpdaterInputs` copies two things into the updater: the CA certificate, without its key, and the job file. The CLI builds that file's credential metadata without the `username`, `token`, `password`, `key` and `auth-key` fields.
+*Credential metadata* is the list of the job's credentials with every secret field removed: each entry keeps its type and its host or URL, so the updater still knows which private registries exist and can point its package managers at them. The requests it sends there carry no secret, and the proxy adds one.
 
-The private key stays on the proxy's side of the boundary, which matters: code in the updater can trust the CA but cannot use it to impersonate a host to anything else.
+The CLI, which runs a job locally, shows both halves of the split:
+
+- **Two networks.** It creates one internal network and one with internet access. The updater joins only the internal one, and the proxy joins both.
+- **The proxy's configuration** receives all the credentials and the CA, private key included.
+- **The updater** receives only the CA certificate, without its key, and the job file.
+- **The job file's credential metadata** is built by copying each credential without its `username`, `token`, `password`, `key` and `auth-key` fields.
+
+*Implementation:* `dependabot/cli`, `NewNetworks`, `NewProxy` and `putUpdaterInputs` in `internal/infra`, and the credential loop in `cmd/dependabot/internal/cmd/update.go`.
+
+```mermaid
+flowchart LR
+    subgraph INT["Internal network, no route out"]
+        U["Updater<br/>repository code, credential metadata,<br/>CA certificate"]
+    end
+    P["Proxy<br/>credentials, job token,<br/>CA private key"]
+    subgraph EXT["Network with internet access"]
+        R["Registries and git hosts"]
+        API["Dependabot API"]
+    end
+    U -->|"every request"| P
+    P -->|"credential added to reads"| R
+    P -->|"job token added"| API
+```
+
+The updater also reports its results through the proxy. It sends the file changes and the pull request text to the Dependabot API, and the proxy adds the job token to those calls. This API is the job's write path: a Dependabot pull request is created by an API call such as `create_pull_request`, not by the updater pushing to the repository.
+
+*Source:* `dependabot-core`, `updater/lib/dependabot/api_client.rb`.
+
+The private key stays on the proxy's side of the boundary, which matters. Code in the updater can trust the certificates the proxy presents, but it cannot sign certificates of its own. The CA is useful to the proxy alone, and a key the updater never holds cannot be copied out of it.
 
 ## The request path
 
-The proxy is a Go program built on `elazarl/goproxy`. It sets `HandleConnect(goproxy.AlwaysMitm)`, so every HTTPS connection is decrypted, and `newProxy` registers handlers that run in a fixed order. A handler that returns a response stops the chain.
+The proxy is a Go program built on `elazarl/goproxy`. It sets `HandleConnect(goproxy.AlwaysMitm)`, so every HTTPS connection is decrypted, and `newProxy` registers handlers that run in a fixed order. Each handler does one of two things: it passes the request on to the next handler, possibly with a header added, or it answers the request with a response of its own, such as a 403, which ends the chain.
 
 ```mermaid
 flowchart TD
@@ -75,7 +103,9 @@ flowchart TD
 
 The egress decision comes before any credential handler, so the handlers that attach secrets do not run for a blocked host. Logging and metrics handlers also sit in the chain and are left out of the chart.
 
-Each handler checks whether the request is one it recognises, and returns it unchanged if not. Credentials live in `config.json`, typed by kind such as `git_source` or `npm_registry`, and each handler reads only its own kind.
+Each handler checks whether the request is one it recognises, and passes it on unchanged if not. Credentials live in `config.json`, typed by kind such as `git_source` or `npm_registry`, and each handler reads only its own kind.
+
+The core README also states that the proxy strips credentials from the registries' responses before they reach the updater. This review did not confirm it in the proxy's response handlers, so the claim rests on the README alone (see Gaps).
 
 ## Which requests receive a credential
 
@@ -89,11 +119,23 @@ if req.URL.Scheme != "https" || !helpers.MethodPermitted(req, "GET", "HEAD") {
 }
 ```
 
-So a request gets a credential only if it matches a configured host, and uses `GET` or `HEAD`. In most handlers it must also use HTTPS, though the Maven and NuGet handlers also accept HTTP, and the Go proxy handler checks only the method. The effect is that credentials are usable for reading packages and not for publishing them. The GitHub API handler applies the same `GET` and `HEAD` rule.
+So a request gets a credential only if it matches a configured host and uses `GET` or `HEAD`. The snippet shows the scheme and method test. Each handler also compares the request's host with its configured hosts, and the scheme rule varies between handlers:
 
-Two handlers do not follow this rule. The Dependabot API handler attaches the job token to any request to the API, by design, since the API is the write path. The Azure DevOps API handler attaches the first `git_source` credential configured for a few `dpdbot.*` Azure DevOps hosts whatever the method; it checks only the scheme and the host, and it was not analysed further (see Gaps).
+| Handler | Host | Scheme | Methods |
+|---------|------|--------|---------|
+| Most registry handlers, such as npm | A configured host | HTTPS only | `GET`, `HEAD` |
+| Maven and NuGet | A configured host | HTTPS or HTTP | `GET`, `HEAD` |
+| Go proxy | A configured host | Not checked | `GET`, `HEAD` |
+| GitHub API | The GitHub API host | Not covered here | `GET`, `HEAD` |
 
-In the npm, Maven, NuGet, RubyGems and Docker handlers, a `******` placeholder in an `Authorization` header counts as no credential, so a dummy value in a tool's configuration does not stop injection. In most registry handlers, a credential that names a registry but holds no secret is not registered with the handler, so no empty header is attached, but its host stays on the allowlist.
+The effect is that credentials are usable for reading packages and not for publishing them. The HTTP exception has a cost of its own: a credential attached to a plain HTTP request travels unencrypted between the proxy and the registry.
+
+Two handlers do not follow this rule:
+
+- **The Dependabot API handler** attaches the job token to any request to the API, by design, since the API is the write path.
+- **The Azure DevOps API handler** attaches the first `git_source` credential configured for a few `dpdbot.*` Azure DevOps hosts, whatever the method. It checks only the scheme and the host. What these hosts serve, and what the credential can do there, was not analysed (see Gaps). Later sections refer back to this paragraph.
+
+A tool in the updater may need some value in its configuration before it sends an authenticated request, and the updater has no secret to put there. A `******` placeholder in an `Authorization` header therefore counts as no credential in the npm, Maven, NuGet, RubyGems and Docker handlers, and the proxy still adds the real one. Without this rule, a dummy value would stop injection. In most registry handlers, a credential that names a registry but holds no secret is not registered with the handler, so no empty header is attached.
 
 ### Git: reads only
 
@@ -111,13 +153,13 @@ func isReadOnlyGitRequest(req *http.Request) bool {
 }
 ```
 
-A `GET` is read-only unless it starts a push. A `POST` is read-only only if it is an upload-pack request, or a Git LFS batch request whose JSON body says `download`. The LFS parser is strict: it rejects a duplicated or wrongly cased `operation` key and any trailing content, so a body cannot be built to read as a download while acting as something else.
+A `GET` is read-only unless it starts a push. A `POST` is read-only only if it is an upload-pack request, or a Git LFS batch request whose JSON body says `download`. Git LFS is git's extension for large files, and its client asks the server for those files with a batch request: a `POST` whose JSON body names the operation in an `operation` key, so the method alone cannot tell a download from an upload. The LFS parser is strict: it rejects a duplicated or wrongly cased `operation` key and any trailing content, so a body cannot be built to read as a download while acting as something else.
 
 For anything else, `HandleRequest` returns a 403 with the message "Dependabot proxy blocked authentication for a non-read-only Git request".
 
-The proxy refuses to *authenticate* a push. It does not ban one: a request that already carries its own Basic credential, with a non-empty password, passes through, and so does a request to a host with no configured credential. That is enough, because the updater has no credential of its own to bring. Over git smart HTTP, the updater can read with the job's identity and cannot write with it. The Azure DevOps API handler described above falls outside this rule.
+The proxy refuses to *authenticate* a push. It does not ban one: a request that already carries its own Basic credential, with a non-empty password, passes through, and so does a request to a host with no configured credential. That is enough, because the updater has no credential of its own to bring. Over git smart HTTP, the updater can read with the job's identity and cannot write with it. The Azure DevOps API handler (see above) falls outside this rule.
 
-Consistent with this, a Dependabot pull request is created through the API, not by a git push from the updater.
+Consistent with this, a Dependabot pull request is created through the API, the write path described in the problem section, not by a git push from the updater.
 
 ### Narrowing the identity
 
@@ -134,15 +176,17 @@ A proxy on two networks is a useful pivot for anyone inside. If the updater coul
 
 The code blocks the cloud metadata service at three levels:
 
+The blocked addresses are `169.254.169.254` and `fd00:ec2::254`, and the code checks for them at three levels:
+
 - **By name:** `blockMetadataAPIHosts` rejects `metadata.google.internal`.
-- **After resolution:** `usableIPs` rejects a host whose addresses include a blocked IP.
-- **At connection time:** `safeControl` runs on the socket, checks the address being dialled, and refuses `169.254.169.254` and `fd00:ec2::254`.
+- **After resolution:** `usableIPs` rejects a host whose addresses include one of the two blocked addresses.
+- **At connection time:** `safeControl` runs on the socket, checks the address being dialled, and refuses the two blocked addresses.
 
 The last check is what resists DNS rebinding, because it sees the real address, not a name resolved earlier. It also refuses non-TCP networks.
 
-The two IP checks apply to the address the proxy dials. The proxy's transport uses `http.ProxyFromEnvironment`, and the CLI forwards the host's `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` to the proxy container. When an upstream proxy is set, the address dialled is that upstream proxy, so the IP checks see its address and not the target's, and only the name check applies to the target. This comes from reading the code, not from a test.
+The two IP checks apply to the address the proxy dials, which is not always the target. The proxy's transport uses `http.ProxyFromEnvironment`, and the CLI forwards the host's `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` to the proxy container. A host has these variables set when it reaches the internet through an upstream proxy, for example a self-hosted runner behind a corporate proxy. The address dialled is then that upstream proxy, so the IP checks see its address and not the target's, only the name check applies to the target, and blocking the metadata address becomes the upstream proxy's job. This comes from reading the code, not from a test.
 
-The list has only those two addresses. Other private ranges are not blocked here, so protection for the rest of an internal network depends on how the host is deployed. Redirect learning, described next, is stricter and never accepts an IP literal.
+The block list has only those two addresses. Other private ranges are not blocked here, so protection for the rest of an internal network depends on how the host is deployed. Redirect learning, described in the egress allowlist section, is stricter and never accepts an IP literal.
 
 ## The egress allowlist
 
@@ -164,14 +208,16 @@ There are three states:
 | on | off | Unlisted hosts are logged and still allowed |
 | either | on | Unlisted hosts receive a 403 |
 
-The flags are job experiments, set by the service. The CLI's proxy configuration has only `all_credentials` and `ca`, with no `experiments` field, so a job run with the CLI at the analysed commits has no egress filtering. Whether GitHub's hosted jobs enforce it is not visible from public code. The handler reports each observed host for "allowlist discovery", which suggests a rollout in progress, but that is an inference.
+A *job experiment* is a named feature flag in the `experiments` map of a job definition, the document that describes one Dependabot run. For a hosted job, GitHub's service writes that definition, so the service decides which experiments are on. With the CLI, the person running it supplies the job file, but the flags reach the proxy only through the proxy's own configuration. The CLI's proxy configuration has only `all_credentials` and `ca`, with no `experiments` field, so a job run with the CLI at the analysed commits has no egress filtering.
+
+*Source:* `dependabot/cli`, `internal/model/job.go` (the `Experiments` field). Whether GitHub's hosted jobs enforce it is not visible from public code. The handler reports each observed host for "allowlist discovery", which suggests a rollout in progress, but that is an inference.
 
 ### How the list is built
 
 When enabled, the allowlist has three sources, with different levels of trust:
 
-- **Static defaults**, embedded from `egress_allowlist_defaults.yaml`. This has GitHub infrastructure domains, shared artifact providers and public registry hosts: 311 distinct host entries once YAML aliases are resolved. A separate section derives redirect hosts, and these are added only when the job has a credential for the matching registry. The union of all ecosystems is applied to every job, because a comment notes that launchers do not reliably set the package manager.
-- **Dynamic hosts**, from the job's credentials. These are matched exactly, never as patterns, so a credential value such as `https://*.com` cannot widen the list.
+- **Static defaults**, embedded from `egress_allowlist_defaults.yaml`. This has GitHub infrastructure domains, shared artifact providers and public registry hosts: 311 distinct host entries once YAML aliases are resolved. A separate section lists *registry redirect hosts*, the download hosts that known registries redirect to, and these are added only when the job has a credential for the matching registry. They are written in the file in advance, unlike learned redirects below, which the proxy adds at run time after seeing a redirect. The union of all ecosystems is applied to every job, because a comment notes that launchers do not reliably set the package manager.
+- **Dynamic hosts**, from the job's credentials. These are matched exactly, never as patterns, so a credential value such as `https://*.com` cannot widen the list. A credential that names a registry but holds no secret still adds its host here, even though no handler attaches anything for it.
 - **Learned redirects.** Artifactory-style registries redirect downloads to a customer bucket whose name cannot be predicted. The proxy learns such a target only from a credentialed private registry, over TLS, to an `https` target, and never for an IP literal.
 
 Public registries and GitHub hosts are explicitly not redirect sources, since they serve user-published content.
@@ -182,7 +228,7 @@ The YAML file records the limit of host-based filtering: a host name is only as 
 
 Two accepted exceptions remain:
 
-- **`storage.googleapis.com`** is allowed as an exact host, because Go and Dart downloads redirect there. It is path-style, so it reaches every bucket, and the file records this as an accepted residual exfiltration risk.
+- **`storage.googleapis.com`** is allowed as an exact host, because Go and Dart downloads redirect there. It is path-style: the bucket name sits in the URL path, not in the host name, so one host entry reaches every bucket, an attacker's included. The file records this as an accepted residual exfiltration risk.
 - **The NuGet CDN** keeps a glob over shared storage, recorded as a known exposure.
 
 A host allowlist also cannot look inside allowed traffic. Any allowed host that accepts data under a path an attacker controls remains a possible channel. Filtering raises the cost of exfiltration without ending it.
@@ -191,19 +237,33 @@ A host allowlist also cannot look inside allowed traffic. Any allowed host that 
 
 Putting these together gives the threat model. Assume code runs in the updater during a job. The table below is my own analysis of the source, not a statement from the project.
 
-| Attacker goal | With credentials on the proxy only | With egress enforcement |
+The last column adds egress enforcement to the controls of the middle one, so it describes both together.
+
+| Attacker goal | With credentials on the proxy only | Plus egress enforcement |
 |---------------|-------------------------------------|-------------------------|
 | Read a registry secret from memory or environment | Blocked: the secret is not there | Blocked |
 | Publish a package with the registry credential | Blocked: `POST` and `PUT` get no credential | Blocked |
 | Push to the repository with the job's token over git smart HTTP | Blocked: the proxy refuses to authenticate | Blocked |
-| Reach the cloud metadata service | Blocked by the dialler when the proxy connects directly | Blocked |
+| Reach the cloud metadata service | Blocked by the dialler when the proxy connects directly | Blocked by the dialler when the proxy connects directly |
 | Read private packages the job can read | Possible: reads are authenticated | Possible |
 | Send data to an arbitrary host | Possible | Blocked, except through allowed hosts |
 | Influence the pull request's content | Possible | Possible |
+| Write with the Azure DevOps API credential | Not analysed (see Gaps) | Not analysed |
+| Obtain a `jit_access` token for another repository | Not analysed (see Gaps) | Not analysed |
+| Carry data to a later job through the response cache | Not analysed (see Gaps) | Not analysed |
 
 No network control addresses the last row. The updater produces the file contents and the pull request text that it sends to the API. A compromised update can therefore propose a malicious change. That is the point at which human review and CI take over, and it sits outside anything a proxy can do.
 
-The scope of a compromise is also bounded in time. The CLI generates a certificate authority per run and starts fresh containers, so an attacker's foothold in the updater ends with the job, unless the job's output carries it forward or a persistent proxy cache (`--cache`) is reused.
+The scope of a compromise is also bounded in time. The CLI generates a certificate authority per run and starts fresh containers, so an attacker's foothold in the updater ends with the job, unless the job's output carries it forward or a cache directory is reused.
+
+The proxy's response cache is the one piece of state that can outlive a run, and it is on by default: the CLI sets `PROXY_CACHE` to `true` unless the host overrides it. Where the cache lives depends on the `--cache` flag:
+
+- **Without `--cache`** (the default), the cache is inside the proxy container, which the CLI removes at the end of the run.
+- **With `--cache <dir>`**, the CLI mounts that host directory into the proxy, so the cache persists and a later run that names the same directory reuses it.
+
+What the cache stores, and whether a reused cache can serve authenticated content to another job, was not analysed (see Gaps).
+
+*Implementation:* `dependabot/cli`, `internal/infra/proxy.go` (`proxyEnv`, the `CacheDir` mount, and `Close`).
 
 ## Applying the pattern elsewhere
 
@@ -211,7 +271,7 @@ The design transfers to other systems that run untrusted code with access to sec
 
 1. **Move the secret out of the process.** A process cannot leak what it never held.
 2. **Remove the direct route.** An internal network makes the proxy mandatory, so it cannot be bypassed by ignoring an environment variable.
-3. **Attach credentials by operation, not by host alone.** Read-only injection removes publishing and pushing from the attacker's options. This is the control with the best ratio of value to effort.
+3. **Attach credentials by operation, not by host alone.** Read-only injection removes publishing and pushing from the attacker's options. This is the control with the best ratio of value to effort: it is one check per request, on the method and, for git, on the service, and it needs no knowledge of what a package ecosystem's traffic looks like, unlike an egress allowlist.
 4. **Treat write paths as a separate service.** Then the worker asks, and something else acts.
 5. **Check the dialled address.** Name-based checks alone fail against DNS rebinding.
 6. **Plan for egress from the start.** Allowlists are hard to add later, as Dependabot's observe mode suggests: discovering what legitimate traffic looks like takes time, and many registries redirect to shared storage.
@@ -223,12 +283,14 @@ The hardest part is the last one, and the proxy's source documents why. Package 
 Dependabot's proxy separates having a credential from being able to use it freely.
 
 - **The updater holds no secrets** and has no route out, and the proxy holds the credentials, the job token and the CA key.
-- **Registry and git credentials attach to reads.** Registry handlers require `GET` or `HEAD`, and the git handler refuses to authenticate anything that is not a fetch. The Dependabot API handler attaches the job token whatever the method, by design, and the Azure DevOps API handler, not analysed here, does the same with its credential.
+- **Registry and git credentials attach to reads.** Registry handlers require `GET` or `HEAD`, and the git handler refuses to authenticate anything that is not a fetch. The Dependabot API handler attaches the job token whatever the method, by design, and the Azure DevOps API handler is the one exception left open (see Gaps).
 - **The proxy declines to authenticate a push; it does not ban it.** This is enough while the updater has no credential of its own.
 - **The metadata service is blocked at the socket** when the proxy connects directly, which resists DNS rebinding. With an upstream proxy set, the socket check sees that proxy's address. Other private ranges are not covered by this check.
 - **Egress filtering is off by default.** It depends on job experiments, the CLI does not set them, and its state on GitHub's hosted service is not public.
 - **Host allowlists have documented limits.** `storage.googleapis.com` and the NuGet CDN are accepted exposures.
 - **No network control protects the content of a pull request.** Review remains the last check.
+
+The points this review left open, including the Azure DevOps handler, `jit_access` tokens and the response cache, are listed in [Gaps](#gaps).
 
 ![Mindmap of Dependabot's credential proxy covering the split between updater and proxy, the request chain, read-only credentials, metadata blocking, the egress allowlist and residual risks]({{site.url_complet}}/assets/article/outil-securite/dependabot/2026-11-05-dependabot-credential-proxy-isolation-mindmap.png)
 
@@ -244,6 +306,12 @@ Dependabot's proxy separates having a credential from being able to use it freel
 | **Credential proxy** | A proxy that holds secrets and adds them to outbound requests. |
 | **Updater** | The container that runs Dependabot's update logic and package managers. |
 | **Job token** | The token that authenticates a job to the Dependabot API. |
+| **Job experiment** | A named feature flag in the `experiments` map of a job definition, set by whoever writes the definition (GitHub's service for hosted jobs). |
+| **Credential metadata** | The job's credentials with their secret fields removed, given to the updater so it knows which registries to use. |
+| **`jit_access` credential** | A credential type that lets the proxy ask the Dependabot API for a token to a repository when known credentials fail. |
+| **Git LFS batch request** | A `POST` with which a Git LFS client asks for large files, its JSON `operation` key saying download or upload. |
+| **Upstream proxy** | A proxy that the credential proxy itself connects through, set by `HTTP_PROXY` and `HTTPS_PROXY`. |
+| **Path-style host** | A storage host that puts the bucket name in the URL path, so one host name covers every bucket. |
 | **Handler** | A function in the proxy's chain that inspects or changes a request or response. |
 | **Read-only injection** | Attaching a credential only to requests that read. |
 | **Upload-pack and receive-pack** | The git services used by a fetch and by a push. |
@@ -325,7 +393,7 @@ The main remaining options are:
 - Send data only through hosts on the allowlist.
 - Change the files and the text sent back for the pull request.
 
-It cannot read a registry secret, publish with one, or push with the job's token over git smart HTTP. The Azure DevOps API handler was not analysed and is listed in Gaps. The third option is the one that review has to catch, and auto-merging Dependabot pull requests removes that check.
+It cannot read a registry secret, publish with one, or push with the job's token over git smart HTTP. The Azure DevOps API handler is the exception left open in Gaps. The third option is the one that review has to catch, and auto-merging Dependabot pull requests removes that check.
 
 ## Gaps
 
@@ -337,11 +405,12 @@ The points below remain open after reading the source.
 | The topology was read in the CLI, not in GitHub's production setup. | Hosted runners may differ. | `internal/infra/run.go` against any published description of hosted runs. |
 | The threat table is my own analysis, and no attack was tested. | Its entries come from reading the code. | The proxy's handler tests, such as `egress_allowlist_test.go`, and a dedicated review. |
 | The proxy's tests were read by name, not run. | The behaviours described rest on source reading. | Run `go test ./...` in `dependabot/proxy` with the Go version it requires. |
-| The Azure DevOps API handler has no `MethodPermitted` check: it attaches the first `git_source` credential for `dpdbot.*` hosts to any method. It was not analysed further. | The read-only claim is stated for the registry, GitHub and git handlers only. Whether this credential can write depends on its scopes in Azure DevOps. | `internal/handlers/azdo_api.go` and the token's Azure DevOps scopes. |
+| The Azure DevOps API handler has no `MethodPermitted` check: it attaches the first `git_source` credential for `dpdbot.*` hosts to any method, and what those hosts serve was not analysed. | The read-only claim is stated for the registry, GitHub and git handlers only. Whether this credential can write depends on its scopes in Azure DevOps. | `internal/handlers/azdo_api.go` and the token's Azure DevOps scopes. |
 | Whether the API limits `jit_access` tokens to repositories the job may read was not analysed. | The updater chooses the `org/repo` in the request path, which could widen what it can read. | `internal/apiclient/client.go` and the API's JIT endpoint. |
 | Behaviour with an upstream proxy (`HTTP_PROXY`, `HTTPS_PROXY`) was read in the code, not tested. | The IP checks then apply to the upstream proxy's address, so the metadata block rests on the name check alone. | `proxy.go`, `internal/dialer/dialer.go`, and a test with an upstream proxy. |
 | The statement that responses have credentials stripped comes from the core README. | The source review did not confirm response filtering. | Response handlers in `internal/handlers`. |
-| Whether the response cache can serve authenticated content across jobs was not analysed. | A shared cache could cross a trust boundary. | `internal/cache` and the CLI's `CacheDir` option (`--cache`, with `PROXY_CACHE` defaulting to `true`). |
+| Whether the response cache can serve authenticated content across jobs was not analysed. | The cache is on by default and persists when `--cache` names a directory, so a reused cache could cross a trust boundary. | `internal/cache` and the CLI's `CacheDir` option (`--cache`, with `PROXY_CACHE` defaulting to `true`). |
+| The NuGet CDN glob is named but not quoted. | The size of that accepted exposure depends on the exact pattern. | The NuGet entry in `egress_allowlist_defaults.yaml`. |
 | Private address ranges other than the metadata service were not tested. | The article says only that the code has no rule for them. | The deployment's network policy. |
 
 ## References

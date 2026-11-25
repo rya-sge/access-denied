@@ -2,7 +2,7 @@
 layout: post
 title: "SSZ vs RLP: How Ethereum Serialises Data on Each Layer"
 date:   2026-11-04
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum solidity
@@ -15,12 +15,12 @@ isMermaid: true
 
 Ethereum runs on two layers, and each one writes its data in its own format. The execution layer, which runs the EVM, uses RLP. The consensus layer, the beacon chain, uses SSZ. Some data belongs to both: a validator withdrawal is decided by the beacon chain and paid out by the execution layer, so the same facts are written twice, hashed with two different functions and committed under two different roots.
 
-For the first withdrawal of block 26,341,215, the two encodings are:
+The example used throughout is execution block 26,341,215, which is beacon slot 15,580,704: a finalized block with 260 transactions and 16 withdrawals. For its first withdrawal, the two encodings are:
 
 - **RLP (execution layer)** answers *how to write a nested value compactly*: 35 bytes, hashed with Keccak-256 into a Merkle-Patricia trie.
 - **SSZ (consensus layer)** answers *how to give a typed value a Merkle root in which any field can be proven and any change rehashed cheaply*: 44 bytes, merkleized with SHA-256.
 
-This article compares them at byte level and measures size and gas on that real block. Every byte shown comes from code that first reproduced the block's hash and its beacon root, and the last section reads the fork meta EIPs to separate what is scheduled from what is only proposed.
+This article compares them at byte level and measures size and gas on that real block. Every byte shown comes from the article's verification project, Python and Solidity code that was first checked against the upstream test vectors and reproduced the block's hash and its beacon root (see "Verification" below). The last section reads the fork meta EIPs to separate what is scheduled from what is only proposed.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -39,7 +39,7 @@ The article assumes familiarity with Ethereum and Solidity, and relies on these 
 
 ## Why two encodings exist
 
-RLP dates from the original execution layer design. When the beacon chain was specified, its authors rejected reusing it. The [Upgrading Ethereum](https://eth2book.info/) book records the reasons: RLP was regarded as overly complex for the purpose, off-the-shelf formats did not guarantee deterministic output, and tree hashing, added in late 2018, is what settled the choice of a bespoke format. Offsets were adopted in April 2019 and limits on lists in June 2019.
+RLP dates from the original execution layer design. When the beacon chain was specified, its authors rejected reusing it. The [Upgrading Ethereum](https://eth2book.info/) book records the reasons: RLP was regarded as overly complex for the purpose, off-the-shelf formats did not guarantee deterministic output, and tree hashing, added in late 2018, is what settled the choice of a bespoke format. Offsets were adopted in April 2019 and limits on lists in June 2019 (both explained below).
 
 The layers were then joined at the Merge without migrating either side, so each block now contains both formats, nested in each other:
 
@@ -68,7 +68,11 @@ flowchart TD
 | Deposit data on the execution side | SSZ root computed in Solidity by the deposit contract | `deposit_data_root` |
 | Execution requests ([EIP-7685](https://eips.ethereum.org/EIPS/eip-7685)) | One type byte followed by SSZ bytes | SHA-256 based `requests_hash` |
 
-The execution rows can be read in `execution-specs`, for example `fork.py` and `blocks.py` under `forks/osaka`. The consensus side treats a transaction as bytes it does not parse: `Transaction` is a `ByteList`, defined in Bellatrix and unchanged in Fulu, which is why the same bytes appear unchanged on both sides.
+Two rows go the other way: the deposit contract and EIP-7685 requests already put SSZ on the execution side.
+
+The consensus side treats a transaction as bytes it does not parse: `Transaction` is a `ByteList`, defined in Bellatrix (the Merge fork) and unchanged in Fulu, which is why the same bytes appear unchanged on both sides.
+
+*Source:* `execution-specs`, `fork.py` and `blocks.py` under `forks/osaka`, for the execution rows.
 
 ## RLP
 
@@ -121,7 +125,7 @@ The encoding removes every zero it can, and pays one prefix byte per field.
 
 ### How strict the decoder is
 
-For a given item RLP allows exactly one encoding, and a conforming decoder rejects the others. Both `ethereum_rlp` and Geth's `rlp` package do so. Run through the strict decoder written for this article, which agrees with the 72 upstream cases listed under "Verification":
+For a given item RLP allows exactly one encoding, and a conforming decoder rejects the others. Both `ethereum_rlp` and Geth's `rlp` package do so. Run through the strict decoder of the verification project, which agrees with the 72 upstream cases listed under "Verification":
 
 | Input | Problem | Verdict |
 |-------|---------|---------|
@@ -134,23 +138,25 @@ For a given item RLP allows exactly one encoding, and a conforming decoder rejec
 | `c4640102` | list overruns its input | refused |
 | `8000` | extra byte after an empty string | refused |
 
-A fuzz run of 200,000 inputs accepted 10,736, and each of them re-encoded to the same bytes. A decoder like this gives one encoding per value, so equal values have equal `keccak256` hashes.
+Every input the decoder accepted in a fuzz run re-encoded to the same bytes. The run drew 200,000 random strings of 1 to 13 bytes, biased towards prefix bytes such as `80`, `b8`, `c0` and `f8`, and 10,736 of them were accepted. A decoder like this gives one encoding per value, so equal values have equal `keccak256` hashes.
 
-`00` and `820004` are structurally valid RLP, and they are only rejected when the *schema* asks for an integer. The `ethereum_rlp` code shows the split: `decode` returns `b"\x00"`, and the leading-zero check lives in `_deserialize_to_uint`. A decoder that stops at the structural step accepts two encodings of the same integer.
+Uniqueness holds per item, that is per byte string or list, and integers need one more check on top. `00` and `80` both decode to the integer 0, and `820004` and `04` both decode to 4.
+
+The first of each pair is structurally valid RLP, and is only rejected when the *schema* asks for an integer. The `ethereum_rlp` code shows the split: `decode` returns `b"\x00"`, and the leading-zero check lives in `_deserialize_to_uint`. A decoder that stops at the structural step accepts two encodings of the same integer.
 
 ### What RLP lacks
 
 **No schema.** The bytes `820400` decode to `0x0400`, which can be the integer 1024, two raw bytes or a string. `rlp(0)`, `rlp("")` and `rlp(False)` are all `80`. The meaning lives in the client, so each transaction type adds its own field order, and typed fields such as a Geth `rlp:"optional"` tag exist only in code.
 
-**No Merkle structure.** A hash of RLP bytes commits to all of them at once. To prove one field a verifier needs the whole item, and EIP-6404 lists this as the first shortcoming of RLP transactions: the signing hash of a large transaction requires the whole calldata. The trie adds per-item proofs, not per-field proofs.
+**No Merkle structure.** A hash of RLP bytes commits to all of them at once. To prove one field a verifier needs the whole item, and [EIP-6404](https://eips.ethereum.org/EIPS/eip-6404) (SSZ transactions, a Draft) lists this as the first shortcoming of RLP transactions: the signing hash of a large transaction requires the whole calldata. The trie adds per-item proofs, not per-field proofs.
 
 ## SSZ
 
 SSZ, for Simple Serialize, is not self-describing: nothing in the bytes says what they are. Both sides must know the type in advance.
 
-The normative text is no longer in `consensus-specs`: commit `498449f` removed `ssz/simple-serialize.md` and `ssz/merkle-proofs.md` in August 2026, and the project now depends on `eth-ssz-specs==0.1.0`. That package is built from [ethereum/ssz-specs](https://github.com/ethereum/ssz-specs), a Python reference implementation "which serves as the official specifications". This article uses release `v0.1.0`, the version `consensus-specs` pins, and read the code at a later commit as well.
+The normative source is now [ethereum/ssz-specs](https://github.com/ethereum/ssz-specs) release `v0.1.0`, the version `consensus-specs` pins since the SSZ text left that repository in August 2026 (References gives the commits).
 
-The commits after the release add validation, such as a refusal of widths and lengths that do not fit, and the parts compared here did not change a root. The type names follow that source: `Uint64`, `BitList` and `BitVector` replace the older `uint64`, `Bitlist` and `Bitvector`, which EIPs still use.
+Type names follow it: `Uint64`, `BitList` and `BitVector` replace the older `uint64`, `Bitlist` and `Bitvector`, which EIPs still use.
 
 ### Basic and fixed-size types
 
@@ -174,6 +180,15 @@ Compare `amount`: `c139d6` in RLP, `d639c10000000000` in SSZ. The bytes are reve
 
 A `List[T, N]` holds up to N elements. A type is variable-size if it is a list, a bitlist, or contains one. Inside a composite, serialisation has two parts: the fixed part, where each variable field is replaced by a 4-byte little-endian offset, and then the variable bodies.
 
+Take this type and value:
+
+```text
+Foo(a: Uint16, b: List[Uint16, 4], c: Uint8, d: List[Uint8, 8])
+a = 0x1234, b = [1, 2], c = 0xff, d = [0xaa, 0xbb, 0xcc]
+```
+
+The fixed part is 2 + 4 + 1 + 4 = 11 bytes. The body of `b` therefore starts at byte 11, written `0b000000`, and the body of `d` at 11 + 4 = 15, written `0f000000`:
+
 ```mermaid
 flowchart LR
     A["a: 3412"] --> B["offset of b: 0b000000"]
@@ -183,23 +198,25 @@ flowchart LR
     E --> F["body of d, at byte 15: aabbcc"]
 ```
 
-That is `Foo(a: Uint16, b: List[Uint16, 4], c: Uint8, d: List[Uint8, 8])` with `a = 0x1234`, `b = [1, 2]`, `c = 0xff`, `d = [0xaa, 0xbb, 0xcc]`:
+The same value in both encodings:
 
 ```text
 SSZ, 18 bytes: 3412 0b000000 ff 0f000000 01000200 aabbcc
 RLP, 16 bytes: cf 821234 c20102 81ff c681aa81bb81cc
 ```
 
-The lengths are never written. The length of `b` is the distance between two offsets, and the last body ends where the data ends. An offset is relative to the start of the object containing it, so an object serialises the same way wherever it sits. The first 4 bytes of the real block are an instance: `64000000` is 100, past the offset itself and the 96-byte signature, and the `message` starts there.
+The lengths are never written. The length of `b` is the distance between two offsets, and the last body ends where the data ends. An offset is relative to the start of the object containing it, so an object serialises the same way wherever it sits. The real block is an instance. A `SignedBeaconBlock` is `{message: BeaconBlock (variable-size), signature: 96 bytes}`, so its fixed part is 4 + 96 = 100 bytes, and its first 4 bytes, `64000000`, are the offset 100 where the `message` starts.
 
-A list of variable-size elements begins with a table of offsets, so its element count is the first offset divided by 4:
+A sequence of variable-size elements begins with a table of offsets, one per element. The layout is the same for a `Vector` and a `List`. For a `List` the type does not give the count, so the decoder computes it as the first offset divided by 4:
 
 ```text
 Vector[List[Uint8,3],4]([1,2],[3,4,5],[],[6])
 10000000 12000000 15000000 15000000 0102 030405 06
 ```
 
-The limit N of a list never appears in the bytes. It is enforced on decoding, and it sets the depth of the Merkle tree. Offsets also bound the format: `check_composite_size`, added to the specification after `v0.1.0`, refuses an encoding of 4 GiB or more, where RLP lengths go up to 8 bytes.
+The offsets are 16 (four offsets of 4 bytes), then 16 + 2 = 18, 18 + 3 = 21, and 21 + 0 = 21 for the empty element.
+
+The limit N of a list never appears in the bytes. It is enforced on decoding, and it sets the depth of the Merkle tree. Offsets also bound the format: `check_composite_size`, added to the specification after `v0.1.0`, refuses an encoding of 4 GiB or more. SSZ thus caps an object below 4 GiB, because offsets are 32 bits, while RLP length fields of up to 8 bytes allow far larger items.
 
 ### Bitfields
 
@@ -214,7 +231,7 @@ BitList[8](eight zeros)   0001        the sentinel needs a new byte
 BitVector[8](eight zeros) 00
 ```
 
-The first attestation of the block has `aggregation_bits` of 25,414 bits with 25,309 set, stored in 3,177 bytes, and its last byte `7f` holds the sentinel.
+The first attestation of the block has `aggregation_bits` of 25,414 bits with 25,309 set, stored in 3,177 bytes, and its last byte `7f` holds the sentinel: one trailing bit gives the length exactly, to the bit.
 
 ### How strict the decoder is
 
@@ -233,7 +250,7 @@ SSZ is equally strict about canonical form. Its rules differ because lengths com
 | `e0` | `BitVector[5]` | padding bits set | refused |
 | `0100ff` | `Uint16` | spare byte | refused |
 
-The first-offset rule closes the gap that would otherwise allow hidden bytes between the two parts. With 200,000 mutated inputs against a mixed container, 27,067 were accepted, and each of them re-encoded to the same bytes.
+The first-offset rule closes the gap that would otherwise allow hidden bytes between the two parts. In the fuzz run, every accepted input re-encoded to the same bytes. The inputs were 200,000 mutations of one valid encoding of a container mixing a `Uint16`, two lists, a `BitList` and a `Boolean`: one to three bytes changed, and a fifth of the inputs also truncated. 27,067 were accepted.
 
 Without a type, however, the bytes mean nothing. `0100020003000400` is `Vector[Uint16,4](1,2,3,4)`, `Vector[Uint8,8](1,0,2,0,3,0,4,0)` and `List[Uint16,4](1,2,3,4)`.
 
@@ -244,7 +261,7 @@ Without a type, however, the bytes mean nothing. `0100020003000400` is `Vector[U
 `hash_tree_root` is defined over the type, not over the serialised bytes:
 
 - **Basic value.** The little-endian bytes, right-padded to a 32-byte chunk. No hash at all.
-- **Bytes and packed vectors.** Serialised, split into chunks, and merkleized.
+- **Byte strings, and vectors and lists of basic types.** Their elements are packed several to a chunk: serialised, split into 32-byte chunks, and merkleized.
 - **Containers and vectors of composites.** One chunk per element, its own `hash_tree_root`, merkleized.
 - **Lists and bitlists.** The tree width comes from the limit, not the length, then the length is mixed in: `sha256(root ‖ uint256_le(length))`.
 
@@ -274,7 +291,9 @@ Tree hashing costs more the first time and much less afterwards. The block itsel
 | `List[Uint64, 2^40]`, 2,000,000 synthetic values, 16,000,000 bytes | 250,001 compressions | 500,027 hashes, 1,000,054 compressions |
 | One value changes in that list | 250,001 compressions again | 39 hashes, 78 compressions |
 
-The compression figure assumes two per 64-byte hash, without an implementation that precomputes the padding block. In the first computation the tree is about four times the work of a flat hash on the list, and about nine times on the real block. After that, one update walks 38 levels and one mix-in, and the code checks that the incremental root equals a full recomputation. This is what makes a monolithic beacon state practical: only the path of each changed value is rehashed.
+*Note:* each 64-byte hash is counted as two SHA-256 compressions, as an implementation that does not precompute the padding block computes it.
+
+In the first computation the tree is about four times the work of a flat hash on the list, and about nine times on the real block. After that, an update is one branch. Four 8-byte values fit in a chunk, so the 2^40 limit gives 2^38 chunks and 38 levels; with the length mix-in that is 39 hashes. The code checks that the incremental root equals a full recomputation. This is what makes a monolithic beacon state practical: only the path of each changed value is rehashed.
 
 The other property is summaries. Any subtree can be replaced by its root without changing the result. On the real block, the 112-byte `BeaconBlockHeader`, whose `body_root` replaces a body, has the same root as the 172,218-byte `BeaconBlock`: `0xe74a493e…542a`.
 
@@ -282,7 +301,7 @@ The other property is summaries. Any subtree can be replaced by its root without
 
 **The root is not bound to the type.** The same run shows that `Vector[Uint16,4](1,2,3,4)` and `Vector[Uint8,8](1,0,2,0,3,0,4,0)` have equal bytes and an equal root, since both fit one chunk. `List[Uint16,4]` and `List[Uint16,8]` also share a root for the same values, as both limits round to one chunk, while `List[Uint16,64]` differs. Consensus signatures also mix in a domain, which separates message kinds, forks and chains, and a contract that compares roots needs to know the type on its own.
 
-**The limit is part of the commitment.** Changing a limit can change every root of that type. This is the weakness that progressive lists address, and [the beacon state proofs article]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/) follows its effect on proofs across forks.
+**The limit is part of the commitment.** Changing a limit can change every root of that type. This is the weakness that progressive lists address: their tree depth does not depend on a limit, as "The direction of travel" explains. [The beacon state proofs article]({{site.url_complet}}/2026/11/04/beacon-state-proofs-hard-fork-deneb-to-gloas/) follows the effect of limits on proofs across forks.
 
 ## The same data in both, measured
 
@@ -306,39 +325,43 @@ The block is slot 15,580,704, finalized, with 260 transactions, 16 withdrawals a
 
 ### Size
 
-`transactions` are compared against the SSZ form of [EIP-6404](https://eips.ethereum.org/EIPS/eip-6404). That EIP is a Draft and has no test vectors, so those rows are this article's reading of it.
+`transactions` are compared against the SSZ form of [EIP-6404](https://eips.ethereum.org/EIPS/eip-6404). That EIP is a Draft and has no test vectors, so those rows are this article's reading of it. The annex section "EIP-6404 transaction layout" lists its fields.
 
-| Data | RLP bytes | SSZ bytes | SSZ / RLP | Calldata gas RLP | Calldata gas SSZ | zlib RLP | zlib SSZ |
-|------|-----------|-----------|-----------|------------------|------------------|----------|----------|
-| One withdrawal | 35 | 44 | 1.257 | 560 | 536 | 46 | 46 |
-| 16 withdrawals | 565 | 704 | 1.246 | 9,040 | 8,600 | 208 | 205 |
-| 260 transactions | 164,232 | 198,453 | 1.208 | 1,563,108 | 1,673,520 | 61,566 | 62,606 |
+| Data | RLP bytes | SSZ bytes | SSZ / RLP | zlib RLP | zlib SSZ |
+|------|-----------|-----------|-----------|----------|----------|
+| One withdrawal | 35 | 44 | 1.257 | 46 | 46 |
+| 16 withdrawals | 565 | 704 | 1.246 | 208 | 205 |
+| 260 transactions | 164,232 | 198,453 | 1.208 | 61,566 | 62,606 |
+
+| Data | Calldata gas RLP | Calldata gas SSZ |
+|------|------------------|------------------|
+| One withdrawal | 560 | 536 |
+| 16 withdrawals | 9,040 | 8,600 |
+| 260 transactions | 1,563,108 | 1,673,520 |
 
 For this one block:
 
-- **Raw size favours RLP.** SSZ is about 20 to 26% larger here, and all 260 transactions grew, by 101 to 183 bytes with a median of 133.
+- **Raw size favours RLP.** SSZ is about 20 to 26% larger here, and all 260 transactions grew, by 101 to 183 bytes with a median of 133. Whole blocks are closer, without being field-for-field equal: the RLP execution block is 166,000 bytes and the `SignedBeaconBlock` 172,318, and the RLP header is 649 bytes against 608 for the `ExecutionPayloadHeader`.
 - **Larger is not always dearer.** Withdrawals are 139 bytes longer in SSZ and 440 gas cheaper as calldata, because the extra bytes are zeros. For transactions the fixed 32-byte integers and offsets outweigh that effect.
 - **Compression removes most of the gap.** The transaction difference falls from 34,221 bytes to 1,040. zlib is a stand-in: the consensus network uses Snappy, which was not measured.
 
 The gas columns use the standard 4 and 16 gas per byte, without the EIP-7623 floor. The zero-byte advantage is specific to that pricing: [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976), scheduled for Glamsterdam, sets a floor of 64 gas per calldata byte, zero or not, and a data-heavy transaction that pays this floor would be charged on length alone.
 
-Some objects are similar in size overall, without being field-for-field equal: the RLP execution block is 166,000 bytes and the `SignedBeaconBlock` 172,318, and the RLP header is 649 bytes against 608 for the `ExecutionPayloadHeader`.
-
 ### Proof size
 
-Counting only, on the same block:
+The counts below come from the same block. Each MPT proof goes to a trie root in the execution header (`transactionsRoot` or `withdrawalsRoot`). Each SSZ branch goes to the root of the `transactions` or `withdrawals` field of the `ExecutionPayload`, so its length is the depth set by the list limit plus the length mix-in:
 
-- **Transaction.** The median MPT proof is 1,354 bytes including the transaction, and the largest 18,765, driven by a large transaction in the final node. An SSZ branch to an element of `Transactions` is 21 siblings, 672 bytes, whatever the size of the element. The verifier also needs the transaction itself (a median of 180 bytes for the 229 type-2 transactions), which the MPT figure already contains.
-- **Withdrawal.** A median of 621 bytes, leaf included, compares with 5 siblings, 160 bytes, plus the 44-byte withdrawal.
+- **Transaction.** The median MPT proof is 1,354 bytes including the transaction, and the largest 18,765, driven by a large transaction in the final node. An SSZ branch to an element of `Transactions` is 21 siblings (20 levels for the `2^20` limit, plus the mix-in), 672 bytes, whatever the size of the element. The verifier also needs the transaction itself (a median of 180 bytes for the 229 type-2 transactions), which the MPT figure already contains.
+- **Withdrawal.** A median of 621 bytes, leaf included, compares with 5 siblings (4 levels for the limit of 16, plus the mix-in), 160 bytes, plus the 44-byte withdrawal.
 
-These depths follow the Fulu limits (`2^20` transactions, 16 withdrawals); Gloas turns `Transactions` and `Withdrawals` into `ProgressiveList` types, which changes both branches.
+These depths follow the Fulu limits (`2^20` transactions, 16 withdrawals); Gloas turns `Transactions` and `Withdrawals` into `ProgressiveList` types, which changes both branches. For transactions, the outer list becomes a `ProgressiveList`, and each element, one transaction, becomes a `ProgressiveList[Byte]` that still holds RLP bytes.
 
 ## Decoding in Solidity
 
 Neither format has EVM support, so a contract needs its own reader. The project reads calldata with a strict RLP reader and a small SSZ reader, compiled with solc 0.8.30, optimizer 200 runs, EVM version `osaka`.
 
 - **RLP reader.** It must parse each header, check canonical form, and walk through earlier items, since an item's position depends on the lengths before it.
-- **SSZ reader.** For a withdrawal it checks the total length, reads at a constant offset, and swaps endianness. For a transaction it checks only the first offset and the union selector before reading at a constant offset, while the RLP reader also requires the outer list to end with the input and checks every header it skips, so part of the gap in the two transaction rows comes from less validation. `uint64` needs a byte swap, as the [deposit contract's](https://github.com/ethereum/solidity-deposit-contract) `to_little_endian_64` does in the other direction.
+- **SSZ reader.** For a withdrawal it checks the total length, reads at a constant offset, and swaps endianness. An EIP-6404 transaction is a union of variants, one per transaction type, and its first payload byte, the union selector, says which variant follows (7 for a type-2 transaction with a recipient). For a transaction the reader checks only the first offset and that selector before reading at a constant offset, while the RLP reader also requires the outer list to end with the input and checks every header it skips. So part of the gap in the two transaction rows comes from less validation; how large a part was not measured. `uint64` needs a byte swap, as the [deposit contract's](https://github.com/ethereum/solidity-deposit-contract) `to_little_endian_64` does in the other direction.
 
 Gas is the cost of the function minus that of a no-op with the same calldata, both already warm, so it excludes intrinsic calldata cost:
 
@@ -350,21 +373,31 @@ Gas is the cost of the function minus that of a no-op with the same calldata, bo
 | Decode all fields of all 16 | 93,069 | 19,776 |
 | Read `value` from a real 180-byte type-2 transaction | 6,145 | 944 |
 | Read `value` from a real 17,527-byte type-2 transaction | 6,265 | 945 |
-| Hash element 0 of 32 real transactions | 2,886 | 1,699 |
-| Hash element 31 of 32 real transactions | 42,484 | 1,290 |
+| Locate and `keccak256` element 0 of 32 real transactions | 2,886 | 1,699 |
+| Locate and `keccak256` element 31 of 32 real transactions | 42,484 | 1,290 |
 
 ![Net gas to read a field from each of 16 real withdrawals: RLP rises in a straight line from 5,489 to 15,885 gas with position, while SSZ stays flat at about 518 gas]({{site.url_complet}}/assets/article/blockchain/ethereum/serialization/2026-11-04-ssz-vs-rlp-ethereum-serialization-read-cost.svg)
 
 RLP grows by about 693 gas per element skipped, and SSZ does not depend on position. The ratios (about 14 for one field) depend on the implementation, because this RLP reader favours clarity and an assembly version would be cheaper. The linear growth and the flat line do not depend on it.
 
-- **Size of the skipped data is not the cost.** Reading `value` costs almost the same in a 180-byte and a 17,527-byte transaction, but `value` is field 6 and comes before `data`, so this only shows that total size does not matter. Reading field 8, the access list, in the large transaction does skip its 17 KB `data`: it costs 8,049 gas, 695 more than field 7, the same step of about 680 gas as between earlier fields (`results/forge.txt`, `rlpTxField big`). RLP reads a length and jumps, so the cost follows the number of items passed, not the number of bytes.
-- **The last two rows include different work.** Each hashes one element of its own length, so the SSZ figure varies with the transaction rather than with its position.
+- **Size of the skipped data is not the cost.** Each RLP field skipped adds about 680 gas. Reading `value` costs almost the same in a 180-byte and a 17,527-byte transaction, but `value` is field 6 (counting from 0, see the type-2 field order in the annex) and comes before `data`, so this only shows that total size does not matter. Reading field 8, the access list, in the large transaction does skip its 17 KB `data`, and it costs 8,049 gas, 695 more than field 7: the same step. RLP reads a length and jumps, so the cost follows the number of items passed, not the number of bytes.
+- **The last two rows compute the same hash.** Both columns use the first 32 transactions of the block, and both take `keccak256` of the same transaction bytes: here the SSZ side is the consensus-layer list of opaque transactions, not EIP-6404. The RLP figure is therefore the walk to the element, and it grows with position. The SSZ figure varies with the length of the element hashed, not with its position.
 
-For comparison, reading `amount` from an ABI-encoded struct argument costs 871 gas gross, including the call. That is less than the 979 gross of the no-op that only receives the 44 SSZ bytes as `bytes`, so less than the 1,275 of the SSZ read (979 plus 296). Both calls carry 132 bytes of calldata, since `bytes` adds an offset, a length and padding.
+*Source:* `results/forge.txt` in the verification project, tests `rlpTxField big` and `rlpListTxHash` / `sszListTxHash`.
+
+For comparison with ABI encoding, the gross figures, which include the call:
+
+| Call | Gross gas |
+|------|-----------|
+| Read `amount` from an ABI-encoded struct argument | 871 |
+| No-op that receives the 44 SSZ bytes as `bytes` | 979 |
+| SSZ read of `amount` (979 + 296) | 1,275 |
+
+The ABI read is cheaper than even the SSZ no-op. Both calls carry 132 bytes of calldata, since `bytes` adds an offset, a length and padding.
 
 ### Committing costs more than reading
 
-Measured on the same withdrawal, hashing favours RLP:
+The hashing rows above compute the same Keccak hash on both sides, so they measure locating an element. Committing in each format's own way is different, and on the same withdrawal it favours RLP:
 
 | Commitment | Net gas |
 |------------|---------|
@@ -378,7 +411,7 @@ With an SSZ tree, a verifier that wants one field from a large object needs the 
 
 ## The direction of travel
 
-The status below was read from the local EIPs checkout and compared with the upstream `master` branch on 2026-11-04.
+The status below was read from the EIPs repository at commit `41a838d` and compared with the upstream `master` branch on 2026-11-04.
 
 | Proposal | Status | Fork meta EIP |
 |----------|--------|---------------|
@@ -393,11 +426,24 @@ The status below was read from the local EIPs checkout and compared with the ups
 
 ### Progressive types: scheduled with EIP-7688
 
-A `ProgressiveList` removes the limit from the tree. Instead of one tree of fixed depth, it uses a spine of subtrees of 1, 4, 16, 64 chunks and so on, and appending never moves an existing element. A `ProgressiveContainer` declares `active_fields`, a bit per position, so a field that is removed leaves a gap and the others keep their place. Both serialise like their ordinary counterparts; only the tree differs. The code checks this against the `ssz-specs` vectors, 117 in all with those types among them.
+A `ProgressiveList` removes the limit from the tree. Instead of one tree of fixed depth, it uses a spine of subtrees of 1, 4, 16, 64 chunks and so on, and appending never moves an existing element. With 21 chunks the tree is:
+
+```mermaid
+flowchart TD
+    R["hash_tree_root: mix in the length"] --> S1["spine node"]
+    S1 --> T1["subtree of 1 chunk: chunk 0"]
+    S1 --> S2["spine node"]
+    S2 --> T4["subtree of 4 chunks: chunks 1 to 4"]
+    S2 --> S3["spine node"]
+    S3 --> T16["subtree of 16 chunks: chunks 5 to 20"]
+    S3 --> Z["zero: end of the spine"]
+```
+
+A 22nd chunk replaces the terminating zero with a new spine node over a 64-chunk subtree. The subtrees already built, and the positions of the chunks in them, do not change. A `ProgressiveContainer` declares `active_fields`, a bit per position, so a field that is removed leaves a gap and the others keep their place. Both serialise like their ordinary counterparts; only the tree differs. The code checks this against the `ssz-specs` vectors, 117 in all with those types among them.
 
 So the consensus layer changes its Merkle tree layouts in Glamsterdam, and its serialisation rules do not change; the contents of some containers do, with [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732), also scheduled in EIP-7773. In the Gloas specification `Validators`, `Balances`, `Attestations` and many others become `ProgressiveList`, and `ExecutionPayloadBid` a `ProgressiveContainer`. A related point from this reading (*derived*, not stated in the EIPs): progressive containers stabilise Merkle positions, not serialised offsets, so a contract that reads SSZ bytes at a constant offset still breaks when a field is added.
 
-Glamsterdam has no mainnet date: the activation table of EIP-7773 is empty for mainnet, and `GLOAS_FORK_EPOCH` is `2**64-1` at `consensus-specs` head. The upstream table has Sepolia at 2026-10-06 and Hoodi at 2026-10-26, and the local pin has only Sepolia.
+Glamsterdam has no mainnet date: the activation table of EIP-7773 is empty for mainnet, and `GLOAS_FORK_EPOCH` is `2**64-1` at `consensus-specs` head. The upstream table has Sepolia at 2026-10-06 and Hoodi at 2026-10-26, and the pinned EIPs commit `41a838d` has only Sepolia.
 
 ### Transactions and receipts: not scheduled
 
@@ -407,7 +453,7 @@ Recent decisions go the other way on the execution side:
 
 - **Block-level access lists.** [EIP-7928](https://eips.ethereum.org/EIPS/eip-7928), scheduled for Glamsterdam, commits to `keccak256(rlp.encode(...))`, and its size analysis mentions an earlier SSZ-based design.
 - **Frame transactions.** [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141), scheduled for Hegotá, defines its payload as an RLP serialization.
-- **The Gloas types.** `Transaction` and `BlockAccessList` become `ProgressiveList[Byte]`: a new SSZ tree around bytes that are still RLP.
+- **The Gloas types.** `Transaction` and `BlockAccessList` become `ProgressiveList[Byte]`: a new SSZ tree around bytes that are still RLP. The outer `Transactions` list becomes a `ProgressiveList` of them, as noted under "Proof size".
 
 The boundary therefore moves inside the consensus layer, and the execution layer keeps adding RLP structures. Nothing read here schedules the end of RLP.
 
@@ -487,8 +533,44 @@ RLP and SSZ answer different questions, and Ethereum's blocks use both, one insi
 | `Transaction` is opaque bytes on the consensus side. | Parse it as an EIP-2718 envelope. An SSZ branch to it proves bytes, not fields. |
 | An SSZ `uint64` is little-endian, and an EVM word is big-endian. | Swap bytes. Check the result against a known value. |
 | A fixed offset depends on the container layout of a fork. | Treat offsets like generalized indices: version them by fork. |
-| `Uint256` costs a 32-byte field in SSZ even for small values. | Compare calldata gas, not lengths. Zeros are cheap. |
+| `Uint256` costs a 32-byte field in SSZ even for small values. | Compare calldata gas, not lengths. Zeros are cheap under EIP-2028 pricing, but not for a transaction that pays the EIP-7623 or EIP-7976 floor. |
 | The EIPs still say `uint64` and `Bitlist`, while `ssz-specs` says `Uint64` and `BitList`. | Treat these as renames, not as different types. |
+
+### EIP-6404 transaction layout
+
+A type-2 transaction, as the RLP reader sees it, is a type byte `02` followed by a list of 12 fields, numbered from 0:
+
+| # | Field | # | Field |
+|---|-------|---|-------|
+| 0 | `chain_id` | 6 | `value` |
+| 1 | `nonce` | 7 | `data` |
+| 2 | `max_priority_fee_per_gas` | 8 | `access_list` |
+| 3 | `max_fee_per_gas` | 9 | `y_parity` |
+| 4 | `gas` | 10 | `r` |
+| 5 | `to` | 11 | `s` |
+
+The verification code reads EIP-6404 as a container of two variable-size fields, so it starts with two 4-byte offsets:
+
+- **Payload.** A union: one selector byte, 7 for a type-2 transaction with a recipient, then the variant, a progressive container with the fixed part below.
+- **Signature.** 66 bytes: one zero byte, then `r`, `s` and `y_parity`.
+
+| Field of the type-2 variant | SSZ type | Bytes in the fixed part |
+|-------|------|-------|
+| `type_` | `Uint8` | 1 |
+| `chain_id` | `Uint256` | 32 |
+| `nonce` | `Uint64` | 8 |
+| `max_fees_per_gas` | container of one `Uint256` | 32 |
+| `gas` | `Uint64` | 8 |
+| `to` | `Bytes20` | 20 |
+| `value` | `Uint256` | 32 |
+| `input_` | `ProgressiveByteList` | 4 (offset) |
+| `access_list` | `ProgressiveList[AccessTuple]` | 4 (offset) |
+| `max_priority_fees_per_gas` | container of one `Uint256` | 32 |
+| Total | | 173 |
+
+`value` therefore sits at 1 + 101 bytes after the start of the payload, whatever the transaction holds. The growth over RLP comes from the four 32-byte integers, which RLP writes with no leading zeros, and from the offsets and the selector.
+
+*Source:* `python/eip6404.py` in the verification project, a reading of the Draft.
 
 ## Frequently Asked Questions
 
@@ -534,8 +616,9 @@ The points below were not settled by the sources or by the runs.
 | Sizes come from one block, the latest finalized when the data was taken, and a planned sample of one epoch was not run. | The ratios describe slot 15,580,704 and its mix of 229 type-2, 25 legacy, 3 blob and 3 set-code transactions; they may differ on other blocks. | Repeat `measure_sizes.py` over many blocks. |
 | The EIP-6404 conversion has no upstream vectors, and the EIP is a Draft. | The transaction SSZ sizes and the 945 gas read are a reading of the text. | Compare with an EIP-6404 implementation or later vectors. |
 | Snappy was not measured, as the Python standard library has no codec. | The zlib columns only suggest the wire comparison. | Re-run with a Snappy implementation on the same bytes. |
+| The share of the transaction-read gap due to the RLP reader's extra validation was not measured. | The 6,145 against 944 gas rows overstate the format difference by an unknown amount. | Give `sszTxValue` in the verification project checks comparable to the RLP reader's and re-measure. |
 | The Solidity readers are written for clarity. | An assembly RLP reader would lower the RLP figures, and the ratios with them. | Measure a production library, keeping the same strictness. |
-| EIP-6466 receipts were not converted. | No size comparison exists for receipts. | The containers of EIP-6466, with `eip-8116` which it requires. |
+| EIP-6466 receipts were not converted. | No size comparison exists for receipts. | The containers of EIP-6466, with [EIP-8116](https://eips.ethereum.org/EIPS/eip-8116) (replaces `cumulativeGasUsed` with `gasUsed` in receipts), which it requires. |
 | The rules were read from the `ssz-specs` Python source; the Lean specification was not read, and vectors are `v0.1.0`, older than the head that was read. | A divergence after the release would not show in the vectors. | `lean/` in `ethereum/ssz-specs`, and vectors of a later release. |
 | PR #12449 is open, with merge conflicts, and EIP-7773 was read on one date. | EIP-7495 and EIP-7916 may become formally listed, and activation rows change quickly. | EIP-7773 and the PR at reading time. |
 | Historical reasons for leaving RLP come from the book, which describes the v1.3.0 spec. | The motives are a secondary account. | Issues linked in the book's SSZ chapter. |
@@ -580,6 +663,7 @@ The points below were not settled by the sources or by the runs.
 - [EIP-7976: Increase Calldata Floor Cost](https://eips.ethereum.org/EIPS/eip-7976)
 - [EIP-8016: SSZ CompatibleUnion](https://eips.ethereum.org/EIPS/eip-8016)
 - [EIP-8081: Hardfork Meta - Hegotá](https://eips.ethereum.org/EIPS/eip-8081)
+- [EIP-8116: Replace cumulative receipt fields](https://eips.ethereum.org/EIPS/eip-8116)
 - [EIP-8141: Frame Transaction](https://eips.ethereum.org/EIPS/eip-8141)
 
 ### Books and proposals tracking

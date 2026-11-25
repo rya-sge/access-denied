@@ -15,7 +15,7 @@ isMermaid: true
 
 [PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) is an open-source Python library, under the MIT licence, that computes portfolio weights from historical prices. It implements the classical mean-variance model of Markowitz together with later methods (shrinkage covariance, Black-Litterman, Hierarchical Risk Parity, CVaR) and hands each optimisation problem to the convex solver library [cvxpy](https://www.cvxpy.org/). The property this article keeps returning to follows from that design: the library solves the problem it is given exactly, so the weights are only as good as the return and risk estimates fed into it.
 
-This article reads the source at commit `a6638d2` (release 1.6.0 plus eight commits), explains how the modules and the class hierarchy fit together, and runs every example offline on the library's own sample data. Each number quoted below comes from a script kept with the article. Two of those runs exposed behaviours that change the result without raising an error, and the article ends with a security review of the package.
+This article reads the source at commit `a6638d2` (release 1.6.0 plus eight commits), explains how the modules and the class hierarchy fit together, and runs every example offline on the library's own sample data. Each number quoted below comes from a script kept with the article. The runs exposed five behaviours that can surprise a caller, four of which change the result without raising an error, the most consequential being the zero-filling of missing prices in the default covariance estimator and the positional pairing of weights and prices in the share allocation. The article ends with a security review of the package.
 
 > This article has been made with the help of [Claude Code](https://claude.com/product/claude-code) and several custom skills
 
@@ -36,17 +36,7 @@ The article assumes basic Python, pandas and the idea of a stock return. It reli
   plus $$w_i \ge 0$$ for a long-only portfolio, which is PyPortfolioOpt's default (`weight_bounds=(0, 1)`). Repeating it for every $$r^{*}$$ traces the efficient frontier: the portfolios with the highest expected return for their level of volatility. The minimum-volatility portfolio sits at the left end of the frontier, and the maximum-Sharpe (tangency) portfolio is the point where a line from the risk-free rate touches it.
 
   The model treats $$\mu$$ and $$\Sigma$$ as exact, so the error in both estimates passes straight into the weights. The later methods each address part of that error: shrinkage improves $$\Sigma$$, Black-Litterman replaces the historical $$\mu$$, and HRP does without $$\mu$$ and without inverting $$\Sigma$$. `EfficientFrontier`, the library's main class, implements the model and its variants.
-- **Black-Litterman model.** Black and Litterman (1991) replace historical expected returns with a Bayesian blend of two sources. The prior is the market equilibrium: the excess returns that would make the market-capitalisation weights $$w_{mkt}$$ optimal, $$\Pi = \delta\,\Sigma\,w_{mkt}$$, where $$\delta$$ is the market's risk aversion. When a risk-free rate is given, `market_implied_prior_returns` adds it to $$\Pi$$ to return total rather than excess returns. The investor then states views as $$P\mu = Q$$ with uncertainty $$\Omega$$: each row of $$P$$ picks assets, $$Q$$ gives the expected return of that pick, and $$\Omega$$ how unsure the view is. The posterior expected returns are
-
-  $$
-  \begin{aligned}
-  E[R] = \Pi + \tau\Sigma P^{\top}\left(P\,\tau\Sigma\,P^{\top} + \Omega\right)^{-1}\left(Q - P\,\Pi\right).
-  \end{aligned}
-  $$
-
-  For a single absolute view on asset $$i$$, the posterior return moves the fraction $$\tau\sigma_i^2 / (\tau\sigma_i^2 + \omega)$$ of the gap from $$\Pi_i$$ to $$Q$$, so a more certain view (smaller $$\omega$$) pulls harder. Without views and with a zero risk-free rate, the posterior is $$\Pi$$ itself, and maximising $$w^{\top}\Pi - \frac{\delta}{2} w^{\top}\Sigma w$$ with the same $$\delta$$ and $$\Sigma$$ returns $$w_{mkt}$$ exactly. That is why the library's documentation describes Black-Litterman portfolios as more stable than those built on historical means. `BlackLittermanModel` computes this formula.
-
-  *Implementation:* `pypfopt/black_litterman.py`, `BlackLittermanModel.bl_returns()` (lines 417-443).
+- **Black-Litterman model.** Black and Litterman (1991) replace historical expected returns with a Bayesian blend of two sources: a prior taken from market equilibrium, the returns that would make the market-capitalisation weights optimal, and the investor's views, each weighted by its uncertainty. Without views the posterior is the prior, and the optimiser returns the market weights. That is why the library's documentation describes Black-Litterman portfolios as more stable than those built on historical means. The [Black-Litterman](#black-litterman) section below gives the formula.
 - **Covariance matrix and positive semidefiniteness.** The $$n \times n$$ matrix $$\Sigma$$ of return covariances gives the portfolio variance $$w^{\top}\Sigma w$$. It must be positive semidefinite (no portfolio with negative variance), otherwise the quadratic problem is not convex and the solver refuses it.
 - **Sharpe ratio and the risk-free rate.** The Sharpe ratio is the excess return over a risk-free rate $$r_f$$ divided by volatility. The value of $$r_f$$ changes which portfolio maximises it, and both are expressed per year in this library.
 - **Convex optimisation and DCP.** In a convex problem every local optimum is a global one, so a solver that converges has found the best solution. cvxpy accepts a problem only if it is written by the rules of disciplined convex programming (DCP), which is why custom constraints and objectives in PyPortfolioOpt must be built from cvxpy functions.
@@ -62,8 +52,10 @@ The library splits portfolio construction into four steps, each in its own modul
 flowchart LR
     P["Prices<br/>(DataFrame, one column per ticker)"] --> ER["expected_returns<br/>mu, annual"]
     P --> RM["risk_models<br/>Sigma, annual"]
-    ER --> OPT["Optimiser<br/>EfficientFrontier, CLA,<br/>Black-Litterman"]
+    ER --> OPT["Optimiser<br/>EfficientFrontier, CLA"]
     RM --> OPT
+    RM --> BL["BlackLittermanModel<br/>market prior + views"]
+    BL -->|"posterior mu and Sigma"| OPT
     P -->|"daily returns"| ALT["HRPOpt, EfficientCVaR,<br/>EfficientSemivariance"]
     OPT --> W["weights<br/>OrderedDict"]
     ALT --> W
@@ -73,7 +65,7 @@ flowchart LR
     DA --> SH["share counts<br/>and leftover cash"]
 ```
 
-The input is a pandas DataFrame of adjusted closing prices, dates in rows and tickers in columns. Every estimator converts it to daily returns with `pct_change`, then annualises with a `frequency` argument that defaults to 252. Nothing in the library fetches data: the caller provides the DataFrame.
+Black-Litterman sits between the estimators and the optimiser: it replaces the historical `mu` with posterior returns, which then go into `EfficientFrontier`. The input is a pandas DataFrame of adjusted closing prices, dates in rows and tickers in columns. Every estimator converts it to daily returns with `pct_change`, then annualises with a `frequency` argument that defaults to 252. Nothing in the library fetches data: the caller provides the DataFrame.
 
 The modules are independent. A user can compute `mu` with PyPortfolioOpt and pass a covariance matrix built elsewhere, or take the weights and ignore `DiscreteAllocation`. The README calls this modularity the main design goal.
 
@@ -123,13 +115,11 @@ flowchart TD
 
 `BaseOptimizer` holds what every method shares: the list of tickers, a `weights` array, `clean_weights()` and `save_weights_to_file()`. `clean_weights()` sets weights below `1e-4` to zero and rounds the rest to five decimals. The class knows nothing about solvers.
 
+The files and lines behind this section and the next are listed in the Annex, under [Where each behaviour is implemented](#where-each-behaviour-is-implemented).
+
 `BaseConvexOptimizer` adds the cvxpy layer. Its constructor creates one cvxpy variable for the weight vector, turns the weight bounds (by default 0 to 1, long-only) into two constraints, and keeps one list of constraints and one of additional objectives. `add_constraint()` takes a callable such as `lambda w: w[0] <= 0.05`, applies it to the weight variable and appends the resulting cvxpy expression. The solve step builds a cvxpy problem that minimises the objective under these constraints, solves it, and raises `OptimizationError` unless the solver status is `optimal` or `optimal_inaccurate`.
 
-*Implementation:* `pypfopt/base/_base_optimizer.py`, `BaseConvexOptimizer.__init__()`, `_solve_cvxpy_opt_problem()` and `add_constraint()` (lines 169-205, 307-345 and 371-396).
-
 `EfficientFrontier` adds the named objectives. The three subclasses replace the variance with another risk measure and disable the methods that do not apply: calling one raises `NotImplementedError`, as `max_sharpe()` does on the CVaR optimiser. The HRP, Critical Line Algorithm and Black-Litterman classes inherit only `BaseOptimizer`, because they do not use cvxpy at all. `DiscreteAllocation` has no base class; it uses cvxpy directly for its integer program.
-
-*Implementation:* `pypfopt/efficient_frontier/efficient_cvar.py`, `EfficientCVaR.max_sharpe()` (lines 117-118).
 
 ### One problem per object
 
@@ -154,13 +144,11 @@ problem might have unintended consequences. A new instance should be created
 for the new set of constraints.
 ```
 
-*Implementation:* `pypfopt/base/_base_optimizer.py`, `add_constraint()` (lines 392-395).
-
 Re-solving the same method with a new target is allowed. The three methods that take a target (a volatility, a return or a risk aversion) keep it in a named cvxpy parameter, so calling the method again with another target only changes that value. Switching objective, for example from minimum volatility to maximum Sharpe, is not: create a new `EfficientFrontier` for each objective.
 
-*Implementation:* `pypfopt/efficient_frontier/efficient_frontier.py`, `max_quadratic_utility()`, `efficient_risk()` and `efficient_return()` (lines 317-469).
-
 ### How max_sharpe stays convex
+
+This subsection looks ahead at one of the five objectives listed under [The efficient frontier and its objectives](#the-efficient-frontier-and-its-objectives), because its formulation shapes how constraints behave.
 
 **The problem.** The Sharpe ratio of a portfolio with weights $$w$$ (summing to 1) is
 
@@ -182,7 +170,7 @@ $$
 \end{aligned}
 $$
 
-This is a quadratic program, which cvxpy solves exactly. The second line keeps track of the scale: since the original weights summed to 1, the rescaled ones sum to $$k$$. The weights are then recovered as $$w = y / k$$.
+This is a quadratic program, which cvxpy solves exactly. The second line keeps track of the scale: since the original weights summed to 1, the rescaled ones sum to $$k$$. The weights are then recovered as $$w = y / k$$. Because the scale is arbitrary, the 1 in the first constraint has no unit: any positive constant gives the same $$w$$. The case $$k = 0$$ cannot occur at a feasible point under the default long-only bounds, since the rescaled bounds $$0 \leq y \leq k$$ would force $$y = 0$$, whose excess return is 0 rather than 1.
 
 The method is the one of Cornuéjols and Tütüncü, cited in the docstring. Three consequences follow from it:
 
@@ -204,7 +192,7 @@ $$
 
 With `compounding=False` it returns the arithmetic mean times 252 instead. `ema_historical_return` weights recent returns more (default span 500 days), and `capm_return` computes $$r_f + \beta_i (E[R_m] - r_f)$$, using the equal-weighted average of the input assets as the market when no index is given.
 
-Historical means are the weakest input of the whole chain. On the sample data, BABA has 896 prices, about 3.6 years of returns, and an annual volatility of 31.8 %. The standard error of its annualised mean is then about $$0.318 / \sqrt{3.55} \approx 16.9$$ percentage points, so an approximate 95 % interval spans about 34 points on either side of the estimate. The optimiser treats the point estimate as exact and puts the largest weights on the assets whose estimates are highest, which are often those whose estimation error is largest.
+Historical means are the weakest input of the whole chain. On the sample data, BABA has 896 prices, 3.55 years of returns, and an annual volatility of 31.8 %. The standard error of its annualised mean is then about $$0.318 / \sqrt{3.55} \approx 16.9$$ percentage points, so an approximate 95 % interval spans about 34 points on either side of the estimate. The optimiser treats the point estimate as exact and puts the largest weights on the assets whose estimates are highest, which are often those whose estimation error is largest.
 
 ### Risk models and shrinkage
 
@@ -260,12 +248,12 @@ Everything must be DCP-compliant. A cardinality limit ("at most 10 assets") is n
 
 ### Downside risk: semivariance, CVaR and CDaR
 
-The three `EfficientFrontier` subclasses take a DataFrame of historical (or simulated) daily returns instead of a covariance matrix. `EfficientCVaR` uses the formulation of Rockafellar and Uryasev, which turns the conditional value-at-risk at level $$\beta$$ (default 0.95) into a linear program with one auxiliary variable $$u_i$$ per observation:
+The three `EfficientFrontier` subclasses take a DataFrame of historical (or simulated) daily returns instead of a covariance matrix. `EfficientCVaR` uses the formulation of Rockafellar and Uryasev, which turns the conditional value-at-risk at level $$\beta$$ (default 0.95) into a linear program with one auxiliary variable $$u_t$$ per day $$t$$ of the sample. Here $$r_t$$ is the vector of all asset returns on day $$t$$:
 
 $$
 \begin{aligned}
-\min_{w,\,\alpha,\,u} \quad & \alpha + \frac{1}{(1-\beta) T} \sum_{i=1}^{T} u_i \\
-\text{subject to} \quad & u_i \geq 0, \quad u_i \geq -w^{\top} r_i - \alpha
+\min_{w,\,\alpha,\,u} \quad & \alpha + \frac{1}{(1-\beta) T} \sum_{t=1}^{T} u_t \\
+\text{subject to} \quad & u_t \geq 0, \quad u_t \geq -w^{\top} r_t - \alpha
 \end{aligned}
 $$
 
@@ -288,7 +276,9 @@ HRP never inverts the covariance matrix, so it still runs when the matrix is sin
 
 ### Black-Litterman
 
-`BlackLittermanModel` combines a prior $$\Pi$$ with $$K$$ views. The usual prior is the market-implied return $$\Pi = \delta \Sigma w_{\text{mkt}}$$, from `market_implied_prior_returns(market_caps, delta, S)`, with $$\delta$$ from `market_implied_risk_aversion(index_prices)`. Views are a picking matrix $$P$$, a vector $$Q$$ and an uncertainty matrix $$\Omega$$; `absolute_views={"AAPL": 0.20}` builds $$P$$ and $$Q$$ for the user. The posterior returns computed by `bl_returns()` are:
+`BlackLittermanModel` combines a prior $$\Pi$$ with $$K$$ views. The usual prior is the market-implied return $$\Pi = \delta \Sigma w_{\text{mkt}}$$, from `market_implied_prior_returns(market_caps, delta, S)`, with $$\delta$$ from `market_implied_risk_aversion(index_prices)`. $$\Pi$$ is an excess return; when a risk-free rate is given, `market_implied_prior_returns` adds it to return total returns.
+
+Views are a picking matrix $$P$$, a vector $$Q$$ and an uncertainty matrix $$\Omega$$: each row of $$P$$ picks assets, $$Q$$ gives the expected return of that pick, and $$\Omega$$ how unsure the view is. `absolute_views={"AAPL": 0.20}` builds $$P$$ and $$Q$$ for the user. The posterior returns computed by `bl_returns()` are:
 
 $$
 \begin{aligned}
@@ -296,7 +286,11 @@ E[R] = \Pi + \tau \Sigma P^{\top} \left( P \tau \Sigma P^{\top} + \Omega \right)
 \end{aligned}
 $$
 
-with $$\tau = 0.05$$ by default. With `omega="idzorek"` and a confidence $$c_k$$ per view, the code sets $$\Omega_{kk} = \tau \alpha_k \, p_k \Sigma p_k^{\top}$$ with $$\alpha_k = (1 - c_k) / c_k$$. For a single absolute view on asset $$i$$ this simplifies to
+with $$\tau = 0.05$$ by default. Without views and with a zero risk-free rate, the posterior is $$\Pi$$ itself, and maximising $$w^{\top}\Pi - \frac{\delta}{2} w^{\top}\Sigma w$$ with the same $$\delta$$ and $$\Sigma$$ returns $$w_{\text{mkt}}$$ exactly.
+
+*Implementation:* `pypfopt/black_litterman.py`, `BlackLittermanModel.bl_returns()` (lines 417-443).
+
+For a single absolute view on asset $$i$$, with $$\omega$$ its uncertainty, the formula reduces to a move of the fraction $$\tau\sigma_i^2 / (\tau\sigma_i^2 + \omega)$$ of the gap from $$\Pi_i$$ to $$Q_i$$, so a more certain view (smaller $$\omega$$) pulls harder. With `omega="idzorek"` and a confidence $$c_k$$ per view, the code sets $$\Omega_{kk} = \tau \alpha_k \, p_k \Sigma p_k^{\top}$$ with $$\alpha_k = (1 - c_k) / c_k$$. For one absolute view, $$p_k \Sigma p_k^{\top} = \sigma_i^2$$, so $$\omega = \tau\alpha\sigma_i^2$$ and the fraction becomes $$1 / (1 + \alpha) = c$$. The posterior is then
 
 $$
 \begin{aligned}
@@ -348,17 +342,24 @@ weights = ef.clean_weights()
 ret, vol, sharpe = ef.portfolio_performance(risk_free_rate=0.02)
 ```
 
-| Objective (Ledoit-Wolf, full window) | Return | Volatility | Sharpe ($$r_f$$ 2 %) | Holdings | Largest weights |
-|---|---|---|---|---|---|
-| `max_sharpe(0.02)` | 26.9 % | 10.3 % | 2.41 | 8 | BABA 39.7 %, FB 28.5 %, MA 22.8 % |
-| `max_sharpe()` ($$r_f$$ 0) | 26.6 % | 10.2 % | 2.61 at $$r_f$$ 0 | | |
-| `min_volatility()` | 17.1 % | 8.5 % | 1.77 | 9 | BABA 43.2 %, GM 21.5 %, FB 14.9 % |
-| `efficient_risk(0.20)` | 37.6 % | 20.0 % | 1.78 | | |
-| `efficient_return(0.20)` | 20.0 % | 8.7 % | 2.07 | | |
-| `CLA().max_sharpe()` ($$r_f$$ 0) | 26.6 % | 10.2 % | 2.61 at $$r_f$$ 0 | | |
-| `CLA().min_volatility()` | 17.1 % | 8.5 % | | | |
+| Objective (Ledoit-Wolf, full window) | Return | Volatility | Sharpe | $$r_f$$ in the Sharpe | Holdings | Largest weights |
+|---|---|---|---|---|---|---|
+| `max_sharpe(0.02)` | 26.9 % | 10.3 % | 2.41 | 2 % | 8 | BABA 39.7 %, FB 28.5 %, MA 22.8 % |
+| `max_sharpe()` | 26.6 % | 10.2 % | 2.61 | 0 % | - | - |
+| `min_volatility()` | 17.1 % | 8.5 % | 1.77 | 2 % | 9 | BABA 43.2 %, GM 21.5 %, FB 14.9 % |
+| `efficient_risk(0.20)` | 37.6 % | 20.0 % | 1.78 | 2 % | - | - |
+| `efficient_return(0.20)` | 20.0 % | 8.7 % | 2.07 | 2 % | - | - |
 
-The CLA and cvxpy results agree to the printed precision. The low volatilities and the 40 % weight on BABA, a stock with 3.6 years of history, are the first warning sign; the section on pitfalls explains where they come from.
+A dash marks a value the verification run did not record. The two Sharpe ratios of the maximum-Sharpe rows are not comparable: each is measured at the rate its own optimisation used.
+
+The Critical Line Algorithm gives a cross-check of the cvxpy solver. `CLA` has no risk-free-rate argument, so its Sharpe ratios are at 0 %:
+
+| CLA method | Return | Volatility | Sharpe ($$r_f$$ 0 %) | cvxpy counterpart |
+|---|---|---|---|---|
+| `CLA().max_sharpe()` | 26.6 % | 10.2 % | 2.61 | `max_sharpe()` |
+| `CLA().min_volatility()` | 17.1 % | 8.5 % | 2.00 | `min_volatility()` |
+
+The CLA and cvxpy results agree to the printed precision. The low volatilities and the 40 % weight on BABA, a stock with 3.6 years of history, are the first warning sign; the section [The Ledoit-Wolf matrix fills missing returns with zeros](#the-ledoit-wolf-matrix-fills-missing-returns-with-zeros) explains where they come from.
 
 ### Adding constraints
 
@@ -415,7 +416,7 @@ latest = get_latest_prices(prices)
 alloc, leftover = DiscreteAllocation(weights, latest, total_portfolio_value=10_000).lp_portfolio()
 ```
 
-On a budget of 10,000 US dollars, the integer program buys six lines for 9,946.59 and the greedy method six lines for 9,598.87, each on a new `DiscreteAllocation` object.
+The weights are those of `max_sharpe(0.02)` on the Ledoit-Wolf matrix, the first example above, with its eight holdings. On a budget of 10,000 US dollars, the integer program buys six lines for 9,946.59 and the greedy method six lines for 9,598.87, each on a new `DiscreteAllocation` object.
 
 ## What the numbers do and do not show
 
@@ -428,7 +429,7 @@ On a budget of 10,000 US dollars, the integer program buys six lines for 9,946.5
 | BABA | 31.8 % | 11.6 % | 11.3 % |
 | FB | 37.0 % | 17.1 % | 16.9 % |
 
-The last column is a back-of-envelope check: scaling the sample volatility by the square root of the observed share reproduces the Ledoit-Wolf value to within a few tenths of a point, and the remainder is the shrinkage itself.
+The last column is a back-of-envelope check: scaling the sample volatility by the square root of the observed share reproduces the Ledoit-Wolf value to within a few tenths of a point, and the remainder is the shrinkage itself. That remainder is small because the intensity is small: with $$\lambda = 0.0063$$, the result is 99.37 % the zero-filled sample matrix, so the low volatilities come from the NaN handling, not from the shrinkage.
 
 The maximum-Sharpe portfolio puts 39.7 % in BABA and 28.5 % in FB because they look like low-risk, high-return assets, and its 10.3 % volatility is an artefact of the zero-filling. With `sample_cov` the same code gives 29.9 % return, 21.8 % volatility and a Sharpe ratio of 1.38, the figures printed in the project README.
 
@@ -440,7 +441,7 @@ Restricting the data to the 896 days from BABA's listing on 2014-09-19, where ev
 
 ### One out-of-sample split
 
-To see how in-sample figures compare with later returns, the optimisers were fitted on the 576 days from 2014-09-19 to 2016-12-30, and the resulting weights were held over the next 320 days, from 2017-01-03 to 2018-04-11:
+To see how in-sample figures compare with later returns, the optimisers were fitted on the 576 days from 2014-09-19 to 2016-12-30, and the resulting weights were held over the next 320 days, from 2017-01-03 to 2018-04-11. The two `EfficientFrontier` portfolios use the historical CAGR and the Ledoit-Wolf matrix of the training window, which has no missing prices, so the zero-filling plays no part; HRP uses the daily returns of the same window.
 
 | Portfolio | Ex-ante return / volatility | Realised return / volatility |
 |---|---|---|
@@ -457,12 +458,12 @@ The universe itself carries survivor bias: the 20 tickers were chosen in 2018, w
 
 Five behaviours in 1.6.0 can surprise a caller. Four of them change a result without an exception, and the fifth breaks HRP on a current SciPy. Each was reproduced in the verification scripts.
 
-- **The risk-free rate defaults to 0.0.** The maximum-Sharpe optimiser and the performance report both default to `risk_free_rate=0.0`. The default was 0.02 until commit `388acf6` of 2024-12-01 ([issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594)), so older tutorials and results assume 2 %. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone function of the same name, called with only the weights, `mu` and `S`, has no such memory and returns 2.61 for the same weights. Pass the rate explicitly everywhere.
+- **The risk-free rate defaults to 0.0.** The maximum-Sharpe optimiser and the performance report both default to `risk_free_rate=0.0`. The default was 0.02 until commit `388acf6` of 2024-12-01 ([issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594)), so older tutorials and results assume 2 %. After `max_sharpe(risk_free_rate=0.02)`, a call to `portfolio_performance()` without the argument does not use 0: it warns that the rate differs and reports the Sharpe ratio at the rate used by the optimiser (2.41). The standalone function of the same name, called with only the weights, `mu` and `S`, has no such memory and returns 2.61 for the same weights. The same 0.0 default applies to the CAPM return estimator and to the two Black-Litterman helpers that build the prior and the market risk aversion. Pass the rate explicitly everywhere.
 
   *Implementation:* `pypfopt/efficient_frontier/efficient_frontier.py`, `max_sharpe()` and `portfolio_performance()` (lines 238 and 472). The standalone `portfolio_performance()` is in `pypfopt/base/_base_optimizer.py` (lines 561-562).
-- **Missing prices become zero returns in Ledoit-Wolf.** Shown above. `mean_historical_return` uses each asset's own observations, so the means and the shrunk covariance of the same DataFrame cover different periods.
+- **Missing prices become zero returns in Ledoit-Wolf.** Shown in [The Ledoit-Wolf matrix fills missing returns with zeros](#the-ledoit-wolf-matrix-fills-missing-returns-with-zeros). `mean_historical_return` uses each asset's own observations, so the means and the shrunk covariance of the same DataFrame cover different periods.
 - **`lp_portfolio()` reads prices by position.** It builds the price vector as `self.latest_prices.values` and the weight vector from the order of the weights dictionary, and pairs them by index. Two ways to break the pairing were reproduced:
-  - `greedy_portfolio()` sorts the stored weights in place, by descending weight, so `lp_portfolio()` on the same object afterwards spends 30,743.14 on a 10,000 budget while reporting 9.65 left over.
+  - `greedy_portfolio()` sorts the stored weights in place, by descending weight, so `lp_portfolio()` on the same object afterwards spends 30,743.14 on a 10,000 budget while reporting 9.65 left over. The integer program does satisfy its budget constraint, but with the mispaired prices: each asset is bought at another asset's price, and 30,743.14 is what the share counts cost at their real prices.
 
     *Implementation:* `pypfopt/discrete_allocation.py`, `greedy_portfolio()` and `lp_portfolio()` (lines 177 and 359).
   - `HRPOpt.optimize()` returns its weights sorted by ticker, while `get_latest_prices()` keeps the column order. Passing that dictionary to `lp_portfolio()` spends 46,218.69 on the same budget. `hrp.clean_weights()`, which keeps the column order, gives 9,997.63. `greedy_portfolio()` looks prices up by ticker and is not affected.
@@ -563,6 +564,17 @@ The library computes what it is asked to compute. The work left to the user is t
 | `EfficientCVaR` drops rows with any NaN and reports a daily CVaR. | Feed a NaN-free returns window, and do not compare the CVaR with annual volatilities. |
 | `max_sharpe` does not scale additional objectives. | Prefer `L2_reg` with `min_volatility` or `efficient_*`, or check the result without it. |
 
+### Where each behaviour is implemented
+
+The descriptive statements of "Class hierarchy" and "One problem per object" rest on these places in the source at commit `a6638d2`.
+
+| Behaviour | File | Function and lines |
+|-----------|------|--------------------|
+| The weight variable, the bound constraints and the solver-status check | `pypfopt/base/_base_optimizer.py` | `BaseConvexOptimizer.__init__()` and `_solve_cvxpy_opt_problem()` (lines 169-205 and 307-345) |
+| `add_constraint()` applies the callable and refuses a solved problem | `pypfopt/base/_base_optimizer.py` | `add_constraint()` (lines 371-396, the refusal at 392-395) |
+| A subclass disables a method that does not apply | `pypfopt/efficient_frontier/efficient_cvar.py` | `EfficientCVaR.max_sharpe()` (lines 117-118) |
+| A target kept in a named cvxpy parameter, so a new target re-solves the same problem | `pypfopt/efficient_frontier/efficient_frontier.py` | `max_quadratic_utility()`, `efficient_risk()` and `efficient_return()` (lines 317-469) |
+
 ## Frequently Asked Questions
 
 **Q: What are the four building blocks of PyPortfolioOpt, and which module holds each?**
@@ -620,6 +632,7 @@ These points were not settled by the source and the runs; check them before rely
 | The PyPI wheels and the dependencies were not part of the security review. | A different artifact or a compromised dependency is outside the verdict. | [PyPortfolioOpt on PyPI](https://pypi.org/project/pyportfolioopt/) file hashes against a build of the pinned source. |
 | Which PyPI release first shipped the 0.0 risk-free-rate default (commit `388acf6`, 2024-12-01) was not checked; the local clone has only the v1.4.1 and v1.6.0 tags. | A reader comparing with a 1.5.x result needs to know which default it used. | The [PyPortfolioOpt releases](https://github.com/PyPortfolio/PyPortfolioOpt/releases) page and [issue #594](https://github.com/PyPortfolio/PyPortfolioOpt/issues/594). |
 | That means are harder to estimate than variances, and that mean-variance optimisers overweight the assets with the largest estimation errors, are stated from general knowledge. | The article uses both to read the out-of-sample table and the BABA weight. | Literature on estimation error in mean-variance optimisation, for example the shrinkage papers in the References and their citations. |
+| The verification run records that `lp_portfolio()` and `greedy_portfolio()` buy six lines from the eight-holding maximum-Sharpe portfolio, but not which two holdings get no shares or why. | A reader may assume the two smallest weights round to zero shares, which the run does not show. | [`verification/pyportfolioopt-portfolio-optimization/allocation.py`](https://github.com/rya-sge/access-denied/tree/main/verification/pyportfolioopt-portfolio-optimization), extended to print the allocation dictionaries and the latest prices. |
 | The out-of-sample table is one split of 15 months. | It cannot rank methods; a rolling or resampled test would be needed. | A walk-forward test over several windows, or Monte Carlo resampling of `mu` and `S`. |
 
 ## References

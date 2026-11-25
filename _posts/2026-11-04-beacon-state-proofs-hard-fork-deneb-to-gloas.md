@@ -2,7 +2,7 @@
 layout: post
 title: "When a Merkle Proof Breaks at a Hard Fork: Beacon State Proofs from Deneb to Gloas"
 date:   2026-11-04
-last_modified_at: 2026-11-19
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum security
@@ -15,7 +15,7 @@ isMermaid: true
 
 Liquid staking and restaking contracts need facts that live on the consensus layer: a validator's withdrawal credentials, its balance, whether it was slashed. Since Dencun they can check those facts without an oracle. [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) exposes each parent beacon block root to the EVM, and an SSZ Merkle branch connects that root to any field of the beacon state.
 
-The branch has a weakness that an ordinary Merkle proof does not have. Its position in the tree is derived from the layout of a container, and a hard fork can change that layout without touching the field being proven. Electra took `BeaconState` from 28 to 37 fields, the tree went from depth 5 to depth 6, and hardcoded generalized indices stopped matching. Fulu added a field with no depth change. Gloas, which is unscheduled, moves to progressive containers, so positions change once more and the proof length starts to depend on the validator index.
+The branch has a weakness that an ordinary Merkle proof does not have. Its position in the tree is derived from the layout of a container, and a hard fork can change that layout without touching the field being proven. Electra took `BeaconState` from 28 to 37 fields, the tree went from depth 5 to depth 6, and hardcoded generalized indices, the numbers that encode a node's position and depth in the tree, stopped matching. Fulu added a field with no depth change. Gloas, which has no activation epoch yet, moves to progressive containers, an SSZ merkleization in which a field keeps its position when fields are added, so positions change once more and the proof length starts to depend on the validator index.
 
 This article derives the arithmetic, then checks it on a real mainnet state: the whole `BeaconState` at slot 15,580,064 was hashed locally, and a 53-sibling proof was verified against the root returned by the EIP-4788 contract. On the same state, deep stale proofs revert, but shallow ones verify and return something else.
 
@@ -35,15 +35,17 @@ The article assumes familiarity with Ethereum staking and Solidity, and relies o
 - **Balance and effective balance.** `balances[i]` is the exact amount in gwei, kept in a separate list. `effective_balance` is a value in the `Validator` record, which moves with hysteresis. A proof has to target the one the contract means to use.
 - **Withdrawal ordering.** [EIP-4895](https://eips.ethereum.org/EIPS/eip-4895) credits beacon withdrawals to execution addresses after the user transactions of the block. One of the two findings below depends on this order.
 
+Terms specific to this article, such as gindex, chunk, length mix-in and progressive tree, are defined in the Key Terms table of the Annex.
+
 ## The proof chain
 
-A contract that verifies a validator field goes through six steps. Only some of them depend on the fork.
+A contract that verifies a validator field goes through six steps. Only some of them depend on the fork. Each edge gives the number of sibling hashes the step adds to the proof and, where it is fixed, the gindex of the target inside its container: the node number defined in Generalized index arithmetic below.
 
 ```mermaid
 flowchart TD
     T["Timestamp T of an execution block"] -->|"staticcall to the EIP-4788 contract"| R["Beacon block root"]
     R -->|"3 siblings, gindex 11"| S["BeaconState root"]
-    S -->|"depends on the fork"| L["validators list root"]
+    S -->|"5 siblings at Deneb, 6 at Electra and Fulu"| L["validators list root"]
     L -->|"1 sibling, gindex 2"| D["List data root"]
     D -->|"40 siblings until Fulu, variable in Gloas"| V["Validator root"]
     V -->|"3 siblings, gindex 8 to 15"| F["Validator field"]
@@ -74,7 +76,7 @@ Gloas keeps the same semantics in the current draft: `specs/gloas/builder.md` se
 
 ### From the block root to a Validator field
 
-`BeaconBlockHeader` has five fields and `Validator` has eight, and neither has changed since phase0. [EIP-7688](https://eips.ethereum.org/EIPS/eip-7688) keeps both as plain containers, so these two tables are stable:
+`BeaconBlockHeader` has five fields and `Validator` has eight, and neither has changed since phase0. [EIP-7688](https://eips.ethereum.org/EIPS/eip-7688), the Gloas SSZ change described below, keeps both as plain containers, so these two tables are stable:
 
 | `BeaconBlockHeader` field | gindex |
 |---------------------------|--------|
@@ -99,26 +101,26 @@ Everything between those two containers belongs to `BeaconState`, and this is wh
 
 ## SSZ merkleization
 
-The SSZ specification files are no longer in the analysed checkout of `consensus-specs`: there is no `ssz/` directory, and `pyproject.toml` depends on `eth-ssz-specs==0.1.0` instead. The rules below come from the "Hash Tree Roots and Merkleization" chapter of the [Upgrading Ethereum](https://eth2book.info/) book, from [EIP-7916](https://eips.ethereum.org/EIPS/eip-7916) and from [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495). The book's chapter on generalized indices is an empty `TODO`, so the index arithmetic comes from [`ssz/merkle-proofs.md`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/merkle-proofs.md) at the older commit that EIP-7916 links to.
+The rules below come from the "Hash Tree Roots and Merkleization" chapter of the [Upgrading Ethereum](https://eth2book.info/) book, from [EIP-7916](https://eips.ethereum.org/EIPS/eip-7916) and from [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495), and the index arithmetic from [`ssz/merkle-proofs.md`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/merkle-proofs.md) at the commit that EIP-7916 links to. The Gaps section records why no current SSZ text was used.
 
 | Type | `hash_tree_root` |
 |------|------------------|
 | `uint64` | 8 bytes little-endian, right-padded with zeros to 32 bytes |
 | `boolean` | `0x01` or `0x00`, then 31 zero bytes |
 | `Bytes32` | the 32 bytes |
-| `Bytes48` (`BLSPubkey`) | two chunks: `sha256(pubkey ‖ 16 zero bytes)` |
+| `Bytes48` (`BLSPubkey`) | padded to 64 bytes, so two chunks, then hashed: `sha256(pubkey ‖ 16 zero bytes)` |
 | `Container` | merkleize the field roots, padded with zero chunks to the next power of two |
 | `Vector[T, N]` | merkleize `N` elements, or their packed chunks for a basic type |
 | `List[T, N]` | `sha256(merkleize(elements up to the limit) ‖ uint256_le(length))` |
-| `ProgressiveList[T]` | `sha256(merkleize_progressive(elements) ‖ uint256_le(length))` |
-| `ProgressiveContainer` | `sha256(merkleize_progressive(field roots) ‖ pack_bits(active_fields))` |
+| `ProgressiveList[T]` | `sha256(merkleize_progressive(elements) ‖ uint256_le(length))`, explained in Gloas: progressive containers |
+| `ProgressiveContainer` | `sha256(merkleize_progressive(field roots) ‖ pack_bits(active_fields))`, explained in the same section |
 
 Two details cause most of the mistakes:
 
 - **The depth of a list comes from its limit, not from its length.** `validators` has a limit of $$2^{40}$$, so its data tree has depth 40 whether the registry holds one validator or two million.
 - **The limit counts chunks, not elements.** Basic types are packed. `balances` holds 4 values per chunk, so its depth is 38 for the same limit, and `previous_epoch_participation`, with one byte per element, has depth 35.
 
-The hash tree root of the mainnet state below confirmed these rules, and also how sensitive they are: the first run of the SSZ hasher written for this article, now published as [`ssz_state.py`](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas), used depth 38 for the participation lists and depth 6 for `proposer_lookahead` (64 values, so 16 chunks and depth 4), and the state root did not match until both were corrected.
+The hash tree root of the mainnet state below confirms these rules. A wrong depth on any list changes the state root: depth 38 for the participation lists, or depth 6 for `proposer_lookahead` (64 values, so 16 chunks and depth 4), does not reproduce it. The published hasher, [`ssz_state.py`](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas), uses the correct depths.
 
 ## Generalized index arithmetic
 
@@ -143,9 +145,11 @@ $$
 \end{aligned}
 $$
 
-A `List` has its data tree at gindex 2 and its length at gindex 3. A `ProgressiveContainer` has its data at 2 and its `active_fields` chunk at 3. And the consensus specification's verifier, `is_valid_merkle_branch(leaf, branch, depth, index, root)`, starts with `if depth != len(branch): return False`, where `index` is the gindex without its leading bit (`get_subtree_index` in the light client specification).
+A `List` has its data tree at gindex 2 and its length at gindex 3. A `ProgressiveContainer` has its data at 2 and its `active_fields` chunk at 3.
 
-The spec's light client constants allow a check of the arithmetic. `finalized_checkpoint` is field 20 and `root` is the second field of `Checkpoint`, so the gindex is 105 for a depth-5 state, 169 for a depth-6 state and 735 for the Gloas layout. All three match `FINALIZED_ROOT_GINDEX`, `FINALIZED_ROOT_GINDEX_ELECTRA` and `FINALIZED_ROOT_GINDEX_GLOAS` in `specs/{altair,electra,gloas}/light-client/sync-protocol.md`.
+The consensus specification's verifier, `is_valid_merkle_branch(leaf, branch, depth, index, root)`, starts with `if depth != len(branch): return False`. Its `index` argument is not the gindex but the gindex without its leading bit, $$\text{index} = g - 2^{\text{depth}}$$ (`get_subtree_index` in the light client specification).
+
+The spec's light client constants allow a check of the arithmetic. The finalized checkpoint is field 20 of the state, and its root is the second field of a two-field container, so gindex 3 inside it. The gindex is therefore $$(32 + 20) \times 2 + 1 = 105$$ for a depth-5 state and $$(64 + 20) \times 2 + 1 = 169$$ for a depth-6 state. For the Gloas layout it is $$367 \times 2 + 1 = 735$$, where 367 is the progressive gindex of the checkpoint, derived in the Gloas section. All three match `FINALIZED_ROOT_GINDEX`, `FINALIZED_ROOT_GINDEX_ELECTRA` and `FINALIZED_ROOT_GINDEX_GLOAS` in `specs/{altair,electra,gloas}/light-client/sync-protocol.md`.
 
 ## Worked example: validator 1,000,000 on mainnet
 
@@ -175,11 +179,11 @@ The result has 53 bits after the leading one, so the proof has 53 siblings: $$3 
 
 The inputs were collected on 2026-11-04:
 
-- **Header.** The finalized header at slot 15,580,064, from the PublicNode beacon API, with `state_root` `0x966c88c1…e72a`.
+- **Header.** The finalized header at slot 15,580,064, from the PublicNode beacon API, with `state_root` `0x966c88c1…ece72a`.
 - **State.** The finalized `BeaconState` from the Attestant checkpoint sync endpoint: 339,268,193 bytes of SSZ, version `fulu`, 2,398,408 validators.
 - **On-chain root.** The next beacon block, slot 15,580,065, carries execution block 26,340,577 with timestamp 1793784803. That is the mainnet genesis time 1606824023 plus 15,580,065 × 12.
 
-A script written for this article parsed the 38 fields and computed `hash_tree_root` from the bytes. The published [`mainnet_state.py`](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas) repeats this on a newer finalized state, and [`mainnet_history.py`](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas) re-fetches the header below and recomputes its root. The result was `0x966c88c1…e72a`, equal to the header's `state_root`. Merkleizing the header gave `0xa544aac2…36b3`, and an `eth_call` to the EIP-4788 contract returned the same value:
+A script written for this article parsed the 38 fields and computed `hash_tree_root` from the bytes. The result was `0x966c88c1…ece72a`, equal to the header's `state_root`. Merkleizing the header gave `0xa544aac2…9e36b3`, and an `eth_call` to the EIP-4788 contract returned the same value:
 
 ```bash
 $ cast call 0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02 \
@@ -210,11 +214,13 @@ Of the 40 siblings in the list data tree, 18 are the precomputed roots of empty 
 
 The same walk for the balance of the validator uses `concat(11, 76, 2, 2**38 + 250000)`, or 393,625,162,993,808, with 48 siblings. The leaf is chunk 250,000, which holds four balances, and validator 1,000,000 is lane 0, the first 8 bytes.
 
-Both proofs pass a Python port of `is_valid_merkle_branch` and the Solidity verifier given later in this article. The verifier costs 43,417 gas for the 53-sibling proof, and 55,659 gas for the full flow on forked mainnet, which adds the 4788 read and the slot proof. These are Foundry gas reports with solc 0.8.28 and 200 optimizer runs, without intrinsic transaction costs.
-
-The [published Foundry project](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas), with the same library and a proof from a newer state (slot 15,687,296), measures 43,483 and 56,837 gas; the difference comes from the test harness, which was not published with the first figures.
+Both proofs pass a Python port of `is_valid_merkle_branch` and the Solidity verifier given later in this article. The verifier costs 43,417 gas for the 53-sibling proof, and 55,659 gas for the full flow on forked mainnet, which adds the 4788 read and the slot proof (the proof of `header.slot`, see Designing a verifier for forks). These are Foundry gas reports with solc 0.8.28, 200 optimizer runs and EVM version `cancun`, without intrinsic transaction costs.
 
 A 64-byte input costs $$60 + 2 \times 12 = 84$$ gas in the SHA-256 precompile, so the precompile accounts for only $$53 \times 84 = 4452$$ of the first figure. The remainder is the memory and loop cost of a readable implementation.
+
+**Reproducing.** The state of slot 15,580,064 is no longer served, so the published code repeats the method on a newer finalized state, slot 15,687,296. In the [verification directory](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas), one script hashes that state and builds the proofs, and another re-fetches the header above and recomputes its root. The published Foundry project, with the same library and a proof from slot 15,687,296, measures 43,483 and 56,837 gas; the difference comes from the test harness, which was not published with the first figures.
+
+*Source:* `mainnet_state.py` and `mainnet_history.py` in the verification directory.
 
 ## `BeaconState` fork by fork
 
@@ -222,19 +228,21 @@ A 64-byte input costs $$60 + 2 \times 12 = 84$$ gas in the SHA-256 precompile, s
 
 The depth of a container is $$\lceil \log_2 n \rceil$$. All the figures below come from `specs/*/beacon-chain.md` and `configs/mainnet.yaml` at the pinned `consensus-specs` commit, recomputed rather than copied. The [verification script](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas) reproduces every gindex, depth, proof length and stale-path outcome in this section and the next ones, and checks each against the figure printed here.
 
+The table includes Heze, the draft consensus fork after Gloas. Its spec removes four fields, which is why it has 42 fields to the 46 of Gloas; the Gloas section below shows that the removed fields leave gaps and move nothing.
+
 | Fork | Epoch | First slot | Mainnet timestamp | Fields | Merkle type | State depth |
 |------|-------|------------|-------------------|--------|-------------|-------------|
 | Deneb | 269,568 | 8,626,176 | 1710338135 | 28 | `Container` | 5 |
 | Electra | 364,032 | 11,649,024 | 1746612311 | 37 | `Container` | **6** |
 | Fulu | 411,392 | 13,164,544 | 1764798551 | 38 | `Container` | 6 |
-| Gloas | $$2^{64}-1$$ (unscheduled) | n/a | n/a | 46 | `ProgressiveContainer` | per field |
-| Heze | $$2^{64}-1$$ (unscheduled) | n/a | n/a | 42 | `ProgressiveContainer` | per field |
+| Gloas | $$2^{64}-1$$ (no epoch set) | n/a | n/a | 46 | `ProgressiveContainer` | per field |
+| Heze | $$2^{64}-1$$ (no epoch set) | n/a | n/a | 42 | `ProgressiveContainer` | per field |
 
-Gloas and Heze are in development: every value in their columns is taken from the pinned commit and may change. EIP-7688 has status Review, and is listed as Scheduled for Inclusion in Glamsterdam by [EIP-7773](https://eips.ethereum.org/EIPS/eip-7773) at the pinned EIPs commit.
+Gloas and Heze are in development: every value in their columns is taken from the pinned commit and may change. The two forks have no activation epoch yet: the configuration holds the placeholder $$2^{64}-1$$. The change itself is planned: EIP-7688 has status Review, and is listed as Scheduled for Inclusion in Glamsterdam, the upgrade that pairs Gloas with Amsterdam, by [EIP-7773](https://eips.ethereum.org/EIPS/eip-7773) at the pinned EIPs commit.
 
 ### State field gindices
 
-Each cell gives the gindex inside `BeaconState`, then the gindex from the beacon block root.
+Each cell gives the gindex inside `BeaconState`, then the gindex from the beacon block root. The Gloas values in this table and the next are derived in Gloas: progressive containers below. Two cells hold the same number for different nodes: 735 is the block-root gindex of `earliest_exit_epoch` at Electra, and also `FINALIZED_ROOT_GINDEX_GLOAS`, which is counted from the Gloas state root.
 
 | Field | Deneb | Electra and Fulu | Gloas (draft) |
 |-------|-------|------------------|---------------|
@@ -251,7 +259,13 @@ Each cell gives the gindex inside `BeaconState`, then the gindex from the beacon
 | `pending_consolidations` | n/a | 100 / 740 | 2959 / 23439 |
 | `proposer_lookahead` | n/a | Fulu only: 101 / 741 | 2960 / 23440 |
 
-`pending_deposits` and the two lists after it did not exist before Electra, and they matter to accounting: amounts sitting in those queues are absent from `balances`, or still present in it.
+`pending_deposits` and the two lists after it did not exist before Electra, and they matter to accounting, because each queue relates to `balances` in its own way:
+
+- **`pending_deposits`.** A deposit request is queued without changing `balances`, and `apply_pending_deposit` credits the amount when the queue is processed. The excess that `queue_excess_active_balance` moves out of a validator's balance, at a switch to compounding credentials, waits here too. Until then, the amount is absent from `balances`.
+- **`pending_partial_withdrawals`.** The amount stays in the validator's `balances` entry until `process_withdrawals` pays it out.
+- **`pending_consolidations`.** The source validator's balance stays in its own entry until `process_pending_consolidations` moves it to the target.
+
+*Source:* `specs/electra/beacon-chain.md`, at the pinned `consensus-specs` commit.
 
 ### Validator and balance leaves
 
@@ -272,15 +286,15 @@ No field moved: `validators` is still field 11. The tree simply grew on top:
 ```mermaid
 flowchart TD
     subgraph DENEB["Deneb: depth 5"]
-        DR["state root"] --> DA["fields 0 to 15"]
-        DR --> DB["fields 16 to 31"]
+        DR["state root"] --> DA["gindex 2: fields 0 to 15"]
+        DR --> DB["gindex 3: fields 16 to 31"]
         DA --> DV["field 11, gindex 43"]
     end
     subgraph ELECTRA["Electra: depth 6"]
         ER["state root"] --> EL["gindex 2: fields 0 to 31"]
         ER --> EH["gindex 3: fields 32 to 63"]
-        EL --> EA["fields 0 to 15"]
-        EL --> EB["fields 16 to 31"]
+        EL --> EA["gindex 4: fields 0 to 15"]
+        EL --> EB["gindex 5: fields 16 to 31"]
         EA --> EV["field 11, gindex 75"]
     end
 ```
@@ -293,7 +307,7 @@ The change is one sibling, but a verifier with `STATE_DEPTH = 5` cannot absorb i
 
 Fulu appended `proposer_lookahead` ([EIP-7917](https://eips.ethereum.org/EIPS/eip-7917)). With 38 fields out of 64, no existing gindex moved, and a verifier updated for Electra kept working unchanged.
 
-A team that checks only whether its proofs still pass after a fork will observe that Fulu was safe, and learn nothing about the next fork. The depth changed at Electra because a power of two was crossed, which is a property of a count of fields.
+A team that checks only whether its proofs still pass after a fork will observe that Fulu was safe, and learn nothing about the next fork. The depth changed at Electra because a power of two was crossed, which is a property of a count of fields. With 38 of 64 positions used, a plain `Container` that went past 64 fields would add another level.
 
 ### Gloas: progressive containers (in development)
 
@@ -313,11 +327,19 @@ flowchart TD
     N3 --> Z["gindex 47, zero"]
 ```
 
-`validators` keeps position 11, which falls in the 16-leaf subtree: $$22 \times 16 + 6 = 358$$. `current_sync_committee` has position 22 and lands in the next subtree, at $$46 \times 64 + 1 = 2945$$. `latest_execution_payload_header` is removed by [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732), and `latest_block_hash` takes position 24. Positions are assigned once at this conversion, so the rule on appending fields applies from then on.
+A position is a leaf of one subtree, so its gindex is that of a leaf inside the subtree, counted from the state root:
+
+$$
+\begin{aligned}
+g &= \text{subtree root} \times \text{subtree size} + (\text{position} - \text{subtree start})
+\end{aligned}
+$$
+
+`validators` keeps position 11, which falls in the 16-leaf subtree rooted at gindex 22 and starting at position 5: $$22 \times 16 + (11 - 5) = 358$$. `current_sync_committee` has position 22 and lands in the next subtree, rooted at 46 and starting at 21: $$46 \times 64 + (22 - 21) = 2945$$. `latest_execution_payload_header` is removed by [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732), and `latest_block_hash` takes position 24. Positions are assigned once at this conversion. From then on, a later fork changes only the bits of `active_fields`, as the next paragraph describes, and no position moves.
 
 The goal of EIP-7688 is stability after this one break. If a fork appends a field, `active_fields` gains a trailing `1`, and if it removes a field, its bit becomes `0` and the position stays reserved. The draft Heze spec illustrates this: it removes `eth1_data`, `eth1_data_votes`, `eth1_deposit_index` and `deposit_requests_start_index` as gaps at positions 8, 9, 10 and 28, and recomputing the gindices confirms that every remaining field keeps its Gloas gindex.
 
-Element `i` of a `ProgressiveList` falls in subtree $$k$$, defined by $$(4^k - 1)/3 \le i \lt (4^{k+1} - 1)/3$$. The path is $$k$$ right turns, one left turn, then $$2k$$ bits of offset, so the length inside the list data is $$3k + 1$$. A validator field adds 15 siblings around it: 3 for the header, 8 for the state position, 1 for the length and 3 for the `Validator` fields.
+Element `i` of a `ProgressiveList` falls in subtree $$k$$, defined by $$(4^k - 1)/3 \le i \lt (4^{k+1} - 1)/3$$. The path is $$k$$ right turns, one left turn, then $$2k$$ bits of offset, so the length inside the list data is $$3k + 1$$. A validator field adds 15 siblings around it: 3 for the header, 8 for the state position (including the `active_fields` sibling at gindex 3), 1 for the length and 3 for the `Validator` fields.
 
 | Validator index | $$k$$ | In list data | Field proof from the block root |
 |-----------------|-------|--------------|---------------------------------|
@@ -350,9 +372,19 @@ The first case is a denial of service. The other two return a wrong value, and t
 
 ### Deep paths end below a leaf
 
-A Deneb verifier asking for a validator field uses the 52-bit path `011 01011 0 <40 bits> <3 bits>`. In the Fulu tree, gindex 43 is an internal node over fields 22 and 23. The path goes left into `current_sync_committee`, and the zeros of the index go to the first chunk of the first public key. That chunk sits at depth 20 and it is a leaf: it contains key bytes, not a hash of two children. Continuing for the 32 remaining levels would require a SHA-256 preimage of those bytes.
+A Deneb verifier asking for a validator field uses the 52-bit path `011 01011 0 <40 bits> <3 bits>`. In the Fulu tree, gindex 43 is an internal node over fields 22 and 23. The path goes left into `current_sync_committee`, and the zeros of the index go to the first chunk of the first public key. The depth of that chunk adds up level by level:
 
-The stale balance path ends the same way. It enters `latest_execution_payload_header`, stops at the `parent_hash` leaf at depth 14 and needs 33 more levels.
+| Levels | Bits of the stale path | Node reached in the Fulu tree |
+|--------|------------------------|-------------------------------|
+| 3 | header `011` | `BeaconState` root |
+| 6 | state `01011`, then the data bit `0` | field 22, `current_sync_committee` |
+| 1 | first index bit, `0` | `pubkeys`, field 0 of the two-field `SyncCommittee` |
+| 9 | next 9 index bits, all `0` | public key 0 of the 512-entry vector |
+| 1 | next index bit, `0` | chunk 0 of the 48-byte key, padded to two chunks |
+
+The chunk sits at depth $$3 + 6 + 1 + 9 + 1 = 20$$, and it is a leaf: it contains key bytes, not a hash of two children. The first 11 bits of a 40-bit index are zero for every index below $$2^{29}$$, which covers the whole registry. Continuing for the $$52 - 20 = 32$$ remaining levels would require a SHA-256 preimage of those bytes.
+
+The stale balance path ends the same way. Its state bits `01100` and the data bit enter field 24, `latest_execution_payload_header`, at depth 9. That header has 17 fields, so a depth of 5, and the zero index bits select field 0, the `parent_hash` leaf at depth 14. The path needs $$47 - 14 = 33$$ more levels.
 
 No valid proof exists, so validator and balance proofs revert for all validators from the first root of a post-fork state. Funds that depend on them wait for a verifier upgrade. For this path a stale verifier fails closed.
 
@@ -373,11 +405,16 @@ The table evaluates the Deneb gindices on the mainnet Fulu state at slot 15,580,
 
 A verifier that reads `state.slot` at gindex 34 would accept a value of about $$5.7 \times 10^{18}$$. Any check of the form `provenSlot >= something` passes. Values taken from internal nodes are not chosen by the prover, because they are fixed by the state. But a prover picks the moment, and also the path when several constants are stale, so the choice covers many such values, and the state changes in each slot.
 
+Two concrete consequences follow for a contract that reads `state.slot` at the stale gindex 34 (*derived*):
+
+- **A freshness check passes for any root.** A contract that rejects snapshots older than the last one it processed, with `provenSlot >= lastSlot`, accepts every proof, since the accepted value is far above any real slot.
+- **A replay key stops naming a slot.** A contract that keys a claim by the proven slot, as EigenLayer keyed partial withdrawals in the first finding below, records a hash instead. A guard that requires each new key to be above the last one then compares hashes, which follow no order, so it rejects some valid claims and accepts some repeats.
+
 A contract that caches a proven `validators` list root and later verifies elements against it would hold `0x3a752dcb…`, and every later element proof would fail. The failure appears in another function, some time after the bad value was accepted.
 
 ### Padding proves zero
 
-Fields 38 to 63 of the Fulu tree are zero chunks, and every chunk has a valid branch.
+A padding leaf is the zero chunk itself, and a padding internal node is the root of an all-zero subtree, such as the `0xf5a5fd42…` of the table above. A stale gindex that lands on a padding leaf therefore proves the value zero. Fields 38 to 63 of the Fulu tree are zero chunks, and every chunk has a valid branch.
 
 The pre-Electra `FINALIZED_ROOT_GINDEX`, 105, is a depth-6 gindex. In a depth-5 state it pointed to `finalized_checkpoint.root`. In a depth-6 state it is leaf 41, which is padding. On the mainnet state, a six-sibling branch at 105 verifies with leaf `0x00…00`, while the real finalized checkpoint root is at gindex 169. A light client that kept 105 would verify a finalized root of zero.
 
@@ -387,7 +424,15 @@ Progressive containers do not remove this case. An inactive position contains `B
 
 ### A depth taken from the caller
 
-Some verifiers take the index from a constant and the depth from `proof.length`. Such a verifier looks fork-resilient: index 11 with six siblings verifies `validators` on Fulu, since the leading zero bit needs no storage. It also accepts fewer siblings, which turns any internal node on the path into a valid leaf. And a library loop that consumes one index bit per sibling ignores the bits left over at the end, so it does not bind the index to the depth either.
+Some verifiers take the index from a constant and the depth from `proof.length`. Such a loop reads one bit of the index per sibling, from the lowest bit up, and stops when the siblings run out. With the constant index 11, binary `1011`, the number of siblings decides which node of the Fulu state tree is reached (*derived*):
+
+| Index | Siblings supplied | Bits read, as a path from the root | Node reached |
+|-------|-------------------|------------------------------------|--------------|
+| 11 | 6 | `001011` | gindex 75, `validators` |
+| 11 | 5 | `01011` | gindex 43, the hash of `current_sync_committee` and `next_sync_committee` |
+| 43 (`101011`) | 5 | `01011`, the top bit is never read | gindex 43, the same node |
+
+The first row is why such a verifier looks fork-resilient: the Deneb index 11 also works on Fulu, because the extra level adds a leading `0` to the path, and a bit that is never set costs nothing to store. The second row is the price: fewer siblings turn any internal node on the path into a valid leaf. The third row shows that bits left over at the end are ignored, so two indices reach one node and the index is not bound to the depth either.
 
 The limit of this behaviour is zero siblings, where `leaf == root` verifies. That is the first finding below.
 
@@ -434,7 +479,7 @@ The fork of a proof is the fork of the state it proves, not the fork at the time
 A verifier that compares `block.timestamp >= ELECTRA_TIMESTAMP` selects the Electra layout for a Deneb state on that block. The two choices that avoid the error:
 
 - **Prove `header.slot`** at gindex 8, against the same root, and compare it to the fork's first slot with `<`. The header layout does not depend on the fork, so this step needs no selection of its own.
-- **Use the timestamp passed to 4788 with a margin of one block.** This is weaker, because missed slots make the distance larger than one slot.
+- **Use the timestamp passed to 4788 with a margin of one block.** Select the newer layout only when `timestamp >= ELECTRA_TIMESTAMP + 12`, which excludes the block at the fork timestamp and its Deneb parent. This is weaker: if the slot at the fork timestamp is missed, the block at `ELECTRA_TIMESTAMP + 12` still has a Deneb parent, and the comparison selects the wrong layout (*derived*).
 
 The proven state is at the fork's layout when `header.slot >= forkSlot`, since `upgrade_to_electra` runs at the epoch transition, before the block at that slot is processed. A proof of slot 11,649,024 uses gindex 715, and a proof of slot 11,649,023 uses 363.
 
@@ -492,10 +537,11 @@ In `validatorFieldGindex`, `base << 41` appends the `0` of the data subtree and 
 
 This code passed tests in Foundry with the real proof of the worked example and the Deneb and Electra gindices of the tables. It rejected a 52-sibling truncation and an empty proof with `leaf == root`. The [published tests](https://github.com/rya-sge/access-denied/tree/main/verification/beacon-state-proofs-hard-fork-deneb-to-gloas) (`test/BeaconProof.t.sol`, 14 tests) run the same checks with a 53-sibling proof from slot 15,687,296.
 
-Gloas needs one more function, which computes the path from `i`. It is the same arithmetic as the tables above, and the published tests check it against the gindex tables (the arithmetic, not a hashed Gloas tree). Declare it inside the `BeaconProof` library, or drop `internal` if it stays a free function: solc rejects visibility on a free function (error 4126):
+Gloas needs one more function, which computes the path from `i`. It is the same arithmetic as the tables above, and the published tests check it against the gindex tables (the arithmetic, not a hashed Gloas tree):
 
 ```solidity
 /// EIP-7916 position of chunk `i` in a progressive tree, root = 1.
+/// A free function takes no visibility (solc error 4126); add `internal` inside a library.
 function progressiveGindex(uint256 i) pure returns (uint256) {
     uint256 g = 1;
     uint256 start;
@@ -518,7 +564,7 @@ A slot switch only knows forks that have a date. Two designs handle the fork aft
 
 Under Gloas, a similar check becomes possible at lower cost. The sibling at gindex 3 of the state is the `active_fields` chunk, `0xffffffffff3f00…` for 46 active fields and `0xfff8ffefff3f00…` for the draft Heze gaps. A verifier that pins this sibling detects that a position was deactivated (*derived*).
 
-Who may change a layout is itself a trust assumption. A verifier upgradable by an owner can be fixed before a fork, and that owner can also point `VALIDATORS` at any node. A timelock shorter than the time to react gives little protection, and a timelock that ends after the fork leaves the protocol stopped until then. State this in the protocol's risk documentation, with the number of signers and the delay.
+Who may change a layout is itself a trust assumption. A verifier upgradable by an owner can be fixed before a fork, and that owner can also point the `VALIDATORS_*` constants at any node. A timelock shorter than the time to react gives little protection, and a timelock that ends after the fork leaves the protocol stopped until then. State this in the protocol's risk documentation, with the number of signers and the delay.
 
 ### Check each layer of the system
 
@@ -531,13 +577,13 @@ Layout is one source of breakage among others, and an auditor reviewing a verifi
 
 ## Two real findings
 
-Neither finding below was caused by a fork. They are in this article because each one breaks a rule that forks put under pressure: the length of a proof, and the comparison at a boundary. Both are from EigenLayer audits, and identifiers `20056` and `40684` are those of the AuditVault index used by the local corpus.
+Neither finding below was caused by a fork. They are in this article because each one breaks a rule that forks put under pressure: the length of a proof, and the comparison at a boundary. Both are from EigenLayer audits.
 
 ### Code4rena 2023-04, H-01: an empty proof verifies
 
 The [EigenLayer contest report](https://code4rena.com/reports/2023-04-eigenlayer), published on 2023-07-06, lists as its first high-severity finding "Slot and block number proofs not required for verification of withdrawal (multiple withdrawals possible)", submitted by 0xTheC0der and also found by windowhan001 and volodya.
 
-The report starts from the Merkle library, whose verifiers "will always return true if proof.length < 32 (e.g. empty proof) and leaf == root". The caller, `verifyWithdrawalProofs`, checked the length of several proofs, but not of `slotProof` or `blockNumberProof`. The warden's change to a valid proof is short:
+The report starts from the Merkle library, whose verifiers "will always return true if proof.length < 32 (e.g. empty proof) and leaf == root". Unlike the `bytes32[]` verifier later in this article, that library takes a proof as packed `bytes` and reads 32 bytes per sibling, so a length of 32 means one sibling. The caller, `verifyWithdrawalProofs`, checked the length of several proofs, but not of `slotProof` or `blockNumberProof`. The warden's change to a valid proof is short:
 
 ```solidity
 proofs.slotProof = bytes("");                     // empty slot proof
@@ -550,15 +596,15 @@ The verification passes, and the rest of the contract interprets a hash as a num
 
 This is the shallow-path case with zero levels. On the header of the worked example, the empty proof decodes a "slot" of 14,741,254,758,814,336,165, the first 8 bytes of the root.
 
-The report recommends to "Require a minimum length (tree height)", and adds "At least require non-empty proofs" with a diff that uses `length >= 32`. Only the first form closes the class.
+The report recommends to "Require a minimum length (tree height)", and adds "At least require non-empty proofs" with a diff that uses `length >= 32`, which requires at least one sibling. Only the first form closes the class.
 
-On the same header, a one-sibling proof with index 0 and leaf gindex 2 verifies, and decodes a slot of 11,533,380,310,597,772,962. A two-sibling proof also verifies. Only three siblings return the true value 15,580,064 (*derived*). The length has to be equal to the depth, which is what a gindex-driven walk enforces. What EigenLayer shipped is not covered by the sources of this article, as the Gaps section records.
+On the same header, a one-sibling proof at gindex 2 (index 0 at depth 1) verifies, and decodes a slot of 11,533,380,310,597,772,962. A two-sibling proof also verifies. Only three siblings return the true value 15,580,064 (*derived*). The length has to be equal to the depth, which is what a gindex-driven walk enforces. What EigenLayer shipped is not covered by the sources of this article, as the Gaps section records.
 
 An exact length is a constant, and at Electra that constant changed for every path through `BeaconState`. Removing the check to survive a fork reopens this finding.
 
 ### Cantina, March 2024: `>` instead of `>=`
 
-The [Cantina competition report](https://cdn.cantina.xyz/reports/cantina_competition_eigenlayer_mar2024.pdf) covers a competition held from February 27 to March 18, and is dated April 5, 2024. Its only high-severity finding, numbered 3.1.1 in the report and `40684` in AuditVault, is "Beacon chain withdrawals that occur at lastwithdrawaltimestamp will be lost", submitted by hash.
+The [Cantina competition report](https://cdn.cantina.xyz/reports/cantina_competition_eigenlayer_mar2024.pdf) covers a competition held from February 27 to March 18, and is dated April 5, 2024. Its only high-severity finding, numbered 3.1.1 in the report and [40684 in AuditVault](https://github.com/Auditware/AuditVault/blob/main/findings/40684-beacon-chain-withdrawals-that-occur-at-lastwithdrawaltimesta.md), is "Beacon chain withdrawals that occur at lastwithdrawaltimestamp will be lost", submitted by hash.
 
 The guard is a strict comparison on the proof timestamp:
 
@@ -640,7 +686,7 @@ These properties apply to any contract that verifies beacon data, in the wording
 | ☐ | The root is read from the EIP-4788 contract or from a documented trusted relay, never from calldata alone. | A prover supplies a root of their own and any proof verifies. |
 | ☐ | `success` and `returndata.length == 32` are checked, and a zero root is rejected. | A failed read falls through with a zero root. On a chain with no code at the address, the call succeeds with empty data. |
 | ☐ | The timestamp is bound to the proof, and a minimum and maximum age are enforced. | A prover selects an older root, such as a balance from before a slashing. |
-| ☐ | A revert for a root outside the buffer leaves no partial state. | A keeper flow is stuck after 27.3 hours. |
+| ☐ | A revert for a root outside the buffer leaves no partial state. | A multi-step flow that stored partial state cannot complete once its root leaves the buffer, after about 27.3 hours. |
 
 #### Proof structure
 
@@ -724,17 +770,17 @@ The points below are open, and should be checked before relying on the correspon
 
 | Gap | Why it matters | What to read or verify |
 |-----|----------------|------------------------|
-| EigenLayer's current constants and how it handled Electra are not stated, because no `BeaconChainProofs.sol` was available locally and the article does not cite them from memory. | The article cannot say whether EigenLayer was affected at Electra or how its verifier selects a fork. | `Layr-Labs/eigenlayer-contracts`, `BeaconChainProofs.sol`, at the release active at Electra and at the current one. |
-| What EigenLayer shipped for H-01 and for the Cantina finding was not read. A local PoC note names release `v0.2.3-mainnet-m2` for the `>=` fix, unverified. | The article quotes the recommendations, not the fixes, and its remark on `>= 32` applies to that recommendation only. | `Layr-Labs/eigenlayer-contracts`, `verifyWithdrawalProofs` and `proofIsForValidTimestamp` after each fix. |
+| EigenLayer's current constants and how it handled Electra are not covered by the sources of this article. | The article cannot say whether EigenLayer was affected at Electra or how its verifier selects a fork. | `Layr-Labs/eigenlayer-contracts`, `BeaconChainProofs.sol`, at the release active at Electra and at the current one. |
+| What EigenLayer shipped for H-01 and for the Cantina finding was not read; the `>=` fix may be in release `v0.2.3-mainnet-m2`, which is unverified. | The article quotes the recommendations, not the fixes, and its remark on `>= 32` applies to that recommendation only. | `Layr-Labs/eigenlayer-contracts`, `verifyWithdrawalProofs` and `proofIsForValidTimestamp` after each fix. |
 | Gloas and Heze are in development, with fork epochs at `2**64-1`, and EIP-7688, EIP-7495 and EIP-7916 have status Review. | Every Gloas or Heze gindex, the field list and the `active_fields` values may change. | `specs/gloas/beacon-chain.md`, `specs/heze/beacon-chain.md`, and `FINALIZED_ROOT_GINDEX_GLOAS` as a quick check. |
-| The SSZ spec files are absent from the analysed `consensus-specs` checkout, and the book's gindex chapter is an empty `TODO`. | Gindex rules were taken from `ssz/merkle-proofs.md` at an older commit. Light client constants and the mainnet state root support them, but no current normative text was read. | The `eth-ssz-specs` 0.1.0 package and its documentation; only its `gindex.py` was read here. |
+| The SSZ spec files are absent from the analysed `consensus-specs` commit, which has no `ssz/` directory and depends on `eth-ssz-specs==0.1.0` instead, and the book's gindex chapter is an empty `TODO`. | Gindex rules were taken from `ssz/merkle-proofs.md` at an older commit. Light client constants and the mainnet state root support them, but no current normative text was read. | The [`eth-ssz-specs` 0.1.0](https://pypi.org/project/eth-ssz-specs/) package and its documentation. |
 | The book describes the Capella version of the spec, v1.3.0. | Its merkleization chapter predates Deneb. The rules used here were confirmed against a Fulu state. | The Preface and "Version information" sections of the book. |
 | No deployed verifier was surveyed, so the article does not know of any contract that accepted a stale proof on mainnet. | The accepted-value outcomes are shown on real data, but their impact on any specific protocol is not. | Verifiers that read state-level fields with fixed-depth constants. |
-| The two PoCs in the local corpus are synthetic reductions, and they were not re-run for this article. | The quotations come from the reports. The `output.txt` of 40684 records a pass, and 20056 has no recorded output. | `evm-hack-registry` folders `20056-…` and `40684-…`. |
+| The proofs of concept for both findings in `evm-hack-registry` are synthetic reductions, and they were not re-run for this article. | The quotations come from the reports, and only the Cantina reduction records a passing run. | The two findings' folders in [sanbir/evm-hack-registry](https://github.com/sanbir/evm-hack-registry/tree/52d0b80becc6a02b4a0a4abba4c5b3f748dab217) at the pinned commit. |
 | The Gloas proofs use real `Validator` roots inside a synthetic state and header. The "reverts" and "verifies" outcomes for a Gloas tree are deduced from positions. | They test the arithmetic, not a real Gloas state, and ePBS semantics of `state_root` were not studied. | Re-run on a Gloas devnet state, with `specs/gloas/beacon-chain.md` and EIP-7732. |
 | The 2026-11-04 state (slot 15,580,064) is not archived, and public checkpoint sync serves only the current state. The headers at slots 15,580,064 and 11,649,023 and execution blocks 26,340,577 and 22,431,084 are re-fetched and checked by `mainnet_history.py`, but the state size, the validator count, the walk nodes and the stale values of the tables cannot be recomputed. | The 4788 root of that block left the buffer after about 27.3 hours, so the original `eth_call` cannot be repeated. | `mainnet_state.py` reproduces the method on any recent finalized state while its root is in the buffer (done for slot 15,687,296, `snapshot.json`). |
 | The verification code is published (`gindex.py`, `ssz_state.py`, `mainnet_history.py`, `mainnet_state.py`, the Foundry tests and gas report), but the harness behind the first gas figures (43,417 and 55,659) was not. | The published harness measures 43,483 and 56,837 on a newer state, so the gas figures are close but not identical. | `gas_report.txt` and `forge_fork_output.txt` in the verification directory. |
-| Gas figures come from a readable reference implementation, in a Foundry gas report with EVM version `cancun` (the same `verify` costs 51,592 with `shanghai`). | An assembly verifier costs less, and calldata costs are excluded. | Re-measure on the implementation under review. |
+| Gas figures come from a readable reference implementation, in a Foundry gas report with EVM version `cancun` (the same `verify` costs 51,592 with `shanghai`, which has no `MCOPY` instruction). | An assembly verifier costs less, and calldata costs are excluded. | Re-measure on the implementation under review. |
 
 ## References
 

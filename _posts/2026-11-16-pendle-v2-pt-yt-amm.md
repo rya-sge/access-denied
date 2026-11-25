@@ -2,7 +2,7 @@
 layout: post
 title: "How Pendle V2 Works - SY, PT and YT, the Rate AMM, Oracles and PT as Collateral"
 date:   2026-11-16
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -37,7 +37,7 @@ The article assumes the reader knows tokens, DEXes and lending in general. A few
 Pendle V2 has three layers of contracts that only talk through interfaces, plus a router on top:
 
 - **SY (Standardized Yield)** wraps a yield-bearing token into one interface. For most SYs, 1 SY is 1 yield token, and `exchangeRate()` returns the amount of *asset* one SY is worth.
-- **The YT contract** (`PendleYieldToken`) holds SY and mints PT and YT against it. PT and YT of one SY and one expiry form a pair, written PY in the code.
+- **The YT contract** (`PendleYieldToken`) is the YT token itself: it holds the SY and mints both PT and YT against it. PT and YT of one SY and one expiry form a pair, written PY in the code.
 - **The market** (`PendleMarketV7`) is an AMM between PT and SY with an LP token and a built-in oracle. There is no YT pool: YT is traded through flash swaps on the PT/SY market.
 - **The router** (`PendleRouterV4`, an EIP-2535 diamond proxy) bundles these steps into one call from any token.
 
@@ -58,9 +58,9 @@ flowchart TD
 
 ### Units: asset, SY and the index
 
-The word *asset* has a precise meaning here: it is what the yield token appreciates against, given by `SY.assetInfo()`. For SY-wstETH the asset is stETH; for SY-sUSDe it is USDe. The documentation notes that the asset address is a best estimate and may not exist on the chain. PT and YT carry the asset's decimals, SY the yield token's, and LP tokens 18; assets with fewer than 18 decimals get a `scaled18` wrapper. Every rate in the contracts is 1e18-scaled on raw units.
+The word *asset* has a precise meaning here: it is what the yield token appreciates against, given by `SY.assetInfo()`. For SY-wstETH the asset is stETH; for SY-sUSDe it is USDe. The documentation notes that the asset address is a best estimate and may not exist on the chain. The token decimals and the scaling of rates are left to the Integration Notes, where an oracle integration needs them.
 
-A PT is worth 1 asset at expiry, not 1 SY: at maturity it redeems for the amount of SY that is worth 1 asset. Pendle's documentation illustrates this with wstETH at 1.2 stETH and gives 0.8928 wstETH per PT-wstETH. The two figures do not match: at 1.2 the amount is $$1/1.2 = 0.8333$$ wstETH, and 0.8928 corresponds to a rate of 1.12.
+A PT is worth 1 asset at expiry, not 1 SY: at maturity it redeems for the amount of SY that is worth 1 asset. With wstETH worth 1.2 stETH at expiry, 1 PT-wstETH redeems for $$1/1.2 = 0.8333$$ wstETH.
 
 ## SY: the wrapper everything else uses
 
@@ -90,23 +90,33 @@ It never decreases. Minting sends SY in and returns $$\text{SY} \times \text{pyI
 
 ### YT accrual
 
-A YT holder earns the SY that one unit of asset frees as the index rises. When the index moves from $$I_0$$ to $$I_1$$, a balance $$B$$ of YT accrues (`InterestManagerYT._distributeInterestPrivate`):
+Backing $$B$$ asset takes $$B/I_0$$ SY at index $$I_0$$ and only $$B/I_1$$ SY at a higher index $$I_1$$. A balance $$B$$ of YT accrues the difference:
 
 $$
 \begin{aligned}
-\Delta\text{SY} = B \cdot \frac{I_1 - I_0}{I_0 \, I_1}
+\Delta\text{SY} = \frac{B}{I_0} - \frac{B}{I_1} = B \cdot \frac{I_1 - I_0}{I_0 \, I_1}
 \end{aligned}
 $$
+
+*Implementation:* `InterestManagerYT._distributeInterestPrivate`.
 
 With 1,000 YT and an index going from 1.200 to 1.212 (a 1 % rise), the holder accrues 8.2508 SY, which is worth exactly $$8.2508 \times 1.212 = 10.000$$ asset: 1 % of 1,000 asset of principal. The accrual is settled on every YT transfer, paid in SY by `redeemDueInterestAndRewards`, and the factory's `interestFeeRate` and `rewardFeeRate` are taken for the treasury on payout.
 
 ### Expiry and the treasury's share
 
-At expiry, YT stops accruing new yield and is worth zero, but the cut-off is the first interaction after expiry, which freezes the index as `firstPYIndex`: index growth between the expiry timestamp and that call still accrues to YT. From then on, PT redeems alone, without YT, for $$\text{PT} / \text{pyIndexCurrent}$$ SY. The difference between what `firstPYIndex` would have paid and what the current index pays goes to `totalSyInterestForTreasury` (`_calcSyRedeemableFromPY`). In other words, **a PT held after expiry does not earn yield**: it is a fixed amount of asset, and the yield on the SY behind it belongs to Pendle's treasury until the holder redeems.
+At expiry, YT stops accruing new yield and is worth zero, but the cut-off is the first interaction after expiry, which freezes the index as `firstPYIndex`: index growth between the expiry timestamp and that call still accrues to YT.
+
+From then on, PT redeems alone, without YT, at the current index: $$\text{PT} / \text{pyIndexCurrent}$$ SY. The index keeps rising after expiry, so this pays fewer SY than redeeming at the frozen index would, and the difference goes to the treasury.
+
+For example, with the index frozen at 1.25 and at 1.30 when the holder redeems, 100 PT would be worth $$100/1.25 = 80$$ SY at the frozen index; the holder receives $$100/1.30 = 76.92$$ SY, and the remaining 3.08 SY go to the treasury.
+
+*Implementation:* `PendleYieldToken._calcSyRedeemableFromPY`, credited to `totalSyInterestForTreasury`.
+
+In other words, **a PT held after expiry does not earn yield**: it is a fixed amount of asset, and the yield on the SY behind it belongs to Pendle's treasury until the holder redeems.
 
 ### Negative yield
 
-If the SY's exchange rate falls below the stored index, the index stays where it was. Redemptions then return fewer SY per PY than the asset value implies, and YT stops accruing until the rate recovers. The documentation's example: a PT minted at index 1.20 that redeems when 1 SY is worth 1.15 asset returns 115 asset per 120 PT. The promise "1 PT = 1 asset" holds only while the SY stays solvent.
+If the SY's exchange rate falls below the stored index, the index stays where it was. Redemptions then return fewer SY per PY than the asset value implies, and YT stops accruing until the rate recovers. The documentation's example: a PT minted at index 1.20 that redeems when 1 SY is worth 1.15 asset returns 115 asset per 120 PT (120 PT redeem for $$120/1.20 = 100$$ SY, worth 115 asset). The promise "1 PT = 1 asset" holds only while the SY stays solvent.
 
 ## The PT/SY market
 
@@ -140,8 +150,8 @@ $$
 
 Three things in these formulas carry the design:
 
-- **The logit term $$\ln\frac{p}{1-p}$$.** It is zero at an even pool and grows without bound as PT fills the pool. Liquidity is concentrated around the anchor; `scalarRoot` sets how concentrated. The docs describe a large `scalarRoot` as a tighter, more capital-efficient market with a narrower range of tradeable rates. Pendle's [AMM whitepaper](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/whitepapers/AMM.pdf) treats $$p$$ between 0.1 and 0.9 as the reasonable trading range and derives the rate scalar at the pool's start from an expected and a maximum rate, so that this range covers implied rates from 0 % up to the maximum.
-- **The rate scalar grows as expiry nears.** $$s$$ is `scalarRoot × 365 days / timeToExpiry`, so the same trade moves $$E$$ less and less. Combined with the next point, this is what pulls the price to 1.
+- **The logit term $$\ln\frac{p}{1-p}$$.** It is zero at an even pool and grows without bound as PT fills the pool. More PT in the pool means a larger $$p$$, a larger $$E$$, a cheaper PT and a higher implied rate: selling PT into the pool pushes the rate up, and buying PT pulls it down. Liquidity is concentrated around the anchor; `scalarRoot` sets how concentrated. The docs describe a large `scalarRoot` as a tighter, more capital-efficient market with a narrower range of tradeable rates. Pendle's [AMM whitepaper](https://github.com/pendle-finance/pendle-core-v2-public/blob/87685c89d05087535e9b9647eeda0e3d297d1f06/whitepapers/AMM.pdf) treats $$p$$ between 0.1 and 0.9 as the reasonable trading range and derives the rate scalar at the pool's start from an expected and a maximum rate, so that this range covers implied rates from 0 % up to the maximum.
+- **The rate scalar grows as expiry nears.** $$s$$ is `scalarRoot × 365 days / timeToExpiry`, so near expiry the same trade moves $$E$$, and with it the rate and the price, less and less. The scalar does not pull the price to 1; the next point does.
 - **The anchor is re-solved before every trade.** `_getRateAnchor` picks $$a$$ so that the pool's current proportion $$p_0$$ reproduces the last implied rate at today's $$\tau$$:
 
 $$
@@ -150,13 +160,22 @@ a = e^{r_{last}\,\tau} - \frac{1}{s}\,\ln\frac{p_0}{1 - p_0}
 \end{aligned}
 $$
 
-So without any trade the implied rate stays constant, and the PT price drifts up deterministically as $$e^{-r\tau}$$.
+So without any trade the implied rate stays constant, and the PT price drifts up deterministically as $$e^{-r\tau}$$, reaching 1 at expiry.
 
-The curve has two hard bounds. A trade that leaves more than 96 % PT in the pool reverts with `MarketProportionTooHigh` (`MAX_MARKET_PROPORTION`), and an exchange rate below 1 reverts with `MarketExchangeRateBelowOne`, so PT can never be bought above 1 asset and the implied rate cannot go negative. Leaving the rate range that `scalarRoot` and the anchor allow is what Pendle's troubleshooting page calls a market going **out of range**: selling PT, buying YT and market-order zaps out are disabled, limit orders still work, and since markets are immutable Pendle redeploys a wider pool.
+The curve has two hard bounds, one at each end of the rate range:
+
+| Bound | Reached by | What reverts |
+|---|---|---|
+| High rate: more than 96 % PT in the pool after the trade | selling PT, buying YT | market-order PT sales, YT buys and zaps out; limit orders still fill |
+| Zero rate: an exchange rate below 1 | buying PT | PT buys, so PT can never be bought above 1 asset and the implied rate cannot go negative |
+
+A zap is a router call that converts to or from another token in one transaction, and limit orders are fills from Pendle's off-chain order book; both are described under [The router](#the-router). Only the high-rate bound is what Pendle's troubleshooting page calls a market going **out of range**: the implied APY has passed the upper end of the yield range that `scalarRoot` and the initial anchor set. Since markets are immutable, Pendle then redeploys a wider pool.
+
+*Implementation:* `MarketProportionTooHigh` (`MAX_MARKET_PROPORTION`) and `MarketExchangeRateBelowOne` in `MarketMathCore.sol`.
 
 ### Fees on the rate
 
-The fee is applied to the exchange rate rather than to the amount. With $$\phi$$ = `lnFeeRateRoot`, the fee factor is $$f = e^{\phi\tau}$$, so it shrinks with time to expiry. In `calcTrade`:
+The fee is applied to the exchange rate rather than to the amount. With $$\phi$$ = `lnFeeRateRoot`, the fee factor is $$f = e^{\phi\tau}$$, so it shrinks toward 1 as expiry approaches. In `calcTrade`:
 
 - **Buying PT** divides the exchange rate by $$f$$ (fewer PT per asset); the code checks that the post-fee rate is still at least 1. The buyer pays the pre-fee asset amount times $$f$$.
 - **Selling PT** returns the pre-fee asset amount divided by $$f$$.
@@ -165,7 +184,9 @@ The fee is applied to the exchange rate rather than to the amount. With $$\phi$$
 
 ### Swaps and liquidity
 
-The market exposes only two primitive swaps, `swapExactPtForSy` and `swapSyForExactPt`, and both are flash swaps: the output is sent, `swapCallback` runs if data was passed, and the balance check comes last. The router solves every other exact-input trade by binary search over the PT amount, bounded by `ApproxParams`. LP `mint` is proportional to reserves, with 1,000 units locked on the first mint; `burn` is pro-rata and still works after expiry, while swaps and mints revert with `MarketExpired`.
+The market exposes only two primitive swaps, `swapExactPtForSy` and `swapSyForExactPt`, and both are flash swaps: the output is sent, `swapCallback` runs if data was passed, and the balance check comes last. The curve gives the cost of a trade from its PT amount, and that relation cannot be inverted in closed form for a given input, so the router solves every other exact-input trade by binary search over the PT amount, bounded by `ApproxParams`.
+
+LP `mint` is proportional to reserves, with 1,000 units locked on the first mint; `burn` is pro-rata and still works after expiry, while swaps and mints revert with `MarketExpired`.
 
 YT is traded on the same pool:
 
@@ -204,10 +225,10 @@ The steps, in the order `executeTradeCore` takes them:
 
 1. **Spot before the trade.** $$E_0 = e^{0.5 \ln 1.1} = \sqrt{1.1} = 1.048809$$, so PT trades at $$1/E_0 = 0.953463$$ asset.
 2. **Anchor.** $$p_0 = 1{,}500{,}000 / 2{,}500{,}000 = 0.6$$, and $$a = 1.048809 - \ln(1.5)/20 = 1.028536$$.
-3. **Trade rate.** The code evaluates the curve at the post-trade PT count over the *pre-trade* total: $$p = 1{,}490{,}000 / 2{,}500{,}000 = 0.596$$, so $$E = \ln(1{,}490{,}000/1{,}010{,}000)/20 + a = 1.047977$$. Before fees, 10,000 PT cost $$10{,}000 / 1.047977 = 9{,}542.20$$ asset.
+3. **Trade rate.** The code evaluates the curve at the post-trade PT count over the *pre-trade* total: $$p = 1{,}490{,}000 / 2{,}500{,}000 = 0.596$$, so $$E = \ln(1{,}490{,}000/1{,}010{,}000)/20 + a = 1.047977$$, where $$1{,}010{,}000 = 2{,}500{,}000 - 1{,}490{,}000$$ is the $$1 - p$$ side. Before fees, 10,000 PT cost $$10{,}000 / 1.047977 = 9{,}542.20$$ asset, against $$10{,}000 / 1.048809 = 9{,}534.63$$ at the pre-trade spot.
 4. **Fee.** $$f = e^{0.003 \times 0.5} = 1.001501$$. The buyer pays $$9{,}542.20 \times f = 9{,}556.52$$ asset, so the fee is 14.32 asset. The post-fee rate $$E/f = 1.046406$$ is above 1, so the trade is allowed.
 5. **Settlement in SY.** 9,556.52 asset is 7,645.22 SY at 1.25 (rounded up in the code, `assetToSyUp`). Of the 14.32 asset fee, 80 % (11.46 asset, 9.17 SY) leaves the pool for the treasury, and 2.86 asset stays with the LPs.
-6. **New state.** `totalPt` = 1,490,000 and `totalSy` = 807,636.05. With the same anchor, the new spot rate is $$E_1 = 1.047999$$: the PT spot price rises to 0.954199 and the stored implied APY falls from 10.00 % to 9.83 %.
+6. **New state.** `totalPt` = 1,490,000 and `totalSy` = 807,636.05 (800,000 + 7,645.22 paid in − 9.17 to the treasury). With the same anchor, the new spot rate is $$E_1 = 1.047999$$: the PT spot price rises to 0.954199 and the stored implied APY falls from 10.00 % to 9.83 %.
 
 The buyer paid 0.955652 asset per PT on average, 0.23 % above the pre-trade spot of 0.953463; the fee accounts for about 0.15 points of that.
 
@@ -225,7 +246,7 @@ The phases, with what each one does to a PT holder:
 
 | Phase | Market | PT value |
 |---|---|---|
-| Long before expiry | swaps live; the rate scalar is small, so rate moves cost more price | $$e^{-r\tau}$$ asset |
+| Long before expiry | swaps live; $$\tau$$ is large, so a given rate move costs more price, and the small rate scalar lets a trade move the rate more | $$e^{-r\tau}$$ asset |
 | Approaching expiry | the rate scalar grows, price impact per unit traded falls; liquidity and incentives often leave | converges to 1 asset if the SY is solvent |
 | At expiry | swaps and mints revert; LP `burn` still works | `redeemPY` returns $$1/\text{pyIndex}$$ SY per PT |
 | After expiry | no AMM exit; the exit is `redeemPY` then `SY.redeem` into `getTokensOut()` (router `exitPostExpToToken`) | a fixed amount of asset, no further yield |
@@ -245,14 +266,29 @@ $$
 \end{aligned}
 $$
 
-`getPtToAssetRateRaw` returns exactly 1 after expiry. The average is taken over the **rate**, and converted to a price at today's $$\tau$$, so the TWAP price still converges to 1 at expiry whatever the rate did. `PendlePYOracleLib` (or the deployed `PendlePYLpOracle` at `0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2`) adds the SY solvency check: if `SY.exchangeRate()` is below the stored PY index, `getPtToAssetRate` scales the price down by their ratio, and `getPtToSyRate` divides by the larger of the two.
+where $$C(t)$$ is the cumulative ln implied rate recorded at time $$t$$.
+
+`getPtToAssetRateRaw` returns exactly 1 after expiry. The average is taken over the **rate**, and converted to a price at today's $$\tau$$, so the TWAP price still converges to 1 at expiry whatever the rate did. `PendlePYOracleLib` (or the deployed `PendlePYLpOracle` at `0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2`) adds the SY solvency check. With $$P$$ the raw PT price in asset above:
+
+$$
+\begin{aligned}
+\text{PtToAsset} &= P \cdot \min\left(1,\ \frac{\text{SY rate}}{\text{pyIndex}}\right) \\
+\text{PtToSy} &= \frac{P}{\max(\text{SY rate},\ \text{pyIndex})}
+\end{aligned}
+$$
+
+When the SY rate has fallen below the stored index, a PT redeems at the index, so dividing by the larger of the two gives the SY a PT redeems for, not the larger amount the falling rate would suggest.
+
+*Implementation:* `PendlePYOracleLib.getPtToAssetRate` and `getPtToSyRate`.
 
 Practical points from the integration guide and the code:
 
-- **Cardinality starts at 1.** A window older than the oldest observation reverts with `OracleTargetTooOld`. Anyone can call `increaseObservationsCardinalityNext(n)`, and the integrator then waits `D` seconds. `getOracleState(market, duration)` reports readiness; the required cardinality is $$\lceil D \times 1000 / \text{blockCycleNumerator} \rceil + 1$$, with 11000 given as the Ethereum value in the code comments (83 slots for 900 s; the integration guide's table gives 85).
+- **Cardinality starts at 1.** A window older than the oldest observation reverts with `OracleTargetTooOld`. Anyone can call `increaseObservationsCardinalityNext(n)`, and the integrator then waits `D` seconds. `getOracleState(market, duration)` reports readiness and the number of slots needed, about one per block over the window: the integration guide's table gives 85 slots for 900 s on Ethereum. The formula behind that count is in the Integration Notes.
 - **Recommended windows** are 900 s or 1800 s. A window of 0 returns the spot `lastLnImpliedRate`, which is manipulable within a block and should not price collateral.
 - **Price to SY, not to asset.** Pendle guarantees PT to SY; SY to asset (sUSDe to USDe, ezETH to ETH) happens outside Pendle and may trade at a discount. The docs advise `getPtToSyRate` times the yield token's price over `getPtToAssetRate` times the asset's price.
-- **`PendleChainlinkOracle`**, the wrapper with Chainlink's interface, reports `updatedAt = block.timestamp` and `roundId = 0`, so a staleness check on it tests nothing. `_descalePrice` multiplies the raw rate by $$10^{\text{in}}/10^{\text{out}}$$, so the answer is in 18-decimal natural units: one natural unit of the input token is worth answer / 1e18 natural units of the output token. Pendle's FAQ says the answer has $$18 + \text{out}$$ decimals, which contradicts the formula it gives just above.
+- **`PendleChainlinkOracle`**, the wrapper with Chainlink's interface, reports `updatedAt = block.timestamp` and `roundId = 0`, so a staleness check on it tests nothing. Its answer reads as whole tokens with 18 decimals: answer / 1e18 is the number of output tokens one input token is worth. For an 18-decimal PT worth 0.95 of a 6-decimal output token, the raw rate per raw unit, scaled by 1e18, is 950,000; the wrapper multiplies it by $$10^{18}/10^{6}$$ and reports $$0.95 \times 10^{18}$$. Pendle's FAQ gives a different reading of the decimals, noted in the Integration Notes.
+
+*Implementation:* `PendleChainlinkOracle._descalePrice`.
 
 ### The linear-discount oracle
 
@@ -264,11 +300,14 @@ $$
 \end{aligned}
 $$
 
-It reads only `block.timestamp`, so it has no liveness or manipulation surface, and it reaches 1 at maturity. It is a discount factor in the PT's asset, not a USD price, and it sees neither a market move nor an SY depeg. Because $$1 - d\tau \le e^{-d\tau}$$, a discount equal to the market rate already prices slightly below the market: 0.9500 against 0.9535 at 10 % and six months.
+It reads only `block.timestamp`, so it has no liveness or manipulation surface, and it reaches 1 at maturity. It is a discount factor in the PT's asset, not a USD price, and it sees neither a market move nor an SY depeg. Here $$d$$ is a simple annual discount, while the market quotes an APY and prices PT at $$(1 + \text{APY})^{-\tau} = e^{-\ln(1+\text{APY})\,\tau}$$. Setting $$d$$ equal to the market's APY therefore already prices slightly below the market, for two reasons that add up:
 
-Pendle's parameter guide advises keeping the oracle below the market price until maturity; setting $$d$$ so that the oracle stays under the **lowest** price of the market's yield range guarantees this. Its example for PT-USDe-25SEP2025 is 18 %.
+- **Linear against exponential.** At the same rate, $$1 - d\tau \le e^{-d\tau}$$: 0.9500 against 0.9512 at 10 % and six months.
+- **APY against ln rate.** The market discounts at $$\ln(1.1) = 0.0953$$, less than 0.10, so its price is higher again: 0.9535.
 
-If the market rate rises far enough above $$d$$, through a stress, a depeg or LPs leaving, the oracle **overprices** the PT. For $$d$$ = 10 % six months out, the break-even is an implied APY of 10.80 %, since $$0.95^{-2} - 1 = 0.1080$$. In the jump to 20 % above, a 10 % oracle reads 0.9500 while the market pays 0.9129, 3.91 % less. Positions are then not liquidated while the collateral's sale value falls, and the liquidation bonus is spent on the gap. That is the cost of the liveness the design buys.
+Pendle's parameter guide advises keeping the oracle below the market price until maturity; setting $$d$$ so that the oracle stays under the price at the highest rate the market can trade, the top of its rate range, guarantees this. Its example for PT-USDe-25SEP2025 is 18 %.
+
+If instead $$d$$ is set at the current market rate, and the market rate then rises far enough above $$d$$, through a stress, a depeg or LPs leaving, the oracle **overprices** the PT. For $$d$$ = 10 % six months out, the break-even is an implied APY of 10.80 %, since $$0.95^{-2} - 1 = 0.1080$$. In the jump to 20 % above, a 10 % oracle reads 0.9500 while the market pays 0.9129, 3.91 % less. Positions are then not liquidated while the collateral's sale value falls, and the liquidation bonus is spent on the gap. That is the cost of the liveness the design buys.
 
 [Pricing Yield Collateral on Morpho - Huma's PST Exchange Rate and Ojo's Pendle PT Feed]({{site.url_complet}}/2026/10/11/huma-pst-ojo-pt-oracle-morpho-collateral-pricing/) looks at a third design, Ojo's feed, which takes the minimum of the TWAP and a linear discount.
 
@@ -287,7 +326,11 @@ If the market rate rises far enough above $$d$$, through a stress, a depeg or LP
 
 ## PT as lending collateral
 
-Pendle's own collateral guide lists three uses: leveraging the spread between the PT's fixed rate and the borrow rate, leveraging a short-yield view, and a leveraged long on the asset with fixed carry on top. Its example of the first: PT-stETH yields 5 %, ETH borrows at 3 %, and a collateral factor of 0.80 allows up to 5x, for at most $$5 \times (5 - 3) = 10$$ %.
+Pendle's own collateral guide lists three uses: leveraging the spread between the PT's fixed rate and the borrow rate, leveraging a short-yield view, and a leveraged long on the asset with fixed carry on top.
+
+Its example of the first: PT-stETH yields 5 %, ETH borrows at 3 %, and a collateral factor of 0.80 allows up to 5x, for at most $$5 \times (5 - 3) = 10$$ %.
+
+That figure is the guide's, and counts the spread on five times the capital. With 1 of equity, 5 of PT and 4 of debt, the return on equity is $$5 \times 5 - 4 \times 3 = 13$$ %, of which 5 points is the unlevered PT yield.
 
 On Morpho Blue, a PT market's oracle can be a `MorphoChainlinkOracleV2` whose base feed is the linear-discount oracle or the TWAP behind a Chainlink-shaped adapter, for which Morpho's documentation lists a community adapter and factory; third-party feeds such as Ojo's min(TWAP, linear) feed are also used. How that price enters a Morpho market's health check is covered in [Morpho Blue and Vault V2]({{site.url_complet}}/2026/11/16/morpho-blue-vault-v2/). Aave's PT price adapter is not in the sources read for this article.
 
@@ -305,7 +348,11 @@ flowchart TD
 
 Every arrow in that path is a dependency: the PT/SY pool's depth before expiry, the SY's output set, and the yield token's own exit through a cooldown or a DEX.
 
-Pendle's sizing rule makes the first one checkable. With a deposit cap $$dCap$$, collateral factor $$c$$, share $$k$$ of loans liquidatable at once, close factor $$f$$ and bonus $$p$$, selling $$dCap \cdot c \cdot k \cdot f \cdot (1 + p)$$ worth of PT must cost less than $$p$$ in price impact. In the guide's Compound V2 example, with $$c = 0.70$$, $$k = 0.30$$, $$f = 0.5$$ and $$p = 0.08$$, that is $$0.1134 \cdot dCap$$. The guide also warns that sales lower the price and liquidate more loans, so a strict analysis takes $$k = 1$$.
+Pendle's sizing rule makes the first one checkable. The letters below differ from the guide's so that they do not clash with the fee factor $$f$$ and the PT proportion $$p$$ used above.
+
+With a deposit cap $$dCap$$, collateral factor $$c$$, share $$k$$ of loans liquidatable at once, close factor $$q$$ and liquidation bonus $$b$$, selling $$dCap \cdot c \cdot k \cdot q \cdot (1 + b)$$ worth of PT must cost less than $$b$$ in price impact. In the guide's Compound V2 example, with $$c = 0.70$$, $$k = 0.30$$, $$q = 0.5$$ and $$b = 0.08$$, that is $$0.1134 \cdot dCap$$.
+
+The guide also warns that sales lower the price and liquidate more loans, so a strict analysis takes $$k = 1$$.
 
 The risks of PT collateral are collected in the Risks annex below.
 
@@ -363,8 +410,10 @@ Pendle V2 turns a yield-bearing token into a fixed-maturity bond and a yield str
 
 | Behaviour | What an integrator should do |
 |-----------|------------------------------|
+| PT and YT carry the asset's decimals, SY the yield token's, and LP tokens 18; assets with fewer than 18 decimals get a `scaled18` wrapper. Every rate in the contracts is 1e18-scaled on raw units. | Read each token's `decimals()` before converting a rate into a price. |
+| `PendlePYLpOracle` sizes the cardinality as $$\lceil D \times 1000 / \text{blockCycleNumerator} \rceil + 1$$, where `blockCycleNumerator` / 1000 is a block time in seconds set below the real one; the code comments give 11000 on Ethereum, which yields 83 slots for 900 s against 85 in the integration guide. | Use the guide's figure or read `blockCycleNumerator()` on-chain rather than assuming either. |
 | `PendleChainlinkOracle.updatedAt` is always `block.timestamp`. | Do not treat it as freshness; check readiness with `getOracleState`. |
-| The answer of `PendleChainlinkOracle` is in 18-decimal natural units after rescaling by the token decimals; Pendle's FAQ states $$18 + \text{out}$$ decimals. | Test the scaling against a known rate on a pair with different decimals before relying on either reading. |
+| The answer of `PendleChainlinkOracle` is in 18-decimal natural units after rescaling by the token decimals; Pendle's FAQ states $$18 + \text{out}$$ decimals, which contradicts the formula the FAQ itself gives. | Test the scaling against a known rate on a pair with different decimals before relying on either reading. |
 | `PendleSparkLinearDiscountOracle.latestRoundData` returns `updatedAt = 0`. | A Chainlink-style staleness check rejects it; the answer depends only on `block.timestamp`, so exempt this feed from that check rather than disabling it for the whole oracle. |
 | A TWAP window older than the oldest observation reverts. | Raise cardinality first and wait the window length before reading. |
 | `getPtToAssetRate` assumes the yield token redeems at its exchange rate. | Price to SY and multiply by the yield token's own price where possible. |
@@ -440,7 +489,9 @@ Because PT and YT are minted at the PY index: one SY at an index of 1.25 mints 1
 
 **Q: What does the rate anchor do, and why is it recomputed before each trade?**
 
-The anchor is the offset of the curve. Before each trade, `_getRateAnchor` chooses it so that the pool's current PT proportion gives back the last stored implied rate at the current time to expiry. As a result, the passage of time alone does not move the implied rate; only trades do. Combined with the rate scalar growing as $$1/\tau$$, this makes the PT price drift up as $$e^{-r\tau}$$ when nobody trades.
+The anchor is the offset of the curve. Before each trade, `_getRateAnchor` chooses it so that the pool's current PT proportion gives back the last stored implied rate at the current time to expiry.
+
+As a result, the passage of time alone does not move the implied rate; only trades do, and the PT price drifts up as $$e^{-r\tau}$$ to 1 when nobody trades. The rate scalar, growing as $$1/\tau$$, only makes each trade move the rate less as expiry nears.
 
 **Q: How does buying YT affect the PT price, given that there is no YT pool?**
 
@@ -477,7 +528,7 @@ The points below were not settled by the sources read for this article.
 | Aave's PT price adapter is not covered by the sources. | An Aave PT listing may price differently from both oracles described here. | Aave governance proposals for PT listings. |
 | Only the sUSDe, wstETH and ERC-4626 SY implementations were read. | Output sets, caps and pause hooks differ per SY. | The specific SY under `Pendle-SY-Public/.../implementations/`. |
 | The audit reports were listed, not read. | Known findings on markets V6/V7 and the oracles are not summarised. | `pendle-core-v2-public/audits/`. |
-| The documentation's wstETH example gives 0.8928 wstETH per PT at a rate of 1.2, which would give 0.8333. | One of the two figures in the doc is wrong; the article quotes neither as fact. | `HighLevelArchitecture.md`, PT section. |
+| The documentation's wstETH example gives 0.8928 wstETH per PT at a rate of 1.2, which would give 0.8333. | One of the two figures in the doc is wrong; the article uses the computed 0.8333. | `HighLevelArchitecture.md`, PT section. |
 
 ## References
 

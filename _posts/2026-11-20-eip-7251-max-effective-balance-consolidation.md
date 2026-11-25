@@ -2,6 +2,7 @@
 layout: post
 title: "EIP-7251: Increasing the Maximum Effective Balance to 2,048 ETH"
 date:   2026-11-20
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain ethereum
@@ -12,7 +13,7 @@ isMath: true
 isMermaid: true
 ---
 
-Before the Pectra upgrade of May 2025, a validator on the Ethereum beacon chain could count at most 32 ETH towards its weight in consensus. A staker with 3,200 ETH therefore ran 100 validators, each with its own BLS key, its own attestation every epoch and its own entry in the beacon state, and, for validators with an execution withdrawal address, any reward above 32 ETH was swept to that address instead of being staked.
+Before the Pectra upgrade of May 2025, a validator on the Ethereum beacon chain could count at most 32 ETH towards its weight in consensus. A staker with 3,200 ETH therefore ran 100 validators, each with its own BLS key, its own attestation every epoch and its own entry in the beacon state. For validators with an execution withdrawal address, any reward above 32 ETH was also swept to that address instead of being staked.
 
 [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251), *Increase the MAX_EFFECTIVE_BALANCE*, raises that ceiling to 2,048 ETH for validators that opt in with a new `0x02` withdrawal credential, while keeping 32 ETH as the minimum to activate. To make the change usable by operators who already run thousands of validators, it adds an in-protocol *consolidation* that merges one validator into another without passing through the exit and deposit queues, a system contract on the execution layer through which those merges are requested, and a much smaller initial slashing penalty.
 
@@ -41,7 +42,7 @@ The EIP's motivation section gives the size of the problem at the time it was wr
 
 > As of October 3, 2023, there are currently over 830,000 validators participating in the consensus layer. The size of this set continues to grow due, in part, to the `MAX_EFFECTIVE_BALANCE`, which limits the stake of a single validator to `32 ETH`. This leads to large amounts of "redundant validators", which are controlled by a single entity, possibly running on the same beacon node, but with distinct BLS signing keys.
 
-The 32 ETH ceiling came from the original sharding design, in which small subcommittees had to be honest with overwhelming probability; keeping validator weights equal kept one large validator from dominating a subcommittee. Once that design was abandoned, the subcommittees were left with a single role, choosing aggregators, which only requires *one* honest member (a `1/N` assumption, in the EIP's words).
+The 32 ETH ceiling came from the original sharding design. The EIP's *subcommittees* are not the attestation committees themselves but the groups of aggregators that `is_aggregator` selects inside each of them. In the sharding design these subcommittees had to be majority honest with overwhelming probability, and keeping validator weights equal kept one large validator from dominating one. Once that design was abandoned, the subcommittees were left with a single role, aggregating attestations, which only requires *one* honest member: a `1/N` assumption, in the EIP's words, meaning that one honest member out of the N is enough.
 
 The cost of keeping the ceiling was paid by everyone:
 
@@ -64,14 +65,14 @@ The EIP defines constants on both layers. On the consensus layer, three values c
 
 The Electra consensus specification adds the limits of the new queues and the slashing quotients:
 
-| Name | Value |
-|---|---|
-| `PENDING_CONSOLIDATIONS_LIMIT` | 262,144 entries |
-| `MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD` | 2 |
-| `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA` | 128 ETH |
-| `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT` | 256 ETH |
-| `MIN_SLASHING_PENALTY_QUOTIENT_ELECTRA` | 4,096 |
-| `WHISTLEBLOWER_REWARD_QUOTIENT_ELECTRA` | 4,096 |
+| Name | Value | Role |
+|---|---|---|
+| `PENDING_CONSOLIDATIONS_LIMIT` | 262,144 entries | Size cap of the beacon-state consolidation queue (see *Churn by balance*) |
+| `MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD` | 2 | Most consolidation requests one execution payload can carry (see *The consolidation request contract*) |
+| `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA` | 128 ETH | Floor of the balance churn per epoch (see *Churn by balance*) |
+| `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT` | 256 ETH | Cap on activations, and separately on exits, per epoch (see *Churn by balance*) |
+| `MIN_SLASHING_PENALTY_QUOTIENT_ELECTRA` | 4,096 | Immediate slashing penalty, 1/4,096 of the effective balance (see *Slashing*) |
+| `WHISTLEBLOWER_REWARD_QUOTIENT_ELECTRA` | 4,096 | Whistleblower reward, 1/4,096 of the slashed effective balance (see *Slashing*) |
 
 The old `MAX_EFFECTIVE_BALANCE` (32 ETH) is not removed. The cap that applies to a given validator is chosen by its credential:
 
@@ -87,7 +88,7 @@ def get_max_effective_balance(validator: Validator) -> Gwei:
 
 A `0x02` credential changes two things, both through `get_max_effective_balance`.
 
-First, the **effective balance can grow** past 32 ETH. `process_effective_balance_updates` now caps the effective balance at the validator's own maximum rather than at a global 32 ETH. Rewards accumulate in the balance, and once the balance exceeds the effective balance by 1.25 ETH, the effective balance moves up to the balance rounded down to a whole ETH. A `0x02` validator at 33.3 ETH therefore has an effective balance of 33 ETH and earns rewards on 33 ETH; a `0x01` validator at 33.3 ETH stays at 32 ETH and has 1.3 ETH swept.
+First, the **effective balance can grow** past 32 ETH. `process_effective_balance_updates` now caps the effective balance at the validator's own maximum rather than at a global 32 ETH. Rewards accumulate in the balance, and once the balance exceeds the effective balance by 1.25 ETH, the effective balance moves up to the balance rounded down to a whole ETH. A `0x02` validator at 33.3 ETH is 1.3 ETH above its 32 ETH effective balance, more than the 1.25 ETH threshold, so it moves to an effective balance of 33 ETH and earns rewards on 33 ETH; a `0x01` validator at 33.3 ETH stays at 32 ETH and has 1.3 ETH swept.
 
 Second, the **automatic partial sweep changes**. `is_partially_withdrawable_validator` now requires the effective balance to equal the validator's own maximum, and the balance to exceed it. For a `0x02` validator that means nothing is swept until it reaches 2,048 ETH. Below that, withdrawals happen only on request (see *Partial withdrawals* below).
 
@@ -97,7 +98,7 @@ A validator obtains `0x02` credentials in one of three ways:
 - **By switching from `0x01`.** A consolidation request whose source and target are the same public key converts the validator (details below).
 - **There is no direct path from `0x00`.** A validator with BLS credentials first changes to `0x01` with a `BLSToExecutionChange` message, as since Capella.
 
-When a validator switches, any balance above 32 ETH is not credited at once: `queue_excess_active_balance` sets the balance to 32 ETH and appends the excess to `pending_deposits`, so it re-enters the active stake through the same churn-limited queue as a top-up deposit. The pending deposit uses `GENESIS_SLOT` as its slot and the point at infinity as its signature, which marks it as internal rather than a real deposit.
+When a validator switches, any balance above 32 ETH is not credited at once: `queue_excess_active_balance` sets the balance to 32 ETH and appends the excess to `pending_deposits`, so it re-enters the active stake through the same churn-limited queue as a top-up deposit. The pending deposit uses `GENESIS_SLOT` as its slot and the point at infinity as its signature, which marks it as internal rather than a real deposit. In practice it never waits for finality, since its slot is always finalized, and its placeholder signature is never checked, since signatures are verified only for deposits that create a new validator.
 
 ## The consolidation request contract
 
@@ -112,9 +113,13 @@ The contract has no Solidity source and no function selector. It dispatches on t
 | Any caller, exactly 96 bytes | Add a request: `source_pubkey (48) ‖ target_pubkey (48)`, with `msg.value ≥ fee` |
 | Anything else | Revert |
 
-Adding a request stores four storage slots per entry: the caller's address, then the two 48-byte public keys packed into the next three slots, and emits a `LOG0` with the 116-byte record. The contract checks only the fee. It does not check that the public keys exist, that the caller owns them, or that the request makes sense; all of that is left to the consensus layer.
+Adding a request stores four storage slots per entry: the caller's address, then the two 48-byte public keys packed into the next three slots, and emits a `LOG0` with the 116-byte record. The record is the 20-byte address followed by the two 48-byte keys. The contract checks only the fee. It does not check that the public keys exist, that the caller owns them, or that the request makes sense; all of that is left to the consensus layer.
 
-At the end of every block, the system call removes up to `MAX_CONSOLIDATION_REQUESTS_PER_BLOCK = 2` entries from the head of the queue and returns them as consecutive 116-byte records (`source_address ‖ source_pubkey ‖ target_pubkey`). The client places them, in that order, in the block's EIP-7685 request list as type `0x02`. The call has a dedicated 30,000,000 gas limit, does not count against the block's gas, and a block is invalid if the contract has no code or the call fails.
+Adding has no per-block cap: any number of requests can enter the queue in one block. At the end of every block, the system call removes up to `MAX_CONSOLIDATION_REQUESTS_PER_BLOCK = 2` entries from the head of the queue and returns them as consecutive 116-byte records (`source_address ‖ source_pubkey ‖ target_pubkey`). The client places them, in that order, in the block's EIP-7685 request list as type `0x02`.
+
+The two limits sit on different layers: `MAX_CONSOLIDATION_REQUESTS_PER_BLOCK` is the contract's dequeue limit, and `MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD` in the constants table is the size of the consensus-layer list that receives them. Both are 2, so the list can hold every record the contract releases in a block.
+
+The call has a dedicated 30,000,000 gas limit, does not count against the block's gas, and a block is invalid if the contract has no code or the call fails.
 
 ### The fee
 
@@ -122,19 +127,21 @@ The fee rate-limits requests with the same exponential rule as blob gas. The con
 
 $$
 \begin{aligned}
-\text{fee} = \left\lfloor e^{\,x / 17} \right\rfloor \text{ wei (approximately)}
+\text{fee} \approx e^{\,x / 17} \text{ wei}
 \end{aligned}
 $$
 
-where $$x$$ is the excess and 17 is `CONSOLIDATION_REQUEST_FEE_UPDATE_FRACTION`. The contract computes it with `fake_exponential(1, excess, 17)`, an integer Taylor expansion, so the result is exact integer arithmetic rather than a true exponential. The fee doubles each time the excess grows by about 11.8 (17 times ln 2):
+where $$x$$ is the excess and 17 is `CONSOLIDATION_REQUEST_FEE_UPDATE_FRACTION`. The contract computes it with `fake_exponential(1, excess, 17)`, an integer Taylor expansion: an integer approximation of $$e^{x/17}$$, rounded down and identical on every client. The fee doubles each time the excess grows by about 11.8 (17 times ln 2):
 
 | Excess | 0 | 17 | 50 | 100 | 200 | 300 | 400 | 500 |
 |---|---|---|---|---|---|---|---|---|
 | Fee (wei) | 1 | 2 | 18 | 357 | 128,545 | 46,130,791 | 16,542,427,319 | 5,933,467,376,577 |
 
+Even at an excess of 500 the fee is about 0.0000059 ETH; it reaches 0.001 ETH only at an excess of 588. Before the first end-of-block system call after the fork, the excess holds the value `2**256 − 1`, and the fee getter reverts instead of returning a fee.
+
 The excess only changes in the end-of-block system call, so the fee is the same for every transaction in a block. When no request arrives, the excess falls by 1 per block, so a burst of requests decays slowly.
 
-The target of 1 is chosen to rate-limit consolidations as much as possible; the maximum of 2 lets a staker switch a validator to `0x02` and consolidate into it in the same block. Even 1 per block is more than the consensus layer can process (one consolidation every 12 seconds against a churn measured per 6.4-minute epoch), which is why the consensus-layer queue has the hard limit of 262,144 entries discussed below.
+The target of 1 is chosen to rate-limit consolidations as much as possible; the maximum of 2 lets a staker switch a validator to `0x02` and consolidate into it in the same block. Even 1 per block is more than the consensus layer can process: with 32 slots per epoch it is 32 consolidations per epoch, 1,024 ETH if each source holds 32 ETH, against the 262 ETH per epoch of consolidation churn in the example of *Churn by balance*. That is why the consensus-layer queue has the hard limit of 262,144 entries discussed below.
 
 ### Paying the right fee
 
@@ -190,6 +197,8 @@ flowchart TD
 
 When the source and target public keys are equal, `is_valid_switch_to_compounding_request` checks that the validator exists, that `source_address` equals the address in its withdrawal credentials (bytes 12 to 31), that the credentials are `0x01`, that the validator is active, and that it has not started exiting. If so, `switch_to_compounding_validator` rewrites the prefix byte to `0x02` and queues the excess balance. A request with equal keys that fails these checks is ignored, since the spec refuses a consolidation of a validator into itself so that it cannot be used as an exit.
 
+Were it accepted, the validator would get an exit epoch drawn from the consolidation churn, and at its withdrawable epoch the balance would move from itself to itself, so nothing would move. The validator would simply end up exited with its whole balance, swept to its withdrawal address, after using the consolidation churn instead of the 256 ETH per epoch exit churn.
+
 ### Starting a consolidation
 
 When the keys differ, the request must pass a list of checks. In the order of the spec:
@@ -205,6 +214,8 @@ When the keys differ, the request must pass a list of checks. In the order of th
 
 Only the source is authenticated. The spec does not compare the target's withdrawal address with the source's, so the owner of a source validator can consolidate it into any `0x02` validator, including one whose withdrawals go to someone else. The stake then belongs to the target's withdrawal address.
 
+The spec gives a single reason for check 2, in a comment: with "too little available consolidation churn limit", requests are ignored. It does not say why the bar is 32 ETH rather than zero, and that choice is listed in *Gaps*.
+
 If every check passes, the source starts exiting. Its `exit_epoch` is computed by `compute_consolidation_epoch_and_update_churn`, which works like the exit queue but draws on the consolidation churn, and its `withdrawable_epoch` is set 256 epochs later. A `PendingConsolidation(source_index, target_index)` is appended to the state.
 
 ### Completing it
@@ -219,7 +230,9 @@ decrease_balance(state, pending_consolidation.source_index, source_effective_bal
 increase_balance(state, pending_consolidation.target_index, source_effective_balance)
 ```
 
-The target's effective balance then rises at the next effective balance update, within its 2,048 ETH cap. Whatever is left on the source (the fraction of an ETH above its effective balance) is withdrawn by the normal sweep, since the source is now exited and withdrawable. The balance moved to the target never passed through the activation queue: it was active stake before and remains active stake, which is what saves large operators from exiting and redepositing.
+The target's effective balance then rises at the next effective balance update, within its 2,048 ETH cap. If the move takes the target's balance above 2,048 ETH, its effective balance stops at the cap and the part above it is paid out by the automatic sweep, which for a `0x02` validator applies above 2,048 ETH.
+
+Whatever is left on the source (the fraction of an ETH above its effective balance) is withdrawn by the normal sweep, since the source is now exited and withdrawable. The balance moved to the target never passed through the activation queue: it was active stake before and remains active stake, which is what saves large operators from exiting and redepositing.
 
 ```mermaid
 sequenceDiagram
@@ -234,7 +247,7 @@ sequenceDiagram
     C-->>EL: "up to 2 records of 116 bytes"
     EL->>CL: "execution_requests.consolidations"
     CL->>CL: "process_consolidation_request: checks, source exit_epoch"
-    Note over CL: "about 256 epochs later (source withdrawable)"
+    Note over CL: "256 epochs after the source exit epoch (source withdrawable)"
     CL->>CL: "process_pending_consolidations: move balance to target"
 ```
 
@@ -250,11 +263,11 @@ to_withdraw = min(
 )
 ```
 
-A validator with 100 ETH can therefore withdraw up to 68 ETH without exiting. The amount is charged to the exit churn through `compute_exit_epoch_and_update_churn`, and the withdrawal is stored as a `PendingPartialWithdrawal` with a `withdrawable_epoch`. The withdrawal sweep processes matured pending partial withdrawals first, up to 8 per block, before the usual validator sweep. A full exit request (`amount == 0`) is refused while a partial withdrawal is pending, and so is a consolidation whose source has one.
+Here `pending_balance_to_withdraw` is the sum of the amounts already queued as pending partial withdrawals for the same validator, so two requests cannot together go below 32 ETH. A validator with 100 ETH and nothing queued can therefore withdraw up to 68 ETH without exiting. The amount is charged to the exit churn through `compute_exit_epoch_and_update_churn`, and the withdrawal is stored as a `PendingPartialWithdrawal` with a `withdrawable_epoch`. The withdrawal sweep processes matured pending partial withdrawals first, up to 8 per block, before the usual validator sweep. A full exit request (`amount == 0`) is refused while a partial withdrawal is pending, and so is a consolidation whose source has one.
 
 ## Churn by balance, not by count
 
-Before Electra, the churn limit counted validators: `max(4, active_validators // 65536)` per epoch, with an activation cap of 8 since Deneb ([EIP-7514](https://eips.ethereum.org/EIPS/eip-7514)). Once a validator can weigh anything from 32 to 2,048 ETH, a count no longer bounds how much stake changes per epoch. Electra therefore measures churn in Gwei and splits it three ways:
+Before Electra, the churn limit counted validators: `max(4, active_validators // 65536)` per epoch, with an activation cap of 8 since Deneb ([EIP-7514](https://eips.ethereum.org/EIPS/eip-7514)). Once a validator can weigh anything from 32 to 2,048 ETH, a count no longer bounds how much stake changes per epoch. Electra therefore measures churn in Gwei and splits it three ways. Consolidation gets a separate share because it moves stake from one active validator to another without changing the active total, so it should not compete with deposits and exits for the budget that protects the weak subjectivity period:
 
 $$
 \begin{aligned}
@@ -268,11 +281,13 @@ where $$T$$ is the total active balance in ETH, $$C_{bal}$$ the balance churn pe
 
 The split has three consequences:
 
-- **Activations and exits are each capped at 256 ETH per epoch**, the equivalent of 8 validators of 32 ETH, which keeps the Deneb activation cap and extends it to exits. The two use separate budgets (`deposit_balance_to_consume` and `exit_balance_to_consume`), so 256 ETH can activate and 256 ETH can exit in the same epoch. The cap binds as soon as $$T$$ reaches 16,777,216 ETH.
+- **Activations and exits are each capped at 256 ETH per epoch**, the equivalent of 8 validators of 32 ETH, which keeps the Deneb activation cap and extends it to exits. The two use separate budgets (`deposit_balance_to_consume` and `exit_balance_to_consume`), so 256 ETH can activate and 256 ETH can exit in the same epoch. The cap binds as soon as $$T$$ reaches 256 × 65,536 = 16,777,216 ETH. Up to that point $$C_{cons}$$ is zero; because of the floor in the formula, it becomes 1 ETH only at 257 × 65,536 = 16,842,752 ETH.
 - **Consolidations get only the surplus.** With an illustrative total active balance of 34 million ETH, $$C_{bal}$$ is 518 ETH, so 256 ETH per epoch goes to activations and exits and 262 ETH per epoch (58,950 ETH per day at 225 epochs per day) to consolidations.
-- **Below a total active balance of about 18.94 million ETH, consolidations stop.** `process_consolidation_request` ignores every request while $$C_{cons} \leq 32$$ ETH, which holds until $$T$$ reaches 289 × 65,536 = 18,939,904 ETH. The switch to compounding is not affected, since it is handled before that check.
+- **Below a total active balance of about 18.94 million ETH, consolidations stop.** `process_consolidation_request` ignores every request while $$C_{cons} \leq 32$$ ETH, which holds until $$T$$ reaches 289 × 65,536 = 18,939,904 ETH. The factor 289 is 256 + 33: a balance churn of 289 ETH is the first one that leaves more than 32 ETH for consolidations. The switch to compounding is not affected, since it is handled before that check.
 
-Deposits follow the same rule. `process_deposit` no longer credits a deposit at once; it appends a `PendingDeposit`, and `process_pending_deposits` applies at most `MAX_PENDING_DEPOSITS_PER_EPOCH = 16` deposits per epoch, within the activation churn and only once the deposit's slot is finalized. A top-up to an existing validator, which was credited immediately before Electra, now waits in the same queue. Because the churn is paid at the deposit stage, `process_registry_updates` activates every eligible validator without a separate activation limit. The EIP's security section states the result as an invariant: activation and exit churn now limit active *weight* rather than validator count.
+Deposits follow the same rule, through a pending deposit queue that the Electra specification marks as part of EIP-7251. `process_deposit` no longer credits a deposit at once; it appends a `PendingDeposit`, and `process_pending_deposits` applies at most `MAX_PENDING_DEPOSITS_PER_EPOCH = 16` deposits per epoch, within the activation churn and only once the deposit's slot is finalized. A top-up to an existing validator, which was credited immediately before Electra, now waits in the same queue.
+
+Because the churn is paid at the deposit stage, `process_registry_updates` activates every eligible validator without a separate activation limit. The EIP's security section states the result as an invariant: activation and exit churn now limit active *weight* rather than validator count.
 
 Consolidation requests reach the beacon chain at a target of one and at most two per block, which can still outrun the consolidation churn. The EIP bounds it with `PENDING_CONSOLIDATIONS_LIMIT = 262,144` entries; a `PendingConsolidation` is two 8-byte indices, so a full queue is 4 MiB of beacon state. Requests that arrive while the queue is full are discarded, and their fee is not refunded.
 
@@ -283,17 +298,19 @@ A larger validator carries a larger penalty when slashed, and before Electra the
 | Effective balance | Before Electra (1/32) | Electra (1/4,096) |
 |---|---|---|
 | 32 ETH | 1 ETH | 0.0078125 ETH |
-| 2,048 ETH | (not possible) | 0.5 ETH |
+| 2,048 ETH | 64 ETH (hypothetical, the cap was 32 ETH) | 0.5 ETH |
 
-The whistleblower reward moves from 1/512 to 1/4,096 of the effective balance as well. The correlation penalty in `process_slashings` is still proportional to the effective balance and to three times the share of stake slashed in the surrounding 36 days, so a validator slashed alone loses little while a validator slashed together with a large fraction of the network still loses most of its stake. Electra only changes the order of its integer divisions, computing the penalty per 1 ETH increment first.
+The whistleblower reward moves from 1/512 to 1/4,096 of the effective balance as well. The correlation penalty in `process_slashings` is still proportional to the effective balance and to three times the share of stake slashed in the surrounding 36 days, so a validator slashed alone loses little while a validator slashed together with a large fraction of the network still loses most of its stake.
+
+That 36-day window is centred on the slashing, which is why the correlation penalty is applied about 18 days after it. Electra only changes the order of its integer divisions, computing the penalty per 1 ETH increment first, which changes how the result is rounded but not its size.
 
 ## Security considerations
 
 The EIP's argument is that the change "modifies committees and churn, but doesn't significantly impact the security properties". It addresses each place where validator weight enters consensus:
 
-- **Attestation committees.** Committees are still drawn uniformly by validator index, but finality counts weight. The EIP states that even with full consolidation, the probability of an adversarial takeover of a committee stays low, and the share of honest validators a committee requires remains well below the 2/3 supermajority needed for finality. It gives no figures in the text.
+- **Attestation committees.** Committees are still drawn uniformly by validator index, but finality counts weight. The EIP states that even with full consolidation, the probability of an adversarial takeover of a committee stays low, and that "the required share of honest validators remains well below the 2/3 supermajority needed for finality". It does not say what that share is required for, and gives no figures in the text (see *Gaps*).
 - **Aggregator selection.** Aggregators only need one honest member per committee. The EIP says the VRF lottery is changed to consider weight so that the probability of at least one honest aggregator does not get worse. The Electra specification read for this article does not redefine `is_aggregator`, however, which is listed in *Gaps*.
-- **Proposer selection.** Proposers were already sampled by effective balance relative to the maximum. With a 2,048 ETH maximum, a 32 ETH validator is accepted with probability 32/2,048 per draw, so selection loops longer. Electra switches the random value in `compute_proposer_index` from one byte to 16 bits, which keeps the acceptance test fine-grained when the ratio is that small.
+- **Proposer selection.** Proposers were already sampled by effective balance relative to the maximum. With a 2,048 ETH maximum, a 32 ETH validator is accepted with probability 32/2,048 per draw, so selection loops longer. Electra switches the random value in `compute_proposer_index` from one byte to 16 bits, which keeps the acceptance test fine-grained when the ratio is that small. With one byte, a 32 ETH validator is accepted for 4 of the 256 possible values, and every effective balance from 33 to 40 ETH for 5 of them, so 1 ETH steps are invisible; with 16 bits, one step of the random value is worth about 0.03 ETH of effective balance.
 - **Sync committees.** Their selection, `get_next_sync_committee_indices`, is weighted the same way and gets the same 16-bit change. Light clients do not change: they check that a supermajority of sync committee members signed, which still holds because selection is weight-based.
 - **Churn.** As above, the invariants are kept by measuring churn in balance.
 
@@ -349,7 +366,7 @@ The trade-offs are explicit in the specification: only the source is authenticat
 | A consolidation never moves stake into a non-compounding validator. | `has_compounding_withdrawal_credential(target_validator)` | The target check is dropped; the moved stake would then be above the target's 32 ETH cap and swept. |
 | Activations change at most 256 ETH of active stake per epoch, and exits (including partial withdrawals) at most 256 ETH, each with its own budget. | `get_activation_exit_churn_limit` used by `process_pending_deposits`, `compute_exit_epoch_and_update_churn` and partial withdrawals | A balance increase bypasses `pending_deposits`, as an immediate top-up did before Electra. |
 | A partial withdrawal never leaves a `0x02` validator below 32 ETH. | The `min(balance − 32 ETH − pending, amount)` cap in `process_withdrawal_request` and again in `get_pending_partial_withdrawals` | The second cap is removed; penalties between request and payout could then push the balance below 32 ETH. |
-| A consolidation cannot be used as a disguised exit. | The `source == target` refusal and the target activity checks | A validator could exit through consolidation churn and skip the exit queue. |
+| A consolidation cannot be used as a disguised exit. | The `source == target` refusal, and the checks that the target is active and not exiting | A validator could exit through consolidation churn and skip the exit queue, either into itself or into an exiting target, whose exit churn was charged before the moved stake arrived. |
 
 ### Integration Notes
 
@@ -403,6 +420,8 @@ The operator first converts one validator, the future target, to `0x02` with a r
 
 The contract dequeues at most 2 requests per block, and its target of 1 per block makes the fee rise when more arrive. The maximum of 2 exists so that the switch and a first consolidation can land in the same block: the beacon chain processes the requests in order, so the target is already `0x02` when the second one is checked.
 
+On the execution side, the 64 requests can all be sent in one block at that block's fee, since the fee only changes at the end-of-block system call. The contract then releases them two per block, over 32 blocks, and the excess rises by 63, which lifts the fee for later requests from 1 to 39 wei.
+
 With consolidation churn of 262 ETH per epoch and an empty queue, the 63 sources (2,016 ETH) are scheduled over about 8 epochs, after which each completes about 27 hours later. Because the balance moved is capped at each source's effective balance, the fractions of an ETH above 32 on each source are swept as normal withdrawals.
 
 **Q: Does lowering the initial slashing penalty to 1/4,096 make attacks cheaper?**
@@ -424,7 +443,8 @@ These points were not settled by the sources read for this article, or rest on r
 | Gap | Why it matters | What to read or verify |
 |---|---|---|
 | The EIP says the aggregator VRF lottery "changes to consider weight", but the Electra specification at commit `065bcd5` does not redefine `is_aggregator`, whose only definition is in phase0. | The article's description of aggregator security depends on which is current. | Compare [`specs/electra/validator.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/electra/validator.md) with [`specs/phase0/validator.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/phase0/validator.md) and the EIP's discussion thread. |
-| The 34 million ETH total active balance is an illustrative value, not a measured one. | The consolidation churn of 262 ETH per epoch and the 8-epoch schedule follow from it. | Read the current total active balance from a beacon node and recompute with `check_numbers.py`. |
+| The spec ignores consolidation requests while the consolidation churn is at most 32 ETH, with only the comment "too little available consolidation churn limit" as explanation. | This check is what stops consolidations below about 18.94 million ETH staked, yet the scheduling function itself spreads a large consolidation over several epochs. | The EIP-7251 and consensus-specs discussion of `process_consolidation_request` in [`specs/electra/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/electra/beacon-chain.md) and the [Ethereum Magicians thread](https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982). |
+| The 34 million ETH total active balance is an illustrative value, not a measured one. | The consolidation churn of 262 ETH per epoch and the 8-epoch schedule follow from it. | Read the current total active balance from a beacon node and recompute with `check_numbers.py` in the [verification folder](https://github.com/rya-sge/access-denied/tree/main/verification/eip-7251-max-effective-balance-consolidation). |
 | The EIP's claim that committee takeover stays unlikely under full consolidation is stated without numbers. | The security argument of the article rests on it. | The analysis linked from the [Ethereum Magicians discussion](https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982). |
 | `process_pending_consolidations` does not re-check that the target is still active when the balance moves. | If the target has exited in the meantime, the moved stake would follow the target's exit path; the article does not analyse that case. | Trace a target exit during a pending consolidation in [`specs/electra/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/electra/beacon-chain.md) and the consensus-spec tests. |
 | The churn rules described are those of Electra; the in-development Gloas fork changes them ([EIP-8061](https://eips.ethereum.org/EIPS/eip-8061)) with one quotient of 2^15 shared by activations and exits and a dedicated consolidation quotient of 2^16. | The 256 ETH cap would remain for activations only, exits would be uncapped, and consolidation churn would no longer be the surplus above the cap. | [`specs/gloas/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/065bcd5c6ad96186cd2c0ac1c435f620a0b25373/specs/gloas/beacon-chain.md) and EIP-8061. |

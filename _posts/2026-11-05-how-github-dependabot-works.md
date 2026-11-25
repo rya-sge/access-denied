@@ -2,7 +2,7 @@
 layout: post
 title: "How GitHub Dependabot Works: From an Update Job to a Pull Request"
 date:   2026-11-05
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: security
@@ -80,7 +80,7 @@ The CLI takes the place of the private API when you run a job yourself. It serve
 
 ## One interface per ecosystem
 
-At the analysed commit, `dependabot-omnibus` depends on `dependabot-common` and 34 ecosystem gems, from `bundler` and `npm_and_yarn` to `terraform` and `github_actions`. The README states the contract: each gem implements the same classes.
+At the analysed commit, `dependabot-omnibus`, the meta-package that bundles every Dependabot gem, depends on `dependabot-common`, the shared code, and on 34 ecosystem gems, from `bundler` and `npm_and_yarn` to `terraform` and `github_actions`. The README states the contract: each gem implements the same classes.
 
 | Class | Responsibility |
 |-------|----------------|
@@ -94,7 +94,9 @@ At the analysed commit, `dependabot-omnibus` depends on `dependabot-common` and 
 
 This split keeps the orchestration independent of any language, because `updater/` only ever calls `Dependabot::UpdateCheckers.for_package_manager(...)` and its siblings.
 
-The file update step usually delegates to the real package manager rather than reimplementing it. For Go, `go_mod_updater.rb` bumps modules with `go get lib@version`, then runs `go get` again with no argument so that its validation checks run against each module in `go.mod`. This keeps lockfiles consistent, and it is the reason the update has to be isolated: real package managers can run code from the project.
+The file update step usually delegates to the real package manager rather than reimplementing it. For Go, `go_mod_updater.rb` bumps modules with `go get lib@version`, then runs `go get` again with no argument so that its validation checks run against each module in `go.mod`. This keeps lockfiles consistent.
+
+It is also the reason the whole update has to be isolated: a real package manager can run code from the project or from its dependencies. "Trust boundaries: running untrusted code" below describes how the updater is boxed in for that reason.
 
 ## Anatomy of an update job
 
@@ -107,8 +109,11 @@ A job is a declarative description of one piece of work. The CLI's `model.Job` s
 - `security-updates-only`, `security-advisories` and `dependencies` turn the job into a targeted fix.
 - `updating-a-pull-request` and `existing-pull-requests` tell the job what is already open.
 - `cooldown` delays recent releases.
+- `experiments` is a map of feature flags, normally set by the service, that switch optional behaviour on for one job.
 
-The entry point is `updater/bin/update_files.rb`. The CLI still issues `bin/run fetch_files && bin/run update_files`, but `bin/run` treats `fetch_files` as a no-op kept for backward compatibility. Both steps run in one process.
+On GitHub, the private service creates the job and fills these fields, including `security-advisories` and `dependencies` for a security update. With the CLI, you write them yourself in a job file, as "Running a job yourself" shows.
+
+The entry point is `updater/bin/update_files.rb`.
 
 ```mermaid
 sequenceDiagram
@@ -137,31 +142,43 @@ The steps map to two commands:
 1. **`FileFetcherCommand`** validates the target branch, clones the repository and collects the dependency files. If that fails it reports the error and marks the job as processed.
 2. **`UpdateFilesCommand`** builds a `DependencySnapshot`, which runs the ecosystem's `FileParser`, sends the dependency list to the API, and hands over to `Dependabot::Updater`.
 
-Every update job whose manifests parse reports the project's dependencies, so a version update run also refreshes what the service knows about the repository. If parsing fails, `UpdateFilesCommand` records the error and marks the job as processed before that call.
+Both steps run in one process. The CLI still issues `bin/run fetch_files && bin/run update_files`, but `bin/run` treats `fetch_files` as a no-op kept for backward compatibility.
+
+Every update job whose manifests parse reports the project's dependencies, so a version update run also refreshes what the service knows about the repository. If parsing fails, `UpdateFilesCommand` records the error and marks the job as processed before it sends `update_dependency_list`.
 
 An update that cannot happen is not a job failure. It is recorded with `record_update_job_error` and a type such as `security_update_not_found`, and the job still ends with `mark_as_processed`.
 
 ### Choosing an operation
 
-`Updater#run` asks `Operations.class_for(job:)` for a class, and takes the first in an ordered list whose `applies_to?` returns true.
+`Updater#run` asks `Operations.class_for(job:)` for a class, and takes the first in an ordered list whose `applies_to?` returns true. The first entry handles every new version update, even in a repository with no groups, because `UpdateAllVersions` is only reached through it (see below).
 
 | Operation | Applies to |
 |-----------|-----------|
-| `GroupUpdateAllVersions` | Multi-ecosystem jobs, new version updates, and security jobs with several dependencies or a group for security updates |
+| `GroupUpdateAllVersions` | Multi-ecosystem jobs; new version updates; security jobs with more than one dependency or a group for security updates |
 | `RefreshGroupUpdatePullRequest` | An existing group pull request to rebuild |
 | `CreateSecurityUpdatePullRequest` | A new security update for named dependencies |
 | `RefreshSecurityUpdatePullRequest` | An existing security pull request |
 | `RefreshVersionUpdatePullRequest` | An existing version pull request |
 
-`UpdateAllVersions` is not in that list, and its `applies_to?` returns false. It is called by `GroupUpdateAllVersions`, which first runs each configured group and then handles the remaining dependencies one by one. So every new version update goes through the group path, even in a repository with no groups.
+`UpdateAllVersions` is not in that list, and its `applies_to?` returns false. It is called by `GroupUpdateAllVersions`, which first runs each configured group and then handles the remaining dependencies one by one. A multi-ecosystem job is one flagged `multi-ecosystem-update`: its group combines updates from several package managers in one pull request, and it skips the one-by-one pass.
 
 The refresh operations are separate jobs. Refreshing an open pull request recomputes the change and sends it with `update_pull_request`.
 
 ## Version updates: finding a target
 
-For each dependency, `UpdateAllVersions` builds an `UpdateChecker` and asks whether the dependency is up to date. Dependencies are shuffled first unless deterministic updates are switched on, so ordering is not a stable property of a run.
+For each dependency, `UpdateAllVersions` builds an `UpdateChecker` and asks whether the dependency is up to date. Ungrouped dependencies are shuffled first unless the updater's environment sets `UPDATER_DETERMINISTIC`, which is off by default, so ordering is not a stable property of a run.
 
 The shared finder `PackageLatestVersionFinder` narrows the published releases in a fixed order:
+
+1. yanked releases are removed;
+2. releases still inside the cooldown are removed;
+3. releases that do not support the project's language version are removed;
+4. pre-releases are removed, unless the current version or a requirement already names one;
+5. versions excluded by ignore rules are removed;
+6. the ecosystem applies its own last filter, if it defines one.
+
+Steps 2 to 6 run inside `@cooldown_tracker.filter`. That wrapper removes nothing itself: it records which releases the cooldown held back, and flags the dependency when a newer release was held back.
+
 
 ```ruby
 releases = filter_yanked_versions(releases)
@@ -184,7 +201,7 @@ A latest version is not necessarily installable, so the operation then asks how 
 | `:own` | The dependency's own requirement must change |
 | `:all` | Other dependencies must change too |
 
-The levels are tried in that order, and `:update_not_possible` is the result if none works. For version updates, an impossible update is only logged.
+The levels are tried in that order. If none works, the checker returns `:update_not_possible`, which is not a fourth level but the failure result. For version updates, an impossible update is only logged.
 
 ## Security updates: finding the minimum fix
 
@@ -210,9 +227,9 @@ end
 Finding the target then differs from a version update in four ways:
 
 - **It picks the lowest version, not the highest.** The patched release is the smallest change that closes the advisory.
-- **It removes vulnerable versions** by testing each candidate against every advisory with `filter_vulnerable_versions`.
+- **It removes vulnerable versions** by testing each candidate against every advisory with `filter_vulnerable_versions`, then drops every version not above the current one with `filter_lower_versions`.
 - **It skips the cooldown.** The operation builds its checker without one. The code does not say why, and the likely reason is that delaying a fix costs more than proposing a recent release.
-- **It does not apply the shared pre-release filter.** That line is commented out in `fetch_lowest_security_fix_version`, although an ecosystem can still filter on its own, as Go does.
+- **It does not apply the shared pre-release filter.** That line is commented out in `fetch_lowest_security_fix_version`, although an ecosystem can still filter on its own, as Go does. In the shared finder, a pre-release that is the lowest non-vulnerable version can therefore become the target. Which ecosystems use this path without a filter of their own was not checked.
 
 ```ruby
 releases = filter_yanked_versions(releases)
@@ -226,11 +243,11 @@ releases = apply_post_fetch_lowest_security_fix_versions_filter(releases)
 releases.min_by(&:version)&.version
 ```
 
-Go adds one detail. The Go proxy lists tagged releases, but an advisory can be fixed by a commit that has only a pseudo-version, such as `2.3.1-0.20260320110106-0b84568fffcc`. `fetch_lowest_security_fix_version` in the Go finder extracts those versions from the advisory's own boundaries and adds them as candidates.
+Go adds one detail. The Go proxy lists tagged releases, but an advisory can be fixed by a commit that has only a pseudo-version, such as `2.3.1-0.20260320110106-0b84568fffcc`. `fetch_lowest_security_fix_version` in the Go finder extracts those pseudo-versions from the version strings in the advisory's vulnerable ranges, such as `< 2.3.1-0.20260320110106-0b84568fffcc`, and adds the ones above the current version as candidates.
 
 ### Why a security update can fail
 
-A vulnerable dependency does not guarantee a pull request. The operation walks through a chain of checks, and each exit reports a specific error.
+A vulnerable dependency does not guarantee a pull request. The operation walks through a chain of checks, and each exit reports a specific error. `security_update_not_found` covers two cases: no non-vulnerable version is published, or none is compatible with the project's environment, for example its Python version.
 
 ```mermaid
 flowchart TD
@@ -243,16 +260,25 @@ flowchart TD
     D -->|"no"| E4["all_versions_ignored"]
     D -->|"yes"| F{"Non-vulnerable version available?"}
     F -->|"no"| E5["security_update_not_found"]
-    F -->|"yes"| G{"Can requirements be unlocked?"}
+    F -->|"yes"| P1{"PR already open for the latest version?"}
+    P1 -->|"yes"| E7["pull_request_exists_for_latest_version"]
+    P1 -->|"no"| G{"Can requirements be unlocked?"}
     G -->|"no"| E6["security_update_not_possible"]
     G -->|"yes"| H{"Does the update fix an advisory?"}
     H -->|"no"| E6
-    H -->|"yes"| I["create_pull_request"]
+    H -->|"yes"| P2{"PR already open for this change?"}
+    P2 -->|"yes"| E8["pull_request_exists_for_security_update"]
+    P2 -->|"no"| I["create_pull_request"]
 ```
 
 The last check is a guard. `job.security_fix?` confirms that at least one updated dependency moves from an affected version to a non-affected one, or is removed. The code comment explains why it exists: for npm and Yarn sub-dependencies, Dependabot does not control the final version, so an update could otherwise land on another vulnerable release.
 
-GitHub's documentation describes the same limit from the outside: outside npm and NuGet projects that use `PackageReference`, Dependabot cannot update a transitive dependency if that would also require updating its parent.
+GitHub's documentation describes the related limit from the outside. Only two kinds of project can have a transitive dependency updated when its parent must also change:
+
+- npm projects;
+- NuGet projects that use `PackageReference`.
+
+In every other ecosystem, Dependabot cannot update a transitive dependency if that would also require updating its parent. This is why the guard above matters most for npm and Yarn: there, Dependabot moves sub-dependencies without fully controlling the version they land on.
 
 ## Where advisories come from
 
@@ -273,6 +299,8 @@ def vulnerable?(version)
 end
 ```
 
+The last two lines carry a second rule. If an advisory lists no vulnerable range at all, only patched or unaffected versions, every version outside those safe ranges counts as vulnerable.
+
 The source of that data on GitHub is the [GitHub Advisory Database](https://github.com/advisories), published as `github/advisory-database`. The documentation is explicit that only advisories reviewed by GitHub trigger alerts. The snapshot analysed here shows why the distinction matters:
 
 | Measure, commit `b6d0ec57e55` of 2026-11-04 | Count |
@@ -282,9 +310,9 @@ The source of that data on GitHub is the [GitHub Advisory Database](https://gith
 | Unreviewed advisories | 362,041 |
 | Unreviewed advisories with an `ecosystem` field | 3 |
 
-Reviewed advisories are about 9.4% of the files, and they are nearly the only ones Dependabot could match to a package. The unreviewed ones generally lack the package and version data that matching needs. These counts describe what the database holds on that date. They are not a measure of how many vulnerabilities exist.
+The repository stores one JSON file per advisory, and reviewed advisories are about 9.4% of those files, and they are nearly the only ones Dependabot could match to a package. The unreviewed ones generally lack the package and version data that matching needs. These counts describe what the database holds on that date. They are not a measure of how many vulnerabilities exist. Whether a withdrawn reviewed advisory can still reach a job is not visible from the public code.
 
-The conversion from an OSV record to the job's fields happens in the private service. The fields correspond in an obvious way, but the code that does it is not public.
+The conversion from an OSV record to the job's fields happens in the private service, and the code that does it is not public. OSV describes a range with events, whereas the job carries plain requirement strings for affected, patched and unaffected versions. How one becomes the other, for example how a `last_affected` event is written, cannot be read from the code.
 
 ## Version matching, not reachability
 
@@ -302,9 +330,9 @@ The data could not support more on its own: none of the 5,065 reviewed Go adviso
 
 The third column is a separate GitHub feature. [Reachability analysis for Dependabot alerts](https://docs.github.com/en/code-security/concepts/supply-chain-security/about-reachability-analysis-for-dependabot-alerts) is in public preview for repositories using npm, pnpm or Yarn. It only helps with prioritisation: it does not find new vulnerabilities or close alerts, and the documentation advises against dismissing an alert on the verdict alone. Nothing in the two public repositories refers to it, and the page does not say whether it affects which pull requests are raised.
 
-For a Go project, the two tools answer different questions and work well together. Dependabot proposes the fix, and running govulncheck in CI tells you which findings can be reached.
-
 Version matching reports vulnerable code that is never called, which generates noise. It also needs no build and no call graph, works the same way across every ecosystem, and does not miss a vulnerability because of reflection or dynamic dispatch.
+
+For a Go project, the two tools answer different questions and work well together. Dependabot proposes the fix, and running govulncheck in CI tells you which findings can be reached.
 
 ## Trust boundaries: running untrusted code
 
@@ -313,7 +341,7 @@ Updating a dependency means executing the project's tooling. The core README nam
 Three mechanisms do that work, all visible in the CLI:
 
 - **Network isolation.** `NewNetworks` creates two Docker networks, one with `Internal: true`. The updater attaches only to the internal one. The proxy attaches to both, so it is the updater's only way out.
-- **Credential separation.** The updater reads `credentials_metadata` from the job, which describes registries but holds no secrets. Real credentials are given to the proxy, and it adds them to outbound requests. In the core README's words, Dependabot-Core never sees private registry credentials.
+- **Credential separation.** The updater reads `credentials_metadata` from the job, which describes registries but holds no secrets. Real credentials are given to the proxy, and it adds them to outbound requests. In the core README's words, Dependabot-Core never sees private registry credentials. The README's diagram also shows the proxy stripping credentials from responses, a step the proxy article could not confirm in the source.
 - **Interception by a local CA.** `NewProxy` generates a certificate authority for the run, and the updater container trusts it. That is what lets the proxy add headers to HTTPS traffic.
 
 The updater also runs as an unprivileged `dependabot` user, created in `Dockerfile.updater-core`. Before starting anything, the CLI requires valid GitHub build attestations for the updater and proxy images, which ties them to the `main` branch of their repositories. A flag can skip this check for trusted development images.
@@ -333,7 +361,11 @@ flowchart LR
     P -->|"requests with credentials"| R
 ```
 
-This limits the damage of a compromise, but it does not remove it. As the [proxy article]({{site.url_complet}}/2026/11/05/dependabot-credential-proxy-isolation/) shows from the proxy's source, the proxy adds credentials to read requests and refuses to authenticate git pushes, so code in the updater can still read what the job can read. It can also change the file contents sent back. Egress filtering exists in the proxy, but it is off unless a job experiment enables it.
+This limits the damage of a compromise, but it does not remove it. As the [proxy article]({{site.url_complet}}/2026/11/05/dependabot-credential-proxy-isolation/) shows from the proxy's source, the proxy adds credentials to read requests and refuses to authenticate git pushes, so code in the updater can still read what the job can read.
+
+The updater also holds one secret of its own, the job token it presents to the Dependabot API. With it, compromised code in the updater can make the job's API calls, and in particular send altered file contents in its `create_pull_request` request.
+
+Egress filtering exists in the proxy, but it is off unless a job experiment, one of the flags in the job's `experiments` field, enables it.
 
 None of this reviews the new code itself. A Dependabot pull request is an automated proposal to run new third-party code, and it needs the same checks as any other contribution.
 
@@ -341,7 +373,9 @@ None of this reviews the new code itself. A Dependabot pull request is an automa
 
 Once a target is known, `DependencyChangeBuilder` asks the ecosystem's `FileUpdater` to rewrite the files, and raises `DependencyFileContentNotChanged` if nothing changed. The result is a `DependencyChange`.
 
-The title and body come from `PullRequestCreator::MessageBuilder`, which uses the `MetadataFinder` to add release notes, the changelog and commits. The `MetadataFinders::Base` class also has hooks for maintainer changes, install script changes and attestation changes, which ecosystems can implement, and the message builder includes a `link_and_mention_sanitizer`.
+The title and body come from `PullRequestCreator::MessageBuilder`, which uses the `MetadataFinder` to add release notes, the changelog and commits. The `MetadataFinders::Base` class also has three hooks that ecosystems can implement. Each adds a collapsible section to the pull request body, titled "Maintainer changes", "Install script changes" or "Attestation changes", when the new release differs from the old one on that point. At the analysed commit, `npm_and_yarn` implements all three: it reports a release pushed by a publisher who is new since the current version, a release that has lost the attestation its predecessor had, and added or changed install scripts.
+
+The message builder then passes the text through a link and mention sanitizer. It breaks `@` mentions with a zero-width space, which a code comment says prevents notifications, so that quoting an upstream changelog does not ping its authors. It also rewrites `github.com` links to a redirection host.
 
 Then the updater stops. It does not push a branch. `ApiClient#create_pull_request` sends a POST to `/update_jobs/<id>/create_pull_request` with the new file contents and the message:
 
@@ -358,7 +392,7 @@ As far as the public code shows, the component that runs untrusted code asks for
 
 The CLI makes all of this observable. It needs Docker, and `dependabot update go_modules dependabot/cli` runs a version update on a public repository. It records the calls the updater makes and writes them as YAML with `--output`, but it does not create a pull request. The core README points to `dependabot/example-cli-usage` for turning the diffs into pull requests.
 
-A security job needs you to supply the advisory, since nothing else will. The CLI repository has an example job in `testdata/go/security-go.yaml`, added with its initial commit in September 2022. It is not one of the smoke tests: the CLI's smoke workflow downloads its test files from `dependabot/smoke-tests`, and no workflow or Go test reads this file. Its input is:
+A security job needs you to supply the advisory, since nothing else will. The CLI repository has an example job in `testdata/go/security-go.yaml`, but as written it would stop before the pull request step at the analysed commits: it lacks the `dependencies` field, which the updater needs. No test exercises this file, which may explain why it is out of date. Its input is:
 
 ```yaml
 input:
@@ -380,9 +414,9 @@ input:
       commit: 832e37c1a7a4ef89feb9dc7cfa06f62205191994
 ```
 
-The file expects an `update_dependency_list` call, then a `create_pull_request` that moves `github.com/fatih/color` from `1.7.0` to `1.10.0`: the lowest version outside the range, not the latest one.
+The expected output recorded in the file is an `update_dependency_list` call, then a `create_pull_request` that moves `github.com/fatih/color` from `1.7.0` to `1.10.0`: the lowest version outside the range, not the latest one.
 
-The job has no `dependencies` field, and the updater needs one. At commit `6a43f5c18` of `dependabot-core`, `CreateSecurityUpdatePullRequest.applies_to?` returns false when `dependencies` is empty, and `GroupUpdateAllVersions` accepts a security job only with more than one dependency or a group for security updates. So `Operations.class_for` returns nil for a security job without `dependencies`, and `Updater#run` raises `Dependabot::NotImplemented`. According to the code, the job also needs this field under `job` to reach `CreateSecurityUpdatePullRequest`:
+The missing field is what stops it. At commit `6a43f5c18` of `dependabot-core`, `CreateSecurityUpdatePullRequest.applies_to?` returns false when `dependencies` is empty, and `GroupUpdateAllVersions` accepts a security job only with more than one dependency or a group for security updates. So `Operations.class_for` returns nil for a security job without `dependencies`, and `Updater#run` raises `Dependabot::NotImplemented`. According to the code, the job also needs this field under `job` to reach `CreateSecurityUpdatePullRequest`:
 
 ```yaml
     dependencies:
@@ -448,7 +482,7 @@ Dependabot is a job system. A private service decides what to do, and an open-so
 |-----------|------------------------------|
 | Without a lockfile, `dependency.version` can be empty and `vulnerable?` returns false. | Commit a lockfile if you rely on security updates. |
 | A git dependency pinned to a SHA is not considered vulnerable. | Track such dependencies separately, since Dependabot can't place them in a range. |
-| Dependencies are shuffled in each run. | Don't rely on update order, and set a group if updates must travel together. |
+| Ungrouped dependencies are shuffled in each run unless `UPDATER_DETERMINISTIC` is set in the updater's environment. | Don't rely on update order, and set a group if updates must travel together. |
 | A job that cannot update records an error and still ends as processed. | Read the error type, because "no pull request" can have several causes. |
 | The default cooldown does not apply to security updates. | Don't expect a security pull request to have aged, and review it as a fresh release. |
 | The CLI produces diffs, not pull requests. | Use `dependabot/example-cli-usage` as a base for self-hosting. |
@@ -476,15 +510,15 @@ Several exits in `CreateSecurityUpdatePullRequest` lead there:
 
 - The dependency's version cannot be matched, for example with no lockfile or a pinned SHA.
 - An ignore rule covering every version, or an `allow` rule that excludes the dependency (`all_versions_ignored`).
-- The fixed version is not usable in this environment (`security_update_not_found`).
+- No non-vulnerable version is published, or none is compatible with this environment (`security_update_not_found`).
 - A parent dependency blocks the change (`security_update_not_possible`).
-- A pull request already exists.
+- A pull request already exists, for the latest version or for the same change (`pull_request_exists_for_latest_version`, `pull_request_exists_for_security_update`).
 
 The job's error type says which one applies.
 
 **Q: How does Dependabot protect registry credentials from a malicious package?**
 
-The updater never receives them. It runs on an internal Docker network, with the proxy as its only way out, and its job holds only credential metadata. The proxy injects the secret into the outbound request and strips it from the response, using a local certificate authority to do so for HTTPS.
+The updater never receives them. It runs on an internal Docker network, with the proxy as its only way out, and its job holds only credential metadata. The proxy injects the secret into the outbound request, using a local certificate authority to do so for HTTPS. The core README also says it strips credentials from responses, which the source review in the proxy article did not confirm.
 
 A package that runs code during an update therefore finds no registry credential in the updater's environment. The updater does hold one secret, the job token it sends to the Dependabot API (`DEPENDABOT_JOB_TOKEN`), which the CLI sets to an empty string.
 
@@ -503,7 +537,10 @@ The points below were not settled by the code and documentation read for this ar
 | Whether hosted jobs enable the proxy's egress enforcement is not public. | It sets the limit of the isolation described. | GitHub's documentation or a statement from the project. |
 | Whether reachability verdicts change which security updates are raised is not stated. | It affects how much of the update path is version-only on GitHub. | The reachability documentation, which is in preview and may change. |
 | How `reject-external-code` is honoured by each ecosystem was not checked. | The article says only that the flag is passed to the parser. | `reject_external_code` in each ecosystem's `FileParser`. |
-| The CLI example job `testdata/go/security-go.yaml` was not run, with or without `dependencies`. | The `1.10.0` result is the file's recorded expectation, and the `NotImplemented` outcome without `dependencies` was established by reading `Operations.class_for` and `Updater#run` at commit `6a43f5c18`, not by running the job. | Run `dependabot test -f testdata/go/security-go.yaml` as is, then with `dependencies: [github.com/fatih/color]` added. |
+| The CLI example job `testdata/go/security-go.yaml` was not run, with or without `dependencies`, and it dates from the CLI's initial commit in September 2022. | The `1.10.0` result is the file's recorded expectation, and the `NotImplemented` outcome without `dependencies` was established by reading `Operations.class_for` and `Updater#run` at commit `6a43f5c18`, not by running the job; the CLI's smoke workflow downloads its test files from `dependabot/smoke-tests`, and no workflow or Go test reads this file. | Run `dependabot test -f testdata/go/security-go.yaml` as is, then with `dependencies: [github.com/fatih/color]` added. |
+| How the private service maps OSV events (`introduced`, `fixed`, `last_affected`) to `affected-versions`, `patched-versions` and `unaffected-versions` is not public. | A reader cannot tell how a `last_affected` boundary is written, or where `unaffected-versions` comes from. | GitHub's documentation, or job files recorded by the CLI for a known advisory. |
+| Whether withdrawn reviewed advisories, 1,256 in the snapshot, still reach jobs or keep alerts open was not checked. | A withdrawn advisory that still reached jobs would produce pull requests for a retracted finding. | The `withdrawn` field in [`github/advisory-database`](https://github.com/github/advisory-database) and the [Dependabot alerts documentation](https://docs.github.com/en/code-security/dependabot/dependabot-alerts/about-dependabot-alerts). |
+| Which ecosystems can pick a pre-release as a security target was not checked. | The shared finder does not filter pre-releases for security updates, and only Go was seen to filter on its own. | `fetch_lowest_security_fix_version` and `filter_prerelease_versions` in each ecosystem's `UpdateChecker`. |
 | GitHub's documentation pages carry no date, and the schedule and repository settings in the feature table come from general knowledge. | The feature table may change, particularly the preview. | The pages listed in the references, and the `dependabot.yml` options reference. |
 
 ## References

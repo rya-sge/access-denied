@@ -2,7 +2,7 @@
 layout: post
 title: "Who Absorbs the Loss? Tranched Stablecoins Compared - infiniFi, f(x) Protocol and Liquity"
 date:   2026-11-16
-last_modified_at: 2026-11-18
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: blockchain defi ethereum
@@ -39,7 +39,7 @@ The three designs differ less in their parameters than in where the loss-absorbi
 
 - **Liquity** puts it in a pool of stablecoin depositors that buys liquidated collateral at a discount. The pool's risk is the price of the collateral at the moment of liquidation.
 - **infiniFi** puts it in junior tokens of the same stablecoin. iUSD is a claim on a portfolio of farms, and liUSD and siUSD holders agree to be written down first when that portfolio loses value.
-- **f(x)** puts it mainly in the borrowers. Positions are deleveraged in a rebalance zone before liquidation, the stability pool only swaps stablecoins at par for the keeper's token, and debt that collateral cannot cover is added to the other borrowers of the same pool.
+- **f(x)** puts it mainly in the borrowers. Positions are deleveraged in a rebalance zone before liquidation. The stability pool advances its stablecoins to repay the liquidated debt and is paid back at par by the liquidator in the same transaction, so it never holds the collateral. Debt that collateral cannot cover is added to the other borrowers of the same pool.
 
 The sections below follow each design from the event that creates a loss to the last holder who can be charged with it.
 
@@ -52,7 +52,7 @@ A Liquity V1 trove is liquidatable when its individual collateral ratio (ICR) fa
 1. **Offset.** LUSD from the stability pool equal to the trove's debt is burned, and the trove's ETH, minus 0.5 % paid to the liquidator, is shared between depositors in proportion to their deposits.
 2. **Redistribution.** If the pool holds less LUSD than the debt, the pool offsets what it can, and the remaining debt and collateral are redistributed to every active trove in proportion to its collateral.
 
-A depositor's result per liquidation depends only on the ICR of the liquidated trove, because in a mixed liquidation the collateral share matches the debt share. A worked example, with the 200 LUSD liquidation reserve left out for clarity:
+A depositor's result per liquidation depends only on the ICR of the liquidated trove. When the pool covers only part of the debt (a *mixed* liquidation, offset plus redistribution), it receives the same fraction of the collateral as of the debt, so the collateral and debt it takes have the trove's ICR, and its gain or loss per LUSD burned is the same as in a full offset. A worked example, with the 200 LUSD liquidation reserve left out for clarity:
 
 - A trove holds 10 ETH at 2,000 USD and owes 18,500 LUSD, an ICR of about 108.1 %. The pool burns 18,500 LUSD and receives 9.95 ETH worth 19,900 USD: a gain of 1,400 USD for the depositors.
 - If the price had fallen fast enough for the same debt to be liquidated at an ICR of 95 % (collateral worth 17,575 USD), the depositors would receive 0.995 × 17,575 = 17,487.1 USD for 18,500 LUSD burned: a loss of about 1,013 USD.
@@ -66,10 +66,17 @@ The loss order of V1 is therefore: the borrower's collateral, then the stability
 [How Liquity V2 Works - BOLD, User-Set Interest Rates, Redemption Routing and Branch Shutdown]({{site.url_complet}}/2026/10/22/liquity-v2-bold-user-set-interest-rates/) covers BOLD in full; three changes to the waterfall matter here.
 
 - **One pool per collateral branch.** WETH, wstETH and rETH each have their own stability pool, and redistribution only reaches troves of the same branch.
-- **A capped penalty.** The pool keeps collateral worth `debt × 1.05`. A redistribution takes `debt × 1.10` on the WETH branch and `debt × 1.20` on the wstETH and rETH branches. The rest goes to `CollSurplusPool` for the borrower, unlike V1, where the whole collateral was seized in Normal Mode.
+- **A capped penalty.** Both liquidation paths seize at most a fixed multiple of the debt, and any collateral above it goes to `CollSurplusPool`, where the borrower can claim it. In V1, by contrast, the whole collateral was seized in Normal Mode.
+
+  | Path | Collateral seized, at most | Who receives it |
+  |---|---|---|
+  | Offset | `debt × 1.05` on every branch | stability pool depositors |
+  | Redistribution | `debt × 1.10` on WETH, `debt × 1.20` on wstETH and rETH | the other troves of the branch |
+
+- **Interest to the pool.** 75 % of the interest paid by a branch's borrowers goes to that branch's stability pool (`SP_YIELD_SPLIT`); the other 25 % goes to the `InterestRouter`, directed by governance.
 - **Shutdown can leave bad debt.** When a branch's total collateral ratio falls below its shutdown threshold or its oracle fails, the branch shuts down for good. Known issue 9 of the [bold README](https://github.com/liquity/bold/blob/d262669ef3c4d37bf0544df3bb2624c07b8a5ee0/README.md) says the branch may be left with remaining bad debt, so that "a portion of the BOLD supply can never be redeemed". The code does not socialise it automatically; the README lists options such as redirecting redemption fees or governance-directed interest to burn BOLD.
 
-Since the March 2025 code revision, called V5 in ChainSecurity's report, the pool always keeps 1 BOLD (`MIN_BOLD_IN_SP`), so an offset never empties it completely.
+Since the March 2025 code revision, the pool always keeps 1 BOLD (`MIN_BOLD_IN_SP`). ChainSecurity's report calls that revision V5: it is the fifth code version the firm audited, not a Liquity version. An offset never empties it completely, and that 1 BOLD does not count towards the branch's backing. For the waterfall the change is minor: the README says only the offset boundary shifts by 1 BOLD.
 
 ```mermaid
 flowchart TD
@@ -86,10 +93,10 @@ flowchart TD
 
 infiniFi mints iUSD against collateral such as USDC and deploys that collateral into farms: Aave, Pendle principal tokens, Ethena, Maple, Morpho and others, split between liquid farms and maturity farms that cannot be withdrawn before a date. On top of iUSD sit two junior tokens:
 
-- **siUSD**, an ERC-4626 vault over iUSD. Under `YieldSharingV3`, the stakers' share of a profit is sent to a `YieldVestingEscrow` and streamed into the vault over `interpolationDuration`, 8 hours by default. Only the legacy `YieldSharing` called `StakedToken.depositRewards`, which queued rewards for the next one-week epoch.
+- **siUSD**, an ERC-4626 vault over iUSD that earns a share of the protocol's profits. The profit is not paid into the vault at once: it waits in an escrow and is streamed in over a few hours, which matters for the loss order below.
 - **liUSD**, one locked token per duration bucket, such as 2, 4 or 6 weeks of unwinding. Each bucket has a reward multiplier, and a holder who calls `startUnwinding` waits the bucket's duration in `UnwindingModule` before withdrawing.
 
-There is no liquidation in this design. A loss is a fall in the value of the farms, measured by `YieldSharingV3.unaccruedYield()`:
+There is no liquidation in this design. A loss is a fall in the value of the farms, measured by `YieldSharingV3.unaccruedYield()`. In the code, iUSD is called the *receipt token*:
 
 ```solidity
 // src/finance/YieldSharingV3.sol
@@ -125,9 +132,11 @@ FixedPriceOracle(oracle).setPrice(newPrice);
 Each tier has its own rule:
 
 - **The safety buffer is all or nothing.** It is iUSD held by `YieldSharingV3`, refilled first out of profits up to `safetyBufferSize`. It absorbs a loss only if it covers the whole of it; a larger loss skips it, and the buffer's iUSD then takes only the last-tier repricing like any other iUSD.
-- **Lockers are hit pro rata, not by multiplier.** `LockingController.applyLosses` splits the amount between the unwinding positions and the buckets in proportion to their iUSD balances. Unwinding positions lose through a lower `slashIndex` in `UnwindingModule`; buckets lose through burned iUSD and a lower `totalReceiptTokens` each. The reward multiplier of a longer bucket earns it more yield but does not change its share of a loss. A loss larger than `maxLossPercentage` (0.999999e18) of the locked balance wipes every locker and pauses the `LockingController`.
-- **siUSD loses principal.** `StakedToken.applyLosses` first slashes any epoch rewards queued through `depositRewards`, then burns principal, which lowers the share price. `YieldSharingV3` never calls `depositRewards`, so under V3 those queues are empty and the loss goes straight to principal. `accrue()` first pushes the rewards already vested into the vault; the iUSD still vesting in the escrow is not part of the vault's balance, escapes this tier and takes only the last-tier repricing.
+- **Lockers are hit pro rata, not by multiplier.** The loss is split between the unwinding positions and the duration buckets in proportion to their iUSD balances. The reward multiplier of a longer bucket earns it more yield but does not change its share of a loss. A loss larger than 99.9999 % of the locked balance wipes every locker and pauses the `LockingController`.
+- **siUSD loses principal.** The vault burns iUSD from its principal, which lowers the share price for every staker. One part of the stakers' money is outside the vault at that moment: the profit share still waiting in the escrow. `accrue()` first moves the part already vested into the vault; the iUSD still vesting is not part of the vault's balance, so it escapes this tier and takes only the last-tier repricing. That iUSD belongs to the stakers: it reaches the vault over the following hours, so whoever holds siUSD then receives it without the siUSD tier's write-down. The worked example below puts numbers on it.
 - **iUSD is repriced last.** Whatever is left lowers the iUSD price written in its `FixedPriceOracle`, by `price × (supply − loss) / supply`. Every holder is hit, including iUSD waiting in the redemption queue, which stays in `totalSupply` until it is funded.
+
+*Implementation:* `LockingController.applyLosses`. Unwinding positions lose through a lower `slashIndex` in `UnwindingModule`, and buckets through burned iUSD and a lower `totalReceiptTokens`. The threshold is `maxLossPercentage = 0.999999e18`. For siUSD, `YieldSharingV3` sends the stakers' profit to a `YieldVestingEscrow` and streams it over `interpolationDuration`, 8 hours by default, through `distributeInterpolationRewards()`. `StakedToken.applyLosses` would first slash rewards queued through `depositRewards`, but only the legacy `YieldSharing` called that function, so under V3 the loss goes straight to principal.
 
 ```mermaid
 flowchart TD
@@ -144,8 +153,18 @@ flowchart TD
 
 Take an iUSD supply of 100 M, a safety buffer of 0.5 M, 10 M held by lockers and 30 M inside siUSD. These balances are illustrative, not deployment values.
 
-- **A 15 M loss.** The buffer is smaller than the loss and is skipped. Lockers lose their 10 M; a loss equal to the whole locked balance is above `maxLossPercentage`, so this step also pauses the `LockingController`. siUSD absorbs the remaining 5 M from its principal. The iUSD price stays at 1.
-- **A 45 M loss.** Lockers lose 10 M and siUSD loses 30 M, which burns 40 M of iUSD and leaves a supply of 60 M. The last 5 M sets the iUSD price to `(60 − 5) / 60`, about 0.9167. The check: 60 M iUSD at 0.9167 is 55 M, the value left after a 45 M loss on 100 M. The 0.5 M buffer is part of the 60 M and is repriced with it. As in the first case, wiping the lockers pauses the `LockingController`.
+In both cases the buffer is smaller than the loss and is skipped, and the lockers lose their whole 10 M. A loss equal to the whole locked balance is above the 99.9999 % threshold, so this step also pauses the `LockingController`.
+
+| Tier | Balance | 15 M loss | 45 M loss |
+|---|---|---|---|
+| Safety buffer | 0.5 M | skipped | skipped, then repriced with plain iUSD |
+| Lockers (liUSD) | 10 M | − 10 M, wiped | − 10 M, wiped |
+| siUSD principal | 30 M | − 5 M, share price down about 16.7 % | − 30 M, wiped |
+| iUSD price | 1 | unchanged at 1 | `(60 − 5) / 60`, about 0.9167 |
+
+In the 45 M case, the lockers and siUSD burn 40 M of iUSD and leave a supply of 60 M, and the last 5 M lowers the price. The check: 60 M iUSD at 0.9167 is 55 M, the value left after a 45 M loss on 100 M. The 0.5 M buffer is part of the 60 M and is repriced with it.
+
+The escrow changes the siUSD line. Suppose 1 M of the stakers' profit is still vesting, outside the 30 M. In the 15 M case siUSD principal still falls from 30 M to 25 M, and the 1 M then streams into the vault at full value, bringing it to 26 M for the stakers who hold siUSD over the next hours. In the 45 M case the 1 M is part of the 60 M left and is repriced to about 0.917 M before it reaches the vault.
 
 ### Pending loss and the keeper
 
@@ -154,13 +173,15 @@ Take an iUSD supply of 100 M, a safety buffer of 0.5 M, 10 M held by lockers and
 Between the moment a farm's mark falls and the next `accrue()`, the loss is **pending**: it is visible in `unaccruedYield()` but applied to nobody. During that window the gateway closes every exit and leaves every entry open:
 
 - **siUSD exits are blocked.** `StakedToken.maxRedeem` and `maxWithdraw` return 0 while `unaccruedYield() < 0`, so the gateway's `unstake` and `unstakeAndLock` revert on the ERC-4626 check that the shares redeemed do not exceed `maxRedeem`.
-- **iUSD redemptions are blocked.** `RedeemController.redeem` is restricted to the `ENTRY_POINT` role, which `roles.1.json` grants only to the gateway proxy and to `MigrationController`, and `MigrationController` never calls it. The gateway's `redeem` starts with `_revertIfThereAreUnaccruedLosses()`, which reverts with `PendingLossesUnapplied` while `unaccruedYield() < 0` (in `InfiniFiGatewayV1` and `InfiniFiGatewayV2`; `InfiniFiGatewayV3` inherits V2). `UnstakeAndRedeemHelper` goes through the same `redeem`.
+- **iUSD redemptions are blocked.** The gateway's `redeem` reverts with `PendingLossesUnapplied` while `unaccruedYield() < 0`, and no other path reaches the redemption contract.
 - **liUSD withdrawals are blocked.** The gateway's `withdraw` of an unwound position runs the same check. `startUnwinding` has none, but an unwinding position still shares the loss pro rata, so starting to unwind gives no escape.
 - **Entries stay open.** The gateway's `mint`, `mintAndStake`, `stake` and `createPosition` have no pending-loss check. A new entrant mints iUSD at the stored price, or stakes or locks into a tier about to be charged, and takes part of a loss that already exists.
 
 A holder who wants out during the window can only sell iUSD, siUSD or liUSD on a secondary market, where one exists, at the market price. The error's own comment tells a user who sees it to "call YieldSharing.accrue()", which a user without the role cannot do. How long the exits stay closed therefore depends on the keepers' schedule, which the code does not state.
 
-These checks are read from the gateway sources in the repository, V1 to V3. The repository's `addresses.1.json` also lists a `GATEWAY_IMPLEMENTATION_V4` whose source is not in the repository, so whether the live gateway keeps them was not verified.
+*Implementation:* the check is `_revertIfThereAreUnaccruedLosses()`, at the start of `redeem` and `withdraw` in `InfiniFiGatewayV1` and `InfiniFiGatewayV2` (`InfiniFiGatewayV3` inherits V2). `RedeemController.redeem` is restricted to the `ENTRY_POINT` role, which `roles.1.json` grants only to the gateway proxy and to `MigrationController`, and `MigrationController` never calls it; `UnstakeAndRedeemHelper` goes through the gateway's `redeem`.
+
+These checks are read from the gateway sources V1 to V3; the live gateway is a V4 whose source is not in the repository (see Gaps).
 
 ```mermaid
 sequenceDiagram
@@ -185,7 +206,15 @@ sequenceDiagram
 
 ### fxUSD as the debt of leveraged positions
 
-In the current f(x) design, new fxUSD is minted as the debt of NFT positions in per-collateral long pools, such as wstETH and WBTC, managed by one `PoolManager`. The older `mint` is disabled, but legacy fTokens can still be wrapped into fxUSD through `wrap` and `wrapFrom`. A position's debt ratio is `debt / (coll × price)`, and positions with similar ratios share a tick, so rebalances and liquidations act on a whole tick at once. fxUSD's backing is the collateral of the long pools at the oracle price, plus a USDC reserve inside the fxUSD contract that fills when fxBASE's USDC, or a borrower's USDC repayment, is used to repay debt.
+In the current f(x) design, a borrower opens a leveraged long position, held as an NFT: it deposits collateral such as wstETH or WBTC and borrows fxUSD against it, so new fxUSD is the debt of these positions. Each collateral has its own pool of positions, a *long pool*, and one `PoolManager` runs them all. When a position is rebalanced or liquidated, a stability pool called fxBASE, described [below](#the-stability-pool-fxbase-and-fxsave), supplies the stablecoins that repay its debt.
+
+A position's debt ratio is `debt / (coll × price)`, and positions with similar ratios share a tick, so rebalances and liquidations act on a whole tick at once. fxUSD in circulation is backed by three things:
+
+- **The long pools' debt**, itself backed by the positions' collateral at the oracle price.
+- **A USDC reserve inside the fxUSD contract.** It fills when debt is repaid in USDC instead of fxUSD, by fxBASE or by a borrower.
+- **Legacy wrapped supply.** The earlier f(x) design issued a fractional token, called an fToken, per market. Minting fxUSD the old way is now disabled, but existing fTokens can still be wrapped into fxUSD.
+
+*Implementation:* `FxUSDRegeneracy.sol`, `wrap` and `wrapFrom` for the legacy fTokens, and `stableReserve` for the USDC reserve.
 
 Each tick falls in one of four zones, set by admin parameters (`BasePool.sol`):
 
@@ -198,9 +227,18 @@ Each tick falls in one of four zones, set by admin parameters (`BasePool.sol`):
 
 ### Rebalance: the position pays first
 
-The rebalance amount comes from `_getRawDebtToRebalance`. With `D` the tick's debt, `V` its collateral value, `t` the target ratio and `i` the bonus, the debt to repay is `x = (D − t·V) / (1 − (1 + i)·t)`. The position gives up collateral worth `x·(1 + i)`; `PoolManager` keeps the share `getLiquidationExpenseRatio()` of the bonus as a protocol fee and sends the rest to the keeper.
+A rebalance repays just enough debt to bring the tick back to the target ratio. Write `D` for the tick's debt, `V` for its collateral value, `t` for the target ratio and `i` for the bonus. Repaying `x` of debt costs the position collateral worth `x·(1 + i)`, and the tick must end at the target:
 
-With illustrative values `D = 880`, `V = 1,000`, `t = 0.85` and `i = 2.5 %`, the tick starts at a ratio of 0.88. The keeper repays about 233.0 of debt and takes collateral worth about 238.8, of which 5.8 is the bonus. The tick ends with a debt of about 647.0 against collateral worth about 761.2, a ratio of 0.85. The bonus is paid out of the positions' own collateral: the rebalance zone is a partial liquidation that leaves the positions open with lower leverage.
+```text
+(D − x) / (V − x·(1 + i)) = t
+x = (D − t·V) / (1 − (1 + i)·t)
+```
+
+The second line is the first one solved for `x`. Part of the bonus is kept as a protocol fee and the rest goes to the keeper.
+
+*Implementation:* `BasePool.sol`, `_getRawDebtToRebalance`; the fee share is `PoolManager.getLiquidationExpenseRatio()`.
+
+With illustrative values `D = 880`, `V = 1,000`, `t = 0.85` and `i = 2.5 %`, the tick starts at a ratio of 0.88. The keeper repays about 233.0 of debt and takes collateral worth about 238.8, of which 5.8 is the bonus. The stablecoins it repays with come from fxBASE, which the keeper pays back, as the fxBASE section below describes. The tick ends with a debt of about 647.0 against collateral worth about 761.2, a ratio of 0.85. The bonus is paid out of the positions' own collateral: the rebalance zone is a partial liquidation that leaves the positions open with lower leverage.
 
 ### Liquidation and bad debt
 
@@ -215,6 +253,8 @@ vars.debtIndex += (rawBadDebt * E96) / vars.totalDebtShares;
 
 An example with round numbers: a pool owes 10,000 fxUSD, and a tick with a debt of 1,050 holds collateral worth 1,000 with no reserve left. The keeper repays 1,000 and takes all the collateral. The 50 left are added to the remaining 8,950 of debt through `debtIndex`, about 0.56 % more debt for every other position in the pool. The pool then owes 9,000. The other borrowers of the same collateral pool absorb the bad debt; borrowers of other pools and fxUSD holders do not.
 
+That holds only while the pool's remaining positions can carry the extra debt. If the liquidated tick holds the pool's last debt shares, the division by the remaining shares fails and the liquidation reverts. If the pool's total collateral is below its total debt, raising `debtIndex` only pushes the shortfall onto positions that are themselves under water, and part of the fxUSD that pool minted is left without full backing. This is the case behind the "terminal tier" row of the comparison table (*derived*).
+
 How the 9,000 of debt lines up with fxUSD supply depends on what repaid the 1,000. If the 1,000 was repaid in fxUSD, it was burned and 9,000 fxUSD remain, matching the debt. If fxBASE repaid it in USDC, no fxUSD is burned: 10,000 fxUSD remain, backed by the 9,000 of debt and the 1,000 USDC sent to the fxUSD contract's reserve.
 
 ### The stability pool fxBASE and fxSAVE
@@ -226,6 +266,8 @@ So fxBASE converts stablecoins at par into the keeper's stablecoin and never hol
 - **The fxUSD price.** `nav()` values fxBASE's fxUSD at the Curve fxUSD/USDC EMA times Chainlink USDC/USD, so a depeg on Curve lowers the NAV without any transaction.
 - **USDC.** The USDC side is valued at Chainlink's USDC/USD price, and deposits are refused below `stableDepegPrice`.
 - **Lent USDC.** The asset manager can lend part of the USDC through a strategy such as `AaveV3Strategy`, which adds that venue's risk.
+
+What fxBASE depositors earn is only partly visible in the code. An instant-redeem fee stays in the pool, so it accrues to the depositors who remain, and fxBASE shares staked in the pool's gauge earn its reward tokens; fxSAVE stakes its shares there and harvests them. The long pools' funding fees and collateral rewards are sent by `PoolManager.harvest` to treasury addresses read from a registry; whether they reach fxBASE is deployment state (see Gaps).
 
 Exits from fxBASE wait `redeemCoolDownPeriod` after `requestRedeem`, or pay an instant fee capped at 5 % (`MAX_INSTANT_REDEEM_FEE`). fxSAVE (`SavingFxUSD`) is an ERC-4626 vault over fxBASE shares staked through Convex, with `nav() = fxBASE.nav() × convertToAssets(1e18) / 1e18`; its withdrawals go through the same cooldown.
 
@@ -251,14 +293,14 @@ flowchart TD
 | Who can lose without opting in | other troves, by redistribution | every iUSD holder, by repricing | other borrowers of the same pool, by `debtIndex` |
 | Terminal tier | V1: none beyond redistribution; V2: bad debt left on a shut-down branch | the iUSD price | the fxUSD backing, if a pool's total collateral falls below its debt (*derived*) |
 | When the loss is applied | in the liquidation transaction, by anyone | at `accrue()`, by a role holder | in the rebalance or liquidation transaction, by any keeper with tokens, unless `EMERGENCY_ROLE` has paused the `PoolManager` |
-| What the absorbers earn | liquidation discount; V2 also 75 % of interest | profit share weighted by multipliers | fxBASE: funding and rewards; keepers: the bonus |
+| What the absorbers earn | liquidation discount; V2 also 75 % of interest | profit share weighted by multipliers | fxBASE: instant-redeem fees and gauge rewards, share of funding not traced; keepers: the bonus |
 | Exit limits in stress | V1: no SP withdrawal while any ICR is below 110 % | siUSD unstaking, iUSD redemption and liUSD withdrawal blocked while a loss is pending; liUSD waits its bucket | fxBASE and fxSAVE cooldown, or an instant fee up to 5 % |
 | How the junior value is marked | collateral at the oracle price | admin-set iUSD price and farm self-reports | Curve EMA for fxUSD, Chainlink for USDC |
 
 Read across the rows, the table shows three properties. They are *derived* from the code paths above, not stated in any of the projects' documents:
 
-- **infiniFi is the only design where plain holders are written down by the protocol.** Liquity and f(x) keep the stablecoin's supply matched to debt by charging borrowers; infiniFi has no borrowers to charge, so the terminal tier is the iUSD price itself.
-- **Only infiniFi applies losses on a schedule.** In Liquity and f(x) the transaction that creates the loss also applies it. The one exception is a pause of the `PoolManager` by an `EMERGENCY_ROLE` holder. In infiniFi the loss waits for a role holder, and during the wait the gateway blocks every exit but no entry, so a new entrant can buy into a loss that already exists.
+- **infiniFi is the only design where the protocol actively writes down plain holders.** Liquity and f(x) keep the stablecoin's supply matched to debt by charging borrowers; infiniFi has no borrowers to charge, so the terminal tier is the iUSD price itself, which `accrue()` lowers. Liquity V2 can also leave plain holders worse off, but passively: a shut-down branch with bad debt leaves part of the BOLD supply unbacked, and nothing reprices or burns BOLD.
+- **Only infiniFi gates the application of a loss behind a role.** In all three designs a loss exists economically as soon as the price or the farm mark falls. In Liquity and f(x), anyone can apply it, and the liquidation reward or bonus pays them to do it quickly; the one exception is a pause of the `PoolManager` by an `EMERGENCY_ROLE` holder. In infiniFi only an `ACCRUE_YIELD` holder can apply it. The asymmetry that matters is what happens in the meantime: the gateway blocks every exit but no entry, so a new entrant can buy into a loss that already exists.
 - **f(x)'s stability pool takes no collateral risk.** Liquity's pool is a buyer of last resort for collateral; fxBASE is a stablecoin swap facility whose risk is the stablecoins themselves.
 
 ## Conclusion
@@ -270,7 +312,7 @@ The three designs place the same economic loss in different hands: Liquity in a 
 - **infiniFi's loss is pending until `accrue()`**, a role-gated call; siUSD unstaking, iUSD redemption and liUSD withdrawal are blocked during that window, while minting, staking and locking stay open at the old price.
 - **f(x)** deleverages a tick in a rebalance zone, liquidates it with a bonus topped up by a reserve, and adds any unpaid debt to the other positions of the same pool through `debtIndex`.
 - **fxBASE and fxSAVE** do not hold liquidated collateral; their depositors are exposed to the fxUSD Curve EMA, the USDC price and lent USDC, with a cooldown or an instant fee to leave.
-- **The main risks** are the self-reported farm marks and the keeper schedule in infiniFi, the admin-set thresholds and oracle switches in f(x), and liquidations below 100 % or a branch shutdown in Liquity.
+- **The main risks** are the self-reported farm marks and the keeper schedule in infiniFi, the admin-set zone thresholds and the Curve EMA mark of fxUSD in f(x), and liquidations below 100 % or a branch shutdown in Liquity.
 
 ![Mindmap of loss absorption in tranched stablecoins covering the Liquity stability pool baseline, infiniFi's buffer, liUSD, siUSD and iUSD repricing with pending loss, and f(x)'s rebalance, reserve, debtIndex and fxBASE]({{site.url_complet}}/assets/article/blockchain/defi/tranched-stablecoins/2026-11-16-tranched-stablecoins-loss-waterfall-mindmap.png)
 
@@ -281,6 +323,9 @@ The three designs place the same economic loss in different hands: Liquity in a 
 | Term | Definition |
 |------|------------|
 | **Collateral ratio (ICR)** | The value of a position's collateral divided by its debt; Liquity liquidates a trove below its minimum collateral ratio. |
+| **MCR, TCR, SCR** | In Liquity, the minimum collateral ratio of a trove (110 % on V1 and on the V2 WETH branch), the total collateral ratio of the system or branch, and V2's shutdown collateral ratio, below which a branch shuts down. |
+| **Recovery Mode** | Liquity V1's state when the TCR is below 150 %, in which troves can be liquidated up to the TCR and those at or below 100 % ICR are redistributed rather than offset. |
+| **Urgent redemption** | In Liquity V2, the only redemption left on a shut-down branch: no fee, troves in any order, and a 2 % collateral bonus to the redeemer. |
 | **Debt ratio** | f(x)'s inverse measure, `debt / (coll × price)`; a higher value means a riskier position. |
 | **Stability pool** | A pool of stablecoin deposits that repays liquidated debt and receives the collateral in exchange. |
 | **Offset** | In Liquity, cancelling a liquidated debt against an equal amount of stability pool deposits. |
@@ -288,12 +333,16 @@ The three designs place the same economic loss in different hands: Liquity in a 
 | **Branch shutdown** | In Liquity V2, the irreversible stop of one collateral branch after its total ratio falls below the shutdown threshold or its oracle fails. |
 | **First-loss capital** | Capital that absorbs losses before other holders, in exchange for extra yield. |
 | **Loss waterfall** | The fixed order in which a protocol charges a loss to successive groups of holders. |
+| **Receipt token** | The name infiniFi's code uses for iUSD. |
 | **iUSD** | infiniFi's receipt token, minted against collateral and valued by an admin-set `FixedPriceOracle`. |
 | **siUSD** | infiniFi's staked iUSD, an ERC-4626 vault that takes losses after the lockers. |
 | **liUSD** | infiniFi's locked iUSD, one token per unwinding-duration bucket, the first tier after the safety buffer. |
 | **Safety buffer** | iUSD held by `YieldSharingV3`, refilled from profits, burned against a loss only if it covers the whole loss. |
 | **Pending loss** | A negative `unaccruedYield()` that `accrue()` has not yet applied to any tier. |
 | **unaccruedYield** | infiniFi's measure of profit or loss: total farm value in iUSD minus iUSD supply. |
+| **Long pool** | In f(x), the pool of leveraged long positions on one collateral, such as wstETH, whose debt is fxUSD. |
+| **ReservePool** | f(x)'s reserve that pays the liquidation bonus when a tick's collateral cannot. |
+| **PegKeeper** | f(x)'s contract that reads the fxUSD Curve EMA, allows borrowing only above a price threshold and redemptions only below it, and lets role holders run buyback and stabilise swaps through fxBASE. |
 | **Tick** | In f(x), a group of positions with similar debt ratios, rebalanced and liquidated together. |
 | **Rebalance zone** | f(x)'s range of debt ratios where a tick is partly deleveraged back to a target ratio. |
 | **debtIndex** | f(x)'s multiplier from debt shares to debt; raising it spreads bad debt over every position of a pool. |
@@ -440,6 +489,7 @@ The points below were not settled by the sources read for this article.
 | f(x)'s documentation describes a "liquidation brake" that was not matched to a mechanism in the code. | The article describes the rebalance zone as the closest mechanism; the docs may mean something else. | f(x)'s documentation on fxprotocol.gitbook.io (not read; exact page unknown). |
 | The short-pool side of f(x) and its credit-note settlement were not traced. | Long pools lend to short pools, so a killed short pool may add a loss path not covered here. | `core/short/ShortPoolManager.sol` and `PoolManager.redeemForSettle` in the pinned repository. |
 | The live infiniFi gateway is `GATEWAY_IMPLEMENTATION_V4` in `deployment/configuration/addresses.1.json`, whose source is not in the repository; the article reads V1 to V3. | Whether exits are still blocked, and entries still open, during a pending loss depends on that implementation. | The verified source of the V4 implementation on Etherscan, or a later commit of [infinifi-protocol](https://github.com/InfiniFi-Labs/infinifi-protocol). |
+| Where f(x)'s funding fees and collateral rewards go is not in the code: `PoolManager.harvest` sends them to treasury addresses read from a registry. | It decides what fxBASE depositors are paid for providing liquidation liquidity, and so whether the pool stays funded. | The registry entries for the pool funding and rewards treasuries on the deployed `PoolConfiguration`, and f(x)'s documentation on fxBASE yield (not read; exact page unknown). |
 | No audit report was read for infiniFi or f(x). | Known findings on the loss paths may change the analysis. | Each project's audit page, public URLs not confirmed. |
 
 ## References

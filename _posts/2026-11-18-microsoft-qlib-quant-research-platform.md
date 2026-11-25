@@ -40,6 +40,8 @@ qlib was presented in [Yang et al., *Qlib: An AI-oriented Quantitative Investmen
 
 The version read here is the `v0.9.8` tag on GitHub. The Python package on PyPI, `pyqlib`, stopped at 0.9.7 at the time of writing, so the worked example below builds qlib from the tagged source. The README also warns that recent source changes (a restricted expression parser, an explicit `trusted` flag for loading Python files) change how existing configurations behave; the security section comes back to them.
 
+Those changes came after version 0.9.7, so the PyPI package most likely still evaluates expressions with Python's `eval` and has no `trusted` gate. That package was not inspected for this article, and the Gaps section lists the point.
+
 The components are loosely coupled: each layer can be used alone, and each is configured as a dictionary naming a class and its arguments. The diagram shows the layers and what flows between them.
 
 ```mermaid
@@ -58,8 +60,6 @@ flowchart TD
 ```
 
 The companion articles on [QuantLib]({{site.url_complet}}/2026/11/18/quantlib-architecture-pricing-library/) and [PyPortfolioOpt]({{site.url_complet}}/2026/11/18/pyportfolioopt-portfolio-optimization/) cover two other tasks of a quant library: pricing a derivative, and turning expected returns into portfolio weights. qlib prices no derivatives, and its portfolio construction (a top-k selection strategy and an enhanced-indexing optimiser) is built around its own signals; its main output is the expected-return signal that an optimiser such as PyPortfolioOpt can consume.
-
-*Implementation:* `qlib/contrib/strategy/`, `TopkDropoutStrategy` and the optimiser in `optimizer/`.
 
 ## Architecture, layer by layer
 
@@ -81,9 +81,11 @@ Expression results are cached in memory and optionally on disk. A separate point
 
 *Implementation:* `qlib/data/data.py`, `D.calendar()`, `D.instruments()`, `D.list_instruments()`, `D.features()` and `LocalPITProvider` at line 746; `qlib.init(provider_uri=..., region=...)`, with the `REG_CN` and `REG_US` rules in `qlib/config.py` at lines 317-326; the cache in `qlib/data/cache.py`.
 
-Two scripts build and check the folder. The first converts one CSV per symbol into the layout above. The second reports missing values, missing OHLCV columns, a missing `factor` (the price-adjustment factor the exchange uses to round orders to whole lots) and day-to-day jumps above 50 % in price or 300 % in volume. A third script downloads a ready-made dataset; the security section explains why the worked example does not use it.
+Two scripts build and check the folder. The first converts one CSV per symbol into the layout above. The second reports missing values, missing OHLCV columns, a missing `factor` and day-to-day jumps above 50 % in price or 300 % in volume. A third script downloads a ready-made dataset; the security section explains why the worked example does not use it.
 
-*Implementation:* `scripts/dump_bin.py` (command `dump_all`), `scripts/check_data_health.py` and `scripts/get_data.py`.
+The `factor` field is the split and dividend adjustment factor: the ratio of the adjusted price to the original price on each day. qlib stores adjusted prices, and its simulated exchange uses the factor for one thing only, converting an order's adjusted share count back to real shares so that it can be rounded to the trade unit. If the factor is missing, that rounding is disabled.
+
+*Implementation:* `scripts/dump_bin.py` (command `dump_all`), `scripts/check_data_health.py` and `scripts/get_data.py`; the factor definition in `docs/component/data.rst`, and its use in `Exchange.round_amount_by_trade_unit()`, `qlib/backtest/exchange.py`.
 
 ### The expression engine
 
@@ -119,14 +121,15 @@ Before evaluation, a helper rewrites the string into Python syntax: `$close` bec
         return series
 ```
 
-The direction of a ratio matters as much as the sign of `N`. The worked example queried AAPL around 10 April 2018:
+The direction of a ratio matters as much as the sign of `N`. The worked example, described below, uses a dataset that ends on 11 April 2018 and in which only the close prices are real. It queried AAPL around 10 April 2018:
 
-```text
-                       $close   $close/Ref($close, 1) - 1   Ref($close, 1)/$close - 1   Mean($close, 5)   Ref($close, -2)/Ref($close, -1) - 1
-AAPL  2018-04-09   170.050003                    0.009918                   -0.009821        170.246002                             -0.004675
-      2018-04-10   173.250000                    0.018818                   -0.018470        171.218002                                   NaN
-      2018-04-11   172.440002                   -0.004675                    0.004697        171.384003                                   NaN
-```
+| AAPL | close | r1 | inv | ma5 | label |
+|---|---:|---:|---:|---:|---:|
+| 2018-04-09 | 170.050003 | 0.009918 | −0.009821 | 170.246002 | −0.004675 |
+| 2018-04-10 | 173.250000 | 0.018818 | −0.018470 | 171.218002 | NaN |
+| 2018-04-11 | 172.440002 | −0.004675 | 0.004697 | 171.384003 | NaN |
+
+The columns are `$close`, then r1 = `$close/Ref($close, 1) - 1`, inv = `Ref($close, 1)/$close - 1`, ma5 = `Mean($close, 5)` and label = `Ref($close, -2)/Ref($close, -1) - 1`.
 
 `$close/Ref($close, 1) - 1` is the daily return (+1.88 % on 10 April). `Ref($close, 1)/$close - 1` is a different quantity (−1.85 %), close to the negated return but not equal to it. The last column is qlib's default label, discussed next: on 9 April it equals the return from 10 to 11 April (172.44 / 173.25 − 1 = −0.4675 %), and it is `NaN` on the last two days of the data because those future prices do not exist.
 
@@ -143,7 +146,7 @@ qlib ships two ready-made handlers:
 
 *Implementation:* `qlib/contrib/data/handler.py`, `Alpha360` at line 48 and `Alpha158` at line 98; the expressions, including `MA`, `STD`, `BETA` and `CORR`, in `qlib/contrib/data/loader.py`.
 
-Both use the same label, `Ref($close, -2)/Ref($close, -1) - 1`: the return from the close of day t+1 to the close of day t+2, for a prediction made with data up to the close of day t. The one-day gap is there because a signal computed after day t's close can be traded at day t+1 at the earliest. The default learning processors are `DropnaLabel` and `CSZScoreNorm` on the label, which replaces each day's labels by their cross-sectional z-score, so the model learns relative rather than absolute returns.
+Both use the same label, `Ref($close, -2)/Ref($close, -1) - 1`: the return from the close of day t+1 to the close of day t+2, for a prediction made with data up to the close of day t. The one-day gap is there because a signal computed after day t's close can be traded at day t+1 at the earliest; the timeline table in the Backtest section below shows how the backtest lines up with it. The default learning processors are `DropnaLabel` and `CSZScoreNorm` on the label, which replaces each day's labels by their cross-sectional z-score, so the model learns relative rather than absolute returns.
 
 Processors that are fitted, such as `ZScoreNorm`, learn their statistics between `fit_start_time` and `fit_end_time`. If `fit_end_time` lies after the end of the training segment, the normalisation has seen validation or test data.
 
@@ -161,14 +164,14 @@ Every model implements the same interface: it is fitted on a dataset and predict
 
 *Implementation:* `qlib/model/base.py`, `Model.fit(dataset)`, `Model.predict(dataset, segment)` and `ModelFT`; `qlib/contrib/model/gbdt.py`, `LGBModel` (line 16); the other models in `qlib/contrib/model/`.
 
-The PyTorch, XGBoost and CatBoost models are imported only if their libraries are installed; the image used here contains LightGBM only, and qlib logs that the others are skipped. `examples/benchmarks/` holds one directory per model with YAML configurations and published results on the Chinese CSI 300 and CSI 500 universes.
+The PyTorch, XGBoost and CatBoost models are imported only if their libraries are installed; the container image used for the worked example contains LightGBM only, and qlib logs that the others are skipped. `examples/benchmarks/` holds one directory per model with YAML configurations and published results on the Chinese CSI 300 and CSI 500 universes.
 
 ### Workflow: R, recorders and MLflow
 
 qlib wraps MLflow in a global experiment manager, `R`. Starting an experiment opens an MLflow run, the run is then returned as a recorder, and record templates write artifacts into it:
 
 - **`SignalRecord`** saves the model's test-segment predictions as `pred.pkl` and the matching labels as `label.pkl`.
-- **`SigAnaRecord`** computes the daily IC and rank IC series (`sig_analysis/ic.pkl`, `ric.pkl`) and logs their mean and IR as metrics.
+- **`SigAnaRecord`** computes the daily IC and rank IC series (`sig_analysis/ic.pkl`, `ric.pkl`) and logs their mean and their ICIR as metrics. The ICIR is the mean divided by the standard deviation, defined under IC and rank IC below.
 - **`PortAnaRecord`** runs a backtest from a strategy and exchange configuration and saves the daily report, the positions and `port_analysis_1day.pkl`, the risk analysis of the excess return with and without cost.
 
 *Implementation:* `qlib.workflow.R`, `R.start(experiment_name=...)` and `R.get_recorder()`; the record templates in `qlib/workflow/record_temp.py`.
@@ -185,9 +188,9 @@ The `qrun` command runs the same chain from a YAML file: a `qlib_init` block, th
 
 The backtest in `qlib/backtest/` separates three roles:
 
-- **The strategy** decides what to trade. `TopkDropoutStrategy` is described in the next section; `WeightStrategyBase` and `EnhancedIndexingStrategy` produce target weights instead.
+- **The strategy** decides what to trade. `TopkDropoutStrategy` is described under TopkDropout and turnover below; `WeightStrategyBase` and `EnhancedIndexingStrategy` produce target weights instead, the latter through an enhanced-indexing optimiser.
 
-  *Implementation:* `qlib/contrib/strategy/signal_strategy.py`, `TopkDropoutStrategy` (line 74).
+  *Implementation:* `qlib/contrib/strategy/signal_strategy.py`, `TopkDropoutStrategy` at line 74 and `EnhancedIndexingStrategy` at line 374; the optimiser in `qlib/contrib/strategy/optimizer/`.
 - **The executor** decides when and how the decisions are executed. `SimulatorExecutor` fills orders once per step. `NestedExecutor` runs an inner strategy and executor at a finer frequency inside each outer step, for example a daily portfolio decision executed by an intraday order-splitting strategy.
 - **The exchange** knows prices and rules: the price field used for fills, the opening and closing costs as fractions of the traded value with defaults of 0.15 % and 0.25 %, a minimum cost per order of 5 currency units by default, a market-impact cost, the price-limit threshold and the trade unit from the region.
 
@@ -216,6 +219,18 @@ sequenceDiagram
     AC-->>EX: daily return, turnover, cost
 ```
 
+The table follows one score through the backtest, with the default label and fills at the close (`deal_price: "close"`). Here t−1 is the day the score is computed, which the Data handlers section calls day t.
+
+| Moment | What happens |
+|---|---|
+| Close of day t−1 | The features use data up to this close and the model scores every stock. The label of this score is the return from the close of t to the close of t+1. |
+| Close of day t | The strategy for day t reads that score and trades. Orders fill at this close, and their costs are booked on day t. |
+| Close of day t+1 | Positions are valued at this close. The gain from the close of t to the close of t+1 is booked as the return of day t+1. |
+
+A position therefore earns exactly the return that the label of its selecting score measures. Each backtest step also runs from its own day to the next date of the calendar, so the last backtest day must be followed by one more trading day in the data. With the default label, the backtest can end at the latest one trading day before the end of the data, and its last step then trades on the last score that has a label.
+
+*Implementation:* `qlib/backtest/account.py`, lines 269-287, for the daily return computed from the value at the end of the bar; `qlib/backtest/utils.py`, line 131, where `TradeCalendarManager.get_step_time()` ends each step at the next calendar date.
+
 The backtest needs a benchmark instrument that exists in the data. The default is `SH000300`, the CSI 300 index, whatever the region, so a run on US data asks for an instrument that is not in the data unless `benchmark` is set.
 
 *Implementation:* `qlib/backtest/__init__.py`, default `benchmark` (lines 182, 222 and 284).
@@ -236,7 +251,11 @@ qlib's reinforcement-learning module is a framework for sequential decisions, us
 
 ### Alpha factors and labels
 
-An alpha factor is a number computed for each stock and day that is expected to rank stocks by future return. Alpha158's `ROC5` (the close five days ago divided by today's close) is a factor; so is a model's output. The label is the quantity the model is trained to predict, and its definition fixes the trading horizon: with the default label, a prediction on day t targets the move from t+1 to t+2, and the backtest holds positions for about a day before re-ranking.
+An alpha factor is a number computed for each stock and day that is expected to rank stocks by future return. Alpha158's `ROC5` (the close five days ago divided by today's close) is a factor; so is a model's output. Despite its name, `ROC` is defined in qlib's code as that inverted ratio, `Ref($close, d)/$close`, the same direction that the expression-engine section warns is not the return. For a tree model the inversion does not matter, since it only reverses the order of the values.
+
+*Implementation:* `qlib/contrib/data/loader.py`, the `ROC` fields (lines 149-153).
+
+The label is the quantity the model is trained to predict, and its definition fixes the trading horizon: with the default label, a prediction on day t targets the move from t+1 to t+2, and the backtest holds positions for about a day before re-ranking (the timeline table in the Backtest section shows the days).
 
 ### IC and rank IC
 
@@ -264,7 +283,9 @@ where $$\rho$$ is the Pearson correlation across the $$n$$ instruments of the da
 2. Rank held stocks and candidates together; sell the held stocks that fall in the bottom `n_drop` of that combined ranking.
 3. Buy the best candidates until `topk` stocks are held again, splitting the available cash, times `risk_degree` (0.95 by default), equally among the stocks bought. Positions already held are not rebalanced.
 
-`n_drop` caps turnover: with `topk = 5` and `n_drop = 1`, at most one fifth of the portfolio is replaced each day, and each replacement pays a sell cost and a buy cost. `hold_thresh` sets a minimum holding period, and `only_tradable` and `forbid_all_trade_at_limit` handle suspended or limit-locked stocks.
+qlib's daily turnover is the traded value of that day, buys plus sells, divided by the portfolio value of the previous day. `n_drop` caps it: with `topk = 5` and `n_drop = 1`, at most one fifth of the portfolio is replaced each day, and each replacement pays a sell cost and a buy cost. `hold_thresh` sets a minimum holding period, and `only_tradable` and `forbid_all_trade_at_limit` handle suspended or limit-locked stocks.
+
+*Implementation:* `qlib/backtest/account.py`, where each fill adds its traded value to the turnover at line 186 and `turnover_rate` is computed at line 287.
 
 ### Excess return with and without cost
 
@@ -295,7 +316,7 @@ qlib prevents some leaks by construction: the strategy reads the previous step's
 - **Processor fitting window.** `fit_end_time` must not pass the end of the training segment.
 - **Universe chosen with hindsight.** A list of today's large companies, applied to the past, contains the winners and omits the companies that were delisted. The binary format has no record of index membership history unless the instruments file provides start and end dates per symbol.
 - **Data revised after the fact.** Price fields are stored by trading date, not by publication date; only the point-in-time provider records when fundamental data became known.
-- **Backtest end.** The backtest must end on or before the last date that has a label, two trading days before the end of the data with the default label.
+- **Backtest end.** The last backtest day trades on the previous day's score, so that score must have a label: with the default label, end the backtest at least one trading day before the end of the data (timeline table in the Backtest section).
 
 ## Using qlib end to end
 
@@ -332,13 +353,15 @@ The full sequence, as run for this article, has six steps. The verification fold
        "valid": ("2015-01-01", "2016-06-30"), "test": ("2016-07-01", "2018-04-11")}}})
    ```
 
-4. **Choose the model and the backtest.** The benchmark is an instrument of the dataset, the costs are explicit, and the backtest ends two trading days before the data.
+4. **Choose the model and the backtest.** The benchmark is an instrument of the dataset, the costs are explicit, and the backtest ends on 10 April 2018, one trading day before the data: its last step trades on the score of 9 April, the last date with a label.
 
    ```python
    model = init_instance_by_config({"class": "LGBModel", "module_path": "qlib.contrib.model.gbdt",
        "kwargs": {"loss": "mse", "learning_rate": 0.05, "num_leaves": 31, "num_threads": 4, "seed": 0}})
    port = {"strategy": {"class": "TopkDropoutStrategy", "module_path": "qlib.contrib.strategy",
                         "kwargs": {"signal": (model, dataset), "topk": 5, "n_drop": 1}},
+           # a configuration only: PortAnaRecord builds the strategy in step 5, which then
+           # calls model.predict(), so the model needs to be fitted only before that step
            "backtest": {"start_time": "2016-07-01", "end_time": "2018-04-10", "account": 1_000_000,
                         "benchmark": "SPY", "exchange_kwargs": {"deal_price": "close",
                         "open_cost": 0.0005, "close_cost": 0.0015, "min_cost": 5}}}
@@ -365,7 +388,7 @@ The full sequence, as run for this article, has six steps. The verification fold
 
 ### Data and setup
 
-The example runs qlib 0.9.8, built from commit `5435523` in a container with no network access, on 21 instruments: 20 US stocks and the SPY ETF, from 2 January 2008 to 11 April 2018 (2,587 trading days). The prices come from the test fixtures of the PyPortfolioOpt library, which contain adjusted closes only.
+The example runs qlib 0.9.8, built from commit `5435523` in a container with no network access, on 21 instruments: 20 US stocks and the SPY ETF, from 2 January 2008 to 11 April 2018 (2,587 trading days). The prices come from the test fixtures of the PyPortfolioOpt library, which contain adjusted closes only. Each instrument starts at its first price in that file, and three start late: GM in November 2010, FB in May 2012 and BABA in September 2014. The training segment therefore has about 19.4 instruments per day on average (24,411 rows over 1,258 days), while the validation and test segments have all 21 on every day.
 
 **The data is synthetic beyond the close.** Open, high, low and VWAP are set equal to the close and volume to a constant 1,000,000, so 48 of Alpha158's 158 columns carry no information: the 9 candlestick features, the 4 price ratios and 25 volume statistics are constant, and the 10 price-volume correlations are empty. The factors built on highs and lows repeat information from the close. The example tests qlib's data conversion, training, recording, signal analysis and backtest code. Its returns are not a strategy result and say nothing about how Alpha158 or LightGBM perform on real data.
 
@@ -391,9 +414,11 @@ On the 447 test days, LightGBM's predictions gave:
 | Mean rank IC | 0.0239 |
 | t-statistic of the mean rank IC | 1.92 |
 
-The mean IC differs from zero by about three standard errors, but the rank IC is less than half of it and its t-statistic of 1.92 is below the conventional 1.96 for a two-sided 5 % test. The difference means the Pearson IC is carried by a few extreme predictions: on the first test day, AAPL, AMZN and BABA all received the same score (0.004218) while AMD received 0.1993, a pattern expected when 48 features are constant or empty and many others are built from the close alone.
+The mean IC differs from zero by about three standard errors, but the rank IC is less than half of it and its t-statistic of 1.92 is below the conventional 1.96 for a two-sided 5 % test. The difference suggests that the Pearson IC is carried by a few extreme predictions.
 
-With 20 to 21 stocks per day, each daily IC is a correlation of about 20 points, which explains the standard deviation of 0.42.
+A single score far from the others weighs heavily in a Pearson correlation over 21 points, while in a rank correlation it only counts as the first place. The first test day shows such a pattern: AAPL, AMZN and BABA all received the same score (0.004218) while AMD received 0.1993, which is expected when 48 features are constant or empty and many others are built from the close alone. One day does not prove the pattern holds over the 447 days; the distribution of daily scores was not analysed.
+
+With 21 instruments per test day, each daily IC is a correlation of about 20 points, which explains the standard deviation of 0.42.
 
 ### Backtest
 
@@ -405,11 +430,15 @@ With 20 to 21 stocks per day, each daily IC is a correlation of about 20 points,
 | Excess return without cost | 0.0546 % | 0.979 % | 13.0 % | 0.86 | −17.3 % |
 | Excess return with cost | 0.0151 % | 0.978 % | 3.6 % | 0.24 | −23.5 % |
 
+For the benchmark row, qlib applies the same risk analysis to SPY's own daily return, with nothing subtracted: its information ratio of 1.45 is the mean daily return over its standard deviation times $$\sqrt{238}$$, and its drawdown is measured on the summed returns, like the other two rows.
+
+*Implementation:* `qlib/workflow/record_temp.py`, `risk_analysis(report_normal["bench"])` in `PortAnaRecord` (line 532).
+
 The mean daily cost was 0.0395 % of portfolio value, which is 9.4 percentage points a year on qlib's ×238 scale and exactly the gap between the two excess-return rows (13.0 − 3.6). The mean daily turnover was 0.40: about one stock sold and one bought per day out of five, as `n_drop = 1` allows. Summed over the 446 days, the excess return with cost is 6.7 %; compounded, it is 4.7 %.
 
 ### What the example does not show
 
-Checked against the statistical sins listed in [MIT 6.0002, lectures 14 and 15](https://ocw.mit.edu/courses/6-0002-introduction-to-computational-thinking-and-data-science-fall-2016/), the result has six limits, and each applies to any qlib backtest:
+Checked against the "statistical sins", the list of common errors in drawing conclusions from data given in [MIT 6.0002, lectures 14 and 15](https://ocw.mit.edu/courses/6-0002-introduction-to-computational-thinking-and-data-science-fall-2016/), the result has six limits, and each applies to any qlib backtest:
 
 - **Data quality.** Constant volume and identical OHLC prices remove 48 of the 158 factors and turn others into copies of close-based ones; a real study needs real OHLCV data.
 - **Universe chosen in hindsight.** The 20 stocks are a fixed list of large US companies selected after the period, not the index members of each date, and SPY itself is in the tradeable universe. A universe defined by index membership on each date is required to avoid survivorship bias.
@@ -420,7 +449,7 @@ Checked against the statistical sins listed in [MIT 6.0002, lectures 14 and 15](
 
 ### What a leak does
 
-To show the size of a look-ahead error, the example scored a single expression that peeks into the label window, `Ref($close, -2)/$close - 1`, with no model at all. Its mean daily IC against the label on the test days is **0.68**, about eleven times the trained model's 0.063. A feature list that contains one such expression produces a model with an excellent IC and a backtest that cannot be reproduced in trading.
+To show the size of a look-ahead error, the example scored a single expression that peeks into the label window, `Ref($close, -2)/$close - 1`, with no model at all. Its mean daily IC against the label on the test days is **0.68**, about eleven times the trained model's 0.063. It stays below 1 because the expression covers the closes from t to t+2 while the label covers t+1 to t+2: it contains the label plus the return from t to t+1, which acts as noise. A feature list that contains one such expression produces a model with an excellent IC and a backtest that cannot be reproduced in trading.
 
 qlib's own benchmark table reports mean ICs between 0.0099 and 0.0522 for its models on the CSI 300 universe; an IC far above that range is a reason to look for a negative `Ref` before looking for a better model.
 
@@ -444,7 +473,7 @@ The remaining risks come from the design: qlib is a research tool in which confi
 | MLflow records local context | `qlib/workflow/recorder.py:372-387` (`git diff`, `git status`, `git diff --cached`), `qlib/model/trainer.py:47` (host name) | Uncommitted changes, including secrets in tracked files, land in `mlruns` and in any remote tracking server | Run outside a repository with sensitive changes, keep the tracking URI local |
 | NFS provider runs `sudo mount.nfs` | `qlib/__init__.py:95` | A remote `provider_uri` triggers a privileged mount | Use local paths |
 
-Two observations from the run confirm the table. In the container, which has no `git` binary, `_log_uncommitted_code` failed with `git: not found` and logged nothing, so the leak depends on where qlib is run. And the default benchmark `SH000300` is not a security issue but deserves the same attention in a review: a US backtest without an explicit benchmark asks for a Chinese index that is not in the data.
+One observation from the run confirms the MLflow row. In the container, which has no `git` binary, `_log_uncommitted_code` failed with `git: not found` and logged nothing, so the leak depends on where qlib is run.
 
 The container itself is the main mitigation: it runs with `--network none`, as a non-root user, with only the working folder mounted. It does not cover the supply chain. `pip freeze` in the image lists 192 packages besides qlib, MLflow, Jupyter and LightGBM among them, installed from PyPI without pinned versions and not audited by this review; [A Threat Model of the Dependency Update Path]({{site.url_complet}}/2026/11/05/dependency-update-path-threat-model/) describes what pinning and update tooling do and do not protect against.
 
@@ -496,7 +525,7 @@ qlib turns stock-selection research into a reproducible machine-learning pipelin
 | `Ref($close, 1)/$close - 1` is not the daily return. | Write returns as `$close/Ref($close, 1) - 1`. |
 | `Ref(x, 0)` returns the first value of the loaded window, not today's value. | Use `x` directly for today's value. |
 | The backtest benchmark defaults to `SH000300` in every region. | Always set `benchmark` to an instrument present in the data. |
-| The last two days of the data have no label. | End the backtest at least two trading days before the end of the data. |
+| The last two days of the data have no label, and each backtest day trades on the previous day's score. | End the backtest at least one trading day before the end of the data, so that its last step trades on a labelled score. |
 | `risk_analysis` annualises a sum of daily returns with N = 238. | Compare strategies under the same setting, or pass `N=252` and `mode="product"` when reporting a compounded US figure. |
 | Alpha158 does not normalise features at inference by default. | Add inference processors before using it with a model that needs scaled inputs. |
 | Segments are adjacent date ranges with no purge gap. | Leave a gap of at least the label horizon between segments. |
@@ -518,6 +547,8 @@ Alpha360 contains the last 60 days of six raw series, the four prices, VWAP and 
 **Q: Why is the default label `Ref($close, -2)/Ref($close, -1) - 1` and not the next day's return?**
 
 The features for day t use data up to the close of day t, so the earliest trade on that information is on day t+1. The label therefore measures the return from the close of t+1 to the close of t+2, the first return a strategy acting on the signal could earn. In the backtest, the strategy on day t uses the prediction made on day t−1, which matches this one-day gap.
+
+The timeline table in the Backtest section follows one score from its computation to the return it earns.
 
 **Q: A model reaches an IC of 0.6 on the test segment. What should be checked first?**
 
@@ -547,10 +578,10 @@ The following points were not settled by the sources read for this article and s
 |-----|----------------|------------------------|
 | Only LightGBM with Alpha158 and TopkDropout was run; PyTorch models, `qrun` on a full YAML, nested executors, online rolling and the RL framework were read, not executed. | Their descriptions rest on the code and docstrings only. | The `examples/` folder of [microsoft/qlib at v0.9.8](https://github.com/microsoft/qlib/tree/54355232463878d2eebb91fe0ee5fa7fa1f5976c/examples), in particular `benchmarks/`, `nested_decision_execution/`, `online_srv/` and `rl_order_execution/`. |
 | The worked example uses synthetic OHLCV data built from closes only. | No figure in it says anything about Alpha158 or LightGBM on real markets. | Rebuild the data with real OHLCV prices (qlib's `scripts/data_collector/`) and re-run the [verification scripts](https://github.com/rya-sge/access-denied/tree/main/verification/microsoft-qlib-quant-research-platform). |
-| The statement that AMD's 52.3 % move on 22 April 2016 is a real price move comes from general knowledge, not from a source read for this article. | It decides whether the health-check warning is a data error. | AMD's historical prices for April 2016 from an exchange or data vendor. |
+| Whether AMD's 52.3 % move on 22 April 2016, flagged by the health check, is a real price move or an error in the input file was not checked against a source. | It decides whether the health-check warning is a data error. | AMD's historical prices for April 2016 from an exchange or data vendor. |
 | The IC range used to judge a suspicious IC (0.0099 to 0.0522) comes from qlib's benchmarks on Chinese CSI 300 data. | Typical IC levels differ between markets, universes and horizons. | The [examples/benchmarks README](https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/examples/benchmarks/README.md) and published IC studies for the market being tested. |
 | The two hardening commits ([#2339](https://github.com/microsoft/qlib/pull/2339) and [#2340](https://github.com/microsoft/qlib/pull/2340)) come 35 commits after `v0.9.7` and carry the `v0.9.8` tag, while the README still calls them unreleased and PyPI stops at 0.9.7. | A user installing `pyqlib` from PyPI probably runs code that still evaluates expressions with `eval` and has no `trusted` gate; the PyPI package itself was not inspected. | The [qlib releases page](https://github.com/microsoft/qlib/releases) and the `pyqlib` history on PyPI (URL not checked for this article). |
-| The roughly one hundred PyPI dependencies installed with qlib were not reviewed and are not pinned. | A compromised dependency would not be caught by the source review. | `pip freeze` in the image, then an audit with a tool such as `pip-audit`. |
+| The 192 packages that `pip freeze` lists in the image besides qlib were not reviewed and are not pinned. | A compromised dependency would not be caught by the source review. | `pip freeze` in the image, then an audit with a tool such as `pip-audit`. |
 | The `SunsetWolf/qlib_dataset` archive was not downloaded or inspected. | Its contents, date range and integrity are unknown. | The releases of the repository named in `qlib/tests/data.py`, downloaded into an isolated folder. |
 
 ## References

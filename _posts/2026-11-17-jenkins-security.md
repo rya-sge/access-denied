@@ -2,6 +2,7 @@
 layout: post
 title: "Jenkins Security - Threat Model, Permissions, Groovy, Credentials and Nine Years of Advisories"
 date:   2026-11-17
+last_modified_at: 2026-11-24
 lang: en
 locale: en-GB
 categories: security programmation
@@ -42,7 +43,13 @@ A CI server combines three things an attacker wants, in one process, with one se
 - **Code execution by design.** Running other people's code is the product. A build executes `Makefile`s, tests and `Jenkinsfile`s that the administrators did not write, and an administrator can run arbitrary Groovy on the controller through the Script Console.
 - **Position in the supply chain.** The artifacts Jenkins builds, signs and publishes are installed downstream. Control of a build is control of what those users receive, which MITRE ATT&CK lists as [Compromise Software Supply Chain (T1195.002)](https://attack.mitre.org/techniques/T1195/002/).
 
-ATT&CK v19.2 also has a technique for the CI-specific path, T1677 [Poisoned Pipeline Execution](https://attack.mitre.org/techniques/T1677), with three variants that map directly to Jenkins: editing the pipeline file itself, editing the tests and build scripts the pipeline calls, and opening a pull request from a fork that triggers the pipeline. The credentials stored in `JENKINS_HOME` fall under T1552.001 [Credentials In Files](https://attack.mitre.org/techniques/T1552/001/), and an internet-facing controller under T1190 [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/).
+ATT&CK v19.2 also has a technique for the CI-specific path, T1677 [Poisoned Pipeline Execution](https://attack.mitre.org/techniques/T1677), with three variants that map directly to Jenkins:
+
+- **Direct**: the attacker edits the pipeline file itself.
+- **Indirect**: the attacker edits the tests and build scripts the pipeline calls.
+- **Public**: the attacker, without access to the repository, opens a pull request from a fork that triggers the pipeline.
+
+The credentials stored in `JENKINS_HOME` fall under T1552.001 [Credentials In Files](https://attack.mitre.org/techniques/T1552/001/), and an internet-facing controller under T1190 [Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/).
 
 The Jenkins documentation draws the same boundaries. The people who control what a build runs are less trusted than the administrator: anyone with Job/Configure, the authors of build scripts such as `pom.xml` or `Makefile`, and the authors of the code under test ([controller isolation](https://www.jenkins.io/doc/book/security/controller-isolation/)). A `Jenkinsfile` is a build script in the same sense. The diagram shows the entry points into the controller and what each one leads to.
 
@@ -51,6 +58,7 @@ flowchart LR
     ANON["Anonymous visitor"] -->|"unprotected URLs, CLI"| WEB["Web UI, API, CLI<br/>on the controller"]
     RD["User with Overall/Read"] -->|"form validation endpoints"| WEB
     CFG["User with Job/Configure"] -->|"pipeline script, Replay"| AG["Agent workspace"]
+    CFG -->|"build on the built-in node"| HOME
     PR["Fork pull request author"] -->|"tests and build scripts"| AG
     ADM["Administrator"] -->|"Script Console"| HOME[("JENKINS_HOME<br/>secrets and credentials")]
     WEB -->|"plugin bug"| HOME
@@ -59,7 +67,7 @@ flowchart LR
     HOME -->|"decrypted credentials"| TGT
 ```
 
-Every arrow into `JENKINS_HOME` other than the administrator's is supposed to be closed by a control described below: permission checks on web endpoints, agent-to-controller access control on the Remoting channel, and the Groovy sandbox for pipeline code. Many of the advisories in the last sections are failures of one of those three. Others take a different route: cross-site scripting reaches the controller through an administrator's browser, and a secret stored in plain text leaks without crossing any boundary.
+Every arrow into `JENKINS_HOME` other than the administrator's is supposed to be closed by a control described below: permission checks on web endpoints, zero executors on the built-in node so that no build runs inside the controller, agent-to-controller access control on the Remoting channel, and the Groovy sandbox for pipeline code. Many of the advisories in the last sections are failures of one of the last three. Others take a different route: cross-site scripting reaches the controller through an administrator's browser, and a secret stored in plain text leaks without crossing any boundary.
 
 ## The security model: realms, authorization strategies and permissions
 
@@ -83,7 +91,7 @@ The [permissions reference](https://www.jenkins.io/doc/book/security/access-cont
 | Job/Configure | Change a job, which implies Run/Replay: re-run a Pipeline with an edited script. With credentials in scope, it is the ability to use those credentials. |
 | Job/Workspace | Browse the workspace: source code and intermediate build output. |
 | Run/Update | Edit build descriptions, which the markup formatter renders as HTML. |
-| Credentials/Create, View, Update | From the Credentials plugin. Create should be held by very few people. |
+| Credentials/Create, View, Update | From the Credentials plugin: add credentials to a credentials provider, view the stored credentials, and modify them. Create should be held by very few people. |
 
 Overall/Administer is the one permission with no ceiling. The documentation says that an instance where an untrusted user obtained it is compromised: the instance should be replaced, every secret rotated, and every artifact produced since the compromise checked. The project's [reporting rules](https://www.jenkins.io/security/reporting/) follow from this: "an administrator can execute code" is not a vulnerability, because that is what the permission is.
 
@@ -91,7 +99,9 @@ Two smaller permissions exist to give administration without that ceiling. Overa
 
 ### Builds run as SYSTEM
 
-Permissions apply to users. Builds are another matter. By default a build runs as the internal SYSTEM user, with full permissions: it can run on any node, create or delete jobs, and start or cancel any other build ([access control for builds](https://www.jenkins.io/doc/book/security/build-authorization/)). On an instance with fine-grained permissions this is a privilege escalation: a user who can configure one job adds `build job: 'deploy-production'` to its Pipeline and starts a job they have no permission to start. The Agent/Build permission is not enforced at all in that state, since what Jenkins checks is the build's identity, not the user's.
+Permissions apply to users. Builds are another matter. By default a build runs as the internal SYSTEM user, with full permissions: it can run on any node, create or delete jobs, and start or cancel any other build ([access control for builds](https://www.jenkins.io/doc/book/security/build-authorization/)). On an instance with fine-grained permissions this is a privilege escalation: a user who can configure one job adds `build job: 'deploy-production'` to its Pipeline and starts a job they have no permission to start.
+
+The Agent/Build permission, which decides which users may run jobs on agents once build authorization is active, is not enforced at all in that state, since what Jenkins checks is the build's identity, not the user's.
 
 The fix the documentation names is the [Authorize Project plugin](https://plugins.jenkins.io/authorize-project/), which configures, globally or per project, which user a build runs as. The same page notes that the plugin is not actively maintained and has known limitations. The security team does not treat "builds can start jobs the user cannot" as a vulnerability: it is this documented configuration issue.
 
@@ -99,13 +109,13 @@ The fix the documentation names is the [Authorize Project plugin](https://plugin
 
 The [controller isolation](https://www.jenkins.io/doc/book/security/controller-isolation/) page starts from one fact: a build on the built-in node runs inside the controller's process and file system, with the same access to `JENKINS_HOME` and `secrets/` as Jenkins itself. Out of the box Jenkins is configured to build there. The recommended setting is zero executors on the built-in node (Manage Jenkins » Nodes » Built-In Node » Configure), or the [Job Restrictions plugin](https://plugins.jenkins.io/job-restrictions/) to decide which jobs may run there whatever label their configuration asks for.
 
-Moving builds to agents does not end the problem; it moves the boundary to the Remoting channel. An attacker controls an agent process when a build ran their code, or when they hold Agent/Connect. That process can send objects and file requests to the controller. Three mechanisms stand in the way:
+Moving builds to agents does not end the problem; it moves the boundary to the Remoting channel. An attacker controls an agent process when a build ran their code, or when they hold Agent/Connect, the permission to connect agents to the controller. That process can send objects and file requests to the controller. Three mechanisms stand in the way:
 
 - **Agent → Controller Access Control** rejects commands and file accesses from the agent that the controller did not allow. It is always on, and cannot be disabled, since Jenkins 2.326 ([JEP-235](https://www.jenkins.io/doc/book/security/controller-isolation/jep-235/)); earlier versions had a switch that should be checked.
-- **The required role check** (Jenkins 2.319, LTS 2.303.3) rejects any `Callable` sent from agent to controller whose `checkRoles` method neither throws nor calls the role checker. Two system properties re-open this, and either one set on a controller is a finding unless each allowed class was reviewed.
+- **The required role check** (Jenkins 2.319, LTS 2.303.3) applies to the messages the two sides send each other over Remoting. Each message type must declare on which side of the channel it may run, and a message sent from an agent that makes no such declaration is rejected instead of being executed on the controller. Two system properties re-open this: `hudson.remoting.ChannelBuilder.specificCallablesCanIgnoreRoleChecker` for a list of classes, and `hudson.remoting.ChannelBuilder.allCallablesCanIgnoreRoleChecker` for all of them. Either one set on a controller is a finding unless each allowed class was reviewed ([required role check](https://www.jenkins.io/doc/book/security/controller-isolation/required-role-check/)).
 - **The JEP-200 class filter** limits which classes can be deserialized from the channel.
 
-Even with all three, an agent can still write the build directories of the builds it is running, so whatever Jenkins later serves from those directories is content the agent influenced. Before Jenkins 2.319 and LTS 2.303.3 (SECURITY-2428), it could write any build directory except `build.xml`. The advisories show how often the boundary itself fails:
+Even with all three, an agent can still write the build directories of the builds it is running, so whatever Jenkins later serves from those directories is content the agent influenced. Before Jenkins 2.319 and LTS 2.303.3 (SECURITY-2428), it could read and write the directory of any build stored in Jenkins, not only of the builds it was running, with very few exceptions such as the `build.xml` file. An agent taken over by one project's build could therefore change what Jenkins served for every other project's builds. The advisories show how often the boundary itself fails:
 
 - [2021-11-04](https://www.jenkins.io/security/advisory/2021-11-04/), SECURITY-2455, Critical: a series of bypasses of the path filtering in agent-to-controller access control, with eleven CVE IDs (CVE-2021-21685 to CVE-2021-21695).
 - [2024-08-07](https://www.jenkins.io/security/advisory/2024-08-07/), SECURITY-3430 / CVE-2024-43044, Critical: `ClassLoaderProxy#fetchJar` let an agent read any file from the controller, which the advisory says can lead to code execution.
@@ -125,17 +135,17 @@ The Script Console is also why so many issues are rated as they are. A stored cr
 
 ### The sandbox and script approval
 
-Pipeline, Job DSL, Email Extension templates and other features let users who are not administrators write Groovy. The [Script Security plugin](https://plugins.jenkins.io/script-security/) runs that code in a sandbox that allows only method signatures on an allowlist; the same rules apply to scripts written by administrators ([script approval](https://www.jenkins.io/doc/book/managing/script-approval/)). Code outside the sandbox needs an administrator's approval in Manage Jenkins » In-process Script Approval, and three properties of that screen matter:
+Pipeline, Job DSL, Email Extension templates and other features let users who are not administrators write Groovy. The [Script Security plugin](https://plugins.jenkins.io/script-security/) runs that code in a sandbox that allows only method signatures on an allowlist; the same rules apply to scripts written by administrators ([script approval](https://www.jenkins.io/doc/book/managing/script-approval/)). Code outside the sandbox needs an administrator's approval in Manage Jenkins » In-process Script Approval. Every approval made there is instance-wide, not tied to the job that asked for it, and three properties of that screen matter:
 
-- **An approval is global.** Approving a whole script approves that text for every job that submits it, and an approved script that reads user-controlled parameters can still be used against the controller.
-- **Signatures are approved one by one.** An approval is not tied to a job: it applies to every sandboxed script on the instance. Approving signatures such as `java.lang.Runtime exec`, `java.io.File` access, `Jenkins.getInstance` or reflection (the article's examples, not a list from the documentation) therefore effectively removes the sandbox for every Pipeline.
+- **Whole-script approvals.** Approving a whole script approves that exact text for every job that submits it, and an approved script that reads user-controlled parameters can still be used against the controller.
+- **Signature approvals.** Approving one method signature allows it in every sandboxed script on the instance. Approving signatures such as `java.lang.Runtime exec`, `java.io.File` access, `Jenkins.getInstance` or reflection (the article's examples, not a list from the documentation) therefore effectively removes the sandbox for every Pipeline.
 - **"Approve assuming permissions check"** allows a signature only when the running user holds the permission the method would itself check (for `ItemGroup.getItems()`, Job/Read). Plain "Approve" can bypass permission checks.
 
 The sandbox has a long history of bypasses. In the advisory archive, 52 issue titles mention a sandbox, classpath or script approval bypass, all rated High; 26 of them are in `script-security` itself and 8 in `workflow-cps`, and the [2026-09-16 advisory](https://www.jenkins.io/security/advisory/2026-09-16/) alone fixed six Script Security sandbox bypasses (CVE-2026-92122 to CVE-2026-92126, and CVE-2026-92129). Keeping `script-security` and `workflow-cps` current is part of keeping the sandbox at all.
 
 ### Shared libraries and hook scripts
 
-[Global Trusted Pipeline Libraries](https://www.jenkins.io/doc/book/pipeline/shared-libraries/) run **outside** the sandbox, so they can wrap unsafe APIs behind safe steps. The documentation's warning is direct: "anyone able to push commits to this SCM repository could obtain unlimited access to Jenkins". Configuring a trusted library needs Overall/RunScripts, which today means Administer; folder-scoped libraries, and libraries loaded on the fly by the Pipeline: GitHub Groovy Libraries plugin, are always untrusted. Push access to a trusted library repository is therefore an administrator permission held outside Jenkins, and it should be granted like one.
+[Global Trusted Pipeline Libraries](https://www.jenkins.io/doc/book/pipeline/shared-libraries/) run **outside** the sandbox, so they can wrap unsafe APIs behind safe steps. The documentation's warning is direct: "anyone able to push commits to this SCM repository could obtain unlimited access to Jenkins". Configuring a trusted library needs Overall/RunScripts, which today means Administer; folder-scoped libraries, and libraries loaded on the fly by the *Pipeline: GitHub Groovy Libraries* plugin, are always untrusted. Push access to a trusted library repository is therefore an administrator permission held outside Jenkins, and it should be granted like one.
 
 Hook scripts are the last Groovy entry point: `init.groovy`, `init.groovy.d/*.groovy` and `boot-failure.groovy` in `JENKINS_HOME` run with full privileges at startup. This turns any file-write bug that can reach `JENKINS_HOME` (or `plugins/`) into code execution at the next restart, which is why the security team rates path traversal `C:H/I:H/A:H`.
 
@@ -174,7 +184,9 @@ The documentation calls the third effect credential mangling: a secret containin
 
 ## Jenkinsfiles and untrusted pull requests
 
-The question for a Pipeline is who can change what it runs. For multibranch projects, the answer depends on the branch source: the GitHub Branch Source plugin treats anyone who can write to a branch of the repository as trusted. A pull request from a fork that is not allowed to change the `Jenkinsfile` can still change the tests or build scripts that the trusted `Jenkinsfile` calls. If those run inside `withCredentials`, the pull request author can capture the credential without touching the Pipeline. This is ATT&CK's "indirect" and "public" Poisoned Pipeline Execution in Jenkins terms.
+The question for a Pipeline is who can change what it runs. For multibranch projects, the answer depends on the branch source: the GitHub Branch Source plugin treats anyone who can write to a branch of the repository as trusted.
+
+Which revision of the `Jenkinsfile` Jenkins builds for a pull request from an untrusted fork is set by the branch source's trust settings, which the documentation read for this article does not describe (see Gaps). Even when the fork is not allowed to change the `Jenkinsfile`, its pull request can still change the tests or build scripts that the trusted `Jenkinsfile` calls. If those run inside `withCredentials`, the pull request author can capture the credential without touching the Pipeline. This is ATT&CK's "indirect" and "public" Poisoned Pipeline Execution in Jenkins terms.
 
 Interpolation also creates a command-injection path. The documentation's example:
 
@@ -211,13 +223,15 @@ For comparison with another build system that runs untrusted build tools next to
 
 ### CSRF crumbs
 
-State-changing POST requests must carry a crumb ([CSRF protection](https://www.jenkins.io/doc/book/security/csrf-protection/)). The default crumb issuer hashes the user name, the web session ID and an instance salt. Requests authenticated with a user name and an API token are exempt, since a cross-site attacker cannot attach the token. Two settings weaken this: the system property that disables CSRF protection entirely, and `hudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true`, or its equivalent in the Strict Crumb Issuer plugin, "Check the session ID" left unchecked. Without the session ID, a crumb can be forged by someone who has read the crumb salt from `secrets/`, a step CVE-2024-23897 made possible.
+State-changing POST requests must carry a crumb ([CSRF protection](https://www.jenkins.io/doc/book/security/csrf-protection/)). The default crumb issuer hashes the user name, the web session ID and an instance salt. Requests authenticated with a user name and an API token are exempt, since a cross-site attacker cannot attach the token.
+
+Two settings weaken this: the system property that disables CSRF protection entirely, and `hudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true`, or its equivalent in the Strict Crumb Issuer plugin, "Check the session ID" left unchecked. Without the session ID, a crumb can be forged by someone who has read the crumb salt from `secrets/`, a step made possible by CVE-2024-23897, an arbitrary file read through the CLI described in the *CVE-2024-23897* subsection below.
 
 ### Content-Security-Policy and the resource root URL
 
 Workspaces, archived artifacts, `/userContent/`, HTML Publisher reports and other files that users or builds produce are served with a restrictive policy: `sandbox allow-same-origin; default-src 'none'; img-src 'self'; style-src 'self';`. That stops a malicious HTML report from running JavaScript in the Jenkins origin ([user content](https://www.jenkins.io/doc/book/security/user-content/)). Administrators who need reports with scripts are asked not to relax the header through `hudson.model.DirectoryBrowserSupport.CSP`, and to configure a **resource root URL** instead: a different host name from which Jenkins serves those files without the CSP header, so the scripts run in an origin that holds no Jenkins session.
 
-The documentation states two properties of those URLs. They require no authentication until they expire (30 minutes by default), so sharing one shares the file. And they are signed with an HMAC whose key lives in `secrets/`; the 2024-01-24 advisory lists forged resource root URLs as one of the routes from a file read to code execution.
+The documentation states two properties of those URLs. They require no authentication until they expire (30 minutes by default), so sharing one shares the file. And they are signed with an HMAC whose key lives in `secrets/`; the 2024-01-24 advisory lists forged resource root URLs as one of the routes from a file read to code execution (see the *CVE-2024-23897* subsection below).
 
 Since Jenkins 2.539 the Jenkins UI itself can be served with a CSP ([CSP for the Jenkins UI](https://www.jenkins.io/doc/book/security/csp/)). It is disabled by default, because many of the more than 2,000 plugins use inline scripts or other constructs the policy forbids; violations are logged even while enforcement is off, so an administrator can measure what would break before turning it on.
 
@@ -235,11 +249,11 @@ Jenkins exposes few services, and the [services page](https://www.jenkins.io/doc
 
 Scripted clients should authenticate with an API token rather than a password ([CLI documentation](https://www.jenkins.io/doc/book/managing/cli/)), passed with `-auth @file` or environment variables so the token does not appear in the process list. Tokens are bound to a user and revocable; they also keep working for accounts that the external directory has locked, until the realm plugin checks the account status ([plugin developer security guide](https://www.jenkins.io/doc/developer/security/)), so offboarding has to revoke them explicitly.
 
-The CLI has been the entry point of several critical issues. In [2017-04-26](https://www.jenkins.io/security/advisory/2017-04-26/), SECURITY-429 / CVE-2017-1000353 was an unauthenticated remote code execution: a serialized `SignedObject` sent to the Remoting-based CLI was deserialized outside the existing blocklist. That advisory recommended disabling the Remoting CLI, deprecated since Jenkins 2.54, in favour of the HTTP and SSH modes. The next section follows the 2024 case in detail.
+The CLI has been the entry point of several critical issues. In [2017-04-26](https://www.jenkins.io/security/advisory/2017-04-26/), SECURITY-429 / CVE-2017-1000353 was an unauthenticated remote code execution: a serialized `SignedObject` sent to the Remoting-based CLI was deserialized outside the existing blocklist. That advisory recommended disabling the Remoting CLI, deprecated since Jenkins 2.54, in favour of the HTTP and SSH modes. The *CVE-2024-23897* subsection below follows the 2024 case in detail.
 
 ## Notable advisories
 
-The table lists core advisories referred to in this article, read from the advisory files. Severities are the Jenkins security team's.
+The table lists core advisories referred to in this article, plus other notable core issues, read from the advisory files. Severities are the Jenkins security team's. SECURITY-4125 is a code execution rated High rather than Critical because the attacker needs Overall/Read and either a user account or a permission to submit `config.xml`.
 
 | Date | Issue | CVE | Severity | What happened |
 |---|---|---|---|---|
@@ -265,7 +279,9 @@ The [2024-01-24 advisory](https://www.jenkins.io/security/advisory/2024-01-24/) 
 - with Overall/Read, an attacker reads whole files;
 - without it, the first few lines; the security team found ways to read three lines with no plugins installed.
 
-Binary files such as the keys in `secrets/` can be read too, but through the controller's default character encoding: with UTF-8 roughly half of the bytes of random binary data are replaced, which makes a 32-byte HMAC key infeasible to recover. The advisory therefore lists the follow-on attacks with conditions attached:
+Binary files such as the keys in `secrets/` can be read too, but through the controller's default character encoding: with UTF-8 roughly half of the bytes of random binary data are replaced, which makes a 32-byte HMAC key infeasible to recover.
+
+The advisory reports that more than 90 % of instances sending usage statistics use UTF-8, while encodings such as Windows-1252 make the keys recoverable. It still rates the issue Critical, with the vector `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H`: an attacker without any account reads the first lines of any file, one with Overall/Read reads any text file whole, and the advisory warns that further attacks likely exist, including ones that need no binary key. The diagram shows the escalation path on an instance where the keys can be read:
 
 ```mermaid
 sequenceDiagram
@@ -282,9 +298,10 @@ sequenceDiagram
     C-->>A: Script Console as an administrator, then code execution
 ```
 
-The advisory lists five routes to code execution, each with several conditions. All of them require the attacker to recover **binary** keys through the file read, which the advisory describes as infeasible on controllers reading files as UTF-8 (more than 90 % of instances reporting usage statistics) and feasible with encodings such as Windows-1252:
+The advisory lists five routes to code execution, each with several conditions, and all of them require the binary keys:
 
-- a forged resource root URL, when that feature is enabled (two variants);
+- a forged resource root URL, when that feature is enabled and the CLI WebSocket endpoint is reachable, for an attacker who knows the user name of an account with Overall/Read;
+- a forged resource root URL, when that feature is enabled, for an attacker who holds an API token of any non-anonymous account;
 - a forged "Remember me" cookie for an administrator, a feature that is on by default, which also needs Overall/Read to read past the first lines of a file;
 - a forged crumb, when the session ID is not part of crumbs;
 - forged console notes that inject script into build logs, when the attacker controls build output.
@@ -321,7 +338,14 @@ When a plugin maintainer does not respond, the Jenkins security team publishes t
 | Medium | 870 | 56.5 % |
 | Low | 208 | 13.5 % |
 
-Of the ten Critical issues, seven concern core or what ships with it: the Stapler routing bug, two agent boundary bypasses, the two file reads (one of them through agent connections), and the bundled Jetty and Git. Three are in plugins: a hardcoded password, an authentication bypass and an insufficient validation of token claims.
+Of the ten Critical issues, seven concern core or what ships with it:
+
+- **Stapler routing:** SECURITY-595.
+- **Agent boundary bypasses:** SECURITY-2455 and SECURITY-3911.
+- **File reads:** SECURITY-3314 through the CLI, and SECURITY-3430 through agent connections.
+- **Bundled software:** SECURITY-1983 in Jetty, and SECURITY-3039 in the Git shipped in the Docker images.
+
+Three are in plugins: SECURITY-2117 is a hardcoded password, SECURITY-3481 an authentication bypass, and SECURITY-3574 an insufficient validation of token claims.
 
 ### Classes
 
@@ -341,7 +365,7 @@ Of the ten Critical issues, seven concern core or what ships with it: the Staple
 | Agent-to-controller bypass | 24 | 1.6 % | Medium (11) |
 | None of the above | 205 | 13.3 % | |
 
-The shares add up to more than 100 % because 205 issues match two or more classes; the most common pair comes from the 169 titles that start with "CSRF vulnerability and missing permission check". The classes map to the developer guidance in the [plugin security documentation](https://www.jenkins.io/doc/developer/security/):
+The shares add up to more than 100 % because 205 issues match two or more classes. That this equals the 205 issues of the last row, which match no class, is a coincidence of the counts, not a copy error. The most common pair comes from the 169 titles that start with "CSRF vulnerability and missing permission check". The classes map to the developer guidance in the [plugin security documentation](https://www.jenkins.io/doc/developer/security/):
 
 - **Missing permission checks** are `doCheck*`, `doFill*Items` and `do*` web methods without `checkPermission` or `hasPermission`, reachable with Overall/Read. A frequent impact is enumerating credential IDs.
 - **CSRF** is a side-effecting method that accepts GET; the fix is `@POST` or `@RequirePOST`.
@@ -349,12 +373,14 @@ The shares add up to more than 100 % because 205 issues match two or more classe
 - **XSS** is unescaped output in Jelly views; the security team rates stored XSS High because of the Script Console.
 - **XXE** comes from a default XML parser reading workspace files, and can read `secrets/master.key`.
 
+The agent-to-controller class is mostly Medium because 19 of its 24 issues are bypasses in individual plugins, which the advisories rate from Low to High. The two Critical ones, SECURITY-2455 and SECURITY-3911, are in core.
+
 ### What these counts do not show
 
 - **They count published issues, not vulnerabilities.** A popular plugin that is audited often will have more advisories than an abandoned one that nobody reads, so the per-plugin counts measure scrutiny as much as quality.
-- **The yearly series is not a trend.** Among full years, issues per year range from 47 in 2024 to 299 in 2019, and two years, 2019 and 2022, carry 593 of them. Large batches of plugin issues published at once can produce such peaks; the files do not say why a batch was published when it was, and 2026 is counted only to 28 October.
 - **The severity is the Jenkins team's scoring.** Its conventions raise stored XSS, path traversal and, since 2024, file read to high impact on all three CVSS metrics, and score plain-text secrets in global configuration as requiring local access.
 - **The classifier reads titles only.** In a random sample of 40 titles read by hand, every assigned label matched the title and the two unlabelled titles belonged to none of the classes. That checks precision on a small sample, not how many issues a title describes too vaguely to classify.
+- **The yearly series is not a trend.** Among full years, issues per year range from 47 in 2024 to 299 in 2019, and two years, 2019 and 2022, carry 593 of them. Large batches of plugin issues published at once can produce such peaks; the files do not say why a batch was published when it was, and 2026 is counted only to 28 October.
 
 | Year | 2017 (8 Nov. only) | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to 28 Oct.) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -425,9 +451,9 @@ controller:
     ingressClassName: public-nginx
 ```
 
-Read against the earlier sections:
+Read against the earlier sections, the bullets below describe the full files, beyond the excerpt: the agent templates, the security realm, the credentials, the network policy and the `weekly.ci` and `release.ci` files are not shown above.
 
-- **Isolation.** Zero executors on the built-in node; Kubernetes agents run as pods in a separate namespace and connect over WebSocket, and ephemeral Azure VM agents are launched over SSH (with `executeInitScriptAsRoot: true`). Whether the inbound TCP agent port is closed depends on Helm chart defaults that the file does not set. The controller pod runs as a non-root user, and a Kubernetes network policy is enabled.
+- **Isolation.** Zero executors on the built-in node; Kubernetes agents run as pods in a separate namespace and connect over WebSocket, and ephemeral Azure VM agents are launched over SSH. Their `executeInitScriptAsRoot: true` applies to the VM's provisioning script, which sets up monitoring and Docker and ends by removing the cloud-init `sudoers` entry; the file does not say which user the agent process runs as. Whether the inbound TCP agent port is closed depends on Helm chart defaults that the file does not set. The controller pod runs as a non-root user, and a Kubernetes network policy is enabled.
 - **Authorization.** An LDAP realm, a global matrix with Overall/Administer only for two admin groups, and every other account limited to reading, building and viewing configuration.
 - **Browser side.** UI CSP is enforced, and user content is served from a separate `assets.` host.
 - **Groovy.** Two approved signatures in total, both on exception classes.
@@ -580,12 +606,13 @@ Writing `sh 'curl -H "Token: $TOKEN" ...'` passes `$TOKEN` through to the shell,
 
 **Q: CVE-2024-23897 was an arbitrary file read. Why did the Jenkins team rate it Critical, and which settings changed how far it could go?**
 
-The file read reached `secrets/`. With the binary keys recovered, an attacker can forge a resource root URL, a "Remember me" cookie for an administrator, or a CSRF crumb, and use the resulting access to reach the Script Console. The advisory lists the conditions for each route:
+It needs no account, reads the first lines of any file, and reads whole text files for anyone with Overall/Read; the file read also reached `secrets/`. With the binary keys recovered, which is realistic mainly when the controller reads files in a non-UTF-8 encoding such as Windows-1252, the advisory lists five routes to code execution:
 
-- every route: the binary keys must be readable, which is realistic mainly when the controller reads files in a non-UTF-8 encoding such as Windows-1252;
-- a resource root URL enabled;
-- "Remember me" enabled (the default), plus Overall/Read to read whole files;
-- crumbs that exclude the session ID.
+- a forged resource root URL, when that feature is enabled, for an attacker who knows the user name of an account with Overall/Read;
+- a forged resource root URL, when that feature is enabled, for an attacker who holds an API token;
+- a forged "Remember me" cookie for an administrator, when "Remember me" is enabled (the default), plus Overall/Read to read whole files;
+- a forged crumb, when crumbs exclude the session ID;
+- forged console notes that inject script into build logs, when the attacker controls build output.
 
 Overall/Read for `anonymous` turned the partial read (first lines) into a whole-file read for any visitor. Since this advisory, the team scores file-read vulnerabilities high on confidentiality, integrity and availability.
 
@@ -617,7 +644,7 @@ The points below were not settled by the sources read for this article.
 | The vulnerability classes come from keyword matching on titles, checked on a 40-title sample for precision only. | Class counts are approximate and recall is unmeasured. | Re-run [the classification script](https://github.com/rya-sge/access-denied/tree/main/verification/jenkins-security) with a larger manual sample, or classify descriptions. |
 | The meaning of disabling `jenkins.security.QueueItemAuthenticatorMonitor` on `infra.ci.jenkins.io` is inferred from the class name; the local documentation does not describe the monitor. | The reference-configuration section does not claim what the warning was about. | The class in [jenkinsci/jenkins](https://github.com/jenkinsci/jenkins) core. |
 | That the CasC `globalLibraries` key configures Global Trusted Pipeline Libraries (as opposed to untrusted ones) comes from general knowledge of the plugin, not from a document read. | The statement that push rights on `pipeline-library` equal administrator rights depends on it. | The [Pipeline: Groovy Libraries plugin](https://plugins.jenkins.io/pipeline-groovy-lib/) CasC reference. |
-| The `pipeline-library` retriever on `infra.ci` discovers `pull/*` refs and excludes `pull/` versions from caching, which suggests pull-request versions are loaded; whether a Pipeline can request `@Library('pipeline-library@pull/N/head')` (version override) and whether trusted status then applies was not checked. | If both hold, the exposure extends from users with push rights to pull-request authors whose ref is loaded. | The [Pipeline: Groovy Libraries plugin documentation](https://plugins.jenkins.io/pipeline-groovy-lib/) (`allowVersionOverride`, default) and `config/privatek8s-sponsored/infra.ci.jenkins.io.yaml` lines 656-678. |
+| The `pipeline-library` retriever on `infra.ci` discovers `pull/*` refs and excludes `pull/` versions from caching, which suggests pull-request versions are loaded; whether a Pipeline can request `@Library('pipeline-library@pull/N/head')` (version override) and whether trusted status then applies was not checked. | If both hold, the exposure extends from users with push rights to pull-request authors whose ref is loaded. | The [Pipeline: Groovy Libraries plugin documentation](https://plugins.jenkins.io/pipeline-groovy-lib/) (`allowVersionOverride`, default) and the `pipeline-library` retriever under `globalLibraries` in `config/privatek8s-sponsored/infra.ci.jenkins.io.yaml`. |
 | Advisories after 2026-10-28 are not included; the local documentation copy is dated 2026-11-17. | Version advice and counts age quickly. | The [Jenkins security advisories index](https://www.jenkins.io/security/advisories/). |
 | The mechanism by which CVE-2024-23897 file contents reach the attacker (command error output) is described generally; the advisory does not detail it. | The sequence diagram simplifies that step. | The [2024-01-24 advisory](https://www.jenkins.io/security/advisory/2024-01-24/) and the SonarSource write-up it credits. |
 
