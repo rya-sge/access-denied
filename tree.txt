@@ -1434,8 +1434,16 @@ _posts/2026-11-23-across-protocol-intent-bridge.md
 
 _posts/2026-11-23-lifi-bridge-aggregator-diamond.md
   assets/article/blockchain/defi/lifi/lifi-bridge-aggregator-diamond-mindmap.puml   (mindmap -> .png, cover image)
+_posts/2026-11-25-lifi-security-exploits-audits.md
+  assets/article/blockchain/defi/lifi/lifi-security-exploits-audits-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article (API-to-Executor sequence, swap-then-bridge flowchart, governance flowchart), no .puml
 
 _posts/2026-11-24-linux-swap-memory-reclaim.md
   assets/article/linux/swap/2026-11-24-linux-swap-memory-reclaim-mindmap.puml   (mindmap -> .png, cover image)
   in-section diagrams: inline Mermaid in the article (reclaim flowchart, OOM sequence), no .puml
+
+_posts/2026-11-25-kg-local-search-index-sqlite-fts5.md
+  assets/article/programmation/kg/2026-11-25-kg-local-search-index-mindmap.puml   (mindmap -> .png, cover image)
+  assets/article/programmation/kg/kg-architecture-concept.puml   (concept -> .png, asset only)
+  assets/article/programmation/kg/kg-index-update-workflow.puml   (workflow -> .png, asset only)
+  in-section diagrams: inline Mermaid in the article (module flowchart, incremental index flowchart), no .puml
