@@ -1,0 +1,32 @@
+@startuml
+title kg: modules and data
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+skinparam database {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+component cli
+component corpus
+component index
+component search
+component evaluate
+component mine
+database "index.sqlite" as db
+folder "resource files" as files
+cli --> corpus
+cli --> index
+cli --> search
+cli --> evaluate
+index --> corpus
+corpus --> files
+index --> db : the only writer
+search --> db : read-only
+search --> files : excerpts
+evaluate --> search
+mine --> files
+@enduml

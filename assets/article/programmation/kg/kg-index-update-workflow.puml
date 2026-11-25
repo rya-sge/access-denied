@@ -1,0 +1,27 @@
+@startuml
+title kg index: incremental update of one resource
+skinparam shadowing false
+skinparam activity {
+  BackgroundColor #EAF6F0
+  BorderColor #2E8B67
+}
+start
+if (git commit unchanged and tree clean?) then (yes)
+  :skip the resource;
+  stop
+endif
+:walk the files;
+repeat
+  if (size and mtime unchanged?) then (yes)
+    :keep indexed rows;
+  elseif (content hash unchanged?) then (yes)
+    :keep indexed rows;
+  else (no)
+    :re-chunk and replace rows;
+  endif
+repeat while (more files?)
+:remove rows of deleted files;
+:commit the resource in one transaction;
+:mark it indexed at its commit;
+stop
+@enduml

@@ -1,0 +1,48 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  node {
+    BackgroundColor #EAF6F0
+    LineColor #2E8B67
+  }
+  :depth(1) {
+    BackgroundColor #2E8B67
+    FontColor white
+  }
+}
+</style>
+* kg: local search index
+** Problem
+*** Many repositories, one agent
+*** 5 calls per lookup (p90 17)
+*** ripgrep: no ranking, noise
+** Corpus
+*** Resource units: submodule, scrape, folder
+*** 8 categories: weights and filters
+*** Size limit by kind of file
+*** Data files: name only
+*** Versioned docs collapse
+** Index
+*** SQLite FTS5, contentless
+*** Chunks: headings, 60-line windows
+*** Incremental: commit, mtime, hash
+*** One transaction per resource
+** Search
+*** Quoted terms, OR
+*** bm25 x category x name boost
+*** Collapse and excerpts from disk
+*** Text or JSON output
+** Evaluation
+*** 40 real questions, 20 held out
+*** kg 18 vs ripgrep 4 in top 5
+*** MRR 0.783 vs 0.110
+** Verification findings
+*** Readers wrote side files
+*** immutable reader unsafe
+*** bm25 drift: rebuild
+*** Vendored files leaked
+** Next
+*** symbol, source, map, context
+*** Line accuracy in code
+*** More questions
+@endmindmap
